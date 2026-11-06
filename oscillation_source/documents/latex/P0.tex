@@ -1,0 +1,199 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  10pt,
+  a4paper,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{setspace}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{Liberation Serif}
+  \setsansfont[]{Liberation Sans}
+  \setmonofont[]{DejaVu Sans Mono}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=22mm]{geometry}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+\usepackage[bidi=basic]{babel}
+\else
+\usepackage[bidi=default]{babel}
+\fi
+\babelprovide[main,import]{korean}
+\ifPDFTeX
+\else
+\babelfont{rm}[]{Liberation Serif}
+\fi
+% get rid of language-specific shorthands (see #6817):
+\let\LanguageShortHands\languageshorthands
+\def\languageshorthands#1{}
+\usepackage{xeCJK}
+\setCJKmainfont{Noto Serif CJK KR}
+\setCJKsansfont{Noto Sans CJK KR}
+\setCJKmonofont{Noto Sans Mono CJK KR}
+\xeCJKsetup{CJKspace=true}
+\usepackage{xurl}
+\usepackage{fvextra}
+\usepackage{fancyhdr}
+\AtBeginDocument{\DefineVerbatimEnvironment{verbatim}{Verbatim}{breaklines=true,breakanywhere=true,fontsize=\small}}
+\setlength{\emergencystretch}{4em}
+\setlength{\headheight}{15pt}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small 중성자별 구조와 비방사 진동}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\setcounter{tocdepth}{2}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={P0 · 내 소스를 그대로 독립 실행하기},
+  pdflang={ko-KR},
+  colorlinks=true,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\title{P0 · 내 소스를 그대로 독립 실행하기}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{과제 큐시트}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\setstretch{1.12}
+\textbf{선행:} A21　 \textbf{독립 작업:} 0.5--1시간 (계획치)
+
+\subsection{옮긴 것은 실행파일인가, 자신이 작성한
+계산인가?}\label{uxc62euxae34-uxac83uxc740-uxc2e4uxd589uxd30cuxc77cuxc778uxac00-uxc790uxc2e0uxc774-uxc791uxc131uxd55c-uxacc4uxc0b0uxc778uxac00}
+
+새 폴더에서 결과가 나왔다. 이전 binary를 사용한 것인지 소스로부터 만든
+것인지 어떻게 구별할지, 복사 전에 필요한 파일을 적자.
+
+먼저 한두 문장으로 답한 뒤 아래 설명을 읽자. 첫 예측이 틀렸거나 아직
+모르겠다고 적는 것은 감점하지 않는다.
+
+\subsection{필요한 관계와 읽을
+위치}\label{uxd544uxc694uxd55c-uxad00uxacc4uxc640-uxc77duxc744-uxc704uxce58}
+
+이 과제는 물리 방정식의 추가가 아니다. 동일한 소스와 공용 의존성을
+보존하고, 다른 위치에서 실제로 빌드·실행할 수 있는지 확인한다.
+
+\path|notes/chapters/ch11.md|, \path|tools/export_learner.py|,
+\path|tools/verify_export.py|, \path|tools/make_calculation.py|
+
+\subsection{계산으로
+옮기기}\label{uxacc4uxc0b0uxc73cuxb85c-uxc62euxae30uxae30}
+
+P1--P4의 자동 검사는 직접 구현한 learner의 독립 export 경로다. 제공
+계산만 사용하는 독자는 별도 계산 폴더에서 같은 소스·의존성·실행 설명을
+확인한다.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  직접 작성한 learner 경로와 제공 계산 경로 중 무엇을 옮길지 먼저
+  정한다.
+\item
+  P1--P4의 verify\_export 시험을 사용할 때는 export\_learner로
+  ../my\_solver를 만든다.
+\item
+  제공 계산은 make\_calculation으로 별도 ../my\_calculation에 만든다.
+  서로의 확인 도구를 혼용하지 않는다.
+\end{enumerate}
+
+\newpage
+
+\subsection{실행해서 무엇을 볼
+것인가}\label{uxc2e4uxd589uxd574uxc11c-uxbb34uxc5c7uxc744-uxbcfc-uxac83uxc778uxac00}
+
+첫 명령은 P1--P4의 learner 검사 경로다. 둘째 명령은 제공 계산을 별도로
+옮긴다. 목적지는 모두 새 폴더여야 한다.
+
+\begin{verbatim}
+python tools/export_learner.py --output ../my_solver
+\end{verbatim}
+
+\begin{verbatim}
+python tools/make_calculation.py --output ../my_calculation
+\end{verbatim}
+
+\subsection{결과를
+설명하기}\label{uxacb0uxacfcuxb97c-uxc124uxba85uxd558uxae30}
+
+제공 계산과 직접 작성한 learner는 서로 다른 출발점이다. 어느 쪽을
+옮겼는지 명시해야 자신의 성취와 재현 범위가 드러난다.
+
+\textbf{남길 증거.} 선택한 경로, 옮긴 소스 목록, 제공 함수와 직접 작성한
+함수의 구분
+
+\textbf{판단 기준.} 2점: 실제 소스 보존·의존성·실행 기록을 연결하고,
+계산하지 않은 물리 결과까지 검증했다고 말하지 않는다. 최초 예측의
+정오보다, 결과를 본 뒤 이유를 고치고 다른 입력에도 적용하는지를 본다.
+
+\subsection{막혔을 때}\label{uxb9c9uxd614uxc744-uxb54c}
+
+\textbf{힌트 1.} 먼저 출발한 폴더가 learner인지 calculation인지
+확인한다.
+
+\textbf{힌트 2.} SOURCE\_FILES.json과 CALCULATION.json은 같은 확인
+도구의 입력이 아니다.
+
+\subsection{다음 만남에 다시
+묻기}\label{uxb2e4uxc74c-uxb9ccuxb0a8uxc5d0-uxb2e4uxc2dc-uxbb3buxae30}
+
+다음 회차에는 원래 폴더 경로를 보지 않고 필요한 소스·입력·공용 함수가
+어디 있는지 설명한다. 먼저 짧게 답한 뒤 본문과 자신의 기록을 열어
+확인한다.
+
+\textbf{범위.} 소스 보존과 build 성공은 별 전체의 물리 검증과 다르다.
+작성하지 않은 함수는 새 폴더에서도 미완성이다.
+
+\end{document}

@@ -1,0 +1,319 @@
+ Quadrupolar f - and p1 -mode frequencies of joined neutron-star equations of state in
+                        the relativistic Cowling approximation
+                                            [Author name(s) to be supplied]
+                                                 (Dated: November 6, 2026)
+                We calculate the quadrupolar polar-fluid fundamental mode and first pressure overtone of 234
+             crust–core joined neutron-star equations of state (EOSs). The cohort is drawn from a 390-member
+             matching matrix containing 13 crust tables, three high-density core families, and six matching pre-
+             scriptions; the 156 cases independently classified as retaining source-core acausality are excluded.
+             Before stellar integration, we construct a separate solver-adapter representation by taking q(
+             muB ) = nB /
+             muB piecewise linear, integrating P ′ = nB =
+             muB q, and setting
+             epsilon =
+             muB nB − P . All 234 source q sequences are already nondecreasing, so weighted isotonic regres-
+             sion pools zero knots; the nontrivial operation is the between-knot closure and pressure/energy
+             re-integration. The original EOS tables are preserved separately. For each EOS we solve the
+                                                                                    N
+             TOV equations at a fixed gravitational mass M = 1.3300106263 M⊙          and locate the ℓ = 2 fluid
+             roots by two-sided matching in the relativistic Cowling approximation. Eigenfunction node counts,
+             rather than frequency ordering alone, identify the f and p1 modes. All 234 cases pass the node-
+             identity and matching checks. Across the three core families, the median frequencies are respectively
+             (f, p1 ) = (2.505, 7.008) kHz for BBB BHF2, (2.370, 6.718) kHz for RG SLY4, and (1.920, 6.009) kHz
+             for GM GM1. Tightening the ODE tolerances and step cap changes the frequencies of three represen-
+             tative models by at most 1.71 × 10−6 Hz between the loose and tight runs. These small integration
+             differences quantify numerical convergence within the adopted model; they do not quantify the
+             systematic error of the Cowling approximation or the uncertainty associated with the barotropic,
+             beta-equilibrated perturbation closure.
+
+
+                I.   INTRODUCTION                                the McDermott–Van Horn–Scholl relativistic Cowling
+                                                                 prescription, in which all Eulerian metric perturbations
+                                                                 are neglected (δgµν = 0) [5]. This is distinct from the
+   Fluid oscillations of neutron stars provide a connection
+                                                                 related Finn formulation, which retains part of the met-
+between the stellar bulk structure and the high-density
+                                                                 ric perturbation structure [2]. We apply the supplied
+equation of state. The fundamental fluid mode is pre-
+                                                                 Fortran implementation to a large set of joined Com-
+dominantly restored by the star’s global pressure and
+                                                                 pOSE barotropes. We focus on the reproducible numeri-
+gravitational stratification, whereas pressure overtones
+                                                                 cal spectrum of the stated model, not on a full-GR predic-
+are acoustic in character. Their frequencies therefore re-
+                                                                 tion. A necessary part of the calculation is to distinguish
+spond differently to the density dependence of the EOS.
+                                                                 three logically separate questions: whether the original
+A mode label must, however, be tied to the eigenfunction:
+                                                                 crust–core join passes its source-level gates, whether the
+in a smooth barotropic problem the f mode is nodeless,
+                                                                 EOS interpolant is a thermodynamically admissible func-
+while the first pressure overtone has one radial node in
+                                                                 tion between its tabulated knots, and whether an eigen-
+the relevant fluid displacement functions [1, 2].
+                                                                 frequency root has the node structure of the requested
+   The fully relativistic nonradial problem couples fluid        mode. The analysis preserves these distinctions.
+perturbations to metric perturbations and, for radiative
+modes, to an exterior gravitational-wave solution. The
+relativistic Cowling approximation fixes the background             II.   EOS COHORT AND THERMODYNAMIC
+metric and neglects its Eulerian perturbation. It is conse-                     REPRESENTATION
+quently appropriate for a controlled calculation of fluid-
+mode frequencies, but it does not produce gravitational-                          A.    Joined-table cohort
+wave damping times or spacetime w modes. Compar-
+isons with full general relativity show that the accuracy
+                                                                    The starting matching matrix contains
+is mode- and compactness-dependent; differences of or-
+der ten to several tens of percent can occur, particularly                       Nmatrix = 13 × 5 × 6 = 390              (1)
+for the f mode in less compact configurations [1, 3]. A re-
+cent analysis also emphasizes that the response of matter        candidate crust–core tables. An independent source au-
+during an oscillation need not coincide with the equilib-        dit classified 234 as passing the join-level consistency
+rium beta-equilibrated response used to construct a cold         gates and 156 as retaining source-core acausality. The
+barotropic EOS [4].                                              latter set comprises 78 APR APR and 78 RG KDE0v1
+   The perturbation equations implemented here follow            cases; it is not included in the oscillation calculation. No
+                                                                                                                               2
+
+clipping, causal continuation, or post hoc promotion of             nB is quadratic and P is exactly cubic there. The result-
+these source failures is performed here.                            ing P (µB ) is therefore represented exactly by a cubic-
+   The passing set consists of 13 crust tables joined               Hermite segment whose endpoint derivatives are the pro-
+to three core families, BBB BHF2, RG SLY4, and                      jected nodal densities.
+GM GM1, using six matching prescriptions labelled css,                 The construction also makes the stability and causality
+cubic F, cubic P, maxwell, quintic F, and quintic P.                conditions transparent:
+Thus each core family contributes 78 EOSs. The la-
+bels are inherited from the matching matrix. In particu-            dP                 dε      dnB             dP        q
+                                                                        = nB ,            = µB     ,         c2s ≡=             .
+lar, the suffix maxwell denotes the corresponding legacy            dµB               dµB      dµB             dε    q + µB q ′
+matching prescription in this matrix; it must not be                                                                       (8)
+read as an instruction to insert a sharp first-order phase          For q > 0 and q ′ ≥ 0, one has 0 < c2s ≤ 1. The
+boundary into the oscillation equations. The present stel-          q-linear stage is therefore not a physical EOS correc-
+lar backgrounds are treated as smooth one-dimensional               tion at the density knots. Its nontrivial action is the
+barotropes. No material-interface transfer condition or             choice of a continuous between-knot closure and the
+interface g-mode is included.                                       associated pressure re-integration: the maximum rela-
+                                                                    tive density change is 3.18 × 10−16 , while the maxi-
+                                                                    mum absolute pressure change is 1.2931 × 10−3 Pmax and
+          B.    Cold thermodynamic identity                         the maximum energy-density change relative to µB nB is
+                                                                    8.3590×10−4 . The original source-knot tables remain un-
+  The source CompOSE tables provide the cold beta-                  changed and are distributed separately from the adapter
+equilibrated barotrope on a discrete grid. In the con-              tables. The pressure reconstructed from the first-law in-
+ventions used by the normalizer, the thermodynamic                  tegral differs from the original pressure sequence by at
+columns give                                                        most 1.2931 × 10−3 Pmax ; the median of this maximum-
+                                                                    per-table measure is 5.0781 × 10−4 Pmax . The maximum
+P = nB Q1 ,      µB = mn (1+Q3 ),    ε = nB mn (1+Q7 ),             change in energy density, measured relative to µB nB , is
+                                                    (2)             8.3590 × 10−4 . All 234 projected EOS tables pass ev-
+where mn is the neutron rest energy in the source-table             ery native interpolation cell in the package audit. Both
+convention. The first-law identity                                  source-normalized and projected tables are retained in
+                                                                    the data release, so the projection is explicit and re-
+                       ε + P = µB nB                          (3)   versible at the file level.
+is checked at every source knot. For the 234 admitted
+tables the maximum relative residual of this identity is               III.    RELATIVISTIC COWLING PROBLEM
+below 2 × 10−12 .
+   A direct use of the original pressure knots with the
+                                                                                       A.    Background star
+package’s native cubic-Hermite P (µB ) interpolant did
+not pass the package’s cell-by-cell convexity and causal-
+ity audit. This is an interpolation-admissibility issue and           We use the static, spherically symmetric metric
+is kept separate from the earlier source-level acausality
+                                                                              ds2 = −e2ν(r) c2 dt2 + e2λ(r) dr2 + r2 dΩ2 ,    (9)
+classification. To construct a causal interpolant without
+materially altering the tabulated density branch, we de-            with signature (−, +, +, +) and
+fine
+                                 nB                                                                  2Gm(r)
+                        q(µB ) ≡    .                    (4)                            e−2λ = 1 −          .                (10)
+                                 µB                                                                    rc2
+
+The nodal q values are checked by a weighted isotonic               The TOV equations are
+regression. For this 234-EOS cohort every source qi se-                             dm         ε
+quence is already nondecreasing, so the regression pools                                = 4πr2 2 ,                           (11)
+                                                                                    dr         c
+zero knots and changes qi only at floating-point roundoff.                          dP             dν
+In each chemical-potential cell we take q(µB ) to be linear                             = −(ε + P ) ,                        (12)
+and set                                                                             dr            dr      
+                                                                                     dν    G m + 4πr3 P/c2
+        nB (µB ) = µB q(µB ),                                 (5)                       = 2 2                  .             (13)
+                                                                                     dr   c r [1 − 2Gm/(rc2 )]
+                                 Z µB
+         P (µB ) = P (µB,0 ) +           µ˜B q(µ˜B ) dµ˜B ,   (6)   The lapse is normalized by the Schwarzschild exterior
+                                  µB,0                              value at the adopted surface cutoff. The target gravita-
+          ε(µB ) = µB nB (µB ) − P (µB ).                     (7)   tional mass is
+
+The integration constant is anchored to the original pres-          M = 2.644606257493485 × 1030 kg = 1.3300106263 M⊙N
+                                                                                                                       ,
+sure at the first tabulated knot. Since q is linear in a cell,                                                     (14)
+                                                                                                                                                                                     3
+
+          N                                                                                          f mode                                                      p1 mode
+where M⊙     = (GM )N  ⊙ /G uses the IAU nominal solar                             2.5
+mass parameter (GM )N   ⊙ = 1.3271244 × 10
+                                            20
+                                               m3 s−2 and                                                                                       7.0
+                   −11   3  −1 −2                                                  2.4
+G = 6.67430 × 10       m kg s . Each EOS is assigned                                                                                            6.8
+
+
+
+
+                                                                 Frequency [kHz]
+
+
+
+
+                                                                                                                              Frequency [kHz]
+its own central-pressure bracket on the low-pressure,                              2.3
+                                                                                                                                                6.6
+increasing-mass branch; the mass is not obtained by ap-                            2.2
+plying one common central pressure to all EOSs.                                                                                                 6.4
+                                                                                   2.1
+   The integration ends at the lowest positive pressure                                                                                         6.2
+                                                                                   2.0
+tabulated in the EOS, not at P = 0. We therefore re-                                                                                            6.0
+                                                                                   1.9
+port radii and eigenfrequencies for a finite-pressure cut-                                      F2        Y4             M1                                HF2         Y4       M1
+                                                                                         BBB BH      RG SL          GM G                              BBB B       RG SL     GM G
+off model. The cutoff pressure is reached exactly by the
+pressure-coordinate integration. The difference between
+                                                                    FIG. 1. Distribution of the quadrupolar f - and p1 -mode fre-
+a finite-cutoff surface and an exact vacuum surface is a
+                                                                    quencies across the 78 EOSs in each core family. The spread
+model systematic not included in the ODE convergence                includes the 13 crust choices and six matching prescriptions.
+table.                                                              Frequencies are calculated in the relativistic Cowling approx-
+                                                                    imation.
+
+            B.      Polar fluid perturbations
+                                                                                                               C.    Mode identity
+
+  We adopt harmonic time dependence eiωt and a polar
+displacement                                                           A root is not labelled by frequency order alone. We
+                                                                    count radial zeros of both W and V in the interior solu-
+                W (r)                      V (r) a                  tion, using the package’s relative zero threshold. A valid
+    ξ r = e−λ         Yℓm ,       ξa = −        D Yℓm .   (15)      quadrupolar f mode must have (NW , NV ) = (0, 0) and a
+                 r2                         r2                      valid p1 mode must have (NW , NV ) = (1, 1). The corre-
+                                                                    sponding outer branch is separately checked to be node-
+With this convention [W ] = L3 and [V ] = L2 . In the rel-
+                                                                    less. This criterion is applied to all final models. An ini-
+ativistic Cowling approximation the metric perturbation
+                                                                    tial batch exposed 72 GM GM1 roots with three interior
+is set to zero. For ℓ = 2, the two first-order equations
+                                                                    nodes; these were treated as higher-overtone candidates
+used in the package are
+                                                                    and not retained as p1 . The first one-node pressure root
+                         ωr 2                                     was found by a wider residual scan and the 72 cases were
+                  Q=              eλ−2ν V + ν ′ W,        (16)      recomputed. The final 234-row set contains 234 nodeless
+                          c
+                                                                    f roots and 234 one-node p1 roots.
+                dW    Q
+                    =     − 6eλ V,                        (17)
+                 dr   χ
+                 dV            eλ                                                                               IV.       RESULTS
+                    = 2ν ′ V − 2 W,                       (18)
+                 dr            r
+                                                                                                     A.    Core-family dependence
+where χ = dP/dε is the barotropic compressibility of the
+projected EOS. The regular central solution satisfies
+                                                                       Table I summarizes the median and full range of the
+                                       A                            calculated frequencies and radii in each core family. Each
+    W = Ar3 + O(r5 ),             V = − r2 + O(r4 ).      (19)      group contains 78 EOSs and spans all 13 crust tables
+                                       2
+                                                                    and six matching prescriptions. The f and p1 frequen-
+We use the package’s second-order central expansion at              cies differ substantially between the core families at fixed
+r0 = 10 m.                                                          gravitational mass. The spread within a family is smaller
+  The Cowling surface condition is expressed in terms of            than the separation of the family medians for these three
+the Lagrangian pressure perturbation,                               representative high-density core sets.
+                                                                       The larger radii in the GM GM1 subset accompany
+                              (ε + P )e−λ                           its lower f - and p1 -mode frequencies in this fixed-mass
+                   ∆P = −                 Q.              (20)      comparison. This statement is descriptive for the selected
+                                   r2                               table cohort; it is not a universal relation and should not
+Because the model ends at a positive cutoff pressure,               be extrapolated to unrelated EOS families.
+the package’s normalized surface residual is retained as a
+diagnostic rather than interpreted as an exact vacuum-
+boundary condition. Frequencies are located by match-                                                 B.        Numerical validation
+ing independent inward and outward solutions at a fixed
+EOS-cell index. The normalized matching determinant                   The maximum absolute normalized matching residual
+is bisected in frequency.                                           over the 234 EOSs is 4.56 × 10−8 for the f mode and
+                                                                                                                                   4
+
+
+                                                                                     N
+TABLE I. Quadrupolar relativistic-Cowling frequencies and radii at M = 1.3300106263 M⊙ . Entries are the median followed
+by the full range across the 78 EOSs in each core family.
+Core family                      f mode [kHz]                              p1 mode [kHz]                           R⋆ [km]
+BBB BHF2                   2.5051 [2.4883, 2.5136]                     7.0083 [6.6076, 7.1823]            11.2684 [11.2653, 11.2738]
+RG SLY4                    2.3698 [2.3574, 2.3803]                     6.7177 [6.3471, 6.8906]            11.7706 [11.7670, 11.7745]
+GM GM1                     1.9202 [1.8893, 1.9401]                     6.0090 [5.6866, 6.0773]            13.8079 [13.7980, 13.8215]
+
+
+
+3.09 × 10−10 for the p1 mode. The maximum relative                       tion convergence measured here is many orders of magni-
+mass residual against the target mass is 9.92 × 10−13 .                  tude tighter than those approximation-level differences;
+The largest inward–outward matching-radius mismatch                      quoting many digits in the frequency table is useful for
+is 9.10 × 10−12 m and the largest relative matching-mass                 internal numerical comparisons, not a claim of compara-
+mismatch is 6.39 × 10−16 . The maximum absolute sur-                     ble physical accuracy.
+face residual is 2.78 × 10−17 for p1 ; the surface pressure                 A second limitation is the perturbative thermodynamic
+is reached with zero relative cutoff error at the stored                 closure. The equilibrium EOSs are cold beta-equilibrated
+precision. Every final mode satisfies the required node                  barotropes, and the perturbation equations use the same
+identity.                                                                equilibrium derivative χ = dP/dε. Weak reactions may
+   We also repeated three representative EOSs, one per                   be too slow to maintain beta equilibrium during an os-
+core family, with progressively tighter ODE tolerances                   cillation, in which case the relevant adiabatic response
+and smaller maximum step caps. The central pressure                      is closer to a frozen-composition derivative. The differ-
+was held fixed in this convergence experiment, so the                    ence between frozen and beta-equilibrated f and p modes
+mass changes shown in the calculation archive reflect                    has been studied explicitly for cold neutron-star matter
+integration convergence rather than a new mass-target                    [4]. The present results do not implement that frozen-
+solve. Table II reports the largest absolute difference be-              composition closure and should be treated as the beta-
+tween the loose and tight frequency results, as well as                  equilibrated barotropic Cowling spectrum.
+between the nominal and tight results.                                      The calculation also assumes a perfect fluid and spher-
+   The maximum nominal–tight differences are 1.11 ×                      ical, nonrotating background. Elastic crust shear, super-
+10−8 Hz for f and 4.98 × 10−8 Hz for p1 . These num-                     fluid counter-motion, magnetic stresses, rotational mode
+bers demonstrate convergence of the numerical integra-                   splitting, and sharp material-interface transfer conditions
+tion and root-finding procedures for the representative                  are absent. In particular, first-order phase transitions
+cases. They are not rigorous global error bounds for                     can introduce discontinuity-driven modes and require ex-
+all 234 EOSs and do not include interpolation systemat-                  plicit interface conditions; such modes are not repre-
+ics, finite surface-cutoff effects, uncertainty in the source            sented by the smooth one-dimensional tables used here
+EOS, or the error of the Cowling approximation.                          [6, 7]. The finite positive surface-pressure cutoff is an-
+                                                                         other controlled numerical approximation and must be
+                                                                         kept in mind when comparing the frequencies with cal-
+       V.   DISCUSSION AND LIMITATIONS                                   culations that integrate to a zero-pressure surface.
+                                                                            The thermodynamic reconstruction is a separate mod-
+   The results provide a systematic, node-identified                     eling step. It preserves the nodal density sequence to
+spectrum for a large set of smooth crust–core joined                     roundoff while reconstructing pressure and energy den-
+cold barotropes under one declared relativistic fluid-                   sity from the first law so that the package’s native cubic-
+oscillation model. They should not be interpreted as full                Hermite interpolant is stable and causal cell by cell. The
+general-relativistic mode frequencies. Neglecting met-                   raw normalized EOS tables and the derived projected
+ric perturbations changes the fluid-mode spectrum, and                   tables are both distributed. Consequently, downstream
+published comparisons show that the error depends on                     users can compare spectra based on the projected rep-
+mode type and stellar compactness [1, 3]. The integra-                   resentation with alternative thermodynamically consis-
+                                                                         tent interpolants without confusing the projection with
+                                                                         a change in the original nuclear-model labels.
+TABLE II. Frequency convergence for three representative
+EOSs at fixed central pressure. The reported differences are
+absolute loose–tight and nominal–tight changes.                                            VI.   CONCLUSIONS
+Core           |floose − ftight | [Hz]   |p1,loose − p1,tight | [Hz]
+BBB BHF2           9.35 × 10−8                 1.71 × 10−6                 We have calculated the quadrupolar polar-fluid f
+RG SLY4            6.64 × 10−8                 1.28 × 10−7               and first pressure p1 mode frequencies for 234 source-
+GM GM1             1.80 × 10−8                 3.67 × 10−7               audited crust–core joined EOSs at a common mass
+                                                                                            N
+                                                                         of 1.3300106263 M⊙   . The computation uses the rela-
+                                                                                                                       5
+
+tivistic Cowling approximation, a cold beta-equilibrated      nant interpretive limitations.
+barotropic closure, a finite positive surface-pressure cut-
+off, and two-sided matching in the package’s native EOS
+cells. A monotone-q(µB ) thermodynamic reconstruc-
+tion was required for all 234 joined tables to pass the                      ACKNOWLEDGMENTS
+package’s cellwise interpolation audit. Each final root
+passes the expected eigenfunction node identity, match-          The numerical calculations used the Fortran TOV and
+ing, mass, and surface diagnostics. The three core fami-      relativistic-Cowling implementation distributed in the
+lies show clearly separated median frequencies in this co-    supplied Neutron Star Oscillations Seminar pack-
+hort. The numerical convergence tests are substantially       age. The release archive records the input package check-
+tighter than the known model systematics of the Cowling       sum, source EOS provenance, projected EOS hashes,
+and barotropic approximations, which remain the domi-         solver settings, run manifests, and validation summaries.
+
+
+
+
+[1] K. D. Kokkotas, Pulsating relativistic stars (1996),          [nucl-th].
+    arXiv:gr-qc/9603024 [gr-qc].                              [5] P. N. McDermott, H. M. Van Horn, and J. F. Scholl, The
+[2] L. S. Finn, Monthly Notices of the Royal Astronomical         Astrophysical Journal 268, 837 (1983).
+    Society 232, 259 (1988).                                  [6] I. F. Ranea-Sandoval, O. M. Guilera, M. Mariani, and
+[3] S. Yoshida and Y. Kojima, Monthly Notices of the Royal        M. G. Orsaria, Journal of Cosmology and Astroparticle
+    Astronomical Society 289, 117 (1997).                         Physics 2018 (12), 031, arXiv:1807.02166 [astro-ph.HE].
+[4] G. Montefusco, M. Antonelli, and F. Gulminelli, Astron-   [7] L. Tonetto and G. Lugones, Physical Review D 101,
+    omy & Astrophysics 694, A150 (2025), arXiv:2410.08008         123029 (2020), arXiv:2003.01259 [astro-ph.HE].
+

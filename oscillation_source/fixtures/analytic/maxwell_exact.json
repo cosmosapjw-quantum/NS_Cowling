@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "fixture_id": "maxwell_exact",
+  "purpose": "Independent analytic oracle for a two-phase Gamma=2 Maxwell crossing in SI units.",
+  "gamma": 2.0,
+  "u_j": 1.5e-11,
+  "mu_t_j": 1.5e-10,
+  "p_t_pa": 1.0e33,
+  "n_low_m3": 6.666666666666667e43,
+  "n_high_m3": 1.3333333333333334e44,
+  "k_low_pa_m6": 2.25e-55,
+  "k_high_pa_m6": 5.625e-56,
+  "c_low_j": 1.2e-10,
+  "c_high_j": 1.35e-10,
+  "energy_low_j_m3": 9.0e33,
+  "energy_high_j_m3": 1.9e34,
+  "delta_n_m3": 6.666666666666667e43,
+  "delta_energy_j_m3": 1.0e34,
+  "mu_bracket_j": [1.46e-10, 1.54e-10],
+  "domain_n_m3": [1.0e43, 3.0e44],
+  "derivation": {
+    "definitions": [
+      "P_i(n)=K_i n^2",
+      "epsilon_i(n)=C_i n + P_i(n)",
+      "mu_i(n)=C_i+2 K_i n",
+      "P_i(mu)=(mu-C_i)^2/(4 K_i)"
+    ],
+    "construction": [
+      "n_low=P_t/u",
+      "n_high=2 P_t/u",
+      "K_i=P_t/n_i^2",
+      "C_i=mu_t-2 P_t/n_i"
+    ],
+    "delta_e_identity": "Delta epsilon = mu_t Delta n",
+    "scope": "analytic teaching fixture; not a calibrated microscopic neutron-star phase transition"
+  }
+}

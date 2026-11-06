@@ -1,0 +1,55 @@
+{
+  "purpose": "본문 EOS 구간 계산과 양방향 경계값 방법",
+  "files": [
+    {
+      "file": "methods/src/eos/ns_cell_eos.f90",
+      "sha256": "714b83deb06d6ecbbd84e0e7d999e6fb0ce0967f0c01eb1cb530d3157b89d02c"
+    },
+    {
+      "file": "calculation/src/models/ns_controlled_table_variant.f90",
+      "sha256": "d0b5bfdb96d811d0071bb76d69a6b50fdf86dc7aa418e0134ee05e989bb17586"
+    },
+    {
+      "file": "calculation/src/adapters/ns_cell_shooting.f90",
+      "sha256": "0d728b5e0d832b8d00e5c9c4588506545c5da6173a9fbc9bfa769fb21b61c92b"
+    },
+    {
+      "file": "calculation/app/cell_solve.f90",
+      "sha256": "f1973852fe1e470e8aa8f99888d6b7f883e59999c5e6cacbd197b2e58d0d5bd9"
+    },
+    {
+      "file": "calculation/tests_fortran/cell_checks.f90",
+      "sha256": "ece7718a07322a53fa9860225e3d455963767c60beabe09b3710ea0ce65dfb46"
+    }
+  ],
+  "student_responsibility": [
+    "한 함수의 EOS 값·미분·역함수와 유효구간을 설명한다.",
+    "TOV·Cowling 우변과 중심·표면의 물리조건을 검산한다.",
+    "제공 방법을 호출하고 절대·paired 수렴과 mode identity를 확인한다.",
+    "직접 구현을 선택한 경우에만 자신의 물리 함수를 명시적으로 연결한다."
+  ],
+  "record_extension": "table_eos_t has allocatable cells(:); no learner equation is completed by this declaration.",
+  "no_solution_fallback": true,
+  "direct_exercise_adapters": [
+    {
+      "file": "src/eos/ns_cell_eos.f90",
+      "sha256": "714b83deb06d6ecbbd84e0e7d999e6fb0ce0967f0c01eb1cb530d3157b89d02c"
+    },
+    {
+      "file": "src/eos/ns_controlled_table_variant.f90",
+      "sha256": "d0b5bfdb96d811d0071bb76d69a6b50fdf86dc7aa418e0134ee05e989bb17586"
+    },
+    {
+      "file": "src/modes/ns_cell_shooting.f90",
+      "sha256": "0d728b5e0d832b8d00e5c9c4588506545c5da6173a9fbc9bfa769fb21b61c92b"
+    },
+    {
+      "file": "app/cell_solve.f90",
+      "sha256": "3fc920f16eadf80c5a2539fd13a66700baec918a9b4cef5fde7e7c9eaf44a611"
+    },
+    {
+      "file": "tests_fortran/cell_checks.f90",
+      "sha256": "ece7718a07322a53fa9860225e3d455963767c60beabe09b3710ea0ce65dfb46"
+    }
+  ]
+}

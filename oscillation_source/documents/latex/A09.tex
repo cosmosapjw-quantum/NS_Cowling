@@ -1,0 +1,213 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  10pt,
+  a4paper,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{setspace}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{Liberation Serif}
+  \setsansfont[]{Liberation Sans}
+  \setmonofont[]{DejaVu Sans Mono}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=22mm]{geometry}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+\usepackage[bidi=basic]{babel}
+\else
+\usepackage[bidi=default]{babel}
+\fi
+\babelprovide[main,import]{korean}
+\ifPDFTeX
+\else
+\babelfont{rm}[]{Liberation Serif}
+\fi
+% get rid of language-specific shorthands (see #6817):
+\let\LanguageShortHands\languageshorthands
+\def\languageshorthands#1{}
+\usepackage{xeCJK}
+\setCJKmainfont{Noto Serif CJK KR}
+\setCJKsansfont{Noto Sans CJK KR}
+\setCJKmonofont{Noto Sans Mono CJK KR}
+\xeCJKsetup{CJKspace=true}
+\usepackage{xurl}
+\usepackage{fvextra}
+\usepackage{fancyhdr}
+\AtBeginDocument{\DefineVerbatimEnvironment{verbatim}{Verbatim}{breaklines=true,breakanywhere=true,fontsize=\small}}
+\setlength{\emergencystretch}{4em}
+\setlength{\headheight}{15pt}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small 중성자별 구조와 비방사 진동}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\setcounter{tocdepth}{2}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={A09 · Cowling single-shot와 표면 잔차},
+  pdflang={ko-KR},
+  colorlinks=true,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\title{A09 · Cowling single-shot와 표면 잔차}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{과제 큐시트}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\setstretch{1.12}
+\textbf{선행:} A06, A08　 \textbf{독립 작업:} 7--12시간 (계획치)
+
+\subsection{한 번 끝까지 적분한 해는 이미 진동
+모드인가?}\label{uxd55c-uxbc88-uxb05duxae4cuxc9c0-uxc801uxbd84uxd55c-uxd574uxb294-uxc774uxbbf8-uxc9c4uxb3d9-uxbaa8uxb4dcuxc778uxac00}
+
+유체 요소를 옮겼을 때 원래 위치에서 본 압력 변화와 요소를 따라간 압력
+변화는 같을까? 표면에서 0으로 두어야 할 쪽을 먼저 말하자.
+
+먼저 한두 문장으로 답한 뒤 아래 설명을 읽자. 첫 예측이 틀렸거나 아직
+모르겠다고 적는 것은 감점하지 않는다.
+
+\subsection{필요한 관계와 읽을
+위치}\label{uxd544uxc694uxd55c-uxad00uxacc4uxc640-uxc77duxc744-uxc704uxce58}
+
+\[
+\begin{aligned}
+Q&=(\omega/c)^2r^2e^{\lambda-2\nu}V+\nu'W,\\
+W'&=Q/\chi-\ell(\ell+1)e^\lambda V,\\
+V'&=2\nu'V-e^\lambda W/r^2,\\
+\Delta P&=-(\epsilon+P)e^{-\lambda}Q/r^2.
+\end{aligned}
+\]
+
+\begin{itemize}
+\tightlist
+\item
+  \path|notes/chapters/ch05.md|
+\item
+  \path|notes/equations/cowling.md|
+\item
+  \path|learner/src/modes/ns_cowling.f90|
+\item
+  \path|learner/src/modes/ns_center_state.f90|
+\item
+  \path|learner/src/modes/ns_surface_residual.f90|
+\end{itemize}
+
+\subsection{계산으로
+옮기기}\label{uxacc4uxc0b0uxc73cuxb85c-uxc62euxae30uxae30}
+
+TOV 경험자는 제5장의 유도와 한 점 검산부터 시작한다. 중심·우변·표면
+함수를 직접 작성할 수 있지만, 적응 적분과 양방향 연결은 제공 방법을
+사용한다.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  제5장의 풀이를 따라 W,V의 차원과 중심 정칙해를 확인한다.
+\item
+  한 배경점 우변을 손계산하고 calculation의 출력 또는 자신의 물리 함수와
+  대조한다.
+\item
+  한 trial에서 잔차의 진폭·방향 변환을 확인한다. 제공 양방향 matching은
+  다시 구현하지 않는다.
+\end{enumerate}
+
+\newpage
+
+\subsection{실행해서 무엇을 볼
+것인가}\label{uxc2e4uxd589uxd574uxc11c-uxbb34uxc5c7uxc744-uxbcfc-uxac83uxc778uxac00}
+
+패키지 루트에서 실행한다. \texttt{-\/-plan}은 경로만 확인하며 계산
+성공을 뜻하지 않는다.
+
+\begin{verbatim}
+python tools/run_assignment.py A09 --plan
+python tools/run_assignment.py A09 --run \
+  --workspace learner --output ../A09_result.json
+\end{verbatim}
+
+\subsection{결과를
+설명하기}\label{uxacb0uxacfcuxb97c-uxc124uxba85uxd558uxae30}
+
+표면조건의 주체는 움직이는 유체 요소다. 한 점의 우변, 중심의 정칙성, 한
+trial의 잔차를 확인해도 고유값 탐색과 모드 식별은 아직 남는다.
+
+\textbf{남길 증거.} 차원표와 point RHS; 한 trial의 W,V profile; 잔차
+진폭 불변성과 이번 값이 아직 고유모드가 아닌 이유; 같은 표면조건을
+만족하는 양방향 시작 벡터와 matching 조건의 설명
+
+\textbf{판단 기준.} 2점 예: 경계 잔차가 작아도 mode identification은
+별도라는 점을 실행 상태와 연결한다. 최초 예측의 정오보다, 결과를 본 뒤
+이유를 고치고 다른 입력에도 적용하는지를 본다.
+
+\subsection{막혔을 때}\label{uxb9c9uxd614uxc744-uxb54c}
+
+\textbf{힌트 1.} Q 각 항의 차원을 먼저 확인하고 부호는 별도 점검한다.
+
+\textbf{힌트 2.} 양의 진폭 배율에서는 잔차가 유지되고 전체 부호
+반전에서는 잔차 부호만 바뀌어야 한다.
+
+\subsection{다음 만남에 다시
+묻기}\label{uxb2e4uxc74c-uxb9ccuxb0a8uxc5d0-uxb2e4uxc2dc-uxbb3buxae30}
+
+다음 회차에는 lapse에 상수를 더한 경우 주파수를 어떻게 바꿔야 같은 항을
+얻는지 설명한다. 차원 검사만으로 찾지 못하는 오류도 하나 든다. 먼저 짧게
+답한 뒤 본문과 자신의 기록을 열어 확인한다.
+
+\textbf{범위.} 단일 trial 성공은 mode identity나 spectral completeness가
+아니다. 평형 barotropic χ는 frozen composition을 포함하지 않는다.
+
+\end{document}

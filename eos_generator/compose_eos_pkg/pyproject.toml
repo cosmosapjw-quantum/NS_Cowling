@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "compose_eos"
+version = "3.3.0"
+description = "Parse, check, reconstruct and plot cold CompOSE equation-of-state tables"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "EOS consistency audit" }]
+dependencies = [
+    "numpy>=1.20",
+    "scipy>=1.7",
+    "matplotlib>=3.4",
+]
+
+[project.scripts]
+compose-eos = "compose_eos.cli:main"
+compose-tov-audit = "compose_eos.tov_cli:main"
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[tool.setuptools.packages.find]
+include = ["compose_eos*"]
+

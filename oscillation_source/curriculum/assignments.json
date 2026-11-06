@@ -1,0 +1,1368 @@
+{
+  "assignments": [
+    {
+      "id": "A00",
+      "title": "실행환경과 입력의 의미",
+      "stage": "ch01",
+      "prerequisites": [],
+      "independent_hours": [
+        0.5,
+        1
+      ],
+      "source_paths": [
+        "START_HERE.md",
+        "support/fpm.toml",
+        "learner/fpm.toml"
+      ],
+      "tests": [
+        "tests/test_student_environment.py::test_selected_learner_environment"
+      ],
+      "objective": "자신의 소스에서 만든 실행파일과 실제 입력을 연결하고 빌드·수치·물리 검증을 구별한다.",
+      "derivation": "이 과제의 probe는 무차원이다. $\\mathrm{workspace}=\\mathrm{learner}$는 실행 경로의 이름이며 물리 정확도에 대한 진술이 아니다.",
+      "procedure": [
+        "새 디렉터리에서 입력 파일과 실제 실행할 소스를 확인한다.",
+        "run_assignment의 --plan으로 시험 경로를 읽고, --run으로 environment case를 실행한다.",
+        "입력의 실수·정수·문자열을 바꾸고 실제 전달된 값과 반환 상태를 비교한다."
+      ],
+      "deliverables": [
+        "도구 판본과 첫 명령 출력",
+        "빌드 성공이 아직 증명하지 않은 것 두 가지"
+      ],
+      "interpretation": "오류에 compiler나 파일 누락이 보이면 학습 슬롯의 미구현과 분리한다.",
+      "hint1": "최초 실패 지점이 Python import, manifest 읽기, compiler, Fortran 상태 중 어디인지 찾는다.",
+      "hint2": "상수·별 계산을 호출하기 전에 environment의 입력 문자열과 workspace부터 확인한다.",
+      "transfer": "공백이 있는 새 디렉터리에서 같은 source를 빌드한다. 성공했어도 OS 접근격리로 부르지 않는다.",
+      "limits": "Linux x86_64에서 확인한 판본만 지원 증거가 있다. 다른 플랫폼 및 실측 학생 효과는 미검증이다.",
+      "rubric_anchor": "2점 예: manifest→source→binary→input의 연결과, 이것이 방정식 검증을 대신하지 않는 이유를 함께 설명한다.",
+      "cue_source": "curriculum/cues/A00.md",
+      "commands": [],
+      "learning_prompt": {
+        "question": "프로그램이 끝났다면, 우리는 무엇을 확인한 것일까?",
+        "prediction": "아직 별을 계산하지 않았다. 입력한 실수·정수·문자열이 되돌아왔다는 사실로 확인할 수 있는 것 하나와 확인할 수 없는 것 하나를 먼저 적자.",
+        "feedback": "입력 전달과 실행 대상을 구별했다면 충분하다. 이 시험에서 질량이나 모드의 정확성을 근거로 들었다면, 아직 계산하지 않은 양을 찾아 설명에서 빼자.",
+        "delayed_transfer": "다음 만남에는 로그의 성공 문구를 가리고, 어떤 소스를 어떤 입력으로 실행했는지 파일만 보고 복원한다."
+      }
+    },
+    {
+      "id": "A01",
+      "title": "단위·밀도·주파수의 경계",
+      "stage": "ch02",
+      "prerequisites": [
+        "A00"
+      ],
+      "independent_hours": [
+        1,
+        2
+      ],
+      "source_paths": [
+        "notes/chapters/ch02_units.md",
+        "notes/equations/conventions.md",
+        "notes/chapters/ch02_units.md"
+      ],
+      "tests": [
+        "tests/test_units.py::test_independent_density_conversion",
+        "tests/test_units.py::test_rho0_and_rho_energy_are_not_interchangeable"
+      ],
+      "objective": "압력과 에너지밀도, 정지질량밀도와 총에너지 대응 밀도, Hz와 rad/s를 정의에서 구별한다.",
+      "derivation": "$1\\,\\mathrm{MeV\\,fm^{-3}}=1.602176634\\times10^{32}\\,\\mathrm{J\\,m^{-3}}$, $\\rho_0=m_b n$, $\\rho_E=\\epsilon/c^2$, $f=\\omega/(2\\pi)$.",
+      "procedure": [
+        "환산의 분모 fm 세 개를 손으로 전개한다.",
+        "제공 단위 모듈을 사용하여 기준값과 왕복을 각각 검사한다.",
+        "같은 잘못된 계수를 쓴 순·역변환이 왕복을 통과하는 반례를 만든다.",
+        "내부에너지가 있는 상태에서 두 질량밀도의 차이를 해석한다."
+      ],
+      "deliverables": [
+        "환산 유도와 차원표",
+        "독립 기준값과 왕복 결과",
+        "2π 누락을 차원만으로 찾을 수 없는 이유"
+      ],
+      "interpretation": "단위 제공 모듈은 완성되어 있으므로 이 과제의 기본 검사는 starter에서도 성공해야 한다.",
+      "hint1": "변환 전 이름과 단위를 열 제목에 함께 적는다.",
+      "hint2": "왕복과 독립 anchor를 다른 주장으로 기록한다.",
+      "transfer": "새 n과 내부에너지에서 rho0와 rhoE를 계산하고 관계를 설명한다.",
+      "limits": "단위시험은 EOS의 물리성이나 별의 질량을 검증하지 않는다.",
+      "rubric_anchor": "2점 예: 왕복만 맞는 틀린 환산을 제시하고 독립 anchor가 이를 배제함을 정량적으로 보여준다.",
+      "cue_source": "curriculum/cues/A01.md",
+      "commands": [],
+      "learning_prompt": {
+        "question": "왕복 변환이 맞으면 단위도 맞은 것일까?",
+        "prediction": "순변환의 계수를 잘못 정하고 역변환에 그 역수를 썼다고 하자. 왕복 시험과 독립 기준값 시험 중 어느 쪽이 이 오류를 찾을지 먼저 선택하자.",
+        "feedback": "왕복 성공은 두 연산의 일관성이다. 올바른 물리 단위인지는 정의에서 구한 한 값으로 따로 확인해야 한다. 두 밀도와 두 주파수의 이름도 이때 구별한다.",
+        "delayed_transfer": "다음 회차에는 환산표를 덮고 분모의 fm 세 개만 다시 전개한다. 그 뒤 표를 열어 지수와 단위를 고친다."
+      }
+    },
+    {
+      "id": "A02",
+      "title": "이분법과 실패를 보존하는 근 찾기",
+      "stage": "ch02",
+      "prerequisites": [
+        "A01"
+      ],
+      "independent_hours": [
+        3,
+        5
+      ],
+      "source_paths": [
+        "notes/chapters/ch02_numerics.md",
+        "learner/src/numerics/ns_bisection.f90"
+      ],
+      "tests": [
+        "tests/test_roots.py::test_root_sqrt2_first_success"
+      ],
+      "objective": "연속성 및 부호 bracket의 불변량을 구현하고 x 오차·F 잔차·정체를 구별한다.",
+      "derivation": "$F(a)F(b)<0$는 연속성 가정 아래에서 근 존재의 충분조건이다. 실제 부호 비교는 곱셈 없이 한다. $b_k-a_k=(b_0-a_0)2^{-k}$.",
+      "procedure": [
+        "풀이에서 bracket의 연속성 전제와 갱신할 절반을 확인한다.",
+        "제공 근 찾기를 호출하고 정상 근·끝점 근·실패 상태를 비교한다.",
+        "함수의 배율을 바꿔 잔차 조건과 좌표 조건을 따로 읽는다. 직접 구현은 같은 시험을 사용하는 선택 경로다."
+      ],
+      "deliverables": [
+        "bracket 폭과 반복 횟수 표",
+        "성공 사례와 실패 상태 한 개",
+        "함수 스케일 변화의 해석"
+      ],
+      "interpretation": "작은 함수값을 정확한 근 좌표와 동일시하지 않는다.",
+      "hint1": "매 반복마다 유지되어야 하는 조건을 assert 대신 종이에 먼저 적는다.",
+      "hint2": "아주 큰 반대 부호 끝점에서 중점식의 overflow 가능성을 검사한다.",
+      "transfer": "새 선형함수 또는 3차함수로 옮겨 같은 종료 논리를 검증한다.",
+      "limits": "pole 및 discontinuity에서는 부호변화만으로 근을 주장할 수 없다.",
+      "rubric_anchor": "2점 예: F 스케일은 root를 바꾸지 않지만 residual stopping은 달라짐을 실행으로 설명한다.",
+      "cue_source": "curriculum/cues/A02.md",
+      "commands": [],
+      "learning_prompt": {
+        "question": "작은 잔차는 근에 가까워졌다는 뜻일까?",
+        "prediction": "같은 함수 전체를 작은 양의 상수로 곱한다. 근의 위치, 잔차의 크기, 이분법의 구간 폭 중 무엇이 변하는지 계산 전에 나누어 적자.",
+        "feedback": "근은 함수의 전체 배율에 무관하다. 잔차와 좌표 오차를 같은 조건으로 취급했다면, 어느 종료 기준을 썼는지 먼저 찾아 비교하자.",
+        "delayed_transfer": "다음 회차에는 연속인 삼차함수와 pole을 가진 함수에서 같은 부호 반전이 무엇을 뜻하는지 설명한다. 함수값을 보기 전에 필요한 전제를 말한다."
+      }
+    },
+    {
+      "id": "A03",
+      "title": "Euler와 RK4: 단계와 전역 오차",
+      "stage": "ch02",
+      "prerequisites": [
+        "A02"
+      ],
+      "independent_hours": [
+        3,
+        5
+      ],
+      "source_paths": [
+        "notes/chapters/ch02_numerics.md",
+        "learner/src/numerics/ns_rk4.f90",
+        "tools/numerics_demo.py"
+      ],
+      "tests": [
+        "tests/test_ode.py::test_rk4_first_success",
+        "tests/test_ode.py::test_nonautonomous_polynomial"
+      ],
+      "objective": "단계 위치·가중치를 구현하고 해석해에 대한 차수와 위상 오차를 측정한다.",
+      "derivation": "$y_{n+1}=y_n+h(k_1+2k_2+2k_3+k_4)/6$. 매끄럽고 안정한 유한 구간에서 Euler와 RK4 전역 오차는 각각 $O(h)$, $O(h^4)$이다.",
+      "procedure": [
+        "해석해를 기준으로 Euler·RK4의 한 단계를 손으로 확인한다.",
+        "제공 방법 또는 자신이 작성한 함수를 사용하여 N=16,32,64에서 오차를 비교한다.",
+        "비자율 문제와 조화진동자에서 좌표 전달·진폭·위상 오차를 분리한다."
+      ],
+      "deliverables": [
+        "단계표·수렴 표 또는 그림",
+        "비자율 방정식 검사",
+        "RK4가 에너지를 정확히 보존하지 않는 이유"
+      ],
+      "interpretation": "자율방정식 하나만 통과하면 잘못된 중간 좌표를 놓칠 수 있다.",
+      "hint1": "k에는 h가 포함되는지 API 정의를 확인한다.",
+      "hint2": "y′=x³를 사용하면 단계의 x 인수를 값 계산과 독립적으로 확인할 수 있다.",
+      "transfer": "적분 구간을 바꾸고 예상 차수가 언제 roundoff에 의해 흐려지는지 설명한다.",
+      "limits": "차수는 안정성이나 임의 step 크기의 정확도를 보증하지 않는다.",
+      "rubric_anchor": "2점 예: 세 해상도 값과 오차비를 제시하며 이 비를 엄밀한 전역오차 상한으로 부르지 않는다.",
+      "cue_source": "curriculum/cues/A03.md",
+      "commands": [],
+      "learning_prompt": {
+        "question": "적분값 하나가 맞았는데도 왜 다른 예제를 푸는가?",
+        "prediction": "우변이 상태에만 의존하는 예제에서는 중간 좌표를 잘못 전달해도 오류가 드러나지 않을 수 있다. 좌표 자체가 우변에 들어가는 예제가 필요한 이유를 먼저 적자.",
+        "feedback": "오차표에서는 단계 수를 바꾼 비율과 오차가 더 이상 줄지 않는 구간을 구별한다. 조화진동자는 진폭뿐 아니라 위상도 비교해야 한다.",
+        "delayed_transfer": "다음 회차에는 처음 보지 않은 적분 구간을 정하고 어떤 해석해를 기준으로 삼을지 스스로 고른다. 차수 이름만 답하지 않는다."
+      }
+    },
+    {
+      "id": "A04",
+      "title": "Adaptive error control과 rollback",
+      "stage": "ch02",
+      "prerequisites": [
+        "A03"
+      ],
+      "independent_hours": [
+        5,
+        8
+      ],
+      "source_paths": [
+        "learner/src/numerics/ns_adaptive_rk.f90",
+        "notes/chapters/ch02_numerics.md",
+        "methods/src/numerics/ns_adaptive_rk.f90"
+      ],
+      "tests": [
+        "tests/test_ode.py::test_adaptive_first_success",
+        "tests/test_ode.py::test_rejection_keeps_state_and_profile",
+        "tests/test_ode.py::test_endpoint_clipped_not_overshot"
+      ],
+      "objective": "제공된 적응 적분기를 호출하고 성분별 오차, 수락·거절과 종료 상태를 해석한다. 내부 controller 구현은 선택 연습이다.",
+      "derivation": "$s_i=a_i+r\\max(|y_i^{old}|,|y_i^{(5)}|)$, $E=\\max_i|e_i|/s_i$. $E\\le1$일 때만 상태를 수락한다. 기본 배율은 $\\operatorname{clip}(0.9E^{-1/5},0.2,5)$이다.",
+      "procedure": [
+        "제공 options에서 성분별 절대오차의 단위와 상대오차를 읽는다.",
+        "trace의 거절 행 다음에서 마지막 수락 좌표·상태가 유지되는지 확인한다.",
+        "종료 이유와 마지막 수락 지점을 해석한다. Controller를 다시 작성하는 것은 선택 연습이다."
+      ],
+      "deliverables": [
+        "거절 전후 trace와 accepted profile",
+        "크기가 다른 두 성분의 norm 검사",
+        "세 허용오차의 전역오차 비교"
+      ],
+      "interpretation": "기본 계산은 methods의 적분기를 사용한다. 이 과제의 learner 시험은 controller를 직접 구현하는 선택 경로를 검사하며, 기본 별 계산의 선행조건이 아니다.",
+      "hint1": "거절 때 갱신해도 되는 것은 다음 trial step과 진단 count뿐이다.",
+      "hint2": "초기 h를 크게 하여 거절을 유도하고 y_initial과 첫 accepted state 사이의 경로를 조사한다.",
+      "transfer": "새로운 비자율 문제와 backward integration에서 끝점·rollback을 설명한다.",
+      "limits": "제공 단계표는 원전 DOPRI5의 dense output·FSAL·강성 탐지를 전부 구현한 것이 아니다.",
+      "rubric_anchor": "2점 예: 거절된 상태가 profile에 없음을 실제 trace로 보여주고 전체 오차와 local error를 구별한다.",
+      "cue_source": "curriculum/cues/A04.md",
+      "commands": [],
+      "learning_prompt": {
+        "question": "거절한 단계는 어디로 돌아가는가?",
+        "prediction": "큰 trial step이 거절되었다고 하자. 좌표, 상태벡터, 저장된 profile 중 무엇을 유지해야 하는지 trace를 열기 전에 표시하자.",
+        "feedback": "수락된 상태에서 다시 출발해야 한다. 끝 좌표에 도착했다는 기록만 있고 그곳까지 적분하지 않았다면 성공이 아니다. Controller의 내부 구현은 이번 필수 수행이 아니다.",
+        "delayed_transfer": "다음 회차에는 크기가 다른 두 성분의 허용오차를 설명한다. 작은 성분을 무시할 위험과 성분별 절대오차의 단위를 먼저 확인한다."
+      }
+    },
+    {
+      "id": "A05",
+      "title": "압력식을 열역학적 EOS로 완결하기",
+      "stage": "ch03",
+      "prerequisites": [
+        "A04"
+      ],
+      "independent_hours": [
+        4,
+        7
+      ],
+      "source_paths": [
+        "notes/chapters/ch03_eos.md",
+        "notes/equations/eos.md",
+        "learner/src/eos/ns_polytrope.f90"
+      ],
+      "tests": [
+        "tests/test_polytrope.py::test_polytrope_thermodynamics"
+      ],
+      "objective": "P(n), ε(n), μ(n), χ(n), 역함수를 하나의 cold thermodynamics에서 얻는다.",
+      "derivation": "$$\n\\epsilon=Cn+\\frac{P}{\\Gamma-1},\\qquad\n\\mu=C+\\frac{\\Gamma P}{(\\Gamma-1)n},\\qquad\n\\chi=\\frac{\\Gamma P}{\\epsilon+P}.\n$$\n같은 압력식에서 에너지와 두 도함수를 얻는다.",
+      "procedure": [
+        "압력 적분의 선형 에너지 상수 C를 유도한다.",
+        "anchor ratio를 사용해 큰 SI 수밀도에서 중간 overflow를 피한다.",
+        "n→P→n과 n→μ→n을 검사한다.",
+        "에너지의 중앙차분 및 압력 적분으로 열역학을 대조한다."
+      ],
+      "deliverables": [
+        "유도와 domain 조건",
+        "세 차분 간격의 μ 비교",
+        "C 변화에 대한 P,ε,μ,χ 표"
+      ],
+      "interpretation": "같은 압력곡선이라도 energy zero 선택은 중력과 압축응답에 영향을 준다.",
+      "hint1": "epsilon에 baryon rest energy가 포함되는지 먼저 고정한다.",
+      "hint2": "Γ>2의 높은 밀도 극한 χ→Γ−1을 사용해 무제한 extrapolation의 위험을 찾는다.",
+      "transfer": "다른 Γ와 양의 C를 선택해 유한 causal interval을 선언한다.",
+      "limits": "폴리트로프는 핵물질 fit이 아니며 EOS 성공은 별 계산 성공이 아니다.",
+      "rubric_anchor": "2점 예: 에너지 차분과 압력 적분 중 어떤 경로가 구현식과 독립적인지 설명한다.",
+      "cue_source": "curriculum/cues/A05.md",
+      "commands": [],
+      "learning_prompt": {
+        "question": "압력곡선 하나가 총에너지까지 결정하는가?",
+        "prediction": "압력함수를 그대로 두고 선형 에너지 상수만 바꿔 보자. 압력, 에너지, 화학퍼텐셜, 압축응답 중 변할 양을 먼저 고른다.",
+        "feedback": "적분상수는 압력곡선에 없는 정보다. 같은 우변을 다시 평가한 결과와 에너지 차분·압력 구적의 결과를 구별하면 어떤 관계를 점검했는지 드러난다.",
+        "delayed_transfer": "다음 회차에는 압력함수만 주어진 새 폴리트로프에서 추가로 지정해야 할 정보를 말한다. 완성된 에너지식을 외우는 답 대신 적분상수의 역할을 설명한다."
+      }
+    },
+    {
+      "id": "A06",
+      "title": "TOV: 중심에서 유효 표면까지",
+      "stage": "ch03",
+      "prerequisites": [
+        "A05"
+      ],
+      "independent_hours": [
+        6,
+        10
+      ],
+      "source_paths": [
+        "notes/chapters/ch03_tov.md",
+        "notes/equations/tov.md",
+        "learner/src/structure/ns_tov.f90"
+      ],
+      "tests": [
+        "tests/test_tov.py::test_tov_invariants_and_lapse"
+      ],
+      "objective": "SI TOV와 중심급수, log-pressure adapter, finite-cutoff lapse 기준을 일관되게 구현한다.",
+      "derivation": "$m^{\\prime}=4\\pi r^2\\epsilon/c^2$, $P^{\\prime}=-(\\epsilon+P)\\nu^{\\prime}$, $\\nu^{\\prime}=G(m+4\\pi r^3P/c^2)/[c^2r^2(1-2Gm/(rc^2))]$.",
+      "procedure": [
+        "r=0에 RHS를 직접 넣지 않고 $m\\sim r^3$, $P-P_c\\sim r^2$의 계수를 구한다.",
+        "q=ln(Pstart/P)에서 dr/dq의 부호를 유도한다.",
+        "양의 Pcut에서 정지하고 lapse의 적분상수를 같은 기준으로 맞춘다.",
+        "r0, ODE 허용오차, Pcut 변화는 별개의 실험으로 기록한다."
+      ],
+      "deliverables": [
+        "중심급수 유도",
+        "M,R 및 μexp(ν) profile",
+        "세 오차원에 대한 별도 비교표"
+      ],
+      "interpretation": "μexp(ν)의 보존만으로 질량 방정식까지 모두 검증되지는 않는다.",
+      "hint1": "m은 kg이며 Gm/c²와 혼동하지 않는다.",
+      "hint2": "Pcut을 바꾸는 실험에서는 같은 IVP의 step refinement가 아니라 정의한 절단 문제가 달라진다.",
+      "transfer": "다른 중심압력에서 동일 convention을 유지하고 M,R 변화와 compactness를 점검한다.",
+      "limits": "양압 cutoff는 정확한 진공 표면과의 접합이 아니다. 회전·자기장·탄성 지각은 범위 밖이다.",
+      "rubric_anchor": "2점 예: 중심 시작 오차, 적분 오차, 표면 모델 민감도를 한 숫자로 합치지 않는다.",
+      "cue_source": "curriculum/cues/A06.md",
+      "commands": [],
+      "learning_prompt": {
+        "question": "TOV를 이미 풀었는데 왜 중심과 표면을 다시 읽는가?",
+        "prediction": "중심 시작점을 바꾸는 실험과 표면 cutoff를 바꾸는 실험을 나란히 놓자. 각각 어떤 근사 또는 문제의 정의를 바꾸는지 먼저 구별한다.",
+        "feedback": "중심 급수, 적분 오차, 표면 선택은 서로 다르다. 질량·반경의 일치만 보고 lapse 기준까지 같다고 판단하지 않는다.",
+        "delayed_transfer": "다음 회차에는 자신의 TOV 한 행에서 진동에 필요한 계수를 찾는다. 없는 양은 0으로 채우지 말고 어디서 계산할지 설명한다."
+      }
+    },
+    {
+      "id": "A07",
+      "title": "같은 질량의 별을 찾기",
+      "stage": "ch03",
+      "prerequisites": [
+        "A06"
+      ],
+      "independent_hours": [
+        3,
+        5
+      ],
+      "source_paths": [
+        "learner/src/structure/ns_target_mass.f90",
+        "notes/chapters/ch03_tov.md"
+      ],
+      "tests": [
+        "tests/test_target_mass.py::test_target_mass_first",
+        "tests/test_target_mass.py::test_same_mass_changes_central_pressure_not_target"
+      ],
+      "objective": "선언한 연결 branch 안에서 중심압력을 조정하고 마지막 재적분으로 질량 잔차를 확인한다.",
+      "derivation": "$F(P_c)=[M(P_c)-M_*]/M_*$. 좁은 $P_c$ bracket과 작은 $|M-M_*|$는 다른 조건이다.",
+      "procedure": [
+        "허용 중심압력 구간과 branch를 선택하고 scan한다.",
+        "TOV 실패를 외부 root의 정상 함수값으로 사용하지 않는다.",
+        "선택한 목표질량에 대한 외부 bisection을 연결한다.",
+        "최종 Pc에서 TOV를 다시 풀고 mass_atol/mass_rtol을 확인한다."
+      ],
+      "deliverables": [
+        "Pc–M scan",
+        "최종 질량 잔차와 branch 식별",
+        "EOS 변화 시 Pc가 달라져야 하는 이유"
+      ],
+      "interpretation": "같은 Pc 비교와 같은 M 비교는 물리적으로 다른 실험이다.",
+      "hint1": "외부 root와 내부 TOV의 종료 상태를 별도로 저장한다.",
+      "hint2": "turning region을 가로지르는 bracket이 다중해를 숨기는지 점검한다.",
+      "transfer": "새 목표질량이 branch 범위 밖일 때 extrapolation 없이 거절한다.",
+      "limits": "국소 branch 선택은 전체 방사형 안정성 정리의 증명이 아니다.",
+      "rubric_anchor": "2점 예: 재적분 질량 오차를 보고하며 root bracket만으로 same-mass를 선언하지 않는다.",
+      "cue_source": "curriculum/cues/A07.md",
+      "commands": [],
+      "learning_prompt": {
+        "question": "같은 중심압력으로 비교하면 같은 질량의 별인가?",
+        "prediction": "EOS를 바꾸고 중심압력은 유지했다. 질량도 유지된다는 보장이 있는가? 없다면 무엇을 다시 조절해야 하는지 먼저 적자.",
+        "feedback": "최종 중심압력에서 별을 다시 적분한 질량 잔차가 필요하다. 외부 bracket이 좁다는 사실만으로 내부 TOV 오차까지 제거되지는 않는다.",
+        "delayed_transfer": "다음 회차에는 목표질량이 선택한 가지의 범위 밖에 있는 상황을 설명한다. 더 큰 외삽 구간을 자동으로 만드는 대신 어떤 정보를 반환할지 고른다."
+      }
+    },
+    {
+      "id": "A08",
+      "title": "해석적 shooting: root와 pole",
+      "stage": "ch04",
+      "prerequisites": [
+        "A04"
+      ],
+      "independent_hours": [
+        5,
+        8
+      ],
+      "source_paths": [
+        "notes/chapters/ch04.md",
+        "notes/equations/shooting.md",
+        "learner/src/modes/ns_shooting_toy.f90",
+        "learner/src/modes/ns_scan.f90"
+      ],
+      "tests": [
+        "tests/test_shooting_toy.py::test_known_eigenvalues"
+      ],
+      "objective": "초기값 적분을 경계 잔차의 고유값 문제로 바꾸고 유한 scan의 한계를 설명한다.",
+      "derivation": "$y^{\\prime\\prime}+k^2y=0$, $y(0)=y(L)=0$, $k_n=n\\pi/L$. $\\mathcal R=y(L)/(|A|L)$는 진폭에 안전하지만 $y/y^{\\prime}$는 pole을 가진다.",
+      "procedure": [
+        "A≠0와 k=0 예외를 해석적으로 확인한다.",
+        "single shot→scan→bracket→refine→재적분 순서로 구현한다.",
+        "실패 trial을 지우지 말고 bracket barrier로 남긴다.",
+        "L과 scan 밀도를 바꾸고 누락된 root 가능성을 조사한다."
+      ],
+      "deliverables": [
+        "잔차 scan 및 pole 반례",
+        "두 고유함수와 k_n L 비교",
+        "ODE 오차와 root 종료오차의 분리",
+        "양방향 해석해의 determinant가 -sin(kL)/k임을 확인한 계산"
+      ],
+      "interpretation": "유한 scan의 동일 결과는 전체 spectrum의 완전성 증명이 아니다.",
+      "hint1": "한 trial의 출력은 경계조건을 아직 강제하지 않은 초기값 해이다.",
+      "hint2": "π/2 근처 y/y′의 부호변화와 올바른 잔차의 부호를 나란히 적는다.",
+      "transfer": "L=2 m에서 root를 미리 알려주지 않고 다시 찾고 kL 불변량을 확인한다.",
+      "limits": "이 toy의 k는 역길이이고 중성자별의 omega가 아니다. node 규칙을 sharp interface에 무검토 전사하지 않는다.",
+      "rubric_anchor": "2점 예: 실패한 trial 양옆을 연결하지 않는 이유를 연속성과 함께 설명한다.",
+      "cue_source": "curriculum/cues/A08.md",
+      "commands": [],
+      "learning_prompt": {
+        "question": "부호가 바뀌는 곳마다 고유값이 있는가?",
+        "prediction": "표면값을 그 도함수로 나누면 분모가 0인 곳에서도 부호가 바뀔 수 있다. 그 지점을 고유값으로 부를 수 있는지 해석해를 보기 전에 판단하자.",
+        "feedback": "판단의 전제는 잔차의 연속성과 비자명한 해다. 실패한 trial을 지운 뒤 양옆을 잇거나 영해를 모드로 세면 다른 문제를 풀게 된다.",
+        "delayed_transfer": "다음 회차에는 길이를 바꾸되 새로운 정답을 먼저 보지 않고 두 근을 예측한다. 마지막에 무차원 곱으로 해석해와 대조한다."
+      }
+    },
+    {
+      "id": "A09",
+      "title": "Cowling single-shot와 표면 잔차",
+      "stage": "ch05",
+      "prerequisites": [
+        "A06",
+        "A08"
+      ],
+      "independent_hours": [
+        7,
+        12
+      ],
+      "source_paths": [
+        "notes/chapters/ch05.md",
+        "notes/equations/cowling.md",
+        "learner/src/modes/ns_cowling.f90",
+        "learner/src/modes/ns_center_state.f90",
+        "learner/src/modes/ns_surface_residual.f90"
+      ],
+      "tests": [
+        "tests/test_cowling_rhs.py::test_center_regular_l2",
+        "tests/test_cowling_rhs.py::test_rhs_point_matches_independent_formula",
+        "tests/test_mode_residual.py::test_residual_matches_independent_cosine_definition",
+        "tests/test_mode_residual.py::test_fixed_background_single_shot_is_finite"
+      ],
+      "objective": "W,V의 차원·중심 정칙성·Lagrangian 표면조건을 한 trial의 IVP에 연결한다.",
+      "derivation": "$$\n\\begin{aligned}\nQ&=(\\omega/c)^2r^2e^{\\lambda-2\\nu}V+\\nu'W,\\\\\nW'&=Q/\\chi-\\ell(\\ell+1)e^\\lambda V,\\\\\nV'&=2\\nu'V-e^\\lambda W/r^2,\\\\\n\\Delta P&=-(\\epsilon+P)e^{-\\lambda}Q/r^2.\n\\end{aligned}\n$$",
+      "procedure": [
+        "제5장의 풀이를 따라 W,V의 차원과 중심 정칙해를 확인한다.",
+        "한 배경점 우변을 손계산하고 calculation의 출력 또는 자신의 물리 함수와 대조한다.",
+        "한 trial에서 잔차의 진폭·방향 변환을 확인한다. 제공 양방향 matching은 다시 구현하지 않는다."
+      ],
+      "deliverables": [
+        "차원표와 point RHS",
+        "한 trial의 W,V profile",
+        "잔차 진폭 불변성과 이번 값이 아직 고유모드가 아닌 이유",
+        "같은 표면조건을 만족하는 양방향 시작 벡터와 matching 조건의 설명"
+      ],
+      "interpretation": "표면조건은 δP=0가 아니라 ΔP=0이다. f와 omega는 단위 차원만으로 구별되지 않는다.",
+      "hint1": "Q 각 항의 차원을 먼저 확인하고 부호는 별도 점검한다.",
+      "hint2": "양의 진폭 배율에서는 잔차가 유지되고 전체 부호 반전에서는 잔차 부호만 바뀌어야 한다.",
+      "transfer": "ν→ν+C, ω→exp(C)ω에서 주파수 항의 covariance를 직접 검증한다.",
+      "limits": "단일 trial 성공은 mode identity나 spectral completeness가 아니다. 평형 barotropic χ는 frozen composition을 포함하지 않는다.",
+      "rubric_anchor": "2점 예: 경계 잔차가 작아도 mode identification은 별도라는 점을 실행 상태와 연결한다.",
+      "cue_source": "curriculum/cues/A09.md",
+      "commands": [],
+      "learning_prompt": {
+        "question": "한 번 끝까지 적분한 해는 이미 진동 모드인가?",
+        "prediction": "유체 요소를 옮겼을 때 원래 위치에서 본 압력 변화와 요소를 따라간 압력 변화는 같을까? 표면에서 0으로 두어야 할 쪽을 먼저 말하자.",
+        "feedback": "표면조건의 주체는 움직이는 유체 요소다. 한 점의 우변, 중심의 정칙성, 한 trial의 잔차를 확인해도 고유값 탐색과 모드 식별은 아직 남는다.",
+        "delayed_transfer": "다음 회차에는 lapse에 상수를 더한 경우 주파수를 어떻게 바꿔야 같은 항을 얻는지 설명한다. 차원 검사만으로 찾지 못하는 오류도 하나 든다."
+      }
+    },
+    {
+      "id": "A10",
+      "title": "두 근에서 f와 p1 모드로",
+      "stage": "ch06",
+      "prerequisites": [
+        "A09"
+      ],
+      "independent_hours": [
+        6,
+        10
+      ],
+      "source_paths": [
+        "notes/chapters/ch06.md",
+        "learner/src/modes/ns_mode_spectrum.f90",
+        "learner/src/modes/ns_mode_identity.f90",
+        "learner/src/modes/ns_mode_normalization.f90",
+        "fixtures/contracts/smooth_l2.json"
+      ],
+      "tests": [
+        "tests/test_smooth_modes.py::test_spectrum_feature_is_real",
+        "tests/test_smooth_modes.py::test_normalization_and_node_contract",
+        "tests/test_smooth_modes.py::test_successful_root_with_ambiguous_identity_is_separate"
+      ],
+      "objective": "고유값 탐색과 고유함수 기반 식별을 분리하고 교정값의 정확도 의미를 제한한다.",
+      "derivation": "$x=r/R_s$, $w=W/R_s^3$, $v=V/R_s^2$, $\\int(w^2+6v^2)\\,dx=1$. 이 정규화는 진단량이며 mode energy가 아니다.",
+      "procedure": [
+        "coarse 배경에서 scan과 bracket을 만든다.",
+        "정밀 root에서 profile을 재적분하고 W,V의 내부 node를 확인한다.",
+        "교정된 smooth_l2 contract와 fixed background의 identity를 함께 읽는다.",
+        "ODE tolerance와 배경 해상도의 영향을 따로 비교한다."
+      ],
+      "deliverables": [
+        "root_status와 identity_status",
+        "같은 좌표/정규화의 f,p1 고유함수",
+        "적분 방법 일치와 배경 오차의 차이"
+      ],
+      "interpretation": "첫 두 root라는 이유만으로 f,p1 이름을 붙이지 않는다.",
+      "hint1": "node zero threshold와 endpoint 제외구간을 먼저 고정한다.",
+      "hint2": "0/0 및 1/1 규칙은 현재 smooth family의 진단이지 계면 spectrum의 보편 정리가 아니다.",
+      "transfer": "중심압력의 작은 변화에서 단순 주파수 순서 대신 overlap과 node로 같은 가족을 추적한다.",
+      "limits": "회귀 소수자리와 실제 물리 정확도는 다르며 full-GR damping은 계산하지 않는다.",
+      "rubric_anchor": "2점 예: 배경 refinement 차이가 root tolerance보다 큰 사례를 제시하고 오차원을 올바르게 분류한다.",
+      "cue_source": "curriculum/cues/A10.md",
+      "commands": [],
+      "learning_prompt": {
+        "question": "두 번째로 찾은 근은 반드시 첫 압력모드인가?",
+        "prediction": "주파수 순서만 적힌 표에서 두 모드의 이름을 지운다. 다시 이름을 붙이려면 고유함수에서 무엇을 읽어야 할지 먼저 고르자.",
+        "feedback": "이 예제에서는 node와 overlap을 지정된 정규화·구간에서 비교한다. 두 곡선의 높이 차이를 물리 에너지의 차이로 읽었다면 정규화부터 다시 확인한다.",
+        "delayed_transfer": "다음 회차에는 가까운 두 주파수 후보를 보고 어느 자료가 더 필요할지 말한다. 첫째·둘째라는 순번 대신 모드의 대응을 근거로 쓴다."
+      }
+    },
+    {
+      "id": "A11",
+      "title": "고정 고밀도 부분의 두 폴리트로프와 direct join",
+      "stage": "ch07",
+      "prerequisites": [
+        "A05",
+        "A10"
+      ],
+      "independent_hours": [
+        3,
+        5
+      ],
+      "source_paths": [
+        "notes/chapters/ch07.md",
+        "learner/src/eos/ns_two_polytrope.f90",
+        "learner/src/eos/ns_direct_join.f90"
+      ],
+      "tests": [
+        "tests/test_matching.py::test_continuous_two_polytrope_knot_preserves_all_state_variables",
+        "tests/test_matching.py::test_direct_join_pressure_match_can_expose_chemical_mismatch"
+      ],
+      "objective": "고밀도 부분 에너지 기준을 바꾸지 않고 저밀도 C를 정하며 압력 일치와 화학평형을 구별한다.",
+      "derivation": "$C_L=C_H+\\frac{P_t}{n_t}\\left[\\frac{1}{\\Gamma_H-1}-\\frac{1}{\\Gamma_L-1}\\right]$. 같은 $(n_t,P_t)$에서 $\\epsilon$과 $\\mu$는 연속이지만 $\\chi$는 다를 수 있다.",
+      "procedure": [
+        "동일 n,P에서 두 epsilon식을 같게 두고 C_L을 구한다.",
+        "core parameter를 복사/재fit하지 않고 저밀도 branch만 만든다.",
+        "P,ε,n,μ 및 χ의 좌우값을 비교한다.",
+        "독립 phase를 임의 압력에서 붙여 Δμ가 남는 사례를 만든다."
+      ],
+      "deliverables": [
+        "C_L 유도와 units",
+        "좌우 상태 표",
+        "core 함수 불변 검산"
+      ],
+      "interpretation": "연속 artificial knot은 실제 crust-고밀도 부분 transition의 정답이 아니다.",
+      "hint1": "C_L 계산에 사용하는 P_t/n_t의 단위는 J이다.",
+      "hint2": "같은 P의 direct join에서 Δμ를 지우려 고밀도 부분 C를 수정하면 실험 조건 자체가 바뀐다.",
+      "transfer": "Γ_L를 새 값으로 바꾸고 고밀도 부분 동일성을 유지한 채 χ jump의 변화를 확인한다.",
+      "limits": "현재 과제는 equilibrium matching이며 sharp material-transfer 구현은 A14이다.",
+      "rubric_anchor": "2점 예: P,ε,n,μ의 연속성과 χ의 불연속이 모순이 아님을 설명한다.",
+      "cue_source": "curriculum/cues/A11.md",
+      "commands": [],
+      "learning_prompt": {
+        "question": "고밀도 부분을 고정했다는 말은 어디서 확인하는가?",
+        "prediction": "접합 압력만 같게 맞췄다. 에너지와 화학퍼텐셜까지 이어진다고 말할 수 있을까? 연속이어야 하는 양과 달라도 되는 미분을 먼저 나누자.",
+        "feedback": "저밀도 상수를 정하는 동안 고밀도 에너지 기준을 다시 맞추면 비교의 조건을 바꾼 것이다. 공통 구간의 실제 함수값을 함께 확인한다.",
+        "delayed_transfer": "다음 회차에는 접합점 양쪽의 압력과 화학퍼텐셜만 주고 기계적 일치와 상평형을 구별한다. 필요한 추가 조건을 직접 고른다."
+      }
+    },
+    {
+      "id": "A12",
+      "title": "Maxwell crossing과 phase 선택",
+      "stage": "ch07",
+      "prerequisites": [
+        "A11"
+      ],
+      "independent_hours": [
+        3,
+        5
+      ],
+      "source_paths": [
+        "notes/equations/matching.md",
+        "learner/src/eos/ns_maxwell.f90",
+        "fixtures/analytic/maxwell_exact.json"
+      ],
+      "tests": [
+        "tests/test_matching.py::test_maxwell_exact_fixture_recovers_known_crossing_and_jump",
+        "tests/test_matching.py::test_maxwell_reversed_phase_roles_are_not_admitted"
+      ],
+      "objective": "공통 μ domain에서 압력 crossing을 찾고 phase 우세 및 density-jump 방향을 검증한다.",
+      "derivation": "$P_H(\\mu_t)=P_L(\\mu_t)$, $\\Delta\\epsilon=\\mu_t\\Delta n$. 동일 energy convention과 phase equilibrium이 필요하다.",
+      "procedure": [
+        "analytic fixture를 nL,nH,Ki,Ci에서 직접 복원한다.",
+        "두 phase의 공통 μ interval을 계산한다.",
+        "bracketed residual을 풀고 양쪽 압력 우세를 검사한다.",
+        "없는 crossing과 뒤집힌 phase를 각각 거절한다."
+      ],
+      "deliverables": [
+        "analytic crossing과 수치 잔차",
+        "Δε−μtΔn 검사",
+        "부적합 phase selection의 설명"
+      ],
+      "interpretation": "root가 존재한다는 것과 thermodynamic transition으로 승인된다는 것은 다르다.",
+      "hint1": "고밀도/저밀도 label보다 crossing 양옆의 pressure ordering을 본다.",
+      "hint2": "서로 다른 domain에 있는 값을 extrapolate해 root를 만들지 않는다.",
+      "transfer": "bracket을 domain 밖으로 옮기고 no_bracket과 out_of_domain을 구별한다.",
+      "limits": "Maxwell equilibrium은 유한 두께 mixed phase의 동역학을 정하지 않는다.",
+      "rubric_anchor": "2점 예: crossing, 압력 우세, jump 방향을 모두 제시하고 임의 energy shift를 사용하지 않는다.",
+      "cue_source": "curriculum/cues/A12.md",
+      "commands": [],
+      "learning_prompt": {
+        "question": "압력곡선의 교점 하나로 상전이가 결정되는가?",
+        "prediction": "공통 화학퍼텐셜에서 압력이 같아졌다. 교점의 양쪽에서 어느 상이 선택되는지 보지 않아도 되는가? 필요한 검사를 먼저 적자.",
+        "feedback": "교점은 후보다. 공통 정의역, 양쪽 압력 우세와 밀도 변화 방향이 함께 맞아야 채택한 상평형 문제로 읽을 수 있다.",
+        "delayed_transfer": "다음 회차에는 같은 압력에서 밀도가 다른 두 상태의 에너지 차이를 설명한다. 적분기의 오류라고 부르기 전에 열역학 관계부터 적용한다."
+      }
+    },
+    {
+      "id": "A13",
+      "title": "Hermite bridge와 구간 전체 허용조건",
+      "stage": "ch07",
+      "prerequisites": [
+        "A12"
+      ],
+      "independent_hours": [
+        4,
+        7
+      ],
+      "source_paths": [
+        "notes/equations/matching.md",
+        "learner/src/eos/ns_mu_bridge.f90",
+        "methods/src/eos/ns_mu_bridge.f90"
+      ],
+      "tests": [
+        "tests/test_bridge.py::test_branch_based_hermite_bridge_matches_endpoint_pressure_and_density",
+        "tests/test_bridge.py::test_bridge_checks_interval_not_only_midpoint_samples",
+        "tests/test_bridge.py::test_bridge_rejects_superluminal_interval"
+      ],
+      "objective": "한 cubic P(μ)에서 상태와 도함수를 구하고 endpoint matching과 전체 구간 물리성을 구별한다.",
+      "derivation": "$n=P^{\\prime}$, $\\epsilon=\\mu P^{\\prime}-P$, $\\chi=P^{\\prime}/(\\mu P^{\\prime\\prime})$. 양의 $\\mu,n$에서 causality는 $\\mu P^{\\prime\\prime}-P^{\\prime}\\ge0$와 연결된다.",
+      "procedure": [
+        "두 endpoint의 P,n을 Hermite 조건으로 넣는다.",
+        "같은 polynomial에서 P′,P″를 평가한다.",
+        "P″와 μP″−P′의 구간 extrema를 점검한다.",
+        "endpoint는 맞지만 구간 내부가 부적합한 반례를 실행한다."
+      ],
+      "deliverables": [
+        "cubic 계수와 endpoint residual",
+        "admitted/rejected 각각 한 사례",
+        "grid sample만으로 부족한 이유"
+      ],
+      "interpretation": "한 구간의 계수와 열역학 관계는 직접 유도한다. 기본 별 계산에서는 제공된 Hermite 구성과 허용성 검사를 호출하며, 내부 보간기 구현은 선택할 수 있다.",
+      "hint1": "무차원 구간 좌표 t와 Δμ 미분 인자를 구분한다.",
+      "hint2": "P″는 선형이며 μP″−P′는 다항식이므로 endpoints와 stationary point를 확인한다.",
+      "transfer": "bridge 폭을 바꾸고 매번 새 모델의 허용조건을 검사한다.",
+      "limits": "finite-width bridge는 sharp Maxwell model의 단순 수치 개선판이 아니다.",
+      "rubric_anchor": "2점 예: endpoint 일치와 interval stability/causality를 서로 다른 증거로 제시한다.",
+      "cue_source": "curriculum/cues/A13.md",
+      "commands": [],
+      "learning_prompt": {
+        "question": "끝점이 매끄럽게 이어지면 물리적으로도 허용되는가?",
+        "prediction": "두 끝점의 압력과 기울기는 맞는데 구간 내부의 압축응답은 아직 모른다. 그림이 매끄럽다는 이유만으로 허용할 수 있는지 먼저 판단하자.",
+        "feedback": "끝점 조건은 다항식을 정하는 조건이지 구간 전체의 안정성·인과성 검사가 아니다. 처음에는 제공된 실패 예제로 어느 미분이 문제인지 찾는다.",
+        "delayed_transfer": "다음 회차에는 다른 폭의 bridge를 보며 무엇이 단순 격자 변화이고 무엇이 새 EOS 선택인지 설명한다. 보간 함수를 다시 작성할 필요는 없다."
+      }
+    },
+    {
+      "id": "A14",
+      "title": "Material interface의 전달과 restart",
+      "stage": "ch07",
+      "prerequisites": [
+        "A13",
+        "A09"
+      ],
+      "independent_hours": [
+        4,
+        7
+      ],
+      "source_paths": [
+        "notes/equations/interface.md",
+        "learner/src/modes/ns_interface_transfer.f90",
+        "notes/chapters/ch07.md"
+      ],
+      "tests": [
+        "tests/test_interface.py::test_material_transfer_matches_independent_enthalpy_formula",
+        "tests/test_interface.py::test_segment_restart_hits_events_without_crossing_and_preserves_one_sided_state",
+        "tests/test_interface.py::test_material_interface_rejects_zero_frequency"
+      ],
+      "objective": "선언된 slow/material interface의 [W]=[ΔP]=0를 one-sided 전달과 정확한 event 정지에 연결한다.",
+      "derivation": "$$\nq_h=\\frac{\\epsilon_{\\rm in}+P_t}{\\epsilon_{\\rm out}+P_t},\n\\qquad a=(\\omega r_t/c)^2e^{\\lambda_t-2\\nu_t},\n$$\n$$\nW_{\\rm out}=W_{\\rm in},\\qquad\nV_{\\rm out}=q_hV_{\\rm in}+(q_h-1)\\frac{\\nu'_tW_{\\rm in}}a.\n$$\n$[\\Delta P]=0$과 zero-jump 한계를 직접 확인한다.",
+      "procedure": [
+        "ΔP 식에서 enthalpy ratio를 직접 유도한다.",
+        "같은 r_t의 inner/outer record를 따로 보존한다.",
+        "event에서 정지→transfer→restart를 수행한다.",
+        "zero jump와 forward/reverse composition을 검사한다."
+      ],
+      "deliverables": [
+        "전달식 유도",
+        "W 및 ΔP 좌우값",
+        "세그먼트 경계와 side 기록"
+      ],
+      "interpretation": "V의 jump를 plot 직선으로 연결해 생기는 영점은 물리적 node가 아니다.",
+      "hint1": "q_h는 enthalpy ratio이고 q_P=ln(Pstart/P)와 다른 변수이다.",
+      "hint2": "χ-only knot에서는 state가 연속일 수 있으므로 material jump와 구별한다.",
+      "transfer": "새 eps contrast에서 같은 radius와 ΔP 연속을 확인하고 omega=0 요청을 거절한다.",
+      "limits": "rapid conversion, surface shell, elasticity, zero-frequency limit는 포함하지 않는다.",
+      "rubric_anchor": "2점 예: V를 무조건 연속시키면 ΔP가 어긋나는 반례와 exact-stop 기록을 함께 보인다.",
+      "cue_source": "curriculum/cues/A14.md",
+      "commands": [],
+      "learning_prompt": {
+        "question": "밀도가 뛰면 변위의 두 성분도 함께 뛰어야 하는가?",
+        "prediction": "계면의 압력과 반경은 같고 에너지밀도만 다르다. 연속으로 둘 양을 평형 곡선이 아니라 채택한 유체 경계조건에서 먼저 고르자.",
+        "feedback": "이 과제의 조건은 물질적 계면을 따르는 변위와 Lagrangian 압력의 연속이다. 두 one-sided 값을 잇는 그림의 직선을 실제 층으로 읽지 않는다.",
+        "delayed_transfer": "다음 회차에는 밀도 jump를 없앤 극한을 설명한다. 압축응답만 바뀌는 knot와 같은 전달식을 적용해야 하는지도 구별한다."
+      }
+    },
+    {
+      "id": "A15",
+      "title": "포화조건으로 핵물질 toy를 교정하기",
+      "stage": "ch08",
+      "prerequisites": [
+        "A05"
+      ],
+      "independent_hours": [
+        5,
+        8
+      ],
+      "source_paths": [
+        "notes/chapters/ch08.md",
+        "notes/worked/nuclear_calibration.md",
+        "learner/src/eos/ns_nuclear_toy.f90"
+      ],
+      "tests": [
+        "tests/test_nuclear_toy.py::test_simple_model_matches_closed_form_calibration",
+        "tests/test_nuclear_toy.py::test_regulated_saturation_constraints_close",
+        "tests/test_nuclear_toy.py::test_symmetry_energy_is_calibrated_at_saturation"
+      ],
+      "objective": "함수형을 선택한 뒤 결합에너지·영압력·K0로 계수를 정하고 regulator의 외부 선택을 밝힌다.",
+      "derivation": "$e_0=T_0u^{2/3}+Au/2+BF(u)/(\\sigma+1)$, $F=u^\\sigma/(1+C_Ru^{\\sigma-1})$, $e_0(1)=E_b<0$, $e_0^{\\prime}(1)=0$, $9e_0^{\\prime\\prime}(1)=K_0$.",
+      "procedure": [
+        "worked example에서 binding_mev의 음수 convention을 확인한다.",
+        "simple model의 A,B,σ를 손으로 구한다.",
+        "C_R를 고정하고 regulated case의 나머지를 재교정한다.",
+        "포화 제약 성공과 고밀도 causal 구간을 별도로 확인한다."
+      ],
+      "deliverables": [
+        "계수 유도와 실제 calibration residual",
+        "서로 다른 regulator 비교",
+        "S_kin endpoint convention과 Taylor 계수의 구분"
+      ],
+      "interpretation": "세 제약이 함수형 자체나 regulator까지 유일하게 결정하지 않는다.",
+      "hint1": "K0 미분은 n이 아니라 u에서 계산할 때 9e0″(1)로 간단해진다.",
+      "hint2": "F(1),F′(1),F″(1)을 먼저 구하면 두 선형 계수와 하나의 σ 조건으로 분리된다.",
+      "transfer": "새 K0를 선택해 동일 함수형에서 교정하고 density domain의 한계를 설명한다.",
+      "limits": "현상론적 nuclear toy이지 many-body 계산, RMF, realistic inner-crust 모델이 아니다.",
+      "rubric_anchor": "2점 예: 계산한 A,B,σ와 세 residual을 제시하고 C_R는 입력 선택임을 명확히 한다.",
+      "cue_source": "curriculum/cues/A15.md",
+      "commands": [],
+      "learning_prompt": {
+        "question": "포화조건 세 개는 함수형까지 정해 주는가?",
+        "prediction": "같은 결합에너지·영압력·비압축률을 맞춘 두 함수가 있다. 포화점 밖에서도 같다고 할 수 있을지, 계수 계산 전에 판단하자.",
+        "feedback": "함수형과 regulator를 먼저 선택하고 그 아래에서 계수를 구한다. 제약의 충족은 미시적 핵이론을 유일하게 도출했다는 뜻이 아니다.",
+        "delayed_transfer": "다음 회차에는 regulator를 바꾸면 어떤 계수를 다시 정해야 하는지 풀이를 덮고 말한다. 이후 풀이를 열어 제약식을 확인한다."
+      }
+    },
+    {
+      "id": "A16",
+      "title": "npe beta equilibrium과 압축응답",
+      "stage": "ch08",
+      "prerequisites": [
+        "A15",
+        "A02"
+      ],
+      "independent_hours": [
+        4,
+        7
+      ],
+      "source_paths": [
+        "learner/src/eos/ns_beta_equilibrium.f90",
+        "notes/worked/nuclear_calibration.md"
+      ],
+      "tests": [
+        "tests/test_beta_equilibrium.py::test_beta_equilibrium_at_saturation",
+        "tests/test_beta_equilibrium.py::test_beta_pressure_matches_equilibrium_first_law"
+      ],
+      "objective": "전하중성과 chemical equilibrium을 proton fraction root로 풀고 equilibrium response와 frozen composition을 구별한다.",
+      "derivation": "$$\nF(x)=4S(n)(1-2x)-\\mu_e(nx),\\qquad 0\\leq x\\leq\\frac12.\n$$\n두 에너지 항을 같은 단위로 평가한다. $n_e=n_p=nx$이고 $\\alpha=1-2x$다.",
+      "procedure": [
+        "common nucleon rest mass와 electron total energy의 convention을 적는다.",
+        "[0,1/2]에서 residual 양끝과 단조성을 확인한다.",
+        "electron helper를 호출하며 x_p를 찾는다.",
+        "n±hn에서 조성을 다시 풀어 압력 first law와 equilibrium χ를 검사한다."
+      ],
+      "deliverables": [
+        "한 밀도의 x_p,α,μ_e,잔차",
+        "전하중성 검사",
+        "재평형 미분과 고정조성 미분의 차이"
+      ],
+      "interpretation": "전자 rest energy는 x_p에 의존하므로 임의로 제거하지 않는다.",
+      "hint1": "S>0에서 residual의 x_p 미분 부호를 먼저 생각한다.",
+      "hint2": "압력 미분을 할 때 주변 밀도의 beta equilibrium을 다시 풀었는지 확인한다.",
+      "transfer": "0.8n0와 1.2n0에서 x_p 변화를 예측한 뒤 비교한다.",
+      "limits": "npe-only toy는 muon과 reaction-rate dynamics를 포함하지 않는다. 조성 평형이 진동 시간척도에서 유지된다는 별도 주장을 하지 않는다.",
+      "rubric_anchor": "2점 예: chemical residual만이 아니라 energy-pressure consistency도 별도 차분으로 제시한다.",
+      "cue_source": "curriculum/cues/A16.md",
+      "commands": [],
+      "learning_prompt": {
+        "question": "밀도를 바꿀 때 조성도 다시 풀어야 하는가?",
+        "prediction": "한 밀도에서 beta equilibrium을 구했다. 이 조성을 고정한 미분과 새 밀도에서 평형을 다시 구한 미분이 같은 질문인지 먼저 설명하자.",
+        "feedback": "전하중성, 화학평형, 압축응답은 연결되지만 같지 않다. 두 미분을 모두 계산했다면 어느 쪽을 Cowling 입력으로 선택했는지 명시한다.",
+        "delayed_transfer": "다음 회차에는 전자 화학퍼텐셜과 핵물질 항의 단위를 숨긴 입력을 읽는다. 근 찾기 전에 에너지 convention과 조성 제약을 복원한다."
+      }
+    },
+    {
+      "id": "A17",
+      "title": "액적 toy와 이산 최소화",
+      "stage": "ch08",
+      "prerequisites": [
+        "A16"
+      ],
+      "independent_hours": [
+        3,
+        5
+      ],
+      "source_paths": [
+        "notes/chapters/ch08.md",
+        "learner/src/eos/ns_liquid_drop.f90",
+        "fixtures/nuclear/liquid_drop_toy.json"
+      ],
+      "tests": [
+        "tests/test_liquid_drop.py::test_liquid_drop_scaling_and_domain",
+        "tests/test_liquid_drop.py::test_finer_candidate_mesh_cannot_raise_minimum",
+        "tests/test_liquid_drop.py::test_boundary_minimum_is_not_called_stationary_point"
+      ],
+      "objective": "volume·surface·Coulomb·asymmetry의 scaling을 이해하고 선언한 정수 mesh에서만 최소를 찾는다.",
+      "derivation": "$E_{nuc}=-a_vA+a_sA^{2/3}+a_cZ^2A^{-1/3}+a_a(A-2Z)^2/A$, $n_e=(Z/A)n_B$, $e_{toy}=E_{nuc}/A+\\epsilon_e/n_B$.",
+      "procedure": [
+        "경험계수와 제공 electron helper의 역할을 구분한다.",
+        "고정 n_B에서 A,Z mesh를 선언한다.",
+        "허용 candidate만 평가하고 최소 위치가 경계인지 기록한다.",
+        "후보를 포함하도록 세분한 mesh에서 최소값이 높아지지 않는지 확인한다."
+      ],
+      "deliverables": [
+        "네 에너지 항 분해",
+        "coarse/fine 최소 후보",
+        "경계 최소와 continuum stationary point의 차이"
+      ],
+      "interpretation": "일반적인 비포함 새 mesh에는 최소값 단조 규칙을 그대로 적용할 수 없다.",
+      "hint1": "고정 Z와 고정 Z/A에서 Coulomb scaling이 달라진다.",
+      "hint2": "A→8A, Z 고정이면 surface는 4배, Coulomb은 1/2배이다.",
+      "transfer": "다른 허용 n_B에서 최소 후보 이동을 계산하고 mesh boundary 의존성을 점검한다.",
+      "limits": "fixed-pressure Gibbs, neutron drip, pairing, pasta, full-star provider는 범위 밖이다.",
+      "rubric_anchor": "2점 예: discrete global minimum이라는 범위를 명시하고 실제 inner crust로 과장하지 않는다.",
+      "cue_source": "curriculum/cues/A17.md",
+      "commands": [],
+      "learning_prompt": {
+        "question": "가장 낮은 후보는 곧 최소점인가?",
+        "prediction": "정수 후보를 훑었더니 경계에서 에너지가 가장 낮았다. 이를 내부 stationary point라 부를 수 있을지, 더 필요한 비교를 먼저 적자.",
+        "feedback": "후보 집합 안의 최소와 연속 문제의 최소를 구분한다. 후보를 추가한 경우 이전 최소가 여전히 허용된다면 최솟값이 높아질 수는 없다.",
+        "delayed_transfer": "다음 회차에는 표면항과 Coulomb 항의 크기 의존성을 말로 예측한다. 어떤 변수를 고정했는지도 함께 답한다."
+      }
+    },
+    {
+      "id": "A18",
+      "title": "표의 취득 의미와 Hermite representation",
+      "stage": "ch09",
+      "prerequisites": [
+        "A10",
+        "A13의 Hermite 유도"
+      ],
+      "independent_hours": [
+        3,
+        5
+      ],
+      "source_paths": [
+        "notes/chapters/ch09.md",
+        "methods/src/eos/ns_table_eos.f90",
+        "tools/normalize_compose.py",
+        "fixtures/tables/hermite_consistent.csv",
+        "tools/inspect_table.py",
+        "examples/method_calls/table_query.f90"
+      ],
+      "tests": [
+        "tests/test_data_intake.py::test_normalizer_preserves_order_duplicates_and_rest_mass_semantics",
+        "tests/test_data_intake.py::test_compose_134_real_table_normalization_and_independent_samples",
+        "tests/test_provided_tables.py::test_provided_table_accepts_consistent_input",
+        "tests/test_provided_tables.py::test_provided_table_rejects_unadmitted_real_input"
+      ],
+      "objective": "원자료 provenance, 단위 의미, solver representation의 허용조건을 서로 다른 단계로 판정한다.",
+      "derivation": "$n=P^{\\prime}(\\mu)$, $\\epsilon=\\mu n-P$, $\\chi=n/(\\mu P^{\\prime\\prime})$. 원표 closure 검사는 이 representation의 항등식 확인과 별도이다.",
+      "procedure": [
+        "동봉 synthetic 표를 inspect_table로 읽고 제공된 허용조건 검사를 호출한다.",
+        "동봉 ID134 원자료와 metadata를 읽고 source order를 보존한다.",
+        "ID134의 196개 구간 중 거절된 72개를 확인한다. 이 표현을 임의로 평활화하지 않는다.",
+        "동봉 ID69의 의미와 native 구간을 확인하고 A20의 제공 함수로 값과 미분을 함께 읽는다."
+      ],
+      "deliverables": [
+        "raw 열 정의와 SI 변환",
+        "admitted/rejected interval 설명",
+        "각 표의 허용·거절 이유와 실제 별 계산에 사용할 함수의 정의"
+      ],
+      "interpretation": "원표 취득 성공은 full-star provider 허용조건을 보증하지 않는다.",
+      "hint1": "mu 비단조나 duplicate를 sort·삭제하여 문제를 숨기지 않는다.",
+      "hint2": "동일한 P,μ의 두 행이 값 중복인지 phase jump인지 의미부터 확인한다.",
+      "transfer": "존재하지 않는 표 경로와 이미 존재하는 출력 디렉터리를 각각 거절하는지 검사한다. A20에서는 국소 구간 밖의 평가를 검사한다.",
+      "limits": "Synthetic 예제의 전체 밀도 범위를 실제 별에 외삽하지 않는다. 별 계산은 명시한 ID69의 유효구간과 양의 표면압력에 한정한다.",
+      "rubric_anchor": "2점 예: raw identity, 단위 의미, representation admissibility를 별도 evidence로 제시한다.",
+      "cue_source": "curriculum/cues/A18.md",
+      "commands": [],
+      "direct_implementation_tests": [
+        "tests/test_table_eos.py::test_consistent_hermite_table_is_admitted_and_recovers_same_representation",
+        "tests/test_table_eos.py::test_unadmitted_real_table_cannot_be_promoted_to_eos_provider"
+      ],
+      "direct_workspace": "learner",
+      "default_workspace": "calculation",
+      "learning_prompt": {
+        "question": "표를 읽었다면 별에 넣을 EOS도 준비된 것일까?",
+        "prediction": "파일의 열과 단위는 읽었지만 보간 구간의 미분은 검사하지 않았다. 이 상태에서 성공이라고 부를 수 있는 작업과 아직 남은 작업을 나누자.",
+        "feedback": "원자료의 의미와 선택한 함수의 허용조건을 따로 판단한다. 거절된 구간을 지우거나 평활화해서 같은 물리 문제라고 보고하지 않는다.",
+        "delayed_transfer": "다음 회차에는 중복 행의 의미를 묻는다. 표의 순서와 물질 상태를 확인하지 않고 정렬·삭제하면 무엇을 잃을 수 있는지 설명한다."
+      }
+    },
+    {
+      "id": "A20",
+      "title": "EOS의 값과 미분을 같은 구간에서 읽기",
+      "stage": "ch09",
+      "prerequisites": [
+        "A13",
+        "A18"
+      ],
+      "independent_hours": [
+        2,
+        4
+      ],
+      "source_paths": [
+        "notes/chapters/ch09.md",
+        "methods/src/eos/ns_cell_eos.f90",
+        "methods/src/eos/ns_table_eos.f90",
+        "calculation/tests_fortran/cell_checks.f90"
+      ],
+      "tests": [
+        "tests/test_precision_learning.py::test_selected_cell_thermodynamics"
+      ],
+      "objective": "본문의 Hermite EOS 함수를 호출하여 한 구간의 값·미분·역함수를 확인하고, native 경계를 지키는 이유를 설명한다.",
+      "derivation": "$n=P_{,t}/H,\\ \\epsilon=\\mu n-P,\\ \\chi=H P_{,t}/(\\mu P_{,tt}),\\ dr/dx=H/(\\mu\\nu')$.",
+      "procedure": [
+        "P와 첫 미분의 연속성을 둘째 미분의 연속성과 구분한다.",
+        "무차원 P=mu^2와 좁은 구간 예제에서 제공 cell_state·역함수를 호출한다.",
+        "calculation의 cell_checks를 실행하고 12개 관계가 의미하는 범위를 적는다.",
+        "다른 t와 구간 폭에서 제1법칙과 SI 차원을 손계산으로 확인한다."
+      ],
+      "deliverables": [
+        "한 구간의 P,n,epsilon,chi 유도",
+        "local t 역함수와 절대 mu subtraction 비교",
+        "선택 workspace의 실제 검사 기록"
+      ],
+      "interpretation": "제3·7·9장에서 도입한 EOS 표현의 본 과제다. 표 보간기·역함수·고급 적분기 구현을 요구하지 않는다.",
+      "hint1": "미분할 때 t의 단위와 H 인자를 확인한다.",
+      "hint2": "P-a0와 t(a1+t(a2+a3t))를 비교하면 작은 차이를 절대 mu로 되돌리지 않아도 된다.",
+      "transfer": "다른 구간 폭에서 동일한 압력 역함수 잔차를 검사한다.",
+      "limits": "Cell 검사는 별의 고유값 또는 실제 EOS의 오차 상한을 증명하지 않는다.",
+      "rubric_anchor": "2점: 계수 jump와 새로운 물질적 jump를 구분하고, 각 미분의 H 차수와 pressure residual을 설명한다.",
+      "cue_source": "curriculum/cues/A20.md",
+      "commands": [
+        "python tools/run_assignment.py A20 --run --output ../A20.json"
+      ],
+      "default_workspace": "calculation",
+      "learning_prompt": {
+        "question": "같은 표에서 읽은 값과 미분이 왜 서로 어긋날까?",
+        "prediction": "압력과 첫 미분이 연속인 cubic을 이어 붙였다. 둘째 미분도 연속인가? 압축응답의 knot를 물질적 밀도 jump로 읽어도 되는지 먼저 적자.",
+        "feedback": "평가할 대상은 하나의 구간 함수다. Native knot를 보존하고 작은 local coordinate에서 값·미분·역함수를 확인한다. 표를 더 조밀하게 만든 것과는 다르다.",
+        "delayed_transfer": "다음 회차에는 구간 폭만 다른 같은 시험문제를 고른다. 재보간 없이 역함수 잔차를 비교하고, 정밀도가 나빠졌다면 어떤 연산을 먼저 의심할지 말한다."
+      }
+    },
+    {
+      "id": "A19",
+      "title": "통제 비교와 분해능 판단",
+      "stage": "ch10",
+      "prerequisites": [
+        "A07",
+        "A10",
+        "A18",
+        "A20"
+      ],
+      "independent_hours": [
+        8,
+        14
+      ],
+      "source_paths": [
+        "notes/chapters/ch10.md",
+        "learner/src/diagnostics/ns_structure_diagnostics.f90",
+        "learner/src/diagnostics/ns_mode_diagnostics.f90",
+        "tools/stellar_methods.py"
+      ],
+      "tests": [
+        "tests/test_controlled_study.py::test_constant_background_geometry_acoustic_and_dimensionless_frequency",
+        "tests/test_null_and_difference.py::test_pair_resolution_is_separate_from_mode_identity",
+        "tests/test_null_and_difference.py::test_exact_null_uses_absolute_resolution_not_relative_error"
+      ],
+      "objective": "고밀도 부분·질량 branch·섭동·표면 처방을 통제하고 paired refinement가 허용하는 결론만 진술한다.",
+      "derivation": "$\\delta_{\\rm num}=\\max(|\\Delta_1-\\Delta_0|,|\\Delta_2-\\Delta_1|)$. 독립적인 root·roundoff 척도보다 큰 마지막 변화가 증가하면 convergence_unresolved다.",
+      "procedure": [
+        "제공 구조·음향 진단과 차이 분류기를 호출한다. 직접 구현은 선택한다.",
+        "본문의 세 refinement 기록을 먼저 스스로 분류한 뒤 판정과 대조한다.",
+        "한 pair의 결과와 전체 A21 수렴 자료를 구분하여 해석한다."
+      ],
+      "deliverables": [
+        "핵심 자동시험",
+        "세 수준의 차이·floor·판정 표",
+        "같은 core/M/closure를 유지하는 계획서 또는 실제 pair 증거",
+        "mass residual의 주파수 기여 한계"
+      ],
+      "interpretation": "기본 자동시험은 진단/분류기 시험이다. 실제 same-mass 모델 pair를 계산한 증거를 대신하지 않는다.",
+      "hint1": "각 refinement에서 baseline과 variant를 같은 설정으로 계산해야 한다.",
+      "hint2": "주어진 p1 변화량의 마지막 증가를 먼저 확인하라. fine 값이 크다는 이유로 resolved라 부르지 않는다.",
+      "transfer": "새 세 수열을 주고 below_resolution, convergence_unresolved, identity_unresolved를 근거와 함께 구별한다.",
+      "limits": "실패한 저장 배경 수열과 native EOS 함수를 직접 적분한 결과를 구별한다. 한 pair의 성공을 전체 오차 확인으로 읽지 않는다.",
+      "rubric_anchor": "2점 예: 자동시험·기록 해석·실제 pair 생성의 증거 수준을 분리하고 unresolved 판정을 정확히 내린다.",
+      "cue_source": "curriculum/cues/A19.md",
+      "commands": [
+        "python -c \"from tools.stellar_methods import solve_pair; solve_pair('../first_pair')\""
+      ],
+      "learning_prompt": {
+        "question": "차이가 일정하면 두 계산도 수렴한 것일까?",
+        "prediction": "두 별의 주파수가 refinement마다 함께 이동하여 차이만 거의 일정하다. 이 경우 확인한 것은 차이인가, 각각의 주파수인가? 먼저 답을 분리하자.",
+        "feedback": "서로 다른 오류가 상쇄될 수 있다. 절대 주파수 수열과 paired difference를 함께 읽고, 아직 분해하지 못했다는 결론을 물리적 무효과로 바꾸지 않는다.",
+        "delayed_transfer": "다음 회차에는 분해능 이하·수렴 미확인·모드 식별 미확인의 세 상황에 다음 실험을 각각 하나씩 고른다. 모든 경우에 tolerance만 줄인다고 답하지 않는다."
+      }
+    },
+    {
+      "id": "A21",
+      "title": "같은 경계값 문제에서 작은 모드 차이를 분해하기",
+      "stage": "ch10",
+      "prerequisites": [
+        "A19",
+        "A20"
+      ],
+      "independent_hours": [
+        4,
+        6
+      ],
+      "source_paths": [
+        "notes/chapters/ch05.md",
+        "notes/chapters/ch06.md",
+        "notes/chapters/ch10.md",
+        "tools/stellar_methods.py",
+        "calculation/src/adapters/ns_cell_shooting.f90"
+      ],
+      "tests": [
+        "tests/test_precision_learning.py::test_selected_precision_pair"
+      ],
+      "objective": "제공된 양방향 방법으로 같은 질량의 두 별을 계산하고 절대 주파수·차이·모드 식별·오차 항목을 함께 확인한다.",
+      "derivation": "$D=\\det(\\mathbf z_{\\rm in},\\mathbf z_{\\rm out})/(\\|\\mathbf z_{\\rm in}\\|\\|\\mathbf z_{\\rm out}\\|)$; $\\mathbf b\\cdot\\mathbf z_s=0$.",
+      "procedure": [
+        "표면벡터와 determinant를 본문 식에서 설명한 뒤 제공 solve_pair를 호출한다.",
+        "run_study의 단계별 결과에서 절대 주파수·차이·모드 대응을 각각 읽는다.",
+        "중심·표면·연결점·질량·무변형 및 적분 검사의 근거로 결론을 쓴다. 중심 다음 항은 선택한다."
+      ],
+      "deliverables": [
+        "같은 물리 BC와 두 방향 해의 연결",
+        "두 별의 절대 주파수와 paired difference 수렴표",
+        "고유함수 대응과 오차 항목의 계산 근거",
+        "study.json과 재개 가능한 실행 명령"
+      ],
+      "interpretation": "제10장의 본 과제다. 자동 선택 시험은 한 pair만 검사한다. 물리적 분해 판정은 별도의 21개 단일별 실행과 모든 조건을 요구한다.",
+      "hint1": "두 비영 벡터가 평행하면 비자명한 선형해의 전체 배율을 맞출 수 있다.",
+      "hint2": "주파수만 비교하지 말고 matching점의 r,m와 고유함수도 확인한다.",
+      "transfer": "새 질량 하나에서 같은 branch와 mode를 확인하고 필요한 수렴 실험을 스스로 고른다.",
+      "limits": "Empirical allowance는 interval proof나 관측 신뢰구간이 아니다.",
+      "rubric_anchor": "2점: 자동 pair 성공과 전체 numerical allowance를 구분하고, 같은 EOS·질량·mode 조건에서 결과의 부호를 방어한다.",
+      "cue_source": "curriculum/cues/A21.md",
+      "commands": [
+        "python tools/stellar_methods.py --output ../my_study --max-new-runs 2",
+        "python tools/stellar_methods.py --output ../my_study"
+      ],
+      "default_workspace": "calculation",
+      "learning_prompt": {
+        "question": "같은 문제의 해라는 주장을 무엇으로 방어하는가?",
+        "prediction": "두 방향에서 얻은 벡터의 determinant가 작다. 이것만으로 다른 EOS·다른 질량에서 얻은 해도 연결할 수 있을까? 잔차 앞에 필요한 조건을 먼저 말하자.",
+        "feedback": "단일 pair 성공, 절대 주파수 수렴, 모드 대응과 전체 수치 여유는 별도 증거다. 적분 검사에서도 유한 표면항을 보존하고 저장 주파수를 다시 넣는 순환 검사를 피한다.",
+        "delayed_transfer": "다음 만남에는 결과의 마지막 자릿수를 가린다. 같은 물리 문제인지 확인할 조건과 가장 취약한 오차원에 대한 다음 실험 하나를 스스로 고른다."
+      }
+    },
+    {
+      "id": "P0",
+      "title": "내 소스를 그대로 독립 실행하기",
+      "stage": "ch11",
+      "prerequisites": [
+        "A21"
+      ],
+      "independent_hours": [
+        0.5,
+        1
+      ],
+      "source_paths": [
+        "tools/export_learner.py",
+        "tools/verify_export.py",
+        "notes/chapters/ch11.md",
+        "tools/make_calculation.py"
+      ],
+      "tests": [],
+      "objective": "선택한 물리 함수를 보존하고 제공 방법과 함께 새 폴더에서 실행한다.",
+      "derivation": "이 과제는 물리 방정식의 추가가 아니다. 동일한 소스와 공용 의존성을 보존하고, 다른 위치에서 실제로 빌드·실행할 수 있는지 확인한다.",
+      "procedure": [
+        "직접 작성한 learner 경로와 제공 계산 경로 중 무엇을 옮길지 먼저 정한다.",
+        "P1–P4의 verify_export 시험을 사용할 때는 export_learner로 ../my_solver를 만든다.",
+        "제공 계산은 make_calculation으로 별도 ../my_calculation에 만든다. 서로의 확인 도구를 혼용하지 않는다."
+      ],
+      "deliverables": [
+        "선택한 경로와 SOURCE_FILES.json 또는 CALCULATION.json",
+        "전후 소스 비교 및 직접 작성·제공 함수의 구분"
+      ],
+      "interpretation": "이전 실행파일이 없어도 소스로부터 다시 만들어져야 한다. 임시 폴더 실행을 운영체제의 접근 격리와 혼동하지 않는다.",
+      "hint1": "경로는 실행한 현재 폴더가 아니라 fpm.toml의 위치를 기준으로 해석한다.",
+      "hint2": "CALCULATION.json의 물리 파일과 실제 선택한 파일의 내용을 비교한다.",
+      "transfer": "같은 소스를 다른 새 폴더로 옮겨 필요한 의존성이 그 안에 모두 있는지 확인한다.",
+      "limits": "소스 보존과 build 성공은 별 전체의 물리 검증과 다르다. 작성하지 않은 함수는 새 폴더에서도 미완성이다.",
+      "rubric_anchor": "2점: 실제 소스 보존·의존성·실행 기록을 연결하고, 계산하지 않은 물리 결과까지 검증했다고 말하지 않는다.",
+      "cue_source": "curriculum/cues/P0.md",
+      "commands": [
+        "python tools/export_learner.py --output ../my_solver",
+        "python tools/make_calculation.py --output ../my_calculation"
+      ],
+      "learning_prompt": {
+        "question": "옮긴 것은 실행파일인가, 자신이 작성한 계산인가?",
+        "prediction": "새 폴더에서 결과가 나왔다. 이전 binary를 사용한 것인지 소스로부터 만든 것인지 어떻게 구별할지, 복사 전에 필요한 파일을 적자.",
+        "feedback": "제공 계산과 직접 작성한 learner는 서로 다른 출발점이다. 어느 쪽을 옮겼는지 명시해야 자신의 성취와 재현 범위가 드러난다.",
+        "delayed_transfer": "다음 회차에는 원래 폴더 경로를 보지 않고 필요한 소스·입력·공용 함수가 어디 있는지 설명한다."
+      }
+    },
+    {
+      "id": "P1",
+      "title": "제공 support의 의존성 닫기",
+      "stage": "ch11",
+      "prerequisites": [
+        "P0"
+      ],
+      "independent_hours": [
+        0.5,
+        1
+      ],
+      "source_paths": [
+        "tools/export_learner.py",
+        "tools/verify_export.py",
+        "notes/chapters/ch11.md"
+      ],
+      "tests": [],
+      "objective": "path dependency가 독립 실행 내부에서만 해석되고 동일 support를 사용하는지 확인한다.",
+      "derivation": "이 과제는 물리 방정식의 추가가 아니다. 동일한 소스와 공용 의존성을 보존하고, 다른 위치에서 실제로 빌드·실행할 수 있는지 확인한다.",
+      "procedure": [
+        "P0에서 만든 learner export의 manifest와 내부 공용 경로를 읽는다.",
+        "아래 명령은 SOURCE_FILES.json을 가진 learner export에 사용한다. CALCULATION.json만 있는 폴더에는 적용하지 않는다.",
+        "경로가 어디를 기준으로 해석되는지 결과와 연결한다."
+      ],
+      "deliverables": [
+        "learner export의 실제 의존 경로 검사",
+        "검사한 폴더와 실행 경로의 명시"
+      ],
+      "interpretation": "이전 실행파일이 없어도 소스로부터 다시 만들어져야 한다. 임시 폴더 실행을 운영체제의 접근 격리와 혼동하지 않는다. 기본 계산공간에서는 calculation, methods, support의 의존성을 같은 원칙으로 확인한다. learner 전용 명령은 직접 구현 경로에만 사용한다.",
+      "hint1": "경로는 실행한 현재 폴더가 아니라 fpm.toml의 위치를 기준으로 해석한다.",
+      "hint2": "SOURCE_FILES.json에 기록된 파일과 실제 learner 파일의 내용을 비교한다.",
+      "transfer": "같은 소스를 다른 새 폴더로 옮겨 필요한 의존성이 그 안에 모두 있는지 확인한다.",
+      "limits": "소스 보존과 build 성공은 별 전체의 물리 검증과 다르다. 작성하지 않은 함수는 새 폴더에서도 미완성이다.",
+      "rubric_anchor": "2점: 실제 소스 보존·의존성·실행 기록을 연결하고, 계산하지 않은 물리 결과까지 검증했다고 말하지 않는다.",
+      "cue_source": "curriculum/cues/P1.md",
+      "commands": [
+        "python tools/verify_export.py --export ../my_solver --output ../dependency_check.json"
+      ],
+      "learning_prompt": {
+        "question": "공용 함수를 가져오면 외부 의존성도 사라지는가?",
+        "prediction": "fpm 설정에 상대 경로가 있다. 이 경로가 어느 파일의 위치를 기준으로 해석되는지 먼저 말하고, 옮긴 폴더 밖으로 나가는지 예측하자.",
+        "feedback": "의존성이 있다는 사실은 문제가 아니다. 무엇을 어디에서 가져오는지 드러나고 새 위치 안에서 해석되는지가 핵심이다.",
+        "delayed_transfer": "다음 회차에는 다른 위치의 같은 manifest를 읽는다. 작업 폴더와 설정 파일의 기준점을 혼동하지 않고 의존 경로를 찾아간다."
+      }
+    },
+    {
+      "id": "P2",
+      "title": "숨은 binary와 외부 경로 찾기",
+      "stage": "ch11",
+      "prerequisites": [
+        "P1"
+      ],
+      "independent_hours": [
+        0.5,
+        1
+      ],
+      "source_paths": [
+        "tools/export_learner.py",
+        "tools/verify_export.py",
+        "notes/chapters/ch11.md"
+      ],
+      "tests": [],
+      "objective": "과거 compiler 산출물과 외부 source fallback 없이 소스만 전달한다.",
+      "derivation": "이 과제는 물리 방정식의 추가가 아니다. 동일한 소스와 공용 의존성을 보존하고, 다른 위치에서 실제로 빌드·실행할 수 있는지 확인한다.",
+      "procedure": [
+        "learner export에서 binary·외부 경로·원본 소스 변경을 검사한다.",
+        "아래 명령은 SOURCE_FILES.json을 가진 learner export에 사용한다. CALCULATION.json만 있는 폴더에는 적용하지 않는다.",
+        "거절된 항목의 실제 경로를 확인하고 과학 결과와 구별한다."
+      ],
+      "deliverables": [
+        "실제 소스 목록과 binary·외부 경로 검사",
+        "검사가 배제한 의존성과 남은 한계"
+      ],
+      "interpretation": "이전 실행파일이 없어도 소스로부터 다시 만들어져야 한다. 임시 폴더 실행을 운영체제의 접근 격리와 혼동하지 않는다. 기본 계산공간에서는 calculation, methods, support의 의존성을 같은 원칙으로 확인한다. learner 전용 명령은 직접 구현 경로에만 사용한다.",
+      "hint1": "경로는 실행한 현재 폴더가 아니라 fpm.toml의 위치를 기준으로 해석한다.",
+      "hint2": "SOURCE_FILES.json에 기록된 파일과 실제 learner 파일의 내용을 비교한다.",
+      "transfer": "같은 소스를 다른 새 폴더로 옮겨 필요한 의존성이 그 안에 모두 있는지 확인한다.",
+      "limits": "소스 보존과 build 성공은 별 전체의 물리 검증과 다르다. 작성하지 않은 함수는 새 폴더에서도 미완성이다.",
+      "rubric_anchor": "2점: 실제 소스 보존·의존성·실행 기록을 연결하고, 계산하지 않은 물리 결과까지 검증했다고 말하지 않는다.",
+      "cue_source": "curriculum/cues/P2.md",
+      "commands": [
+        "python tools/verify_export.py --export ../my_solver --output ../source_check.json"
+      ],
+      "learning_prompt": {
+        "question": "지난 실행의 흔적이 없어도 다시 만들 수 있는가?",
+        "prediction": "소스 폴더에 .o·.mod·실행파일이 섞여 있다. 그것들이 없어도 계산을 다시 만들 수 있어야 하는 이유를 검사 전에 설명하자.",
+        "feedback": "숨은 binary나 원래의 절대 경로가 있으면 새 소스로 계산했다는 주장을 뒷받침하기 어렵다. 소스 보존 검사와 실행 성공은 구별한다.",
+        "delayed_transfer": "다음 회차에는 결과가 같은 두 폴더에서 실제 사용한 소스가 같은지 확인할 자료를 고른다. 파일명만 비교하지 않는다."
+      }
+    },
+    {
+      "id": "P3",
+      "title": "clean build와 CLI smoke",
+      "stage": "ch11",
+      "prerequisites": [
+        "P2"
+      ],
+      "independent_hours": [
+        0.5,
+        1
+      ],
+      "source_paths": [
+        "tools/export_learner.py",
+        "tools/verify_export.py",
+        "notes/chapters/ch11.md"
+      ],
+      "tests": [],
+      "objective": "별도 임시 사본에서 소스부터 빌드하고 learner environment를 실행한다.",
+      "derivation": "이 과제는 물리 방정식의 추가가 아니다. 동일한 소스와 공용 의존성을 보존하고, 다른 위치에서 실제로 빌드·실행할 수 있는지 확인한다.",
+      "procedure": [
+        "검사 도구의 --build로 별도 사본에서 소스를 빌드하고 작은 입력을 실행한다.",
+        "아래 명령은 SOURCE_FILES.json을 가진 learner export에 사용한다. CALCULATION.json만 있는 폴더에는 적용하지 않는다.",
+        "빌드 성공과 environment 실행이 확인한 범위를 적는다."
+      ],
+      "deliverables": [
+        "소스부터 빌드한 명령과 environment 실행",
+        "물리 검증과 구분한 성공 범위"
+      ],
+      "interpretation": "이전 실행파일이 없어도 소스로부터 다시 만들어져야 한다. 임시 폴더 실행을 운영체제의 접근 격리와 혼동하지 않는다. 기본 계산공간에서는 calculation, methods, support의 의존성을 같은 원칙으로 확인한다. learner 전용 명령은 직접 구현 경로에만 사용한다.",
+      "hint1": "경로는 실행한 현재 폴더가 아니라 fpm.toml의 위치를 기준으로 해석한다.",
+      "hint2": "SOURCE_FILES.json에 기록된 파일과 실제 learner 파일의 내용을 비교한다.",
+      "transfer": "같은 소스를 다른 새 폴더로 옮겨 필요한 의존성이 그 안에 모두 있는지 확인한다.",
+      "limits": "소스 보존과 build 성공은 별 전체의 물리 검증과 다르다. 작성하지 않은 함수는 새 폴더에서도 미완성이다.",
+      "rubric_anchor": "2점: 실제 소스 보존·의존성·실행 기록을 연결하고, 계산하지 않은 물리 결과까지 검증했다고 말하지 않는다.",
+      "cue_source": "curriculum/cues/P3.md",
+      "commands": [
+        "python tools/verify_export.py --export ../my_solver --build --output ../build_check.json"
+      ],
+      "learning_prompt": {
+        "question": "빌드가 끝나면 물리 검증도 끝나는가?",
+        "prediction": "새 위치에서 environment case가 성공했다. EOS·TOV·고유값 중 어느 단계까지 검증되었다고 말할 수 있는지 먼저 적자.",
+        "feedback": "이 과제는 빌드와 입력 전달을 확인한다. 물리 결과는 해당 입력의 과학 시험이 필요하다. 시작 단계 A00에서 했던 구분을 여기서 다시 적용한다.",
+        "delayed_transfer": "다음 회차에는 설치 실패와 함수가 반환한 물리적 거절의 로그를 구별한다. 고쳐야 할 대상도 서로 다르게 적는다."
+      }
+    },
+    {
+      "id": "P4",
+      "title": "동료에게 넘길 재현 가능한 실행 안내",
+      "stage": "ch11",
+      "prerequisites": [
+        "P3"
+      ],
+      "independent_hours": [
+        0.5,
+        1
+      ],
+      "source_paths": [
+        "tools/export_learner.py",
+        "tools/verify_export.py",
+        "notes/chapters/ch11.md"
+      ],
+      "tests": [],
+      "objective": "입력·소스·환경·결과·한계를 한 번에 따라갈 수 있는 실행 안내를 작성한다.",
+      "derivation": "이 과제는 물리 방정식의 추가가 아니다. 동일한 소스와 공용 의존성을 보존하고, 다른 위치에서 실제로 빌드·실행할 수 있는지 확인한다.",
+      "procedure": [
+        "동료에게 입력·실행 명령·결과의 단위와 한계를 전달한다.",
+        "아래 명령은 SOURCE_FILES.json을 가진 learner export에 사용한다. CALCULATION.json만 있는 폴더에는 적용하지 않는다.",
+        "동료가 멈춘 지점 하나를 안내문에 반영한 뒤 다시 실행해 본다."
+      ],
+      "deliverables": [
+        "동료가 사용한 입력·명령·결과",
+        "질문을 반영해 수정한 안내문 한 문장"
+      ],
+      "interpretation": "이전 실행파일이 없어도 소스로부터 다시 만들어져야 한다. 임시 폴더 실행을 운영체제의 접근 격리와 혼동하지 않는다. 기본 계산공간에서는 calculation, methods, support의 의존성을 같은 원칙으로 확인한다. learner 전용 명령은 직접 구현 경로에만 사용한다.",
+      "hint1": "경로는 실행한 현재 폴더가 아니라 fpm.toml의 위치를 기준으로 해석한다.",
+      "hint2": "SOURCE_FILES.json에 기록된 파일과 실제 learner 파일의 내용을 비교한다.",
+      "transfer": "같은 소스를 다른 새 폴더로 옮겨 필요한 의존성이 그 안에 모두 있는지 확인한다.",
+      "limits": "소스 보존과 build 성공은 별 전체의 물리 검증과 다르다. 작성하지 않은 함수는 새 폴더에서도 미완성이다.",
+      "rubric_anchor": "2점: 실제 소스 보존·의존성·실행 기록을 연결하고, 계산하지 않은 물리 결과까지 검증했다고 말하지 않는다.",
+      "cue_source": "curriculum/cues/P4.md",
+      "commands": [
+        "python tools/verify_export.py --export ../my_solver --build --output ../handoff_check.json"
+      ],
+      "learning_prompt": {
+        "question": "동료는 설명 없이도 같은 질문을 계산할 수 있는가?",
+        "prediction": "명령 하나와 주파수 표만 전달받았다고 하자. 같은 결과를 해석하기 위해 추가로 필요한 조건을 동료의 입장에서 먼저 적자.",
+        "feedback": "도움을 준 문장을 실행 안내에 반영한다. 동료가 막힌 사실을 능력 탓으로 돌리지 말고 누락된 입력·환경·단계가 무엇인지 확인한다.",
+        "delayed_transfer": "다음 만남에는 처음의 구두 설명 없이 안내문만으로 작은 실행을 반복한다. 안내문의 수정으로 달라진 점과 남은 문제를 기록한다."
+      }
+    },
+    {
+      "id": "P5",
+      "title": "누적 음향시간의 독립 확장",
+      "stage": "ch12",
+      "prerequisites": [
+        "P4"
+      ],
+      "independent_hours": [
+        3,
+        5
+      ],
+      "source_paths": [
+        "extensions/P5/cumulative_acoustic_time.py",
+        "notes/chapters/ch12.md"
+      ],
+      "tests": [
+        "extensions/P5/test_cumulative_acoustic_time.py::test_local_analytic_profile_has_tau_equal_two_r_over_c",
+        "extensions/P5/test_cumulative_acoustic_time.py::test_nonuniform_grid_with_nonconstant_integrand",
+        "extensions/P5/test_cumulative_acoustic_time.py::test_invalid_profile_does_not_emit_success_output",
+        "extensions/P5/test_cumulative_acoustic_time.py::test_lapse_shift_rescales_postprocessed_time"
+      ],
+      "objective": "동결된 배경의 read-only 적분을 추가하고  solver와 학생 source를 보존한다.",
+      "derivation": "$$\n\\tau(r)=\\int_0^r\\frac{e^{\\lambda(r')-\\nu(r')}}{c\\sqrt{\\chi(r')}}\\,dr'.\n$$\n$0<r<r_0$에서는 첫 integrand를 유지하고, 이후에는 저장된 radial 점의 trapezoid rule을 적용한다.",
+      "procedure": [
+        "현재 독립 export 안의 P5 slot만 수정한다.",
+        "중심 누락구간의 hold와 이후 trapezoid 규칙을 구현한다.",
+        "상수 integrand와 비균일 격자의 비상수 integrand를 각각 확인한다.",
+        "잘못된 chi/반경 입력을 거절하고  solver source hash를 보존한다."
+      ],
+      "deliverables": [
+        "cumulative τ CSV와 metadata",
+        "두 독립 적분 기준의 시험 결과",
+        "허용 변경 경로와 이전 solver 불변 receipt"
+      ],
+      "interpretation": "새 postprocessing 진단은 EOS나 Cowling closure를 변경하지 않는다.",
+      "hint1": "처음 저장된 반경이 0이 아니므로 초기 τ를 0으로 두면 안 된다.",
+      "hint2": "간격이 균일하다고 가정하지 말고 각 Δr을 사용한다.",
+      "transfer": "ν만 상수 C만큼 바꾼 고정 profile에서 τ가 exp(−C)배가 되는지 비교한다.",
+      "limits": "선형 sample 보간의 구적 규칙이며 실제 음파 mode spectrum을 새로 계산하는 solver가 아니다.",
+      "rubric_anchor": "2점 예: 비상수 g의 비균일 격자에서도 중심 hold와 trapezoid를 독립 계산으로 확인한다.",
+      "cue_source": "curriculum/cues/P5.md",
+      "commands": [],
+      "learning_prompt": {
+        "question": "음향시간을 추가하면서 원래 별을 바꿔야 하는가?",
+        "prediction": "첫 저장 반경이 0이 아니다. 누적 적분을 그곳에서 0으로 시작하면 무엇을 생략하는지 먼저 그림이나 문장으로 설명하자.",
+        "feedback": "배경을 읽기만 하는 진단이다. 중심 누락 구간의 규칙과 각 반경 간격을 명시하고, 상수 integrand 하나로 일반 적분 구현을 검증했다고 말하지 않는다.",
+        "delayed_transfer": "다음 회차에는 고정 profile의 lapse에 상수를 더한 경우 음향시간이 어떻게 바뀌는지 설명한다. 새 고유모드 계산과는 구별한다."
+      }
+    }
+  ]
+}

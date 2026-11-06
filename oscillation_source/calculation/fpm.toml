@@ -1,0 +1,24 @@
+name = "ns-calculation"
+description = "Explicit Cowling model using provided numerical methods"
+[build]
+auto-executables = false
+auto-tests = false
+auto-examples = false
+module-naming = false
+[library]
+source-dir = "src"
+[fortran]
+implicit-typing = false
+implicit-external = false
+source-form = "free"
+[dependencies]
+ns-support = { path = "../support" }
+ns-methods = { path = "../methods" }
+[[executable]]
+name = "cell_solve"
+source-dir = "app"
+main = "cell_solve.f90"
+[[test]]
+name = "cell_checks"
+source-dir = "tests_fortran"
+main = "cell_checks.f90"

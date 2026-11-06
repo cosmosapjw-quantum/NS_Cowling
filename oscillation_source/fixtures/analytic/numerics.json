@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "kind": "analytic_definitions",
+  "not_ns_calibration": true,
+  "independent_variable": "dimensionless",
+  "problems": {
+    "sqrt2": "F(x)=x*x-2",
+    "exponential": "dy/dx=y, y(0)=1; y(x)=exp(x)",
+    "oscillator": "dq/dx=v,dv/dx=-q; q(0)=1,v(0)=0; (q,v)=(cos(x),-sin(x))",
+    "cubic": "dy/dx=x^3, y(0)=0; y(1)=1/4",
+    "quartic": "dy/dx=x^4, y(0)=0; y(h)=h^5/5"
+  },
+  "uniform_steps": [
+    16,
+    32,
+    64
+  ],
+  "dopri_reference": "https://www.unige.ch/~hairer/prog/nonstiff/dopri5.f",
+  "reference_use": "mathematical coefficient check; no original solver copied; max norm/proportional controller chosen locally"
+}

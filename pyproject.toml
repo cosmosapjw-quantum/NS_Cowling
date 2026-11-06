@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "compose-cowling-pipeline"
+version = "1.0.0"
+description = "Reproducible joined CompOSE EOS to relativistic Cowling f/p1 oscillation pipeline"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.20"]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[project.scripts]
+compose-cowling = "compose_cowling.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "pipeline"}
+
+[tool.setuptools.packages.find]
+where = ["pipeline"]

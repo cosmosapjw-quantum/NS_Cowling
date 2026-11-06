@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "id": "polytrope_analytic_v1",
+  "kind": "analytic_problem_definition",
+  "units": "SI",
+  "total_energy_includes_linear_rest_term": true,
+  "input": {
+    "n_anchor_m3": 1e+44,
+    "p_anchor_pa": 1e+32,
+    "gamma": 2.0,
+    "c_j": 1.5e-10,
+    "n_min_m3": 1e+40,
+    "n_max_m3": 1e+46
+  },
+  "expected_anchor": {
+    "pressure_pa": 1e+32,
+    "energy_j_m3": 1.51e+34,
+    "mu_j": 1.52e-10,
+    "chi": 0.013157894736842105
+  },
+  "oracle": "closed-form cold first law; tests also use Decimal 60 digits, independent FD and Simpson",
+  "not_a_stellar_calibration": true,
+  "domain": "closed positive interval; n=0 and automatic extensions excluded"
+}

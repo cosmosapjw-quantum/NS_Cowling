@@ -1,0 +1,201 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  10pt,
+  a4paper,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{setspace}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{Liberation Serif}
+  \setsansfont[]{Liberation Sans}
+  \setmonofont[]{DejaVu Sans Mono}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=22mm]{geometry}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+\usepackage[bidi=basic]{babel}
+\else
+\usepackage[bidi=default]{babel}
+\fi
+\babelprovide[main,import]{korean}
+\ifPDFTeX
+\else
+\babelfont{rm}[]{Liberation Serif}
+\fi
+% get rid of language-specific shorthands (see #6817):
+\let\LanguageShortHands\languageshorthands
+\def\languageshorthands#1{}
+\usepackage{xeCJK}
+\setCJKmainfont{Noto Serif CJK KR}
+\setCJKsansfont{Noto Sans CJK KR}
+\setCJKmonofont{Noto Sans Mono CJK KR}
+\xeCJKsetup{CJKspace=true}
+\usepackage{xurl}
+\usepackage{fvextra}
+\usepackage{fancyhdr}
+\AtBeginDocument{\DefineVerbatimEnvironment{verbatim}{Verbatim}{breaklines=true,breakanywhere=true,fontsize=\small}}
+\setlength{\emergencystretch}{4em}
+\setlength{\headheight}{15pt}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small 중성자별 구조와 비방사 진동}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\setcounter{tocdepth}{2}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={A17 · 액적 toy와 이산 최소화},
+  pdflang={ko-KR},
+  colorlinks=true,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\title{A17 · 액적 toy와 이산 최소화}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{과제 큐시트}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\setstretch{1.12}
+\textbf{선행:} A16　 \textbf{독립 작업:} 3--5시간 (계획치)
+
+\subsection{가장 낮은 후보는 곧
+최소점인가?}\label{uxac00uxc7a5-uxb0aeuxc740-uxd6c4uxbcf4uxb294-uxace7-uxcd5cuxc18cuxc810uxc778uxac00}
+
+정수 후보를 훑었더니 경계에서 에너지가 가장 낮았다. 이를 내부 stationary
+point라 부를 수 있을지, 더 필요한 비교를 먼저 적자.
+
+먼저 한두 문장으로 답한 뒤 아래 설명을 읽자. 첫 예측이 틀렸거나 아직
+모르겠다고 적는 것은 감점하지 않는다.
+
+\subsection{필요한 관계와 읽을
+위치}\label{uxd544uxc694uxd55c-uxad00uxacc4uxc640-uxc77duxc744-uxc704uxce58}
+
+\(E_{nuc}=-a_vA+a_sA^{2/3}+a_cZ^2A^{-1/3}+a_a(A-2Z)^2/A\),
+\(n_e=(Z/A)n_B\), \(e_{toy}=E_{nuc}/A+\epsilon_e/n_B\).
+
+\begin{itemize}
+\tightlist
+\item
+  \path|notes/chapters/ch08.md|
+\item
+  \path|learner/src/eos/ns_liquid_drop.f90|
+\item
+  \path|fixtures/nuclear/liquid_drop_toy.json|
+\end{itemize}
+
+\subsection{계산으로
+옮기기}\label{uxacc4uxc0b0uxc73cuxb85c-uxc62euxae30uxae30}
+
+기본 경로는 제공 함수의 호출과 해석이다. 아래 \texttt{learner} 시험은
+같은 물리 함수를 직접 작성한 경우에 실행한다. 제공 예제를 검사할 때에는
+명시적으로 \texttt{calculation}을 선택한다.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  경험계수와 제공 electron helper의 역할을 구분한다.
+\item
+  고정 n\_B에서 A,Z mesh를 선언한다.
+\item
+  허용 candidate만 평가하고 최소 위치가 경계인지 기록한다.
+\item
+  후보를 포함하도록 세분한 mesh에서 최소값이 높아지지 않는지 확인한다.
+\end{enumerate}
+
+\newpage
+
+\subsection{실행해서 무엇을 볼
+것인가}\label{uxc2e4uxd589uxd574uxc11c-uxbb34uxc5c7uxc744-uxbcfc-uxac83uxc778uxac00}
+
+패키지 루트에서 실행한다. \texttt{-\/-plan}은 경로만 확인하며 계산
+성공을 뜻하지 않는다.
+
+\begin{verbatim}
+python tools/run_assignment.py A17 --plan
+python tools/run_assignment.py A17 --run \
+  --workspace learner --output ../A17_result.json
+\end{verbatim}
+
+\subsection{결과를
+설명하기}\label{uxacb0uxacfcuxb97c-uxc124uxba85uxd558uxae30}
+
+후보 집합 안의 최소와 연속 문제의 최소를 구분한다. 후보를 추가한 경우
+이전 최소가 여전히 허용된다면 최솟값이 높아질 수는 없다.
+
+\textbf{남길 증거.} 네 에너지 항 분해; coarse/fine 최소 후보; 경계
+최소와 continuum stationary point의 차이
+
+\textbf{판단 기준.} 2점 예: discrete global minimum이라는 범위를
+명시하고 실제 inner crust로 과장하지 않는다. 최초 예측의 정오보다,
+결과를 본 뒤 이유를 고치고 다른 입력에도 적용하는지를 본다.
+
+\subsection{막혔을 때}\label{uxb9c9uxd614uxc744-uxb54c}
+
+\textbf{힌트 1.} 고정 Z와 고정 Z/A에서 Coulomb scaling이 달라진다.
+
+\textbf{힌트 2.} A→8A, Z 고정이면 surface는 4배, Coulomb은 1/2배이다.
+
+\subsection{다음 만남에 다시
+묻기}\label{uxb2e4uxc74c-uxb9ccuxb0a8uxc5d0-uxb2e4uxc2dc-uxbb3buxae30}
+
+다음 회차에는 표면항과 Coulomb 항의 크기 의존성을 말로 예측한다. 어떤
+변수를 고정했는지도 함께 답한다. 먼저 짧게 답한 뒤 본문과 자신의 기록을
+열어 확인한다.
+
+\textbf{범위.} fixed-pressure Gibbs, neutron drip, pairing, pasta,
+full-star provider는 범위 밖이다.
+
+\end{document}

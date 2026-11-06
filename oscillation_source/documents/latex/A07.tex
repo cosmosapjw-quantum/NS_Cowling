@@ -1,0 +1,200 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  10pt,
+  a4paper,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{setspace}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{Liberation Serif}
+  \setsansfont[]{Liberation Sans}
+  \setmonofont[]{DejaVu Sans Mono}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=22mm]{geometry}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+\usepackage[bidi=basic]{babel}
+\else
+\usepackage[bidi=default]{babel}
+\fi
+\babelprovide[main,import]{korean}
+\ifPDFTeX
+\else
+\babelfont{rm}[]{Liberation Serif}
+\fi
+% get rid of language-specific shorthands (see #6817):
+\let\LanguageShortHands\languageshorthands
+\def\languageshorthands#1{}
+\usepackage{xeCJK}
+\setCJKmainfont{Noto Serif CJK KR}
+\setCJKsansfont{Noto Sans CJK KR}
+\setCJKmonofont{Noto Sans Mono CJK KR}
+\xeCJKsetup{CJKspace=true}
+\usepackage{xurl}
+\usepackage{fvextra}
+\usepackage{fancyhdr}
+\AtBeginDocument{\DefineVerbatimEnvironment{verbatim}{Verbatim}{breaklines=true,breakanywhere=true,fontsize=\small}}
+\setlength{\emergencystretch}{4em}
+\setlength{\headheight}{15pt}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small 중성자별 구조와 비방사 진동}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\setcounter{tocdepth}{2}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={A07 · 같은 질량의 별을 찾기},
+  pdflang={ko-KR},
+  colorlinks=true,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\title{A07 · 같은 질량의 별을 찾기}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{과제 큐시트}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\setstretch{1.12}
+\textbf{선행:} A06　 \textbf{독립 작업:} 3--5시간 (계획치)
+
+\subsection{같은 중심압력으로 비교하면 같은 질량의
+별인가?}\label{uxac19uxc740-uxc911uxc2ecuxc555uxb825uxc73cuxb85c-uxbe44uxad50uxd558uxba74-uxac19uxc740-uxc9c8uxb7c9uxc758-uxbcc4uxc778uxac00}
+
+EOS를 바꾸고 중심압력은 유지했다. 질량도 유지된다는 보장이 있는가?
+없다면 무엇을 다시 조절해야 하는지 먼저 적자.
+
+먼저 한두 문장으로 답한 뒤 아래 설명을 읽자. 첫 예측이 틀렸거나 아직
+모르겠다고 적는 것은 감점하지 않는다.
+
+\subsection{필요한 관계와 읽을
+위치}\label{uxd544uxc694uxd55c-uxad00uxacc4uxc640-uxc77duxc744-uxc704uxce58}
+
+\(F(P_c)=[M(P_c)-M_*]/M_*\). 좁은 \(P_c\) bracket과 작은 \(|M-M_*|\)는
+다른 조건이다.
+
+\begin{itemize}
+\tightlist
+\item
+  \path|learner/src/structure/ns_target_mass.f90|
+\item
+  \path|notes/chapters/ch03_tov.md|
+\end{itemize}
+
+\subsection{계산으로
+옮기기}\label{uxacc4uxc0b0uxc73cuxb85c-uxc62euxae30uxae30}
+
+기본 경로는 제공 함수의 호출과 해석이다. 아래 \texttt{learner} 시험은
+같은 물리 함수를 직접 작성한 경우에 실행한다. 제공 예제를 검사할 때에는
+명시적으로 \texttt{calculation}을 선택한다.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  허용 중심압력 구간과 branch를 선택하고 scan한다.
+\item
+  TOV 실패를 외부 root의 정상 함수값으로 사용하지 않는다.
+\item
+  선택한 목표질량에 대한 외부 bisection을 연결한다.
+\item
+  최종 Pc에서 TOV를 다시 풀고 mass\_atol/mass\_rtol을 확인한다.
+\end{enumerate}
+
+\newpage
+
+\subsection{실행해서 무엇을 볼
+것인가}\label{uxc2e4uxd589uxd574uxc11c-uxbb34uxc5c7uxc744-uxbcfc-uxac83uxc778uxac00}
+
+패키지 루트에서 실행한다. \texttt{-\/-plan}은 경로만 확인하며 계산
+성공을 뜻하지 않는다.
+
+\begin{verbatim}
+python tools/run_assignment.py A07 --plan
+python tools/run_assignment.py A07 --run \
+  --workspace learner --output ../A07_result.json
+\end{verbatim}
+
+\subsection{결과를
+설명하기}\label{uxacb0uxacfcuxb97c-uxc124uxba85uxd558uxae30}
+
+최종 중심압력에서 별을 다시 적분한 질량 잔차가 필요하다. 외부 bracket이
+좁다는 사실만으로 내부 TOV 오차까지 제거되지는 않는다.
+
+\textbf{남길 증거.} Pc--M scan; 최종 질량 잔차와 branch 식별; EOS 변화
+시 Pc가 달라져야 하는 이유
+
+\textbf{판단 기준.} 2점 예: 재적분 질량 오차를 보고하며 root
+bracket만으로 same-mass를 선언하지 않는다. 최초 예측의 정오보다, 결과를
+본 뒤 이유를 고치고 다른 입력에도 적용하는지를 본다.
+
+\subsection{막혔을 때}\label{uxb9c9uxd614uxc744-uxb54c}
+
+\textbf{힌트 1.} 외부 root와 내부 TOV의 종료 상태를 별도로 저장한다.
+
+\textbf{힌트 2.} turning region을 가로지르는 bracket이 다중해를 숨기는지
+점검한다.
+
+\subsection{다음 만남에 다시
+묻기}\label{uxb2e4uxc74c-uxb9ccuxb0a8uxc5d0-uxb2e4uxc2dc-uxbb3buxae30}
+
+다음 회차에는 목표질량이 선택한 가지의 범위 밖에 있는 상황을 설명한다.
+더 큰 외삽 구간을 자동으로 만드는 대신 어떤 정보를 반환할지 고른다. 먼저
+짧게 답한 뒤 본문과 자신의 기록을 열어 확인한다.
+
+\textbf{범위.} 국소 branch 선택은 전체 방사형 안정성 정리의 증명이
+아니다.
+
+\end{document}

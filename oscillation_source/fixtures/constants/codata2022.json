@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "constants_id": "SI2019_CODATA2022_IAU2015_v1",
+  "codata_version": 2022,
+  "sources": {
+    "BIPM": {
+      "title": "SI defining constants",
+      "url": "https://www.bipm.org/en/measurement-units/si-defining-constants"
+    },
+    "CODATA2022": {
+      "title": "2022 CODATA recommended values: complete ASCII table",
+      "url": "https://physics.nist.gov/cuu/Constants/Table/allascii.txt"
+    },
+    "IAU2015B3": {
+      "title": "IAU 2015 Resolution B3",
+      "url": "https://arxiv.org/abs/1510.07674",
+      "specific_location": "PDF page 3, solar conversion table and item 5"
+    }
+  },
+  "constants": {
+    "c_si": {
+      "value_decimal": "299792458",
+      "value_si": 299792458.0,
+      "unit": "m s^-1",
+      "source_id": "BIPM",
+      "exact_in_definition": true,
+      "standard_uncertainty_si": 0.0,
+      "dimension_kg_m_s_A_K_mol_cd": [
+        0,
+        1,
+        -1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "h_si": {
+      "value_decimal": "6.62607015e-34",
+      "value_si": 6.62607015e-34,
+      "unit": "J s",
+      "source_id": "BIPM",
+      "exact_in_definition": true,
+      "standard_uncertainty_si": 0.0,
+      "dimension_kg_m_s_A_K_mol_cd": [
+        1,
+        2,
+        -1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "e_si": {
+      "value_decimal": "1.602176634e-19",
+      "value_si": 1.602176634e-19,
+      "unit": "C",
+      "source_id": "BIPM",
+      "exact_in_definition": true,
+      "standard_uncertainty_si": 0.0,
+      "dimension_kg_m_s_A_K_mol_cd": [
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    "g_si": {
+      "value_decimal": "6.67430e-11",
+      "value_si": 6.6743e-11,
+      "unit": "m^3 kg^-1 s^-2",
+      "source_id": "CODATA2022",
+      "exact_in_definition": false,
+      "standard_uncertainty_si": 1.5e-15,
+      "dimension_kg_m_s_A_K_mol_cd": [
+        -1,
+        3,
+        -2,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "m_e_si": {
+      "value_decimal": "9.1093837139e-31",
+      "value_si": 9.1093837139e-31,
+      "unit": "kg",
+      "source_id": "CODATA2022",
+      "exact_in_definition": false,
+      "standard_uncertainty_si": 2.8e-40,
+      "dimension_kg_m_s_A_K_mol_cd": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "m_n_si": {
+      "value_decimal": "1.67492750056e-27",
+      "value_si": 1.67492750056e-27,
+      "unit": "kg",
+      "source_id": "CODATA2022",
+      "exact_in_definition": false,
+      "standard_uncertainty_si": 8.5e-37,
+      "dimension_kg_m_s_A_K_mol_cd": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "m_p_si": {
+      "value_decimal": "1.67262192595e-27",
+      "value_si": 1.67262192595e-27,
+      "unit": "kg",
+      "source_id": "CODATA2022",
+      "exact_in_definition": false,
+      "standard_uncertainty_si": 5.2e-37,
+      "dimension_kg_m_s_A_K_mol_cd": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "gm_sun_nominal": {
+      "value_decimal": "1.3271244e20",
+      "value_si": 1.3271244e+20,
+      "unit": "m^3 s^-2",
+      "source_id": "IAU2015B3",
+      "exact_in_definition": true,
+      "standard_uncertainty_si": 0.0,
+      "dimension_kg_m_s_A_K_mol_cd": [
+        0,
+        3,
+        -2,
+        0,
+        0,
+        0,
+        0
+      ],
+      "role": "nominal conversion, not a current solar measurement"
+    }
+  },
+  "mathematical_constants": {
+    "pi": "acos(-1) evaluated at real64; irrational, rounded"
+  },
+  "derived_quantities": {
+    "hbar_si": "h_si/(2*pi)",
+    "mev_in_j": "1e6 * e_si * one_volt",
+    "mev_fm3_in_si": "mev_in_j/(1e-15 m)^3",
+    "inverse_fm3_in_si": "1/(1e-15 m)^3",
+    "hbar_c_mev_fm": "hbar_si*c_si/(mev_in_j*1e-15 m)",
+    "nominal_solar_mass_kg": "gm_sun_nominal/g_si; pinned conversion, not exact physical solar mass"
+  },
+  "validation_note": "Independently transcribed from the cited primary sources, compared to compiled Fortran outputs. Exact in definition does not mean exactly representable as a binary float. No stochastic uncertainty propagation or stellar calibration is asserted.",
+  "access_date_utc": "2026-09-24"
+}

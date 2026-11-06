@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "scope": "T12 pedagogical fixed-density liquid-drop crust toy",
+  "formula": "E_nuc(A,Z) = -a_v A + a_s A^(2/3) + a_c Z^2 A^(-1/3) + a_a (A-2Z)^2/A",
+  "coefficient_set": {
+    "a_volume_mev": 15.75,
+    "a_surface_mev": 17.8,
+    "a_coulomb_mev": 0.711,
+    "a_asymmetry_mev": 23.7,
+    "source_note": "Standard educational Bethe-Weizsaecker/Rohlf coefficient set; values are reproduced in public university nuclear-physics teaching notes. They are empirical inputs, not fitted by this package.",
+    "public_sources": [
+      "https://faculty.chas.uni.edu/~shand/Mod_Phys_Lecture_Notes/Chap8_Structure_Atomic_Nuclei_Notes_s12.pdf",
+      "https://sethna.lassp.cornell.edu/Teaching/QuantumI/HW/ps11.pdf"
+    ]
+  },
+  "conventions": {
+    "pairing_term_included": false,
+    "coulomb_uses_z_squared": true,
+    "electron_model": "provided zero-temperature relativistic ideal electron gas from T11",
+    "charge_neutrality": "n_e = Z n_nucleus = (Z/A) n_B",
+    "objective": "minimize total energy per baryon at fixed n_B over an explicitly declared integer A/Z candidate mesh"
+  },
+  "density_admission_fm3": {
+    "min": 1e-10,
+    "max": 0.00025,
+    "meaning": "pedagogical fully-ionized pre-neutron-drip window, not an exact phase-boundary determination",
+    "source_note": "Neutron-star crust reviews place neutron drip near 4e11 g cm^-3 and describe nuclei plus a degenerate electron gas below drip; the lower cutoff is a conservative teaching choice near the fully-ionized one-component-plasma regime."
+  },
+  "not_included": [
+    "fixed-pressure Gibbs minimization",
+    "neutron drip or dripped-neutron fluid",
+    "shell corrections",
+    "pairing",
+    "lattice Coulomb energy",
+    "pasta",
+    "realistic inner-crust EOS",
+    "full-star EOS provider registration"
+  ]
+}

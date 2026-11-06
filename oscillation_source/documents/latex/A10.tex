@@ -1,0 +1,209 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  10pt,
+  a4paper,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{setspace}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{Liberation Serif}
+  \setsansfont[]{Liberation Sans}
+  \setmonofont[]{DejaVu Sans Mono}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=22mm]{geometry}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+\usepackage[bidi=basic]{babel}
+\else
+\usepackage[bidi=default]{babel}
+\fi
+\babelprovide[main,import]{korean}
+\ifPDFTeX
+\else
+\babelfont{rm}[]{Liberation Serif}
+\fi
+% get rid of language-specific shorthands (see #6817):
+\let\LanguageShortHands\languageshorthands
+\def\languageshorthands#1{}
+\usepackage{xeCJK}
+\setCJKmainfont{Noto Serif CJK KR}
+\setCJKsansfont{Noto Sans CJK KR}
+\setCJKmonofont{Noto Sans Mono CJK KR}
+\xeCJKsetup{CJKspace=true}
+\usepackage{xurl}
+\usepackage{fvextra}
+\usepackage{fancyhdr}
+\AtBeginDocument{\DefineVerbatimEnvironment{verbatim}{Verbatim}{breaklines=true,breakanywhere=true,fontsize=\small}}
+\setlength{\emergencystretch}{4em}
+\setlength{\headheight}{15pt}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small 중성자별 구조와 비방사 진동}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\setcounter{tocdepth}{2}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={A10 · 두 근에서 f와 p1 모드로},
+  pdflang={ko-KR},
+  colorlinks=true,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\title{A10 · 두 근에서 f와 p1 모드로}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{과제 큐시트}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\setstretch{1.12}
+\textbf{선행:} A09　 \textbf{독립 작업:} 6--10시간 (계획치)
+
+\subsection{두 번째로 찾은 근은 반드시 첫
+압력모드인가?}\label{uxb450-uxbc88uxc9f8uxb85c-uxcc3euxc740-uxadfcuxc740-uxbc18uxb4dcuxc2dc-uxccab-uxc555uxb825uxbaa8uxb4dcuxc778uxac00}
+
+주파수 순서만 적힌 표에서 두 모드의 이름을 지운다. 다시 이름을 붙이려면
+고유함수에서 무엇을 읽어야 할지 먼저 고르자.
+
+먼저 한두 문장으로 답한 뒤 아래 설명을 읽자. 첫 예측이 틀렸거나 아직
+모르겠다고 적는 것은 감점하지 않는다.
+
+\subsection{필요한 관계와 읽을
+위치}\label{uxd544uxc694uxd55c-uxad00uxacc4uxc640-uxc77duxc744-uxc704uxce58}
+
+\(x=r/R_s\), \(w=W/R_s^3\), \(v=V/R_s^2\), \(\int(w^2+6v^2)\,dx=1\). 이
+정규화는 진단량이며 mode energy가 아니다.
+
+\begin{itemize}
+\tightlist
+\item
+  \path|notes/chapters/ch06.md|
+\item
+  \path|learner/src/modes/ns_mode_spectrum.f90|
+\item
+  \path|learner/src/modes/ns_mode_identity.f90|
+\item
+  \path|learner/src/modes/ns_mode_normalization.f90|
+\item
+  \path|fixtures/contracts/smooth_l2.json|
+\end{itemize}
+
+\subsection{계산으로
+옮기기}\label{uxacc4uxc0b0uxc73cuxb85c-uxc62euxae30uxae30}
+
+기본 경로는 제공 함수의 호출과 해석이다. 아래 \texttt{learner} 시험은
+같은 물리 함수를 직접 작성한 경우에 실행한다. 제공 예제를 검사할 때에는
+명시적으로 \texttt{calculation}을 선택한다.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  coarse 배경에서 scan과 bracket을 만든다.
+\item
+  정밀 root에서 profile을 재적분하고 W,V의 내부 node를 확인한다.
+\item
+  교정된 smooth\_l2 contract와 fixed background의 identity를 함께
+  읽는다.
+\item
+  ODE tolerance와 배경 해상도의 영향을 따로 비교한다.
+\end{enumerate}
+
+\newpage
+
+\subsection{실행해서 무엇을 볼
+것인가}\label{uxc2e4uxd589uxd574uxc11c-uxbb34uxc5c7uxc744-uxbcfc-uxac83uxc778uxac00}
+
+패키지 루트에서 실행한다. \texttt{-\/-plan}은 경로만 확인하며 계산
+성공을 뜻하지 않는다.
+
+\begin{verbatim}
+python tools/run_assignment.py A10 --plan
+python tools/run_assignment.py A10 --run \
+  --workspace learner --output ../A10_result.json
+\end{verbatim}
+
+\subsection{결과를
+설명하기}\label{uxacb0uxacfcuxb97c-uxc124uxba85uxd558uxae30}
+
+이 예제에서는 node와 overlap을 지정된 정규화·구간에서 비교한다. 두
+곡선의 높이 차이를 물리 에너지의 차이로 읽었다면 정규화부터 다시
+확인한다.
+
+\textbf{남길 증거.} root\_status와 identity\_status; 같은 좌표/정규화의
+f,p1 고유함수; 적분 방법 일치와 배경 오차의 차이
+
+\textbf{판단 기준.} 2점 예: 배경 refinement 차이가 root tolerance보다 큰
+사례를 제시하고 오차원을 올바르게 분류한다. 최초 예측의 정오보다, 결과를
+본 뒤 이유를 고치고 다른 입력에도 적용하는지를 본다.
+
+\subsection{막혔을 때}\label{uxb9c9uxd614uxc744-uxb54c}
+
+\textbf{힌트 1.} node zero threshold와 endpoint 제외구간을 먼저
+고정한다.
+
+\textbf{힌트 2.} 0/0 및 1/1 규칙은 현재 smooth family의 진단이지 계면
+spectrum의 보편 정리가 아니다.
+
+\subsection{다음 만남에 다시
+묻기}\label{uxb2e4uxc74c-uxb9ccuxb0a8uxc5d0-uxb2e4uxc2dc-uxbb3buxae30}
+
+다음 회차에는 가까운 두 주파수 후보를 보고 어느 자료가 더 필요할지
+말한다. 첫째·둘째라는 순번 대신 모드의 대응을 근거로 쓴다. 먼저 짧게
+답한 뒤 본문과 자신의 기록을 열어 확인한다.
+
+\textbf{범위.} 회귀 소수자리와 실제 물리 정확도는 다르며 full-GR
+damping은 계산하지 않는다.
+
+\end{document}

@@ -1,0 +1,86 @@
+{
+  "model": "APR_APR",
+  "tail_cs2": 0.95,
+  "metadata": {
+    "schema": "compose-eos-causal-completion-v1",
+    "method": "constant_sound_speed_extension",
+    "cs2_extension": 0.95,
+    "n_match_fm3": 0.8732724588425688,
+    "P_match_MeV_fm3": 437.5953354967793,
+    "eps_match_MeV_fm3": 1015.3245890770272,
+    "n_max_fm3": 1.34,
+    "source_composition_omitted": false,
+    "source_max_cs2": 1.4711109125811217,
+    "source_first_limiter_index": 147,
+    "chemical_potential_match_relative_residual": 6.567542581223313e-07,
+    "sound_speed_continuity_at_join": false,
+    "warning": "This is an explicit constant-cs alternative, not a unique repair of the microscopic source EOS. If cs2_extension differs from 1, c_s^2 has a finite kink at the first causal-limit point even though P, epsilon and mu_B remain continuous."
+  },
+  "overall": {
+    "status": "PASS",
+    "pass_": true,
+    "failed_checks": [],
+    "finite_primary_arrays": true,
+    "note": "C7-C9/C11 are reported as finite-difference diagnostics, not standalone proofs"
+  },
+  "failed_checks": [],
+  "C2": {
+    "basis": "charge-neutral beta equilibrium: mu_l=0",
+    "applicable": true,
+    "max_rel": 3.544057957203427e-16,
+    "pass_": true
+  },
+  "C10": {
+    "min_cs2": 0.0005891874397585309,
+    "max_cs2": 0.9809832374319418,
+    "min_cs2_first_law": 0.000589186145281932,
+    "max_cs2_first_law": 0.9810523193412635,
+    "max_abs_difference_between_forms": 0.00011235604398973642,
+    "acausal_point_count": 0,
+    "acausal_nb_range": null,
+    "acausal_point_count_first_law": 0,
+    "n_points": 458,
+    "pass_": true,
+    "status": "SMOOTH_BRANCH_FINITE_DIFFERENCE; checked dP/deps and dP/(mu_b dn)"
+  },
+  "C11": {
+    "min_dmubdnb": 98.28953892888967,
+    "n_points": 458,
+    "pass_": true,
+    "status": "SMOOTH_BRANCH_FINITE_DIFFERENCE"
+  },
+  "causality_profile": {
+    "pchip": {
+      "max_cs2": 0.981764919734326,
+      "min_cs2": 0.011386336760627426,
+      "acausal_count": 0,
+      "acausal_nb_range": null,
+      "first_acausal_nb": null,
+      "n_valid": 439,
+      "acausal": false
+    },
+    "cubic_spline": {
+      "max_cs2": 0.9953169701541298,
+      "min_cs2": 0.010813946500787609,
+      "acausal_count": 0,
+      "acausal_nb_range": null,
+      "first_acausal_nb": null,
+      "n_valid": 439,
+      "acausal": false
+    },
+    "centered_fd": {
+      "max_cs2": 0.9808655486373415,
+      "min_cs2": 0.011392759350260911,
+      "acausal_count": 0,
+      "acausal_nb_range": null,
+      "first_acausal_nb": null,
+      "n_valid": 439,
+      "acausal": false
+    },
+    "classification": {
+      "robust_acausality": false,
+      "onset_spread_fm3": 0.0,
+      "root_cause": "no_acausality_detected"
+    }
+  }
+}

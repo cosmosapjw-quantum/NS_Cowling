@@ -1,0 +1,208 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  10pt,
+  a4paper,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{setspace}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{Liberation Serif}
+  \setsansfont[]{Liberation Sans}
+  \setmonofont[]{DejaVu Sans Mono}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=22mm]{geometry}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+\usepackage[bidi=basic]{babel}
+\else
+\usepackage[bidi=default]{babel}
+\fi
+\babelprovide[main,import]{korean}
+\ifPDFTeX
+\else
+\babelfont{rm}[]{Liberation Serif}
+\fi
+% get rid of language-specific shorthands (see #6817):
+\let\LanguageShortHands\languageshorthands
+\def\languageshorthands#1{}
+\usepackage{xeCJK}
+\setCJKmainfont{Noto Serif CJK KR}
+\setCJKsansfont{Noto Sans CJK KR}
+\setCJKmonofont{Noto Sans Mono CJK KR}
+\xeCJKsetup{CJKspace=true}
+\usepackage{xurl}
+\usepackage{fvextra}
+\usepackage{fancyhdr}
+\AtBeginDocument{\DefineVerbatimEnvironment{verbatim}{Verbatim}{breaklines=true,breakanywhere=true,fontsize=\small}}
+\setlength{\emergencystretch}{4em}
+\setlength{\headheight}{15pt}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small 중성자별 구조와 비방사 진동}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\setcounter{tocdepth}{2}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={A14 · Material interface의 전달과 restart},
+  pdflang={ko-KR},
+  colorlinks=true,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\title{A14 · Material interface의 전달과 restart}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{과제 큐시트}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\setstretch{1.12}
+\textbf{선행:} A13, A09　 \textbf{독립 작업:} 4--7시간 (계획치)
+
+\subsection{밀도가 뛰면 변위의 두 성분도 함께 뛰어야
+하는가?}\label{uxbc00uxb3c4uxac00-uxb6f0uxba74-uxbcc0uxc704uxc758-uxb450-uxc131uxbd84uxb3c4-uxd568uxaed8-uxb6f0uxc5b4uxc57c-uxd558uxb294uxac00}
+
+계면의 압력과 반경은 같고 에너지밀도만 다르다. 연속으로 둘 양을 평형
+곡선이 아니라 채택한 유체 경계조건에서 먼저 고르자.
+
+먼저 한두 문장으로 답한 뒤 아래 설명을 읽자. 첫 예측이 틀렸거나 아직
+모르겠다고 적는 것은 감점하지 않는다.
+
+\subsection{필요한 관계와 읽을
+위치}\label{uxd544uxc694uxd55c-uxad00uxacc4uxc640-uxc77duxc744-uxc704uxce58}
+
+\[
+q_h=\frac{\epsilon_{\rm in}+P_t}{\epsilon_{\rm out}+P_t},
+\qquad a=(\omega r_t/c)^2e^{\lambda_t-2\nu_t},
+\] \[
+W_{\rm out}=W_{\rm in},\qquad
+V_{\rm out}=q_hV_{\rm in}+(q_h-1)\frac{\nu'_tW_{\rm in}}a.
+\] \([\Delta P]=0\)과 zero-jump 한계를 직접 확인한다.
+
+\begin{itemize}
+\tightlist
+\item
+  \path|notes/equations/interface.md|
+\item
+  \path|learner/src/modes/ns_interface_transfer.f90|
+\item
+  \path|notes/chapters/ch07.md|
+\end{itemize}
+
+\subsection{계산으로
+옮기기}\label{uxacc4uxc0b0uxc73cuxb85c-uxc62euxae30uxae30}
+
+기본 경로는 제공 함수의 호출과 해석이다. 아래 \texttt{learner} 시험은
+같은 물리 함수를 직접 작성한 경우에 실행한다. 제공 예제를 검사할 때에는
+명시적으로 \texttt{calculation}을 선택한다.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  ΔP 식에서 enthalpy ratio를 직접 유도한다.
+\item
+  같은 r\_t의 inner/outer record를 따로 보존한다.
+\item
+  event에서 정지→transfer→restart를 수행한다.
+\item
+  zero jump와 forward/reverse composition을 검사한다.
+\end{enumerate}
+
+\newpage
+
+\subsection{실행해서 무엇을 볼
+것인가}\label{uxc2e4uxd589uxd574uxc11c-uxbb34uxc5c7uxc744-uxbcfc-uxac83uxc778uxac00}
+
+패키지 루트에서 실행한다. \texttt{-\/-plan}은 경로만 확인하며 계산
+성공을 뜻하지 않는다.
+
+\begin{verbatim}
+python tools/run_assignment.py A14 --plan
+python tools/run_assignment.py A14 --run \
+  --workspace learner --output ../A14_result.json
+\end{verbatim}
+
+\subsection{결과를
+설명하기}\label{uxacb0uxacfcuxb97c-uxc124uxba85uxd558uxae30}
+
+이 과제의 조건은 물질적 계면을 따르는 변위와 Lagrangian 압력의 연속이다.
+두 one-sided 값을 잇는 그림의 직선을 실제 층으로 읽지 않는다.
+
+\textbf{남길 증거.} 전달식 유도; W 및 ΔP 좌우값; 세그먼트 경계와 side
+기록
+
+\textbf{판단 기준.} 2점 예: V를 무조건 연속시키면 ΔP가 어긋나는 반례와
+exact-stop 기록을 함께 보인다. 최초 예측의 정오보다, 결과를 본 뒤 이유를
+고치고 다른 입력에도 적용하는지를 본다.
+
+\subsection{막혔을 때}\label{uxb9c9uxd614uxc744-uxb54c}
+
+\textbf{힌트 1.} q\_h는 enthalpy ratio이고 q\_P=ln(Pstart/P)와 다른
+변수이다.
+
+\textbf{힌트 2.} χ-only knot에서는 state가 연속일 수 있으므로 material
+jump와 구별한다.
+
+\subsection{다음 만남에 다시
+묻기}\label{uxb2e4uxc74c-uxb9ccuxb0a8uxc5d0-uxb2e4uxc2dc-uxbb3buxae30}
+
+다음 회차에는 밀도 jump를 없앤 극한을 설명한다. 압축응답만 바뀌는 knot와
+같은 전달식을 적용해야 하는지도 구별한다. 먼저 짧게 답한 뒤 본문과
+자신의 기록을 열어 확인한다.
+
+\textbf{범위.} rapid conversion, surface shell, elasticity,
+zero-frequency limit는 포함하지 않는다.
+
+\end{document}

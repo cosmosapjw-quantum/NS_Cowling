@@ -1,0 +1,1026 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  10pt,
+  a4paper,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{setspace}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{Liberation Serif}
+  \setsansfont[]{Liberation Sans}
+  \setmonofont[]{DejaVu Sans Mono}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=22mm]{geometry}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+\ifLuaTeX
+\usepackage[bidi=basic]{babel}
+\else
+\usepackage[bidi=default]{babel}
+\fi
+\babelprovide[main,import]{korean}
+\ifPDFTeX
+\else
+\babelfont{rm}[]{Liberation Serif}
+\fi
+% get rid of language-specific shorthands (see #6817):
+\let\LanguageShortHands\languageshorthands
+\def\languageshorthands#1{}
+\usepackage{xeCJK}
+\setCJKmainfont{Noto Serif CJK KR}
+\setCJKsansfont{Noto Sans CJK KR}
+\setCJKmonofont{Noto Sans Mono CJK KR}
+\xeCJKsetup{CJKspace=true}
+\usepackage{xurl}
+\usepackage{fvextra}
+\usepackage{fancyhdr}
+\usepackage{needspace}
+\AtBeginDocument{\DefineVerbatimEnvironment{verbatim}{Verbatim}{breaklines=true,breakanywhere=true,fontsize=\small}}
+\setlength{\emergencystretch}{4em}
+\setlength{\headheight}{15pt}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small 중성자별 구조와 비방사 진동}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\setcounter{tocdepth}{2}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={중성자별 구조와 비방사 진동: 강의계획},
+  pdflang={ko-KR},
+  colorlinks=true,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\title{중성자별 구조와 비방사 진동: 강의계획}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{TOV 구현 경험자를 위한 16회 과정}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+{
+\hypersetup{linkcolor=}
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+\setstretch{1.12}
+\section{강의의 출발점과
+도달점}\label{uxac15uxc758uxc758-uxcd9cuxbc1cuxc810uxacfc-uxb3c4uxb2ecuxc810}
+
+TOV 코드를 작성했고 Cowling 근사의 기본 가정도 공부했다. 그렇다면 이제
+남은 일은 두 미분방정식을 적분기에 넣는 것뿐일까? 이 강의는 바로 그
+질문에서 시작한다. 평형 배경을 준비하는 일, 중심과 표면을 동시에
+만족하는 주파수를 찾는 일, 그 값을 물리적으로 해석하는 일은 연결되어
+있지만 같은 작업이 아니다. 이미 알고 있는 이론을 처음부터
+되풀이하기보다, 그 연결에서 빠지기 쉬운 정의와 판단을 실제 계산으로
+드러내자.
+
+목표는 세 가지다. 주어진 EOS와 중심상태에서 진동 계산에 필요한 배경을
+준비한다. 중심과 표면조건을 동시에 만족하는 \(f,p_1\) 모드를 구하고 그
+식별과 수렴을 설명한다. 마지막으로 같은 고밀도 함수와 질량을 유지한
+제한된 EOS 변화에서 주파수 차이를 해석한다. 이때 유의한 차이가 나오는 것
+자체를 성공 조건으로 두지 않는다.
+
+계산이 끝나면 숫자는 남는다. 그런데 그 숫자가 어느 문제의 답인지
+설명하지 못한다면 연구 결과로는 아직 부족하다. 우리는 입력과 가정,
+비교한 오차, 남아 있는 한계를 함께 적는다. 마지막 보고서의 논증은 그
+기록에서 시작된다.
+
+\subsection{최소 선수지식}\label{uxcd5cuxc18c-uxc120uxc218uxc9c0uxc2dd}
+
+TOV 방정식의 유도 전체를 암기할 필요는 없지만 \(m(r)\), \(P(r)\),
+\(\nu(r)\)의 역할과 중심·표면 조건은 설명할 수 있어야 한다.
+정지질량밀도와 총에너지밀도의 차이, \(\omega\)와 \(f\)의 차이, 선형
+ODE의 초기값 문제와 경계값 문제의 차이도 필요하다. 수치법에서는 단계
+크기와 허용오차가 무엇을 조절하는지 알고, 간단한 Fortran 함수를 읽고
+수정할 수 있으면 된다.
+
+기본 Cowling 공부는 \(\delta g_{\mu\nu}=0\)라는 말에서 멈추지 않는다.
+유체 변위와 압력섭동은 남아 있고, 시간 정규화가 고유주파수에 들어간다는
+것을 이해해야 한다. 유도 과정의 세부 상쇄가 익숙하지 않아도 괜찮다.
+제5장에서 입자수 보존과 운동방정식으로부터 다시 전개한다.
+
+Python은 자료를 읽고 시험을 실행하는 데 쓴다. 물리 solver를 Python으로
+다시 구현하는 것을 필수 과제로 요구하지 않는다. Fortran 모듈 체계나
+\texttt{fpm}이 익숙하지 않으면 짧은 노트와 첫 실행을 먼저 따라간다. 설치
+문제에 걸린 시간은 물리 문제의 난이도와 구분해 기록한다.
+
+\subsection{시작 전에 하는
+진단}\label{uxc2dcuxc791-uxc804uxc5d0-uxd558uxb294-uxc9c4uxb2e8}
+
+첫 만남 전에 자신의 TOV 출력 한 개와 그 입력을 준비한다. 코드를 새로
+작성하지 말고, 이미 계산한 자료에서 다음 질문에 답한다.
+
+첫째, 저장한 \texttt{rho}는 \(\rho_0\)인가 \(\epsilon/c^2\)인가? 압력과
+에너지는 같은 단위를 쓰는가? 둘째, 질량함수의 단위가 kg인지 \(Gm/c^2\)의
+길이인지 설명한다. 셋째, 적분한 \(\nu\)의 상수가 어떻게 정해졌는지
+적는다. 넷째, 표면은 \(P=0\)인지 양의 cutoff인지 적는다. 다섯째,
+\(dP/d\epsilon\)이 어느 함수에서 계산되었는지 찾는다. 마지막으로 두
+해상도의 \(M,R\)을 비교하고 두 숫자의 차이를 무엇의 오차로 해석할 수
+있는지 설명한다.
+
+이때 파일을 열어도 된다. 함수 이름을 외우는지가 아니라 실제로 무엇을
+계산했는지를 묻고 있기 때문이다. 답이 없는 항목은 틀린 학생을 찾는
+표지가 아니라, 배경을 진동 문제에 연결하기 전에 설명해야 할 빈자리다.
+정의를 정확히 찾은 항목은 빠르게 통과하고 그 빈자리에만 시간을 쓴다.
+
+\subsection{실행과 직접 구현의 두
+경로}\label{uxc2e4uxd589uxacfc-uxc9c1uxc811-uxad6cuxd604uxc758-uxb450-uxacbduxb85c}
+
+먼저 \texttt{calculation/}의 완성된 물리 예제로 결과를 계산한다.
+\texttt{methods/}에는 적응 적분, 근 찾기, 열역학 표 표현과 역함수가
+제공되어 있다. \path|calculation/src/adapters/|에는 EOS 구간별 적분과
+양방향 matching이 있다. 이 함수들의 내부를 작성하지 않고도
+\texttt{solve\_pair}와 \texttt{run\_study}로 실제 별과 수렴 자료를
+얻는다.
+
+내부 적분기를 작성하지 않으면 무엇을 배울 수 있을까? 우리는 어떤 EOS와
+압축응답을 전달했는지, 왜 두 경계조건이 필요한지, 두 별에서 무엇을
+고정했는지를 설명할 수 있어야 한다. 함수의 사용자는 이 선택을 넘겨줄 수
+없다. EOS 표현은 제3·7·9장에, 양방향 shooting은 제4·5·6장에 들어 있다.
+식을 이해하는 자리와 코드를 호출하는 자리를 떨어뜨리지 않는다.
+
+자신의 물리 함수를 직접 구현하는 경로도 유지한다.
+\texttt{-\/-start\ cowling}으로 선행 예제를 준비하고 A09의
+중심조건·Cowling 우변·표면잔차를 작성한다. 같은 인터페이스의 TOV까지
+준비되면 \path|make_calculation.py --physics learner/src|로 네 물리
+파일을 명시하여 새 계산공간에 연결한다. 기존 TOV의 출력 형식만 같다고
+바로 연결되는 것은 아니다. 제3장의 변수·단위·lapse 대응과 함수
+인터페이스를 먼저 맞춘다.
+
+기초부터 적분기까지 작성하려는 독자는 \path|--start foundations|를
+선택할 수 있다. 그 구현은 선택 연습이며 제공 계산의 선행조건이 아니다.
+직접 작성한 함수의 성취와 제공 예제의 실행을 각각 평가한다. 어느
+경로에서도 미구현 함수를 해설이나 과거 결과로 자동 대체하지 않는다.
+
+\subsection{설명을 읽고 다시 해 보는
+순서}\label{uxc124uxba85uxc744-uxc77duxace0-uxb2e4uxc2dc-uxd574-uxbcf4uxb294-uxc21cuxc11c}
+
+각 큐시트의 첫 질문에는 한두 문장만 답한다. 모르면 그 지점을 적어 두고
+바로 본문의 풀이를 읽는다. 첫 시도는 정답을 맞히기 위한 시험이 아니라,
+뒤의 설명에서 무엇을 찾아야 할지 정하는 시간이다. 설명을 읽은 뒤에는
+어느 정의를 사용했는지 말하고 작은 계산 하나를 수행한다.
+
+힌트로 한 문제를 해결했다면 같은 답을 곧바로 다시 요구하지 않는다.
+입력이나 표현을 조금 바꿔 그 원리를 사용할 수 있는지 본다. 다음 만남의
+질문도 짧게 답한 뒤 자료를 열어 확인한다. 처음 배우는 복잡한 유도에서는
+완성 풀이를 충분히 제공한다. 독립 수행으로 넘어가는 속도는 이미 가진
+지식과 실제 응답에 따라 조절한다.
+
+\section{강의와 과제의
+연결}\label{uxac15uxc758uxc640-uxacfcuxc81cuxc758-uxc5f0uxacb0}
+
+본문에서는 함께 유도하고, 큐시트에서는 그 유도를 한 번 자신의 판단으로
+사용한다. 처음부터 모든 빈칸을 혼자 채우라는 뜻은 아니다. 먼저 짧은
+예측을 적고 설명을 읽은 뒤, 계산이 그 예측을 어떻게 바꾸었는지 돌아본다.
+과제별 source 경로와 실제 pytest 선택은
+\path|curriculum/assignments.json|에 있다.
+\path|run_assignment.py --plan|은 경로와 시험 선택을 보여 주지만 계산을
+실행하지는 않는다. 완료 여부는 실제 실행 결과와 물리적 설명을 함께 보고
+판단한다.
+
+A00-A10은 하나의 매끄러운 별에서 두 유체 모드를 계산하는 경로다.
+A11-A14는 EOS 접합과 물질적 계면을 다룬다. A15-A17은 핵물질·조성·액적
+모형을 이해하는 별도 가지이며, 첫 Cowling 계산의 필수 선행조건은 아니다.
+A18은 표의 의미와 열역학적 보간, A19는 통제 비교다. A20은 제9장의 구간별
+EOS 호출 과제이고 A21은 제10장의 전체 수렴 과제다. A18→A20→A19→A21
+순서로 진행한다. 이론은 앞 회차에서 미리 배우므로 뒤에 두 회차를 더
+붙이지 않는다. P0-P5는 자신의 코드 보존·실행과 작은 진단 확장을 다룬다.
+
+\subsection{첫 계산을 위한
+명령}\label{uxccab-uxacc4uxc0b0uxc744-uxc704uxd55c-uxba85uxb839}
+
+GNU Fortran과 fpm이 준비된 패키지 루트에서 실행한다. fpm을 찾지 못하면
+실제 실행파일의 경로를 \texttt{NS\_FPM} 환경변수로 지정할 수 있다.
+Python은 실행·자료 관리에 쓰고 별의 방정식은 Fortran이 계산한다.
+
+\begin{verbatim}
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python tools/make_calculation.py --output ../my_calculation
+cd ../my_calculation
+python tools/run_assignment.py A20 --run --output ../A20.json
+python tools/stellar_methods.py --output ../my_study --max-new-runs 2
+\end{verbatim}
+
+마지막 명령은 두 단일별 계산을 수행하고 멈춘다. 같은 명령을 다시
+실행하면 완료한 계산을 확인하여 재사용한다. 전체를 이어서 끝내려면
+\texttt{-\/-max-new-runs\ 2}를 생략한다. 한 번에 수행하는 수를 제한하는
+것과 정확도 기준을 낮추는 것은 다르다.
+
+계산의 중간 상태는 \texttt{pending}이고 모든 조건이 끝난 뒤에만
+\path|numerically_resolved_in_fixed_model|을 반환할 수 있다.
+소스·입력·EOS가 달라졌으면 새 출력 폴더를 사용한다. 실패한 시도를
+보존하여 재실행하려면 \texttt{-\/-retry-failed}를 명시한다. 설치 문제와
+물리·수치 실패를 하나의 오류로 뭉뚱그리지 않는다.
+
+\subsection{한 회차의 시간
+배치}\label{uxd55c-uxd68cuxcc28uxc758-uxc2dcuxac04-uxbc30uxce58}
+
+회당 120분 안에서 읽기와 시도를 교대한다. 시작 10분은 지난 개념의 짧은
+복원, 다음 25분은 이유를 설명하는 풀이 예제, 25분은 작은 계산, 35분은
+결과 비교와 피드백, 15분은 도움을 줄인 재시도, 마지막 10분은 다음 입력을
+정하는 데 쓴다. 이 분배는 운영을 위한 선택이지 연구가 정해 준 최적
+시간은 아니다. 새 개념에서 막히면 풀이를 더 보여 주고, 이미 설명할 수
+있으면 같은 연습을 되풀이하지 않는다.
+
+이미 TOV를 구현한 독자는 첫 세 회차의 일부를 진단과 짧은 복습으로 압축할
+수 있다. 반대로 Fortran 함수 작성이 처음이라면 별도의 기초 시간이
+필요하다. 다음 시간 범위는 과제 계획용 추정이며 실제 학습자에게서 측정한
+소요시간이 아니다. 일주일에 지도 2시간과 독립 작업 5-9시간 정도를 우선
+확보하고, 첫 두 회차의 기록으로 조정한다. 코드 오류를 진단한 시간과 물리
+개념을 다시 공부한 시간은 따로 적는다.
+
+\subsection{회차별 산출물의
+크기}\label{uxd68cuxcc28uxbcc4-uxc0b0uxcd9cuxbb3cuxc758-uxd06cuxae30}
+
+긴 보고서를 매번 쓰지는 않는다. 초반의 한 페이지에는 식과 단위, 독립
+계산 하나면 충분하다. 중반에는 그림 두 개와 수렴표, 후반에는 질문과
+결론을 잇는 2-4쪽의 메모를 남긴다. 최초 예측과 수정 이유는 여기에 한두
+문장으로 붙인다. 서류의 양을 늘리지 않고 판단이 바뀐 지점을 남기려는
+것이다.
+
+아래 각 회차의 '최소 통과'는 그 회차의 능력만을 뜻한다. A09를 통과했다고
+전체 스펙트럼을 얻었다고 말하지 않고, P3의 빌드를 통과했다고 모든 물리
+결과가 검증되었다고 말하지 않는다.
+
+\section{1회: 자신의 별을 진동 문제의 입력으로
+읽기}\label{uxd68c-uxc790uxc2e0uxc758-uxbcc4uxc744-uxc9c4uxb3d9-uxbb38uxc81cuxc758-uxc785uxb825uxc73cuxb85c-uxc77duxae30}
+
+\textbf{연결 과제:} A00, A01; A06의 진단
+
+출발 질문은 ``나의 TOV 출력에서 진동 방정식은 무엇을 읽는가?''이다.
+독자는 자신의 프로파일 한 개를 열고 \(r,m,P,\epsilon,\nu\)의 정의와
+단위를 적는다. 같은 이름의 배열이 두 코드에서 다른 물리량을 뜻할 수
+있음을 실제 열에서 확인한다. 아직 모드 주파수를 비교하지 않는다.
+
+먼저 \(\rho_0\)와 \(\epsilon/c^2\)를 구별한다. \(P=K\rho_0^\Gamma\)의
+압력식만 보고 \(\epsilon\)까지 정해졌다고 가정하지 않는다. 다음으로
+질량함수를 길이로 저장했는지 살펴보고, \(e^{-2\lambda}=1-2Gm/(rc^2)\)를
+한 점에서 계산한다. 자신이 저장한 \(\lambda\)와 같은지 비교한다.
+
+지도 중에는 한 행을 SI로 직접 옮긴 뒤 제공 상수 모듈의 결과와 대조한다.
+단위 왕복만 통과하는 잘못된 변환 쌍을 만들어, 왕복 시험의 한계를
+설명한다. 마지막에는 \texttt{A00}과 \texttt{A01}을 실제 실행하고 build
+오류와 물리량 불일치를 구별한다.
+
+독립 작업에서는 lapse의 적분상수, cutoff와 EOS 미분의 계산 위치를 찾아
+주석이 아닌 수식과 함수 경로로 기록한다. 최소 통과는 자신이 계산한 별의
+정의를 다른 독자에게 전달할 수 있는 것이다. 질량과 반경 숫자만 제시한
+답은 충분하지 않다.
+
+\textbf{함께 확인할 장면.} 먼저 자신의 출력에서 밀도 열 하나를 골라
+이유를 말한다. 지도자는 맞고 틀림만 답하지 않고 그 정의가 질량식의 어느
+항으로 들어가는지 되묻는다. 확인 뒤에는 다른 반경의 한 행으로 다시
+설명한다.
+
+\section{2회: 이분법과 적분 오차를 필요한 만큼
+복습하기}\label{uxd68c-uxc774uxbd84uxbc95uxacfc-uxc801uxbd84-uxc624uxcc28uxb97c-uxd544uxc694uxd55c-uxb9ccuxd07c-uxbcf5uxc2b5uxd558uxae30}
+
+\textbf{연결 과제:} A02-A04
+
+우리는 root finder가 별의 물리를 알아서 판단하지 않는다는 점에서
+시작한다. 연속함수의 부호 반전은 근의 존재를 지지하지만 불연속이나
+pole에서는 그렇지 않다. \(F(x)=x^2-2\)와 \(F(x)=1/(x-a)\)의 bracket을
+나란히 살펴본다.
+
+이분법의 폭은 이상적인 연산에서 반복마다 절반이 된다. 그러나 작은 폭,
+작은 함수값과 정확한 물리해는 서로 다르다. \(F\)에 작은 상수를 곱해도
+root는 변하지 않지만 잔차는 작아진다. 이 예제로 상대·절대 허용오차와
+종료 이유를 설명한다.
+
+다음으로 \(y'=y\)를 Euler와 RK4로 적분하고 \(N,2N,4N\)에서 오차를
+기록한다. 비자율 예제 \(y'=x^3\)도 추가하여 중간 단계의 좌표가 올바른지
+확인한다. Adaptive 방법에서는 수락되지 않은 trial state가 다음 초기값이
+되지 않는지를 trace로 확인한다. 이미 해당 코드를 작성한 독자는 재구현
+대신 이 세 가지 증거를 준비한다.
+
+최소 통과는 적분기의 국소 오차 제어가 잘못된 우변·초기조건·EOS를 교정해
+주지 않는다는 점을 실제 반례로 설명하는 것이다. 한 개의 쉬운 해석해가
+맞았다는 결과를 모든 ODE의 정확도로 확대하지 않는다.
+
+이 회차의 기본 수행은 \texttt{methods}에 들어 있는 적분기를 호출하는
+것이다. Controller 내부를 처음부터 작성하지 않는다. Euler·RK4의 한
+단계는 손으로 확인하고, 제공 적응 적분기의 거절 trace를 읽는다. 학생은
+절대오차의 단위와 실패가 발생했을 때 반환되는 상태를 설명한다.
+
+\textbf{함께 확인할 장면.} 풀이를 읽은 뒤 마지막 구간 갱신 한 번만
+독자가 선택한다. 이유가 불분명하면 전체 이분법을 다시 쓰게 하기보다
+연속성 전제로 돌아간다. 다음에는 함수의 배율만 바꿔 같은 결정을 해 본다.
+
+\section{3회: 압력식과 총에너지의 관계를
+닫기}\label{uxd68c-uxc555uxb825uxc2dduxacfc-uxcd1duxc5d0uxb108uxc9c0uxc758-uxad00uxacc4uxb97c-uxb2ebuxae30}
+
+\textbf{연결 과제:} A05
+
+압력은 알고 있는데 왜 에너지 상수가 필요한가? 차갑고 단일 보존량으로
+기술되는 유체에서 \(d(\epsilon/n)/dn=P/n^2\)를 적분하여
+\(\epsilon=Cn+P/(\Gamma-1)\)을 얻는다. \(C\)는 압력곡선에 없는 정보다.
+같은 압력에서 \(C\)만 바꾸면 무엇이 변하는지 계산한다.
+
+수밀도에서 압력·에너지·화학퍼텐셜·음속을 각각 따로 맞추지 않고 하나의
+함수에서 얻는다. \(\mu=(\epsilon+P)/n\)와
+\(\chi=\Gamma P/(\epsilon+P)\)를 유도한 후, \(\epsilon(n)\)의 중앙차분
+및 \(P/n^2\)의 구적으로 대조한다. 같은 우변을 두 번 쓰는 시험과 다른
+계산 경로의 시험을 구별한다.
+
+계산에서는 SI 수밀도의 큰 거듭제곱을 바로 만들지 않고 기준점 비율
+\(n/n_a\)를 쓴다. 이것은 물리적 근사가 아니라 수치적인 평가 방식이다.
+반면 유효 밀도 구간 밖으로 외삽하는 것은 새로운 가정을 요구한다.
+
+독립 제출물에는 \(C\) 변화 전후의 \(P,\epsilon,\mu,\chi\)와 그 변화의
+이유를 적는다. 고밀도 극한 \(\chi\to\Gamma-1\)에서 인과성의 제한을
+설명한다. 작은 밀도에서 역함수의 subtraction이 나쁘게 조건화될 수 있다는
+점도 확인한다. 최소 통과는 EOS의 값과 도함수가 같은 열역학을 나타내는
+것이다.
+
+해석식의 제1법칙을 확인한 직후 표의 경우로 옮긴다. \(P,\epsilon,\chi\)를
+따로 보간하는 것과 하나의 \(P(\mu)\)를 미분하는 것은 같은 절차가 아니다.
+여기서는 원칙만 먼저 세우고, 11회의 한 구간 유도와 15회의 A20 호출로
+연결한다. 도함수의 불연속을 새로운 밀도 jump로 읽지 않는다.
+
+\textbf{함께 확인할 장면.} 에너지식을 보여 주기 전에 적분상수가 남을지
+짧게 예상한다. 풀이를 본 뒤에는 압력과 화학퍼텐셜의 변화만 자신의 말로
+정리한다. 다음 회차에서 같은 압력곡선의 두 에너지를 다시 구별한다.
+
+\section{4회: 중심·표면·lapse가 정하는
+배경}\label{uxd68c-uxc911uxc2ecuxd45cuxba74lapseuxac00-uxc815uxd558uxb294-uxbc30uxacbd}
+
+\textbf{연결 과제:} A06, A07
+
+TOV를 다시 적분하는 목적은 단순히 이전 질량과 반경을 재현하는 것이
+아니다. 중심 급수와 양의 압력 cutoff, 시간 정규화가 진동 문제에 어떻게
+전달되는지 확인한다. \(m=O(r^3)\), \(P-P_c=O(r^2)\)를 우변에 대입하여
+leading coefficient를 직접 구한다.
+
+압력좌표 \(q_P=\ln(P_{\rm start}/P)\)를 도입하면
+\(dr/dq_P=P/[(\epsilon+P)\nu']\)다. \(r\)이 바깥으로 증가하는 부호를
+확인하고, finite cutoff의 끝 좌표를 명시한다. 마지막 저장점을 임의의
+진공 표면으로 부르지 않는다.
+
+두 TOV 해상도의 질량과 반경, \(\mu e^\nu\)를 비교한다. 그런 다음 같은
+EOS 안에서 작은 중심압력 변화가 질량을 어떻게 바꾸는지 조사한다. 목표
+질량을 찾을 때는 선택한 가지 안에서 bracket을 만들고, 최종 중심압력에서
+별을 다시 적분한다.
+
+독립 작업은 자신의 TOV 배경과 제공된 함수의 한 점 비교다. 전체
+spectrum보다 먼저 배경 계수의 정의를 맞춘다. 최소 통과는 \(r_0\), ODE
+tolerance, \(P_{\rm cut}\)의 변화가 서로 다른 실험이라는 것을 수치
+자료와 연결하는 것이다.
+
+\textbf{함께 확인할 장면.} 중심·적분·표면의 세 조절량을 먼저 분류한다.
+분류가 섞였으면 실제 입력에서 어느 줄이 바뀌는지 함께 찾는다. 새
+사례에서는 이름표 없이 바뀐 설정만 보고 실험의 의미를 설명한다.
+
+\section{5회: 해석적 문제에서 shooting을
+완성하기}\label{uxd68c-uxd574uxc11duxc801-uxbb38uxc81cuxc5d0uxc11c-shootinguxc744-uxc644uxc131uxd558uxae30}
+
+\textbf{연결 과제:} A08
+
+별의 물리를 잠시 떼어 내고 \(y''+k^2y=0\), \(y(0)=y(L)=0\)를 푼다.
+\(y'(0)=A\ne0\)를 주면 각 \(k\)는 초기값 문제가 되지만, \(y(L)=0\)은
+특정한 \(k_n=n\pi/L\)에서만 성립한다. \(k=0\)은 별도로 \(y''=0\)을 풀어
+자명하지 않은 고유모드가 아님을 확인한다.
+
+잔차는 \(y(L)/(|A|L)\)로 정한다. \(y(L)/y'(L)\)와 비교하여 pole의 부호
+반전이 가짜 bracket을 만드는 장면을 직접 그린다. 한 scan에서 amplitude의
+전체 부호를 바꾸지 않는 이유도 여기에 있다.
+
+실패 trial을 사이에 두고 양옆의 성공점을 이어 붙이지 않는다. 중간에
+NaN이나 적분 실패를 넣고 bracket이 분리되는지 시험한다. 충분히 거친
+격자에서는 같은 부호의 두 끝점 사이의 두 근을 놓칠 수 있으므로, scan을
+촘촘하게 하는 것과 유한 구간의 완전성을 증명하는 것은 구별한다.
+
+제출물은 두 해석 고유값, 고유함수 비교와 최소 세 step 수준의 오차표다.
+\(L\)을 바꾸어 \(k_nL=n\pi\)를 회복하는 전이 실험을 수행한다. 최소
+통과는 별의 고유값 탐색에 필요한 구조를 물리 모형과 분리하여 이해하는
+것이다.
+
+이제 같은 string 문제를 양쪽에서 적분한다. 왼쪽 정칙해와 오른쪽 경계해의
+determinant가 \(-\sin(kL)/k\)임을 계산한다. 어느 중간점에서 비교해도
+같은 근을 얻는다. 단방향 shooting은 작은 해석 예제의 출발점이고, 먼
+경계까지의 전파가 민감해지는 별에서는 이 양방향 구조를 제공 함수로
+사용한다.
+
+\textbf{함께 확인할 장면.} 단방향 해를 먼저 완전히 풀어 주고 양방향 해의
+연결에서 한 단계만 남긴다. 근이 같은 이유를 설명한 뒤, 연결점 위치를
+바꾼 사례를 도움 없이 판정한다.
+
+\section{6회: Cowling의 두 식을 보존법칙에서
+얻기}\label{uxd68c-cowlinguxc758-uxb450-uxc2dduxc744-uxbcf4uxc874uxbc95uxce59uxc5d0uxc11c-uxc5bbuxae30}
+
+\textbf{연결 과제:} A09의 유도와 point RHS
+
+변위의 정의부터 시작한다. \(\xi^r=e^{-\lambda}WY/r^2\),
+\(\xi^a=-VD^aY/r^2\)를 놓고 \([W]=L^3\), \([V]=L^2\)를 확인한다. 이어서
+공간 발산에서 radial metric 인자가 상쇄되는 과정을 전개한다.
+구면조화함수 Laplacian의 부호를 생략하지 않는다.
+
+입자수 보존으로 \(\Delta n/n=-D_i\xi^i\)를 얻고, 차가운 제1법칙과
+압축응답으로 \(\Delta P\)를 변위와 연결한다. 각방향 운동방정식은
+\(\delta P=-(\epsilon+P)(\omega/c)^2e^{-2\nu}VY\)를 준다. 이 둘을
+\(\Delta P=\delta P+\xi^rP'\)로 연결하여 \(W'\)의 식을 얻는다.
+
+radial 운동방정식에서는 평형과 섭동에 같은 barotrope를 쓴다는 가정이
+상쇄를 만든다. 이 가정이 어느 줄에서 사용되었는지 표시한 뒤
+\(V'=2\nu'V-e^\lambda W/r^2\)를 얻는다. 이미 Cowling 이론을 공부했더라도
+이 상쇄를 자신의 표기에서 다시 확인한다.
+
+독립 구현은 한 점의 RHS까지다. 같은 점을 연구 코드의 단위로 바꾸어
+계산한 결과와 대조한다. 최소 통과는 공식 복사가 아니라 각 항의 차원,
+부호와 사용한 압축응답을 설명하고 실제 함수에 연결하는 것이다.
+
+\textbf{함께 확인할 장면.} 새 유도에서는 빈칸을 많이 만들지 않는다.
+입자수 보존에서 압력 변화로 가는 한 단계를 함께 설명한 뒤, 평형과 섭동에
+같은 barotrope를 쓰는 줄만 독자가 찾아 표시한다.
+
+\section{7회: 정칙 중심과 표면을 양방향으로
+연결하기}\label{uxd68c-uxc815uxce59-uxc911uxc2ecuxacfc-uxd45cuxba74uxc744-uxc591uxbc29uxd5a5uxc73cuxb85c-uxc5f0uxacb0uxd558uxae30}
+
+\textbf{연결 과제:} A09의 단일 trial과 양방향 경계조건
+
+중심에서 \(W\sim r^s\), \(V\sim r^{s-1}\)를 대입하여
+\(s(s-1)=\ell(\ell+1)\)을 얻는다. \(s=\ell+1\)와 \(s=-\ell\) 중 정칙한
+가지를 고른다. \(\ell=2\)에서 \(V=-A_0r^2/2\)의 음의 부호와 반경 지수가
+맞아야 한다.
+
+표면의 물리 조건은 \(\Delta P=0\)이며, 정의된 \(Q\)에 대해
+\(Q(R_s)=0\)이다. \(W\) 또는 \(V\)로 나누는 대신 두 비영 벡터 \(b,z\)의
+정규화된 내적을 사용한다. 양의 amplitude scaling과 전체 sign flip에서
+잔차가 어떻게 변해야 하는지 먼저 예측한다.
+
+고정 배경에서 한 주파수를 선택하여 적분한다. 배경 보간점에서 적분을
+끝내는 방법과 q좌표의 chain rule을 연결한다. 출력에는 trial 주파수,
+잔차, 적분 상태와 고유함수 형태를 남긴다. 그 주파수를 모드라고 부르지
+않는다.
+
+독립 과제는 \(\nu\mapsto\nu+C_\nu\), \(\omega\mapsto e^{C_\nu}\omega\)의
+변환 검사다. 잘못된 \(2\pi\)나 lapse를 ODE tolerance로 해결하려고 하지
+않는다. 최소 통과는 단일 trial의 물리와 실행이 함께 닫히는 것이다.
+
+한 단방향 trial의 의미를 확인한 뒤 양방향으로 옮긴다. 표면 벡터 \(b\)에
+대해 \(z_s=(b_2,-b_1)/\|b\|\)를 만들면 같은 표면조건을 처음부터
+만족한다. 중심의 정칙해와 표면의 해를 중간에서 연결하는 \(D=0\)을
+유도하고 \texttt{match\_cells}를 호출한다. 적응 제어·구간 정지·배율
+처리는 제공하며 물리 경계조건의 설명은 학생에게 남긴다.
+
+\textbf{함께 확인할 장면.} 잔차 식을 보기 전에 진폭을 바꾸면 무엇이
+달라져야 하는지 예측한다. 이후 실제 출력과 비교하고, 오해가 남으면
+영벡터와 비영벡터의 차이부터 다시 확인한다.
+
+\section{8회: 두 root를 찾고 모드 이름을
+붙이기}\label{uxd68c-uxb450-rootuxb97c-uxcc3euxace0-uxbaa8uxb4dc-uxc774uxb984uxc744-uxbd99uxc774uxae30}
+
+\textbf{연결 과제:} A10
+
+먼저 한정된 주파수 구간을 scan하고 성공한 인접 trial에서만 bracket을
+만든다. 초기 예제의 숫자는 검색을 시작할 범위를 주지만 정답을 함수에
+넣는 데 쓰지 않는다. 좁은 구간에서도 실제 잔차를 다시 평가한다.
+
+최종 root에서는 표면 잔차와 bracket 폭을 각각 확인하고 고유함수를
+저장한다. \(x=r/R_s\), \(w=W/R_s^3\), \(v=V/R_s^2\)로 무차원화하여 두
+성분을 공통의 양의 배율로 정규화한다. 내부 영점의 정의에는 끝점 제외
+범위와 zero threshold가 포함된다.
+
+매끄러운 기준 예제의 0/0과 1/1 패턴을 확인한 뒤, 작은 중심압력 변화에서
+같은 모드가 어떻게 움직이는지 추적한다. 첫 두 root라는 이유만으로 이름을
+붙이지 않는다. 주파수는 가깝지만 모양이 다른 후보가 있으면 식별을
+보류한다.
+
+제출물은 주파수표 하나와 두 고유함수 그림, node 판정 조건, identity를
+지지하는 근거다. 최소 통과는 root와 mode identity를 별개의 상태로
+취급하는 것이다. 이 단계에서 중력파 감쇠시간이나 모든 모드의 완전성을
+주장하지 않는다.
+
+양방향 계산에서도 주파수의 근과 모드의 이름은 별개다. 최종 고유함수의
+node와 overlap을 확인하고, 연결점에서 두 방향의 \(r,m\) 및 변위가 같은
+배경·해를 나타내는지 검사한다. Root residual만 작고 배경이 다르면 성공한
+경계값 해가 아니다.
+
+\textbf{함께 확인할 장면.} 처음에는 기준 고유함수의 이름을 보여 준다.
+다음 그림에서는 이름을 가리고 정규화·node·overlap 중 필요한 증거를
+선택하게 한다. 판단할 수 없는 후보를 보류하는 답도 허용한다.
+
+\section{9회: 배경과 진동의 오차를
+분리하기}\label{uxd68c-uxbc30uxacbduxacfc-uxc9c4uxb3d9uxc758-uxc624uxcc28uxb97c-uxbd84uxb9acuxd558uxae30}
+
+\textbf{연결 과제:} A10의 수렴, A19의 준비
+
+고정 배경에서 적분 tolerance를 줄이는 실험부터 수행한다. 그런 다음 배경
+격자를 줄이고 같은 주파수 계산을 반복한다. 두 실험의 변화량을 같은 Hz
+단위로 적는다. 원래 두 코드의 독립 대조표를 함께 읽어 격자와 보간이 다를
+때 일치의 의미를 토론한다.
+
+\(h,h/2,h/4\)에서의 변화가 규칙적일 때에만 관측 차수를 계산한다. 차이가
+roundoff에 가깝거나 부호가 뒤집히면 Richardson 형태를 기계적으로
+사용하지 않는다. RK4가 내부 적분에 있다고 전체 계산이 4차라고 단정하지
+않는다.
+
+다음으로 \(r_0\)와 \(P_{\rm cut}\)을 따로 바꾼다. 전자는 중심 급수의
+절단, 후자는 유효 표면 문제의 선택에 관련된다. 표면을 옮길 때 lapse의
+정규화도 같은 convention으로 다시 적용한다.
+
+독립 제출물에서는 가장 정밀한 값 옆에 마지막 배경 변화와 ODE 변화의
+크기를 적는다. 둘을 통계적 오차 막대로 합치지 않는다. 최소 통과는 현재
+계산에서 무엇이 오차를 지배하는지 자료에 근거해 선택하고 다음 실험 한
+개를 제안하는 것이다.
+
+두 별의 차이에 공통 오차가 상쇄될 수 있으므로 절대 주파수 수열도 각각
+검사한다. NaN이나 동일한 수치 설정의 반복을 수렴 자료로 인정하지 않는다.
+제공 \texttt{run\_study}의 main 그룹을 읽고, 15회 이전에 전체 검사를
+작은 단위로 실행할 수 있다. 이때 사용할 EOS 함수의 의미는 3회에서 정하고
+상세 구간 계산은 11회에서 보충한다.
+
+\textbf{함께 확인할 장면.} 수렴표를 먼저 주고 다음 실험을 하나 선택하게
+한다. 피드백 뒤에는 같은 표의 정답을 외우게 하지 않고, 배경 오차가
+지배하는 다른 사례로 판단을 옮긴다.
+
+\section{10회: 고밀도 함수를 고정한 연속
+접합}\label{uxd68c-uxace0uxbc00uxb3c4-uxd568uxc218uxb97c-uxace0uxc815uxd55c-uxc5f0uxc18d-uxc811uxd569}
+
+\textbf{연결 과제:} A11
+
+저밀도 지수만 바꾸겠다는 말을 수학적 조건으로 옮긴다. 접합점 위의
+\(P,\epsilon,n,\mu,\chi\)는 같은 함수여야 한다. 같은 파일명을 사용했다는
+사실만으로 이 조건이 보장되지 않는다.
+
+두 폴리트로프를 \((n_t,P_t)\)에서 연결하고 \(\epsilon\) 연속성으로
+저밀도 에너지 상수 \(C_L\)를 구한다. \(\mu\) 연속성이 함께 성립하는지
+직접 대입한다. 고밀도 상수 \(C_H\)를 다시 조정해서 차이를 감추지 않는다.
+
+이 연속 knot와 임의의 pressure-only join을 비교한다. 둘째 경우에는
+\(\Delta\mu\)가 남을 수 있다. 그 차이를 파일 오류라고 자동 처리하지 말고
+기계적 연결과 상평형의 차이로 읽는다.
+
+독립 작업에서는 고밀도 공통 구간의 여러 점에서 실제 함수값을 비교하고,
+저밀도 지수를 한 번 바꾼 뒤 접합점의 연속량과 jump하는 미분량을 적는다.
+최소 통과는 수정한 자유도와 고정한 자유도가 실제 코드에서도 분리되는
+것이다.
+
+\textbf{함께 확인할 장면.} 접합 계산을 마친 뒤 고밀도 함수가 변하지
+않았는지 독자가 검사 지점을 선택한다. 파일명을 비교한 답에는 실제 함수의
+어느 양을 비교해야 하는지 되묻는다.
+
+\section{11회: Maxwell 평형과 유한 폭 연결을
+비교하기}\label{uxd68c-maxwell-uxd3c9uxd615uxacfc-uxc720uxd55c-uxd3ed-uxc5f0uxacb0uxc744-uxbe44uxad50uxd558uxae30}
+
+\textbf{연결 과제:} A12, A13
+
+상평형 후보에서는 공통 \(\mu\)에서 두 압력을 비교한다.
+\(P_H(\mu_t)=P_L(\mu_t)\)의 root뿐 아니라 양쪽에서 어느 상의 압력이
+우세한지 확인한다. 공통 domain 밖에서 crossing을 외삽하여 만들지 않는다.
+
+\(\epsilon=\mu n-P\)에서 \(\Delta\epsilon=\mu_t\Delta n\)을 얻는다. 같은
+압력과 화학퍼텐셜에서 밀도가 뛰는 이유를 설명한다. 이 jump가 적분기의
+실수 때문에 생긴 불연속과 다르다는 것을 확인한다.
+
+다음에는 endpoint의 \(P,n\)을 보존하는 cubic Hermite \(P(\mu)\)를 직접
+쓴다. 다항식이 매끄럽게 이어진다는 사실과 \(P''>0\), \(0<\chi\leq1\)을
+만족한다는 사실을 분리한다. 구간 내부의 극값에서 부적합해지는 예를
+검사한다.
+
+독립 제출물은 sharp 모델과 finite-width 모델의 가정 비교다. 같은
+endpoint를 맞춘 두 곡선이 같은 진동 문제를 뜻한다고 쓰지 않는다. 최소
+통과는 함수 연결의 대수적 성질과 물리적 허용조건을 각각 검증하는 것이다.
+
+유도한 한 구간을 \texttt{methods}의 제공 함수로 평가한다. 작은 \(t\)
+좌표에서 압력 역함수를 구하고 \(n,\epsilon,\chi\)를 같은 다항식에서
+읽는다. Native knot를 바꾸지 않는 경우에도 \(P''\)는 jump할 수 있다. 이
+부분은 접합의 별도 부록이 아니라 실제표 적분을 위한 본문이다. A13의 내부
+알고리즘 구현은 선택할 수 있다.
+
+\textbf{함께 확인할 장면.} 완성된 Hermite 예제로 값과 기울기의 조건을
+보여 준다. 이후 끝점은 맞지만 내부가 거절되는 예제에서 필요한 미분을
+찾아 설명하게 한다. 고급 허용조건 검사 코드는 제공한다.
+
+\section{12회: 물질적 계면을 실제로
+통과하기}\label{uxd68c-uxbb3cuxc9c8uxc801-uxacc4uxba74uxc744-uxc2e4uxc81cuxb85c-uxd1b5uxacfcuxd558uxae30}
+
+\textbf{연결 과제:} A14
+
+평형 계면과 진동하는 계면은 같은 질문이 아니다. 이 회차에서는 느린
+상변환의 물질적 계면을 채택하고 \([W]=[\Delta P]=0\)에서 출발한다. 어느
+조건이 물질 요소의 이동을 뜻하고 어느 조건이 힘의 연속성을 뜻하는지
+설명한다.
+
+one-sided enthalpy의 비로 \(V_{\rm out}\)을 유도한다. 같은 식의
+\(\epsilon+P_t\)를 \(\epsilon-P_t\)로 잘못 쓰면 차원은 맞아도 물리가
+달라진다. 따라서 전달 전후의 \(\Delta P\)를 식에서 독립적으로 다시
+계산한다.
+
+적분은 정확히 계면 좌표에서 끝내고 안쪽 값을 저장한 다음 바깥 상태로
+재시작한다. 하나의 RK 단계 안에서 두 EOS를 혼합하지 않는다. 같은 반경에
+두 값이 있다는 이유로 한 행을 삭제하지 않는다.
+
+독립 과제는 zero-jump 한계, forward/reverse 전달과 계면 plotting의 node
+오인 반례다. 최소 통과는 전달식 하나의 일치뿐 아니라 event 위치와
+one-sided 기록까지 연결하는 것이다. \(\omega=0\), 빠른 상변환과 탄성층은
+별도 문제로 남긴다.
+
+\textbf{함께 확인할 장면.} 전달식을 바로 암기시키지 않는다. 먼저 계면을
+따라가는 유체 요소를 그려 보게 하고, 연속조건에서 식을 읽는다. 다음에는
+밀도 jump가 없는 사례에서 같은 판단을 다시 한다.
+
+\section{13회: 핵물질의 함수형과 포화조건을
+구별하기}\label{uxd68c-uxd575uxbb3cuxc9c8uxc758-uxd568uxc218uxd615uxacfc-uxd3ecuxd654uxc870uxac74uxc744-uxad6cuxbcc4uxd558uxae30}
+
+\textbf{연결 과제:} A15
+
+포화밀도, 결합에너지와 incompressibility는 핵물질 함수형 전체를 유일하게
+정하지 않는다. 먼저 \(e_0(u)\)의 kinetic+interaction 형태와 regulator를
+선택하고, 그 아래에서 남은 계수를 구한다. 가정과 유도를 문장에서
+분리한다.
+
+상세 풀이의 \(F(1),F'(1),F''(1)\)를 직접 구하고 세 포화조건을
+\(A,B,\sigma\)에 대한 식으로 만든다. 두 식을 빼서 변수를 제거한 다음
+\(\sigma=1\) 또는 regulator의 특수값에서 분모가 왜 문제가 되는지
+확인한다. 단순한 division-by-zero가 아니라 제약의 독립성이 사라지는
+경우일 수 있다.
+
+코드가 출력한 계수표는 세 residual에 다시 대입하여 검증한다. 같은
+포화점에 맞는 두 함수가 고밀도에서도 같다고 가정하지 않는다. 선언한 밀도
+구간에서 압력과 음속을 비교한다.
+
+독립 제출물은 완성 풀이의 숫자 재현에 더해 regulator 변화 한 개다. 매번
+어떤 계수를 다시 구해야 하는지 명시한다. 최소 통과는 포화 제약을
+만족하는 현상론적 모형과 미시적 핵이론의 유일한 결과를 구별하는 것이다.
+
+\textbf{함께 확인할 장면.} 완성 풀이를 읽은 뒤 계수를 없애는 한 단계를
+설명하게 한다. 도움이 필요하면 어떤 제약을 결합했는지 표시해 준다. 새
+regulator에서는 다시 정해야 할 계수만 먼저 고른다.
+
+\section{14회: npe 조성과 저밀도 군집의
+모형}\label{uxd68c-npe-uxc870uxc131uxacfc-uxc800uxbc00uxb3c4-uxad70uxc9d1uxc758-uxbaa8uxd615}
+
+\textbf{연결 과제:} A16, A17
+
+고정한 baryon 밀도에서 전하중성은 \(n_e=n_p=nx\)이고, 공통 nucleon
+질량의 포물선형 근사에서는 \(\mu_n-\mu_p=4S(n)(1-2x)\)다. 전자
+화학퍼텐셜과의 차이를 scalar residual로 만들어 허용된
+\(0\leq x\leq1/2\)에서 root를 찾는다.
+
+Kinetic 대칭에너지의 endpoint 차이와 \(\alpha=0\) Taylor 계수는 다르다.
+채택한 \(S(n)\)에 포함된 kinetic 항을 exact two-Fermi-sea 식으로 다시
+더하지 않는다. 이 실수는 단위 검사를 통과하므로 에너지 분해를 실제
+식으로 확인해야 한다.
+
+밀도를 조금 바꾼 뒤 조성을 다시 풀어 equilibrium derivative를 구한다.
+조성을 고정한 미분과 비교하여 두 결과가 다른 질문에 답한다는 점을
+확인한다. Muon을 넣지 않은 모형의 해를 실제 별의 완전한 조성으로
+해석하지 않는다.
+
+후반에는 액적의 bulk·surface·Coulomb·비대칭 항과 전자 에너지를 합해 고정
+밀도에서 정수 후보를 비교한다. 최저 후보가 mesh 경계에 있으면 이를 내부
+stationary point라 부르지 않는다. 최소 통과는 균질 core와 군집화된
+물질의 자유도가 다르다는 점을 계산으로 설명하되, 이 작은 액적 모형을
+full-star EOS로 사용하지 않는 것이다.
+
+\textbf{함께 확인할 장면.} 조성을 고정한 미분과 다시 평형을 구한 미분을
+나란히 설명한다. 어느 것이 더 좋은가를 묻지 않고 각각 무슨 물리 질문인지
+묻는다. 액적 최소화는 후보 집합의 의미에 초점을 둔다.
+
+\section{15회: 실제 표에서 통제된 주파수
+차이로}\label{uxd68c-uxc2e4uxc81c-uxd45cuxc5d0uxc11c-uxd1b5uxc81cuxb41c-uxc8fcuxd30cuxc218-uxcc28uxc774uxb85c}
+
+\textbf{연결 과제:} A18, A20, A19, A21
+
+표의 열 이름, 단위, 정지에너지와 조성을 확인한다. 3회에서 정한 단일
+열역학 함수의 원칙과 11회에서 유도한 구간 다항식을 이제 실제 ID69에
+적용한다. \texttt{init\_table\_eos}, \path|table_pressure_coordinate|,
+\texttt{cell\_state}를 호출하여 값·미분·역함수를 확인한다. 새로운
+보간기를 작성하는 회차가 아니다.
+
+그 다음 같은 고밀도 함수·목표 질량·가지·표면·섭동조건을 가진 두 별을
+정의한다. 중심과 표면의 해는 7회에서 배운 양방향 방법으로 연결한다. 먼저
+무변형 대조를 확인하고 저밀도 변형을 적용한다. 모형 변경과 보간 표현의
+변경을 같은 실험에 섞지 않는다.
+
+A21에서는 \texttt{run\_study}의 전체 결과를 읽는다. 네 단계의 두 별,
+다른 적분 단계법, 중심 시작점·표면압력·matching 위치, 질량 잔차와 무변형
+대조를 분리한다. 각 절대 주파수가 수렴하는지와 차이가 안정적인지를 따로
+본다. 자동 과제시험이 한 pair를 확인한 사실은 이 전체 검사를 대신하지
+않는다.
+
+제출물은 두 절대 주파수와 차이의 수렴표, 고유함수 대응, 오차 항목과 물리
+결론이다. 이 본문 예제에서는 비영 차이를 수치적으로 분해하지만, 새
+입력에서도 같은 부호나 크기를 정답으로 강요하지 않는다. 최소 통과는
+자료가 지지하는 해석과 고정한 물리 모형의 한계를 함께 설명하는 것이다.
+
+실행 자체는 회차 사이에 \texttt{max\_new\_runs}로 나누어 수행할 수 있다.
+수치 방법의 유도와 API 설명을 이미 앞 회차에서 다뤘으므로 A20·A21을 위해
+새로운 고급 수치해석 수업 두 회차를 추가하지 않는다.
+
+\textbf{함께 확인할 장면.} 계산이 끝난 보고서에서 한 결론을 먼저 스스로
+작성한다. 지도자는 새로운 숫자를 요구하기 전에 그 문장의 범위가 실행한
+검사를 넘는지 확인한다. 수정한 문장과 이유를 함께 남긴다.
+
+\section{16회: 자기 코드의 재현과 하나의 연구
+질문}\label{uxd68c-uxc790uxae30-uxcf54uxb4dcuxc758-uxc7acuxd604uxacfc-uxd558uxb098uxc758-uxc5f0uxad6c-uxc9c8uxbb38}
+
+\textbf{연결 과제:} P0-P5; A19의 보고서
+
+마지막 회차에서는 자신이 수정한 소스가 새 폴더에서도 그대로 실행되는지
+확인한다. 제공 함수, 직접 구현한 함수와 선택 해설의 역할을 분명히
+적는다. 원래 폴더의 실행파일이나 cache 없이 fpm으로 빌드하고 작은 입력을
+실행한다.
+
+그 뒤 누적 음향시간을 별도 진단으로 추가한다. 중심 누락 구간의 처리와
+trapezoid 적분을 명시하고, 상수·비상수 integrand 및 lapse 변환을
+시험한다. 진단을 추가하기 위해 EOS나 Cowling 우변을 바꾸지 않는다.
+
+최종 발표에서는 한 개의 제한된 질문을 제시한다. 가정, 비교 대상, 수치
+검증과 결론이 그 질문에 연결되어야 한다. 계산하지 않은 회전·탄성·초유체
+효과를 미래 가능성이라는 이유로 현재 결과에 끌어오지 않는다.
+
+마지막 확인은 동료의 질문으로 한다. 동료가 안내문을 읽고 같은 종류의
+계산을 실행할 수 있는가? 우리는 결과의 의미와 한계를 설명할 수 있는가?
+그 다음에야 새 질문을 고르고 독립적인 비교를 시작한다. 강의의 수료와
+논문의 독창적 기여는 다른 판단이다.
+
+\textbf{함께 확인할 장면.} 동료가 작은 실행을 시도하는 동안 구두 설명을
+최소화한다. 막힌 지점이 나오면 필요한 문장을 안내문에 보태고 재시도한다.
+이것은 독자의 실행 조건을 점검하는 활동이지 사람을 평가하는 시험이
+아니다.
+
+제공 계산을 옮기는 기본 명령은 \path|make_calculation.py|다. 자신의
+함수는 \texttt{-\/-physics}로 명시하고, 수치 방법은 함께 옮긴다. 새
+위치에서 소스부터 빌드하여 단일 pair를 실행한다. 이 절차는 학생이
+작성하지 않은 함수를 작성했다고 인정하는 과정이 아니다.
+
+P1--P4의 \texttt{verify\_export.py} 자동 검사는
+\texttt{export\_learner.py}가 만든 \texttt{SOURCE\_FILES.json}을 읽는다.
+제공 계산의 \texttt{CALCULATION.json}과 같은 형식이 아니다. 큐시트
+P0에서 두 목적지를 분리하고, 어느 경로의 소스를 전달했는지 먼저
+선택한다.
+
+\section{유도에서 제공 함수로
+넘어가기}\label{uxc720uxb3c4uxc5d0uxc11c-uxc81cuxacf5-uxd568uxc218uxb85c-uxb118uxc5b4uxac00uxae30}
+
+제3·5장의 중심 다음 항은 TOV와 변위 방정식의 차수별 대입으로 설명한다.
+구현은 제공 함수에 맡기며 1 m의 leading 시작과 100 m의 보정 시작을
+비교한다. 학생이 모든 계수를 코딩하는 것은 필수 성취가 아니다. 바뀐 것이
+물리 모형이 아니라 초기조건 근사의 차수임을 설명해야 한다.
+
+제5장의 자기수반 scalar 식과 유한 표면항은 제6·10장의 적분 검사로
+연결한다. 자동 실행 결과를 읽을 때에는 ``저장 주파수를 우변에 다시 넣은
+항등식''과 ``주파수에 독립적인 시험함수의 적분''을 구분하게 한다. 네
+수준의 적분 검사는 전체 계산에 포함되며 추가 수치 구현 과제를 요구하지
+않는다. 세부 유도는 본문에 제공하고 A21에서 수렴 표·표면항·실패 상태를
+해석한다.
+
+\section{피드백과 성취
+판단}\label{uxd53cuxb4dcuxbc31uxacfc-uxc131uxcde8-uxd310uxb2e8}
+
+\subsection{자동시험과 개념
+설명}\label{uxc790uxb3d9uxc2dcuxd5d8uxacfc-uxac1cuxb150-uxc124uxba85}
+
+시험이 통과했는데 설명은 틀릴 수 있다. 반대로 물리는 정확히 이해했지만
+변수 하나를 잘못 전달했을 수도 있다. 앞의 경우에는 표면조건이나 미분의
+의미를 다시 묻고, 뒤의 경우에는 가장 작은 입력에서 변환을 추적한다. 같은
+빨간 표시를 두 종류의 실패에 붙여 놓고 끝내지 않는다. 자동시험과 설명이
+서로 다른 증거인 이유다.
+
+공개 기준은 문제의 정의와 수정된 예측, 계산, 비교, 진단, 한계의 다섯
+차원이다. 최초 예측의 정답 여부는 채점하지 않는다. 설명을 읽고 계산한
+뒤에도 근거가 없거나 핵심 의미가 틀리면 0, 맞는 요소가 있지만 조건이나
+연결이 빠지면 1, 해당 관계를 설명하고 작은 새 입력에도 적용하면 2로
+기록한다. 점수와 함께 다음에 다시 해 볼 작업 하나를 적는다. 총점만으로
+핵심 오개념을 덮지 않는다.
+
+특히 다음 구분은 반드시 말과 계산에서 확인한다. 적분 성공과 고유주파수
+발견, 작은 잔차와 작은 주파수 오차, 선형 진폭과 물리 에너지, 배경 미분과
+고정 조성 미분, 주파수 변화와 식별 가능한 물리 효과다. 이 구분을 놓친
+경우에는 더 많은 소수 자리를 출력하는 것으로 보완할 수 없다.
+
+\subsection{도움을 줄이는
+순서}\label{uxb3c4uxc6c0uxc744-uxc904uxc774uxb294-uxc21cuxc11c}
+
+초반에는 무엇을 비교할지와 해석 기준을 제공한다. 예를 들어
+단위변환에서는 독립 기준값을 주고, shooting에서는 정확한 \(n\pi/L\)를
+제공한다. 중반에는 여러 검증 후보 중 가장 위험한 오류에 대응하는 것을
+독자가 선택한다. 후반에는 자신의 비교에서 가장 큰 오차원을 먼저 예측하고
+검증 실험을 설계한다.
+
+첫 힌트는 필요한 정의를 가리키고, 둘째 힌트는 그 정의를 쓸 작은 사례를
+제시한다. 그래도 막히면 한 단계를 실제로 함께 풀어 준다. 설명을 보지
+못하게 오래 기다리는 것이 목표는 아니다. 다음에는 같은 원리가 필요한
+다른 입력을 풀고, 다음 만남에서 짧게 다시 묻는다. 도움을 받은 직후의
+재현과 시간이 지난 뒤의 판단은 구별해 기록한다.
+
+\subsection{실패를 기록하는 간단한
+양식}\label{uxc2e4uxd328uxb97c-uxae30uxb85duxd558uxb294-uxac04uxb2e8uxd55c-uxc591uxc2dd}
+
+실패 메모는 길 필요가 없다. 무엇을 계산하려 했는지, 어느 명령에서 무엇이
+달랐는지, 다음에는 무엇 하나를 바꿔 볼지를 적는다. 원인을 아직 모르면
+모른다고 쓴다. 틀린 예측보다 문제가 되는 것은, 관찰한 차이를 설명하지
+않은 채 정답처럼 보이는 숫자만 남기는 일이다.
+
+원인은 물리 가정, 수식·단위, 수치 근사, 프로그램 구현, 실행환경으로
+구분한다. 분류가 불확실하면 그대로 적는다. 예를 들어 주파수 차이가
+있다는 사실만으로 EOS 오류라고 정하지 않는다. 한 점 우변, 고정 배경
+적분과 배경 격자 비교로 범위를 좁힌다.
+
+\section{석사논문으로 이어지는 제한된 연구
+계획}\label{uxc11duxc0acuxb17cuxbb38uxc73cuxb85c-uxc774uxc5b4uxc9c0uxb294-uxc81cuxd55cuxb41c-uxc5f0uxad6c-uxacc4uxd68d}
+
+\subsection{질문을 작게
+정의한다}\label{uxc9c8uxbb38uxc744-uxc791uxac8c-uxc815uxc758uxd55cuxb2e4}
+
+강의의 첫 연구 질문은 ``저밀도 물질은 진동을 바꾸는가?''보다 좁아야
+한다. 어떤 고밀도 함수를 고정하고, 어떤 저밀도 parameter를 어느 범위에서
+바꾸며, 어느 질량 가지와 표면 조건에서 어떤 모드를 비교하는지 적는다. 이
+정의가 없으면 여러 종류의 차이가 같은 그림에 겹친다.
+
+예를 들어 연속 two-polytrope의 저밀도 지수를 바꾸고 \(M\)을 고정한
+\(f,p_1\)의 변화를 조사할 수 있다. 또는 같은 실제표에 대해 두
+열역학적으로 명시된 보간 표현의 차이를 연구할 수 있다. 첫째는 물질
+모형의 변화이고 둘째는 수치 표현의 영향이다. 두 질문을 한 번에 풀기보다
+각각의 null과 수렴 조건을 먼저 정한다.
+
+\subsection{연구 진입의 최소
+증거}\label{uxc5f0uxad6c-uxc9c4uxc785uxc758-uxcd5cuxc18c-uxc99duxac70}
+
+선택한 기준 별에서 root와 mode identity가 확인되어 있어야 한다. 수치
+오차의 주요 원인이 식별되어 있어야 하고, 작은 입력 변화에서 같은 모드를
+추적할 수 있어야 한다. 자신의 프로그램을 새 폴더에서 빌드할 수 있으며,
+제공한 함수와 직접 작성한 함수를 구별할 수 있어야 한다.
+
+이 조건들이 충족되면 한정된 parameter 집합의 비교로 넘어간다. 아직 범용
+EOS 조사나 큰 parameter scan을 시작할 필요는 없다. 작은 모델군에서
+발견된 불일치가 무엇을 의미하는지 해석하지 못한다면, 더 많은 모델을
+추가해도 그 불확실성이 줄지는 않는다.
+
+\subsection{보고서의 논증
+순서}\label{uxbcf4uxace0uxc11cuxc758-uxb17cuxc99d-uxc21cuxc11c}
+
+첫 절에서 질문과 고정할 조건을 명시한다. 둘째 절에서는 필요한 물리식과
+변수 정의만 정리한다. 셋째 절은 입력 EOS, 배경 생성, 고유값 탐색과 모드
+추적 방법이다. 넷째 절에는 null, refinement, 질량 잔차와 데이터 표현의
+영향을 분리한다. 그 다음 결과와 물리적 해석을 제시한다.
+
+결론은 계산이 지지하는 범위를 넘지 않는다. 차이가 분해능 이하라면 해당
+모델·수치 표현에서 분해하지 못했다는 결론이다. 모든 저밀도 물리가
+무관하다는 결론이 아니다. 수렴이 부족하면 현재 결과의 부호까지
+안정적인지 확인해야 하며, 고유함수의 형태 변화가 있어도 그것이 독립적인
+관측 신호라고 즉시 말할 수는 없다.
+
+\section{읽기 안내}\label{uxc77duxae30-uxc548uxb0b4}
+
+먼저 강의 제3장의 열역학 EOS와 TOV 연결, 제5장의 Cowling 유도, 제6장의
+수렴·식별을 읽는다. 이미 알고 있는 부분은 진단 문제를 풀고 넘어가되,
+표기와 단위가 다르면 대응표를 만든다. 접합은 제7장, 핵물질은 제8장의
+상세 풀이, 실제표와 통제 비교는 제9-10장에 연결된다.
+
+Silbar와 Reddy의 「Neutron Stars for Undergraduates」는 계산을 통해
+구조와 물질 모형을 연결하는 읽을거리다.{[}C1{]} Yoshida와 Lee의 연구는
+상대론적 Cowling에서 고체 지각까지 포함하는 경우와 유체 문제의 범위를
+비교하는 데 사용한다.{[}C2{]} 여기의 유체 식을 탄성 지각 식과 동일시하지
+않는다. Montefusco 등의 논문은 평형과 고정 조성의 구분을 확인하는 데
+읽는다.{[}C3{]} 각 문헌의 수치값을 이 강의의 정답으로 옮기기 전에
+EOS·표면·섭동 가정을 먼저 맞추어야 한다.
+
+\section{수행 범위의 마지막
+확인}\label{uxc218uxd589-uxbc94uxc704uxc758-uxb9c8uxc9c0uxb9c9-uxd655uxc778}
+
+이 과정은 차갑고 비회전인 구대칭 완전유체의 상대론적 Cowling 문제를
+중심으로 한다. 기본 압축응답은 평형 barotrope이고 표면은 명시된 양의
+cutoff다. 계면은 채택한 느린 상변환의 물질적 조건만 다룬다. 핵물질과
+액적 과제는 함수형과 유효 자유도를 이해하는 모형이며, 모든 밀도에서 실제
+물질을 재현한다고 주장하지 않는다.
+
+완성 여부는 자료의 생성과 함수의 실행, 수치적 수렴, 물리적 해석을 따로
+보고 판단한다. 실제 학습자의 소요시간과 독립 수행 능력은 첫 실행에서
+기록하여 운영안을 조정한다. 문서의 분량이나 자동시험 수가 그 증거를
+대신하지는 않는다.
+
+\begingroup\small
+
+\section{참고문헌과 읽기
+범위}\label{uxcc38uxace0uxbb38uxd5ccuxacfc-uxc77duxae30-uxbc94uxc704}
+
+{[}C1{]} R. R. Silbar and S. Reddy, ``Neutron Stars for
+Undergraduates,'' \emph{American Journal of Physics} \textbf{72},
+892-905 (2004); erratum \textbf{73}, 286 (2005). DOI: 10.1119/1.1703544.
+arXiv:nucl-th/0309041. 구조와 물질 모형을 계산으로 연결하는 읽을거리다.
+동반 핵물질 식은 본문에 표시한 가정과 매개변수로 직접 계산하며, 모든
+수치를 이 문헌의 결과로 간주하지 않는다.
+
+{[}C2{]} S. Yoshida and U. Lee, ``Nonradial Oscillations of Neutron
+Stars with a Solid Crust: Analysis in the Relativistic Cowling
+Approximation,'' \emph{Astronomy \& Astrophysics} \textbf{395}, 201-208
+(2002). DOI: 10.1051/0004-6361:20021270. arXiv:astro-ph/0210591. 유체와
+고체 지각을 포함하는 문제의 차이와 모드의 공간적 성질을 비교하는 데
+사용한다. 탄성 지각의 spectrum을 이 강의 유체 예제의 정답으로 쓰지
+않는다.
+
+{[}C3{]} G. Montefusco, M. Antonelli and F. Gulminelli, ``Frozen and
+\(\beta\)-equilibrated \(f\) and \(p\) modes of cold neutron stars:
+nuclear metamodel predictions,'' \emph{Astronomy \& Astrophysics}
+\textbf{694}, A150 (2025). DOI: 10.1051/0004-6361/202452727.
+arXiv:2410.08008. 평형 압축응답과 고정 조성 응답의 물리적 구분에
+사용한다. 이 강의의 두 방정식에 고정 조성 효과가 자동 포함된다는 근거가
+아니다.
+
+{[}N1{]} E. Hairer and G. Wanner, DOPRI5, Université de Genève,
+\url{https://www.unige.ch/~hairer/prog/nonstiff/dopri5.f}. Embedded
+Runge-Kutta 계수의 확인에 사용한다. 동반 controller의 모든 선택을 해당
+프로그램과 동일시하지 않는다.
+
+{[}U1{]} BIPM, SI defining constants,
+\url{https://www.bipm.org/en/measurement-units/si-defining-constants}.
+
+{[}U2{]} NIST, 2022 CODATA adjustment,
+\url{https://physics.nist.gov/cuu/Constants/Table/allascii.txt}. 실제
+사용한 상수는 \path|fixtures/constants/codata2022.json|에 있다.
+
+{[}U3{]} IAU 2015 Resolution B3, arXiv:1510.07674. 명목 태양 mass
+parameter의 정의에 사용한다.
+
+{[}F1{]} Fortran Package Manager, Manifest reference,
+\url{https://fpm.fortran-lang.org/spec/manifest.html}.
+\texttt{fpm.toml}의 target과 local dependency의 의미에 사용한다.
+
+본문의 간단한 수치 예제와 두 코드의 대조값은 동반 계산 자료에서 나온다.
+위 문헌의 수치 결과를 그대로 전사한 것이 아니다. 코드의 비교는 같은 물리
+가정·단위·표면을 먼저 맞춘 경우에만 유효하다.
+
+{[}A1{]} F. D. Swesty, ``Thermodynamically Consistent Interpolation for
+Equation of State Tables,'' \emph{Journal of Computational Physics}
+\textbf{127}, 118--127 (1996), doi:10.1006/jcph.1996.0162. 하나의
+thermodynamic potential에서 값과 미분을 얻는 일관성 원칙의 참고다.
+논문의 bi-quintic Helmholtz scheme을 여기서 사용했다는 뜻은 아니다.
+
+{[}A2{]} R. H. D. Townsend and S. A. Teitler, ``GYRE: An open-source
+stellar oscillation code based on a new Magnus Multiple Shooting
+Scheme,'' \emph{MNRAS} \textbf{435}, 3406--3418 (2013), arXiv:1308.2965,
+doi:10.1093/mnras/stt1533. Stellar shooting의 한계를 다루는 더 고급의
+대안이다. 동반 주 계산은 DOPRI/RK4 양방향 방법이며 GYRE를 호출하지
+않는다. 별도로 대조한 연구 구현은 GL4 Magnus 전달을 사용하지만 GYRE 그
+자체는 아니다.
+
+{[}A3{]} E. Hairer and G. Wanner, \emph{Fortran Codes}, nonstiff
+integration, DOPRI5, Université de Genève.
+\url{https://www.unige.ch/~hairer/software.html}. 이 패키지는 자체 DOPRI
+단계·controller와 RK4를 사용하며, 문헌 코드를 전체적으로 복제하거나 그
+모든 기능을 지원하지 않는다.
+
+{[}A4{]} R. H. D. Townsend, R. V. Kuenzi and J. Christensen-Dalsgaard,
+``Tools for Characterizing the Numerical Error of Stellar Oscillation
+Codes,'' arXiv:2505.20212v2 (2025). 코드 간 일치와 개별 코드의 오차
+특성화가 다른 질문이라는 점을 읽는다. 이 강의의 경험적 여유를 그 논문의
+변분적 오차 측정식이나 엄밀한 상한으로 동일시하지 않는다.
+
+\endgroup
+
+\end{document}

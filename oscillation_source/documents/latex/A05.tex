@@ -1,0 +1,206 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  10pt,
+  a4paper,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{setspace}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{Liberation Serif}
+  \setsansfont[]{Liberation Sans}
+  \setmonofont[]{DejaVu Sans Mono}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=22mm]{geometry}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+\usepackage[bidi=basic]{babel}
+\else
+\usepackage[bidi=default]{babel}
+\fi
+\babelprovide[main,import]{korean}
+\ifPDFTeX
+\else
+\babelfont{rm}[]{Liberation Serif}
+\fi
+% get rid of language-specific shorthands (see #6817):
+\let\LanguageShortHands\languageshorthands
+\def\languageshorthands#1{}
+\usepackage{xeCJK}
+\setCJKmainfont{Noto Serif CJK KR}
+\setCJKsansfont{Noto Sans CJK KR}
+\setCJKmonofont{Noto Sans Mono CJK KR}
+\xeCJKsetup{CJKspace=true}
+\usepackage{xurl}
+\usepackage{fvextra}
+\usepackage{fancyhdr}
+\AtBeginDocument{\DefineVerbatimEnvironment{verbatim}{Verbatim}{breaklines=true,breakanywhere=true,fontsize=\small}}
+\setlength{\emergencystretch}{4em}
+\setlength{\headheight}{15pt}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small 중성자별 구조와 비방사 진동}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\setcounter{tocdepth}{2}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={A05 · 압력식을 열역학적 EOS로 완결하기},
+  pdflang={ko-KR},
+  colorlinks=true,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\title{A05 · 압력식을 열역학적 EOS로 완결하기}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{과제 큐시트}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\setstretch{1.12}
+\textbf{선행:} A04　 \textbf{독립 작업:} 4--7시간 (계획치)
+
+\subsection{압력곡선 하나가 총에너지까지
+결정하는가?}\label{uxc555uxb825uxace1uxc120-uxd558uxb098uxac00-uxcd1duxc5d0uxb108uxc9c0uxae4cuxc9c0-uxacb0uxc815uxd558uxb294uxac00}
+
+압력함수를 그대로 두고 선형 에너지 상수만 바꿔 보자. 압력, 에너지,
+화학퍼텐셜, 압축응답 중 변할 양을 먼저 고른다.
+
+먼저 한두 문장으로 답한 뒤 아래 설명을 읽자. 첫 예측이 틀렸거나 아직
+모르겠다고 적는 것은 감점하지 않는다.
+
+\subsection{필요한 관계와 읽을
+위치}\label{uxd544uxc694uxd55c-uxad00uxacc4uxc640-uxc77duxc744-uxc704uxce58}
+
+\[
+\epsilon=Cn+\frac{P}{\Gamma-1},\qquad
+\mu=C+\frac{\Gamma P}{(\Gamma-1)n},\qquad
+\chi=\frac{\Gamma P}{\epsilon+P}.
+\] 같은 압력식에서 에너지와 두 도함수를 얻는다.
+
+\begin{itemize}
+\tightlist
+\item
+  \path|notes/chapters/ch03_eos.md|
+\item
+  \path|notes/equations/eos.md|
+\item
+  \path|learner/src/eos/ns_polytrope.f90|
+\end{itemize}
+
+\subsection{계산으로
+옮기기}\label{uxacc4uxc0b0uxc73cuxb85c-uxc62euxae30uxae30}
+
+기본 경로는 제공 함수의 호출과 해석이다. 아래 \texttt{learner} 시험은
+같은 물리 함수를 직접 작성한 경우에 실행한다. 제공 예제를 검사할 때에는
+명시적으로 \texttt{calculation}을 선택한다.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  압력 적분의 선형 에너지 상수 C를 유도한다.
+\item
+  anchor ratio를 사용해 큰 SI 수밀도에서 중간 overflow를 피한다.
+\item
+  n→P→n과 n→μ→n을 검사한다.
+\item
+  에너지의 중앙차분 및 압력 적분으로 열역학을 대조한다.
+\end{enumerate}
+
+\newpage
+
+\subsection{실행해서 무엇을 볼
+것인가}\label{uxc2e4uxd589uxd574uxc11c-uxbb34uxc5c7uxc744-uxbcfc-uxac83uxc778uxac00}
+
+패키지 루트에서 실행한다. \texttt{-\/-plan}은 경로만 확인하며 계산
+성공을 뜻하지 않는다.
+
+\begin{verbatim}
+python tools/run_assignment.py A05 --plan
+python tools/run_assignment.py A05 --run \
+  --workspace learner --output ../A05_result.json
+\end{verbatim}
+
+\subsection{결과를
+설명하기}\label{uxacb0uxacfcuxb97c-uxc124uxba85uxd558uxae30}
+
+적분상수는 압력곡선에 없는 정보다. 같은 우변을 다시 평가한 결과와 에너지
+차분·압력 구적의 결과를 구별하면 어떤 관계를 점검했는지 드러난다.
+
+\textbf{남길 증거.} 유도와 domain 조건; 세 차분 간격의 μ 비교; C 변화에
+대한 P,ε,μ,χ 표
+
+\textbf{판단 기준.} 2점 예: 에너지 차분과 압력 적분 중 어떤 경로가
+구현식과 독립적인지 설명한다. 최초 예측의 정오보다, 결과를 본 뒤 이유를
+고치고 다른 입력에도 적용하는지를 본다.
+
+\subsection{막혔을 때}\label{uxb9c9uxd614uxc744-uxb54c}
+
+\textbf{힌트 1.} epsilon에 baryon rest energy가 포함되는지 먼저
+고정한다.
+
+\textbf{힌트 2.} Γ\textgreater2의 높은 밀도 극한 χ→Γ−1을 사용해 무제한
+extrapolation의 위험을 찾는다.
+
+\subsection{다음 만남에 다시
+묻기}\label{uxb2e4uxc74c-uxb9ccuxb0a8uxc5d0-uxb2e4uxc2dc-uxbb3buxae30}
+
+다음 회차에는 압력함수만 주어진 새 폴리트로프에서 추가로 지정해야 할
+정보를 말한다. 완성된 에너지식을 외우는 답 대신 적분상수의 역할을
+설명한다. 먼저 짧게 답한 뒤 본문과 자신의 기록을 열어 확인한다.
+
+\textbf{범위.} 폴리트로프는 핵물질 fit이 아니며 EOS 성공은 별 계산
+성공이 아니다.
+
+\end{document}

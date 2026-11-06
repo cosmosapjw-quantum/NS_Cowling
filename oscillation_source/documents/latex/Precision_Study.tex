@@ -1,0 +1,250 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  10pt,
+  a4paper,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{setspace}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{Liberation Serif}
+  \setsansfont[]{Liberation Sans}
+  \setmonofont[]{DejaVu Sans Mono}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=22mm]{geometry}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+\ifLuaTeX
+\usepackage[bidi=basic]{babel}
+\else
+\usepackage[bidi=default]{babel}
+\fi
+\babelprovide[main,import]{korean}
+\ifPDFTeX
+\else
+\babelfont{rm}[]{Liberation Serif}
+\fi
+% get rid of language-specific shorthands (see #6817):
+\let\LanguageShortHands\languageshorthands
+\def\languageshorthands#1{}
+\usepackage{xeCJK}
+\setCJKmainfont{Noto Serif CJK KR}
+\setCJKsansfont{Noto Sans CJK KR}
+\setCJKmonofont{Noto Sans Mono CJK KR}
+\xeCJKsetup{CJKspace=true}
+\usepackage{xurl}
+\usepackage{fvextra}
+\usepackage{fancyhdr}
+\AtBeginDocument{\DefineVerbatimEnvironment{verbatim}{Verbatim}{breaklines=true,breakanywhere=true,fontsize=\small}}
+\setlength{\emergencystretch}{4em}
+\setlength{\headheight}{15pt}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small 중성자별 구조와 비방사 진동}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\setcounter{tocdepth}{2}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={제공 수치 방법의 사용 안내},
+  pdflang={ko-KR},
+  colorlinks=true,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\title{제공 수치 방법의 사용 안내}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{함수 호출과 수렴 결과 읽기}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+{
+\hypersetup{linkcolor=}
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+\setstretch{1.12}
+\section{제공 방법을 호출하는
+순서}\label{uxc81cuxacf5-uxbc29uxbc95uxc744-uxd638uxcd9cuxd558uxb294-uxc21cuxc11c}
+
+이 문서는 함수 사용 시 옆에 두는 짧은 안내다. EOS의 열역학적 표현은 본문
+제3·7·9장, 양방향 경계값 문제는 제4·5장, 모드 식별과 수렴은 제6·10장에서
+전개한다. 여기의 명령만 실행했다고 그 물리적 설명을 대신한 것은 아니다.
+
+\subsection{한 별과 같은 질량의 두
+별}\label{uxd55c-uxbcc4uxacfc-uxac19uxc740-uxc9c8uxb7c9uxc758-uxb450-uxbcc4}
+
+\begin{verbatim}
+from tools.stellar_methods import Model, solve_star, solve_pair
+
+star = solve_star("../one_star", alpha=0.0, level="fine")
+pair = solve_pair("../one_pair", alpha=0.1, level="fine")
+print(pair["delta_f_hz"], pair["delta_p1_hz"])
+print(pair["physical_claim_status"])
+\end{verbatim}
+
+기본 \texttt{Model}은 동봉한 native Hermite 표, 목표 질량
+\(2.644606257493485\times10^{30}\) kg, 양의 표면압력 \(10^{20}\) Pa와
+중심 시작점 1 m를 사용한다. 두 모드는 \(\ell=2\)의 \(f,p_1\)이다.
+\texttt{solve\_pair}는 두 별을 같은 질량에 맞추고 실제 고유함수를
+비교하지만 전체 수렴 실험을 수행하지 않는다. 상태는
+\path|pending_additional_checks|다.
+
+\texttt{level}은 \texttt{coarse}, \texttt{medium}, \texttt{fine},
+\texttt{audit} 중 하나다. 상대 허용오차와 native 구간 최대 단계는 각각
+\((10^{-7},0.2)\), \((10^{-9},0.1)\), \((10^{-11},0.05)\),
+\((10^{-13},0.025)\)다. 단계 좌표는 구간별 무차원 좌표이며 반경 m 단위의
+격자폭이 아니다. \texttt{method="rk4"}는 별도의 단계법 점검이며 같은
+상대오차 제어를 수행한다는 뜻이 아니다.
+
+\begin{verbatim}
+custom = Model(target_mass_kg=2.6e30, p_cut_pa=1e20, r0_m=1.0)
+pair = solve_pair("../another_mass", model=custom)
+\end{verbatim}
+
+이렇게 질량을 바꾼 결과에 기본 실험의 수렴 판정을 자동 부여하지 않는다.
+새로운 문제의 branch와 검색 구간, 모드 대응 및 경계 민감도를 다시 정해야
+한다. 이 인터페이스가 임의의 EOS·질량에서 근의 존재나 스펙트럼 완전성을
+보장하지는 않는다.
+
+\subsection{전체 비교를 실행하고
+재개한다}\label{uxc804uxccb4-uxbe44uxad50uxb97c-uxc2e4uxd589uxd558uxace0-uxc7acuxac1cuxd55cuxb2e4}
+
+\begin{verbatim}
+from tools.stellar_methods import run_study
+result = run_study("../my_study", max_new_runs=2)
+print(result["status"], result["pending_runs"])
+\end{verbatim}
+
+같은 호출을 반복하면 검증된 완료 사례는 다시 적분하지 않고 필요한 다음
+사례로 간다. 한 번에 끝내려면 \texttt{max\_new\_runs}를 생략한다. 이
+제한은 한 호출의 작업 수만 바꾸며 물리·수치 허용오차를 낮추지 않는다.
+
+전체 preset은 21개 단일별 계산이다. \texttt{main}은 네 정밀도의 두 별,
+\texttt{method}는 별도의 RK4 pair, \texttt{boundary}는
+중심·표면·연결점의 세 pair, \texttt{mass}는 두 모델 각각의 질량 기여
+추정에 쓰는 네 이웃, \texttt{null}은 무변형 계산이다. 한 그룹만 실행해도
+전체 필수 목록은 사라지지 않는다.
+
+\begin{verbatim}
+python tools/stellar_methods.py --output ../my_study --group main
+python tools/stellar_methods.py --output ../my_study
+\end{verbatim}
+
+\texttt{study.json}은 현재 판정과 남은 사례, \texttt{convergence.csv}는
+두 절대 주파수와 차이, 각 사례 디렉터리는 입력·수치 출력·실행 상태를
+담는다. 모두 끝나기 전에는 \texttt{pending}이다. 최종
+\path|numerically_resolved_in_fixed_model|은 정의한 비교에서 수치적
+분해가 확인되었다는 뜻이며 엄밀한 오차 상한이나 실제 EOS의 물리적
+불확실성 범위를 뜻하지 않는다.
+
+\subsection{초기조건과 해 전체를
+확인한다}\label{uxcd08uxae30uxc870uxac74uxacfc-uxd574-uxc804uxccb4uxb97c-uxd655uxc778uxd55cuxb2e4}
+
+\begin{verbatim}
+from tools.stellar_methods import Model, solve_pair
+m = Model(r0_m=100.0, center_order=2)
+pair = solve_pair("../series_start", model=m, level="audit")
+\end{verbatim}
+
+\texttt{center\_order=2}는 제3·5장에서 유도한 다음 중심항을 제공 함수로
+계산한다. 기본값 0은 1 m의 leading 시작이다. 큰 시작점이 다른 EOS 구간을
+건너면 거절한다. 임의의 물리 우변에 보편적으로 적용되는 보정이 아니며,
+새 설정의 결과에도 전체 수렴 판정이 자동 부여되지 않는다.
+
+\begin{verbatim}
+from tools.variational_check import audit_run
+check = audit_run("../my_study/L3_a0.0", "../one_integral.json")
+\end{verbatim}
+
+전체 \texttt{run\_study}는 네 paired 수준의 적분 검사를 자동 수행하고
+\path|variational_checks.json|에 저장한다. 주파수를 재대입하지 않은
+scalar 항등식과 표면항은 본문 제5·6장에 있다. 적분 불일치가 수치 여유를
+넘으면 \path|integral_consistency_unresolved|로 남긴다. 원래 주파수를
+적분값으로 덮어쓰지는 않는다.
+
+\subsection{실패를 성공 기록과 섞지
+않는다}\label{uxc2e4uxd328uxb97c-uxc131uxacf5-uxae30uxb85duxacfc-uxc11euxc9c0-uxc54auxb294uxb2e4}
+
+NaN·무한대, 잘못된 설정, 일치하지 않는 소스·입력·출력은 거절한다. 실패한
+계산 폴더는 성공 결과로 사용하지 않는다. 같은 입력을 다시 시도하려면
+명시적으로 다음을 사용한다.
+
+\begin{verbatim}
+python tools/stellar_methods.py --output ../my_study --retry-failed
+\end{verbatim}
+
+원래 시도는 \texttt{failed\_attempts/} 아래에 보존된다. 코드를
+수정했거나 물리 입력을 바꿨으면 새 출력 폴더를 선택한다. 동일 출력
+폴더의 동시 실행은 잠금으로 거절하며 중단되면 운영체제가 잠금을
+해제한다. 이 재개 기능은 POSIX 환경을 사용한다.
+
+\subsection{Fortran에서 가져다
+쓴다}\label{fortranuxc5d0uxc11c-uxac00uxc838uxb2e4-uxc4f4uxb2e4}
+
+\begin{verbatim}
+use ns_numerical_methods, only: adaptive_integrate, bisect
+use ns_stellar_methods, only: integrate_cells, match_cells
+\end{verbatim}
+
+첫 모듈은 수치 적분과 근 찾기, 둘째는 EOS 구간에서 TOV·Cowling 물리
+함수를 연결하는 adapter다. 실제 인수의 자료형은 해당 모듈과
+\texttt{cell\_solve.f90} 예제를 따른다. \texttt{methods}에는 원래 EOS
+표를 다루는 완성 함수도 있다. TOV·Cowling 식과 물리 경계조건은
+\path|calculation/src/physics/|에 별도로 보인다.
+
+직접 구현한 물리 함수는
+\path|make_calculation.py --physics learner/src|로 명시적으로 연결한다.
+미완성 함수에 대한 자동 해설 대체는 없다. 제공 예제의 수치적 성공과
+학생의 직접 구현 성취도 다른 판정이다.
+
+\end{document}

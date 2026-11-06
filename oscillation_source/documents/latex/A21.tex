@@ -1,0 +1,216 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  10pt,
+  a4paper,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{setspace}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{Liberation Serif}
+  \setsansfont[]{Liberation Sans}
+  \setmonofont[]{DejaVu Sans Mono}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=22mm]{geometry}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+\usepackage[bidi=basic]{babel}
+\else
+\usepackage[bidi=default]{babel}
+\fi
+\babelprovide[main,import]{korean}
+\ifPDFTeX
+\else
+\babelfont{rm}[]{Liberation Serif}
+\fi
+% get rid of language-specific shorthands (see #6817):
+\let\LanguageShortHands\languageshorthands
+\def\languageshorthands#1{}
+\usepackage{xeCJK}
+\setCJKmainfont{Noto Serif CJK KR}
+\setCJKsansfont{Noto Sans CJK KR}
+\setCJKmonofont{Noto Sans Mono CJK KR}
+\xeCJKsetup{CJKspace=true}
+\usepackage{xurl}
+\usepackage{fvextra}
+\usepackage{fancyhdr}
+\AtBeginDocument{\DefineVerbatimEnvironment{verbatim}{Verbatim}{breaklines=true,breakanywhere=true,fontsize=\small}}
+\setlength{\emergencystretch}{4em}
+\setlength{\headheight}{15pt}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small 중성자별 구조와 비방사 진동}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\setcounter{tocdepth}{2}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={A21 · 같은 경계값 문제에서 작은 모드 차이를 분해하기},
+  pdflang={ko-KR},
+  colorlinks=true,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\title{A21 · 같은 경계값 문제에서 작은 모드 차이를 분해하기}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{과제 큐시트}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\setstretch{1.12}
+\textbf{선행:} A19, A20　 \textbf{독립 작업:} 4--6시간 (계획치)
+
+\subsection{같은 문제의 해라는 주장을 무엇으로
+방어하는가?}\label{uxac19uxc740-uxbb38uxc81cuxc758-uxd574uxb77cuxb294-uxc8fcuxc7a5uxc744-uxbb34uxc5c7uxc73cuxb85c-uxbc29uxc5b4uxd558uxb294uxac00}
+
+두 방향에서 얻은 벡터의 determinant가 작다. 이것만으로 다른 EOS·다른
+질량에서 얻은 해도 연결할 수 있을까? 잔차 앞에 필요한 조건을 먼저
+말하자.
+
+먼저 한두 문장으로 답한 뒤 아래 설명을 읽자. 첫 예측이 틀렸거나 아직
+모르겠다고 적는 것은 감점하지 않는다.
+
+\subsection{필요한 관계와 읽을
+위치}\label{uxd544uxc694uxd55c-uxad00uxacc4uxc640-uxc77duxc744-uxc704uxce58}
+
+\(D=\det(\mathbf z_{\rm in},\mathbf z_{\rm out})/(\|\mathbf z_{\rm in}\|\|\mathbf z_{\rm out}\|)\);
+\(\mathbf b\cdot\mathbf z_s=0\).
+
+\begin{itemize}
+\tightlist
+\item
+  \path|notes/chapters/ch05.md|
+\item
+  \path|notes/chapters/ch06.md|
+\item
+  \path|notes/chapters/ch10.md|
+\item
+  \path|tools/stellar_methods.py|
+\item
+  \path|calculation/src/adapters/ns_cell_shooting.f90|
+\end{itemize}
+
+\subsection{계산으로
+옮기기}\label{uxacc4uxc0b0uxc73cuxb85c-uxc62euxae30uxae30}
+
+제공 함수의 호출이 기본 경로다. 구간 보간·역함수·적응 적분·matching의
+내부 코드를 작성하지 않고, 입력 조건과 반환된 근거를 해석한다.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  표면벡터와 determinant를 본문 식에서 설명한 뒤 제공 solve\_pair를
+  호출한다.
+\item
+  run\_study의 단계별 결과에서 절대 주파수·차이·모드 대응을 각각 읽는다.
+\item
+  중심·표면·연결점·질량·무변형 및 적분 검사의 근거로 결론을 쓴다. 중심
+  다음 항은 선택한다.
+\end{enumerate}
+
+\newpage
+
+\subsection{실행해서 무엇을 볼
+것인가}\label{uxc2e4uxd589uxd574uxc11c-uxbb34uxc5c7uxc744-uxbcfc-uxac83uxc778uxac00}
+
+첫 명령 묶음은 한 pair의 시험이다. 전체 판정은 아래
+\texttt{run\_study}의 모든 필요한 실행과 검사가 끝난 뒤에만 읽는다.
+
+\begin{verbatim}
+python tools/run_assignment.py A21 --plan
+python tools/run_assignment.py A21 --run --output ../A21.json
+\end{verbatim}
+
+\begin{verbatim}
+from tools.stellar_methods import run_study
+r = run_study("../my_study", max_new_runs=2)
+# 이후 같은 인수로 반복하거나 max_new_runs를 생략한다.
+print(r["status"], len(r["pending_runs"]))
+\end{verbatim}
+
+\subsection{결과를
+설명하기}\label{uxacb0uxacfcuxb97c-uxc124uxba85uxd558uxae30}
+
+단일 pair 성공, 절대 주파수 수렴, 모드 대응과 전체 수치 여유는 별도
+증거다. 적분 검사에서도 유한 표면항을 보존하고 저장 주파수를 다시 넣는
+순환 검사를 피한다.
+
+\textbf{남길 증거.} 같은 물리 BC와 두 방향 해의 연결; 두 별의 절대
+주파수와 paired difference 수렴표; 고유함수 대응과 오차 항목의 계산
+근거; study.json과 재개 가능한 실행 명령
+
+\textbf{판단 기준.} 2점: 자동 pair 성공과 전체 numerical allowance를
+구분하고, 같은 EOS·질량·mode 조건에서 결과의 부호를 방어한다. 최초
+예측의 정오보다, 결과를 본 뒤 이유를 고치고 다른 입력에도 적용하는지를
+본다.
+
+\subsection{막혔을 때}\label{uxb9c9uxd614uxc744-uxb54c}
+
+\textbf{힌트 1.} 두 비영 벡터가 평행하면 비자명한 선형해의 전체 배율을
+맞출 수 있다.
+
+\textbf{힌트 2.} 주파수만 비교하지 말고 matching점의 r,m와 고유함수도
+확인한다.
+
+\subsection{다음 만남에 다시
+묻기}\label{uxb2e4uxc74c-uxb9ccuxb0a8uxc5d0-uxb2e4uxc2dc-uxbb3buxae30}
+
+다음 만남에는 결과의 마지막 자릿수를 가린다. 같은 물리 문제인지 확인할
+조건과 가장 취약한 오차원에 대한 다음 실험 하나를 스스로 고른다. 먼저
+짧게 답한 뒤 본문과 자신의 기록을 열어 확인한다.
+
+\textbf{범위.} Empirical allowance는 interval proof나 관측 신뢰구간이
+아니다.
+
+\end{document}

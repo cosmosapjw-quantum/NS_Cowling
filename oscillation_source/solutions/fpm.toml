@@ -1,0 +1,29 @@
+name = "ns-solutions"
+description = "solutions: neutron-star calculations"
+[build]
+auto-executables = false
+auto-tests = false
+auto-examples = false
+module-naming = false
+[library]
+source-dir = "src"
+[fortran]
+implicit-typing = false
+implicit-external = false
+source-form = "free"
+[dependencies]
+ns-support = { path = "../support" }
+[[executable]]
+name = "case_driver"
+source-dir = "app"
+main = "case_driver.f90"
+
+[[test]]
+name = "cell_checks"
+source-dir = "tests_fortran"
+main = "cell_checks.f90"
+
+[[executable]]
+name = "cell_solve"
+source-dir = "app"
+main = "cell_solve.f90"

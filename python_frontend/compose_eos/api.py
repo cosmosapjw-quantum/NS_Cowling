@@ -117,6 +117,48 @@ def fill_density_gap(data: EOSData, n_fill: int = 60, fit_points: int = 12, *,
         run_native(*command)
         return EOSData.from_internal_directory(target, source_dir=data.source_dir)
 
+
+def causal_completion(data: EOSData, *, cs2: float = 1.0,
+                      n_max: float | None = None, n_points: int = 200,
+                      return_metadata: bool = False):
+    """Append a native constant-sound-speed tail at the first resolved cs2=1 crossing.
+
+    This creates an explicit high-density model alternative, not a unique repair
+    of the microscopic source EOS. The output intentionally omits composition.
+    Set return_metadata=True to receive (EOSData, native_report).
+    """
+    import math
+    if not isinstance(data, EOSData):
+        raise TypeError("data must be an EOSData instance")
+    if not isinstance(n_points, int) or isinstance(n_points, bool) or n_points < 4:
+        raise ValueError("n_points must be an integer >= 4")
+    sound_speed = float(cs2)
+    if not math.isfinite(sound_speed) or not (0.0 < sound_speed <= 1.0):
+        raise ValueError("cs2 must be finite and in (0, 1]")
+    if n_max is None:
+        n_max_arg = 0.0
+    else:
+        n_max_arg = float(n_max)
+        if not math.isfinite(n_max_arg) or n_max_arg <= 0.0:
+            raise ValueError("n_max must be finite and positive when specified")
+
+    with tempfile.TemporaryDirectory(prefix="compose-eos-causal-completion-") as td:
+        root = Path(td)
+        source = root / "source"
+        target = root / "completed"
+        source.mkdir()
+        target.mkdir()
+        data.write_internal_directory(source)
+        payload = run_native(
+            "causal-complete", source, target,
+            format(sound_speed, ".17g"), format(n_max_arg, ".17g"), str(n_points)
+        )
+        completed = EOSData.from_internal_directory(target, source_dir=data.source_dir)
+    if return_metadata:
+        return completed, payload
+    return completed
+
+
 def reconstruct_master(*args, **kwargs):
     raise NativeFeatureUnavailable("Full master-function smoothing/candidate selection is not yet ported to Fortran.")
 

@@ -242,3 +242,134 @@ def test_native_density_gap_rejects_hermite_bridge_with_negative_dpdn(tmp_path):
     )
     assert "no positive, mechanically stable and causal" in result.stdout
     assert not (output_dir / "eos_data.csv").exists()
+
+
+def analytic_css_source(*, n_max=1.2, mu_offset=0.0, phase_edge=False,
+                        composition_available=False):
+    """Cold first-law EOS: P=K n^3, eps=930 n + K n^3/2."""
+    n = np.geomspace(0.05, n_max, 120)
+    k = 1000.0
+    pressure = k * n**3
+    energy = 930.0 * n + 0.5 * k * n**3
+    free = energy / n
+    q1 = pressure / n
+    mu = (energy + pressure) / n + mu_offset
+    mn = 939.0
+    zeros = np.zeros_like(n)
+    phases = np.zeros(n.size, dtype=int)
+    if phase_edge:
+        n_cross_exact = np.sqrt(930.0 / (1.5 * k))
+        phases[np.searchsorted(n, n_cross_exact):] = 1
+    return EOSData(
+        nb=n, mn=mn, mp=mn, Q1=q1, Q2=zeros.copy(),
+        Q3=mu / mn - 1.0, Q4=zeros.copy(), Q5=zeros.copy(),
+        Q6=free / mn - 1.0, Q7=free / mn - 1.0,
+        q_extra=zeros.copy(), Iphase=phases,
+        Yn=zeros.copy(), Yp=zeros.copy(), Ye=zeros.copy(), Ymu=zeros.copy(),
+        Aav=zeros.copy(), Zav=zeros.copy(), Yh=zeros.copy(),
+        composition_file_present=composition_available,
+        composition_available=composition_available,
+    )
+
+
+def test_native_causal_completion_matches_analytic_css_tail_and_first_law():
+    from compose_eos import causal_completion
+
+    source = analytic_css_source(composition_available=True)
+    source_nb = source.nb.copy()
+    source_p = source.p.copy()
+    source_eps = source.eps.copy()
+    completed, meta = causal_completion(
+        source, cs2=1.0, n_max=1.8, n_points=64, return_metadata=True
+    )
+
+    n_match_exact = np.sqrt(930.0 / 1500.0)
+    assert meta["operation"] == "causal-complete"
+    assert meta["n_match"] == pytest.approx(n_match_exact, rel=8e-4)
+    assert meta["mu_match_relative_residual"] <= 5e-3
+    assert meta["sound_speed_continuous"] is True
+    assert meta["composition_omitted"] is True
+    assert completed.nb[-1] == pytest.approx(1.8)
+    assert np.all(np.diff(completed.nb) > 0.0)
+    assert np.all(np.diff(completed.p) > 0.0)
+    assert np.all(np.diff(completed.eps) > 0.0)
+
+    # All retained low-density pressure and energy-density source knots are
+    # unchanged, while the returned thermodynamic variables obey Euler closure.
+    keep = source.nb < meta["n_match"]
+    np.testing.assert_array_equal(completed.nb[:keep.sum()], source_nb[keep])
+    np.testing.assert_allclose(completed.p[:keep.sum()], source_p[keep], rtol=3e-14)
+    np.testing.assert_allclose(completed.eps[:keep.sum()], source_eps[keep], rtol=3e-14)
+    np.testing.assert_allclose(completed.eps + completed.p,
+                               completed.nb * completed.mub, rtol=3e-15, atol=2e-13)
+
+    tail = slice(-64, None)
+    expected_mu = meta["mu_match"] * (completed.nb[tail] / meta["n_match"])
+    np.testing.assert_allclose(completed.mub[tail], expected_mu, rtol=3e-13)
+    np.testing.assert_allclose(np.diff(completed.p[tail]), np.diff(completed.eps[tail]),
+                               rtol=3e-12, atol=2e-12)
+    assert not completed.composition_available
+    assert not completed.composition_file_present
+    assert np.all(completed.Iphase == 0)
+    assert np.all(completed.Ye == 0.0)
+    np.testing.assert_array_equal(source.nb, source_nb)
+
+
+def test_native_causal_completion_supports_subcausal_css_and_marks_cs2_kink():
+    from compose_eos import causal_completion
+
+    completed, meta = causal_completion(
+        analytic_css_source(), cs2=0.33, n_max=1.6, n_points=80,
+        return_metadata=True
+    )
+    assert meta["sound_speed_continuous"] is False
+    assert np.all(np.diff(completed.nb) > 0.0)
+    n_tail = completed.nb[-80:]
+    mu_tail = completed.mub[-80:]
+    np.testing.assert_allclose(
+        mu_tail, meta["mu_match"] * (n_tail / meta["n_match"])**0.33,
+        rtol=4e-13
+    )
+    assert np.all(completed.p[-80:] > 0.0)
+    assert np.all(completed.eps[-80:] > 0.0)
+
+
+def test_native_causal_completion_refuses_missing_causal_crossing():
+    from compose_eos import NativeExecutionError, causal_completion
+
+    with pytest.raises(NativeExecutionError, match="no resolved first c_s\\^2=1 crossing"):
+        causal_completion(analytic_css_source(n_max=0.6), n_points=40)
+
+
+def test_native_causal_completion_rejects_phase_edge_near_first_crossing():
+    from compose_eos import NativeExecutionError, causal_completion
+
+    with pytest.raises(NativeExecutionError, match="single-phase interval"):
+        causal_completion(analytic_css_source(phase_edge=True), n_points=40)
+
+
+def test_native_causal_completion_rejects_bad_source_chemical_potential():
+    from compose_eos import NativeExecutionError, causal_completion
+
+    with pytest.raises(NativeExecutionError, match="chemical-potential mismatch"):
+        causal_completion(analytic_css_source(mu_offset=20.0), n_points=40)
+
+
+def test_native_causal_completion_rejects_invalid_controls():
+    from compose_eos import causal_completion
+
+    source = analytic_css_source()
+    with pytest.raises(ValueError, match="cs2"):
+        causal_completion(source, cs2=0.0)
+    with pytest.raises(ValueError, match="n_points"):
+        causal_completion(source, n_points=3)
+    with pytest.raises(ValueError, match="n_max"):
+        causal_completion(source, n_max=0.0)
+
+
+def test_native_causal_completion_rejects_nmax_below_matching_density():
+    from compose_eos import NativeExecutionError, causal_completion
+
+    with pytest.raises(NativeExecutionError, match="n_max must exceed"):
+        causal_completion(analytic_css_source(), n_max=0.5, n_points=40)
+

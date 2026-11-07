@@ -17,7 +17,7 @@ Status values: PORT_VERIFIED means the native Fortran implementation was compile
 | Crust-core matching: cubic_P/quintic_P/css/cubic_F/quintic_F | NOT_PORTED | Explicit unavailable error | Full six-method bridge selection and slope/area gates remain |
 | Literature-specific RMF/Skyrme/APR solvers | PARTIAL | Not exposed as complete parity | Existing Fortran nuclear/liquid-drop/beta-equilibrium examples are not equivalent to the literature solver suite |
 | Genuine Maxwell/Gibbs phase transitions | PARTIAL | Not exposed as complete parity | Existing Fortran interface toys do not implement every Python phase-transition/TOV treatment |
-| Causality profile/completion | PARTIAL | Through table admission only | No full causal-completion generator parity |
+| Causality profile/completion | PARTIAL | Native CSS completion wrapper; profile remains Python-only | First resolved single-phase c_s^2=1 crossing; native constant-c_s^2 tail; no phase-jump interpolation; explicit composition omission; independent profile remains unported |
 | TOV star | PORT_VERIFIED in solver workspace | WRAPPER_ADDED | Native real_table_star callback |
 | TOV sequence | Fortran solve per point | WRAPPER_ADDED | Python orchestrates pressure scan; each TOV integration is Fortran |
 | Relativistic Cowling f/p1 | PORT_VERIFIED for solver | WRAPPER_ADDED | Uses native cell_solve; cohort results tracked separately |

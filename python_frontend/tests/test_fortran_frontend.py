@@ -40,13 +40,17 @@ def test_alternate_eos_roundtrip(tmp_path):
 
 
 def test_native_density_gap_is_available_and_remaining_generator_operations_fail_explicitly():
-    from compose_eos import fill_density_gap, reconstruct_master, match_crust_core
+    from compose_eos import fill_density_gap, reconstruct_master, match_crust_core, NativeExecutionError
     eos = read_compose(SAMPLE)
     filled = fill_density_gap(eos, n_fill=3, gap_phase=7)
     assert filled.n == eos.n + 3
-    for fn in (reconstruct_master, match_crust_core):
-        with pytest.raises(NativeFeatureUnavailable):
-            fn(eos)
+    # Reconstruction is now implemented natively. This particular production
+    # table is deliberately refused by the v1 interpolant's physical gate;
+    # it must not fall back to the legacy Python smoother or emit an unchecked EOS.
+    with pytest.raises(NativeExecutionError, match="master reconstruction .*failure"):
+        reconstruct_master(eos)
+    with pytest.raises(NativeFeatureUnavailable):
+        match_crust_core(eos)
 
 
 def test_normalize_compose_and_verify_csv(tmp_path):

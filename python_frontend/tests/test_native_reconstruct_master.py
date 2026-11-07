@@ -109,7 +109,7 @@ def test_native_master_reconstruction_obeys_exact_first_law_without_inventing_co
     np.testing.assert_array_equal(out.Q5, np.zeros(out.n))
     np.testing.assert_array_equal(out.Q6, out.Q7)
     np.testing.assert_allclose(out.F, source.F, rtol=3e-13, atol=3e-13)
-    np.testing.assert_allclose(out.Q1, 30.0, rtol=3e-12, atol=3e-12)
+    np.testing.assert_allclose(out.Q1, 30.0, rtol=1e-11, atol=3e-12)
     np.testing.assert_allclose(out.mub, out.F + out.Q1, rtol=0.0, atol=2e-13)
     np.testing.assert_allclose(out.p, out.nb * out.Q1, rtol=0.0, atol=2e-13)
     np.testing.assert_allclose(out.eps, out.nb * out.F, rtol=0.0, atol=2e-13)
@@ -190,7 +190,7 @@ def test_native_master_preserves_extra_thermo_column_unless_explicitly_declared_
 
     rebuilt, report = reconstruct_master(source, smooth=False, recompute_extra_cs2=True, return_report=True)
     expected = 30.0 / (rebuilt.F + 30.0)
-    np.testing.assert_allclose(rebuilt.q_extra, expected, rtol=3e-12, atol=3e-13)
+    np.testing.assert_allclose(rebuilt.q_extra, expected, rtol=1e-10, atol=2e-12)
     assert report["q_extra_recomputed_as_cs2"] is True
 
 

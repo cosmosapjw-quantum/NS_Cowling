@@ -568,7 +568,7 @@ contains
     real(wp),allocatable::xbridge(:),qbridge(:),bslopes(:),za(:),ycharge(:)
     real(wp)::nq,yeval,ymuval,mueval,t,resid,yecand,yeprev,yenext,yqlo,yqhi,neval
     real(wp)::kf,pel,elat,plat,qval,dqval,fval,muval,dpdn,cs,second,integral
-    real(wp)::xq,scale,offset
+    real(wp)::xq
     integer::n,i,j,k,last_crust,ilo,ihi,idrip,ijoin,nbri,offset_int
     logical::ok,anom_drop,has_comp,has_outer,physical
     character(len=256)::why
@@ -843,17 +843,27 @@ contains
         dpdn=qval+dqval
         if(.not.ieee_is_finite(fval+qval+dqval+muval+dpdn).or. &
           fval<=0._wp.or.qval<=0._wp.or.muval<=0._wp.or.dpdn<=0._wp)then
-          physical=.false.;exit
+          physical=.false.
+          write(status,'(a,i0,a,6(es13.5,1x))') &
+            'master reconstruction thermodynamic positivity failure at interval ',i, &
+            ' (n_B,F,Q1,mu_B,dPdn,Fpp)= ',exp(xq),fval,qval,muval,dpdn,dqval
+          exit
         endif
         cs=dpdn/muval
         if(.not.ieee_is_finite(cs).or.cs<=0._wp.or.cs>1._wp+1.e-6_wp)then
-          physical=.false.;exit
+          physical=.false.
+          write(status,'(a,i0,a,6(es13.5,1x))') &
+            'master reconstruction causality failure at interval ',i, &
+            ' (n_B,F,Q1,mu_B,dPdn,cs2)= ',exp(xq),fval,qval,muval,dpdn,cs
+          exit
         endif
       enddo
       if(.not.physical)exit
     enddo
     if(.not.physical)then
-      status='reconstructed master EOS violates positive pressure, mechanical stability or causality on its interpolation mesh'
+      if(index(status,'master reconstruction ') /= 1)then
+        status='master reconstruction failed its interpolation-mesh physical admissibility gate'
+      endif
       return
     endif
 

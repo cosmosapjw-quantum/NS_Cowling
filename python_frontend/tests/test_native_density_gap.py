@@ -129,3 +129,70 @@ def test_native_density_gap_refuses_unphysical_gm1_gap():
     source = read_compose(ROOT / "eos_generator" / "eos_data_normalized" / "GM_GM1")
     with pytest.raises(NativeExecutionError, match="no positive, mechanically stable and causal"):
         fill_density_gap(source, n_fill=12)
+
+
+def test_native_density_gap_accepts_physical_hermite_fallback():
+    # The integral-corrected log-Q1 PCHIP has dP/dn_B < 0 for this endpoint
+    # configuration, while the endpoint-constrained cubic-Hermite F bridge
+    # remains positive, mechanically stable and causal throughout the gap.
+    x = np.array([-1.0, -0.5, 0.0, 2.0, 2.5])
+    nb = np.exp(x)
+    q1 = np.array([
+        5.006862597939881,
+        10.53946265748791,
+        16.03244715100962,
+        4.760711089250459,
+        17.523175149575234,
+    ])
+    mn = 939.0
+    free = np.array([980.0, 990.0, 1000.0, 1015.195000252497751, 1020.0])
+    mu = free + q1
+    zeros = np.zeros_like(nb)
+    source = EOSData(
+        nb=nb, mn=mn, mp=mn,
+        Q1=q1, Q2=zeros.copy(), Q3=mu / mn - 1.0,
+        Q4=zeros.copy(), Q5=zeros.copy(), Q6=free / mn - 1.0,
+        Q7=free / mn - 1.0, q_extra=zeros.copy(),
+        Iphase=np.zeros(nb.size, dtype=int),
+        Yn=zeros.copy(), Yp=zeros.copy(), Ye=zeros.copy(), Ymu=zeros.copy(),
+        Aav=zeros.copy(), Zav=zeros.copy(), Yh=zeros.copy(),
+        composition_available=False,
+    )
+
+    out = fill_density_gap(source, n_fill=8, fit_points=2)
+
+    # Compare to the defining cubic-Hermite F(x), not to an independently
+    # interpolated pressure or chemical-potential curve.
+    x_fill = np.log(out.nb[3:11])
+    h = 2.0
+    t = x_fill / h
+    t2 = t * t
+    t3 = t2 * t
+    f0, f1 = free[2], free[3]
+    q0, q1_right = q1[2], q1[3]
+    expected_f = (
+        (2*t3 - 3*t2 + 1)*f0
+        + (t3 - 2*t2 + t)*h*q0
+        + (-2*t3 + 3*t2)*f1
+        + (t3 - t2)*h*q1_right
+    )
+    expected_q = (
+        (6*t2 - 6*t)/h*f0
+        + (3*t2 - 4*t + 1)*q0
+        + (-6*t2 + 6*t)/h*f1
+        + (3*t2 - 2*t)*q1_right
+    )
+    expected_fpp = (
+        (12*t - 6)/(h*h)*f0
+        + (6*t - 4)/h*q0
+        + (-12*t + 6)/(h*h)*f1
+        + (6*t - 2)/h*q1_right
+    )
+    expected_dpdn = expected_q + expected_fpp
+    expected_cs2 = expected_dpdn / (expected_f + expected_q)
+
+    np.testing.assert_allclose(out.F[3:11], expected_f, rtol=2e-12, atol=2e-12)
+    np.testing.assert_allclose(out.Q1[3:11], expected_q, rtol=2e-12, atol=2e-12)
+    assert np.all(expected_q > 0.0)
+    assert np.all(expected_dpdn > 0.0)
+    assert np.all((expected_cs2 >= 0.0) & (expected_cs2 < 1.0))

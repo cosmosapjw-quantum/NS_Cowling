@@ -73,7 +73,7 @@ def master_source(*, composition=False, outer_crust=False, dissolution=False,
     return EOSData(
         nb=nb, mn=mn, mp=mn,
         Q1=q1, Q2=zeros.copy(), Q3=mu / mn - 1.0,
-        Q4=np.full(n, -0.01), Q5=np.full(n, 0.02),
+        Q4=np.full(n, -0.01), Q5=zeros.copy(),
         Q6=free / mn - 1.0, Q7=(free / mn - 1.0) + 2.0e-4,
         q_extra=extra, Iphase=phases,
         Yn=yn, Yp=yp, Ye=ye, Ymu=ymu,
@@ -208,4 +208,18 @@ def test_native_master_rejects_invalid_smoothing_and_temperature_controls():
         reconstruct_master(source, smooth_sigma=0.0)
     source.temperature_mev = 1.0
     with pytest.raises(NativeExecutionError, match="cold T=0"):
+        reconstruct_master(source)
+
+
+def test_native_master_rejects_nonzero_entropy_even_with_cold_metadata():
+    source = master_source(composition=False)
+    source.Q2[4] = 1.e-3
+    with pytest.raises(NativeExecutionError, match="zero source entropy Q2"):
+        reconstruct_master(source)
+
+
+def test_native_master_rejects_trapped_lepton_potential_for_neutrino_transparent_rebuild():
+    source = master_source(composition=False)
+    source.Q5[4] = 1.e-3
+    with pytest.raises(NativeExecutionError, match="neutrino-transparent beta equilibrium"):
         reconstruct_master(source)

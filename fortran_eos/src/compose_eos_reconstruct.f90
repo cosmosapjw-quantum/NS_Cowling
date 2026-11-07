@@ -674,6 +674,14 @@ contains
       status='reconstruct_master requires beta-equilibrated source metadata'
       return
     endif
+    if(maxval(abs(eos%q(2,:)))>2.e-8_wp)then
+      status='reconstruct_master requires zero source entropy Q2 for a cold T=0 branch'
+      return
+    endif
+    if(maxval(abs(eos%q(5,:)))>2.e-6_wp)then
+      status='reconstruct_master requires neutrino-transparent beta equilibrium with Q5 approximately zero'
+      return
+    endif
     ! A phase label change is not by itself a thermodynamic discontinuity.
     ! Reject only an equal-pressure phase boundary, which is the signature of
     ! a density plateau/jump that a single-valued F(ln n_B) spline must not cross.

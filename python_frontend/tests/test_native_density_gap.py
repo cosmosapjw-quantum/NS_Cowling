@@ -225,6 +225,8 @@ def test_native_density_gap_rejects_hermite_bridge_with_negative_dpdn():
         composition_available=False,
     )
 
+    from compose_eos import NativeExecutionError
+
     with pytest.raises(NativeExecutionError,
                        match="no positive, mechanically stable and causal"):
         fill_density_gap(source, n_fill=8, fit_points=2)

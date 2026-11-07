@@ -286,3 +286,8 @@ Negative tests cover missing composition-drop consent, unavailable literature_be
 7. Fortin et al. (2016), [Neutron star radii and crusts: uncertainties and unified equations of state](https://journals.aps.org/prc/abstract/10.1103/PhysRevC.94.035804). Relevant to the effect of crust EOS choices on stellar structure.
 
 The historic implementation in this repository is the primary numerical reference for code-to-code differential testing. The literature motivates thermodynamic constraints and provides alternatives; it does not independently certify the historical interpolation heuristics.
+
+
+## 11. Verified source snapshot
+
+The bounded implementation in this note was built and tested on branch `research/fortran-eos-gap-fill-v1`, HEAD `3486e3ca9407ddc1362208b3d36f0c3154d78e6e`. Push GitHub Actions run [42377746709](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42377746709) and pull-request run [42377750637](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42377750637) both passed. The push run reports a successful gfortran build, 44 passing frontend/direct-provider tests, 58/58 tracked SHA-256 checks, source archive creation and artifact upload. The archive is available as [NS_Cowling-3486e3ca9407ddc1362208b3d36f0c3154d78e6e](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42377746709/artifacts/13576666331), size 198,966,313 bytes, artifact ZIP digest `sha256:97e3f62e03b8bab2a7d11cebb56b671fefe0f624c5791349fc9a4f630579fc5c`, and retention expiry 2026-12-07. The SHA digest is for the uploaded artifact ZIP; the repository's 58-file manifest separately verifies the tracked source and documentation contents.

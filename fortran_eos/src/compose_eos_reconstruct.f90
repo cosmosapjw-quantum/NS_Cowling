@@ -218,6 +218,7 @@ contains
         call hermite_second_derivative(x0,x1,f0,f1,q0,q1,lv,d2v)
         ! Q1=F' and dP/dn_B=Q1+dQ1/dln(n_B)=F'+F''.
         mu=ff+dv;dpdn=dv+d2v
+        if(j>=ndense-2)write(*,'(a,i0,6(1x,es24.16))') 'DBG_HERMITE ',j,u,dv,d2v,mu,dpdn,ff
         if(.not.ieee_is_finite(ff).or..not.ieee_is_finite(dv).or. &
            .not.ieee_is_finite(d2v).or..not.ieee_is_finite(mu).or. &
            .not.ieee_is_finite(dpdn).or.dv<=0._wp.or.mu<=0._wp.or.dpdn<=0._wp)then

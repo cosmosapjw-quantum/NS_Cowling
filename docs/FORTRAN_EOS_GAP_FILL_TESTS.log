@@ -40,3 +40,36 @@ Additional package baseline checks
   oscillation_source tests: blocked because fpm is not installed. The test harness
   explicitly prohibits compiler fallback when fpm is absent. No fpm-dependent
   source tests are claimed as passed.
+
+Follow-up: Hermite fallback correctness audit (2026-11-07)
+  Branch: research/fortran-eos-gap-fill-v1
+  Relevant implementation commits:
+    cb9811881b4672e7875031a156593240cb94d943  reset fallback admissibility state
+    eaad6a9988b003782ba115ab63e434cb5bfdc52d  analytic Hermite second derivative gate
+    f62c438c1c9b977cce41774aa6369f486743577a  recompute fallback sample abscissae
+  Regression tests:
+    - Accept a physically admissible Hermite fallback after PCHIP rejection.
+    - Reject a Hermite bridge with Q1>0 but dP/dn_B=Q1+F''<0.
+    - Assert a rejected bridge writes no EOS table.
+
+  Root cause:
+    The PCHIP admissibility scan exits at its first inadmissible dense sample.
+    The Hermite fallback then reused densex(j), although the unvisited tail of
+    densex was still undefined. The fallback loop's own u advanced across the
+    gap while the actual evaluation coordinate remained at x0. The fallback
+    now computes x=x0+u*(x1-x0) on each iteration.
+
+  Physics gate:
+    Q1=F'(x), mu_B=F+Q1, dP/dn_B=F'+F''=Q1+F'', and
+    cs2=(dP/dn_B)/(F+Q1). F'' is evaluated analytically from the
+    cubic-Hermite polynomial. Positivity, mechanical stability, finite values,
+    and the causal upper bound are checked on the dense gap grid.
+
+  CI run 42371669781:
+    Native Fortran build: PASS.
+    Targeted suite: 24 passed in 19.24s.
+    SHA256SUMS_v4.txt: FAILED because the tracked hashes for the implementation,
+    regression tests, changelog and gap-fill documentation had not yet been
+    refreshed at that commit. This is a manifest bookkeeping failure, not a
+    build or numerical-test failure; the next verification must refresh and
+    recheck the manifest before completion.

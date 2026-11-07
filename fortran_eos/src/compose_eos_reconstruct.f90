@@ -3,7 +3,7 @@ module compose_eos_reconstruct
   use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
   implicit none
   private
-  public :: fill_density_gap
+  public :: fill_density_gap, reconstruct_master
 contains
   subroutine pchip_slopes(x,y,m,ok,message)
     real(wp),intent(in)::x(:),y(:)
@@ -305,4 +305,581 @@ contains
     enddo
     status='ok'
   end subroutine fill_density_gap
+
+
+  integer function pchip_interval(x,xq) result(i)
+    real(wp),intent(in)::x(:),xq
+    integer::lo,hi,mid,n
+    n=size(x)
+    if(xq<=x(1))then
+      i=1
+      return
+    endif
+    if(xq>=x(n))then
+      i=n-1
+      return
+    endif
+    lo=1;hi=n
+    do while(hi-lo>1)
+      mid=(lo+hi)/2
+      if(xq<x(mid))then
+        hi=mid
+      else
+        lo=mid
+      endif
+    enddo
+    i=lo
+  end function pchip_interval
+
+  pure subroutine pchip_value_second(x,y,m,i,xq,value,derivative,second)
+    real(wp),intent(in)::x(:),y(:),m(:),xq
+    integer,intent(in)::i
+    real(wp),intent(out)::value,derivative,second
+    real(wp)::h,t,t2,t3
+    h=x(i+1)-x(i)
+    t=(xq-x(i))/h;t2=t*t;t3=t2*t
+    value=(2*t3-3*t2+1)*y(i)+(t3-2*t2+t)*h*m(i) &
+      +(-2*t3+3*t2)*y(i+1)+(t3-t2)*h*m(i+1)
+    derivative=((6*t2-6*t)/h)*y(i)+(3*t2-4*t+1)*m(i) &
+      +((-6*t2+6*t)/h)*y(i+1)+(3*t2-2*t)*m(i+1)
+    second=((12*t-6)/(h*h))*y(i)+((6*t-4)/h)*m(i) &
+      +((-12*t+6)/(h*h))*y(i+1)+((6*t-2)/h)*m(i+1)
+  end subroutine pchip_value_second
+
+  pure real(wp) function pchip_segment_primitive(x0,x1,y0,y1,m0,m1,xq) result(value)
+    real(wp),intent(in)::x0,x1,y0,y1,m0,m1,xq
+    real(wp)::h,t,a00,a10,a01,a11
+    h=x1-x0;t=(xq-x0)/h
+    a00=0.5_wp*t**4-t**3+t
+    a10=0.25_wp*t**4-(2._wp/3._wp)*t**3+0.5_wp*t**2
+    a01=-0.5_wp*t**4+t**3
+    a11=0.25_wp*t**4-(1._wp/3._wp)*t**3
+    value=h*(a00*y0+a10*h*m0+a01*y1+a11*h*m1)
+  end function pchip_segment_primitive
+
+  subroutine pchip_primitive(x,y,m,xq,value)
+    real(wp),intent(in)::x(:),y(:),m(:),xq
+    real(wp),intent(out)::value
+    integer::i,k,n
+    real(wp)::xcut
+    n=size(x);value=0._wp
+    if(xq<=x(1))then
+      i=1
+      value=pchip_segment_primitive(x(i),x(i+1),y(i),y(i+1),m(i),m(i+1),xq)
+      return
+    endif
+    if(xq>=x(n))then
+      do k=1,n-1
+        value=value+pchip_segment_primitive(x(k),x(k+1),y(k),y(k+1),m(k),m(k+1),x(k+1))
+      enddo
+      if(xq>x(n)) value=value+(xq-x(n))*y(n)
+      return
+    endif
+    i=pchip_interval(x,xq)
+    do k=1,i-1
+      value=value+pchip_segment_primitive(x(k),x(k+1),y(k),y(k+1),m(k),m(k+1),x(k+1))
+    enddo
+    xcut=max(x(i),min(x(i+1),xq))
+    value=value+pchip_segment_primitive(x(i),x(i+1),y(i),y(i+1),m(i),m(i+1),xcut)
+  end subroutine pchip_primitive
+
+  subroutine pchip_integral(x,y,m,a,b,value)
+    real(wp),intent(in)::x(:),y(:),m(:),a,b
+    real(wp),intent(out)::value
+    real(wp)::pa,pb
+    call pchip_primitive(x,y,m,a,pa)
+    call pchip_primitive(x,y,m,b,pb)
+    value=pb-pa
+  end subroutine pchip_integral
+
+  subroutine solve_normal4(matrix,rhs,solution,ok)
+    real(wp),intent(in)::matrix(4,4),rhs(4)
+    real(wp),intent(out)::solution(4)
+    logical,intent(out)::ok
+    real(wp)::a(4,5),row(5),pivot,factor,best,tmp
+    integer::i,j,k,p
+    a(:,1:4)=matrix
+    a(:,5)=rhs
+    ok=.false.;solution=0._wp
+    do k=1,4
+      p=k;best=abs(a(k,k))
+      do i=k+1,4
+        if(abs(a(i,k))>best)then
+          p=i;best=abs(a(i,k))
+        endif
+      enddo
+      if(best<=1.e-14_wp*max(1._wp,maxval(abs(a(:,1:4)))))return
+      if(p/=k)then
+        row=a(k,:);a(k,:)=a(p,:);a(p,:)=row
+      endif
+      pivot=a(k,k)
+      a(k,k:5)=a(k,k:5)/pivot
+      do i=1,4
+        if(i==k)cycle
+        factor=a(i,k)
+        a(i,k:5)=a(i,k:5)-factor*a(k,k:5)
+      enddo
+    enddo
+    solution=a(:,5)
+    ok=all(ieee_is_finite(solution))
+  end subroutine solve_normal4
+
+  subroutine smooth_master_samples(x,values,sigma,smoothed,ok,message)
+    real(wp),intent(in)::x(:),values(:),sigma
+    real(wp),intent(out)::smoothed(:)
+    logical,intent(out)::ok
+    character(len=*),intent(out)::message
+    real(wp)::normal(4,4),rhs(4),coeff(4),z,w,powers(0:6),h,range
+    integer::n,i,j,jlo,jhi,radius,a,b
+    logical::solved
+    n=size(x);ok=.false.;message='invalid local master-function smoothing arrays'
+    if(n<5.or.size(values)/=n.or.size(smoothed)/=n)return
+    if(sigma<=0._wp.or.sigma>0.5_wp.or..not.ieee_is_finite(sigma))then
+      message='smooth_sigma must lie in (0, 0.5]'
+      return
+    endif
+    if(any(.not.ieee_is_finite(values)))then
+      message='master-function smoothing received nonfinite values'
+      return
+    endif
+    range=x(n)-x(1)
+    if(range<=0._wp)then
+      message='master-function smoothing requires an increasing log-density grid'
+      return
+    endif
+    radius=max(2,min((n-1)/2,nint(sigma*real(n,wp))))
+    do i=1,n
+      jlo=max(1,i-radius);jhi=min(n,i+radius)
+      if(jhi-jlo+1<4)then
+        jlo=max(1,min(i-2,n-3))
+        jhi=jlo+3
+      endif
+      h=max(x(i)-x(jlo),x(jhi)-x(i))
+      if(h<=tiny(1._wp))then
+        message='degenerate local smoothing bandwidth'
+        return
+      endif
+      normal=0._wp;rhs=0._wp
+      do j=jlo,jhi
+        z=(x(j)-x(i))/h
+        w=exp(-2._wp*z*z)
+        powers(0)=1._wp
+        do a=1,6
+          powers(a)=powers(a-1)*z
+        enddo
+        do a=0,3
+          rhs(a+1)=rhs(a+1)+w*powers(a)*values(j)
+          do b=0,3
+            normal(a+1,b+1)=normal(a+1,b+1)+w*powers(a+b)
+          enddo
+        enddo
+      enddo
+      call solve_normal4(normal,rhs,coeff,solved)
+      if(.not.solved)then
+        message='local cubic least-squares fit is singular'
+        return
+      endif
+      smoothed(i)=coeff(1)
+    enddo
+    ok=all(ieee_is_finite(smoothed))
+    if(ok)then
+      message='ok'
+    else
+      message='smoothed master function contains nonfinite values'
+    endif
+  end subroutine smooth_master_samples
+
+  pure real(wp) function lepton_chemical_potential(y,nb,mass) result(mu)
+    real(wp),intent(in)::y,nb,mass
+    real(wp),parameter::hbarc=197.3269804_wp,pi=acos(-1._wp)
+    real(wp)::kf
+    mu=mass
+    if(y<=0._wp.or.nb<=0._wp)return
+    kf=(3._wp*pi*pi*nb*y)**(1._wp/3._wp)
+    mu=sqrt(mass*mass+(hbarc*kf)**2)
+  end function lepton_chemical_potential
+
+  pure real(wp) function electron_pressure(nb,ye) result(pressure)
+    real(wp),intent(in)::nb,ye
+    real(wp),parameter::hbarc=197.3269804_wp,me=0.51099895_wp,pi=acos(-1._wp)
+    real(wp)::ne,kf,x,bracket,pref
+    pressure=0._wp
+    if(nb<=0._wp.or.ye<=0._wp)return
+    ne=nb*ye
+    kf=(3._wp*pi*pi*ne)**(1._wp/3._wp)
+    x=hbarc*kf/me
+    pref=me**4/(24._wp*pi*pi*hbarc**3)
+    if(x<0.05_wp)then
+      bracket=x**5*(1.6_wp+x*x*(-4._wp/7._wp+x*x/3._wp))
+    else
+      bracket=x*(2._wp*x*x-3._wp)*sqrt(1._wp+x*x)+3._wp*asinh(x)
+    endif
+    pressure=pref*bracket
+  end function electron_pressure
+
+  subroutine beta_lepton_fractions(nb,ycharge,ye,ymu,mu_e,ok)
+    real(wp),intent(in)::nb,ycharge
+    real(wp),intent(out)::ye,ymu,mu_e
+    logical,intent(out)::ok
+    real(wp),parameter::me=0.51099895_wp,mmu=105.6583745_wp
+    real(wp)::lo,hi,mid,flo,fmid
+    integer::iter
+    ok=.false.;ye=0._wp;ymu=0._wp;mu_e=me
+    if(nb<=0._wp.or.ycharge<0._wp.or.ycharge>1._wp)return
+    if(ycharge<=tiny(1._wp))then
+      ok=.true.
+      return
+    endif
+    mu_e=lepton_chemical_potential(ycharge,nb,me)
+    if(mu_e<=mmu)then
+      ye=ycharge;ymu=0._wp;ok=.true.;return
+    endif
+    lo=0._wp;hi=ycharge
+    flo=mu_e-mmu
+    do iter=1,100
+      mid=0.5_wp*(lo+hi)
+      fmid=lepton_chemical_potential(ycharge-mid,nb,me) &
+        -lepton_chemical_potential(mid,nb,mmu)
+      if(fmid>0._wp)then
+        lo=mid
+      else
+        hi=mid
+      endif
+      if(hi-lo<=2.e-14_wp*max(1._wp,ycharge))exit
+    enddo
+    ymu=0.5_wp*(lo+hi)
+    ye=ycharge-ymu
+    mu_e=lepton_chemical_potential(ye,nb,me)
+    ok=ieee_is_finite(ye+ymu+mu_e).and.ye>=0._wp.and.ymu>=0._wp
+  end subroutine beta_lepton_fractions
+
+  subroutine reconstruct_master(eos,smooth,smooth_sigma,fix_dissolution,dissolution_tol, &
+                                recompute_extra_cs2,out,outer_crust_corrected,status)
+    type(eos_data_t),intent(in)::eos
+    logical,intent(in)::smooth,fix_dissolution,recompute_extra_cs2
+    real(wp),intent(in)::smooth_sigma,dissolution_tol
+    type(eos_data_t),intent(out)::out
+    logical,intent(out)::outer_crust_corrected
+    character(len=*),intent(out)::status
+    integer,parameter::dense_per_interval=32
+    real(wp),parameter::me=0.51099895_wp,alpha=1._wp/137.035999084_wp
+    real(wp),parameter::hbarc=197.3269804_wp,pi=acos(-1._wp)
+    real(wp),allocatable::x(:),fraw(:),fsm(:),fslope(:),q1(:),dqdx(:),cs2(:)
+    real(wp),allocatable::xbridge(:),qbridge(:),bslopes(:),za(:),ycharge(:)
+    real(wp)::nq,yeval,ymuval,mueval,t,resid,yecand,yeprev,yenext,yqlo,yqhi
+    real(wp)::kf,pel,elat,plat,qval,dqval,fval,muval,dpdn,cs,second,integral
+    real(wp)::xq,scale,offset
+    integer::n,i,j,k,last_crust,ilo,ihi,idrip,ijoin,nbri,offset_int
+    logical::ok,anom_drop,has_comp,has_outer,physical
+    character(len=256)::why
+
+    n=eos%n
+    status='uninitialized'
+    outer_crust_corrected=.false.
+    if(n<5)then
+      status='reconstruct_master requires at least five source density points'
+      return
+    endif
+    if(.not.allocated(eos%nb).or..not.allocated(eos%q).or..not.allocated(eos%q_extra) &
+       .or..not.allocated(eos%iphase))then
+      status='EOS primary arrays are not allocated'
+      return
+    endif
+    if(size(eos%nb)/=n.or.any(shape(eos%q)/=[7,n]).or.size(eos%q_extra)/=n &
+       .or.size(eos%iphase)/=n)then
+      status='EOS primary array shapes are inconsistent'
+      return
+    endif
+    if(.not.all(ieee_is_finite(eos%nb)).or..not.all(ieee_is_finite(eos%q)) &
+       .or..not.all(ieee_is_finite(eos%q_extra)))then
+      status='EOS source contains nonfinite primary values'
+      return
+    endif
+    if(any(eos%nb<=0._wp).or.any(eos%nb(2:)<=eos%nb(:n-1)))then
+      status='reconstruct_master requires a positive strictly increasing density grid'
+      return
+    endif
+    if(abs(eos%temperature_mev)>1.e-12_wp.or..not.ieee_is_finite(eos%temperature_mev))then
+      status='reconstruct_master requires a cold T=0 table'
+      return
+    endif
+    if(.not.eos%beta_equilibrated)then
+      status='reconstruct_master requires beta-equilibrated source metadata'
+      return
+    endif
+    ! A phase label change is not by itself a thermodynamic discontinuity.
+    ! Reject only an equal-pressure phase boundary, which is the signature of
+    ! a density plateau/jump that a single-valued F(ln n_B) spline must not cross.
+    do i=1,n-1
+      if(eos%iphase(i+1)/=eos%iphase(i))then
+        if(abs(eos%nb(i+1)*eos%q(1,i+1)-eos%nb(i)*eos%q(1,i)) <= &
+          1.e-12_wp*max(1._wp,abs(eos%nb(i)*eos%q(1,i)),abs(eos%nb(i+1)*eos%q(1,i+1))))then
+          status='reconstruct_master v1 refuses a pressure plateau across an Iphase boundary'
+          return
+        endif
+      endif
+    enddo
+    if(eos%nadd<0.or.eos%nadd>1)then
+      status='reconstruct_master supports Nadd=0 or 1 only'
+      return
+    endif
+    if(recompute_extra_cs2.and.eos%nadd/=1)then
+      status='recomputing q_extra as c_s^2 requires exactly one extra thermo column (Nadd=1)'
+      return
+    endif
+    if(dissolution_tol<0._wp.or..not.ieee_is_finite(dissolution_tol))then
+      status='dissolution_tol must be finite and non-negative'
+      return
+    endif
+    if(smooth.and.(smooth_sigma<=0._wp.or.smooth_sigma>0.5_wp.or..not.ieee_is_finite(smooth_sigma)))then
+      status='smooth_sigma must lie in (0, 0.5]'
+      return
+    endif
+    has_comp=eos%composition_available
+    if(has_comp.and..not.eos%composition_file_present)then
+      status='composition_available is true but eos.compo provenance is absent'
+      return
+    endif
+    if(has_comp)then
+      if(.not.allocated(eos%yp).or..not.allocated(eos%ye).or..not.allocated(eos%ymu) &
+        .or..not.allocated(eos%abar).or..not.allocated(eos%zbar).or..not.allocated(eos%yh) &
+        .or..not.allocated(eos%yn))then
+        status='composition arrays are not allocated'
+        return
+      endif
+      if(size(eos%yp)/=n.or.size(eos%ye)/=n.or.size(eos%ymu)/=n.or.size(eos%abar)/=n &
+        .or.size(eos%zbar)/=n.or.size(eos%yh)/=n.or.size(eos%yn)/=n)then
+        status='composition array shapes are inconsistent'
+        return
+      endif
+      if(any(.not.ieee_is_finite(eos%yp)).or.any(.not.ieee_is_finite(eos%ymu)) &
+        .or.any(.not.ieee_is_finite(eos%abar)).or.any(.not.ieee_is_finite(eos%zbar)) &
+        .or.any(.not.ieee_is_finite(eos%yh)).or.any(.not.ieee_is_finite(eos%ye)))then
+        status='composition arrays contain nonfinite values'
+        return
+      endif
+    endif
+
+    allocate(x(n),fraw(n),fsm(n),fslope(n),q1(n),dqdx(n),cs2(n),za(n),ycharge(n))
+    x=log(eos%nb)
+    fraw=eos_free_energy(eos)
+    if(any(.not.ieee_is_finite(fraw)).or.any(fraw<=0._wp))then
+      status='master free energy per baryon must be finite and positive'
+      return
+    endif
+    if(smooth)then
+      call smooth_master_samples(x,fraw,smooth_sigma,fsm,ok,why)
+      if(.not.ok)then
+        status=trim(why)
+        return
+      endif
+    else
+      fsm=fraw
+    endif
+    call pchip_slopes(x,fsm,fslope,ok,why)
+    if(.not.ok)then
+      status='master-function PCHIP failed: '//trim(why)
+      return
+    endif
+
+    out=eos
+    if(has_comp)then
+      out%yp=max(0._wp,min(1._wp,eos%yp))
+      out%ymu=max(0._wp,min(1._wp,eos%ymu))
+      out%yh=max(0._wp,min(1._wp,eos%yh))
+      out%abar=eos%abar
+      out%zbar=eos%zbar
+      out%iphase=eos%iphase
+      if(fix_dissolution)then
+        last_crust=0
+        do i=1,n
+          if(out%abar(i)>0._wp)last_crust=i
+        enddo
+        if(last_crust>0.and.last_crust<n)then
+          if(out%abar(last_crust+1)<=0._wp)then
+            ilo=last_crust-1;ihi=last_crust+1
+            za=0._wp
+            do i=1,n
+              if(out%abar(i)>0._wp)za(i)=out%zbar(i)/out%abar(i)
+            enddo
+            resid=abs(out%yp(last_crust)+za(last_crust)*out%yh(last_crust) &
+              -(eos%ye(last_crust)+out%ymu(last_crust)))
+            anom_drop=.false.
+            if(ilo>=1.and.ihi<=n)then
+              if(out%abar(ihi)<=0._wp)then
+                yecand=out%yp(last_crust)+za(last_crust)*out%yh(last_crust)-out%ymu(last_crust)
+                yeprev=out%yp(ilo)+za(ilo)*out%yh(ilo)-out%ymu(ilo)
+                yenext=out%yp(ihi)-out%ymu(ihi)
+                if(yecand<0.5_wp*min(yeprev,yenext))anom_drop=.true.
+              endif
+            endif
+            if((resid>dissolution_tol.or.anom_drop).and.last_crust+2<=n.and.ilo>=1)then
+              if(out%abar(ihi)<=0._wp.and.out%abar(ilo)>0._wp)then
+                yqlo=za(ilo)*out%yh(ilo)
+                yqhi=out%yp(ihi)
+                t=(x(last_crust)-x(ilo))/(x(ihi)-x(ilo))
+                nq=yqlo*(1._wp-t)+yqhi*t
+                out%iphase(last_crust)=out%iphase(ihi)
+                out%yh(last_crust)=0._wp
+                out%abar(last_crust)=0._wp
+                out%zbar(last_crust)=0._wp
+                out%yp(last_crust)=nq
+                out%ymu(last_crust)=0._wp
+              endif
+            endif
+          endif
+        endif
+      endif
+
+      out%yn=max(0._wp,min(1._wp,1._wp-out%yp-out%yh))
+      out%yh=max(0._wp,min(1._wp,1._wp-out%yp-out%yn))
+      do i=1,n
+        if(out%abar(i)>0._wp)then
+          za(i)=out%zbar(i)/out%abar(i)
+        else
+          za(i)=0._wp
+        endif
+      enddo
+      ycharge=max(0._wp,min(1._wp,out%yp+za*out%yh))
+      do i=1,n
+        call beta_lepton_fractions(eos%nb(i),ycharge(i),yeval,ymuval,mueval,ok)
+        if(.not.ok)then
+          status='electron-muon beta-equilibrium solve failed at a source row'
+          return
+        endif
+        out%ye(i)=yeval
+        out%ymu(i)=ymuval
+        out%q(4,i)=-mueval/eos%mn
+      enddo
+      out%composition_available=.true.
+    endif
+
+    has_outer=.false.;idrip=0;ijoin=1
+    if(has_comp)then
+      do i=1,n
+        if(out%abar(i)>0._wp.and.out%yn(i)<=1.e-12_wp)idrip=i
+      enddo
+      if(idrip>5.and.idrip<n)then
+        if(maxval(abs(out%ymu(:idrip)))<=1.e-8_wp)then
+          if(all(out%abar(:idrip)>0._wp).and.all(out%yn(:idrip)<=1.e-12_wp))then
+            offset_int=max(8,int(0.025_wp*real(n,wp)))
+            ijoin=min(n,idrip+offset_int)
+            if(ijoin>idrip)has_outer=.true.
+          endif
+        endif
+      endif
+    endif
+
+    if(has_outer)then
+      outer_crust_corrected=.true.
+      nbri=idrip+(n-ijoin+1)
+      allocate(xbridge(nbri),qbridge(nbri),bslopes(nbri))
+      do i=1,idrip
+        xbridge(i)=x(i)
+        ne(i)=eos%nb(i)*out%ye(i)
+        kf=(3._wp*pi*pi*max(ne(i),0._wp))**(1._wp/3._wp)
+        pel=electron_pressure(eos%nb(i),out%ye(i))
+        elat=-0.9_wp*(4._wp/(9._wp*pi))**(1._wp/3._wp)*alpha &
+          *max(out%zbar(i),0._wp)**(2._wp/3._wp)*hbarc*kf*ne(i)
+        plat=elat/3._wp
+        qbridge(i)=(pel+plat)/eos%nb(i)
+      enddo
+      do i=ijoin,n
+        j=idrip+i-ijoin+1
+        xbridge(j)=x(i)
+        call pchip_value(x,fsm,fslope,x(i),qval,dqval)
+        qbridge(j)=dqval
+      enddo
+      if(any(qbridge<=0._wp).or.any(.not.ieee_is_finite(qbridge)))then
+        status='outer-crust electron+lattice bridge has nonpositive or nonfinite Q1'
+        return
+      endif
+      call pchip_slopes(xbridge,qbridge,bslopes,ok,why)
+      if(.not.ok)then
+        status='outer-crust Q1 bridge PCHIP failed: '//trim(why)
+        return
+      endif
+      do i=1,ijoin
+        call pchip_value(xbridge,qbridge,bslopes,x(i),q1(i),dqdx(i))
+        call pchip_integral(xbridge,qbridge,bslopes,x(i),x(ijoin),integral)
+        fsm(i)=fsm(ijoin)-integral
+      enddo
+    endif
+
+    if(.not.has_outer)ijoin=1
+    do i=ijoin+1,n
+      j=pchip_interval(x,x(i))
+      call pchip_value_second(x,fsm,fslope,j,x(i),fsm(i),q1(i),dqdx(i))
+    enddo
+    if(ijoin==1)then
+      j=1
+      call pchip_value_second(x,fsm,fslope,j,x(1),fsm(1),q1(1),dqdx(1))
+    endif
+    do i=1,ijoin
+      if(has_outer)cycle
+      j=pchip_interval(x,x(i))
+      call pchip_value_second(x,fsm,fslope,j,x(i),fsm(i),q1(i),dqdx(i))
+    enddo
+    if(has_outer)then
+      call pchip_value(xbridge,qbridge,bslopes,x(ijoin),q1(ijoin),dqdx(ijoin))
+    endif
+
+    ! Inspect the actual interpolating polynomials on a dense mesh.  This is
+    ! an explicit physical admissibility gate, not a legacy-parity comparison.
+    physical=.true.
+    do i=1,n-1
+      do k=0,dense_per_interval
+        xq=x(i)+(x(i+1)-x(i))*real(k,wp)/real(dense_per_interval,wp)
+        if(has_outer.and.i<ijoin)then
+          call pchip_value(xbridge,qbridge,bslopes,xq,qval,dqval)
+          call pchip_integral(xbridge,qbridge,bslopes,xq,x(ijoin),integral)
+          fval=fsm(ijoin)-integral
+        else
+          j=pchip_interval(x,xq)
+          call pchip_value_second(x,fsm,fslope,j,xq,fval,qval,second)
+          dqval=second
+        endif
+        muval=fval+qval
+        dpdn=qval+dqval
+        if(.not.ieee_is_finite(fval+qval+dqval+muval+dpdn).or. &
+          fval<=0._wp.or.qval<=0._wp.or.muval<=0._wp.or.dpdn<=0._wp)then
+          physical=.false.;exit
+        endif
+        cs=dpdn/muval
+        if(.not.ieee_is_finite(cs).or.cs<=0._wp.or.cs>1._wp+1.e-6_wp)then
+          physical=.false.;exit
+        endif
+      enddo
+      if(.not.physical)exit
+    enddo
+    if(.not.physical)then
+      status='reconstructed master EOS violates positive pressure, mechanical stability or causality on its interpolation mesh'
+      return
+    endif
+
+    do i=1,n
+      if(.not.has_outer.or.i>ijoin)then
+        j=pchip_interval(x,x(i))
+        call pchip_value_second(x,fsm,fslope,j,x(i),fsm(i),q1(i),dqdx(i))
+      endif
+      if(has_outer.and.i<=ijoin)then
+        call pchip_value(xbridge,qbridge,bslopes,x(i),q1(i),dqdx(i))
+      endif
+      muval=fsm(i)+q1(i)
+      cs2(i)=(q1(i)+dqdx(i))/muval
+    enddo
+
+    out%q(1,:)=q1
+    out%q(2,:)=0._wp
+    out%q(3,:)=(fsm+q1)/eos%mn-1._wp
+    out%q(5,:)=0._wp
+    out%q(6,:)=fsm/eos%mn-1._wp
+    out%q(7,:)=out%q(6,:)
+    if(recompute_extra_cs2)then
+      out%q_extra=cs2
+    endif
+    out%beta_equilibrated=.true.
+    status='ok'
+  end subroutine reconstruct_master
+
 end module compose_eos_reconstruct

@@ -212,8 +212,68 @@ def construct_maxwell_transition(phase_low: EOSData, phase_high: EOSData, *,
     return (matched, report) if return_report else matched
 
 
-def reconstruct_master(*args, **kwargs):
-    raise NativeFeatureUnavailable("Full master-function smoothing/candidate selection is not yet ported to Fortran.")
+def reconstruct_master(data: EOSData, smooth: bool = True,
+                       smooth_sigma: float = 0.05,
+                       fix_dissolution: bool = True,
+                       dissolution_tol: float = 0.015, *,
+                       recompute_extra_cs2: bool = False,
+                       return_report: bool = False):
+    """Reconstruct a cold beta-equilibrated EOS from its free-energy master function.
+
+    The numerical transformation is performed by the native Fortran backend.
+    Smoothing is a local weighted-cubic regularisation in log(n_B), not a
+    compatibility claim for SciPy's global UnivariateSpline. If composition
+    is available, the backend enforces baryon/charge conservation and solves
+    electron-muon Fermi-gas equilibrium. Composition-free tables retain their
+    supplied Q4 and composition placeholders.
+    """
+    import math
+    if not isinstance(data, EOSData):
+        raise TypeError("data must be an EOSData instance")
+    if not isinstance(smooth, bool) or not isinstance(fix_dissolution, bool):
+        raise TypeError("smooth and fix_dissolution must be bool")
+    if not isinstance(recompute_extra_cs2, bool):
+        raise TypeError("recompute_extra_cs2 must be bool")
+    sigma = float(smooth_sigma)
+    tolerance = float(dissolution_tol)
+    if not math.isfinite(sigma) or (smooth and not (0.0 < sigma <= 0.5)):
+        raise ValueError("smooth_sigma must be finite and lie in (0, 0.5] when smooth=True")
+    if not math.isfinite(tolerance) or tolerance < 0.0:
+        raise ValueError("dissolution_tol must be finite and non-negative")
+    if data.n < 5:
+        raise ValueError("reconstruct_master requires at least five source points")
+    with tempfile.TemporaryDirectory(prefix="compose-eos-reconstruct-master-") as td:
+        root = Path(td)
+        source, target = root / "source", root / "rebuilt"
+        source.mkdir()
+        target.mkdir()
+        data.write_internal_directory(source)
+        payload = run_native(
+            "reconstruct-master", source, target,
+            "true" if smooth else "false", format(sigma, ".17g"),
+            "true" if fix_dissolution else "false", format(tolerance, ".17g"),
+            "true" if recompute_extra_cs2 else "false",
+        )
+        rebuilt = EOSData.from_internal_directory(target, source_dir=data.source_dir)
+    consistency = check_consistency(rebuilt)
+    if not consistency["overall"]["pass_"]:
+        failed = ", ".join(consistency["overall"]["failed_checks"])
+        raise NativeExecutionError(
+            "native reconstructed EOS failed independent C1-C6/C10-C11 checks: " + failed
+        )
+    report = dict(payload)
+    report["master_function"] = "F(log(n_B))"
+    report["interpolation"] = "local_weighted_cubic_then_PCHIP" if smooth else "PCHIP_of_source_F"
+    report["first_law_closure"] = "Q1=dF/dln(n_B); mu_B=F+Q1; P=n_B Q1; epsilon=n_B F"
+    report["composition_provenance"] = (
+        "reconstructed_beta_equilibrium" if data.composition_available
+        else "source_composition_absent_and_not_invented"
+    )
+    report["composition_preserved"] = bool(data.composition_available)
+    report["q_extra_recomputed_as_cs2"] = recompute_extra_cs2
+    report["consistency"] = consistency
+    return (rebuilt, report) if return_report else rebuilt
+
 
 def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
                     cr_name: str = "", co_name: str = "",

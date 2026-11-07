@@ -2,7 +2,7 @@ program compose_eos_fortran
   use compose_eos_types
   use compose_eos_io
   use compose_eos_verify
-  use compose_eos_reconstruct, only: fill_density_gap
+  use compose_eos_reconstruct, only: fill_density_gap, reconstruct_master
   use compose_eos_causality, only: causal_complete, causal_completion_report_t
   use compose_eos_matching, only: match_crust_core, match_report_t
   use compose_eos_phase_transition, only: construct_maxwell_transition, maxwell_transition_report_t
@@ -14,15 +14,16 @@ program compose_eos_fortran
   type(maxwell_transition_report_t)::phase_report
   character(len=32)::action
   character(len=2048)::arg1,arg2,arg3
-  character(len=128)::arg4,arg5,arg6
+  character(len=128)::arg4,arg5,arg6,arg7
   character(len=512)::status
   integer::narg,ios,n_fill,fit_points,gap_phase,n_points,n_bridge
-  real(wp)::cs2_extension,n_max_requested
+  real(wp)::cs2_extension,n_max_requested,smooth_sigma,dissolution_tol
   logical::has_gap_phase,drop_composition,local_neutrality_confirmed
-  action='';arg1='';arg2='';arg3='';arg4='';arg5='';arg6=''
+  logical::smooth_master_flag,fix_dissolution,recompute_extra_cs2,outer_crust_corrected
+  action='';arg1='';arg2='';arg3='';arg4='';arg5='';arg6='';arg7=''
   narg=command_argument_count()
   if(narg<2)then
-    write(*,'(a)')'usage: compose_eos_fortran {read|verify|verify-csv|normalize|write|fill-gap|causal-complete|match-core|maxwell-transition} INPUT OUTPUT [OPTIONS]'
+    write(*,'(a)')'usage: compose_eos_fortran {read|verify|verify-csv|normalize|write|fill-gap|reconstruct-master|causal-complete|match-core|maxwell-transition} INPUT OUTPUT [OPTIONS]'
     stop 2
   endif
   call get_command_argument(1,action,status=ios)
@@ -32,6 +33,7 @@ program compose_eos_fortran
   if(narg>=5)call get_command_argument(5,arg4,status=ios)
   if(narg>=6)call get_command_argument(6,arg5,status=ios)
   if(narg>=7)call get_command_argument(7,arg6,status=ios)
+  if(narg>=8)call get_command_argument(8,arg7,status=ios)
   select case(trim(action))
   case('read')
     if(narg/=3)then;call emit_failure('read requires input CompOSE directory and output directory');stop 2;endif
@@ -175,6 +177,51 @@ program compose_eos_fortran
       ',"composition_dropped":'//logical_text(match_report%composition_dropped)// &
       ',"is_exact_maxwell":'//logical_text(match_report%is_exact_maxwell)// &
       ',"seidov_applicable":'//logical_text(match_report%seidov_applicable)//'}'
+  case('reconstruct-master')
+    if(narg/=8)then
+      call emit_failure('reconstruct-master requires INPUT_INTERNAL OUTPUT_INTERNAL SMOOTH SMOOTH_SIGMA FIX_DISSOLUTION DISSOLUTION_TOL RECOMPUTE_EXTRA_CS2');stop 2
+    endif
+    select case(trim(adjustl(arg3)))
+    case('true','TRUE','.true.','1')
+      smooth_master_flag=.true.
+    case('false','FALSE','.false.','0')
+      smooth_master_flag=.false.
+    case default
+      call emit_failure('SMOOTH must be true or false');stop 2
+    end select
+    read(arg4,*,iostat=ios)smooth_sigma
+    if(ios/=0)then;call emit_failure('invalid SMOOTH_SIGMA');stop 2;endif
+    select case(trim(adjustl(arg5)))
+    case('true','TRUE','.true.','1')
+      fix_dissolution=.true.
+    case('false','FALSE','.false.','0')
+      fix_dissolution=.false.
+    case default
+      call emit_failure('FIX_DISSOLUTION must be true or false');stop 2
+    end select
+    read(arg6,*,iostat=ios)dissolution_tol
+    if(ios/=0)then;call emit_failure('invalid DISSOLUTION_TOL');stop 2;endif
+    select case(trim(adjustl(arg7)))
+    case('true','TRUE','.true.','1')
+      recompute_extra_cs2=.true.
+    case('false','FALSE','.false.','0')
+      recompute_extra_cs2=.false.
+    case default
+      call emit_failure('RECOMPUTE_EXTRA_CS2 must be true or false');stop 2
+    end select
+    call read_internal_csv(trim(arg1)//'/eos_data.csv',trim(arg1)//'/eos_data.nml',eos,status)
+    if(status/='ok')then;call emit_failure('invalid EOS input: '//trim(status));stop 3;endif
+    call reconstruct_master(eos,smooth_master_flag,smooth_sigma,fix_dissolution, &
+      dissolution_tol,recompute_extra_cs2,out,outer_crust_corrected,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    call write_internal_csv(trim(arg2)//'/eos_data.csv',out,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    call write_metadata(trim(arg2)//'/eos_data.nml',out,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    write(*,'(a)')'{"status":"ok","operation":"reconstruct-master","n":'//integer_text(out%n)// &
+      ',"composition_reconstructed":'//logical_text(out%composition_available)// &
+      ',"outer_crust_correction_applied":'//logical_text(outer_crust_corrected)// &
+      ',"q_extra_recomputed_as_cs2":'//logical_text(recompute_extra_cs2)//'}'
   case('maxwell-transition')
     if(narg/=5)then
       call emit_failure('maxwell-transition requires LOW_PHASE_INTERNAL HIGH_PHASE_INTERNAL OUTPUT_INTERNAL LOCAL_NEUTRALITY_CONFIRMED');stop 2

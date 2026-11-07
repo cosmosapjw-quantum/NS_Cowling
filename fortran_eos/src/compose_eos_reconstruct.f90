@@ -553,6 +553,72 @@ contains
     ok=ieee_is_finite(ye+ymu+mu_e).and.ye>=0._wp.and.ymu>=0._wp
   end subroutine beta_lepton_fractions
 
+
+
+  pure subroutine quadratic_polynomial_minimum(c0,c1,c2,ymin)
+    real(wp),intent(in)::c0,c1,c2
+    real(wp),intent(out)::ymin
+    real(wp)::t,y,scale
+    ymin=min(c0,c0+c1+c2)
+    scale=max(1._wp,abs(c0),abs(c1),abs(c2))
+    if(abs(c2)>1.e-14_wp*scale)then
+      t=-c1/(2._wp*c2)
+      if(t>0._wp.and.t<1._wp)then
+        y=c0+c1*t+c2*t*t
+        ymin=min(ymin,y)
+      endif
+    endif
+  end subroutine quadratic_polynomial_minimum
+
+  pure subroutine cubic_polynomial_minimum(c0,c1,c2,c3,ymin)
+    real(wp),intent(in)::c0,c1,c2,c3
+    real(wp),intent(out)::ymin
+    real(wp)::a,b,c,disc,sq,q,r1,r2,y,scale
+    integer::nr
+    ymin=min(c0,c0+c1+c2+c3)
+    a=3._wp*c3
+    b=2._wp*c2
+    c=c1
+    scale=max(1._wp,abs(a),abs(b),abs(c))
+    nr=0;r1=0._wp;r2=0._wp
+    if(abs(a)<=1.e-14_wp*scale)then
+      if(abs(b)>1.e-14_wp*scale)then
+        nr=1
+        r1=-c/b
+      endif
+    else
+      disc=b*b-4._wp*a*c
+      if(disc>=-1.e-14_wp*scale*scale)then
+        sq=sqrt(max(0._wp,disc))
+        if(b>=0._wp)then
+          q=-0.5_wp*(b+sq)
+        else
+          q=-0.5_wp*(b-sq)
+        endif
+        if(abs(q)>tiny(1._wp))then
+          nr=2
+          r1=q/a
+          r2=c/q
+        else
+          nr=1
+          r1=-b/(2._wp*a)
+        endif
+      endif
+    endif
+    if(nr>=1)then
+      if(r1>0._wp.and.r1<1._wp)then
+        y=c0+c1*r1+c2*r1*r1+c3*r1*r1*r1
+        ymin=min(ymin,y)
+      endif
+    endif
+    if(nr>=2)then
+      if(r2>0._wp.and.r2<1._wp)then
+        y=c0+c1*r2+c2*r2*r2+c3*r2*r2*r2
+        ymin=min(ymin,y)
+      endif
+    endif
+  end subroutine cubic_polynomial_minimum
+
   subroutine reconstruct_master(eos,smooth,smooth_sigma,fix_dissolution,dissolution_tol, &
                                 recompute_extra_cs2,out,outer_crust_corrected,status)
     type(eos_data_t),intent(in)::eos
@@ -561,14 +627,15 @@ contains
     type(eos_data_t),intent(out)::out
     logical,intent(out)::outer_crust_corrected
     character(len=*),intent(out)::status
-    integer,parameter::dense_per_interval=32
+    integer,parameter::outer_dense_per_interval=256
     real(wp),parameter::me=0.51099895_wp,alpha=1._wp/137.035999084_wp
     real(wp),parameter::hbarc=197.3269804_wp,pi=acos(-1._wp)
     real(wp),allocatable::x(:),fraw(:),fsm(:),fslope(:),q1(:),dqdx(:),cs2(:)
     real(wp),allocatable::xbridge(:),qbridge(:),bslopes(:),za(:),ycharge(:)
     real(wp)::nq,yeval,ymuval,mueval,t,resid,yecand,yeprev,yenext,yqlo,yqhi,neval
     real(wp)::kf,pel,elat,plat,qval,dqval,fval,muval,dpdn,cs,second,integral
-    real(wp)::xq
+    real(wp)::xq,hp,fa,fb,fc,fd,qc0,qc1,qc2,mu0,mu1,mu2,mu3
+    real(wp)::dp0,dp1,dp2,g0,g1,g2,g3,minf,minq,minmu,mindp,ming,polyscale
     integer::n,i,j,k,last_crust,ilo,ihi,idrip,ijoin,nbri,offset_int
     logical::ok,anom_drop,has_comp,has_outer,physical
     character(len=256)::why
@@ -824,40 +891,78 @@ contains
       call pchip_value(xbridge,qbridge,bslopes,x(ijoin),q1(ijoin),dqdx(ijoin))
     endif
 
-    ! Inspect the actual interpolating polynomials on a dense mesh.  This is
-    ! an explicit physical admissibility gate, not a legacy-parity comparison.
+    ! For the PCHIP master-function branch, F is cubic in each local
+    ! coordinate t=(x-x_i)/h.  We therefore test exact polynomial extrema:
+    ! F>0, Q1=F'>0, mu=F+F'>0, D=dP/dn=F'+F''>0, and mu-D>=0.
+    ! The last inequality is exactly c_s^2<=1 because c_s^2=D/mu.
+    ! The outer-crust branch integrates a PCHIP Q1, so F is quartic there;
+    ! that special electron+lattice bridge is checked on a dense 256-point mesh.
     physical=.true.
     do i=1,n-1
-      do k=0,dense_per_interval
-        xq=x(i)+(x(i+1)-x(i))*real(k,wp)/real(dense_per_interval,wp)
-        if(has_outer.and.i<ijoin)then
+      hp=x(i+1)-x(i)
+      fa=fsm(i)
+      fb=hp*fslope(i)
+      fc=3._wp*(fsm(i+1)-fsm(i))-hp*(2._wp*fslope(i)+fslope(i+1))
+      fd=2._wp*(fsm(i)-fsm(i+1))+hp*(fslope(i)+fslope(i+1))
+      qc0=fb/hp
+      qc1=2._wp*fc/hp
+      qc2=3._wp*fd/hp
+      mu0=fa+qc0
+      mu1=fb+qc1
+      mu2=fc+qc2
+      mu3=fd
+      dp0=qc0+2._wp*fc/(hp*hp)
+      dp1=qc1+6._wp*fd/(hp*hp)
+      dp2=qc2
+      g0=mu0-dp0
+      g1=mu1-dp1
+      g2=mu2-dp2
+      g3=mu3
+      if(has_outer.and.i<ijoin)then
+        do k=0,outer_dense_per_interval
+          xq=x(i)+(x(i+1)-x(i))*real(k,wp)/real(outer_dense_per_interval,wp)
           call pchip_value(xbridge,qbridge,bslopes,xq,qval,dqval)
           call pchip_integral(xbridge,qbridge,bslopes,xq,x(ijoin),integral)
           fval=fsm(ijoin)-integral
-        else
-          j=pchip_interval(x,xq)
-          call pchip_value_second(x,fsm,fslope,j,xq,fval,qval,second)
-          dqval=second
-        endif
-        muval=fval+qval
-        dpdn=qval+dqval
-        if(.not.ieee_is_finite(fval+qval+dqval+muval+dpdn).or. &
-          fval<=0._wp.or.qval<=0._wp.or.muval<=0._wp.or.dpdn<=0._wp)then
+          muval=fval+qval
+          dpdn=qval+dqval
+          if(.not.ieee_is_finite(fval+qval+dqval+muval+dpdn).or. &
+            fval<=0._wp.or.qval<=0._wp.or.muval<=0._wp.or.dpdn<=0._wp)then
+            physical=.false.
+            write(status,'(a,i0,a,6(es13.5,1x))') &
+              'master reconstruction outer-crust positivity failure at interval ',i, &
+              ' (n_B,F,Q1,mu_B,dPdn,dQ1dx)= ',exp(xq),fval,qval,muval,dpdn,dqval
+            exit
+          endif
+          cs=dpdn/muval
+          if(.not.ieee_is_finite(cs).or.cs<=0._wp.or.cs>1._wp+1.e-6_wp)then
+            physical=.false.
+            write(status,'(a,i0,a,6(es13.5,1x))') &
+              'master reconstruction outer-crust causality failure at interval ',i, &
+              ' (n_B,F,Q1,mu_B,dPdn,cs2)= ',exp(xq),fval,qval,muval,dpdn,cs
+            exit
+          endif
+        enddo
+      else
+        call cubic_polynomial_minimum(fa,fb,fc,fd,minf)
+        call quadratic_polynomial_minimum(qc0,qc1,qc2,minq)
+        call cubic_polynomial_minimum(mu0,mu1,mu2,mu3,minmu)
+        call quadratic_polynomial_minimum(dp0,dp1,dp2,mindp)
+        call cubic_polynomial_minimum(g0,g1,g2,g3,ming)
+        polyscale=max(1._wp,maxval(abs([mu0,mu1,mu2,mu3])), &
+          maxval(abs([dp0,dp1,dp2])))
+        if(minf<=0._wp.or.minq<=0._wp.or.minmu<=0._wp.or.mindp<=0._wp)then
           physical=.false.
-          write(status,'(a,i0,a,6(es13.5,1x))') &
-            'master reconstruction thermodynamic positivity failure at interval ',i, &
-            ' (n_B,F,Q1,mu_B,dPdn,Fpp)= ',exp(xq),fval,qval,muval,dpdn,dqval
-          exit
-        endif
-        cs=dpdn/muval
-        if(.not.ieee_is_finite(cs).or.cs<=0._wp.or.cs>1._wp+1.e-6_wp)then
+          write(status,'(a,i0,a,5(es13.5,1x))') &
+            'master reconstruction polynomial positivity failure at interval ',i, &
+            ' (minF,minQ1,minMu,minD,minMuMinusD)= ',minf,minq,minmu,mindp,ming
+        else if(ming < -1.e-6_wp*polyscale)then
           physical=.false.
-          write(status,'(a,i0,a,6(es13.5,1x))') &
-            'master reconstruction causality failure at interval ',i, &
-            ' (n_B,F,Q1,mu_B,dPdn,cs2)= ',exp(xq),fval,qval,muval,dpdn,cs
-          exit
+          write(status,'(a,i0,a,5(es13.5,1x))') &
+            'master reconstruction polynomial causality failure at interval ',i, &
+            ' (minF,minQ1,minMu,minD,minMuMinusD)= ',minf,minq,minmu,mindp,ming
         endif
-      enddo
+      endif
       if(.not.physical)exit
     enddo
     if(.not.physical)then

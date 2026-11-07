@@ -1,6 +1,6 @@
 # Python EOS package to Fortran feature-parity matrix
 
-Status values: PORT_VERIFIED means the native Fortran implementation was compiled and differentially tested; WRAPPER_VERIFIED means the Python API invokes the native routine; PARTIAL means only a subset is implemented; NOT_PORTED means deliberately unavailable and no Python numerical fallback is invoked.
+Status values: PORT_VERIFIED means the native Fortran implementation was compiled and tested; WRAPPER_VERIFIED means the Python API invokes the native routine; IMPLEMENTED (CI_PENDING) means source, CLI and tests are assembled but exact-HEAD CI has not yet passed; PARTIAL means only a subset is implemented; NOT_PORTED means deliberately unavailable and no Python numerical fallback is invoked.
 
 | Historic capability | Fortran status | Python frontend | Evidence / limitation |
 |---|---|---|---|
@@ -15,7 +15,8 @@ Status values: PORT_VERIFIED means the native Fortran implementation was compile
 | Full master-function smoothing/candidate selection | NOT_PORTED | Explicit unavailable error | Historic global smoothing, anomaly repair and candidate-selection policy are still not ported |
 | Crust-core smooth matching: maxwell/css/cubic_F/cubic_P/quintic_F/quintic_P | PARTIAL (six thermo-only methods PORT_VERIFIED) | WRAPPER_VERIFIED | All six smooth strict-thermo methods compiled and passed native-versus-legacy differential tests on GPPVA_FSU2H + GM_GM1. Composition-aware matching and literature_beta_eq remain unported. The legacy `maxwell` token is a smooth near-pressure plateau, not a density jump |
 | Literature-specific RMF/Skyrme/APR solvers | PARTIAL | Not exposed as complete parity | Existing Fortran nuclear/liquid-drop/beta-equilibrium examples are not equivalent to the literature solver suite |
-| Genuine Maxwell/Gibbs phase transitions | PARTIAL | Not exposed as complete parity | Existing Fortran interface toys do not implement every Python phase-transition/TOV treatment |
+| Genuine one-charge Maxwell transition with local neutrality | IMPLEMENTED (CI_PENDING) | Native Fortran kernel and Python orchestration | Caller must confirm local neutrality; cold beta-equilibrium; one isolated transition; thermo-only; no Seidov/TOV interface verdict; not complete CompOSE composition output |
+| Gibbs mixed phase / global electric neutrality | NOT_PORTED | Explicitly unavailable | Requires phase charge densities, independent charge chemical potential and volume fraction absent from 1-D barotropes |
 | Causality profile/completion | PARTIAL | Native CSS completion wrapper; profile remains Python-only | First resolved single-phase c_s^2=1 crossing; native constant-c_s^2 tail; no phase-jump interpolation; explicit composition omission; independent profile remains unported |
 | TOV star | PORT_VERIFIED in solver workspace | WRAPPER_ADDED | Native real_table_star callback |
 | TOV sequence | Fortran solve per point | WRAPPER_ADDED | Python orchestrates pressure scan; each TOV integration is Fortran |

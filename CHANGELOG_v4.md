@@ -26,3 +26,13 @@
 - Added explicit state gates for cold T=0, beta-equilibrium metadata, zero entropy, Q6=Q7, endpoint sound speed, positive monotonic thermodynamics, subluminal bridge sound speed and First-Law closure.
 - Composition-bearing inputs now require explicit `drop_composition=True`; composition-aware reconstruction and `literature_beta_eq` remain unported.
 - Added differential regression tests against the historic Python package and a self-contained implementation/audit note. Final differential CI status is recorded against the exact branch HEAD.
+
+
+## v4 follow-up: native one-charge Maxwell transition
+
+- Added a separate Fortran Maxwell construction for two supplied cold, beta-equilibrated, single-phase barotropes, with local charge neutrality explicitly confirmed by the caller.
+- Enforced (dP/d\mu_B=n_B) and \(\epsilon=\mu_B n_B-P\) through a cubic-Hermite (P(\mu_B)) representation; mechanical stability and causality are checked over each full interpolant interval.
+- Isolated all pressure-equality roots of the piecewise-cubic pressure difference by its stationary points; the v1 policy accepts exactly one isolated coexistence point.
+- Wrote two equal-pressure/equal-chemical-potential transition rows with a finite density and energy-density jump, and checked \(\Delta\epsilon=\mu_t\Delta n_B\).
+- Masked derivative stencils at every phase-label boundary and blocked complete CompOSE export when phase composition is absent.
+- Gibbs, composition reconstruction, Seidov threshold evaluation and phase-interface TOV stability remain unported or unverified; see the self-contained Maxwell note and audit record.

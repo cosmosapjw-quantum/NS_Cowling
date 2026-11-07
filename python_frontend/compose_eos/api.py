@@ -5,7 +5,7 @@ import tempfile
 from pathlib import Path
 from typing import Any
 from .eos_data import EOSData
-from .native import run_native, NativeFeatureUnavailable
+from .native import run_native, NativeFeatureUnavailable, NativeExecutionError
 
 def read_compose(directory: str | Path) -> EOSData:
     """Read a cold 1-D CompOSE slice with the Fortran reader."""
@@ -18,7 +18,13 @@ def read_compose(directory: str | Path) -> EOSData:
 
 def write_compose(directory: str | Path, data: EOSData, copy_from: str | Path | None = None, *,
                   composition_tolerance: float = 2e-3) -> None:
-    """Write CompOSE files using the Fortran backend."""
+    """Write a complete CompOSE table using the Fortran backend."""
+    if any(data.Iphase[i] != data.Iphase[i - 1] for i in range(1, data.n)) and (
+        not data.composition_available or not data.composition_file_present
+    ):
+        raise NativeFeatureUnavailable(
+            "a phase-discontinuous barotrope without phase composition cannot be exported as a complete CompOSE table"
+        )
     del copy_from, composition_tolerance
     target = Path(directory).expanduser().resolve()
     target.mkdir(parents=True, exist_ok=True)
@@ -157,6 +163,53 @@ def causal_completion(data: EOSData, *, cs2: float = 1.0,
     if return_metadata:
         return completed, payload
     return completed
+
+
+def construct_maxwell_transition(phase_low: EOSData, phase_high: EOSData, *,
+                                  assume_local_charge_neutrality: bool = False,
+                                  return_report: bool = False):
+    """Construct a genuine single-conserved-charge Maxwell transition natively.
+
+    Inputs are two cold, beta-equilibrated, composition-free single-phase
+    barotropes. All thermodynamic interpolation, stability and causality checks
+    are performed by the Fortran backend. The Python layer only serializes the
+    input/output tables and exposes the native report.
+    """
+    if not isinstance(phase_low, EOSData) or not isinstance(phase_high, EOSData):
+        raise TypeError("phase_low and phase_high must both be EOSData instances")
+    if not isinstance(assume_local_charge_neutrality, bool):
+        raise TypeError("assume_local_charge_neutrality must be bool")
+    if not assume_local_charge_neutrality:
+        raise ValueError(
+            "confirm that both input phases are locally charge neutral by passing "
+            "assume_local_charge_neutrality=True; the thermo-only data cannot prove this from composition"
+        )
+    with tempfile.TemporaryDirectory(prefix="compose-eos-maxwell-") as td:
+        root = Path(td)
+        low_dir, high_dir, target_dir = root / "low", root / "high", root / "maxwell"
+        low_dir.mkdir()
+        high_dir.mkdir()
+        target_dir.mkdir()
+        phase_low.write_internal_directory(low_dir)
+        phase_high.write_internal_directory(high_dir)
+        payload = run_native("maxwell-transition", low_dir, high_dir, target_dir, "true")
+        matched = EOSData.from_internal_directory(target_dir, source_dir=phase_low.source_dir)
+    consistency = check_consistency(matched)
+    if not consistency["overall"]["pass_"]:
+        failed = ", ".join(consistency["overall"]["failed_checks"])
+        raise NativeExecutionError(
+            "Fortran Maxwell output failed the independent C1-C6/C10-C11 verifier: " + failed
+        )
+    report = dict(payload)
+    report["construction"] = "single_conserved_charge_local_neutrality_maxwell"
+    report["local_charge_neutrality"] = "caller_confirmed"
+    report["composition_preserved"] = False
+    report["compose_export_allowed"] = False
+    report["consistency"] = consistency
+    report["is_exact_maxwell"] = True
+    report["seidov_criterion_evaluated"] = False
+    report["tov_interface_support"] = "not_verified"
+    return (matched, report) if return_report else matched
 
 
 def reconstruct_master(*args, **kwargs):

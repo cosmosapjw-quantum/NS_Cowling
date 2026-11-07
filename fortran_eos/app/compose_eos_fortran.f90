@@ -5,22 +5,24 @@ program compose_eos_fortran
   use compose_eos_reconstruct, only: fill_density_gap
   use compose_eos_causality, only: causal_complete, causal_completion_report_t
   use compose_eos_matching, only: match_crust_core, match_report_t
+  use compose_eos_phase_transition, only: construct_maxwell_transition, maxwell_transition_report_t
   implicit none
-  type(eos_data_t)::eos,out,crust,core
+  type(eos_data_t)::eos,out,crust,core,phase_low,phase_high
   type(verify_report_t)::report
   type(causal_completion_report_t)::causal_report
   type(match_report_t)::match_report
+  type(maxwell_transition_report_t)::phase_report
   character(len=32)::action
   character(len=2048)::arg1,arg2,arg3
   character(len=128)::arg4,arg5,arg6
   character(len=512)::status
   integer::narg,ios,n_fill,fit_points,gap_phase,n_points,n_bridge
   real(wp)::cs2_extension,n_max_requested
-  logical::has_gap_phase,drop_composition
+  logical::has_gap_phase,drop_composition,local_neutrality_confirmed
   action='';arg1='';arg2='';arg3='';arg4='';arg5='';arg6=''
   narg=command_argument_count()
   if(narg<2)then
-    write(*,'(a)')'usage: compose_eos_fortran {read|verify|verify-csv|normalize|write|fill-gap|causal-complete|match-core} INPUT OUTPUT [OPTIONS]'
+    write(*,'(a)')'usage: compose_eos_fortran {read|verify|verify-csv|normalize|write|fill-gap|causal-complete|match-core|maxwell-transition} INPUT OUTPUT [OPTIONS]'
     stop 2
   endif
   call get_command_argument(1,action,status=ios)
@@ -173,6 +175,41 @@ program compose_eos_fortran
       ',"composition_dropped":'//logical_text(match_report%composition_dropped)// &
       ',"is_exact_maxwell":'//logical_text(match_report%is_exact_maxwell)// &
       ',"seidov_applicable":'//logical_text(match_report%seidov_applicable)//'}'
+  case('maxwell-transition')
+    if(narg/=5)then
+      call emit_failure('maxwell-transition requires LOW_PHASE_INTERNAL HIGH_PHASE_INTERNAL OUTPUT_INTERNAL LOCAL_NEUTRALITY_CONFIRMED');stop 2
+    endif
+    select case(trim(adjustl(arg4)))
+    case('true','TRUE','.true.','1')
+      local_neutrality_confirmed=.true.
+    case('false','FALSE','.false.','0')
+      local_neutrality_confirmed=.false.
+    case default
+      call emit_failure('LOCAL_NEUTRALITY_CONFIRMED must be true or false');stop 2
+    end select
+    call read_internal_csv(trim(arg1)//'/eos_data.csv',trim(arg1)//'/eos_data.nml',phase_low,status)
+    if(status/='ok')then;call emit_failure('invalid low-density phase: '//trim(status));stop 3;endif
+    call read_internal_csv(trim(arg2)//'/eos_data.csv',trim(arg2)//'/eos_data.nml',phase_high,status)
+    if(status/='ok')then;call emit_failure('invalid high-density phase: '//trim(status));stop 3;endif
+    call construct_maxwell_transition(phase_low,phase_high,local_neutrality_confirmed,out,phase_report,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    call write_internal_csv(trim(arg3)//'/eos_data.csv',out,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    call write_metadata(trim(arg3)//'/eos_data.nml',out,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    write(*,'(a)')'{"status":"ok","operation":"maxwell-transition","n":'//integer_text(out%n)// &
+      ',"pressure_crossings":'//integer_text(phase_report%pressure_crossings)// &
+      ',"mu_transition":'//real_text(phase_report%mu_transition)// &
+      ',"pressure_transition":'//real_text(phase_report%pressure_transition)// &
+      ',"n_low":'//real_text(phase_report%n_low)//',"n_high":'//real_text(phase_report%n_high)// &
+      ',"epsilon_low":'//real_text(phase_report%epsilon_low)//',"epsilon_high":'//real_text(phase_report%epsilon_high)// &
+      ',"density_jump":'//real_text(phase_report%density_jump)// &
+      ',"latent_energy_density":'//real_text(phase_report%latent_energy_density)// &
+      ',"maxwell_identity_residual":'//real_text(phase_report%maxwell_identity_residual)// &
+      ',"max_euler_residual_low":'//real_text(phase_report%max_euler_residual_low)// &
+      ',"max_euler_residual_high":'//real_text(phase_report%max_euler_residual_high)// &
+      ',"min_cs2":'//real_text(min(phase_report%min_cs2_low,phase_report%min_cs2_high))// &
+      ',"max_cs2":'//real_text(max(phase_report%max_cs2_low,phase_report%max_cs2_high))//'}'
   case default
     call emit_failure('unknown operation: '//trim(action));stop 2
   end select

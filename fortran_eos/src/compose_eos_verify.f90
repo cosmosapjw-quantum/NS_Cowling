@@ -128,9 +128,10 @@ contains
     allocate(mask(n),cs2(n),csfl(n));mask=.true.;cs2=0._wp;csfl=0._wp
     do i=1,n-1
       if(log(eos%nb(i+1)/eos%nb(i))>dxmax)mask(i:i+1)=.false.
-      if(eos%composition_available)then
-        if(eos%iphase(i+1)/=eos%iphase(i))mask(i:i+1)=.false.
-      endif
+      ! A phase boundary is nonsmooth even when eos.compo is absent.
+      ! Always mask both adjacent knots so finite-difference stencils never
+      ! manufacture derivatives across a Maxwell density discontinuity.
+      if(eos%iphase(i+1)/=eos%iphase(i))mask(i:i+1)=.false.
     enddo
     do i=1,n
       if(deps(i)<=0._wp.or.mub(i)<=0._wp)mask(i)=.false.

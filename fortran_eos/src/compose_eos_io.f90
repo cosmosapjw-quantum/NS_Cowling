@@ -405,6 +405,21 @@ contains
     integer::u,ios,i,nquad
     character(len=1024)::path
     real(wp)::yi
+    if(eos%n<1.or..not.allocated(eos%iphase)) then
+      status='cannot write invalid EOS phase metadata'
+      return
+    endif
+    if(size(eos%iphase)/=eos%n) then
+      status='cannot write inconsistent EOS phase metadata'
+      return
+    endif
+    if(eos%n>1) then
+      if(any(eos%iphase(2:)/=eos%iphase(:eos%n-1)).and. &
+         (.not.eos%composition_available.or..not.eos%composition_file_present)) then
+        status='cannot export a phase-discontinuous barotrope as a complete CompOSE table without phase composition'
+        return
+      endif
+    endif
     path=trim(directory)//'/eos.nb'
     open(newunit=u,file=trim(path),status='replace',action='write',iostat=ios)
     if(ios/=0)then;status='cannot write eos.nb';return;endif

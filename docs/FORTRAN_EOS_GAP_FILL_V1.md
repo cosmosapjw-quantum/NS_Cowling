@@ -39,7 +39,15 @@ The caller must explicitly pass `gap_phase` when `composition_available` is true
 
    where \(u=(x-x_0)/(x_1-x_0)\). The free energy is obtained by integrating this same `Q1`, not by independently interpolating `F`.
 3. The candidate is sampled densely and accepted only when `F`, `Q1`, `mu_B`, `dP/dn_B` and `c_s^2` satisfy the positive, mechanically stable and causal checks.
-4. If the corrected PCHIP candidate is not physical, a cubic-Hermite `F(x)` interpolant using `(F0,F1,Q1_0,Q1_1)` is tested. If neither construction passes, the operation fails and emits no output table.
+4. If the corrected PCHIP candidate is not physical, a cubic-Hermite `F(x)` interpolant using `(F0,F1,Q1_0,Q1_1)` is tested from a freshly initialized admissibility state. The fallback evaluates its analytic second derivative, not a duplicate of its first derivative:
+   
+   \\[
+   F''(x)=\\frac{12t-6}{h^2}F_0+\\frac{6t-4}{h}Q_{1,0}
+          +\\frac{-12t+6}{h^2}F_1+\\frac{6t-2}{h}Q_{1,1},
+   \\qquad \\frac{dP}{dn_B}=F'+F''=Q_1+F''.
+   \\]
+   
+   The fallback is accepted only when `Q1=F'`, `mu_B=F+Q1`, `dP/dn_B`, and `c_s^2=(dP/dn_B)/(F+Q1)` are finite and satisfy the positive, mechanically stable and causal bounds. This explicitly rejects cases where `Q1>0` but `Q1+F''<=0`. If neither construction passes, the operation fails and emits no output table.
 5. `Q4`, `Ye`, `Yp`, `Ymu`, `Abar`, `Zbar` and `Yh` use local PCHIP interpolation. `Yn` is set to zero in the inserted cells. The cold-slice conventions `Q2=Q5=0` and `Q7=Q6` are applied to the output, matching the reference Python routine. If both interpolated lepton fraction and nuclear charge are positive, `Abar=Zbar/(Ye+Ymu)` is used to prevent charge overshoot; otherwise `Abar` is interpolated and `Zbar=(Ye+Ymu)Abar`.
 
 The implementation is in `fortran_eos/src/compose_eos_reconstruct.f90`. The CLI action is `fill-gap INPUT_INTERNAL_DIR OUTPUT_INTERNAL_DIR N_FILL FIT_POINTS [GAP_PHASE]`.
@@ -56,6 +64,7 @@ Environment: Python 3.13.5, NumPy 2.3.5, SciPy 1.17.0, pytest 9.0.2, GNU Fortran
 - Real source test: `GPPVA_FSU2H` has 300 rows and a maximum adjacent density ratio of 7.4343642318 at source index 216, crossing phase IDs `0 -> 7`. With `n_fill=12, gap_phase=7`, the native operation returns 312 rows. The inserted-segment first-law residual is `2.7643342084e-16` relative.
 - Differential comparison against `eos_generator/compose_eos_pkg/compose_eos/reconstruct.py` for the same `GPPVA_FSU2H` input and parameters: maximum relative differences were `8.61e-16` in `n_B`, `8.94e-16` in `Q1`, `2.21e-16` in `Q4`, `1.28e-15` in `Ye`, `1.24e-15` in `Abar`, and below `2e-16` for the other listed fields; `Q3`, `Q6`, `Q7` and `Iphase` matched exactly. This is one representative differential case, not a proof across every EOS table.
 - Refusal parity, now covered by an integration test: the `GM_GM1` input with a 191.5518567 adjacent-density ratio is rejected by both the legacy Python routine and the Fortran implementation because neither candidate satisfies the positivity/stability/causality gate. No unchecked EOS is written.
+- Hermite fallback regression tests: a case where the integral-corrected PCHIP fails but the endpoint-constrained Hermite master function is physical is accepted; a separate case with `Q1>0` but `dP/dn_B=Q1+F''<0` is rejected. These tests distinguish the true second derivative of `F` from the erroneous duplicate-first-derivative expression.
 
 The full-table cold first-law residual for the GPPVA example remains `1.5379901059e-6` because the original source rows are deliberately retained, including their pre-existing residual. The newly inserted segment itself is consistent to roundoff. This is not a claim that every untouched source knot has been repaired.
 

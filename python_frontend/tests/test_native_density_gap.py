@@ -196,3 +196,35 @@ def test_native_density_gap_accepts_physical_hermite_fallback():
     assert np.all(expected_q > 0.0)
     assert np.all(expected_dpdn > 0.0)
     assert np.all((expected_cs2 >= 0.0) & (expected_cs2 < 1.0))
+
+
+def test_native_density_gap_rejects_hermite_bridge_with_negative_dpdn():
+    # Q=F' stays positive, but Q+F'' becomes negative.  A check that
+    # mistakenly substitutes 2*Q for dP/dn_B would accept this bridge.
+    x = np.array([-1.0, -0.5, 0.0, 2.0, 2.5])
+    nb = np.exp(x)
+    q1 = np.array([
+        67.70137930746613,
+        1.1974657485715685,
+        22.616022935440583,
+        5.940658063690422,
+        0.7638106043367205,
+    ])
+    mn = 939.0
+    free = np.array([950.0, 980.0, 1000.0, 1066.20596238054553, 1080.0])
+    mu = free + q1
+    zeros = np.zeros_like(nb)
+    source = EOSData(
+        nb=nb, mn=mn, mp=mn,
+        Q1=q1, Q2=zeros.copy(), Q3=mu / mn - 1.0,
+        Q4=zeros.copy(), Q5=zeros.copy(), Q6=free / mn - 1.0,
+        Q7=free / mn - 1.0, q_extra=zeros.copy(),
+        Iphase=np.zeros(nb.size, dtype=int),
+        Yn=zeros.copy(), Yp=zeros.copy(), Ye=zeros.copy(), Ymu=zeros.copy(),
+        Aav=zeros.copy(), Zav=zeros.copy(), Yh=zeros.copy(),
+        composition_available=False,
+    )
+
+    with pytest.raises(NativeExecutionError,
+                       match="no positive, mechanically stable and causal"):
+        fill_density_gap(source, n_fill=8, fit_points=2)

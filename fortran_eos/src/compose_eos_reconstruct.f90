@@ -566,7 +566,7 @@ contains
     real(wp),parameter::hbarc=197.3269804_wp,pi=acos(-1._wp)
     real(wp),allocatable::x(:),fraw(:),fsm(:),fslope(:),q1(:),dqdx(:),cs2(:)
     real(wp),allocatable::xbridge(:),qbridge(:),bslopes(:),za(:),ycharge(:)
-    real(wp)::nq,yeval,ymuval,mueval,t,resid,yecand,yeprev,yenext,yqlo,yqhi
+    real(wp)::nq,yeval,ymuval,mueval,t,resid,yecand,yeprev,yenext,yqlo,yqhi,neval
     real(wp)::kf,pel,elat,plat,qval,dqval,fval,muval,dpdn,cs,second,integral
     real(wp)::xq,scale,offset
     integer::n,i,j,k,last_crust,ilo,ihi,idrip,ijoin,nbri,offset_int
@@ -776,11 +776,11 @@ contains
       allocate(xbridge(nbri),qbridge(nbri),bslopes(nbri))
       do i=1,idrip
         xbridge(i)=x(i)
-        ne(i)=eos%nb(i)*out%ye(i)
-        kf=(3._wp*pi*pi*max(ne(i),0._wp))**(1._wp/3._wp)
+        neval=eos%nb(i)*out%ye(i)
+        kf=(3._wp*pi*pi*max(neval,0._wp))**(1._wp/3._wp)
         pel=electron_pressure(eos%nb(i),out%ye(i))
         elat=-0.9_wp*(4._wp/(9._wp*pi))**(1._wp/3._wp)*alpha &
-          *max(out%zbar(i),0._wp)**(2._wp/3._wp)*hbarc*kf*ne(i)
+          *max(out%zbar(i),0._wp)**(2._wp/3._wp)*hbarc*kf*neval
         plat=elat/3._wp
         qbridge(i)=(pel+plat)/eos%nb(i)
       enddo

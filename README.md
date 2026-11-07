@@ -18,7 +18,7 @@ Python API:
     from compose_eos import read_compose, write_compose, check_consistency
     from compose_cowling import solve_tov_star, solve_tov_sequence, solve_cowling_spectrum
 
-The legacy Python implementation remains in eos_generator/compose_eos_pkg/ only as a reference for differential tests. Native integral-preserving density-gap filling and six strict-thermo-only smooth crust-core bridges are implemented on the feature branch. Composition-aware crust/core reconstruction, literature_beta_eq, full master-function smoothing/candidate selection, literature-specific EOS solvers, Gibbs mixed-phase generation, and complete phase-interface/TOV stability diagnostics remain out of scope. A separate native one-conserved-charge Maxwell construction for two caller-confirmed locally neutral cold phases is added in this feature branch; it is thermo-only and is not verified for phase-interface TOV sequences. The legacy `maxwell` matching token remains a smooth near-pressure plateau with no density jump. See docs/FORTRAN_EOS_CRUST_CORE_MATCHING_V1.md and docs/FORTRAN_EOS_MAXWELL_TRANSITION_V1.md.
+The legacy Python implementation remains in eos_generator/compose_eos_pkg/ only as a reference for differential tests. Native integral-preserving density-gap filling and six strict-thermo-only smooth crust-core bridges are implemented on the feature branch. A native cold master-function reconstruction v1 is now exposed through the Python frontend. It uses local weighted-cubic/PCHIP regularisation, reconstructs electron/muon equilibrium only when composition is present, and applies a bounded electron-plus-lattice correction on eligible supplied outer-crust rows. This is a partial port, not the historical global-spline/candidate-selection policy or a microscopic nuclear solver. A separate native one-conserved-charge Maxwell construction is available for two caller-confirmed locally neutral cold phases, but remains thermo-only and is not verified for phase-interface TOV sequences. Composition-aware crust-core matching, literature_beta_eq, Gibbs mixed-phase generation, Seidov onset evaluation and phase-interface/TOV stability remain outside the verified native path. The legacy `maxwell` matching token remains a smooth near-pressure plateau with no density jump. See docs/FORTRAN_EOS_CRUST_CORE_MATCHING_V1.md and docs/FORTRAN_EOS_MAXWELL_TRANSITION_V1.md.
 
 The stellar solver is nonrotating, spherical, perfect-fluid ell=2 polar modes in the relativistic Cowling approximation, with cold barotropic perturbations and a finite positive pressure surface cutoff. It is not a full-GR metric-perturbation calculation and does not compute gravitational-wave damping.
 
@@ -31,3 +31,15 @@ The Fortran EOS frontend exposes the six historical smooth barotropic matching m
 ## Native first-order Maxwell transition
 
 The feature branch adds `construct_maxwell_transition` and the native `maxwell-transition` CLI for a single globally conserved baryon charge with local electric neutrality imposed separately in each supplied phase. The caller must explicitly confirm local charge neutrality because a composition-free barotrope cannot prove it. The Fortran kernel uses a First-Law-consistent cubic-Hermite representation in baryon chemical potential, analytic whole-interval mechanical and causal checks, and stationary-point-isolated pressure-root searches. It rejects composition-bearing inputs, nonzero Nadd, and mismatched charge-fraction slices. Its output is an internal phase-labelled barotrope, not a composition-preserving CompOSE product; both Python and native Fortran writers refuse a complete CompOSE export without phase composition. Gibbs, Seidov stability evaluation and phase-interface TOV support remain unported or unverified. See [the Maxwell transition note](docs/FORTRAN_EOS_MAXWELL_TRANSITION_V1.md) and [the adversarial audit](docs/ADVERSARIAL_AUDIT_MAXWELL_TRANSITION_20261107.md).
+
+
+## Native master-function reconstruction v1
+
+    from compose_eos import reconstruct_master
+    rebuilt, report = reconstruct_master(
+        eos, smooth=True, smooth_sigma=0.05,
+        fix_dissolution=True, dissolution_tol=0.015,
+        recompute_extra_cs2=False, return_report=True,
+    )
+
+The Fortran path defines \(F=f/n_B\) on \(x=\ln n_B\) and derives \(Q_1=F'\), \(\mu_B=F+Q_1\), \(P=n_BQ_1\), and \(\epsilon=n_BF\) from the same interpolant. PCHIP core intervals use exact polynomial-extremum checks for positivity, mechanical stability and \(c_s^2/c^2\le1\); the integrated outer-crust bridge is checked separately on a 256-point mesh per interval. Source entropy and neutrino/lepton potential must be negligible. Composition-free inputs do not receive fabricated particle fractions. See [the self-contained derivation and limits](docs/FORTRAN_EOS_MASTER_RECONSTRUCTION_V1.md) and [the bounded adversarial audit](docs/ADVERSARIAL_AUDIT_MASTER_RECONSTRUCTION_20261108.md).

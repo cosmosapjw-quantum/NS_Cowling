@@ -66,7 +66,7 @@ mu_B n'_B-n_B>=0 are the required conditions.
 
 **Independent check:** Wolfram Language symbolic evaluation returned zero for P'-n, epsilon'-mu n', and P'/epsilon'-n/(mu n') for a generic cubic P(mu) with n=P'.
 
-**Status:** Algebraically derived and symbolically checked. Native compiler/CI status must be read from exact-HEAD workflow results.
+**Status:** Algebraically derived and symbolically checked. Native build and analytic regression verified on the exact Maxwell feature revision.
 
 ### Cycle 3: pressure-root topology and transition identity
 
@@ -82,7 +82,7 @@ P_L(\mu_t)=P_H(\mu_t),\quad
 \Delta\epsilon=\mu_t\Delta n_B.
 \]
 
-**Status:** Mathematical construction implemented; analytic EOS regression fixture added; execution awaits exact-HEAD CI.
+**Status:** Mathematical construction implemented and the analytic EOS regression fixture passed exact-head native CI.
 
 ### Cycle 4: phase boundary, metadata and export safety
 
@@ -98,7 +98,7 @@ P_L(\mu_t)=P_H(\mu_t),\quad
 
 **Change:** Corrected API test flags; added explicit-neutrality rejection, composition-rejection, non-overlap, acausal-input, Q3-Euler mismatch, Python export refusal and native CLI export refusal tests. Added a self-contained derivation/implementation note and an updated conservative feature matrix.
 
-**Status:** The first exact-HEAD CI run on `6ffdd62080dd8313e6c890cf6a6261e68f5c864d` compiled the complete Fortran executable successfully. The suite then reported **53 passed, 1 failed**: the analytic Maxwell test expected `low_phase_rows`, but the CLI JSON omitted that field although the native report type contained it. This is a Python/native report-schema serialization defect, not a failure of the coexistence equations. The CLI JSON has been extended with `low_phase_rows`, `high_phase_rows`, and phase-resolved sound-speed extrema. The final outcome remains **CI_PENDING** until the corrective exact-HEAD run passes the complete suite and checksum/package steps.
+**Status:** The first exact-HEAD CI run on `6ffdd62080dd8313e6c890cf6a6261e68f5c864d` compiled the complete Fortran executable successfully. The suite then reported **53 passed, 1 failed**: the analytic Maxwell test expected `low_phase_rows`, but the CLI JSON omitted that field although the native report type contained it. This is a Python/native report-schema serialization defect, not a failure of the coexistence equations. The CLI JSON has been extended with `low_phase_rows`, `high_phase_rows`, and phase-resolved sound-speed extrema. The Maxwell feature passed both push and PR CI on commit 37f7fdcba998b05f73f8ab2ee94e85c24ea37b19: 54 tests passed, the then-current 62-entry manifest passed, and source archive creation/upload succeeded.
 
 ## 4. Claim-to-evidence table
 
@@ -123,12 +123,12 @@ P_L(\mu_t)=P_H(\mu_t),\quad
 
 ## 6. Blockers and explicit non-claims
 
-1. **CI remains pending after a caught report-schema defect:** the exact commit `6ffdd620...` built, then failed one analytic test with 53/54 passing because the CLI omitted two report keys. The CLI correction is staged for the next commit; no full PASS is claimed until its exact-HEAD tests, manifest and package workflow pass.
+1. **Initial CI defect preserved:** commit 6ffdd620 built but failed one test (53 passed, 1 failed) because the CLI JSON omitted low_phase_rows and high_phase_rows. Commit 37f7fdc added these keys and passed the full 54-test, checksum and packaging gates.
 2. **No local compiler run:** the connected Desktop Commander endpoint reported its monthly usage limit. This was not retried. GitHub Actions is the available compiler/test environment.
 3. **No native subagent dispatch:** no tool for independent native subagent execution was available. The review cycles are direct source/math/test audits, not simulated subagent reports.
 4. **Gibbs, composition reconstruction, full reconstruct_master, literature-specific EOS solvers, Seidov threshold and phase-interface TOV stability remain unverified or unported.**
 5. **No merge to main:** the intended change is confined to the existing feature branch and its open PR.
-6. **Initial regression outcome retained:** the failure is not hidden or rewritten as a pass; the run links and corrected report fields will be added after the next exact-HEAD CI result.
+6. **Initial regression outcome retained:** the first report-schema failure is preserved as a historical defect; it was corrected in the later exact-head commit and is not represented as a passing run.
 
 ## 7. Stop condition
 
@@ -144,3 +144,13 @@ A failed gate returns to the relevant bounded cycle. A passing gate establishes 
 ## 8. Writing and citation-tool check
 
 The two technical documents were checked with the Academic Writing Toolkit. Both passed its conservative British-English spelling check with zero findings. Its paragraph-logic pass flagged short standalone equation lead-ins and concise exclusion statements; these were retained where they separate displayed mathematics, code interfaces or explicit non-claims. The citation audit did not yield a usable PASS: it reported `notes-source-malformed` for a Harvard `**Source**` line returned by the toolkit's own reading-note template generator, followed by phantom-citation warnings. We therefore treat that automated citation result as **INCONCLUSIVE**, not as a clean audit. Bibliographic entries and in-text author-year citations were instead cross-checked manually against the cited CompOSE manual and DOI/arXiv records. This tool-schema inconsistency is retained here rather than concealed.
+
+
+## 9. Exact Maxwell release evidence
+
+On commit 37f7fdcba998b05f73f8ab2ee94e85c24ea37b19, push CI [run 42381968318](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42381968318) and PR CI [run 42381971708](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42381971708) both completed successfully. The push workflow reported 54 passed in 21.41 s, 62/62 manifest entries, source archive packaging and artifact upload. Later master-reconstruction commits continued to build and test on the same feature branch; see the separate master reconstruction audit.
+
+
+## 9. Exact Maxwell release evidence
+
+On commit 37f7fdcba998b05f73f8ab2ee94e85c24ea37b19, push CI [run 42381968318](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42381968318) and PR CI [run 42381971708](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42381971708) both completed successfully. The push workflow reported 54 passed in 21.41 s, 62/62 manifest entries, source archive packaging and artifact upload. Later master-reconstruction revisions build and test on the same feature branch; see the separate master reconstruction audit.

@@ -14,3 +14,13 @@
 - Enforced First-Law closure in (P(\mu_B)), whole-interval mechanical/causal inequalities, stationary-point-isolated coexistence search and the latent-energy identity \(\Delta\epsilon=\mu_t\Delta n_B\).
 - Added explicit phase labels and derivative-stencil masking. Python and native Fortran CompOSE writers reject phase-discontinuous output without phase composition.
 - Gibbs construction, composition reconstruction, Seidov criterion and phase-interface TOV stability remain unported or unverified.
+
+
+## v4 follow-up: native cold master-function reconstruction
+
+- Added native Fortran reconstruct_master and its Python wrapper, with a First-Law-consistent \(F(\ln n_B)\) representation.
+- Added local weighted-cubic/PCHIP smoothing and unsmoothed PCHIP modes; the algorithm is not a reproduction of the historical global spline.
+- Enforced exact polynomial-extremum physical checks on PCHIP core intervals and a dense mesh check on the integrated outer-crust correction.
+- Added source metadata gates for zero entropy and neutrino-transparent beta equilibrium; composition is only reconstructed when eos.compo is present.
+- Added zero-temperature electron-muon charge closure, a bounded dissolution repair, outer-crust electron/lattice pressure, opt-in \(c_s^2/c^2\) extra-column recomputation, and adversarial rejection tests.
+- See FORTRAN_EOS_MASTER_RECONSTRUCTION_V1.md and ADVERSARIAL_AUDIT_MASTER_RECONSTRUCTION_20261108.md.

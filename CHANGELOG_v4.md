@@ -36,3 +36,15 @@
 - Wrote two equal-pressure/equal-chemical-potential transition rows with a finite density and energy-density jump, and checked \(\Delta\epsilon=\mu_t\Delta n_B\).
 - Masked derivative stencils at every phase-label boundary and blocked complete CompOSE export when phase composition is absent.
 - Gibbs, composition reconstruction, Seidov threshold evaluation and phase-interface TOV stability remain unported or unverified; see the self-contained Maxwell note and audit record.
+
+
+## v4 follow-up: native cold master-function reconstruction
+
+- Added the native Fortran reconstruct_master operation, CLI and Python wrapper. The first-law representation uses \(F=f/n_B\), \(Q_1=dF/d\ln n_B\), \(\mu_B=F+Q_1\), \(P=n_BQ_1\), and \(\epsilon=n_BF\).
+- Added local weighted-cubic smoothing and unsmoothed PCHIP paths; no exact parity with the historical global UnivariateSpline is claimed.
+- Added exact PCHIP interval-extremum checks for \(F,Q_1,\mu_B,dP/dn_B\), and the causal polynomial \(\mu_B-dP/dn_B\). The integrated outer-crust bridge uses a separately disclosed dense mesh gate.
+- Added composition-aware baryon/charge closure and zero-temperature electron-muon chemical-potential bisection, plus a bounded remnant-nucleus dissolution repair.
+- Added relativistic-electron and BCC Wigner-Seitz lattice pressure correction for eligible supplied outer-crust composition rows; this is not a complete BPS nuclear-species generator.
+- Preserves extra thermo columns by default; explicit recompute_extra_cs2=True is required to reinterpret a single Nadd=1 column as \(c_s^2/c^2\).
+- Requires cold neutrino-transparent input (\(Q_2\simeq Q_5\simeq0\)); rejects equal-pressure phase jumps and any interpolation that fails its physical gates.
+- Added analytic and adversarial tests for First-Law closure, composition absence, electron/muon equilibrium, dissolution repair, outer crust, extra-column semantics and invalid inputs.

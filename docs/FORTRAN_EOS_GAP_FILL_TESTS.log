@@ -1,0 +1,42 @@
+Native gap-fill validation session
+Source snapshot commit: 6eed9c5178afd820c9d814e4138dd0f15d1f5a73
+Implementation branch: research/fortran-eos-gap-fill-v1
+
+Environment
+  Python 3.13.5
+  NumPy 2.3.5
+  SciPy 1.17.0
+  pytest 9.0.2
+  GNU Fortran 14.2.0
+
+Native build
+  Command: bash fortran_eos/build.sh build/compose_eos_fortran
+  Result: PASS
+
+Targeted integration suite
+  Command: PYTHONPATH=python_frontend python -m pytest -q python_frontend/tests pipeline/tests
+  Result: 22 passed in 5.86s
+
+Coverage added
+  - analytic constant-Q1 master function and source-knot immutability
+  - Q2/Q5 zeroing and Q7=Q6 cold-slice convention
+  - phase-crossing rejection without gap_phase
+  - explicit phase label propagation
+  - invalid n_fill rejection
+  - analytic F=930+100*n_B reconstruction
+  - GPPVA_FSU2H source-table integration and inserted-segment first-law residual
+  - GM_GM1 unphysical large-gap refusal
+
+Additional package baseline checks
+  eos_generator/tests: 53 passed, 1 failed.
+  Existing failure: test_phase_aware_tov_executes_and_applies_interface_jump raises
+  FloatingPointError: invalid d epsilon/dP in phase branch. This is in the legacy
+  Python phase-transition/TOV module and is outside the new native gap-fill path.
+
+  Whole-repository pytest collection: blocked by import-name collisions between
+  the legacy and native compose_eos packages, duplicate test module basenames,
+  and test-path setup. Run package suites from their documented package roots.
+
+  oscillation_source tests: blocked because fpm is not installed. The test harness
+  explicitly prohibits compiler fallback when fpm is absent. No fpm-dependent
+  source tests are claimed as passed.

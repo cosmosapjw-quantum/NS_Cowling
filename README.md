@@ -18,6 +18,6 @@ Python API:
     from compose_eos import read_compose, write_compose, check_consistency
     from compose_cowling import solve_tov_star, solve_tov_sequence, solve_cowling_spectrum
 
-The legacy Python implementation remains in eos_generator/compose_eos_pkg/ only as a reference for differential tests. Full generator feature parity is not claimed: master-function reconstruction, all six crust-core matching methods, literature-specific EOS models, true Maxwell/Gibbs phase-transition generation and causal completion remain explicitly marked NOT_PORTED or PARTIAL.
+The legacy Python implementation remains in eos_generator/compose_eos_pkg/ only as a reference for differential tests. Full generator feature parity is not claimed: native integral-preserving density-gap filling is available, while full master-function smoothing/candidate selection, all six crust-core matching methods, literature-specific EOS models, true Maxwell/Gibbs phase-transition generation and causal completion remain explicitly marked NOT_PORTED or PARTIAL.
 
 The stellar solver is nonrotating, spherical, perfect-fluid ell=2 polar modes in the relativistic Cowling approximation, with cold barotropic perturbations and a finite positive pressure surface cutoff. It is not a full-GR metric-perturbation calculation and does not compute gravitational-wave damping.

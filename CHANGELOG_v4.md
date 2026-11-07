@@ -6,3 +6,10 @@
 - Added a feature-parity matrix that explicitly identifies unported legacy generator/matching/literature/phase-transition capabilities.
 - Kept the previous Python compose_eos package as an offline differential reference.
 - Kept the v3 direct P-epsilon representation as the default stellar EOS provider.
+
+
+## v4 follow-up: native master-function density-gap fill
+
+- Added a Fortran PCHIP/First-Law density-gap reconstruction kernel with an integral correction and a causal cubic-Hermite fallback.
+- Exposed `fill_density_gap` through the Python frontend and native CLI; cross-phase gaps require an explicit `gap_phase`.
+- Added synthetic EOS tests, a real GPPVA source-table test, and a differential comparison against the historic Python implementation.

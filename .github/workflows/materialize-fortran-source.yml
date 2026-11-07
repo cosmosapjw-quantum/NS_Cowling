@@ -1,0 +1,117 @@
+name: Materialize and verify Fortran EOS gap-fill source
+
+on:
+  push:
+    branches:
+      - research/fortran-eos-gap-fill-v1
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gap-fill-materialize-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  materialize-test-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout implementation branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - name: Materialize byte-pinned Fortran source
+        shell: bash
+        run: |
+          set -euo pipefail
+          compressed="fortran_eos/src/compose_eos_reconstruct.f90.gz"
+          source="fortran_eos/src/compose_eos_reconstruct.f90"
+          if [[ ! -f "$compressed" ]]; then
+            echo "No staged source blob; nothing to materialize."
+            exit 0
+          fi
+          gzip -dc "$compressed" > "$source"
+          echo "535467df5e12514c1eadf9122537062bb0758ff69ccfbda933917fcb71c308a5  $source" | sha256sum -c -
+          rm "$compressed"
+
+      - name: Install compiler and Python dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y gfortran
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+
+      - name: Build native Fortran EOS executable
+        run: bash fortran_eos/build.sh build/compose_eos_fortran
+
+      - name: Run native EOS frontend and direct-provider tests
+        env:
+          PYTHONPATH: python_frontend
+        run: python -m pytest -q python_frontend/tests pipeline/tests
+
+      - name: Refresh SHA-256 manifests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          root = Path(".")
+          manifest = root / "SHA256SUMS_v4.txt"
+          entries = {}
+          for line in manifest.read_text(encoding="utf-8").splitlines():
+              if not line.strip():
+                  continue
+              digest, rel = line.split(maxsplit=1)
+              rel = rel.lstrip("* ")
+              entries[rel] = digest
+          changed = [
+              "CHANGELOG_v4.md",
+              "README.md",
+              "docs/FORTRAN_EOS_FEATURE_PARITY.md",
+              "docs/FORTRAN_PYTHON_FRONTEND_V4.md",
+              "docs/FORTRAN_EOS_GAP_FILL_V1.md",
+              "docs/FORTRAN_EOS_GAP_FILL_TESTS.log",
+              "fortran_eos/app/compose_eos_fortran.f90",
+              "fortran_eos/build.sh",
+              "fortran_eos/src/compose_eos_reconstruct.f90",
+              "python_frontend/compose_eos/api.py",
+              "python_frontend/tests/test_fortran_frontend.py",
+              "python_frontend/tests/test_native_density_gap.py",
+              "pyproject.toml",
+          ]
+          for rel in changed:
+              path = root / rel
+              if not path.is_file():
+                  raise SystemExit(f"manifest target missing: {rel}")
+              entries[rel] = hashlib.sha256(path.read_bytes()).hexdigest()
+          payload = "".join(f"{entries[k]}  {k}\n" for k in sorted(entries))
+          manifest.write_text(payload, encoding="utf-8", newline="\n")
+          (root / "docs/MANIFEST_v4.sha256").write_bytes(manifest.read_bytes())
+          PY
+          sha256sum -c SHA256SUMS_v4.txt
+
+      - name: Commit verified source and manifests
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG_v4.md README.md pyproject.toml SHA256SUMS_v4.txt \
+            docs/FORTRAN_EOS_FEATURE_PARITY.md docs/FORTRAN_PYTHON_FRONTEND_V4.md \
+            docs/FORTRAN_EOS_GAP_FILL_V1.md docs/FORTRAN_EOS_GAP_FILL_TESTS.log \
+            docs/MANIFEST_v4.sha256 fortran_eos/app/compose_eos_fortran.f90 \
+            fortran_eos/build.sh fortran_eos/src/compose_eos_reconstruct.f90 \
+            python_frontend/compose_eos/api.py \
+            python_frontend/tests/test_fortran_frontend.py \
+            python_frontend/tests/test_native_density_gap.py
+          if git diff --cached --quiet; then
+            echo "Verified source tree has no pending commit."
+            exit 0
+          fi
+          git commit -m "feat: materialize and verify native density-gap fill"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

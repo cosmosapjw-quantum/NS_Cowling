@@ -39,10 +39,12 @@ def test_alternate_eos_roundtrip(tmp_path):
         assert np.array_equal(getattr(eos,name),getattr(again,name))
 
 
-def test_unported_generator_operations_fail_explicitly():
+def test_native_density_gap_is_available_and_remaining_generator_operations_fail_explicitly():
     from compose_eos import fill_density_gap, reconstruct_master, match_crust_core
     eos = read_compose(SAMPLE)
-    for fn in (fill_density_gap, reconstruct_master, match_crust_core):
+    filled = fill_density_gap(eos, n_fill=3, gap_phase=7)
+    assert filled.n == eos.n + 3
+    for fn in (reconstruct_master, match_crust_core):
         with pytest.raises(NativeFeatureUnavailable):
             fn(eos)
 

@@ -2,22 +2,28 @@ program compose_eos_fortran
   use compose_eos_types
   use compose_eos_io
   use compose_eos_verify
+  use compose_eos_reconstruct, only: fill_density_gap
   implicit none
-  type(eos_data_t)::eos
+  type(eos_data_t)::eos,out
   type(verify_report_t)::report
   character(len=32)::action
   character(len=2048)::arg1,arg2
+  character(len=128)::arg3,arg4,arg5
   character(len=512)::status
-  integer::narg,ios
-  action='';arg1='';arg2=''
+  integer::narg,ios,n_fill,fit_points,gap_phase
+  logical::has_gap_phase
+  action='';arg1='';arg2='';arg3='';arg4='';arg5=''
   narg=command_argument_count()
   if(narg<2)then
-    write(*,'(a)')'usage: compose_eos_fortran {read|verify|verify-csv|normalize|write} INPUT OUTPUT'
+    write(*,'(a)')'usage: compose_eos_fortran {read|verify|verify-csv|normalize|write|fill-gap} INPUT OUTPUT [N_FILL FIT_POINTS [GAP_PHASE]]'
     stop 2
   endif
   call get_command_argument(1,action,status=ios)
   call get_command_argument(2,arg1,status=ios)
   if(narg>=3)call get_command_argument(3,arg2,status=ios)
+  if(narg>=4)call get_command_argument(4,arg3,status=ios)
+  if(narg>=5)call get_command_argument(5,arg4,status=ios)
+  if(narg>=6)call get_command_argument(6,arg5,status=ios)
   select case(trim(action))
   case('read')
     if(narg/=3)then;call emit_failure('read requires input CompOSE directory and output directory');stop 2;endif
@@ -66,6 +72,28 @@ program compose_eos_fortran
     call write_compose(trim(arg2),eos,status)
     if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
     write(*,'(a)')'{"status":"ok","operation":"write","n":'//integer_text(eos%n)//'}'
+  case('fill-gap')
+    if(narg/=5.and.narg/=6)then
+      call emit_failure('fill-gap requires input internal EOS directory, output directory, n_fill, fit_points, and optional gap_phase');stop 2
+    endif
+    read(arg3,*,iostat=ios)n_fill
+    if(ios/=0)then;call emit_failure('invalid n_fill');stop 2;endif
+    read(arg4,*,iostat=ios)fit_points
+    if(ios/=0)then;call emit_failure('invalid fit_points');stop 2;endif
+    has_gap_phase=narg==6;gap_phase=0
+    if(has_gap_phase)then
+      read(arg5,*,iostat=ios)gap_phase
+      if(ios/=0)then;call emit_failure('invalid gap_phase');stop 2;endif
+    endif
+    call read_internal_csv(trim(arg1)//'/eos_data.csv',trim(arg1)//'/eos_data.nml',eos,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    call fill_density_gap(eos,n_fill,fit_points,gap_phase,has_gap_phase,out,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    call write_internal_csv(trim(arg2)//'/eos_data.csv',out,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    call write_metadata(trim(arg2)//'/eos_data.nml',out,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    write(*,'(a)')'{"status":"ok","operation":"fill-gap","n":'//integer_text(out%n)//'}'
   case default
     call emit_failure('unknown operation: '//trim(action));stop 2
   end select

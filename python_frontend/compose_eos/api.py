@@ -86,8 +86,36 @@ def find_density_gap(data: EOSData, min_ratio: float = 5.0) -> int:
     if ratios[i]<min_ratio:raise ValueError(f"no density gap found (max ratio {ratios[i]:.6g} < {min_ratio})")
     return i
 
-def fill_density_gap(*args, **kwargs):
-    raise NativeFeatureUnavailable("Fortran master-function density-gap reconstruction is not ported yet.")
+def fill_density_gap(data: EOSData, n_fill: int = 60, fit_points: int = 12, *,
+                     gap_phase: int | None = None) -> EOSData:
+    """Fill the largest density gap with a native First-Law master-function bridge.
+
+    Source knots outside the gap are copied unchanged.  The inserted segment is
+    built from F(ln n_B), with Q1=dF/dln(n_B), mu_B=F+Q1 and Q7=Q6.
+    No legacy-Python numerical fallback is used.
+    """
+    if not isinstance(n_fill, int) or isinstance(n_fill, bool) or n_fill < 1:
+        raise ValueError("n_fill must be >= 1")
+    if not isinstance(fit_points, int) or isinstance(fit_points, bool) or fit_points < 2:
+        raise ValueError("fit_points must be >= 2")
+    igap = find_density_gap(data, min_ratio=5.0)
+    if data.composition_available and data.Iphase[igap] != data.Iphase[igap + 1] and gap_phase is None:
+        raise ValueError(
+            f"density gap crosses phase IDs {int(data.Iphase[igap])}->{int(data.Iphase[igap + 1])}; "
+            "pass gap_phase explicitly instead of silently assigning a phase"
+        )
+    with tempfile.TemporaryDirectory(prefix="compose-eos-fill-gap-") as td:
+        root = Path(td)
+        source = root / "source"
+        target = root / "filled"
+        source.mkdir()
+        target.mkdir()
+        data.write_internal_directory(source)
+        command = ["fill-gap", source, target, str(n_fill), str(fit_points)]
+        if gap_phase is not None:
+            command.append(str(int(gap_phase)))
+        run_native(*command)
+        return EOSData.from_internal_directory(target, source_dir=data.source_dir)
 
 def reconstruct_master(*args, **kwargs):
     raise NativeFeatureUnavailable("Full master-function smoothing/candidate selection is not yet ported to Fortran.")

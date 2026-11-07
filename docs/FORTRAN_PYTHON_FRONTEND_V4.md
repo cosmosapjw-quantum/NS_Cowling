@@ -10,11 +10,12 @@ The native ABI is intentionally a file/CLI contract in this first port. This avo
 
 ## Current public API
 
-    from compose_eos import EOSData, read_compose, write_compose, check_consistency
+    from compose_eos import EOSData, read_compose, write_compose, check_consistency, fill_density_gap
     from compose_cowling import solve_tov_star, solve_tov_sequence, solve_cowling_spectrum
 
     eos = read_compose("path/to/compose_table")
     report = check_consistency(eos)
+    filled = fill_density_gap(eos, n_fill=60, gap_phase=7)  # pass gap_phase only for an explicitly approved phase crossing
     write_compose("path/to/output", eos)
     star = solve_tov_star(eos, pc_pa=1.5e34)
     sequence = solve_tov_sequence(eos, [1.0e34, 1.2e34, 1.5e34])
@@ -52,6 +53,6 @@ The standalone native build requires a Fortran 2018 compiler. The solver build c
 
 ## Important feature-parity boundary
 
-The native CompOSE reader/writer and C1-C11 verifier are ported. The historic Python generator is broader: master-function smoothing and gap filling, all six crust-core matching constructions, literature-specific EOS solvers, genuine Maxwell/Gibbs phase transitions, causal completion, and full TOV sequence diagnostics are not yet all ported to the new Fortran EOS core. Those APIs raise NativeFeatureUnavailable rather than silently dispatching to the old Python implementation. The original Python package remains under eos_generator/compose_eos_pkg as a differential reference, not the installed backend.
+The native CompOSE reader/writer and C1-C11 verifier are ported. The integral-preserving master-function density-gap fill is now implemented in Fortran and exposed as `fill_density_gap`; it retains source knots outside the gap and rejects an implicit cross-phase fill unless `gap_phase` is supplied. Full master-function smoothing/candidate selection, all six crust-core matching constructions, literature-specific EOS solvers, genuine Maxwell/Gibbs phase transitions, causal completion, and full TOV sequence diagnostics are not yet all ported to the new Fortran EOS core. Those remaining APIs raise `NativeFeatureUnavailable` rather than silently dispatching to the old Python implementation. The original Python package remains under eos_generator/compose_eos_pkg as a differential reference, not the installed backend.
 
 The existing Fortran TOV/Cowling kernels are callable from Python, but solve_tov_sequence is currently a Python-controlled scan over independent Fortran TOV solves, and Cowling full-cohort convergence is still a separately audited campaign. This is a functional frontend, not a claim of complete one-to-one parity with every historic Python utility.

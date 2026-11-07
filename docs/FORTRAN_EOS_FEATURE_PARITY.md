@@ -10,9 +10,9 @@ Status values: PORT_VERIFIED means the native Fortran implementation was compile
 | CompOSE writer | PORT_VERIFIED | WRAPPER_VERIFIED | 18/18 table numerical columns reproduced exactly in round trip |
 | C1-C6, C10-C11 consistency verdicts | PORT_VERIFIED | WRAPPER_VERIFIED | Differential hard verdicts compared against Python reference |
 | C7-C9 derivative diagnostics | PORT_VERIFIED | WRAPPER_VERIFIED | Finite-difference residuals; final parity recheck recorded separately |
-| Density-gap detection | PARTIAL | WRAPPER_VERIFIED | Current index helper remains a small Python array query |
-| Master-function density-gap fill | NOT_PORTED | Explicit unavailable error | Integral-preserving Fortran bridge still required |
-| Full master-function smoothing/candidate selection | NOT_PORTED | Explicit unavailable error | Historic smoothing policy not yet ported |
+| Density-gap detection | PARTIAL | Python utility | Largest adjacent density ratio is selected in the Python EOSData array helper |
+| Master-function density-gap fill | PORT_VERIFIED | WRAPPER_VERIFIED | Fortran PCHIP of log(Q1), integral correction enforcing F'=Q1, causal Hermite fallback; synthetic and GPPVA differential tests |
+| Full master-function smoothing/candidate selection | NOT_PORTED | Explicit unavailable error | Historic global smoothing, anomaly repair and candidate-selection policy are still not ported |
 | Crust-core matching: maxwell compatibility bridge | NOT_PORTED | Explicit unavailable error | Do not confuse historic smooth near-plateau method with a physical Maxwell jump |
 | Crust-core matching: cubic_P/quintic_P/css/cubic_F/quintic_F | NOT_PORTED | Explicit unavailable error | Full six-method bridge selection and slope/area gates remain |
 | Literature-specific RMF/Skyrme/APR solvers | PARTIAL | Not exposed as complete parity | Existing Fortran nuclear/liquid-drop/beta-equilibrium examples are not equivalent to the literature solver suite |

@@ -139,7 +139,7 @@ contains
     logical,allocatable :: cs2_valid(:)
     real(wp),allocatable :: nb_out(:),p_out(:),eps_out(:),mu_out(:)
     real(wp) :: nmax,fa,fb,fm,a,b,mid,cs2,nt,pt,et,mu_t,mu_interp
-    real(wp) :: mismatch,w_t,q,power,free_per_baryon
+    real(wp) :: mismatch,w_t,q,power
     real(wp) :: lv,dv,dmu
     integer :: n,i,ilo,ihi,nkeep,j,iter
     logical :: ok,found
@@ -243,7 +243,7 @@ contains
       ! decision and the stability check inside one phase-local support stencil.
       ilo=max(1,i-1)
       ihi=min(n,i+2)
-      if(any(eos%iphase(ilo:ihi)/=eos%iphase(i)) cycle
+      if(any(eos%iphase(ilo:ihi)/=eos%iphase(i))) cycle
       if(x(i+1)-x(i)>0.25_wp) cycle
       if(cs2_knot(i)< -1.e-8_wp) then
         status='source EOS is mechanically unstable below its first causal-limit crossing'
@@ -363,8 +363,7 @@ contains
     out%q(3,:)=mu_out/out%mn-1._wp
     out%q(4,:)=0._wp
     out%q(5,:)=0._wp
-    free_per_baryon=eps_out/nb_out
-    out%q(6,:)=free_per_baryon/out%mn-1._wp
+    out%q(6,:)=(eps_out/nb_out)/out%mn-1._wp
     out%q(7,:)=out%q(6,:)
     out%q_extra=0._wp
     out%iphase=0

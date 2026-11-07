@@ -162,5 +162,107 @@ def causal_completion(data: EOSData, *, cs2: float = 1.0,
 def reconstruct_master(*args, **kwargs):
     raise NativeFeatureUnavailable("Full master-function smoothing/candidate selection is not yet ported to Fortran.")
 
-def match_crust_core(*args, **kwargs):
-    raise NativeFeatureUnavailable("The six-method CompOSE crust-core matching API is not yet at Fortran feature parity.")
+def match_crust_core(d_cr: EOSData, d_co: EOSData, cr_name: str = "", co_name: str = "",
+                    method: str = "quintic_P", n_bridge: int = 40, *,
+                    core_compo_mode: str = "strict_thermo_only",
+                    drop_composition: bool = False):
+    """Join cold crust/core barotropes with the native six-method Fortran bridge.
+
+    The native v1 implementation is deliberately strict-thermo-only. Any input
+    carrying an eos.compo file or usable composition requires the caller to opt
+    in to dropping that information with drop_composition=True.
+    """
+    import math
+    if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+        raise TypeError("d_cr and d_co must both be EOSData instances")
+    methods = {"maxwell", "css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+    if method not in methods:
+        raise ValueError(f"method must be one of {sorted(methods)}")
+    if not isinstance(n_bridge, int) or isinstance(n_bridge, bool) or n_bridge < 8:
+        raise ValueError("n_bridge must be an integer >= 8")
+    if core_compo_mode != "strict_thermo_only":
+        raise NativeFeatureUnavailable(
+            "The native matcher currently supports only core_compo_mode='strict_thermo_only'; "
+            "literature_beta_eq reconstruction is not ported."
+        )
+    if not isinstance(drop_composition, bool):
+        raise TypeError("drop_composition must be bool")
+    crust_has_composition = bool(d_cr.composition_file_present or d_cr.composition_available)
+    core_has_composition = bool(d_co.composition_file_present or d_co.composition_available)
+    carries_composition = crust_has_composition or core_has_composition
+    if carries_composition and not drop_composition:
+        raise ValueError(
+            "one or both EOS inputs carry composition data; pass drop_composition=True "
+            "to explicitly discard it in the matched output"
+        )
+    if not math.isfinite(float(d_cr.temperature_mev)) or not math.isfinite(float(d_co.temperature_mev)):
+        raise ValueError("input temperatures must be finite")
+    if abs(float(d_cr.temperature_mev)) > 1e-12 or abs(float(d_co.temperature_mev)) > 1e-12:
+        raise ValueError("native matching requires T=0 inputs")
+    if not d_cr.beta_equilibrated or not d_co.beta_equilibrated:
+        raise ValueError("native matching requires beta_equilibrated inputs")
+    for label, data in (("crust", d_cr), ("core", d_co)):
+        if not all(len(getattr(data, name)) == data.n for name in
+                   ("Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Iphase")):
+            raise ValueError(f"{label} EOS arrays have inconsistent lengths")
+        if not all(math.isfinite(float(v)) for v in data.nb):
+            raise ValueError(f"{label} density grid contains nonfinite values")
+
+    with tempfile.TemporaryDirectory(prefix="compose-eos-match-core-") as td:
+        root = Path(td)
+        crust_dir, core_dir, target_dir = root / "crust", root / "core", root / "matched"
+        crust_dir.mkdir()
+        core_dir.mkdir()
+        target_dir.mkdir()
+        d_cr.write_internal_directory(crust_dir)
+        d_co.write_internal_directory(core_dir)
+        payload = run_native(
+            "match-core", crust_dir, core_dir, target_dir, method, str(n_bridge),
+            "true" if drop_composition else "false",
+        )
+        matched = EOSData.from_internal_directory(target_dir, source_dir=d_cr.source_dir)
+
+    # Preserve the legacy tuple return while adding the complete native report
+    # and an independently generated C1-C11 consistency record.
+    consistency = check_consistency(matched)
+    dm_crust = float(d_co.mn - d_cr.mn)
+    f1, f2 = float(payload["F1"]), float(payload["F2"])
+    p1, p2 = float(payload["P1"]), float(payload["P2"])
+    mu1, mu2 = float(payload["mu1"]), float(payload["mu2"])
+    info = {
+        "crust": cr_name, "core": co_name, "method": method,
+        "i1": int(payload["i1"]), "i2": int(payload["i2"]), "n_bridge": n_bridge,
+        "n1": float(payload["n1"]), "n2": float(payload["n2"]),
+        "dnb": float(payload["n2"] - payload["n1"]),
+        "P1": p1, "P2": p2, "dP": p2 - p1,
+        "mu1": mu1, "mu2": mu2, "dmu": mu2 - mu1,
+        "eps1": float(payload["n1"] * f1), "eps2": float(payload["n2"] * f2),
+        "deps": float(payload["n2"] * f2 - payload["n1"] * f1),
+        "seidov_ratio": None, "seidov_applicable": False,
+        "is_exact_maxwell": False, "density_jump_fm3": 0.0,
+        "phase_transition_order": None,
+        "phase_transition_class": "not_assigned_no_density_jump",
+        "construction_kind": payload["construction_kind"],
+        "regularity_class": payload["construction_kind"],
+        "cs2_1": float(payload["cs2_source_left"]),
+        "cs2_2": float(payload["cs2_source_right"]),
+        "cs2_left_br": float(payload["cs2_left"]),
+        "cs2_right_br": float(payload["cs2_right"]),
+        "dcs2_left": abs(float(payload["cs2_left"]) - float(payload["cs2_source_left"])),
+        "dcs2_right": abs(float(payload["cs2_right"]) - float(payload["cs2_source_right"])),
+        "cs2_min_bridge": float(payload["cs2_min"]),
+        "cs2_max_bridge": float(payload["cs2_max"]),
+        "first_law_relative_residual": float(payload["first_law_relative_residual"]),
+        "pressure_span_bridge": float(payload["pressure_span"]),
+        "spline_mode": payload["spline_mode"],
+        "dm_crust": dm_crust, "dm_core": 0.0,
+        "core_compo_mode": core_compo_mode,
+        "composition_provenance": "none_strict_thermo_only",
+        "core_composition_input_status": "explicitly_dropped" if core_has_composition else "input_eos_compo_absent",
+        "core_composition_input_usable": False,
+        "composition_dropped": bool(payload["composition_dropped"]),
+        "diagnostic_only": not bool(consistency["overall"]["pass_"]),
+        "consistency": consistency,
+        "native_report": payload,
+    }
+    return matched, info

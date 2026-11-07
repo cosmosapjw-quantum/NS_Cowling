@@ -4,21 +4,23 @@ program compose_eos_fortran
   use compose_eos_verify
   use compose_eos_reconstruct, only: fill_density_gap
   use compose_eos_causality, only: causal_complete, causal_completion_report_t
+  use compose_eos_matching, only: match_crust_core, match_report_t
   implicit none
-  type(eos_data_t)::eos,out
+  type(eos_data_t)::eos,out,crust,core
   type(verify_report_t)::report
   type(causal_completion_report_t)::causal_report
+  type(match_report_t)::match_report
   character(len=32)::action
-  character(len=2048)::arg1,arg2
-  character(len=128)::arg3,arg4,arg5
+  character(len=2048)::arg1,arg2,arg3
+  character(len=128)::arg4,arg5,arg6
   character(len=512)::status
-  integer::narg,ios,n_fill,fit_points,gap_phase,n_points
+  integer::narg,ios,n_fill,fit_points,gap_phase,n_points,n_bridge
   real(wp)::cs2_extension,n_max_requested
-  logical::has_gap_phase
-  action='';arg1='';arg2='';arg3='';arg4='';arg5=''
+  logical::has_gap_phase,drop_composition
+  action='';arg1='';arg2='';arg3='';arg4='';arg5='';arg6=''
   narg=command_argument_count()
   if(narg<2)then
-    write(*,'(a)')'usage: compose_eos_fortran {read|verify|verify-csv|normalize|write|fill-gap|causal-complete} INPUT OUTPUT [OPTIONS]'
+    write(*,'(a)')'usage: compose_eos_fortran {read|verify|verify-csv|normalize|write|fill-gap|causal-complete|match-core} INPUT OUTPUT [OPTIONS]'
     stop 2
   endif
   call get_command_argument(1,action,status=ios)
@@ -27,6 +29,7 @@ program compose_eos_fortran
   if(narg>=4)call get_command_argument(4,arg3,status=ios)
   if(narg>=5)call get_command_argument(5,arg4,status=ios)
   if(narg>=6)call get_command_argument(6,arg5,status=ios)
+  if(narg>=7)call get_command_argument(7,arg6,status=ios)
   select case(trim(action))
   case('read')
     if(narg/=3)then;call emit_failure('read requires input CompOSE directory and output directory');stop 2;endif
@@ -129,6 +132,47 @@ program compose_eos_fortran
       ',"n_tail_points":'//integer_text(causal_report%n_tail_points)// &
       ',"composition_omitted":'//logical_text(causal_report%composition_omitted)// &
       ',"sound_speed_continuous":'//logical_text(causal_report%sound_speed_continuous)//'}'
+  case('match-core')
+    if(narg/=7)then
+      call emit_failure('match-core requires CRUST_INTERNAL CORE_INTERNAL OUTPUT METHOD N_BRIDGE DROP_COMPOSITION');stop 2
+    endif
+    read(arg5,*,iostat=ios)n_bridge
+    if(ios/=0)then;call emit_failure('invalid n_bridge');stop 2;endif
+    select case(trim(adjustl(arg6)))
+    case('true','TRUE','.true.','1')
+      drop_composition=.true.
+    case('false','FALSE','.false.','0')
+      drop_composition=.false.
+    case default
+      call emit_failure('DROP_COMPOSITION must be true or false');stop 2
+    end select
+    call read_internal_csv(trim(arg1)//'/eos_data.csv',trim(arg1)//'/eos_data.nml',crust,status)
+    if(status/='ok')then;call emit_failure('invalid crust input: '//trim(status));stop 3;endif
+    call read_internal_csv(trim(arg2)//'/eos_data.csv',trim(arg2)//'/eos_data.nml',core,status)
+    if(status/='ok')then;call emit_failure('invalid core input: '//trim(status));stop 3;endif
+    call match_crust_core(crust,core,trim(arg4),n_bridge,drop_composition,out,match_report,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    call write_internal_csv(trim(arg3)//'/eos_data.csv',out,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    call write_metadata(trim(arg3)//'/eos_data.nml',out,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    write(*,'(a)')'{"status":"ok","operation":"match-core","n":'//integer_text(out%n)// &
+      ',"method":"'//trim(match_report%method)//'","construction_kind":"'//trim(match_report%construction_kind)// &
+      '","spline_mode":"'//trim(match_report%spline_mode)//'","i1":'//integer_text(match_report%i1)// &
+      ',"i2":'//integer_text(match_report%i2)//',"n_bridge":'//integer_text(match_report%n_bridge)// &
+      ',"n1":'//real_text(match_report%n1)//',"n2":'//real_text(match_report%n2)// &
+      ',"P1":'//real_text(match_report%p1)//',"P2":'//real_text(match_report%p2)// &
+      ',"F1":'//real_text(match_report%f1)//',"F2":'//real_text(match_report%f2)// &
+      ',"mu1":'//real_text(match_report%mu1)//',"mu2":'//real_text(match_report%mu2)// &
+      ',"cs2_source_left":'//real_text(match_report%cs2_source_left)// &
+      ',"cs2_source_right":'//real_text(match_report%cs2_source_right)// &
+      ',"cs2_left":'//real_text(match_report%cs2_left)//',"cs2_right":'//real_text(match_report%cs2_right)// &
+      ',"cs2_min":'//real_text(match_report%cs2_min)//',"cs2_max":'//real_text(match_report%cs2_max)// &
+      ',"pressure_span":'//real_text(match_report%pressure_span)// &
+      ',"first_law_relative_residual":'//real_text(match_report%first_law_relative_residual)// &
+      ',"composition_dropped":'//logical_text(match_report%composition_dropped)// &
+      ',"is_exact_maxwell":'//logical_text(match_report%is_exact_maxwell)// &
+      ',"seidov_applicable":'//logical_text(match_report%seidov_applicable)//'}'
   case default
     call emit_failure('unknown operation: '//trim(action));stop 2
   end select

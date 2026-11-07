@@ -114,7 +114,7 @@ The historic method name is retained for API compatibility, but this is **not** 
 \[
  \delta P_{\rm plat}=0.015(P_2-P_1).
 \]
-The inner pressures are P_a=P_t-delta P_plat and P_b=P_t+delta P_plat. The plateau reference P_t is determined by a scalar root solve that enforces
+The inner pressures are P_a=P_t-delta P_plat and P_b=P_t+delta P_plat. The plateau reference P_t is determined by a scalar root solve using a 64-point Gauss--Legendre rule on the full interval, matching the historical reference implementation. Each partial free-energy integral F(u) uses a 16-point Gauss--Legendre rule on [0,u]. The root solve enforces
 \[
  F_2-F_1=\Delta x\int_0^1
  \frac{P(u)}{\exp(x_1+u\Delta x)}\,du.

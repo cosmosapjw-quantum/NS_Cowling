@@ -104,11 +104,11 @@ def test_internal_metadata_parses_fortran_l1_logical_values(tmp_path):
 
     metadata = tmp_path / "eos_data.nml"
     metadata.write_text(
-        "&metadata\\n"
-        " composition_file_present=F\\n"
-        " composition_available=F\\n"
-        " beta_equilibrated=T\\n"
-        "/\\n",
+        "&metadata\n"
+        " composition_file_present=F\n"
+        " composition_available=F\n"
+        " beta_equilibrated=T\n"
+        "/\n",
         encoding="utf-8",
     )
     parsed = _read_metadata(metadata)

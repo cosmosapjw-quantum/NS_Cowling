@@ -343,23 +343,55 @@ contains
     slopes(4)=min(dpdu2,2.2_wp*max(1.e-12_wp,sec2))
   end subroutine make_pressure_spline
 
+  subroutine gauss_legendre_rule(n,x,w)
+    integer,intent(in)::n
+    real(wp),intent(out)::x(n),w(n)
+    integer::i,j,m,iteration
+    real(wp)::z,zold,p1,p2,p3,pp,pi
+    pi=acos(-1._wp);m=(n+1)/2
+    do i=1,m
+      z=cos(pi*(real(i,wp)-0.25_wp)/(real(n,wp)+0.5_wp))
+      do iteration=1,100
+        p1=1._wp;p2=0._wp
+        do j=1,n
+          p3=p2;p2=p1
+          p1=((2._wp*real(j,wp)-1._wp)*z*p2-(real(j,wp)-1._wp)*p3)/real(j,wp)
+        enddo
+        pp=real(n,wp)*(z*p1-p2)/(z*z-1._wp)
+        zold=z;z=zold-p1/pp
+        if(abs(z-zold)<=4._wp*epsilon(1._wp)*max(1._wp,abs(z)))exit
+      enddo
+      ! Re-evaluate the derivative at the converged root before forming the weight.
+      p1=1._wp;p2=0._wp
+      do j=1,n
+        p3=p2;p2=p1
+        p1=((2._wp*real(j,wp)-1._wp)*z*p2-(real(j,wp)-1._wp)*p3)/real(j,wp)
+      enddo
+      pp=real(n,wp)*(z*p1-p2)/(z*z-1._wp)
+      x(i)=-z;x(n+1-i)=z
+      w(i)=2._wp/((1._wp-z*z)*pp*pp);w(n+1-i)=w(i)
+    enddo
+  end subroutine gauss_legendre_rule
+
   function pressure_work_integral(pt,uend,p1,p2,dpdu1,dpdu2,x1,dx) result(val)
     real(wp),intent(in)::pt,uend,p1,p2,dpdu1,dpdu2,x1,dx
-    real(wp)::val,kn(4),vv(4),ss(4),u,p,dp,aa,step,s0,s1,s2
-    integer,parameter::ns=512
-    integer::j
+    real(wp)::val,kn(4),vv(4),ss(4),u,p,dp,aa,weight
+    real(wp)::xg(64),wg(64)
+    integer::j,nquad
+    val=0._wp
+    if(uend<=0._wp)return
+    ! Match the historical Python implementation: 64-point Gauss-Legendre
+    ! for the full-interval plateau root and 16-point for each partial F(u).
+    nquad=16
+    if(uend>=1._wp-8._wp*epsilon(1._wp))nquad=64
+    call gauss_legendre_rule(nquad,xg(:nquad),wg(:nquad))
     call make_pressure_spline(pt,p1,p2,dpdu1,dpdu2,kn,vv,ss)
-    if(uend<=0._wp)then;val=0._wp;return;endif
-    step=uend/real(ns,wp);s0=0._wp;s1=0._wp;s2=0._wp
-    do j=0,ns
-      u=real(j,wp)*step
+    do j=1,nquad
+      u=0.5_wp*uend*(xg(j)+1._wp)
+      weight=0.5_wp*uend*wg(j)
       call spline_eval(kn,vv,ss,u,p,dp,aa)
-      p=p/exp(x1+u*dx)
-      if(j==0.or.j==ns)then;s0=s0+p
-      else if(mod(j,2)==1)then;s1=s1+p
-      else;s2=s2+p;endif
+      val=val+weight*p/exp(x1+u*dx)
     enddo
-    val=step*(s0+4._wp*s1+2._wp*s2)/3._wp
   end function pressure_work_integral
 
   subroutine css_residual(s,n1,n2,mu1,mu2,p1,p2,res,mu_m,n_m,csa,csb)

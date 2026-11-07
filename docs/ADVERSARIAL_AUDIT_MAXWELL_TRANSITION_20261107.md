@@ -98,7 +98,7 @@ P_L(\mu_t)=P_H(\mu_t),\quad
 
 **Change:** Corrected API test flags; added explicit-neutrality rejection, composition-rejection, non-overlap, acausal-input, Q3-Euler mismatch, Python export refusal and native CLI export refusal tests. Added a self-contained derivation/implementation note and an updated conservative feature matrix.
 
-**Status:** Source changes assembled. The final outcome remains **CI_PENDING** until GitHub Actions has built and tested the exact resulting commit and verified the updated SHA-256 manifest.
+**Status:** The first exact-HEAD CI run on `6ffdd62080dd8313e6c890cf6a6261e68f5c864d` compiled the complete Fortran executable successfully. The suite then reported **53 passed, 1 failed**: the analytic Maxwell test expected `low_phase_rows`, but the CLI JSON omitted that field although the native report type contained it. This is a Python/native report-schema serialization defect, not a failure of the coexistence equations. The CLI JSON has been extended with `low_phase_rows`, `high_phase_rows`, and phase-resolved sound-speed extrema. The final outcome remains **CI_PENDING** until the corrective exact-HEAD run passes the complete suite and checksum/package steps.
 
 ## 4. Claim-to-evidence table
 
@@ -123,11 +123,12 @@ P_L(\mu_t)=P_H(\mu_t),\quad
 
 ## 6. Blockers and explicit non-claims
 
-1. **CI not yet recorded in this document:** no PASS may be claimed until the exact final commit's build, test and manifest workflow has completed successfully.
+1. **CI remains pending after a caught report-schema defect:** the exact commit `6ffdd620...` built, then failed one analytic test with 53/54 passing because the CLI omitted two report keys. The CLI correction is staged for the next commit; no full PASS is claimed until its exact-HEAD tests, manifest and package workflow pass.
 2. **No local compiler run:** the connected Desktop Commander endpoint reported its monthly usage limit. This was not retried. GitHub Actions is the available compiler/test environment.
 3. **No native subagent dispatch:** no tool for independent native subagent execution was available. The review cycles are direct source/math/test audits, not simulated subagent reports.
 4. **Gibbs, composition reconstruction, full reconstruct_master, literature-specific EOS solvers, Seidov threshold and phase-interface TOV stability remain unverified or unported.**
 5. **No merge to main:** the intended change is confined to the existing feature branch and its open PR.
+6. **Initial regression outcome retained:** the failure is not hidden or rewritten as a pass; the run links and corrected report fields will be added after the next exact-HEAD CI result.
 
 ## 7. Stop condition
 

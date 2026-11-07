@@ -199,6 +199,8 @@ program compose_eos_fortran
     if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
     write(*,'(a)')'{"status":"ok","operation":"maxwell-transition","n":'//integer_text(out%n)// &
       ',"pressure_crossings":'//integer_text(phase_report%pressure_crossings)// &
+      ',"low_phase_rows":'//integer_text(phase_report%low_phase_rows)// &
+      ',"high_phase_rows":'//integer_text(phase_report%high_phase_rows)// &
       ',"mu_transition":'//real_text(phase_report%mu_transition)// &
       ',"pressure_transition":'//real_text(phase_report%pressure_transition)// &
       ',"n_low":'//real_text(phase_report%n_low)//',"n_high":'//real_text(phase_report%n_high)// &
@@ -208,6 +210,10 @@ program compose_eos_fortran
       ',"maxwell_identity_residual":'//real_text(phase_report%maxwell_identity_residual)// &
       ',"max_euler_residual_low":'//real_text(phase_report%max_euler_residual_low)// &
       ',"max_euler_residual_high":'//real_text(phase_report%max_euler_residual_high)// &
+      ',"min_cs2_low":'//real_text(phase_report%min_cs2_low)// &
+      ',"max_cs2_low":'//real_text(phase_report%max_cs2_low)// &
+      ',"min_cs2_high":'//real_text(phase_report%min_cs2_high)// &
+      ',"max_cs2_high":'//real_text(phase_report%max_cs2_high)// &
       ',"min_cs2":'//real_text(min(phase_report%min_cs2_low,phase_report%min_cs2_high))// &
       ',"max_cs2":'//real_text(max(phase_report%max_cs2_low,phase_report%max_cs2_high))//'}'
   case default

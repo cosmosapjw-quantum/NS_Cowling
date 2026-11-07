@@ -192,7 +192,7 @@ n_L<n_H,\qquad
 \epsilon_H=\mu_t n_H-P_t.
 \]
 
-The phase labels are set to 1 and 2 on the corresponding branches. The output is ordered by strictly increasing baryon density, has nondecreasing pressure and increasing energy density, and reports the density jump, latent energy density, Euler closure residuals, and sound-speed ranges of the two pure phases.
+The phase labels are set to 1 and 2 on the corresponding branches. The output is ordered by strictly increasing baryon density, has nondecreasing pressure and increasing energy density, and reports the retained row counts for each phase, the density jump, latent energy density, Euler closure residuals, and separate minimum/maximum sound-speed diagnostics for each pure phase.
 
 The C1-C11 verifier now masks derivative stencils adjacent to any Iphase change, whether or not an eos.compo file exists. A finite-difference derivative must not cross the density discontinuity. The algebraic pressure and energy-density checks still see both coexistence rows, and the monotonic-pressure check permits the equal-pressure pair.
 

@@ -1,0 +1,28 @@
+{
+  "schema": "compose-cowling-q-linear-adapter-v1",
+  "adapter_kind": "solver_interpolation_closure_not_source_eos_replacement",
+  "source_path": "data/eos_original_normalized/SPG_M4__BBB_BHF2__maxwell.csv",
+  "source_sha256": "c2861f8e9e926dea6d5f410077d441932b181bceca0c5f222f3b01ec7eb3e526",
+  "adapter_path": "data/eos_cowling_adapter_v2/SPG_M4__BBB_BHF2__maxwell.csv",
+  "adapter_sha256": "25f8b9752548c3e87d658dc767908a706df8f230889e1f2c00626861ac71ddac",
+  "neutron_mass_mev": 939.56533,
+  "construction": "weighted_PAV_q_if_needed; piecewise_linear_q(mu_B); n=mu_B*q; P=P0+integral(n dmu_B); epsilon=mu_B*n-P",
+  "metrics": {
+    "n_rows": 429,
+    "source_first_law_max_relative": 4.3703664701442876e-16,
+    "adapter_first_law_max_relative": 1.3955105963777714e-16,
+    "source_q_monotone": true,
+    "pav_pooled_blocks": 0,
+    "pav_pooled_knots": 0,
+    "max_abs_delta_n_over_n_source": 2.145898165016318e-16,
+    "rms_delta_n_over_n_source": 5.267713984392963e-17,
+    "max_abs_delta_P_over_Pmax": 0.0012838892658235265,
+    "median_abs_delta_P_over_Pmax": 2.1515104569584814e-10,
+    "max_abs_delta_epsilon_over_mu_n": 0.0008168178700549764,
+    "min_cs2": 6.783184821490572e-06,
+    "max_cs2": 0.8545565490707089,
+    "min_q_slope": 1.715601893756549e-11,
+    "max_q_slope": 0.00013884364817368138,
+    "max_relative_hermite_pressure_residual": 3.4492178380091507e-16
+  }
+}

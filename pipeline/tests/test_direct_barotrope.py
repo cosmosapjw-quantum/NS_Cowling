@@ -2,7 +2,10 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from pipeline.compose_cowling.direct_barotrope import DirectBarotrope, audit_csv
+try:
+    from compose_cowling.direct_barotrope import DirectBarotrope, audit_csv
+except ImportError:
+    from pipeline.compose_cowling.direct_barotrope import DirectBarotrope, audit_csv
 
 ROOT = Path(__file__).resolve().parents[2]
 EOS_DIR = ROOT / "data" / "eos_original_normalized"

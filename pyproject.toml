@@ -4,19 +4,30 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "compose-cowling-pipeline"
-version = "1.0.0"
-description = "Reproducible joined CompOSE EOS to relativistic Cowling f/p1 oscillation pipeline"
+version = "2.0.0"
+description = "Fortran EOS core with Python frontend for CompOSE, TOV and relativistic Cowling modes"
 requires-python = ">=3.10"
-dependencies = ["numpy>=1.20"]
+dependencies = ["numpy>=1.23"]
 
 [project.optional-dependencies]
 test = ["pytest>=7"]
+plot = ["matplotlib>=3.6"]
 
 [project.scripts]
+compose-eos = "compose_eos.cli:main"
 compose-cowling = "compose_cowling.cli:main"
 
 [tool.setuptools]
-package-dir = {"" = "pipeline"}
+package-dir = {"" = "python_frontend"}
 
 [tool.setuptools.packages.find]
-where = ["pipeline"]
+where = ["python_frontend"]
+include = ["compose_eos*", "compose_cowling*"]
+
+[tool.setuptools.data-files]
+"share/compose-eos/fortran_eos" = ["fortran_eos/build.sh"]
+"share/compose-eos/fortran_eos/src" = ["fortran_eos/src/*.f90"]
+"share/compose-eos/fortran_eos/app" = ["fortran_eos/app/*.f90"]
+"share/compose-eos/oscillation_source/support/src" = ["oscillation_source/support/src/*.f90"]
+"share/compose-eos/oscillation_source/solutions/src" = ["oscillation_source/solutions/src/*.f90"]
+"share/compose-eos/oscillation_source/solutions/app" = ["oscillation_source/solutions/app/*.f90"]

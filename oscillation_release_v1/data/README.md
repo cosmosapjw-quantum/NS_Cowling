@@ -1,0 +1,1 @@
+spectrum_summary_234.csv contains the final 234-row f/p1 table. Original normalized EOS and projected EOS tables are stored separately. All projected tables passed the native cell audit. Per-table projection JSON records source/projected hashes and reconstruction diagnostics. Column units are stated in the CSV header.

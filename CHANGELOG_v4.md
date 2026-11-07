@@ -16,3 +16,4 @@
 
 - Hardened the cubic-Hermite fallback gate: reset candidate admissibility independently of the failed PCHIP candidate and evaluate analytic F'' so dP/dn_B=F'+F'' is checked rather than substituting a duplicate F' term.
 - Added regression coverage for both acceptance of a physical Hermite fallback and rejection of a positive-Q1 fallback with negative dP/dn_B.
+- Fixed Hermite fallback sampling after early PCHIP rejection: fallback abscissae are now recomputed from the local gap coordinate rather than reusing the potentially partially initialized dense-validation array.

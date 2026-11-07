@@ -91,11 +91,28 @@ The bounded strict-thermo smooth matching increment satisfies its stop condition
 
 Main remains unchanged. PR #1 remains open and unmerged pending an explicit user decision.
 
-## Final integrated release evidence
+## Final exact-HEAD release evidence
 
-GitHub Actions run 42377336346 on commit 4b7f6a983e3a7cbcd920dad7cdfee3caee7125dc completed the native gfortran build and all **44 tests passed in 24.51 s**. This includes the six native-versus-legacy matching-method differential tests, no-argument API compatibility, Fortran L1 metadata parsing, existing causal-completion regressions, and direct-provider/frontend tests. The checksum stage initially exposed a stale density-gap test digest and then the audit document's digest. The first attempted repair used an auxiliary JavaScript SHA-256 routine with an incomplete compression-constant table; that helper was discarded. Both exact UTF-8 byte streams were re-hashed with Wolfram SHA-256 over ByteArray, the two manifest copies were updated, and the final exact-HEAD CI independently accepted every manifest entry.
+**Final branch HEAD:** `e2b7ef319b9bb73dc85023a757dc1449c8f22e3c`  
+**Branch:** `research/fortran-eos-gap-fill-v1`
 
+Both GitHub Actions workflows completed successfully on this exact commit:
 
-## Manifest hash calculation provenance
+- Push CI: [run 42378176837](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42378176837)
+- Pull-request CI: [run 42378180891](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42378180891)
 
-The first repair attempt used an auxiliary JavaScript SHA-256 routine whose compression-constant table was incomplete for long inputs. This did not affect source code or test execution, but it produced invalid expected digests for two long files. Those outputs were discarded. The exact UTF-8 byte streams were re-hashed with Wolfram's SHA-256 over ByteArray values and will be checked independently by the final CI `sha256sum -c` step. This audit records the helper defect rather than treating the mismatch as a repository or runtime failure.
+The push run reported a successful native `gfortran` build, **44 tests passed in 23.50 s**, all **58/58** tracked SHA-256 entries verified, source archive creation and artifact upload. The pull-request run independently reported a successful native build, **44 tests passed in 18.52 s**, all **58/58** checksums verified, and successful archive upload.
+
+The push-run source artifact is [`NS_Cowling-e2b7ef319b9bb73dc85023a757dc1449c8f22e3c`](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42378176837/artifacts/13576661259), artifact ID `13576661259`, size 198,970,172 bytes. Its uploaded ZIP digest is `sha256:28793bbbfa0708a8b24d0cc2e128b0833e9eea16e3d30ea547172b172b62474b`; retention expires 2026-12-07. The artifact digest applies to the uploaded ZIP container; the repository manifest independently verifies all tracked source/documentation files.
+
+### Manifest calculation provenance
+
+During the checksum repair, an auxiliary JavaScript SHA-256 helper was found to have an incomplete compression-constant table for long inputs. Its outputs were discarded. The exact UTF-8 byte streams for affected files were re-hashed using Wolfram Language SHA-256 over `ByteArray` values. Both manifest copies were updated, and the final exact-HEAD push and pull-request CI independently accepted every entry using the system `sha256sum -c` command.
+
+### Bounded completion decision
+
+The six smooth strict-thermo-only matching methods are **implementation-verified**: they compile, retain the Python wrapper contract, pass native-versus-legacy differential tests on GPPVA_FSU2H + GM_GM1, pass the full targeted frontend/direct-provider suite, satisfy the tracked manifest gate, and are included in the exact-HEAD source artifact.
+
+This is not complete legacy EOS-generator parity. Composition-aware matching, `literature_beta_eq`, full master-function smoothing/candidate selection, microscopic RMF/Skyrme/APR solvers, genuine Maxwell/Gibbs transition generation, full causal-profile parity and complete TOV sequence/stable-branch diagnostics remain separate unported capabilities.
+
+Main remains unchanged. PR #1 remains open and unmerged pending an explicit user decision.

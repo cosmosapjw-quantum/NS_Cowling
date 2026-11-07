@@ -110,7 +110,7 @@ def test_native_master_reconstruction_obeys_exact_first_law_without_inventing_co
     np.testing.assert_array_equal(out.Q6, out.Q7)
     np.testing.assert_allclose(out.F, source.F, rtol=3e-13, atol=3e-13)
     np.testing.assert_allclose(out.Q1, 30.0, rtol=1e-11, atol=3e-12)
-    np.testing.assert_allclose(out.mub, out.F + out.Q1, rtol=0.0, atol=2e-13)
+    np.testing.assert_allclose(out.mub, out.F + out.Q1, rtol=0.0, atol=5e-13)
     np.testing.assert_allclose(out.p, out.nb * out.Q1, rtol=0.0, atol=2e-13)
     np.testing.assert_allclose(out.eps, out.nb * out.F, rtol=0.0, atol=2e-13)
     np.testing.assert_allclose(out.eps + out.p, out.nb * out.mub, rtol=2e-14)

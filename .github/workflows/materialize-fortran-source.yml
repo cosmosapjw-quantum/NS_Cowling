@@ -43,7 +43,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gfortran
           python -m pip install --upgrade pip
-          python -m pip install -e .
+          python -m pip install -e '.[test]'
 
       - name: Build native Fortran EOS executable
         run: bash fortran_eos/build.sh build/compose_eos_fortran

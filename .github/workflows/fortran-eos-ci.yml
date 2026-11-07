@@ -45,6 +45,8 @@ jobs:
       - name: Run frontend and direct-provider tests
         env:
           PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
         run: python -m pytest -q python_frontend/tests pipeline/tests
 
       - name: Verify tracked SHA-256 manifest

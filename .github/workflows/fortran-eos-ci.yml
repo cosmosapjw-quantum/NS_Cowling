@@ -1,0 +1,51 @@
+name: Fortran EOS frontend CI
+
+on:
+  push:
+    branches:
+      - main
+      - research/fortran-eos-gap-fill-v1
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fortran-eos-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install native compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gfortran
+
+      - name: Install Python package and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+
+      - name: Build Fortran EOS executable
+        run: bash fortran_eos/build.sh build/compose_eos_fortran
+
+      - name: Run frontend and direct-provider tests
+        env:
+          PYTHONPATH: python_frontend
+        run: python -m pytest -q python_frontend/tests pipeline/tests
+
+      - name: Verify tracked SHA-256 manifest
+        run: sha256sum -c SHA256SUMS_v4.txt

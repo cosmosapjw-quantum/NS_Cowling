@@ -162,7 +162,8 @@ def causal_completion(data: EOSData, *, cs2: float = 1.0,
 def reconstruct_master(*args, **kwargs):
     raise NativeFeatureUnavailable("Full master-function smoothing/candidate selection is not yet ported to Fortran.")
 
-def match_crust_core(d_cr: EOSData, d_co: EOSData, cr_name: str = "", co_name: str = "",
+def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                    cr_name: str = "", co_name: str = "",
                     method: str = "quintic_P", n_bridge: int = 40, *,
                     core_compo_mode: str = "strict_thermo_only",
                     drop_composition: bool = False):
@@ -173,6 +174,11 @@ def match_crust_core(d_cr: EOSData, d_co: EOSData, cr_name: str = "", co_name: s
     in to dropping that information with drop_composition=True.
     """
     import math
+    if d_cr is None or d_co is None:
+        raise NativeFeatureUnavailable(
+            "match_crust_core requires both crust and core EOSData inputs; "
+            "the native smooth thermo-only matching API is available when both are supplied."
+        )
     if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
         raise TypeError("d_cr and d_co must both be EOSData instances")
     methods = {"maxwell", "css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
@@ -200,7 +206,7 @@ def match_crust_core(d_cr: EOSData, d_co: EOSData, cr_name: str = "", co_name: s
     if abs(float(d_cr.temperature_mev)) > 1e-12 or abs(float(d_co.temperature_mev)) > 1e-12:
         raise ValueError("native matching requires T=0 inputs")
     if not d_cr.beta_equilibrated or not d_co.beta_equilibrated:
-        raise ValueError("native matching requires beta_equilibrated inputs")
+        raise ValueError("native matching requires beta-equilibrated inputs")
     for label, data in (("crust", d_cr), ("core", d_co)):
         if not all(len(getattr(data, name)) == data.n for name in
                    ("Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Iphase")):

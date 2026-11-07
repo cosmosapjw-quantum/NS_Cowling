@@ -97,3 +97,21 @@ def test_combined_spectrum_234_modes_integrity():
         p1_v = int(r["p1_inner_V_nodes"]) + int(r["p1_outer_V_nodes"])
         assert p1_w == 1 and p1_v == 1
 
+
+
+def test_internal_metadata_parses_fortran_l1_logical_values(tmp_path):
+    from compose_eos.eos_data import _read_metadata
+
+    metadata = tmp_path / "eos_data.nml"
+    metadata.write_text(
+        "&metadata\\n"
+        " composition_file_present=F\\n"
+        " composition_available=F\\n"
+        " beta_equilibrated=T\\n"
+        "/\\n",
+        encoding="utf-8",
+    )
+    parsed = _read_metadata(metadata)
+    assert parsed["composition_file_present"] is False
+    assert parsed["composition_available"] is False
+    assert parsed["beta_equilibrated"] is True

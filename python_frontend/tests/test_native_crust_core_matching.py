@@ -36,9 +36,19 @@ def _legacy_match(method: str, tmp_path: Path):
     npz = tmp_path / f"legacy_{method}.npz"
     metadata = tmp_path / f"legacy_{method}.json"
     script = r'''
-import json, sys
+import json, os, sys, types
+from pathlib import Path
 import numpy as np
-from compose_eos import read_compose, match_crust_core
+
+# The legacy package __init__ eagerly imports optional plotting backends.
+# Install a minimal package namespace so the reference reader/matcher can be
+# imported without matplotlib; their numerical dependencies are NumPy/SciPy.
+legacy_pkg = types.ModuleType("compose_eos")
+legacy_pkg.__path__ = [str(Path(os.environ["LEGACY_ROOT"]) / "compose_eos")]
+sys.modules["compose_eos"] = legacy_pkg
+from compose_eos.io import read_compose
+from compose_eos.matching import match_crust_core
+
 cr = read_compose(sys.argv[1])
 co = read_compose(sys.argv[2])
 matched, info = match_crust_core(
@@ -51,6 +61,7 @@ with open(sys.argv[5], "w", encoding="utf-8") as stream:
 '''
     env = os.environ.copy()
     env["PYTHONPATH"] = str(LEGACY_ROOT)
+    env["LEGACY_ROOT"] = str(LEGACY_ROOT)
     completed = subprocess.run(
         [sys.executable, "-c", script, str(CRUST), str(CORE), method, str(npz), str(metadata)],
         cwd=ROOT, env=env, capture_output=True, text=True, check=False,

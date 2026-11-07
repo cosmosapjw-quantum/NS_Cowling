@@ -198,7 +198,7 @@ def test_native_density_gap_accepts_physical_hermite_fallback():
     assert np.all((expected_cs2 >= 0.0) & (expected_cs2 < 1.0))
 
 
-def test_native_density_gap_rejects_hermite_bridge_with_negative_dpdn():
+def test_native_density_gap_rejects_hermite_bridge_with_negative_dpdn(tmp_path):
     # Q=F' stays positive, but Q+F'' becomes negative.  A check that
     # mistakenly substitutes 2*Q for dP/dn_B would accept this bridge.
     x = np.array([-1.0, -0.5, 0.0, 2.0, 2.5])
@@ -227,12 +227,19 @@ def test_native_density_gap_rejects_hermite_bridge_with_negative_dpdn():
 
     from compose_eos import NativeExecutionError
 
-    try:
-        out = fill_density_gap(source, n_fill=8, fit_points=2)
-    except NativeExecutionError as exc:
-        assert "no positive, mechanically stable and causal" in str(exc)
-    else:
-        pytest.fail(
-            "native accepted the supposedly unstable gap; "
-            f"Q1={out.Q1[3:11]!r}; F={out.F[3:11]!r}"
-        )
+    import subprocess
+    from compose_eos.native import executable
+
+    source_dir = tmp_path / "source"
+    output_dir = tmp_path / "output"
+    source.write_internal_directory(source_dir)
+    output_dir.mkdir()
+    result = subprocess.run(
+        [str(executable()), "fill-gap", str(source_dir), str(output_dir), "8", "2"],
+        capture_output=True, text=True, check=False,
+    )
+    assert result.returncode != 0, (
+        "native accepted the supposedly unstable gap; "
+        f"stdout={result.stdout!r}; stderr={result.stderr!r}"
+    )
+    assert "no positive, mechanically stable and causal" in result.stdout

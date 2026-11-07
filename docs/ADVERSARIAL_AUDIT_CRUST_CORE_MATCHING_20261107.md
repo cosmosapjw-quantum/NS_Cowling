@@ -94,3 +94,8 @@ Main remains unchanged. PR #1 remains open and unmerged pending an explicit user
 ## Final integrated evidence before manifest repair
 
 GitHub Actions run 42377336346 on commit 4b7f6a983e3a7cbcd920dad7cdfee3caee7125dc completed the native gfortran build and all **44 tests passed in 24.51 s**. This includes the six native-versus-legacy matching-method differential tests, no-argument API compatibility, Fortran L1 metadata parsing, existing causal-completion regressions, and direct-provider/frontend tests. The tracked manifest check then found one stale SHA-256 entry for `python_frontend/tests/test_native_density_gap.py`; the file was unchanged by this matching increment, but its manifest entry no longer matched the branch's actual bytes. The exact file SHA-256 was recalculated as `4a9f4bb6542a5a7e0b3fef4f6079b74578e33208d9d4ddc2c83de035ee891e12` and both manifest copies were updated. A final exact-HEAD CI run must still recheck the manifest and create the packaged source artifact.
+
+
+## Manifest hash calculation provenance
+
+The first repair attempt used an auxiliary JavaScript SHA-256 routine whose compression-constant table was incomplete for long inputs. This did not affect source code or test execution, but it produced invalid expected digests for two long files. Those outputs were discarded. The exact UTF-8 byte streams were re-hashed with Wolfram's SHA-256 over ByteArray values and will be checked independently by the final CI `sha256sum -c` step. This audit records the helper defect rather than treating the mismatch as a repository or runtime failure.

@@ -196,6 +196,9 @@ contains
       if(.not.ieee_is_finite(cs2).or.cs2< -1.e-8_wp.or.cs2>=1._wp+1.e-6_wp)then;physical=.false.;exit;endif
     enddo
     if(.not.physical)then
+      ! The PCHIP candidate failed; evaluate the Hermite fallback from a fresh
+      ! admissibility state rather than inheriting the previous failure.
+      physical=.true.
       do j=1,n_fill
         call hermite_value(x0,x1,f0,f1,q0,q1,xfill(j),ffill(j),qfill(j))
       enddo

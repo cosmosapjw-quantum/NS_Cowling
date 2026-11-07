@@ -306,8 +306,8 @@ def test_native_causal_completion_matches_analytic_css_tail_and_first_law():
     tail = slice(-64, None)
     expected_mu = meta["mu_match"] * (completed.nb[tail] / meta["n_match"])
     np.testing.assert_allclose(completed.mub[tail], expected_mu, rtol=3e-13)
-    np.testing.assert_allclose(np.diff(completed.p[tail]), np.diff(completed.eps[tail]),
-                               rtol=3e-12, atol=2e-12)
+    np.testing.assert_allclose(np.diff(completed.p[tail]) / np.diff(completed.eps[tail]),
+                               1.0, rtol=3e-12, atol=2e-12)
     assert not completed.composition_available
     assert not completed.composition_file_present
     assert np.all(completed.Iphase == 0)
@@ -332,6 +332,10 @@ def test_native_causal_completion_supports_subcausal_css_and_marks_cs2_kink():
     )
     assert np.all(completed.p[-80:] > 0.0)
     assert np.all(completed.eps[-80:] > 0.0)
+    np.testing.assert_allclose(
+        np.diff(completed.p[-80:]) / np.diff(completed.eps[-80:]),
+        0.33, rtol=2e-11, atol=2e-12
+    )
 
 
 def test_native_causal_completion_refuses_missing_causal_crossing():

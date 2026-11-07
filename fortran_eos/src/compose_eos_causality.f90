@@ -225,7 +225,7 @@ contains
     cs2_knot=0._wp
     cs2_valid=.false.
     do i=1,n
-      if(slopee(i)>0._wp) then
+      if(abs(slopee(i))>tiny(1._wp)) then
         cs2_knot(i)=exp(logp(i)-loge(i))*slopep(i)/slopee(i)
         cs2_valid(i)=ieee_is_finite(cs2_knot(i))
       endif
@@ -239,17 +239,17 @@ contains
     found=.false.
     do i=1,n-1
       if(.not.cs2_valid(i).or..not.cs2_valid(i+1)) cycle
+      ! A local PCHIP slope uses neighbouring knots.  Keep both the crossing
+      ! decision and the stability check inside one phase-local support stencil.
+      ilo=max(1,i-1)
+      ihi=min(n,i+2)
+      if(any(eos%iphase(ilo:ihi)/=eos%iphase(i)) cycle
+      if(x(i+1)-x(i)>0.25_wp) cycle
       if(cs2_knot(i)< -1.e-8_wp) then
         status='source EOS is mechanically unstable below its first causal-limit crossing'
         return
       endif
       if(cs2_knot(i)>1._wp.or.cs2_knot(i+1)<=1._wp) cycle
-      ! A local PCHIP slope uses neighbouring knots.  Keep the match stencil
-      ! inside one phase so a derivative is never blended across a phase edge.
-      ilo=max(1,i-1)
-      ihi=min(n,i+2)
-      if(any(eos%iphase(ilo:ihi)/=eos%iphase(i))) cycle
-      if(x(i+1)-x(i)>0.25_wp) cycle
       fa=cs2_knot(i)-1._wp
       fb=cs2_knot(i+1)-1._wp
       if(fa>0._wp.or.fb<=0._wp) cycle

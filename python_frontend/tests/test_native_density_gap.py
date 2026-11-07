@@ -225,8 +225,6 @@ def test_native_density_gap_rejects_hermite_bridge_with_negative_dpdn(tmp_path):
         composition_available=False,
     )
 
-    from compose_eos import NativeExecutionError
-
     import subprocess
     from compose_eos.native import executable
 
@@ -243,3 +241,4 @@ def test_native_density_gap_rejects_hermite_bridge_with_negative_dpdn(tmp_path):
         f"stdout={result.stdout!r}; stderr={result.stderr!r}"
     )
     assert "no positive, mechanically stable and causal" in result.stdout
+    assert not (output_dir / "eos_data.csv").exists()

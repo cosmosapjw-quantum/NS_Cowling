@@ -108,6 +108,16 @@ contains
                +((-6*t2+6*t)/h)*y1+(3*t2-2*t)*d1
   end subroutine hermite_value
 
+  pure subroutine hermite_second_derivative(x0,x1,y0,y1,d0,d1,xq,second_derivative)
+    real(wp),intent(in)::x0,x1,y0,y1,d0,d1,xq
+    real(wp),intent(out)::second_derivative
+    real(wp)::h,t
+    h=x1-x0;t=(xq-x0)/h
+    second_derivative=((12._wp*t-6._wp)/(h*h))*y0 &
+      +((6._wp*t-4._wp)/h)*d0+((-12._wp*t+6._wp)/(h*h))*y1 &
+      +((6._wp*t-2._wp)/h)*d1
+  end subroutine hermite_second_derivative
+
   subroutine interp_fit_field(xfit,yfit,xq,yq,ok,message)
     real(wp),intent(in)::xfit(:),yfit(:),xq(:)
     real(wp),intent(out)::yq(:)
@@ -132,7 +142,7 @@ contains
     character(len=*),intent(out)::status
     integer::n,igap,nfit,leftlo,righthi,k,j,ndense,lo,hi,phase_left,phase_right
     real(wp)::ratio,best,x0,x1,dx,f0,f1,q0,q1,ipc,deltaq,u,phi,intphi
-    real(wp)::lv,dv,qbase,dqdx,ff,qq,mu,dpdn,cs2
+    real(wp)::lv,dv,d2v,qbase,dqdx,ff,qq,mu,dpdn,cs2
     real(wp),allocatable::xfit(:),logq(:),slope(:),xfill(:),qfill(:),ffill(:),q4fit(:),q4fill(:)
     real(wp),allocatable::densex(:),densef(:),denseq(:),fitwork(:),fitout(:)
     real(wp),allocatable::ye_fill(:),yp_fill(:),ymu_fill(:),abar_fill(:),zbar_fill(:),yh_fill(:)
@@ -205,10 +215,14 @@ contains
       do j=1,ndense
         u=real(j-1,wp)/real(ndense-1,wp);lv=densex(j)
         call hermite_value(x0,x1,f0,f1,q0,q1,lv,ff,dv)
-        mu=ff+dv;dpdn=dv+((6._wp*u*u-6._wp*u)/dx)*f0 &
-          +(3._wp*u*u-4._wp*u+1._wp)*q0+((-6._wp*u*u+6._wp*u)/dx)*f1 &
-          +(3._wp*u*u-2._wp*u)*q1
-        if(mu<=0._wp.or.dpdn<=0._wp)then;physical=.false.;exit;endif
+        call hermite_second_derivative(x0,x1,f0,f1,q0,q1,lv,d2v)
+        ! Q1=F' and dP/dn_B=Q1+dQ1/dln(n_B)=F'+F''.
+        mu=ff+dv;dpdn=dv+d2v
+        if(.not.ieee_is_finite(ff).or..not.ieee_is_finite(dv).or. &
+           .not.ieee_is_finite(d2v).or..not.ieee_is_finite(mu).or. &
+           .not.ieee_is_finite(dpdn).or.dv<=0._wp.or.mu<=0._wp.or.dpdn<=0._wp)then
+          physical=.false.;exit
+        endif
         cs2=dpdn/mu
         if(.not.ieee_is_finite(cs2).or.cs2< -1.e-8_wp.or.cs2>=1._wp+1.e-6_wp)then;physical=.false.;exit;endif
       enddo

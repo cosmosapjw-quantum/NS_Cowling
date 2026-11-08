@@ -224,7 +224,9 @@ def test_native_master_rejects_trapped_lepton_potential_for_neutrino_transparent
     with pytest.raises(NativeExecutionError, match="neutrino-transparent beta equilibrium"):
         reconstruct_master(source)
 
-\n\ndef test_native_master_rejects_cold_source_with_inconsistent_free_and_internal_energy():
+
+
+def test_native_master_rejects_cold_source_with_inconsistent_free_and_internal_energy():
     source = master_source(composition=False)
     source.Q7[5] += 1.0e-4
     with pytest.raises(NativeExecutionError, match="cold-source Q6=Q7"):

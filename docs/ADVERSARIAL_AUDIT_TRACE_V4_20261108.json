@@ -16,7 +16,8 @@
   "commits": {
     "physical": "44cf251aefdf8f11be3425ad15074c5d36fa0a8c",
     "syntax": "4b97ba97f8f350d4e9c60a602fb58c4f84c5e32c",
-    "test_serialization": "8f23b9e5ecf0e9345753de25a7573a515228813d"
+    "test_serialization": "8f23b9e5ecf0e9345753de25a7573a515228813d",
+    "regression_test_fixture_fix": "1dbb75c27b704209cfeef43f7c49be0cfb28fd44"
   },
   "cycles": [
     {
@@ -61,7 +62,7 @@
       "low-x_e series",
       "flat/multiple/narrow-pocket polynomial cases"
     ],
-    "implementation_verified": "Requires exact-head build, full regression tests, native polynomial test, manifest verification and source archive."
+    "implementation_verified": "PASS on exact verified code head 1dbb75c27b704209cfeef43f7c49be0cfb28fd44: native Fortran build, 67 pytest tests, native polynomial-extrema test, all 69 tracked SHA-256 entries and source archive upload/digest verification."
   },
   "unresolved": [
     "global UnivariateSpline selection parity",
@@ -75,5 +76,44 @@
     "historical 234-EOS cohort not rerun"
   ],
   "no_subagent_review_claimed": true,
-  "main_merged": false
+  "main_merged": false,
+  "verification": {
+    "verified_head": "1dbb75c27b704209cfeef43f7c49be0cfb28fd44",
+    "workflows": [
+      {
+        "run_id": 42445023146,
+        "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42445023146",
+        "trigger": "push",
+        "conclusion": "success"
+      },
+      {
+        "run_id": 42445027928,
+        "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42445027928",
+        "trigger": "pull_request",
+        "conclusion": "success"
+      }
+    ],
+    "native_fortran_build": "PASS",
+    "pytest": {
+      "passed": 67,
+      "duration_seconds": 21.29,
+      "command": "python -m pytest -q python_frontend/tests pipeline/tests"
+    },
+    "native_polynomial_extrema": "PASS",
+    "manifest": {
+      "entries": 69,
+      "conclusion": "all OK",
+      "files_identical": true
+    },
+    "source_archive": {
+      "artifact_id": 13603276568,
+      "artifact_name": "NS_Cowling-1dbb75c27b704209cfeef43f7c49be0cfb28fd44",
+      "archive": "NS_Cowling-1dbb75c27b704209cfeef43f7c49be0cfb28fd44.tar.gz",
+      "archive_sha256": "a4ba5cd496db225f3b9c0b5ae7f6bd7560f181665ae079144040aa556942301b",
+      "artifact_zip_sha256": "90a405c1bc3fbb3c6a202d38545ab153cf91a9e7d6ead05a3b105d958e23ab11",
+      "artifact_size_bytes": 199030097,
+      "independently_downloaded_and_digest_verified": true,
+      "retention_days": 30
+    }
+  }
 }

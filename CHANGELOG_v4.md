@@ -57,3 +57,12 @@
 - Match core-side slope to bridge Q1 at the join.
 - Replace outer-crust fixed mesh by stationary-point isolation for quartic/cubic intervals; add native flat/multiple/narrow-pocket tests.
 - Add native Fortran polynomial-extrema test to CI.
+
+
+## v4 verification closure (2026-11-08)
+
+- Verified code head: \`1dbb75c27b704209cfeef43f7c49be0cfb28fd44\`.
+- Exact-head GitHub Actions push and pull-request workflows completed successfully.
+- Native Fortran build passed; Python frontend/pipeline suite: 67 passed; native quartic polynomial-extrema test passed.
+- All 69 tracked SHA-256 manifest entries passed.
+- Source archive uploaded as artifact \`13603276568\`; artifact ZIP and embedded source tarball digests were independently checked. See the final adversarial audit and machine-readable trace.

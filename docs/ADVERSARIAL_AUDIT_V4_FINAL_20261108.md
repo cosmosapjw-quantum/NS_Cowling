@@ -30,7 +30,7 @@ For Il=0, Q3 includes the charge-potential correction and is not interchangeable
 The first integration commit missed a closing parenthesis in the finite-coefficient guard. The next pytest collection found literal backslash-n text in the test file. Repair both and preserve failed runs as evidence. Neither is a physics failure.
 
 ### Cycle 5: documentation and package lineage
-README/frontend described the removed mesh; PROGRESS described the historical v2 spectrum cohort. Add this guide, final audit and JSON trace; update README, changelog, feature matrix, technical notes and historic scope. Exact-head CI and source artifact remain release gates.
+README/frontend described the removed mesh; PROGRESS described the historical v2 spectrum cohort. Add this guide, final audit and JSON trace; update README, changelog, feature matrix, technical notes and historic scope. The final exact-head workflows now pass, both checksum manifests verify, and the source artifact is uploaded and digest-verified.
 
 ## Claim-to-equation trace
 
@@ -58,3 +58,28 @@ The separate Zerilli/Regge-Wheeler exterior-QNM pipeline remains blocked by the 
 - Corrected-test run: https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42434432010
 
 At audit cutoff the corrected-test workflow had completed the native executable build; its remaining pytest, native polynomial test, checksum and source-package steps must be read before release acceptance. Main is not merged.
+
+
+## Final exact-head verification (2026-11-08)
+
+**Verified code head:** \`1dbb75c27b704209cfeef43f7c49be0cfb28fd44\`.
+
+Two GitHub Actions triggers on this exact branch SHA completed successfully:
+- Push workflow: https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42445023146
+- Pull-request workflow: https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42445027928
+
+The push workflow log records:
+- Fortran 2018 native executable build: **PASS**.
+- Python frontend and pipeline regression: **67 passed in 21.29 s**.
+- Native Fortran polynomial-extrema unit test: **PASS** (\`quartic polynomial extrema: PASS\`).
+- Tracked SHA-256 manifest: **69 entries, all OK**.
+- Git source archive creation: **PASS**.
+- Artifact upload: **PASS**, artifact ID \`13603276568\`.
+
+The uploaded artifact is \`NS_Cowling-1dbb75c27b704209cfeef43f7c49be0cfb28fd44\`, 199,030,097 bytes, with GitHub artifact ZIP SHA-256:
+\`90a405c1bc3fbb3c6a202d38545ab153cf91a9e7d6ead05a3b105d958e23ab11\`.
+
+The source tarball inside the artifact is \`NS_Cowling-1dbb75c27b704209cfeef43f7c49be0cfb28fd44.tar.gz\`, SHA-256:
+\`a4ba5cd496db225f3b9c0b5ae7f6bd7560f181665ae079144040aa556942301b\`.
+
+The artifact was downloaded, and the embedded tarball digest independently matched its sidecar and GitHub artifact metadata. Artifact retention is 30 days from upload. Main remains unmerged by design.

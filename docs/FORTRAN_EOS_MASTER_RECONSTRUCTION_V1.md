@@ -46,14 +46,11 @@ The first-law-consistent reconstruction derives every thermodynamic quantity fro
 
 \[
 Q_1(x)=\frac{dF}{dx},\qquad
-\mu_B(x)=F(x)+Q_1(x),
+\mu_H(x)\equiv\frac{d\epsilon}{dn_B}=F(x)+Q_1(x),
 \]
 \[
 P(x)=n_B Q_1(x),\qquad
-\epsilon(x)=n_B F(x),
-\]
-\[
-Q_3(x)=\frac{\mu_B(x)}{m_n c^2}-1,\qquad
+\epsilon(x)=n_B F(x),\qquad
 Q_6(x)=Q_7(x)=\frac{F(x)}{m_n c^2}-1.
 \]
 
@@ -66,14 +63,14 @@ Since \(x=\ln n_B\),
 and therefore
 
 \[
-\mu_B=F+n_B\frac{dF}{dn_B}
+\mu_H=F+n_B\frac{dF}{dn_B}
 =\frac{d\epsilon}{dn_B}.
 \]
 
 The pressure follows from the zero-temperature Euler relation,
 
 \[
-P=n_B\mu_B-\epsilon=n_B Q_1.
+P=n_B\mu_H-\epsilon=n_B Q_1.
 \]
 
 Differentiating the pressure with respect to density gives
@@ -87,10 +84,14 @@ Consequently, the adiabatic sound-speed ratio is
 
 \[
 \boxed{\frac{c_s^2}{c^2}=\frac{dP}{d\epsilon}
-=\frac{Q_1+F''}{F+Q_1}=\frac{D}{\mu_B}.}
+=\frac{Q_1+F''}{F+Q_1}=\frac{D}{\mu_H}.}
 \]
 
-This representation is the governing definition of the native output. The routine does not interpolate \(P\), \(\epsilon\), and \(\mu_B\) independently and then try to reconcile them afterwards.
+This representation is the governing definition of the native output. The routine does not interpolate \(P\), \(\epsilon\), and the enthalpy derivative independently. CompOSE Q3 is a separate convention-dependent column. For \(I_l=0\), the repository verifier uses
+\[
+(1+Q_3)m_nc^2=\mu_H-Y_qQ_4m_nc^2,
+\]
+where \(Y_q\) is the charge-fraction metadata value. Output Q3 therefore subtracts \(Y_qQ_4\) from \((F+Q_1)/(m_nc^2)-1\) for \(I_l=0\). For the supported \(I_l=1\) branch, \(Q_5\simeq0\) and the verifier's relation reduces to \((1+Q_3)m_nc^2=\mu_H\). In both branches the sound-speed denominator is \(\mu_H=d\epsilon/dn_B\), not the convention-adjusted Q3 quantity.
 
 ## 4. Interpolation and regularisation
 
@@ -126,11 +127,11 @@ For a cold single-component barotrope, the required conditions are
 
 \[
 F>0,\quad Q_1=F'>0,\quad
-\mu_B=F+Q_1>0,\quad
+\mu_H=F+Q_1>0,\quad
 D=Q_1+F''>0,
 \]
 \[
-\mu_B-D\ge0
+\mu_H-D\ge0
 \quad\Longleftrightarrow\quad
 0<\frac{c_s^2}{c^2}\le1.
 \]
@@ -150,9 +151,9 @@ E=2(F_i-F_{i+1})+h(m_i+m_{i+1}),
 
 where \(m_i,m_{i+1}\) are the PCHIP endpoint slopes with respect to \(x\).
 
-It follows that \(F\) and \(\mu_B-D\) are cubic polynomials in \(t\), whereas \(Q_1\) and \(D\) are quadratic. The native gate therefore finds the endpoint and interior stationary-point values of the relevant polynomials and tests their minima over the complete interval. For example, the minimum of a cubic on \([0,1]\) is obtained by checking both endpoints and all real roots in \((0,1)\) of its quadratic derivative. A fixed sample grid is not used as the proof for the PCHIP core intervals.
+It follows that \(F\) and \(\mu_H-D\) are cubic polynomials in \(t\), whereas \(Q_1\) and \(D\) are quadratic. The native gate therefore finds the endpoint and interior stationary-point values of the relevant polynomials and tests their minima over the complete interval. For example, the minimum of a cubic on \([0,1]\) is obtained by checking both endpoints and all real roots in \((0,1)\) of its quadratic derivative. A fixed sample grid is not used as the proof for the PCHIP core intervals.
 
-The outer-crust correction integrates a separate PCHIP interpolant for \(Q_1\). The outer-crust bridge is now checked over the complete represented polynomial interval using stationary-point isolation; the former fixed mesh has been removed. This is a mesh-based acceptance test for that bridge, not an analytic quartic-extremum proof. The report distinguishes the outer-crust-correction path, and this remaining numerical limitation is explicit.
+The outer-crust correction integrates a separate PCHIP interpolant for \(Q_1\). Since the integral of each cubic PCHIP segment is quartic, the native gate constructs quartic and cubic coefficients and checks both endpoints and all internal stationary points of \(F\), \(Q_1\), \(\mu_H\), \(D\), and \(\mu_H-D\). The derivative cubic is partitioned at its quadratic critical points; tangential roots are retained and sign-changing monotone intervals are bisected. This replaces the former fixed 256-subinterval mesh. It is a floating-point root-isolation check, not a formal interval-arithmetic proof. The report separately records whether the outer-crust correction was applied.
 
 Any failure of positivity, mechanical stability or causality rejects the reconstructed EOS. The code reports the offending interval and the local thermodynamic quantities; it does not clip \(c_s^2\), flatten the pressure, or return a partially admissible table.
 
@@ -274,13 +275,15 @@ This flag is a semantic assertion by the caller that the single extra column rep
 
 The current native v1 path requires:
 1. At least five finite source density points, with positive and strictly increasing \(n_B\).
-2. \(T=0\) metadata and a beta-equilibrated source flag.
-3. Negligible source entropy \(Q_2\) and neutrino-transparent lepton potential \(Q_5\).
-4. A single-valued smooth master curve. An equal-pressure pair across a change in \`Iphase\` is rejected because a single \(F(\ln n_B)\) interpolant must not cross a first-order density discontinuity.
-5. \`Nadd=0\` or \(1\). Recomputing \(c_s^2\) in the extra column requires \`Nadd=1\).
-6. If composition is marked available, the source \`eos.compo\` provenance and all required composition arrays must be present and finite.
+2. Finite positive neutron rest energy \(m_nc^2\), supported \(I_l\in\{0,1\}\), and finite charge-fraction metadata.
+3. \(|T|\le10^{-12}\) MeV, beta-equilibrium metadata, \(\max|Q_2|\le2\times10^{-8}\), and \(\max|Q_5|\le10^{-8}\).
+4. The cold-source identity \(\max|Q_6-Q_7|\le2\times10^{-6}\).
+5. A rowwise source Q3/CompOSE Euler identity relative residual no larger than \(2\times10^{-6}\). For \(I_l=0\), this identity includes \(-Y_qQ_4m_nc^2\); for \(I_l=1\), the correction is absent under the Q5 gate.
+6. A single-valued smooth master curve. An equal-pressure pair across a change in \`Iphase\` is rejected because a single \(F(\ln n_B)\) interpolant must not cross a first-order density discontinuity.
+7. \`Nadd=0\` or \(1\). Recomputing \(c_s^2\) in the extra column requires \`Nadd=1\`.
+8. If composition is marked available, the source \`eos.compo\` provenance and all required composition arrays must be present and finite.
 
-The code validates the complete PCHIP polynomial intervals for the core branch and applies a dense mesh gate to the integrated outer-crust bridge. A rejected input is not silently passed to the legacy Python implementation.
+The native code validates complete PCHIP polynomial intervals for both the core branch and integrated outer-crust bridge. A rejected input is not silently passed to the legacy Python implementation.
 
 ## 11. Python API and native CLI
 
@@ -319,7 +322,9 @@ The native test set contains analytic and adversarial fixtures for:
 - relativistic-electron plus lattice pressure in an outer-crust fixture;
 - preservation of an extra column unless its semantics are explicitly declared as \(c_s^2\);
 - rejection of a pressure plateau across an \`Iphase\` boundary;
-- rejection of invalid smoothing, nonzero entropy and nonzero neutrino/lepton potential.
+- rejection of invalid smoothing, nonzero entropy and nonzero neutrino/lepton potential;
+- rejection of Q6/Q7 and source Q3/Euler mismatches;
+- preservation of the distinct Il=0 Q3 charge-potential convention.
 
 The production GPPVA_FSU2H normalized table passes its native CompOSE and C1-C11 intake checks but is **rejected by this v1 master reconstruction** at the interpolation physical-admissibility gate. This is an important negative result: passing the intake consistency checks does not prove that the selected smoothed \(F(\ln n_B)\) PCHIP is mechanically stable and causal everywhere. The Fortran routine reports the interval and the local thermodynamic quantities instead of silently producing a table. The unsmoothed source path remains a separate option; model-specific follow-up should determine whether the source interpolation, local smoothing width, or outer-crust join causes the first failure before any alternative regularisation is accepted.
 
@@ -339,6 +344,3 @@ This operation does not yet port:
 4. L. Suleiman, J. L. Zdunik and P. Haensel (2024), *Layers of electron captures in the crust of accreting neutron stars*, Astronomy & Astrophysics **690**, A301, [doi:10.1051/0004-6361/202348340](https://doi.org/10.1051/0004-6361/202348340). This work gives the zero-temperature degenerate-electron EOS and a linear-mixing-rule lattice pressure for parent/daughter nuclear mixtures. The present implementation uses only the single-species BCC limit with the supplied nuclear charge number; it does not implement the mixture function or electron-capture kinetics.
 
 The thermodynamic identities and interval-extremum criteria in this note are derived from the stated master function and implemented in the native Fortran module. The local smoothing and dissolution rules are implementation choices whose numerical convergence and model dependence should be assessed with each source EOS.
-
-
-Convention note: the native code distinguishes mu_H=d epsilon/dn_B from CompOSE Q3. For Il=0, Q3 includes the -Y_q Q4 m_n c^2 correction; the sound-speed denominator remains mu_H.

@@ -1142,7 +1142,7 @@ contains
         gcoef4=fcoef4
         if(.not.all(ieee_is_finite([fcoef0,fcoef1,fcoef2,fcoef3,fcoef4, &
              qcoef0,qcoef1,qcoef2,qcoef3,mucoef0,mucoef1,mucoef2,mucoef3,mucoef4, &
-             dcoef0,dcoef1,dcoef2,dcoef3,gcoef0,gcoef1,gcoef2,gcoef3,gcoef4]))then
+             dcoef0,dcoef1,dcoef2,dcoef3,gcoef0,gcoef1,gcoef2,gcoef3,gcoef4])))then
           physical=.false.
           status='master reconstruction outer-crust polynomial coefficients are nonfinite'
           exit

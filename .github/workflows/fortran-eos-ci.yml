@@ -48,6 +48,15 @@ jobs:
           COMPOSE_EOS_FORTRAN_ROOT: .
           COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
         run: python -m pytest -q python_frontend/tests pipeline/tests
+      - name: Run native Fortran polynomial-extrema unit tests
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/test_polynomial_extrema.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_reconstruct.o \
+            -o build/compose_eos_fortran/test_polynomial_extrema
+          build/compose_eos_fortran/test_polynomial_extrema
 
       - name: Verify tracked SHA-256 manifest
         run: sha256sum -c SHA256SUMS_v4.txt

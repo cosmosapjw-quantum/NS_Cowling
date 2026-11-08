@@ -74,7 +74,7 @@ def master_source(*, composition=False, outer_crust=False, dissolution=False,
         nb=nb, mn=mn, mp=mn,
         Q1=q1, Q2=zeros.copy(), Q3=mu / mn - 1.0,
         Q4=np.full(n, -0.01), Q5=zeros.copy(),
-        Q6=free / mn - 1.0, Q7=(free / mn - 1.0) + 2.0e-4,
+        Q6=free / mn - 1.0, Q7=free / mn - 1.0,
         q_extra=extra, Iphase=phases,
         Yn=yn, Yp=yp, Ye=ye, Ymu=ymu,
         Aav=abar, Zav=zbar, Yh=yh,
@@ -223,3 +223,31 @@ def test_native_master_rejects_trapped_lepton_potential_for_neutrino_transparent
     source.Q5[4] = 1.e-3
     with pytest.raises(NativeExecutionError, match="neutrino-transparent beta equilibrium"):
         reconstruct_master(source)
+
+\n\ndef test_native_master_rejects_cold_source_with_inconsistent_free_and_internal_energy():
+    source = master_source(composition=False)
+    source.Q7[5] += 1.0e-4
+    with pytest.raises(NativeExecutionError, match="cold-source Q6=Q7"):
+        reconstruct_master(source, smooth=False)
+
+
+def test_native_master_rejects_source_baryon_chemical_potential_euler_mismatch():
+    source = master_source(composition=False)
+    source.Q3[5] += 1.0e-3
+    with pytest.raises(NativeExecutionError, match="Euler chemical potential identity"):
+        reconstruct_master(source, smooth=False)
+
+
+def test_native_master_preserves_compose_il_zero_charge_potential_convention():
+    source = master_source(composition=False)
+    source.Il = 0
+    source.charge_fraction_grid = 0.25
+    source.Q4[:] = -1.0e-2
+    mu_source = source.F + source.Q1 - source.charge_fraction_grid * source.Q4 * source.mn
+    source.Q3[:] = mu_source / source.mn - 1.0
+
+    out = reconstruct_master(source, smooth=False)
+
+    expected_q3 = (out.F + out.Q1) / out.mn - 1.0 - source.charge_fraction_grid * out.Q4
+    np.testing.assert_allclose(out.Q3, expected_q3, rtol=0.0, atol=2e-14)
+    np.testing.assert_allclose(out.mub, mu_source, rtol=2e-14, atol=2e-12)

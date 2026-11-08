@@ -3,7 +3,7 @@ module compose_eos_reconstruct
   use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
   implicit none
   private
-  public :: fill_density_gap, reconstruct_master
+  public :: fill_density_gap, reconstruct_master, quartic_polynomial_minimum
 contains
   subroutine pchip_slopes(x,y,m,ok,message)
     real(wp),intent(in)::x(:),y(:)
@@ -619,6 +619,147 @@ contains
     endif
   end subroutine cubic_polynomial_minimum
 
+  pure subroutine append_unit_root(roots,nroot,value)
+    real(wp),intent(inout)::roots(3)
+    integer,intent(inout)::nroot
+    real(wp),intent(in)::value
+    real(wp)::tmp,tol
+    integer::i,j
+    if(.not.ieee_is_finite(value))return
+    if(value<=0._wp.or.value>=1._wp.or.nroot>=3)return
+    tol=128._wp*epsilon(1._wp)*max(1._wp,abs(value))
+    do i=1,nroot
+      if(abs(roots(i)-value)<=tol)return
+    enddo
+    nroot=nroot+1;roots(nroot)=value
+    do i=2,nroot
+      tmp=roots(i);j=i-1
+      do while(j>=1)
+        if(roots(j)<=tmp)exit
+        roots(j+1)=roots(j);j=j-1
+      enddo
+      roots(j+1)=tmp
+    enddo
+  end subroutine append_unit_root
+
+  pure subroutine append_quadratic_root(value,roots,nroot)
+    real(wp),intent(in)::value
+    real(wp),intent(inout)::roots(2)
+    integer,intent(inout)::nroot
+    real(wp)::tmp,tol
+    integer::i
+    if(.not.ieee_is_finite(value))return
+    if(value<=0._wp.or.value>=1._wp.or.nroot>=2)return
+    tol=128._wp*epsilon(1._wp)*max(1._wp,abs(value))
+    do i=1,nroot
+      if(abs(roots(i)-value)<=tol)return
+    enddo
+    nroot=nroot+1;roots(nroot)=value
+    if(nroot==2.and.roots(2)<roots(1))then
+      tmp=roots(1);roots(1)=roots(2);roots(2)=tmp
+    endif
+  end subroutine append_quadratic_root
+
+  pure subroutine quadratic_roots_unit_interval(c0,c1,c2,roots,nroot)
+    real(wp),intent(in)::c0,c1,c2
+    real(wp),intent(out)::roots(2)
+    integer,intent(out)::nroot
+    real(wp)::scale,a0,a1,a2,tol,disc,sq,q,r1,r2
+    roots=0._wp;nroot=0
+    scale=max(abs(c0),abs(c1),abs(c2),tiny(1._wp))
+    a0=c0/scale;a1=c1/scale;a2=c2/scale
+    tol=64._wp*epsilon(1._wp)
+    if(abs(a2)<=tol)then
+      if(abs(a1)<=tol)return
+      call append_quadratic_root(-a0/a1,roots,nroot)
+      return
+    endif
+    disc=a1*a1-4._wp*a2*a0
+    if(disc < -128._wp*epsilon(1._wp)*max(a1*a1,abs(4._wp*a2*a0),tiny(1._wp)))return
+    sq=sqrt(max(0._wp,disc))
+    if(a1>=0._wp)then
+      q=-0.5_wp*(a1+sq)
+    else
+      q=-0.5_wp*(a1-sq)
+    endif
+    if(abs(q)>tiny(1._wp))then
+      r1=q/a2;r2=a0/q
+    else
+      r1=-a1/(2._wp*a2);r2=r1
+    endif
+    call append_quadratic_root(r1,roots,nroot)
+    call append_quadratic_root(r2,roots,nroot)
+  end subroutine quadratic_roots_unit_interval
+
+  pure real(wp) function cubic_polynomial_value(c0,c1,c2,c3,t) result(value)
+    real(wp),intent(in)::c0,c1,c2,c3,t
+    value=((c3*t+c2)*t+c1)*t+c0
+  end function cubic_polynomial_value
+
+  pure real(wp) function quartic_polynomial_value(c0,c1,c2,c3,c4,t) result(value)
+    real(wp),intent(in)::c0,c1,c2,c3,c4,t
+    value=((((c4*t+c3)*t+c2)*t+c1)*t+c0)
+  end function quartic_polynomial_value
+
+  ! The cubic derivative's quadratic critical points partition [0,1] into
+  ! monotone intervals. Tangential roots at critical points are retained;
+  ! sign-changing roots are bracketed and bisected on each monotone interval.
+  pure subroutine cubic_roots_unit_interval(c0,c1,c2,c3,roots,nroot)
+    real(wp),intent(in)::c0,c1,c2,c3
+    real(wp),intent(out)::roots(3)
+    integer,intent(out)::nroot
+    real(wp)::critical(2),points(4),fa,fb,fm,lo,hi,mid,scale,value_tol
+    integer::ncritical,npoints,i,iter
+    roots=0._wp;nroot=0
+    call quadratic_roots_unit_interval(c1,2._wp*c2,3._wp*c3,critical,ncritical)
+    points=0._wp;points(1)=0._wp
+    do i=1,ncritical
+      points(i+1)=critical(i)
+    enddo
+    npoints=ncritical+2;points(npoints)=1._wp
+    scale=max(abs(c0),abs(c1),abs(c2),abs(c3),tiny(1._wp))
+    value_tol=256._wp*epsilon(1._wp)*scale
+    do i=1,npoints
+      fa=cubic_polynomial_value(c0,c1,c2,c3,points(i))
+      if(abs(fa)<=value_tol)call append_unit_root(roots,nroot,points(i))
+    enddo
+    do i=1,npoints-1
+      lo=points(i);hi=points(i+1)
+      fa=cubic_polynomial_value(c0,c1,c2,c3,lo)
+      fb=cubic_polynomial_value(c0,c1,c2,c3,hi)
+      if((fa<0._wp).eqv.(fb<0._wp))cycle
+      do iter=1,128
+        mid=0.5_wp*(lo+hi)
+        fm=cubic_polynomial_value(c0,c1,c2,c3,mid)
+        if(abs(fm)<=tiny(1._wp))then
+          lo=mid;hi=mid
+          exit
+        endif
+        if((fa<0._wp).eqv.(fm<0._wp))then
+          lo=mid;fa=fm
+        else
+          hi=mid
+        endif
+        if(hi-lo<=8._wp*epsilon(1._wp)*max(1._wp,abs(mid)))exit
+      enddo
+      call append_unit_root(roots,nroot,0.5_wp*(lo+hi))
+    enddo
+  end subroutine cubic_roots_unit_interval
+
+  pure subroutine quartic_polynomial_minimum(c0,c1,c2,c3,c4,ymin)
+    real(wp),intent(in)::c0,c1,c2,c3,c4
+    real(wp),intent(out)::ymin
+    real(wp)::roots(3),value
+    integer::nroot,i
+    ymin=min(quartic_polynomial_value(c0,c1,c2,c3,c4,0._wp), &
+             quartic_polynomial_value(c0,c1,c2,c3,c4,1._wp))
+    call cubic_roots_unit_interval(c1,2._wp*c2,3._wp*c3,4._wp*c4,roots,nroot)
+    do i=1,nroot
+      value=quartic_polynomial_value(c0,c1,c2,c3,c4,roots(i))
+      ymin=min(ymin,value)
+    enddo
+  end subroutine quartic_polynomial_minimum
+
   subroutine reconstruct_master(eos,smooth,smooth_sigma,fix_dissolution,dissolution_tol, &
                                 recompute_extra_cs2,out,outer_crust_corrected,status)
     type(eos_data_t),intent(in)::eos
@@ -627,7 +768,6 @@ contains
     type(eos_data_t),intent(out)::out
     logical,intent(out)::outer_crust_corrected
     character(len=*),intent(out)::status
-    integer,parameter::outer_dense_per_interval=256
     real(wp),parameter::me=0.51099895_wp,alpha=1._wp/137.035999084_wp
     real(wp),parameter::hbarc=197.3269804_wp,pi=acos(-1._wp)
     real(wp),allocatable::x(:),fraw(:),fsm(:),fslope(:),q1(:),dqdx(:),cs2(:)
@@ -636,6 +776,11 @@ contains
     real(wp)::kf,pel,elat,plat,qval,dqval,fval,muval,dpdn,cs,second,integral
     real(wp)::xq,hp,fa,fb,fc,fd,qc0,qc1,qc2,mu0,mu1,mu2,mu3
     real(wp)::dp0,dp1,dp2,g0,g1,g2,g3,minf,minq,minmu,mindp,ming,polyscale
+    real(wp)::qsecond,qthird,qcoef0,qcoef1,qcoef2,qcoef3
+    real(wp)::fcoef0,fcoef1,fcoef2,fcoef3,fcoef4
+    real(wp)::mucoef0,mucoef1,mucoef2,mucoef3,mucoef4
+    real(wp)::dcoef0,dcoef1,dcoef2,dcoef3
+    real(wp)::gcoef0,gcoef1,gcoef2,gcoef3,gcoef4,bridge_h,bridge_c3,mu_source,mu_tab,mu_resid
     integer::n,i,j,k,last_crust,ilo,ihi,idrip,ijoin,nbri,offset_int
     logical::ok,anom_drop,has_comp,has_outer,physical
     character(len=256)::why
@@ -666,6 +811,18 @@ contains
       status='reconstruct_master requires a positive strictly increasing density grid'
       return
     endif
+    if(.not.ieee_is_finite(eos%mn).or.eos%mn<=0._wp)then
+      status='reconstruct_master requires a finite positive neutron rest energy mn'
+      return
+    endif
+    if(eos%il/=0.and.eos%il/=1)then
+      status='reconstruct_master supports CompOSE lepton flag Il=0 or Il=1 only'
+      return
+    endif
+    if(.not.ieee_is_finite(eos%charge_fraction_grid))then
+      status='reconstruct_master requires a finite charge-fraction metadata value'
+      return
+    endif
     if(abs(eos%temperature_mev)>1.e-12_wp.or..not.ieee_is_finite(eos%temperature_mev))then
       status='reconstruct_master requires a cold T=0 table'
       return
@@ -678,8 +835,28 @@ contains
       status='reconstruct_master requires zero source entropy Q2 for a cold T=0 branch'
       return
     endif
-    if(maxval(abs(eos%q(5,:)))>2.e-6_wp)then
+    if(maxval(abs(eos%q(5,:)))>1.e-8_wp)then
       status='reconstruct_master requires neutrino-transparent beta equilibrium with Q5 approximately zero'
+      return
+    endif
+    if(maxval(abs(eos%q(6,:)-eos%q(7,:)))>2.e-6_wp)then
+      status='reconstruct_master requires a cold-source Q6=Q7 first-law identity'
+      return
+    endif
+    mu_resid=0._wp
+    do i=1,n
+      mu_tab=(1._wp+eos%q(3,i))*eos%mn
+      mu_source=(1._wp+eos%q(6,i))*eos%mn+eos%q(1,i)
+      if(eos%il==0)mu_source=mu_source-eos%charge_fraction_grid*eos%q(4,i)*eos%mn
+      if(.not.ieee_is_finite(mu_tab).or..not.ieee_is_finite(mu_source).or. &
+         mu_tab<=0._wp.or.mu_source<=0._wp)then
+        status='reconstruct_master source Euler chemical potential must be finite and positive'
+        return
+      endif
+      mu_resid=max(mu_resid,abs(mu_tab-mu_source)/max(abs(mu_tab),abs(mu_source),tiny(1._wp)))
+    enddo
+    if(mu_resid>2.e-6_wp)then
+      status='reconstruct_master source Q3 fails the CompOSE Euler chemical potential identity'
       return
     endif
     ! A phase label change is not by itself a thermodynamic discontinuity.
@@ -879,6 +1056,14 @@ contains
         call pchip_integral(xbridge,qbridge,bslopes,x(i),x(ijoin),integral)
         fsm(i)=fsm(ijoin)-integral
       enddo
+      ! Match the core-side Hermite derivative to the bridge Q1 at the join.
+      ! Otherwise F is continuous but dF/dln(n_B), and therefore P, can jump.
+      call pchip_value(xbridge,qbridge,bslopes,x(ijoin),qval,dqval)
+      if(.not.ieee_is_finite(qval).or.qval<=0._wp)then
+        status='outer-crust bridge has an invalid join derivative'
+        return
+      endif
+      fslope(ijoin)=qval
     endif
 
     if(.not.has_outer)ijoin=1
@@ -899,12 +1084,9 @@ contains
       call pchip_value(xbridge,qbridge,bslopes,x(ijoin),q1(ijoin),dqdx(ijoin))
     endif
 
-    ! For the PCHIP master-function branch, F is cubic in each local
-    ! coordinate t=(x-x_i)/h.  We therefore test exact polynomial extrema:
-    ! F>0, Q1=F'>0, mu=F+F'>0, D=dP/dn=F'+F''>0, and mu-D>=0.
-    ! The last inequality is exactly c_s^2<=1 because c_s^2=D/mu.
-    ! The outer-crust branch integrates a PCHIP Q1, so F is quartic there;
-    ! that special electron+lattice bridge is checked on a dense 256-point mesh.
+    ! The ordinary master-function branch is cubic in each log-density
+    ! interval. The outer-crust branch integrates PCHIP Q1, so F is quartic;
+    ! both branches are checked over the complete interval.
     physical=.true.
     do i=1,n-1
       hp=x(i+1)-x(i)
@@ -927,30 +1109,62 @@ contains
       g2=mu2-dp2
       g3=mu3
       if(has_outer.and.i<ijoin)then
-        do k=0,outer_dense_per_interval
-          xq=x(i)+(x(i+1)-x(i))*real(k,wp)/real(outer_dense_per_interval,wp)
-          call pchip_value(xbridge,qbridge,bslopes,xq,qval,dqval)
-          call pchip_integral(xbridge,qbridge,bslopes,xq,x(ijoin),integral)
-          fval=fsm(ijoin)-integral
-          muval=fval+qval
-          dpdn=qval+dqval
-          if(.not.ieee_is_finite(fval+qval+dqval+muval+dpdn).or. &
-            fval<=0._wp.or.qval<=0._wp.or.muval<=0._wp.or.dpdn<=0._wp)then
-            physical=.false.
-            write(status,'(a,i0,a,6(es13.5,1x))') &
-              'master reconstruction outer-crust positivity failure at interval ',i, &
-              ' (n_B,F,Q1,mu_B,dPdn,dQ1dx)= ',exp(xq),fval,qval,muval,dpdn,dqval
-            exit
-          endif
-          cs=dpdn/muval
-          if(.not.ieee_is_finite(cs).or.cs<=0._wp.or.cs>1._wp+1.e-6_wp)then
-            physical=.false.
-            write(status,'(a,i0,a,6(es13.5,1x))') &
-              'master reconstruction outer-crust causality failure at interval ',i, &
-              ' (n_B,F,Q1,mu_B,dPdn,cs2)= ',exp(xq),fval,qval,muval,dpdn,cs
-            exit
-          endif
-        enddo
+        ! q=Q1 is cubic on the active bridge PCHIP segment. Integrating q
+        ! gives quartic F; all physical inequalities are checked by extrema.
+        xq=0.5_wp*(x(i)+x(i+1))
+        j=pchip_interval(xbridge,xq)
+        call pchip_value_second(xbridge,qbridge,bslopes,j,x(i),qcoef0,qval,qsecond)
+        bridge_h=xbridge(j+1)-xbridge(j)
+        bridge_c3=2._wp*(qbridge(j)-qbridge(j+1)) &
+          +bridge_h*(bslopes(j)+bslopes(j+1))
+        qthird=6._wp*bridge_c3/(bridge_h**3)
+        qcoef1=hp*qval
+        qcoef2=0.5_wp*hp*hp*qsecond
+        qcoef3=(hp**3)*qthird/6._wp
+        fcoef0=fsm(i)
+        fcoef1=hp*qcoef0
+        fcoef2=0.5_wp*hp*qcoef1
+        fcoef3=hp*qcoef2/3._wp
+        fcoef4=0.25_wp*hp*qcoef3
+        mucoef0=fcoef0+qcoef0
+        mucoef1=fcoef1+qcoef1
+        mucoef2=fcoef2+qcoef2
+        mucoef3=fcoef3+qcoef3
+        mucoef4=fcoef4
+        dcoef0=qcoef0+qcoef1/hp
+        dcoef1=qcoef1+2._wp*qcoef2/hp
+        dcoef2=qcoef2+3._wp*qcoef3/hp
+        dcoef3=qcoef3
+        gcoef0=fcoef0-qcoef1/hp
+        gcoef1=fcoef1-2._wp*qcoef2/hp
+        gcoef2=fcoef2-3._wp*qcoef3/hp
+        gcoef3=fcoef3
+        gcoef4=fcoef4
+        if(.not.all(ieee_is_finite([fcoef0,fcoef1,fcoef2,fcoef3,fcoef4, &
+             qcoef0,qcoef1,qcoef2,qcoef3,mucoef0,mucoef1,mucoef2,mucoef3,mucoef4, &
+             dcoef0,dcoef1,dcoef2,dcoef3,gcoef0,gcoef1,gcoef2,gcoef3,gcoef4]))then
+          physical=.false.
+          status='master reconstruction outer-crust polynomial coefficients are nonfinite'
+          exit
+        endif
+        call quartic_polynomial_minimum(fcoef0,fcoef1,fcoef2,fcoef3,fcoef4,minf)
+        call cubic_polynomial_minimum(qcoef0,qcoef1,qcoef2,qcoef3,minq)
+        call quartic_polynomial_minimum(mucoef0,mucoef1,mucoef2,mucoef3,mucoef4,minmu)
+        call cubic_polynomial_minimum(dcoef0,dcoef1,dcoef2,dcoef3,mindp)
+        call quartic_polynomial_minimum(gcoef0,gcoef1,gcoef2,gcoef3,gcoef4,ming)
+        polyscale=max(1._wp,maxval(abs([mucoef0,mucoef1,mucoef2,mucoef3,mucoef4])), &
+          maxval(abs([dcoef0,dcoef1,dcoef2,dcoef3])))
+        if(minf<=0._wp.or.minq<=0._wp.or.minmu<=0._wp.or.mindp<=0._wp)then
+          physical=.false.
+          write(status,'(a,i0,a,5(es13.5,1x))') &
+            'master reconstruction outer-crust polynomial positivity failure at interval ',i, &
+            ' (minF,minQ1,minMu,minD,minMuMinusD)= ',minf,minq,minmu,mindp,ming
+        else if(ming < -1.e-6_wp*polyscale)then
+          physical=.false.
+          write(status,'(a,i0,a,5(es13.5,1x))') &
+            'master reconstruction outer-crust polynomial causality failure at interval ',i, &
+            ' (minF,minQ1,minMu,minD,minMuMinusD)= ',minf,minq,minmu,mindp,ming
+        endif
       else
         call cubic_polynomial_minimum(fa,fb,fc,fd,minf)
         call quadratic_polynomial_minimum(qc0,qc1,qc2,minq)
@@ -995,6 +1209,7 @@ contains
     out%q(1,:)=q1
     out%q(2,:)=0._wp
     out%q(3,:)=(fsm+q1)/eos%mn-1._wp
+    if(eos%il==0)out%q(3,:)=out%q(3,:)-eos%charge_fraction_grid*out%q(4,:)
     out%q(5,:)=0._wp
     out%q(6,:)=fsm/eos%mn-1._wp
     out%q(7,:)=out%q(6,:)

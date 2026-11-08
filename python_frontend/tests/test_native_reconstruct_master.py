@@ -196,8 +196,12 @@ def test_native_master_preserves_extra_thermo_column_unless_explicitly_declared_
 
 def test_native_master_rejects_phase_pressure_plateau_instead_of_smoothing_across_it():
     source = master_source(composition=False)
-    source.Iphase[source.n // 2:] = 1
-    source.Q1[source.n // 2] = source.nb[source.n // 2 - 1] * source.Q1[source.n // 2 - 1] / source.nb[source.n // 2]
+    k = source.n // 2
+    source.Iphase[k:] = 1
+    source.Q1[k] = source.nb[k - 1] * source.Q1[k - 1] / source.nb[k]
+    # Keep every source-state identity valid so this test isolates the
+    # equal-pressure phase-boundary rejection rather than failing the Q3 gate.
+    source.Q3[k] = source.Q6[k] + source.Q1[k] / source.mn
     with pytest.raises(NativeExecutionError, match="pressure plateau across an Iphase boundary"):
         reconstruct_master(source, smooth=True)
 

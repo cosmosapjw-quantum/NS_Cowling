@@ -12,7 +12,7 @@ Status values: PORT_VERIFIED means the native Fortran implementation was compile
 | C7-C9 derivative diagnostics | PORT_VERIFIED | WRAPPER_VERIFIED | Finite-difference residuals; final parity recheck recorded separately |
 | Density-gap detection | PARTIAL | Python utility | Largest adjacent density ratio is selected in the Python EOSData array helper |
 | Master-function density-gap fill | PORT_VERIFIED | WRAPPER_VERIFIED | Fortran PCHIP of log(Q1), integral correction enforcing F'=Q1, causal Hermite fallback; synthetic and GPPVA differential tests |
-| Cold master-function reconstruction v1 | PARTIAL (native kernel PORT_VERIFIED) | WRAPPER_VERIFIED | F(log n_B) local weighted-cubic/PCHIP or unsmoothed PCHIP; first-law closure; exact PCHIP core-interval extrema; composition/outer-crust subset; no global-spline or microscopic-model parity |
+| Cold master-function reconstruction v1 | PARTIAL (native kernel PORT_VERIFIED) | WRAPPER_VERIFIED | F(log n_B) local weighted-cubic/PCHIP or unsmoothed PCHIP; cold Q6=Q7 and CompOSE Q3/Euler gates; Il=0 Q3 convention; first-law closure; whole-interval PCHIP core and quartic outer-bridge extrema; matched outer-bridge join derivative; composition/outer-crust subset; no global-spline or microscopic-model parity |
 | Historic global smoothing/candidate-selection policy and full master-function repair | NOT_PORTED | Explicitly unavailable | Legacy global UnivariateSpline smoothing-factor policy, global candidate selection and complete anomaly-repair behaviour remain unported |
 | Crust-core smooth matching: maxwell/css/cubic_F/cubic_P/quintic_F/quintic_P | PARTIAL (six thermo-only methods PORT_VERIFIED) | WRAPPER_VERIFIED | All six smooth strict-thermo methods compiled and passed native-versus-legacy differential tests on GPPVA_FSU2H + GM_GM1. Composition-aware matching and literature_beta_eq remain unported. The legacy `maxwell` token is a smooth near-pressure plateau, not a density jump |
 | Literature-specific RMF/Skyrme/APR solvers | PARTIAL | Not exposed as complete parity | Existing Fortran nuclear/liquid-drop/beta-equilibrium examples are not equivalent to the literature solver suite |
@@ -25,3 +25,6 @@ Status values: PORT_VERIFIED means the native Fortran implementation was compile
 | Plotting | Python presentation layer | RETAINED | Not part of thermodynamic core |
 
 This matrix is intentionally conservative. Native master reconstruction and the one-charge Maxwell kernel are verified only within their stated v1 contracts. The historical global-spline selection, microscopic solvers, Gibbs surfaces and phase-interface stellar stability remain distinct unported or unverified capabilities; a successful CompOSE round-trip is not a complete EOS-generator parity claim.
+
+
+2026-11-08: this feature remains PARTIAL; historic global-spline selection, microscopic solvers and complete BPS nuclide generation remain unimplemented.

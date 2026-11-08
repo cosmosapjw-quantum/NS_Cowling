@@ -1,5 +1,8 @@
 # Adversarial audit: native Fortran master-function reconstruction v1
 
+> Superseded note (2026-11-08): earlier code head be648add; its fixed-mesh statement is historical. Consult the final v4 guide and audit for current status.
+
+
 **Audit date:** 2026-11-08  
 **Repository:** cosmosapjw-quantum/NS_Cowling  
 **Branch:** research/fortran-eos-gap-fill-v1  

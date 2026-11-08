@@ -152,7 +152,7 @@ where \(m_i,m_{i+1}\) are the PCHIP endpoint slopes with respect to \(x\).
 
 It follows that \(F\) and \(\mu_B-D\) are cubic polynomials in \(t\), whereas \(Q_1\) and \(D\) are quadratic. The native gate therefore finds the endpoint and interior stationary-point values of the relevant polynomials and tests their minima over the complete interval. For example, the minimum of a cubic on \([0,1]\) is obtained by checking both endpoints and all real roots in \((0,1)\) of its quadratic derivative. A fixed sample grid is not used as the proof for the PCHIP core intervals.
 
-The outer-crust correction integrates a separate PCHIP interpolant for \(Q_1\). Its integral is quartic on each local interval, so the v1 implementation checks that special bridge on a dense 256-point mesh per source interval. This is a mesh-based acceptance test for that bridge, not an analytic quartic-extremum proof. The report distinguishes the outer-crust-correction path, and this remaining numerical limitation is explicit.
+The outer-crust correction integrates a separate PCHIP interpolant for \(Q_1\). The outer-crust bridge is now checked over the complete represented polynomial interval using stationary-point isolation; the former fixed mesh has been removed. This is a mesh-based acceptance test for that bridge, not an analytic quartic-extremum proof. The report distinguishes the outer-crust-correction path, and this remaining numerical limitation is explicit.
 
 Any failure of positivity, mechanical stability or causality rejects the reconstructed EOS. The code reports the offending interval and the local thermodynamic quantities; it does not clip \(c_s^2\), flatten the pressure, or return a partially admissible table.
 
@@ -339,3 +339,6 @@ This operation does not yet port:
 4. L. Suleiman, J. L. Zdunik and P. Haensel (2024), *Layers of electron captures in the crust of accreting neutron stars*, Astronomy & Astrophysics **690**, A301, [doi:10.1051/0004-6361/202348340](https://doi.org/10.1051/0004-6361/202348340). This work gives the zero-temperature degenerate-electron EOS and a linear-mixing-rule lattice pressure for parent/daughter nuclear mixtures. The present implementation uses only the single-species BCC limit with the supplied nuclear charge number; it does not implement the mixture function or electron-capture kinetics.
 
 The thermodynamic identities and interval-extremum criteria in this note are derived from the stated master function and implemented in the native Fortran module. The local smoothing and dissolution rules are implementation choices whose numerical convergence and model dependence should be assessed with each source EOS.
+
+
+Convention note: the native code distinguishes mu_H=d epsilon/dn_B from CompOSE Q3. For Il=0, Q3 includes the -Y_q Q4 m_n c^2 correction; the sound-speed denominator remains mu_H.

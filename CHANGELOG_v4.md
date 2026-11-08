@@ -48,3 +48,12 @@
 - Preserves extra thermo columns by default; explicit recompute_extra_cs2=True is required to reinterpret a single Nadd=1 column as \(c_s^2/c^2\).
 - Requires cold neutrino-transparent input (\(Q_2\simeq Q_5\simeq0\)); rejects equal-pressure phase jumps and any interpolation that fails its physical gates.
 - Added analytic and adversarial tests for First-Law closure, composition absence, electron/muon equilibrium, dissolution repair, outer crust, extra-column semantics and invalid inputs.
+
+
+## v4 native Fortran physical-contract hardening (2026-11-08)
+
+- Enforce cold Q6=Q7 and rowwise CompOSE Q3/Euler identity; tighten the neutrino-transparent Q5 gate.
+- Preserve Il=0 charge-potential correction in output Q3 while retaining mu_H=d epsilon/dn_B as the sound-speed denominator.
+- Match core-side slope to bridge Q1 at the join.
+- Replace outer-crust fixed mesh by stationary-point isolation for quartic/cubic intervals; add native flat/multiple/narrow-pocket tests.
+- Add native Fortran polynomial-extrema test to CI.

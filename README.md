@@ -42,4 +42,9 @@ The feature branch adds `construct_maxwell_transition` and the native `maxwell-t
         recompute_extra_cs2=False, return_report=True,
     )
 
-The Fortran path defines \(F=f/n_B\) on \(x=\ln n_B\) and derives \(Q_1=F'\), \(\mu_B=F+Q_1\), \(P=n_BQ_1\), and \(\epsilon=n_BF\) from the same interpolant. PCHIP core intervals use exact polynomial-extremum checks for positivity, mechanical stability and \(c_s^2/c^2\le1\); the integrated outer-crust bridge is checked separately on a 256-point mesh per interval. Source entropy and neutrino/lepton potential must be negligible. Composition-free inputs do not receive fabricated particle fractions. See [the self-contained derivation and limits](docs/FORTRAN_EOS_MASTER_RECONSTRUCTION_V1.md) and [the bounded adversarial audit](docs/ADVERSARIAL_AUDIT_MASTER_RECONSTRUCTION_20261108.md).
+The Fortran path defines \(F=f/n_B\) on \(x=\ln n_B\) and derives \(Q_1=F'\), \(\mu_H=F+Q_1=d\epsilon/dn_B\), \(P=n_BQ_1\), and \(\epsilon=n_BF\) from the same interpolant. The outer-crust bridge is now checked over the complete represented polynomial interval using stationary-point isolation; the former fixed mesh has been removed. Source entropy and neutrino/lepton potential must be negligible. Composition-free inputs do not receive fabricated particle fractions. See [the self-contained derivation and limits](docs/FORTRAN_EOS_MASTER_RECONSTRUCTION_V1.md) and [the bounded adversarial audit](docs/ADVERSARIAL_AUDIT_MASTER_RECONSTRUCTION_20261108.md).
+
+
+## v4 physical and verification guide
+
+See [the self-contained Fortran physics guide](docs/NS_COWLING_PHYSICS_AND_CODE_GUIDE_V4.md), [the final adversarial audit](docs/ADVERSARIAL_AUDIT_V4_FINAL_20261108.md) and [the machine-readable trace](docs/ADVERSARIAL_AUDIT_TRACE_V4_20261108.json).

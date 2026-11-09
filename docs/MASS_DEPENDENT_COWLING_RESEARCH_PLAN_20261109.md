@@ -209,7 +209,9 @@ The Actions run still reports failure because the final CLI summary used obsolet
 The physical sequence gate remains blocked: 0/48 f/p1 roots were admitted, no complete six-method target-mass cell exists, and the first rising-proxy endpoint is about 0.7653 Msun. The later high-density rising segment is only a kinematic candidate; it is not declared radially stable. The next substantive physics task is a direct radial pulsation calculation for the nodeless fundamental eigenvalue omega_0^2, after fixing the closure (barotropic-equilibrium versus frozen-composition Gamma_1) and deriving/implementing a valid boundary condition for the finite-positive-pressure surface. If composition derivatives are absent, restrict claims explicitly to barotropic-equilibrium stability. Only then attempt f/p1 roots on branches whose radial eigenvalue and node count are validated.
 
 
-## 17. Finite-pressure surface continuation before radial eigenmodes
+## 17. Finite-pressure surface continuation before radial eigenmodes (historical R13 diagnostic; superseded for primary analysis)
+
+**Supersession:** the synthetic C1 tangent/curvature tail described in this historical section is retained as a mathematical diagnostic only. It is not selected as a physical crust and is not used in the current primary analysis. R14 replaces this work path with exact native pressure-knot truncation of the unmodified projected EOS tables. No new EOS rows are created.
 
 The projected EOS is terminated at (P_{cut}=9.000000079422\times10^{-12}\;\mathrm{MeV\,fm^{-3}}), with (\epsilon_{cut}=4.354134734530827\times10^{-7}\;\mathrm{MeV\,fm^{-3}}), (n_{b,cut}=4.67962\times10^{-10}\;\mathrm{fm^{-3}}), and (\mu_{b,cut}=930.4654511545\;\mathrm{MeV}). The first five raw knots are exactly identical across the six matching-method EOS files, so a shared outer continuation is available without introducing a method-specific exterior difference.
 
@@ -232,4 +234,31 @@ Actions run 42618432567 (source-code HEAD `2e4dc9982238bd937a92019dd46580b379239
 
 The workflow correctly stops at the physical validator: the first rising-branch proxy reaches only about 0.7653 Msun, below the required 1.0 Msun mass; all 48 requested spectrum rows are outside that proxy, so no complete six-method paired cell exists and no f/p1 spectrum is admitted. Overall workflow conclusion is failure by design at the unresolved science gate, not a numerical-integrator or CLI-code failure. Artifact ID 13675450289 and SHA-256 `30922c2fafd5260d3c03d6852057530555cd997a64962d5b59d3f8af966af2ee` were verified after download.
 
-The next active work item is the surface continuation. The first five EOS knots are identical across all six methods. Use a C1 tangent polytrope only as a reference continuation; derive (n_b) from the first law, enforce (mu_b=(\epsilon+P)/n_b) and (dP=n_b d\mu_b), then compare against another smooth continuation. Only after P=0 TOV profiles, M/R sensitivity and causal/thermodynamic checks are sound should the radial pulsation solver be implemented and benchmarked. Initial (Gamma_1=Gamma_{eq}) supports only a barotropic-equilibrium stability claim, not frozen-composition stability.
+R14 has replaced the synthetic continuation as the active primary surface-boundary investigation. The active result is an EOS-preserving scan at eight existing native pressure knots for six matching methods (48 TOV integrations), with exact source-table hashes checked before and after and native background profiles exported. All 48 cases passed; source tables remained unchanged; the six native-edge M/R baselines reproduced within 2e-5. This establishes truncation convergence within the tabulated positive-pressure domain only. It does not establish a P=0 surface or a complete-star radius. The next physical gate is a sourced low-density crust EOS, or a separately specified finite-domain boundary-value problem whose truncated-domain interpretation is explicit. Radial \\(\\omega_0^2\\) and full-star Cowling f/p1 calculations remain blocked until a justified surface condition is available. Initial (Gamma_1=Gamma_{eq}) would support only a barotropic-equilibrium stability claim, not frozen-composition stability.
+
+## 19. R14 native-table-only boundary scan (2026-11-09)
+
+### Authority and invariants
+
+The six projected EOS CSVs in the frozen GPPVA_FSU2 x BBB_BHF2 cohort remain the sole primary EOS inputs. Each contains 323 native rows. Their Git blob identities and before/after SHA-256 values are recorded in the R14 artifact. No row was appended, deleted, rewritten, sorted, smoothed, clipped, refitted, or replaced. The frozen v5 native-knot cubic-Hermite P(mu_b) provider is used as the continuous representation between supplied knots; this does not create or write a new EOS table.
+
+### Design
+
+The selected pressure cutoffs are nearest existing rows 1, 3, 4, 6, 7, 11, 15 and 20, corresponding to actual log10 offsets 0, 0.311229, 0.467474, 0.779805, 0.936080, 1.560687, 1.994697 and 3.049259 dex above the first native row. Each method is run at the same frozen reference central pressure with the existing v5 TOV backend and settings r0=10 m, r_limit=1e8 m, rtol=1e-9 and step_cap=0.05. The native background CSV is exported at every finite-pressure endpoint.
+
+### Exact-head verification
+
+Actions [42640660436](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42640660436) passed on exact HEAD `aff4e6ad2789555648f2e564a96bbabd952ee4ac`.
+
+- 48/48 TOV cases completed; zero failures.
+- 6/6 original EOS source CSVs retained their exact SHA-256 before/after values and expected Git blob identities.
+- 6/6 row-1 table-edge baseline reproductions passed the unchanged 2e-5 relative M/R tolerance.
+- 48/48 backend-exported background profiles passed SHA-256 and row-count validation.
+- Zero synthetic EOS tables were emitted.
+- Artifact ID `13684872040`, 18,300,545 bytes, SHA-256 `e124339e932636e9e08c92298b2e1269aca3fac4980230083a28a3451421d8f3`.
+
+At source row 20 relative to row 1, the enclosed mass inside the selected isobar changes by approximately (-4.54\times10^{-10}), while the isobar radius decreases by approximately 0.2137% or 24.1 m across all six methods. This is a finite-pressure truncation response within the input tables, not the physical missing-crust correction or P=0 radius.
+
+### Stop rule and next physical gate
+
+Every selected cutoff has P_cut>0. Even source row 1 is an internal isobar, not the vacuum surface. The R14 scan therefore does not admit a complete-star surface, radial \\(\\omega_0^2\\), or full-star Cowling spectrum. R13 synthetic tails remain reproducible historical diagnostics only. Continue to physical radial stability only after a sourced low-density crust EOS and a justified surface condition are available; alternatively, explicitly scope a finite-domain eigenproblem with a positive-pressure boundary and do not mislabel its roots as full-star f/p modes.

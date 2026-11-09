@@ -40,7 +40,7 @@ def test_nonmonotone_source_q_is_pooled_but_projected_n_is_not_silently_preserve
 
 def test_reconstruction_rejects_nonpositive_or_nonmonotone_source_knots():
     with pytest.raises(ValueError, match="strictly increasing"):
-        reconstruct_projection([1.0, 1.0, 2.0], [1.0, 2.0, 3.0], [1.0, 2.0, 3.0], [0.0, 0.0, 0.0])
+        reconstruct_projection([1.0, 1.0, 2.0], [1.0, 2.0, 3.0], [1.0, 2.0, 3.0], [0.1, 0.2, 0.3])
 
     with pytest.raises(ValueError, match="positive"):
-        reconstruct_projection([1.0, 2.0, 3.0], [1.0, 0.0, 3.0], [1.0, 2.0, 3.0], [0.0, 0.0, 0.0])
+        reconstruct_projection([1.0, 2.0, 3.0], [1.0, 0.0, 3.0], [1.0, 2.0, 3.0], [0.1, 0.2, 0.3])

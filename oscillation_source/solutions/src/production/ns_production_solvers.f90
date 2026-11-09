@@ -29,12 +29,17 @@ module ns_production_solvers
 
     public :: solve_tov_star,solve_cowling_spectrum
 contains
-    subroutine solve_tov_star_smooth(eos,pc,options,profile)
+    subroutine solve_tov_star_smooth(eos,pc,options,profile,eos_events)
         procedure(eos_pressure_callback) :: eos
         real(wp),intent(in) :: pc
         type(star_options_t),intent(in) :: options
         type(star_profile_t),intent(out) :: profile
-        call integrate_tov(eos,pc,options,profile)
+        real(wp),intent(in),optional :: eos_events(:)
+        if(present(eos_events)) then
+            call integrate_tov(eos,pc,options,profile,eos_events)
+        else
+            call integrate_tov(eos,pc,options,profile)
+        end if
     end subroutine
 
     subroutine solve_tov_star_maxwell(eos_high,eos_low,pc,pt,options,star)

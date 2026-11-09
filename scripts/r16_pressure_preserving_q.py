@@ -192,10 +192,14 @@ def qexp_shape_parameter(
         k = 0.0
     else:
         lo, hi = (-1.0, 0.0) if target_dp < linear_dp else (0.0, 1.0)
-        while qexp_pressure_increment(mu0, mu1, q0, q1, lo) > target_dp and lo > -500.0:
-            lo = max(-500.0, 2.0 * lo)
-        while qexp_pressure_increment(mu0, mu1, q0, q1, hi) < target_dp and hi < 500.0:
-            hi = min(500.0, 2.0 * hi)
+        # q-exponential approaches its step-function envelope only as |k|→∞.
+        # The analytic integral uses asymptotic forms beyond |k|=500, so allow
+        # a wider bracket for targets close to the regularized envelope.
+        shape_limit = 1.0e6
+        while qexp_pressure_increment(mu0, mu1, q0, q1, lo) > target_dp and lo > -shape_limit:
+            lo = max(-shape_limit, 2.0 * lo)
+        while qexp_pressure_increment(mu0, mu1, q0, q1, hi) < target_dp and hi < shape_limit:
+            hi = min(shape_limit, 2.0 * hi)
         if (
             qexp_pressure_increment(mu0, mu1, q0, q1, lo) > target_dp + tol
             or qexp_pressure_increment(mu0, mu1, q0, q1, hi) < target_dp - tol

@@ -8,6 +8,7 @@ on:
       - "scripts/r15_native_density_preflight.py"
       - "python_frontend/compose_cowling/native_table_cutoff_scan.py"
       - "python_frontend/tests/test_native_density_cutoff_scan.py"
+      - "python_frontend/tests/test_r15_native_density_preflight.py"
       - "oscillation_release_v1/data/spectrum_summary_234.csv"
       - "oscillation_release_v1/data/eos_projected/**"
   workflow_dispatch:
@@ -26,7 +27,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install pytest
+      - name: Install Python audit dependencies
         run: python -m pip install numpy scipy pytest
       - name: Test native density selector
         run: |

@@ -1,0 +1,78 @@
+name: Repackage R15 full-cohort evidence into downloadable shards
+
+on:
+  push:
+    branches: [research/r15-native-outer-crust-pilot]
+    paths:
+      - ".github/workflows/repack-r15-full-cohort-artifact.yml"
+      - "scripts/repack_r15_full_cohort_artifact.py"
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  repack-r15-artifact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Download completed full-cohort artifact without rerunning TOV
+        uses: actions/download-artifact@v4
+        with:
+          name: ns-cowling-r15-full-cohort-42650666976
+          path: source-artifact
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: "42650666976"
+      - name: Verify and split profile evidence into four shards
+        run: |
+          python scripts/repack_r15_full_cohort_artifact.py \
+            --source-dir source-artifact \
+            --output-dir repacked \
+            --source-run-id 42650666976
+      - name: Upload compact receipt, tables and TOV summaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: ns-cowling-r15-full-cohort-core-42650666976
+          path: repacked/core/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload profile shard 01
+        uses: actions/upload-artifact@v4
+        with:
+          name: ns-cowling-r15-full-cohort-profiles-01-42650666976
+          path: repacked/profiles_part_01/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload profile shard 02
+        uses: actions/upload-artifact@v4
+        with:
+          name: ns-cowling-r15-full-cohort-profiles-02-42650666976
+          path: repacked/profiles_part_02/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload profile shard 03
+        uses: actions/upload-artifact@v4
+        with:
+          name: ns-cowling-r15-full-cohort-profiles-03-42650666976
+          path: repacked/profiles_part_03/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload profile shard 04
+        uses: actions/upload-artifact@v4
+        with:
+          name: ns-cowling-r15-full-cohort-profiles-04-42650666976
+          path: repacked/profiles_part_04/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload evidence index
+        uses: actions/upload-artifact@v4
+        with:
+          name: ns-cowling-r15-full-cohort-index-42650666976
+          path: repacked/index.json
+          if-no-files-found: error
+          retention-days: 30

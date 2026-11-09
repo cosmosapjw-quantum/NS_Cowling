@@ -1,9 +1,11 @@
 from pathlib import Path
+import json
 
 import numpy as np
 import pytest
 
 from research_artifacts.mass_response.independent_scipy_tov_reference import NativeHermiteEOS
+import research_artifacts.mass_response.independent_scipy_tov_reference as tov_reference
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -41,3 +43,47 @@ def test_native_hermite_pressure_inverse_closes_inside_transition_cells(method):
         assert mu == pytest.approx(expected_mu, rel=3e-12)
         assert epsilon + target_pressure == pytest.approx(mu * density, rel=3e-12)
         assert 0.0 < cs2 < 1.0
+
+
+def test_main_reports_metrics_from_the_persisted_v2_receipt_schema(
+    monkeypatch, capsys, tmp_path
+):
+    receipt = {
+        "status": "PASS_REFINED_SAME_EOS_INDEPENDENT_TOV",
+        "cases": [{}, {}, {}],
+        "max_relative_difference_coarse_vs_native_reference": {
+            "mass": 2.5e-6,
+            "radius": 1.5e-6,
+        },
+        "max_relative_difference_scipy_tight_vs_native_tight": {
+            "mass": 1.6e-8,
+            "radius": 1.2e-7,
+        },
+        "max_relative_native_refinement": {
+            "mass": 1.3e-10,
+            "radius": 7.1e-11,
+        },
+    }
+
+    def fake_build_reference(output_dir, *, relative_tolerance):
+        assert output_dir == tmp_path
+        assert relative_tolerance == pytest.approx(1.0e-6)
+        return receipt
+
+    monkeypatch.setattr(tov_reference, "build_reference", fake_build_reference)
+    assert tov_reference.main(["--output-dir", str(tmp_path)]) == 0
+    summary = json.loads(capsys.readouterr().out)
+
+    assert summary["case_count"] == 3
+    assert summary["max_relative_difference_scipy_tight_vs_native_tight"] == {
+        "mass": 1.6e-8,
+        "radius": 1.2e-7,
+    }
+    assert summary["max_relative_difference_coarse_vs_native_reference"] == {
+        "mass": 2.5e-6,
+        "radius": 1.5e-6,
+    }
+    assert summary["max_relative_native_refinement"] == {
+        "mass": 1.3e-10,
+        "radius": 7.1e-11,
+    }

@@ -175,3 +175,30 @@ The repair now underway writes a diagnostic receipt before acceptance and record
 SciPy rtol/max step and native q-step are refined. The 1e-6 acceptance remains unchanged. Inspect the exact-head CI artifact; do not call independent TOV validation PASS unless the tight comparison passes.
 
 If the refined SciPy/native comparison passes, close the TOV structural cross-check only. If it still fails, preserve per-case receipts and classify the mismatch (surface event, EOS state, centre expansion, ODE integration) before any further repair. Do not widen the criterion. The radial eigenvalue solver remains unimplemented, so no branch is radially stable and no new mass-dependent f/p1 prediction is admitted.
+
+
+## Continuation R10: exact-head receipt readback and CLI schema defect (2026-11-09)
+
+Live branch before this repair: `57511496a57e1a1cee6bafc5254de63f4f5ab514`. Exact-head Actions run: `42617251360`; artifact: `13673098470`; ZIP SHA-256: `0d376752ba610819d3ca59fceedbf50ea5eebc5d03b3f440e3b87135546b3964`.
+
+Readback:
+- The 384-point six-model run completed 2304/2304 native TOV integrations with no failed samples.
+- All six frozen-v5 reference M/R anchors reproduced.
+- 10 mass-sequence tests, 6 fixed-mass/Cowling mock tests and 4 Hermite-EOS tests passed.
+- Independent SciPy receipt status: `PASS_REFINED_SAME_EOS_INDEPENDENT_TOV`.
+- Maximum tight SciPy/native relative differences: mass `1.6232670240598032e-8`, radius `1.1432510017123261e-7`, both below the unchanged `1e-6` threshold.
+- Maximum native refinement differences: mass `1.299910193106295e-10`, radius `7.057766721929021e-11`.
+- All this is a structural TOV comparison only. No radial stability or Cowling mode claim follows.
+
+The workflow status was failure because the CLI report raised `KeyError: 'max_relative_mass_difference'` after writing the passing v2 receipt. The stored schema uses nested keys `max_relative_difference_scipy_tight_vs_native_tight`, `max_relative_difference_coarse_vs_native_reference`, and `max_relative_native_refinement`. The repair adds a `cli_summary` adapter and a regression test for `main()`; no acceptance tolerance is changed.
+
+### Next exact-head checks
+
+1. Inspect the live branch HEAD and PR #3 status before any mutation.
+2. Confirm the CLI regression test passes and the summary prints all three receipt groups.
+3. Inspect the new exact-head Actions result. The independent TOV step should complete; the subsequent physical mass-pair validator may still hold/fail correctly because 0/48 f/p1 roots and no complete 1.0 Msun six-method cell exist. Do not call the entire pipeline green unless the run says success.
+4. Preserve the first rising-proxy endpoint near 0.7653 Msun as the target-coverage limit for that candidate segment. Do not extrapolate to 1.0 Msun and do not infer radial stability for the later high-density rising segment.
+5. The next physics implementation is the direct radial pulsation eigenproblem for the nodeless fundamental omega_0^2. Explicitly choose the equilibrium Gamma versus frozen-composition Gamma_1 closure, and resolve the finite-positive-pressure surface condition. Without composition derivatives, make only the barotropic-equilibrium stability claim.
+6. Only after the radial eigenvalue/node and boundary-condition gates pass should Cowling f/p1 roots be attempted on the newly classified stable intervals. Keep the true sharp-Maxwell slow/rapid junction laws separate from the six historical smooth bridges.
+
+Dropbox backup target is the existing `/TOV_Cowling_Solver_Backups` folder. A dated checkpoint document should record the commit, Actions run, artifact digest, numerical receipt, and remaining science hold. PR #3 remains open/draft/unmerged and must not be altered.

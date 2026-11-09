@@ -236,3 +236,18 @@ The 384-point CI also ran:
 The raw comparison reached maximum relative mass difference 3.60164e-7 and radius difference 1.46572e-6. The predeclared acceptance was 1e-6 for both M and R, so the radius criterion narrowly failed. No tolerance was widened. The failure did not invalidate the 2304 successful native integrations or the six frozen-anchor reproductions; it means the independent structural comparison was not yet accepted.
 
 The first version of the comparison script raised before writing its casewise receipt. This is a diagnostic/representation defect, not evidence that the two TOV formulations disagree physically. The next commit repairs this by always serializing per-case coarse/tight SciPy and default/tight native results before checking acceptance. It tightens the SciPy direct-r integration and also refines the native q-step. The same 1e-6 criterion remains in force, now applied to tight SciPy versus tight native results. The next exact-head run must inspect the saved per-case receipt even if acceptance fails again.
+
+
+### Exact-head 384-point and independent TOV receipt: run 42617251360
+
+The exact-head run used commit `57511496a57e1a1cee6bafc5254de63f4f5ab514` and artifact `13673098470` (SHA-256 `0d376752ba610819d3ca59fceedbf50ea5eebc5d03b3f440e3b87135546b3964`). The 384-point pilot completed all 2304/2304 native TOV integrations, all six frozen-v5 M/R anchor reproductions, and the 10 mass-sequence, 6 fixed-mass/Cowling mock, and 4 native-Hermite tests. There were still 0/48 admitted f/p1 spectra and zero complete paired target-mass cells; the physical validator was skipped after the preceding step failed.
+
+The saved independent SciPy receipt has status `PASS_REFINED_SAME_EOS_INDEPENDENT_TOV`. Across five selected central pressures, the maximum tight SciPy-versus-tight-native relative differences are:
+- mass: `1.6232670240598032e-8`;
+- radius: `1.1432510017123261e-7`.
+
+Both are below the unchanged `1e-6` acceptance threshold. Native baseline-to-refinement differences are at most `1.299910193106295e-10` in mass and `7.057766721929021e-11` in radius. The coarse SciPy comparison remains deliberately diagnostic and is not the acceptance comparator. This closes the **structural TOV cross-check only** for the sampled points and shared finite-pressure surface convention.
+
+The overall Actions run nevertheless concluded `failure`, not green. The numerical script completed and wrote the passing receipt, then its CLI summary raised `KeyError: 'max_relative_mass_difference'`: the printer referenced obsolete v1 field names, while the persisted v2 receipt correctly stores nested fields `max_relative_difference_scipy_tight_vs_native_tight`, `max_relative_difference_coarse_vs_native_reference`, and `max_relative_native_refinement`. This is an implementation/reporting defect after successful numerical acceptance, not a TOV discrepancy. A regression test now exercises the CLI against the v2 receipt schema. The six-method validator remains intentionally unrelaxed.
+
+Scientific boundary unchanged: the first rising-proxy endpoint is only about 0.7653 Msun, all candidate segments have `radial_stability_status=unresolved_requires_radial_mode_spectrum`, and no 1.0 Msun six-method cell or new Cowling spectrum exists. Do not infer stability from the high-density rising interval or from the structural TOV agreement.

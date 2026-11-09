@@ -130,3 +130,15 @@ The 96-to-192 first-max mass shift is small (about 2.2e-4 relative), but first-m
 | MD-19b | Per-case SciPy/native refinement receipt | REPAIR_PUSHED_CI_PENDING | The comparison code now saves per-case coarse/tight SciPy and baseline/tight Fortran results before acceptance. SciPy rtol/max-step and Fortran q-step are refined. 1e-6 remains unchanged. |
 
 The first maximum is nearly converged in mass but not in radius; the following minimum remains badly radius-sensitive. The maxwell-labelled smooth bridge retains its extra local fold pair. These sequence pieces remain kinematic only, and no radial-stability label is assigned.
+
+
+## Exact-head structural TOV result and reporting repair (2026-11-09)
+
+| ID | Node | Status | Evidence / next condition |
+|---|---|---|---|
+| MD-19b | Same-EOS independent SciPy TOV acceptance | PASS_NUMERICAL / ACTION_REPORTING_FAILURE | Five-point refined comparison: max relative M=1.6233e-8, R=1.1433e-7, both below unchanged 1e-6. Per-case receipt is preserved in artifact 13673098470. |
+| MD-21 | CLI receipt-schema regression repair | IMPLEMENTED_CI_PENDING | The post-compute CLI used obsolete v1 metric keys and raised KeyError; printer now uses the persisted v2 nested schema and a regression test covers the CLI boundary. |
+| MD-22 | Six-method mass-pair validator | SCIENCE_HOLD | 0/48 admitted spectra and 0 complete paired cells; first rising-proxy endpoint is about 0.7653 Msun, below the 1.0 Msun target. Do not widen target coverage or extrapolate. |
+| MD-23 | Direct radial fundamental-mode stability | NEXT_PHYSICAL_GATE | Implement/verify the nodeless radial eigenvalue omega_0^2 problem with declared perturbative closure and a valid surface condition before allowing modes on secondary rising intervals. |
+
+Run 42617251360 completed 2304/2304 TOV integrations and all frozen-v5 anchor checks. The independent same-interpolation SciPy DOP853 comparison passed its numerical 1e-6 acceptance, but the job status was failure because the CLI summary indexed obsolete keys after writing the passing receipt. The mass-pair validator was skipped by that step failure; even after repairing the reporting bug, it is expected to hold because the selected pilot still has 0/48 modes and no complete 1.0 Msun six-method cell. Overall workflow green is not the exit criterion; physical stability and mode identity remain the controlling gates.

@@ -325,18 +325,26 @@ def build_reference(output_dir: Path, *, relative_tolerance: float = 1.0e-6) -> 
         )
     return receipt
 
+def cli_summary(receipt: dict) -> dict:
+    """Return a CLI summary using the persisted v2 receipt schema verbatim."""
+    return {
+        "status": receipt["status"],
+        "case_count": len(receipt["cases"]),
+        "max_relative_difference_coarse_vs_native_reference":
+            receipt["max_relative_difference_coarse_vs_native_reference"],
+        "max_relative_difference_scipy_tight_vs_native_tight":
+            receipt["max_relative_difference_scipy_tight_vs_native_tight"],
+        "max_relative_native_refinement": receipt["max_relative_native_refinement"],
+    }
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, default=Path("dist/independent-scipy-tov"))
     parser.add_argument("--relative-tolerance", type=float, default=1.0e-6)
     args = parser.parse_args(argv)
     receipt = build_reference(args.output_dir, relative_tolerance=args.relative_tolerance)
-    print(json.dumps({
-        "status": receipt["status"],
-        "case_count": len(receipt["cases"]),
-        "max_relative_mass_difference": receipt["max_relative_mass_difference"],
-        "max_relative_radius_difference": receipt["max_relative_radius_difference"],
-    }, indent=2))
+    print(json.dumps(cli_summary(receipt), indent=2))
     return 0
 
 

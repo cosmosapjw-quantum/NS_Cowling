@@ -66,9 +66,8 @@ contains
         if(options%ode%h_initial<=0._wp.or.options%ode%h_min<=0._wp.or. &
            options%ode%h_max<options%ode%h_min.or.options%ode%max_steps<=0) return
 
-        call center_start_phase(eos_high,SIDE_INNER,pc,options%r0_m,options%nu_start,y0,star%status)
+        call center_start_phase(eos_high,SIDE_INNER,pc,options%r0_m,options%nu_start,y0,p_start,star%status)
         if(.not.is_ok(star%status)) return
-        p_start=y0(2)
         if(p_start<=pt) then
             call fail_status(star%status,NS_OUT_OF_DOMAIN,'physics', &
                 'central series endpoint must remain above the Maxwell pressure')
@@ -183,15 +182,16 @@ contains
         star%valid=.true.;call clear_status(star%status)
     end subroutine
 
-    subroutine center_start_phase(eos,side,pc,r0,nu0,y,status)
+    subroutine center_start_phase(eos,side,pc,r0,nu0,y,p_start,status)
         procedure(eos_pressure_callback) :: eos
         integer,intent(in) :: side
         real(wp),intent(in) :: pc,r0,nu0
-        real(wp),intent(out) :: y(3)
+        real(wp),intent(out) :: y(3),p_start
         type(status_t),intent(out) :: status
         type(eos_state_t) :: s,starter
         real(wp) :: alpha,drop
         y=ieee_value(0._wp,ieee_quiet_nan)
+        p_start=ieee_value(0._wp,ieee_quiet_nan)
         call fail_status(status,NS_INVALID_INPUT,'physics','finite central pressure, radius and lapse required')
         if(.not.all(ieee_is_finite([pc,r0,nu0])).or.pc<=0._wp.or.r0<=0._wp) return
         call eos(pc,side,s,status);if(.not.is_ok(status)) return
@@ -205,14 +205,18 @@ contains
             call fail_status(status,NS_OUT_OF_DOMAIN,'physics','central TOV expansion is not resolved')
             return
         end if
-        y=[(4._wp*pi/3._wp)*(s%energy_j_m3/c_si**2)*r0**3,pc-drop,nu0]
-        if(y(2)==pc.or..not.all(ieee_is_finite(y))) then
+        ! The q-ODE state is [r,m,nu]; the pressure coordinate is
+        ! independent and must not be packed into the state vector.
+        p_start=pc-drop
+        y=[r0,(4._wp*pi/3._wp)*(s%energy_j_m3/c_si**2)*r0**3,nu0]
+        if(p_start==pc.or..not.ieee_is_finite(p_start).or.p_start<=0._wp.or. &
+           .not.all(ieee_is_finite(y))) then
             call fail_status(status,NS_STAGNATION,'numerics','central pressure correction is not representable')
             return
         end if
-        call eos(y(2),side,starter,status)
+        call eos(p_start,side,starter,status)
         if(.not.is_ok(status)) return
-        if(starter%pressure_pa/=y(2)) then
+        if(starter%pressure_pa/=p_start) then
             call fail_status(status,NS_INVALID_INPUT,'physics','central EOS callback returned a different pressure')
             return
         end if

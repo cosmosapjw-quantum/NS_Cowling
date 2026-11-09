@@ -14,7 +14,7 @@ def _write_table(path, *, count=40, maximum=1.0e-3):
     ]
     for i in range(count):
         fraction = i / (count - 1)
-        n_b = 10.0 ** (-8.0 + 5.7 * fraction)
+        n_b = 10.0 ** (-8.0 + 4.8 * fraction)
         p = 10.0 ** (20.0 + 5.5 * fraction)
         eps = max(1.0e-15, n_b * 930.0)
         rows.append(f"{i + 1},{p:.17e},{eps:.17e},{n_b:.17e},{930.0 + fraction:.17e}")

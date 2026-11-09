@@ -236,9 +236,24 @@ For convex (P(\mu_B)), adjacent secant slopes (s_i=\Delta P_i/\Delta\mu_i) must 
 
 ### Updated next-gate ordering
 
-1. **R17:** formulate a constrained reconstruction comparison. Keep the current q-preserving exact-integral projection as baseline A; define alternatives by the exact variables they are allowed to change and by explicit data-fidelity objectives. Where source uncertainty metadata are absent, do not invent weights; perform weight/objective sensitivity and report a Pareto/error budget.
-2. Trace each raw secant/Hermite failure to the original CompOSE model, source phase/composition records, and matching/projection path. Preserve the distinctions between raw package, normalized matched table and projected solver table.
-3. Only after R17 identifies a bounded and explicitly justified alternative set, propagate those alternatives to TOV and spectra as separate versioned EOS artifacts. R16 itself performed no TOV or mode runs.
-4. MD-31 still requires a sourced physical low-density EOS down to (P=0); MD-32 still needs a justified finite-domain perturbation boundary. Radial (\omega_0^2) and complete-star Cowling modes remain blocked.
+1. **R17 constrained joint-q pilot: PASS / limited negative result.** The 4-table × 2-quadrature × 5-lambda study is recorded in `docs/R17_JOINT_Q_RECONSTRUCTION_PILOT_20261110.md`. All 40 candidates are admissible and lambda=1 reproduces baseline A, but pressure RMS improves by only 0.001095 percentage points (mu weighting) or 0.000268 points (log_n weighting) at lambda=1e-4. The row-218 local pressure mismatch remains essentially unchanged. Do not scale this objective family to all 234 tables.
+2. **R18 source/matching localization:** map the 447 raw pressure-secant decreases by source row/density, matching metadata and source phase/composition records where available. In particular, distinguish the 234 common low-density events from the additional higher-density events and determine why the historical `maxwell` bridge carries 177 of the 447 transitions.
+3. Only after R18 identifies a source-backed mechanism and a materially distinct reconstruction should a bounded candidate set be propagated to TOV and spectra as separate versioned EOS artifacts. Do not overwrite the frozen primary cohort.
+4. MD-31 still requires a sourced physical low-density EOS down to (P=0); MD-32 still needs a justified finite-domain perturbation boundary. Radial \\(\omega_0^2\\) and complete-star Cowling modes remain blocked.
 
-R16 report: `docs/R16_NORMALIZED_TO_PROJECTED_AUDIT_20261110.md`. R15 finite-pressure TOV and Hermite reports remain the records for their separate scopes.
+R16 report: `docs/R16_NORMALIZED_TO_PROJECTED_AUDIT_20261110.md`. R17 report: `docs/R17_JOINT_Q_RECONSTRUCTION_PILOT_20261110.md`. R15 finite-pressure TOV and Hermite reports remain the records for their separate scopes.
+
+## R17 constrained joint-q pilot (2026-11-10)
+
+| ID | Node | Status | Evidence / interpretation |
+|---|---|---|---|
+| R17-01 | Four-table × two-coordinate × five-lambda joint-q fit | PASS_40_OF_40 | Actions [42669846775](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42669846775), code HEAD `9fde7e2206a162530c03a77098c5fa7fa19eeba7`: all candidates generated, scale-relative KKT residual max 9.9943e-13, first-law max 2.2011e-16, no stability/causality failures. |
+| R17-02 | Baseline-A identity and parent preservation | PASS | Lambda=1 reproduces the frozen projected EOS to floating-point roundoff; all four normalized and projected parent hashes unchanged. |
+| R17-03 | Pareto/error-budget assessment | PASS_DIAGNOSTIC / PRESSURE_REPAIR_NOT_MATERIAL | At lambda=1e-4, mean pressure RMS mismatch improves by only 0.001095 percentage points for mu weights and 0.000268 points for log_n weights; the latter has smaller density RMS movement (0.0308% vs 0.0801%). Row-218 local pressure mismatch persists. |
+| R17-04 | Interpretation boundary | CLOSED_FOR_PILOT | Four BBB_BHF2 examples only; no core-family generalization, full-cohort candidate, TOV run, mode calculation or EOS writes. The joint-q objective is not promoted as a physically preferred reconstruction. |
+
+### R17 next gate
+
+R18 is a source/matching localization audit of the 447 raw pressure-secant decreases. Stratify exact lower/upper source rows and density, then join to matching metadata and source phase/composition records where those identities are available. Resolve the 234 common low-density events separately from higher-density events and inspect the additional concentration under the smooth `maxwell` bridge label (177/447). Preserve byte and semantic identity across raw CompOSE, normalized matched, and projected solver tables.
+
+R17 report: `docs/R17_JOINT_Q_RECONSTRUCTION_PILOT_20261110.md`. The full 1,872-case TOV cohort remains the R15 finite-positive-pressure diagnostic; no new structural/spectral propagation is authorized by this pilot.

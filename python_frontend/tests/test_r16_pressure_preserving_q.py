@@ -71,8 +71,12 @@ def test_pressure_increment_outside_monotone_q_envelope_is_marked_infeasible():
 
     assert below["feasible"] is False
     assert below["status"] == "BELOW_MONOTONE_Q_ENVELOPE"
+    assert below["k"] is None
+    assert below["realizable_by_continuous_q"] is False
     assert above["feasible"] is False
     assert above["status"] == "ABOVE_MONOTONE_Q_ENVELOPE"
+    assert above["k"] is None
+    assert above["realizable_by_continuous_q"] is False
 
 
 def test_bounded_regularization_produces_a_finite_shape_for_outside_increment():

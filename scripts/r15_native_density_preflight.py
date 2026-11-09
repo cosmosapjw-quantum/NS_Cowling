@@ -101,7 +101,7 @@ def audit_native_table(
     knots = select_native_density_knots(
         rows,
         target_count=target_count,
-        maximum_density_fm3=maximum_density,
+        maximum_density_fm3=maximum_density_fm3,
     )
     if len(knots) != target_count:
         raise ValueError(f"selector returned {len(knots)} cutoffs, expected {target_count}")

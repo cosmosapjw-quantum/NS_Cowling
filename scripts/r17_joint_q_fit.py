@@ -54,7 +54,7 @@ def fit_monotone_q(
     *,
     lambda_density: float,
     max_iterations: int = 50000,
-    tolerance: float = 1.0e-9,
+    tolerance: float = 1.0e-12,
 ) -> dict[str, Any]:
     """Solve a convex q-fit under positivity and nondecreasing-q constraints.
 

@@ -156,9 +156,9 @@ def main() -> int:
                 "max_relative_shift": delta,
             }
         convergence[conv] = conv_data
-    if max_ode_shift > 2.0e-3:
+    if max_ode_shift > 1.0e-4:
         raise RuntimeError(f"ODE refinement root shift >2e-3: {max_ode_shift:.6e}")
-    if max_grid_root_shift > 2.0e-5:
+    if max_grid_root_shift > 1.0e-7:
         raise RuntimeError(f"grid/root refinement shift >2e-5: {max_grid_root_shift:.6e}")
 
     eos = MaxwellEOS(make_eos_data())
@@ -193,9 +193,9 @@ def main() -> int:
     dm = rel(float(native["mass_kg"]), star.mass_kg)
     dr = rel(float(native["radius_m"]), star.radius_m)
     drt = rel(float(native["interface_radius_m"]), star.interface.radius_m)
-    if max_reference_root_delta > 5.0e-3:
+    if max_reference_root_delta > 1.0e-4:
         raise RuntimeError(f"native/Python root discrepancy >5e-3: {max_reference_root_delta:.6e}")
-    if max(dm, dr, drt) > 2.0e-4:
+    if max(dm, dr, drt) > 1.0e-6:
         raise RuntimeError(
             "native/Python TOV discrepancy >2e-4: "
             f"M={dm:.6e}, R={dr:.6e}, rt={drt:.6e}"
@@ -213,7 +213,7 @@ def main() -> int:
             "max_relative_shift_grid_root_tight": max_grid_root_shift,
             "slow": convergence["slow"],
             "rapid": convergence["rapid"],
-            "acceptance_limits": {"ode_tight": 2.0e-3, "grid_root_tight": 2.0e-5},
+            "acceptance_limits": {"ode_tight": 1.0e-4, "grid_root_tight": 1.0e-7},
         },
         "python_scipy_reference": {
             "tov": {
@@ -232,7 +232,7 @@ def main() -> int:
                 "cowling_rtol": 2.0e-9, "cowling_max_step_m": 5.0,
                 "root_method": "SciPy brentq",
             },
-            "acceptance_limits": {"tov_relative_difference": 2.0e-4, "root_relative_difference": 5.0e-3},
+            "acceptance_limits": {"tov_relative_difference": 1.0e-6, "root_relative_difference": 1.0e-4},
         },
         "interpretation": (
             "Native and independent Python/SciPy implementations are compared on the same generated analytic "

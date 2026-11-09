@@ -181,6 +181,7 @@ def main(argv=None) -> int:
                 "pressure_objective_after": result["pressure_objective_after"],
                 "iterations": result["iterations"],
                 "kkt_residual": result["projected_gradient_kkt_residual"],
+                "kkt_residual_relative": result["projected_gradient_kkt_residual_relative"],
                 "density_rms_relative_change": result["density_rms_relative_change"],
                 "density_max_abs_relative_change": result["density_max_abs_relative_change"],
                 "pressure_rms_relative_change": result["pressure_rms_relative_change"],

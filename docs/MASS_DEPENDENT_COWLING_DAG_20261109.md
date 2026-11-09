@@ -142,3 +142,15 @@ The first maximum is nearly converged in mass but not in radius; the following m
 | MD-23 | Direct radial fundamental-mode stability | NEXT_PHYSICAL_GATE | Implement/verify the nodeless radial eigenvalue omega_0^2 problem with declared perturbative closure and a valid surface condition before allowing modes on secondary rising intervals. |
 
 Run 42617251360 completed 2304/2304 TOV integrations and all frozen-v5 anchor checks. The independent same-interpolation SciPy DOP853 comparison passed its numerical 1e-6 acceptance, but the job status was failure because the CLI summary indexed obsolete keys after writing the passing receipt. The mass-pair validator was skipped by that step failure; even after repairing the reporting bug, it is expected to hold because the selected pilot still has 0/48 modes and no complete 1.0 Msun six-method cell. Overall workflow green is not the exit criterion; physical stability and mode identity remain the controlling gates.
+
+
+## Surface boundary and radial-stability gate (2026-11-09)
+
+| ID | Node | Status | Evidence / next condition |
+|---|---|---|---|
+| MD-24 | Shared low-density continuation diagnostic | DIAGNOSTIC_COMPLETE / MODEL_NOT_SELECTED | First five raw EOS knots are identical across all six smooth methods. At the cutoff (P=9.0e-12), (epsilon=4.3541e-7) MeV fm^-3 and right-cell (Gamma_{eq}=1.52432); local values decrease to 1.46155 by knot 5. A local tangent polytrope (P=Kepsilon^{\gamma_s}) can match value and derivative, but requires (n_b,mu_b) first-law completion and continuation sensitivity tests. |
+| MD-25 | Extend TOV background to (P=0) | NEXT_EXECUTION_GATE | Implement the C1 tangent extension as one reference only; audit first-law closure, causality, positive compressibility, finite radius, M/R change, and sensitivity to alternative continuation parameters. |
+| MD-26 | Direct radial fundamental eigenvalue | BLOCKED_ON_MD-25 | Solve for nodeless (omega_0^2) with geometric-unit TOV background, centre regularity, (Delta P(R)=0), node count and eigenvalue convergence. Initial (Gamma_1=Gamma_{eq}) supports only barotropic-equilibrium stability. |
+| MD-27 | Mass-dependent Cowling modes on classified stable segments | BLOCKED_ON_MD-26 | Require a converged radial-stability label and validated f/p1 root identity before target-mass scans. |
+
+The surface analysis used the exact six projected EOS CSVs. The first five ((n_b,P,\epsilon,\mu_b)) knots match exactly in all six methods; this permits one shared continuation baseline. However, the local effective polytropic slope changes across those knots, and least-squares exponents depend materially on the fitting window. Hence a broad-window polytrope is not adopted. The C1 tangent polytrope is a starting diagnostic and must be thermodynamically completed and sensitivity-tested before it supplies a radial surface condition.

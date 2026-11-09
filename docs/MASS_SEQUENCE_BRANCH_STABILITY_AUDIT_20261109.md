@@ -251,3 +251,38 @@ Both are below the unchanged `1e-6` acceptance threshold. Native baseline-to-ref
 The overall Actions run nevertheless concluded `failure`, not green. The numerical script completed and wrote the passing receipt, then its CLI summary raised `KeyError: 'max_relative_mass_difference'`: the printer referenced obsolete v1 field names, while the persisted v2 receipt correctly stores nested fields `max_relative_difference_scipy_tight_vs_native_tight`, `max_relative_difference_coarse_vs_native_reference`, and `max_relative_native_refinement`. This is an implementation/reporting defect after successful numerical acceptance, not a TOV discrepancy. A regression test now exercises the CLI against the v2 receipt schema. The six-method validator remains intentionally unrelaxed.
 
 Scientific boundary unchanged: the first rising-proxy endpoint is only about 0.7653 Msun, all candidate segments have `radial_stability_status=unresolved_requires_radial_mode_spectrum`, and no 1.0 Msun six-method cell or new Cowling spectrum exists. Do not infer stability from the high-density rising interval or from the structural TOV agreement.
+
+
+### Surface-boundary continuation diagnostic from the raw projected EOS (2026-11-09)
+
+Source: `oscillation_release_v1/data/eos_projected/GPPVA_FSU2__BBB_BHF2__css.csv`, Git blob `5826c044e18054a8709dacde4bc648559cfb5bb9`, 323 rows. The first five raw knots were checked in all six projected method files (`css`, `cubic_F`, `cubic_P`, `maxwell`, `quintic_F`, `quintic_P)); the first-five tuples ((n_b,P,\epsilon,\mu_b)) are exactly identical across all six methods. Thus this particular outer-crust continuation can be shared across the six-method pilot, subject to the remaining EOS-source/provenance checks.
+
+At the finite-pressure cutoff:
+- (P_{\rm cut}=9.000000079422\times10^{-12}\;\mathrm{MeV\,fm^{-3}});
+- (\epsilon_{\rm cut}=4.354134734530827\times10^{-7}\;\mathrm{MeV\,fm^{-3}});
+- (n_{b,\rm cut}=4.67962\times10^{-10}\;\mathrm{fm^{-3}});
+- (\mu_{b,\rm cut}=930.4654511545\;\mathrm{MeV});
+- right-cell Hermite (c_s^2=3.1507096132423\times10^{-5});
+- (\Gamma_{\rm eq}=(\epsilon+P)c_s^2/P=1.52432195647).
+
+The right-sided local (\Gamma_{\rm eq}) values at the first five knots are approximately (1.52432,1.50950,1.49434,1.47885,1.46155). A log-log least-squares fit (\log P=a+\gamma\log\epsilon) across successively wider low-density windows is not a stable global prescription:
+| First knots | fitted (\gamma) | RMS residual in (\log P) |
+|---:|---:|---:|
+| 5 | 1.58002 | 0.00241 |
+| 10 | 1.54586 | 0.01140 |
+| 20 | 1.46579 | 0.05136 |
+| 40 | 1.39937 | 0.08822 |
+| 80 | 1.36705 | 0.10260 |
+| 160 | 1.32284 | 0.13340 |
+
+A candidate *local tangent* zero-pressure continuation is:
+[
+P=K\epsilon^{\gamma_s},\qquad
+\gamma_s=\frac{\epsilon_{\rm cut}}{P_{\rm cut}}c_{s,\rm cut}^2,
+\qquad K=\frac{P_{\rm cut}}{\epsilon_{\rm cut}^{\gamma_s}}.
+]
+It matches (P) and (dP/d\epsilon=c_s^2) at the cutoff and has (P,\epsilon\to0) together. This is a mathematical C1 closure candidate, not a physically sourced crust EOS. A thermodynamically admissible implementation must additionally continue (n_b) using (d\epsilon=(\epsilon+P)dn_b/n_b), and set (\mu_b=(\epsilon+P)/n_b), preserving (dP= n_b d\mu_b). Do not just extend (P(\epsilon)) while leaving (n_b,\mu_b) inconsistent.
+
+The continuation must be sensitivity-tested against alternative smooth continuations / fit windows, TOV radius and mass changes, and radial eigenvalues. The present data support a C1 tangent baseline but do not justify selecting a unique exterior EOS. First-five-knot identity across the six methods indicates that the outer continuation itself should not create a spurious matching-method effect if shared identically.
+
+The first radial-stability implementation should use (\Gamma_1=\Gamma_{\rm eq}) only as an explicitly labelled *barotropic-equilibrium* closure. Frozen-composition (\Gamma_1=(\epsilon+P)(\partial P/\partial\epsilon)_{s,Y_i}/P) requires composition derivatives that are not present in this projected table.

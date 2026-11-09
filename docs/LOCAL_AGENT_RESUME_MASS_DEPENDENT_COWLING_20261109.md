@@ -202,3 +202,29 @@ The workflow status was failure because the CLI report raised `KeyError: 'max_re
 6. Only after the radial eigenvalue/node and boundary-condition gates pass should Cowling f/p1 roots be attempted on the newly classified stable intervals. Keep the true sharp-Maxwell slow/rapid junction laws separate from the six historical smooth bridges.
 
 Dropbox backup target is the existing `/TOV_Cowling_Solver_Backups` folder. A dated checkpoint document should record the commit, Actions run, artifact digest, numerical receipt, and remaining science hold. PR #3 remains open/draft/unmerged and must not be altered.
+
+
+## Continuation R11: finite-pressure surface closure diagnostic (2026-11-09)
+
+Current code HEAD at start of this note: `2e4dc9982238bd937a92019dd46580b37923998f`. The exact 384-point SciPy TOV comparison passed numerically at five central pressures (max relative mass (1.6233e-8), radius (1.1433e-7), threshold (1e-6)); its overall prior Actions run failed afterward only due the v2 receipt CLI key mismatch. The code fix and CLI regression test are in the immediately preceding commit. The follow-up exact-head Action is run `42618432567` on `2e4dc998...`; read its final state before the next mutation.
+
+### New EOS surface diagnostic
+
+- Source CSS projected EOS blob: `5826c044e18054a8709dacde4bc648559cfb5bb9`.
+- The first five ((n_b,P,\epsilon,\mu_b)) rows are exactly identical across css, cubic_F, cubic_P, maxwell, quintic_F and quintic_P.
+- Cutoff: (P=9.000000079422e-12) MeV fm(^{-3}), (epsilon=4.354134734530827e-7) MeV fm(^{-3}), (n_b=4.67962e-10) fm(^{-3}), (mu_b=930.4654511545) MeV.
+- Right-cell Hermite (c_s^2=3.1507096132423e-5), (Gamma_{eq}=1.52432195647). Local right-sided values at the next four knots decrease to 1.46155.
+- Log-log (P(\epsilon)) fit exponents over first 5/10/20/40/80/160 knots are 1.58002/1.54586/1.46579/1.39937/1.36705/1.32284; residual increases as the fit window expands.
+
+A shared low-density continuation is possible because the first five knots coincide across all six smooth methods. The proposed baseline is a C1 tangent polytrope (P=K\epsilon^{\gamma_s}), with (\gamma_s=(\epsilon_{cut}/P_{cut})c_{s,cut}^2) and (K=P_{cut}/\epsilon_{cut}^{\gamma_s}). It is a mathematical extension, not a sourced crust EOS. Close the first law through (d\epsilon=(\epsilon+P)dn_b/n_b) and (mu_b=(\epsilon+P)/n_b), then verify (dP=n_b d\mu_b), causality, positive compressibility and (P=0) endpoint behaviour. Compare alternative smooth continuation families; do not rely on a global log-log fit.
+
+### Ordered next tasks
+
+1. Inspect final Action `42618432567` on HEAD `2e4dc998...`; confirm the CLI regression and numerical TOV stage. The physical validator may still report zero spectra / no 1.0 Msun paired cell, which is a scientific hold rather than a reason to relax the gate.
+2. Implement a thermodynamically consistent outer continuation as an isolated component with an explicit model identifier and provenance.
+3. Compare at least the tangent-polytrope baseline with another smooth continuation family and quantify changes to TOV (M,R), radius at the P=0 surface, sound speed, (n_b,mu_b), and first-law residual.
+4. Only after continuation validation, integrate the radial pulsation system in (G=c=1), with explicit (Gamma_1), regular centre data, (Delta P(R)=0), eigenvalue bracketing, node count, and frequency convergence. First pass is barotropic-equilibrium (Gamma_1=Gamma_{eq}); do not call it frozen-composition stability.
+5. Benchmark against published radial-mode tables and a turning-point zero-frequency consistency check where assumptions apply.
+6. Keep the six smooth matching prescriptions separate from the sharp-Maxwell slow/rapid interface problem.
+
+The 384-point first rising proxy is still only about 0.7653 Msun; there are no admitted f/p1 roots (0/48) and no complete six-method 1.0 Msun paired cell. No f/p1 output should be started on a secondary segment until the nodeless radial eigenvalue and boundary closure are verified.

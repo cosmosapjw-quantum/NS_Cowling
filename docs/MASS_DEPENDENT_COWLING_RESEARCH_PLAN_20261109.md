@@ -207,3 +207,20 @@ The exact-head run 42617251360 completed the 384-point six-model sequence (2304/
 The Actions run still reports failure because the final CLI summary used obsolete v1 key names after the v2 receipt had been written. The code now maps the summary directly to the v2 receipt schema, with a regression test. This does not relax the numerical criterion or the physical validator.
 
 The physical sequence gate remains blocked: 0/48 f/p1 roots were admitted, no complete six-method target-mass cell exists, and the first rising-proxy endpoint is about 0.7653 Msun. The later high-density rising segment is only a kinematic candidate; it is not declared radially stable. The next substantive physics task is a direct radial pulsation calculation for the nodeless fundamental eigenvalue omega_0^2, after fixing the closure (barotropic-equilibrium versus frozen-composition Gamma_1) and deriving/implementing a valid boundary condition for the finite-positive-pressure surface. If composition derivatives are absent, restrict claims explicitly to barotropic-equilibrium stability. Only then attempt f/p1 roots on branches whose radial eigenvalue and node count are validated.
+
+
+## 17. Finite-pressure surface continuation before radial eigenmodes
+
+The projected EOS is terminated at (P_{cut}=9.000000079422\times10^{-12}\;\mathrm{MeV\,fm^{-3}}), with (\epsilon_{cut}=4.354134734530827\times10^{-7}\;\mathrm{MeV\,fm^{-3}}), (n_{b,cut}=4.67962\times10^{-10}\;\mathrm{fm^{-3}}), and (\mu_{b,cut}=930.4654511545\;\mathrm{MeV}). The first five raw knots are exactly identical across the six matching-method EOS files, so a shared outer continuation is available without introducing a method-specific exterior difference.
+
+The right-sided Hermite estimate gives (c_{s,cut}^2=3.1507096132423\times10^{-5}) and (\Gamma_{eq,cut}=1.52432195647). The local right-cell (\Gamma_{eq}) decreases to approximately 1.46155 by the fifth knot. Log-log fits of (P) versus (\epsilon) over 5, 10, 20, 40, 80 and 160 knots give exponents 1.58002, 1.54586, 1.46579, 1.39937, 1.36705 and 1.32284, respectively, with increasing log-residual. A single broad-window polytrope is therefore not a robust extrapolation rule.
+
+Use the local tangent continuation only as an explicit reference model:
+[
+P=K\epsilon^{\gamma_s},quad
+\gamma_s=(\epsilon_{cut}/P_{cut})c_{s,cut}^2,quad
+K=P_{cut}/\epsilon_{cut}^{\gamma_s}.
+]
+This matches (P) and (dP/d\epsilon) at the cutoff and takes (P,\epsilon\to0). The continuation is not a microphysically sourced crust EOS. To be thermodynamically admissible, obtain (n_b(\epsilon)) from (d\epsilon=(\epsilon+P)dn_b/n_b), normalize it to the tabulated (n_{b,cut}), and define (\mu_b=(\epsilon+P)/n_b). Verify (dP=n_b d\mu_b), positivity, (c_s^2\in(0,1)), and endpoint continuity. Vary the continuation parameterization and quantify its effects on TOV M/R and on the radial spectrum.
+
+The first radial pulsation calculation may set (\Gamma_1=\Gamma_{eq}), but results must be called barotropic-equilibrium radial stability. Frozen-composition (\Gamma_1) is not available from the current projected table without composition derivatives. Only after the (P=0) continuation and boundary sensitivity have been audited should the code solve for the nodeless fundamental (\omega_0^2), check node count and compare against published radial-mode reference models. Mass-dependent f/p1 calculations remain blocked until that radial eigenvalue gate is complete.

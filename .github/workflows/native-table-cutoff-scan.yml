@@ -1,0 +1,57 @@
+name: EOS-preserving native-table TOV cutoff scan
+
+on:
+  push:
+    branches: [research/mass-dependent-cowling-v1]
+    paths:
+      - ".github/workflows/native-table-cutoff-scan.yml"
+      - ".github/workflows/surface-continuation.yml"
+      - "python_frontend/compose_cowling/native_table_cutoff_scan.py"
+      - "python_frontend/tests/test_native_table_cutoff_scan.py"
+      - "scripts/run_native_table_cutoff_scan.py"
+      - "python_frontend/compose_cowling/solver.py"
+      - "oscillation_release_v1/data/spectrum_summary_234.csv"
+      - "oscillation_release_v1/data/eos_projected/GPPVA_FSU2__BBB_BHF2__*.csv"
+      - "oscillation_release_v1/workflow/compile_manifest.json"
+      - "oscillation_source/calculation/**"
+      - "oscillation_source/methods/**"
+      - "oscillation_source/support/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-table-cutoff-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      PYTHONPATH: python_frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install GNU Fortran and Python dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gfortran
+          python -m pip install --upgrade pip
+          python -m pip install numpy scipy pytest
+      - name: Test native-knot cutoff selection
+        run: python -m pytest -q python_frontend/tests/test_native_table_cutoff_scan.py
+      - name: Test native TOV background-profile export
+        run: python -m pytest -q python_frontend/tests/test_v5_background_profile_export.py
+      - name: Run EOS-preserving six-method native-table cutoff scan
+        run: |
+          python scripts/run_native_table_cutoff_scan.py \
+            --output-dir dist/native-table-cutoff-scan \
+            --baseline-relative-tolerance 2.0e-5
+      - name: Upload native-table boundary and background-profile evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ns-cowling-native-table-cutoff-${{ github.run_id }}
+          path: dist/native-table-cutoff-scan/
+          if-no-files-found: warn
+          retention-days: 30

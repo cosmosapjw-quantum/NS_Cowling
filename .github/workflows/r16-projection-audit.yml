@@ -8,6 +8,9 @@ on:
       - "scripts/r16_projection_audit.py"
       - "scripts/audit_r16_projection_cohort.py"
       - "scripts/audit_r16_pressure_increment_residuals.py"
+      - "scripts/audit_r16_pressure_preserving_q_feasibility.py"
+      - "scripts/r16_pressure_preserving_q.py"
+      - "python_frontend/tests/test_r16_pressure_preserving_q.py"
       - "scripts/r16_pressure_preserving_q.py"
       - "python_frontend/tests/test_r16_pressure_preserving_q.py"
       - "python_frontend/tests/test_r16_projection_reconstruction.py"
@@ -35,6 +38,10 @@ jobs:
         run: python -m pytest -q python_frontend/tests/test_r16_projection_reconstruction.py
       - name: Test pressure-preserving monotone q interpolant
         run: python -m pytest -q python_frontend/tests/test_r16_pressure_preserving_q.py
+      - name: Audit exact pressure-preserving q feasibility across all source cells
+        run: |
+          python scripts/audit_r16_pressure_preserving_q_feasibility.py \
+            --output-dir dist/r16-pressure-preserving-q-feasibility
       - name: Audit every native pressure-increment residual
         run: |
           python scripts/audit_r16_pressure_increment_residuals.py \
@@ -57,5 +64,13 @@ jobs:
         with:
           name: ns-cowling-r16-pressure-increment-${{ github.run_id }}
           path: dist/r16-pressure-increment-residuals/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload pressure-preserving q feasibility evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ns-cowling-r16-pressure-preserving-q-${{ github.run_id }}
+          path: dist/r16-pressure-preserving-q-feasibility/
           if-no-files-found: error
           retention-days: 30

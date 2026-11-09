@@ -30,6 +30,7 @@ SELECTED = (
     "SPG_M1__BBB_BHF2__css",
 )
 LAMBDAS = (1.0, 0.1, 0.01, 0.001, 0.0001)
+WEIGHT_COORDINATES = ("mu", "log_n")
 
 
 def sha256(path: Path) -> str:
@@ -97,9 +98,10 @@ def main(argv=None) -> int:
         if [int(x["source_row"]) for x in raw] != list(range(1, len(raw) + 1)):
             raise RuntimeError(f"{name}: source row order is invalid")
 
-        for lam in LAMBDAS:
+        for weight_coordinate in WEIGHT_COORDINATES:
+          for lam in LAMBDAS:
             result = fit_monotone_q(
-                mu, n, p, lambda_density=lam,
+                mu, n, p, lambda_density=lam, weight_coordinate=weight_coordinate,
                 max_iterations=args.max_iterations, tolerance=args.tolerance,
             )
             cells = [
@@ -170,6 +172,7 @@ def main(argv=None) -> int:
                 "crust": ref["crust"],
                 "core": ref["core"],
                 "matching_method": ref["matching_method"],
+                "weight_coordinate": weight_coordinate,
                 "lambda_density": lam,
                 "objective_before_source_q": result["objective_before_source_q"],
                 "objective_after_fit": result["objective_after_fit"],
@@ -203,6 +206,7 @@ def main(argv=None) -> int:
             for i in range(len(mu)):
                 knot_rows.append({
                     "name": name,
+                    "weight_coordinate": weight_coordinate,
                     "lambda_density": lam,
                     "source_row": i + 1,
                     "mu_b_mev": float(mu_fit[i]),
@@ -224,7 +228,7 @@ def main(argv=None) -> int:
     receipt = {
         "schema": "ns-cowling-r17-joint-q-fit-pilot-v1",
         "status": "PASS_R17_JOINT_Q_FIT_PILOT" if (
-            len(summaries) == len(SELECTED) * len(LAMBDAS)
+            len(summaries) == len(SELECTED) * len(LAMBDAS) * len(WEIGHT_COORDINATES)
             and baseline_checks_pass and all_candidates_admissible
             and source_hashes_unchanged and projected_hashes_unchanged
         ) else "FAIL_R17_JOINT_Q_FIT_PILOT",
@@ -232,7 +236,9 @@ def main(argv=None) -> int:
         "source_summary_sha256": SUMMARY_SHA256,
         "selected_tables": list(SELECTED),
         "lambda_grid": list(LAMBDAS),
+        "weight_coordinates": list(WEIGHT_COORDINATES),
         "lambda_interpretation": "sensitivity parameter only; no statistical uncertainty model is assumed",
+        "weight_coordinate_interpretation": "mu trapezoid is the baseline measure; log_n trapezoid is an explicit low-density emphasis sensitivity, not a statistical likelihood",
         "causal_roundoff_policy": "accept G=mu*P''-P' >= -1e-12*max(|n_i|,|n_{i+1}|); analytic q monotonicity remains the exact causality invariant",
         "objective": (
             "lambda * mu-grid-weighted relative n_B residual^2 "

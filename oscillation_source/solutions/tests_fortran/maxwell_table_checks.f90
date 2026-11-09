@@ -187,6 +187,11 @@ contains
         write(u,'(A)') ' dq_max = 5.0e-2'
         write(u,'(A)') ' max_steps = 100000'
         write(u,'(A)') ' frequency_hz = 1800.0'
+        write(u,'(A)') ' frequency_min_hz = 100.0'
+        write(u,'(A)') ' frequency_max_hz = 20000.0'
+        write(u,'(A)') ' scan_n = 41'
+        write(u,'(A)') ' root_xtol = 1.0e-5'
+        write(u,'(A)') ' root_rtol = 1.0e-10'
         write(u,'(A)') " conversion = 'slow'"
         write(u,'(A)') ' atol_w = 1.0e-12'
         write(u,'(A)') ' atol_v = 1.0e-12'

@@ -187,3 +187,31 @@ The eight selected source rows are 1, 3, 4, 6, 7, 11, 15 and 20 (actual log-pres
 At source row 20 relative to row 1, the enclosed mass change is about (-4.54\times10^{-10}) and the radius of that finite-pressure isobar changes by about (-0.2137\%\), approximately (-24.1\,\mathrm{m}). The result says that the mass integral is effectively saturated within this sampled low-pressure part of the supplied tables, while the coordinate location of the selected isobar still moves. It does not estimate the missing outer-crust thickness or the P=0 radius.
 
 The R13 synthetic tail branch is retained for reproducibility but is withdrawn as the primary surface strategy. The legacy synthetic-surface workflow is manual-dispatch only. MD-25 is superseded; MD-26 and MD-27 remain blocked until the physical low-density EOS and boundary issue is resolved. The R14 artifact has ID `13684872040`, size 18,300,545 bytes and SHA-256 `e124339e932636e9e08c92298b2e1269aca3fac4980230083a28a3451421d8f3`.
+
+
+## R15 full-cohort finite-pressure low-density cutoff diagnostic (2026-11-10)
+
+This R15 track is an EOS-preserving TOV-only truncation diagnostic on the existing 234 projected tables. It does not replace the mass-dependent f/p1 programme and does not close the P=0/radial-stability gates.
+
+| ID | Node | Status | Evidence / boundary |
+|---|---|---|---|
+| R15-01 | Full projected-cohort native-density preflight | PASS_234_OF_234 | Actions [42650145210](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42650145210): 234/234 projected table hashes match the frozen spectrum summary and remain unchanged; source-row order is preserved; 1,872/1,872 native cutoff knots selected; no TOV integrations in this preflight. |
+| R15-02 | Full 39-pair × 6-method × 8-cutoff TOV scan | PASS_1872_OF_1872 | Actions [42650666976](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42650666976), code HEAD `16f44113464987c2043d1b6c70a028f936af16e8`: 1,872 cases all `ok`; 234/234 source tables unchanged; 234/234 native-edge baselines reproduce to near machine precision; 312/312 complete six-method pair×cutoff cells; zero failures and zero synthetic EOS. |
+| R15-03 | Background-profile provenance and downloadable evidence | PASS_1872_OF_1872 | Repack Actions [42651779185](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42651779185): original 752-MB artifact revalidated inside GitHub, then split into four profile shards plus core/index. All 1,872 profile SHA-256 and data-row counts were independently checked after download; all six ZIP digests and archive integrity checks pass. |
+| R15-04 | Paired cutoff response summary | PASS_DESCRIPTIVE_SCOPE | At row 217, mean internal-isobar mass change is -0.00301608% and radius change -3.934502% relative to the same method/table row-1 isobar. Core-family mean radius responses: BBB_BHF2 -3.475964%, GM_GM1 -4.622658%, RG_SLY4 -3.704885%. Six-method spread is much smaller than the core-conditioned contrast for this selected finite-pressure diagnostic. |
+| R15-05 | Row-217→218 sparse-cell diagnostic | PASS_REPRESENTATIVE_ENDPOINT_READ / INTERPOLANT_AUDIT_NEXT | Across 13 representative crust-family tables the density jump ratio is 7.434–11.152. The two-point \\(\Delta\ln P/\Delta\ln n_b\\) secant is not a local adiabatic index, sound speed or causality result. Next inspect the solver's exact cubic-Hermite \\(P(\mu_b)\\) representation and its derivatives over the entire sparse native cell. |
+
+### Interpretation limits
+
+The eight cutoffs use source rows `(1, 9, 17, 23, 52, 73, 116, 217)), shared by all 234 projected tables. The last cutoff remains at (P_{\rm cut}>0); row 1 is also a finite-positive-pressure internal isobar. The reported values are (M(r_{\rm cut})) and (r_{\rm cut}), not full-star M/R. R15 therefore does not provide a physical surface-radius correction, outer-crust mass/thickness, crust-core transition location, radial-stability eigenvalue, or complete-star Cowling modes.
+
+The legacy `maxwell` matching token remains a smooth bridge in this cohort and is not a sharp first-order Maxwell interface.
+
+### Updated next-gate ordering
+
+1. R15 sparse-cell representation audit: exact native-knot cubic-Hermite (P(\mu_b)), endpoint slopes, whole-cell stationary points, positivity/monotonicity, and implied (dP/d\epsilon) on row 217→218. Preserve the source tables and hashes; do not subdivide/append authoritative EOS rows.
+2. MD-31 remains blocked: source-backed low-density crust EOS to (P=0) and a physical surface are not available from this cohort.
+3. MD-32 remains a separate design choice: a finite-positive-pressure eigenproblem is admissible only if explicitly formulated as a truncated-domain problem with a justified boundary condition.
+4. MD-26 radial (\omega_0^2) and MD-27 full-star mass-dependent Cowling f/p1 remain blocked until a sourced low-density EOS and a validated surface/perturbation boundary condition exist. The initial (Gamma_1=\Gamma_{eq}) route would support only barotropic-equilibrium stability; it is not frozen-composition stability.
+
+Full result report: `docs/R15_FULL_COHORT_TOV_RESULTS_20261110.md`. Full input preflight: `docs/R15_FULL_COHORT_NATIVE_DENSITY_PREFLIGHT_20261110.md`. Representative row boundary diagnostic: `docs/R15_ROW217_218_BOUNDARY_DIAGNOSTIC_20261110.md`.

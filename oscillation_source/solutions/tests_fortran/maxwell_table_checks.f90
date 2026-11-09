@@ -23,8 +23,8 @@ program maxwell_table_checks
     real(wp),parameter :: log_gl_w(8)=[0.189450610455068496285_wp,0.182603415044923588867_wp, &
         0.169156519395002538189_wp,0.149595988816576732081_wp,0.124628971255533872052_wp, &
         0.095158511682492784810_wp,0.062253523938647892863_wp,0.027152459411754094852_wp]
-    character(len=*),parameter :: core_file='build/maxwell_core_fixture.csv'
-    character(len=*),parameter :: envelope_file='build/maxwell_envelope_fixture.csv'
+    character(len=*),parameter :: core_file='../../dist/maxwell_core_fixture.csv'
+    character(len=*),parameter :: envelope_file='../../dist/maxwell_envelope_fixture.csv'
     real(wp) :: pt,pc,pcut,n_high_pt,mu_mismatch,thermo_res,thermo_scale,dp_rel
     integer :: checks
     type(normalized_table_t) :: core_raw,envelope_raw
@@ -164,7 +164,7 @@ contains
 
     subroutine write_namelist()
         integer :: u,ios
-        open(newunit=u,file='build/maxwell_table_fixture.nml',status='replace',action='write',iostat=ios)
+        open(newunit=u,file='../../dist/maxwell_table_fixture.nml',status='replace',action='write',iostat=ios)
         call require(ios==0,'open Maxwell table case NAMELIST')
         write(u,'(A)') '&request'
         write(u,'(A)') " request_token = 'maxwell-table-cli-smoke'"

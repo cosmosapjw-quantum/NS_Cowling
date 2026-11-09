@@ -206,6 +206,9 @@ def fit_monotone_q(
         ),
         "iterations": iteration,
         "projected_gradient_kkt_residual": kkt_residual,
+        "projected_gradient_kkt_residual_relative": kkt_residual / (
+            1.0 + float(np.linalg.norm(x, ord=np.inf))
+        ),
         "q_monotone": q_monotone,
         "positive_thermodynamics": positive,
         "pressure_strictly_increasing": pressure_increasing,

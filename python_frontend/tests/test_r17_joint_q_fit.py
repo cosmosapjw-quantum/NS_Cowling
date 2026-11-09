@@ -59,3 +59,15 @@ def test_joint_fit_rejects_invalid_objective_weight_and_source_domain():
         fit_monotone_q(mu, n, p, lambda_density=0.0)
     with pytest.raises(ValueError, match="strictly increasing"):
         fit_monotone_q([1.0, 1.0, 2.0], [1.0, 2.0, 3.0], [0.2, 1.4, 2.0], lambda_density=0.5)
+
+
+def test_log_density_weighted_fit_is_a_declared_coordinate_sensitivity():
+    mu, n, p = _nonconvex_pressure_fixture()
+    result = fit_monotone_q(
+        mu, n, p, lambda_density=0.5, weight_coordinate="log_n"
+    )
+
+    assert result["weight_coordinate"] == "log_n"
+    assert result["q_monotone"] is True
+    assert result["positive_thermodynamics"] is True
+    assert result["objective_after_fit"] <= result["objective_before_source_q"] + 1e-12

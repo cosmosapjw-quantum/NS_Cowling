@@ -24,15 +24,25 @@ def _shape_integrals(k: float) -> tuple[float, float]:
     k = float(k)
     if not math.isfinite(k):
         raise ValueError("shape parameter must be finite")
-    if abs(k) < 1.0e-4:
+    if abs(k) < 1.0e-2:
         k2 = k * k
         k3 = k2 * k
         k4 = k2 * k2
         k5 = k4 * k
-        a0 = 0.5 + k / 12.0 - k3 / 720.0 + k5 / 30240.0
+        k6 = k3 * k3
+        k7 = k6 * k
+        k8 = k4 * k4
+        k9 = k8 * k
+        # Taylor expansions avoid cancellation in the closed forms near k=0.
+        a0 = (
+            0.5 + k / 12.0 - k3 / 720.0 + k5 / 30240.0
+            - k7 / 1209600.0 + k9 / 47900160.0
+        )
         a1 = (
             1.0 / 3.0 + k / 24.0 - k2 / 720.0
             - k3 / 1440.0 + k4 / 30240.0 + k5 / 60480.0
+            - k6 / 1209600.0 - k7 / 2419200.0
+            + k8 / 47900160.0 + k9 / 95800320.0
         )
         return a0, a1
 

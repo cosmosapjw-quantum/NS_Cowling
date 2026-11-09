@@ -9,7 +9,7 @@ def test_monotone_source_q_is_not_pooled_and_pressure_is_reintegrated():
     mu = [2.0, 3.0, 4.0]
     n = [1.0, 2.25, 4.0]  # q = n/mu = [0.5, 0.75, 1.0]
     p = [1.0, 1.75, 3.0]
-    eps = [mu[i] * n[i] - p[i] for i in range(3)]
+    eps = [0.1, 0.5, 1.0]
 
     out = reconstruct_projection(mu, n, p, eps)
 

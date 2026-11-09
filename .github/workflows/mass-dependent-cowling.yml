@@ -15,6 +15,7 @@ on:
       - "oscillation_source/methods/**"
       - "oscillation_source/calculation/**"
       - "research_artifacts/mass_response/**"
+      - "python_frontend/tests/test_independent_tov_scipy.py"
       - "python_frontend/tests/test_fixed_mass_response.py"
       - "python_frontend/compose_cowling/mass_sequence.py"
       - "python_frontend/tests/test_mass_sequence.py"
@@ -66,10 +67,15 @@ jobs:
             expected_models=234
           else
             python scripts/run_mass_dependent_spectrum.py --crusts GPPVA_FSU2 --cores BBB_BHF2 \
-              --tov-samples 192 --output-dir dist/mass-dependent-cowling
+              --tov-samples 384 --output-dir dist/mass-dependent-cowling
             expected_models=6
           fi
           echo "EXPECTED_MODELS=$expected_models" >> "$GITHUB_ENV"
+      - name: Independent SciPy TOV cross-check with native Hermite EOS
+        run: |
+          python -m pytest -q python_frontend/tests/test_independent_tov_scipy.py
+          python research_artifacts/mass_response/independent_scipy_tov_reference.py \
+            --output-dir dist/mass-dependent-cowling/independent-scipy-tov
       - name: Validate frozen baseline and complete six-method mass pairing
         run: |
           python scripts/validate_mass_dependent_spectrum.py \

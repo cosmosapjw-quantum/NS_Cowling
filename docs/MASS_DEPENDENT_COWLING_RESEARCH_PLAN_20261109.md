@@ -182,3 +182,10 @@ Full equations and the exact 24-point pilot evidence are recorded in docs/MASS_S
 ## 13. 96-to-192 topology refinement
 
 The first sampled turning point moved from M about 0.7433 Msun, Pc about 0.172 MeV fm^-3, R about 1233 km at 24 samples to M about 0.7651 Msun, Pc about 0.227 MeV fm^-3, R about 1880 km at 96 samples. This is not converged. A 192-point run is now the pilot configuration. The maxwell compatibility bridge has a distinct extra turning pair inside its low-sound-speed interval; all such pieces remain radial-stability unresolved.
+
+
+## 14. 192-to-384 refinement and independent TOV cross-check
+
+At 192 Pc samples, all six rows completed with no failed TOV integrations and v5 M/R anchors passed. The first maximum mass moved by only about 2.2e-4 relative from the 96-point estimate, but its radius moved by about 1.6%, while the first subsequent minimum radius shifted from about 418 km to about 195 km in the css row. This is insufficient convergence. The workflow is moved to 384 Pc samples.
+
+The next CI increment also includes an independently coded SciPy DOP853 direct-r TOV integrator. It reconstructs the exact piecewise cubic-Hermite P(mu) table from raw native knots, using the raw baryon density n as the endpoint derivative dP/dmu. It checks five central pressures spanning the first fold, falling segment, the extra maxwell smooth-bridge folds, and a high-density reference against frozen v5 cell_solve task=star. The target is <=1e-6 relative M and R discrepancy. This verifies structure integration and EOS interpolation equivalence only. It does not classify radial stability or validate f/p1 modes.

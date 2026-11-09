@@ -133,3 +133,8 @@ The six-model 24-point native v5 pilot reproduces its frozen TOV M/R anchor but 
 ## Mass-sequence refinement status (2026-11-09)
 
 The 96-point six-model TOV pilot runs successfully at the numerical level (all 576 integrations valid and v5 M/R baselines reproduce), but the physical validator admits 0 new f/p1 spectra because the initial rising-proxy branch ends below 0.8 Msun. The 24-to-96 first-turning-point shift is substantial, so a 192-point scan is now configured. The legacy maxwell row remains a smooth, zero-density-jump bridge; its additional mass-sequence folds are exploratory and radially unresolved. See docs/MASS_SEQUENCE_BRANCH_STABILITY_AUDIT_20261109.md.
+
+
+## 192-point mass-sequence refinement (2026-11-09)
+
+The 192-point six-model TOV pilot completed 1152/1152 integrations with all frozen v5 M/R anchors reproduced, but admitted zero new spectra. The first maximum mass is stabilizing across grids, while radius and the first post-maximum minimum remain unconverged. The maxwell compatibility bridge retains a distinct intermediate M(Pc) fold pair. A 384-point scan and independent SciPy same-EOS TOV check are now configured. No candidate segment is classified radially stable. See docs/MASS_SEQUENCE_BRANCH_STABILITY_AUDIT_20261109.md.

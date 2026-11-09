@@ -149,3 +149,39 @@ The pilot workflow is changed from 96 to 192 logarithmic central-pressure sample
 3. all local candidate turns, especially the method-specific maxwell bridge folds, are recorded without stability labels;
 4. the exact same EOS SHA, v5 source build key, r0, radius limit, step cap and ODE tolerance are retained;
 5. no Cowling spectra are admitted until radial omega_0^2 is computed with a declared perturbative Gamma_1 closure and a valid surface condition.
+
+
+## Exact 192-point pilot: observed mass-sequence topology (2026-11-09)
+
+Exact-head run: https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42615970377  
+HEAD: 40177800d4484a19149485581e0f2d5bd69594a9  
+Artifact: 13673520039; ZIP SHA-256 e460c295af38a70444e6139fb82aa037b3be4718e29d172db7be31d358abbff5
+
+Execution:
+- All 6 model rows completed 192/192 valid TOV integrations (1152/1152 total; no failed samples).
+- All frozen-v5 M/R reference reproductions passed at near machine precision.
+- Candidate-segment unit tests: 10 passed.
+- Fixed-mass and Cowling tangent mock tests: 6 passed.
+- Valid f/p1 spectrum rows: 0/48; complete six-method mass cells: 0. The scientific validator again fails correctly at the required 1.0 Msun paired cell.
+
+First sampled maximum across methods:
+- M = 0.7652434–0.7652747 Msun;
+- Pc = 0.2248758–0.2254394 MeV fm^-3;
+- R = 1849.995–1858.853 km.
+
+Relative to the 96-point results, the first-maximum mass changes by only about 2.2e-4 in relative terms, while Pc shifts by roughly 0.8% and R by about 1.6%. This is promising but not sufficient to call the structural turning point converged, especially because the first subsequent minimum remains poorly resolved in radius: for css, the sampled minimum changes from about 418 km at 96 points to about 195 km at 192 points, while its mass remains about 0.0714–0.0716 Msun. The transition region has a sharp response in M(Pc), and radius convergence lags mass convergence.
+
+The method-specific maxwell bridge fold persists and becomes better localized:
+- intermediate local maximum: M = 0.2179489 Msun, Pc = 1.0415144 MeV fm^-3, R = 17.8614 km;
+- intermediate local minimum: M = 0.2028220 Msun, Pc = 1.9619452 MeV fm^-3, R = 17.2259 km.
+
+At 96 points the corresponding candidates were M = 0.2168408 Msun at Pc = 1.1164034, R = 17.8562 km and M = 0.2028787 Msun at Pc = 1.8976322, R = 17.3147 km. The additional pair therefore persists under doubling the grid, although its Pc locations still move by several percent. It remains a kinematic feature of the smooth near-pressure-plateau compatibility bridge (not an exact Maxwell jump), not a radial-stability result.
+
+For the five other methods, the candidate direction pattern remains rising/falling/rising/falling. For the maxwell compatibility row it remains rising/falling/rising/falling/rising/falling. The late high-density sampled maximum remains near 1.9195–1.9196 Msun at Pc about 893.7 MeV fm^-3 and R about 9.53 km, followed by a small decline at the upper scan edge; this is not certified Mmax because the high-pressure endpoint is not a demonstrated EOS-domain/sequence boundary.
+
+The 192-point result shows that:
+1. the first maximum mass is becoming stable across grid refinement, but its radius and the following minimum are not;
+2. the maxwell-labelled smooth bridge has a reproducible additional M(Pc) fold absent in the other five prescriptions at these resolutions;
+3. no segment can be assigned radial stability without the nodeless radial eigenvalue omega_0^2.
+
+The pilot is therefore refined once more to 384 central-pressure points. At the same time, an independent SciPy DOP853 TOV calculation is added. It reconstructs the exact native-knot cubic-Hermite P(mu) interpolation (with raw n=dP/dmu knot derivatives) and integrates the SI TOV equations directly in radius. Five selected Pc values cover the first fold, the early falling interval, both maxwell bridge folds and a high-density reference. The cross-check target is relative M and R agreement <= 1e-6 against the frozen v5 cell_solve TOV-only backend. This is a structure/TOV benchmark, not a radial-mode or Cowling-spectrum validation.

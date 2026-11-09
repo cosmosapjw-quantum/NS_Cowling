@@ -126,3 +126,14 @@ Exact Actions run 42611801783 failed only at the physical validator after all si
 The 24-point first maximum was near 0.7433 Msun / 0.172 MeV fm^-3 / 1233 km; the 96-point first maximum is 0.76502-0.76511 Msun / 0.22676-0.22733 MeV fm^-3 / 1879.8-1889 km. Thus 24-to-96 is not converged. Five methods have four monotonic pieces; the smooth maxwell bridge has six, including an extra max/min at Pc about 1.116/1.898 MeV fm^-3, M about 0.21684/0.20288 Msun and R about 17.86/17.31 km. The bridge has no density jump; its metadata gives cs2_min about 9.07e-4. No piece is called stable.
 
 The workflow is changed to 192 Pc samples on the six-model pilot. After push, inspect the exact-head run/artifact and compare first turning-point M/R/Pc plus every candidate fold. Do not use the secondary/higher-density intervals for Cowling roots until direct radial fundamental-mode omega_0^2, an explicit Gamma_1 closure and a valid zero-pressure/finite-cutoff surface condition have been validated.
+
+
+## Exact 192-point artifact readback and next action (2026-11-09)
+
+Current 192-point pilot commit: 40177800d4484a19149485581e0f2d5bd69594a9. Backup: backup/mass-dependent-192point-topology-20261109 -> 40177800d4484a19149485581e0f2d5bd69594a9.
+
+Actions 42615970377 completed the six-model 192-point run. Artifact 13673520039, ZIP SHA-256 e460c295af38a70444e6139fb82aa037b3be4718e29d172db7be31d358abbff5. All 1152 TOV integrations were valid; the six reference M/R anchors reproduced to machine precision. The 10 branch helper tests and 6 fixed-mass/Cowling mock tests passed. The physical validator failed correctly because all 0/48 spectra are available and the 1.0 Msun six-method cell is absent.
+
+The first sampled max is M=0.7652434-0.7652747 Msun, Pc=0.2248758-0.2254394 MeV fm^-3, R=1849.995-1858.853 km. The 96-to-192 mass shift is small, but R shifts about 1.6% and the first subsequent minimum R in css shifts about 418 to 195 km. The maxwell-labelled smooth bridge retains an extra maximum/minimum pair (M about 0.21795/0.20282 Msun at Pc about 1.0415/1.9619 MeV fm^-3); it is not an exact density-jump transition and is not a stability label.
+
+The next workflow is configured for 384 central-pressure points and adds a SciPy DOP853 TOV reference using the exact same raw-knot cubic-Hermite P(mu) EOS. Five selected Pc values compare M/R against native v5 cell_solve with a predeclared 1e-6 relative criterion. Inspect both the 384-point topology and SciPy reference artifact before promoting any structural claim. Radial omega_0^2, closure Gamma_1, and surface condition remain unimplemented; no mass-dependent Cowling mode result is admitted.

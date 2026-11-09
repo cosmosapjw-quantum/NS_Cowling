@@ -108,3 +108,14 @@ The detailed equations, pilot table, acceptance gates and references are in docs
 | MD-18 | Six-model 192-point topology refinement | QUEUED_BY_NEXT_PUSH | Compare first-turning-point M/R/Pc and all method-dependent turns against the 96-point values. Do not run spectra or label stability. |
 
 At 96 points, the first sampled maximum ranges from 0.7650195 to 0.7651069 Msun at Pc = 0.226758–0.227326 MeV fm^-3, R = 1879.8–1889.0 km. The maxwell compatibility method, which is a smooth zero-density-jump bridge, exhibits an additional candidate max/min pair inside its low-cs2 bridge. This is an observed sequence feature, not a stable branch label. Full details and the 24-to-96 nonconvergence observation are in docs/MASS_SEQUENCE_BRANCH_STABILITY_AUDIT_20261109.md.
+
+
+## 192-point pilot and independent TOV benchmark (2026-11-09)
+
+| ID | Node | Status | Exit evidence |
+|---|---|---|---|
+| MD-18 | Six-model 192-point topology pilot | PASS_EXECUTION_HOLD_SCIENCE | 1152/1152 TOV integrations valid; all six frozen-v5 M/R anchors pass; 0/48 f/p1 rows; no 1.0 Msun paired cell. Artifact 13673520039, SHA-256 e460c295af38a70444e6139fb82aa037b3be4718e29d172db7be31d358abbff5. |
+| MD-19 | Same-EOS independent SciPy TOV reference | IMPLEMENTED_CI_PENDING | New DOP853 direct-r SI TOV solver rebuilds native-knot cubic-Hermite P(mu), then compares M/R with v5 cell_solve at five selected Pc values. Acceptance: max relative M/R difference <= 1e-6. |
+| MD-20 | 384-point six-model topology refinement | QUEUED_BY_NEXT_PUSH | Resolve remaining first-minimum radius and maxwell-bridge fold location movement. No radial stability labels or spectra. |
+
+The 96-to-192 first-max mass shift is small (about 2.2e-4 relative), but first-max radius moves by about 1.6% and the first-minimum radius by more than a factor of two in the css row. This is not a converged mass-radius topology. The maxwell compatibility bridge's extra fold persists, with its intermediate maximum moving from Pc about 1.1164 to 1.0415 MeV fm^-3 and its intermediate minimum from Pc about 1.8976 to 1.9619 MeV fm^-3. This remains a smooth bridge, not a density-jump Maxwell construction. See docs/MASS_SEQUENCE_BRANCH_STABILITY_AUDIT_20261109.md.

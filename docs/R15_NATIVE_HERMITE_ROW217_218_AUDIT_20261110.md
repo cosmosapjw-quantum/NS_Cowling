@@ -79,7 +79,7 @@ Established: numerical stability/causality of the existing projected (P(\mu_b)) 
 
 Not established: physical outer-crust completeness, crust-core transition location, physical crust mass/thickness, a (P=0) surface, or a validated radial/Cowling perturbation boundary condition. The interpolant is a representation of supplied endpoint data, not new microphysical source data.
 
-The next high-value study is a provenance and microphysics audit of the underlying low-density source segments (including CompOSE/BSk22-derived records) and the mapping/projection that produces rows 217–218. MD-31 ((P=0) physical completion) and MD-32 (finite-domain perturbation boundary) remain separate gates; radial (\omega_0^2) and complete-star Cowling modes remain blocked.
+The full-cohort normalized-to-projected audit is now recorded in `R16_NORMALIZED_TO_PROJECTED_AUDIT_20261110.md`. It finds source pressure secant drops in 447 adjacent transitions and raw Hermite rejection in 24,505/109,776 cells, while the projected representation passes all cells. The next study is R17: explicitly compare pressure-relaxed and joint (P,n) convex thermodynamic reconstructions, while tracing failures to upstream source/phase/matching provenance. MD-31 (physical P=0 completion) and MD-32 (finite-domain perturbation boundary) remain separate gates; radial `omega_0^2` and complete-star Cowling modes remain blocked.
 
 ## Artifact provenance
 

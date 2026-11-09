@@ -1,0 +1,61 @@
+name: R15 native outer-crust finite-pressure TOV pilot
+
+on:
+  push:
+    branches: [research/r15-native-outer-crust-pilot]
+    paths:
+      - ".github/workflows/native-outer-crust-r15.yml"
+      - "docs/R15_NATIVE_OUTER_CRUST_CUTOFF_PILOT_20261110.md"
+      - "python_frontend/compose_cowling/native_table_cutoff_scan.py"
+      - "python_frontend/tests/test_native_density_cutoff_scan.py"
+      - "scripts/run_native_outer_crust_r15.py"
+      - "python_frontend/compose_cowling/solver.py"
+      - "oscillation_release_v1/data/spectrum_summary_234.csv"
+      - "oscillation_release_v1/data/eos_projected/**"
+      - "oscillation_release_v1/workflow/compile_manifest.json"
+      - "oscillation_source/calculation/**"
+      - "oscillation_source/methods/**"
+      - "oscillation_source/support/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-outer-crust-r15:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      PYTHONPATH: python_frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install GNU Fortran and Python dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gfortran
+          python -m pip install --upgrade pip
+          python -m pip install numpy scipy pytest
+      - name: Test native pressure and density knot selectors
+        run: |
+          python -m pytest -q python_frontend/tests/test_native_density_cutoff_scan.py
+          python -m pytest -q python_frontend/tests/test_native_table_cutoff_scan.py
+      - name: Test v5 TOV background-profile export
+        run: python -m pytest -q python_frontend/tests/test_v5_background_profile_export.py
+      - name: Run R15 three-pair native outer-crust cutoff pilot
+        run: |
+          python scripts/run_native_outer_crust_r15.py \
+            --output-dir dist/native-outer-crust-r15 \
+            --baseline-relative-tolerance 2.0e-5 \
+            --target-count 8 \
+            --maximum-density-fm3 1.0e-3
+      - name: Upload R15 cutoff and background-profile evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ns-cowling-native-outer-crust-r15-${{ github.run_id }}
+          path: dist/native-outer-crust-r15/
+          if-no-files-found: warn
+          retention-days: 30

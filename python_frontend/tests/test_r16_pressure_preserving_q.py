@@ -102,3 +102,16 @@ def test_constant_q_cell_cannot_match_a_different_source_pressure_increment():
     assert result["status"] == "INFEASIBLE_CONSTANT_Q"
     assert result["k"] is None
     assert result["realizable_by_continuous_q"] is False
+
+
+def test_small_shape_parameter_uses_stable_integral_series():
+    mu0, mu1 = 956.9629705366431, 957.1695838405601
+    q0, q1 = 0.00010127909927038724, 0.00010328364896477299
+    source_dp = 0.02022539849412841
+
+    result = qexp_shape_parameter(mu0, mu1, q0, q1, source_dp)
+    reconstructed = qexp_pressure_increment(mu0, mu1, q0, q1, result["k"])
+    relative_error = abs(reconstructed-source_dp)/source_dp
+
+    assert abs(result["k"]) < 1.0e-3
+    assert relative_error < 1.0e-12

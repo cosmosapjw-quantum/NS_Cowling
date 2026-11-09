@@ -125,10 +125,15 @@ def reconstruct_projection(
     )
 
     row217, row218 = 216, 217
-    if len(mu_v) <= row218:
-        raise ValueError("source table has fewer than 218 rows")
-    block217 = next(b for b in blocks if b["lo_zero_based"] <= row217 < b["hi_exclusive_zero_based"])
-    block218 = next(b for b in blocks if b["lo_zero_based"] <= row218 < b["hi_exclusive_zero_based"])
+    has_r16_boundary = len(mu_v) > row218
+    if has_r16_boundary:
+        block217 = next(b for b in blocks if b["lo_zero_based"] <= row217 < b["hi_exclusive_zero_based"])
+        block218 = next(b for b in blocks if b["lo_zero_based"] <= row218 < b["hi_exclusive_zero_based"])
+    else:
+        block217 = block218 = None
+
+    def boundary_value(values: Sequence[float], index: int):
+        return values[index] if has_r16_boundary else None
 
     return {
         "row_count": len(mu_v),
@@ -138,8 +143,8 @@ def reconstruct_projection(
         "pav_pooled_block_count": len(pooled_blocks),
         "pav_pooled_knots": pooled_knots,
         "pav_knot_reduction": pooled_reduction,
-        "pav_row217_block_width": block217["width"],
-        "pav_row218_block_width": block218["width"],
+        "pav_row217_block_width": block217["width"] if has_r16_boundary else None,
+        "pav_row218_block_width": block218["width"] if has_r16_boundary else None,
         "max_abs_delta_n_over_n": max_relative(n_projected, n_v),
         "max_abs_delta_p_over_p": max_relative(p_projected, p_v),
         "max_abs_delta_p_over_pmax": max(abs(a - b) for a, b in zip(p_projected, p_v)) / max(p_v),
@@ -150,29 +155,33 @@ def reconstruct_projection(
         ),
         "source_first_law_max_rel": source_first_law,
         "projected_first_law_max_rel": projected_first_law,
-        "row217_n_source": n_v[row217],
-        "row218_n_source": n_v[row218],
-        "row217_mu_source": mu_v[row217],
-        "row218_mu_source": mu_v[row218],
-        "row217_p_source": p_v[row217],
-        "row218_p_source": p_v[row218],
-        "row217_p_projected": p_projected[row217],
-        "row218_p_projected": p_projected[row218],
-        "row217_eps_source": eps_v[row217],
-        "row218_eps_source": eps_v[row218],
-        "row217_eps_projected": eps_projected[row217],
-        "row218_eps_projected": eps_projected[row218],
-        "row218_pressure_endpoint_delta_pct": 100.0 * (
-            p_projected[row218] / p_v[row218] - 1.0
+        "row217_n_source": boundary_value(n_v, row217),
+        "row218_n_source": boundary_value(n_v, row218),
+        "row217_mu_source": boundary_value(mu_v, row217),
+        "row218_mu_source": boundary_value(mu_v, row218),
+        "row217_p_source": boundary_value(p_v, row217),
+        "row218_p_source": boundary_value(p_v, row218),
+        "row217_p_projected": boundary_value(p_projected, row217),
+        "row218_p_projected": boundary_value(p_projected, row218),
+        "row217_eps_source": boundary_value(eps_v, row217),
+        "row218_eps_source": boundary_value(eps_v, row218),
+        "row217_eps_projected": boundary_value(eps_projected, row217),
+        "row218_eps_projected": boundary_value(eps_projected, row218),
+        "row218_pressure_endpoint_delta_pct": (
+            100.0 * (p_projected[row218] / p_v[row218] - 1.0)
+            if has_r16_boundary else None
         ),
-        "row218_energy_endpoint_delta_pct": 100.0 * (
-            eps_projected[row218] / eps_v[row218] - 1.0
+        "row218_energy_endpoint_delta_pct": (
+            100.0 * (eps_projected[row218] / eps_v[row218] - 1.0)
+            if has_r16_boundary else None
         ),
-        "row217_218_source_delta_p": p_v[row218] - p_v[row217],
-        "row217_218_projected_delta_p": p_projected[row218] - p_projected[row217],
-        "row217_218_delta_p_increment_delta_pct": 100.0 * (
-            (p_projected[row218] - p_projected[row217])
-            / (p_v[row218] - p_v[row217]) - 1.0
+        "row217_218_source_delta_p": p_v[row218] - p_v[row217] if has_r16_boundary else None,
+        "row217_218_projected_delta_p": p_projected[row218] - p_projected[row217] if has_r16_boundary else None,
+        "row217_218_delta_p_increment_delta_pct": (
+            100.0 * (
+                (p_projected[row218] - p_projected[row217])
+                / (p_v[row218] - p_v[row217]) - 1.0
+            ) if has_r16_boundary else None
         ),
         "projected_n": n_projected,
         "projected_p": p_projected,

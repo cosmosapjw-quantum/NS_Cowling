@@ -148,10 +148,10 @@ Run 42617251360 completed 2304/2304 TOV integrations and all frozen-v5 anchor ch
 
 | ID | Node | Status | Evidence / next condition |
 |---|---|---|---|
-| MD-24 | Shared low-density continuation diagnostic | DIAGNOSTIC_COMPLETE / MODEL_NOT_SELECTED | First five raw EOS knots are identical across all six smooth methods. At the cutoff (P=9.0e-12), (epsilon=4.3541e-7) MeV fm^-3 and right-cell (Gamma_{eq}=1.52432); local values decrease to 1.46155 by knot 5. A local tangent polytrope (P=Kepsilon^{\gamma_s}) can match value and derivative, but requires (n_b,mu_b) first-law completion and continuation sensitivity tests. |
-| MD-25 | Extend TOV background to (P=0) | NEXT_EXECUTION_GATE | Implement the C1 tangent extension as one reference only; audit first-law closure, causality, positive compressibility, finite radius, M/R change, and sensitivity to alternative continuation parameters. |
-| MD-26 | Direct radial fundamental eigenvalue | BLOCKED_ON_MD-25 | Solve for nodeless (omega_0^2) with geometric-unit TOV background, centre regularity, (Delta P(R)=0), node count and eigenvalue convergence. Initial (Gamma_1=Gamma_{eq}) supports only barotropic-equilibrium stability. |
-| MD-27 | Mass-dependent Cowling modes on classified stable segments | BLOCKED_ON_MD-26 | Require a converged radial-stability label and validated f/p1 root identity before target-mass scans. |
+| MD-24 | Shared low-density continuation diagnostic | HISTORICAL_DIAGNOSTIC_ONLY / NO_MODEL_SELECTED | The R13 tangent/curvature tails satisfy a mathematical barotropic closure but are synthetic EOS extensions. They are retained only as historical diagnostics and are excluded from the primary EOS-preserving analysis. |
+| MD-25 | Synthetic EOS extension to (P=0) | SUPERSEDED_FOR_PRIMARY_PATH | Do not extend or append EOS rows in the primary study. A physical P=0 continuation is blocked until a sourced low-density crust EOS and a compatible surface boundary are specified. |
+| MD-26 | Direct radial fundamental eigenvalue | BLOCKED_ON_PHYSICAL_LOW_DENSITY_EOS_AND_SURFACE_BC | Solve for nodeless (omega_0^2) only after a physical low-density EOS and justified surface boundary condition are available; retain centre regularity, node count and eigenvalue convergence. Initial (Gamma_1=Gamma_{eq}) supports only barotropic-equilibrium stability. |
+| MD-27 | Full-star mass-dependent Cowling modes on classified stable segments | BLOCKED_ON_MD-26_AND_PHYSICAL_SURFACE | Require a converged radial-stability label, a physical surface condition, and validated f/p1 root identity before complete-star target-mass scans. |
 
 The surface analysis used the exact six projected EOS CSVs. The first five ((n_b,P,\epsilon,\mu_b)) knots match exactly in all six methods; this permits one shared continuation baseline. However, the local effective polytropic slope changes across those knots, and least-squares exponents depend materially on the fitting window. Hence a broad-window polytrope is not adopted. The C1 tangent polytrope is a starting diagnostic and must be thermodynamically completed and sensitivity-tested before it supplies a radial surface condition.
 
@@ -162,9 +162,28 @@ The surface analysis used the exact six projected EOS CSVs. The first five ((n_b
 |---|---|---|---|
 | MD-21 | SciPy TOV receipt-schema CLI repair | PASS_CODE_AND_REGRESSION | Actions 42618432567: 5/5 independent-Hermite/CLI tests pass; CLI prints all v2 receipt groups with no KeyError. |
 | MD-22 | Six-method mass-pair validator | SCIENCE_HOLD | Validator intentionally fails: required 1.0 Msun mass has no complete six-method pair; 0/48 roots and 0 complete cells. |
-| MD-24 | Shared low-density continuation diagnostic | DIAGNOSTIC_COMPLETE / MODEL_NOT_SELECTED | First five raw ((n_b,P,\epsilon,\mu_b)) knots identical across all six methods; C1 tangent-polytrope continuation is candidate only. |
+| MD-24 | Shared low-density continuation diagnostic | HISTORICAL_DIAGNOSTIC_ONLY / NO_MODEL_SELECTED | The R13 tangent/curvature tails satisfy a mathematical barotropic closure but are synthetic EOS extensions. They are retained only as historical diagnostics and are excluded from the primary EOS-preserving analysis. |
 | MD-25 | Thermodynamic extension to (P=0) | NEXT_EXECUTION_GATE | Enforce first law, (dP=n_b d\mu_b), causality, positivity, and continuation sensitivity before radial surface BC. |
-| MD-26 | Direct radial fundamental eigenvalue | BLOCKED_ON_MD-25 | No radial (omega_0^2) computation admitted yet. |
+| MD-26 | Direct radial fundamental eigenvalue | BLOCKED_ON_PHYSICAL_LOW_DENSITY_EOS_AND_SURFACE_BC | Solve for nodeless (omega_0^2) only after a physical low-density EOS and justified surface boundary condition are available; retain centre regularity, node count and eigenvalue convergence. Initial (Gamma_1=Gamma_{eq}) supports only barotropic-equilibrium stability. |
 | MD-27 | f/p1 on classified stable segments | BLOCKED_ON_MD-26 | No mass-dependent Cowling roots until radial eigenvalue/node and surface-closure gates pass. |
 
 Actions run 42618432567 was executed on code HEAD `2e4dc9982238bd937a92019dd46580b37923998f`. All code and numerical TOV steps passed, including the receipt-schema regression and refined SciPy/native structural comparison. The workflow ended in failure only at the physical 1.0 Msun pairing validator: the first rising-branch proxy ends at approximately 0.7653 Msun, so all 48 requested mass rows are outside it. Artifact 13675450289 has verified SHA-256 `30922c2fafd5260d3c03d6852057530555cd997a64962d5b59d3f8af966af2ee`. A subsequent docs-only commit records the result and the surface-continuation diagnostic; the code tested by the run is unchanged.
+
+
+## EOS-preserving native-table boundary audit R14 (2026-11-09)
+
+| ID | Node | Status | Evidence / next condition |
+|---|---|---|---|
+| MD-28 | Native pressure-knot selector and source-integrity guards | PASS_CODE_AND_TESTS | Existing CSV rows are read in source order; pressure must be strictly increasing; cutoff selection returns only exact source-row P, epsilon, n_b and mu_b values; no source file is written. |
+| MD-29 | Six-method native finite-pressure TOV cutoff scan | PASS_EXACT_HEAD_48_OF_48 | Actions 42640660436 on exact HEAD `aff4e6ad2789555648f2e564a96bbabd952ee4ac`: 48/48 native TOV integrations, zero failures, all six 323-row source EOS SHA-256 values unchanged, all six row-1 frozen M/R baselines reproduced within 2e-5. |
+| MD-30 | Native TOV background-profile preservation | PASS_48_OF_48 | All 48 backend-exported finite-domain background CSVs have verified SHA-256 and row count. They do not extend below the selected positive-pressure endpoint. |
+| MD-31 | Physical P=0 completion and full-star radial boundary | BLOCKED_ON_SOURCED_LOW_DENSITY_EOS | No crust EOS, synthetic tail, or vacuum continuation is selected in the primary analysis. A physical P=0 surface and radial boundary condition remain unavailable from the current input tables alone. |
+| MD-32 | Finite-domain radial/Cowling diagnostic | DESIGN_DECISION_REQUIRED | May be explored only if explicitly named a truncated-domain eigenproblem with a mathematically justified positive-pressure boundary condition. Do not label its roots as complete-star f/p modes. |
+
+The source cohort is GPPVA_FSU2 x BBB_BHF2 with methods css, cubic_F, cubic_P, maxwell, quintic_F and quintic_P. All six raw projected CSVs have 323 rows and identical first native thermodynamic knots. The minimum pressure is (9.000000079422\times10^{-12}\;\mathrm{MeV\,fm^{-3}}>0), so even the native table-edge endpoint is not the vacuum surface.
+
+The eight selected source rows are 1, 3, 4, 6, 7, 11, 15 and 20 (actual log-pressure offsets 0, 0.311229, 0.467474, 0.779805, 0.936080, 1.560687, 1.994697 and 3.049259 dex). Each method uses its exact source row at the same index and its frozen reference central pressure. No EOS rows are appended, rewritten, reordered or interpolated as new table entries.
+
+At source row 20 relative to row 1, the enclosed mass change is about (-4.54\times10^{-10}) and the radius of that finite-pressure isobar changes by about (-0.2137\%\), approximately (-24.1\,\mathrm{m}). The result says that the mass integral is effectively saturated within this sampled low-pressure part of the supplied tables, while the coordinate location of the selected isobar still moves. It does not estimate the missing outer-crust thickness or the P=0 radius.
+
+The R13 synthetic tail branch is retained for reproducibility but is withdrawn as the primary surface strategy. The legacy synthetic-surface workflow is manual-dispatch only. MD-25 is superseded; MD-26 and MD-27 remain blocked until the physical low-density EOS and boundary issue is resolved. The R14 artifact has ID `13684872040`, size 18,300,545 bytes and SHA-256 `e124339e932636e9e08c92298b2e1269aca3fac4980230083a28a3451421d8f3`.

@@ -117,7 +117,8 @@ program maxwell_table_checks
     call require(dp_rel<1e-9_wp,'table-backed rapid Delta P continuity')
 
     print '(A,I0,A)', 'maxwell_table_checks: ',checks,' checks passed'
-    call write_namelist()
+    call write_namelist('maxwell_table_fixture.nml','slow')
+    call write_namelist('maxwell_table_rapid_fixture.nml','rapid')
 contains
     subroutine require(ok,label)
         logical,intent(in) :: ok
@@ -162,9 +163,10 @@ contains
         call require(ios==0,'close normalized fixture')
     end subroutine
 
-    subroutine write_namelist()
+    subroutine write_namelist(filename,conversion)
+        character(len=*),intent(in) :: filename,conversion
         integer :: u,ios
-        open(newunit=u,file='../../dist/maxwell_table_fixture.nml',status='replace',action='write',iostat=ios)
+        open(newunit=u,file='../../dist/'//trim(filename),status='replace',action='write',iostat=ios)
         call require(ios==0,'open Maxwell table case NAMELIST')
         write(u,'(A)') '&request'
         write(u,'(A)') " request_token = 'maxwell-table-cli-smoke'"
@@ -192,7 +194,7 @@ contains
         write(u,'(A)') ' scan_n = 41'
         write(u,'(A)') ' root_xtol = 1.0e-5'
         write(u,'(A)') ' root_rtol = 1.0e-10'
-        write(u,'(A)') " conversion = 'slow'"
+        write(u,'(A)') " conversion = '"//trim(conversion)//"'"
         write(u,'(A)') ' atol_w = 1.0e-12'
         write(u,'(A)') ' atol_v = 1.0e-12'
         write(u,'(A)') '/'

@@ -73,6 +73,10 @@ jobs:
           grep -E '^spectrum_scan_valid[[:space:]]+bool[[:space:]]+true$' ../../dist/maxwell-spectrum-cli.log
           grep -E '^spectrum_all_trials_succeeded[[:space:]]+bool[[:space:]]+true$' ../../dist/maxwell-spectrum-cli.log
           grep -E '^spectrum_valid[[:space:]]+bool[[:space:]]+true$' ../../dist/maxwell-spectrum-cli.log
+          fpm run --target case_driver -- maxwell_table_spectrum ../../dist/maxwell_table_rapid_fixture.nml 2>&1 | tee ../../dist/maxwell-rapid-spectrum-cli.log
+          grep -E '^spectrum_scan_valid[[:space:]]+bool[[:space:]]+true$' ../../dist/maxwell-rapid-spectrum-cli.log
+          grep -E '^spectrum_all_trials_succeeded[[:space:]]+bool[[:space:]]+true$' ../../dist/maxwell-rapid-spectrum-cli.log
+          grep -E '^spectrum_valid[[:space:]]+bool[[:space:]]+true$' ../../dist/maxwell-rapid-spectrum-cli.log
 
       - name: Record exact source identity
         run: |

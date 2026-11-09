@@ -77,3 +77,14 @@ Toolchain: GNU Fortran 16.2.0, FPM 0.13.0, runtime checks with `-fcheck=all`. Te
 ## Current stop point
 
 Native generic production dispatch, slow/rapid positive-root scans, bounded ODE/grid/root refinement and independent Python/SciPy TOV/Cowling cross-check all pass exact-head CI on the generated analytic fixture. Mode identity, pointwise perturbation comparison, negative admission tests, stable M-R sequence and realistic source-backed CompOSE integration remain open.
+
+
+## Separate smooth-matching mass-response track (2026-11-09)
+
+The mass-dependent follow-up is tracked in research/mass-dependent-cowling-v1, branched from the live feature head a09ec30d74b363652d2d1aefe990557c468679dd. It is not the native sharp-Maxwell phase-interface problem described above and does not modify PR #3.
+
+The smooth v5 cohort has 13 crusts × 3 admitted core families × 6 smooth methods = 234 method rows / 39 fixed core-crust pairs. The historical spectra all target 1.3300106 solar masses; the prior reuse report states that zero modes were recomputed. A new runner is being added for 0.8, 1.0, 1.2, 1.33, 1.4, 1.6, 1.8 and 2.0 solar masses. It scans TOV central pressure, keeps the connected rising branch, does not bridge failed samples, passes adjacent stable-branch Pc brackets into the native target-mass solver, and computes fresh Cowling roots with the smooth W/V identity gate.
+
+The paired estimand is delta_m(y)=100*(y_m/ybar_6-1), for y=f,p1. Incomplete six-method core/crust/mass cells are excluded, never imputed. Low-mass p1 sensitivity is already present in published work; the candidate differentiator must be a reproducible core/crust-conditioned mass-response structure plus independent numerical benchmarks. The old maxwell method token remains a smooth bridge and is not a density jump.
+
+Implementation and node states are in docs/MASS_DEPENDENT_COWLING_DAG_20261109.md. Assumptions and publication gates are in docs/MASS_DEPENDENT_COWLING_RESEARCH_PLAN_20261109.md. No new mass-dependent result, Mmax, radial-stability result, crust mass/thickness, tidal deformability or observational inference is claimed until its own evidence gate passes.

@@ -135,20 +135,30 @@ def solve_cowling_spectrum(eos:EOSData | str | Path,pc_pa:float,frequency_lo_hz,
                            target_mass_kg:float=2.644606257493485e30,p_cut_pa:float|None=None,
                            match_index:int=72,rtol:float=1e-9,mode_rtol:float=1e-9,
                            step_cap:float=0.05,mass_rtol:float=1e-10,
-                           residual_tol:float=1e-6)->dict:
+                           residual_tol:float=1e-6,
+                           pc_bracket_pa:tuple[float,float]|None=None)->dict:
     _,cell_solve=_compile_solver()
     with tempfile.TemporaryDirectory(prefix='compose-cowling-') as td0:
         td=Path(td0);table=_normalised_file(eos,td)
         if p_cut_pa is None:p_cut_pa=_surface_pressure(eos)
         lo=list(map(float,frequency_lo_hz));hi=list(map(float,frequency_hi_hz))
         if len(lo)!=2 or len(hi)!=2:raise ValueError("frequency brackets must be [f,p1]")
+        if pc_bracket_pa is None:
+            pc_lo,pc_hi=0.65*pc_pa,1.45*pc_pa
+        else:
+            if len(pc_bracket_pa)!=2:
+                raise ValueError("pc_bracket_pa must contain exactly two pressures")
+            pc_lo,pc_hi=map(float,pc_bracket_pa)
+            if not np.all(np.isfinite([pc_lo,pc_hi])) or pc_lo<=0 or pc_hi<=pc_lo:
+                raise ValueError("pc_bracket_pa must be finite, positive and strictly increasing")
+            pc_pa=float(np.sqrt(pc_lo*pc_hi))
         nml=td/'spectrum.nml';prefix=td/'spectrum'
         nml.write_text(
           "&precision\n"
           f" table_path='{table}'\n task='spectrum'\n method='dopri'\n shooting='matched'\n"
           f" match_index={match_index}\n split_index=69\n alpha=0.0\n pc_pa={pc_pa:.17e}\n"
           f" p_cut_pa={p_cut_pa:.17e}\n r0_m=10.0\n target_mass_kg={target_mass_kg:.17e}\n"
-          f" pc_lo_pa={0.65*pc_pa:.17e}\n pc_hi_pa={1.45*pc_pa:.17e}\n"
+          f" pc_lo_pa={pc_lo:.17e}\n pc_hi_pa={pc_hi:.17e}\n"
           f" rtol={rtol:.17e}\n mode_rtol={mode_rtol:.17e}\n step_cap={step_cap:.17e}\n"
           f" mass_rtol={mass_rtol:.17e}\n frequency_lo={lo[0]:.17e},{lo[1]:.17e}\n"
           f" frequency_hi={hi[0]:.17e},{hi[1]:.17e}\n root_atol_hz=1.0e-8\n"

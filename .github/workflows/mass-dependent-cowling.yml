@@ -1,0 +1,70 @@
+name: Mass-dependent Cowling spectrum
+
+on:
+  push:
+    branches: [research/mass-dependent-cowling-v1]
+    paths:
+      - ".github/workflows/mass-dependent-cowling.yml"
+      - "python_frontend/compose_cowling/solver.py"
+      - "python_frontend/compose_cowling/mass_sequence.py"
+      - "python_frontend/tests/test_mass_sequence.py"
+      - "scripts/run_mass_dependent_spectrum.py"
+      - "scripts/validate_mass_dependent_spectrum.py"
+      - "oscillation_release_v1/data/eos_projected/**"
+      - "oscillation_release_v1/data/spectrum_summary_234.csv"
+  workflow_dispatch:
+    inputs:
+      cohort:
+        description: "Run the six-model tail pilot or full 234-EOS cohort"
+        required: true
+        type: choice
+        options: [pilot, full]
+        default: pilot
+
+permissions:
+  contents: read
+
+jobs:
+  mass-dependent-cowling:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      PYTHONPATH: python_frontend
+      COHORT: ${{ github.event_name == 'workflow_dispatch' && inputs.cohort || 'pilot' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install GNU Fortran and Python dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gfortran
+          python -m pip install --upgrade pip
+          python -m pip install numpy scipy pytest
+      - name: Unit tests for stable-branch and paired-response rules
+        run: python -m pytest -q python_frontend/tests/test_mass_sequence.py
+      - name: Run mass-dependent spectrum
+        run: |
+          if [ "$COHORT" = "full" ]; then
+            python scripts/run_mass_dependent_spectrum.py --tov-samples 48 --output-dir dist/mass-dependent-cowling
+            expected_models=234
+          else
+            python scripts/run_mass_dependent_spectrum.py --crusts GPPVA_FSU2 --cores BBB_BHF2 \
+              --tov-samples 24 --output-dir dist/mass-dependent-cowling
+            expected_models=6
+          fi
+          echo "EXPECTED_MODELS=$expected_models" >> "$GITHUB_ENV"
+      - name: Validate frozen baseline and complete six-method mass pairing
+        run: |
+          python scripts/validate_mass_dependent_spectrum.py \
+            --output-dir dist/mass-dependent-cowling \
+            --expected-models "$EXPECTED_MODELS" --required-mass 1.33 --required-low-mass 1.0
+      - name: Upload reproducible mass-dependent evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ns-cowling-mass-dependent-${{ github.run_id }}
+          path: dist/mass-dependent-cowling/
+          if-no-files-found: warn
+          retention-days: 30

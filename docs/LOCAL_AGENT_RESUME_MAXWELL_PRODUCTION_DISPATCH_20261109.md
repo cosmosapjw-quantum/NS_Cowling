@@ -220,3 +220,18 @@ Earlier milestone backups remain available:
 - positive-root handoff `3ff2914776e95d00a3674310d0cff7bd0e16cca0`
 
 Current feature branch latest code/docs handoff is the HEAD recorded in PR #3. No workstation checkout or local files were modified by these GitHub operations.
+
+
+## Separate workstream: mass-dependent smooth-matching cohort (2026-11-09)
+
+This is not the native sharp-Maxwell interface track. Use the separate branch research/mass-dependent-cowling-v1, forked from the live Maxwell feature head a09ec30d74b363652d2d1aefe990557c468679dd. Keep PR #3 open/draft/unmerged.
+
+The frozen 234-row smooth cohort comprises 13 crusts × 3 cores × 6 smooth methods, or 39 repeated core/crust pairs. Old spectra are at one mass only (1.3300106 solar masses); the reuse audit says recomputed_modes=0. The historical method token maxwell is a smooth bridge, not a density discontinuity.
+
+The new code scans central pressure and retains the initial connected rising-M(Pc) branch. Failed TOV samples are barriers. The first maximum requires two consecutive mass decreases greater than 1e-4; a scan that stops before this is reported as a branch endpoint, not Mmax. Fresh spectra are solved at eight declared target masses and only when the target is bracketed by adjacent samples on that branch. The solver accepts an explicit Pc interval; old default behaviour remains unchanged.
+
+Run the exact-head GitHub Actions pilot first. Pilot covers the six methods for BBB_BHF2 × GPPVA_FSU2 and requires baseline M/R reproduction plus a complete six-method 1.33-solar-mass pair. Do not run full 234 × 8 until the pilot artifact and mode/node gates are inspected. Full workflow dispatch uses cohort=full.
+
+Research plan: docs/MASS_DEPENDENT_COWLING_RESEARCH_PLAN_20261109.md. DAG: docs/MASS_DEPENDENT_COWLING_DAG_20261109.md. Local continuation prompt: docs/LOCAL_AGENT_RESUME_MASS_DEPENDENT_COWLING_20261109.md.
+
+Publication guard: a low-mass p1 trend alone is not novel because Canullán-Pascual et al. (2025) already report low-mass sensitivity. Look for reproducible core/crust-conditioned mass-response structure and benchmark the Cowling calculation independently. Do not conflate Cowling systematic offsets with matching-method shifts. No full-GR QNM, damping, radial stability, Mmax, crust mass/thickness, tidal Lambda, or inference claim without separate evidence.

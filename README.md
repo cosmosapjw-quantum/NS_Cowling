@@ -104,3 +104,12 @@ Exact tested head: `afcdf948f0ca6844a6c3402f66e184a46aa78978` (Fortran/table-tes
 - Maximum Fortran/Python Cowling root-set relative difference: (5.205\times10^{-5}).
 
 All four roots remain `unresolved` by mode family. This is a numerical verification on generated analytic tables, not a realistic neutron-star spectrum or source-backed CompOSE result. Exact artifacts and acceptance limits are recorded in the DAG and adversarial audit.
+
+
+## Mass-dependent smooth crust-core matching spectra (2026-11-09)
+
+A separate follow-up track is maintained on research/mass-dependent-cowling-v1. It extends the frozen 234-row smooth-matching cohort across the stellar mass sequence rather than reusing the old single-mass spectrum. The 234 rows are 39 fixed core/crust pairs crossed with six matching methods, not 234 independent EOS samples. The historical method token maxwell remains a smooth pressure-plateau bridge, not a sharp first-order density jump.
+
+The new workflow scans TOV central pressure, extracts the initial connected rising-mass branch, rejects gaps and out-of-branch target masses, then sends adjacent stable-branch pressure brackets to the native mass-root solver before calculating fresh Cowling spectra. Six-method paired deviations are admitted only for complete core/crust/mass cells. The predeclared mass grid is 0.8, 1.0, 1.2, 1.33, 1.4, 1.6, 1.8 and 2.0 solar masses.
+
+See the research plan at docs/MASS_DEPENDENT_COWLING_RESEARCH_PLAN_20261109.md, DAG at docs/MASS_DEPENDENT_COWLING_DAG_20261109.md, and local-agent resume prompt at docs/LOCAL_AGENT_RESUME_MASS_DEPENDENT_COWLING_20261109.md. The pilot/full GitHub Actions workflow is .github/workflows/mass-dependent-cowling.yml. This is an implementation increment awaiting exact-head CI and artifact review; no new mass-dependent scientific result or maximum-mass claim is made yet.

@@ -108,7 +108,7 @@ def audit_native_table(
     indices = [k.row_index for k in knots]
     if indices[0] != 0 or indices[-1] != max(
         i for i, row in enumerate(rows)
-        if float(row["n_b_fm3"]) <= maximum_density
+        if float(row["n_b_fm3"]) <= maximum_density_fm3
     ):
         raise ValueError("selected cutoffs do not include both eligible native-prefix endpoints")
     if len(set(indices)) != target_count or indices != sorted(indices):

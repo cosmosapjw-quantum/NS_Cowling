@@ -116,6 +116,28 @@ program maxwell_table_checks
         max(abs(rapid_shot%delta_p_inner_pa),abs(rapid_shot%delta_p_outer_pa),tiny(1._wp))
     call require(dp_rel<1e-9_wp,'table-backed rapid Delta P continuity')
 
+    ! Negative admission checks: physically invalid interfaces and callback
+    ! failures must never produce a valid Maxwell background.
+    call integrate_maxwell_tov(high_eos,low_eos,pc,1.1_wp*pt,star_options,star)
+    call require(.not.star%valid.and..not.is_ok(star%status), &
+        'reject transition pressure outside the low-density table domain')
+
+    call integrate_maxwell_tov(high_eos,low_eos_bad_mu,pc,pt,star_options,star)
+    call require(.not.star%valid.and..not.is_ok(star%status), &
+        'reject chemical-potential mismatch at coexistence')
+
+    call integrate_maxwell_tov(high_eos_reversed_jump,low_eos,pc,pt,star_options,star)
+    call require(.not.star%valid.and..not.is_ok(star%status), &
+        'reject reversed energy and baryon-density jump ordering')
+
+    call integrate_maxwell_tov(high_eos_bad_first_law,low_eos,pc,pt,star_options,star)
+    call require(.not.star%valid.and..not.is_ok(star%status), &
+        'reject interface that violates the cold first-law jump identity')
+
+    call integrate_maxwell_tov(high_eos,low_eos_callback_failure,pc,pt,star_options,star)
+    call require(.not.star%valid.and..not.is_ok(star%status), &
+        'propagate a low-phase EOS callback failure')
+
     print '(A,I0,A)', 'maxwell_table_checks: ',checks,' checks passed'
     call write_namelist('maxwell_table_fixture.nml','slow',2e-9_wp,5e-2_wp,41,1e-5_wp,1e-10_wp,1e-12_wp)
     call write_namelist('maxwell_table_rapid_fixture.nml','rapid',2e-9_wp,5e-2_wp,41,1e-5_wp,1e-10_wp,1e-12_wp)
@@ -249,5 +271,53 @@ contains
         type(eos_state_t),intent(out) :: state
         type(status_t),intent(out) :: st
         call eos_table_at_pressure(envelope_model,p,side,state,st)
+    end subroutine
+    subroutine low_eos_bad_mu(p,side,state,st)
+        real(wp),intent(in)::p
+        integer,intent(in)::side
+        type(eos_state_t),intent(out)::state
+        type(status_t),intent(out)::st
+        call low_eos(p,side,state,st)
+        if(.not.is_ok(st)) return
+        if(p==pt) state%mu_j=state%mu_j*(1._wp+1e-5_wp)
+    end subroutine
+
+    subroutine high_eos_reversed_jump(p,side,state,st)
+        real(wp),intent(in)::p
+        integer,intent(in)::side
+        type(eos_state_t),intent(out)::state
+        type(status_t),intent(out)::st
+        if(p==pt) then
+            call eos_table_at_pressure(envelope_model,p,SIDE_OUTER,state,st)
+            if(.not.is_ok(st)) return
+            state%side=SIDE_INNER
+            state%n_b_m3=0.5_wp*state%n_b_m3
+            state%energy_j_m3=state%mu_j*state%n_b_m3-p
+        else
+            call high_eos(p,side,state,st)
+        end if
+    end subroutine
+
+    subroutine high_eos_bad_first_law(p,side,state,st)
+        real(wp),intent(in)::p
+        integer,intent(in)::side
+        type(eos_state_t),intent(out)::state
+        type(status_t),intent(out)::st
+        call high_eos(p,side,state,st)
+        if(.not.is_ok(st)) return
+        if(p==pt) state%energy_j_m3=1.01_wp*state%energy_j_m3
+    end subroutine
+
+    subroutine low_eos_callback_failure(p,side,state,st)
+        real(wp),intent(in)::p
+        integer,intent(in)::side
+        type(eos_state_t),intent(out)::state
+        type(status_t),intent(out)::st
+        if(p==pt) then
+            state=eos_state_t()
+            call fail_status(st,NS_INVALID_INPUT,'test','injected low-phase callback failure')
+        else
+            call low_eos(p,side,state,st)
+        end if
     end subroutine
 end program maxwell_table_checks

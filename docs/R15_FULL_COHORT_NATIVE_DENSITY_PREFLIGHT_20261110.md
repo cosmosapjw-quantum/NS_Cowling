@@ -60,7 +60,7 @@ The observed jump therefore tracks the crust-family low-density mesh, rather tha
 
 The result establishes a common native-knot selection rule over all 234 projected tables. It does **not** identify the physical crust-core transition, complete an EOS to (P=0), provide a physical surface radius or crust mass/thickness, or validate radial stability or Cowling-mode boundary conditions.
 
-The next numerical stage is the separate full-cohort TOV scan: 39 pairs × 6 methods × 8 cutoffs = 1,872 integrations. Its result must be evaluated independently against per-table native-edge baselines, source-hash preservation, all case statuses, and all background-profile hashes and row counts.
+The full-cohort TOV stage is now complete: 39 pairs × 6 methods × 8 cutoffs = 1,872 integrations passed in [run 42650666976](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42650666976). Independent receipt, source-hash, native-edge baseline, pair-cell, and all 1,872 background-profile hash/row-count checks also passed after evidence repackaging. See [R15_FULL_COHORT_TOV_RESULTS_20261110.md](R15_FULL_COHORT_TOV_RESULTS_20261110.md) for the full results and artifact provenance.
 
 The large source-row-217-to-218 density interval should remain a separate low-density EOS-segment/interpolation audit; it must not be interpreted as a physical layer thickness.
 

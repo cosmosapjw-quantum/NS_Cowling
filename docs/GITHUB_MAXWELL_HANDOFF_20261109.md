@@ -112,3 +112,24 @@ The statement that native Fortran production solvers are smooth-only is supersed
 - The pre-dispatch branch backup remains `backup/maxwell-native-fortran-pre-production-dispatch-20261109`.
 
 The production generic API now dispatches smooth or Maxwell TOV backgrounds and smooth or Maxwell Cowling scans. PR #3 remains draft/open/unmerged. A realistic source-backed CompOSE hybrid EOS remains untested. The positive-root branch and mode-family identity need dedicated validation. The 33-path v5 overlay remains unapplied.
+
+
+## Native generic production dispatch and positive-root validation update (2026-11-09)
+
+The former smooth-EOS-only production limitation is superseded. Native Fortran now exposes generic smooth/Maxwell overloads for `solve_tov_star` and `solve_cowling_spectrum`, and existing production case adapters route through them.
+
+Latest exact code/test head: `9e92655a8277922f312f4c31df8e331e8c12df1b`.
+Latest exact workflow head tested by push and PR: `ec4527f0d518f6ba19f57eb42d8a8eb00b98dfca`.
+
+The generated analytic two-phase fixture executes both slow and rapid production spectrum scans on 41 frequencies from 100 to 20,000 Hz. Each conversion prescription returns two bisection-refined roots with a fresh final Cowling shot:
+
+- Slow: 1764.8989380477 Hz (residual (-6.9575\times10^{-7})); 4937.6449322607 Hz (residual (9.3334\times10^{-8})).
+- Rapid: 4937.0162338857 Hz (residual (8.5331\times10^{-9})); 19493.6326018255 Hz (residual (3.8951\times10^{-7})).
+
+All roots are valid; family identity remains unresolved. These are synthetic fixture roots and not identified physical mode frequencies.
+
+Both exact-head events pass:
+- Push [42586438396](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42586438396): artifact 13658709148, SHA-256 `02d1673cd82045aaacbae8125c74c7ce7b8896b7abe6def70e81df07331c3d04`.
+- PR [42586446195](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42586446195): artifact 13659137810, SHA-256 `478fb960cf8a993bb92bf2bbc544f17160b854e0f0f5ac5a28cc0b14a9ccaeaf`.
+
+The strict CI requires two valid roots for both slow and rapid conversion. Root-frequency convergence, independent Python/SciPy cross-validation, phase-aware mode identity, realistic source-backed CompOSE data and stable M-R analysis remain open. PR #3 remains draft/open/unmerged.

@@ -151,3 +151,26 @@ The same exact-head CI also checks 12 cell, 22 analytic Maxwell and 74 normalize
 - Pull request [42585366571](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42585366571), artifact 13659056245, SHA-256 `12afce4e910c53b9a0dda180826bea2a98a5986562df0866bb7f9a26da219412`.
 
 CI-validated workflow head: `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`. Code-bearing implementation head: `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`. The normalized tables remain generated analytic fixtures; realistic CompOSE data, positive-root convergence and mode identity remain unverified.
+
+
+## Exact-head positive-root validation for both conversion prescriptions (2026-11-09)
+
+The normalized-table fixture now writes separate slow- and rapid-conversion NAMELIST inputs. Both use a frequency grid corresponding to 100-20,000 Hz with 41 uniformly spaced samples, and both run through the actual production `case_driver maxwell_table_spectrum` route. The bisection routine refines each sign bracket and the scanner reruns the Cowling shot at each resulting root.
+
+Slow conversion:
+- Root 1: (1764.8989380477\,\mathrm{Hz}), final surface residual (-6.9575\times10^{-7}).
+- Root 2: (4937.6449322607\,\mathrm{Hz}), final surface residual (9.3334\times10^{-8}).
+
+Rapid conversion:
+- Root 1: (4937.0162338857\,\mathrm{Hz}), final surface residual (8.5331\times10^{-9}).
+- Root 2: (19493.6326018255\,\mathrm{Hz}), final surface residual (3.8951\times10^{-7}).
+
+All four roots report `root_valid=true`, status `ok`, and finite final residuals below the CLI fixture's (10^{-5}) acceptance threshold. Their family labels are intentionally `unresolved`. These are numerical roots for a generated analytic two-phase regression EOS, not realistic neutron-star frequencies and not f/p1/interface-mode identifications.
+
+The strict workflow requires `spectrum_roots_found=2` and `spectrum_root_valid_00001/00002=true` independently for slow and rapid conversions. Exact code/test head: `9e92655a8277922f312f4c31df8e331e8c12df1b`. Exact workflow head: `ec4527f0d518f6ba19f57eb42d8a8eb00b98dfca`.
+
+Both exact-head CI events passed:
+- Push [42586438396](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42586438396), artifact 13658709148, SHA-256 `02d1673cd82045aaacbae8125c74c7ce7b8896b7abe6def70e81df07331c3d04`.
+- Pull request [42586446195](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42586446195), artifact 13659137810, SHA-256 `478fb960cf8a993bb92bf2bbc544f17160b854e0f0f5ac5a28cc0b14a9ccaeaf`.
+
+This verifies the positive-root branch, not a root-convergence study: only one ODE/root-tolerance configuration is used. Frequency-grid refinement, ODE tolerance refinement, independent Python/SciPy comparison and mode identity/continuation remain open.

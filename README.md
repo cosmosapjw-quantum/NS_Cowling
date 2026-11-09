@@ -83,3 +83,12 @@ The Maxwell scanner retains every trial status, only refines sign/near brackets 
 
 
 The latest exact-head workflow evidence is recorded in the adversarial audit and local-agent resume file. The successful push and pull-request runs both check the workflow/docs head while all native Fortran source code remains at the separately verified implementation commit `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`.
+
+
+## Native sharp-Maxwell production API and positive-root gate (2026-11-09)
+
+The Fortran production generic APIs now dispatch both smooth and one-interface sharp-Maxwell TOV/Cowling paths. Exact-head CI uses generated analytic phase tables and verifies two bisection-refined roots for each conversion prescription. The numerical roots are:
+- Slow: 1764.8989380477 Hz and 4937.6449322607 Hz.
+- Rapid: 4937.0162338857 Hz and 19493.6326018255 Hz.
+
+These values are synthetic regression-fixture roots only. All four mode-family labels remain `unresolved`; root convergence, Python/SciPy cross-validation, realistic CompOSE phases and mode identity remain open. The DAG and adversarial audit contain exact CI provenance.

@@ -155,3 +155,17 @@ After each independently passing unit:
 5. move/advance a named backup branch only after recording its target SHA;
 6. update this resume prompt, the DAG, the implementation guide and adversarial audit;
 7. update PR #3 metadata without merging or marking it ready for review.
+
+
+## Superseding authority and positive-root regression (2026-11-09)
+
+This section supersedes earlier authority/result statements above.
+
+- Exact code/test commit: `9e92655a8277922f312f4c31df8e331e8c12df1b`.
+- Exact strict workflow head tested by both push and PR: `ec4527f0d518f6ba19f57eb42d8a8eb00b98dfca`.
+- Push [42586438396](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42586438396), artifact 13658709148, SHA-256 `02d1673cd82045aaacbae8125c74c7ce7b8896b7abe6def70e81df07331c3d04`.
+- PR [42586446195](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42586446195), artifact 13659137810, SHA-256 `478fb960cf8a993bb92bf2bbc544f17160b854e0f0f5ac5a28cc0b14a9ccaeaf`.
+
+The latest CI requires exactly 2 valid roots for each conversion prescription on a 41-point 100-20,000 Hz grid. Slow roots: 1764.8989380477 Hz (residual -6.9575e-7), 4937.6449322607 Hz (9.3334e-8). Rapid roots: 4937.0162338857 Hz (8.5331e-9), 19493.6326018255 Hz (3.8951e-7). All mode-family identities remain unresolved; these are synthetic analytic-table results, not realistic star predictions.
+
+Next work: perform independent root-frequency convergence by varying ODE tolerance, maximum step, bisection tolerance and grid density separately, then compare the sharp-interface Python/SciPy reference with identical table EOS and background. Do not assign mode identity by root ordering.

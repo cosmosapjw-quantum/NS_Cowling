@@ -117,3 +117,29 @@ The spectrum CLI scanned 1799, 1800 and 1801 Hz. All three shots succeeded with 
 The implementation also preserves the optional smooth `eos_events(:)` argument through the generic TOV wrapper. A compile failure from its initial omission is recorded at earlier commit `f0723ec...`; the corrected exact-head run passed. A later malformed workflow authoring commit `42b5936...` created no jobs; the workflow was restored from the previous clean YAML and both final events passed.
 
 **Current audit state:** `PASS_BOUNDED_NATIVE_GENERIC_DISPATCH_AND_SYNTHETIC_NO_ROOT_CLI`. Still unverified: source-backed realistic CompOSE phases, positive-root refinement, root-frequency convergence, mode-family identity/continuation, M-R stability sequence and astrophysical inference.
+
+
+## Positive-root scan and strict slow/rapid CI (2026-11-09)
+
+The fixture writer emits separate slow and rapid NML files and scans 41 frequencies over 100-20,000 Hz. Each scan finds exactly two sign brackets; the bisection path then returns two valid roots with a fresh final Cowling shot.
+
+| Conversion | Root | Frequency (Hz) | Final surface residual | Status |
+|---|---:|---:|---:|---|
+| slow | 1 | 1764.8989380477 | (-6.9575\times10^{-7}) | valid / ok |
+| slow | 2 | 4937.6449322607 | (9.3334\times10^{-8}) | valid / ok |
+| rapid | 1 | 4937.0162338857 | (8.5331\times10^{-9}) | valid / ok |
+| rapid | 2 | 19493.6326018255 | (3.8951\times10^{-7}) | valid / ok |
+
+All root identities remain `unresolved`. The slow and rapid sets are not paired by root order or nearby frequency; a phase-aware identity invariant is not yet available. The values belong to the synthetic normalized two-table fixture only.
+
+The workflow now requires exactly two roots and both root-valid flags for each conversion prescription. Exact tested heads:
+- Code/test: `9e92655a8277922f312f4c31df8e331e8c12df1b`.
+- Workflow: `ec4527f0d518f6ba19f57eb42d8a8eb00b98dfca`.
+
+Both workflows passed:
+- Push [42586438396](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42586438396), artifact 13658709148, SHA-256 `02d1673cd82045aaacbae8125c74c7ce7b8896b7abe6def70e81df07331c3d04`.
+- PR [42586446195](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42586446195), artifact 13659137810, SHA-256 `478fb960cf8a993bb92bf2bbc544f17160b854e0f0f5ac5a28cc0b14a9ccaeaf`.
+
+Toolchain: GNU Fortran 16.2.0, FPM 0.13.0; runtime-check flags include `-fcheck=all`. Counts: 12 cell, 22 analytic Maxwell and 74 normalized-table checks.
+
+**Updated audit state:** `PASS_BOUNDED_NATIVE_GENERIC_DISPATCH_AND_SYNTHETIC_SLOW_RAPID_POSITIVE_ROOTS`. Remaining: root-frequency convergence, independent Python/SciPy cross-validation, negative table admission, mode identity/continuation, stable M-R sequence and source-backed realistic EOS.

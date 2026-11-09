@@ -3,8 +3,8 @@
 Authority:
 - Repository: `cosmosapjw-quantum/NS_Cowling`
 - Branch: `research/maxwell-native-fortran-v1`
-- Exact code+workflow head exercised by CI: `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`
-- Exact code-bearing implementation head: `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`
+- Exact code/test head: `9e92655a8277922f312f4c31df8e331e8c12df1b`
+- Exact workflow head tested by both push and PR CI: `ec4527f0d518f6ba19f57eb42d8a8eb00b98dfca`
 - PR #3 remains open, draft and unmerged.
 
 ## Current dependency graph
@@ -14,17 +14,18 @@ flowchart TD
   A[Two one-sided EOS tables] --> B[Maxwell coexistence audit at Pt]
   B --> C[Core TOV to exact Pt]
   C --> D[Envelope TOV from shared rt mt nu_t]
-  D --> E[Separate phase backgrounds and lapse normalization]
+  D --> E[Separate phase backgrounds]
   E --> F[Core Cowling integration]
   F --> G[Slow or rapid interface transfer]
   G --> H[Envelope Cowling integration]
   H --> I[Surface residual]
   I --> J1[Frequency-grid scan]
-  J1 --> J2[Bracket and root refinement]
-  J2 --> J3[Phase-aware mode identity and continuation]
+  J1 --> J2[Bracket and bisection root refinement]
+  J2 --> J3[Root-frequency convergence]
+  J3 --> J4[Phase-aware mode identity and continuation]
   D --> K[Central-pressure sequence and M-R branches]
   K --> L[Radial stability and twin-star classification]
-  J3 --> M[Benchmarked mode observables]
+  J4 --> M[Benchmarked mode observables]
   L --> N[Hybrid-EOS parameter analysis]
   M --> N
 ```
@@ -33,36 +34,36 @@ flowchart TD
 
 | Node | Status | What is actually established |
 |---|---|---|
-| A-B: two-phase coexistence input | PASS_SYNTHETIC_TABLE | Two normalized T14 phase tables load and pass admission. One-sided states at (P_t) satisfy pressure/chemical-potential coexistence, positive jump ordering and cold first-law closure. Tables are generated analytic fixtures, not a real CompOSE hybrid pair. |
-| C-E: phase-segmented TOV | PASS_SYNTHETIC_TABLE | Callback and normalized-table fixtures verify exact (P_t) endpoint/restart, shared geometric state and lapse normalization. Synthetic CLI gives (M=9.6357\times10^{-4}M_\odot^{\rm nominal}), (R=642.793\,\mathrm{m}), and (r_t=332.172\,\mathrm{m}). |
-| F-I: native Cowling interface shot | PASS_SYNTHETIC_TABLE | (ell=2), single 1800 Hz trial, both slow and rapid transfer maps, plus the single-shot production CLI. Pressure-perturbation continuity is below (10^{-9}); the CLI sides agree at about (3.2\times10^{-16}) relative. |
-| Production generic dispatch | PASS_BOUNDED_SYNTHETIC | `ns_production_solvers` exports `solve_tov_star` overloads for smooth EOS and high/low Maxwell callbacks, and `solve_cowling_spectrum` overloads for smooth background/profile and Maxwell star. Existing TOV, normalized-table TOV, smooth spectrum and Maxwell case adapters route through these APIs. The smooth TOV optional `eos_events(:)` argument is preserved. |
-| J1: Maxwell frequency-grid scan | PASS_BOUNDED_SYNTHETIC_NO_ROOT | Slow/rapid scans and `maxwell_table_spectrum` preserve all trial states. CLI scans 1799, 1800 and 1801 Hz; all three trials succeed. Residuals are approximately 0.989787, 0.993524 and 0.996295, all positive. The scan reports 0 brackets, 0 roots and no unresolved candidates. This is a successful no-root scan only. |
-| J2: Maxwell bracket/root refinement | IMPLEMENTED_NOT_POSITIVE_ROOT_VERIFIED | Sign/near brackets are refined with bisection and the final shot is rerun. The current physical fixture has no bracket, so the positive-root/bisection branch is not yet exercised by exact-head tests. |
-| J3: Maxwell mode identity / continuation | NOT_STARTED | Root family labels remain `unresolved`; no (f), (p_1), or interface-mode claim. Requires phase-aware node/overlap diagnostics and continuation across frequency and conversion prescription. |
-| K-L: M-R branches / radial stability | NOT_STARTED | The Seidov ratio is only a local onset diagnostic. |
+| A-B: two-phase coexistence input | PASS_SYNTHETIC_TABLE | Two normalized T14 phase tables load and pass admission. One-sided states at (P_t) satisfy pressure/chemical-potential coexistence, positive jump ordering and cold first-law closure. These are generated analytic fixtures, not a real CompOSE hybrid pair. |
+| C-E: phase-segmented TOV | PASS_SYNTHETIC_TABLE | Callback and normalized-table fixtures verify exact (P_t) endpoint/restart, shared geometric state and lapse normalization. Fixture outputs are not astrophysical predictions. |
+| F-I: native Cowling interface shot | PASS_SYNTHETIC_TABLE | (ell=2), slow and rapid transfer maps; table-backed 1800 Hz shots and production CLI. Interface pressure-perturbation continuity passes the stated test tolerances. |
+| Production generic dispatch | PASS_BOUNDED_SYNTHETIC | `ns_production_solvers` exports smooth/Maxwell overloads for `solve_tov_star` and smooth background/profile plus Maxwell overloads for `solve_cowling_spectrum`. Existing smooth TOV, table-star and smooth spectrum cases route through the generic APIs. Smooth optional `eos_events(:)` is preserved. |
+| J1: Maxwell frequency-grid scan | PASS_BOUNDED_SYNTHETIC | Slow and rapid each scan 41 frequencies from 100 to 20,000 Hz on generated analytic two-phase tables. All trial shots succeed. Each conversion prescription has 2 sign brackets. This is a bounded search over the supplied finite grid. |
+| J2: positive-root refinement | PASS_SYNTHETIC_SLOW_AND_RAPID | All four brackets are refined by bisection and followed by fresh Cowling shots. Slow roots: 1764.8989380477 Hz ((R_s=-6.9575\times10^{-7})) and 4937.6449322607 Hz ((R_s=9.3334\times10^{-8})). Rapid roots: 4937.0162338857 Hz ((R_s=8.5331\times10^{-9})) and 19493.6326018255 Hz ((R_s=3.8951\times10^{-7})). All roots valid, status `ok`. |
+| J3: root-frequency convergence | NOT_VERIFIED | Current run uses one ODE/root-tolerance configuration. Need independent ODE tolerance and frequency-grid/root-tolerance refinement, with a convergence envelope. |
+| J4: mode identity / continuation | UNRESOLVED | Every returned family label remains `unresolved`. No f-mode, p1-mode or interface-mode identity is asserted. Need phase-aware node/overlap diagnostics and continuation. |
+| K-L: M-R branches / radial stability | NOT_STARTED | The Seidov ratio is only a local onset diagnostic; no stable sequence or twin-star analysis. |
 | M-N: data benchmarks / inference | BLOCKED_BY_UPSTREAM | No realistic hybrid EOS benchmark or verified mode data cohort is attached to this implementation. |
 | Real CompOSE high-/low-phase pair | NOT_STARTED | Requires provenance, units, crust/core matching, source-backed (P_t) coexistence construction and full EOS-domain admission. |
 
-## Exact-head evidence
+## Exact-head CI evidence
 
-Both workflow events check branch head `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`:
+Both events tested exact workflow head `ec4527f0d518f6ba19f57eb42d8a8eb00b98dfca`, including explicit assertions that both conversions find exactly two valid roots:
 
-- Push [42585358415](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42585358415): success; artifact 13658722733; SHA-256 `26313f4315af74718f5fa9d1687658ef603c405807b2f7d44d27057fa38242a1`.
-- Pull request [42585366571](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42585366571): success; artifact 13659056245; SHA-256 `12afce4e910c53b9a0dda180826bea2a98a5986562df0866bb7f9a26da219412`.
+- Push [42586438396](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42586438396): success; artifact 13658709148; SHA-256 `02d1673cd82045aaacbae8125c74c7ce7b8896b7abe6def70e81df07331c3d04`.
+- Pull request [42586446195](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42586446195): success; artifact 13659137810; SHA-256 `478fb960cf8a993bb92bf2bbc544f17160b854e0f0f5ac5a28cc0b14a9ccaeaf`.
 - GNU Fortran 16.2.0; FPM 0.13.0; runtime checks `-fcheck=all`.
 - `cell_checks`: 12; `maxwell_checks`: 22; `maxwell_table_checks`: 74.
-- Production build, `maxwell_table_cowling` and `maxwell_table_spectrum` CLI smoke all passed.
-
-The earlier malformed workflow commit `42b5936136f8021ee9548cd5e6d07ef437baa112` generated a failed Actions run with no jobs. The workflow was restored from the last clean blob, structurally checked for unique steps and committed in `22b0faa...`; both exact-head events then passed. This failed authoring attempt is retained and not counted as validation.
+- Production `case_driver` build, `maxwell_table_cowling`, slow `maxwell_table_spectrum` and rapid `maxwell_table_spectrum` all passed.
+- Exact code/test commit: `9e92655a8277922f312f4c31df8e331e8c12df1b`; strict workflow commit: `ec4527f0d518f6ba19f57eb42d8a8eb00b98dfca`.
 
 ## Next implementation order
 
-1. Find or construct a reproducible physical synthetic-star frequency interval with an isolating residual sign bracket; test bisection, fresh root shooting, residual closure and root-tolerance refinement. Do not hardcode or assume an eigenfrequency. If no robust root exists in the current fixture, expose a small test seam for the bracket/refinement component while retaining the real scanner tests.
-2. Cross-check native table-backed TOV against the existing independent Python/SciPy phase-aware reference with identical EOS knots, constants, cutoff, (P_c) and (P_t). Compare (r_t,m_t,M,R) and one-sided metric/thermodynamic values.
-3. Add tolerance-refinement studies for core/envelope TOV, core/envelope Cowling, interface transfer and root refinement.
+1. Add independent root convergence studies. Repeat slow/rapid scans while varying ODE tolerances, maximum step, root `xtol/rtol), and frequency-grid density independently. Record root shifts and residuals. Avoid pairing slow/rapid branches by root order.
+2. Cross-check table-backed native TOV against the independent Python/SciPy phase-aware reference with identical EOS knots, constants, cutoff, (P_c) and (P_t). Compare (r_t,m_t,M,R) and one-sided metric/thermodynamic values.
+3. Compare Cowling phase-segmented solutions and transfer maps against the Python/SciPy reference at fixed (omega), separately for slow and rapid conversion.
 4. Add negative table/provider/CLI tests: out-of-range (P_t), chemical-potential mismatch, reversed jump, first-law failure, failed callbacks and incomplete frequency scans.
-5. Add phase-aware node/overlap diagnostics and mode continuation before assigning (f), (p_1), or interface-mode labels.
+5. Add phase-aware node/overlap diagnostics and mode continuation before assigning f/p1/interface labels.
 6. Add central-pressure continuation, M-R branch analysis and radial stability only after the background and EOS gates.
 7. Attach realistic source-backed hybrid EOS only after provenance, units, crust/core matching, coexistence and full-domain admission are audited.
 
@@ -70,13 +71,13 @@ The earlier malformed workflow commit `42b5936136f8021ee9548cd5e6d07ef437baa112`
 
 - Stop before TOV integration if the phases do not coexist at the declared (P_t).
 - Stop before interpreting a Cowling root if the background is not independently verified or the interface map fails its jump conditions.
-- Do not call a single-frequency residual an eigenfrequency.
-- Do not treat a successful finite-grid no-root scan as a complete spectrum.
-- Do not assign a mode-family identity solely by root ordering.
+- Do not call an arbitrary single-frequency residual an eigenfrequency.
+- Do not treat the finite grid as a proof of spectrum completeness.
+- Do not assign a mode-family identity solely by root ordering or frequency similarity.
 - Do not infer stable branches from the Seidov ratio alone.
 - Do not combine sharp discontinuity results with the 234-row smooth-matching cohort.
 - Do not apply the 33-path v5 overlay without checking its recorded base SHA and all old-blob identities against the current branch.
 
 ## Current stop point
 
-The production generic TOV/Cowling dispatch, smooth-profile dispatch, normalized-table Maxwell integration, slow/rapid no-root frequency scans and both production CLI routes are verified on generated analytic phase tables. Positive-root bisection, mode identity, independent Python/SciPy cross-validation, tolerance refinement, negative admission tests and realistic CompOSE execution remain open.
+The native generic production TOV/Cowling dispatch and both slow/rapid positive-root refinement paths pass exact-head CI on synthetic normalized tables. Remaining gates are root-frequency convergence, independent Python/SciPy cross-validation, negative admission tests, mode identity/continuation, stable M-R sequence and realistic source-backed CompOSE execution.

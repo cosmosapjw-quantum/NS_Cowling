@@ -6,6 +6,7 @@ on:
     paths:
       - ".github/workflows/native-outer-crust-r15-hermite-audit.yml"
       - "scripts/r15_native_hermite_audit.py"
+      - "scripts/audit_r15_native_hermite_boundary.py"
       - "python_frontend/tests/test_r15_native_hermite_audit.py"
       - "oscillation_release_v1/data/spectrum_summary_234.csv"
       - "oscillation_release_v1/data/eos_projected/**"
@@ -40,5 +41,5 @@ jobs:
         with:
           name: ns-cowling-r15-native-hermite-row217-218-${{ github.run_id }}
           path: dist/r15-native-hermite-row217-218/
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 30

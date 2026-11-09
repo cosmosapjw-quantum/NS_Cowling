@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R15: native-knot low-density TOV cutoff pilot for three crossed EOS pairs."""
+"""R15: native-knot low-density TOV cutoffs for pilot or full 39-pair cohort."""
 from __future__ import annotations
 
 import argparse
@@ -72,6 +72,34 @@ def load_reference_rows() -> list[dict[str, str]]:
     return rows
 
 
+def select_cohort_pairs(
+    references: list[dict[str, str]], *, full_cohort: bool = False
+) -> tuple[tuple[str, str], ...]:
+    """Resolve the frozen three-pair pilot or all 39 complete cohort pairs."""
+    if not full_cohort:
+        return PAIRS
+
+    methods_by_pair: dict[tuple[str, str], set[str]] = defaultdict(set)
+    for row in references:
+        pair = (str(row.get("crust", "")), str(row.get("core", "")))
+        methods_by_pair[pair].add(str(row.get("matching_method", "")))
+
+    if len(methods_by_pair) != 39:
+        raise RuntimeError(
+            f"full R15 cohort requires 39 crust-core pairs; found {len(methods_by_pair)}"
+        )
+    if len({crust for crust, _ in methods_by_pair}) != 13:
+        raise RuntimeError("full R15 cohort requires exactly 13 crust families")
+    if {core for _, core in methods_by_pair} != {"BBB_BHF2", "GM_GM1", "RG_SLY4"}:
+        raise RuntimeError("full R15 cohort core-family inventory changed")
+    for pair, methods in methods_by_pair.items():
+        if methods != set(METHODS):
+            raise RuntimeError(
+                f"full R15 cohort pair {pair[0]} x {pair[1]} is not six-method complete"
+            )
+    return tuple(sorted(methods_by_pair))
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -81,6 +109,10 @@ def main(argv=None) -> int:
     parser.add_argument("--target-count", type=int, default=CUTOFF_COUNT)
     parser.add_argument(
         "--maximum-density-fm3", type=float, default=MAXIMUM_DENSITY_FM3
+    )
+    parser.add_argument(
+        "--full-cohort", action="store_true",
+        help="run all 39 six-method crust-core pairs instead of the frozen three-pair pilot",
     )
     args = parser.parse_args(argv)
 
@@ -96,8 +128,9 @@ def main(argv=None) -> int:
         )
 
     references = load_reference_rows()
+    cohort_pairs = select_cohort_pairs(references, full_cohort=args.full_cohort)
     selected_pairs = []
-    for crust, core in PAIRS:
+    for crust, core in cohort_pairs:
         rows = [
             row for row in references
             if row.get("crust") == crust and row.get("core") == core
@@ -110,9 +143,12 @@ def main(argv=None) -> int:
             raise RuntimeError(f"incomplete method cell: {crust} x {core}")
         selected_pairs.append((crust, core, {r["matching_method"]: r for r in rows}))
 
-    expected_cases = len(PAIRS) * len(METHODS) * CUTOFF_COUNT
-    if expected_cases != 144:
-        raise RuntimeError(f"internal R15 case-count contract changed: {expected_cases}")
+    expected_cases = len(cohort_pairs) * len(METHODS) * CUTOFF_COUNT
+    expected_contract = 1872 if args.full_cohort else 144
+    if expected_cases != expected_contract:
+        raise RuntimeError(
+            f"internal R15 case-count contract changed: {expected_cases} != {expected_contract}"
+        )
 
     output = args.output_dir.resolve()
     backgrounds = output / "backgrounds"
@@ -120,25 +156,29 @@ def main(argv=None) -> int:
     receipt_path = output / "native_outer_crust_r15.json"
 
     receipt = {
-        "schema": "ns-cowling-native-outer-crust-r15-v1",
+        "schema": ("ns-cowling-native-outer-crust-r15-full-cohort-v1" if args.full_cohort else "ns-cowling-native-outer-crust-r15-v1"),
         "status": "RUNNING",
+        "run_scope": "full_39_pair_cohort" if args.full_cohort else "three_pair_pilot",
         "source_commit": os.environ.get("GITHUB_SHA", "UNAVAILABLE_LOCAL_RUN"),
         "source_summary_sha256": SUMMARY_SHA256,
         "cohort": [
             {"crust": crust, "core": core, "methods": list(METHODS)}
-            for crust, core in PAIRS
+            for crust, core in cohort_pairs
         ],
         "cohort_design": {
-            "pair_count": len(PAIRS),
+            "pair_count": len(cohort_pairs),
             "method_count_per_pair": len(METHODS),
-            "projected_table_count": len(PAIRS) * len(METHODS),
+            "projected_table_count": len(cohort_pairs) * len(METHODS),
             "cutoff_count_per_table": CUTOFF_COUNT,
             "expected_tov_case_count": expected_cases,
-            "selection_contrasts": [
-                "GPPVA_FSU2 x BBB_BHF2: R14 sensitivity-tail stress pair",
-                "SPG_M2 x BBB_BHF2: crust-family contrast at fixed core",
-                "GPPVA_FSU2 x GM_GM1: core-family contrast at fixed crust",
-            ],
+            "selection_contrasts": (
+                ["complete 13-crust x 3-core x 6-method cohort"]
+                if args.full_cohort else [
+                    "GPPVA_FSU2 x BBB_BHF2: R14 sensitivity-tail stress pair",
+                    "SPG_M2 x BBB_BHF2: crust-family contrast at fixed core",
+                    "GPPVA_FSU2 x GM_GM1: core-family contrast at fixed crust",
+                ]
+            ),
         },
         "source_policy": {
             "authoritative_solver_inputs": "oscillation_release_v1/data/eos_projected",
@@ -382,7 +422,7 @@ def main(argv=None) -> int:
             )
 
     pair_cutoff_summary: list[dict] = []
-    for crust, core in PAIRS:
+    for crust, core in cohort_pairs:
         for source_row in EXPECTED_SOURCE_ROWS:
             cell = [
                 row for row in results
@@ -409,7 +449,7 @@ def main(argv=None) -> int:
             })
 
     all_tables_unchanged = (
-        len(source_receipts) == len(PAIRS) * len(METHODS)
+        len(source_receipts) == len(cohort_pairs) * len(METHODS)
         and all(item.get("unchanged") for item in source_receipts)
     )
     all_baselines_pass = all(
@@ -419,10 +459,10 @@ def main(argv=None) -> int:
             and row.get("baseline_reproduction_ok") is True
             for row in results
         )
-        for crust, core in PAIRS for method in METHODS
+        for crust, core in cohort_pairs for method in METHODS
     )
     all_pair_cutoffs_complete = (
-        len(pair_cutoff_summary) == len(PAIRS) * CUTOFF_COUNT
+        len(pair_cutoff_summary) == len(cohort_pairs) * CUTOFF_COUNT
         and all(row.get("complete_six_method_cell") for row in pair_cutoff_summary)
     )
     profile_count = len(list(backgrounds.glob("*.csv")))
@@ -437,14 +477,15 @@ def main(argv=None) -> int:
         "all_pair_cutoff_cells_complete": all_pair_cutoffs_complete,
         "background_profile_count": profile_count,
         "status": (
-            "PASS_R15_NATIVE_OUTER_CRUST_CUTOFF_PILOT"
+            ("PASS_R15_FULL_COHORT_NATIVE_OUTER_CRUST_CUTOFF_SCAN"
+             if args.full_cohort else "PASS_R15_NATIVE_OUTER_CRUST_CUTOFF_PILOT")
             if len(results) == expected_cases
             and not failures
             and all_tables_unchanged
             and all_baselines_pass
             and all_pair_cutoffs_complete
             and profile_count == expected_cases
-            else "FAIL_R15_NATIVE_OUTER_CRUST_CUTOFF_PILOT"
+            else "FAIL_R15_FULL_COHORT_NATIVE_OUTER_CRUST_CUTOFF_SCAN" if args.full_cohort else "FAIL_R15_NATIVE_OUTER_CRUST_CUTOFF_PILOT"
         ),
     })
     receipt_path.write_text(
@@ -481,6 +522,8 @@ def main(argv=None) -> int:
         ),
         "source_summary_sha256": SUMMARY_SHA256,
         "source_table_count": len(source_receipts),
+        "cohort_pair_count": len(cohort_pairs),
+        "run_scope": receipt["run_scope"],
         "source_tables_unchanged": all_tables_unchanged,
         "synthetic_eos_table_count": 0,
         "background_profile_count": len(profiles),
@@ -494,7 +537,7 @@ def main(argv=None) -> int:
 
     print(json.dumps({
         "status": receipt["status"],
-        "selected_pairs": len(PAIRS),
+        "selected_pairs": len(cohort_pairs),
         "projected_source_tables": len(source_receipts),
         "expected_tov_cases": expected_cases,
         "completed_tov_cases": len(results),

@@ -61,3 +61,8 @@ See [the self-contained Fortran physics guide](docs/NS_COWLING_PHYSICS_AND_CODE_
 ## Verified v4 Fortran snapshot
 
 Verified code head: \`1dbb75c27b704209cfeef43f7c49be0cfb28fd44\`. GitHub Actions reports 67 Python tests passed, the native Fortran polynomial-extrema test passed, all 69 tracked SHA-256 entries passed, and the source archive was uploaded. See the [final adversarial audit](docs/ADVERSARIAL_AUDIT_V4_FINAL_20261108.md) for run IDs and artifact digests.
+
+
+## Native Fortran sharp-Maxwell TOV/Cowling v1
+
+A separate phase-segmented native Fortran path now accepts independent high-density and low-density EOS tables, enforces the Maxwell pressure/chemical-potential/first-law conditions at the sharp interface, integrates TOV on two non-crossing pressure segments, and performs a single-frequency Cowling shot with slow or rapid phase-conversion transfer. See [the implementation and validation contract](docs/MAXWELL_NATIVE_FORTRAN_V1.md). This path is separate from the legacy smooth maxwell bridge and the 234-row v5 smooth-matching cohort. Its analytic fixture and exact-head CI gate validate the bounded implementation scope only; they do not yet establish a realistic hybrid-EOS spectrum survey.

@@ -57,5 +57,6 @@ The earlier status in this handoff records the pre-integration point. The sharp-
 - Native Fortran EOS build passed; focused Maxwell tests **7/7**; independent validation returned `PASS_BOUNDED_REFERENCE_VALIDATION`; full frontend/pipeline suite **74 passed**.
 - Source commit was created by the workflow only after all validation stages passed.
 - CI artifact ID `13657075483`, SHA-256 `93347a170c238458fa937f2359e9ae4a8737098c5f9ec9dbdb09a26351f9946b`.
+- Follow-up exact-PR-head Actions run [42579770412](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42579770412) checked commit `2b7a00984dfa215bcca48c7d7adb5f3619013502` and completed successfully. Its artifact ID is `13656363884`, SHA-256 `0cfba640210b84d3141213b820f5c335d67ea1abef4a9e39b204d4a41b82e4f6`.
 
 The integrated scope is the phase-aware **Python/SciPy reference TOV/Cowling path** and independent Fortran slow/rapid transfer routines. Native Fortran stellar TOV/Cowling production solvers are still smooth-EOS-only. The 33-path v5 source overlay remains unapplied to this branch and is not represented as synced here. No merge has been performed.

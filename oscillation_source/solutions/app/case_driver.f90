@@ -17,6 +17,7 @@ program case_driver
     use ns_table_star_cases, only: is_table_star_case,run_table_star_case
     use ns_diagnostics_cases, only: is_diagnostics_case,run_diagnostics_case
     use ns_controlled_table_cases, only: is_controlled_table_case,run_controlled_table_case
+    use ns_maxwell_cases, only: is_maxwell_case,run_maxwell_case
     implicit none
     character(len=128) :: case_id
     character(len=4096) :: input_path
@@ -37,6 +38,8 @@ program case_driver
         if (arg_status == 0) call get_command_argument(2, input_path, status=arg_status)
         if (arg_status /= 0) then
             call emit_text('status', 'invalid_input')
+        else if (is_maxwell_case(trim(case_id))) then
+            call run_maxwell_case(trim(case_id),trim(input_path))
         else if (is_controlled_table_case(trim(case_id))) then
             call run_controlled_table_case(trim(case_id),trim(input_path))
         else if (is_diagnostics_case(trim(case_id))) then

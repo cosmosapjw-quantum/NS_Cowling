@@ -33,7 +33,7 @@ jobs:
         run: python -m pytest -q python_frontend/tests/test_r15_native_hermite_audit.py
       - name: Audit row 217 to 218 in all 234 projected tables
         run: |
-          python scripts/r15_native_hermite_audit.py \
+          python scripts/audit_r15_native_hermite_boundary.py \
             --output-dir dist/r15-native-hermite-row217-218
       - name: Upload whole-cell derivative and stationary-point evidence
         if: always()

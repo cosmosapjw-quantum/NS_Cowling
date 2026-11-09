@@ -45,3 +45,21 @@ The independent Fortran and Python transfer maps agree with zero relative differ
 ## Provenance
 
 The solver source is the compact v5 package, pinned before these edits by `NS_Cowling_Fortran_Python_v5_20261109.zip` SHA-256 `6d2ba545101df4cdc5bb5aed187b640ec84e528bf2005db764792bc4e19d9885`. The original solver ZIP and the earlier 234-EOS canonical results were not modified. This audit describes local source/test evidence only; it is not evidence of a GitHub push, CI run, PR merge, or a publication result.
+
+
+## Final GitHub exact-head verification (2026-11-09)
+
+The earlier "no GitHub CI" and local-only provenance statements above describe the pre-push audit cutoff. The following later exact-head execution supersedes that status:
+
+- Integration commit: `6b23d024e41661d33b83d6202038db6da918821d`.
+- Branch: `research/maxwell-reference-validation-v1`.
+- GitHub Actions workflow: [run 42579257980](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42579257980), final conclusion **success**.
+- The patch passed `git apply --check` and was applied to the full GitHub branch tree (README, RELEASE_INFO and compact-package SHA manifest metadata hunks were intentionally excluded).
+- Native Fortran EOS build: **PASS**.
+- Focused sharp-interface Maxwell tests: **7 passed in 30.08 s**.
+- Independent validation script: `PASS_BOUNDED_REFERENCE_VALIDATION`; smooth-limit TOV relative differences were `-3.53194e-5` (mass) and `-9.75084e-6` (radius). Slow/rapid Fortran/Python transfer maps both agreed with zero W/V relative difference in this exact CI environment.
+- Full frontend and pipeline regression: **74 passed in 32.86 s**.
+- `git diff --check`, source commit, and push to the same PR branch: **PASS**.
+- Evidence artifact: [maxwell-sharp-interface-integration-42579257980](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42579257980/artifacts/13657075483), artifact ID `13657075483`, uploaded ZIP SHA-256 `93347a170c238458fa937f2359e9ae4a8737098c5f9ec9dbdb09a26351f9946b`.
+
+The integrated source scope remains exactly as limited above: the sharp-interface stellar TOV/Cowling integrator is Python/SciPy reference code; native Fortran provides the independently tested slow/rapid interface-transfer routines, while the production Fortran stellar solver remains smooth-EOS-only. No stable-branch, maximum-mass, twin-star or full-GR claim is added by this CI result.

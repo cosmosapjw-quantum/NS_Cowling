@@ -67,7 +67,7 @@ program maxwell_checks
     cowling_options%ode%max_steps=100000
     call shoot_maxwell_cowling(star,two_pi*1800._wp,'slow',cowling_options,slow_shot)
     call require(slow_shot%valid.and.is_ok(slow_shot%status),'native slow-conversion Cowling shot')
-    call shoot_maxwell_cowling(star,2._wp*pi*1800._wp,'rapid',cowling_options,rapid_shot)
+    call shoot_maxwell_cowling(star,two_pi*1800._wp,'rapid',cowling_options,rapid_shot)
     call require(rapid_shot%valid.and.is_ok(rapid_shot%status),'native rapid-conversion Cowling shot')
     dp_rel=abs(slow_shot%delta_p_inner_pa-slow_shot%delta_p_outer_pa)/ &
         max(abs(slow_shot%delta_p_inner_pa),abs(slow_shot%delta_p_outer_pa),tiny(1._wp))

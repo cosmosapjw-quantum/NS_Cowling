@@ -134,7 +134,8 @@ def qexp_shape_parameter(
         return {
             "status": "PASS_CONSTANT_Q" if exact else "INFEASIBLE_CONSTANT_Q",
             "feasible": exact,
-            "k": 0.0,
+            "realizable_by_continuous_q": exact,
+            "k": 0.0 if exact else None,
             "lower_bound": lower,
             "upper_bound": upper,
             "source_pressure_increment": source_dp,
@@ -142,10 +143,10 @@ def qexp_shape_parameter(
             "source_mean_q": source_dp / area,
             "target_mean_q": q0,
             "regularization_applied": False,
-            "qprime_lower": 0.0,
-            "qprime_upper": 0.0,
-            "chi_lower": 1.0,
-            "chi_upper": 1.0,
+            "qprime_lower": 0.0 if exact else None,
+            "qprime_upper": 0.0 if exact else None,
+            "chi_lower": 1.0 if exact else None,
+            "chi_upper": 1.0 if exact else None,
         }
 
     source_mean_q = source_dp / area

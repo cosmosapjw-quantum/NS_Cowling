@@ -26,6 +26,7 @@ SOURCE_DIR = ROOT / "oscillation_release_v1/data/eos_original_normalized"
 SUMMARY_SHA256 = "ce54c111510f32086065f95356903cd6abad675adce12cab1a06b5cc82350965"
 EXPECTED_TABLES = 234
 REGULARIZATION_FRACTION = 1.0e-3
+EXACT_MATCH_RELATIVE_TOLERANCE = 5.0e-12
 RELATIVE_TOLERANCE = 1.0e-12
 METHODS = ("css", "cubic_F", "cubic_P", "maxwell", "quintic_F", "quintic_P")
 
@@ -288,9 +289,15 @@ def main(argv=None) -> int:
         and exact_feasible + exact_infeasible == len(cell_rows)
     )
     qbar_obstruction = total_qbar_drops > 0 and tables_with_drops == EXPECTED_TABLES
+    max_exact_error = max(
+        (x["max_exact_pressure_reconstruction_relative_error"] for x in table_rows),
+        default=0.0,
+    )
+    exact_reconstruction_ok = max_exact_error <= EXACT_MATCH_RELATIVE_TOLERANCE
     overall_pass = (
         not failures and coverage_ok and all_sources_unchanged
         and boundary_feasible == EXPECTED_TABLES and qbar_obstruction
+        and exact_reconstruction_ok
     )
 
     out = args.output_dir.resolve()
@@ -359,6 +366,8 @@ def main(argv=None) -> int:
         ),
         "source_tables_unchanged": all_sources_unchanged,
         "regularization_fraction_for_infeasible_cells": REGULARIZATION_FRACTION,
+"exact_pressure_match_relative_tolerance": EXACT_MATCH_RELATIVE_TOLERANCE,
+"exact_pressure_reconstruction_within_tolerance": exact_reconstruction_ok,
         "tov_integrations_executed": 0,
         "synthetic_eos_tables_written": 0,
         "failures": failures,

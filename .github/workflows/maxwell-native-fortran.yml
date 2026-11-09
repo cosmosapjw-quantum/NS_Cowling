@@ -68,7 +68,12 @@ jobs:
           set -euo pipefail
           fpm run --target case_driver -- maxwell_table_cowling ../../dist/maxwell_table_fixture.nml 2>&1 | tee ../../dist/maxwell-table-cli.log
           grep -E '^result_valid[[:space:]]+bool[[:space:]]+true$' ../../dist/maxwell-table-cli.log
-          grep -E '^cowling_shot_valid[[:space:]]+bool[[:space:]]+true
+          grep -E '^cowling_shot_valid[[:space:]]+bool[[:space:]]+true$' ../../dist/maxwell-table-cli.log
+          fpm run --target case_driver -- maxwell_table_spectrum ../../dist/maxwell_table_fixture.nml 2>&1 | tee ../../dist/maxwell-spectrum-cli.log
+          grep -E '^spectrum_scan_valid[[:space:]]+bool[[:space:]]+true$' ../../dist/maxwell-spectrum-cli.log
+          grep -E '^spectrum_all_trials_succeeded[[:space:]]+bool[[:space:]]+true$' ../../dist/maxwell-spectrum-cli.log
+          grep -E '^spectrum_valid[[:space:]]+bool[[:space:]]+true$' ../../dist/maxwell-spectrum-cli.log
+
       - name: Record exact source identity
         run: |
           set -euo pipefail
@@ -82,95 +87,6 @@ jobs:
             oscillation_source/solutions/src/modes/ns_mode_cases.f90 \
             oscillation_source/solutions/src/structure/ns_tov_cases.f90 \
             oscillation_source/solutions/src/structure/ns_table_star_cases.f90 \
-            oscillation_source/solutions/tests_fortran/maxwell_checks.f90 \
-            oscillation_source/solutions/tests_fortran/maxwell_table_checks.f90 \
-            oscillation_source/solutions/fpm.toml \
-            > dist/MAXWELL_NATIVE_FORTRAN_SHA256SUMS.txt
-
-      - name: Upload exact-head validation evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: maxwell-native-fortran-${{ github.run_id }}
-          path: dist/
-          if-no-files-found: error
-          retention-days: 30 ../../dist/maxwell-table-cli.log
-          fpm run --target case_driver -- maxwell_table_spectrum ../../dist/maxwell_table_fixture.nml 2>&1 | tee ../../dist/maxwell-spectrum-cli.log
-          grep -E '^spectrum_scan_valid[[:space:]]+bool[[:space:]]+true
-      - name: Record exact source identity
-        run: |
-          set -euo pipefail
-          git rev-parse HEAD | tee dist/VERIFIED_HEAD.txt
-          sha256sum \
-            oscillation_source/solutions/src/structure/ns_maxwell_tov.f90 \
-            oscillation_source/solutions/src/modes/ns_maxwell_cowling.f90 \
-            oscillation_source/solutions/src/structure/ns_maxwell_cases.f90 \
-            oscillation_source/solutions/tests_fortran/maxwell_checks.f90 \
-            oscillation_source/solutions/tests_fortran/maxwell_table_checks.f90 \
-            oscillation_source/solutions/fpm.toml \
-            > dist/MAXWELL_NATIVE_FORTRAN_SHA256SUMS.txt
-
-      - name: Upload exact-head validation evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: maxwell-native-fortran-${{ github.run_id }}
-          path: dist/
-          if-no-files-found: error
-          retention-days: 30 ../../dist/maxwell-spectrum-cli.log
-          grep -E '^spectrum_all_trials_succeeded[[:space:]]+bool[[:space:]]+true
-      - name: Record exact source identity
-        run: |
-          set -euo pipefail
-          git rev-parse HEAD | tee dist/VERIFIED_HEAD.txt
-          sha256sum \
-            oscillation_source/solutions/src/structure/ns_maxwell_tov.f90 \
-            oscillation_source/solutions/src/modes/ns_maxwell_cowling.f90 \
-            oscillation_source/solutions/src/structure/ns_maxwell_cases.f90 \
-            oscillation_source/solutions/tests_fortran/maxwell_checks.f90 \
-            oscillation_source/solutions/tests_fortran/maxwell_table_checks.f90 \
-            oscillation_source/solutions/fpm.toml \
-            > dist/MAXWELL_NATIVE_FORTRAN_SHA256SUMS.txt
-
-      - name: Upload exact-head validation evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: maxwell-native-fortran-${{ github.run_id }}
-          path: dist/
-          if-no-files-found: error
-          retention-days: 30 ../../dist/maxwell-spectrum-cli.log
-          grep -E '^spectrum_valid[[:space:]]+bool[[:space:]]+true
-      - name: Record exact source identity
-        run: |
-          set -euo pipefail
-          git rev-parse HEAD | tee dist/VERIFIED_HEAD.txt
-          sha256sum \
-            oscillation_source/solutions/src/structure/ns_maxwell_tov.f90 \
-            oscillation_source/solutions/src/modes/ns_maxwell_cowling.f90 \
-            oscillation_source/solutions/src/structure/ns_maxwell_cases.f90 \
-            oscillation_source/solutions/tests_fortran/maxwell_checks.f90 \
-            oscillation_source/solutions/tests_fortran/maxwell_table_checks.f90 \
-            oscillation_source/solutions/fpm.toml \
-            > dist/MAXWELL_NATIVE_FORTRAN_SHA256SUMS.txt
-
-      - name: Upload exact-head validation evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: maxwell-native-fortran-${{ github.run_id }}
-          path: dist/
-          if-no-files-found: error
-          retention-days: 30 ../../dist/maxwell-spectrum-cli.log
-
-      - name: Record exact source identity
-        run: |
-          set -euo pipefail
-          git rev-parse HEAD | tee dist/VERIFIED_HEAD.txt
-          sha256sum \
-            oscillation_source/solutions/src/structure/ns_maxwell_tov.f90 \
-            oscillation_source/solutions/src/modes/ns_maxwell_cowling.f90 \
-            oscillation_source/solutions/src/structure/ns_maxwell_cases.f90 \
             oscillation_source/solutions/tests_fortran/maxwell_checks.f90 \
             oscillation_source/solutions/tests_fortran/maxwell_table_checks.f90 \
             oscillation_source/solutions/fpm.toml \

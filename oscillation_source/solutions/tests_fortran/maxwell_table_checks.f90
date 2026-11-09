@@ -117,8 +117,16 @@ program maxwell_table_checks
     call require(dp_rel<1e-9_wp,'table-backed rapid Delta P continuity')
 
     print '(A,I0,A)', 'maxwell_table_checks: ',checks,' checks passed'
-    call write_namelist('maxwell_table_fixture.nml','slow')
-    call write_namelist('maxwell_table_rapid_fixture.nml','rapid')
+    call write_namelist('maxwell_table_fixture.nml','slow',2e-9_wp,5e-2_wp,41,1e-5_wp,1e-10_wp,1e-12_wp)
+    call write_namelist('maxwell_table_rapid_fixture.nml','rapid',2e-9_wp,5e-2_wp,41,1e-5_wp,1e-10_wp,1e-12_wp)
+    call write_namelist('maxwell_table_slow_ode_tight.nml','slow',2e-10_wp,2.5e-2_wp,41, &
+        1e-5_wp,1e-10_wp,1e-13_wp)
+    call write_namelist('maxwell_table_rapid_ode_tight.nml','rapid',2e-10_wp,2.5e-2_wp,41, &
+        1e-5_wp,1e-10_wp,1e-13_wp)
+    call write_namelist('maxwell_table_slow_root_grid_tight.nml','slow',2e-9_wp,5e-2_wp,81, &
+        1e-8_wp,1e-12_wp,1e-12_wp)
+    call write_namelist('maxwell_table_rapid_root_grid_tight.nml','rapid',2e-9_wp,5e-2_wp,81, &
+        1e-8_wp,1e-12_wp,1e-12_wp)
 contains
     subroutine require(ok,label)
         logical,intent(in) :: ok
@@ -163,8 +171,11 @@ contains
         call require(ios==0,'close normalized fixture')
     end subroutine
 
-    subroutine write_namelist(filename,conversion)
+    subroutine write_namelist(filename,conversion,rtol_value,dq_max_value,scan_n_value, &
+        root_xtol_value,root_rtol_value,atol_value)
         character(len=*),intent(in) :: filename,conversion
+        real(wp),intent(in) :: rtol_value,dq_max_value,root_xtol_value,root_rtol_value,atol_value
+        integer,intent(in) :: scan_n_value
         integer :: u,ios
         open(newunit=u,file='../../dist/'//trim(filename),status='replace',action='write',iostat=ios)
         call require(ios==0,'open Maxwell table case NAMELIST')
@@ -180,23 +191,23 @@ contains
         write(u,'(A)') ' r0_m = 1.0'
         write(u,'(A)') ' r_limit_m = 2000000.0'
         write(u,'(A)') ' nu_start = 0.0'
-        write(u,'(A)') ' rtol = 2.0e-9'
+        write(u,'(A,ES24.16E3)') ' rtol = ',rtol_value
         write(u,'(A)') ' atol_r_m = 1.0e-5'
         write(u,'(A)') ' atol_mass_kg = 1.0e13'
         write(u,'(A)') ' atol_nu = 1.0e-12'
         write(u,'(A)') ' dq_initial = 1.0e-5'
         write(u,'(A)') ' dq_min = 1.0e-15'
-        write(u,'(A)') ' dq_max = 5.0e-2'
+        write(u,'(A,ES24.16E3)') ' dq_max = ',dq_max_value
         write(u,'(A)') ' max_steps = 100000'
         write(u,'(A)') ' frequency_hz = 1800.0'
         write(u,'(A)') ' frequency_min_hz = 100.0'
         write(u,'(A)') ' frequency_max_hz = 20000.0'
-        write(u,'(A)') ' scan_n = 41'
-        write(u,'(A)') ' root_xtol = 1.0e-5'
-        write(u,'(A)') ' root_rtol = 1.0e-10'
+        write(u,'(A,I0)') ' scan_n = ',scan_n_value
+        write(u,'(A,ES24.16E3)') ' root_xtol = ',root_xtol_value
+        write(u,'(A,ES24.16E3)') ' root_rtol = ',root_rtol_value
         write(u,'(A)') " conversion = '"//trim(conversion)//"'"
-        write(u,'(A)') ' atol_w = 1.0e-12'
-        write(u,'(A)') ' atol_v = 1.0e-12'
+        write(u,'(A,ES24.16E3)') ' atol_w = ',atol_value
+        write(u,'(A,ES24.16E3)') ' atol_v = ',atol_value
         write(u,'(A)') '/'
         close(u,iostat=ios)
         call require(ios==0,'close Maxwell table case NAMELIST')

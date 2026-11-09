@@ -8,6 +8,10 @@ on:
       - .github/workflows/maxwell-native-fortran.yml
       - oscillation_source/solutions/**
       - oscillation_source/support/**
+      - python_frontend/compose_cowling/maxwell.py
+      - python_frontend/compose_cowling/direct_barotrope.py
+      - python_frontend/compose_eos/eos_data.py
+      - scripts/validate_native_maxwell_reference.py
   pull_request:
     branches:
       - research/maxwell-reference-validation-v1
@@ -45,7 +49,7 @@ jobs:
           set -euo pipefail
           mkdir -p "${RUNNER_TEMP}/micromamba"
           curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj -C "${RUNNER_TEMP}/micromamba" bin/micromamba
-          "${RUNNER_TEMP}/micromamba/bin/micromamba" create -y -p "${RUNNER_TEMP}/fpm-env" -c conda-forge fpm
+          "${RUNNER_TEMP}/micromamba/bin/micromamba" create -y -p "${RUNNER_TEMP}/fpm-env" -c conda-forge fpm numpy scipy
           echo "${RUNNER_TEMP}/fpm-env/bin" >> "${GITHUB_PATH}"
 
       - name: Run native Fortran tests with runtime checks
@@ -83,6 +87,29 @@ jobs:
           grep -E '^spectrum_roots_found[[:space:]]+int[[:space:]]+2$' ../../dist/maxwell-rapid-spectrum-cli.log
           grep -E '^spectrum_root_valid_00001[[:space:]]+bool[[:space:]]+true$' ../../dist/maxwell-rapid-spectrum-cli.log
           grep -E '^spectrum_root_valid_00002[[:space:]]+bool[[:space:]]+true$' ../../dist/maxwell-rapid-spectrum-cli.log
+          run_spectrum_case() {
+            local nml="$1"
+            local log="$2"
+            fpm run --target case_driver -- maxwell_table_spectrum "../../dist/${nml}" 2>&1 | tee "../../dist/${log}"
+            grep -E '^spectrum_scan_valid[[:space:]]+bool[[:space:]]+true$' "../../dist/${log}"
+            grep -E '^spectrum_all_trials_succeeded[[:space:]]+bool[[:space:]]+true$' "../../dist/${log}"
+            grep -E '^spectrum_valid[[:space:]]+bool[[:space:]]+true$' "../../dist/${log}"
+            grep -E '^spectrum_roots_found[[:space:]]+int[[:space:]]+2$' "../../dist/${log}"
+            grep -E '^spectrum_root_valid_00001[[:space:]]+bool[[:space:]]+true$' "../../dist/${log}"
+            grep -E '^spectrum_root_valid_00002[[:space:]]+bool[[:space:]]+true$' "../../dist/${log}"
+          }
+          run_spectrum_case maxwell_table_slow_ode_tight.nml maxwell-spectrum-slow-ode-tight.log
+          run_spectrum_case maxwell_table_rapid_ode_tight.nml maxwell-spectrum-rapid-ode-tight.log
+          run_spectrum_case maxwell_table_slow_root_grid_tight.nml maxwell-spectrum-slow-root-grid-tight.log
+          run_spectrum_case maxwell_table_rapid_root_grid_tight.nml maxwell-spectrum-rapid-root-grid-tight.log
+          python ../../scripts/validate_native_maxwell_reference.py \
+            --slow-log ../../dist/maxwell-spectrum-cli.log \
+            --rapid-log ../../dist/maxwell-rapid-spectrum-cli.log \
+            --slow-ode-tight-log ../../dist/maxwell-spectrum-slow-ode-tight.log \
+            --rapid-ode-tight-log ../../dist/maxwell-spectrum-rapid-ode-tight.log \
+            --slow-root-grid-tight-log ../../dist/maxwell-spectrum-slow-root-grid-tight.log \
+            --rapid-root-grid-tight-log ../../dist/maxwell-spectrum-rapid-root-grid-tight.log \
+            --output ../../dist/maxwell-native-convergence-reference.json
 
       - name: Record exact source identity
         run: |
@@ -100,6 +127,10 @@ jobs:
             oscillation_source/solutions/tests_fortran/maxwell_checks.f90 \
             oscillation_source/solutions/tests_fortran/maxwell_table_checks.f90 \
             oscillation_source/solutions/fpm.toml \
+            python_frontend/compose_cowling/maxwell.py \
+            python_frontend/compose_cowling/direct_barotrope.py \
+            python_frontend/compose_eos/eos_data.py \
+            scripts/validate_native_maxwell_reference.py \
             > dist/MAXWELL_NATIVE_FORTRAN_SHA256SUMS.txt
 
       - name: Upload exact-head validation evidence

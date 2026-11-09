@@ -18,14 +18,21 @@ module ns_maxwell_mode_spectrum
     implicit none
     private
 
+    type, public :: maxwell_node_count_t
+        integer :: nodes_inner=-1,nodes_outer=-1,nodes_total=-1
+        integer :: samples_inner=0,samples_outer=0
+        logical :: valid=.false.
+    end type
+
     type, public :: maxwell_mode_root_t
         type(bracket_candidate_t) :: candidate
         type(root_result_t) :: search
         type(maxwell_cowling_shot_t) :: shot
+        type(maxwell_node_count_t) :: nodes
         integer :: candidate_index=0
         logical :: root_valid=.false.
         character(len=16) :: label='unresolved'
-        type(status_t) :: root_status,identity_status
+        type(status_t) :: root_status,identity_status,node_status
     end type
 
     type, public :: maxwell_mode_spectrum_t
@@ -36,8 +43,87 @@ module ns_maxwell_mode_spectrum
         type(status_t) :: status
     end type
 
-    public :: scan_maxwell_modes
+    public :: scan_maxwell_modes,count_maxwell_cowling_nodes
 contains
+    subroutine count_maxwell_cowling_nodes(shot,interface_radius,nodes,status,relative_zero_tol)
+        type(maxwell_cowling_shot_t),intent(in) :: shot
+        real(wp),intent(in) :: interface_radius
+        type(maxwell_node_count_t),intent(out) :: nodes
+        type(status_t),intent(out) :: status
+        real(wp),intent(in),optional :: relative_zero_tol
+        real(wp) :: zero_tol,radius_tol
+        integer :: n,n_inner,i
+
+        nodes=maxwell_node_count_t()
+        call fail_status(status,NS_INVALID_INPUT,'numerics', &
+            'phase-aware node count requires finite piecewise Cowling W profile and interface radius')
+        if(.not.ieee_is_finite(interface_radius).or.interface_radius<=0._wp) return
+        if(.not.allocated(shot%r_m).or..not.allocated(shot%w_m3)) return
+        n=size(shot%r_m)
+        if(n<4.or.size(shot%w_m3)/=n) return
+        if(.not.all(ieee_is_finite(shot%r_m)).or..not.all(ieee_is_finite(shot%w_m3))) return
+        if(any(shot%r_m<=0._wp)) return
+        do i=2,n
+            if(shot%r_m(i)<=shot%r_m(i-1)) return
+        end do
+        radius_tol=64._wp*epsilon(1._wp)*max(abs(interface_radius),1._wp)
+        if(interface_radius<=shot%r_m(1)+radius_tol.or. &
+           interface_radius>=shot%r_m(n)-radius_tol) return
+        if(present(relative_zero_tol)) then
+            zero_tol=relative_zero_tol
+            if(.not.ieee_is_finite(zero_tol).or.zero_tol<0._wp.or.zero_tol>=0.1_wp) return
+        else
+            zero_tol=128._wp*epsilon(1._wp)
+        end if
+
+        ! The interface sample belongs to the inner segment. The first
+        ! envelope sample is counted independently; no sign comparison is
+        ! ever made between the one-sided interface values.
+        n_inner=count(shot%r_m<=interface_radius+radius_tol)
+        nodes%samples_inner=n_inner
+        nodes%samples_outer=n-n_inner
+        if(n_inner<2.or.n-n_inner<2) then
+            call fail_status(status,NS_STAGNATION,'numerics', &
+                'phase-aware node count is under-resolved in one phase segment')
+            return
+        end if
+        call count_segment_nodes(shot%w_m3(1:n_inner),zero_tol,nodes%nodes_inner,status)
+        if(.not.is_ok(status)) return
+        call count_segment_nodes(shot%w_m3(n_inner+1:n),zero_tol,nodes%nodes_outer,status)
+        if(.not.is_ok(status)) return
+        nodes%nodes_total=nodes%nodes_inner+nodes%nodes_outer
+        nodes%valid=.true.
+        call clear_status(status)
+    end subroutine count_maxwell_cowling_nodes
+
+    subroutine count_segment_nodes(values,relative_zero_tol,nodes,status)
+        real(wp),intent(in) :: values(:),relative_zero_tol
+        integer,intent(out) :: nodes
+        type(status_t),intent(out) :: status
+        real(wp) :: scale,threshold
+        integer :: i,last_sign,current_sign
+
+        nodes=-1
+        call fail_status(status,NS_INVALID_INPUT,'numerics','node-count segment must be finite and nonempty')
+        if(size(values)<1.or..not.all(ieee_is_finite(values))) return
+        scale=maxval(abs(values))
+        if(.not.ieee_is_finite(scale)) return
+        nodes=0
+        if(scale<=tiny(1._wp)) then
+            call clear_status(status)
+            return
+        end if
+        threshold=relative_zero_tol*scale
+        last_sign=0
+        do i=1,size(values)
+            if(abs(values(i))<=threshold) cycle
+            current_sign=merge(1,-1,values(i)>0._wp)
+            if(last_sign/=0.and.current_sign/=last_sign) nodes=nodes+1
+            last_sign=current_sign
+        end do
+        call clear_status(status)
+    end subroutine count_segment_nodes
+
     subroutine scan_maxwell_modes(star,grid,conversion,options,result)
         type(maxwell_star_t),intent(in) :: star
         real(wp),intent(in) :: grid(:)
@@ -165,6 +251,8 @@ contains
                 cycle
             end if
             result%refinements(j)%root_valid=.true.
+            call count_maxwell_cowling_nodes(result%refinements(j)%shot,star%jump%radius_m, &
+                result%refinements(j)%nodes,result%refinements(j)%node_status)
             result%roots_found=result%roots_found+1
         end do
 

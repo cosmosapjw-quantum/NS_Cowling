@@ -175,6 +175,21 @@ contains
                     call emit_text('spectrum_root_status_'//trim(suffix), &
                         trim(status_name(spectrum%refinements(i)%root_status%code)))
                     call emit_text('spectrum_identity_'//trim(suffix),'unresolved')
+                    call emit_bool('spectrum_nodes_valid_'//trim(suffix),spectrum%refinements(i)%nodes%valid)
+                    call emit_text('spectrum_nodes_status_'//trim(suffix), &
+                        trim(status_name(spectrum%refinements(i)%node_status%code)))
+                    if(spectrum%refinements(i)%nodes%valid) then
+                        call emit_int('spectrum_nodes_inner_'//trim(suffix), &
+                            int(spectrum%refinements(i)%nodes%nodes_inner,int64))
+                        call emit_int('spectrum_nodes_outer_'//trim(suffix), &
+                            int(spectrum%refinements(i)%nodes%nodes_outer,int64))
+                        call emit_int('spectrum_nodes_total_'//trim(suffix), &
+                            int(spectrum%refinements(i)%nodes%nodes_total,int64))
+                        call emit_int('spectrum_node_samples_inner_'//trim(suffix), &
+                            int(spectrum%refinements(i)%nodes%samples_inner,int64))
+                        call emit_int('spectrum_node_samples_outer_'//trim(suffix), &
+                            int(spectrum%refinements(i)%nodes%samples_outer,int64))
+                    end if
                     if(spectrum%refinements(i)%search%valid) then
                         call emit_real('spectrum_root_hz_'//trim(suffix), &
                             spectrum%refinements(i)%search%root/two_pi)

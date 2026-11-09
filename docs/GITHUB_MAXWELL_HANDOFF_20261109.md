@@ -45,3 +45,17 @@ The independent Python/SciPy sharp-interface reference path and Fortran transfer
 3. Add the sharp-interface module to the full repository build graph and extend the native Fortran TOV/Cowling production path if that is the desired end state.
 4. Run focused tests, all feasible regression tests, manifest checks and exact-head GitHub Actions.
 5. Keep true Maxwell discontinuity outputs separate from the old smooth maxwell matching cohort and from all previously released 234-mode results.
+
+
+## Final GitHub execution update (2026-11-09)
+
+The earlier status in this handoff records the pre-integration point. The sharp-interface source patch has since been applied to this branch and pushed after exact-head validation:
+
+- Final source commit: `6b23d024e41661d33b83d6202038db6da918821d`.
+- Follow-up documentation commits record the exact CI evidence; the current PR head is checked in PR metadata.
+- GitHub Actions run [42579257980](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42579257980) completed successfully.
+- Native Fortran EOS build passed; focused Maxwell tests **7/7**; independent validation returned `PASS_BOUNDED_REFERENCE_VALIDATION`; full frontend/pipeline suite **74 passed**.
+- Source commit was created by the workflow only after all validation stages passed.
+- CI artifact ID `13657075483`, SHA-256 `93347a170c238458fa937f2359e9ae4a8737098c5f9ec9dbdb09a26351f9946b`.
+
+The integrated scope is the phase-aware **Python/SciPy reference TOV/Cowling path** and independent Fortran slow/rapid transfer routines. Native Fortran stellar TOV/Cowling production solvers are still smooth-EOS-only. The 33-path v5 source overlay remains unapplied to this branch and is not represented as synced here. No merge has been performed.

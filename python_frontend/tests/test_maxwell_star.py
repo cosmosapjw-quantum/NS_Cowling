@@ -13,7 +13,7 @@ sys.path.insert(0, str(ROOT / "python_frontend"))
 from compose_eos import EOSData, construct_maxwell_transition
 from compose_cowling import (MaxwellEOS, solve_maxwell_tov, solve_tov_star, solve_cowling_spectrum,
                               shoot_maxwell_cowling, scan_maxwell_cowling_modes)
-from compose_cowling.maxwell import MEV_FM3_TO_J_M3, _interface_transfer
+from compose_cowling.maxwell import MEV_FM3_TO_J_M3, _interface_transfer, _sampled_phase_nodes
 from compose_cowling.solver import _compile_solver, _parse_tsv
 
 
@@ -47,6 +47,36 @@ def reference_transition():
         low, high, assume_local_charge_neutrality=True,
     )
     return low, high, matched
+
+
+def test_sampled_phase_wv_nodes_are_separate_and_ignore_interface_sign_jump():
+    w_inner = np.array([1.0, -1.0, 1.0, 1.0])
+    w_outer = np.array([-1.0, 1.0, -1.0])
+    v_inner = np.array([1.0, 1.0, -1.0, 1.0])
+    v_outer = np.array([1.0, -1.0, -1.0])
+    diag = _sampled_phase_nodes(w_inner, w_outer, v_inner, v_outer)
+
+    assert diag["w_nodes_inner_sampled"] == 2
+    assert diag["w_nodes_outer_sampled"] == 2
+    assert diag["w_nodes_total_sampled"] == 4
+    assert diag["v_nodes_inner_sampled"] == 2
+    assert diag["v_nodes_outer_sampled"] == 1
+    assert diag["v_nodes_total_sampled"] == 3
+
+    # Changing only the sign across the interface is not an interior node.
+    no_jump_w = _sampled_phase_nodes(
+        np.ones(4), -np.ones(3), np.ones(4), -np.ones(3)
+    )
+    assert no_jump_w["w_nodes_total_sampled"] == 0
+    assert no_jump_w["v_nodes_total_sampled"] == 0
+
+    # Counts must survive arbitrary finite amplitude normalization and sign.
+    scaled = _sampled_phase_nodes(
+        -1e-24 * w_inner, -1e-24 * w_outer,
+        1e-24 * v_inner, 1e-24 * v_outer,
+    )
+    assert scaled["w_nodes_total_sampled"] == diag["w_nodes_total_sampled"]
+    assert scaled["v_nodes_total_sampled"] == diag["v_nodes_total_sampled"]
 
 
 def test_maxwell_eos_keeps_two_one_sided_states_and_exact_thermodynamics():

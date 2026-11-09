@@ -81,7 +81,7 @@ def finite_cutoff_pa(eos_path: Path) -> float:
     return value
 
 
-def solve_star(eos_path: Path, pc_pa: float, pcut_pa: float) -> dict:
+def solve_star(eos_path: Path, pc_pa: float, pcut_pa: float, *, background_path: Path | None = None) -> dict:
     return solve_v5_tov_star(
         eos_path,
         pc_pa,
@@ -90,6 +90,7 @@ def solve_star(eos_path: Path, pc_pa: float, pcut_pa: float) -> dict:
         r_limit_m=1.0e8,
         rtol=1.0e-9,
         step_cap=0.05,
+        background_output_path=background_path,
     )
 
 
@@ -125,6 +126,8 @@ def main(argv=None) -> int:
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     tables_dir = args.output_dir / "extended_tables"
+    backgrounds_dir = args.output_dir / "backgrounds"
+    backgrounds_dir.mkdir(parents=True, exist_ok=True)
     receipt_path = args.output_dir / "surface_continuation_summary.json"
     summary_rows: list[dict] = []
     table_receipts: list[dict] = []
@@ -179,7 +182,8 @@ def main(argv=None) -> int:
         source_sha = sha256(eos_path)
         try:
             source_pcut = finite_cutoff_pa(eos_path)
-            base = solve_star(eos_path, pc_pa, source_pcut)
+            base_background = backgrounds_dir / f"{name}__finite_cutoff_reference.csv"
+            base = solve_star(eos_path, pc_pa, source_pcut, background_path=base_background)
             baseline_mass = float(base["mass_kg"])
             baseline_radius = float(base["radius_m"])
             baseline_mass_ref = baseline_mass / ref_mass - 1.0
@@ -202,6 +206,9 @@ def main(argv=None) -> int:
                 "radius_relative_to_frozen_reference": baseline_radius_ref,
                 "backend_build_key": base.get("backend_build_key"),
                 "source_eos_sha256": source_sha,
+                "background_profile_sha256": base["background_profile"]["sha256"],
+                "background_profile_row_count": base["background_profile"]["row_count"],
+                "background_profile_path": str(base_background.relative_to(args.output_dir)),
             }
             summary_rows.append(baseline_record)
             method_cases["finite_cutoff_reference"] = baseline_record
@@ -231,13 +238,15 @@ def main(argv=None) -> int:
                                       "family": family, "alpha": alpha})
                 table_receipts.append(table_receipt)
                 extension_pcut = float(table_receipt["surface_pressure_pa"])
-                star = solve_star(output_eos, pc_pa, extension_pcut)
+                background_path = backgrounds_dir / f"{name}__{label}.csv"
+                star = solve_star(output_eos, pc_pa, extension_pcut, background_path=background_path)
                 mass = float(star["mass_kg"])
                 radius = float(star["radius_m"])
                 record = {
                     "name": name,
                     "method": method,
                     "scenario": label,
+                    "status": "ok",
                     "family": family,
                     "alpha": alpha,
                     "min_energy_ratio": energy_ratio,
@@ -253,6 +262,9 @@ def main(argv=None) -> int:
                     "radius_relative_to_frozen_reference": radius / ref_radius - 1.0,
                     "surface_residual_pa": star.get("surface_residual_pa"),
                     "backend_build_key": star.get("backend_build_key"),
+                    "background_profile_sha256": star["background_profile"]["sha256"],
+                    "background_profile_row_count": star["background_profile"]["row_count"],
+                    "background_profile_path": str(background_path.relative_to(args.output_dir)),
                     "extended_eos_sha256": table_receipt["output_sha256"],
                     "source_eos_sha256": source_sha,
                     "continuation_closure": table_receipt["diagnostics"]["closure"],
@@ -308,6 +320,11 @@ def main(argv=None) -> int:
         "summary_csv_sha256": sha256(args.output_dir / "surface_continuation_summary.csv"),
         "sensitivity_csv_sha256": sha256(args.output_dir / "surface_continuation_sensitivity.csv"),
         "table_count": len(table_receipts),
+        "background_profile_count": len(list(backgrounds_dir.glob("*.csv"))),
+        "background_profiles": [
+            {"path": str(path.relative_to(args.output_dir)), "sha256": sha256(path), "bytes": path.stat().st_size}
+            for path in sorted(backgrounds_dir.glob("*.csv"))
+        ],
         "source_summary_sha256": receipt["source_summary_sha256"],
         "source_commit": receipt["source_commit"],
     }

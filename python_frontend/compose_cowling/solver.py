@@ -129,7 +129,7 @@ def _run_v5_cell_solve(eos,pc_pa,*,task,target_mass_kg=0.0,pc_bracket_pa=None,
                        frequency_hi_hz=(3000.0,8000.0),p_cut_pa=None,
                        r0_m=10.0,r_limit_m=1e8,rtol=1e-9,mode_rtol=1e-9,
                        step_cap=0.05,mass_rtol=1e-10,residual_tol=1e-6,
-                       match_index=72,center_order=2):
+                       match_index=72,center_order=2,background_output_path=None):
     executable,build_key=_compile_v5_cell_solve()
     if task not in ('star','shot','spectrum'):
         raise ValueError("v5 task must be star, shot or spectrum")
@@ -185,6 +185,32 @@ def _run_v5_cell_solve(eos,pc_pa,*,task,target_mass_kg=0.0,pc_bracket_pa=None,
         result['backend_build_key']=build_key
         result['center_order']=center_order
         result['r_limit_m']=float(r_limit_m)
+        if background_output_path is not None:
+            if task != 'star':
+                raise ValueError("background export is available only for TOV task='star'")
+            source_profile=Path(str(prefix)+'_background.csv')
+            if not source_profile.is_file():
+                raise NativeExecutionError("v5 TOV run did not emit its requested background profile")
+            destination=Path(background_output_path)
+            if destination.exists():
+                raise FileExistsError(destination)
+            destination.parent.mkdir(parents=True,exist_ok=True)
+            shutil.copyfile(source_profile,destination)
+            with destination.open(newline='') as stream:
+                reader=csv.DictReader(stream)
+                expected=('cell','t','r_m','m_kg','p_pa','energy_j_m3','chi','nu','w_over_r3','v_over_r2')
+                if tuple(reader.fieldnames or ()) != expected:
+                    raise NativeExecutionError("v5 background profile has an unexpected schema")
+                profile_rows=list(reader)
+            if len(profile_rows)<2:
+                raise NativeExecutionError("v5 background profile has fewer than two rows")
+            profile_sha=hashlib.sha256(destination.read_bytes()).hexdigest()
+            result['background_profile']={
+                'path':str(destination),
+                'sha256':profile_sha,
+                'row_count':len(profile_rows),
+                'columns':list(expected),
+            }
         if task=='spectrum':
             nodes={}
             for j,mode in ((1,'f'),(2,'p1')):
@@ -200,11 +226,13 @@ def _run_v5_cell_solve(eos,pc_pa,*,task,target_mass_kg=0.0,pc_bracket_pa=None,
 
 def solve_v5_tov_star(eos:EOSData | str | Path,pc_pa:float,*,p_cut_pa:float|None=None,
                       r0_m:float=10.0,r_limit_m:float=1e8,rtol:float=1e-9,
-                      step_cap:float=0.05,center_order:int=2)->dict:
+                      step_cap:float=0.05,center_order:int=2,
+                      background_output_path:str | Path | None=None)->dict:
     """TOV-only run using the exact frozen v5 source family and center expansion."""
     return _run_v5_cell_solve(eos,pc_pa,task='star',p_cut_pa=p_cut_pa,
         r0_m=r0_m,r_limit_m=r_limit_m,rtol=rtol,mode_rtol=rtol,
-        step_cap=step_cap,center_order=center_order)
+        step_cap=step_cap,center_order=center_order,
+        background_output_path=background_output_path)
 
 
 def solve_v5_cowling_shot(eos:EOSData | str | Path,pc_pa:float,frequency_hz:float,*,

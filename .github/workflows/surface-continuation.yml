@@ -1,0 +1,55 @@
+name: Thermodynamic P=0 surface continuation
+
+on:
+  push:
+    branches: [research/mass-dependent-cowling-v1]
+    paths:
+      - ".github/workflows/surface-continuation.yml"
+      - "python_frontend/compose_cowling/surface_continuation.py"
+      - "python_frontend/compose_cowling/solver.py"
+      - "python_frontend/tests/test_surface_continuation.py"
+      - "scripts/run_surface_continuation.py"
+      - "oscillation_release_v1/data/spectrum_summary_234.csv"
+      - "oscillation_release_v1/data/eos_projected/GPPVA_FSU2__BBB_BHF2__*.csv"
+      - "oscillation_release_v1/workflow/compile_manifest.json"
+      - "oscillation_source/calculation/**"
+      - "oscillation_source/methods/**"
+      - "oscillation_source/support/**"
+
+permissions:
+  contents: read
+
+jobs:
+  surface-continuation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      PYTHONPATH: python_frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install GNU Fortran and Python dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gfortran
+          python -m pip install --upgrade pip
+          python -m pip install numpy pytest
+      - name: Test thermodynamic surface continuation
+        run: python -m pytest -q python_frontend/tests/test_surface_continuation.py
+      - name: Run six-method native TOV surface continuation comparison
+        run: |
+          python scripts/run_surface_continuation.py \
+            --output-dir dist/surface-continuation \
+            --tail-points 512 \
+            --coarse-energy-ratio 1.0e-8 \
+            --fine-energy-ratio 1.0e-12
+      - name: Upload surface-continuation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ns-cowling-surface-continuation-${{ github.run_id }}
+          path: dist/surface-continuation/
+          if-no-files-found: warn
+          retention-days: 30

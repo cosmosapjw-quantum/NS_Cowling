@@ -209,9 +209,36 @@ The legacy `maxwell` matching token remains a smooth bridge in this cohort and i
 
 ### Updated next-gate ordering
 
-1. R16 low-density source/provenance audit: trace the CompOSE/BSk22-derived inputs and projection/mapping that generate the sparse row-217→218 interval; compare only source-backed outer-crust alternatives while preserving each source hash and model identity.
+1. R17 constrained reconstruction comparison: retain the current q-preserving exact-integral projection as baseline A; define alternative movable variables and data-fidelity objectives explicitly, then map source-pressure-knot and Hermite failures to upstream source/phase provenance before any TOV/mode propagation.
 2. MD-31 remains blocked: source-backed low-density crust EOS to (P=0) and a physical surface are not available from this cohort.
 3. MD-32 remains a separate design choice: a finite-positive-pressure eigenproblem is admissible only if explicitly formulated as a truncated-domain problem with a justified boundary condition.
 4. MD-26 radial (\omega_0^2) and MD-27 full-star mass-dependent Cowling f/p1 remain blocked until a sourced low-density EOS and a validated surface/perturbation boundary condition exist. The initial (Gamma_1=\Gamma_{eq}) route would support only barotropic-equilibrium stability; it is not frozen-composition stability.
 
-Full result report: `docs/R15_FULL_COHORT_TOV_RESULTS_20261110.md`. Full input preflight: `docs/R15_FULL_COHORT_NATIVE_DENSITY_PREFLIGHT_20261110.md`. Representative row boundary diagnostic: `docs/R15_ROW217_218_BOUNDARY_DIAGNOSTIC_20261110.md`. Whole-cell Hermite audit: `docs/R15_NATIVE_HERMITE_ROW217_218_AUDIT_20261110.md`.
+Full result report: `docs/R15_FULL_COHORT_TOV_RESULTS_20261110.md`. Full input preflight: `docs/R15_FULL_COHORT_NATIVE_DENSITY_PREFLIGHT_20261110.md`. Representative row boundary diagnostic: `docs/R15_ROW217_218_BOUNDARY_DIAGNOSTIC_20261110.md`. Whole-cell Hermite audit: `docs/R15_NATIVE_HERMITE_ROW217_218_AUDIT_20261110.md`. R16 projection/convexity audit: `docs/R16_NORMALIZED_TO_PROJECTED_AUDIT_20261110.md`.
+
+## R16 full-cohort normalized-to-projected audit (2026-11-10)
+
+| ID | Node | Status | Evidence / interpretation |
+|---|---|---|---|
+| R16-01 | Reproduce frozen q-isotonic projection | PASS_234_OF_234 | Actions [42666868668](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42666868668), code HEAD `858c5d5639e0140e53c6f27b6e504eb261c05b01`: independent PAV/q-linear/exact-pressure-integral reconstruction matches all 234 projected CSVs with max relative mismatch 0.0; source and projected hashes unchanged. |
+| R16-02 | Raw vs projected whole-cell Hermite admissibility | PASS_PROJECTED_109776 / SOURCE_REJECTED_24505 | Across 109,776 cells, raw normalized input rejects 24,465 by strict convexity and 24,505 by stability/causal margin (40 stable-but-acausal); projected solver input rejects none. This is an input-representation comparison, not a verdict on the upstream physical model. |
+| R16-03 | Sparse row-217→218 contrast | PASS_DIAGNOSTIC | Raw source cell fails in 144/234 tables: all 8 GPPVA families (18/18 tables each); it passes in the 5 SPG families. Projected row-217→218 cell passes 234/234. |
+| R16-04 | Pressure-knot convexity obstruction | PASS_447_SECANT_DROPS | There are 447 downward adjacent pressure-secant transitions across 234 normalized tables; projected pressure secants have zero decreases. The largest drop is -21.3709% (GPPVA_TM1e, source row 290). An exactly pressure-knot-preserving convex interpolant cannot exist for any table containing such a decrease. |
+| R16-05 | Density localization | PASS_109776_CELL_MAP | Raw stability/causality failures are not confined to the lowest-density crust prefix: 82.87% in geometric-midpoint bin 0.002–0.01 fm^-3 and 44.27% in 0.01–0.1 fm^-3; projected failures remain zero. See density-bin CSV and detailed report. |
+
+### R16 interpretation boundary
+
+The 234 inputs are the frozen normalized matched tables under `eos_original_normalized`; the outputs are derived projected solver inputs under `eos_projected`. Neither should be conflated with the repository's separately stored raw CompOSE package or its upstream source hashes.
+
+The projector's (q=n_B/\mu_B) is already nondecreasing in all 234 source tables, so PAV does not pool any knots. The main change is to reintegrate pressure from (dP/d\mu_B=n_B), then set (\epsilon=\mu_B n_B-P). The source algebraic First-Law residual is small, but that identity does not alone guarantee differential compatibility.
+
+For convex (P(\mu_B)), adjacent secant slopes (s_i=\Delta P_i/\Delta\mu_i) must be nondecreasing. The 447 decreases show that exact preservation of all source pressure knots and convexity cannot both be achieved in those data sequences. This is a constraint on the matched/normalized sequence, not proof that the upstream microphysical EOS itself is unstable.
+
+### Updated next-gate ordering
+
+1. **R17:** formulate a constrained reconstruction comparison. Keep the current q-preserving exact-integral projection as baseline A; define alternatives by the exact variables they are allowed to change and by explicit data-fidelity objectives. Where source uncertainty metadata are absent, do not invent weights; perform weight/objective sensitivity and report a Pareto/error budget.
+2. Trace each raw secant/Hermite failure to the original CompOSE model, source phase/composition records, and matching/projection path. Preserve the distinctions between raw package, normalized matched table and projected solver table.
+3. Only after R17 identifies a bounded and explicitly justified alternative set, propagate those alternatives to TOV and spectra as separate versioned EOS artifacts. R16 itself performed no TOV or mode runs.
+4. MD-31 still requires a sourced physical low-density EOS down to (P=0); MD-32 still needs a justified finite-domain perturbation boundary. Radial (\omega_0^2) and complete-star Cowling modes remain blocked.
+
+R16 report: `docs/R16_NORMALIZED_TO_PROJECTED_AUDIT_20261110.md`. R15 finite-pressure TOV and Hermite reports remain the records for their separate scopes.

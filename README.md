@@ -69,7 +69,7 @@ A separate phase-segmented native Fortran path now accepts independent high-dens
 
 
 
-The native sharp-Maxwell Fortran path is tracked independently in [the implementation contract](docs/MAXWELL_NATIVE_FORTRAN_V1.md), [the adversarial audit](docs/ADVERSARIAL_AUDIT_MAXWELL_NATIVE_FORTRAN_20261109.md), and [the research DAG](docs/MAXWELL_NATIVE_FORTRAN_DAG_20261109.md). The typed production generic APIs now dispatch both smooth and one-sharp-Maxwell TOV/Cowling paths. Exact-head CI on workflow/source commit `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c` passed 12 cell, 22 analytic Maxwell and 74 normalized-table checks, built the production driver, and ran both `maxwell_table_cowling` and `maxwell_table_spectrum` against generated analytic phase tables. The spectrum fixture has 3 successful trials and 0 brackets/roots: this validates the finite-grid no-root path, not an eigenfrequency or positive-root bisection. PR #3 remains draft/open/unmerged; a source-backed realistic CompOSE hybrid phase pair remains untested.
+The native sharp-Maxwell Fortran path is tracked independently in [the implementation contract](docs/MAXWELL_NATIVE_FORTRAN_V1.md), [the adversarial audit](docs/ADVERSARIAL_AUDIT_MAXWELL_NATIVE_FORTRAN_20261109.md), and [the research DAG](docs/MAXWELL_NATIVE_FORTRAN_DAG_20261109.md). Typed production generics now dispatch smooth and one-interface Maxwell TOV/Cowling paths. The latest exact-head CI checks 12 cell, 22 analytic Maxwell, and 74 normalized-table assertions; builds the production driver; tests slow and rapid spectra with two positive roots each; varies ODE and root/grid settings; and compares native TOV/Cowling roots against the independent Python/SciPy phase-aware reference. The generated analytic fixture only is validated: root-family identity remains unresolved and no source-backed realistic CompOSE hybrid EOS has been run. PR #3 remains draft/open/unmerged.
 
 ## Native production solver dispatch (2026-11-09)
 
@@ -79,7 +79,7 @@ The Fortran module `ns_production_solvers` exposes generic production entry poin
 - `solve_cowling_spectrum(background, grid, options, spectrum)` and the corresponding `star_profile_t` overload preserve the smooth path.
 - `solve_cowling_spectrum(maxwell_star, grid, options, conversion, spectrum)` scans a two-phase background separately for `slow` or `rapid` conversion.
 
-The Maxwell scanner retains every trial status, only refines sign/near brackets with bisection, and rejects unresolved near-zero samples. A converged root remains `unresolved` by family until an independent identity/continuation method is added. A successful finite-grid scan does not prove that all eigenfrequencies in or outside the grid were found. The current CI spectrum smoke uses generated analytic tables and intentionally checks a no-root scan path; a source-backed realistic EOS and root-family validation remain open. See [the dispatch contract](docs/PRODUCTION_SOLVER_DISPATCH_MAXWELL_20261109.md), [the DAG](docs/MAXWELL_NATIVE_FORTRAN_DAG_20261109.md), and [the local-agent resume prompt](docs/LOCAL_AGENT_RESUME_MAXWELL_PRODUCTION_DISPATCH_20261109.md).
+The Maxwell scanner retains trial statuses, refines sign/near brackets with bisection, reruns Cowling shots at roots, and checks final surface residuals. Exact-head CI now verifies two slow and two rapid roots on the generated analytic fixture. Separate ODE refinement moves roots by at most 3.2810e-5 relative; denser-grid/tighter-bisection refinement moves them by at most 2.6561e-10. The independent Python/SciPy reference agrees in TOV M/R/interface radius at 5.5e-10 or better and in the four unlabelled Cowling roots within 5.21e-5 relative. The roots remain family-unresolved; the finite grid is not a spectrum-completeness proof. See [the DAG](docs/MAXWELL_NATIVE_FORTRAN_DAG_20261109.md), [the adversarial audit](docs/ADVERSARIAL_AUDIT_MAXWELL_NATIVE_FORTRAN_20261109.md), and [the local-agent resume prompt](docs/LOCAL_AGENT_RESUME_MAXWELL_PRODUCTION_DISPATCH_20261109.md).
 
 
 The latest exact-head workflow evidence is recorded in the adversarial audit and local-agent resume file. The successful push and pull-request runs both check the workflow/docs head while all native Fortran source code remains at the separately verified implementation commit `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`.
@@ -92,3 +92,15 @@ The Fortran production generic APIs now dispatch both smooth and one-interface s
 - Rapid: 4937.0162338857 Hz and 19493.6326018255 Hz.
 
 These values are synthetic regression-fixture roots only. All four mode-family labels remain `unresolved`; root convergence, Python/SciPy cross-validation, realistic CompOSE phases and mode identity remain open. The DAG and adversarial audit contain exact CI provenance.
+
+
+## Native Maxwell convergence and independent reference gate (2026-11-09)
+
+Exact tested head: `afcdf948f0ca6844a6c3402f66e184a46aa78978` (Fortran/table-test increment `9d3ef4bfe8b018b17887504d60e25d1c94971b6e`). Both push and PR Actions passed. The generated two-phase fixture now has explicit ODE-refinement and frequency-grid/root-tolerance-refinement runs for slow and rapid conversion, plus an independent Python/SciPy phase-aware cross-check.
+
+- Maximum root shift under the tighter ODE setting: (3.2810\times10^{-5}).
+- Maximum root shift under the denser grid and tighter bisection setting: (2.6561\times10^{-10}).
+- Python/SciPy TOV relative differences: mass (5.47\times10^{-10}), radius (2.15\times10^{-10}), interface radius (2.67\times10^{-10}).
+- Maximum Fortran/Python Cowling root-set relative difference: (5.205\times10^{-5}).
+
+All four roots remain `unresolved` by mode family. This is a numerical verification on generated analytic tables, not a realistic neutron-star spectrum or source-backed CompOSE result. Exact artifacts and acceptance limits are recorded in the DAG and adversarial audit.

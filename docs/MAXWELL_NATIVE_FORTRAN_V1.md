@@ -174,3 +174,30 @@ Both exact-head CI events passed:
 - Pull request [42586446195](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42586446195), artifact 13659137810, SHA-256 `478fb960cf8a993bb92bf2bbc544f17160b854e0f0f5ac5a28cc0b14a9ccaeaf`.
 
 This verifies the positive-root branch, not a root-convergence study: only one ODE/root-tolerance configuration is used. Frequency-grid refinement, ODE tolerance refinement, independent Python/SciPy comparison and mode identity/continuation remain open.
+
+
+## Root convergence and independent Python/SciPy reference (2026-11-09)
+
+The CI fixture now generates six spectrum NAMELIST files:
+- baseline slow and rapid: (rtol=2\times10^{-9}), (dq_{max}=0.05), 41 points, (xtol=10^{-5}), (rtol_{root}=10^{-10});
+- ODE-refined slow and rapid: (rtol=2\times10^{-10}), (dq_{max}=0.025), 41 points, unchanged root tolerances, Cowling absolute tolerances (10^{-13});
+- grid/root-refined slow and rapid: ODE settings unchanged from baseline, 81 points, (xtol=10^{-8}), (rtol_{root}=10^{-12}).
+
+The largest root displacement when tightening the ODE settings is (3.2810\times10^{-5}) relative (rapid second root). The largest displacement under the denser frequency grid and tighter bisection tolerance is (2.6561\times10^{-10}). The CI acceptance limits are (10^{-4}) and (10^{-7}), respectively.
+
+An independent reference script, `scripts/validate_native_maxwell_reference.py`, reconstructs the same generated two-phase analytic EOS as an `EOSData` phase-labelled table, admits it through the independent Python `MaxwellEOS`/DirectBarotrope provider, then solves TOV and scans Cowling roots with SciPy DOP853/brentq. Native-vs-reference relative differences:
+- TOV mass: (5.4709\times10^{-10})
+- TOV radius: (2.1518\times10^{-10})
+- interface radius: (2.6674\times10^{-10})
+- largest sorted Cowling root-set difference: (5.2046\times10^{-5})
+
+The root-set comparison sorts frequencies only as numerical values. It does not pair slow and rapid modes or assign f/p1/interface identity. Acceptance limits are (10^{-6}) for the TOV values and (10^{-4}) for the root set. The JSON report is archived at `dist/maxwell-native-convergence-reference.json`.
+
+Exact test/fixture commit: `9d3ef4bfe8b018b17887504d60e25d1c94971b6e`.
+Exact validator commit and tested head: `afcdf948f0ca6844a6c3402f66e184a46aa78978`.
+
+Both exact-head CI events passed:
+- Push [42588162457](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42588162457), artifact 13659334940, SHA-256 `2f394e17b8f2afa2618322c3c634f63fb6faff81090fe14c700d66f374f165d5`.
+- Pull request [42588170532](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42588170532), artifact 13660500740, SHA-256 `05d6786c5a5e82e177646a7db72efc50d485d54d0fac45ae1cec8a499666fd8e`.
+
+This closes the bounded synthetic numerical convergence and independent-reference gate. It does not establish realistic CompOSE phenomenology, a complete frequency spectrum, or mode-family identity.

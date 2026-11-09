@@ -133,3 +133,23 @@ Both exact-head events pass:
 - PR [42586446195](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42586446195): artifact 13659137810, SHA-256 `478fb960cf8a993bb92bf2bbc544f17160b854e0f0f5ac5a28cc0b14a9ccaeaf`.
 
 The strict CI requires two valid roots for both slow and rapid conversion. Root-frequency convergence, independent Python/SciPy cross-validation, phase-aware mode identity, realistic source-backed CompOSE data and stable M-R analysis remain open. PR #3 remains draft/open/unmerged.
+
+
+## Native Maxwell production dispatch, root convergence and independent reference (2026-11-09)
+
+The previous smooth-EOS-only limitation is resolved at the production API boundary. The generic `solve_tov_star` and `solve_cowling_spectrum` entry points dispatch smooth and one-interface Maxwell paths; production case adapters route through them.
+
+Exact fixture/test commit: `9d3ef4bfe8b018b17887504d60e25d1c94971b6e`.
+Exact strict validator/head: `afcdf948f0ca6844a6c3402f66e184a46aa78978`.
+
+The latest strict CI adds ODE refinement, 41-to-81 point frequency-grid/root tolerance refinement, and independent Python/SciPy reference validation on the same generated analytic two-phase fixture. Results:
+- ODE-refinement maximum relative root shift: (3.2810\times10^{-5}).
+- Grid/root-refinement maximum relative shift: (2.6561\times10^{-10}).
+- Independent TOV relative differences: M (5.47\times10^{-10}), R (2.15\times10^{-10}), interface radius (2.67\times10^{-10}).
+- Independent Cowling root-set maximum relative difference: (5.205\times10^{-5}).
+
+Both exact-head workflows pass:
+- Push [42588162457](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42588162457), artifact 13659334940, SHA-256 `2f394e17b8f2afa2618322c3c634f63fb6faff81090fe14c700d66f374f165d5`.
+- PR [42588170532](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42588170532), artifact 13660500740, SHA-256 `05d6786c5a5e82e177646a7db72efc50d485d54d0fac45ae1cec8a499666fd8e`.
+
+The four roots remain family-unresolved and belong to synthetic analytic tables only. Do not use them as observed/realistic neutron-star frequencies. Next gates are mode identity/continuation, pointwise profile comparison, negative EOS admission tests, M-R/radial stability and source-backed CompOSE phase data. PR #3 remains draft/open/unmerged.

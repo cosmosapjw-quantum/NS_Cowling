@@ -169,3 +169,35 @@ This section supersedes earlier authority/result statements above.
 The latest CI requires exactly 2 valid roots for each conversion prescription on a 41-point 100-20,000 Hz grid. Slow roots: 1764.8989380477 Hz (residual -6.9575e-7), 4937.6449322607 Hz (9.3334e-8). Rapid roots: 4937.0162338857 Hz (8.5331e-9), 19493.6326018255 Hz (3.8951e-7). All mode-family identities remain unresolved; these are synthetic analytic-table results, not realistic star predictions.
 
 Next work: perform independent root-frequency convergence by varying ODE tolerance, maximum step, bisection tolerance and grid density separately, then compare the sharp-interface Python/SciPy reference with identical table EOS and background. Do not assign mode identity by root ordering.
+
+
+## Superseding verified state: root convergence and Python/SciPy reference (2026-11-09)
+
+This section supersedes earlier status/next-step statements above.
+
+- Exact Fortran/table fixture commit: `9d3ef4bfe8b018b17887504d60e25d1c94971b6e`.
+- Exact validator head: `afcdf948f0ca6844a6c3402f66e184a46aa78978`.
+- Push [42588162457](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42588162457): artifact 13659334940, SHA-256 `2f394e17b8f2afa2618322c3c634f63fb6faff81090fe14c700d66f374f165d5`.
+- PR [42588170532](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42588170532): artifact 13660500740, SHA-256 `05d6786c5a5e82e177646a7db72efc50d485d54d0fac45ae1cec8a499666fd8e`.
+
+Strict CI results: 12 cell, 22 analytic Maxwell, 74 normalized-table assertions; production build; baseline slow/rapid positive-root spectra; ODE-refined slow/rapid spectra; denser-grid/tighter-bisection slow/rapid spectra; independent Python/SciPy reference. The strict validator gates are:
+- ODE refinement root shift <= 1e-4; measured maximum 3.2810e-5.
+- Frequency-grid/root-tolerance refinement shift <= 1e-7; measured maximum 2.6561e-10.
+- Python TOV relative differences <= 1e-6; measured M 5.4709e-10, R 2.1517e-10, r_t 2.6674e-10.
+- Python Cowling root-set difference <= 1e-4; measured maximum 5.2046e-5.
+
+Reference frequency set, sorted only for numerical comparison:
+- Rapid native 4937.0162338857 / Python 4937.0455932778 Hz; native 19493.6326018255 / Python 19494.6472160782 Hz.
+- Slow native 1764.8989380477 / Python 1764.9225737103 Hz; native 4937.6449322607 / Python 4937.6746742499 Hz.
+
+No mode identities are assigned. The root list is not a complete-spectrum claim and the fixture is synthetic. A source-backed realistic CompOSE hybrid EOS remains absent.
+
+## Next local research tasks
+
+1. Implement phase-aware mode identity using segment-aware node counting, a consistent normalization/overlap, and continuation in frequency. Treat the slow/rapid spectra as separate boundary-value problems; do not pair roots by order.
+2. Add negative admission tests for out-of-range transition pressure, mismatched chemical potential, reversed jumps, first-law closure failure, callback failure, failed scan trial and non-bracketed near-zero sample.
+3. Compare one-sided Cowling profiles and interface-transfer diagnostics pointwise against Python/SciPy at matched frequencies and tolerances.
+4. Construct a source-backed CompOSE hybrid EOS pair with provenance, units, phase labels, crust/core matching, coexistence pressure and checksum; only then run the production solvers.
+5. Build central-pressure sequences, M-R branches, turning-point/radial stability and twin-star diagnostics as separate gates.
+
+Do not merge PR #3 or remove the draft label. Preserve old failed Actions attempts and the pre-dispatch backup branches as provenance.

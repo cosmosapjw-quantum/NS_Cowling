@@ -143,3 +143,67 @@ Both workflows passed:
 Toolchain: GNU Fortran 16.2.0, FPM 0.13.0; runtime-check flags include `-fcheck=all`. Counts: 12 cell, 22 analytic Maxwell and 74 normalized-table checks.
 
 **Updated audit state:** `PASS_BOUNDED_NATIVE_GENERIC_DISPATCH_AND_SYNTHETIC_SLOW_RAPID_POSITIVE_ROOTS`. Remaining: root-frequency convergence, independent Python/SciPy cross-validation, negative table admission, mode identity/continuation, stable M-R sequence and source-backed realistic EOS.
+
+
+## Exact-head root-convergence and independent Python/SciPy audit (2026-11-09)
+
+### Authority
+
+- Fortran table fixture and six-NAMELIST increment: `9d3ef4bfe8b018b17887504d60e25d1c94971b6e`.
+- Tight acceptance-limit validator and exact tested head: `afcdf948f0ca6844a6c3402f66e184a46aa78978`.
+- Both push and PR events passed at the exact tested head.
+
+### ODE and root/grid refinement
+
+The baseline scan uses 41 points from 100 to 20,000 Hz. A separate ODE-refined run changes (rtol), maximum q-step and Cowling absolute tolerances while retaining the same frequency grid and root tolerance. A third run retains baseline ODE settings but changes grid density from 41 to 81 points and tightens bisection (xtol) and (rtol).
+
+- Maximum root shift under ODE refinement: (3.2810191\times10^{-5}) relative.
+- Maximum root shift under grid/root refinement: (2.6560312\times10^{-10}) relative.
+- Strict CI limits: (10^{-4}) and (10^{-7}), respectively.
+
+The largest ODE sensitivity is the rapid-conversion higher root:
+- baseline 19493.6326018255 Hz;
+- ODE-refined 19494.2722126190 Hz;
+- shift 0.6396108 Hz, or (3.2810\times10^{-5}) relative.
+
+The denser-grid/tighter-root estimates remain:
+- slow: 1764.8989385165 Hz, 4937.6449327349 Hz;
+- rapid: 4937.0162350114 Hz, 19493.6325999867 Hz.
+
+### Independent Python/SciPy comparison
+
+`scripts/validate_native_maxwell_reference.py` reconstructs the exact analytic pressure/energy/density/chemical-potential phase tables and runs the separate `MaxwellEOS` DirectBarotrope provider, phase-segmented SciPy DOP853 TOV, and SciPy Brent root scanner.
+
+| Quantity | Native Fortran | Python/SciPy | Relative difference |
+|---|---:|---:|---:|
+| TOV mass | from CLI | reference | (5.4709\times10^{-10}) |
+| TOV radius | from CLI | reference | (2.1517\times10^{-10}) |
+| Interface radius | from CLI | reference | (2.6674\times10^{-10}) |
+
+Cowling root-set comparison (sorted numerically; no family pairing):
+| Conversion | Native Hz | Python/SciPy Hz | Relative difference |
+|---|---:|---:|---:|
+| rapid | 4937.0162338857 | 4937.0455932778 | (5.9468\times10^{-6}) |
+| rapid | 19493.6326018255 | 19494.6472160782 | (5.2046\times10^{-5}) |
+| slow | 1764.8989380477 | 1764.9225737103 | (1.3392\times10^{-5}) |
+| slow | 4937.6449322607 | 4937.6746742499 | (6.0235\times10^{-6}) |
+
+Strict reference limits: (10^{-6}) for TOV quantities and (10^{-4}) for Cowling root frequencies. All passed. The fixture is generated analytic data; root-family labels remain `unresolved`.
+
+### Exact-head GitHub Actions
+
+Both exact-head events passed:
+- Push [42588162457](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42588162457): artifact 13659334940, SHA-256 `2f394e17b8f2afa2618322c3c634f63fb6faff81090fe14c700d66f374f165d5`.
+- PR [42588170532](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42588170532): artifact 13660500740, SHA-256 `05d6786c5a5e82e177646a7db72efc50d485d54d0fac45ae1cec8a499666fd8e`.
+
+Runtime-check graph: 12 cell, 22 analytic Maxwell and 74 normalized-table checks; production build; baseline slow/rapid scans; ODE-refined slow/rapid scans; grid/root-refined slow/rapid scans; independent Python/SciPy reference cross-check. Machine-readable output: `dist/maxwell-native-convergence-reference.json`.
+
+**Updated audit state:** `PASS_BOUNDED_SYNTHETIC_PRODUCTION_DISPATCH_ROOT_CONVERGENCE_AND_PYTHON_REFERENCE`.
+
+### Remaining risks and non-claims
+
+- This is one generated analytic EOS pair, not a source-backed realistic CompOSE hybrid EOS cohort.
+- Frequency search is finite-grid and not a completeness theorem.
+- Four roots remain without f/p1/interface identity; no slow/rapid root pairing is claimed.
+- One ODE refinement comparison and one grid/root refinement comparison are not an exhaustive numerical error budget.
+- Pointwise Cowling profile/transfer comparison, provider negative tests, realistic EOS execution, M-R stability sequence and astrophysical inference remain open.

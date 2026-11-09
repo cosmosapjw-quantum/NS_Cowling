@@ -273,13 +273,21 @@ def main(argv=None) -> int:
     source_unchanged = all(x.get("source_unchanged") for x in records)
     projected_unchanged = all(x.get("projected_unchanged") for x in records)
     all_match = len(records) == EXPECTED_TABLES and all(x["status"] == "PASS_RECONSTRUCTION_MATCH" for x in records)
+    projected_cells_admissible = (
+        len(records) == EXPECTED_TABLES
+        and all(
+            x["projected_nonstable_cell_count"] == 0
+            and x["projected_noncausal_cell_count"] == 0
+            for x in records
+        )
+    )
     groups = summarize(records)
     out = args.output_dir.resolve()
     out.mkdir(parents=True, exist_ok=True)
 
     receipt = {
         "schema": "ns-cowling-r16-normalized-to-projected-audit-v1",
-        "status": "PASS_R16_FULL_COHORT_PROJECTION_RECONSTRUCTION" if all_match and not failures and source_unchanged and projected_unchanged else "FAIL_R16_FULL_COHORT_PROJECTION_RECONSTRUCTION",
+        "status": "PASS_R16_FULL_COHORT_PROJECTION_RECONSTRUCTION" if all_match and projected_cells_admissible and not failures and source_unchanged and projected_unchanged else "FAIL_R16_FULL_COHORT_PROJECTION_RECONSTRUCTION",
         "source_commit": os.environ.get("GITHUB_SHA", "UNAVAILABLE_LOCAL_RUN"),
         "source_summary_sha256": SUMMARY_SHA256,
         "expected_table_count": EXPECTED_TABLES,
@@ -289,6 +297,7 @@ def main(argv=None) -> int:
         "source_tables_unchanged": source_unchanged,
         "projected_tables_unchanged": projected_unchanged,
         "all_projector_reconstructions_match": all_match,
+        "all_projected_hermite_cells_admissible": projected_cells_admissible,
         "source_q_nonmonotone_table_count": sum(not x["source_q_monotone"] for x in records),
         "pav_pooled_table_count": sum(x["pav_pooled_block_count"] > 0 for x in records),
         "pav_pooled_block_count_total": sum(x["pav_pooled_block_count"] for x in records),
@@ -337,6 +346,10 @@ def main(argv=None) -> int:
         "row218_pressure_delta_pct_range": receipt["row218_pressure_endpoint_delta_pct_range"],
         "row217_218_delta_p_increment_delta_pct_range": receipt["row217_218_delta_p_increment_delta_pct_range"],
         "max_reconstruction_rel_mismatch": receipt["max_reconstruction_rel_mismatch"],
+        "source_row217_218_rejected_cells": receipt["source_row217_218_rejected_cell_count"],
+        "projected_row217_218_rejected_cells": receipt["projected_row217_218_rejected_cell_count"],
+        "source_tables_with_nonstable_cells": receipt["source_tables_with_any_nonstable_cell"],
+        "projected_tables_with_nonstable_cells": receipt["projected_tables_with_any_nonstable_cell"],
         "source_tables_unchanged": source_unchanged,
         "projected_tables_unchanged": projected_unchanged,
     }, indent=2), flush=True)

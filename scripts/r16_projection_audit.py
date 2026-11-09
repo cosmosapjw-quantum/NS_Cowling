@@ -153,6 +153,23 @@ def reconstruct_projection(
     projected_pressure_secants = [
         (p_projected[i + 1] - p_projected[i]) / h[i] for i in range(len(h))
     ]
+    source_pressure_increments = [
+        p_v[i + 1] - p_v[i] for i in range(len(h))
+    ]
+    projected_pressure_increments = [
+        p_projected[i + 1] - p_projected[i] for i in range(len(h))
+    ]
+    pressure_increment_residuals = [
+        projected_pressure_increments[i] - source_pressure_increments[i]
+        for i in range(len(h))
+    ]
+    cumulative_pressure_residuals = [
+        p_projected[i] - p_v[i] for i in range(len(mu_v))
+    ]
+    pressure_increment_relative_residuals = [
+        pressure_increment_residuals[i] / source_pressure_increments[i]
+        for i in range(len(h))
+    ]
     source_secant_change_pct = [None] + [
         100.0 * (source_pressure_secants[i] / source_pressure_secants[i - 1] - 1.0)
         for i in range(1, len(source_pressure_secants))
@@ -222,6 +239,23 @@ def reconstruct_projection(
         "source_q_violation_count": source_q_violation_count,
         "source_pressure_secants_dpdmu": source_pressure_secants,
         "projected_pressure_secants_dpdmu": projected_pressure_secants,
+        "source_pressure_increments": source_pressure_increments,
+        "projected_pressure_increments": projected_pressure_increments,
+        "pressure_increment_residuals": pressure_increment_residuals,
+        "pressure_increment_relative_residuals": pressure_increment_relative_residuals,
+        "cumulative_pressure_residuals": cumulative_pressure_residuals,
+        "max_abs_pressure_increment_residual": max(abs(x) for x in pressure_increment_residuals),
+        "max_abs_pressure_increment_relative_residual": max(abs(x) for x in pressure_increment_relative_residuals),
+        "max_abs_cumulative_pressure_residual": max(abs(x) for x in cumulative_pressure_residuals),
+        "row217_cumulative_pressure_residual": boundary_value(cumulative_pressure_residuals, 216),
+        "row218_cumulative_pressure_residual": boundary_value(cumulative_pressure_residuals, 217),
+        "row217_218_pressure_increment_residual": pressure_increment_residuals[216] if has_r16_boundary else None,
+        "source_nonstable_cell_count": source_nonstable_cells,
+        "source_noncausal_cell_count": source_noncausal_cells,
+        "projected_nonstable_cell_count": projected_nonstable_cells,
+        "projected_noncausal_cell_count": projected_noncausal_cells,
+        "source_min_d2p_all_cells": min(x["min_d2p"] for x in source_cell_diagnostics),
+        "projected_min_d2p_all_cells": min(x["min_d2p"] for x in projected_cell_diagnostics),
         "source_secant_change_pct": source_secant_change_pct,
         "projected_secant_change_pct": projected_secant_change_pct,
         "source_secant_decrease_count": len(source_secant_decrease_indices),

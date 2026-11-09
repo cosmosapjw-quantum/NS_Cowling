@@ -193,6 +193,8 @@ def reconstruct_projection(
         "projected_min_causal_margin_all_cells": min(x["min_causal_margin"] for x in projected_cell_diagnostics),
         "source_row217_218_cell": source_boundary_cell,
         "projected_row217_218_cell": projected_boundary_cell,
+        "source_cell_diagnostics": source_cell_diagnostics,
+        "projected_cell_diagnostics": projected_cell_diagnostics,
         "source_q_monotone": source_q_violation_count == 0,
         "source_q_violation_count": source_q_violation_count,
         "pav_block_count": len(blocks),

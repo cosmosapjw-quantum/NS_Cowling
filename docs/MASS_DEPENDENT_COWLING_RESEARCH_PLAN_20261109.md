@@ -177,3 +177,8 @@ At the centre, DeltaP(0)=-3 Gamma_1 P_c xi(0); at a zero-pressure surface DeltaP
 The closure is part of the physics. Gamma_eq=(epsilon+P)/P*dP/d epsilon tracks the barotropic equilibrium EOS; Gamma_1=(epsilon+P)/P*(partial P/partial epsilon)_(s,Y_i) describes an adiabatic perturbation at frozen entropy/composition. A radial-stability result must state which closure was used. For a genuine sharp interface, the perturbative junction condition is independent of the equilibrium interpolation: slow and rapid conversion have different [xi,DeltaP] transfer laws. The historical six methods remain smooth bridges and receive no sharp-interface jump condition.
 
 Full equations and the exact 24-point pilot evidence are recorded in docs/MASS_SEQUENCE_BRANCH_STABILITY_AUDIT_20261109.md. The next exit sequence is: 96-point TOV topology -> 96-to-192 refinement -> same-interpolation independent TOV reference -> direct radial omega_0^2 solver and closure audit -> only then target-mass f/p1 spectra on a certified branch.
+
+
+## 13. 96-to-192 topology refinement
+
+The first sampled turning point moved from M about 0.7433 Msun, Pc about 0.172 MeV fm^-3, R about 1233 km at 24 samples to M about 0.7651 Msun, Pc about 0.227 MeV fm^-3, R about 1880 km at 96 samples. This is not converged. A 192-point run is now the pilot configuration. The maxwell compatibility bridge has a distinct extra turning pair inside its low-sound-speed interval; all such pieces remain radial-stability unresolved.

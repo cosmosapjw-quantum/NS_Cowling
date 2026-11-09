@@ -128,3 +128,8 @@ The separate research/mass-dependent-cowling-v1 track now includes the fixed-gra
 ## Radial-stability gate for mass-dependent Cowling work (2026-11-09)
 
 The six-model 24-point native v5 pilot reproduces its frozen TOV M/R anchor but finds only a first rising-M(Pc) peak near 0.743 Msun and admits zero new spectra at the requested 0.8-2.0 Msun targets. A later rising interval exists in the coarse scan but is not called stable. The next increment records all monotonic M(Pc) candidate segments, increases the pilot to 96 Pc samples and labels radial stability unresolved. Direct radial Sturm-Liouville eigenvalues, an explicit Gamma_1 closure and a validated surface condition are required before using any secondary branch. See docs/MASS_SEQUENCE_BRANCH_STABILITY_AUDIT_20261109.md.
+
+
+## Mass-sequence refinement status (2026-11-09)
+
+The 96-point six-model TOV pilot runs successfully at the numerical level (all 576 integrations valid and v5 M/R baselines reproduce), but the physical validator admits 0 new f/p1 spectra because the initial rising-proxy branch ends below 0.8 Msun. The 24-to-96 first-turning-point shift is substantial, so a 192-point scan is now configured. The legacy maxwell row remains a smooth, zero-density-jump bridge; its additional mass-sequence folds are exploratory and radially unresolved. See docs/MASS_SEQUENCE_BRANCH_STABILITY_AUDIT_20261109.md.

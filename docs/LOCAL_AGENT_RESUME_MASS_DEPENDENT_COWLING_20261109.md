@@ -115,3 +115,14 @@ The 24-point scan has a second, higher-density rising interval ending at about 1
 - Kokkotas & Ruoff 2001, DOI 10.1051/0004-6361:20000216: published radial-mode framework and reference frequencies.
 
 The theory/mock commit d1d01e6 and this candidate-segment increment are separate from PR #3. PR #3 must remain open/draft/unmerged. No local workstation checkout was modified. Dropbox artifacts were inspected read-only; no Dropbox mutation was performed.
+
+
+## Exact 96-point artifact readback and immediate 192-point gate (2026-11-09)
+
+Current tested candidate-segment implementation HEAD: dd5a33e521ecde554945c82b79cfd534ed91b306. Backup before 192-point refinement: backup/mass-dependent-96point-pilot-20261109 -> dd5a33e521ecde554945c82b79cfd534ed91b306.
+
+Exact Actions run 42611801783 failed only at the physical validator after all six TOV rows and both test suites completed. Artifact 13670407745, ZIP SHA-256 ecafc110e8b9d0196dfb4bb341da2ee54273f5d61767cca7c36e502a40737b7d. All six EOS/method rows completed 96/96 TOV points with no failed samples, and the frozen baseline M/R anchor reproduces to near machine precision. Unit tests: 10 mass-sequence tests and 6 fixed-mass/Cowling mock tests passed. The 48 requested spectra are unavailable; complete paired cells=0; required 1.0 Msun validation fails correctly.
+
+The 24-point first maximum was near 0.7433 Msun / 0.172 MeV fm^-3 / 1233 km; the 96-point first maximum is 0.76502-0.76511 Msun / 0.22676-0.22733 MeV fm^-3 / 1879.8-1889 km. Thus 24-to-96 is not converged. Five methods have four monotonic pieces; the smooth maxwell bridge has six, including an extra max/min at Pc about 1.116/1.898 MeV fm^-3, M about 0.21684/0.20288 Msun and R about 17.86/17.31 km. The bridge has no density jump; its metadata gives cs2_min about 9.07e-4. No piece is called stable.
+
+The workflow is changed to 192 Pc samples on the six-model pilot. After push, inspect the exact-head run/artifact and compare first turning-point M/R/Pc plus every candidate fold. Do not use the secondary/higher-density intervals for Cowling roots until direct radial fundamental-mode omega_0^2, an explicit Gamma_1 closure and a valid zero-pressure/finite-cutoff surface condition have been validated.

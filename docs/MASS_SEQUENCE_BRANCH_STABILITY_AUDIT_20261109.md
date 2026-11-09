@@ -108,3 +108,44 @@ The pilot scan is increased from 24 to 96 logarithmic Pc samples for the same si
 5. M. G. Alford, S. P. Harris & P. S. Sachdeva, “On the Stability of Strange Dwarf Hybrid Stars,” ApJ 847, 109 (2017), arXiv:1705.09880.
 6. R. Essick, “Exotic Stable Branches with Efficient TOV Sequences,” arXiv:2405.05395 (2024).
 7. P. B. Rau & G. G. Salaben, “Non-equilibrium effects on stability of hybrid stars with first-order phase transitions,” arXiv:2309.08540v2.
+
+
+## Exact 96-point pilot: observed mass-sequence topology (2026-11-09)
+
+Exact-head run: https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42611801783  
+HEAD: dd5a33e521ecde554945c82b79cfd534ed91b306  
+Artifact: 13670407745; ZIP SHA-256 ecafc110e8b9d0196dfb4bb341da2ee54273f5d61767cca7c36e502a40737b7d
+
+Execution facts:
+- All six model rows completed 96/96 valid TOV integrations; no failed scan samples.
+- All six frozen-v5 reference M/R reproductions passed at near machine precision.
+- Candidate-segment tests: 10 passed.
+- Fixed-mass/Cowling mock tests: 6 passed.
+- 48 requested f/p1 rows were unavailable (0 valid); the physical validator failed at the required 1.0 Msun complete six-method cell. This is an expected scientific hold, not a code/test failure.
+
+The 96-point first sampled local maximum is now consistently near:
+- M = 0.7650195–0.7651069 Msun;
+- Pc = 0.226758–0.227326 MeV fm^-3;
+- R = 1879.8–1889.0 km.
+
+By comparison, the 24-point run placed the first sampled maximum at M = 0.74320–0.74343 Msun, Pc = 0.17195–0.17236 MeV fm^-3, and R = 1232–1235 km. The sizable movement between 24 and 96 samples proves that the 24-point maximum was not a converged turning-point estimate. The 96-point estimate is still grid-resolved only, not a converged continuum extremum.
+
+For five methods (css, cubic_F, cubic_P, quintic_F, quintic_P), the candidate pieces are rising/falling/rising/falling. The maxwell compatibility method (which is not an exact Maxwell transition and has no density jump) displays rising/falling/rising/falling/rising/falling. Its two intermediate turning candidates are:
+- local maximum near Pc = 1.11640 MeV fm^-3, M = 0.216841 Msun, R = 17.856 km;
+- local minimum near Pc = 1.89763 MeV fm^-3, M = 0.202879 Msun, R = 17.315 km.
+
+These lie inside its smooth near-pressure-plateau bridge, which is documented as P_transition,left = 0.25468 to P_transition,right = 3.308 MeV fm^-3, n_left = 0.054 to n_right = 0.2 fm^-3, with cs2_min = 9.0712e-4, and zero density jump. The other five bridges do not show this extra pair of turning candidates at 96-point resolution. This is an observed method-dependent sequence feature, not yet a radial-stability or mode-spectrum result.
+
+All five non-maxwell methods have a later rising candidate piece from approximately M = 0.0713 to 1.9196 Msun over Pc = 0.312 to 892.7 MeV fm^-3, followed by a small final decline to about 1.9149 Msun at the scan endpoint. The maxwell row has the additional local fold noted above before its later high-density rise. No candidate segment is labelled stable; the JSON/CSV explicitly retain radial_stability_status=unresolved_requires_radial_mode_spectrum.
+
+A notable coincidence is that the common first maximum sits shortly below the smooth bridge's left boundary at 0.25468 MeV fm^-3. This suggests a common crust/bridge-entry response, but the 96-point grid still moves the first maximum significantly relative to the 24-point grid. The hypothesis must be tested with 192-point refinement and a separate radial eigenvalue calculation before physical attribution.
+
+
+## 7. Next refinement
+
+The pilot workflow is changed from 96 to 192 logarithmic central-pressure samples for the same six EOS/method rows. Acceptance requires:
+1. each model completes all 192 native TOV integrations;
+2. first-fold Pc, M and R changes are compared with the 96-point values, not merely the discrete segment count;
+3. all local candidate turns, especially the method-specific maxwell bridge folds, are recorded without stability labels;
+4. the exact same EOS SHA, v5 source build key, r0, radius limit, step cap and ODE tolerance are retained;
+5. no Cowling spectra are admitted until radial omega_0^2 is computed with a declared perturbative Gamma_1 closure and a valid surface condition.

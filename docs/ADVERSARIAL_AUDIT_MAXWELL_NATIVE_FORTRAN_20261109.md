@@ -74,3 +74,28 @@ Both workflows also ran `fpm build` for the production case driver and uploaded 
 ## Audit conclusion
 
 `PASS_BOUNDED_NATIVE_SYNTHETIC_TABLE_AND_CLI` for exact source head `d3649906292b0ec8f1caf98961f12436fa00871b`. The callback and normalized-table fixtures pass; the production CLI loads two separate normalized phase tables, integrates the sharp-interface TOV background, and completes both slow/rapid test shots. The 1800 Hz CLI value is a trial residual, not a mode root. This is not evidence for a realistic CompOSE hybrid-star prediction, a complete spectrum, stable-branch classification, or observational inference.
+
+## Production generic dispatch follow-up (2026-11-09)
+
+### Exact source head
+
+- Dispatch implementation head: `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`
+- New module `ns_production_solvers.f90` blob: `3539dac7f6aaefb5af76c493ff26e009df0e7010`
+- New module `ns_maxwell_mode_spectrum.f90` blob: `726a03b219827e77412175c68e3d7c28ef32ef84`
+- Production Maxwell adapter blob: `6b911462981cdf503efe649232aae002bbded790`
+- Generic-dispatch API regression test blob: `456cd365ecfcdbcb1a0f1055195b935255da14c1`
+
+### Verified result
+
+GitHub Actions push run [42584910411](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42584910411) passed on exact head `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`; artifact ID `13658767086`, SHA-256 `7a4ecb2784e777256735a809c5a331f9cb4f8bef85963d2fe1348045b17b4443`.
+
+- GNU Fortran 16.2.0, FPM 0.13.0; runtime checks enabled.
+- `cell_checks`: 12 checks passed.
+- `maxwell_checks`: 22 checks passed, including smooth and Maxwell TOV generic dispatch, smooth-profile Cowling generic dispatch and slow/rapid Maxwell frequency-grid no-root scans.
+- `maxwell_table_checks`: 74 checks passed.
+- Production case-driver build and previous `maxwell_table_cowling` synthetic table smoke passed.
+- The optional smooth `eos_events(:)` contract is preserved through the generic TOV wrapper. A first run exposed this interface omission; the initial failure is retained in Actions history and the follow-up exact-head run passed after the wrapper was corrected.
+
+### Claim boundary
+
+This run verifies compilation and the generic dispatch/no-root scanning path only. The frequency fixture around 1800 Hz contains no candidate root, so the bisection-positive-root branch was not exercised. Even when a bracketed root is found, mode family identity remains `unresolved`. No realistic CompOSE hybrid EOS, physical eigenfrequency, complete spectrum, f/p1 continuation, or stable-branch inference is claimed.

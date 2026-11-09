@@ -120,3 +120,23 @@ Exact-head GitHub Actions:
 - Both events ran 12 existing cell checks, 18 analytic Maxwell checks and 74 normalized-table checks, built the production driver, ran the table-driven CLI smoke, and recorded exact source identities.
 
 Important boundary: these CSV tables are generated analytic fixtures, not source-backed CompOSE or other realistic hybrid EOS data. This verifies the normalized-table/provider/CLI integration contract, not realistic hybrid-star phenomenology. The old 33-path v5 overlay remains unapplied.
+
+## Production generic dispatch extension (2026-11-09)
+
+The low-level kernels remain separately callable, but production callers now have one typed generic API in `src/production/ns_production_solvers.f90`:
+
+```fortran
+call solve_tov_star(eos, pc, options, smooth_profile)
+call solve_tov_star(eos_high, eos_low, pc, pt, options, maxwell_star)
+
+call solve_cowling_spectrum(smooth_background, omega_grid, mode_options, smooth_spectrum)
+call solve_cowling_spectrum(smooth_profile, omega_grid, mode_options, smooth_spectrum)
+call solve_cowling_spectrum(maxwell_star, omega_grid, mode_options, 'slow', maxwell_spectrum)
+call solve_cowling_spectrum(maxwell_star, omega_grid, mode_options, 'rapid', maxwell_spectrum)
+```
+
+The smooth TOV overload also preserves the optional `eos_events(:)` smooth-stop argument. The Maxwell overload still requires two callbacks whose already-admitted tables satisfy coexistence at the supplied `P_t`; it does not construct coexistence or extrapolate either phase table.
+
+The Maxwell spectrum implementation lives in `src/modes/ns_maxwell_mode_spectrum.f90`. It scans the supplied positive, strictly increasing angular-frequency grid, retains failed trials as barriers, finds candidates using the existing bracket builder, refines sign/near brackets with bisection, and reruns the shot at the candidate root. The conversion prescription is fixed for one scan (`slow` or `rapid`). Root-family identity is always reported as `unresolved`; the implementation does not yet assign f/p1/interface labels. A finite scan is only a bounded search over the supplied grid and is not a completeness theorem.
+
+Production case adapters now route existing smooth TOV, normalized-table TOV, and smooth Cowling spectrum calls through the generic API. The Maxwell case adapter routes TOV through the same generic API and adds `maxwell_table_spectrum`. Current exact-head CI uses a generated analytic two-table fixture and checks the scan/no-root path; positive-root bisection, realistic CompOSE data, root-family identity and physical spectrum convergence remain open.

@@ -1,0 +1,156 @@
+# Local coding-agent resume prompt: native Maxwell production dispatch
+
+Date: 2026-11-09
+Repository: `cosmosapjw-quantum/NS_Cowling`
+Feature branch: `research/maxwell-native-fortran-v1`
+Draft PR: https://github.com/cosmosapjw-quantum/NS_Cowling/pull/3
+
+## Authority and workspace safety
+
+The latest exact-source-tested implementation commit is:
+
+- `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`
+
+Its exact-head GitHub Actions push run passed:
+
+- Run: https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42584910411
+- Artifact ID: `13658767086`
+- Artifact SHA-256: `7a4ecb2784e777256735a809c5a331f9cb4f8bef85963d2fe1348045b17b4443`
+
+Before changing any local files:
+1. Run `git status --short --branch`, `git rev-parse HEAD`, and `git branch --show-current`.
+2. Preserve any local modifications. Do not reset, clean, checkout over, stash, or force-update user work.
+3. Fetch `origin/research/maxwell-native-fortran-v1`. If the local branch is behind and clean, fast-forward only. If it diverges or is dirty, stop and report the exact divergence; do not reconcile by destructive reset.
+4. Keep PR #3 open as draft. Do not merge it.
+5. A pre-dispatch backup snapshot exists at `backup/maxwell-native-fortran-pre-production-dispatch-20261109`, pointing to the former implementation head `8d0aeb83a889d396794194338544d594c183e8b4`.
+
+The initial implementation commit `f0723ecdfd90fcc5eda3ae27d73859f2b75e06f3` failed compile because the production generic wrapper omitted the optional smooth `eos_events(:)` argument. The fix is recorded in `f8678cb...`. Preserve that CI failure in the history; do not relabel it as a passing run.
+
+## Research objective
+
+Remove the previous smooth-EOS-only production boundary without flattening or interpolating through a sharp Maxwell density jump. Maintain a single type-resolved public entry point for smooth and one-interface Maxwell backgrounds, while preserving the existing low-level kernels and backward compatibility.
+
+## Implemented public API
+
+Source: `oscillation_source/solutions/src/production/ns_production_solvers.f90`.
+
+```fortran
+call solve_tov_star(eos, pc, options, smooth_profile)
+call solve_tov_star(eos, pc, options, smooth_profile, eos_events)
+call solve_tov_star(eos_high, eos_low, pc, pt, options, maxwell_star)
+
+call solve_cowling_spectrum(smooth_background, omega_grid, mode_options, smooth_spectrum)
+call solve_cowling_spectrum(smooth_profile, omega_grid, mode_options, smooth_spectrum)
+call solve_cowling_spectrum(maxwell_star, omega_grid, mode_options, 'slow', maxwell_spectrum)
+call solve_cowling_spectrum(maxwell_star, omega_grid, mode_options, 'rapid', maxwell_spectrum)
+```
+
+- Smooth TOV wraps `integrate_tov` and forwards the optional smooth pressure-stop list.
+- Maxwell TOV wraps `integrate_maxwell_tov`, with distinct high/low EOS callbacks and exact `P_t` segmentation.
+- Smooth Cowling spectrum wraps `scan_modes`; a `star_profile_t` can be copied into the existing `background_table_t` representation.
+- Maxwell Cowling spectrum is implemented in `oscillation_source/solutions/src/modes/ns_maxwell_mode_spectrum.f90`. It takes one fixed conversion prescription per scan, scans an increasing positive angular-frequency grid, preserves trial statuses, builds brackets, uses bisection for sign/near brackets, reruns the shot at the root, and checks the final residual.
+- A valid Maxwell scan means the requested finite-grid trials and any detected bracket candidates completed. It is not a completeness claim for the full spectrum.
+- Root labels remain `unresolved`; no `f`, `p1`, or interface-mode identification is performed.
+
+Production routes now use the generic API:
+- Smooth TOV case adapter: `src/structure/ns_tov_cases.f90`.
+- Normalized-table TOV adapter: `src/structure/ns_table_star_cases.f90`.
+- Smooth mode cases: `src/modes/ns_mode_cases.f90`.
+- Maxwell table case adapter: `src/structure/ns_maxwell_cases.f90`.
+- Added CLI case `maxwell_table_spectrum`.
+
+## Verified at exact code head f8678cb
+
+Toolchain: GNU Fortran 16.2.0, FPM 0.13.0, flags:
+`-std=f2018 -O0 -g -fcheck=all -ffree-line-length-none -fimplicit-none`.
+
+Results:
+- `cell_checks`: 12 passed.
+- `maxwell_checks`: 22 passed, including smooth/Maxwell TOV dispatch, smooth profile Cowling dispatch, and slow/rapid Maxwell scan no-root path.
+- `maxwell_table_checks`: 74 passed.
+- Production `case_driver` build passed.
+- Existing `maxwell_table_cowling` synthetic two-table CLI smoke passed.
+- The analytic fixture small-jump comparison remains `dM/M=9.1343e-8`, `dR/R=2.8981e-8`.
+
+The workflow still needs a separate smoke invocation of `maxwell_table_spectrum` on the generated analytic table fixture; do not claim that CLI spectrum path is CI-verified until the updated workflow completes successfully.
+
+## Next research steps, in order
+
+### 1. Verify the positive-root branch of the Maxwell scanner
+The current fixture window around 1800 Hz has no residual sign change. Therefore `bisect` and the final root shot are implemented but not exercised by the current Maxwell spectrum test.
+
+- Explore a broad enough angular-frequency grid for the existing analytic Maxwell fixture.
+- Record every sample frequency, shot status and residual; do not infer a root from one small residual.
+- Find an isolating sign bracket for slow and rapid conversion independently.
+- Add assertions that the candidate is bracketed, the bisection root is valid, a fresh root shot is valid, and `abs(residual) <= residual_tol`.
+- Add grid-refinement and root-tolerance refinement checks.
+- If this fixture has no robust root, introduce a narrowly scoped deterministic seam for residual-bracket logic and test it against the real scanner interface. Do not invent or hardcode an eigenfrequency.
+- Keep family label `unresolved` until phase-aware identity is established.
+
+### 2. Independent Python/SciPy TOV cross-validation
+Use the separate phase-aware Python/SciPy reference implementation, not a reimplementation of the Fortran equations in the test. Match EOS knots, SI constants, pressure cutoff, central pressure, and interface pressure. Compare (r_t), (m_t), surface (M), surface (R), and one-sided metric/thermodynamic values. Record tolerances and provenance.
+
+### 3. Numerical convergence envelope
+Vary ODE tolerances and max step size independently for:
+- core TOV segment,
+- envelope TOV segment,
+- core Cowling segment,
+- envelope Cowling segment,
+- interface-transfer residual,
+- root bisection tolerance once a positive bracket fixture exists.
+
+Do not use a single small residual as a convergence study.
+
+### 4. Admission negative tests
+Verify rejection and precise status for:
+- (P_t) outside either phase-table common domain,
+- mismatched (mu_B(P_t)),
+- reversed/nonpositive (Delta n_B) or (Deltaepsilon),
+- first-law jump-closure failure,
+- failed phase callback during integration,
+- incomplete frequency scan with failed trials,
+- zero/duplicate/unsorted/nonfinite frequencies,
+- unresolved near-zero sample without an isolating bracket.
+
+### 5. Physical data gate
+Only then attach a realistic source-backed CompOSE or other hybrid EOS pair. Preserve source file, release/version, units, checksums, transformations, phase labels, crust/core matching and the declared coexistence pressure. Do not call the synthetic tables realistic data.
+
+### 6. Later branches
+Central-pressure continuation and stable M-R branches, radial stability, twin-star analysis, phase-aware mode identity/continuation and observational inference remain downstream. The Seidov ratio is only a local onset diagnostic.
+
+## Commands for local verification
+
+From `oscillation_source/solutions`:
+
+```bash
+fpm test --compiler gfortran --flag '-std=f2018 -O0 -g -fcheck=all -ffree-line-length-none -fimplicit-none'
+fpm build --compiler gfortran --flag '-std=f2018 -O0 -g -fcheck=all -ffree-line-length-none -fimplicit-none'
+```
+
+Then exercise both generated fixture cases:
+- `case_driver maxwell_table_cowling ../../dist/maxwell_table_fixture.nml`
+- `case_driver maxwell_table_spectrum ../../dist/maxwell_table_fixture.nml`
+
+The fixture is generated by `maxwell_table_checks`. Assert `result_valid` and `cowling_shot_valid` for the first case; for the spectrum case assert `spectrum_scan_valid`, `spectrum_all_trials_succeeded`, and `spectrum_valid`. Also inspect the trial records and candidate/root fields. A true `spectrum_valid` without a root is a successful finite-grid no-root scan, not an eigenmode result.
+
+## Non-claims to preserve
+
+- No source-backed realistic CompOSE hybrid EOS has been executed in this implementation.
+- The current synthetic table fixture is an integration regression fixture only.
+- The Maxwell root-refinement branch needs a positive-bracket test.
+- No root-family labels, f/p1 identity, interface-mode classification or spectrum completeness is established.
+- No maximum mass, stable branch, twin-star, radial-stability sequence or astrophysical inference.
+- No full-GR metric perturbations, rotation, magnetic field, elasticity, superfluidity, composition stratification or GW damping.
+- The 234-row v5 smooth-matching results and old smooth `maxwell` bridge remain physically separate from sharp density-jump results.
+- The separate 33-path v5 overlay remains unapplied unless independently proven otherwise on the exact repository tree.
+
+## Completion protocol
+
+After each independently passing unit:
+1. record the exact Git commit and changed file list;
+2. run the focused test and full relevant FPM/CLI verification;
+3. push a fast-forward commit to `research/maxwell-native-fortran-v1`;
+4. retain exact-head Actions logs and artifact digest;
+5. move/advance a named backup branch only after recording its target SHA;
+6. update this resume prompt, the DAG, the implementation guide and adversarial audit;
+7. update PR #3 metadata without merging or marking it ready for review.

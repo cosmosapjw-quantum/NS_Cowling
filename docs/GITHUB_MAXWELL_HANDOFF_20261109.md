@@ -83,3 +83,17 @@ Exact verified branch head: `d3649906292b0ec8f1caf98961f12436fa00871b`.
 - PR Actions run [42582845328](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42582845328): success, artifact 13658265995, SHA-256 `5d5a1683e4ba708f246c275e225b462bfc6968f201cf02d4956c9ceecf2cc278`.
 
 The fixture is an analytic synthetic normalized table pair; a realistic source-backed CompOSE hybrid EOS has not yet been executed. PR #3 remains draft, open and unmerged. The 33-path v5 overlay also remains unapplied.
+
+## Native production generic-dispatch increment (2026-11-09)
+
+The earlier handoff statement that native Fortran `solve_tov_star` and `solve_cowling_spectrum` are smooth-only is superseded by the generic-dispatch implementation on `research/maxwell-native-fortran-v1`.
+
+- Code head: `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`.
+- Production façade: `oscillation_source/solutions/src/production/ns_production_solvers.f90`.
+- Maxwell spectrum scanner: `oscillation_source/solutions/src/modes/ns_maxwell_mode_spectrum.f90`.
+- Exact-head push workflow: [42584910411](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42584910411), success; artifact 13658767086, SHA-256 `7a4ecb2784e777256735a809c5a331f9cb4f8bef85963d2fe1348045b17b4443`.
+- Checks: 12 cell, 22 analytic Maxwell, 74 normalized-table.
+- Smooth TOV cases and normalized-table TOV cases route through `solve_tov_star`; smooth spectrum/profile and Maxwell scans route through `solve_cowling_spectrum`. The Maxwell CLI includes `maxwell_table_spectrum`.
+- A pre-dispatch snapshot remains at `backup/maxwell-native-fortran-pre-production-dispatch-20261109`.
+
+The present CI exercises the Maxwell no-root scan path only. Positive-root bisection needs a deterministic bracket fixture; mode-family identity remains unimplemented. Keep PR #3 draft/open/unmerged. No local workstation checkout was changed by this ChatGPT-side GitHub operation.

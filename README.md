@@ -37,7 +37,7 @@ The feature branch adds `construct_maxwell_transition` and the native `maxwell-t
 
 The sharp-interface follow-up is implemented on the `research/maxwell-reference-validation-v1` branch and tracked in [PR #2](https://github.com/cosmosapjw-quantum/NS_Cowling/pull/2). It consumes the existing native one-charge Maxwell construction as two separate phase providers, integrates the high-density core to exact `P_t`, and restarts the low-density envelope without interpolating across the density jump. Its `ell=2` Cowling reference path distinguishes slow conversion (`[xi^r]=[Delta P]=0`) from rapid conversion (`[Delta P]=0`, `[xi^r-Delta P/P'_0]=0`).
 
-**Implementation boundary:** the phase-segmented stellar TOV/Cowling reference solver is Python/SciPy. Native Fortran now independently implements and tests both interface-transfer maps, but the production Fortran `solve_tov_star` and `solve_cowling_spectrum` remain smooth-EOS-only. No stable-branch, maximum-mass, twin-star or full-GR claim is made. The strong-jump analytic fixture is for interface-condition testing only; its rapid-onset Seidov diagnostic is unstable. The small-jump fixture validates convergence toward the smooth-EOS solution.
+**Implementation boundary (updated 2026-11-09):** the phase-segmented stellar TOV/Cowling reference solver remains available in Python/SciPy, and native Fortran now exposes production generic `solve_tov_star` and `solve_cowling_spectrum` entry points for both smooth and one-sharp-Maxwell backgrounds. The native Maxwell route accepts two already-coexisting phase EOS providers and preserves separate core/envelope backgrounds. Its Cowling spectrum route performs a bounded frequency-grid scan and bracket refinement for slow or rapid conversion; it does not yet assign `f`, `p1`, or interface-mode identities. No realistic CompOSE hybrid-EOS result, stable-branch, maximum-mass, twin-star or full-GR claim is made. The strong-jump analytic fixture is for interface-condition testing only; its rapid-onset Seidov diagnostic is unstable. The small-jump fixture validates convergence toward the smooth-EOS solution.
 
 See [the interface derivation](docs/MAXWELL_TOV_COWLING_INTERFACE_V1.md), [the independent validation record](docs/MAXWELL_REFERENCE_VALIDATION_V1_20261109.md), and [the final adversarial audit](docs/ADVERSARIAL_AUDIT_MAXWELL_TOV_COWLING_20261109.md).
 
@@ -70,3 +70,13 @@ A separate phase-segmented native Fortran path now accepts independent high-dens
 
 
 The native sharp-Maxwell Fortran path is tracked independently in [the implementation contract](docs/MAXWELL_NATIVE_FORTRAN_V1.md), [the adversarial audit](docs/ADVERSARIAL_AUDIT_MAXWELL_NATIVE_FORTRAN_20261109.md), and [the research DAG](docs/MAXWELL_NATIVE_FORTRAN_DAG_20261109.md). Exact-head CI includes 74 normalized-table integration checks and a successful `maxwell_table_cowling` production CLI smoke on generated analytic phase tables; PR #3 remains a draft and execution with source-backed realistic CompOSE hybrid phases remains open.
+
+## Native production solver dispatch (2026-11-09)
+
+The Fortran module `ns_production_solvers` exposes generic production entry points:
+- `solve_tov_star(eos, pc, options, profile [, eos_events])` preserves the existing smooth-EOS integration and optional smooth pressure-stop contract.
+- `solve_tov_star(eos_high, eos_low, pc, pt, options, maxwell_star)` invokes the phase-segmented sharp-Maxwell TOV construction.
+- `solve_cowling_spectrum(background, grid, options, spectrum)` and the corresponding `star_profile_t` overload preserve the smooth path.
+- `solve_cowling_spectrum(maxwell_star, grid, options, conversion, spectrum)` scans a two-phase background separately for `slow` or `rapid` conversion.
+
+The Maxwell scanner retains every trial status, only refines sign/near brackets with bisection, and rejects unresolved near-zero samples. A converged root remains `unresolved` by family until an independent identity/continuation method is added. A successful finite-grid scan does not prove that all eigenfrequencies in or outside the grid were found. The current CI spectrum smoke uses generated analytic tables and intentionally checks a no-root scan path; a source-backed realistic EOS and root-family validation remain open. See [the dispatch contract](docs/PRODUCTION_SOLVER_DISPATCH_MAXWELL_20261109.md), [the DAG](docs/MAXWELL_NATIVE_FORTRAN_DAG_20261109.md), and [the local-agent resume prompt](docs/LOCAL_AGENT_RESUME_MAXWELL_PRODUCTION_DISPATCH_20261109.md).

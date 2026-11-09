@@ -58,6 +58,7 @@ jobs:
         run: |
           python -m pytest -q python_frontend/tests/test_fixed_mass_response.py
           python research_artifacts/mass_response/mock_mass_response.py --output-dir dist/mass-response-mock
+          python research_artifacts/mass_response/mock_cowling_variation.py --output-dir dist/mass-response-mock/cowling-variation
       - name: Run mass-dependent spectrum
         run: |
           if [ "$COHORT" = "full" ]; then

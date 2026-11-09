@@ -152,3 +152,12 @@ References:
 ## Provenance qualification for the v5 backend
 
 The current solve_v5_* adapter compiles the 35 source paths listed, in their recorded order, by oscillation_release_v1/workflow/compile_manifest.json and records a runtime build key over those branch source bytes plus the manifest. The release_summary.json stores a reference source_zip_sha256 of b2c0dcaf6a5b07956cf8d33c39651d4ade32f44b4c49b33aa08fd84fb458185b. The Dropbox source archive was not downloaded and independently hashed in this session, so the adapter is manifest-path/order matched, not yet byte-identity certified against the archived release source. The next CI artifact must retain the runtime build key and manifest SHA.
+
+
+## 11. Forward-sensitivity route for the mechanism analysis
+
+The current smooth Cowling W,V system has been recast as y'=A y. The parameter tangent S_zeta'=A S_zeta+A_zeta y, together with the frequency tangent, yields the simple-root derivative -D_zeta/D_omega. Composition with the fixed-mass identity gives a computable response at constant gravitational mass. The derivation and a synthetic ODE finite-difference check are recorded in docs/COWLING_FIRST_VARIATION_RESPONSE_20261109.md.
+
+This is an implementation route, not yet a physical sensitivity kernel. A physical calculation must differentiate the TOV background, EOS-cell closure, centre expansion, finite-positive-pressure surface/event, matching determinant and mode identity. For a sharp Maxwell interface, the slow/rapid transfer map must be differentiated separately. The existing sharp-interface track is not silently folded into the smooth six-method cohort.
+
+The q-path mock was strengthened from mesh-only admission to whole-polynomial-interval extremum checks. Its exact lower bound applies only to the synthetic path and does not establish that the six historical matching methods lie on one admissible differentiable path.

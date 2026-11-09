@@ -5,6 +5,7 @@ from research_artifacts.mass_response.mock_mass_response import (
     CORES, CRUSTS, fixed_mass_response, mode_value, pair_parameters,
     stable_logpc_at_mass, thermodynamic_q_path, tov_partials, build_mock,
 )
+from research_artifacts.mass_response.mock_cowling_variation import build_mock as build_cowling_variation_mock
 
 
 def test_ift_decomposition_matches_fixed_mass_central_difference():
@@ -30,6 +31,8 @@ def test_thermodynamic_q_path_preserves_endpoints_and_causality():
     result=thermodynamic_q_path()
     assert result["lambda_slices"]==6
     assert result["q_min"]>0
+    assert result["q_min_continuous"] == pytest.approx(0.8,abs=1e-13)
+    assert result["dq_dt_min_continuous"] == pytest.approx(137.0/550.0,abs=1e-12)
     assert 0<result["cs2_min"]<=result["cs2_max"]<1
     assert result["endpoint_pressure_spread"]<2e-13
     assert result["endpoint_energy_spread"]<2e-13
@@ -68,3 +71,14 @@ def test_mock_experiment_writes_deterministic_outputs(tmp_path: Path):
     assert result["results"]["max_ift_vs_central_fd_relative_error"]<1e-6
     assert (tmp_path/"mock_manifest.json").is_file()
     assert (tmp_path/"mass_coverage_summary.csv").is_file()
+
+
+def test_cowling_forward_sensitivity_matches_independent_root_refinement(tmp_path: Path):
+    result=build_cowling_variation_mock(tmp_path)
+    assert result["status"] == "MOCK_ONLY_NOT_A_PHYSICAL_NEUTRON_STAR_MODE"
+    assert result["root_residual_abs"] < 1e-9
+    assert result["max_relative_error"] < 2e-7
+    errors=[row["relative_error"] for row in result["finite_difference_checks"]]
+    assert errors[1] < 0.4*errors[0]
+    assert errors[2] < 0.4*errors[1]
+    assert (tmp_path/"cowling_tangent_variation.json").is_file()

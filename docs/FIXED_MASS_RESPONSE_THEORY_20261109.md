@@ -108,3 +108,12 @@ Acceptance: same node-identified mode branch; both stars on the same connected r
 ## Scope
 
 This is a sensitivity identity and thermodynamic-path lemma. It does not derive the Cowling equations, determine frozen-composition adiabatic response, establish radial stability, or derive sharp-interface slow/rapid conversion laws.
+
+
+## First-variation system for the relativistic Cowling equations
+
+For the current smooth ell-pole system, put y=(W,V)^T, chi=dP/d epsilon, L=ell(ell+1), and a=(omega*r/c)^2 exp(Lambda-2 nu). Then y'=A y with A=[[nu'/chi, a/chi-L exp(Lambda)],[-exp(Lambda)/r^2,2 nu']]. For any differentiable parameter zeta, the tangent S_zeta=partial_zeta y at fixed omega obeys S_zeta'=A S_zeta+A_zeta y, with initial data obtained by differentiating the regular centre expansion.
+
+The full A_zeta must include nu'_zeta, Lambda_zeta, nu_zeta and chi_zeta. At fixed background and varying only chi, A_zeta has first row (-nu'*chi_zeta/chi^2, -a*chi_zeta/chi^2) and a zero second row. For the frequency tangent on a fixed background, A_omega has only the upper-right entry 2a/(omega*chi).
+
+If D(omega,zeta)=0 is a simple shooting/surface residual, then d omega/d zeta=-D_zeta/D_omega. At fixed gravitational mass this combines with the fixed-mass identity above to give d omega/d zeta at fixed M = -(D_zeta-D_x*M_zeta/M_x)/D_omega. Derivatives of the centre expansion, surface/event location and interface/transfer conditions are part of the physical calculation; the synthetic coefficient-only test does not provide them. See docs/COWLING_FIRST_VARIATION_RESPONSE_20261109.md for the full derivation and acceptance contract.

@@ -26,6 +26,16 @@ F_BASE={"BBB_BHF2":2.505,"RG_SLY4":2.370,"GM_GM1":1.920}
 P1_BASE={"BBB_BHF2":7.008,"RG_SLY4":6.718,"GM_GM1":6.009}
 
 
+def _polynomial_minimum_unit_interval(poly: Polynomial) -> float:
+    """Exact whole-interval minimum of a low-degree real polynomial."""
+    candidates=[0.0,1.0]
+    for root in poly.deriv().roots():
+        value=complex(root)
+        if abs(value.imag)<=1.0e-10 and -1.0e-12<=value.real<=1.0+1.0e-12:
+            candidates.append(min(1.0,max(0.0,float(value.real))))
+    return min(float(poly(t)) for t in candidates)
+
+
 def pair_parameters(core_index: int, crust_index: int, lam: float) -> tuple[float,...]:
     """A smooth synthetic TOV surface with an adjustable first mass fold."""
     phase=2.0*math.pi*crust_index/13.0
@@ -164,22 +174,30 @@ def thermodynamic_q_path(npoints: int=401) -> dict:
     endpoint_pressure=[]
     rows=[]
     q_min=math.inf
+    dq_dt_min=math.inf
     cs_min=math.inf
     cs_max=-math.inf
     endpoint_eps=[]
     for method_index,lam in enumerate(LAMBDAS):
         qpoly=q0+0.1*lam*perturb
         dqdt=qpoly.deriv()
+        # Polynomial extrema are checked over the full interval [0,1], not
+        # inferred from the 401-point diagnostic mesh below.
+        q_slice_min=_polynomial_minimum_unit_interval(qpoly)
+        dq_dt_slice_min=_polynomial_minimum_unit_interval(dqdt)
+        if q_slice_min<=0.0 or dq_dt_slice_min<=0.0:
+            raise AssertionError("continuous q path lost positivity or strict monotonicity")
+        q_min=min(q_min,q_slice_min)
+        dq_dt_min=min(dq_dt_min,dq_dt_slice_min)
         pressure_primitive=(beta*Z*qpoly).integ()
         p=pressure_primitive(t)-pressure_primitive(0.0)
         q=qpoly(t)
         q_mu=dqdt(t)/beta
         cs2=q/(q+z*q_mu)
         epsilon=z*z*q-p
-        if not (np.all(q>0.0) and np.all(q_mu>=0.0)
-                and np.all(cs2>0.0) and np.all(cs2<=1.0)):
+        if not (np.all(q>0.0) and np.all(q_mu>0.0)
+                and np.all(cs2>0.0) and np.all(cs2<1.0)):
             raise AssertionError("synthetic q-path lost thermodynamic stability or causality")
-        q_min=min(q_min,float(np.min(q)))
         cs_min=min(cs_min,float(np.min(cs2)))
         cs_max=max(cs_max,float(np.max(cs2)))
         endpoint_pressure.append(float(p[-1]))
@@ -197,9 +215,12 @@ def thermodynamic_q_path(npoints: int=401) -> dict:
         raise AssertionError("endpoint pressure/energy invariance failed along q path")
     return {
         "lambda_slices":len(LAMBDAS),"npoints_per_slice":npoints,
-        "q_min":q_min,"cs2_min":cs_min,"cs2_max":cs_max,
+        "q_min":q_min,"dq_dt_min_continuous":dq_dt_min,
+        "q_min_continuous":q_min,"cs2_min":cs_min,"cs2_max":cs_max,
         "endpoint_pressure_spread":pspread,"endpoint_energy_spread":espread,
         "weighted_zero_integral_constant_c":float(c),
+        "analytic_bounds":{"q_min":4.0/5.0,"dq_dt_min":137.0/550.0,
+            "lambda_interval":[0.0,1.0],"t_interval":[0.0,1.0]},
         "interpretation":"synthetic admissible q-path; not a physical EOS table",
         "sample_rows":rows,
     }

@@ -40,13 +40,14 @@ The theorem predicts generic conditioning singularity, not an unconditional dive
 
 ## Thermodynamic-path check
 
-Six λ slices and 401 points per slice gave:
-- qmin = 0.8;
-- cs² in [0.34546, 0.42220];
-- endpoint pressure spread \(2.78\times10^{-17}\) in dimensionless units;
+Six λ slices and 401 diagnostic points per slice gave:
+- continuous-interval q_min = 0.8;
+- continuous-interval min(dq/dt) = 137/550 ≈ 0.2490909091;
+- sampled cs² in [0.34546, 0.42220];
+- endpoint pressure spread 2.78e-17 in dimensionless units;
 - endpoint energy spread at roundoff level.
 
-The path remained positive and monotone, with 0<cs²<1 at all sampled points. These are sampled checks; the continuous-function claim follows from the lemma in FIXED_MASS_RESPONSE_THEORY_20261109.md.
+Unlike the earlier point-mesh-only check, the updated implementation finds polynomial extrema from derivative roots over the entire interval t in [0,1]. Wolfram gives c=28/55 and the exact derivative dq_lambda/dt = [165 + lambda(-28 + 166 t - 165 t^2)]/550. This is concave in t, so its minimum on the closed interval occurs at an endpoint. For 0<=lambda<=1, the global lower bound is 137/550>0, while q is increasing from q(0)=4/5. Hence q>0, dq/dt>0, and 0<cs²<1 hold continuously for this toy path, not merely at the sampled points.
 
 ## Crossed mock cohort and coverage
 
@@ -71,3 +72,12 @@ Generator: research_artifacts/mass_response/mock_mass_response.py
 Tests: python_frontend/tests/test_fixed_mass_response.py
 
 The generator writes mock_manifest.json, paired_mock_ranges.csv, mass_coverage_summary.csv, fixed_mass_derivative_checks.csv, turning_point_scaling.csv, thermodynamic_q_path_summary.json and thermodynamic_q_path_samples.csv. The manifest status is MOCK_ONLY_NOT_A_PHYSICAL_EOS_OR_SPECTRUM. GitHub Actions is configured to run the tests and upload outputs with the native pilot artifact.
+
+
+## Cowling first-variation mock
+
+A second deterministic test differentiates the existing smooth ell=2 Cowling two-component system in matrix form y'=A y, and integrates the tangent S_zeta'=A S_zeta+A_zeta y alongside the state. A separate tangent is integrated for omega; the simple-root derivative -D_zeta/D_omega is checked against independently re-solved roots at zeta±h.
+
+The prescribed coefficient background is synthetic, with nu=r^2/2, Lambda=0, R=1, and chi=0.3+zeta*r^2*(1-r)^2. It is not a TOV star. The analysis-environment check gives omega=8.146085425792169, |D|=8.1e-14, d omega/d zeta=0.5254905905549, and relative errors 6.1e-9, 1.5e-9, 3.8e-10 for h=1e-3, 5e-4, 2.5e-4, respectively. The root is unlabelled and dimensionless.
+
+The runnable implementation is research_artifacts/mass_response/mock_cowling_variation.py; exact-head CI is pending. The derivation, full coefficient derivative, surface/matching terms and limitations are in docs/COWLING_FIRST_VARIATION_RESPONSE_20261109.md. This is a forward-sensitivity algorithm test, not a new variational principle or a physical sensitivity kernel.

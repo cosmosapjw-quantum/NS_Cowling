@@ -72,3 +72,13 @@ Re-run the six-model pilot after the same-cell TOV-only backend, configurable ra
 ## Source-identity qualification
 
 MD-02b reproduces the 35 paths and their order from the v5 compile manifest and hashes the current branch source bytes into a runtime build key. The release summary records source_zip_sha256 b2c0dcaf6a5b07956cf8d33c39651d4ade32f44b4c49b33aa08fd84fb458185b, but the Dropbox source archive was not independently downloaded/hashed in this session. Therefore source byte identity versus the archived release is UNVERIFIED; do not call it byte-identical. The next runner manifest records both the reference archive hash and current runtime build key.
+
+
+## Additional theory/mock node (2026-11-09)
+
+| ID | Node | Status at code-push preparation | Exit evidence |
+|---|---|---|---|
+| MD-13 | Smooth Cowling forward first variation plus fixed-mass composition | DERIVED_AND_ANALYSIS_MOCK_CHECKED; EXACT-HEAD_CI_PENDING | Matrix tangent S_zeta'=A S_zeta+A_zeta y; simple-root derivative -D_zeta/D_omega; deterministic synthetic ODE root/finite-difference comparison. No physical EOS kernel claim. |
+| MD-14 | Whole-domain thermodynamic q-path mock admission | ANALYTIC_EXTREMA_CHECK_ADDED; EXACT-HEAD_CI_PENDING | Polynomial extrema over t in [0,1], q_min=4/5, (dq/dt)_min=137/550; exact pressure-integral endpoint constraint. |
+
+The selected research-loop scope for this increment is R2/R4/R5/R7 plus C5/C6: literature triage, hypothesis/model refinement, analytic derivation, deterministic mock experiment, implementation and exact-head checks. Native subagent dispatch was unavailable and was not run. The next physical acceptance gate remains MD-03, the six-model pilot; MD-04 full-cohort execution is not authorized by a failed or unverified pilot.

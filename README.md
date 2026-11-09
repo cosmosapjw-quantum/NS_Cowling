@@ -118,3 +118,8 @@ See the research plan at docs/MASS_DEPENDENT_COWLING_RESEARCH_PLAN_20261109.md, 
 ## v5 backend provenance qualification
 
 The mass-dependent smooth-cohort runner builds the 35 calculation/methods/support source paths in the v5 compile manifest and records a runtime build key. The release summary's source archive reference SHA-256 is b2c0dcaf6a5b07956cf8d33c39651d4ade32f44b4c49b33aa08fd84fb458185b; byte identity against the Dropbox archive is not verified in this session. The latest lineage receipt records this limitation.
+
+
+## Fixed-mass response and Cowling first-variation research (2026-11-09)
+
+The separate research/mass-dependent-cowling-v1 track now includes the fixed-gravitational-mass response identity, a thermodynamically admissible synthetic q-path with whole-interval polynomial-extrema checks, and a forward-tangent mock for the smooth ell=2 Cowling W,V system. See docs/FIXED_MASS_RESPONSE_THEORY_20261109.md, docs/COWLING_FIRST_VARIATION_RESPONSE_20261109.md and docs/MASS_RESPONSE_MOCK_EXPERIMENT_20261109.md. These are analytic/mock-method results, not realistic neutron-star predictions or a physical sensitivity kernel. Exact-head CI and the six-model native v5 mass-sequence pilot remain the next gates; the full 234-EOS mass grid is not yet claimed.

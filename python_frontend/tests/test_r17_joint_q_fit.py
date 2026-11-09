@@ -44,7 +44,13 @@ def test_pressure_density_tradeoff_improves_pressure_fit_without_losing_cell_adm
             float(mu[i + 1]), float(candidate["p_fitted"][i + 1]), float(candidate["n_fitted"][i + 1]),
         )
         assert cell["stable"] is True
-        assert cell["causal"] is True
+        # A q plateau has exactly zero analytic causal margin; allow endpoint
+        # Hermite roundoff at 1e-12 relative to the endpoint density scale.
+        causal_roundoff = 1.0e-12 * max(
+            abs(float(candidate["n_fitted"][i])),
+            abs(float(candidate["n_fitted"][i + 1])),
+        )
+        assert cell["min_causal_margin"] >= -causal_roundoff
 
 
 def test_joint_fit_rejects_invalid_objective_weight_and_source_domain():

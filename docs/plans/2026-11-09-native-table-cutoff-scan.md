@@ -44,3 +44,23 @@ Stop the scan as scientifically failed if any native-edge baseline fails, any so
 ## Background-profile handoff
 
 The frozen v5 backend exports its native TOV background profile through `background_output_path`. The R14 runner requests one profile for every one of the 48 finite-pressure isobars and verifies the backend-reported SHA-256 and row count. These files are structural background evidence for a subsequent radial-stability/Cowling study, not new EOS tables. The R14 artifact must retain the explicit finite-pressure/truncated-domain interpretation; a profile ending at positive pressure cannot be relabelled as a complete stellar background.
+
+
+## Exact-head result (2026-11-09)
+
+Implementation and exact-head workflow validation are complete. GitHub Actions run [42640660436](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42640660436) passed on branch HEAD `aff4e6ad2789555648f2e564a96bbabd952ee4ac`.
+
+- All 48 requested native TOV cases completed; no case failures.
+- All six original 323-row EOS source tables retained their exact before/after SHA-256 identities and expected Git blob SHA1s.
+- All six source-row-1 TOV baselines reproduced the frozen M/R reference within the unchanged 2e-5 criterion.
+- All 48 background profile CSVs were exported by the frozen v5 TOV backend; all backend SHA-256 receipts and row counts match the downloaded artifact.
+- No synthetic EOS table was emitted.
+- Downloaded artifact: ID `13684872040`, 18,300,545 bytes, SHA-256 `e124339e932636e9e08c92298b2e1269aca3fac4980230083a28a3451421d8f3`.
+
+Across the six methods, moving the integration endpoint from source row 1 to source row 20 changes the enclosed mass by only about (-4.54\times10^{-10}) relative to the native edge, while the isobar radius decreases by about 24.1 m (approximately 0.2137%). This is a within-table truncation result; it is not the physical missing-crust radius or the P=0 surface correction.
+
+## Supersession and next decision
+
+R13's synthetic low-density tails are retained only as historical mathematical diagnostics. They are not used as EOS input for the primary study and are not selected as a physical crust completion. The R13 workflow has been switched to manual dispatch only.
+
+The next decision is whether to (a) obtain and validate a source-backed low-density crust EOS that is compatible with the supplied table, or (b) run a separately labelled finite-domain radial/Cowling problem whose boundary is explicitly placed at a positive-pressure native isobar. Neither route may be described as a complete P=0 stellar model until a justified physical low-density EOS and boundary condition are supplied. The current TOV cutoff scan alone does not admit a radial-stability or full-star Cowling claim.

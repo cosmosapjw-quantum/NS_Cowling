@@ -109,8 +109,19 @@ def main(argv=None) -> int:
                 )
                 for i in range(len(mu) - 1)
             ]
+            causal_roundoff_tolerance = 1.0e-12 * np.maximum(
+                np.abs(result["n_fitted"][:-1]), np.abs(result["n_fitted"][1:])
+            )
             nonstable = sum(not x["stable"] for x in cells)
-            noncausal = sum(not x["causal"] for x in cells)
+            noncausal = sum(
+                x["min_causal_margin"] < -float(causal_roundoff_tolerance[i])
+                for i, x in enumerate(cells)
+            )
+            minimum_causal_margin = min(x["min_causal_margin"] for x in cells)
+            minimum_causal_margin_relative = min(
+                x["min_causal_margin"] / max(float(causal_roundoff_tolerance[i]), 1.0e-300)
+                for i, x in enumerate(cells)
+            )
             source_cell_count = len(cells)
 
             eps_fit = np.asarray(result["epsilon_fitted"])
@@ -131,6 +142,7 @@ def main(argv=None) -> int:
                 and result["pressure_strictly_increasing"]
                 and result["energy_density_strictly_increasing"]
                 and nonstable == 0 and noncausal == 0
+                and minimum_causal_margin_relative >= -1.0
                 and first_law <= 2.0e-12 and secant_decreases == 0
             ):
                 all_candidates_admissible = False
@@ -176,6 +188,9 @@ def main(argv=None) -> int:
                 "candidate_cell_count": source_cell_count,
                 "candidate_nonstable_cell_count": nonstable,
                 "candidate_noncausal_cell_count": noncausal,
+                "candidate_minimum_causal_margin": minimum_causal_margin,
+                "candidate_minimum_causal_margin_over_roundoff_tolerance": minimum_causal_margin_relative,
+                "causal_margin_roundoff_tolerance_relative": 1.0e-12,
                 "first_law_max_relative_residual": first_law,
                 "lambda_one_n_max_relative_mismatch": baseline_n_mismatch,
                 "lambda_one_p_max_relative_mismatch": baseline_p_mismatch,
@@ -218,6 +233,7 @@ def main(argv=None) -> int:
         "selected_tables": list(SELECTED),
         "lambda_grid": list(LAMBDAS),
         "lambda_interpretation": "sensitivity parameter only; no statistical uncertainty model is assumed",
+        "causal_roundoff_policy": "accept G=mu*P''-P' >= -1e-12*max(|n_i|,|n_{i+1}|); analytic q monotonicity remains the exact causality invariant",
         "objective": (
             "lambda * mu-grid-weighted relative n_B residual^2 "
             "+ (1-lambda) * mu-grid-weighted relative P residual^2"

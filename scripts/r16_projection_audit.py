@@ -187,5 +187,10 @@ def reconstruct_projection(
         "projected_p": p_projected,
         "projected_eps": eps_projected,
         "projected_q": q_projected,
+        "q_source": q_source,
+        "q_projected": q_projected,
+        "n_projected": n_projected,
+        "p_projected": p_projected,
+        "eps_projected": eps_projected,
         "pav_blocks": blocks,
     }

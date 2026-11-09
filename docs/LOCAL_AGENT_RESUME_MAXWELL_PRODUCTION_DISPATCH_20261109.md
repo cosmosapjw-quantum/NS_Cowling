@@ -201,3 +201,22 @@ No mode identities are assigned. The root list is not a complete-spectrum claim 
 5. Build central-pressure sequences, M-R branches, turning-point/radial stability and twin-star diagnostics as separate gates.
 
 Do not merge PR #3 or remove the draft label. Preserve old failed Actions attempts and the pre-dispatch backup branches as provenance.
+
+
+## Final backup ledger
+
+Created and branch-search-verified:
+- `backup/maxwell-native-fortran-code-test-convergence-20261109` -> `9d3ef4bfe8b018b17887504d60e25d1c94971b6e`
+- `backup/maxwell-native-fortran-convergence-reference-20261109` -> `afcdf948f0ca6844a6c3402f66e184a46aa78978`
+- `backup/maxwell-native-fortran-final-validated-handoff-20261109` -> `6d588f6101aaf9f08d806216fec97657805176eb`
+
+Earlier milestone backups remain available:
+- pre-dispatch `8d0aeb83a889d396794194338544d594c183e8b4`
+- production generic API `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`
+- first spectrum CLI `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`
+- handoff docs `c389b8ad6394ae1a9a8d1746315a262a16e72e88`
+- earlier final docs `2d95da83f5e7ad6918bc0ef6c224e752c8700d39`
+- both conversion positive-root CI `ec4527f0d518f6ba19f57eb42d8a8eb00b98dfca`
+- positive-root handoff `3ff2914776e95d00a3674310d0cff7bd0e16cca0`
+
+Current feature branch latest code/docs handoff is the HEAD recorded in PR #3. No workstation checkout or local files were modified by these GitHub operations.

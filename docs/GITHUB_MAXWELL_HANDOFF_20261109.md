@@ -153,3 +153,25 @@ Both exact-head workflows pass:
 - PR [42588170532](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42588170532), artifact 13660500740, SHA-256 `05d6786c5a5e82e177646a7db72efc50d485d54d0fac45ae1cec8a499666fd8e`.
 
 The four roots remain family-unresolved and belong to synthetic analytic tables only. Do not use them as observed/realistic neutron-star frequencies. Next gates are mode identity/continuation, pointwise profile comparison, negative EOS admission tests, M-R/radial stability and source-backed CompOSE phase data. PR #3 remains draft/open/unmerged.
+
+
+## Final backup inventory for the convergence/reference gate (2026-11-09)
+
+The following immutable backup branch refs were created after strict slow/rapid root, convergence and independent Python/SciPy validation:
+
+| Backup branch | Exact commit |
+|---|---|
+| `backup/maxwell-native-fortran-code-test-convergence-20261109` | `9d3ef4bfe8b018b17887504d60e25d1c94971b6e` |
+| `backup/maxwell-native-fortran-convergence-reference-20261109` | `afcdf948f0ca6844a6c3402f66e184a46aa78978` |
+| `backup/maxwell-native-fortran-final-validated-handoff-20261109` | `6d588f6101aaf9f08d806216fec97657805176eb` |
+
+Earlier stage backups are retained:
+- `backup/maxwell-native-fortran-pre-production-dispatch-20261109` = `8d0aeb83a889d396794194338544d594c183e8b4`
+- `backup/maxwell-native-fortran-production-dispatch-20261109` = `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`
+- `backup/maxwell-native-fortran-spectrum-cli-20261109` = `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`
+- `backup/maxwell-native-fortran-handoff-20261109` = `c389b8ad6394ae1a9a8d1746315a262a16e72e88`
+- `backup/maxwell-native-fortran-final-20261109` = `2d95da83f5e7ad6918bc0ef6c224e752c8700d39`
+- `backup/maxwell-native-fortran-both-conversion-roots-20261109` = `ec4527f0d518f6ba19f57eb42d8a8eb00b98dfca`
+- `backup/maxwell-native-fortran-positive-roots-handoff-20261109` = `3ff2914776e95d00a3674310d0cff7bd0e16cca0`
+
+Latest handoff authority at the time this inventory was authored: `6d588f6101aaf9f08d806216fec97657805176eb`. The subsequent commit only adds this backup ledger and does not modify source, tests, workflow or validator.

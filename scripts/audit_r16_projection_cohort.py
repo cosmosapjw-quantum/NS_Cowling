@@ -59,6 +59,89 @@ def max_relative_mismatch(actual: list[float], expected: list[float]) -> float:
     return max(abs(a - e) / max(abs(e), 1.0e-300) for a, e in zip(actual, expected))
 
 
+def density_bin(n_mid: float) -> str:
+    if n_mid < 1.0e-4:
+        return "lt_1e-4"
+    if n_mid < 1.0e-3:
+        return "1e-4_to_1e-3"
+    if n_mid < 2.0e-3:
+        return "1e-3_to_2e-3"
+    if n_mid < 1.0e-2:
+        return "2e-3_to_1e-2"
+    if n_mid < 1.0e-1:
+        return "1e-2_to_1e-1"
+    if n_mid < 5.0e-1:
+        return "1e-1_to_5e-1"
+    return "ge_5e-1"
+
+
+def build_cell_records(
+    reference: dict[str, str],
+    source_rows: list[dict[str, str]],
+    source: dict[str, list[dict[str, Any]]],
+) -> list[dict]:
+    cells = []
+    source_diag = source["source_cell_diagnostics"]
+    projected_diag = source["projected_cell_diagnostics"]
+    if len(source_diag) != len(source_rows) - 1 or len(projected_diag) != len(source_diag):
+        raise ValueError(f"{reference['name']}: interval diagnostic cardinality mismatch")
+
+    for i, (raw, projected) in enumerate(zip(source_diag, projected_diag)):
+        low, high = source_rows[i], source_rows[i + 1]
+        n0 = float(low["n_b_fm3"])
+        n1 = float(high["n_b_fm3"])
+        mu0 = float(low["mu_b_mev"])
+        mu1 = float(high["mu_b_mev"])
+        p0_source = float(low["pressure_mev_fm3"])
+        p1_source = float(high["pressure_mev_fm3"])
+        p0_projected = float(source["projected_p"][i])
+        p1_projected = float(source["projected_p"][i + 1])
+        delta_p_source = p1_source - p0_source
+        delta_p_projected = p1_projected - p0_projected
+        n_mid = math.sqrt(n0 * n1)
+
+        cells.append({
+            "name": reference["name"],
+            "crust": reference["crust"],
+            "core": reference["core"],
+            "matching_method": reference["matching_method"],
+            "cell_ordinal": i + 1,
+            "source_row_low": i + 1,
+            "source_row_high": i + 2,
+            "n_b_low_fm3": n0,
+            "n_b_high_fm3": n1,
+            "n_b_mid_geometric_fm3": n_mid,
+            "log10_n_b_mid": math.log10(n_mid),
+            "density_bin": density_bin(n_mid),
+            "mu_b_low_mev": mu0,
+            "mu_b_high_mev": mu1,
+            "delta_mu_b_mev": mu1 - mu0,
+            "pressure_increment_source_mev_fm3": delta_p_source,
+            "pressure_increment_projected_mev_fm3": delta_p_projected,
+            "source_vs_projected_delta_p_increment_pct": (
+                100.0 * (delta_p_projected / delta_p_source - 1.0)
+                if delta_p_source > 0.0 else None
+            ),
+            "source_d2p_low": raw["d2p_low"],
+            "source_d2p_high": raw["d2p_high"],
+            "source_min_d2p": raw["min_d2p"],
+            "source_causal_margin_low": raw["causal_margin_low"],
+            "source_causal_margin_high": raw["causal_margin_high"],
+            "source_min_causal_margin": raw["min_causal_margin"],
+            "source_stable": raw["stable"],
+            "source_causal": raw["causal"],
+            "projected_d2p_low": projected["d2p_low"],
+            "projected_d2p_high": projected["d2p_high"],
+            "projected_min_d2p": projected["min_d2p"],
+            "projected_causal_margin_low": projected["causal_margin_low"],
+            "projected_causal_margin_high": projected["causal_margin_high"],
+            "projected_min_causal_margin": projected["min_causal_margin"],
+            "projected_stable": projected["stable"],
+            "projected_causal": projected["causal"],
+        })
+    return cells
+
+
 def verify_summary() -> list[dict[str, str]]:
     if digest(SUMMARY) != SUMMARY_SHA256:
         raise RuntimeError("frozen spectrum summary SHA-256 mismatch")
@@ -134,7 +217,7 @@ def audit_one(reference: dict[str, str]) -> dict:
         f"{int(b['lo_zero_based']) + 1}-{int(b['hi_exclusive_zero_based'])}"
         for b in pooled_blocks
     ]
-    return {
+    row_record = {
         "name": name,
         "crust": reference["crust"],
         "core": reference["core"],
@@ -203,6 +286,21 @@ def audit_one(reference: dict[str, str]) -> dict:
         "row217_218_delta_p_increment_delta_pct": result["row217_218_delta_p_increment_delta_pct"],
         "status": "PASS_RECONSTRUCTION_MATCH",
     }
+    cell_records = build_cell_records(reference, source_rows, result)
+    source_bad = [x for x in cell_records if not x["source_stable"] or not x["source_causal"]]
+    if source_bad:
+        row_record["first_source_rejected_cell_lower_row"] = min(x["source_row_low"] for x in source_bad)
+        row_record["last_source_rejected_cell_lower_row"] = max(x["source_row_low"] for x in source_bad)
+    else:
+        row_record["first_source_rejected_cell_lower_row"] = None
+        row_record["last_source_rejected_cell_lower_row"] = None
+    row_record["source_worst_d2p_cell_lower_row"] = min(
+        cell_records, key=lambda x: x["source_min_d2p"]
+    )["source_row_low"]
+    row_record["source_worst_causal_margin_cell_lower_row"] = min(
+        cell_records, key=lambda x: x["source_min_causal_margin"]
+    )["source_row_low"]
+    return row_record, cell_records
 
 
 def write_csv(path: Path, rows: list[dict]) -> None:
@@ -242,6 +340,38 @@ def summarize(records: list[dict]) -> list[dict]:
     return summaries
 
 
+def summarize_density_bins(cells: list[dict]) -> list[dict]:
+    groups: dict[tuple[str, str, str], list[dict]] = defaultdict(list)
+    for cell in cells:
+        groups[(cell["crust"], cell["core"], cell["density_bin"])].append(cell)
+    rows = []
+    for (crust, core, bin_name), values in sorted(groups.items()):
+        source_nonstable = sum(not x["source_stable"] for x in values)
+        source_noncausal = sum(not x["source_causal"] for x in values)
+        source_stable_but_acausal = sum(x["source_stable"] and not x["source_causal"] for x in values)
+        projected_nonstable = sum(not x["projected_stable"] for x in values)
+        projected_noncausal = sum(not x["projected_causal"] for x in values)
+        rows.append({
+            "crust": crust,
+            "core": core,
+            "density_bin": bin_name,
+            "cell_count": len(values),
+            "source_nonstable_cell_count": source_nonstable,
+            "source_noncausal_cell_count": source_noncausal,
+            "source_stable_but_acausal_cell_count": source_stable_but_acausal,
+            "projected_nonstable_cell_count": projected_nonstable,
+            "projected_noncausal_cell_count": projected_noncausal,
+            "source_nonstable_fraction": source_nonstable / len(values),
+            "source_noncausal_fraction": source_noncausal / len(values),
+            "projected_nonstable_fraction": projected_nonstable / len(values),
+            "projected_noncausal_fraction": projected_noncausal / len(values),
+            "max_abs_source_min_d2p": max(abs(x["source_min_d2p"]) for x in values),
+            "min_source_min_d2p": min(x["source_min_d2p"] for x in values),
+            "min_source_causal_margin": min(x["source_min_causal_margin"] for x in values),
+        })
+    return rows
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, default=ROOT / "dist/r16-full-cohort-projection-audit")
@@ -263,10 +393,12 @@ def main(argv=None) -> int:
         raise RuntimeError("normalized/projected directory inventory differs from summary")
 
     by_name = {row["name"]: row for row in references}
-    records, failures = [], []
+    records, cell_records, failures = [], [], []
     for name in sorted(names):
         try:
-            records.append(audit_one(by_name[name]))
+            table_record, table_cells = audit_one(by_name[name])
+            records.append(table_record)
+            cell_records.extend(table_cells)
         except Exception as exc:
             failures.append({"name": name, "error": f"{type(exc).__name__}: {exc}"[:2000]})
 
@@ -282,6 +414,15 @@ def main(argv=None) -> int:
         )
     )
     groups = summarize(records)
+    density_groups = summarize_density_bins(cell_records)
+    source_cell_count = len(cell_records)
+    source_nonstable_cell_count = sum(not x["source_stable"] for x in cell_records)
+    source_noncausal_cell_count = sum(not x["source_causal"] for x in cell_records)
+    source_stable_but_acausal_cell_count = sum(
+        x["source_stable"] and not x["source_causal"] for x in cell_records
+    )
+    projected_nonstable_cell_count = sum(not x["projected_stable"] for x in cell_records)
+    projected_noncausal_cell_count = sum(not x["projected_causal"] for x in cell_records)
     out = args.output_dir.resolve()
     out.mkdir(parents=True, exist_ok=True)
 
@@ -292,6 +433,17 @@ def main(argv=None) -> int:
         "source_summary_sha256": SUMMARY_SHA256,
         "expected_table_count": EXPECTED_TABLES,
         "audited_table_count": len(records),
+        "audited_cell_count": source_cell_count,
+        "source_nonstable_cell_count": source_nonstable_cell_count,
+        "source_noncausal_cell_count": source_noncausal_cell_count,
+        "source_stable_but_acausal_cell_count": source_stable_but_acausal_cell_count,
+        "projected_nonstable_cell_count": projected_nonstable_cell_count,
+        "projected_noncausal_cell_count": projected_noncausal_cell_count,
+        "source_nonstable_cell_fraction": source_nonstable_cell_count / source_cell_count if source_cell_count else None,
+        "source_noncausal_cell_fraction": source_noncausal_cell_count / source_cell_count if source_cell_count else None,
+        "projected_nonstable_cell_fraction": projected_nonstable_cell_count / source_cell_count if source_cell_count else None,
+        "projected_noncausal_cell_fraction": projected_noncausal_cell_count / source_cell_count if source_cell_count else None,
+        "density_bin_count": len(density_groups),
         "matching_methods": list(METHODS),
         "projection_definition": "weighted PAV of q=n_b/mu_b on trapezoidal mu weights; n=mu*q; exact interval integral of piecewise-linear q for P; epsilon=mu*n-P",
         "source_tables_unchanged": source_unchanged,
@@ -324,13 +476,18 @@ def main(argv=None) -> int:
     receipt_path.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     write_csv(out / "r16_projection_audit_tables.csv", records)
     write_csv(out / "r16_projection_audit_groups.csv", groups)
+    write_csv(out / "r16_projection_audit_cells.csv", cell_records)
+    write_csv(out / "r16_projection_audit_density_bins.csv", density_groups)
     manifest = {
         "schema": "ns-cowling-r16-projection-audit-manifest-v1",
         "receipt_sha256": digest(receipt_path),
         "tables_csv_sha256": digest(out / "r16_projection_audit_tables.csv"),
         "groups_csv_sha256": digest(out / "r16_projection_audit_groups.csv"),
+        "cells_csv_sha256": digest(out / "r16_projection_audit_cells.csv"),
+        "density_bins_csv_sha256": digest(out / "r16_projection_audit_density_bins.csv"),
         "source_summary_sha256": SUMMARY_SHA256,
         "audited_table_count": len(records),
+        "audited_cell_count": source_cell_count,
         "tov_integrations_executed": 0,
         "synthetic_eos_table_count": 0,
     }
@@ -339,6 +496,13 @@ def main(argv=None) -> int:
     print(json.dumps({
         "status": receipt["status"],
         "audited_tables": len(records),
+        "audited_cells": source_cell_count,
+        "source_nonstable_cells": source_nonstable_cell_count,
+        "source_noncausal_cells": source_noncausal_cell_count,
+        "source_stable_but_acausal_cells": source_stable_but_acausal_cell_count,
+        "projected_nonstable_cells": projected_nonstable_cell_count,
+        "projected_noncausal_cells": projected_noncausal_cell_count,
+        "density_bins": len(density_groups),
         "failures": len(failures),
         "source_q_nonmonotone_tables": receipt["source_q_nonmonotone_table_count"],
         "pav_pooled_tables": receipt["pav_pooled_table_count"],

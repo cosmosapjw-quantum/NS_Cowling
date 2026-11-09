@@ -82,3 +82,18 @@ MD-02b reproduces the 35 paths and their order from the v5 compile manifest and 
 | MD-14 | Whole-domain thermodynamic q-path mock admission | ANALYTIC_EXTREMA_CHECK_ADDED; EXACT-HEAD_CI_PENDING | Polynomial extrema over t in [0,1], q_min=4/5, (dq/dt)_min=137/550; exact pressure-integral endpoint constraint. |
 
 The selected research-loop scope for this increment is R2/R4/R5/R7 plus C5/C6: literature triage, hypothesis/model refinement, analytic derivation, deterministic mock experiment, implementation and exact-head checks. Native subagent dispatch was unavailable and was not run. The next physical acceptance gate remains MD-03, the six-model pilot; MD-04 full-cohort execution is not authorized by a failed or unverified pilot.
+
+
+## Branch-topology and radial-stability audit (2026-11-09)
+
+| ID | Node | Status | Exit evidence |
+|---|---|---|---|
+| MD-03 | Six-model 24-point pilot | FAILED_PHYSICAL_GATE | Exact v5 baseline M/R passes at machine precision; first rising-proxy peak is only 0.7432–0.7434 Msun; zero admitted spectra; validator correctly rejects the required 1.0 Msun paired cell. Actions 42610037961, artifact 13668724637. |
+| MD-15 | All monotonic M(Pc) candidate segments | IMPLEMENTED_CI_PENDING | New extractor partitions contiguous TOV blocks into rising/falling/flat segments, shares local turning points, preserves failed/missing-index barriers and marks every segment radial_stability_status=unresolved_requires_radial_mode_spectrum. |
+| MD-16 | Direct radial eigenvalue branch classification | NOT_IMPLEMENTED_BLOCKS_SECONDARY_BRANCH_USE | Requires a radial Sturm-Liouville solver, explicit Gamma_1 closure, centre/surface boundary conditions, and interface transfer law where a true discontinuity exists. |
+
+The 24-point artifact reveals a common low-compactness first maximum (about 0.743 Msun, R about 1232 km) followed by a large M/R excursion and a later rising interval reaching about 1.915 Msun. This is an observed coarse-grid topology only. It is neither a certified first-branch maximum mass nor proof of stability recovery. A new 96-point scan is staged to test resolution. No full 234-EOS run is authorized.
+
+The radial stability gate is the nodeless fundamental eigenvalue omega_0^2, not the sign of dM/dPc alone. The selected perturbative closure must be declared: Gamma_eq=(epsilon+P)/P*dP/d epsilon for instantaneous barotropic equilibrium, or Gamma_1=(epsilon+P)/P*(partial P/partial epsilon)_(s,Y_i) for frozen composition. These need not coincide. The current finite-positive-pressure surface cutoff also needs a physical continuation or a derived finite-cutoff boundary condition before radial eigenvalues can be trusted.
+
+The detailed equations, pilot table, acceptance gates and references are in docs/MASS_SEQUENCE_BRANCH_STABILITY_AUDIT_20261109.md.

@@ -1,4 +1,4 @@
-"""Stable-branch extraction and balanced paired-response diagnostics."""
+"""Initial rising-M(Pc) proxy, kinematic segments and paired responses."""
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Iterable, Mapping, Sequence
@@ -35,11 +35,12 @@ def _valid_point(point: Mapping) -> bool:
 def extract_stable_branch(sequence: Iterable[Mapping], *,
     fractional_decrease_tolerance: float = 1.0e-4,
     sustained_decreases: int = 2) -> StableBranch:
-    """Keep the initial connected rising-mass branch up to its first maximum.
+    """Keep the initial connected rising-M(Pc) segment as a branch proxy.
 
-    A maximum is accepted after two consecutive fractional decreases larger
-    than the tolerance. A failed sample terminates the connected sequence;
-    later samples are never bridged. An unresolved endpoint is not called Mmax.
+    This is NOT a radial-stability classification. A local mass maximum can
+    change the number of unstable radial modes, and later stability recovery
+    is EOS-dependent. A maximum is accepted after two consecutive fractional
+    decreases larger than the tolerance. Failed samples are hard barriers.
     """
     if not math.isfinite(fractional_decrease_tolerance) or fractional_decrease_tolerance < 0:
         raise ValueError("fractional_decrease_tolerance must be finite and nonnegative")
@@ -104,8 +105,176 @@ def extract_stable_branch(sequence: Iterable[Mapping], *,
         truncated_low)
 
 
+
+def extract_candidate_mass_segments(sequence: Iterable[Mapping], *,
+    fractional_slope_tolerance: float = 1.0e-4) -> list[dict]:
+    """Partition each contiguous TOV scan block into monotonic M(Pc) segments.
+
+    This is a kinematic diagnostic only. It does NOT classify radial stability:
+    every returned segment is tagged unresolved until a radial pulsation
+    eigenvalue/mode-count calculation is available. Turning points are shared
+    endpoints of adjacent segments. Failed samples remain hard barriers.
+    """
+    if (not math.isfinite(fractional_slope_tolerance)
+            or fractional_slope_tolerance < 0.0):
+        raise ValueError("fractional_slope_tolerance must be finite and nonnegative")
+    ordered = sorted((dict(p) for p in sequence),
+                     key=lambda p: int(p.get("scan_index", 0)))
+    blocks: list[list[dict]] = []
+    current: list[dict] = []
+    previous_scan = None
+    for point in ordered:
+        if not _valid_point(point):
+            if current:
+                blocks.append(current)
+                current = []
+            previous_scan = None
+            continue
+        scan_index = int(point["scan_index"])
+        pc = float(point["pc_pa"])
+        if current:
+            if previous_scan is not None and scan_index <= previous_scan:
+                raise ValueError("scan_index must be strictly increasing within a TOV block")
+            if pc <= float(current[-1]["pc_pa"]):
+                raise ValueError("central pressures must be strictly increasing within a TOV block")
+            # A skipped index denotes a missing sample even if it was omitted
+            # from the input iterable; do not bridge it silently.
+            if previous_scan is not None and scan_index != previous_scan + 1:
+                blocks.append(current)
+                current = []
+        current.append(point)
+        previous_scan = scan_index
+    if current:
+        blocks.append(current)
+
+    output: list[dict] = []
+    for block_id, points in enumerate(blocks):
+        if not points:
+            continue
+        if len(points) == 1:
+            p = points[0]
+            output.append({
+                "sequence_block_id": block_id,
+                "segment_in_block": 0,
+                "direction": "unresolved_single_sample",
+                "start_scan_index": int(p["scan_index"]),
+                "end_scan_index": int(p["scan_index"]),
+                "start_pc_pa": float(p["pc_pa"]),
+                "end_pc_pa": float(p["pc_pa"]),
+                "start_mass_kg": float(p["mass_kg"]),
+                "end_mass_kg": float(p["mass_kg"]),
+                "start_radius_m": float(p["radius_m"]),
+                "end_radius_m": float(p["radius_m"]),
+                "sample_count": 1,
+                "start_turning_point_kind": "sequence_start",
+                "end_turning_point_kind": "sequence_end_or_gap",
+                "radial_stability_status": "unresolved_requires_radial_mode_spectrum",
+            })
+            continue
+
+        raw_signs: list[int] = []
+        for left, right in zip(points[:-1], points[1:]):
+            m0, m1 = float(left["mass_kg"]), float(right["mass_kg"])
+            fractional_slope = (m1 - m0) / max(abs(m0), abs(m1), 1.0e-300)
+            if fractional_slope > fractional_slope_tolerance:
+                raw_signs.append(1)
+            elif fractional_slope < -fractional_slope_tolerance:
+                raw_signs.append(-1)
+            else:
+                raw_signs.append(0)
+
+        nonzero = [i for i, sign in enumerate(raw_signs) if sign != 0]
+        if not nonzero:
+            signs = [0] * len(raw_signs)
+        else:
+            # Treat a flat plateau as part of the preceding run. At a
+            # maximum/minimum plateau this places the shared turning point at
+            # the last plateau sample and makes the convention deterministic.
+            signs = list(raw_signs)
+            previous_sign = None
+            for i, sign in enumerate(signs):
+                if sign != 0:
+                    previous_sign = sign
+                elif previous_sign is not None:
+                    signs[i] = previous_sign
+            next_sign = None
+            for i in range(len(signs)-1, -1, -1):
+                if signs[i] != 0:
+                    next_sign = signs[i]
+                elif next_sign is not None:
+                    signs[i] = next_sign
+
+        start_node = 0
+        current_sign = signs[0]
+        start_kind = "sequence_start"
+        segment_index = 0
+        for edge_index in range(1, len(signs)):
+            next_sign = signs[edge_index]
+            if next_sign == current_sign:
+                continue
+            if current_sign == 0 or next_sign == 0:
+                # A flat mass interval has no well-defined increasing/decreasing
+                # side; keep it in a separate unresolved segment.
+                boundary_kind = "flat_or_degenerate_turning_candidate"
+            elif current_sign > 0 and next_sign < 0:
+                boundary_kind = "local_maximum_candidate"
+            elif current_sign < 0 and next_sign > 0:
+                boundary_kind = "local_minimum_candidate"
+            else:
+                boundary_kind = "unresolved_direction_change"
+            end_node = edge_index
+            segment_points = points[start_node:end_node+1]
+            first, last = segment_points[0], segment_points[-1]
+            output.append({
+                "sequence_block_id": block_id,
+                "segment_in_block": segment_index,
+                "direction": ("rising" if current_sign > 0 else
+                              "falling" if current_sign < 0 else "flat"),
+                "start_scan_index": int(first["scan_index"]),
+                "end_scan_index": int(last["scan_index"]),
+                "start_pc_pa": float(first["pc_pa"]),
+                "end_pc_pa": float(last["pc_pa"]),
+                "start_mass_kg": float(first["mass_kg"]),
+                "end_mass_kg": float(last["mass_kg"]),
+                "start_radius_m": float(first["radius_m"]),
+                "end_radius_m": float(last["radius_m"]),
+                "sample_count": len(segment_points),
+                "start_turning_point_kind": start_kind,
+                "end_turning_point_kind": boundary_kind,
+                "radial_stability_status": "unresolved_requires_radial_mode_spectrum",
+            })
+            segment_index += 1
+            start_node = end_node
+            start_kind = boundary_kind
+            current_sign = next_sign
+
+        segment_points = points[start_node:]
+        first, last = segment_points[0], segment_points[-1]
+        output.append({
+            "sequence_block_id": block_id,
+            "segment_in_block": segment_index,
+            "direction": ("rising" if current_sign > 0 else
+                          "falling" if current_sign < 0 else "flat"),
+            "start_scan_index": int(first["scan_index"]),
+            "end_scan_index": int(last["scan_index"]),
+            "start_pc_pa": float(first["pc_pa"]),
+            "end_pc_pa": float(last["pc_pa"]),
+            "start_mass_kg": float(first["mass_kg"]),
+            "end_mass_kg": float(last["mass_kg"]),
+            "start_radius_m": float(first["radius_m"]),
+            "end_radius_m": float(last["radius_m"]),
+            "sample_count": len(segment_points),
+            "start_turning_point_kind": start_kind,
+            "end_turning_point_kind": "sequence_end_or_gap",
+            "radial_stability_status": "unresolved_requires_radial_mode_spectrum",
+        })
+    for global_index, row in enumerate(output):
+        row["candidate_segment_id"] = f"B{row['sequence_block_id']:02d}-S{row['segment_in_block']:02d}"
+    return output
+
+
 def find_mass_bracket(branch: StableBranch, target_mass_kg: float) -> dict | None:
-    """Find adjacent stable-branch samples; final Pc is solved by Fortran."""
+    """Find adjacent samples on the initial rising-M(Pc) proxy segment."""
     if not math.isfinite(target_mass_kg) or target_mass_kg <= 0:
         raise ValueError("target_mass_kg must be finite and positive")
     for left, right in zip(branch.points[:-1], branch.points[1:]):

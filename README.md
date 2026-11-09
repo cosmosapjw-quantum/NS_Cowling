@@ -123,3 +123,8 @@ The mass-dependent smooth-cohort runner builds the 35 calculation/methods/suppor
 ## Fixed-mass response and Cowling first-variation research (2026-11-09)
 
 The separate research/mass-dependent-cowling-v1 track now includes the fixed-gravitational-mass response identity, a thermodynamically admissible synthetic q-path with whole-interval polynomial-extrema checks, and a forward-tangent mock for the smooth ell=2 Cowling W,V system. See docs/FIXED_MASS_RESPONSE_THEORY_20261109.md, docs/COWLING_FIRST_VARIATION_RESPONSE_20261109.md and docs/MASS_RESPONSE_MOCK_EXPERIMENT_20261109.md. These are analytic/mock-method results, not realistic neutron-star predictions or a physical sensitivity kernel. Exact-head CI and the six-model native v5 mass-sequence pilot remain the next gates; the full 234-EOS mass grid is not yet claimed.
+
+
+## Radial-stability gate for mass-dependent Cowling work (2026-11-09)
+
+The six-model 24-point native v5 pilot reproduces its frozen TOV M/R anchor but finds only a first rising-M(Pc) peak near 0.743 Msun and admits zero new spectra at the requested 0.8-2.0 Msun targets. A later rising interval exists in the coarse scan but is not called stable. The next increment records all monotonic M(Pc) candidate segments, increases the pilot to 96 Pc samples and labels radial stability unresolved. Direct radial Sturm-Liouville eigenvalues, an explicit Gamma_1 closure and a validated surface condition are required before using any secondary branch. See docs/MASS_SEQUENCE_BRANCH_STABILITY_AUDIT_20261109.md.

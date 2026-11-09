@@ -161,3 +161,19 @@ The current smooth Cowling W,V system has been recast as y'=A y. The parameter t
 This is an implementation route, not yet a physical sensitivity kernel. A physical calculation must differentiate the TOV background, EOS-cell closure, centre expansion, finite-positive-pressure surface/event, matching determinant and mode identity. For a sharp Maxwell interface, the slow/rapid transfer map must be differentiated separately. The existing sharp-interface track is not silently folded into the smooth six-method cohort.
 
 The q-path mock was strengthened from mesh-only admission to whole-polynomial-interval extremum checks. Its exact lower bound applies only to the synthetic path and does not establish that the six historical matching methods lie on one admissible differentiable path.
+
+
+## 12. Branch topology, radial stability and the secondary-branch stop rule
+
+The first connected rising-M(Pc) segment remains the conservative mass-root search proxy, but it is not itself a radial eigenvalue calculation. The first 24-point exact-v5 pilot shows a first mass maximum near 0.7432 Msun and R near 1232 km, followed by a large excursion and a later rising interval reaching about 1.915 Msun at the scan endpoint. This same topology occurs across all six methods in the pilot pair, but the coarse grid does not establish whether it is a physical transition structure, an unresolved numerical feature, or an unstable/stable branch sequence.
+
+The code increment adds a kinematic monotonic-segment partition and raises the six-model pilot grid from 24 to 96 Pc samples. It labels all candidate segments as radially unresolved. No secondary branch is sent to the Cowling mode solver.
+
+A direct radial-mode calculation is required before secondary branches are admitted. In geometric units, the standard radial problem uses the dimensionless Lagrangian displacement xi and DeltaP:
+- dxi/dr = (nu' - 3/r)xi - DeltaP/(r Gamma_1 P);
+- dDeltaP/dr = {exp(2lambda)[omega^2 exp(-2nu)-8 pi P] + nu'(4/r+nu')} (epsilon+P)r xi - {nu'+4 pi(epsilon+P)r exp(2lambda)}DeltaP.
+At the centre, DeltaP(0)=-3 Gamma_1 P_c xi(0); at a zero-pressure surface DeltaP(R)=0. The current v5 background stops at finite positive pressure, so an outer-EOS continuation or a separately derived finite-cutoff boundary condition is required.
+
+The closure is part of the physics. Gamma_eq=(epsilon+P)/P*dP/d epsilon tracks the barotropic equilibrium EOS; Gamma_1=(epsilon+P)/P*(partial P/partial epsilon)_(s,Y_i) describes an adiabatic perturbation at frozen entropy/composition. A radial-stability result must state which closure was used. For a genuine sharp interface, the perturbative junction condition is independent of the equilibrium interpolation: slow and rapid conversion have different [xi,DeltaP] transfer laws. The historical six methods remain smooth bridges and receive no sharp-interface jump condition.
+
+Full equations and the exact 24-point pilot evidence are recorded in docs/MASS_SEQUENCE_BRANCH_STABILITY_AUDIT_20261109.md. The next exit sequence is: 96-point TOV topology -> 96-to-192 refinement -> same-interpolation independent TOV reference -> direct radial omega_0^2 solver and closure audit -> only then target-mass f/p1 spectra on a certified branch.

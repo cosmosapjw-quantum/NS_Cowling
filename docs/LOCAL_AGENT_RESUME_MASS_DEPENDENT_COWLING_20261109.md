@@ -82,3 +82,36 @@ After push:
 2. check the runtime v5 backend build key and manifest SHA in the artifact;
 3. compare frozen M/R at each stored Pc before considering mode results;
 4. only then inspect the first fold candidate and complete pair coverage.
+
+
+## Current continuation state: branch topology is the active blocker (2026-11-09)
+
+Latest fully tested code/theory head before the candidate-segment increment: d1d01e6b114d97cd496640037aafaf7ff7be126e. Backup refs:
+- backup/mass-dependent-pre-cowling-variation-20261109 -> ef738a620c440fea7e91d4c10da13d2f2e30c93a
+- backup/mass-dependent-pre-segment-audit-20261109 -> d1d01e6b114d97cd496640037aafaf7ff7be126e
+
+The exact-head Actions run 42610037961 (job 129135805050; artifact 13668724637; zip SHA-256 fb62570658e44f9847d4a08f73174e36f14c091b6960b3b847206232a73b1534) completed with failure at the physical pilot validator. The two helper/mock suites passed (6 tests each). The validator reports: required mass 1.0 lacks a complete six-method pair. All six models reproduce the frozen v5 TOV M/R at the reference Pc to near machine precision, but the 24-point Pc scan's first rising-proxy maximum is only 0.7432-0.7434 Msun, so every requested mass >=0.8 Msun is outside the initial rising proxy. Valid f/p1 roots = 0. No scientific mass-dependent spectrum is admitted.
+
+The 24-point scan has a second, higher-density rising interval ending at about 1.915 Msun, after an extreme excursion in M and R. This interval is not labeled stable or used for mode roots. The new implementation adds extract_candidate_mass_segments, candidate_mass_segments.csv, explicit radial_stability_status=unresolved_requires_radial_mode_spectrum, and a 96-point six-model pilot. It also renames branch output/diagnostics to avoid calling the first local peak Mmax. Inspect the exact new HEAD and its Actions before trusting the implementation.
+
+## Immediate agent tasks
+
+1. Fetch the live branch ref and exact-head Actions. Inspect code, branch-proxy and test changes; do not assume the current handoff's SHA is still head.
+2. Confirm the four candidate-segment unit tests: rising/falling/rising split; shared maximum plateau; hard barriers at failed or omitted indices; unresolved radial stability labels.
+3. Inspect candidate_mass_segments.csv and tov_sequence.csv from the 96-point artifact for all six methods. Report local maxima/minima, M/R/Pc, failed integration points, and grid coverage. Do not label any candidate segment radially stable.
+4. Require 96-to-192 resolution convergence for the first peak and rapid M/R excursion. Do not infer physical EOS discontinuity from a coarse grid.
+5. Reproduce selected points independently with exactly the native raw-knot P(mu) cubic-Hermite EOS interpolation. A generic P(epsilon) spline is not an independent comparator for this code path.
+6. Implement or integrate a relativistic radial pulsation Sturm-Liouville solver. In geometric units the standard two-variable equations for xi and DeltaP, centre BC, and zero-pressure surface BC are given in docs/MASS_SEQUENCE_BRANCH_STABILITY_AUDIT_20261109.md. The v5 finite-positive-pressure endpoint needs either a low-density EOS continuation to P=0 or a separately derived finite-cutoff boundary condition.
+7. Declare the perturbation closure. Gamma_eq follows the equilibrium barotrope; Gamma_1=(epsilon+P)/P*(partial P/partial epsilon)_(s,Y_i) is the frozen-composition adiabatic response. If composition derivatives are unavailable, only label results as barotropic-equilibrium radial stability, not general physical stability.
+8. Track the nodeless omega_0^2 and its zero crossings along Pc. Only after the radial eigenvalue/node gate passes should mass-target f/p1 spectra be attempted on each radially stable interval.
+9. For a true sharp Maxwell interface, implement slow/rapid/reactive radial junction conditions separately from the historical smooth six-method cohort.
+10. Do not dispatch the full 234-EOS cohort until the six-model high-resolution pilot passes its branch, radial-stability, M/R, mass-residual, shooting and node gates.
+
+## Scientific reference boundary
+
+- Alford, Harris & Sachdeva 2017, arXiv:1705.09880: direct radial Sturm-Liouville eigenvalues are the fundamental stability test; BTM turning-point heuristic can differ for exotic low-compactness branches.
+- Essick 2024, arXiv:2405.05395: EOS-dependent stability recovery/secondary branches can occur in selected low-pressure, low-compactness sequences.
+- Rau & Salaben, arXiv:2309.08540v2: distinguishes equilibrium Gamma from frozen-composition Gamma_1 and derives interface junction conditions for genuine first-order transitions.
+- Kokkotas & Ruoff 2001, DOI 10.1051/0004-6361:20000216: published radial-mode framework and reference frequencies.
+
+The theory/mock commit d1d01e6 and this candidate-segment increment are separate from PR #3. PR #3 must remain open/draft/unmerged. No local workstation checkout was modified. Dropbox artifacts were inspected read-only; no Dropbox mutation was performed.

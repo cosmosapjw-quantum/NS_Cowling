@@ -1,0 +1,110 @@
+# Mass-sequence topology and radial-stability audit
+
+Date: 2026-11-09  
+Scope: GPPVA_FSU2 × BBB_BHF2 six-method pilot, frozen v5 EOS-cell TOV backend  
+Evidence state: CI artifact inspected; 24-point branch topology is an observed numerical diagnostic, not a radial-stability result. A 96-point refinement is the next exact-head experiment.
+
+## 1. Why the first mass-branch gate is not yet a stability gate
+
+The initial mass-sequence extractor deliberately retains only the first connected rising segment of M(Pc), and stops at the first resolved decline. This is a conservative turning-point proxy for target-mass searches. It is not a proof that every point in the retained segment is radially stable, nor does it prove that every later rising segment is unstable.
+
+The radial stability criterion is the sign of the lowest eigenvalue of the relativistic radial-pulsation problem. With the convention exp(i omega t), a nodeless fundamental radial mode satisfies:
+- omega_0^2 > 0: radially stable;
+- omega_0^2 = 0: marginal;
+- omega_0^2 < 0: radially unstable.
+
+Bardeen–Thorne–Meltzer (BTM) turning-point counting is a useful sequence-level diagnostic under its assumptions, but the direct radial Sturm–Liouville spectrum is the decisive test. Alford, Harris & Sachdeva explicitly compare the two and show why mass-radius extrema alone can misclassify exotic low-compactness branches. Essick gives further examples of stability re-appearance in specially structured low-pressure EOS sequences. Therefore neither “all later rises are stable” nor “all later rises remain unstable” is a safe general rule.
+
+## 2. Exact pilot evidence at the preceding 24-point resolution
+
+Actions run: https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42610037961  
+Tested HEAD: d1d01e6b114d97cd496640037aafaf7ff7be126e  
+Artifact: 13668724637, SHA-256 fb62570658e44f9847d4a08f73174e36f14c091b6960b3b847206232a73b1534
+
+The branch test was performed on six methods for the same GPPVA_FSU2 × BBB_BHF2 pair. The v5 TOV baseline M and R at the frozen reference Pc reproduced to near machine precision for all six methods. The helper tests and both mock-response test groups passed, but the physical pilot validator failed because no complete six-method cell existed at 1.0 Msun.
+
+For the css row, representative native TOV samples were:
+
+| Scan index | Pc (Pa) | M (Msun) | R (km) |
+|---:|---:|---:|---:|
+| 0 | 7.3959e30 | 0.671717 | 636.227 |
+| 3 | 2.7549e31 | 0.743214 | 1231.731 |
+| 4 | 4.2706e31 | 0.684088 | 2777.204 |
+| 5 | 6.6201e31 | 0.083621 | 51.056 |
+| 14 | 3.4217e33 | 0.681138 | 11.645 |
+| 18 | 1.9758e34 | 1.455607 | 11.138 |
+| 23 | 1.7685e35 | 1.914837 | 9.320 |
+
+Across all six matching prescriptions, the first sampled maximum lies in the narrow interval 0.743199–0.743409 Msun, with radius approximately 1231–1235 km. A later high-density rising interval reaches approximately 1.9147–1.91485 Msun at the scan endpoint. The very large excursion in radius and mass between scan indices 3–6 is common to all six methods at this coarse sampling.
+
+These values are TOV sequence observations from a 24-point logarithmic Pc mesh. They do not show that the first peak is the physical maximum mass, do not demonstrate that the later high-density interval is stable, and do not establish that the sharp transition in the sampled M/R sequence is a physical EOS feature rather than insufficient resolution or a numerical issue. The fact that six bridges show similar topology suggests a common upstream core/low-density EOS contribution, but this remains a hypothesis.
+
+## 3. Radial pulsation formulation and thermodynamic closure
+
+For reference, in geometric units G=c=1 and metric
+ds^2 = -exp(2 nu) dt^2 + exp(2 lambda) dr^2 + r^2 dOmega^2,
+the standard first-order radial pulsation system can be written in terms of the dimensionless Lagrangian radial displacement xi and Lagrangian pressure perturbation DeltaP:
+
+d xi/dr = (nu' - 3/r) xi - DeltaP/(r Gamma_1 P),
+
+d DeltaP/dr =
+{ exp(2 lambda) [omega^2 exp(-2 nu) - 8 pi P]
+  + nu' (4/r + nu') } (epsilon+P) r xi
+- { nu' + 4 pi (epsilon+P) r exp(2 lambda) } DeltaP.
+
+For a regular centre, normalize xi(0)=1 and impose
+DeltaP(0) = -3 Gamma_1(0) P_c xi(0).
+For a true zero-pressure stellar surface, impose DeltaP(R)=0. These boundary conditions must not be copied uncritically to the current v5 endpoint: the current background is terminated at a finite positive pressure cutoff. The radial problem therefore needs either a documented low-density continuation to P=0 or a separately derived and independently tested finite-cutoff boundary condition.
+
+The equilibrium barotropic index is
+Gamma_eq = (epsilon+P)/P * dP/d epsilon.
+The perturbative adiabatic index is instead
+Gamma_1 = (epsilon+P)/P * (partial P/partial epsilon)_(s,Y_i).
+They coincide only under the adopted instantaneous-equilibrium/barotropic perturbation closure. For cold beta-equilibrium matter, the frozen-composition perturbation can have a different Gamma_1. The current projected EOS table does not by itself provide all composition derivatives needed for a microphysical frozen-composition stability calculation. A result computed with Gamma_1=Gamma_eq must therefore be labelled “barotropic-equilibrium radial stability”, not universal physical stability.
+
+At a genuine sharp first-order interface the radial variables require their own junction law. In the usual limiting cases, [DeltaP]=0 and:
+- slow conversion: [xi]=0;
+- rapid conversion: [xi - DeltaP/(r P')]=0.
+More general reactive junction conditions require composition variables and their gradients. These conditions are not to be imposed at the historical smooth-bridge matching interval. The native sharp-Maxwell PR #2/#3 track remains separate.
+
+## 4. New diagnostic implemented in the mass-dependent track
+
+The code now partitions each contiguous valid TOV scan block into monotonic M(Pc) candidate segments:
+- rising;
+- falling;
+- flat/degenerate;
+- unresolved single-sample segments.
+
+Local maxima/minima are shared endpoints of adjacent segments. Failed TOV samples and omitted scan indices are hard barriers. Each row carries the explicit label
+radial_stability_status = unresolved_requires_radial_mode_spectrum.
+
+The original initial-rising-segment selector is retained only as a conservative target-mass search proxy. Its output metadata and log labels are being renamed so its first local peak is not called Mmax and no unverified segment is called radially stable. Candidate segments are written to candidate_mass_segments.csv and are not used for Cowling spectrum roots.
+
+The pilot scan is increased from 24 to 96 logarithmic Pc samples for the same six EOS/method rows. This experiment asks whether the observed topology is resolved with materially improved sampling. It does not itself assign radial stability.
+
+## 5. Acceptance gates before secondary-branch spectra
+
+1. Inspect the 96-point TOV samples for all six methods, including solver failures, radius, mass, central pressure, and EOS-cell/event locations.
+2. Demonstrate convergence of every candidate maximum/minimum location and M/R values under a second grid refinement, for example 96 to 192 points, before interpreting the topology.
+3. Reproduce selected TOV points with an independent implementation of the same raw native-knot P(mu) cubic-Hermite interpolation; a generic P(epsilon) spline is not an equivalent comparator.
+4. Implement the radial eigenproblem with an explicitly selected Gamma_1 closure, centre series, and physically admissible surface condition. Verify the radial solver against published reference tables such as Kokkotas & Ruoff and/or Gondek et al.
+5. Track the nodeless omega_0^2 along Pc and identify zero crossings. Radial-stability labels are assigned only after eigenvalue and mode-node checks converge.
+6. If a true sharp phase boundary is present, implement and test its perturbative junction law separately; do not use smooth-bridge continuity or infer slow/rapid conversion from the equilibrium EOS alone.
+7. Only after a radially admissible mass branch is established should mass-target solving and f/p1 mode scans be attempted on that branch.
+
+## 6. Current disposition
+
+- The 24-point six-model pilot: baseline M/R reproduction passes; no 1.0 Msun complete pair; zero admitted f/p1 spectra.
+- The forward Cowling tangent mock and fixed-mass response mock pass their scoped CI tests but are not physical-star calculations.
+- The 96-point scan and candidate-segment output are implemented in the next code increment; exact-head Actions are pending.
+- No value in this note is a published maximum mass, a certified radial eigenfrequency, or a new physical f/p1 result.
+
+## References
+
+1. S. Chandrasekhar, “The Dynamical Instability of Gaseous Masses Approaching the Schwarzschild Limit in General Relativity,” ApJ 140 (1964) 417–433.
+2. J. M. Bardeen, K. S. Thorne & D. W. Meltzer, “A catalogue of methods for studying the normal modes of radial pulsation of general-relativistic stellar models,” ApJ 145 (1966) 505.
+3. K. D. Kokkotas & J. Ruoff, “Radial oscillations of relativistic stars,” A&A (2001), DOI 10.1051/0004-6361:20000216.
+4. D. Gondek, J. L. Zdunik & P. Haensel, “Radial pulsations of proto-neutron stars,” A&A 325 (1997) 217; see also arXiv:astro-ph/9901167 for relativistic radial-mode equations and mode evolution.
+5. M. G. Alford, S. P. Harris & P. S. Sachdeva, “On the Stability of Strange Dwarf Hybrid Stars,” ApJ 847, 109 (2017), arXiv:1705.09880.
+6. R. Essick, “Exotic Stable Branches with Efficient TOV Sequences,” arXiv:2405.05395 (2024).
+7. P. B. Rau & G. G. Salaben, “Non-equilibrium effects on stability of hybrid stars with first-order phase transitions,” arXiv:2309.08540v2.

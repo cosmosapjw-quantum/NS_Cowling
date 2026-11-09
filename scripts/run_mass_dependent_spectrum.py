@@ -8,7 +8,8 @@ import numpy as np
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"python_frontend"))
 from compose_cowling.solver import solve_v5_tov_star,solve_v5_cowling_spectrum
-from compose_cowling.mass_sequence import extract_stable_branch,find_mass_bracket,paired_sensitivity
+from compose_cowling.mass_sequence import (extract_candidate_mass_segments, extract_stable_branch,
+    find_mass_bracket,paired_sensitivity)
 MASS_GRID=(.8,1.,1.2,1.33,1.4,1.6,1.8,2.)
 METHODS=("css","cubic_F","cubic_P","maxwell","quintic_F","quintic_P")
 REF=ROOT/"oscillation_release_v1/data/spectrum_summary_234.csv"
@@ -77,9 +78,23 @@ def solve_model(ref,eos_dir,masses,solar_mass,*,nscan,tov_rtol,spectrum_rtol,mod
         except Exception as exc: r["failure"]=f"{type(exc).__name__}: {exc}"[:1000]
         scan.append(r)
     branch=extract_stable_branch(scan)
-    stable_ids={int(p["scan_index"]) for p in branch.points}
-    tov_rows=[{**p,"name":name,"crust":ref["crust"],"core":ref["core"],
-               "method":ref["matching_method"],"stable_branch_member":int(p["scan_index"]) in stable_ids} for p in scan]
+    candidate_segments=extract_candidate_mass_segments(scan)
+    candidate_by_scan={}
+    for segment in candidate_segments:
+        for scan_index in range(segment["start_scan_index"],segment["end_scan_index"]+1):
+            candidate_by_scan.setdefault(scan_index,[]).append(segment)
+    initial_rise_ids={int(p["scan_index"]) for p in branch.points}
+    tov_rows=[]
+    for pnt in scan:
+        segments=candidate_by_scan.get(int(pnt["scan_index"]),[])
+        tov_rows.append({**pnt,"name":name,"crust":ref["crust"],"core":ref["core"],
+            "method":ref["matching_method"],
+            "initial_rising_branch_proxy_member":int(pnt["scan_index"]) in initial_rise_ids,
+            "candidate_segment_ids":";".join(segment["candidate_segment_id"] for segment in segments),
+            "candidate_segment_directions":";".join(segment["direction"] for segment in segments),
+            "radial_stability_status":"unresolved_requires_radial_mode_spectrum" if segments else "unresolved_invalid_tov_sample"})
+    candidate_rows=[{**segment,"name":name,"crust":ref["crust"],"core":ref["core"],
+        "method":ref["matching_method"],"kinematic_only":True} for segment in candidate_segments]
     baseline=solve_v5_tov_star(eos,pc_ref,p_cut_pa=pcut,rtol=tov_rtol,step_cap=.05,
         r0_m=10.0,r_limit_m=radius_limit_m)
     bm=float(baseline["mass_kg"])/float(ref["mass_kg"])-1
@@ -90,8 +105,8 @@ def solve_model(ref,eos_dir,masses,solar_mass,*,nscan,tov_rtol,spectrum_rtol,mod
         base={"name":name,"crust":ref["crust"],"core":ref["core"],"method":ref["matching_method"],
               "mass_msun":m,"turning_point_found":branch.turning_point_found,"branch_status":branch.status}
         if bracket is None:
-            rows.append({**base,"valid":False,"status":"target_outside_resolved_stable_branch",
-                "branch_max_mass_msun":branch.maximum_mass_kg/solar_mass if branch.maximum_mass_kg else None,
+            rows.append({**base,"valid":False,"status":"target_outside_initial_rising_branch_proxy",
+                "first_turning_point_mass_msun":branch.maximum_mass_kg/solar_mass if branch.maximum_mass_kg else None,
                 "branch_endpoint_mass_msun":branch.branch_endpoint_mass_kg/solar_mass if branch.branch_endpoint_mass_kg else None})
             continue
         scale=math.sqrt((target/bracket["radius_guess_m"]**3)/(float(ref["mass_kg"])/float(ref["radius_m"])**3))
@@ -127,13 +142,17 @@ def solve_model(ref,eos_dir,masses,solar_mass,*,nscan,tov_rtol,spectrum_rtol,mod
         "r0_m":10.0,"r_limit_m":radius_limit_m,"tov_step_cap":0.05,"tov_rtol":tov_rtol,
         "baseline_reproduction_status":"pass" if abs(bm)<=2e-5 and abs(br)<=2e-5 else "mismatch",
         "branch_status":branch.status,"turning_point_found":branch.turning_point_found,
-        "stable_branch_points":len(branch.points),"maximum_mass_kg":branch.maximum_mass_kg,
-        "maximum_mass_pc_pa":branch.maximum_mass_pc_pa,"branch_endpoint_mass_kg":branch.branch_endpoint_mass_kg,
+        "branch_stability_classification":"unresolved_requires_radial_mode_spectrum",
+        "candidate_mass_segment_count":len(candidate_segments),
+        "candidate_mass_segment_directions":[row["direction"] for row in candidate_segments],
+        "initial_rising_branch_proxy_points":len(branch.points),
+        "first_turning_point_mass_kg":branch.maximum_mass_kg,
+        "first_turning_point_pc_pa":branch.maximum_mass_pc_pa,"branch_endpoint_mass_kg":branch.branch_endpoint_mass_kg,
         "first_branch_pc_pa":float(branch.points[0]["pc_pa"]) if branch.points else None,
         "last_branch_pc_pa":float(branch.points[-1]["pc_pa"]) if branch.points else None,
         "low_pressure_truncated":branch.low_pressure_truncated,
         "target_mass_valid_count":sum(bool(r["valid"]) for r in rows)}
-    return tov_rows,rows,model
+    return tov_rows,rows,model,candidate_rows
 
 
 def main(argv=None):
@@ -169,22 +188,22 @@ def main(argv=None):
     if not selected: raise SystemExit("no EOS rows selected")
     if any(not (EOS_DIR/f"{r['name']}.csv").is_file() for r in selected): raise SystemExit("projected EOS table missing")
     solar=float(json.loads(RELEASE.read_text())["solar_mass_nominal_kg"])
-    a.output_dir.mkdir(parents=True,exist_ok=True);tov_all=[];modes=[];models=[];failures=[]
+    a.output_dir.mkdir(parents=True,exist_ok=True);tov_all=[];modes=[];models=[];candidate_all=[];failures=[]
     for i,ref in enumerate(selected,1):
         print(f"[{i}/{len(selected)}] {ref['name']}",flush=True)
         try:
-            tr,sr,model=solve_model(ref,EOS_DIR,masses,solar,nscan=a.tov_samples,tov_rtol=a.tov_rtol,
+            tr,sr,model,candidates=solve_model(ref,EOS_DIR,masses,solar,nscan=a.tov_samples,tov_rtol=a.tov_rtol,
                 spectrum_rtol=a.spectrum_rtol,mode_rtol=a.mode_rtol,mass_rtol=a.mass_rtol,residual_tol=a.residual_tol,radius_limit_m=a.radius_limit_m)
-            tov_all.extend(tr);modes.extend(sr);models.append(model)
+            tov_all.extend(tr);modes.extend(sr);models.append(model);candidate_all.extend(candidates)
             write_csv(a.output_dir/"tov_sequence_partial.csv",tov_all);write_csv(a.output_dir/"spectrum_partial.csv",modes)
-            cap=(f"Mmax={model['maximum_mass_kg']/solar:.4f} Msun" if model["turning_point_found"]
-                 else f"branch-end={model['branch_endpoint_mass_kg']/solar:.4f} Msun")
+            cap=(f"first-turning-point candidate={model['first_turning_point_mass_kg']/solar:.4f} Msun" if model["turning_point_found"]
+                 else f"rising-proxy-end={model['branch_endpoint_mass_kg']/solar:.4f} Msun")
             print(f"  {model['branch_status']}; {model['target_mass_valid_count']}/{len(masses)} spectra; {cap}",flush=True)
         except Exception as exc:
             failures.append({"name":ref["name"],"error":f"{type(exc).__name__}: {exc}"})
             print(f"  MODEL FAILURE: {failures[-1]['error']}",flush=True);break
     paired,deltas=paired_sensitivity(modes,METHODS)
-    for filename,rows in (("tov_sequence.csv",tov_all),("spectrum_mass_grid.csv",modes),
+    for filename,rows in (("tov_sequence.csv",tov_all),("candidate_mass_segments.csv",candidate_all),("spectrum_mass_grid.csv",modes),
         ("paired_mass_sensitivity.csv",paired),("paired_method_deviations.csv",deltas),("model_branch_summary.csv",models)):
         write_csv(a.output_dir/filename,rows)
     manifest={"schema":"ns-cowling-mass-dependent-spectrum-v1","reference_cohort_sha256":sha256(REF),
@@ -200,11 +219,12 @@ def main(argv=None):
         "models":models,"model_failures":failures,
         "scope":{"cohort":"finite 13-crust x 3-core x 6-smooth-method crossed design; not 234 independent EOS samples",
         "maxwell_label":"historical smooth bridge, not a sharp first-order Maxwell transition",
-        "stability":"initial connected rising-Pc branch to the first sustained M(Pc) maximum; unresolved endpoint is not Mmax",
+        "stability":"the initial rising-M(Pc) branch is only a turning-point proxy; every monotonic candidate segment remains radially unresolved until a radial pulsation spectrum/mode count is computed",
         "mode_identity":"ell=2 smooth Cowling W/V nodes: f=(0,0)/(0,0), p1=(1,1)/(0,0), inner/outer",
         "frequency_seed":"0.72-1.28 mean-density scaling about frozen 1.33-Msun row, then node gate",
         "background_solver":"frozen v5 compile_manifest cell_solve; center_order=2 for TOV and Cowling",
         "tov_r0_m":10.0,"tov_step_cap":0.05,"tov_r_limit_m":a.radius_limit_m,"center_order":2,
+        "candidate_segments":"kinematic M(Pc) monotonic pieces only; not radial-stability labels",
         "surface":"historical finite positive pressure cutoff; no zero-pressure extrapolation",
         "gravity":"Cowling frequencies, not full-GR complex frequencies or damping times"}}
     (a.output_dir/"manifest.json").write_text(json.dumps(manifest,indent=2,sort_keys=True)+"\n")

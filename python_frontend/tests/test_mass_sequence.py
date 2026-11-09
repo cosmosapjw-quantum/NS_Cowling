@@ -1,5 +1,6 @@
 import pytest
-from compose_cowling.mass_sequence import extract_stable_branch, find_mass_bracket, paired_sensitivity
+from compose_cowling.mass_sequence import (extract_candidate_mass_segments, extract_stable_branch,
+    find_mass_bracket, paired_sensitivity)
 
 
 def point(pc, mass, radius=12000.0, index=0):
@@ -70,3 +71,44 @@ def test_two_consecutive_declines_confirm_the_first_mass_maximum():
     assert branch.turning_point_found
     assert branch.maximum_mass_kg==pytest.approx(1.5)
     assert branch.status=="first_turning_point_resolved"
+
+
+
+def test_candidate_segments_split_rise_fall_rise_without_stability_claim():
+    data=[point(1,.5,index=0),point(2,1.0,index=1),point(4,.8,index=2),
+          point(8,.4,index=3),point(16,.6,index=4),point(32,1.0,index=5)]
+    segments=extract_candidate_mass_segments(data)
+    assert [s["direction"] for s in segments] == ["rising","falling","rising"]
+    assert [(s["start_scan_index"],s["end_scan_index"]) for s in segments] == [(0,1),(1,3),(3,5)]
+    assert segments[0]["end_turning_point_kind"]=="local_maximum_candidate"
+    assert segments[1]["end_turning_point_kind"]=="local_minimum_candidate"
+    assert segments[1]["start_turning_point_kind"]=="local_maximum_candidate"
+    assert all(s["radial_stability_status"]=="unresolved_requires_radial_mode_spectrum" for s in segments)
+
+
+def test_candidate_segments_keep_turning_plateau_as_shared_maximum():
+    data=[point(1,.5,index=0),point(2,1.0,index=1),point(4,1.0,index=2),point(8,.8,index=3)]
+    segments=extract_candidate_mass_segments(data)
+    assert [s["direction"] for s in segments]==["rising","falling"]
+    assert (segments[0]["start_scan_index"],segments[0]["end_scan_index"])==(0,2)
+    assert (segments[1]["start_scan_index"],segments[1]["end_scan_index"])==(2,3)
+    assert segments[0]["end_turning_point_kind"]=="local_maximum_candidate"
+
+
+def test_candidate_segments_never_bridge_failed_or_missing_scan_indices():
+    data=[point(1,.5,index=0),point(2,1.0,index=1),
+          {"scan_index":2,"pc_pa":4,"status":"failed"},
+          point(8,.4,index=3),point(16,.6,index=4)]
+    segments=extract_candidate_mass_segments(data)
+    assert [(s["start_scan_index"],s["end_scan_index"]) for s in segments]==[(0,1),(3,4)]
+    assert [s["sequence_block_id"] for s in segments]==[0,1]
+    assert all(s["radial_stability_status"]=="unresolved_requires_radial_mode_spectrum" for s in segments)
+
+
+def test_candidate_segments_label_a_monotone_scan_as_a_grid_segment_not_stable():
+    data=[point(1,.5,index=0),point(2,.7,index=1),point(4,.9,index=2)]
+    segments=extract_candidate_mass_segments(data)
+    assert len(segments)==1
+    assert segments[0]["direction"]=="rising"
+    assert segments[0]["end_turning_point_kind"]=="sequence_end_or_gap"
+    assert segments[0]["radial_stability_status"]=="unresolved_requires_radial_mode_spectrum"

@@ -81,3 +81,26 @@ The v5 release_summary.json records source_zip_sha256:
 b2c0dcaf6a5b07956cf8d33c39651d4ade32f44b4c49b33aa08fd84fb458185b
 
 This is a reference checksum embedded in the GitHub release metadata. The Dropbox source archive was not downloaded and independently hashed in this session. The new frontend verifies the 35 manifest paths, their ordering and existence, and derives a runtime build key from the current branch source bytes plus the compile manifest. Its provenance state is therefore MANIFEST_PATH_ORDER_MATCHED / ARCHIVE_BYTE_IDENTITY_UNVERIFIED. Do not describe it as byte-identical to the archived source until the archive is independently retrieved and compared.
+
+
+## New exact-head research findings (2026-11-09)
+
+### Forward sensitivity and mock verification
+- Code/theory commit d1d01e6b114d97cd496640037aafaf7ff7be126e on research/mass-dependent-cowling-v1.
+- Fixed-mass IFT identity and a continuous polynomial q=n/mu path gate are documented in FIXED_MASS_RESPONSE_THEORY_20261109.md and MASS_RESPONSE_MOCK_EXPERIMENT_20261109.md.
+- Smooth Cowling W,V forward tangent ODE, simple-root derivative, and synthetic DOP853-vs-Brent root refinement are in COWLING_FIRST_VARIATION_RESPONSE_20261109.md.
+- Actions 42610037961: mass-sequence helper tests 6 passed; fixed-mass response tests 6 passed; full pilot failed correctly at required 1.0 Msun complete six-method pairing. These mock results are not physical stars or mode predictions.
+
+### 24-point pilot topology
+Artifact 13668724637, SHA-256 fb62570658e44f9847d4a08f73174e36f14c091b6960b3b847206232a73b1534.
+- Six GPPVA_FSU2 × BBB_BHF2 methods reproduce frozen v5 TOV M/R at reference Pc to near machine precision.
+- First sampled M(Pc) peak: 0.743199–0.743409 Msun, radius about 1231–1235 km.
+- Subsequent excursion reaches about 0.08 Msun and radii of order 50 km in the coarse scan; the later high-density interval rises to about 1.9147–1.91485 Msun, radius about 9.32 km at the endpoint.
+- All six methods show the same qualitative pattern.
+- No 0.8–2.0 Msun target lies in the initial rising-proxy branch; zero Cowling spectra are admitted. This is not an Mmax result and not proof of radial stability or its recovery.
+
+### New candidate-segment implementation staged
+- extract_candidate_mass_segments divides valid contiguous TOV samples into rising/falling/flat candidate pieces with shared extrema and hard failed/missing-index barriers.
+- candidate_mass_segments.csv records candidate pieces, with radial stability explicitly unresolved.
+- The original first rising segment is retained only as a conservative mass-root proxy.
+- Pilot pressure grid increased from 24 to 96 samples. Exact-head CI and artifact review are pending.

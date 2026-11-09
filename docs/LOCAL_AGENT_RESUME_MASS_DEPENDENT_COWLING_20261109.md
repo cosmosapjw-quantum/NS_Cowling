@@ -228,3 +228,30 @@ A shared low-density continuation is possible because the first five knots coinc
 6. Keep the six smooth matching prescriptions separate from the sharp-Maxwell slow/rapid interface problem.
 
 The 384-point first rising proxy is still only about 0.7653 Msun; there are no admitted f/p1 roots (0/48) and no complete six-method 1.0 Msun paired cell. No f/p1 output should be started on a secondary segment until the nodeless radial eigenvalue and boundary closure are verified.
+
+
+## Continuation R12: exact-head run after the CLI receipt-schema repair
+
+Run `42618432567` was executed on code HEAD `2e4dc9982238bd937a92019dd46580b37923998f`; run URL: https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42618432567
+
+Verified results:
+- 10 mass-sequence tests PASS.
+- 6 fixed-mass/Cowling mock tests PASS.
+- 5 native-Hermite EOS + CLI receipt-schema tests PASS.
+- All six pilot models completed 384 central-pressure samples: 2304/2304 TOV integrations valid.
+- No model failures; all frozen-v5 M/R baseline reproductions pass.
+- Independent SciPy-vs-native refined TOV receipt PASS over five Pc values; maximum relative mass difference (2.1897181093210662e-7), radius (1.352408093342036e-7), both below (1e-6).
+- CLI summary now reports coarse comparison, tight SciPy/native comparison and native refinement fields from schema v2 correctly.
+- Final validator fails exactly at `required mass 1.0 lacks a complete six-method pair`. The 48 mass rows remain outside the initial rising-branch proxy. Do not widen the proxy, extrapolate or impute modes.
+
+Artifact: `13675450289`; ZIP SHA-256 `30922c2fafd5260d3c03d6852057530555cd997a64962d5b59d3f8af966af2ee`. Local downloaded ZIP digest was independently recomputed and matched. Manifest confirms 6 models, 2304 TOV rows, 26 candidate kinematic segments, 0/48 f/p1 roots and 0 complete six-method mass cells. All segments remain radially unresolved.
+
+The exact branch now has a subsequent docs-only surface-continuation note commit `11e2fb61d4b55b2019ce75718ff26f871bee3f8b`; it does not alter the code tested above. PR #3 is still open/draft/unmerged and its head was not touched.
+
+### Immediate next execution
+
+1. Implement the local-tangent (P=K\epsilon^{\gamma_s}) extension as a named reference only; use the shared first-five-knot crust across all six methods.
+2. Derive (n_b(\epsilon)) from (d\epsilon=(\epsilon+P)dn_b/n_b) and set (\mu_b=(\epsilon+P)/n_b). Verify (dP=n_b d\mu_b), endpoint C1 continuity, positivity, compressibility, and (0<c_s^2<1).
+3. Compare at least one alternative smooth continuation and fit-window/parameter variation. Quantify the effect on P=0 radius, total mass and the later radial eigenvalue; keep EOS continuation uncertainty separate from crust-core matching response.
+4. Solve the nodeless radial (omega_0^2) eigenproblem only after the P=0 background/boundary condition is verified. Label (Gamma_1=Gamma_{eq}) results as barotropic-equilibrium stability; frozen-composition claims require composition derivatives.
+5. Continue to block f/p1 target-mass spectra until mode identities are on a radially admissible interval.

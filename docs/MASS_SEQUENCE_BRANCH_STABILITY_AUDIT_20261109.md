@@ -286,3 +286,18 @@ It matches (P) and (dP/d\epsilon=c_s^2) at the cutoff and has (P,\epsilon\to0) t
 The continuation must be sensitivity-tested against alternative smooth continuations / fit windows, TOV radius and mass changes, and radial eigenvalues. The present data support a C1 tangent baseline but do not justify selecting a unique exterior EOS. First-five-knot identity across the six methods indicates that the outer continuation itself should not create a spurious matching-method effect if shared identically.
 
 The first radial-stability implementation should use (\Gamma_1=\Gamma_{\rm eq}) only as an explicitly labelled *barotropic-equilibrium* closure. Frozen-composition (\Gamma_1=(\epsilon+P)(\partial P/\partial\epsilon)_{s,Y_i}/P) requires composition derivatives that are not present in this projected table.
+
+
+### Exact-head run after CLI repair: Actions 42618432567
+
+The source-code run used HEAD `2e4dc9982238bd937a92019dd46580b37923998f`; the branch then received a documentation-only surface-continuation commit `11e2fb61d4b55b2019ce75718ff26f871bee3f8b`, which does not alter the tested code.
+
+Execution and verification:
+- Six models completed; all 2304/2304 native TOV scan points were valid. There were no model failures and no frozen-v5 baseline M/R reproduction failures.
+- The branch/mass-sequence suite passed (10 tests); fixed-mass/Cowling mock suite passed (6 tests); independent Hermite-EOS/CLI suite passed (5 tests). The new v2 receipt-schema regression is included in the latter.
+- The independent same-EOS SciPy DOP853 versus refined native Fortran check completed with `PASS_REFINED_SAME_EOS_INDEPENDENT_TOV` over five central pressures. The maximum tight relative differences were mass `2.1897181093210662e-7), radius `1.352408093342036e-7), below the unchanged (10^{-6}) criterion. Maximum native refinement differences were (1.299910193106295e-10) (mass) and (7.057766721929021e-11) (radius). The CLI now prints all three nested v2 comparison groups without KeyError.
+- The physical validator then failed at the required 1.0 Msun six-method pair: `required mass 1.0 lacks a complete six-method pair`. All 48 requested mass rows are outside the initial rising-branch proxy; complete paired mass cells = 0. This is the intended science hold, not a reason to broaden the branch proxy or impute modes.
+
+The artifact is `13675450289`, SHA-256 `30922c2fafd5260d3c03d6852057530555cd997a64962d5b59d3f8af966af2ee`. It was downloaded locally and the ZIP digest independently recomputed to the exact same value. Its manifest records 6/6 models, 2304/2304 TOV integrations, 26 kinematic candidate segments (the smooth `maxwell` compatibility bridge has 6; the other five methods have 4 each), 0/48 spectra, and zero complete paired cells. Every branch row remains `unresolved_requires_radial_mode_spectrum`.
+
+The run conclusion is therefore `failure` at the scientific 1.0 Msun coverage validator. Numerical TOV structural acceptance and code regression pass; the mass-dependent Cowling science result is not admitted. PR #3 remains open/draft/unmerged. The v5 source archive byte identity remains `NOT_VERIFIED_IN_THIS_SESSION`.

@@ -154,3 +154,17 @@ Run 42617251360 completed 2304/2304 TOV integrations and all frozen-v5 anchor ch
 | MD-27 | Mass-dependent Cowling modes on classified stable segments | BLOCKED_ON_MD-26 | Require a converged radial-stability label and validated f/p1 root identity before target-mass scans. |
 
 The surface analysis used the exact six projected EOS CSVs. The first five ((n_b,P,\epsilon,\mu_b)) knots match exactly in all six methods; this permits one shared continuation baseline. However, the local effective polytropic slope changes across those knots, and least-squares exponents depend materially on the fitting window. Hence a broad-window polytrope is not adopted. The C1 tangent polytrope is a starting diagnostic and must be thermodynamically completed and sensitivity-tested before it supplies a radial surface condition.
+
+
+## Exact-head outcome after CLI repair (2026-11-09)
+
+| ID | Node | Status | Evidence |
+|---|---|---|---|
+| MD-21 | SciPy TOV receipt-schema CLI repair | PASS_CODE_AND_REGRESSION | Actions 42618432567: 5/5 independent-Hermite/CLI tests pass; CLI prints all v2 receipt groups with no KeyError. |
+| MD-22 | Six-method mass-pair validator | SCIENCE_HOLD | Validator intentionally fails: required 1.0 Msun mass has no complete six-method pair; 0/48 roots and 0 complete cells. |
+| MD-24 | Shared low-density continuation diagnostic | DIAGNOSTIC_COMPLETE / MODEL_NOT_SELECTED | First five raw ((n_b,P,\epsilon,\mu_b)) knots identical across all six methods; C1 tangent-polytrope continuation is candidate only. |
+| MD-25 | Thermodynamic extension to (P=0) | NEXT_EXECUTION_GATE | Enforce first law, (dP=n_b d\mu_b), causality, positivity, and continuation sensitivity before radial surface BC. |
+| MD-26 | Direct radial fundamental eigenvalue | BLOCKED_ON_MD-25 | No radial (omega_0^2) computation admitted yet. |
+| MD-27 | f/p1 on classified stable segments | BLOCKED_ON_MD-26 | No mass-dependent Cowling roots until radial eigenvalue/node and surface-closure gates pass. |
+
+Actions run 42618432567 was executed on code HEAD `2e4dc9982238bd937a92019dd46580b37923998f`. All code and numerical TOV steps passed, including the receipt-schema regression and refined SciPy/native structural comparison. The workflow ended in failure only at the physical 1.0 Msun pairing validator: the first rising-branch proxy ends at approximately 0.7653 Msun, so all 48 requested mass rows are outside it. Artifact 13675450289 has verified SHA-256 `30922c2fafd5260d3c03d6852057530555cd997a64962d5b59d3f8af966af2ee`. A subsequent docs-only commit records the result and the surface-continuation diagnostic; the code tested by the run is unchanged.

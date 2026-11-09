@@ -53,6 +53,7 @@ def fit_monotone_q(
     p_source: Sequence[float],
     *,
     lambda_density: float,
+    weight_coordinate: str = "mu",
     max_iterations: int = 50000,
     tolerance: float = 1.0e-12,
 ) -> dict[str, Any]:
@@ -90,9 +91,18 @@ def fit_monotone_q(
     if not math.isfinite(q_scale) or q_scale <= 0.0:
         raise ValueError("source q scale is not positive")
 
+    if weight_coordinate == "mu":
+        quadrature_coordinate = mu_v
+    elif weight_coordinate == "log_n":
+        quadrature_coordinate = np.log(n_v)
+    else:
+        raise ValueError("weight_coordinate must be 'mu' or 'log_n'")
+    quadrature_steps = np.diff(quadrature_coordinate)
+    if np.any(quadrature_steps <= 0.0):
+        raise ValueError("objective quadrature coordinate must be strictly increasing")
     weights = np.empty(len(mu_v), dtype=float)
-    weights[0], weights[-1] = 0.5 * h[0], 0.5 * h[-1]
-    weights[1:-1] = 0.5 * (h[:-1] + h[1:])
+    weights[0], weights[-1] = 0.5 * quadrature_steps[0], 0.5 * quadrature_steps[-1]
+    weights[1:-1] = 0.5 * (quadrature_steps[:-1] + quadrature_steps[1:])
     weights /= np.sum(weights)
 
     operator = pressure_operator(mu_v)
@@ -182,6 +192,7 @@ def fit_monotone_q(
 
     return {
         "lambda_density": lam,
+        "weight_coordinate": weight_coordinate,
         "objective_before_source_q": lam * source_jn + (1.0 - lam) * source_jp,
         "objective_after_fit": lam * jn + (1.0 - lam) * jp,
         "density_objective_before": source_jn,

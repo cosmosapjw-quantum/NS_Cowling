@@ -8,7 +8,7 @@ program maxwell_checks
     use ns_maxwell_cowling, only: maxwell_cowling_shot_t,shoot_maxwell_cowling
     use ns_cowling, only: cowling_options_t
     use ns_mode_spectrum, only: mode_options_t,mode_spectrum_t
-    use ns_maxwell_mode_spectrum, only: maxwell_mode_spectrum_t
+    use ns_maxwell_mode_spectrum, only: maxwell_mode_spectrum_t,maxwell_node_count_t,count_maxwell_cowling_nodes
     use ns_production_solvers, only: solve_tov_star,solve_cowling_spectrum
     use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     implicit none
@@ -26,9 +26,34 @@ program maxwell_checks
     type(mode_options_t) :: mode_options
     type(mode_spectrum_t) :: smooth_spectrum
     type(maxwell_mode_spectrum_t) :: slow_spectrum,rapid_spectrum
+    type(maxwell_cowling_shot_t) :: node_shot
+    type(maxwell_node_count_t) :: node_counts
     type(status_t) :: status
 
     checks=0
+
+    ! TDD: phase-aware sampled node counts must not register a sign jump
+    ! between the two one-sided interface values as an interior node.
+    allocate(node_shot%r_m(7),node_shot%w_m3(7))
+    node_shot%r_m=[1._wp,2._wp,3._wp,4._wp,5._wp,6._wp,7._wp]
+    node_shot%w_m3=[1._wp,-1._wp,1._wp,1._wp,-1._wp,1._wp,-1._wp]
+    call count_maxwell_cowling_nodes(node_shot,4._wp,node_counts,status)
+    call require(is_ok(status).and.node_counts%valid,'phase-aware node diagnostic accepts a valid split profile')
+    call require(node_counts%nodes_inner==2,'inner-segment node count excludes interface jump')
+    call require(node_counts%nodes_outer==2,'outer-segment node count is independent')
+    call require(node_counts%nodes_total==4,'total sampled node count is sum of phase segments')
+
+    node_shot%w_m3=[1._wp,1._wp,1._wp,1._wp,-1._wp,-1._wp,-1._wp]
+    call count_maxwell_cowling_nodes(node_shot,4._wp,node_counts,status)
+    call require(is_ok(status).and.node_counts%valid,'node diagnostic accepts a pure interface sign jump')
+    call require(node_counts%nodes_total==0,'interface sign jump is not counted as an interior node')
+
+    node_shot%w_m3=-1e-24_wp*[1._wp,-1._wp,1._wp,1._wp,-1._wp,1._wp,-1._wp]
+    call count_maxwell_cowling_nodes(node_shot,4._wp,node_counts,status)
+    call require(is_ok(status).and.node_counts%valid,'node diagnostic is invariant under amplitude scaling and sign')
+    call require(node_counts%nodes_inner==2.and.node_counts%nodes_outer==2, &
+        'phase node counts are invariant under amplitude normalization')
+
     pt=pt_mev_fm3*mev_fm3_to_j_m3
     pc=pc_mev_fm3*mev_fm3_to_j_m3
     pcut=pcut_mev_fm3*mev_fm3_to_j_m3

@@ -32,7 +32,7 @@ Mechanism and inference extensions branch from the verified mass-dependent spect
 |---|---|---|---|
 | MD-00 | Freeze 234-row cohort, projected EOS tables, release summary and checksums | PASS_READ_ONLY | 13 crusts, 3 core families, 6 smooth methods. All old spectra at 1.3300106 solar masses. |
 | MD-01 | Stable-branch extractor and paired estimands | IMPLEMENTED_CI_PENDING | Tests cover first turning point, failed-sample barriers, adjacent target brackets and no-imputation six-method pairing. |
-| MD-02 | Explicit central-pressure bracket in native target-mass solver wrapper | IMPLEMENTED_CI_PENDING | Optional pc_bracket_pa; former default 0.65–1.45 bracket preserved for existing callers. |
+| MD-02 | Exact-backend TOV-only sequence and explicit numerical limits | IMPLEMENTED_CI_PENDING | `solve_cowling_tov_star` calls `cell_solve task=star` with v5 `r0=10 m`, `rtol=1e-9`, `step_cap=0.05`; configurable radius limit defaults to historical 1e6 m and is set to 1e8 m for the exploratory scan. Explicit Pc brackets remain optional and preserve the old default. |
 | MD-03 | Six-model high-tail pilot: BBB_BHF2 × GPPVA_FSU2, all six methods and eight masses | WAITING_FOR_PUSH_ACTIONS | Pilot validator requires frozen baseline TOV reproduction and complete six-method 1.0- and 1.33-solar-mass pairs; partial valid pairs are rejected. |
 | MD-04 | Full 234-EOS × eight-mass execution | NOT_RUN | Manual workflow dispatch with cohort=full; 48 log-pressure TOV samples per EOS. |
 | MD-05 | Mass-response and coverage analysis across 39 fixed pairs | NOT_RUN | Complete-pair denominators, paired ranges, per-core/per-crust maps, method sign reversals and peak mass locations. |
@@ -66,4 +66,4 @@ Only complete six-method cells enter paired summaries. No imputation. Report com
 
 ## Immediate next action
 
-Inspect the exact-head push Actions run for the six-model pilot. If unit tests, baseline reproduction, mass closure, node identity and the complete 1.33-solar-mass paired cell pass, dispatch the same workflow with cohort=full. Then inspect artifact provenance and perform coverage and paired mass-response analysis before writing a publication claim.
+Re-run the six-model pilot after the same-cell TOV-only backend, configurable radius limit and validator correction are pushed. Inspect baseline M/R parity and all sequence samples first. Do not dispatch the full cohort unless the pilot has valid 1.0- and 1.33-solar-mass paired cells and the M/R, mass-residual, shooting-residual and node gates pass. The first run has zero valid spectra and must not be cited as a scientific result.

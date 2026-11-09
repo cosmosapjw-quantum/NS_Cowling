@@ -20,8 +20,7 @@ def main():
     assert all(r["baseline_reproduction_status"]=="pass" for r in models)
     for target in (a.required_low_mass,a.required_mass):
         required=[r for r in paired if abs(float(r["mass_msun"])-target)<1e-9]
-        assert required and all(r["pair_complete"]=="true" for r in required), \\
-            f"required mass {target} lacks a complete six-method pair"
+        assert required and all(r["pair_complete"]=="true" for r in required), f"required mass {target} lacks a complete six-method pair"
     partial=[r for r in paired if r["pair_complete"]!="true" and int(r["n_valid_methods"])>0]
     assert not partial, f"partially valid six-method cells must be investigated, found {len(partial)}"
     valid=[r for r in spectra if r["valid"]=="true"]

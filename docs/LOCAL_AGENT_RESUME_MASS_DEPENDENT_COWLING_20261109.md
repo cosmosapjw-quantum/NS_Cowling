@@ -33,11 +33,11 @@ The method token maxwell means a smooth near-pressure-plateau bridge with no lat
 ## First required checks
 
 1. Fetch current branch HEAD and the workflow run tied to that SHA.
-2. Run PYTHONPATH=python_frontend python -m pytest -q python_frontend/tests/test_mass_sequence.py.
-3. Inspect the pilot artifact and manifest. Confirm the frozen 234-row input CSV hash and every projected EOS SHA-256.
-4. Inspect each model's baseline reproduction status, branch status, target mass coverage, shooting residuals, W/V node counts and mass residuals.
-5. Push pilot group is BBB_BHF2 × GPPVA_FSU2, six methods and eight requested masses. Validator requires a complete six-method 1.33-solar-mass paired cell and TOV M/R baseline reproduction.
-6. If pilot passes, manually dispatch workflow with cohort=full. Full run computes all 234 rows with 48 log-Pc TOV samples per EOS. It may run up to six hours; do not claim completion until run and artifact are inspected.
+2. Run PYTHONPATH=python_frontend python -m pytest -q python_frontend/tests/test_mass_sequence.py and compile the native `cell_solve` executable.
+3. Inspect the pilot artifact and manifest. Confirm the frozen 234-row input CSV hash and every projected EOS SHA-256. The failed first attempt is Actions run 42598463512 / artifact 13664393404; it produced zero valid spectra and is a failed integration test, not scientific evidence.
+4. Inspect each model's baseline reproduction status, branch status, target mass coverage, shooting residuals, W/V node counts and mass residuals. The first run's M/R mismatch was traced to using `case_driver real_table_star` (r0=1 m, rtol=1e-8) against v5 `cell_solve` metadata (r0=10 m, rtol=1e-9, step_cap=0.05). The new runner must use `solve_cowling_tov_star` / `cell_solve task=star` and identical v5 settings for N1.
+5. Push pilot group is BBB_BHF2 × GPPVA_FSU2, six methods and eight requested masses. `cell_solve` has a configurable `r_limit_m`; its old 1e6-m default is preserved, while the exploratory scan uses 1e8 m. Confirm the radius-limit setting is carried through mass-root and mode matching calls. Validator requires a complete six-method 1.33-solar-mass paired cell and TOV M/R baseline reproduction.
+6. Do not dispatch full cohort until a new pilot passes. If pilot passes, manually dispatch workflow with cohort=full. Full run computes all 234 rows with 48 log-Pc TOV samples per EOS. It may run up to six hours; do not claim completion until run and artifact are inspected.
 
 ## Required analysis after full execution
 

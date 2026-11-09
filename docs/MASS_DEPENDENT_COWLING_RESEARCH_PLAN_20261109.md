@@ -68,7 +68,7 @@ The frozen f and p1 frequencies seed search windows using only the mean-density 
 \]
 The predeclared window is 0.72–1.28 times the scaled reference frequency. This is a root-bracketing device, not a fitted physical prediction.
 
-The Python wrapper accepts optional explicit pc_bracket_pa=(Pc_lo,Pc_hi). When omitted, its former 0.65–1.45 multiplicative bracket remains unchanged. When supplied, the bracket is validated and passed into native cell_solve. This constrains the target-mass search to the sampled rising branch.
+The `cell_solve` EOS-cell integrator now accepts a configurable `r_limit_m` in its namelist; its historical default remains 1e6 m. For this mass scan, the explicit exploratory ceiling is 1e8 m and is recorded in every model manifest. The wrapper adds `solve_cowling_tov_star(..., task=star)` so sequence scans use the same pressure-cell integration and central-start contract as the mode calculation. The generic `case_driver real_table_star` API is retained separately. The Python wrapper accepts optional explicit pc_bracket_pa=(Pc_lo,Pc_hi). When omitted, its former 0.65–1.45 multiplicative bracket remains unchanged. When supplied, the bracket is validated and passed into native cell_solve. This constrains the target-mass search to the sampled rising branch.
 
 A spectrum row is admitted only if:
 - the target-mass residual closes;
@@ -101,7 +101,7 @@ The 39 fixed core/crust pairs are the physical pairing units. Do not treat the 2
 
 ## 7. Numerical validation gates
 
-N1: frozen baseline reproduction. Recompute TOV M,R at every reference central pressure. Current pilot acceptance requires relative differences no larger than 2e-5.
+N1: frozen baseline reproduction. Recompute TOV M,R at every reference central pressure using the same `cell_solve task=star` EOS-cell integrator as the spectrum calculation, with the recorded v5 settings `r0_m=10 m`, `rtol=1e-9`, `step_cap=0.05` and the identical first-row finite surface-pressure cutoff. The separate `case_driver real_table_star` path is not an acceptable direct reproduction comparator because its ODE and central-start contracts differ. Current pilot acceptance requires relative M,R differences no larger than 2e-5.
 
 N2: target-mass solve. Require relative mass residual no larger than five times the configured mass_rtol; default mass_rtol is 1e-10.
 
@@ -140,7 +140,7 @@ PRD: requires a new relativistic perturbation/sensitivity derivation or systemat
 
 ## 10. Implementation status
 
-Stable-branch extraction, adjacent-Pc bracketing, six-method complete-pair estimands, the explicit bracket wrapper, the all-cohort runner, validator and pilot/full workflow are staged on the new branch. Boolean CSV serialization is normalized to lowercase for the strict validator. No new mass-dependent spectrum or Mmax result is claimed until exact-head CI has completed and its artifact has been inspected.
+Stable-branch extraction, adjacent-Pc bracketing, six-method complete-pair estimands, explicit Pc and radius-limit controls, the shared cell_solve TOV-only backend, the all-cohort runner and the pilot/full workflow are staged on the new branch. The first integration run (Actions 42598463512) exposed a non-comparable baseline: the runner used `case_driver real_table_star` (`r0=1 m`, `rtol=1e-8`) while the v5 reference metadata records `cell_solve` (`r0=10 m`, `rtol=1e-9`, `step_cap=0.05`). The same run also reached the old hard-coded 1e6-m direct-cell radius ceiling. The wrapper now uses the same `cell_solve task=star` backend and exposes the ceiling without changing its default. The validator syntax defect is corrected. These changes await a new exact-head CI run; the failed run yielded zero valid mass-dependent spectra and no Mmax result.
 
 References:
 1. Canullán-Pascual et al. (2025), Astronomische Nachrichten, DOI 10.1002/asna.20240150, arXiv:2502.02373.

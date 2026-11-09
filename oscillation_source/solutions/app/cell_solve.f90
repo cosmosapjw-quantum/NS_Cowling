@@ -20,7 +20,7 @@ program cell_solve
  character(len=2048)::input_path,output_prefix,table_path
  character(len=16)::task='spectrum',method='dopri',shooting='matched'
  integer::match_index=72,split_index=69,unit,ios,j,nmode=2
- real(wp)::alpha=0.1_wp,pc_pa=1.5e34_wp,p_cut_pa=1e20_wp,r0_m=1._wp
+ real(wp)::alpha=0.1_wp,pc_pa=1.5e34_wp,p_cut_pa=1e20_wp,r0_m=1._wp,r_limit_m=1e6_wp
  real(wp)::target_mass_kg=2.644606257493485e30_wp,pc_lo_pa=1.2e34_wp,pc_hi_pa=1.8e34_wp
  real(wp)::rtol=1e-10_wp,mode_rtol=1e-10_wp,step_cap=0.05_wp,mass_rtol=1e-12_wp
  real(wp)::frequency_lo(2)=[2000._wp,6500._wp],frequency_hi(2)=[3000._wp,8000._wp]
@@ -31,7 +31,7 @@ program cell_solve
  character(len=2048)::path
  namelist /precision/ table_path,task,method,shooting,match_index,split_index,alpha,pc_pa,p_cut_pa,r0_m, &
  target_mass_kg,pc_lo_pa,pc_hi_pa,rtol,mode_rtol,step_cap,mass_rtol,frequency_lo,frequency_hi, &
- frequency_hz,root_atol_hz,residual_tol,nmode
+ frequency_hz,root_atol_hz,residual_tol,nmode,r_limit_m
  if(command_argument_count()/=2)then
   print *, 'Usage: cell_solve input.nml output_prefix';stop 2
  endif
@@ -41,9 +41,9 @@ program cell_solve
  if(ios/=0)stop 2
  read(unit,nml=precision,iostat=ios);close(unit)
  if(ios/=0)then;print *,'invalid precision namelist';stop 2;endif
- if(.not.all(ieee_is_finite([alpha,pc_pa,p_cut_pa,r0_m,target_mass_kg,pc_lo_pa,pc_hi_pa, &
+ if(.not.all(ieee_is_finite([alpha,pc_pa,p_cut_pa,r0_m,r_limit_m,target_mass_kg,pc_lo_pa,pc_hi_pa, &
        rtol,mode_rtol,step_cap,mass_rtol,frequency_lo,frequency_hi,frequency_hz,root_atol_hz,residual_tol])))stop 2
- if(target_mass_kg<0._wp.or.root_atol_hz<=0._wp.or.residual_tol<=0._wp)stop 2
+ if(target_mass_kg<0._wp.or.root_atol_hz<=0._wp.or.residual_tol<=0._wp.or.r_limit_m<=r0_m)stop 2
  call load_normalized_table(trim(table_path),raw,st);call must(st)
  if(alpha==0._wp)then
   ! Zero-amplitude baseline is a byte-for-byte table passthrough. Do not
@@ -71,7 +71,7 @@ program cell_solve
   call bisect(mass_residual,lo,hi,opts,root);call must(root%status)
   pc_pa=exp(root%root)
  endif
- call integrate_cells(model,pc_pa,p_cut_pa,r0_m,rtol,step_cap,method,0._wp,0._wp,star)
+ call integrate_cells(model,pc_pa,p_cut_pa,r0_m,rtol,step_cap,method,0._wp,0._wp,star,r_limit_m=r_limit_m)
  call must(star%status)
  if(target_mass_kg>0._wp)then
   if(abs(star%mass_kg/target_mass_kg-1._wp)>mass_rtol)then
@@ -79,7 +79,7 @@ program cell_solve
   endif
  endif
  call integrate_cells(model,pc_pa,p_cut_pa,r0_m,rtol,step_cap,method,0._wp,star%nu_surface, &
-      checkstar,trim(output_prefix)//'_background.csv')
+      checkstar,trim(output_prefix)//'_background.csv',r_limit_m=r_limit_m)
  call must(checkstar%status)
  match_r=0._wp;match_m=0._wp;boundary_res=0._wp;f=0._wp;res=0._wp;mshot=0._wp;rshot=0._wp;width=0._wp;steps=0;mcells=0
  if(task=='spectrum')then
@@ -90,11 +90,11 @@ program cell_solve
    write(path,'(a,a,i0)')trim(output_prefix),'_mode',j
    if(shooting=='matched')then
     call match_cells(model,pc_pa,p_cut_pa,r0_m,mode_rtol,step_cap,method,f(j),star,match_index, &
-         res(j),match_r(j),match_m(j),st,trim(path),steps(j),boundary_res(j))
+         res(j),match_r(j),match_m(j),st,trim(path),steps(j),boundary_res(j),r_limit_m)
     call must(st)
    else if(shooting=='outward')then
    path=trim(path)//'.csv'
-   call integrate_cells(model,pc_pa,p_cut_pa,r0_m,mode_rtol,step_cap,method,f(j),star%nu_surface,shot,trim(path))
+   call integrate_cells(model,pc_pa,p_cut_pa,r0_m,mode_rtol,step_cap,method,f(j),star%nu_surface,shot,trim(path),r_limit_m=r_limit_m)
    call must(shot%status)
    res(j)=shot%residual;mshot(j)=shot%mass_kg;rshot(j)=shot%radius_m;steps(j)=shot%steps;mcells(j)=shot%cells
    else
@@ -108,11 +108,11 @@ program cell_solve
  else if(task=='shot')then
   if(shooting=='matched')then
    call match_cells(model,pc_pa,p_cut_pa,r0_m,mode_rtol,step_cap,method,frequency_hz,star,match_index, &
-      res(1),match_r(1),match_m(1),st,trim(output_prefix)//'_shot',steps(1),boundary_res(1))
+      res(1),match_r(1),match_m(1),st,trim(output_prefix)//'_shot',steps(1),boundary_res(1),r_limit_m)
    call must(st);f(1)=frequency_hz
   else
   call integrate_cells(model,pc_pa,p_cut_pa,r0_m,mode_rtol,step_cap,method,frequency_hz,star%nu_surface, &
-    shot,trim(output_prefix)//'_shot.csv')
+    shot,trim(output_prefix)//'_shot.csv',r_limit_m=r_limit_m)
   call must(shot%status);f(1)=frequency_hz;res(1)=shot%residual;mshot(1)=shot%mass_kg
   endif
  else if(task/='star')then
@@ -139,7 +139,7 @@ program cell_solve
  write(unit,'(a,i0,a)')'"admitted_eos_intervals":',audit%admitted_intervals,','
  call scalar('alpha',alpha);call scalar('rtol',rtol);call scalar('mode_rtol',mode_rtol)
  call scalar('step_cap',step_cap);call scalar('pc_pa',pc_pa);call scalar('p_cut_pa',p_cut_pa)
- call scalar('r0_m',r0_m);call scalar('target_mass_kg',target_mass_kg)
+ call scalar('r0_m',r0_m);call scalar('r_limit_m',r_limit_m);call scalar('target_mass_kg',target_mass_kg)
  call scalar('mass_kg',star%mass_kg);call scalar('radius_m',star%radius_m)
  call scalar('nu_surface',star%nu_surface);call scalar('surface_pressure_rel_error',star%surface_pressure_rel_error)
  call scalar('f_hz',f(1));call scalar('p1_hz',f(2));call scalar('f_residual',res(1));call scalar('p1_residual',res(2))
@@ -181,7 +181,7 @@ contains
   real(wp),intent(out)::value
   type(status_t),intent(out)::status
   type(cell_run_t)::run
-  call integrate_cells(model,exp(x),p_cut_pa,r0_m,rtol,step_cap,method,0._wp,0._wp,run)
+  call integrate_cells(model,exp(x),p_cut_pa,r0_m,rtol,step_cap,method,0._wp,0._wp,run,r_limit_m=r_limit_m)
   status=run%status;value=0._wp
   if(is_ok(status))value=run%mass_kg/target_mass_kg-1._wp
  end subroutine
@@ -192,9 +192,9 @@ contains
   type(cell_run_t)::run
   if(shooting=='matched')then
    call match_cells(model,pc_pa,p_cut_pa,r0_m,mode_rtol,step_cap,method,freq,star,match_index, &
-        value,dummy_r,dummy_m,status)
+        value,dummy_r,dummy_m,status,r_limit_m=r_limit_m)
   else
-   call integrate_cells(model,pc_pa,p_cut_pa,r0_m,mode_rtol,step_cap,method,freq,star%nu_surface,run)
+   call integrate_cells(model,pc_pa,p_cut_pa,r0_m,mode_rtol,step_cap,method,freq,star%nu_surface,run,r_limit_m=r_limit_m)
    status=run%status;value=0._wp
    if(is_ok(status))value=run%residual
   endif

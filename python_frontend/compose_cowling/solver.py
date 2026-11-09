@@ -116,6 +116,48 @@ def solve_tov_star(eos:EOSData | str | Path,pc_pa:float,*,p_cut_pa:float|None=No
         result['backend']='Fortran';return result
 
 
+def solve_cowling_tov_star(eos:EOSData | str | Path,pc_pa:float,*,p_cut_pa:float|None=None,
+                           r0_m:float=10.0,r_limit_m:float=1e8,rtol:float=1e-9,
+                           step_cap:float=0.05)->dict:
+    """TOV-only background using the exact cell_solve backend of Cowling spectra.
+
+    This is the comparison-preserving backend for the historical spectrum cohort.
+    The general real_table_star case_driver API remains available independently.
+    """
+    _,cell_solve=_compile_solver()
+    if not np.all(np.isfinite([pc_pa,r0_m,r_limit_m,rtol,step_cap])) or pc_pa<=0:
+        raise ValueError("Pc, radii, tolerances and step cap must be finite; Pc must be positive")
+    if r0_m<=0 or r_limit_m<=r0_m or rtol<=0 or step_cap<=0:
+        raise ValueError("require 0 < r0_m < r_limit_m and positive tolerances")
+    with tempfile.TemporaryDirectory(prefix='compose-cell-tov-') as td0:
+        td=Path(td0);table=_normalised_file(eos,td)
+        if p_cut_pa is None:p_cut_pa=_surface_pressure(eos)
+        if not np.isfinite(p_cut_pa) or p_cut_pa<=0 or pc_pa<=p_cut_pa:
+            raise ValueError("require finite 0 < surface cutoff < central pressure")
+        prefix=td/'background'
+        nml=td/'background.nml'
+        nml.write_text(
+          "&precision\n"
+          f" table_path='{table}'\n task='star'\n method='dopri'\n shooting='matched'\n"
+          f" match_index=72\n split_index=69\n alpha=0.0\n pc_pa={pc_pa:.17e}\n"
+          f" p_cut_pa={p_cut_pa:.17e}\n r0_m={r0_m:.17e}\n r_limit_m={r_limit_m:.17e}\n"
+          " target_mass_kg=0.0\n pc_lo_pa=1.0e30\n pc_hi_pa=2.0e30\n"
+          f" rtol={rtol:.17e}\n mode_rtol={rtol:.17e}\n step_cap={step_cap:.17e}\n"
+          " mass_rtol=1.0e-10\n frequency_lo=2000.0,6500.0\n"
+          " frequency_hi=3000.0,8000.0\n frequency_hz=2500.0\n"
+          " root_atol_hz=1.0e-8\n residual_tol=1.0e-6\n nmode=2\n/\n"
+        )
+        run=subprocess.run([str(cell_solve),str(nml),str(prefix)],capture_output=True,text=True)
+        result_path=prefix.with_suffix('.json')
+        if not result_path.is_file():
+            raise NativeExecutionError(f"cell_solve TOV-only run produced no JSON: {run.stdout}\n{run.stderr}")
+        result=json.loads(result_path.read_text())
+        if run.returncode or result.get('status')!='ok':
+            raise NativeExecutionError(f"cell_solve TOV-only result invalid: {result}; {run.stderr}")
+        result['backend']='Fortran cell_solve task=star'
+        return result
+
+
 def solve_tov_sequence(eos:EOSData | str | Path,central_pressures_pa,**kwargs)->list[dict]:
     # Python orchestrates the scan; each stellar integration and EOS query is Fortran.
     return [solve_tov_star(eos,float(pc),**kwargs) for pc in central_pressures_pa]
@@ -136,7 +178,8 @@ def solve_cowling_spectrum(eos:EOSData | str | Path,pc_pa:float,frequency_lo_hz,
                            match_index:int=72,rtol:float=1e-9,mode_rtol:float=1e-9,
                            step_cap:float=0.05,mass_rtol:float=1e-10,
                            residual_tol:float=1e-6,
-                           pc_bracket_pa:tuple[float,float]|None=None)->dict:
+                           pc_bracket_pa:tuple[float,float]|None=None,
+                           r_limit_m:float=1e6)->dict:
     _,cell_solve=_compile_solver()
     with tempfile.TemporaryDirectory(prefix='compose-cowling-') as td0:
         td=Path(td0);table=_normalised_file(eos,td)
@@ -157,7 +200,7 @@ def solve_cowling_spectrum(eos:EOSData | str | Path,pc_pa:float,frequency_lo_hz,
           "&precision\n"
           f" table_path='{table}'\n task='spectrum'\n method='dopri'\n shooting='matched'\n"
           f" match_index={match_index}\n split_index=69\n alpha=0.0\n pc_pa={pc_pa:.17e}\n"
-          f" p_cut_pa={p_cut_pa:.17e}\n r0_m=10.0\n target_mass_kg={target_mass_kg:.17e}\n"
+          f" p_cut_pa={p_cut_pa:.17e}\n r0_m=10.0\n r_limit_m={r_limit_m:.17e}\n target_mass_kg={target_mass_kg:.17e}\n"
           f" pc_lo_pa={pc_lo:.17e}\n pc_hi_pa={pc_hi:.17e}\n"
           f" rtol={rtol:.17e}\n mode_rtol={mode_rtol:.17e}\n step_cap={step_cap:.17e}\n"
           f" mass_rtol={mass_rtol:.17e}\n frequency_lo={lo[0]:.17e},{lo[1]:.17e}\n"

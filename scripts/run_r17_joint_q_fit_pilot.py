@@ -29,7 +29,7 @@ SELECTED = (
     "GPPVA_TM1e__BBB_BHF2__maxwell",
     "SPG_M1__BBB_BHF2__css",
 )
-LAMBDAS = (1.0, 0.75, 0.5, 0.25, 0.1)
+LAMBDAS = (1.0, 0.1, 0.01, 0.001, 0.0001)
 
 
 def sha256(path: Path) -> str:

@@ -6,6 +6,7 @@ on:
     paths:
       - ".github/workflows/r16-projection-audit.yml"
       - "scripts/r16_projection_audit.py"
+      - "scripts/audit_r16_projection_cohort.py"
       - "python_frontend/tests/test_r16_projection_reconstruction.py"
       - "oscillation_release_v1/data/spectrum_summary_234.csv"
       - "oscillation_release_v1/data/eos_original_normalized/**"
@@ -31,7 +32,7 @@ jobs:
         run: python -m pytest -q python_frontend/tests/test_r16_projection_reconstruction.py
       - name: Audit all 234 normalized-to-projected EOS pairs
         run: |
-          python scripts/r16_projection_audit.py \
+          python scripts/audit_r16_projection_cohort.py \
             --output-dir dist/r16-full-cohort-projection-audit
       - name: Upload R16 source-to-projection evidence
         if: always()

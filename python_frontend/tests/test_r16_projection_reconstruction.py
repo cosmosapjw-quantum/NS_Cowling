@@ -63,3 +63,17 @@ def test_sparse_source_cell_can_fail_raw_hermite_convexity_while_projected_cell_
     assert projected["causal"] is True
     assert projected["min_d2p"] > 0.0
     assert projected["min_causal_margin"] >= 0.0
+
+
+def test_projection_exposes_cell_level_raw_and_projected_admissibility():
+    out = reconstruct_projection(
+        mu=[2.0, 3.0, 4.0],
+        n_source=[1.0, 2.25, 4.0],
+        p_source=[1.0, 1.75, 3.0],
+        eps_source=[0.1, 0.5, 1.0],
+    )
+
+    assert len(out["source_cell_diagnostics"]) == 2
+    assert len(out["projected_cell_diagnostics"]) == 2
+    assert all(cell["stable"] and cell["causal"] for cell in out["projected_cell_diagnostics"])
+    assert all(cell["min_d2p"] > 0.0 for cell in out["projected_cell_diagnostics"])

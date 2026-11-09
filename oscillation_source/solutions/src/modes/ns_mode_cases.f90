@@ -8,6 +8,7 @@ module ns_mode_cases
     use ns_scan, only: linear_scan_grid
     use ns_scan_types, only: bracket_candidate_t,CAND_SIGN,CAND_SAMPLE
     use ns_mode_spectrum
+    use ns_production_solvers, only: solve_cowling_spectrum
     use ns_mode_normalization
     use ns_mode_identity
     use, intrinsic :: iso_fortran_env, only: int64
@@ -138,7 +139,7 @@ contains
         case('smooth_spectrum')
             call linear_scan_grid(frequency_min_hz*two_pi,frequency_max_hz*two_pi,scan_n,grid,status)
             if(.not.is_ok(status)) then;call finish(.false.);return;end if
-            call scan_modes(bg,grid,opt,spectrum);status=spectrum%status
+            call solve_cowling_spectrum(bg,grid,opt,spectrum);status=spectrum%status
             call emit_int('roots_found',int(spectrum%roots_found,int64))
             call emit_int('f_index',int(spectrum%f_index,int64));call emit_int('p1_index',int(spectrum%p1_index,int64))
             if(allocated(spectrum%scan%trials)) then

@@ -4,23 +4,28 @@ program maxwell_checks
     use ns_physical_constants, only: two_pi
     use ns_eos_types, only: eos_state_t,SIDE_REGULAR
     use ns_background_records, only: star_options_t,star_profile_t
-    use ns_tov, only: integrate_tov
     use ns_maxwell_tov, only: maxwell_star_t,integrate_maxwell_tov
     use ns_maxwell_cowling, only: maxwell_cowling_shot_t,shoot_maxwell_cowling
     use ns_cowling, only: cowling_options_t
+    use ns_mode_spectrum, only: mode_options_t,mode_spectrum_t
+    use ns_maxwell_mode_spectrum, only: maxwell_mode_spectrum_t
+    use ns_production_solvers, only: solve_tov_star,solve_cowling_spectrum
     use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     implicit none
     real(wp),parameter :: mev_fm3_to_j_m3=1.602176634e32_wp
     real(wp),parameter :: mev_to_j=1.602176634e-13_wp
     real(wp),parameter :: fm3_to_m3=1e45_wp
     real(wp),parameter :: pt_mev_fm3=1._wp,pc_mev_fm3=1.4_wp,pcut_mev_fm3=0.2_wp
-    real(wp) :: jump_eta,pt,pc,pcut,rel_m,rel_r,dp_rel
+    real(wp) :: jump_eta,pt,pc,pcut,rel_m,rel_r,dp_rel,freq_grid(3)
     integer :: checks
     type(star_options_t) :: star_options
     type(maxwell_star_t) :: star
     type(star_profile_t) :: smooth_profile
     type(cowling_options_t) :: cowling_options
     type(maxwell_cowling_shot_t) :: slow_shot,rapid_shot
+    type(mode_options_t) :: mode_options
+    type(mode_spectrum_t) :: smooth_spectrum
+    type(maxwell_mode_spectrum_t) :: slow_spectrum,rapid_spectrum
     type(status_t) :: status
 
     checks=0
@@ -43,7 +48,7 @@ program maxwell_checks
     ! A finite but small first-order density jump, below the Seidov rapid-onset
     ! threshold. This fixture tests a true nonzero discontinuity.
     jump_eta=5e-5_wp
-    call integrate_maxwell_tov(eos_high,eos_low,pc,pt,star_options,star)
+    call solve_tov_star(eos_high,eos_low,pc,pt,star_options,star)
     if(.not.star%valid.or..not.is_ok(star%status)) then
         write(*,'(A,A,A,A,A,A)') 'MAXWELL_TOV_DIAGNOSTIC status=',trim(status_name(star%status%code)), &
             ' category=',trim(star%status%category),' detail=',trim(star%status%detail)
@@ -81,14 +86,35 @@ program maxwell_checks
     call require(dp_rel<1e-9_wp,'rapid interface conserves Delta P')
     call require(size(slow_shot%r_m)>=4.and.size(rapid_shot%r_m)>=4,'piecewise Cowling profiles retained')
 
+    ! The production spectrum facade dispatches smooth profiles and a true
+    ! phase-segmented Maxwell star without flattening the interface.
+    mode_options%shot=cowling_options
+    mode_options%root%xtol=1e-9_wp
+    mode_options%root%max_iter=100
+    mode_options%residual_tol=1e-5_wp
+    mode_options%zero_tol=1e-10_wp
+    freq_grid=two_pi*[1799._wp,1800._wp,1801._wp]
+    call solve_cowling_spectrum(star,freq_grid,mode_options,'slow',slow_spectrum)
+    call require(slow_spectrum%scan%valid.and.slow_spectrum%valid, &
+        'production Maxwell spectrum dispatch completes slow-conversion scan')
+    call require(size(slow_spectrum%scan%trials)==3.and.all(slow_spectrum%scan%trials%valid), &
+        'production Maxwell spectrum retains all successful slow trials')
+    call solve_cowling_spectrum(star,freq_grid,mode_options,'rapid',rapid_spectrum)
+    call require(rapid_spectrum%scan%valid.and.rapid_spectrum%valid, &
+        'production Maxwell spectrum dispatch completes rapid-conversion scan')
+
     ! Small-jump smooth-limit cross-check against the pre-existing single-EOS
     ! Fortran TOV implementation; the two phase callbacks tend continuously
     ! to the same cold barotrope as eta -> 0.
     jump_eta=1e-7_wp
     call integrate_maxwell_tov(eos_high,eos_low,pc,pt,star_options,star)
     call require(star%valid.and.is_ok(star%status),'small-jump native Maxwell TOV')
-    call integrate_tov(eos_smooth,pc,star_options,smooth_profile)
+    call solve_tov_star(eos_smooth,pc,star_options,smooth_profile)
     call require(smooth_profile%valid.and.is_ok(smooth_profile%status),'single-EOS smooth TOV reference')
+
+    call solve_cowling_spectrum(smooth_profile,freq_grid,mode_options,smooth_spectrum)
+    call require(smooth_spectrum%scan%valid.and.smooth_spectrum%scan%all_trials_succeeded, &
+        'production Cowling spectrum accepts smooth TOV profile')
     rel_m=abs(star%mass_kg-smooth_profile%mass_kg)/smooth_profile%mass_kg
     rel_r=abs(star%radius_m-smooth_profile%radius_m)/smooth_profile%radius_m
     call require(rel_m<2e-5_wp,'Maxwell TOV smooth-limit mass convergence')

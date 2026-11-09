@@ -77,3 +77,17 @@ def test_projection_exposes_cell_level_raw_and_projected_admissibility():
     assert len(out["projected_cell_diagnostics"]) == 2
     assert all(cell["stable"] and cell["causal"] for cell in out["projected_cell_diagnostics"])
     assert all(cell["min_d2p"] > 0.0 for cell in out["projected_cell_diagnostics"])
+
+
+def test_nonconvex_source_pressure_knots_cannot_be_preserved_by_convex_projection():
+    out = reconstruct_projection(
+        mu=[2.0, 3.0, 4.0],
+        n_source=[1.0, 2.25, 4.0],
+        p_source=[1.0, 2.5, 3.4],
+        eps_source=[0.1, 0.5, 1.0],
+    )
+
+    assert out["source_secant_decrease_count"] == 1
+    assert out["projected_secant_decrease_count"] == 0
+    assert out["source_secant_change_pct"][1] < 0.0
+    assert out["projected_secant_change_pct"][1] > 0.0

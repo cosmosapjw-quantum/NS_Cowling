@@ -116,3 +116,8 @@ The source patch is now applied to `research/maxwell-reference-validation-v1` at
 This does not change the PR #2 implementation boundary: its sharp-interface phase-segmented TOV/Cowling path is Python/SciPy, while its Fortran contribution provides the slow/rapid interface-transfer algebra and direct tests. The separate native phase-segmented TOV/Cowling integration is tracked on research/maxwell-native-fortran-v1. The analytic strong-jump fixture remains a boundary-condition test and is not a stable hybrid-star prediction.
 
 A follow-up exact-PR-head Actions run, [42579770412](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42579770412), checked PR #2 head 2b7a00984dfa215bcca48c7d7adb5f3619013502 and completed with conclusion success. Its exact-head artifact is 13656363884 (SHA-256 0cfba640210b84d3141213b820f5c335d67ea1abef4a9e39b204d4a41b82e4f6).
+
+
+## Native Fortran follow-up (2026-11-09)
+
+A separate native phase-segmented Fortran TOV/Cowling path has since been added on `research/maxwell-native-fortran-v1` and is under draft [PR #3](https://github.com/cosmosapjw-quantum/NS_Cowling/pull/3). Exact head `98d2f9ce6033015109286e5713639c6626a6f7fb` passed both push and PR GitHub Actions runs `42581655510` and `42581660400`; its analytic fixture passed 18 checks and the production case driver built. This is a new sibling implementation, not a modification of `solve_tov_star` or `solve_cowling_spectrum` in this branch. It still lacks an executed realistic two-table EOS case and a complete mode spectrum. The earlier PR #2 implementation boundary remains unchanged.

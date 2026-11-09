@@ -60,3 +60,15 @@ The earlier status in this handoff records the pre-integration point. The sharp-
 - Follow-up exact-PR-head Actions run [42579770412](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42579770412) checked commit `2b7a00984dfa215bcca48c7d7adb5f3619013502` and completed successfully. Its artifact ID is `13656363884`, SHA-256 `0cfba640210b84d3141213b820f5c335d67ea1abef4a9e39b204d4a41b82e4f6`.
 
 The integrated scope is the phase-aware **Python/SciPy reference TOV/Cowling path** and independent Fortran slow/rapid transfer routines. Native Fortran stellar TOV/Cowling production solvers are still smooth-EOS-only. The 33-path v5 source overlay remains unapplied to this branch and is not represented as synced here. No merge has been performed.
+
+
+## Native Fortran phase-segmented follow-up (2026-11-09)
+
+The native Fortran implementation has now been ported to the full repository tree on sibling branch `research/maxwell-native-fortran-v1`, tracked by draft [PR #3](https://github.com/cosmosapjw-quantum/NS_Cowling/pull/3). Exact verified head: `98d2f9ce6033015109286e5713639c6626a6f7fb`.
+
+- PR Actions run `42581660400`: success; artifact `13656748986`, SHA-256 `083f3eabf9215ac69cde06677f06c0fc58746bb35b24e5559c3a6184b5e7c5f6`.
+- Push Actions run `42581655510`: success; artifact `13656434783`, SHA-256 `b6274813105f8e41f9eec269ffbe747ee3c5b594aea3a7bf36c3427a0cfb665e`.
+- The exact-head log reports 12 cell checks and 18 Maxwell checks passed; the analytic small-jump TOV limit has `dM/M=9.1343e-8` and `dR/R=2.8981e-8`.
+- `docs/ADVERSARIAL_AUDIT_MAXWELL_NATIVE_FORTRAN_20261109.md` records the verified scope and explicit non-claims; `docs/MAXWELL_NATIVE_FORTRAN_DAG_20261109.md` records the next implementation dependencies.
+
+This follow-up does not merge PR #3. The normalized two-table production path has compile/build evidence but still needs a real end-to-end data fixture. The 33-path v5 overlay remains unapplied and must not be inferred to have been synchronized by this Maxwell integration.

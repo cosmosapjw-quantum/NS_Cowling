@@ -66,3 +66,7 @@ Verified code head: \`1dbb75c27b704209cfeef43f7c49be0cfb28fd44\`. GitHub Actions
 ## Native Fortran sharp-Maxwell TOV/Cowling v1
 
 A separate phase-segmented native Fortran path now accepts independent high-density and low-density EOS tables, enforces the Maxwell pressure/chemical-potential/first-law conditions at the sharp interface, integrates TOV on two non-crossing pressure segments, and performs a single-frequency Cowling shot with slow or rapid phase-conversion transfer. See [the implementation and validation contract](docs/MAXWELL_NATIVE_FORTRAN_V1.md). This path is separate from the legacy smooth maxwell bridge and the 234-row v5 smooth-matching cohort. Its analytic fixture and exact-head CI gate validate the bounded implementation scope only; they do not yet establish a realistic hybrid-EOS spectrum survey.
+
+
+
+The native sharp-Maxwell Fortran path is tracked independently in [the implementation contract](docs/MAXWELL_NATIVE_FORTRAN_V1.md), [the adversarial audit](docs/ADVERSARIAL_AUDIT_MAXWELL_NATIVE_FORTRAN_20261109.md), and [the research DAG](docs/MAXWELL_NATIVE_FORTRAN_DAG_20261109.md). Exact-head CI evidence is recorded there; PR #3 remains a draft and real normalized EOS-table execution is still an open gate.

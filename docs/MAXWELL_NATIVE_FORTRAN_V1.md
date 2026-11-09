@@ -91,3 +91,14 @@ The numerical values above are placeholders; the two tables and transition press
 - This branch does not contain the previously prepared 33-path v5 source overlay. The v5 sensitivity report and this physical phase-transition solver remain separate research tracks.
 
 A passing CI run establishes compilation and the checks in this fixture only. It does not establish agreement with realistic CompOSE hybrid EOS, a published mode benchmark, or a production M(R)/spectrum survey.
+
+## Exact-head verification (2026-11-09)
+
+Verified source head: `98d2f9ce6033015109286e5713639c6626a6f7fb` on `research/maxwell-native-fortran-v1`, tracked by draft [PR #3](https://github.com/cosmosapjw-quantum/NS_Cowling/pull/3). Both exact-head GitHub Actions events passed:
+
+- PR run [42581660400](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42581660400): success; artifact ID `13656748986`, SHA-256 `083f3eabf9215ac69cde06677f06c0fc58746bb35b24e5559c3a6184b5e7c5f6`.
+- Push run [42581655510](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42581655510): success; artifact ID `13656434783`, SHA-256 `b6274813105f8e41f9eec269ffbe747ee3c5b594aea3a7bf36c3427a0cfb665e`.
+- The native fixture reports 12 existing cell checks and 18 Maxwell checks passed. Its small-jump TOV comparison gives `dM/M=9.1343e-8` and `dR/R=2.8981e-8`.
+- The exact-head workflow compiled with GNU Fortran 15.2.0, ran FPM 0.13.0 with bounds/runtime checks, built the production case driver, and uploaded source-identity evidence.
+
+These results establish the bounded analytic fixture and build path only. They do not establish a real normalized two-table EOS execution, a published hybrid-star benchmark, a complete mode spectrum, a stable-branch survey or observational inference. See `docs/ADVERSARIAL_AUDIT_MAXWELL_NATIVE_FORTRAN_20261109.md` and `docs/MAXWELL_NATIVE_FORTRAN_DAG_20261109.md` for the audit and remaining gates.

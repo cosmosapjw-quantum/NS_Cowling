@@ -62,7 +62,7 @@ def node_identity(result):
     return True,"smooth_l2_WV_nodes_v1"
 
 
-def solve_model(ref,eos_dir,masses,solar_mass,*,nscan,tov_rtol,spectrum_rtol,mode_rtol,mass_rtol,residual_tol):
+def solve_model(ref,eos_dir,masses,solar_mass,*,nscan,tov_rtol,spectrum_rtol,mode_rtol,mass_rtol,residual_tol,radius_limit_m):
     name=ref["name"];eos=eos_dir/f"{name}.csv";pcut,pmax=pressure_bounds(eos);pc_ref=float(ref["pc_pa"])
     grid=np.geomspace(max(1.05*pcut,5e-4*pc_ref),min(.95*pmax,100*pc_ref),nscan)
     scan=[]

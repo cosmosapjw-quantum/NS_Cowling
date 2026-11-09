@@ -7,6 +7,7 @@ on:
       - ".github/workflows/r16-projection-audit.yml"
       - "scripts/r16_projection_audit.py"
       - "scripts/audit_r16_projection_cohort.py"
+      - "scripts/audit_r16_pressure_increment_residuals.py"
       - "python_frontend/tests/test_r16_projection_reconstruction.py"
       - "oscillation_release_v1/data/spectrum_summary_234.csv"
       - "oscillation_release_v1/data/eos_original_normalized/**"
@@ -30,6 +31,10 @@ jobs:
         run: python -m pip install pytest
       - name: Test weighted isotonic and exact pressure integration
         run: python -m pytest -q python_frontend/tests/test_r16_projection_reconstruction.py
+      - name: Audit every native pressure-increment residual
+        run: |
+          python scripts/audit_r16_pressure_increment_residuals.py \
+            --output-dir dist/r16-pressure-increment-residuals
       - name: Audit all 234 normalized-to-projected EOS pairs
         run: |
           python scripts/audit_r16_projection_cohort.py \
@@ -40,5 +45,13 @@ jobs:
         with:
           name: ns-cowling-r16-projection-audit-${{ github.run_id }}
           path: dist/r16-full-cohort-projection-audit/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload cellwise pressure-increment residual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ns-cowling-r16-pressure-increment-${{ github.run_id }}
+          path: dist/r16-pressure-increment-residuals/
           if-no-files-found: error
           retention-days: 30

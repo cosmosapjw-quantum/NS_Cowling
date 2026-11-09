@@ -72,3 +72,14 @@ The native Fortran implementation has now been ported to the full repository tre
 - `docs/ADVERSARIAL_AUDIT_MAXWELL_NATIVE_FORTRAN_20261109.md` records the verified scope and explicit non-claims; `docs/MAXWELL_NATIVE_FORTRAN_DAG_20261109.md` records the next implementation dependencies.
 
 This follow-up does not merge PR #3. The normalized two-table production path has compile/build evidence but still needs a real end-to-end data fixture. The 33-path v5 overlay remains unapplied and must not be inferred to have been synchronized by this Maxwell integration.
+## Final native table-provider and CLI verification (2026-11-09)
+
+Exact verified branch head: `d3649906292b0ec8f1caf98961f12436fa00871b`.
+
+- The generated analytic two-phase normalized-table fixture passed 74 checks, including table loading, provider admission, one-sided `P_t` coexistence, cold first-law closure, table-backed native TOV, and both slow/rapid Cowling shots.
+- The workflow then executed the actual `case_driver` with `maxwell_table_cowling`; `status=ok`, `result_valid=true`, and `cowling_shot_valid=true`.
+- The 1800 Hz surface residual is a trial residual, not a root. No mode identity or complete spectrum is claimed.
+- Push Actions run [42582837414](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42582837414): success, artifact 13657672304, SHA-256 `ec8333d0afc1fb65b57277c669333d403fbbbd6e18a19fb701aa369397bc2515`.
+- PR Actions run [42582845328](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42582845328): success, artifact 13658265995, SHA-256 `5d5a1683e4ba708f246c275e225b462bfc6968f201cf02d4956c9ceecf2cc278`.
+
+The fixture is an analytic synthetic normalized table pair; a realistic source-backed CompOSE hybrid EOS has not yet been executed. PR #3 remains draft, open and unmerged. The 33-path v5 overlay also remains unapplied.

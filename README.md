@@ -69,4 +69,4 @@ A separate phase-segmented native Fortran path now accepts independent high-dens
 
 
 
-The native sharp-Maxwell Fortran path is tracked independently in [the implementation contract](docs/MAXWELL_NATIVE_FORTRAN_V1.md), [the adversarial audit](docs/ADVERSARIAL_AUDIT_MAXWELL_NATIVE_FORTRAN_20261109.md), and [the research DAG](docs/MAXWELL_NATIVE_FORTRAN_DAG_20261109.md). Exact-head CI evidence is recorded there; PR #3 remains a draft and real normalized EOS-table execution is still an open gate.
+The native sharp-Maxwell Fortran path is tracked independently in [the implementation contract](docs/MAXWELL_NATIVE_FORTRAN_V1.md), [the adversarial audit](docs/ADVERSARIAL_AUDIT_MAXWELL_NATIVE_FORTRAN_20261109.md), and [the research DAG](docs/MAXWELL_NATIVE_FORTRAN_DAG_20261109.md). Exact-head CI includes 74 normalized-table integration checks and a successful `maxwell_table_cowling` production CLI smoke on generated analytic phase tables; PR #3 remains a draft and execution with source-backed realistic CompOSE hybrid phases remains open.

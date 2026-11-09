@@ -7,11 +7,12 @@ Date: 2026-11-09
 - Repository: `cosmosapjw-quantum/NS_Cowling`
 - Branch: `research/maxwell-native-fortran-v1`
 - Pull request: [#3](https://github.com/cosmosapjw-quantum/NS_Cowling/pull/3), draft, open, not merged
-- Exact verified head: `98d2f9ce6033015109286e5713639c6626a6f7fb`
+- Exact verified source head: `d3649906292b0ec8f1caf98961f12436fa00871b`
 - TOV module blob: `6e54f73c07ae68c8113ceb3ff31aff2dd12170e6`
 - Cowling module blob: `ce4fac829d3a5c211139d5174541a7053793afc6`
 - Table-driven case adapter blob: `1b0853565884a43696afc15cfb072e2bde033231`
 - Analytic test fixture blob: `7dc7f6f525b34314257f0645fa1e8026ff85237c`
+- Normalized-table fixture blob: `e09a6e5cdb0dcd1ca55fcbbbb3ecee6a619f0a51`
 
 ## Gate results
 
@@ -24,17 +25,24 @@ Date: 2026-11-09
 | Production `case_driver` link | PASS | Exact-head `fpm build` stage |
 | TOV small-jump smooth limit | PASS | `dM/M = 9.1343e-8`; `dR/R = 2.8981e-8` |
 | Slow/rapid interface shot | PASS, bounded | Both shots valid at one 1800 Hz trial; both `Delta P` conservation checks below `1e-9` |
-| Realistic normalized EOS table execution | NOT RUN | CLI/provider path compiles, but no real two-table fixture was executed |
+| Synthetic normalized-table TOV/Cowling integration | PASS | Two generated T14-format phase tables loaded and admitted; exact-Pt coexistence and first-law closure checked; table-backed TOV and slow/rapid Cowling shots passed |
+| Production case-driver table CLI | PASS, synthetic fixture | `maxwell_table_cowling` returned `result_valid=true` and `cowling_shot_valid=true`; one 1800 Hz residual only |
+| Realistic CompOSE hybrid-EOS execution | NOT RUN | No real source-backed high/low phase pair has been supplied and audited |
 | Complete Cowling spectrum / mode identity | NOT IMPLEMENTED | Single-frequency shooting residual only |
 
 ### Exact-head GitHub Actions
 
-Both events checked the same commit `98d2f9ce6033015109286e5713639c6626a6f7fb`:
+Both events checked the same final source head `d3649906292b0ec8f1caf98961f12436fa00871b`:
 
-- Pull-request run [42581660400](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42581660400): success. Artifact ID `13656748986`, SHA-256 `083f3eabf9215ac69cde06677f06c0fc58746bb35b24e5559c3a6184b5e7c5f6`.
-- Push run [42581655510](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42581655510): success. Artifact ID `13656434783`, SHA-256 `b6274813105f8e41f9eec269ffbe747ee3c5b594aea3a7bf36c3427a0cfb665e`.
-- Exact-head job log: `cell_checks: 12 checks passed`; `maxwell_checks: 18 checks passed`; `dM/M=9.1343e-8`; `dR/R=2.8981e-8`.
-- Compile/test flags: `-std=f2018 -O0 -g -fcheck=all -ffree-line-length-none -fimplicit-none`.
+- Push run [42582837414](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42582837414): success. Artifact ID `13657672304`, SHA-256 `ec8333d0afc1fb65b57277c669333d403fbbbd6e18a19fb701aa369397bc2515`.
+- Pull-request run [42582845328](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42582845328): success. Artifact ID `13658265995`, SHA-256 `5d5a1683e4ba708f246c275e225b462bfc6968f201cf02d4956c9ceecf2cc278`.
+- FPM 0.13.0 and GNU Fortran 15.2.0; compile/test flags `-std=f2018 -O0 -g -fcheck=all -ffree-line-length-none -fimplicit-none`.
+- Native checks: `cell_checks: 12`; `maxwell_checks: 18`; `maxwell_table_checks: 74`.
+- Production CLI smoke: `maxwell_table_cowling` emitted `status=ok`, `result_valid=true`, and `cowling_shot_valid=true` for the generated two-table fixture.
+- Table-backed fixture values: (M=9.6356877\times10^{-4}M_\odot^{\rm nominal}), (R=642.793\,\mathrm{m}), (r_t=332.172\,\mathrm{m}), Seidov ratio `0.21276596` below critical `0.50159574`.
+- At 1800 Hz the Cowling integration returned a surface residual `0.9935236`, which is a non-root trial value, not an eigenfrequency. The slow-conversion interface pressure perturbations agree to about `3.2e-16` relative; 854 profile points were emitted.
+
+Both workflows also ran `fpm build` for the production case driver and uploaded exact-head source identity evidence.
 
 ## Scientific and numerical review
 
@@ -43,6 +51,8 @@ Both events checked the same commit `98d2f9ce6033015109286e5713639c6626a6f7fb`:
 3. The Seidov ratio is emitted as an onset diagnostic. It is not a radial-stability calculation or a substitute for tracing stable branches.
 4. The Cowling path integrates the core and envelope separately and then applies the existing native slow/material or rapid conversion map. Its test checks that the mapped pressure perturbation agrees on both sides to relative tolerance `1e-9`.
 5. The small-jump test compares the new phase-segmented TOV result with the existing smooth single-EOS TOV solution. It is a cross-implementation limit check for this analytic fixture, not a realistic hybrid-star prediction.
+6. A second test constructs two normalized T14 tables with (g=\epsilon-P) linear in \(\ln P\), runs the actual reader and provider, and feeds those providers into native TOV/Cowling. The matching construction makes PCHIP and the first-law quadrature representation-exact; it is an integration fixture, not observational EOS data.
+7. The production case-driver is separately run against those generated files. This verifies NAMELIST parsing, table admission, stellar integration, and a single-frequency Cowling shot in the actual CLI path.
 
 ## Defects caught during the integration loop
 
@@ -53,7 +63,7 @@ Both events checked the same commit `98d2f9ce6033015109286e5713639c6626a6f7fb`:
 
 ## Residual risks and explicit non-claims
 
-- The normalized high-/low-density table provider path and NAMELIST CLI have compile evidence only; an actual two-table run remains open.
+- The normalized high-/low-density table provider and production CLI are verified only on a generated analytic two-table fixture. A source-backed CompOSE hybrid-EOS pair remains untested.
 - No published realistic hybrid-EOS TOV/Cowling benchmark has been reproduced in this PR.
 - No complete frequency root scan, `f/p1` continuation, mode identity tracking, interface-mode classification, or convergence under a frequency-root refinement study is implemented.
 - No maximum-mass or stable-branch survey, twin-star analysis, radial stability calculation beyond the local Seidov diagnostic, or parameter inference is claimed.
@@ -63,4 +73,4 @@ Both events checked the same commit `98d2f9ce6033015109286e5713639c6626a6f7fb`:
 
 ## Audit conclusion
 
-`PASS_BOUNDED_NATIVE_ANALYTIC_FIXTURE` for the exact source head above. The core native phase-segmented TOV/Cowling path compiles, the analytic discontinuity fixture passes, and the production case driver links. The implementation is suitable for the next integration gate, but it is not yet evidence for realistic hybrid-star predictions or observational inference.
+`PASS_BOUNDED_NATIVE_SYNTHETIC_TABLE_AND_CLI` for exact source head `d3649906292b0ec8f1caf98961f12436fa00871b`. The callback and normalized-table fixtures pass; the production CLI loads two separate normalized phase tables, integrates the sharp-interface TOV background, and completes both slow/rapid test shots. The 1800 Hz CLI value is a trial residual, not a mode root. This is not evidence for a realistic CompOSE hybrid-star prediction, a complete spectrum, stable-branch classification, or observational inference.

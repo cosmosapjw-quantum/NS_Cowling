@@ -102,3 +102,21 @@ Verified source head: `98d2f9ce6033015109286e5713639c6626a6f7fb` on `research/ma
 - The exact-head workflow compiled with GNU Fortran 15.2.0, ran FPM 0.13.0 with bounds/runtime checks, built the production case driver, and uploaded source-identity evidence.
 
 These results establish the bounded analytic fixture and build path only. They do not establish a real normalized two-table EOS execution, a published hybrid-star benchmark, a complete mode spectrum, a stable-branch survey or observational inference. See `docs/ADVERSARIAL_AUDIT_MAXWELL_NATIVE_FORTRAN_20261109.md` and `docs/MAXWELL_NATIVE_FORTRAN_DAG_20261109.md` for the audit and remaining gates.
+## Synthetic normalized-table and production CLI verification (2026-11-09)
+
+The later integration gate closes the previous normalized-table runtime gap on a generated analytic fixture. Final source head: `d3649906292b0ec8f1caf98961f12436fa00871b`.
+
+- `tests_fortran/maxwell_table_checks.f90` writes two independent 19-column T14 normalized CSV tables, with `g=epsilon-P` linear in `ln(P)` so the current monotone PCHIP representation is exact and the first-law density quadrature is self-consistent.
+- Both tables load through `load_normalized_table`, pass `init_table_eos`, and return one-sided states at the same `P_t`. Chemical-potential coexistence, positive density/energy jumps and cold first-law closure are checked.
+- Table-backed native phase-segmented TOV and both slow/rapid Cowling shots pass. The table fixture reports 74 checks passed.
+- The GitHub Actions workflow then invokes the actual production `case_driver` with `maxwell_table_cowling` and the generated NAMELIST. The case returns `status=ok`, `result_valid=true`, and `cowling_shot_valid=true`.
+- For this synthetic fixture only: `M=9.6356877e-4` nominal solar masses, `R=642.793 m`, and `r_t=332.172 m`; the Seidov ratio is `0.21276596`, below its `0.50159574` critical value.
+- At the 1800 Hz Cowling trial, the surface residual is `0.9935236`, so this is not a mode root. The interface pressure perturbations agree across the interface to approximately `3.2e-16` relative.
+
+Exact-head GitHub Actions:
+
+- Push run [42582837414](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42582837414): success; artifact ID `13657672304`, SHA-256 `ec8333d0afc1fb65b57277c669333d403fbbbd6e18a19fb701aa369397bc2515`.
+- Pull-request run [42582845328](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42582845328): success; artifact ID `13658265995`, SHA-256 `5d5a1683e4ba708f246c275e225b462bfc6968f201cf02d4956c9ceecf2cc278`.
+- Both events ran 12 existing cell checks, 18 analytic Maxwell checks and 74 normalized-table checks, built the production driver, ran the table-driven CLI smoke, and recorded exact source identities.
+
+Important boundary: these CSV tables are generated analytic fixtures, not source-backed CompOSE or other realistic hybrid EOS data. This verifies the normalized-table/provider/CLI integration contract, not realistic hybrid-star phenomenology. The old 33-path v5 overlay remains unapplied.

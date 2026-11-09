@@ -217,15 +217,13 @@ The projected EOS is terminated at (P_{cut}=9.000000079422\times10^{-12}\;\mathr
 
 The right-sided Hermite estimate gives (c_{s,cut}^2=3.1507096132423\times10^{-5}) and (\Gamma_{eq,cut}=1.52432195647). The local right-cell (\Gamma_{eq}) decreases to approximately 1.46155 by the fifth knot. Log-log fits of (P) versus (\epsilon) over 5, 10, 20, 40, 80 and 160 knots give exponents 1.58002, 1.54586, 1.46579, 1.39937, 1.36705 and 1.32284, respectively, with increasing log-residual. A single broad-window polytrope is therefore not a robust extrapolation rule.
 
-Use the local tangent continuation only as an explicit reference model:
-[
-P=K\epsilon^{\gamma_s},quad
-\gamma_s=(\epsilon_{cut}/P_{cut})c_{s,cut}^2,quad
-K=P_{cut}/\epsilon_{cut}^{\gamma_s}.
-]
-This matches (P) and (dP/d\epsilon) at the cutoff and takes (P,\epsilon\to0). The continuation is not a microphysically sourced crust EOS. To be thermodynamically admissible, obtain (n_b(\epsilon)) from (d\epsilon=(\epsilon+P)dn_b/n_b), normalize it to the tabulated (n_{b,cut}), and define (\mu_b=(\epsilon+P)/n_b). Verify (dP=n_b d\mu_b), positivity, (c_s^2\in(0,1)), and endpoint continuity. Vary the continuation parameterization and quantify its effects on TOV M/R and on the radial spectrum.
+Historical R13 reference model only (not selected for the primary analysis):
 
-The first radial pulsation calculation may set (\Gamma_1=\Gamma_{eq}), but results must be called barotropic-equilibrium radial stability. Frozen-composition (\Gamma_1) is not available from the current projected table without composition derivatives. Only after the (P=0) continuation and boundary sensitivity have been audited should the code solve for the nodeless fundamental (\omega_0^2), check node count and compare against published radial-mode reference models. Mass-dependent f/p1 calculations remain blocked until that radial eigenvalue gate is complete.
+The former diagnostic used a C1 tangent relation P=K epsilon^gamma_s with gamma_s=(epsilon_cut/P_cut)c_s,cut^2 and completed n_b,mu_b through the cold first law. Its first-law algebra is a valid barotropic closure, but it supplies no microphysical outer-crust composition and is an unsourced extrapolation below the input table. The corresponding synthetic-tail workflow is manual-dispatch only and is not part of the EOS-preserving primary path.
+
+R14 instead terminates the unchanged source EOS at exact native pressure knots and reports finite-pressure internal-isobar M(r_cut), r_cut. This measures the truncation response only within the provided positive-pressure domain; it cannot determine the missing physical crust or P=0 radius.
+
+The first radial pulsation calculation may set (\Gamma_1=\Gamma_{eq}), but results must be called barotropic-equilibrium radial stability. Frozen-composition (\Gamma_1) is not available from the current projected table without composition derivatives. Only after a sourced physical low-density EOS and a justified P=0 surface boundary have been established should the code solve for the nodeless fundamental (\omega_0^2), check node count and compare against published radial-mode reference models. Mass-dependent f/p1 calculations remain blocked until that radial eigenvalue gate is complete.
 
 
 ## 18. Exact-head verification after the CLI repair

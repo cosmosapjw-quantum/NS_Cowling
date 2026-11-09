@@ -178,7 +178,6 @@ contains
         write(u,'(A)') ' r0_m = 1.0'
         write(u,'(A)') ' r_limit_m = 2000000.0'
         write(u,'(A)') ' nu_start = 0.0'
-        write(u,'(A)') " surface_policy = 'finite_cutoff_schwarzschild_time'"
         write(u,'(A)') ' rtol = 2.0e-9'
         write(u,'(A)') ' atol_r_m = 1.0e-5'
         write(u,'(A)') ' atol_mass_kg = 1.0e13'

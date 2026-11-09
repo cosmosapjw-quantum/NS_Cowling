@@ -25,6 +25,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Install pytest
+        run: python -m pip install pytest
       - name: Test weighted isotonic and exact pressure integration
         run: python -m pytest -q python_frontend/tests/test_r16_projection_reconstruction.py
       - name: Audit all 234 normalized-to-projected EOS pairs

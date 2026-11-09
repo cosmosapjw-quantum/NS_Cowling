@@ -156,16 +156,25 @@ class ThermodynamicSurfaceContinuation:
             x, self.gamma_s - 1.0
         ) * self._shape_factor(x)
 
-    def _log_number_density(self, x: np.ndarray) -> np.ndarray:
-        """Integrate the cold first law in log epsilon using Gauss-Legendre."""
+    def _log_chemical_potential(self, x: np.ndarray) -> np.ndarray:
+        """Integrate the cold first law for log(mu_b) in log energy density.
+
+        From dP=n_b dmu_b and c_s^2=dP/depsilon,
+
+            d ln(mu_b) / d ln(epsilon) = c_s^2 / (1 + P/epsilon).
+
+        Integrating this small logarithmic increment is better conditioned in
+        the dilute tail than integrating ln(n_b) and subtracting it from
+        ln(epsilon+P) to reconstruct an almost constant chemical potential.
+        """
         u = np.log(x)
-        # Map the interval [0, log(x)] to the fixed 96-point Gauss rule.
         t = 0.5 * u[:, None] * (_GL_X[None, :] + 1.0)
         xq = np.exp(t)
         ratio = self._pressure_ratio(xq)
-        integrand = 1.0 / (1.0 + ratio)
+        cs2 = ratio * self._slope_factor(xq)
+        integrand = cs2 / (1.0 + ratio)
         integral = 0.5 * u * np.sum(integrand * _GL_W[None, :], axis=1)
-        return math.log(self.number_density_cut_fm3) + integral
+        return math.log(self.chemical_potential_cut_mev) + integral
 
     def state_many(self, epsilon_mev_fm3: Iterable[float]) -> dict[str, np.ndarray]:
         eps = np.asarray(tuple(epsilon_mev_fm3), dtype=float)
@@ -177,8 +186,8 @@ class ThermodynamicSurfaceContinuation:
         pressure = self.pressure_cut_mev_fm3 * np.power(x, self.gamma_s) * self._shape_factor(x)
         slope_factor = self._slope_factor(x)
         cs2 = pressure / eps * slope_factor
-        number_density = np.exp(self._log_number_density(x))
-        chemical_potential = (eps + pressure) / number_density
+        chemical_potential = np.exp(self._log_chemical_potential(x))
+        number_density = (eps + pressure) / chemical_potential
         arrays = (pressure, number_density, chemical_potential, cs2)
         if not all(np.all(np.isfinite(a)) for a in arrays):
             raise ArithmeticError("surface continuation produced a nonfinite thermodynamic state")

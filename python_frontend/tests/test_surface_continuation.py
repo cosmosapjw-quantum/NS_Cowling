@@ -205,3 +205,48 @@ def test_runner_cli_import_does_not_get_shadowed_by_scripts_module(tmp_path):
     )
     assert result.returncode == 0, result.stderr
     assert "--output-dir" in result.stdout
+
+
+def native_mu_hermite_audit(rows):
+    """Mirror the production Fortran endpoint tests for each cubic P(mu) cell."""
+    p = np.asarray([float(row["pressure_mev_fm3"]) for row in rows])
+    n = np.asarray([float(row["n_b_fm3"]) for row in rows])
+    mu = np.asarray([float(row["mu_b_mev"]) for row in rows])
+    h = np.diff(mu)
+    dp = np.diff(p)
+    a2 = 3.0 * dp - h * (2.0 * n[:-1] + n[1:])
+    a3 = -2.0 * dp + h * (n[:-1] + n[1:])
+    d20 = 2.0 * a2 / np.square(h)
+    d21 = (2.0 * a2 + 6.0 * a3) / np.square(h)
+    causal0 = mu[:-1] * d20 - n[:-1]
+    causal1 = mu[1:] * d21 - n[1:]
+    return {
+        "mu_increasing": bool(np.all(h > 0.0)),
+        "pressure_increasing": bool(np.all(dp > 0.0)),
+        "min_d2p": float(np.min(np.minimum(d20, d21))),
+        "min_causal_margin": float(np.min(np.minimum(causal0, causal1))),
+        "stable_cells": int(np.count_nonzero(np.minimum(d20, d21) > 0.0)),
+        "causal_cells": int(np.count_nonzero((np.minimum(d20, d21) > 0.0) & (np.minimum(causal0, causal1) >= 0.0))),
+        "cell_count": int(len(h)),
+    }
+
+
+def test_all_surface_families_are_admitted_by_native_mu_hermite_at_fine_cutoff():
+    scenarios = [
+        ("power_law", 0.0),
+        ("exp_quadratic", -0.5),
+        ("exp_quadratic", 0.5),
+        ("poly_quadratic", -0.5),
+        ("poly_quadratic", 0.5),
+    ]
+    for family, alpha in scenarios:
+        rows = build_extended_projected_rows(
+            raw_rows(), family=family, alpha=alpha, tail_points=512, min_energy_ratio=1.0e-12
+        )
+        audit = native_mu_hermite_audit(rows[:513])  # 512 tail intervals plus the cutoff knot
+        assert audit["mu_increasing"], (family, alpha, audit)
+        assert audit["pressure_increasing"], (family, alpha, audit)
+        assert audit["stable_cells"] == audit["cell_count"], (family, alpha, audit)
+        assert audit["causal_cells"] == audit["cell_count"], (family, alpha, audit)
+        assert audit["min_d2p"] > 0.0, (family, alpha, audit)
+        assert audit["min_causal_margin"] >= 0.0, (family, alpha, audit)

@@ -46,12 +46,23 @@ def read_csv(path: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(stream))
 
 
-def write_csv(path: Path, rows: list[dict]) -> None:
-    if not rows:
-        return
+SENSITIVITY_FIELDS = (
+    "method",
+    "comparison",
+    "mass_relative_change_fine_vs_coarse",
+    "radius_relative_change_fine_vs_coarse",
+    "mass_relative_change_alternative_vs_tangent",
+    "radius_relative_change_alternative_vs_tangent",
+)
+
+
+def write_csv(path: Path, rows: list[dict], *, fieldnames: tuple[str, ...] | None = None) -> None:
+    """Write a CSV receipt even when a scientific gate yields zero rows."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    fields = list(dict.fromkeys(key for row in rows for key in row))
+    fields = list(fieldnames or dict.fromkeys(key for row in rows for key in row))
     with path.open("w", newline="", encoding="utf-8") as stream:
+        if not fields:
+            return
         writer = csv.DictWriter(stream, fieldnames=fields, extrasaction="ignore", lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
@@ -290,7 +301,7 @@ def main(argv=None) -> int:
     receipt["status"] = "PASS_TOV_CONTINUATION_EXECUTION" if not failures and len(summary_rows) == receipt["expected_tov_case_count"] else "FAIL_TOV_CONTINUATION_EXECUTION"
     persist_receipt(receipt_path, receipt)
     write_csv(args.output_dir / "surface_continuation_summary.csv", summary_rows)
-    write_csv(args.output_dir / "surface_continuation_sensitivity.csv", sensitivity)
+    write_csv(args.output_dir / "surface_continuation_sensitivity.csv", sensitivity, fieldnames=SENSITIVITY_FIELDS)
     manifest = {
         "schema": "ns-cowling-surface-continuation-manifest-v1",
         "receipt_sha256": sha256(receipt_path),

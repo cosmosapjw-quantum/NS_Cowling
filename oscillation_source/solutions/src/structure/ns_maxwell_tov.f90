@@ -81,7 +81,7 @@ contains
         end if
 
         core_options=options%ode
-        core_options%h_initial=min(core_options%h_initial,0.1_wp*(pc-y0(2))/pc,q_core)
+        core_options%h_initial=min(core_options%h_initial,0.1_wp*(pc-p_start)/pc,q_core)
         call integrate_segment(eos_high,SIDE_INNER,p_start,pt,q_core,options%r_limit_m, &
             y0,core_options,core_traj,star%status)
         if(.not.is_ok(star%status).or..not.core_traj%valid) return

@@ -8,12 +8,18 @@ import hashlib
 import json
 import math
 import os
+import sys
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+# Direct script execution puts scripts/ ahead of PYTHONPATH.  This repository
+# also contains scripts/compose_cowling.py, which otherwise shadows the
+# python_frontend/compose_cowling package during imports.
+sys.path.insert(0, str(ROOT / "python_frontend"))
 
 from compose_cowling.solver import solve_v5_tov_star
 from compose_cowling.surface_continuation import write_extended_projected_csv
 
-ROOT = Path(__file__).resolve().parents[1]
 SUMMARY = ROOT / "oscillation_release_v1" / "data" / "spectrum_summary_234.csv"
 EOS_DIR = ROOT / "oscillation_release_v1" / "data" / "eos_projected"
 METHODS = ("css", "cubic_F", "cubic_P", "maxwell", "quintic_F", "quintic_P")

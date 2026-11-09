@@ -1,5 +1,8 @@
 import csv
 import math
+import os
+import subprocess
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -166,3 +169,39 @@ def test_writer_emits_native_normalized_header_and_hash_receipts(tmp_path):
     assert receipt["output_sha256"]
     assert rows[-3:] == raw_rows()
     assert float(rows[0]["pressure_pa"]) > 0.0
+
+
+def test_runner_cli_import_does_not_get_shadowed_by_scripts_module(tmp_path):
+    repo_root = Path(__file__).resolve().parents[2]
+    scripts = tmp_path / "scripts"
+    package = tmp_path / "python_frontend" / "compose_cowling"
+    scripts.mkdir()
+    package.mkdir(parents=True)
+    runner = scripts / "run_surface_continuation.py"
+    runner.write_text(
+        (repo_root / "scripts" / "run_surface_continuation.py").read_text(),
+        encoding="utf-8",
+    )
+    # This sibling file shadows a package import unless the runner explicitly
+    # places python_frontend first on sys.path.
+    (scripts / "compose_cowling.py").write_text(
+        "raise RuntimeError('shadow module imported instead of package')\n",
+        encoding="utf-8",
+    )
+    (package / "__init__.py").write_text("\n", encoding="utf-8")
+    (package / "solver.py").write_text("solve_v5_tov_star = None\n", encoding="utf-8")
+    (package / "surface_continuation.py").write_text(
+        "write_extended_projected_csv = None\n", encoding="utf-8"
+    )
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(tmp_path / "python_frontend")
+    result = subprocess.run(
+        [sys.executable, str(runner), "--help"],
+        cwd=tmp_path,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert "--output-dir" in result.stdout

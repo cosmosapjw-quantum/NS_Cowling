@@ -33,6 +33,14 @@ The Fortran EOS frontend exposes the six historical smooth barotropic matching m
 The feature branch adds `construct_maxwell_transition` and the native `maxwell-transition` CLI for a single globally conserved baryon charge with local electric neutrality imposed separately in each supplied phase. The caller must explicitly confirm local charge neutrality because a composition-free barotrope cannot prove it. The Fortran kernel uses a First-Law-consistent cubic-Hermite representation in baryon chemical potential, analytic whole-interval mechanical and causal checks, and stationary-point-isolated pressure-root searches. It rejects composition-bearing inputs, nonzero Nadd, and mismatched charge-fraction slices. Its output is an internal phase-labelled barotrope, not a composition-preserving CompOSE product; both Python and native Fortran writers refuse a complete CompOSE export without phase composition. Gibbs, Seidov stability evaluation and phase-interface TOV support remain unported or unverified. See [the Maxwell transition note](docs/FORTRAN_EOS_MAXWELL_TRANSITION_V1.md) and [the adversarial audit](docs/ADVERSARIAL_AUDIT_MAXWELL_TRANSITION_20261107.md).
 
 
+## Sharp Maxwell phase-interface TOV/Cowling reference path (2026-11-09)
+
+The sharp-interface follow-up is implemented on the `research/maxwell-reference-validation-v1` branch and tracked in [PR #2](https://github.com/cosmosapjw-quantum/NS_Cowling/pull/2). It consumes the existing native one-charge Maxwell construction as two separate phase providers, integrates the high-density core to exact `P_t`, and restarts the low-density envelope without interpolating across the density jump. Its `ell=2` Cowling reference path distinguishes slow conversion (`[xi^r]=[Delta P]=0`) from rapid conversion (`[Delta P]=0`, `[xi^r-Delta P/P'_0]=0`).
+
+**Implementation boundary:** the phase-segmented stellar TOV/Cowling reference solver is Python/SciPy. Native Fortran now independently implements and tests both interface-transfer maps, but the production Fortran `solve_tov_star` and `solve_cowling_spectrum` remain smooth-EOS-only. No stable-branch, maximum-mass, twin-star or full-GR claim is made. The strong-jump analytic fixture is for interface-condition testing only; its rapid-onset Seidov diagnostic is unstable. The small-jump fixture validates convergence toward the smooth-EOS solution.
+
+See [the interface derivation](docs/MAXWELL_TOV_COWLING_INTERFACE_V1.md), [the independent validation record](docs/MAXWELL_REFERENCE_VALIDATION_V1_20261109.md), and [the final adversarial audit](docs/ADVERSARIAL_AUDIT_MAXWELL_TOV_COWLING_20261109.md).
+
 ## Native master-function reconstruction v1
 
     from compose_eos import reconstruct_master

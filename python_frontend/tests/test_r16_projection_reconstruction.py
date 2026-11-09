@@ -44,3 +44,22 @@ def test_reconstruction_rejects_nonpositive_or_nonmonotone_source_knots():
 
     with pytest.raises(ValueError, match="positive"):
         reconstruct_projection([1.0, 2.0, 3.0], [1.0, 0.0, 3.0], [1.0, 2.0, 3.0], [0.1, 0.2, 0.3])
+
+from scripts.r16_projection_audit import hermite_cell_diagnostics
+
+
+def test_sparse_source_cell_can_fail_raw_hermite_convexity_while_projected_cell_passes():
+    mu0, mu1 = 939.5626728207, 941.9599599398
+    n0, n1 = 0.000269021, 0.0020000001
+    p0_source, p1_source = 0.0004981910045986, 0.001960000017999996
+    p0_projected, p1_projected = 0.0004979837658772507, 0.0032159718477015545
+
+    raw = hermite_cell_diagnostics(mu0, p0_source, n0, mu1, p1_source, n1)
+    projected = hermite_cell_diagnostics(mu0, p0_projected, n0, mu1, p1_projected, n1)
+
+    assert raw["stable"] is False
+    assert raw["min_d2p"] < 0.0
+    assert projected["stable"] is True
+    assert projected["causal"] is True
+    assert projected["min_d2p"] > 0.0
+    assert projected["min_causal_margin"] >= 0.0

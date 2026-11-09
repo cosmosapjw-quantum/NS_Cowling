@@ -117,8 +117,7 @@ program maxwell_table_checks
     call require(dp_rel<1e-9_wp,'table-backed rapid Delta P continuity')
 
     print '(A,I0,A)', 'maxwell_table_checks: ',checks,' checks passed'
-    call delete_fixture(core_file)
-    call delete_fixture(envelope_file)
+    call write_namelist()
 contains
     subroutine require(ok,label)
         logical,intent(in) :: ok
@@ -162,6 +161,40 @@ contains
         close(u,iostat=ios)
         call require(ios==0,'close normalized fixture')
     end subroutine
+
+    subroutine write_namelist()
+        integer :: u,ios
+        open(newunit=u,file='build/maxwell_table_fixture.nml',status='replace',action='write',iostat=ios)
+        call require(ios==0,'open Maxwell table case NAMELIST')
+        write(u,'(A)') '&request'
+        write(u,'(A)') " request_token = 'maxwell-table-cli-smoke'"
+        write(u,'(A)') '/'
+        write(u,'(A)') '&parameters'
+        write(u,'(A)') " core_table_path = '"//core_file//"'"
+        write(u,'(A)') " envelope_table_path = '"//envelope_file//"'"
+        write(u,'(A,ES24.16E3)') ' pc_pa = ',pc_mev_fm3*mev_fm3_to_j_m3
+        write(u,'(A,ES24.16E3)') ' pt_pa = ',pt_mev_fm3*mev_fm3_to_j_m3
+        write(u,'(A,ES24.16E3)') ' p_cut_pa = ',pcut_mev_fm3*mev_fm3_to_j_m3
+        write(u,'(A)') ' r0_m = 1.0'
+        write(u,'(A)') ' r_limit_m = 2000000.0'
+        write(u,'(A)') ' nu_start = 0.0'
+        write(u,'(A)') " surface_policy = 'finite_cutoff_schwarzschild_time'"
+        write(u,'(A)') ' rtol = 2.0e-9'
+        write(u,'(A)') ' atol_r_m = 1.0e-5'
+        write(u,'(A)') ' atol_mass_kg = 1.0e13'
+        write(u,'(A)') ' atol_nu = 1.0e-12'
+        write(u,'(A)') ' dq_initial = 1.0e-5'
+        write(u,'(A)') ' dq_min = 1.0e-15'
+        write(u,'(A)') ' dq_max = 5.0e-2'
+        write(u,'(A)') ' max_steps = 100000'
+        write(u,'(A)') ' frequency_hz = 1800.0'
+        write(u,'(A)') " conversion = 'slow'"
+        write(u,'(A)') ' atol_w = 1.0e-12'
+        write(u,'(A)') ' atol_v = 1.0e-12'
+        write(u,'(A)') '/'
+        close(u,iostat=ios)
+        call require(ios==0,'close Maxwell table case NAMELIST')
+    end subroutine write_namelist
 
     pure real(wp) function log_density_integral(ua,ub,g_at_pt,slope) result(value)
         real(wp),intent(in) :: ua,ub,g_at_pt,slope

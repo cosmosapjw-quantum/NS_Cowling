@@ -1,0 +1,146 @@
+{
+  "date": "2026-11-09",
+  "independent_fortran_python_interface_transfer": [
+    {
+      "conversion": "slow",
+      "fortran_delta_p_relative_jump": 0.0,
+      "python_delta_p_relative_jump": 2.550500039869652e-16,
+      "python_interface_condition_residual": 0.0,
+      "v_out_relative_difference": 0.0,
+      "w_out_relative_difference": 0.0
+    },
+    {
+      "conversion": "rapid",
+      "fortran_delta_p_relative_jump": 0.0,
+      "python_delta_p_relative_jump": 2.550500039869652e-16,
+      "python_interface_condition_residual": 0.0,
+      "v_out_relative_difference": 0.0,
+      "w_out_relative_difference": 0.0
+    }
+  ],
+  "non_claims": [
+    "not a native Fortran sharp-interface TOV/Cowling solver",
+    "not a full stable-branch or maximum-mass calculation",
+    "not a realistic EOS cohort prediction",
+    "not a full-GR polar-mode or damping calculation",
+    "no generalized mode-family continuation through strong transitions"
+  ],
+  "provenance": {
+    "backend_eos_builder": "native Fortran construct_maxwell_transition",
+    "backend_phase_aware_tov_cowling": "Python/SciPy independent reference",
+    "backend_smooth_reference": "native Fortran smooth-EOS TOV/Cowling",
+    "baseline_solver_zip_sha256": "6d2ba545101df4cdc5bb5aed187b640ec84e528bf2005db764792bc4e19d9885",
+    "numpy": "2.5.4",
+    "python": "3.13.18",
+    "scipy": "1.18.1"
+  },
+  "schema": "maxwell-interface-validation-v1",
+  "small_jump_smooth_limit": {
+    "cowling_phase_aware_hz": {
+      "rapid": [
+        45894.58380637414,
+        65877.0931439789
+      ],
+      "slow": [
+        45896.35438166085,
+        65878.55985451251
+      ]
+    },
+    "cowling_relative_difference_vs_smooth_fortran": {
+      "rapid": [
+        -4.200621260475046e-05,
+        -2.333619196803749e-05
+      ],
+      "slow": [
+        -3.4286558495688624e-06,
+        -1.0723634324971698e-06
+      ]
+    },
+    "cowling_smooth_fortran_hz": {
+      "f": 45896.51174500432,
+      "p1": 65878.63050034684
+    },
+    "delta_n_over_n_low": 4.999877589814116e-05,
+    "maxwell_identity_relative_residual": 1.256107787228622e-10,
+    "provider_first_law_residual_high": 2.3572392624209743e-16,
+    "provider_first_law_residual_low": 2.1977376667249382e-16,
+    "roots_unlabelled_outside_this_smooth_limit_cross_match": true,
+    "seidov_critical_ratio": 0.501595744677343,
+    "seidov_ratio": 5.005196621877839e-05,
+    "slow_rapid_relative_difference": [
+      3.8579177320308133e-05,
+      2.226434810048694e-05
+    ],
+    "tov_phase_aware": {
+      "mass_kg": 3.083864737486364e+27,
+      "radius_m": 903.1617757215573
+    },
+    "tov_relative_difference": {
+      "mass": -3.531944802837028e-05,
+      "radius": -9.750840174960196e-06
+    },
+    "tov_smooth_fortran": {
+      "mass_kg": 3.083973661733831e+27,
+      "radius_m": 903.170582393557
+    }
+  },
+  "status": "PASS_BOUNDED_REFERENCE_VALIDATION",
+  "strong_jump_fixture": {
+    "accepted_tov_steps": 196,
+    "cowling_interface_diagnostics_at_1800_hz": {
+      "rapid": {
+        "delta_p_inner_pa": -1.0098592801203059e+32,
+        "delta_p_outer_pa": -1.0098592801203059e+32,
+        "delta_p_relative_jump": 0.0,
+        "isobar_displacement_jump_m": -2.842170943040401e-14,
+        "radial_displacement_jump_m": 175.10400641176244,
+        "rapid_condition_residual": 2.4600687190433006e-15,
+        "slow_condition_residual": 0.48403198475983983,
+        "v_inner": -15416.498466435472,
+        "v_outer": -15416.498466435454,
+        "w_inner": 5526258.843929483,
+        "w_outer": 10710467.859828975
+      },
+      "slow": {
+        "delta_p_inner_pa": -1.0098592801203059e+32,
+        "delta_p_outer_pa": -1.0098592801203059e+32,
+        "delta_p_relative_jump": 0.0,
+        "isobar_displacement_jump_m": -175.10400641176247,
+        "radial_displacement_jump_m": 0.0,
+        "rapid_condition_residual": 1.0706399386674295,
+        "slow_condition_residual": 0.0,
+        "v_inner": -15416.498466435472,
+        "v_outer": 218240.5415018236,
+        "w_inner": 5526258.843929483,
+        "w_outer": 5526258.843929483
+      }
+    },
+    "interface_radius_m": 172.03701122818867,
+    "interface_thermodynamics": {
+      "chemical_potential_mev": 940.9999999999466,
+      "density_high_fm3": 1.9999999999601026,
+      "density_jump_fm3": 0.9999999999816334,
+      "density_low_fm3": 0.9999999999784692,
+      "energy_high_mev_fm3": 1880.9999999624658,
+      "energy_low_mev_fm3": 939.9999999796141,
+      "latent_energy_mev_fm3": 940.9999999828517,
+      "maxwell_identity_relative_residual": 2.666385237578948e-13,
+      "pressure_mev_fm3": 1.000000000009196,
+      "pressure_pa": 1.6021766340147336e+32,
+      "provider_first_law_residual_high": 2.2700017069245383e-16,
+      "provider_first_law_residual_low": 2.1977376667249382e-16,
+      "seidov_critical_ratio": 0.5015957446809003,
+      "seidov_onset_stable_rapid_diagnostic": false,
+      "seidov_ratio": 1.0010638297907013
+    },
+    "interpretation": "boundary-condition and discontinuity exercise only; not admitted as a stable hybrid-star prediction",
+    "mass_solar": 0.0011854884381809355,
+    "radius_m": 848.6266547437914,
+    "rapid_onset_stability_diagnostic": false
+  },
+  "tov_tolerance_refinement": {
+    "relative_interface_radius_difference": -5.683531423272825e-11,
+    "relative_mass_difference": 1.093830803711171e-09,
+    "relative_radius_difference": 1.6924639467674751e-10
+  }
+}

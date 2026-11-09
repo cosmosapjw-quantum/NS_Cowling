@@ -1,0 +1,84 @@
+name: Maxwell exact-head regression verification
+
+on:
+  push:
+    branches:
+      - research/maxwell-reference-validation-v1
+    paths:
+      - .github/workflows/maxwell-reference-regression.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: maxwell-reference-regression-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v4
+        with:
+          ref: research/maxwell-reference-validation-v1
+          fetch-depth: 0
+
+      - name: Record exact head and source hashes
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          git rev-parse HEAD | tee dist/VERIFIED_HEAD.txt
+          sha256sum \
+            python_frontend/compose_cowling/maxwell.py \
+            python_frontend/compose_cowling/__init__.py \
+            oscillation_source/solutions/src/modes/ns_interface_transfer.f90 \
+            oscillation_source/solutions/src/modes/ns_interface_cases.f90 \
+            python_frontend/tests/test_maxwell_star.py \
+            scripts/validate_maxwell_interface.py \
+            validation/MAXWELL_REFERENCE_VALIDATION_20261109.json \
+            > dist/MAXWELL_SOURCE_SHA256SUMS.txt
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install native compiler and test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gfortran
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+
+      - name: Build native Fortran EOS core
+        run: bash fortran_eos/build.sh build/compose_eos_fortran
+
+      - name: Focused Maxwell tests and independent reference validation
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+        run: |
+          python -m pytest -q python_frontend/tests/test_maxwell_star.py --junitxml=dist/maxwell-focused-junit.xml
+          python -m compileall -q python_frontend/compose_cowling python_frontend/compose_eos scripts/validate_maxwell_interface.py
+          python scripts/validate_maxwell_interface.py | tee dist/maxwell-reference-validation.txt
+
+      - name: Full frontend and pipeline regression
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+        run: python -m pytest -q python_frontend/tests pipeline/tests --junitxml=dist/full-regression-junit.xml
+
+      - name: Upload exact-head evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maxwell-exact-head-verification-${{ github.run_id }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30

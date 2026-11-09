@@ -1,0 +1,120 @@
+name: Maxwell sharp-interface integration gate
+# Re-run after restoring the patch's terminal newline.
+
+on:
+  push:
+    branches:
+      - research/maxwell-reference-validation-v1
+    paths:
+      - .github/workflows/maxwell-sharp-interface-gate.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: maxwell-sharp-interface-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  apply-validate-commit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout exact PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: research/maxwell-reference-validation-v1
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install native compiler and dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gfortran
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+
+      - name: Check patch applicability without metadata-only paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          PATCH=research_artifacts/maxwell/NS_Cowling_V5_MAXWELL_V1.patch
+          test -s "$PATCH"
+          git apply --check \
+            --exclude=README.md \
+            --exclude=RELEASE_INFO.md \
+            --exclude=SHA256SUMS.txt \
+            "$PATCH"
+
+      - name: Apply sharp-interface Maxwell source patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git apply \
+            --exclude=README.md \
+            --exclude=RELEASE_INFO.md \
+            --exclude=SHA256SUMS.txt \
+            research_artifacts/maxwell/NS_Cowling_V5_MAXWELL_V1.patch
+          git diff --check
+
+      - name: Build native Fortran EOS core
+        run: bash fortran_eos/build.sh build/compose_eos_fortran
+
+      - name: Run focused Maxwell interface tests
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+        run: |
+          python -m pytest -q python_frontend/tests/test_maxwell_star.py
+          python -m compileall -q python_frontend/compose_cowling python_frontend/compose_eos scripts/validate_maxwell_interface.py
+          python scripts/validate_maxwell_interface.py
+
+      - name: Run full frontend and pipeline regression suite
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+        run: python -m pytest -q python_frontend/tests pipeline/tests
+
+      - name: Record exact patch integration diff
+        run: |
+          mkdir -p dist
+          git diff --check
+          git diff --stat > dist/maxwell-integration-diff-stat.txt
+          git status --short > dist/maxwell-integration-status.txt
+
+      - name: Commit only after all validation gates pass
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            docs/ADVERSARIAL_AUDIT_MAXWELL_TOV_COWLING_20261109.md \
+            docs/MAXWELL_TOV_COWLING_INTERFACE_V1.md \
+            oscillation_source/solutions/src/modes/ns_interface_cases.f90 \
+            oscillation_source/solutions/src/modes/ns_interface_transfer.f90 \
+            python_frontend/compose_cowling/__init__.py \
+            python_frontend/compose_cowling/maxwell.py \
+            python_frontend/tests/test_maxwell_star.py \
+            scripts/validate_maxwell_interface.py \
+            validation/MAXWELL_REFERENCE_VALIDATION_20261109.json
+          git diff --cached --check
+          git commit -m "feat(maxwell): add sharp-interface stellar reference path"
+          git push origin HEAD:research/maxwell-reference-validation-v1
+
+      - name: Upload integration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maxwell-sharp-interface-integration-${{ github.run_id }}
+          path: dist/
+          if-no-files-found: warn
+          retention-days: 30

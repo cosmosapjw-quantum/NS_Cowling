@@ -9,6 +9,8 @@ on:
       - "python_frontend/compose_cowling/native_table_cutoff_scan.py"
       - "python_frontend/tests/test_native_density_cutoff_scan.py"
       - "python_frontend/tests/test_r15_native_density_preflight.py"
+      - "python_frontend/tests/test_r15_cohort_selection.py"
+      - "scripts/run_native_outer_crust_r15.py"
       - "oscillation_release_v1/data/spectrum_summary_234.csv"
       - "oscillation_release_v1/data/eos_projected/**"
   workflow_dispatch:
@@ -33,6 +35,7 @@ jobs:
         run: |
           python -m pytest -q python_frontend/tests/test_native_density_cutoff_scan.py
           python -m pytest -q python_frontend/tests/test_r15_native_density_preflight.py
+          python -m pytest -q python_frontend/tests/test_r15_cohort_selection.py
       - name: Audit all 234 projected EOS tables without TOV integrations
         run: |
           python scripts/r15_native_density_preflight.py \

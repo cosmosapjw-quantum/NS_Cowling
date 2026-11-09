@@ -143,9 +143,14 @@ def audit_native_table(
     if after != before:
         raise RuntimeError("projected EOS bytes changed during read-only preflight")
 
+    try:
+        relative_path = path.resolve().relative_to(ROOT.resolve()).as_posix()
+    except ValueError:
+        relative_path = path.name
+
     table_record = {
         "name": name,
-        "relative_path": path.relative_to(ROOT).as_posix(),
+        "relative_path": relative_path,
         "bytes": path.stat().st_size,
         "row_count": len(rows),
         "sha256_expected_from_frozen_summary": expected_sha256,

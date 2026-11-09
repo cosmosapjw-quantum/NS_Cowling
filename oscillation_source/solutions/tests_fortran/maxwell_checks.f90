@@ -44,6 +44,10 @@ program maxwell_checks
     ! threshold. This fixture tests a true nonzero discontinuity.
     jump_eta=5e-5_wp
     call integrate_maxwell_tov(eos_high,eos_low,pc,pt,star_options,star)
+    if(.not.star%valid.or..not.is_ok(star%status)) then
+        write(*,'(A,A,A,A,A,A)') 'MAXWELL_TOV_DIAGNOSTIC status=',trim(status_name(star%status%code)), &
+            ' category=',trim(star%status%category),' detail=',trim(star%status%detail)
+    end if
     call require(star%valid.and.is_ok(star%status),'native phase-segmented TOV')
     call require(star%core%p_pa(star%core%n)==pt,'core terminates at exact Pt')
     call require(star%envelope%p_pa(1)==pt,'envelope restarts at exact Pt')

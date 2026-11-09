@@ -118,7 +118,7 @@ def audit_native_table(
 
     density = [float(row["n_b_fm3"]) for row in rows]
     pressure = [float(row["pressure_pa"]) for row in rows]
-    last_eligible = max(i for i, value in enumerate(density) if value <= maximum_density)
+    last_eligible = max(i for i, value in enumerate(density) if value <= maximum_density_fm3)
     next_index = last_eligible + 1
     boundary = None
     if next_index < len(rows):

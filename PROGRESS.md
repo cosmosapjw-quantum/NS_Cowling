@@ -112,3 +112,21 @@ Detailed result and artifact provenance: `docs/R15_FULL_COHORT_TOV_RESULTS_20261
 **Interpretation:** the original normalized knots satisfy the algebraic identity (\epsilon+P=\mu_B n_B) to machine precision, but this alone does not establish differential compatibility (dP/d\mu_B=n_B). The secant obstruction concerns the stored matched/normalized pressure-knot sequence, not proof that the upstream microphysical EOS is physically unstable. The raw CompOSE package files, normalized matched tables and projected solver tables remain separate provenance identities.
 
 **Next:** R17 should compare constrained thermodynamic reconstructions with declared data-fidelity objectives and explicit movable variables. Preserve the current q-preserving exact-integral projector as baseline A; do not invent statistical errors or weights. Trace the source/phase/composition provenance of raw knot failures before launching further TOV or mode sensitivity runs. MD-31/32, radial (\omega_0^2), and complete-star Cowling modes remain blocked.
+
+## R17 constrained joint-q reconstruction Pareto pilot (2026-11-10)
+
+**Status: PASS for the bounded four-table implementation/admissibility pilot; negative/limited scientific outcome for this objective family.**
+
+- Actions [42669846775](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42669846775), code HEAD `9fde7e2206a162530c03a77098c5fa7fa19eeba7); 4 representative BBB_BHF2 tables × 5 lambda values × 2 quadrature coordinates = 40 candidates, 14,740 knot rows.
+- Quadrature measures: `mu` and `log_n`; lambda values `1, 0.1, 0.01, 0.001, 0.0001`. Lambda and coordinate are sensitivity parameters, not statistical weights.
+- All 40 candidates have nondecreasing positive q, positive/increasing P and epsilon, zero failed Hermite cells, zero causal-margin rejects, and zero downward candidate pressure-secant changes.
+- Lambda=1 reproduces the frozen projected parent EOS to floating-point roundoff; all four source hashes and all four projected-parent hashes remain unchanged.
+- Maximum relative KKT residual is 9.9943e-13 against the 1e-12 stopping tolerance; maximum First-Law residual is 2.2011e-16.
+- Mean source-relative pressure RMS mismatch changes only from 2.967337% at lambda=1 to 2.966241% for mu weighting and 2.967068% for log_n weighting at lambda=1e-4. Mean density RMS movement is 0.0801% (mu) and 0.0308% (log_n). The row-218 pressure discrepancies remain +64.0802% (GPPVA_DD2), +30.3615% (GPPVA_TM1e), and +15.8415% (SPG_M1) relative to normalized source knots.
+- Interpretation: this constrained joint-q fit is feasible but does not materially resolve the source pressure-knot mismatch. Log-density weighting reduces density movement but gives even less pressure-RMS improvement. This is a scoped negative result for the four BBB_BHF2 examples and this objective family, not a universal no-go.
+- No TOV integrations, mode calculations, synthetic EOS rows, or primary EOS writes were performed.
+- Final reporting workflow [42669846775](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42669846775), artifact ID `13697898562`, SHA-256 `8a266c0b5c1316391fd6ede3d5ae65904b869a8dab66fcb29230a3ede5d52799`. The downloaded ZIP, archive integrity and all manifest hashes independently passed. The final artifact includes explicit scale-relative KKT residuals.
+
+Detailed evidence: `docs/R17_JOINT_Q_RECONSTRUCTION_PILOT_20261110.md`.
+
+**Next:** R18 should localize the 447 R16 source pressure-secant decreases by exact source row/density, matching metadata/bridge construction, and available phase/composition provenance. Preserve raw CompOSE package, normalized matched table, and projected solver input as distinct identity layers. Do not scale joint-q fitting or rerun TOV until a distinct reconstruction has a source-backed mechanism and a meaningful Pareto advantage. MD-31/32 and full-star radial/Cowling modes remain blocked.

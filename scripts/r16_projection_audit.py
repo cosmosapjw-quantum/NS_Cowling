@@ -147,6 +147,29 @@ def reconstruct_projection(
     source_boundary_cell = source_cell_diagnostics[216] if len(source_cell_diagnostics) > 216 else None
     projected_boundary_cell = projected_cell_diagnostics[216] if len(projected_cell_diagnostics) > 216 else None
 
+    source_pressure_secants = [
+        (p_v[i + 1] - p_v[i]) / h[i] for i in range(len(h))
+    ]
+    projected_pressure_secants = [
+        (p_projected[i + 1] - p_projected[i]) / h[i] for i in range(len(h))
+    ]
+    source_secant_change_pct = [None] + [
+        100.0 * (source_pressure_secants[i] / source_pressure_secants[i - 1] - 1.0)
+        for i in range(1, len(source_pressure_secants))
+    ]
+    projected_secant_change_pct = [None] + [
+        100.0 * (projected_pressure_secants[i] / projected_pressure_secants[i - 1] - 1.0)
+        for i in range(1, len(projected_pressure_secants))
+    ]
+    source_secant_decrease_indices = [
+        i + 1 for i in range(1, len(source_pressure_secants))
+        if source_pressure_secants[i] < source_pressure_secants[i - 1] * (1.0 - 1.0e-12)
+    ]
+    projected_secant_decrease_indices = [
+        i + 1 for i in range(1, len(projected_pressure_secants))
+        if projected_pressure_secants[i] < projected_pressure_secants[i - 1] * (1.0 - 1.0e-12)
+    ]
+
     source_q_violation_count = sum(
         b < a for a, b in zip(q_source, q_source[1:])
     )
@@ -197,6 +220,17 @@ def reconstruct_projection(
         "projected_cell_diagnostics": projected_cell_diagnostics,
         "source_q_monotone": source_q_violation_count == 0,
         "source_q_violation_count": source_q_violation_count,
+        "source_pressure_secants_dpdmu": source_pressure_secants,
+        "projected_pressure_secants_dpdmu": projected_pressure_secants,
+        "source_secant_change_pct": source_secant_change_pct,
+        "projected_secant_change_pct": projected_secant_change_pct,
+        "source_secant_decrease_count": len(source_secant_decrease_indices),
+        "source_secant_decrease_lower_cell_indices": source_secant_decrease_indices,
+        "projected_secant_decrease_count": len(projected_secant_decrease_indices),
+        "projected_secant_decrease_lower_cell_indices": projected_secant_decrease_indices,
+        "source_secant_worst_relative_drop_pct": min(
+            (x for x in source_secant_change_pct if x is not None), default=0.0
+        ),
         "pav_block_count": len(blocks),
         "pav_pooled_block_count": len(pooled_blocks),
         "pav_pooled_knots": pooled_knots,

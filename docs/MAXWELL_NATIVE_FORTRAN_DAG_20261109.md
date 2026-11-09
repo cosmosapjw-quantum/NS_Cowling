@@ -3,7 +3,7 @@
 Authority:
 - Repository: `cosmosapjw-quantum/NS_Cowling`
 - Branch: `research/maxwell-native-fortran-v1`
-- Latest branch/workflow/documentation head: `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`
+- Exact code+workflow head exercised by CI: `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`
 - Exact code-bearing implementation head: `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`
 - PR #3 remains open, draft and unmerged.
 

@@ -9,7 +9,7 @@ Date: 2026-11-09
 - Pull request: [#3](https://github.com/cosmosapjw-quantum/NS_Cowling/pull/3), draft, open, not merged
 - Historical verified source head: `d3649906292b0ec8f1caf98961f12436fa00871b`
 - Latest code-bearing implementation head: `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`
-- Latest branch/workflow/documentation head: `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`
+- Exact code+workflow head exercised by CI: `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`
 - TOV module blob: `6e54f73c07ae68c8113ceb3ff31aff2dd12170e6`
 - Cowling module blob: `ce4fac829d3a5c211139d5174541a7053793afc6`
 - Table-driven case adapter blob: `1b0853565884a43696afc15cfb072e2bde033231`

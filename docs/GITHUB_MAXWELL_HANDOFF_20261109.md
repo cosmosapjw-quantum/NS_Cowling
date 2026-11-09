@@ -103,7 +103,7 @@ The present CI exercises the Maxwell no-root scan path only. Positive-root bisec
 
 The statement that native Fortran production solvers are smooth-only is superseded by the generic production API and tests on the current feature branch.
 
-- Latest branch/workflow/documentation head: `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`.
+- Exact code+workflow head exercised by CI: `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`.
 - Code-bearing implementation head: `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`.
 - Push [42585358415](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42585358415): success; artifact 13658722733; SHA-256 `26313f4315af74718f5fa9d1687658ef603c405807b2f7d44d27057fa38242a1`.
 - Pull request [42585366571](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42585366571): success; artifact 13659056245; SHA-256 `12afce4e910c53b9a0dda180826bea2a98a5986562df0866bb7f9a26da219412`.

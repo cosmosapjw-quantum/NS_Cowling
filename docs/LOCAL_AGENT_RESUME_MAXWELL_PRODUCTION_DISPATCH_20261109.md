@@ -7,7 +7,7 @@ Draft PR: https://github.com/cosmosapjw-quantum/NS_Cowling/pull/3
 
 ## Authority and workspace safety
 
-The latest branch/workflow/documentation head is `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`. The exact code-bearing implementation commit is `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`.
+The exact code+workflow head exercised by CI is `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`. The exact code-bearing implementation commit is `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`.
 
 The exact latest-head push and PR workflows both passed:
 

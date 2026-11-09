@@ -150,4 +150,4 @@ The same exact-head CI also checks 12 cell, 22 analytic Maxwell and 74 normalize
 - Push [42585358415](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42585358415), artifact 13658722733, SHA-256 `26313f4315af74718f5fa9d1687658ef603c405807b2f7d44d27057fa38242a1`.
 - Pull request [42585366571](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42585366571), artifact 13659056245, SHA-256 `12afce4e910c53b9a0dda180826bea2a98a5986562df0866bb7f9a26da219412`.
 
-Workflow/documentation head: `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`. Code-bearing implementation head: `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`. The normalized tables remain generated analytic fixtures; realistic CompOSE data, positive-root convergence and mode identity remain unverified.
+CI-validated workflow head: `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`. Code-bearing implementation head: `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`. The normalized tables remain generated analytic fixtures; realistic CompOSE data, positive-root convergence and mode identity remain unverified.

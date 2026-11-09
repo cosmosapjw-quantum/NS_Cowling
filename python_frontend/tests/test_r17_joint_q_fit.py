@@ -71,3 +71,16 @@ def test_log_density_weighted_fit_is_a_declared_coordinate_sensitivity():
     assert result["q_monotone"] is True
     assert result["positive_thermodynamics"] is True
     assert result["objective_after_fit"] <= result["objective_before_source_q"] + 1e-12
+
+
+def test_joint_fit_reports_scale_relative_projected_gradient_residual():
+    mu, n, p = _nonconvex_pressure_fixture()
+    result = fit_monotone_q(mu, n, p, lambda_density=0.01, tolerance=1e-12)
+
+    assert result["projected_gradient_kkt_residual_relative"] <= 1e-12
+    assert result["projected_gradient_kkt_residual_relative"] == pytest.approx(
+        result["projected_gradient_kkt_residual"] /
+        (1.0 + max(abs(x) for x in result["q_fitted"]) / np.median(n / mu)),
+        rel=1e-12,
+        abs=1e-15,
+    )

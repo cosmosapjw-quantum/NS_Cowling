@@ -54,6 +54,33 @@ def pav_increasing(values: Sequence[float], weights: Sequence[float]) -> tuple[l
     return projected, normalized_blocks
 
 
+def hermite_cell_diagnostics(
+    mu0: float, p0: float, n0: float,
+    mu1: float, p1: float, n1: float,
+) -> dict[str, Any]:
+    """Whole-cell endpoint curvature and causal-margin diagnostics for cubic P(mu)."""
+    if not (mu1 > mu0 and p1 > p0 and mu0 > 0.0 and mu1 > 0.0):
+        raise ValueError("Hermite cell mu and pressure must be positive and strictly increasing")
+    h = mu1 - mu0
+    dp_over_h = (p1 - p0) / h
+    d2_low = (6.0 * dp_over_h - 4.0 * n0 - 2.0 * n1) / h
+    d2_high = (2.0 * n0 + 4.0 * n1 - 6.0 * dp_over_h) / h
+    g_low = mu0 * d2_low - n0
+    g_high = mu1 * d2_high - n1
+    stable = d2_low > 0.0 and d2_high > 0.0
+    causal = stable and g_low >= 0.0 and g_high >= 0.0
+    return {
+        "d2p_low": d2_low,
+        "d2p_high": d2_high,
+        "min_d2p": min(d2_low, d2_high),
+        "causal_margin_low": g_low,
+        "causal_margin_high": g_high,
+        "min_causal_margin": min(g_low, g_high),
+        "stable": stable,
+        "causal": causal,
+    }
+
+
 def reconstruct_projection(
     mu: Sequence[float],
     n_source: Sequence[float],
@@ -102,6 +129,24 @@ def reconstruct_projection(
     ) or any(b <= a for a, b in zip(eps_projected, eps_projected[1:])):
         raise ValueError("projected thermodynamics are not positive and monotone")
 
+    source_cell_diagnostics = [
+        hermite_cell_diagnostics(mu_v[i], p_v[i], n_v[i], mu_v[i + 1], p_v[i + 1], n_v[i + 1])
+        for i in range(len(mu_v) - 1)
+    ]
+    projected_cell_diagnostics = [
+        hermite_cell_diagnostics(
+            mu_v[i], p_projected[i], n_projected[i],
+            mu_v[i + 1], p_projected[i + 1], n_projected[i + 1],
+        )
+        for i in range(len(mu_v) - 1)
+    ]
+    source_nonstable_cells = sum(not x["stable"] for x in source_cell_diagnostics)
+    source_noncausal_cells = sum(not x["causal"] for x in source_cell_diagnostics)
+    projected_nonstable_cells = sum(not x["stable"] for x in projected_cell_diagnostics)
+    projected_noncausal_cells = sum(not x["causal"] for x in projected_cell_diagnostics)
+    source_boundary_cell = source_cell_diagnostics[216] if len(source_cell_diagnostics) > 216 else None
+    projected_boundary_cell = projected_cell_diagnostics[216] if len(projected_cell_diagnostics) > 216 else None
+
     source_q_violation_count = sum(
         b < a for a, b in zip(q_source, q_source[1:])
     )
@@ -137,6 +182,17 @@ def reconstruct_projection(
 
     return {
         "row_count": len(mu_v),
+        "source_cell_count": len(source_cell_diagnostics),
+        "source_nonstable_cell_count": source_nonstable_cells,
+        "source_noncausal_cell_count": source_noncausal_cells,
+        "projected_nonstable_cell_count": projected_nonstable_cells,
+        "projected_noncausal_cell_count": projected_noncausal_cells,
+        "source_min_d2p_all_cells": min(x["min_d2p"] for x in source_cell_diagnostics),
+        "source_min_causal_margin_all_cells": min(x["min_causal_margin"] for x in source_cell_diagnostics),
+        "projected_min_d2p_all_cells": min(x["min_d2p"] for x in projected_cell_diagnostics),
+        "projected_min_causal_margin_all_cells": min(x["min_causal_margin"] for x in projected_cell_diagnostics),
+        "source_row217_218_cell": source_boundary_cell,
+        "projected_row217_218_cell": projected_boundary_cell,
         "source_q_monotone": source_q_violation_count == 0,
         "source_q_violation_count": source_q_violation_count,
         "pav_block_count": len(blocks),

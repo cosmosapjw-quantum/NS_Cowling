@@ -19,7 +19,8 @@ module ns_maxwell_mode_spectrum
     private
 
     type, public :: maxwell_node_count_t
-        integer :: nodes_inner=-1,nodes_outer=-1,nodes_total=-1
+        integer :: w_nodes_inner=-1,w_nodes_outer=-1,w_nodes_total=-1
+        integer :: v_nodes_inner=-1,v_nodes_outer=-1,v_nodes_total=-1
         integer :: samples_inner=0,samples_outer=0
         logical :: valid=.false.
     end type
@@ -58,10 +59,11 @@ contains
         call fail_status(status,NS_INVALID_INPUT,'numerics', &
             'phase-aware node count requires finite piecewise Cowling W profile and interface radius')
         if(.not.ieee_is_finite(interface_radius).or.interface_radius<=0._wp) return
-        if(.not.allocated(shot%r_m).or..not.allocated(shot%w_m3)) return
+        if(.not.allocated(shot%r_m).or..not.allocated(shot%w_m3).or..not.allocated(shot%v_m2)) return
         n=size(shot%r_m)
-        if(n<4.or.size(shot%w_m3)/=n) return
-        if(.not.all(ieee_is_finite(shot%r_m)).or..not.all(ieee_is_finite(shot%w_m3))) return
+        if(n<4.or.size(shot%w_m3)/=n.or.size(shot%v_m2)/=n) return
+        if(.not.all(ieee_is_finite(shot%r_m)).or..not.all(ieee_is_finite(shot%w_m3)).or. &
+           .not.all(ieee_is_finite(shot%v_m2))) return
         if(any(shot%r_m<=0._wp)) return
         do i=2,n
             if(shot%r_m(i)<=shot%r_m(i-1)) return
@@ -87,11 +89,16 @@ contains
                 'phase-aware node count is under-resolved in one phase segment')
             return
         end if
-        call count_segment_nodes(shot%w_m3(1:n_inner),zero_tol,nodes%nodes_inner,status)
+        call count_segment_nodes(shot%w_m3(1:n_inner),zero_tol,nodes%w_nodes_inner,status)
         if(.not.is_ok(status)) return
-        call count_segment_nodes(shot%w_m3(n_inner+1:n),zero_tol,nodes%nodes_outer,status)
+        call count_segment_nodes(shot%w_m3(n_inner+1:n),zero_tol,nodes%w_nodes_outer,status)
         if(.not.is_ok(status)) return
-        nodes%nodes_total=nodes%nodes_inner+nodes%nodes_outer
+        call count_segment_nodes(shot%v_m2(1:n_inner),zero_tol,nodes%v_nodes_inner,status)
+        if(.not.is_ok(status)) return
+        call count_segment_nodes(shot%v_m2(n_inner+1:n),zero_tol,nodes%v_nodes_outer,status)
+        if(.not.is_ok(status)) return
+        nodes%w_nodes_total=nodes%w_nodes_inner+nodes%w_nodes_outer
+        nodes%v_nodes_total=nodes%v_nodes_inner+nodes%v_nodes_outer
         nodes%valid=.true.
         call clear_status(status)
     end subroutine count_maxwell_cowling_nodes

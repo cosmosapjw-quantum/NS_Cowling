@@ -179,12 +179,18 @@ contains
                     call emit_text('spectrum_nodes_status_'//trim(suffix), &
                         trim(status_name(spectrum%refinements(i)%node_status%code)))
                     if(spectrum%refinements(i)%nodes%valid) then
-                        call emit_int('spectrum_nodes_inner_'//trim(suffix), &
-                            int(spectrum%refinements(i)%nodes%nodes_inner,int64))
-                        call emit_int('spectrum_nodes_outer_'//trim(suffix), &
-                            int(spectrum%refinements(i)%nodes%nodes_outer,int64))
-                        call emit_int('spectrum_nodes_total_'//trim(suffix), &
-                            int(spectrum%refinements(i)%nodes%nodes_total,int64))
+                        call emit_int('spectrum_w_nodes_inner_'//trim(suffix), &
+                            int(spectrum%refinements(i)%nodes%w_nodes_inner,int64))
+                        call emit_int('spectrum_w_nodes_outer_'//trim(suffix), &
+                            int(spectrum%refinements(i)%nodes%w_nodes_outer,int64))
+                        call emit_int('spectrum_w_nodes_total_'//trim(suffix), &
+                            int(spectrum%refinements(i)%nodes%w_nodes_total,int64))
+                        call emit_int('spectrum_v_nodes_inner_'//trim(suffix), &
+                            int(spectrum%refinements(i)%nodes%v_nodes_inner,int64))
+                        call emit_int('spectrum_v_nodes_outer_'//trim(suffix), &
+                            int(spectrum%refinements(i)%nodes%v_nodes_outer,int64))
+                        call emit_int('spectrum_v_nodes_total_'//trim(suffix), &
+                            int(spectrum%refinements(i)%nodes%v_nodes_total,int64))
                         call emit_int('spectrum_node_samples_inner_'//trim(suffix), &
                             int(spectrum%refinements(i)%nodes%samples_inner,int64))
                         call emit_int('spectrum_node_samples_outer_'//trim(suffix), &

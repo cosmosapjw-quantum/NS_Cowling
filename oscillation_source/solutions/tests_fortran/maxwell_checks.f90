@@ -34,25 +34,33 @@ program maxwell_checks
 
     ! TDD: phase-aware sampled node counts must not register a sign jump
     ! between the two one-sided interface values as an interior node.
-    allocate(node_shot%r_m(7),node_shot%w_m3(7))
+    allocate(node_shot%r_m(7),node_shot%w_m3(7),node_shot%v_m2(7))
     node_shot%r_m=[1._wp,2._wp,3._wp,4._wp,5._wp,6._wp,7._wp]
     node_shot%w_m3=[1._wp,-1._wp,1._wp,1._wp,-1._wp,1._wp,-1._wp]
+    node_shot%v_m2=[1._wp,-1._wp,1._wp,1._wp,-1._wp,1._wp,-1._wp]
     call count_maxwell_cowling_nodes(node_shot,4._wp,node_counts,status)
     call require(is_ok(status).and.node_counts%valid,'phase-aware node diagnostic accepts a valid split profile')
-    call require(node_counts%nodes_inner==2,'inner-segment node count excludes interface jump')
-    call require(node_counts%nodes_outer==2,'outer-segment node count is independent')
-    call require(node_counts%nodes_total==4,'total sampled node count is sum of phase segments')
+    call require(node_counts%w_nodes_inner==2,'inner W-node count excludes interface jump')
+    call require(node_counts%w_nodes_outer==2,'outer W-node count is independent')
+    call require(node_counts%w_nodes_total==4,'total W-node count is sum of phase segments')
+    call require(node_counts%v_nodes_inner==2,'inner V-node count excludes interface jump')
+    call require(node_counts%v_nodes_outer==2,'outer V-node count is independent')
+    call require(node_counts%v_nodes_total==4,'total V-node count is sum of phase segments')
 
     node_shot%w_m3=[1._wp,1._wp,1._wp,1._wp,-1._wp,-1._wp,-1._wp]
+    node_shot%v_m2=[1._wp,1._wp,1._wp,1._wp,-1._wp,-1._wp,-1._wp]
     call count_maxwell_cowling_nodes(node_shot,4._wp,node_counts,status)
     call require(is_ok(status).and.node_counts%valid,'node diagnostic accepts a pure interface sign jump')
-    call require(node_counts%nodes_total==0,'interface sign jump is not counted as an interior node')
+    call require(node_counts%w_nodes_total==0.and.node_counts%v_nodes_total==0, &
+        'interface sign jump is not counted as an interior W or V node')
 
     node_shot%w_m3=-1e-24_wp*[1._wp,-1._wp,1._wp,1._wp,-1._wp,1._wp,-1._wp]
+    node_shot%v_m2= 1e-24_wp*[1._wp,-1._wp,1._wp,1._wp,-1._wp,1._wp,-1._wp]
     call count_maxwell_cowling_nodes(node_shot,4._wp,node_counts,status)
     call require(is_ok(status).and.node_counts%valid,'node diagnostic is invariant under amplitude scaling and sign')
-    call require(node_counts%nodes_inner==2.and.node_counts%nodes_outer==2, &
-        'phase node counts are invariant under amplitude normalization')
+    call require(node_counts%w_nodes_inner==2.and.node_counts%w_nodes_outer==2.and. &
+        node_counts%v_nodes_inner==2.and.node_counts%v_nodes_outer==2, &
+        'phase W and V node counts are invariant under amplitude normalization')
 
     pt=pt_mev_fm3*mev_fm3_to_j_m3
     pc=pc_mev_fm3*mev_fm3_to_j_m3

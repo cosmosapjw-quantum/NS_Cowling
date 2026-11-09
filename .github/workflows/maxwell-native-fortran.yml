@@ -96,7 +96,135 @@ jobs:
             grep -E '^spectrum_valid[[:space:]]+bool[[:space:]]+true$' "../../dist/${log}"
             grep -E '^spectrum_roots_found[[:space:]]+int[[:space:]]+2$' "../../dist/${log}"
             grep -E '^spectrum_root_valid_00001[[:space:]]+bool[[:space:]]+true$' "../../dist/${log}"
-            grep -E '^spectrum_root_valid_00002[[:space:]]+bool[[:space:]]+true$' "../../dist/${log}"
+            grep -E '^spectrum_root_valid_00002[[:space:]]+bool[[:space:]]+true          run_spectrum_case maxwell_table_slow_ode_tight.nml maxwell-spectrum-slow-ode-tight.log
+          run_spectrum_case maxwell_table_rapid_ode_tight.nml maxwell-spectrum-rapid-ode-tight.log
+          run_spectrum_case maxwell_table_slow_root_grid_tight.nml maxwell-spectrum-slow-root-grid-tight.log
+          run_spectrum_case maxwell_table_rapid_root_grid_tight.nml maxwell-spectrum-rapid-root-grid-tight.log
+          python ../../scripts/validate_native_maxwell_reference.py \
+            --slow-log ../../dist/maxwell-spectrum-cli.log \
+            --rapid-log ../../dist/maxwell-rapid-spectrum-cli.log \
+            --slow-ode-tight-log ../../dist/maxwell-spectrum-slow-ode-tight.log \
+            --rapid-ode-tight-log ../../dist/maxwell-spectrum-rapid-ode-tight.log \
+            --slow-root-grid-tight-log ../../dist/maxwell-spectrum-slow-root-grid-tight.log \
+            --rapid-root-grid-tight-log ../../dist/maxwell-spectrum-rapid-root-grid-tight.log \
+            --output ../../dist/maxwell-native-convergence-reference.json
+
+      - name: Record exact source identity
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD | tee dist/VERIFIED_HEAD.txt
+          sha256sum \
+            oscillation_source/solutions/src/structure/ns_maxwell_tov.f90 \
+            oscillation_source/solutions/src/modes/ns_maxwell_cowling.f90 \
+            oscillation_source/solutions/src/structure/ns_maxwell_cases.f90 \
+            oscillation_source/solutions/src/production/ns_production_solvers.f90 \
+            oscillation_source/solutions/src/modes/ns_maxwell_mode_spectrum.f90 \
+            oscillation_source/solutions/src/modes/ns_mode_cases.f90 \
+            oscillation_source/solutions/src/structure/ns_tov_cases.f90 \
+            oscillation_source/solutions/src/structure/ns_table_star_cases.f90 \
+            oscillation_source/solutions/tests_fortran/maxwell_checks.f90 \
+            oscillation_source/solutions/tests_fortran/maxwell_table_checks.f90 \
+            oscillation_source/solutions/fpm.toml \
+            python_frontend/compose_cowling/maxwell.py \
+            python_frontend/compose_cowling/direct_barotrope.py \
+            python_frontend/compose_eos/eos_data.py \
+            scripts/validate_native_maxwell_reference.py \
+            > dist/MAXWELL_NATIVE_FORTRAN_SHA256SUMS.txt
+
+      - name: Upload exact-head validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maxwell-native-fortran-${{ github.run_id }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30 "../../dist/${log}"
+            grep -E '^spectrum_nodes_valid_00001[[:space:]]+bool[[:space:]]+true          run_spectrum_case maxwell_table_slow_ode_tight.nml maxwell-spectrum-slow-ode-tight.log
+          run_spectrum_case maxwell_table_rapid_ode_tight.nml maxwell-spectrum-rapid-ode-tight.log
+          run_spectrum_case maxwell_table_slow_root_grid_tight.nml maxwell-spectrum-slow-root-grid-tight.log
+          run_spectrum_case maxwell_table_rapid_root_grid_tight.nml maxwell-spectrum-rapid-root-grid-tight.log
+          python ../../scripts/validate_native_maxwell_reference.py \
+            --slow-log ../../dist/maxwell-spectrum-cli.log \
+            --rapid-log ../../dist/maxwell-rapid-spectrum-cli.log \
+            --slow-ode-tight-log ../../dist/maxwell-spectrum-slow-ode-tight.log \
+            --rapid-ode-tight-log ../../dist/maxwell-spectrum-rapid-ode-tight.log \
+            --slow-root-grid-tight-log ../../dist/maxwell-spectrum-slow-root-grid-tight.log \
+            --rapid-root-grid-tight-log ../../dist/maxwell-spectrum-rapid-root-grid-tight.log \
+            --output ../../dist/maxwell-native-convergence-reference.json
+
+      - name: Record exact source identity
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD | tee dist/VERIFIED_HEAD.txt
+          sha256sum \
+            oscillation_source/solutions/src/structure/ns_maxwell_tov.f90 \
+            oscillation_source/solutions/src/modes/ns_maxwell_cowling.f90 \
+            oscillation_source/solutions/src/structure/ns_maxwell_cases.f90 \
+            oscillation_source/solutions/src/production/ns_production_solvers.f90 \
+            oscillation_source/solutions/src/modes/ns_maxwell_mode_spectrum.f90 \
+            oscillation_source/solutions/src/modes/ns_mode_cases.f90 \
+            oscillation_source/solutions/src/structure/ns_tov_cases.f90 \
+            oscillation_source/solutions/src/structure/ns_table_star_cases.f90 \
+            oscillation_source/solutions/tests_fortran/maxwell_checks.f90 \
+            oscillation_source/solutions/tests_fortran/maxwell_table_checks.f90 \
+            oscillation_source/solutions/fpm.toml \
+            python_frontend/compose_cowling/maxwell.py \
+            python_frontend/compose_cowling/direct_barotrope.py \
+            python_frontend/compose_eos/eos_data.py \
+            scripts/validate_native_maxwell_reference.py \
+            > dist/MAXWELL_NATIVE_FORTRAN_SHA256SUMS.txt
+
+      - name: Upload exact-head validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maxwell-native-fortran-${{ github.run_id }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30 "../../dist/${log}"
+            grep -E '^spectrum_nodes_valid_00002[[:space:]]+bool[[:space:]]+true          run_spectrum_case maxwell_table_slow_ode_tight.nml maxwell-spectrum-slow-ode-tight.log
+          run_spectrum_case maxwell_table_rapid_ode_tight.nml maxwell-spectrum-rapid-ode-tight.log
+          run_spectrum_case maxwell_table_slow_root_grid_tight.nml maxwell-spectrum-slow-root-grid-tight.log
+          run_spectrum_case maxwell_table_rapid_root_grid_tight.nml maxwell-spectrum-rapid-root-grid-tight.log
+          python ../../scripts/validate_native_maxwell_reference.py \
+            --slow-log ../../dist/maxwell-spectrum-cli.log \
+            --rapid-log ../../dist/maxwell-rapid-spectrum-cli.log \
+            --slow-ode-tight-log ../../dist/maxwell-spectrum-slow-ode-tight.log \
+            --rapid-ode-tight-log ../../dist/maxwell-spectrum-rapid-ode-tight.log \
+            --slow-root-grid-tight-log ../../dist/maxwell-spectrum-slow-root-grid-tight.log \
+            --rapid-root-grid-tight-log ../../dist/maxwell-spectrum-rapid-root-grid-tight.log \
+            --output ../../dist/maxwell-native-convergence-reference.json
+
+      - name: Record exact source identity
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD | tee dist/VERIFIED_HEAD.txt
+          sha256sum \
+            oscillation_source/solutions/src/structure/ns_maxwell_tov.f90 \
+            oscillation_source/solutions/src/modes/ns_maxwell_cowling.f90 \
+            oscillation_source/solutions/src/structure/ns_maxwell_cases.f90 \
+            oscillation_source/solutions/src/production/ns_production_solvers.f90 \
+            oscillation_source/solutions/src/modes/ns_maxwell_mode_spectrum.f90 \
+            oscillation_source/solutions/src/modes/ns_mode_cases.f90 \
+            oscillation_source/solutions/src/structure/ns_tov_cases.f90 \
+            oscillation_source/solutions/src/structure/ns_table_star_cases.f90 \
+            oscillation_source/solutions/tests_fortran/maxwell_checks.f90 \
+            oscillation_source/solutions/tests_fortran/maxwell_table_checks.f90 \
+            oscillation_source/solutions/fpm.toml \
+            python_frontend/compose_cowling/maxwell.py \
+            python_frontend/compose_cowling/direct_barotrope.py \
+            python_frontend/compose_eos/eos_data.py \
+            scripts/validate_native_maxwell_reference.py \
+            > dist/MAXWELL_NATIVE_FORTRAN_SHA256SUMS.txt
+
+      - name: Upload exact-head validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maxwell-native-fortran-${{ github.run_id }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30 "../../dist/${log}"
           }
           run_spectrum_case maxwell_table_slow_ode_tight.nml maxwell-spectrum-slow-ode-tight.log
           run_spectrum_case maxwell_table_rapid_ode_tight.nml maxwell-spectrum-rapid-ode-tight.log

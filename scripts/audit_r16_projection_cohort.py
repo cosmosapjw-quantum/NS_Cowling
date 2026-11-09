@@ -122,6 +122,18 @@ def build_cell_records(
                 100.0 * (delta_p_projected / delta_p_source - 1.0)
                 if delta_p_source > 0.0 else None
             ),
+            "source_pressure_secant_dpdmu": source["source_pressure_secants_dpdmu"][i],
+            "projected_pressure_secant_dpdmu": source["projected_pressure_secants_dpdmu"][i],
+            "source_secant_change_from_previous_pct": source["source_secant_change_pct"][i],
+            "projected_secant_change_from_previous_pct": source["projected_secant_change_pct"][i],
+            "source_knot_convexity_violation": bool(
+                source["source_secant_change_pct"][i] is not None
+                and (1.0 + source["source_secant_change_pct"][i] / 100.0) < (1.0 - 1.0e-12)
+            ),
+            "projected_knot_convexity_violation": bool(
+                source["projected_secant_change_pct"][i] is not None
+                and (1.0 + source["projected_secant_change_pct"][i] / 100.0) < (1.0 - 1.0e-12)
+            ),
             "source_d2p_low": raw["d2p_low"],
             "source_d2p_high": raw["d2p_high"],
             "source_min_d2p": raw["min_d2p"],
@@ -236,6 +248,15 @@ def audit_one(reference: dict[str, str]) -> dict:
         "reconstruction_mu_max_rel_mismatch": mismatch_mu,
         "source_q_monotone": result["source_q_monotone"],
         "source_q_violation_count": result["source_q_violation_count"],
+        "source_pressure_secant_decrease_count": result["source_secant_decrease_count"],
+        "source_pressure_secant_decrease_lower_cell_rows": ";".join(
+            str(x) for x in result["source_secant_decrease_lower_cell_indices"]
+        ),
+        "source_pressure_secant_worst_relative_drop_pct": result["source_secant_worst_relative_drop_pct"],
+        "projected_pressure_secant_decrease_count": result["projected_secant_decrease_count"],
+        "projected_pressure_secant_decrease_lower_cell_rows": ";".join(
+            str(x) for x in result["projected_secant_decrease_lower_cell_indices"]
+        ),
         "pav_block_count": result["pav_block_count"],
         "pav_pooled_block_count": result["pav_pooled_block_count"],
         "pav_pooled_knots": result["pav_pooled_knots"],
@@ -325,6 +346,10 @@ def summarize(records: list[dict]) -> list[dict]:
             "context": context,
             "table_count": len(rows),
             "source_q_nonmonotone_table_count": sum(not x["source_q_monotone"] for x in rows),
+            "source_pressure_knot_nonconvex_table_count": sum(x["source_pressure_secant_decrease_count"] > 0 for x in rows),
+            "source_pressure_secant_decrease_count_total": sum(x["source_pressure_secant_decrease_count"] for x in rows),
+            "projected_pressure_knot_nonconvex_table_count": sum(x["projected_pressure_secant_decrease_count"] > 0 for x in rows),
+            "projected_pressure_secant_decrease_count_total": sum(x["projected_pressure_secant_decrease_count"] for x in rows),
             "pav_pooled_table_count": sum(x["pav_pooled_block_count"] > 0 for x in rows),
             "pav_pooled_block_count_total": sum(x["pav_pooled_block_count"] for x in rows),
             "pav_knot_reduction_total": sum(x["pav_knot_reduction"] for x in rows),
@@ -423,6 +448,8 @@ def main(argv=None) -> int:
     )
     projected_nonstable_cell_count = sum(not x["projected_stable"] for x in cell_records)
     projected_noncausal_cell_count = sum(not x["projected_causal"] for x in cell_records)
+    source_secant_decreases = [x for x in cell_records if x["source_knot_convexity_violation"]]
+    projected_secant_decreases = [x for x in cell_records if x["projected_knot_convexity_violation"]]
     out = args.output_dir.resolve()
     out.mkdir(parents=True, exist_ok=True)
 
@@ -443,6 +470,17 @@ def main(argv=None) -> int:
         "source_noncausal_cell_fraction": source_noncausal_cell_count / source_cell_count if source_cell_count else None,
         "projected_nonstable_cell_fraction": projected_nonstable_cell_count / source_cell_count if source_cell_count else None,
         "projected_noncausal_cell_fraction": projected_noncausal_cell_count / source_cell_count if source_cell_count else None,
+        "source_pressure_secant_decrease_count": len(source_secant_decreases),
+        "source_tables_with_pressure_knot_nonconvexity": sum(
+            x["source_pressure_secant_decrease_count"] > 0 for x in records
+        ),
+        "projected_pressure_secant_decrease_count": len(projected_secant_decreases),
+        "projected_tables_with_pressure_knot_nonconvexity": sum(
+            x["projected_pressure_secant_decrease_count"] > 0 for x in records
+        ),
+        "source_pressure_secant_worst_relative_drop_pct": min(
+            (x["source_pressure_secant_worst_relative_drop_pct"] for x in records), default=None
+        ),
         "density_bin_count": len(density_groups),
         "matching_methods": list(METHODS),
         "projection_definition": "weighted PAV of q=n_b/mu_b on trapezoidal mu weights; n=mu*q; exact interval integral of piecewise-linear q for P; epsilon=mu*n-P",
@@ -478,6 +516,7 @@ def main(argv=None) -> int:
     write_csv(out / "r16_projection_audit_groups.csv", groups)
     write_csv(out / "r16_projection_audit_cells.csv", cell_records)
     write_csv(out / "r16_projection_audit_density_bins.csv", density_groups)
+    write_csv(out / "r16_projection_audit_convexity_violations.csv", source_secant_decreases)
     manifest = {
         "schema": "ns-cowling-r16-projection-audit-manifest-v1",
         "receipt_sha256": digest(receipt_path),
@@ -485,6 +524,7 @@ def main(argv=None) -> int:
         "groups_csv_sha256": digest(out / "r16_projection_audit_groups.csv"),
         "cells_csv_sha256": digest(out / "r16_projection_audit_cells.csv"),
         "density_bins_csv_sha256": digest(out / "r16_projection_audit_density_bins.csv"),
+        "convexity_violations_csv_sha256": digest(out / "r16_projection_audit_convexity_violations.csv"),
         "source_summary_sha256": SUMMARY_SHA256,
         "audited_table_count": len(records),
         "audited_cell_count": source_cell_count,
@@ -502,6 +542,9 @@ def main(argv=None) -> int:
         "source_stable_but_acausal_cells": source_stable_but_acausal_cell_count,
         "projected_nonstable_cells": projected_nonstable_cell_count,
         "projected_noncausal_cells": projected_noncausal_cell_count,
+        "source_pressure_secant_decreases": len(source_secant_decreases),
+        "tables_with_source_pressure_nonconvexity": receipt["source_tables_with_pressure_knot_nonconvexity"],
+        "projected_pressure_secant_decreases": len(projected_secant_decreases),
         "density_bins": len(density_groups),
         "failures": len(failures),
         "source_q_nonmonotone_tables": receipt["source_q_nonmonotone_table_count"],

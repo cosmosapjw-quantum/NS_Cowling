@@ -49,7 +49,7 @@ jobs:
           set -euo pipefail
           mkdir -p "${RUNNER_TEMP}/micromamba"
           curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj -C "${RUNNER_TEMP}/micromamba" bin/micromamba
-          "${RUNNER_TEMP}/micromamba/bin/micromamba" create -y -p "${RUNNER_TEMP}/fpm-env" -c conda-forge fpm numpy scipy
+          "${RUNNER_TEMP}/micromamba/bin/micromamba" create -y -p "${RUNNER_TEMP}/fpm-env" -c conda-forge fpm numpy scipy pytest
           echo "${RUNNER_TEMP}/fpm-env/bin" >> "${GITHUB_PATH}"
 
       - name: Run native Fortran tests with runtime checks
@@ -65,6 +65,11 @@ jobs:
         run: |
           set -euo pipefail
           fpm build --compiler gfortran --flag "-std=f2018 -O0 -g -fcheck=all -ffree-line-length-none -fimplicit-none" 2>&1 | tee ../../dist/maxwell-native-fpm-build.log
+
+      - name: Run Python Maxwell reference tests
+        run: |
+          set -euo pipefail
+          python -m pytest -q python_frontend/tests/test_maxwell_star.py
 
       - name: Exercise normalized-table production case driver
         working-directory: oscillation_source/solutions

@@ -16,7 +16,7 @@ program maxwell_table_checks
     real(wp),parameter :: mev_to_j=1.602176634e-13_wp
     real(wp),parameter :: fm3_to_m3=1e45_wp
     real(wp),parameter :: pt_mev_fm3=1._wp,pc_mev_fm3=1.4_wp,pcut_mev_fm3=0.2_wp
-    real(wp),parameter :: g_low_pt=939._wp,g_high_pt=939.05_wp,mu_t_mev=941._wp
+    real(wp),parameter :: g_low_pt=939._wp,g_high_pt=1139._wp,mu_t_mev=941._wp
     real(wp),parameter :: log_gl_x(8)=[0.095012509837637440185_wp,0.281603415044923588867_wp, &
         0.458016777657227386342_wp,0.617876244402643748447_wp,0.755404408355003033895_wp, &
         0.865631202387831743880_wp,0.944575023073232576078_wp,0.989400934991649932596_wp]

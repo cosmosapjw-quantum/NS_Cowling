@@ -298,7 +298,7 @@ The 217→218 native density interval is sparse and crust-family-dependent. Acro
 
 The full-cohort solver-native Hermite audit is now complete: Actions [42654562160](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42654562160) evaluated all 234 row-217→218 cells using the exact `cubic_Hermite_P_of_mu_raw_n_v1` construction. Every cell passes the Fortran-equivalent whole-cell (P''>0) and (\mu P''-P'\\ge0) checks; analytic `chi(t)` stationary-point enumeration finds zero interior roots, and `chi` increases monotonically over every cell. The global (c_s^2/c^2) range is (1.830688\\times10^{-4})–(2.950720\\times10^{-3}), with maximum endpoint First-Law closure residual (2.392\\times10^{-16}). Source hashes are unchanged; no EOS rows or TOV solves were added in this audit. Full evidence: `docs/R15_NATIVE_HERMITE_ROW217_218_AUDIT_20261110.md`.
 
-The next study is a source/provenance audit, not another interpolation-stability repair: trace the low-density CompOSE/BSk22-derived material and projection/mapping that produces the prefix and the row-217→218 sparse interval. Preserve the identity and provenance of each original table. Do not infer physical crust completeness from the numerical regularity of an interpolant.
+R16 has now completed the full 234-table normalized-to-projected comparison; see `docs/R16_NORMALIZED_TO_PROJECTED_AUDIT_20261110.md`. The source q=n_B/mu_B sequence is already monotone in all 234 tables, so PAV does not pool knots. Pressure is instead reintegrated from dP/dmu_B=n_B. This exactly reproduces every frozen projected table, but the source pressure knots have 447 downward adjacent-secant transitions across all 234 tables. Thus a convex interpolant cannot preserve every source pressure knot exactly in the affected data sequences. Raw normalized Hermite cells reject 24,505/109,776 for stability/causal-margin conditions, while projected cells reject 0/109,776. This is a representation-level result, not a claim that the upstream microphysical EOS is physically unstable.
 
 
 R15 does not lift MD-31 or MD-32:
@@ -307,3 +307,36 @@ R15 does not lift MD-31 or MD-32:
 - Direct radial (\omega_0^2) and complete-star mass-dependent Cowling f/p1 remain blocked. Barotropic-equilibrium (Gamma_1=\Gamma_{eq}) is distinct from frozen-composition (Gamma_1); the latter requires composition derivatives.
 
 The authoritative R15 result record is `docs/R15_FULL_COHORT_TOV_RESULTS_20261110.md`; input preflight is `docs/R15_FULL_COHORT_NATIVE_DENSITY_PREFLIGHT_20261110.md`.
+
+## 21. R17 constrained thermodynamic reconstruction comparison
+
+R17 should treat the projection as a model choice with an explicit data-fidelity contract, not as a generic cleanup step.
+
+### Baseline A: current q-preserving exact-integral construction
+
+Preserve the normalized source (\mu_B) and (n_B) knots, use the nondecreasing (q=n_B/\mu_B), represent (q) linearly between knots, integrate (dP/d\mu_B=n_B) exactly, and reconstruct (\epsilon=\mu_B n_B-P). This is the current projected solver input and is the baseline to reproduce unchanged.
+
+### Alternative reconstruction families to define
+
+1. **Pressure-relaxed convex fit:** allow pressure knots to move while keeping source (\mu_B,n_B) knots fixed; enforce monotone/convex (P(\mu_B)), positive energy density and causal (c_s^2/c^2\le1). This family directly addresses the 447 source secant drops, but its endpoint pressure residual must be reported rather than hidden.
+2. **Joint (P,n) reconstruction:** allow both pressure and density knots to move under (dP/d\mu_B=n_B), (P''>0), and causal-margin constraints. Explicitly report changes in (n_B), (P), (\epsilon), and (\mu_B); do not claim all source variables are preserved.
+3. **Piecewise source segmentation:** where a phase/composition transition is supported by source metadata, test whether the offending knot sequence should be segmented at a justified interface rather than smoothed across it. A split is not licensed by a numerical residual alone.
+
+### Objective and uncertainty rules
+
+The current repository does not provide a complete statistical uncertainty model for all normalized EOS knots. Therefore:
+- do not invent per-knot standard deviations or claim statistical optimality;
+- expose objective weights and normalization scales as explicit sensitivity parameters;
+- report a Pareto/error budget for pressure, density, energy, chemical potential, convexity, causality, and differentiability;
+- keep exact byte identity of parent normalized/projected inputs separate from semantic table identity;
+- store each candidate reconstruction as a separately versioned derived artifact with source-summary SHA, per-table parent hashes, algorithm version and full receipt.
+
+### Acceptance and stopping conditions
+
+- Baseline A must reproduce the current 234 projected CSVs at the existing (5\times10^{-12}) relative comparison threshold.
+- Each alternative must pass per-cell (P'>0), (P''>0), (\mu P''-P'\ge0), (\epsilon>0), and the exact First-Law reconstruction.
+- Any source pressure knot that cannot be preserved under convexity must appear in the explicit residual ledger; no silent knot replacement.
+- Compare only source-backed low-density model/phase alternatives. Keep raw CompOSE package, normalized matched input, projected solver input and new derived candidates as distinct provenance layers.
+- Do not rerun the full 1,872 TOV cases until at least two clearly defined, physically interpretable candidate reconstructions exist. Then select a small representative structural sensitivity slice before scaling to the 234-table cohort.
+
+R16 did not run TOV or modes. MD-31 ((P=0) physical low-density EOS/surface) and MD-32 (finite-domain perturbation boundary) remain separate. Radial (\omega_0^2) and complete-star Cowling modes remain blocked.

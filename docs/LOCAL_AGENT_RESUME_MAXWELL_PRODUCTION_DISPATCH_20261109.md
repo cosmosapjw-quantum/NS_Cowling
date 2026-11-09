@@ -7,15 +7,12 @@ Draft PR: https://github.com/cosmosapjw-quantum/NS_Cowling/pull/3
 
 ## Authority and workspace safety
 
-The latest exact-source-tested implementation commit is:
+The latest branch/workflow/documentation head is `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`. The exact code-bearing implementation commit is `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`.
 
-- `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`
+The exact latest-head push and PR workflows both passed:
 
-Its exact-head GitHub Actions push run passed:
-
-- Run: https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42584910411
-- Artifact ID: `13658767086`
-- Artifact SHA-256: `7a4ecb2784e777256735a809c5a331f9cb4f8bef85963d2fe1348045b17b4443`
+- Push run: https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42585358415; artifact `13658722733`; SHA-256 `26313f4315af74718f5fa9d1687658ef603c405807b2f7d44d27057fa38242a1`.
+- PR run: https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42585366571; artifact `13659056245`; SHA-256 `12afce4e910c53b9a0dda180826bea2a98a5986562df0866bb7f9a26da219412`.
 
 Before changing any local files:
 1. Run `git status --short --branch`, `git rev-parse HEAD`, and `git branch --show-current`.
@@ -72,7 +69,11 @@ Results:
 - Existing `maxwell_table_cowling` synthetic two-table CLI smoke passed.
 - The analytic fixture small-jump comparison remains `dM/M=9.1343e-8`, `dR/R=2.8981e-8`.
 
-The workflow still needs a separate smoke invocation of `maxwell_table_spectrum` on the generated analytic table fixture; do not claim that CLI spectrum path is CI-verified until the updated workflow completes successfully.
+The updated workflow now runs `maxwell_table_spectrum` on the generated analytic two-table fixture. It scans 1799, 1800 and 1801 Hz; residuals are approximately 0.989787, 0.993524 and 0.996295; all three trials succeed, with zero brackets and zero roots. Thus the production CLI no-root scan path is CI-verified, but the positive-root/bisection branch is not.
+
+## Latest exact-head verification
+
+At branch/workflow head `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`, runtime-check CI reports 12 cell, 22 analytic Maxwell and 74 normalized-table checks passed; production build and both Maxwell CLI cases passed. The synthetic scan is no-root only. The malformed workflow attempt at `42b5936...` and the earlier optional-argument compile failure at `f0723ec...` remain in history, followed by corrected commits and passing runs.
 
 ## Next research steps, in order
 

@@ -97,3 +97,18 @@ The earlier handoff statement that native Fortran `solve_tov_star` and `solve_co
 - A pre-dispatch snapshot remains at `backup/maxwell-native-fortran-pre-production-dispatch-20261109`.
 
 The present CI exercises the Maxwell no-root scan path only. Positive-root bisection needs a deterministic bracket fixture; mode-family identity remains unimplemented. Keep PR #3 draft/open/unmerged. No local workstation checkout was changed by this ChatGPT-side GitHub operation.
+
+
+## Exact-head production dispatch and spectrum CLI update (2026-11-09)
+
+The statement that native Fortran production solvers are smooth-only is superseded by the generic production API and tests on the current feature branch.
+
+- Latest branch/workflow/documentation head: `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`.
+- Code-bearing implementation head: `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`.
+- Push [42585358415](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42585358415): success; artifact 13658722733; SHA-256 `26313f4315af74718f5fa9d1687658ef603c405807b2f7d44d27057fa38242a1`.
+- Pull request [42585366571](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42585366571): success; artifact 13659056245; SHA-256 `12afce4e910c53b9a0dda180826bea2a98a5986562df0866bb7f9a26da219412`.
+- Exact-head results: 12 cell, 22 analytic Maxwell and 74 normalized-table checks passed; production driver built; both `maxwell_table_cowling` and `maxwell_table_spectrum` passed.
+- The spectrum smoke scanned three frequencies (1799, 1800, 1801 Hz), all successful, 0 brackets and 0 roots. It does not verify a physical eigenfrequency or positive-root bisection.
+- The pre-dispatch branch backup remains `backup/maxwell-native-fortran-pre-production-dispatch-20261109`.
+
+The production generic API now dispatches smooth or Maxwell TOV backgrounds and smooth or Maxwell Cowling scans. PR #3 remains draft/open/unmerged. A realistic source-backed CompOSE hybrid EOS remains untested. The positive-root branch and mode-family identity need dedicated validation. The 33-path v5 overlay remains unapplied.

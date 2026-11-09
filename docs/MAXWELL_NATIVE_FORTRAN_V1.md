@@ -140,3 +140,14 @@ The smooth TOV overload also preserves the optional `eos_events(:)` smooth-stop 
 The Maxwell spectrum implementation lives in `src/modes/ns_maxwell_mode_spectrum.f90`. It scans the supplied positive, strictly increasing angular-frequency grid, retains failed trials as barriers, finds candidates using the existing bracket builder, refines sign/near brackets with bisection, and reruns the shot at the candidate root. The conversion prescription is fixed for one scan (`slow` or `rapid`). Root-family identity is always reported as `unresolved`; the implementation does not yet assign f/p1/interface labels. A finite scan is only a bounded search over the supplied grid and is not a completeness theorem.
 
 Production case adapters now route existing smooth TOV, normalized-table TOV, and smooth Cowling spectrum calls through the generic API. The Maxwell case adapter routes TOV through the same generic API and adds `maxwell_table_spectrum`. Current exact-head CI uses a generated analytic two-table fixture and checks the scan/no-root path; positive-root bisection, realistic CompOSE data, root-family identity and physical spectrum convergence remain open.
+
+
+## Exact-head generic-dispatch and spectrum CLI update (2026-11-09)
+
+The updated production smoke now runs both `maxwell_table_cowling` and `maxwell_table_spectrum` through `case_driver`. The finite frequency grid is 1799, 1800 and 1801 Hz; all 3 shots return status `ok`, with residuals (0.989787), (0.993524) and (0.996295). There are no sign brackets, sample candidates or roots. Thus the production scanner's successful no-root path is verified, but no physical eigenfrequency has been found and the bisection-positive-root branch is not exercised by this fixture.
+
+The same exact-head CI also checks 12 cell, 22 analytic Maxwell and 74 normalized-table assertions, and both push and pull-request events pass:
+- Push [42585358415](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42585358415), artifact 13658722733, SHA-256 `26313f4315af74718f5fa9d1687658ef603c405807b2f7d44d27057fa38242a1`.
+- Pull request [42585366571](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42585366571), artifact 13659056245, SHA-256 `12afce4e910c53b9a0dda180826bea2a98a5986562df0866bb7f9a26da219412`.
+
+Workflow/documentation head: `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`. Code-bearing implementation head: `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`. The normalized tables remain generated analytic fixtures; realistic CompOSE data, positive-root convergence and mode identity remain unverified.

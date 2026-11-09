@@ -69,7 +69,7 @@ A separate phase-segmented native Fortran path now accepts independent high-dens
 
 
 
-The native sharp-Maxwell Fortran path is tracked independently in [the implementation contract](docs/MAXWELL_NATIVE_FORTRAN_V1.md), [the adversarial audit](docs/ADVERSARIAL_AUDIT_MAXWELL_NATIVE_FORTRAN_20261109.md), and [the research DAG](docs/MAXWELL_NATIVE_FORTRAN_DAG_20261109.md). Exact-head CI includes 74 normalized-table integration checks and a successful `maxwell_table_cowling` production CLI smoke on generated analytic phase tables; PR #3 remains a draft and execution with source-backed realistic CompOSE hybrid phases remains open.
+The native sharp-Maxwell Fortran path is tracked independently in [the implementation contract](docs/MAXWELL_NATIVE_FORTRAN_V1.md), [the adversarial audit](docs/ADVERSARIAL_AUDIT_MAXWELL_NATIVE_FORTRAN_20261109.md), and [the research DAG](docs/MAXWELL_NATIVE_FORTRAN_DAG_20261109.md). The typed production generic APIs now dispatch both smooth and one-sharp-Maxwell TOV/Cowling paths. Exact-head CI on branch head `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c` passed 12 cell, 22 analytic Maxwell and 74 normalized-table checks, built the production driver, and ran both `maxwell_table_cowling` and `maxwell_table_spectrum` against generated analytic phase tables. The spectrum fixture has 3 successful trials and 0 brackets/roots: this validates the finite-grid no-root path, not an eigenfrequency or positive-root bisection. PR #3 remains draft/open/unmerged; a source-backed realistic CompOSE hybrid phase pair remains untested.
 
 ## Native production solver dispatch (2026-11-09)
 
@@ -80,3 +80,6 @@ The Fortran module `ns_production_solvers` exposes generic production entry poin
 - `solve_cowling_spectrum(maxwell_star, grid, options, conversion, spectrum)` scans a two-phase background separately for `slow` or `rapid` conversion.
 
 The Maxwell scanner retains every trial status, only refines sign/near brackets with bisection, and rejects unresolved near-zero samples. A converged root remains `unresolved` by family until an independent identity/continuation method is added. A successful finite-grid scan does not prove that all eigenfrequencies in or outside the grid were found. The current CI spectrum smoke uses generated analytic tables and intentionally checks a no-root scan path; a source-backed realistic EOS and root-family validation remain open. See [the dispatch contract](docs/PRODUCTION_SOLVER_DISPATCH_MAXWELL_20261109.md), [the DAG](docs/MAXWELL_NATIVE_FORTRAN_DAG_20261109.md), and [the local-agent resume prompt](docs/LOCAL_AGENT_RESUME_MAXWELL_PRODUCTION_DISPATCH_20261109.md).
+
+
+The latest exact-head workflow evidence is recorded in the adversarial audit and local-agent resume file. The successful push and pull-request runs both check the workflow/docs head while all native Fortran source code remains at the separately verified implementation commit `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`.

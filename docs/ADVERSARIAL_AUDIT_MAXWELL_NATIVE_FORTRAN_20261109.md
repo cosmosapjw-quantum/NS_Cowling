@@ -7,7 +7,9 @@ Date: 2026-11-09
 - Repository: `cosmosapjw-quantum/NS_Cowling`
 - Branch: `research/maxwell-native-fortran-v1`
 - Pull request: [#3](https://github.com/cosmosapjw-quantum/NS_Cowling/pull/3), draft, open, not merged
-- Exact verified source head: `d3649906292b0ec8f1caf98961f12436fa00871b`
+- Historical verified source head: `d3649906292b0ec8f1caf98961f12436fa00871b`
+- Latest code-bearing implementation head: `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`
+- Latest branch/workflow/documentation head: `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`
 - TOV module blob: `6e54f73c07ae68c8113ceb3ff31aff2dd12170e6`
 - Cowling module blob: `ce4fac829d3a5c211139d5174541a7053793afc6`
 - Table-driven case adapter blob: `1b0853565884a43696afc15cfb072e2bde033231`
@@ -28,7 +30,7 @@ Date: 2026-11-09
 | Synthetic normalized-table TOV/Cowling integration | PASS | Two generated T14-format phase tables loaded and admitted; exact-Pt coexistence and first-law closure checked; table-backed TOV and slow/rapid Cowling shots passed |
 | Production case-driver table CLI | PASS, synthetic fixture | `maxwell_table_cowling` returned `result_valid=true` and `cowling_shot_valid=true`; one 1800 Hz residual only |
 | Realistic CompOSE hybrid-EOS execution | NOT RUN | No real source-backed high/low phase pair has been supplied and audited |
-| Complete Cowling spectrum / mode identity | NOT IMPLEMENTED | Single-frequency shooting residual only |
+| Cowling frequency scan / mode identity | PARTIAL / IDENTITY NOT IMPLEMENTED | Finite supplied-grid slow/rapid scans and bracket refinement are implemented; the current fixture only verifies the no-root scan path. No positive-root branch, f/p1 continuation, or interface-mode identity is verified. |
 
 ### Exact-head GitHub Actions
 
@@ -65,7 +67,7 @@ Both workflows also ran `fpm build` for the production case driver and uploaded 
 
 - The normalized high-/low-density table provider and production CLI are verified only on a generated analytic two-table fixture. A source-backed CompOSE hybrid-EOS pair remains untested.
 - No published realistic hybrid-EOS TOV/Cowling benchmark has been reproduced in this PR.
-- No complete frequency root scan, `f/p1` continuation, mode identity tracking, interface-mode classification, or convergence under a frequency-root refinement study is implemented.
+- A bounded frequency-grid scanner and bisection path are implemented, but this exact-head fixture has no positive bracket. Positive-root refinement convergence, `f/p1` continuation, mode identity tracking and interface-mode classification remain unverified.
 - No maximum-mass or stable-branch survey, twin-star analysis, radial stability calculation beyond the local Seidov diagnostic, or parameter inference is claimed.
 - No metric perturbations beyond Cowling, rotation, magnetic fields, elasticity, superfluidity, composition stratification, or GW damping.
 - The finite positive-pressure surface cutoff remains part of the numerical contract.
@@ -99,3 +101,19 @@ GitHub Actions push run [42584910411](https://github.com/cosmosapjw-quantum/NS_C
 ### Claim boundary
 
 This run verifies compilation and the generic dispatch/no-root scanning path only. The frequency fixture around 1800 Hz contains no candidate root, so the bisection-positive-root branch was not exercised. Even when a bracketed root is found, mode family identity remains `unresolved`. No realistic CompOSE hybrid EOS, physical eigenfrequency, complete spectrum, f/p1 continuation, or stable-branch inference is claimed.
+
+
+## Final generic production dispatch and CLI-spectrum gate (2026-11-09)
+
+The latest branch head is `22b0faa3c69150f3ae4fffcd2a6cae5d8231bb6c`; its code-bearing implementation parent is `f8678cb13a18f63bad9f8db65c4cd3e66e491ad3`. Both exact-head workflow events passed:
+
+- Push [42585358415](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42585358415), artifact 13658722733, SHA-256 `26313f4315af74718f5fa9d1687658ef603c405807b2f7d44d27057fa38242a1`.
+- Pull request [42585366571](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42585366571), artifact 13659056245, SHA-256 `12afce4e910c53b9a0dda180826bea2a98a5986562df0866bb7f9a26da219412`.
+
+Runtime-check results: `cell_checks=12`, `maxwell_checks=22`, `maxwell_table_checks=74`; production build passed. The generated analytic two-table fixture passed both `maxwell_table_cowling` and `maxwell_table_spectrum` through the actual `case_driver`.
+
+The spectrum CLI scanned 1799, 1800 and 1801 Hz. All three shots succeeded with residuals approximately 0.989787, 0.993524 and 0.996295. It found zero sign brackets and zero roots. This verifies a successful finite-grid no-root scan only. The positive-root/bisection branch is not exercised. A successful scan is not a complete spectrum and none of these residual samples is an eigenfrequency.
+
+The implementation also preserves the optional smooth `eos_events(:)` argument through the generic TOV wrapper. A compile failure from its initial omission is recorded at earlier commit `f0723ec...`; the corrected exact-head run passed. A later malformed workflow authoring commit `42b5936...` created no jobs; the workflow was restored from the previous clean YAML and both final events passed.
+
+**Current audit state:** `PASS_BOUNDED_NATIVE_GENERIC_DISPATCH_AND_SYNTHETIC_NO_ROOT_CLI`. Still unverified: source-backed realistic CompOSE phases, positive-root refinement, root-frequency convergence, mode-family identity/continuation, M-R stability sequence and astrophysical inference.

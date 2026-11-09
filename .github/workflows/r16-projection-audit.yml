@@ -1,0 +1,41 @@
+name: R16 full-cohort isotonic pressure reconstruction audit
+
+on:
+  push:
+    branches: [research/r15-native-outer-crust-pilot]
+    paths:
+      - ".github/workflows/r16-projection-audit.yml"
+      - "scripts/r16_projection_audit.py"
+      - "python_frontend/tests/test_r16_projection_reconstruction.py"
+      - "oscillation_release_v1/data/spectrum_summary_234.csv"
+      - "oscillation_release_v1/data/eos_original_normalized/**"
+      - "oscillation_release_v1/data/eos_projected/**"
+      - "oscillation_release_v1/workflow/project_isotonic.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  r16-projection-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Test weighted isotonic and exact pressure integration
+        run: python -m pytest -q python_frontend/tests/test_r16_projection_reconstruction.py
+      - name: Audit all 234 normalized-to-projected EOS pairs
+        run: |
+          python scripts/r16_projection_audit.py \
+            --output-dir dist/r16-full-cohort-projection-audit
+      - name: Upload R16 source-to-projection evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ns-cowling-r16-projection-audit-${{ github.run_id }}
+          path: dist/r16-full-cohort-projection-audit/
+          if-no-files-found: error
+          retention-days: 30

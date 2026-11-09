@@ -388,6 +388,8 @@ def summarize_density_bins(cells: list[dict]) -> list[dict]:
             "projected_noncausal_cell_count": projected_noncausal,
             "source_nonstable_fraction": source_nonstable / len(values),
             "source_noncausal_fraction": source_noncausal / len(values),
+            "source_pressure_secant_decrease_count": sum(x["source_knot_convexity_violation"] for x in values),
+            "projected_pressure_secant_decrease_count": sum(x["projected_knot_convexity_violation"] for x in values),
             "projected_nonstable_fraction": projected_nonstable / len(values),
             "projected_noncausal_fraction": projected_noncausal / len(values),
             "max_abs_source_min_d2p": max(abs(x["source_min_d2p"]) for x in values),

@@ -42,11 +42,6 @@ The modest endpoint change in (mu_b) suggests that the chemical-potential values
 
 ## Next numerical object
 
-The next useful diagnostic is the actual EOS representation used by the solver on the row-217-to-row-218 interval:
+The full-cohort solver-native representation audit has now been completed; see `R15_NATIVE_HERMITE_ROW217_218_AUDIT_20261110.md`. All 234 cubic-Hermite cells pass the exact endpoint stability/causality conditions, (\chi=c_s^2/c^2) is monotonically increasing with zero interior stationary points in every cell, and maximum endpoint First-Law energy closure residual is (2.392\\times10^{-16}). This closes the numerical interpolation concern for the current representation on this cell, not the physical low-density EOS provenance question.
 
-1. inspect endpoint Hermite slopes and the interpolated (P(mu_b)) / (epsilon(mu_b)) behavior;
-2. test positivity and monotonicity of the represented derivative (dP/d\epsilon);
-3. compare interpolation curvature and integral consistency on the native interval;
-4. perform a separate diagnostic-only interval-subdivision sensitivity test while keeping all authoritative EOS source files and their hashes unchanged.
-
-This should remain a numerical representation audit, separate from any claim about a physical crust-core transition or a (P=0) surface.
+The next useful diagnostic is a source/provenance reconstruction of the low-density rows: identify the original CompOSE and BSk22-derived source records, the crust-family mapping, and any projection/normalization transformations that produced rows 1–218. Keep original source hashes and derived projected-table identity separate. Do not create synthetic EOS rows or infer a physical (P=0) surface from this numerical audit.

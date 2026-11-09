@@ -63,3 +63,20 @@
 - BibTeX validation: 5 entries, 0 issues. Abstract logic review: 0 issues.
 
 **Next action:** no f/p1 integrations remain for this v1 scope. Full-GR perturbations, frozen-composition closure, sharp-interface modes, or a zero-pressure surface are separate physical models and should use separately versioned outputs.
+
+
+## R15 full-cohort native low-density TOV cutoff scan (2026-11-10)
+
+**Status: PASS for the declared finite-positive-pressure truncation diagnostic.** This is not a P=0 surface completion, physical crust-mass/thickness estimate, radial-stability result, or complete-star Cowling spectrum.
+
+- Full-cohort native-density preflight: Actions [42650145210](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42650145210), 234/234 projected tables, 1,872/1,872 selected native knots, all source hashes unchanged.
+- Full TOV scan: Actions [42650666976](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42650666976), source commit `16f44113464987c2043d1b6c70a028f936af16e8`; 39 pairs × 6 methods × 8 cutoffs = 1,872/1,872 TOV cases, all status `ok`.
+- Independent source/baseline/case/profile verification: 234/234 source tables unchanged; 234/234 native-edge M/R baselines reproduced (max relative errors 1.33e-15 mass, 1.22e-15 radius); 312/312 pair×cutoff cells complete; 1,872/1,872 background profile SHA-256 and data-row counts match; zero failures; zero synthetic EOS.
+- Original full TOV artifact is 752 MB and exceeds the connector download cap. Repack workflow [42651779185](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42651779185) verified the source artifact and emitted a compact core artifact, four profile shards, and an index. All six ZIPs were downloaded and their digests/integrity checked.
+- At the last selected cutoff (source row 217), mean enclosed-mass response is -0.00301608% and mean internal-isobar radius response is -3.934502%, each relative to the same method/table source-row-1 finite-pressure isobar. The response is descriptive within the frozen 1.3300106263-Msun reference cohort; it is not a physical surface/crust correction.
+- At row 217 the core-conditioned mean radius responses are BBB_BHF2 -3.475964%, GM_GM1 -4.622658%, RG_SLY4 -3.704885%. Six-method spread is much smaller than these core-family contrasts in this selected diagnostic.
+- Row 217→218 remains a sparse, crust-family-dependent native interval. Its representative two-point secant is not a local sound speed or causality test.
+
+Detailed result and artifact provenance: `docs/R15_FULL_COHORT_TOV_RESULTS_20261110.md`. Native mesh intake: `docs/R15_FULL_COHORT_NATIVE_DENSITY_PREFLIGHT_20261110.md`. Boundary diagnostic: `docs/R15_ROW217_218_BOUNDARY_DIAGNOSTIC_20261110.md`.
+
+**Next numerical question:** inspect the exact native cubic-Hermite (P(\mu_b)) representation over row 217→218, including derivative positivity/monotonicity and whole-cell stationary points. Do not append synthetic rows or infer physical crust/surface completion. MD-31 (sourced P=0 EOS/surface) and MD-32 (finite-domain perturbation BC) remain separate blockers; radial (\omega_0^2) and complete-star Cowling modes remain blocked.

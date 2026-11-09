@@ -16,9 +16,9 @@ def test_monotone_source_q_is_not_pooled_and_pressure_is_reintegrated():
     assert out["pav_block_count"] == 3
     assert out["pav_pooled_block_count"] == 0
     assert out["source_q_monotone"] is True
-    assert out["n_projected"] == pytest.approx(n, rel=0.0, abs=1e-14)
-    assert out["p_projected"] == pytest.approx([1.0, 31.0 / 12.0, 17.0 / 3.0], rel=0.0, abs=1e-14)
-    assert out["q_projected"] == pytest.approx([0.5, 0.75, 1.0], rel=0.0, abs=1e-14)
+    assert out["projected_n"] == pytest.approx(n, rel=0.0, abs=1e-14)
+    assert out["projected_p"] == pytest.approx([1.0, 31.0 / 12.0, 17.0 / 3.0], rel=0.0, abs=1e-14)
+    assert out["projected_q"] == pytest.approx([0.5, 0.75, 1.0], rel=0.0, abs=1e-14)
 
 
 def test_nonmonotone_source_q_is_pooled_but_projected_n_is_not_silently_preserved():

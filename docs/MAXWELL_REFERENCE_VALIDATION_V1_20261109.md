@@ -100,3 +100,17 @@ The phase-aware sharp-interface TOV/Cowling solver is Python/SciPy reference cod
 - Patch SHA-256: de9b51aacbf8d022ffe5dbd0787b7f38d82f6883597f4b15963381530a0f05c5.
 
 These are local package and test artifacts. Their presence in this branch as a patch and documentation is not equivalent to integrating the patch into the native production solver.
+
+
+## Final GitHub exact-head verification (2026-11-09)
+
+The source patch is now applied to `research/maxwell-reference-validation-v1` at commit `6b23d024e41661d33b83d6202038db6da918821d`. GitHub Actions [run 42579257980](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42579257980) completed successfully on the pre-integration head and produced the source commit only after all gates passed:
+
+- Patch applicability and application: PASS.
+- Native Fortran EOS build: PASS.
+- Focused Maxwell interface tests: **7 passed**.
+- Independent Maxwell reference script: `PASS_BOUNDED_REFERENCE_VALIDATION`.
+- Full `python_frontend/tests pipeline/tests`: **74 passed**.
+- Evidence artifact ID: `13657075483`; ZIP SHA-256: `93347a170c238458fa937f2359e9ae4a8737098c5f9ec9dbdb09a26351f9946b`.
+
+This does not change the implementation boundary: sharp-interface phase-segmented TOV/Cowling remains a Python/SciPy reference path. Fortran currently provides native slow/rapid interface-transfer algebra and its direct test harness, not a production phase-segmented `solve_tov_star` or `solve_cowling_spectrum`. The analytic strong-jump fixture remains a boundary-condition test and is not a stable hybrid-star prediction.

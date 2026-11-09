@@ -29,7 +29,7 @@ module ns_cell_shooting
  end type
  public::integrate_cells,match_cells
 contains
- subroutine integrate_cells(model,pc,p_cut,r0,rtol,step_cap,method,f_hz,nu_surface,result,profile_path,match_index,surface_start,center_order)
+ subroutine integrate_cells(model,pc,p_cut,r0,rtol,step_cap,method,f_hz,nu_surface,result,profile_path,match_index,surface_start,center_order,r_limit_m)
   type(table_eos_t),intent(in)::model
   real(wp),intent(in)::pc,p_cut,r0,rtol,step_cap,f_hz,nu_surface
   character(len=*),intent(in)::method
@@ -38,6 +38,7 @@ contains
   integer,optional,intent(in)::match_index
   type(cell_run_t),optional,intent(in)::surface_start
   integer,optional,intent(in)::center_order
+  real(wp),optional,intent(in)::r_limit_m
   type(eos_state_t)::s0,ss,stage_state,sc
   type(status_t)::st
   type(ode_options_t)::opts
@@ -47,7 +48,7 @@ contains
   real(wp)::x,dx,phi,lambda,qterm,dytov(3),w0,v0,rr,mm
   real(wp)::yt(4)
   integer::i,ic,is,j,nd,u,ios,attempts,di,original_surface_cell
-  real(wp)::tdir,b1,b2,normb,wfac,vfac,nu_c,tc
+  real(wp)::tdir,b1,b2,normb,wfac,vfac,nu_c,tc,radius_limit
   integer::order,icc
   logical::modes,save
   result=cell_run_t();modes=f_hz>0._wp;save=present(profile_path)
@@ -56,7 +57,9 @@ contains
   if(pc<=p_cut.or.p_cut<=0._wp.or.r0<=0._wp.or.rtol<=0._wp.or.step_cap<=0._wp.or.f_hz<0._wp)return
   if(method/='dopri'.and.method/='rk4')return
   order=0;if(present(center_order))order=center_order
+  radius_limit=1e6_wp;if(present(r_limit_m))radius_limit=r_limit_m
   if(order/=0.and.order/=2)return
+  if(.not.ieee_is_finite(radius_limit).or.radius_limit<=r0)return
   nd=2;if(modes)nd=4
   call center_start(lookup,pc,r0,0._wp,yc,st)
   if(.not.is_ok(st))then;result%status=st;return;endif
@@ -223,7 +226,7 @@ contains
    if(t>1._wp.and.t<=1._wp+16._wp*epsilon(1._wp))t=1._wp
    call cell_state(model%cells(i),t,stage_state,dn,status);if(.not.is_ok(status))return
    r=z(1)*rscale;m=z(2)*mscale
-   if(r<=0._wp.or.r>1e6_wp.or.m<0._wp)then
+   if(r<=0._wp.or.r>radius_limit.or.m<0._wp)then
     call fail_status(status,NS_OUT_OF_DOMAIN,'physics','invalid direct-cell stellar state');return
    endif
    call tov_rhs(stage_eos,r,[m,stage_state%pressure_pa,0._wp],dtov,status)
@@ -254,7 +257,7 @@ contains
   end subroutine
  end subroutine
 subroutine match_cells(model,pc,p_cut,r0,rtol,step_cap,method,f_hz,star,match_index, &
-                       residual,r_mismatch,m_mismatch,status,profile_prefix,step_count,surface_residual,center_order)
+                       residual,r_mismatch,m_mismatch,status,profile_prefix,step_count,surface_residual,center_order,r_limit_m)
   type(table_eos_t),intent(in)::model
   real(wp),intent(in)::pc,p_cut,r0,rtol,step_cap,f_hz
   character(len=*),intent(in)::method
@@ -266,6 +269,7 @@ subroutine match_cells(model,pc,p_cut,r0,rtol,step_cap,method,f_hz,star,match_in
   integer,optional,intent(out)::step_count
   real(wp),optional,intent(out)::surface_residual
   integer,optional,intent(in)::center_order
+  real(wp),optional,intent(in)::r_limit_m
   type(cell_run_t)::a,b
   real(wp)::za(2),zb(2),na,nb
   residual=0._wp;r_mismatch=0._wp;m_mismatch=0._wp
@@ -273,15 +277,15 @@ subroutine match_cells(model,pc,p_cut,r0,rtol,step_cap,method,f_hz,star,match_in
   if(present(surface_residual))surface_residual=0._wp
   if(present(profile_prefix))then
    call integrate_cells(model,pc,p_cut,r0,rtol,step_cap,method,f_hz,star%nu_surface,a, &
-        trim(profile_prefix)//'_inner.csv',match_index=match_index,center_order=center_order)
+        trim(profile_prefix)//'_inner.csv',match_index=match_index,center_order=center_order,r_limit_m=r_limit_m)
    if(.not.is_ok(a%status))then;status=a%status;return;endif
    call integrate_cells(model,pc,p_cut,r0,rtol,step_cap,method,f_hz,star%nu_surface,b, &
-        trim(profile_prefix)//'_outer.csv',match_index=match_index,surface_start=star,center_order=center_order)
+        trim(profile_prefix)//'_outer.csv',match_index=match_index,surface_start=star,center_order=center_order,r_limit_m=r_limit_m)
   else
-   call integrate_cells(model,pc,p_cut,r0,rtol,step_cap,method,f_hz,star%nu_surface,a,match_index=match_index,center_order=center_order)
+   call integrate_cells(model,pc,p_cut,r0,rtol,step_cap,method,f_hz,star%nu_surface,a,match_index=match_index,center_order=center_order,r_limit_m=r_limit_m)
    if(.not.is_ok(a%status))then;status=a%status;return;endif
    call integrate_cells(model,pc,p_cut,r0,rtol,step_cap,method,f_hz,star%nu_surface,b, &
-        match_index=match_index,surface_start=star,center_order=center_order)
+        match_index=match_index,surface_start=star,center_order=center_order,r_limit_m=r_limit_m)
   endif
   status=b%status;if(.not.is_ok(status))return
   ! Dimensionless physical W,V, referred to one common surface length.

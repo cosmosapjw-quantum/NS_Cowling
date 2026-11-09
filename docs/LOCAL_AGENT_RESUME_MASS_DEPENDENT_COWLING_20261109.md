@@ -71,3 +71,14 @@ If pilot CI fails, identify the exact failure class: EOS pressure domain, TOV in
 ## Publication gate
 
 JKPS/EPJA is a plausible first target only if full mass-dependent paired response, explicit coverage, numerical refinement, and independent benchmarks reveal a robust core/crust-conditioned result beyond already published low-mass p1 sensitivity. A&A/MNRAS additionally requires realistic EOS provenance and observational/tidal inference. PRD requires a new relativistic perturbation/kernel/full-GR contribution.
+
+
+## Source identity and exact next gate
+
+The v5 source archive checksum recorded in release_summary.json is b2c0dcaf6a5b07956cf8d33c39651d4ade32f44b4c49b33aa08fd84fb458185b. It is a reference receipt, not an independently verified archive checksum in this session. The runtime v5 backend hashes the current 35 source files from the branch, their relative paths, and compile_manifest.json. It records a backend build key and manifest SHA in each model record. Byte identity against the archived ZIP/TAR remains UNVERIFIED.
+
+After push:
+1. inspect the exact-head Actions run and confirm it compiles calculation/methods/support, not solutions;
+2. check the runtime v5 backend build key and manifest SHA in the artifact;
+3. compare frozen M/R at each stored Pc before considering mode results;
+4. only then inspect the first fold candidate and complete pair coverage.

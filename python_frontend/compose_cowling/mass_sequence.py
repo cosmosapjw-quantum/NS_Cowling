@@ -68,23 +68,35 @@ def extract_stable_branch(sequence: Iterable[Mapping], *,
             float(end["mass_kg"]) if end else None, float(end["pc_pa"]) if end else None,
             "insufficient_connected_tov_samples", truncated_low)
 
-    peak_index, run = None, 0
+    candidate_index, run = None, 0
     for i in range(1, len(points)):
         m0, m1 = float(points[i-1]["mass_kg"]), float(points[i]["mass_kg"])
-        if (m0 - m1) / m0 > fractional_decrease_tolerance:
+        decreased = (m0 - m1) / m0 > fractional_decrease_tolerance
+        if decreased:
+            if candidate_index is None:
+                candidate_index = i - 1
             run += 1
+            if run >= sustained_decreases:
+                branch = tuple(points[:candidate_index+1])
+                peak = max(branch, key=lambda p: float(p["mass_kg"]))
+                end = branch[-1]
+                return StableBranch(branch, True, float(peak["mass_kg"]), float(peak["pc_pa"]),
+                    float(end["mass_kg"]), float(end["pc_pa"]), "first_turning_point_resolved", truncated_low)
+        elif candidate_index is not None:
+            # A significant decline followed by recovery is not silently
+            # bridged. Stop before the candidate and require grid refinement.
+            branch = tuple(points[:candidate_index+1])
+            end = branch[-1]
+            return StableBranch(branch, False, None, None, float(end["mass_kg"]),
+                float(end["pc_pa"]), "turning_point_candidate_unconfirmed", truncated_low)
         else:
             run = 0
-        if run >= sustained_decreases:
-            peak_index = i - sustained_decreases
-            break
 
-    if peak_index is not None:
-        branch = tuple(points[:peak_index+1])
-        peak = max(branch, key=lambda p: float(p["mass_kg"]))
+    if candidate_index is not None:
+        branch = tuple(points[:candidate_index+1])
         end = branch[-1]
-        return StableBranch(branch, True, float(peak["mass_kg"]), float(peak["pc_pa"]),
-            float(end["mass_kg"]), float(end["pc_pa"]), "first_turning_point_resolved", truncated_low)
+        return StableBranch(branch, False, None, None, float(end["mass_kg"]),
+            float(end["pc_pa"]), "turning_point_candidate_unconfirmed", truncated_low)
 
     end = points[-1]
     return StableBranch(tuple(points), False, None, None, float(end["mass_kg"]),

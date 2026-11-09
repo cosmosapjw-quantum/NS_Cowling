@@ -59,6 +59,180 @@ def _compile_solver():
     return case_driver,cell_solve
 
 
+
+def _v5_source_paths():
+    """Resolve the exact source list recorded by the v5 release manifest."""
+    root=project_root()
+    source=root/'oscillation_source'
+    manifest=root/'oscillation_release_v1'/'workflow'/'compile_manifest.json'
+    data=json.loads(manifest.read_text())
+    marker='Neutron_Star_Oscillations/'
+    if data.get('modules')!=35 or len(data.get('sources',[]))!=35:
+        raise NativeExecutionError("Unexpected v5 compile-manifest module/source count")
+    if len(set(data['sources']))!=35:
+        raise NativeExecutionError("Duplicate source path in v5 compile manifest")
+    paths=[]
+    for item in data['sources']:
+        if marker not in item:
+            raise NativeExecutionError(f"Unexpected v5 source-manifest entry: {item}")
+        rel=item.split(marker,1)[1]
+        path=source/rel
+        if not path.is_file():
+            raise NativeExecutionError(f"Frozen v5 source is missing: {path}")
+        paths.append(path)
+    app=source/'calculation'/'app'/'cell_solve.f90'
+    if not app.is_file():
+        raise NativeExecutionError(f"Frozen v5 application is missing: {app}")
+    return source,manifest,paths,app
+
+
+def _compile_v5_cell_solve():
+    """Compile the v5 calculation/methods/support source family, not solutions/."""
+    source,manifest,paths,app=_v5_source_paths()
+    digest=hashlib.sha256()
+    digest.update(manifest.read_bytes())
+    for path in [*paths,app]:
+        digest.update(path.relative_to(source).as_posix().encode())
+        digest.update(path.read_bytes())
+    key=digest.hexdigest()[:24]
+    build=Path.home()/'.cache'/'compose_eos_fortran'/'v5-release'/key
+    executable=build/'cell_solve'
+    if executable.is_file():
+        return executable,key
+    fc=shutil.which('gfortran')
+    if not fc:
+        raise NativeExecutionError("gfortran is required for the frozen v5 backend")
+    mod=build/'mod';obj=build/'obj'
+    mod.mkdir(parents=True,exist_ok=True);obj.mkdir(exist_ok=True)
+    flags=['-std=f2018','-O2','-ffree-line-length-none','-fimplicit-none']
+    objects=[]
+    for i,path in enumerate(paths):
+        target=obj/f"{i:02d}_{path.stem}.o"
+        result=subprocess.run([fc,*flags,'-J',str(mod),'-I',str(mod),'-c',str(path),'-o',str(target)],
+                              capture_output=True,text=True)
+        if result.returncode:
+            raise NativeExecutionError(f"v5 module compile failed at {path}:\n{result.stderr}")
+        objects.append(str(target))
+    appobj=obj/'cell_solve_app.o'
+    result=subprocess.run([fc,*flags,'-J',str(mod),'-I',str(mod),'-c',str(app),'-o',str(appobj)],
+                          capture_output=True,text=True)
+    if result.returncode:
+        raise NativeExecutionError(f"v5 cell_solve application compile failed:\n{result.stderr}")
+    result=subprocess.run([fc,*objects,str(appobj),'-o',str(executable)],capture_output=True,text=True)
+    if result.returncode:
+        raise NativeExecutionError(f"v5 cell_solve link failed:\n{result.stderr}")
+    return executable,key
+
+
+def _run_v5_cell_solve(eos,pc_pa,*,task,target_mass_kg=0.0,pc_bracket_pa=None,
+                       frequency_hz=2500.0,frequency_lo_hz=(2000.0,6500.0),
+                       frequency_hi_hz=(3000.0,8000.0),p_cut_pa=None,
+                       r0_m=10.0,r_limit_m=1e8,rtol=1e-9,mode_rtol=1e-9,
+                       step_cap=0.05,mass_rtol=1e-10,residual_tol=1e-6,
+                       match_index=72,center_order=2):
+    executable,build_key=_compile_v5_cell_solve()
+    if task not in ('star','shot','spectrum'):
+        raise ValueError("v5 task must be star, shot or spectrum")
+    values=[pc_pa,target_mass_kg,frequency_hz,r0_m,r_limit_m,rtol,mode_rtol,step_cap,mass_rtol,residual_tol]
+    if not np.all(np.isfinite(values)) or pc_pa<=0 or r0_m<=0 or r_limit_m<=r0_m:
+        raise ValueError("v5 input pressure/radius/tolerance must be finite and admissible")
+    if min(rtol,mode_rtol,step_cap,mass_rtol,residual_tol)<=0:
+        raise ValueError("v5 tolerances must be positive")
+    if center_order not in (0,2):
+        raise ValueError("center_order must be 0 or 2")
+    if p_cut_pa is None:
+        p_cut_pa=_surface_pressure(eos)
+    if not np.isfinite(p_cut_pa) or p_cut_pa<=0 or pc_pa<=p_cut_pa:
+        raise ValueError("require finite 0 < surface pressure cutoff < central pressure")
+    if pc_bracket_pa is None:
+        pc_lo_pa,pc_hi_pa=0.65*pc_pa,1.45*pc_pa
+    else:
+        if len(pc_bracket_pa)!=2:
+            raise ValueError("pc_bracket_pa must have two entries")
+        pc_lo_pa,pc_hi_pa=map(float,pc_bracket_pa)
+        if not np.all(np.isfinite([pc_lo_pa,pc_hi_pa])) or pc_lo_pa<=0 or pc_hi_pa<=pc_lo_pa:
+            raise ValueError("invalid explicit central-pressure bracket")
+    lo=list(map(float,frequency_lo_hz));hi=list(map(float,frequency_hi_hz))
+    if len(lo)!=2 or len(hi)!=2 or not np.all(np.isfinite(lo+hi)):
+        raise ValueError("frequency brackets must be two finite values for f and p1")
+    with tempfile.TemporaryDirectory(prefix='v5-cell-solve-') as td0:
+        td=Path(td0);table=_normalised_file(eos,td)
+        prefix=td/'v5_result';nml=td/'v5_request.nml'
+        nml.write_text(
+            "&precision\n"
+            f" table_path='{table}'\n task='{task}'\n method='dopri'\n shooting='matched'\n"
+            f" match_index={int(match_index)}\n split_index=69\n alpha=0.0\n"
+            f" pc_pa={float(pc_pa):.17e}\n p_cut_pa={float(p_cut_pa):.17e}\n"
+            f" r0_m={float(r0_m):.17e}\n r_limit_m={float(r_limit_m):.17e}\n"
+            f" target_mass_kg={float(target_mass_kg):.17e}\n"
+            f" pc_lo_pa={pc_lo_pa:.17e}\n pc_hi_pa={pc_hi_pa:.17e}\n"
+            f" rtol={float(rtol):.17e}\n mode_rtol={float(mode_rtol):.17e}\n"
+            f" step_cap={float(step_cap):.17e}\n mass_rtol={float(mass_rtol):.17e}\n"
+            f" frequency_lo={lo[0]:.17e},{lo[1]:.17e}\n"
+            f" frequency_hi={hi[0]:.17e},{hi[1]:.17e}\n"
+            f" frequency_hz={float(frequency_hz):.17e}\n"
+            " root_atol_hz=1.0e-8\n"
+            f" residual_tol={float(residual_tol):.17e}\n nmode=2\n center_order={center_order}\n/\n"
+        )
+        run=subprocess.run([str(executable),str(nml),str(prefix)],capture_output=True,text=True)
+        result_path=prefix.with_suffix('.json')
+        if not result_path.is_file():
+            raise NativeExecutionError(f"v5 cell_solve produced no JSON: {run.stdout}\n{run.stderr}")
+        result=json.loads(result_path.read_text())
+        if run.returncode or result.get('status')!='ok':
+            raise NativeExecutionError(f"v5 cell_solve {task} failed: {result}; {run.stderr}")
+        result['backend']='v5_release_calculation_methods_support'
+        result['backend_build_key']=build_key
+        result['center_order']=center_order
+        result['r_limit_m']=float(r_limit_m)
+        if task=='spectrum':
+            nodes={}
+            for j,mode in ((1,'f'),(2,'p1')):
+                nodes[mode]={}
+                for region in ('inner','outer'):
+                    profile=Path(str(prefix)+f'_mode{j}_{region}.csv')
+                    nodes[mode][region]={
+                        'W':_node_count(profile,'w_over_r3'),
+                        'V':_node_count(profile,'v_over_r2')}
+            result['node_counts']=nodes
+        return result
+
+
+def solve_v5_tov_star(eos:EOSData | str | Path,pc_pa:float,*,p_cut_pa:float|None=None,
+                      r0_m:float=10.0,r_limit_m:float=1e8,rtol:float=1e-9,
+                      step_cap:float=0.05,center_order:int=2)->dict:
+    """TOV-only run using the exact frozen v5 source family and center expansion."""
+    return _run_v5_cell_solve(eos,pc_pa,task='star',p_cut_pa=p_cut_pa,
+        r0_m=r0_m,r_limit_m=r_limit_m,rtol=rtol,mode_rtol=rtol,
+        step_cap=step_cap,center_order=center_order)
+
+
+def solve_v5_cowling_shot(eos:EOSData | str | Path,pc_pa:float,frequency_hz:float,*,
+                          p_cut_pa:float|None=None,r0_m:float=10.0,r_limit_m:float=1e8,
+                          rtol:float=1e-9,mode_rtol:float=1e-9,step_cap:float=0.05,
+                          match_index:int=72,center_order:int=2)->dict:
+    """Return one matched Cowling determinant value at a fixed frequency."""
+    return _run_v5_cell_solve(eos,pc_pa,task='shot',frequency_hz=frequency_hz,
+        p_cut_pa=p_cut_pa,r0_m=r0_m,r_limit_m=r_limit_m,rtol=rtol,
+        mode_rtol=mode_rtol,step_cap=step_cap,match_index=match_index,
+        center_order=center_order)
+
+
+def solve_v5_cowling_spectrum(eos:EOSData | str | Path,pc_pa:float,frequency_lo_hz,frequency_hi_hz,*,
+                              target_mass_kg:float=2.644606257493485e30,p_cut_pa:float|None=None,
+                              pc_bracket_pa:tuple[float,float]|None=None,match_index:int=72,
+                              r0_m:float=10.0,r_limit_m:float=1e8,rtol:float=1e-9,
+                              mode_rtol:float=1e-9,step_cap:float=0.05,
+                              mass_rtol:float=1e-10,residual_tol:float=1e-6,
+                              center_order:int=2)->dict:
+    """Fresh Cowling roots from the exact v5 source family and center expansion."""
+    return _run_v5_cell_solve(eos,pc_pa,task='spectrum',target_mass_kg=target_mass_kg,
+        pc_bracket_pa=pc_bracket_pa,frequency_lo_hz=frequency_lo_hz,
+        frequency_hi_hz=frequency_hi_hz,p_cut_pa=p_cut_pa,r0_m=r0_m,
+        r_limit_m=r_limit_m,rtol=rtol,mode_rtol=mode_rtol,
+        step_cap=step_cap,mass_rtol=mass_rtol,residual_tol=residual_tol,
+        match_index=match_index,center_order=center_order)
+
 def _normalised_file(eos:EOSData | str | Path,td:Path)->Path:
     if isinstance(eos,(str,Path)):
         path=Path(eos).expanduser().resolve()

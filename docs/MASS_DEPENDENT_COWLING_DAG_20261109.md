@@ -67,3 +67,8 @@ Only complete six-method cells enter paired summaries. No imputation. Report com
 ## Immediate next action
 
 Re-run the six-model pilot after the same-cell TOV-only backend, configurable radius limit and validator correction are pushed. Inspect baseline M/R parity and all sequence samples first. Do not dispatch the full cohort unless the pilot has valid 1.0- and 1.33-solar-mass paired cells and the M/R, mass-residual, shooting-residual and node gates pass. Runs 42598463512 and 42599325312 have zero valid spectra and must not be cited as scientific results.
+
+
+## Source-identity qualification
+
+MD-02b reproduces the 35 paths and their order from the v5 compile manifest and hashes the current branch source bytes into a runtime build key. The release summary records source_zip_sha256 b2c0dcaf6a5b07956cf8d33c39651d4ade32f44b4c49b33aa08fd84fb458185b, but the Dropbox source archive was not independently downloaded/hashed in this session. Therefore source byte identity versus the archived release is UNVERIFIED; do not call it byte-identical. The next runner manifest records both the reference archive hash and current runtime build key.

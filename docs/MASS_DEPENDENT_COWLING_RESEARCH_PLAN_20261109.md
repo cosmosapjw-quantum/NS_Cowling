@@ -147,3 +147,8 @@ References:
 2. F. Nola (2026), A&A 713, A34, DOI 10.1051/0004-6361/202659810.
 3. Kunjipurayil et al. (2022), Phys. Rev. D 106, 063005, arXiv:2205.02081.
 4. Pradhan and Chatterjee (2022), Phys. Rev. C 106, 015805, DOI 10.1103/PhysRevC.106.015805.
+
+
+## Provenance qualification for the v5 backend
+
+The current solve_v5_* adapter compiles the 35 source paths listed, in their recorded order, by oscillation_release_v1/workflow/compile_manifest.json and records a runtime build key over those branch source bytes plus the manifest. The release_summary.json stores a reference source_zip_sha256 of b2c0dcaf6a5b07956cf8d33c39651d4ade32f44b4c49b33aa08fd84fb458185b. The Dropbox source archive was not downloaded and independently hashed in this session, so the adapter is manifest-path/order matched, not yet byte-identity certified against the archived release source. The next CI artifact must retain the runtime build key and manifest SHA.

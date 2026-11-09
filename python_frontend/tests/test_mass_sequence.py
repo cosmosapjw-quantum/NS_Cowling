@@ -50,3 +50,23 @@ def test_six_method_pair_requires_six_valid_modes_and_pair_mean():
     assert not incomplete[0]["pair_complete"]
     assert incomplete[0]["n_valid_methods"] == 5
     assert incomplete[0]["f_range_percent"] is None
+
+
+def test_single_significant_decline_is_not_bridged_by_a_later_rise():
+    data=[point(1,.8,index=0),point(2,1.0,index=1),
+          point(3,.995,index=2),point(4,1.08,index=3),point(5,1.16,index=4)]
+    branch=extract_stable_branch(data)
+    assert [p["pc_pa"] for p in branch.points]==[1,2]
+    assert not branch.turning_point_found
+    assert branch.maximum_mass_kg is None
+    assert branch.status=="turning_point_candidate_unconfirmed"
+
+
+def test_two_consecutive_declines_confirm_the_first_mass_maximum():
+    data=[point(1,.8,index=0),point(2,1.2,index=1),point(3,1.5,index=2),
+          point(4,1.49,index=3),point(5,1.45,index=4),point(6,1.40,index=5)]
+    branch=extract_stable_branch(data)
+    assert [p["pc_pa"] for p in branch.points]==[1,2,3]
+    assert branch.turning_point_found
+    assert branch.maximum_mass_kg==pytest.approx(1.5)
+    assert branch.status=="first_turning_point_resolved"

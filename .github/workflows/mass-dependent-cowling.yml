@@ -8,6 +8,14 @@ on:
       - "python_frontend/compose_cowling/solver.py"
       - "oscillation_source/solutions/src/modes/ns_cell_shooting.f90"
       - "oscillation_source/solutions/app/cell_solve.f90"
+      - "oscillation_source/calculation/src/adapters/ns_cell_shooting.f90"
+      - "oscillation_source/calculation/app/cell_solve.f90"
+      - "oscillation_release_v1/workflow/compile_manifest.json"
+      - "oscillation_source/support/**"
+      - "oscillation_source/methods/**"
+      - "oscillation_source/calculation/**"
+      - "research_artifacts/mass_response/**"
+      - "python_frontend/tests/test_fixed_mass_response.py"
       - "python_frontend/compose_cowling/mass_sequence.py"
       - "python_frontend/tests/test_mass_sequence.py"
       - "scripts/run_mass_dependent_spectrum.py"
@@ -46,6 +54,10 @@ jobs:
           python -m pip install numpy scipy pytest
       - name: Unit tests for stable-branch and paired-response rules
         run: python -m pytest -q python_frontend/tests/test_mass_sequence.py
+      - name: Verify fixed-mass response theorem and q-path mock experiment
+        run: |
+          python -m pytest -q python_frontend/tests/test_fixed_mass_response.py
+          python research_artifacts/mass_response/mock_mass_response.py --output-dir dist/mass-response-mock
       - name: Run mass-dependent spectrum
         run: |
           if [ "$COHORT" = "full" ]; then
@@ -67,6 +79,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ns-cowling-mass-dependent-${{ github.run_id }}
-          path: dist/mass-dependent-cowling/
+          path: |
+            dist/mass-dependent-cowling/
+            dist/mass-response-mock/
           if-no-files-found: warn
           retention-days: 30

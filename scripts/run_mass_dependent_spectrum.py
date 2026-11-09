@@ -7,13 +7,14 @@ from pathlib import Path
 import numpy as np
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"python_frontend"))
-from compose_cowling.solver import solve_cowling_tov_star,solve_cowling_spectrum
+from compose_cowling.solver import solve_v5_tov_star,solve_v5_cowling_spectrum
 from compose_cowling.mass_sequence import extract_stable_branch,find_mass_bracket,paired_sensitivity
 MASS_GRID=(.8,1.,1.2,1.33,1.4,1.6,1.8,2.)
 METHODS=("css","cubic_F","cubic_P","maxwell","quintic_F","quintic_P")
 REF=ROOT/"oscillation_release_v1/data/spectrum_summary_234.csv"
 EOS_DIR=ROOT/"oscillation_release_v1/data/eos_projected"
 RELEASE=ROOT/"oscillation_release_v1/provenance/release_summary.json"
+V5_COMPILE_MANIFEST=ROOT/"oscillation_release_v1/workflow/compile_manifest.json"
 
 
 def sha256(path):
@@ -69,7 +70,7 @@ def solve_model(ref,eos_dir,masses,solar_mass,*,nscan,tov_rtol,spectrum_rtol,mod
     for i,pc in enumerate(grid):
         r={"scan_index":i,"pc_pa":float(pc),"status":"failed"}
         try:
-            star=solve_cowling_tov_star(eos,float(pc),p_cut_pa=pcut,rtol=tov_rtol,step_cap=.05,
+            star=solve_v5_tov_star(eos,float(pc),p_cut_pa=pcut,rtol=tov_rtol,step_cap=.05,
                 r0_m=10.0,r_limit_m=radius_limit_m)
             r.update(status="ok",mass_kg=float(star["mass_kg"]),radius_m=float(star["radius_m"]),
                      surface_residual_pa=star.get("surface_residual_pa"))
@@ -79,7 +80,7 @@ def solve_model(ref,eos_dir,masses,solar_mass,*,nscan,tov_rtol,spectrum_rtol,mod
     stable_ids={int(p["scan_index"]) for p in branch.points}
     tov_rows=[{**p,"name":name,"crust":ref["crust"],"core":ref["core"],
                "method":ref["matching_method"],"stable_branch_member":int(p["scan_index"]) in stable_ids} for p in scan]
-    baseline=solve_cowling_tov_star(eos,pc_ref,p_cut_pa=pcut,rtol=tov_rtol,step_cap=.05,
+    baseline=solve_v5_tov_star(eos,pc_ref,p_cut_pa=pcut,rtol=tov_rtol,step_cap=.05,
         r0_m=10.0,r_limit_m=radius_limit_m)
     bm=float(baseline["mass_kg"])/float(ref["mass_kg"])-1
     br=float(baseline["radius_m"])/float(ref["radius_m"])-1
@@ -97,7 +98,7 @@ def solve_model(ref,eos_dir,masses,solar_mass,*,nscan,tov_rtol,spectrum_rtol,mod
         f0=float(ref["f_hz"])*scale;p10=float(ref["p1_hz"])*scale
         flo=[.72*f0,.72*p10];fhi=[1.28*f0,1.28*p10]
         try:
-            out=solve_cowling_spectrum(eos,bracket["pc_seed_pa"],flo,fhi,target_mass_kg=target,p_cut_pa=pcut,
+            out=solve_v5_cowling_spectrum(eos,bracket["pc_seed_pa"],flo,fhi,target_mass_kg=target,p_cut_pa=pcut,
                 rtol=spectrum_rtol,mode_rtol=mode_rtol,mass_rtol=mass_rtol,residual_tol=residual_tol,
                 pc_bracket_pa=(bracket["pc_lo_pa"],bracket["pc_hi_pa"]),r_limit_m=radius_limit_m)
             identity_ok,identity=node_identity(out);mrel=float(out["mass_kg"])/target-1
@@ -118,7 +119,11 @@ def solve_model(ref,eos_dir,masses,solar_mass,*,nscan,tov_rtol,spectrum_rtol,mod
         "reference_pc_pa":pc_ref,"baseline_mass_kg":float(baseline["mass_kg"]),
         "baseline_radius_m":float(baseline["radius_m"]),
         "baseline_reproduction_mass_relative":bm,"baseline_reproduction_radius_relative":br,
-        "tov_backend":"cell_solve task=star (same native EOS-cell integrator as spectrum)",
+        "tov_backend":"v5 release compile_manifest source family; calculation/methods/support cell_solve task=star",
+        "v5_backend_build_key":baseline.get("backend_build_key"),
+        "v5_compile_manifest_sha256":sha256(V5_COMPILE_MANIFEST),
+        "v5_reference_source_zip_sha256":json.loads(RELEASE.read_text()).get("source_zip_sha256"),
+        "v5_source_byte_identity_vs_reference_archive":"NOT_VERIFIED_IN_THIS_SESSION",
         "r0_m":10.0,"r_limit_m":radius_limit_m,"tov_step_cap":0.05,"tov_rtol":tov_rtol,
         "baseline_reproduction_status":"pass" if abs(bm)<=2e-5 and abs(br)<=2e-5 else "mismatch",
         "branch_status":branch.status,"turning_point_found":branch.turning_point_found,
@@ -183,7 +188,11 @@ def main(argv=None):
         ("paired_mass_sensitivity.csv",paired),("paired_method_deviations.csv",deltas),("model_branch_summary.csv",models)):
         write_csv(a.output_dir/filename,rows)
     manifest={"schema":"ns-cowling-mass-dependent-spectrum-v1","reference_cohort_sha256":sha256(REF),
-        "release_summary_sha256":sha256(RELEASE),"selected_model_count":len(selected),"completed_model_count":len(models),
+        "release_summary_sha256":sha256(RELEASE),
+        "v5_compile_manifest_sha256":sha256(V5_COMPILE_MANIFEST),
+        "v5_reference_source_zip_sha256":json.loads(RELEASE.read_text()).get("source_zip_sha256"),
+        "v5_source_byte_identity_vs_reference_archive":"NOT_VERIFIED_IN_THIS_SESSION",
+        "v5_backend_build_keys":sorted({m.get("v5_backend_build_key") for m in models if m.get("v5_backend_build_key")}),"selected_model_count":len(selected),"completed_model_count":len(models),
         "failed_model_count":len(failures),"mass_grid_msun":list(masses),"expected_methods":list(METHODS),
         "expected_spectrum_count":len(selected)*len(masses),"valid_spectrum_count":sum(bool(r.get("valid")) for r in modes),
         "complete_paired_mass_cells":sum(bool(r["pair_complete"]) for r in paired),
@@ -194,8 +203,8 @@ def main(argv=None):
         "stability":"initial connected rising-Pc branch to the first sustained M(Pc) maximum; unresolved endpoint is not Mmax",
         "mode_identity":"ell=2 smooth Cowling W/V nodes: f=(0,0)/(0,0), p1=(1,1)/(0,0), inner/outer",
         "frequency_seed":"0.72-1.28 mean-density scaling about frozen 1.33-Msun row, then node gate",
-        "background_solver":"cell_solve task=star; same EOS-cell integration and central-start contract as spectrum",
-        "tov_r0_m":10.0,"tov_step_cap":0.05,"tov_r_limit_m":a.radius_limit_m,
+        "background_solver":"frozen v5 compile_manifest cell_solve; center_order=2 for TOV and Cowling",
+        "tov_r0_m":10.0,"tov_step_cap":0.05,"tov_r_limit_m":a.radius_limit_m,"center_order":2,
         "surface":"historical finite positive pressure cutoff; no zero-pressure extrapolation",
         "gravity":"Cowling frequencies, not full-GR complex frequencies or damping times"}}
     (a.output_dir/"manifest.json").write_text(json.dumps(manifest,indent=2,sort_keys=True)+"\n")

@@ -294,7 +294,12 @@ All cutoffs have (P_{\rm cut}>0). The radius changes are internal-isobar coordin
 
 ### Scientific next step and blocking gates
 
-The 217→218 native density interval is sparse and crust-family-dependent. Across 13 representative crust families, (n_b(218)/n_b(217)=7.434)–(11.152). The representative two-point secant (Delta\ln P/\Delta\ln n_b) is not a local sound speed, adiabatic index or causality test. The next numerical study is a full-interval audit of the exact solver cubic-Hermite (P(\mu_b)) cell: endpoint slopes, stationary points, monotonicity/positivity, First-Law closure and the implied (dP/d\epsilon). It should retain the unmodified source table and byte hashes.
+The 217→218 native density interval is sparse and crust-family-dependent. Across 13 representative crust families, (n_b(218)/n_b(217)=7.434)–(11.152). The representative two-point secant (Delta\\ln P/Delta\\ln n_b) is not a local sound speed, adiabatic index or causality test.
+
+The full-cohort solver-native Hermite audit is now complete: Actions [42654562160](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42654562160) evaluated all 234 row-217→218 cells using the exact `cubic_Hermite_P_of_mu_raw_n_v1` construction. Every cell passes the Fortran-equivalent whole-cell (P''>0) and (\mu P''-P'\\ge0) checks; analytic `chi(t)` stationary-point enumeration finds zero interior roots, and `chi` increases monotonically over every cell. The global (c_s^2/c^2) range is (1.830688\\times10^{-4})–(2.950720\\times10^{-3}), with maximum endpoint First-Law closure residual (2.392\\times10^{-16}). Source hashes are unchanged; no EOS rows or TOV solves were added in this audit. Full evidence: `docs/R15_NATIVE_HERMITE_ROW217_218_AUDIT_20261110.md`.
+
+The next study is a source/provenance audit, not another interpolation-stability repair: trace the low-density CompOSE/BSk22-derived material and projection/mapping that produces the prefix and the row-217→218 sparse interval. Preserve the identity and provenance of each original table. Do not infer physical crust completeness from the numerical regularity of an interpolant.
+
 
 R15 does not lift MD-31 or MD-32:
 - MD-31 still requires a sourced physical low-density crust EOS down to (P=0) and a validated vacuum surface.

@@ -158,6 +158,30 @@ def qexp_shape_parameter(
     else:
         status = "SOURCE_INCREMENT_FEASIBLE"
 
+    # At either envelope boundary the admissible monotone q curve is only
+    # approached by an endpoint step. No finite k in this smooth family reaches
+    # that limit. Do not silently pretend that a finite shape parameter exists.
+    if not feasible and regularization_fraction == 0.0:
+        target_dp = lower if source_dp <= lower + tol else upper
+        return {
+            "status": status,
+            "feasible": False,
+            "realizable_by_continuous_q": False,
+            "k": None,
+            "limiting_shape": "endpoint_step_limit",
+            "lower_bound": lower,
+            "upper_bound": upper,
+            "source_pressure_increment": source_dp,
+            "target_pressure_increment": target_dp,
+            "source_mean_q": source_mean_q,
+            "target_mean_q": target_dp / area,
+            "regularization_applied": False,
+            "qprime_lower": None,
+            "qprime_upper": None,
+            "chi_lower": None,
+            "chi_upper": None,
+        }
+
     margin = regularization_fraction * dq
     target_mean_q = min(max(source_mean_q, q0 + margin), q1 - margin)
     target_dp = area * target_mean_q
@@ -195,6 +219,7 @@ def qexp_shape_parameter(
     return {
         "status": status,
         "feasible": feasible,
+        "realizable_by_continuous_q": True,
         "k": k,
         "lower_bound": lower,
         "upper_bound": upper,

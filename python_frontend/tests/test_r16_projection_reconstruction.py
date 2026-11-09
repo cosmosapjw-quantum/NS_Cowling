@@ -91,3 +91,20 @@ def test_nonconvex_source_pressure_knots_cannot_be_preserved_by_convex_projectio
     assert out["projected_secant_decrease_count"] == 0
     assert out["source_secant_change_pct"][1] < 0.0
     assert out["projected_secant_change_pct"][1] > 0.0
+
+
+def test_pressure_increment_residuals_telescope_to_cumulative_pressure_change():
+    out = reconstruct_projection(
+        mu=[2.0, 3.0, 4.0],
+        n_source=[1.0, 2.25, 4.0],
+        p_source=[1.0, 1.75, 3.0],
+        eps_source=[0.1, 0.5, 1.0],
+    )
+
+    assert out["source_pressure_increments"] == pytest.approx([0.75, 1.25])
+    assert out["projected_pressure_increments"] == pytest.approx([19.0 / 12.0, 37.0 / 12.0])
+    assert out["pressure_increment_residuals"] == pytest.approx([5.0 / 6.0, 11.0 / 6.0])
+    assert out["cumulative_pressure_residuals"] == pytest.approx([0.0, 5.0 / 6.0, 8.0 / 3.0])
+    assert sum(out["pressure_increment_residuals"]) == pytest.approx(
+        out["cumulative_pressure_residuals"][-1]
+    )

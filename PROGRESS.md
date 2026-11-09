@@ -93,3 +93,22 @@ Detailed result and artifact provenance: `docs/R15_FULL_COHORT_TOV_RESULTS_20261
 - Evidence report: `docs/R15_NATIVE_HERMITE_ROW217_218_AUDIT_20261110.md`; artifact ID `13689769387`, ZIP SHA-256 `24e0bd37d8acf81f28443c5e5cd6a739b91cd3f5a0c9ca78f6e5b1fbbb6e549f`.
 
 **Interpretation:** this excludes a hidden non-convex, non-monotone-density, or acausal segment in the current solver-native cubic-Hermite representation across rows 217–218. It does not establish that the supplied EOS is a complete physical outer crust or that its low-density source provenance is complete. The next task is R16 source/provenance tracing of CompOSE/BSk22-derived low-density records and their projection into the first 218 native rows. MD-31/32, radial (\omega_0^2), and complete-star Cowling modes remain blocked.
+
+## R16 full-cohort normalized-to-projected EOS and convexity audit (2026-11-10)
+
+**Status: PASS for the declared reconstruction and solver-cell acceptance; not a statement that the projection is uniquely physical.**
+
+- Actions [42666868668](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42666868668), code HEAD `858c5d5639e0140e53c6f27b6e504eb261c05b01`; 234 normalized source tables and 234 projected tables audited.
+- Independent implementation reproduces all 234 projected tables with maximum relative mismatch 0.0; source/projected SHA-256 values remain unchanged. The full audit has 109,776 adjacent intervals.
+- Source (q=n_B/\mu_B) is nondecreasing in all 234 tables: PAV pooling count = 0. The projector's substantive change here is pressure reintegration (P(\mu_B)=P_0+\int n_B\,d\mu_B) and First-Law energy reconstruction, not pooling density knots.
+- Source-normalized Hermite cells: 24,465/109,776 fail strict convexity; 24,505/109,776 fail stability or causal-margin acceptance, including 40 stable-but-acausal cells. Projected Hermite cells: 0/109,776 rejected.
+- In the source-row-217→218 cell, 144/234 source tables fail (all eight GPPVA families, all 18 tables/family); all five SPG families pass. The projected cell passes in 234/234 tables.
+- Source pressure secant slopes (s_i=\Delta P_i/\Delta\mu_i) contain 447 downward transitions (relative decrease threshold (10^{-12})) across all 234 tables; projected pressure secants have zero decreases. The worst source decrease is -21.3709% at the GPPVA_TM1e row-290 knot. This is a discrete convexity obstruction: no convex interpolant can pass through all source pressure knots exactly when successive adjacent secants decrease.
+- Density localization (geometric endpoint midpoint): raw cell rejection is 14.47% below (10^{-4}\,\mathrm{fm}^{-3}), 26.51% at (10^{-4})–(10^{-3}), 82.87% at (2\times10^{-3})–(10^{-2}), 44.27% at (10^{-2})–(10^{-1}), 2.99% at (10^{-1})–0.5, and 0% above 0.5. There are no cells in the (10^{-3})–(2\times10^{-3}) bin because of the native mesh gap.
+- Row-218 pressure is shifted by +11.54–64.08%; the row-217→218 pressure increment by +13.87–85.93%, relative to normalized source knots. No TOV integrations, synthetic rows, or mode calculations were performed in R16.
+- Artifact ID `13697021829`, ZIP SHA-256 `ad9d9858e15ccb013a9591ef63d8e36528202a6ef9d237284765f05c5bbcc8e1`; locally re-downloaded archive and all six manifest payload hashes verified.
+- Detailed evidence: `docs/R16_NORMALIZED_TO_PROJECTED_AUDIT_20261110.md`.
+
+**Interpretation:** the original normalized knots satisfy the algebraic identity (\epsilon+P=\mu_B n_B) to machine precision, but this alone does not establish differential compatibility (dP/d\mu_B=n_B). The secant obstruction concerns the stored matched/normalized pressure-knot sequence, not proof that the upstream microphysical EOS is physically unstable. The raw CompOSE package files, normalized matched tables and projected solver tables remain separate provenance identities.
+
+**Next:** R17 should compare constrained thermodynamic reconstructions with declared data-fidelity objectives and explicit movable variables. Preserve the current q-preserving exact-integral projector as baseline A; do not invent statistical errors or weights. Trace the source/phase/composition provenance of raw knot failures before launching further TOV or mode sensitivity runs. MD-31/32, radial (\omega_0^2), and complete-star Cowling modes remain blocked.

@@ -80,3 +80,16 @@
 Detailed result and artifact provenance: `docs/R15_FULL_COHORT_TOV_RESULTS_20261110.md`. Native mesh intake: `docs/R15_FULL_COHORT_NATIVE_DENSITY_PREFLIGHT_20261110.md`. Boundary diagnostic: `docs/R15_ROW217_218_BOUNDARY_DIAGNOSTIC_20261110.md`.
 
 **Next numerical question:** inspect the exact native cubic-Hermite (P(\mu_b)) representation over row 217→218, including derivative positivity/monotonicity and whole-cell stationary points. Do not append synthetic rows or infer physical crust/surface completion. MD-31 (sourced P=0 EOS/surface) and MD-32 (finite-domain perturbation BC) remain separate blockers; radial (\omega_0^2) and complete-star Cowling modes remain blocked.
+
+## R15 solver-native cubic-Hermite row-217→218 audit (2026-11-10)
+
+**Status: PASS for the currently admitted interpolant over the audited cell; physical outer-crust completeness remains unresolved.**
+
+- Exact implementation inspected: `ns_mu_bridge.f90`, `ns_cell_eos.f90`, and `ns_table_eos.f90`; interpolation identity `cubic_Hermite_P_of_mu_raw_n_v1`.
+- Workflow [42654562160](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42654562160), audit runner HEAD `f4752ce5c6f0b79741dc79a672af0e39516164cf): tests and 234-table row-217→218 audit passed.
+- All 234 cells pass the exact Fortran-equivalent endpoint conditions: (P''>0) and (G=\mu P''-P'\ge0) over the complete cubic interval. Independent analytic stationary-root enumeration finds zero interior stationary points of (chi=c_s^2/c^2); (chi) is monotonically increasing in all 234 cells.
+- Whole-cell (chi) range: (1.830688\times10^{-4}) to (2.950720\times10^{-3}); equivalent (c_s/c=0.0135303)–0.0543205. Maximum endpoint First-Law energy closure residual is (2.392\times10^{-16}).
+- All projected source hashes remain unchanged; no synthetic rows and no TOV integrations were used in this representation audit.
+- Evidence report: `docs/R15_NATIVE_HERMITE_ROW217_218_AUDIT_20261110.md`; artifact ID `13689769387`, ZIP SHA-256 `24e0bd37d8acf81f28443c5e5cd6a739b91cd3f5a0c9ca78f6e5b1fbbb6e549f`.
+
+**Interpretation:** this excludes a hidden non-convex, non-monotone-density, or acausal segment in the current solver-native cubic-Hermite representation across rows 217–218. It does not establish that the supplied EOS is a complete physical outer crust or that its low-density source provenance is complete. The next task is R16 source/provenance tracing of CompOSE/BSk22-derived low-density records and their projection into the first 218 native rows. MD-31/32, radial (\omega_0^2), and complete-star Cowling modes remain blocked.

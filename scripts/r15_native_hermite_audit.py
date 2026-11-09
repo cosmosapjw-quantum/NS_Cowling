@@ -132,7 +132,7 @@ def audit_native_interval(
         "chi_stationary_count": len(stationary_t),
         "epsilon_low_pa": epsilon_low,
         "epsilon_high_pa": epsilon_high,
-        "secant_dlnp_dlnn": math.log(p1 / p0) / math.log(n1 / n0),
+        "secant_dlnp_dlnn": (math.log(p1 / p0) / math.log(n1 / n0)) if n1 != n0 else None,
         "density_ratio": n1 / n0,
         "pressure_ratio": p1 / p0,
         "energy_density_ratio": epsilon_high / epsilon_low,

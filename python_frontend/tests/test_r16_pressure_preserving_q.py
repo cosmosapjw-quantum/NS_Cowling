@@ -92,3 +92,13 @@ def test_bounded_regularization_produces_a_finite_shape_for_outside_increment():
     assert result["target_pressure_increment"] > lower
     assert math.isfinite(result["k"])
     assert result["k"] < 0.0
+
+
+def test_constant_q_cell_cannot_match_a_different_source_pressure_increment():
+    result = qexp_shape_parameter(
+        2.0, 3.0, 0.5, 0.5, 1.2,
+    )
+    assert result["feasible"] is False
+    assert result["status"] == "INFEASIBLE_CONSTANT_Q"
+    assert result["k"] is None
+    assert result["realizable_by_continuous_q"] is False

@@ -1,0 +1,73 @@
+name: R15 full-cohort native outer-crust TOV cutoff scan
+
+on:
+  push:
+    branches: [research/r15-native-outer-crust-pilot]
+    paths:
+      - ".github/workflows/native-outer-crust-r15-full-cohort.yml"
+      - "scripts/run_native_outer_crust_r15.py"
+      - "scripts/r15_native_density_preflight.py"
+      - "python_frontend/compose_cowling/native_table_cutoff_scan.py"
+      - "python_frontend/compose_cowling/solver.py"
+      - "python_frontend/tests/test_native_density_cutoff_scan.py"
+      - "python_frontend/tests/test_native_table_cutoff_scan.py"
+      - "python_frontend/tests/test_r15_native_density_preflight.py"
+      - "python_frontend/tests/test_r15_cohort_selection.py"
+      - "python_frontend/tests/test_v5_background_profile_export.py"
+      - "oscillation_release_v1/data/spectrum_summary_234.csv"
+      - "oscillation_release_v1/data/eos_projected/**"
+      - "oscillation_release_v1/workflow/compile_manifest.json"
+      - "oscillation_source/calculation/**"
+      - "oscillation_source/methods/**"
+      - "oscillation_source/support/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  full-cohort-native-outer-crust-tov:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      PYTHONPATH: python_frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install GNU Fortran and Python dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gfortran
+          python -m pip install --upgrade pip
+          python -m pip install numpy scipy pytest
+      - name: Test selectors, preflight and cohort resolver
+        run: |
+          python -m pytest -q python_frontend/tests/test_native_density_cutoff_scan.py
+          python -m pytest -q python_frontend/tests/test_native_table_cutoff_scan.py
+          python -m pytest -q python_frontend/tests/test_r15_native_density_preflight.py
+          python -m pytest -q python_frontend/tests/test_r15_cohort_selection.py
+          python -m pytest -q python_frontend/tests/test_v5_background_profile_export.py
+      - name: Revalidate all 234 projected EOS tables before any TOV solve
+        run: |
+          python scripts/r15_native_density_preflight.py \
+            --output-dir dist/r15-full-cohort-preflight \
+            --target-count 8 \
+            --maximum-density-fm3 1.0e-3
+      - name: Run 39-pair x 6-method x 8-native-knot TOV scan
+        run: |
+          python scripts/run_native_outer_crust_r15.py \
+            --full-cohort \
+            --output-dir dist/r15-full-cohort-tov \
+            --baseline-relative-tolerance 2.0e-5 \
+            --target-count 8 \
+            --maximum-density-fm3 1.0e-3
+      - name: Upload full-cohort preflight, TOV and background-profile evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ns-cowling-r15-full-cohort-${{ github.run_id }}
+          path: dist/
+          if-no-files-found: warn
+          retention-days: 30

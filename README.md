@@ -138,3 +138,10 @@ The 96-point six-model TOV pilot runs successfully at the numerical level (all 5
 ## 192-point mass-sequence refinement (2026-11-09)
 
 The 192-point six-model TOV pilot completed 1152/1152 integrations with all frozen v5 M/R anchors reproduced, but admitted zero new spectra. The first maximum mass is stabilizing across grids, while radius and the first post-maximum minimum remain unconverged. The maxwell compatibility bridge retains a distinct intermediate M(Pc) fold pair. A 384-point scan and independent SciPy same-EOS TOV check are now configured. No candidate segment is classified radially stable. See docs/MASS_SEQUENCE_BRANCH_STABILITY_AUDIT_20261109.md.
+
+
+## 384-point topology and independent TOV status (2026-11-09)
+
+The 384-point six-model scan completed 2304/2304 TOV integrations and all frozen v5 M/R anchor reproductions. The first maximum mass is stable at about 2.6e-5 relative compared with 192 points, while radius and the following minimum remain unconverged. The smooth maxwell compatibility bridge retains an extra M(Pc) fold pair.
+
+The same-EOS independent SciPy DOP853 TOV comparison nearly passed: max relative mass difference 3.60e-7, radius difference 1.47e-6 versus a predeclared 1e-6 criterion. The radius criterion was not relaxed. A refined per-case diagnostic comparison is being added. No new f/p1 modes or radial stability claims are admitted. See docs/MASS_SEQUENCE_BRANCH_STABILITY_AUDIT_20261109.md.

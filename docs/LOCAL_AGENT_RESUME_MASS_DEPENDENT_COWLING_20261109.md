@@ -137,3 +137,41 @@ Actions 42615970377 completed the six-model 192-point run. Artifact 13673520039,
 The first sampled max is M=0.7652434-0.7652747 Msun, Pc=0.2248758-0.2254394 MeV fm^-3, R=1849.995-1858.853 km. The 96-to-192 mass shift is small, but R shifts about 1.6% and the first subsequent minimum R in css shifts about 418 to 195 km. The maxwell-labelled smooth bridge retains an extra maximum/minimum pair (M about 0.21795/0.20282 Msun at Pc about 1.0415/1.9619 MeV fm^-3); it is not an exact density-jump transition and is not a stability label.
 
 The next workflow is configured for 384 central-pressure points and adds a SciPy DOP853 TOV reference using the exact same raw-knot cubic-Hermite P(mu) EOS. Five selected Pc values compare M/R against native v5 cell_solve with a predeclared 1e-6 relative criterion. Inspect both the 384-point topology and SciPy reference artifact before promoting any structural claim. Radial omega_0^2, closure Gamma_1, and surface condition remain unimplemented; no mass-dependent Cowling mode result is admitted.
+
+
+## Exact 384-point result and current SciPy repair (2026-11-09)
+
+Current branch before the repair commit: 6fb68cf1204b9656aa526f437a380e3c2e340a58. Backup created: backup/mass-dependent-384point-scipy-diagnostic-20261109 -> 6fb68cf1204b9656aa526f437a380e3c2e340a58.
+
+Actions 42616463263 completed:
+- 384/384 TOV points for each of six EOS/method rows (2304 total), no failed integrations;
+- all frozen v5 baseline M/R reproductions pass;
+- 10 mass-sequence tests, 6 fixed-mass/Cowling mock tests and 4 Hermite-EOS tests pass;
+- no admitted f/p1 spectra: 0/48, no complete six-method target-mass cell.
+Artifact 13671829050, SHA-256 a8bd61678ec74e1dea5451718f11386b44bb40162cad6ab29e10f1fe6268befc.
+
+First sampled M(Pc) maximum:
+- M = 0.7652866–0.7652926 Msun;
+- Pc = 0.2239479–0.2245094 MeV fm^-3;
+- R = 1835.56–1844.27 km.
+First maximum mass differs by only about 2.6e-5 relative from the 192-point estimate, but R moves about 0.75%. The first subsequent minimum remains radius-unconverged: 384-point R spans 258–364 km across methods and differs non-monotonically from 192-point results.
+
+The maxwell compatibility smooth bridge has an extra M(Pc) max/min pair:
+- max M=0.2180954 Msun, Pc=1.0606304 MeV fm^-3, R=17.8517 km;
+- min M=0.2028434 Msun, Pc=1.994654 MeV fm^-3, R=17.1793 km.
+It has zero density jump and is not an exact Maxwell construction.
+
+Initial independent SciPy TOV comparison run:
+- 4 EOS-Hermite tests passed;
+- five selected direct-r DOP853 vs native Fortran cases;
+- maximum relative mass difference 3.60164e-7, radius difference 1.46572e-6;
+- radius criterion 1e-6 failed narrowly. This is a numerical comparison concern, not a physical refutation; no tolerance was widened.
+
+The repair now underway writes a diagnostic receipt before acceptance and records all per-case differences for:
+1. coarse SciPy vs default native;
+2. tight SciPy vs default native;
+3. tight SciPy vs tight native;
+4. native baseline vs native refinement.
+SciPy rtol/max step and native q-step are refined. The 1e-6 acceptance remains unchanged. Inspect the exact-head CI artifact; do not call independent TOV validation PASS unless the tight comparison passes.
+
+If the refined SciPy/native comparison passes, close the TOV structural cross-check only. If it still fails, preserve per-case receipts and classify the mismatch (surface event, EOS state, centre expansion, ODE integration) before any further repair. Do not widen the criterion. The radial eigenvalue solver remains unimplemented, so no branch is radially stable and no new mass-dependent f/p1 prediction is admitted.

@@ -185,3 +185,54 @@ The 192-point result shows that:
 3. no segment can be assigned radial stability without the nodeless radial eigenvalue omega_0^2.
 
 The pilot is therefore refined once more to 384 central-pressure points. At the same time, an independent SciPy DOP853 TOV calculation is added. It reconstructs the exact native-knot cubic-Hermite P(mu) interpolation (with raw n=dP/dmu knot derivatives) and integrates the SI TOV equations directly in radius. Five selected Pc values cover the first fold, the early falling interval, both maxwell bridge folds and a high-density reference. The cross-check target is relative M and R agreement <= 1e-6 against the frozen v5 cell_solve TOV-only backend. This is a structure/TOV benchmark, not a radial-mode or Cowling-spectrum validation.
+
+
+## Exact 384-point pilot and SciPy TOV comparison (2026-11-09)
+
+Actions run: https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42616463263  
+HEAD: 6fb68cf1204b9656aa526f437a380e3c2e340a58  
+Artifact: 13671829050; ZIP SHA-256 a8bd61678ec74e1dea5451718f11386b44bb40162cad6ab29e10f1fe6268befc
+
+### Native TOV sequence
+
+- Six selected EOS/method rows completed 384/384 integrations each: 2304/2304 valid TOV points, no solver failures.
+- All six frozen-v5 reference M/R anchors reproduced to near machine precision.
+- Candidate-segment tests: 10 passed.
+- Fixed-mass/Cowling mock tests: 6 passed.
+- Native-Hermite EOS tests: 4 passed.
+- New mass-dependent f/p1 spectra: 0/48; no complete six-method mass cell; every candidate segment remains radially unresolved.
+
+The first sampled maximum across the six methods is:
+- mass: 0.7652866–0.7652926 Msun;
+- central pressure: 0.2239479–0.2245094 MeV fm^-3;
+- radius: 1835.56–1844.27 km.
+
+From 192 to 384 samples the first maximum mass changes by only about 2.6e-5 relative, while its radius decreases by about 0.75% and the pressure location by about 0.4%. The mass estimate is now highly stable under this grid refinement; radius is not yet within a 0.1% structural criterion. The 24-point estimate was severely under-resolved, and the 96-point estimate had a much larger radius.
+
+The first post-maximum minimum remains poorly resolved:
+- css: M=0.0710791 Msun, Pc=0.3153889 MeV fm^-3, R=322.49 km;
+- cubic_F: M=0.0711298 Msun, Pc=0.3153347, R=363.82 km;
+- cubic_P: M=0.0711171 Msun, Pc=0.3153452, R=357.44 km;
+- maxwell compatibility: M=0.0711879 Msun, Pc=0.3160936, R=258.24 km;
+- quintic_F: M=0.0710918 Msun, Pc=0.3154177, R=341.17 km;
+- quintic_P: M=0.0710763 Msun, Pc=0.3155437, R=317.60 km.
+
+This minimum radius is non-monotonic across 96→192→384 and is still not converged. No interpolated M/R fold is used for mode roots.
+
+The legacy maxwell compatibility bridge retains an intermediate max/min pair:
+- max: M=0.2180954 Msun, Pc=1.0606304 MeV fm^-3, R=17.8517 km;
+- min: M=0.2028434 Msun, Pc=1.994654 MeV fm^-3, R=17.1793 km.
+Their masses are nearly stable compared with 192 points, while Pc locations move by roughly 1.8% and 1.7%. The metadata still identifies this method as a smooth near-pressure-plateau construction with zero density jump; it is not a true Maxwell phase transition and no Seidov criterion applies. Five other methods retain four M(Pc) candidate segments; this method retains six.
+
+The late high-density sampled maximum is around M=1.91955 Msun, Pc=918.07 MeV fm^-3 and R=9.504 km, followed by a small decline at the upper grid edge. It is not a certified global Mmax or radially stable branch.
+
+### Independent SciPy TOV check
+
+The 384-point CI also ran:
+- 4 native-Hermite EOS tests: PASS;
+- five selected direct-r SciPy DOP853 TOV comparisons against frozen v5 production TOV;
+- the first comparison used SciPy rtol=2e-10, max_step=2000 m and native Fortran settings rtol=1e-9, step_cap=0.05.
+
+The raw comparison reached maximum relative mass difference 3.60164e-7 and radius difference 1.46572e-6. The predeclared acceptance was 1e-6 for both M and R, so the radius criterion narrowly failed. No tolerance was widened. The failure did not invalidate the 2304 successful native integrations or the six frozen-anchor reproductions; it means the independent structural comparison was not yet accepted.
+
+The first version of the comparison script raised before writing its casewise receipt. This is a diagnostic/representation defect, not evidence that the two TOV formulations disagree physically. The next commit repairs this by always serializing per-case coarse/tight SciPy and default/tight native results before checking acceptance. It tightens the SciPy direct-r integration and also refines the native q-step. The same 1e-6 criterion remains in force, now applied to tight SciPy versus tight native results. The next exact-head run must inspect the saved per-case receipt even if acceptance fails again.

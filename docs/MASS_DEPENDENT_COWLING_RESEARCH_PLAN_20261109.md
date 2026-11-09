@@ -189,3 +189,12 @@ The first sampled turning point moved from M about 0.7433 Msun, Pc about 0.172 M
 At 192 Pc samples, all six rows completed with no failed TOV integrations and v5 M/R anchors passed. The first maximum mass moved by only about 2.2e-4 relative from the 96-point estimate, but its radius moved by about 1.6%, while the first subsequent minimum radius shifted from about 418 km to about 195 km in the css row. This is insufficient convergence. The workflow is moved to 384 Pc samples.
 
 The next CI increment also includes an independently coded SciPy DOP853 direct-r TOV integrator. It reconstructs the exact piecewise cubic-Hermite P(mu) table from raw native knots, using the raw baryon density n as the endpoint derivative dP/dmu. It checks five central pressures spanning the first fold, falling segment, the extra maxwell smooth-bridge folds, and a high-density reference against frozen v5 cell_solve task=star. The target is <=1e-6 relative M and R discrepancy. This verifies structure integration and EOS interpolation equivalence only. It does not classify radial stability or validate f/p1 modes.
+
+
+## 15. 384-point sequence and independent structural validation
+
+The six-model 384-point native TOV scan completed with 2304/2304 valid integrations and all frozen-v5 M/R anchor checks passing. The first sampled maximum mass is now 0.7652866-0.7652926 Msun, stable at about 2.6e-5 relative compared with 192 points. Its radius still moves by about 0.75%, and the first post-maximum minimum radius remains non-monotonic across 96/192/384. The low-density turning topology is therefore only partially converged.
+
+A direct-r SciPy DOP853 calculation using the same raw-knot cubic-Hermite P(mu) EOS was compared with the Fortran q-coordinate integrator. The initial coarse comparison gave maximum relative mass difference 3.60164e-7 and radius difference 1.46572e-6; the predeclared 1e-6 radius criterion was narrowly missed. The acceptance was not relaxed. The new repair stores casewise output on failure, tightens both integrators and retains the same 1e-6 criterion for the refined comparison.
+
+Next: inspect the per-case refined TOV receipt; investigate any remaining mismatch through the EOS state and surface-event residuals. Only after the structural comparison is accepted should the selected M(Pc) folds be fitted/refined locally. Direct radial omega_0^2, an explicit Gamma_1 closure and a physically valid surface condition still gate all f/p1 mass-dependent spectra.

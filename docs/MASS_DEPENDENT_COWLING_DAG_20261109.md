@@ -119,3 +119,14 @@ At 96 points, the first sampled maximum ranges from 0.7650195 to 0.7651069 Msun 
 | MD-20 | 384-point six-model topology refinement | QUEUED_BY_NEXT_PUSH | Resolve remaining first-minimum radius and maxwell-bridge fold location movement. No radial stability labels or spectra. |
 
 The 96-to-192 first-max mass shift is small (about 2.2e-4 relative), but first-max radius moves by about 1.6% and the first-minimum radius by more than a factor of two in the css row. This is not a converged mass-radius topology. The maxwell compatibility bridge's extra fold persists, with its intermediate maximum moving from Pc about 1.1164 to 1.0415 MeV fm^-3 and its intermediate minimum from Pc about 1.8976 to 1.9619 MeV fm^-3. This remains a smooth bridge, not a density-jump Maxwell construction. See docs/MASS_SEQUENCE_BRANCH_STABILITY_AUDIT_20261109.md.
+
+
+## 384-point pilot and independent TOV diagnostic repair (2026-11-09)
+
+| ID | Node | Status | Evidence |
+|---|---|---|---|
+| MD-20 | 384-point native six-model TOV topology | PASS_EXECUTION_HOLD_SCIENCE | 2304/2304 TOV integrations valid; all six frozen v5 M/R anchors pass; 0/48 f/p1 roots. First maximum mass is stable to about 2.6e-5 relative from 192 points; first-minimum radius remains unconverged. Actions 42616463263, artifact 13671829050. |
+| MD-19a | Initial same-EOS SciPy TOV reference | CONCERN_NUMERICAL_TOLERANCE | 4 native-Hermite EOS tests pass. Five DOP853 vs v5 cases produced max relative mass 3.60164e-7 and radius 1.46572e-6; the 1e-6 radius criterion narrowly failed. |
+| MD-19b | Per-case SciPy/native refinement receipt | REPAIR_PUSHED_CI_PENDING | The comparison code now saves per-case coarse/tight SciPy and baseline/tight Fortran results before acceptance. SciPy rtol/max-step and Fortran q-step are refined. 1e-6 remains unchanged. |
+
+The first maximum is nearly converged in mass but not in radius; the following minimum remains badly radius-sensitive. The maxwell-labelled smooth bridge retains its extra local fold pair. These sequence pieces remain kinematic only, and no radial-stability label is assigned.

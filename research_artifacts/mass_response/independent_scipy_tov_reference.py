@@ -121,8 +121,8 @@ class NativeHermiteEOS:
         return float(epsilon), float(n), float(mu), float(cs2)
 
 
-def scipy_tov(eos: NativeHermiteEOS, pc_pa: float, *, rtol: float = 2.0e-10,
-              max_step_m: float = 2000.0, r0_m: float = 10.0,
+def scipy_tov(eos: NativeHermiteEOS, pc_pa: float, *, rtol: float = 2.0e-12,
+              max_step_m: float = 250.0, r0_m: float = 10.0,
               radius_limit_m: float = 1.0e8) -> dict:
     """Direct-r integration of the SI TOV equations with a finite-pressure event."""
     p_cut = float(eos.pressure[0])
@@ -158,7 +158,7 @@ def scipy_tov(eos: NativeHermiteEOS, pc_pa: float, *, rtol: float = 2.0e-10,
 
     surface_event.terminal = True
     surface_event.direction = -1.0
-    atol = np.asarray([1.0e10, max(1.0, p_cut * 1.0e-12)])
+    atol = np.asarray([1.0e8, max(1.0, p_cut * min(1.0e-14, rtol * 0.05))])
     solution = solve_ivp(
         rhs, (r0_m, radius_limit_m), np.asarray([m0, p0]),
         method="DOP853", rtol=rtol, atol=atol, max_step=max_step_m,
@@ -183,6 +183,7 @@ def scipy_tov(eos: NativeHermiteEOS, pc_pa: float, *, rtol: float = 2.0e-10,
 
 
 def build_reference(output_dir: Path, *, relative_tolerance: float = 1.0e-6) -> dict:
+    """Compare coarse and refined SciPy/Fortran TOV solutions and always save a receipt."""
     import sys
     sys.path.insert(0, str(ROOT / "python_frontend"))
     from compose_cowling.solver import solve_v5_tov_star
@@ -200,57 +201,129 @@ def build_reference(output_dir: Path, *, relative_tolerance: float = 1.0e-6) -> 
         path = eos_dir / f"GPPVA_FSU2__BBB_BHF2__{method}.csv"
         eos = NativeHermiteEOS.from_csv(path)
         pc_pa = pc_mev_fm3 * MEV_FM3_TO_PA
-        independent = scipy_tov(eos, pc_pa)
-        native = solve_v5_tov_star(
+
+        # Original setting from the first comparison, retained as a diagnostic.
+        scipy_coarse = scipy_tov(
+            eos, pc_pa, rtol=2.0e-10, max_step_m=2000.0
+        )
+        # Refined, independently integrated direct-r solution.
+        scipy_tight = scipy_tov(
+            eos, pc_pa, rtol=2.0e-12, max_step_m=250.0
+        )
+        # Frozen v5 production settings and a tighter native q-step refinement.
+        native_reference = solve_v5_tov_star(
             path, pc_pa, p_cut_pa=float(eos.pressure[0]),
             r0_m=10.0, r_limit_m=1.0e8, rtol=1.0e-9, step_cap=0.05,
         )
-        dm = abs(independent["mass_kg"] - float(native["mass_kg"])) / max(abs(float(native["mass_kg"])), 1.0)
-        dr = abs(independent["radius_m"] - float(native["radius_m"])) / max(abs(float(native["radius_m"])), 1.0)
+        native_tight = solve_v5_tov_star(
+            path, pc_pa, p_cut_pa=float(eos.pressure[0]),
+            r0_m=10.0, r_limit_m=1.0e8, rtol=1.0e-11, step_cap=0.0125,
+        )
+
+        def diff(left: dict, right: dict, field: str) -> float:
+            return abs(float(left[field]) - float(right[field])) / max(
+                abs(float(right[field])), 1.0
+            )
+
         results.append({
             "method": method,
             "pc_mev_fm3": pc_mev_fm3,
             "pc_pa": pc_pa,
             "eos_sha256": eos.source_sha256,
             "interpolation_id": "cubic_Hermite_P_of_mu_raw_n_v1",
-            "scipy": independent,
-            "native_fortran": {
-                "mass_kg": float(native["mass_kg"]),
-                "radius_m": float(native["radius_m"]),
-                "surface_residual_pa": float(native.get("surface_residual_pa", math.nan)),
-                "backend_build_key": native.get("backend_build_key"),
+            "scipy_coarse": scipy_coarse,
+            "scipy_tight": scipy_tight,
+            "native_fortran_reference": {
+                "mass_kg": float(native_reference["mass_kg"]),
+                "radius_m": float(native_reference["radius_m"]),
+                "surface_residual_pa": float(native_reference.get("surface_residual_pa", math.nan)),
+                "backend_build_key": native_reference.get("backend_build_key"),
+                "rtol": 1.0e-9,
+                "step_cap": 0.05,
             },
-            "relative_mass_difference": dm,
-            "relative_radius_difference": dr,
+            "native_fortran_tight": {
+                "mass_kg": float(native_tight["mass_kg"]),
+                "radius_m": float(native_tight["radius_m"]),
+                "surface_residual_pa": float(native_tight.get("surface_residual_pa", math.nan)),
+                "backend_build_key": native_tight.get("backend_build_key"),
+                "rtol": 1.0e-11,
+                "step_cap": 0.0125,
+            },
+            "relative_difference_scipy_coarse_vs_native_reference": {
+                "mass": diff(scipy_coarse, native_reference, "mass_kg"),
+                "radius": diff(scipy_coarse, native_reference, "radius_m"),
+            },
+            "relative_difference_scipy_tight_vs_native_reference": {
+                "mass": diff(scipy_tight, native_reference, "mass_kg"),
+                "radius": diff(scipy_tight, native_reference, "radius_m"),
+            },
+            "relative_difference_scipy_tight_vs_native_tight": {
+                "mass": diff(scipy_tight, native_tight, "mass_kg"),
+                "radius": diff(scipy_tight, native_tight, "radius_m"),
+            },
+            "relative_native_refinement": {
+                "mass": diff(native_reference, native_tight, "mass_kg"),
+                "radius": diff(native_reference, native_tight, "radius_m"),
+            },
         })
-    max_mass = max(row["relative_mass_difference"] for row in results)
-    max_radius = max(row["relative_radius_difference"] for row in results)
-    if max(max_mass, max_radius) > relative_tolerance:
-        raise AssertionError(
-            f"SciPy/native TOV disagreement exceeds {relative_tolerance:g}: "
-            f"mass={max_mass:g}, radius={max_radius:g}"
-        )
+
+    def maximum(path: tuple[str, str]) -> float:
+        return max(float(row[path[0]][path[1]]) for row in results)
+
+    max_coarse_mass = maximum(("relative_difference_scipy_coarse_vs_native_reference", "mass"))
+    max_coarse_radius = maximum(("relative_difference_scipy_coarse_vs_native_reference", "radius"))
+    max_tight_mass = maximum(("relative_difference_scipy_tight_vs_native_tight", "mass"))
+    max_tight_radius = maximum(("relative_difference_scipy_tight_vs_native_tight", "radius"))
+    max_native_mass = maximum(("relative_native_refinement", "mass"))
+    max_native_radius = maximum(("relative_native_refinement", "radius"))
+
+    passed = max(max_tight_mass, max_tight_radius) <= relative_tolerance
     output_dir.mkdir(parents=True, exist_ok=True)
     receipt = {
-        "schema": "ns-cowling-independent-scipy-tov-reference-v1",
-        "status": "PASS_SAME_EOS_INTERPOLATION_INDEPENDENT_RADIAL_ODE",
-        "relative_tolerance": relative_tolerance,
-        "max_relative_mass_difference": max_mass,
-        "max_relative_radius_difference": max_radius,
+        "schema": "ns-cowling-independent-scipy-tov-reference-v2",
+        "status": (
+            "PASS_REFINED_SAME_EOS_INDEPENDENT_TOV"
+            if passed else "CONCERN_REFINED_SAME_EOS_TOV_DISAGREEMENT"
+        ),
+        "acceptance": {
+            "relative_tolerance": relative_tolerance,
+            "comparison_used_for_acceptance": "scipy_tight_vs_native_tight",
+        },
+        "max_relative_difference_coarse_vs_native_reference": {
+            "mass": max_coarse_mass,
+            "radius": max_coarse_radius,
+        },
+        "max_relative_difference_scipy_tight_vs_native_tight": {
+            "mass": max_tight_mass,
+            "radius": max_tight_radius,
+        },
+        "max_relative_native_refinement": {
+            "mass": max_native_mass,
+            "radius": max_native_radius,
+        },
         "cases": results,
         "scope": (
             "DOP853 direct-r SI TOV integration compared with frozen v5 Fortran "
             "cell_solve task=star. Both use the identical raw-knot cubic-Hermite "
             "P(mu) interpolation and finite positive surface-pressure cutoff. "
-            "This is a structural TOV cross-check only, not a radial-stability "
-            "or f/p1-spectrum validation."
+            "Coarse and refined SciPy settings are compared with default and "
+            "refined native Fortran settings. This is a structural TOV cross-check "
+            "only, not a radial-stability or f/p1-spectrum validation."
         ),
     }
-    (output_dir / "independent_scipy_tov_reference.json").write_text(
+    # Always preserve per-case diagnostic results, even when the acceptance
+    # condition fails. A failed numerical comparison must not erase evidence.
+    receipt_path = output_dir / "independent_scipy_tov_reference.json"
+    receipt_path.write_text(
         json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
+    if not passed:
+        raise AssertionError(
+            f"refined SciPy/native TOV disagreement exceeds {relative_tolerance:g}: "
+            f"mass={max_tight_mass:g}, radius={max_tight_radius:g}; "
+            f"diagnostics preserved at {receipt_path}"
+        )
     return receipt
-
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)

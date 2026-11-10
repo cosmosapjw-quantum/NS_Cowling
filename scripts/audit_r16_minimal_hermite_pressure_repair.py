@@ -109,7 +109,7 @@ def audit_one(ref):
         )
         if cell["status"]!="PASS_NATIVE_CELL_ADMISSIBLE":
             raise RuntimeError(f"{name}: repaired cell {i+1} not admitted: {cell}")
-        min_d2=min(min_d2,cell["min_d2"])
+        min_d2=min(min_d2,cell["min_d2p"])
         min_g=min(min_g,cell["min_causal_margin"])
         repair_records.append((repair,cell))
 

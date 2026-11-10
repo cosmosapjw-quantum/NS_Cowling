@@ -3,7 +3,7 @@
 Date: 2026-11-11  
 Command: PYTHONPATH=<package-root> python -m pytest -q mode_identity/tests
 
-Observed result: 37 passed in 0.87s.
+Observed fresh local result: 42 passed in 0.65s (32 test functions; 42 collected cases after parameter expansion).
 
 ## Assertions tested
 

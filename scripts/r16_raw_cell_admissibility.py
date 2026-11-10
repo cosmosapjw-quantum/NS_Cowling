@@ -133,7 +133,7 @@ def audit_table(path: Path, expected_sha: str, *, name: str, cohort: str) -> tup
                 "error": f"{type(exc).__name__}: {exc}",
             }
         statuses[result["status"]] += 1
-        d2 = result.get("min_d2")
+        d2 = result.get("min_d2p")
         g = result.get("min_causal_margin")
         if d2 is not None and d2 < min_d2:
             min_d2, min_d2_cell = d2, i + 1

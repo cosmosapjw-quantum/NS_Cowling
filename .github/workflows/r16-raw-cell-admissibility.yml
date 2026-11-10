@@ -1,0 +1,43 @@
+name: R16 raw normalized versus projected native-cell admissibility
+
+on:
+  push:
+    branches: [research/r15-native-outer-crust-pilot]
+    paths:
+      - ".github/workflows/r16-raw-cell-admissibility.yml"
+      - "scripts/r16_raw_cell_admissibility.py"
+      - "python_frontend/tests/test_r16_raw_cell_admissibility.py"
+      - "oscillation_release_v1/data/spectrum_summary_234.csv"
+      - "oscillation_release_v1/data/eos_original_normalized/**"
+      - "oscillation_release_v1/data/eos_projected/**"
+      - "oscillation_source/methods/src/eos/ns_mu_bridge.f90"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare-native-cell-admissibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pytest
+        run: python -m pip install pytest
+      - name: Test exact Fortran endpoint acceptance logic
+        run: python -m pytest -q python_frontend/tests/test_r16_raw_cell_admissibility.py
+      - name: Audit every native interval in both 234-table cohorts
+        run: |
+          python scripts/r16_raw_cell_admissibility.py \
+            --output-dir dist/r16-raw-cell-admissibility
+      - name: Upload per-cell rejection map and cohort summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ns-cowling-r16-raw-cell-admissibility-${{ github.run_id }}
+          path: dist/r16-raw-cell-admissibility/
+          if-no-files-found: error
+          retention-days: 30

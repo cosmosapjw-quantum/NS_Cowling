@@ -192,6 +192,8 @@ def main(argv=None):
 
     def aggregate(key):
         rows=records if key is None else [x for x in records if x["core"]==key]
+        if not rows:
+            return {"tables":0,"cells":0,"summary_unavailable_due_to_table_failures":len(failures)}
         return {
             "tables":len(rows),
             "cells":sum(x["cell_count"] for x in rows),

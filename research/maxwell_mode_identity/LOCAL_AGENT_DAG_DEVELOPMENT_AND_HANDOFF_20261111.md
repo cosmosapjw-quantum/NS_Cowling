@@ -543,3 +543,27 @@ Stop at the smallest failed DAG node if the native ODE differs from the assumed 
 - The final exported-package replay was repeated against the exact helper and test files now in the GitHub branch: 12 tests collected, 12 passed in 0.53 s; collection inventory 12 tests in 0.32 s. Python 3.13.5, NumPy 2.3.5, SciPy 1.17.0, pytest 9.0.2. Module and test file SHA256 values are pinned in LOCAL_AGENT_DAG.v1.json and the computation manifest.
 - This run used an exported artifact directory without Git metadata. It is not a full repository replay, not a native Fortran build and not evidence for GitHub Actions. The combined-status endpoint returned no status records.
 - PR #6's test claim remains a separate provenance issue: its captured computation manifest and stdout report 42 cases, while its later validation prose/status and PR body claim 43. The additional one-case receipt was not among the changed files inspected here. Do not resolve this mismatch by selecting the larger count; require a fresh run on the exact live checkout and mutually consistent inventory, stdout and manifest.
+
+
+
+## J. General trace-first rule and 15-case acceptance (revision 1.2)
+
+Do not begin from chi_ad/chi_eq. Begin from the actual complete square ODE system.
+
+For Y'=M(r)Y and a positive weight w=h exp(-nu), Abel-Liouville gives
+
+    d(det(Y))/dr = tr(M) det(Y)
+    Omega = w det(Y)
+    Gamma = tr(M) + h'/h - nu_prime
+    K = Omega * exp[-integral(Gamma dr)] * product(crossed J_k^-1)
+    J_k = (w_outer/w_inner) det(T_inner_to_outer)
+
+This is the general trace-first determinant identity. It is algebraic and basis-dependent. It is not a canonical symplectic current and must not be described as a physical conserved charge without an independent physical derivation.
+
+Only after the source-derived full trace is verified to equal nu_prime*(2+1/chi_ad), and the equilibrium first law is verified as h'/h=-(1+1/chi_eq)*nu_prime, may the agent reduce Gamma to nu_prime*(1/chi_ad-1/chi_eq). If composition gradients add terms, keep the full Gamma. If the physical state vector has n components, derive the n x n fundamental matrix and actual n x n interface map. If the system is non-square or an interface map is rank deficient, stop and request mathematical reformulation. Never squeeze extra modes into a 2x2 formula.
+
+The current helper exports trace_first_drift_density and integrated_trace_first_drift. The 15-case suite has 15 collected functions and passes in 0.58 s; collection was 0.33 s. Exact source hashes, stdout, inventory, environment and manifest are pinned in the computation evidence directory.
+
+A rejected synthetic test scale is preserved: O(1) m^-1 coefficients over 4000 m overflowed in matrix exponential/determinant. The test now uses O(1e-5) m^-1 coefficients; the identity and tolerance are unchanged. This was a synthetic test setup error, not a physical instability. The raw initial failure stdout was not separately captured; see TEST_SCALE_NEGATIVE_CONTROL.md.
+
+Local agent must verify the live native q-to-r equations, full Jacobian trace and equilibrium h'/h before using any result on the real code. Synthetic tests do not satisfy LA1 or establish stellar mode results.

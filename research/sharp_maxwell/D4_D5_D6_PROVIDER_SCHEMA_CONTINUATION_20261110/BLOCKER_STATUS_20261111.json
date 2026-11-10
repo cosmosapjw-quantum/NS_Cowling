@@ -1,0 +1,72 @@
+{
+  "schema": "ns-cowling.c7x-blocker-status.v1",
+  "snapshot_date": "2026-11-11",
+  "decision": "STOP_BEFORE_D6_ROOT_SEARCH",
+  "upstream": {
+    "D0": {"status": "PASS_SCOPED_16_OF_18", "sources": 16, "raw_files": 46, "quarantined_candidates": 2},
+    "D1": {"status": "BLOCKED_NATIVE_EXECUTION", "note": "No usable local checkout/native Fortran execution was available in the 2026-11-10 C7X D4-D6 evidence session. This is distinct from the earlier C6 native build/probe on SPG_M1 and GPPVA_FSU2, which executed and exposed scientific C3/C4 failures."},
+    "D2": {"status": "PASS_SCOPED_WITH_SOURCE_CAVEATS"},
+    "D3": {
+      "status": "PARTIAL_FAIL",
+      "q3_euler_failed_sources": ["GPPVA_DD2", "GPPVA_DDME2", "GPPVA_FSU2R", "GPPVA_NL3wrL55", "GPPVA_TM1e", "RG_SLY4", "RG_KDE0v1"],
+      "q5_failed_sources": ["RG_SLY4", "RG_KDE0v1"],
+      "q5_definition": "Q5 = mu_l/(m_n c^2); the strict cold, neutrino-transparent beta-equilibrium path requires Q5 approximately zero. Nonzero Q5 may represent a different lepton/neutrino state and is not silently projected away.",
+      "cold_path_contract": ["T=0 metadata", "Q2=s/n_B approximately 0", "Q5=mu_l/(m_n c^2) approximately 0", "Q6 approximately Q7"],
+      "strict_q3_euler_tolerance": 2e-6
+    },
+    "D4": {
+      "status": "BLOCKED_PROVIDER_OR_EXPORT_SCHEMA_MISMATCH",
+      "eos_compo_sources": 13,
+      "rows": 4975,
+      "parseable_rows": 4975,
+      "malformed_rows": 0,
+      "inb_mismatch_rows": 0,
+      "crust_sources": 11,
+      "crust_rows": 3538,
+      "outer_crust_rows": 2387,
+      "inner_crust_rows": 1151,
+      "inner_rows_Yquad_equals_Ye": 1151,
+      "inner_rows_standard_and_mass_diagnostic_closure_fail": 1151,
+      "provider_semantics_confirmed": false,
+      "provider_contact_sent": false
+    },
+    "D5": {
+      "status": "DELTA_CORRECTED_EXPLORATORY_NOT_ADMISSION",
+      "segments": 45,
+      "topology_boundary_cells_excluded": 15,
+      "new_boundary_cells_that_fail": 7,
+      "new_boundary_cells_that_pass": 8,
+      "topology_preserving_cells": 5535,
+      "causal_polynomial_violations": 1153,
+      "dn_dmu_nonpositive_cells": 1110,
+      "nonpositive_density_cells": 0,
+      "selected_interval_passes": 4382,
+      "full_one_shot_source_replay": false
+    },
+    "D6": {
+      "status": "STOP_BEFORE_ROOT_SEARCH",
+      "original_manifest_pairs": 65,
+      "screened_candidate_pairs": 55,
+      "mu_support_overlap_pairs": 55,
+      "pairs_requiring_rest_mass_rebase": 55,
+      "pairs_both_q3_q5_pass": 18,
+      "pairs_both_q5_pass": 33,
+      "pairs_both_d5_pass": 0,
+      "common_pressure_evaluated": false,
+      "density_drift_computed": false,
+      "maxwell_roots_run": 0,
+      "note": "A nonempty tabulated chemical-potential support overlap is not a common-pressure root."
+    },
+    "D7_D10": {"status": "NOT_RUN"}
+  },
+  "provenance": {
+    "repository": "cosmosapjw-quantum/NS_Cowling",
+    "source_authority_branch": "research/maxwell-native-fortran-v1",
+    "source_authority_commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
+    "evidence_branch": "research/sharp-maxwell-d4-provider-semantics-v1",
+    "prior_evidence_head": "0a7dec5a17d568a90b3a091ac64ce714d73f4c66",
+    "new_evidence_commit": "5460614eb8ad70adaa97de93d637bda6ff8e5dd3",
+    "draft_pr": 5,
+    "standalone_document": "C7X_BLOCKER_SELF_CONTAINED_20261111.md"
+  }
+}

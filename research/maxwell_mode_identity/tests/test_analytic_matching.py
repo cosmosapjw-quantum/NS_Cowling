@@ -24,6 +24,7 @@ def test_complex_bilinear_matching_determinant_and_basis_covariance():
     d1, factor = basis_change_determinant(pc, ps, ac, ass)
     assert d1 == pytest.approx(d0 * np.linalg.det(ac) * np.linalg.det(ass))
     assert factor == pytest.approx(np.linalg.det(ac) * np.linalg.det(ass))
+    # The bilinear determinant must not silently use a Hermitian product.
     hermitian_det = np.linalg.det(np.column_stack([pc[:, 0], np.conjugate(ps[:, 0])]))
     assert not np.isclose(d0, hermitian_det)
 
@@ -56,8 +57,7 @@ def test_gauge_interface_and_matching_determinant_cocycle():
     yi = np.array([0.3+0.2j, 1.0-0.4j])
     ys = np.array([1.1-0.1j, 0.4+0.5j])
     dy = matching_determinant((Ti @ yi).reshape(2, 1), ys.reshape(2, 1))
-    dz = matching_determinant((Tz @ np.linalg.solve(Gi, yi)).reshape(2, 1),
-                              np.linalg.solve(Go, ys).reshape(2, 1))
+    dz = matching_determinant((Tz @ np.linalg.solve(Gi, yi)).reshape(2, 1), np.linalg.solve(Go, ys).reshape(2, 1))
     assert dy == pytest.approx(np.linalg.det(Go) * dz)
 
 
@@ -105,6 +105,8 @@ def test_zero_frequency_intermediate_transfer_pole_but_implicit_form_is_finite()
     assert np.all(np.isfinite(f0.C_inner)) and np.all(np.isfinite(f0.C_outer))
     assert np.linalg.matrix_rank(np.column_stack([f0.C_inner, f0.C_outer])) == 2
     assert np.linalg.det(f0.C_outer) == pytest.approx(0.0, abs=0.0)
+    # At small nonzero A the graph transfer exists but its lower-left entry
+    # diverges as 1/A; this is a chart singularity, not a determinant zero.
     f1 = interface_matching_form(theta, kappa, 1.0e-10, nu_p)
     assert f1.kind == "transfer"
     assert abs(f1.T[1, 0]) > 1.0e8
@@ -127,6 +129,8 @@ def test_zero_jump_is_identity_even_at_zero_frequency():
 
 
 def test_intermediate_zero_frequency_rank_drop_for_zero_jump_is_not_hidden():
+    # kappa=1 is the no-interface case, so the helper takes the exact identity
+    # branch before constructing the rank-deficient implicit blocks.
     form = interface_matching_form(0.4, 1.0, 0.0, 0.02)
     np.testing.assert_array_equal(form.T, np.eye(2))
 
@@ -141,6 +145,8 @@ def test_singular_gauge_and_invalid_interface_data_are_rejected():
 
 
 def test_norm_based_complex_normalization_fails_cauchy_riemann():
+    # f(z)=sqrt(1+|z|^2) is a typical Hermitian norm factor. Its Wirtinger
+    # derivative dbar(f)=(x+i*y)/(2*f) is nonzero away from z=0.
     x, y = 0.7, -0.9
     f = np.sqrt(1.0 + x*x + y*y)
     dbar = complex(x, y) / (2.0*f)
@@ -148,12 +154,15 @@ def test_norm_based_complex_normalization_fails_cauchy_riemann():
 
 
 def test_basis_multiplier_with_zero_inside_contour_changes_argument_count():
+    # A basis factor nonzero on |lambda|=1 but vanishing at lambda=0.2
+    # is not an admissible holomorphic unit on the enclosed disk.
     lam0, basis_zero = 0.1+0.0j, 0.2+0.0j
     d = lambda z: z-lam0
     unit = lambda z: z-basis_zero
     circle = np.exp(1j*np.linspace(0.0, 2*np.pi, 101))
     assert np.min(np.abs(unit(circle))) >= 0.8 - 1e-12
     assert d(basis_zero) != 0.0 and unit(basis_zero) == 0.0
+    # Product gains an interior zero although the basis factor is nonzero on contour.
     assert d(basis_zero)*unit(basis_zero) == 0.0
 
 
@@ -164,11 +173,13 @@ def test_dimensionless_transfer_condition_scales_like_A_inverse_squared():
     f1 = interface_matching_form(theta, kappa, A1, nu_p)
     f2 = interface_matching_form(theta, kappa, A2, nu_p)
     T1 = dimensionless_interpolation_transfer(f1, L)
+    T2 = dimensionless_interpolation_transfer(f2, L)
     np.testing.assert_allclose(T1, [[1+theta*(kappa-1), theta*(kappa-1)*x1],
                                     [(1-theta)*(kappa-1)/x1, 1+(1-theta)*(kappa-1)]])
     c1 = transfer_condition_number_diagnostic(f1, L)
     c2 = transfer_condition_number_diagnostic(f2, L)
     assert c2/c1 == pytest.approx(4.0, rel=2e-2)
+    # This is a real-frequency conditioning diagnostic, not a holomorphic scalar.
     with pytest.raises(ValueError):
         transfer_condition_number_diagnostic(interface_matching_form(theta,kappa,1j*A2,nu_p),L)
 

@@ -1,0 +1,328 @@
+{
+  "schema_version": "1.0.0",
+  "schema_name": "ns-cowling-local-agent-two-sided-matching-dag",
+  "contract_id": "NSCOWLING-MODEID-WRONSKIAN-LOCAL-AGENT-v1",
+  "snapshot_date": "2026-11-11",
+  "status": "IMPLEMENTATION_SPEC_READY__LOCAL_EXECUTION_REQUIRED",
+  "project": {
+    "repository": "cosmosapjw-quantum/NS_Cowling",
+    "source_authority_branch": "research/maxwell-native-fortran-v1",
+    "source_authority_commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
+    "mode_identity_branch_snapshot": "research/maxwell-mode-identity-v1",
+    "mode_identity_head_snapshot": "3268942dc28b3a236ce484485b0db184cbb634fd",
+    "pr_number": 6,
+    "native_cowling_module": {
+      "name": "ns_maxwell_cowling",
+      "blob_sha": "ce4fac829d3a5c211139d5174541a7053793afc6",
+      "shot_type": "maxwell_cowling_shot_t"
+    },
+    "native_spectrum_module": {
+      "name": "ns_maxwell_mode_spectrum",
+      "blob_sha": "726a03b219827e77412175c68e3d7c28ef32ef84"
+    },
+    "python_solver_blob": "8959f90a37aba63191227bb363e97302988864e9",
+    "snapshot_requires_live_fetch": true
+  },
+  "objective": "Implement and validate an independent two-sided matching cross-check for the existing analytic two-phase sharp-Maxwell relativistic Cowling fixture using the weighted Abel-Liouville determinant invariant.",
+  "mathematical_contract": {
+    "ode": "y'=M y, y=[W,V], M=[[nu'/chi,A/chi-ell*(ell+1)*exp(lambda)],[-exp(lambda)/r^2,2*nu']]",
+    "A": "(omega*r/c)^2*exp(lambda-2nu)",
+    "hypotheses": [
+      "same background, omega, ell and sound-speed closure for both columns",
+      "cold one-parameter barotrope",
+      "d epsilon/dP=1/chi",
+      "P'=-h nu'",
+      "h=epsilon+P>0"
+    ],
+    "invariant": "Omega=h*exp(-nu)*(W1*V2-V1*W2)",
+    "interface_jump": "Omega_o/Omega_i=(h_o/h_i)*exp(-(nu_o-nu_i))*det(T_inner_to_outer)",
+    "slow_rapid_map_det": "h_i/h_o",
+    "two_sided_match": "E(omega;rm)=h(rm)*exp(-nu(rm))*det(y_center(rm),y_surface(rm))",
+    "caveats": [
+      "bilinear without complex conjugation",
+      "not a canonical covariant symplectic current",
+      "not a cross-frequency invariant",
+      "normalised angle is not a holomorphic Evans function",
+      "nonbarotropic chi_ad != chi_eq requires a new weight/system derivation"
+    ]
+  },
+  "non_goals": [
+    "C7X D3/D4/D5/D6 resolution",
+    "CompOSE composition remapping",
+    "55 or 65 pair Maxwell roots",
+    "raw EOS or canonical manifest mutation",
+    "source-backed TOV/Cowling outputs",
+    "automatic f/p1/interface-g labels"
+  ],
+  "mutation_gates": {
+    "M0": "read-only inspect/fetch/test; stop if dirty",
+    "M1": "research-only changes under research/maxwell_mode_identity/** on isolated child branch",
+    "M2": "additive profile export/test-driver only after written note; existing numerical outputs/semantics unchanged",
+    "M3": "RHS/interface/center/surface/root/production API changes require explicit human approval",
+    "M4": "raw EOS, C7X gates/manifests and source-backed physics forbidden",
+    "M5": "push/PR/merge/release/deploy/provider contact/Dropbox require separate explicit instruction"
+  },
+  "dag": [
+    {
+      "id": "LA0",
+      "depends_on": [],
+      "name": "identity and environment preflight",
+      "gate": "M0",
+      "status": "NOT_RUN_BY_LOCAL_AGENT",
+      "outputs": [
+        "run_identity.json",
+        "preflight logs"
+      ],
+      "acceptance": [
+        "clean worktree",
+        "exact source and branch SHAs",
+        "software versions recorded"
+      ],
+      "stop": [
+        "dirty tree",
+        "wrong repo",
+        "unknown source identity"
+      ]
+    },
+    {
+      "id": "LA1",
+      "depends_on": [
+        "LA0"
+      ],
+      "name": "equation and convention audit",
+      "gate": "M0",
+      "status": "PARTIALLY_INSPECTED_REQUIRES_LOCAL_RECHECK",
+      "outputs": [
+        "equation_source_map.md",
+        "convention_table.json",
+        "q_to_r_chain_rule.md"
+      ],
+      "acceptance": [
+        "actual module paths/hash observed",
+        "native q-coordinate chain rule derived",
+        "native and Python RHS compared term-by-term"
+      ],
+      "stop": [
+        "unresolved sign/coordinate mismatch"
+      ]
+    },
+    {
+      "id": "LA2",
+      "depends_on": [
+        "LA1"
+      ],
+      "name": "phase-resolved profile export and schema",
+      "gate": "M1",
+      "status": "NOT_RUN",
+      "outputs": [
+        "profile_schema.v2.json",
+        "native profiles",
+        "Python profiles",
+        "profile_manifest.json"
+      ],
+      "acceptance": [
+        "core/envelope arrays separate",
+        "one-sided interface records explicit",
+        "h,chi,nu,lambda,nu_prime exported",
+        "schema and round-trip pass"
+      ],
+      "stop": [
+        "cross-interface interpolation",
+        "missing required field",
+        "zero-filling missing data"
+      ]
+    },
+    {
+      "id": "LA3",
+      "depends_on": [
+        "LA1",
+        "LA2"
+      ],
+      "name": "invariant and interface regression",
+      "gate": "M1",
+      "status": "LOCAL_37_SYNTHETIC_TESTS_PASS_REMOTE_REPLAY_REQUIRED",
+      "outputs": [
+        "weighted_wronskian_results.json",
+        "test logs"
+      ],
+      "acceptance": [
+        "smooth drift",
+        "complex bilinear",
+        "both maps",
+        "general jump law",
+        "chain telescope",
+        "nonbarotropic and lapse-jump negative controls",
+        "step/scale convergence"
+      ],
+      "stop": [
+        "self-referential expected values",
+        "tolerance weakening"
+      ]
+    },
+    {
+      "id": "LA4",
+      "depends_on": [
+        "LA1",
+        "LA2",
+        "LA3"
+      ],
+      "name": "two-sided center/surface matching",
+      "gate": "M1",
+      "status": "ALGEBRAIC_AND_SYNTHETICALLY_CHECKED_ACTUAL_FIXTURE_NOT_RUN",
+      "outputs": [
+        "two_sided_matching_results.json"
+      ],
+      "acceptance": [
+        "outward center and inward surface integrations",
+        "same ODE and transfers",
+        "at least three match radii",
+        "surface determinant equals existing boundary form",
+        "zero-set agreement"
+      ],
+      "stop": [
+        "unaccounted rescaling",
+        "nonconvergent match-radius spread"
+      ]
+    },
+    {
+      "id": "LA5",
+      "depends_on": [
+        "LA4"
+      ],
+      "name": "zero-jump smooth limit",
+      "gate": "M1",
+      "status": "NOT_RUN",
+      "outputs": [
+        "zero_jump_limit_results.json"
+      ],
+      "acceptance": [
+        "equal one-sided thermodynamics",
+        "identity transfer maps",
+        "smooth/two-phase background, roots and profiles converge"
+      ],
+      "stop": [
+        "transition states not coincident"
+      ]
+    },
+    {
+      "id": "LA6",
+      "depends_on": [
+        "LA5"
+      ],
+      "name": "finite-jump synthetic continuation",
+      "gate": "M1",
+      "status": "NOT_RUN",
+      "outputs": [
+        "finite_jump_continuation_results.json"
+      ],
+      "acceptance": [
+        "common P and mu",
+        "Delta epsilon=mu Delta n",
+        "positive jump",
+        "slow and rapid separate",
+        "forward/reverse continuation",
+        "ambiguity retained"
+      ],
+      "stop": [
+        "thermodynamic identity failure",
+        "root-order label assignment"
+      ]
+    },
+    {
+      "id": "LA7",
+      "depends_on": [
+        "LA4",
+        "LA5",
+        "LA6"
+      ],
+      "name": "native/Python and convergence cross-validation",
+      "gate": "M1",
+      "status": "NOT_RUN",
+      "outputs": [
+        "cross_validation_results.json",
+        "convergence_matrix.csv"
+      ],
+      "acceptance": [
+        "one-sided profile comparison",
+        "half parameter step",
+        "double profile resolution",
+        "tightened tolerances",
+        "three max_step values",
+        "direct/QR comparison"
+      ],
+      "stop": [
+        "unexplained implementation divergence"
+      ]
+    },
+    {
+      "id": "LA8",
+      "depends_on": [
+        "LA0",
+        "LA1",
+        "LA2",
+        "LA3",
+        "LA4",
+        "LA5",
+        "LA6",
+        "LA7"
+      ],
+      "name": "final receipts and checkpoint",
+      "gate": "M1",
+      "status": "NOT_RUN",
+      "outputs": [
+        "VALIDATION_REPORT.md",
+        "SHA256SUMS",
+        "local_checkpoint.md"
+      ],
+      "acceptance": [
+        "every claim has exact evidence",
+        "protected files unchanged",
+        "final commit tested",
+        "failure taxonomy applied"
+      ],
+      "stop": [
+        "missing receipts",
+        "unreviewed diff",
+        "unknown status promoted to PASS"
+      ]
+    }
+  ],
+  "required_artifacts": [
+    "run_identity.json",
+    "profile_schema.v2.json",
+    "profile_manifest.json",
+    "weighted_wronskian_results.json",
+    "two_sided_matching_results.json",
+    "zero_jump_limit_results.json",
+    "finite_jump_continuation_results.json or explicit NOT_RUN",
+    "cross_validation_results.json",
+    "convergence_matrix.csv",
+    "VALIDATION_REPORT.md",
+    "SHA256SUMS"
+  ],
+  "failure_taxonomy": [
+    "THEORY_CONVENTION_MISMATCH",
+    "THERMODYNAMIC_IDENTITY_FAILURE",
+    "INTERFACE_MAP_FAILURE",
+    "ODE_IMPLEMENTATION_FAILURE",
+    "NUMERICAL_CONDITIONING",
+    "PROFILE_SERIALIZATION_FAILURE",
+    "NATIVE_PYTHON_DIVERGENCE",
+    "ENVIRONMENT_OR_BUILD_FAILURE",
+    "PROVENANCE_FAILURE",
+    "SCOPE_OR_POLICY_BLOCK",
+    "INCONCLUSIVE_RESOURCE_LIMIT"
+  ],
+  "external_actions": {
+    "git_push": false,
+    "create_pr": false,
+    "merge": false,
+    "release": false,
+    "deploy": false,
+    "provider_contact": false,
+    "dropbox_upload": false
+  },
+  "handoff_document": "LOCAL_AGENT_DAG_DEVELOPMENT_AND_HANDOFF_20261111.md",
+  "math_note": "WEIGHTED_ABEL_LIOUVILLE_AND_TWO_SIDED_MATCHING_20261111.md",
+  "handoff_prompt": "HANDOFF_PROMPT_20261111.txt"
+}

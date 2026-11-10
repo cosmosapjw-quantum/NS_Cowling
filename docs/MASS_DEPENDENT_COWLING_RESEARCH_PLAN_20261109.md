@@ -348,3 +348,24 @@ R18 should trace each of the 447 source-normalized pressure-secant decreases to 
 R18 must preserve identity boundaries: raw CompOSE package bytes, normalized matched source tables, projected solver inputs, and any derived alternatives are distinct objects. Missing composition files in some prepared entries must remain explicitly missing, not inferred. R18 should produce a source-linked failure ledger and a small mechanism map before any new projection, TOV, or mode calculation.
 
 R16/R17 did not run TOV or modes. MD-31 (physical (P=0) low-density EOS/surface) and MD-32 (finite-domain perturbation boundary) remain separate. Radial (\omega_0^2) and complete-star Cowling modes remain blocked.
+
+## 23. R16 follow-on: matched-pressure TOV pilot for minimal Hermite pressure repair (2026-11-10)
+
+A bounded structural comparison was completed after the full-cohort SI-native cellwise repair passed the compiled production Fortran constructor. It compares three crossed pairs (GPPVA_FSU2×BBB_BHF2, SPG_M2×BBB_BHF2, GPPVA_FSU2×GM_GM1), six bridge tokens and eight cutoff markers: 144 TOV integrations.
+
+The key control is exact matching of both (P_c) and absolute (P_{cut}) to the corresponding frozen R15 projected-EOS case. The source-row number remains a density marker only; the repaired EOS pressure at that row is not imposed as the cutoff. This avoids conflating the closure comparison with a different absolute isobar.
+
+All 144 cases returned `ok`; all 144 profile SHA/row-count checks and 18 derived-table hashes passed; all normalized source and projected reference files remained byte-identical. The v5 Fortran build key matches the R15 comparator. The 18 temporary derived tables retain their source row counts and are not promoted to the authoritative cohort.
+
+Mean changes relative to R15 are:
+- GPPVA_FSU2×BBB_BHF2: (Delta M/M=-0.263900\%), (Delta r_{cut}/r_{cut}=-0.335693\%);
+- SPG_M2×BBB_BHF2: (-0.256384\%), (-0.335217\%);
+- GPPVA_FSU2×GM_GM1: (-0.006094\%), (-0.000610\%).
+
+The response is nearly independent of cutoff row and strongly conditioned on the selected core family. This is **not** an outer-crust-only effect: the current q-linear projector reintegrates pressure increments across every cell, including cells whose original Hermite bridge was already admitted, while the minimal repair preserves those source increments and changes only rejected cells. The comparison therefore measures a global pressure-closure policy difference. Representative nearest-central-pressure source rows show q-linear versus minimal-repair (P) differences of -0.6190% (GPPVA_FSU2×BBB_BHF2), -0.4941% (SPG_M2×BBB_BHF2), and +0.000785% (GPPVA_FSU2×GM_GM1), with corresponding (epsilon) differences +0.09255%, +0.09584%, and -0.0000845%. These are representative CSS diagnostics, not universal extrema.
+
+This remains a bounded three-pair pilot. Do not promote the minimal-repair construction as physically preferred or scale it to all 234 tables yet. The q-linear baseline and the minimal-repair alternative are distinct derived thermodynamic closures, and neither has yet been tied to a source-backed microphysical mechanism explaining the 447 normalized pressure-secant decreases.
+
+Full report: `docs/R16_MINIMAL_REPAIR_MATCHED_PRESSURE_TOV_PILOT_20261110.md`.
+
+**Next stage remains R18**, as specified in Section 22: localize all 447 raw pressure-secant decreases by exact source row/density, matching metadata/bridge construction and available phase/composition provenance. Preserve raw CompOSE package, normalized matched table, q-linear projected solver input and minimal-repair derived EOS as distinct identity layers. Only after source/matching localization and a meaningful physically interpretable reconstruction advantage should any full-cohort TOV or mode propagation be considered. MD-31/MD-32, radial (omega_0^2), and complete-star Cowling modes remain blocked.

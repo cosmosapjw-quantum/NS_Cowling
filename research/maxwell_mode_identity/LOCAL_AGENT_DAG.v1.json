@@ -1,15 +1,15 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "schema_name": "ns-cowling-local-agent-two-sided-matching-dag",
-  "contract_id": "NSCOWLING-MODEID-WRONSKIAN-LOCAL-AGENT-v1",
+  "contract_id": "NSCOWLING-MODEID-WRONSKIAN-LOCAL-AGENT-v1.3",
   "snapshot_date": "2026-11-11",
-  "status": "IMPLEMENTATION_SPEC_READY__LOCAL_EXECUTION_REQUIRED",
+  "status": "LOCAL_IMPLEMENTATION_SPEC_READY__LA9_TRACE_FIRST_AND_LA10_INTERPOLATION_GATES_DEFINED",
   "project": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "source_authority_branch": "research/maxwell-native-fortran-v1",
     "source_authority_commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
     "mode_identity_branch_snapshot": "research/maxwell-mode-identity-v1",
-    "mode_identity_head_snapshot": "9d43806e6b6f318934738ad6d94db261d15c2b98",
+    "mode_identity_head_snapshot": "7c4607c7db0a7e10375a33b43642a29557a1df1e",
     "pr_number": 6,
     "native_cowling_module": {
       "name": "ns_maxwell_cowling",
@@ -24,10 +24,20 @@
     "snapshot_requires_live_fetch": true,
     "snapshot_semantics": {
       "observed_pr6_head_at_task_start": "9d43806e6b6f318934738ad6d94db261d15c2b98",
-      "branch_created_for_this_increment": "research/maxwell-abel-closure-compensation-v1",
+      "branch_created_for_this_increment": "research/maxwell-interface-interpolation-la10-v1",
       "source_authority_commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
-      "rule": "A pinned start snapshot is provenance only. Before local work, fetch the published child branch and record its exact live head; never substitute the PR6 head for the child branch head."
-    }
+      "rule": "Immutable parent pin. Fetch live refs before new work. Never overwrite a moved branch.",
+      "parent_branch_at_start": "research/maxwell-abel-closure-compensation-v1",
+      "parent_sha_at_start": "d1eba5ab7ebad6f2e08a52f6b9826ea8bd3a24c9"
+    },
+    "continuation_branch_snapshot": "research/maxwell-abel-closure-compensation-v1",
+    "continuation_head_snapshot": "d1eba5ab7ebad6f2e08a52f6b9826ea8bd3a24c9",
+    "active_local_child_branch": "research/maxwell-interface-interpolation-la10-v1",
+    "active_pr_number": 7,
+    "upstream_research_prs": [
+      6,
+      7
+    ]
   },
   "objective": "Implement and validate an independent two-sided matching cross-check for the existing analytic two-phase sharp-Maxwell relativistic Cowling fixture using the weighted Abel-Liouville determinant invariant.",
   "mathematical_contract": {
@@ -101,7 +111,8 @@
     "55 or 65 pair Maxwell roots",
     "raw EOS or canonical manifest mutation",
     "source-backed TOV/Cowling outputs",
-    "automatic f/p1/interface-g labels"
+    "automatic f/p1/interface-g labels",
+    "physical finite-rate interface kinetics absent a sourced constitutive law"
   ],
   "mutation_gates": {
     "M0": "read-only inspect/fetch/test; stop if dirty",
@@ -307,39 +318,6 @@
       ]
     },
     {
-      "id": "LA8",
-      "depends_on": [
-        "LA0",
-        "LA1",
-        "LA2",
-        "LA3",
-        "LA4",
-        "LA5",
-        "LA6",
-        "LA7",
-        "LA9"
-      ],
-      "name": "final receipts and checkpoint",
-      "gate": "M1",
-      "status": "NOT_RUN",
-      "outputs": [
-        "VALIDATION_REPORT.md",
-        "SHA256SUMS",
-        "local_checkpoint.md"
-      ],
-      "acceptance": [
-        "every claim has exact evidence",
-        "protected files unchanged",
-        "final commit tested",
-        "failure taxonomy applied"
-      ],
-      "stop": [
-        "missing receipts",
-        "unreviewed diff",
-        "unknown status promoted to PASS"
-      ]
-    },
-    {
       "id": "LA9",
       "depends_on": [
         "LA0",
@@ -387,6 +365,78 @@
         "trace is copied from the sound-speed shortcut without source-level derivation"
       ],
       "local_execution_rule": "The published compensated_abel.py and 12 tests validate only the algebraic synthetic helper. They do not complete this node. Local agent must verify the actual native/Python source, and must not infer a stellar result."
+    },
+    {
+      "id": "LA10",
+      "depends_on": [
+        "LA0",
+        "LA1"
+      ],
+      "name": "nonradial interface interpolation audit (algebraic only; finite-rate physics gate)",
+      "gate": "M1",
+      "status": "ALGEBRAIC_FAMILY_DERIVED_AND_12_CASES_TESTED__PHYSICAL_FINITE_RATE_LAW_NOT_ESTABLISHED",
+      "outputs": [
+        "FINITE_CONVERSION_INTERPOLATION_AUDIT_20261111.md",
+        "FINITE_CONVERSION_INTERPOLATION_STATUS_20261111.json",
+        "finite_conversion_interpolation.py",
+        "tests/test_algebraic_interpolation.py",
+        "computation_evidence/finite_conversion_interpolation_20261111/environment.txt",
+        "computation_evidence/finite_conversion_interpolation_20261111/pytest.stdout.txt"
+      ],
+      "acceptance": [
+        "theta is a dimensionless boundary-condition interpolation parameter only; never a calibrated rate, timescale or mobility",
+        "define [X]_i^o=X_outer-X_inner and keep kappa=h_inner/h_outer distinct from theta",
+        "derive pressure continuity Q_outer=kappa*Q_inner and (1-theta)[W]_i^o+theta[W-Q/nu_prime]_i^o=0",
+        "verify theta=0 slow and theta=1 rapid endpoint maps",
+        "verify det(T_theta)=kappa and zero-jump identity",
+        "verify weighted concomitant jump including exp[-(nu_outer-nu_inner)]",
+        "distinguish Tonetto-Lugones nonradial physical endpoint conditions, Rau-Sedrakian radial algebraic interpolation and Dong-Kuan-Yunes full-GR polar algebraic interpolation",
+        "require sourced microscopic kinetic law, reaction flux, thermodynamic affinity and dissipation/entropy accounting before any physical finite-rate claim"
+      ],
+      "stop": [
+        "theta is described as physical conversion speed, rate, timescale or mobility",
+        "radial junction condition is transplanted to nonradial Cowling without derivation",
+        "no-thin-shell admissibility or additional interface degrees remain unresolved but are claimed settled",
+        "physical finite-rate constitutive law is absent"
+      ],
+      "result_policy": {
+        "algebraic_sensitivity": "MAY_RUN_AS_SEPARATELY_LABELLED_BOUNDARY_CONDITION_SENSITIVITY_SCAN",
+        "physical_finite_rate": "BLOCKED_UNTIL_MICROPHYSICAL_KINETIC_RELATION_AND_INTERFACE_BALANCE_ARE_DERIVED"
+      }
+    },
+    {
+      "id": "LA8",
+      "depends_on": [
+        "LA0",
+        "LA1",
+        "LA2",
+        "LA3",
+        "LA4",
+        "LA5",
+        "LA6",
+        "LA7",
+        "LA9",
+        "LA10"
+      ],
+      "name": "final receipts and checkpoint",
+      "gate": "M1",
+      "status": "NOT_RUN",
+      "outputs": [
+        "VALIDATION_REPORT.md",
+        "SHA256SUMS",
+        "local_checkpoint.md"
+      ],
+      "acceptance": [
+        "every claim has exact evidence",
+        "protected files unchanged",
+        "final commit tested",
+        "failure taxonomy applied"
+      ],
+      "stop": [
+        "missing receipts",
+        "unreviewed diff",
+        "unknown status promoted to PASS"
+      ]
     }
   ],
   "required_artifacts": [
@@ -408,7 +458,13 @@
     "native_python_closure_comparison.md",
     "strict_json_validation.log",
     "trace_first_drift_results.json",
-    "TEST_SCALE_NEGATIVE_CONTROL.md"
+    "TEST_SCALE_NEGATIVE_CONTROL.md",
+    "FINITE_CONVERSION_INTERPOLATION_AUDIT_20261111.md",
+    "FINITE_CONVERSION_INTERPOLATION_STATUS_20261111.json",
+    "finite_conversion_interpolation.py",
+    "tests/test_algebraic_interpolation.py",
+    "computation_evidence/finite_conversion_interpolation_20261111/environment.txt",
+    "computation_evidence/finite_conversion_interpolation_20261111/pytest.stdout.txt"
   ],
   "failure_taxonomy": [
     "THEORY_CONVENTION_MISMATCH",
@@ -437,7 +493,7 @@
   "handoff_prompt": "HANDOFF_PROMPT_20261111.txt",
   "validation_baseline": {
     "historical_pr6_receipt_cases": 42,
-    "historical_pr6_receipt_status": "CAPTURED_EXPORTED_SNAPSHOT_ONLY; SOURCE_COMMIT_UNAUTHENTICATED",
+    "historical_pr6_receipt_status": "CAPTURED_EXPORTED_SNAPSHOT_ONLY_SOURCE_COMMIT_UNAUTHENTICATED",
     "prose_claim_43_case_status": "UNVERIFIED_CONFLICT",
     "current_pr6_head_replay": "NOT_RUN",
     "compensated_abel_cases": 15,
@@ -450,18 +506,33 @@
     "compensated_abel_tests_sha256": "4c188e802855b164af331c10a3cc77beb34500f9353fbad20b3899c12610647a",
     "compensated_abel_local_git_metadata": "UNAVAILABLE_EXPORTED_ARTIFACT_RUN",
     "compensated_abel_helper_sha256": "089607c9d67be1be8f974e081063df1c6d124aca27783ff5fff45014609c3ffb",
-    "compensated_abel_test_sha256": "0a75dabc830cdfa081bf8d2513de093c22c0c69548235d7e2defe89f4ad70de5"
+    "compensated_abel_test_sha256": "0a75dabc830cdfa081bf8d2513de093c22c0c69548235d7e2defe89f4ad70de5",
+    "trace_first_compensated_abel_cases": 15,
+    "trace_first_compensated_abel_status": "STANDALONE_LOCAL_SYNTHETIC_PASS",
+    "intermediate_conversion_cases": 12,
+    "intermediate_conversion_functions": 7,
+    "intermediate_conversion_status": "STANDALONE_LOCAL_SYNTHETIC_PASS",
+    "intermediate_conversion_command": "PYTHONPATH=. python -m pytest -q research/maxwell_mode_identity/tests/test_algebraic_interpolation.py",
+    "wolfram_interpolation": "EXACT_IDENTITIES_PASS_CLEAN_MODULE",
+    "sympy_interpolation": "EXACT_IDENTITIES_PASS",
+    "physical_finite_rate_law": "NOT_ESTABLISHED"
   },
-  "contract_revision": "1.2.0",
+  "contract_revision": "1.3.0",
   "updated_at": "2026-11-11",
   "validation_reconciliation": {
     "historical_manifest_cases": 42,
     "historical_manifest_source_commit": "not_available_exported_container_snapshot",
     "later_43_case_claim": "UNAUTHENTICATED_NO_MATCHING_43_CASE_MANIFEST_AND_STDOUT",
-    "current_live_pr6_head": "9d43806e6b6f318934738ad6d94db261d15c2b98",
-    "current_live_pr6_head_replay": "NOT_RUN_IN_THIS_SESSION",
+    "current_live_pr6_head": "7c4607c7db0a7e10375a33b43642a29557a1df1e",
+    "current_live_pr6_head_replay": "NOT_RUN",
     "new_compensated_helper_cases": 12,
-    "new_compensated_helper_status": "LOCAL_STANDALONE_SYNTHETIC_TESTS_PASS; NOT_FULL_REPOSITORY_REPLAY"
+    "new_compensated_helper_status": "LOCAL_STANDALONE_SYNTHETIC_TESTS_PASS; NOT_FULL_REPOSITORY_REPLAY",
+    "current_pr7_parent_snapshot": "d1eba5ab7ebad6f2e08a52f6b9826ea8bd3a24c9",
+    "la9_trace_first_cases": 15,
+    "la9_trace_first_status": "STANDALONE_LOCAL_SYNTHETIC_PASS",
+    "la10_interpolation_helper_cases": 12,
+    "la10_interpolation_status": "STANDALONE_LOCAL_SYNTHETIC_TEST_PASS",
+    "physical_finite_rate": "NOT_ESTABLISHED"
   },
   "anti_drift_self_audit": [
     "confirm repository, branch, exact HEAD, clean status and remote before mutation",
@@ -481,7 +552,11 @@
     "unknown, missing or inaccessible means NOT_RUN or BLOCKED, never PASS",
     "classify theory, implementation, numerical conditioning, environment and provenance failures separately",
     "do not touch C7X blockers, raw EOS, pair manifests or source authority",
-    "do not push, create a PR, merge, deploy or upload from the local agent without separate authorization"
+    "do not push, create a PR, merge, deploy or upload from the local agent without separate authorization",
+    "is theta kept distinct from kappa and never called a physical conversion rate, timescale or mobility?",
+    "is the 2023 radial interpolation kept separate from the nonradial Cowling derivation?",
+    "does any proposed physical finite-rate law supply a sourced constitutive relation, flux, chemical affinity and dissipation/entropy balance?",
+    "is no-thin-shell admissibility explicitly unresolved unless derived?"
   ],
   "publication_reconciliation": {
     "pr6_head": "7c4607c7db0a7e10375a33b43642a29557a1df1e",
@@ -495,7 +570,12 @@
     "pr7_mergeable": true,
     "pr7_draft": true,
     "pr7_merged": false,
-    "rule": "Keep PR draft; fetch current refs before local work. Do not merge automatically."
+    "rule": "Keep PR draft; fetch current refs before local work. Do not merge automatically.",
+    "la10_branch": "research/maxwell-interface-interpolation-la10-v1",
+    "la10_parent_branch": "research/maxwell-abel-closure-compensation-v1",
+    "la10_parent_sha": "d1eba5ab7ebad6f2e08a52f6b9826ea8bd3a24c9",
+    "intended_base_pr": 7,
+    "local_agent_publication_permission": false
   },
   "negative_test_history": {
     "status": "PRESERVED",
@@ -504,5 +584,13 @@
     "correction": "rescaled matrix coefficients to O(1e-5) m^-1 without relaxing tolerance",
     "receipt": "TEST_SCALE_NEGATIVE_CONTROL.md",
     "raw_failure_log": "not separately captured; failure was observed in-session"
+  },
+  "intermediate_conversion_policy": {
+    "theta": "dimensionless kinematic boundary-condition interpolation only; not a physical rate, timescale or mobility",
+    "kappa": "h_inner/h_outer; distinct from theta",
+    "physical_finite_rate_law": "NOT_ESTABLISHED",
+    "no_thin_shell_interpolation_admissibility": "NOT_ESTABLISHED",
+    "allowed_next_experiment": "algebraic boundary-condition sensitivity scan only after local LA4 and LA5 gates; label nonphysical",
+    "forbidden": "production root solver integration or physical rate inference"
   }
 }

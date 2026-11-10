@@ -47,3 +47,16 @@ All numerical assertions use synthetic cold-barotropic coefficient functions and
 The separate 12-test synthetic helper suite passes. See COMPENSATED_ABEL_VALIDATION_REPORT.md and COMPENSATED_ABEL_RESULTS.json for exact commands and tested range. This does not authenticate or replace the historical 42-case PR #6 test receipt and does not constitute a full repository replay.
 
 The 43-case claim in the prior prose/status files does not have a matching 43-case manifest and captured stdout in the inspected branch. It is therefore not counted as verified. The current PR #6 combined-status endpoint returned no status records; GitHub Actions/CI pass is not claimed.
+
+
+## LA10: algebraic nonradial interface interpolation validation (2026-11-11)
+
+- TDD RED: focused tests failed collection while the helper module was absent.
+- GREEN: fresh focused run -> **12 passed in 0.04 s**.
+- Command: `PYTHONPATH=/mnt/data/NS_Cowling_research_20261111/finite_rate_audit python -m pytest -q /mnt/data/NS_Cowling_research_20261111/finite_rate_audit/research/maxwell_mode_identity/tests/test_algebraic_interpolation.py`.
+- Python `compileall`, AST parsing and JSON parsing: PASS.
+- Independent SymPy exact checks: `det(T_theta)=kappa`, endpoint maps, `T^T J T=kappa J`, weighted jump one for continuous lapse, zero-jump identity.
+- Independent Wolfram Language exact `Module`: same identities, no evaluator warnings.
+- PR #6 historical 42-case receipt was not rerun; the later 43-case claim remains unauthenticated. PR #7 LA9's separately captured 15-case trace-first suite passed according to its receipt, but was not rerun in LA10.
+- No native Fortran, actual fixture roots/profiles, two-sided stellar matching, zero/finite-jump continuation, physical finite-rate model, TOV, or source-backed EOS calculation was run.
+- `theta` is algebraic boundary-condition interpolation only, not a physical conversion rate.

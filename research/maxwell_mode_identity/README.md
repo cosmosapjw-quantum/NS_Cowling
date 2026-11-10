@@ -77,3 +77,8 @@ No physical nonbarotropic theorem, native q-to-r verification, actual stellar pr
 ## Revision 1.2: general trace-first compensation
 
 In addition to the conditional chi_ad/chi_eq shortcut, the helper now implements the general algebraic formula Gamma=tr(M)+d(log h)/dr-nu_prime. The source-derived full trace is the local agent's default; the sound-speed specialization is forbidden until its exact matrix trace and equilibrium first law have been checked against source. Three tests cover shortcut reduction, extra trace/background terms and a general matrix-exponential case. The final synthetic test suite has 15 passing cases; see trace_first_drift_results.json and TEST_SCALE_NEGATIVE_CONTROL.md.
+
+
+## LA10: nonradial interface interpolation (algebraic only)
+
+The single local-agent DAG includes LA10 for an independently symbolically checked and 12-case tested algebraic interpolation between slow and rapid nonradial Cowling kinematic constraints. The dimensionless `theta` is **not** a physical conversion rate, timescale or microscopic mobility. See `FINITE_CONVERSION_INTERPOLATION_AUDIT_20261111.md` and `FINITE_CONVERSION_INTERPOLATION_STATUS_20261111.json`. Physical finite-rate kinetics and no-thin-shell admissibility remain unestablished. The prior LA9 trace-first helper and its 15-case receipt are preserved as a separate node.

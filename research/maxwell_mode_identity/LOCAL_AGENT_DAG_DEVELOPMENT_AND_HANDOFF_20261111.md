@@ -1,9 +1,9 @@
 # Local-agent development contract: weighted Cowling concomitant and two-sided sharp-interface matching
 
-Contract ID: NSCOWLING-MODEID-WRONSKIAN-LOCAL-AGENT-v1  
+Contract ID: NSCOWLING-MODEID-WRONSKIAN-LOCAL-AGENT-v1.3  
 Date: 2026-11-11  
 Status: IMPLEMENTATION_SPEC_READY__LOCAL_EXECUTION_REQUIRED  
-Machine DAG: LOCAL_AGENT_DAG.v1.json  
+Machine DAG: LOCAL_AGENT_DAG.v1.json (contract revision 1.3.0; LA0-LA10)  
 Mathematical note: WEIGHTED_ABEL_LIOUVILLE_AND_TWO_SIDED_MATCHING_20261111.md
 
 ## 0. Non-negotiable rules
@@ -567,3 +567,56 @@ The current helper exports trace_first_drift_density and integrated_trace_first_
 A rejected synthetic test scale is preserved: O(1) m^-1 coefficients over 4000 m overflowed in matrix exponential/determinant. The test now uses O(1e-5) m^-1 coefficients; the identity and tolerance are unchanged. This was a synthetic test setup error, not a physical instability. The raw initial failure stdout was not separately captured; see TEST_SCALE_NEGATIVE_CONTROL.md.
 
 Local agent must verify the live native q-to-r equations, full Jacobian trace and equilibrium h'/h before using any result on the real code. Synthetic tests do not satisfy LA1 or establish stellar mode results.
+
+
+## 13. LA10: nonradial algebraic interface interpolation and physical-kinetics stop gate
+
+Read `FINITE_CONVERSION_INTERPOLATION_AUDIT_20261111.md` and
+`FINITE_CONVERSION_INTERPOLATION_STATUS_20261111.json` before coding.
+
+The single DAG now has LA9 (general trace-first closure-mismatch compensated
+Abel identity and complex diagnostic integrity) and LA10 (algebraic
+nonradial interface interpolation), followed by final checkpoint LA8. Do not
+create a second DAG or renumber LA9. Preserve the LA9 15-case synthetic
+receipt, final timing, general trace-first derivation and negative-control
+evidence.
+
+Conventions: `[X]_i^o=X_outer-X_inner`,
+`Q=A V+nu_prime W`, `kappa=h_inner/h_outer`. Keep `kappa` separate
+from `theta`. Pressure continuity is `Q_outer=kappa Q_inner`. The
+algebraic interpolation is
+
+```text
+(1-theta)[W]_i^o + theta[W-Q/nu_prime]_i^o = 0; 0 <= theta <= 1
+T_theta = [[1+theta*(kappa-1), theta*(kappa-1)*A/nu_prime],
+          [(1-theta)*(kappa-1)*nu_prime/A, 1+(1-theta)*(kappa-1)]]
+```
+
+Exact identities: `T_0=T_slow`, `T_1=T_rapid`,
+`det(T_theta)=kappa`, `T_theta=I` for `kappa=1`. The weighted
+concomitant jump is `exp[-(nu_outer-nu_inner)]`; it is unity only when
+lapse is continuous. In two dimensions `T^T J T=kappa J` follows from
+the determinant and is not an independent symplectic theorem.
+
+**Hard interpretation gate:** `theta` is a dimensionless interpolation of
+kinematic boundary constraints only. It is not a conversion rate, timescale,
+mobility, or calibrated microscopic coefficient. There is no reaction flux,
+chemical affinity, dissipation, entropy production, or additional interface
+degree of freedom. The interpolated no-thin-shell admissibility is unresolved.
+Do not wire this helper into production roots or label a theta scan physical.
+
+Literature boundaries:
+- Tonetto & Lugones (2020), arXiv:2003.01259: physical slow/rapid
+  nonradial sharp-interface endpoints.
+- Rau & Sedrakian (2023), arXiv:2212.09828: radial algebraic interpolation;
+  not a derivation for nonradial Cowling.
+- Dong, Kuan & Yunes (2026), arXiv:2609.33002: full-GR polar algebraic
+  interpolation; intermediate values are not microscopic finite-rate
+  kinetics or calibrated rates, and no-thin-shell admissibility is not shown.
+
+LA10 acceptance requires the 12-case helper suite, independent Wolfram and
+SymPy identities, strict input validation and the mandatory result label
+`ALGEBRAIC_BOUNDARY_INTERPOLATION_ONLY_NOT_FINITE_RATE_KINETICS`.
+Physical finite-rate work remains blocked until a sourced constitutive
+kinetic relation, flux, chemical-potential affinity, interface dissipation/
+entropy balance, and valid junction conditions are derived.

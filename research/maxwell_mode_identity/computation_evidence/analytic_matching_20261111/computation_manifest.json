@@ -1,0 +1,79 @@
+{
+  "schema": "ns-cowling.la11-computation-manifest.v1",
+  "claim_id": "NSCOWLING_LA11_FINITE_INTERVAL_CHARACTERISTIC_DETERMINANT",
+  "date": "2026-11-11",
+  "repository_context": {
+    "repository": "cosmosapjw-quantum/NS_Cowling",
+    "branch": "research/maxwell-analytic-matching-la11-v1",
+    "parent_branch": "research/maxwell-interface-interpolation-la10-v1",
+    "parent_commit": "104b4fa76e191db42e6af26f072533617f45441c",
+    "source_authority_commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
+    "local_git_metadata": "NOT_A_GIT_WORKTREE_EXPORTED_ARTIFACT_RUN",
+    "source_test_blob_identity": "EXACT_MATCH_TO_PUBLISHED_GITHUB_BLOBS",
+    "helper_blob_sha1": "97e9f5c6a134110e92afc68b1b2080dbabbf6756",
+    "test_blob_sha1": "8bedc9870cc80ae63b25f03d86454afd59941c9a"
+  },
+  "commands": {
+    "pytest": "PYTHONPATH=. PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider research/maxwell_mode_identity/tests/test_analytic_matching.py",
+    "collect": "PYTHONPATH=. PYTHONDONTWRITEBYTECODE=1 python -m pytest --collect-only -q -p no:cacheprovider research/maxwell_mode_identity/tests/test_analytic_matching.py",
+    "compileall": "python -m compileall -q research/maxwell_mode_identity/analytic_matching.py",
+    "json_ast": "python -m json.tool for all JSON files; ast.parse for research Python files"
+  },
+  "environment": {
+    "python": "3.13.5",
+    "platform": "linux",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "pytest": "9.0.2",
+    "sympy": "1.14.0"
+  },
+  "execution": {
+    "tests_collected": 22,
+    "tests_passed": 22,
+    "tests_failed": 0,
+    "pytest_exit_status": 0,
+    "collection_exit_status": 0,
+    "compileall_exit_status": 0,
+    "json_parse_exit_status": 0,
+    "ast_parse_exit_status": 0,
+    "pytest_stdout": "...................... [100%]\n22 passed in 0.21s\n",
+    "collection_stdout_tail": "22 tests collected in 0.01s",
+    "red_before_implementation_exit_status": 2,
+    "red_reason": "ModuleNotFoundError before analytic_matching.py was created"
+  },
+  "source_hashes": {
+    "analytic_matching.py": {
+      "sha256": "087ab499e9466b2008fedca79409e04db6038808bb8d4df03fde9d0f74f4b096",
+      "git_blob_sha1": "97e9f5c6a134110e92afc68b1b2080dbabbf6756",
+      "github_blob_match": true
+    },
+    "tests/test_analytic_matching.py": {
+      "sha256": "32c31ac29d044c9141077ac5440b60689e6d0d6f11b2b67db291b881bd090e45",
+      "git_blob_sha1": "8bedc9870cc80ae63b25f03d86454afd59941c9a",
+      "github_blob_match": true
+    }
+  },
+  "symbolic": {
+    "sympy_exact_checks": 7,
+    "wolfram_exact_checks": 10,
+    "all_reported_residuals_zero": true
+  },
+  "numeric_claims": {
+    "dimensionless_transfer_condition": "O(|x|^-2), x=A/(nu_prime*L), in stated scaled coordinates",
+    "A_to_zero_implicit_characteristic": "finite in one synthetic complex endpoint pair",
+    "not_a_claim": "no actual stellar eigenfrequency or physical omega=0 mode"
+  },
+  "failed_attempts": {
+    "initial_red": "expected import failure before implementation; raw stdout saved",
+    "intermediate_test_errors": "two test-contract mismatches observed; raw stdout not separately retained; see test_history.md"
+  },
+  "non_claims": [
+    "native q-to-r derivation",
+    "actual endpoint frame holomorphy",
+    "regular Fredholm-pencil equivalence and algebraic multiplicity",
+    "native Fortran",
+    "actual star roots/profiles",
+    "argument principle on a physical contour",
+    "production integration"
+  ]
+}

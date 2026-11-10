@@ -57,3 +57,14 @@ The 12-test run was executed in the current container against the exact contents
 ## Non-results
 
 No local native build, q-to-r chain-rule audit, actual fixture profile, zero-jump star comparison, finite-jump continuation, TOV integration, or physical mode classification was run. The formula is conditional on the written 2x2 system; a physical nonbarotropic system with additional composition terms requires a new derivation.
+
+
+## Final exact exported-package replay
+
+- Command: PYTHONPATH=research python -m pytest -q research/maxwell_mode_identity/tests/test_compensated_abel.py
+- Captured stdout: 12 passed in 0.56s.
+- Collection: 12 tests collected in 0.29s.
+- Python 3.13.5, NumPy 2.3.5, SciPy 1.17.0, pytest 9.0.2.
+- Captured logs and computation_manifest.json are under computation_evidence/compensated_abel_20261111/.
+
+The test was run in an exported package without Git metadata. It is not a full-repository checkout replay and does not prove GitHub Actions status.

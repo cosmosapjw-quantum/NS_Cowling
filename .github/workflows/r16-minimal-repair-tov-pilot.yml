@@ -1,0 +1,68 @@
+name: R16 minimal-repair matched-pressure TOV pilot
+
+on:
+  push:
+    branches: [research/r15-native-outer-crust-pilot]
+    paths:
+      - ".github/workflows/r16-minimal-repair-tov-pilot.yml"
+      - "scripts/r16_minimal_repair_tov_pilot.py"
+      - "scripts/r16_minimal_hermite_pressure_repair.py"
+      - "python_frontend/tests/test_r16_minimal_repair_tov_pilot.py"
+      - "python_frontend/compose_cowling/solver.py"
+      - "python_frontend/compose_cowling/native_table_cutoff_scan.py"
+      - "oscillation_release_v1/data/spectrum_summary_234.csv"
+      - "oscillation_release_v1/data/eos_original_normalized/**"
+      - "oscillation_release_v1/data/eos_projected/**"
+      - "oscillation_source/calculation/**"
+      - "oscillation_source/methods/**"
+      - "oscillation_source/support/**"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: r16-minimal-repair-tov-pilot-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  minimal-repair-matched-pressure-tov:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      PYTHONPATH: python_frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install native TOV compiler and Python dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gfortran
+          python -m pip install --upgrade pip
+          python -m pip install numpy scipy pytest
+      - name: Download frozen R15 full-cohort TOV reference
+        uses: actions/download-artifact@v4
+        with:
+          name: ns-cowling-r15-full-cohort-core-42650666976
+          path: r15-reference
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: "42651779185"
+      - name: Test SI-native repair-table construction
+        run: python -m pytest -q python_frontend/tests/test_r16_minimal_repair_tov_pilot.py
+      - name: Run 3-pair x 6-method x 8-cutoff matched-pressure TOV pilot
+        run: |
+          python scripts/r16_minimal_repair_tov_pilot.py \
+            --r15-results-csv r15-reference/r15-full-cohort-tov/native_outer_crust_r15.csv \
+            --output-dir dist/r16-minimal-repair-tov-pilot
+      - name: Upload repaired diagnostic EOS, TOV results and profiles
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ns-cowling-r16-minimal-repair-tov-pilot-${{ github.run_id }}
+          path: dist/
+          if-no-files-found: warn
+          retention-days: 30

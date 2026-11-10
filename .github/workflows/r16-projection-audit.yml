@@ -9,6 +9,7 @@ on:
       - "scripts/audit_r16_projection_cohort.py"
       - "scripts/audit_r16_pressure_increment_residuals.py"
       - "scripts/audit_r16_pressure_preserving_q_feasibility.py"
+      - "scripts/build_r16_qexp_diagnostic_candidate.py"
       - "scripts/r16_pressure_preserving_q.py"
       - "python_frontend/tests/test_r16_pressure_preserving_q.py"
       - "python_frontend/tests/test_r16_projection_reconstruction.py"
@@ -40,6 +41,10 @@ jobs:
         run: |
           python scripts/audit_r16_pressure_preserving_q_feasibility.py \
             --output-dir dist/r16-pressure-preserving-q-feasibility
+      - name: Build the full-cohort diagnostic q-exponential knot candidate
+        run: |
+          python scripts/build_r16_qexp_diagnostic_candidate.py \
+            --output-dir dist/r16-qexp-diagnostic-candidate
       - name: Audit every native pressure-increment residual
         run: |
           python scripts/audit_r16_pressure_increment_residuals.py \
@@ -70,5 +75,13 @@ jobs:
         with:
           name: ns-cowling-r16-pressure-preserving-q-${{ github.run_id }}
           path: dist/r16-pressure-preserving-q-feasibility/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload the full-cohort q-exponential diagnostic candidate
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ns-cowling-r16-qexp-diagnostic-candidate-${{ github.run_id }}
+          path: dist/r16-qexp-diagnostic-candidate/
           if-no-files-found: error
           retention-days: 30

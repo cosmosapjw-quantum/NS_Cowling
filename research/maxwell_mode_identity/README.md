@@ -9,7 +9,7 @@ It does **not** assign f-, p1-, or discontinuity-g-mode labels. Existing phase-l
 Run from the repository root:
 
 ```bash
-python -m pytest -q research/maxwell_mode_identity/tests
+PYTHONPATH=research python -m pytest -q research/maxwell_mode_identity/tests
 ```
 
 Files:

@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "claim_id": "COWLING_COMPENSATED_ABEL_INTERFACE_SYNTHETIC_V1",
+  "run_date": "2026-11-11",
+  "repository_context": {
+    "repository": "cosmosapjw-quantum/NS_Cowling",
+    "branch": "research/maxwell-abel-closure-compensation-v1",
+    "tested_source_files_are_byte_identical_to_uploaded_code": true,
+    "local_git_metadata": "NOT_AVAILABLE_EXPORTED_ARTIFACT_RUN",
+    "parent_branch": "research/maxwell-mode-identity-v1",
+    "parent_snapshot": "9d43806e6b6f318934738ad6d94db261d15c2b98",
+    "source_authority_commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
+    "source_revision_authentication": "NOT_CLAIMED",
+    "github_pr_url": "https://github.com/cosmosapjw-quantum/NS_Cowling/pull/7",
+    "github_compare_ahead": 52,
+    "github_compare_behind": 1,
+    "github_head_semantics": "Not pinned to a single branch head: tests ran against exported artifact bytes without Git metadata. The exact helper/test bytes were matched against GitHub blob IDs. See PR #7 and the offline GITHUB_SNAPSHOT.json for the later publication snapshot.",
+    "github_compare_ahead_at_snapshot": 71,
+    "github_compare_behind_at_snapshot": 1
+  },
+  "commands": {
+    "pytest": "PYTHONPATH=research python -m pytest -q -p no:cacheprovider research/maxwell_mode_identity/tests/test_compensated_abel.py",
+    "collect": "PYTHONPATH=research python -m pytest --collect-only -q -p no:cacheprovider research/maxwell_mode_identity/tests/test_compensated_abel.py",
+    "compileall": "python -m compileall -q research/maxwell_mode_identity/compensated_abel.py",
+    "json": "python -m json.tool research/maxwell_mode_identity/COMPENSATED_ABEL_RESULTS.json >/dev/null"
+  },
+  "environment": {
+    "python": "3.13.5",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "pytest": "9.0.2",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "execution": {
+    "pytest_cases": 15,
+    "test_functions": 15,
+    "pytest_exit_status": 0,
+    "compileall_exit_status": 0,
+    "collect_exit_status": 0,
+    "json_parse_exit_status": 0,
+    "pytest_stdout": "15 passed in 0.59s",
+    "collection_stdout_tail": "12 tests collected in 0.32s",
+    "collection_stdout": "15 tests collected in 0.31s"
+  },
+  "sha256": {
+    "research/maxwell_mode_identity/compensated_abel.py": "089607c9d67be1be8f974e081063df1c6d124aca27783ff5fff45014609c3ffb",
+    "research/maxwell_mode_identity/tests/test_compensated_abel.py": "0a75dabc830cdfa081bf8d2513de093c22c0c69548235d7e2defe89f4ad70de5",
+    "research/maxwell_mode_identity/computation_evidence/compensated_abel_20261111/pytest.stdout.txt": "08106afa14fe3a0a17aed781b0fe12ab4cb07508996485889514a03e1678bdc0",
+    "research/maxwell_mode_identity/computation_evidence/compensated_abel_20261111/test_inventory.txt": "85f87356e2a3b32b37ae3c61c530169d86b7f4dac3eacff5d5ba170d7e34546c",
+    "research/maxwell_mode_identity/computation_evidence/compensated_abel_20261111/environment.txt": "d8dceed2bf62d34c15c7c71b29cc5f9b00766a3a29eada9c7e8bb7b2e3cdd0c5",
+    "research/maxwell_mode_identity/computation_evidence/compensated_abel_20261111/pytest.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/maxwell_mode_identity/computation_evidence/compensated_abel_20261111/compileall.stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/maxwell_mode_identity/computation_evidence/compensated_abel_20261111/compileall.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/maxwell_mode_identity/computation_evidence/compensated_abel_20261111/TEST_SCALE_NEGATIVE_CONTROL.md": "6f166b4e338deec223238f8eac86f415ecda92533527d53453082efd84c101c5"
+  },
+  "numerical": {
+    "constant_integral": -0.009343853820598002,
+    "analytic_constant_integral": -0.009343853820598004,
+    "absolute_integral_error": 1.734723475976807e-18,
+    "matrix_exponential_chain_relative_tolerance": 2e-12,
+    "dop853_relative_tolerance": 2e-9,
+    "wolfram_residuals_zero": [
+      "bulk compensation",
+      "slow transfer determinant-alpha",
+      "rapid transfer determinant-alpha",
+      "continuous-lapse current interface multiplier"
+    ]
+  },
+  "non_claims": [
+    "No native q-to-r source audit.",
+    "No native Fortran build or actual fixture-root profile.",
+    "No smooth zero-jump or finite-jump stellar continuation.",
+    "No TOV or source-backed EOS/Cowling result.",
+    "No physical f/p1/discontinuity-g classification.",
+    "Not a generic nonbarotropic theorem.",
+    "Not a canonical covariant symplectic current."
+  ],
+  "general_trace_first": {
+    "formula": "Gamma=tr(M)+d(log h)/dr-nu_prime",
+    "verification": "arbitrary 2x2 determinant derivative exact residual zero under SymPy",
+    "tests": 3
+  },
+  "negative_control": {
+    "observed": "initial O(1) m^-1 constant matrix over 4000 m overflowed in expm/determinant",
+    "classification": "INVALID_SYNTHETIC_TEST_SCALE",
+    "correction": "rescaled entries to O(1e-5) m^-1",
+    "final_suite": "15 passed; no tolerance relaxation"
+  },
+  "observed": {
+    "pytest_cases": 15,
+    "test_functions": 15,
+    "pytest_stdout": "...............                                                          [100%]\n15 passed in 0.59s\n",
+    "collection_stdout_tail": "15 tests collected in 0.31s"
+  },
+  "final_replay": {
+    "command": "PYTHONPATH=research python -m pytest -q -p no:cacheprovider research/maxwell_mode_identity/tests/test_compensated_abel.py",
+    "stdout": "15 passed in 0.59s",
+    "collection_command": "PYTHONPATH=research python -m pytest --collect-only -q -p no:cacheprovider research/maxwell_mode_identity/tests/test_compensated_abel.py",
+    "collection_stdout": "15 tests collected in 0.31s",
+    "git_metadata": "NOT_AVAILABLE_EXPORTED_ARTIFACT_RUN",
+    "source_test_blobs_match_github": true
+  }
+}

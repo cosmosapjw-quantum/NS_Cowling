@@ -1,0 +1,58 @@
+{
+  "schema": "ns-cowling.trace-first-drift-results.v1",
+  "claim_status": "DERIVED_ALGEBRAICALLY_AND_SYNTHETICALLY_TESTED",
+  "scope": "square linear system only; synthetic; no EOS or stellar model result",
+  "definitions": {
+    "ode": "Y_prime=M(r)Y",
+    "weighted_determinant": "Omega=w*det(Y), w=h*exp(-nu)",
+    "general_drift": "Gamma=tr(M)+d(log(h))/dr-nu_prime",
+    "interface_multiplier": "J=(w_outer/w_inner)*det(T_inner_to_outer)",
+    "piecewise_compensator": "K=Omega*exp(-integral(Gamma dr))*product(crossed_J^-1)"
+  },
+  "hypotheses": [
+    "M is the complete implemented square-system matrix",
+    "h is positive and differentiable on each smooth segment",
+    "nu is differentiable on each smooth segment",
+    "interface transfer T is square, finite and nonsingular",
+    "one-sided interface values and orientation are explicit"
+  ],
+  "specialization": {
+    "matrix_trace": "tr(M)=nu_prime*(2+1/chi_ad)",
+    "equilibrium_first_law": "d(log h)/dr=-(1+1/chi_eq)*nu_prime",
+    "reduced_drift": "Gamma=nu_prime*(1/chi_ad-1/chi_eq)",
+    "allowed_only_after_source_verification": true
+  },
+  "symbolic_verification": {
+    "tool": "SymPy exact symbolic arithmetic",
+    "identity": "d(det(Y))/dr=tr(M)*det(Y) for arbitrary symbolic 2x2 M and Y",
+    "residual": "0",
+    "status": "PASS"
+  },
+  "numerical_verification": {
+    "tests_collected": 15,
+    "tests_passed": 15,
+    "tests_failed": 0,
+    "pytest_stdout": "15 passed in 0.59s",
+    "collection_stdout": "15 tests collected in 0.31s",
+    "new_trace_first_tests": 3,
+    "full_helper_and_test_sha256": {
+      "module": "089607c9d67be1be8f974e081063df1c6d124aca27783ff5fff45014609c3ffb",
+      "tests": "0a75dabc830cdfa081bf8d2513de093c22c0c69548235d7e2defe89f4ad70de5"
+    }
+  },
+  "negative_control": {
+    "initial_test": "matrix entries O(1) m^-1 integrated over 4000 m caused matrix exponential/determinant overflow",
+    "classification": "INVALID_SYNTHETIC_TEST_SCALE",
+    "correction": "matrix entries rescaled to O(1e-5) m^-1; no tolerance relaxation",
+    "receipt": "computation_evidence/compensated_abel_20261111/TEST_SCALE_NEGATIVE_CONTROL.md",
+    "raw_initial_stdout": "NOT_SEPARATELY_CAPTURED"
+  },
+  "unverified": [
+    "native RHS full trace and q-to-r equivalence",
+    "native Fortran execution",
+    "actual stellar profile and interface data",
+    "nonbarotropic physics with additional variables",
+    "source-backed mode spectrum or physical mode identity",
+    "canonical covariant symplectic interpretation"
+  ]
+}

@@ -90,5 +90,63 @@
     "native_spectrum_blob": "726a03b219827e77412175c68e3d7c28ef32ef84",
     "wolfram_checks": "Symbolic trace, weighted derivative cancellation, interface determinants and conformal alternating-form identities returned the stated exact expressions; the evaluator emitted Symbol::undefined2 warning retained in provenance.",
     "mode_identity_head_before_handoff_sync": "1a02d7abe51ee079fdf381fa5f9290936b6dae2b"
+  },
+  "conditional_closure_mismatch_extension": {
+    "status": "DERIVED_SYMBOLICALLY_CHECKED_AND_SYNTHETICALLY_TESTED",
+    "formula": "delta=nu_prime*(1/chi_ad-1/chi_eq)",
+    "interface_multiplier": "J=(h_outer/h_inner)*exp(-(nu_outer-nu_inner))*det(T_inner_to_outer)",
+    "compensated_invariant": "K=Omega*exp(-integral(delta dr))*product(crossed_J^-1)",
+    "tests_passed": 12,
+    "native_q_to_r_verified": false,
+    "actual_fixture_profiles_processed": false,
+    "generic_nonbarotropic_claim": false,
+    "note": "Valid only for the exact 2x2 matrix trace and equilibrium first law recorded in COMPENSATED_ABEL_LIOUVILLE_NOTE_20261111.md.",
+    "test_receipt": {
+      "cases": 15,
+      "functions": 15,
+      "stdout": "15 passed in 0.59s",
+      "collection": "15 tests collected in 0.31s",
+      "helper_sha256": "089607c9d67be1be8f974e081063df1c6d124aca27783ff5fff45014609c3ffb",
+      "tests_sha256": "0a75dabc830cdfa081bf8d2513de093c22c0c69548235d7e2defe89f4ad70de5",
+      "local_git_metadata": "UNAVAILABLE_EXPORTED_ARTIFACT_RUN"
+    }
+  },
+  "complex_interface_jump_audit": {
+    "status": "STATIC_SOURCE_AUDIT_CONFIRMED_IMAGINARY_COMPONENT_LOSS",
+    "example": {
+      "re": -0.75,
+      "im": -1.25
+    },
+    "current_behavior": "real projection only",
+    "fix": "NOT_PATCHED; additive backward-compatible field contract assigned to local DAG LA9"
+  },
+  "live_github_reconciliation": {
+    "pr6_head_at_increment_start": "9d43806e6b6f318934738ad6d94db261d15c2b98",
+    "pr6_test_receipt_cases": 42,
+    "pr6_later_43_case_claim": "UNAUTHENTICATED_CONFLICT",
+    "current_pr6_head_replay": "NOT_RUN",
+    "combined_status": "NO_STATUS_RECORDS_RETURNED",
+    "pr7": {
+      "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/pull/7",
+      "status": "OPEN_DRAFT_UNMERGED",
+      "last_verified_head_before_status_update": "dffb95a5db89c156609b02257f09e64bba9a7e15",
+      "base_head": "7c4607c7db0a7e10375a33b43642a29557a1df1e",
+      "compare_ahead": 32,
+      "compare_behind": 1,
+      "mergeable": true,
+      "combined_status": "NO_STATUS_RECORDS_RETURNED_NOT_CI_PASS"
+    }
+  },
+  "general_trace_first": {
+    "status": "DERIVED_AND_SYMPY_SYMBOLICALLY_CHECKED",
+    "formula": "Gamma=tr(M)+d(log h)/dr-nu_prime",
+    "synthetic_tests_added": 3,
+    "non_claim": "not a physical conserved current or generic EOS result"
+  },
+  "negative_test_history": {
+    "classification": "INVALID_SYNTHETIC_TEST_SCALE",
+    "initial_failure": "O(1) m^-1 matrix propagated over 4000 m overflowed expm/determinant",
+    "correction": "O(1e-5) m^-1 coefficients, same exact identity and no tolerance relaxation",
+    "raw_log": "not separately captured; concise receipt preserved in TEST_SCALE_NEGATIVE_CONTROL.md"
   }
 }

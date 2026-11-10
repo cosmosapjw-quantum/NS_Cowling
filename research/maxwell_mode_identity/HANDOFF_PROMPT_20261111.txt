@@ -1,71 +1,227 @@
-You are the local implementation agent for NS_Cowling task NSCOWLING-MODEID-WRONSKIAN-LOCAL-AGENT-v1.
+You are the local implementation and verification agent for the NS_Cowling sharp-Maxwell Cowling mode-identity program.
 
-READ FIRST:
-1. research/maxwell_mode_identity/LOCAL_AGENT_DAG_DEVELOPMENT_AND_HANDOFF_20261111.md
+AUTHORITATIVE REPOSITORY
+- Repository: cosmosapjw-quantum/NS_Cowling
+- Read the current live branch research/maxwell-abel-closure-compensation-v1 and record its exact HEAD before doing anything.
+- Source-authority branch: research/maxwell-native-fortran-v1
+- Source-authority snapshot: a09ec30d74b363652d2d1aefe990557c468679dd
+- PR #6 is the prior shared research branch. Do not edit it.
+- The C7X blocker PR #5 is separate and must remain untouched.
+- Treat all commit pins here as snapshots. Fetch the live refs and verify identity.
+
+READ FIRST, IN THIS ORDER
+1. Repository AGENTS.md, CLAUDE.md, README and build/test instructions, if present.
 2. research/maxwell_mode_identity/LOCAL_AGENT_DAG.v1.json
-3. research/maxwell_mode_identity/WEIGHTED_ABEL_LIOUVILLE_AND_TWO_SIDED_MATCHING_20261111.md
-4. research/maxwell_mode_identity/MODE_IDENTITY_STATUS.json and VALIDATION_REPORT.md
-5. Repository AGENTS.md/CLAUDE.md/README/FPM instructions, if present.
+3. research/maxwell_mode_identity/LOCAL_AGENT_DAG_DEVELOPMENT_AND_HANDOFF_20261111.md
+4. research/maxwell_mode_identity/COMPENSATED_ABEL_LIOUVILLE_NOTE_20261111.md
+5. research/maxwell_mode_identity/WEIGHTED_ABEL_LIOUVILLE_AND_TWO_SIDED_MATCHING_20261111.md
+6. research/maxwell_mode_identity/MODE_IDENTITY_STATUS.json
+7. research/maxwell_mode_identity/VALIDATION_REPORT.md
+8. research/maxwell_mode_identity/COMPENSATED_ABEL_RESULTS.json and COMPENSATED_ABEL_VALIDATION_REPORT.md
+9. profile_schema.v2.json and all relevant source/test files.
 
-GOAL:
-Implement and validate a two-sided matching cross-check for the existing analytic two-phase sharp-Maxwell relativistic Cowling fixture using Omega=h exp(-nu)(W1 V2-V1 W2). Export complete native/Python phase-resolved profiles, including distinct one-sided interface values. Integrate a regular center solution outward and a surface-compatible line inward. Evaluate the raw weighted determinant at at least three match radii; compare with the existing outward surface residual. Validate the zero-jump limit before any finite-jump continuation.
+PRIMARY OBJECTIVE
+Complete the single LA0-LA9 DAG in LOCAL_AGENT_DAG.v1.json. The local objective is an independent source-backed verification of the two-sided matching and conditional closure-mismatch compensated Abel-Liouville identity for the existing analytic two-phase sharp-Maxwell relativistic Cowling fixture. Export complete phase-resolved native/Python profiles, retain one-sided interface data, and verify numerical convergence. Do not create a second competing project plan. Update the existing DAG and development document only.
 
-PROVENANCE:
-Repo cosmosapjw-quantum/NS_Cowling. Source-authority snapshot a09ec30d74b363652d2d1aefe990557c468679dd. Prior mode-identity branch snapshot research/maxwell-mode-identity-v1 at 1a02d7abe51ee079fdf381fa5f9290936b6dae2b. Fetch current head and update run_identity.json if it changed. Do not assume old refs remain current.
+NON-NEGOTIABLE SCOPE
+- Do not touch C7X D3/D4/D5/D6 statuses, provider semantics, eos.compo, Q3/Q5, causality gates, raw EOS files, or the canonical 65-pair manifest.
+- Do not search blocked CompOSE crust pairs for Maxwell roots.
+- Do not modify source-authority production Fortran, historical Maxwell results, raw source data, or production adapters.
+- Do not assign physical f, p1 or discontinuity-g labels. Spectral branch identity is not physical modal character.
+- Do not infer finite-rate or dissipative interface conditions from slow/rapid endpoint maps.
+- Do not make a source-backed TOV/Cowling claim from synthetic data.
+- Preserve every failed, blocked and inconclusive result with stdout, stderr, exact inputs and hashes.
+- Do not weaken tolerances, remove negative controls or replace real failing cases with mocks.
 
-ISOLATION:
-Record repo root, branch, HEAD, clean status, remotes, instructions, Python/NumPy/SciPy and compiler/FPM versions. Stop if dirty. Create an isolated worktree and child branch research/maxwell-two-sided-matching-v1 from the exact observed mode-identity head. Never work on main, source-authority or shared PR #6 branch.
+ISOLATION AND MUTATION
+1. Record repository root, branch, exact HEAD, clean status, remotes, AGENTS/CLAUDE contents, Python/NumPy/SciPy/pytest and Fortran/FPM/compiler versions.
+2. Stop before checkout/mutation if the worktree is dirty or repository identity is ambiguous. Never run git reset --hard or git clean -fdx.
+3. Create a new isolated worktree and child branch based on the exact observed HEAD of research/maxwell-abel-closure-compensation-v1. Suggested child branch: research/maxwell-abel-local-validation-v1. Do not use main, the source-authority branch, PR #6 branch or shared continuation branch as the working branch.
+4. M0: read-only inspection and tests.
+5. M1: research-only changes under research/maxwell_mode_identity/** on the isolated child branch.
+6. M2: additive profile export or additive diagnostic serialization only after a written implementation note and tests proving real-profile legacy values are unchanged.
+7. M3: any RHS, interface law, center/surface condition, root policy or breaking public API change requires separate explicit human approval. Stop and report rather than making such a change.
+8. M4: raw EOS, canonical manifests, C7X gates and source-authority solver semantics are protected.
+9. M5: push, PR creation, merge, release, deployment, provider contact and Dropbox upload are forbidden under this handoff. Obtain separate authorization before any external mutation. Local commit is permitted only after evidence capture and diff review.
 
-MUTATION:
-M0 read-only; M1 research-only edits under research/maxwell_mode_identity/**; M2 additive diagnostic/profile export only after a written implementation note and proof existing outputs stay identical; M3 any RHS/interface/root/production API algorithm change requires explicit human approval; M4 raw EOS/C7X/source admission forbidden; M5 push/PR/merge/release/provider contact/Dropbox forbidden. Commit locally only after validation. Do not push.
+DAG EXECUTION
 
-AUDIT THE ACTUAL ODE FIRST:
-Locate module ns_maxwell_cowling and ns_maxwell_mode_spectrum by rg. Inspect cowling_rhs_point, center, surface and interface transfer code. Compare native and Python _cowling_rhs and _interface_transfer. Native may integrate in log-pressure q; derive the q-to-r chain rule explicitly. If the exact radial ODE is not equivalent to the stated system, stop and report it rather than patching by intuition.
+LA0 — identity and environment
+- Confirm a clean worktree, exact branch/HEAD, remotes and software versions.
+- Write run_identity.json and capture all preflight outputs.
+- Stop if dirty, wrong repo or source identity cannot be pinned.
 
-MATHEMATICS:
-The same cold-barotropic system for two columns has tr(M)=nu_prime*(2+1/chi), while d ln(h exp(-nu))/dr=-nu_prime*(2+1/chi). Thus Omega=h exp(-nu) det([y1,y2]) is constant on smooth phases. At interfaces Omega_outer/Omega_inner=(h_outer/h_inner)*exp(-(nu_outer-nu_inner))*det(T_inner_to_outer). Current slow/rapid maps have det(T)=h_inner/h_outer when nu is continuous. This is a bilinear Abel-Liouville concomitant, not a claimed canonical symplectic current.
+LA1 — equation and convention audit
+- Locate native modules ns_maxwell_cowling and ns_maxwell_mode_spectrum by module declaration and source search; do not guess paths.
+- Inspect the native RHS, center series, surface residual, interface transfer, and Python RHS/transfer.
+- Derive the native q-to-r chain rule directly from the source code.
+- Compare every coefficient, sign, variable, unit and state ordering with the displayed radial system.
+- If there is any unexplained mismatch, stop LA1 and classify it. Do not repair production equations by intuition.
 
-PROFILE EXPORT:
-Reuse existing maxwell_cowling_shot_t q/r/W/V arrays and separate inner/outer interface W,V values. The merged native profile omits duplicate outer-side interface sampling, so emit that side explicitly using its stored one-sided state and exact outer background. Python uses existing separate core/envelope shots and MaxwellStar.background(r,side). Export r_m,q,W_m3,V_m2,P_pa,epsilon_j_m3,h_j_m3,chi,nu,lambda,nu_prime_per_m. No cross-interface interpolation, averaging, or zero-filling missing data. Validate profile_schema.v2 and equal-length finite arrays.
+LA2 — phase-resolved profile export
+- Reuse existing native maxwell_cowling_shot_t arrays and the exact one-sided interface states already retained by the solver.
+- Keep core and envelope arrays separate. Export the outer one-sided interface state explicitly if the merged native array omits the duplicate.
+- Export r, q, W, V, P, epsilon, h, chi, nu, lambda and nu_prime with exact units.
+- Use profile_schema.v2.json and implement semantic checks beyond JSON Schema: finite values, equal lengths, monotonic radii, positive h and chi, exact interface radius match, no duplicate ambiguity.
+- Never interpolate, average or zero-fill across the interface.
 
-TWO-SIDED MATCH:
-Construct center regular solution at finite r0 and propagate outward. Construct the exact current finite-cutoff surface boundary line and propagate inward. Apply exactly the same existing interface transfer at the one-sided interface. At >=3 match radii evaluate E=h exp(-nu) det(y_center,y_surface). Its raw value must converge to a match-radius-independent constant. At R, the unweighted determinant must reproduce the existing surface boundary linear form. Compare zero sets against current outward shooting. Account for every QR/column rescaling factor. Slow and rapid separate.
+LA3 — replay existing invariants
+- Run the existing interface-map, mode-diagnostic and weighted-Wronskian tests from the exact child-branch checkout.
+- The historical PR #6 evidence is internally inconsistent: its captured manifest/stdout report 42 cases, while a later prose/status entry says 43 without a matching 43-case receipt. Do not repeat the 43 claim. Freshly collect and run the exact child-branch suite and capture the inventory and stdout matching the same SHA.
+- Verify complex bilinear determinant without conjugation, slow/rapid maps, multi-interface telescoping, ell=1,2,3,5 trace tests, nonbarotropic negative control, lapse-jump negative control and JSON-safe zero-denominator behavior.
+- Keep the negative max-step control.
+
+LA4 — two-sided matching
+- Use the exact existing finite-pressure surface cutoff in both directions.
+- Start the center solution at finite r_c from the verified regular series. Never evaluate the singular ODE at r=0.
+- Construct the current surface-compatible boundary line and integrate inward.
+- Apply exactly the same one-sided interface transfers to both fundamental solutions.
+- Evaluate raw E(omega;r_m)=h exp(-nu) det(y_center,y_surface) at at least three matching radii.
+- Compare its zero set with the existing outward shooting boundary residual.
+- Run at least three max_step values and tolerance refinement.
+- If QR or column rescaling is needed, retain every scale magnitude and complex phase. det(Y)=det(Q)det(R); Q alone is insufficient.
+- The normalized determinant angle is real-frequency conditioning only. It is not a holomorphic complex-frequency Evans function.
+
+LA5 — zero-jump stellar limit
+- First make one-sided P, epsilon, n, mu, h, chi and background data coincide.
+- Verify both interface maps become identity.
+- Compare smooth and two-phase backgrounds, roots and profiles under identical solver settings.
+- Stop if the two one-sided transition states are not genuinely coincident.
+
+LA6 — finite-jump synthetic continuation
+- Only after LA5 passes.
+- Construct cold analytic phases with common transition pressure and chemical potential.
+- Verify Delta epsilon=mu_t Delta n and positive density/enthalpy jump independently.
+- Track slow and rapid conversions separately.
+- Follow forward and reverse parameter continuation; retain ambiguous assignments.
+- Never label by frequency ordering.
+
+LA7 — native/Python and numerical cross-validation
+- Compare phase-resolved one-sided profiles and RHS outputs, not only final frequencies.
+- Run half parameter step, double profile resolution, tighter tolerances and three max_step values.
+- Compare direct determinant evaluation with scaled/QR evaluation including full determinant scale.
+- Any unexplained mismatch is NATIVE_PYTHON_DIVERGENCE or NUMERICAL_CONDITIONING, not an EOS failure.
+
+LA9 — conditional closure-mismatch compensation and complex diagnostics
+- Read COMPENSATED_ABEL_LIOUVILLE_NOTE_20261111.md and the helper tests first.
+- Derive the complete trace from actual source. Only if it is exactly tr(M)=nu_prime*(2+1/chi_ad), and the equilibrium background satisfies h_prime/h=-(1+1/chi_eq)*nu_prime, use delta=nu_prime*(1/chi_ad-1/chi_eq).
+- If the physical nonbarotropic system contains composition-gradient terms or additional variables, compute its full trace and derive a new compensator. Do not simply substitute chi_ad into the old formula.
+- Integrate delta separately on every smooth phase.
+- For each inner-to-outer interface compute J=(h_o/h_i) exp[-(nu_o-nu_i)] det(T). Preserve orientation and one-sided values.
+- Verify K=Omega exp[-integral(delta dr)] product(J^-1) across each smooth interval and interface, with at least two interfaces in a synthetic test and the actual available fixture.
+- Confirm equal-closure reduction; retain lapse-jump and singular-transfer controls.
+- For complex interface W and V jumps, first add a failing test. Preserve the existing legacy real-projection keys for backward compatibility, but add explicit re, im and absolute-magnitude fields. A jump with a tiny imaginary component must retain it. Validate strict JSON with allow_nan=false.
+- Do not assign physical meaning to an arbitrary global eigenfunction phase.
+
+LA8 — final receipts and checkpoint
+- LA8 closes only after LA0-LA7 and LA9 acceptance conditions pass or are accurately marked BLOCKED/NOT_RUN.
+- Update the same machine DAG and development document, do not create a parallel authority.
+- Emit run_identity.json, profile_manifest.json, weighted_wronskian_results.json, two_sided_matching_results.json, zero_jump_limit_results.json, finite_jump_continuation_results.json or explicit NOT_RUN, cross_validation_results.json, closure_drift_integral_results.json, piecewise_compensated_invariant_results.json, complex_interface_jump_diagnostics.json, native_python_closure_comparison.md, convergence_matrix.csv, VALIDATION_REPORT.md and SHA256SUMS.
+- Every result must name command, exit status, source SHA, software versions, input/output hashes and numerical error.
+
+MATHEMATICAL CONTRACT
+For y=(W,V)^T and the exact 2x2 radial matrix
+
+    M = [[nu_prime/chi_ad, A/chi_ad - ell*(ell+1)*exp(lambda)],
+         [-exp(lambda)/r^2, 2*nu_prime]]
+    A = (omega*r/c)^2 * exp(lambda - 2*nu)
+
+let Y=[y1,y2] and Omega=h exp(-nu) det(Y), using a bilinear determinant without complex conjugation. Under a cold equilibrium background with P_prime=-h nu_prime and h_prime/h=-(1+1/chi_eq)nu_prime:
+
+    delta = nu_prime * (1/chi_ad - 1/chi_eq)
+    I(r) = integral_from_r0_to_r delta(s) ds
+    J_k = (h_outer/h_inner) * exp[-(nu_outer-nu_inner)] * det(T_inner_to_outer)
+    K(r) = Omega(r) * exp[-I(r)] * product_over_crossed_interfaces(J_k^-1)
+
+K is constant only under the stated ODE trace and background first law. It is not a canonical covariant symplectic current. A general nonbarotropic system with additional composition terms is outside this formula until re-derived.
+
+COMPLEX SERIALIZATION CONTRACT
+- Never cast a complex jump to float(real(...)) as the only persisted representation.
+- Keep legacy real-only fields only as explicitly documented projections.
+- Add separate W/V real, imaginary and absolute-magnitude values.
+- Encode complex scalars as {re,im}; do not write JSON NaN/Infinity.
+- A small imaginary part is not zero merely because it falls below an arbitrary epsilon threshold.
+- Test global phase transformation behavior and strict JSON serialization.
+- No phase-based physical interpretation without a declared phase convention.
+
+VALIDATION COMMANDS
+Run from repository root after inspecting actual instructions and dependencies:
+
+    PYTHONPATH=research python -m pytest -q research/maxwell_mode_identity/tests
+    python -m compileall -q research/maxwell_mode_identity
+    python -m json.tool research/maxwell_mode_identity/profile_schema.v2.json
+    python -m json.tool research/maxwell_mode_identity/LOCAL_AGENT_DAG.v1.json
+    python -m json.tool research/maxwell_mode_identity/MODE_IDENTITY_STATUS.json
+    python -m json.tool research/maxwell_mode_identity/COMPENSATED_ABEL_RESULTS.json
+    git diff --check
+    git status --porcelain=v1
+    git diff --name-only
+    git diff --stat
+
+Do not assume the commands succeed just because they appear here. Record exact output and exit status. Rediscover native FPM/gfortran commands from the live project documentation; never invent build commands or claim CI success.
+
+FAILURE TAXONOMY
+Use separate categories:
+THEORY_CONVENTION_MISMATCH
+THERMODYNAMIC_IDENTITY_FAILURE
+INTERFACE_MAP_FAILURE
+ODE_IMPLEMENTATION_FAILURE
+NUMERICAL_CONDITIONING
+PROFILE_SERIALIZATION_FAILURE
+NATIVE_PYTHON_DIVERGENCE
+ENVIRONMENT_OR_BUILD_FAILURE
+PROVENANCE_FAILURE
+SCOPE_OR_POLICY_BLOCK
+INCONCLUSIVE_RESOURCE_LIMIT
+
+ANTI-DRIFT / HALLUCINATION SELF-AUDIT
+Before each checkpoint, provide an evidence-backed answer to every item:
+1. Exact repo, branch, HEAD, clean status and source hashes?
+2. Which source snapshot is source-authority, which is PR6, which is the published continuation base, and which is the local child branch?
+3. Were actual source modules inspected, or inferred from file names?
+4. Is the native q-to-r chain rule derived from source?
+5. Are chi_ad and chi_eq separated exactly as they occur in code?
+6. Are W/V order, units, c, metric convention, interface orientation and one-sided data correct?
+7. Are expected outputs independent of implementation-under-test?
+8. Are complex bilinear determinants retained without conjugation and tiny imaginary terms preserved?
+9. Are every interface jump and QR/column scale accounted for exactly once?
+10. Is the determinant raw analytic scalar distinguished from a normalized non-holomorphic diagnostic?
+11. Are branch continuation IDs separate from physical mode character?
+12. Does collected test count equal captured stdout and manifest for the same exact SHA?
+13. Are negative controls retained and failure classification specific?
+14. Are all source-backed claims grounded in inputs actually run?
+15. Are C7X, raw EOS, manifests and source authority untouched?
+16. Were no external mutations performed without separate authorization?
+
+UNKNOWN OR UNFETCHED = NOT_RUN/BLOCKED, NEVER PASS. A status label is not evidence. A plausible equation is not proof the production code implements it. A synthetic fixture is not a stellar model.
+
+FINAL LOCAL REPORT
+Return:
+- exact run identity and source pins;
+- DAG node statuses LA0-LA9;
+- all changed files and protected-file hash comparison;
+- mathematical derivation and hypotheses;
+- commands, exit codes, stdout/stderr, test inventory, versions and hashes;
+- numerical convergence/error table;
+- failures and blockers with failure taxonomy;
+- explicit non-claims;
+- local checkpoint SHA.
+Do not push, create a PR, merge, release, deploy, contact providers or upload to Dropbox.
 
 
-ROOT FUNCTION AND RESCALING POLICY:
-- The raw weighted determinant E=h*exp(-nu)*det(y_center,y_surface) has the exact zero set. Its small/large magnitude alone is not a root-quality metric.
-- The normalized determinant angle divides by Euclidean norms. Use it only as a real-frequency subspace-angle diagnostic; the complex norm uses conjugation and is generally non-holomorphic in omega. Never use it for complex-frequency contour or winding-number counts.
-- For large dynamic range, use multiple shooting or an analytically scaled determinant. Every nonzero row/column/QR scale factor, complex phase and log magnitude must be retained. For Y=Q R, det(Y)=det(Q)*det(R); Q alone is insufficient. Scaling factors must depend analytically on omega if a complex analytic characteristic is required.
-- A near-zero residual is rejected when either column collapses, factors are missing, overflow/underflow occurs, or match-radius/step/tolerance refinement does not converge.
-- Check the center regular expansion before finite-r0 start; leading order is W~C*r^(ell+1), V~-C*r^ell/ell, hence W+ell*r_c*V=0 only at leading order.
-- Keep the exact current finite-pressure surface cutoff in both directions. It is not automatically the true P=0 surface.
-- If the inner Omega is zero or below relative_floor, observed Omega_outer/Omega_inner is undefined: serialize null with observed_omega_ratio_status=UNDEFINED_ZERO_DENOMINATOR. Never emit NaN/Infinity. Serialize complex Omega values as {re,im}; strict JSON validation must use allow_nan=false.
 
-ZERO JUMP:
-Make one-sided transition P, epsilon, n, mu, h, chi and background derivatives equal. Both maps must be identity. Compare smooth and two-phase TOV/background, root sets and profiles under identical settings. Do not label by frequency order.
+GENERAL TRACE-FIRST EXTENSION (LA9, REVISION 1.2)
 
-FINITE JUMP:
-Only if zero-jump passes. Construct cold analytic phases with common P_t and mu_t; use kappa_h=h_i/h_o>1 and epsilon_i=mu_t*n_i-P_t. Check positive jump and Delta epsilon=mu_t Delta n. Track slow and rapid separately, including the slow discontinuity-g branch and rapid zero-frequency limit. Never force ambiguous overlap assignments or physical labels.
+Do not start by inserting chi_ad and chi_eq into the old formula. For the exact full square system Y'=M(r)Y and positive weight w=h*exp(-nu), first derive Abel-Liouville:
 
-TDD AND VERIFICATION:
-Add a failing focused test before each behavior. Demonstrate the expected red, implement minimal code, show green, then run the full suite. Test smooth/interface/chain identities, complex bilinear columns without conjugation, ell=1,2,3,5 trace, nonbarotropic negative control, metric jump, serialization round trip, multiple matching radii, max_step refinement, tolerance refinement, zero jump, finite jump and native/Python comparisons.
-Run:
-PYTHONPATH=research python -m pytest -q research/maxwell_mode_identity/tests
-python -m compileall -q research/maxwell_mode_identity
-python -m json.tool research/maxwell_mode_identity/profile_schema.v2.json
-python -m json.tool research/maxwell_mode_identity/LOCAL_AGENT_DAG.v1.json
-git diff --check
-git status --porcelain=v1
-git diff --name-only
-git diff --stat
-If native code is touched under M2, rediscover official FPM/gfortran build/test command from current repo docs and capture compiler, flags, logs and exit status. Do not invent commands or claim CI pass.
+    d(det(Y))/dr = tr(M)*det(Y)
+    Omega = w*det(Y)
+    Gamma = tr(M) + d(log h)/dr - nu_prime
+    K = Omega*exp[-integral(Gamma dr)]*product(crossed_J^-1)
+    J = (w_outer/w_inner)*det(T_inner_to_outer)
 
-ANTI-DRIFT AUDIT:
-Before every checkpoint ask: exact SHA? clean branch? actual q-to-r RHS verified? same chi in ODE and First Law? correct W,V order and units? interface orientation correct? one-sided h and nu? determinant bilinear without conjugation? raw vs normalized determinant distinguished? all scale factors tracked? max_step/tolerance convergence? native/Python independent? physical labels unresolved? no raw EOS/C7X/root/TOV/source-backed claim? no forbidden external mutation?
-Unknown means NOT_RUN/BLOCKED, never PASS.
+This is the general algebraic trace-first determinant identity, not a canonical symplectic current or asserted physical charge. Derive the full trace from the actual native/Python RHS source. Only reduce to Gamma=nu_prime*(1/chi_ad-1/chi_eq) if and only if the full source matrix trace is exactly nu_prime*(2+1/chi_ad) and the background first law is exactly h_prime/h=-(1+1/chi_eq)*nu_prime. Extra composition terms remain in Gamma. An n-component perturbation state requires its actual n x n fundamental matrix/interface map; a non-square or rank-deficient matching map is a stop condition, not permission to invent a 2x2 reduction.
 
-DELIVERABLES:
-run_identity.json, profile_schema.v2.json, profile_manifest.json, weighted_wronskian_results.json, two_sided_matching_results.json, zero_jump_limit_results.json, finite_jump_continuation_results.json or explicit NOT_RUN, cross_validation_results.json, convergence_matrix.csv, VALIDATION_REPORT.md, SHA256SUMS. Report exact files/commands/exit codes/test count/numerical errors/provenance/mutations/risks. If any gate fails, stop at the smallest failed DAG node and preserve all evidence. Do not push or create a PR.
+The added helper functions are trace_first_drift_density and integrated_trace_first_drift. Final synthetic suite: 15 collected, 15 passed in 0.59 s; inventory 15 collected in 0.33 s. Read the new negative-scale receipt: the first generalized matrix exponential test overflowed because O(1) m^-1 matrix coefficients were propagated over 4000 m; scale was corrected to O(1e-5) m^-1 without tolerance relaxation. This is not a physical instability. Raw initial failure stdout was not separately captured.
 
-FINAL REPORT:
-Summary; Files changed; Verification; Mutations; Risks/gaps; Checkpoint; Next local action.
+Before local use, fetch the actual live child branch HEAD; current commit pins in this prompt are historical. Do not push, create PR, merge, deploy, contact providers or upload to Dropbox. All external mutations need separate human authorization.

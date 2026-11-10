@@ -1,0 +1,105 @@
+{
+  "schema": "ns-cowling.compensated-abel-results.v1",
+  "research_id": "COWLING-COMPENSATED-ABEL-INTERFACE-v1",
+  "date": "2026-11-11",
+  "scope": "analytic synthetic 2x2 coefficient systems only; not a stellar model",
+  "parent_snapshot": {
+    "repository": "cosmosapjw-quantum/NS_Cowling",
+    "branch": "research/maxwell-mode-identity-v1",
+    "commit": "9d43806e6b6f318934738ad6d94db261d15c2b98",
+    "source_authority_commit": "a09ec30d74b363652d2d1aefe990557c468679dd"
+  },
+  "mathematics": {
+    "status": "DERIVED_CONDITIONALLY",
+    "closure_drift": "delta=nu_prime*(1/chi_ad-1/chi_eq)",
+    "interface_multiplier": "J=(h_outer/h_inner)*exp(-(nu_outer-nu_inner))*det(T_inner_to_outer)",
+    "global_invariant": "K=Omega*exp(-integral(delta dr))*product(crossed_J^-1)",
+    "hypotheses": [
+      "specified 2x2 ODE trace equals nu_prime*(2+1/chi_ad)",
+      "cold equilibrium background obeys P_prime=-h*nu_prime",
+      "h_prime/h=-(1+1/chi_eq)*nu_prime",
+      "h, chi_ad and chi_eq are positive on smooth segments",
+      "each interface transfer is finite and invertible",
+      "one-sided interface orientation and values are explicit"
+    ],
+    "non_claim": "not a general nonbarotropic stellar theorem; extra composition-gradient terms require a new trace calculation"
+  },
+  "symbolic": {
+    "tool": "Wolfram Language evaluator",
+    "bulk_compensation_residual": "0",
+    "slow_transfer_determinant_minus_alpha": "0",
+    "rapid_transfer_determinant_minus_alpha": "0",
+    "standard_interface_multiplier_residual_for_alpha_hinner_over_houter_and_continuous_lapse": "0",
+    "status": "SYMBOLICALLY_CHECKED"
+  },
+  "numerical": {
+    "test_cases_passed": 12,
+    "test_cases_failed": 0,
+    "test_command": "PYTHONPATH=/mnt/data/NS_Cowling_research_20261111 python -m pytest -q /mnt/data/NS_Cowling_research_20261111/compensated_abel/tests",
+    "constant_drift_integral": -0.009343853820598002,
+    "analytic_constant_drift_integral": -0.009343853820598004,
+    "integral_absolute_error": 1.734723475976807e-18,
+    "two_segment_matrix_exponential": "PASS_WITH_NONTRIVIAL_TRANSFER_AND_LAPSE_JUMP",
+    "two_segment_compensated_relative_tolerance": 2e-12,
+    "dop853_drift_and_compensation_relative_tolerance": 2e-9,
+    "multiple_interface_telescoping": "PASS",
+    "tiny_complex_phase_tdd": "RED_THEN_GREEN",
+    "final_test_command": "PYTHONPATH=research python -m pytest -q research/maxwell_mode_identity/tests/test_compensated_abel.py",
+    "final_test_cases_collected": 12,
+    "final_test_stdout": "12 passed in 0.53s",
+    "final_collection_stdout": "12 tests collected in 0.32s",
+    "source_test_sha256": "4c188e802855b164af331c10a3cc77beb34500f9353fbad20b3899c12610647a",
+    "helper_sha256": "9c107c136e7773ae22fe36548767784b26e85256985cc183a555c489ca86a5e5"
+  },
+  "diagnostic_integrity": {
+    "status": "STATIC_SOURCE_AUDIT_CONFIRMED_INFORMATION_LOSS",
+    "path": "research/maxwell_mode_identity/diagnostics.py",
+    "pattern": "float(real(outer_interface_value-inner_interface_value))",
+    "example_jump": {
+      "re": -0.75,
+      "im": -1.25
+    },
+    "legacy_emitted_real_projection": -0.75,
+    "imaginary_component_magnitude_discarded": 1.25,
+    "fix_status": "NOT_PATCHED; ADDITIVE_FIELDS_AND_TDD_ASSIGNED_TO_LOCAL_DAG_LA9"
+  },
+  "unverified": [
+    "native Fortran q-to-r ODE equivalence",
+    "actual native fixture-root profiles",
+    "zero-jump stellar comparison",
+    "finite-jump stellar continuation",
+    "native/Python profile parity",
+    "production integration",
+    "physical f, p1 or discontinuity-g classification"
+  ],
+  "non_claims": [
+    "canonical covariant symplectic current",
+    "general nonbarotropic perturbation theorem",
+    "finite-rate or dissipative interface law",
+    "source-backed EOS/TOV/Cowling result",
+    "C7X D3/D4/D5/D6 blocker resolution"
+  ],
+  "provenance": {
+    "run_type": "exported_container_package_without_git_metadata",
+    "exact_parent_snapshot": "9d43806e6b6f318934738ad6d94db261d15c2b98",
+    "local_git_commit_authentication": "NOT_CLAIMED",
+    "manifest": "computation_evidence/compensated_abel_20261111/computation_manifest.json"
+  },
+  "general_trace_first": {
+    "status": "DERIVED_AND_SYMPY_SYMBOLICALLY_CHECKED",
+    "formula": "Gamma=tr(M)+d(log h)/dr-nu_prime",
+    "identity": "K=h*exp(-nu)*det(Y)*exp(-integral(Gamma dr))*product(crossed_J^-1)",
+    "tests": 3,
+    "scope": "general square linear system determinant identity; not a canonical symplectic current"
+  },
+  "tests": {
+    "passed": 15,
+    "failed": 0,
+    "collected": 15,
+    "functions": 15,
+    "stdout": "15 passed in 0.59s",
+    "collection": "15 tests collected in 0.31s",
+    "command": "PYTHONPATH=research python -m pytest -q -p no:cacheprovider research/maxwell_mode_identity/tests/test_compensated_abel.py"
+  },
+  "test_scale_negative_control": "Initial test matrix exp overflowed due O(1) per-m coefficients over 4000 m; corrected to O(1e-5) per m, no tolerance relaxation; see computation_evidence/compensated_abel_20261111/TEST_SCALE_NEGATIVE_CONTROL.md."
+}

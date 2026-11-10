@@ -1,0 +1,106 @@
+{
+  "schema": "ns-cowling.analytic-matching-status.v1",
+  "date": "2026-11-11",
+  "node": "LA11",
+  "parent": {
+    "branch": "research/maxwell-interface-interpolation-la10-v1",
+    "commit": "104b4fa76e191db42e6af26f072533617f45441c",
+    "pr": 9
+  },
+  "scope": "finite-interval piecewise-smooth linear BVP; research-only analytic matching helpers",
+  "status": "CONDITIONAL_THEORY_DERIVED_AND_22_SYNTHETIC_TESTS_PASS__NATIVE_BVP_HYPOTHESES_UNVERIFIED",
+  "mathematics": {
+    "finite_interval_characteristic": "D(zeta;rm)=det[Phi_center(rm,zeta),Phi_surface(rm,zeta)]",
+    "holomorphy_hypotheses": [
+      "M_j(r,zeta) holomorphic in zeta and locally uniformly L1 in r on each smooth layer",
+      "each interface T_k(zeta) holomorphic and invertible, or use a full-rank implicit interface matching matrix",
+      "endpoint admissible dimensions fixed and full-rank holomorphic frames exist",
+      "parameter domain has no unhandled coefficient, endpoint, or interface singularity"
+    ],
+    "zero_set": "D=0 iff propagated endpoint-admissible subspaces have nontrivial intersection",
+    "basis_cocycle": "D_tilde=D*det(A_center)*det(A_surface)",
+    "gauge_equation": "M_z=G^-1*M_y*G-G^-1*G_prime",
+    "gauge_interface": "T_z=G_outer^-1*T_y*G_inner",
+    "gauge_determinant": "D_y=det(G_at_match)*D_z",
+    "smooth_match_radius": "D(r2)=exp(integral(tr(M)dr))*D(r1)",
+    "interface_match_radius": "D(rk+)=det(T_k)*D(rk-)",
+    "multiplicity_gate": "zero order equals BVP algebraic multiplicity only after the actual BVP is a regular holomorphic Fredholm pencil and the matching matrix is an analytic invertible reduction",
+    "nonholomorphic_warning": "Hermitian norms, Gram-Schmidt, ordinary unitary QR/SVD and polar factors are not holomorphic in complex zeta; all volume/phase/scale/chart factors must be restored"
+  },
+  "la10_interface_chart": {
+    "A": "(omega*r_t/c)^2*exp(lambda_metric-2*nu_metric)",
+    "transfer_pole": "T_theta[1,0]=(1-theta)*(kappa-1)*nu_prime/A for 0<=theta<1,kappa!=1",
+    "C_inner": [
+      [
+        "-kappa*nu_prime",
+        "-kappa*A"
+      ],
+      [
+        "-(1-theta)*nu_prime",
+        "theta*A"
+      ]
+    ],
+    "C_outer": [
+      [
+        "nu_prime",
+        "A"
+      ],
+      [
+        "(1-theta)*nu_prime",
+        "-theta*A"
+      ]
+    ],
+    "determinants": {
+      "C_inner": "-kappa*A*nu_prime",
+      "C_outer": "-A*nu_prime",
+      "T_theta": "kappa"
+    },
+    "implicit_characteristic": "E_imp=det[C_i*y_i,C_o*y_o]",
+    "implicit_to_graph_factor": "E_imp=A*nu_prime*det[T_theta*y_i,y_o] for A!=0,theta<1,kappa!=1",
+    "A_zero_policy": {
+      "theta_lt_1_kappa_ne_1": "implicit blocks remain finite; C_outer loses rank and no graph transfer exists",
+      "theta_eq_1": "explicit analytic rapid extension [V]=0; this is a selected extension at A=0",
+      "kappa_eq_1": "no enthalpy jump; use exact identity map"
+    },
+    "conditioning": "dimensionless x=A/(nu_prime*L), cond2(T_hat)=O(|x|^-2)=O(|omega|^-4); condition number is real-frequency diagnostic only",
+    "physical_finite_rate_law": "NOT_ESTABLISHED"
+  },
+  "symbolic": {
+    "sympy": "PASS_EXACT_ZERO_RESIDUALS_7_IDENTITIES",
+    "sympy_version": "1.14.0",
+    "wolfram_language": "PASS_CLEAN_MODULE_ZERO_RESIDUALS_10_IDENTITIES"
+  },
+  "numerical": {
+    "tests_collected": 22,
+    "tests_passed": 22,
+    "tests_failed": 0,
+    "pytest_stdout": "22 passed in 0.17s",
+    "collection_stdout": "22 tests collected in 0.01s",
+    "environment": {
+      "python": "3.13.5",
+      "numpy": "2.3.5",
+      "scipy": "1.17.0",
+      "pytest": "9.0.2"
+    },
+    "helper_sha256": "087ab499e9466b2008fedca79409e04db6038808bb8d4df03fde9d0f74f4b096",
+    "tests_sha256": "c8d9dee337c502a48a01d78c1c045a320d93a7c928a16016ae133c5326dedd79"
+  },
+  "not_run": [
+    "native Cowling source q-to-r audit",
+    "actual center/surface endpoint frame holomorphy proof",
+    "regular Fredholm-pencil equivalence and algebraic multiplicity for actual BVP",
+    "native Fortran build/run",
+    "actual stellar profiles or roots",
+    "argument-principle root count on physical contour",
+    "production integration",
+    "GitHub Actions CI pass"
+  ],
+  "non_claims": [
+    "whole-line Evans theorem for the finite interval",
+    "canonical covariant symplectic current",
+    "physical finite-rate interface law",
+    "physical omega=0 stellar mode",
+    "source-backed EOS/TOV/Cowling result",
+    "physical f/p1/interface-g labels"
+  ]
+}

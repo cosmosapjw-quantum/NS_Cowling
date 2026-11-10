@@ -207,3 +207,21 @@ Return:
 - explicit non-claims;
 - local checkpoint SHA.
 Do not push, create a PR, merge, release, deploy, contact providers or upload to Dropbox.
+
+
+
+GENERAL TRACE-FIRST EXTENSION (LA9, REVISION 1.2)
+
+Do not start by inserting chi_ad and chi_eq into the old formula. For the exact full square system Y'=M(r)Y and positive weight w=h*exp(-nu), first derive Abel-Liouville:
+
+    d(det(Y))/dr = tr(M)*det(Y)
+    Omega = w*det(Y)
+    Gamma = tr(M) + d(log h)/dr - nu_prime
+    K = Omega*exp[-integral(Gamma dr)]*product(crossed_J^-1)
+    J = (w_outer/w_inner)*det(T_inner_to_outer)
+
+This is the general algebraic trace-first determinant identity, not a canonical symplectic current or asserted physical charge. Derive the full trace from the actual native/Python RHS source. Only reduce to Gamma=nu_prime*(1/chi_ad-1/chi_eq) if and only if the full source matrix trace is exactly nu_prime*(2+1/chi_ad) and the background first law is exactly h_prime/h=-(1+1/chi_eq)*nu_prime. Extra composition terms remain in Gamma. An n-component perturbation state requires its actual n x n fundamental matrix/interface map; a non-square or rank-deficient matching map is a stop condition, not permission to invent a 2x2 reduction.
+
+The added helper functions are trace_first_drift_density and integrated_trace_first_drift. Final synthetic suite: 15 collected, 15 passed in 0.58 s; inventory 15 collected in 0.33 s. Read the new negative-scale receipt: the first generalized matrix exponential test overflowed because O(1) m^-1 matrix coefficients were propagated over 4000 m; scale was corrected to O(1e-5) m^-1 without tolerance relaxation. This is not a physical instability. Raw initial failure stdout was not separately captured.
+
+Before local use, fetch the actual live child branch HEAD; current commit pins in this prompt are historical. Do not push, create PR, merge, deploy, contact providers or upload to Dropbox. All external mutations need separate human authorization.

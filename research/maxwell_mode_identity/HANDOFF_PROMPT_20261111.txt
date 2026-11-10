@@ -1,17 +1,17 @@
 You are the local implementation agent for NS_Cowling task NSCOWLING-MODEID-WRONSKIAN-LOCAL-AGENT-v1.
 
 READ FIRST:
-1. research/maxwell_mode_identity/LOCAL_AGENT_DAG_DEVELOPMENT_AND_HANDOFF_20261111.md
+1. research/maxwell_mode_identity/LOCAL_AGENT_DAG_DEVELOPMENT_AND_HANDOFF_20261111.md (single authority; LA0-LA9)
 2. research/maxwell_mode_identity/LOCAL_AGENT_DAG.v1.json
 3. research/maxwell_mode_identity/WEIGHTED_ABEL_LIOUVILLE_AND_TWO_SIDED_MATCHING_20261111.md
 4. research/maxwell_mode_identity/MODE_IDENTITY_STATUS.json and VALIDATION_REPORT.md
-5. Repository AGENTS.md/CLAUDE.md/README/FPM instructions, if present.
+5. research/maxwell_mode_identity/FINITE_CONVERSION_INTERPOLATION_AUDIT_20261111.md and FINITE_CONVERSION_INTERPOLATION_STATUS_20261111.json.\n6. Repository AGENTS.md/CLAUDE.md/README/FPM instructions, if present.
 
 GOAL:
 Implement and validate a two-sided matching cross-check for the existing analytic two-phase sharp-Maxwell relativistic Cowling fixture using Omega=h exp(-nu)(W1 V2-V1 W2). Export complete native/Python phase-resolved profiles, including distinct one-sided interface values. Integrate a regular center solution outward and a surface-compatible line inward. Evaluate the raw weighted determinant at at least three match radii; compare with the existing outward surface residual. Validate the zero-jump limit before any finite-jump continuation.
 
 PROVENANCE:
-Repo cosmosapjw-quantum/NS_Cowling. Source-authority snapshot a09ec30d74b363652d2d1aefe990557c468679dd. Prior mode-identity branch snapshot research/maxwell-mode-identity-v1 at 1a02d7abe51ee079fdf381fa5f9290936b6dae2b. Fetch current head and update run_identity.json if it changed. Do not assume old refs remain current.
+Repo cosmosapjw-quantum/NS_Cowling. Source-authority snapshot a09ec30d74b363652d2d1aefe990557c468679dd. Mode-identity branch to inspect live: research/maxwell-mode-identity-v1. Coordinator snapshot: 7c4607c7db0a7e10375a33b43642a29557a1df1e. Fetch the live branch head before work; never trust a stale snapshot. Fetch current head and update run_identity.json if it changed. Do not assume old refs remain current.
 
 ISOLATION:
 Record repo root, branch, HEAD, clean status, remotes, instructions, Python/NumPy/SciPy and compiler/FPM versions. Stop if dirty. Create an isolated worktree and child branch research/maxwell-two-sided-matching-v1 from the exact observed mode-identity head. Never work on main, source-authority or shared PR #6 branch.
@@ -69,3 +69,13 @@ run_identity.json, profile_schema.v2.json, profile_manifest.json, weighted_wrons
 
 FINAL REPORT:
 Summary; Files changed; Verification; Mutations; Risks/gaps; Checkpoint; Next local action.
+
+
+INTERMEDIATE-CONVERSION GATE (LA9):
+- Read FINITE_CONVERSION_INTERPOLATION_AUDIT_20261111.md first.
+- theta only interpolates nonradial Cowling kinematic constraints. It is NOT a physical rate, timescale, mobility or calibrated coefficient.
+- Keep kappa=h_inner/h_outer separate from theta.
+- Test T_theta endpoints, det(T_theta)=kappa, zero jump, pressure continuity and the mixed kinematic residual.
+- Do not introduce theta into production roots or claim a finite-rate result.
+- Physical finite-rate kinetics is BLOCKED until a primary-source-supported constitutive law, reaction flux, chemical affinity, interface dissipation/entropy balance and admissible junction conditions are derived.
+- Rau & Sedrakian (2023) is a radial algebraic interpolation; do not transplant it into nonradial Cowling. Dong et al. (2026) explicitly state their full-GR polar interpolation is algebraic, not a microscopic finite-rate law.

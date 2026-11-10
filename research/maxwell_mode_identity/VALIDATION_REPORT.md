@@ -39,3 +39,16 @@ All numerical assertions use synthetic cold-barotropic coefficient functions and
 3. A nonbarotropic or frozen-composition chi requires a new derivation.
 4. The concomitant is not established as a canonical covariant symplectic current.
 5. Physical labels remain unresolved pending zero-jump seeding and actual fixture continuation.
+
+
+## 2026-11-11 additive LA9 verification: algebraic interpolation family
+
+Research-only helper and tests were added in a separate child PR; the existing
+43-case mode-identity suite was not rerun here.
+
+- RED: new tests initially failed collection because the helper module did not exist.
+- GREEN: `PYTHONPATH=. pytest -q research/maxwell_mode_identity/tests/test_algebraic_interpolation.py` -> 12 passed.
+- Independent SymPy exact checks: det(T_theta)=kappa; theta=0/1 endpoints match slow/rapid; T^T J T-kappa J=0; weighted jump at continuous lapse is unity; zero-jump matrix is identity.
+- Wolfram Language Module evaluation independently returned the same exact identities with no evaluator warnings.
+- No existing PR #6 test suite, native Fortran, profile export, fixture-root, zero-jump star sequence, finite-jump continuation, or production root solver was executed in this increment.
+- theta is explicitly nonphysical; the finite-rate kinetic law remains NOT_ESTABLISHED.

@@ -1,15 +1,15 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "schema_name": "ns-cowling-local-agent-two-sided-matching-dag",
   "contract_id": "NSCOWLING-MODEID-WRONSKIAN-LOCAL-AGENT-v1",
   "snapshot_date": "2026-11-11",
-  "status": "IMPLEMENTATION_SPEC_READY__LOCAL_EXECUTION_REQUIRED",
+  "status": "LOCAL_IMPLEMENTATION_SPEC_READY__FINITE_RATE_PHYSICS_GATE_ADDED",
   "project": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "source_authority_branch": "research/maxwell-native-fortran-v1",
     "source_authority_commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
     "mode_identity_branch_snapshot": "research/maxwell-mode-identity-v1",
-    "mode_identity_head_snapshot": "0b8477693b671413f45e1f4dfbb4654598e93fc1",
+    "mode_identity_head_snapshot": "7c4607c7db0a7e10375a33b43642a29557a1df1e",
     "pr_number": 6,
     "native_cowling_module": {
       "name": "ns_maxwell_cowling",
@@ -269,6 +269,41 @@
       ]
     },
     {
+      "id": "LA9",
+      "depends_on": [
+        "LA0",
+        "LA1"
+      ],
+      "name": "intermediate-conversion admissibility and algebraic interpolation audit",
+      "gate": "M1",
+      "status": "ALGEBRAIC_FAMILY_DERIVED_AND_12_CASES_TESTED__PHYSICAL_FINITE_RATE_LAW_NOT_ESTABLISHED",
+      "outputs": [
+        "FINITE_CONVERSION_INTERPOLATION_AUDIT_20261111.md",
+        "FINITE_CONVERSION_INTERPOLATION_STATUS_20261111.json",
+        "finite_conversion_interpolation.py",
+        "tests/test_algebraic_interpolation.py"
+      ],
+      "acceptance": [
+        "theta is only a dimensionless boundary-condition interpolation parameter; never a calibrated rate or timescale",
+        "define jumps as outer minus inner; keep kappa=h_inner/h_outer distinct from theta",
+        "derive pressure continuity plus (1-theta)[W-Q-independent form]: (1-theta)[W]+theta[W-Q/nu_prime]=0",
+        "verify theta=0 slow and theta=1 rapid endpoints",
+        "verify det(T_theta)=kappa, zero-jump identity and weighted concomitant jump including possible lapse jump",
+        "separate 2023 radial interpolation from 2026 full-GR polar algebraic interpolation and from 2020 nonradial physical endpoint conditions",
+        "require sourced microphysical kinetic relation, reaction flux, thermodynamic affinity and dissipation/entropy accounting before physical finite-rate claim"
+      ],
+      "stop": [
+        "theta is described as a physical conversion speed, rate, mobility or timescale",
+        "a radial junction condition is transplanted to nonradial Cowling without derivation",
+        "no-thin-shell admissibility or extra interface degrees of freedom remain unresolved but are claimed solved",
+        "physical kinetic constitutive law is absent"
+      ],
+      "result_policy": {
+        "algebraic_sensitivity": "MAY_RUN_AS_SEPARATELY_LABELLED_BOUNDARY_CONDITION_SENSITIVITY_SCAN",
+        "physical_finite_rate": "BLOCKED_UNTIL_MICROPHYSICAL_KINETIC_RELATION_AND_INTERFACE_BALANCE_ARE_DERIVED"
+      }
+    },
+    {
       "id": "LA8",
       "depends_on": [
         "LA0",
@@ -278,7 +313,8 @@
         "LA4",
         "LA5",
         "LA6",
-        "LA7"
+        "LA7",
+        "LA9"
       ],
       "name": "final receipts and checkpoint",
       "gate": "M1",
@@ -312,7 +348,11 @@
     "cross_validation_results.json",
     "convergence_matrix.csv",
     "VALIDATION_REPORT.md",
-    "SHA256SUMS"
+    "SHA256SUMS",
+    "FINITE_CONVERSION_INTERPOLATION_AUDIT_20261111.md",
+    "FINITE_CONVERSION_INTERPOLATION_STATUS_20261111.json",
+    "finite_conversion_interpolation.py",
+    "tests/test_algebraic_interpolation.py"
   ],
   "failure_taxonomy": [
     "THEORY_CONVENTION_MISMATCH",
@@ -348,6 +388,18 @@
       "tests/test_weighted_wronskian.py": 21
     },
     "runtime_seconds": 0.74,
-    "status": "LOCAL_EXPORTED_SNAPSHOT_FRESH_RERUN_PASS; GITHUB_ACTIONS_NOT_RUN"
+    "status": "LOCAL_EXPORTED_SNAPSHOT_FRESH_RERUN_PASS; GITHUB_ACTIONS_NOT_RUN",
+    "finite_conversion_interpolation_cases": 12,
+    "finite_conversion_interpolation_command": "PYTHONPATH=. pytest -q research/maxwell_mode_identity/tests/test_algebraic_interpolation.py",
+    "finite_conversion_interpolation_status": "FRESH_LOCAL_TEST_RUN_PASS",
+    "wolfram_symbolic": "PASS_CLEAN_MODULE",
+    "sympy_symbolic": "PASS"
+  },
+  "finite_rate_policy": {
+    "theta": "dimensionless kinematic boundary-condition interpolation parameter only",
+    "density_jump_ratio": "kappa=h_inner/h_outer; not the interpolation parameter",
+    "microscopic_kinetic_law": "NOT_ESTABLISHED",
+    "physical_finite_rate_solver": "FORBIDDEN_UNDER_THIS_HANDOFF",
+    "algebraic_sensitivity_scan": "OPTIONAL_AND_MUST_REMAIN_LABELLED_NONPHYSICAL_INTERPOLATION"
   }
 }

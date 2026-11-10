@@ -68,3 +68,8 @@ No local native build, q-to-r chain-rule audit, actual fixture profile, zero-jum
 - Captured logs and computation_manifest.json are under computation_evidence/compensated_abel_20261111/.
 
 The test was run in an exported package without Git metadata. It is not a full-repository checkout replay and does not prove GitHub Actions status.
+
+
+## Reconciled exact-source run
+
+The final local exported-package replay used byte-identical `compensated_abel.py` and `tests/test_compensated_abel.py` files to those published on this branch. Captured stdout: `12 passed in 0.53s`; collection inventory: `12 tests collected in 0.32s`. SHA256 values and the matching manifest are under `computation_evidence/compensated_abel_20261111/`. The test run remains an exported-package run without Git metadata, not a full repository or native Fortran test.

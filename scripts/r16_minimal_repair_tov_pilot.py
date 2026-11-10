@@ -167,6 +167,7 @@ def repair_normalized_rows(
             out["q7_e_over_nb_mn_minus_1"] = format(eps_mev / (n_mev * mn_mev) - 1.0, ".17g")
         output_rows.append(out)
 
+    has_r16_boundary = len(rows) > 217
     return output_rows, {
         "row_count": len(rows),
         "cell_count": len(rows) - 1,
@@ -184,10 +185,10 @@ def repair_normalized_rows(
             abs(e + p - m * nb) / max(abs(e + p), 1.0e-300)
             for e, p, m, nb in zip(eps_repaired, p_repaired, mu, n)
         ),
-        "p_source_row217_pa": p_source[216],
-        "p_source_row218_pa": p_source[217],
-        "p_repaired_row217_pa": p_repaired[216],
-        "p_repaired_row218_pa": p_repaired[217],
+        "p_source_row217_pa": p_source[216] if has_r16_boundary else None,
+        "p_source_row218_pa": p_source[217] if has_r16_boundary else None,
+        "p_repaired_row217_pa": p_repaired[216] if has_r16_boundary else None,
+        "p_repaired_row218_pa": p_repaired[217] if has_r16_boundary else None,
         "cell_records": cell_records,
     }
 

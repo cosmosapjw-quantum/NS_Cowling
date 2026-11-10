@@ -256,4 +256,22 @@ R16 report: `docs/R16_NORMALIZED_TO_PROJECTED_AUDIT_20261110.md`. R17 report: `d
 
 R18 is a source/matching localization audit of the 447 raw pressure-secant decreases. Stratify exact lower/upper source rows and density, then join to matching metadata and source phase/composition records where those identities are available. Resolve the 234 common low-density events separately from higher-density events and inspect the additional concentration under the smooth `maxwell` bridge label (177/447). Preserve byte and semantic identity across raw CompOSE, normalized matched, and projected solver tables.
 
-R17 report: `docs/R17_JOINT_Q_RECONSTRUCTION_PILOT_20261110.md`. The full 1,872-case TOV cohort remains the R15 finite-positive-pressure diagnostic; no new structural/spectral propagation is authorized by this pilot.
+R17 report: `docs/R17_JOINT_Q_RECONSTRUCTION_PILOT_20261110.md`. R16 follow-on matched-pressure TOV pilot: `docs/R16_MINIMAL_REPAIR_MATCHED_PRESSURE_TOV_PILOT_20261110.md`. It covered only three pairs × six methods × eight cutoffs (144 integrations) and does not replace or generalize the frozen R15 1,872-case projected-EOS cohort.
+
+## R16 follow-on: minimal Hermite repair matched-pressure TOV pilot (2026-11-10)
+
+| ID | Node | Status | Evidence / interpretation |
+|---|---|---|---|
+| R16-06 | Three-pair × six-method × eight-cutoff matched-pressure TOV pilot | PASS_144_OF_144 | Actions [42752885366](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42752885366): all cases `ok`; each (P_c) is from the frozen summary and each absolute (P_{cut}) exactly equals its R15 case comparator; 18/18 derived EOS hashes, 144/144 profile hashes/row counts verified; source and projected parents unchanged. |
+| R16-07 | Closure-response comparison | PASS_DESCRIPTIVE / NOT_OUTER_CRUST_ONLY | Mean ((\Delta M/M,\Delta r/r)) versus R15: GPPVA_FSU2×BBB_BHF2 ((-0.263900\%,-0.335693\%)); SPG_M2×BBB_BHF2 ((-0.256384\%,-0.335217\%)); GPPVA_FSU2×GM_GM1 ((-0.006094\%,-0.000610\%)). The response is nearly cutoff-row independent and strongly core-conditioned. |
+| R16-08 | Pressure-closure attribution | PASS_DIAGNOSTIC / GLOBAL_EOS_CLOSURE | q-linear projection reintegrates every cell; minimal repair preserves source pressure increments in cells already admitted and only repairs rejected cells. Representative central-pressure (P,epsilon) differences show the two closures can diverge in the interior. Do not interpret the TOV response as a low-density-only correction. |
+
+### R16 follow-on interpretation and next gate
+
+The TOV comparison holds the frozen (P_c) and absolute (P_{cut}) fixed for each paired case. The source-row index is only a density marker because the repaired pressure at that row is not generally equal to the projected table's cutoff pressure. The reported outputs remain internal isobars, not (P=0) stars or physical crust thickness/mass.
+
+This is a 144-case pilot, not an authorization to replace or rerun the complete 234-table cohort. The difference is a global pressure-closure response: the q-linear projector changes pressure increments even in cells whose original Hermite interpolation was already admissible, whereas minimal repair preserves those source increments. A source-backed rationale is still required before preferring either closure.
+
+R18 remains the next gate: localize the 447 raw pressure-secant decreases by exact source row/density, matching bridge metadata, and available source phase/composition provenance. Preserve raw CompOSE package, normalized matched source, q-linear projected solver input, and minimal-repair derived EOS as separate identities.
+
+Full report: `docs/R16_MINIMAL_REPAIR_MATCHED_PRESSURE_TOV_PILOT_20261110.md`. The original R15 1,872-case projected-EOS diagnostic remains frozen and unchanged.

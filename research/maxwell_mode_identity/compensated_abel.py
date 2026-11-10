@@ -5,9 +5,12 @@ current. It is valid only when the supplied ODE matrix has the documented
 trace and no additional composition-gradient terms have been omitted.
 """
 from __future__ import annotations
+
 import math
 from collections.abc import Iterable
+
 import numpy as np
+
 
 def _finite_real_array(value: object, name: str) -> np.ndarray:
     arr = np.asarray(value, dtype=float)
@@ -15,7 +18,12 @@ def _finite_real_array(value: object, name: str) -> np.ndarray:
         raise ValueError(f"{name} must contain only finite real values")
     return arr
 
-def closure_drift_density(nu_prime_per_m: object, chi_ad: object, chi_eq: object) -> np.ndarray | float:
+
+def closure_drift_density(
+    nu_prime_per_m: object,
+    chi_ad: object,
+    chi_eq: object,
+) -> np.ndarray | float:
     """Return d(log Omega)/dr = nu'*(1/chi_ad - 1/chi_eq).
 
     The formula assumes the exact matrix trace tr(M)=nu'*(2+1/chi_ad)
@@ -33,7 +41,13 @@ def closure_drift_density(nu_prime_per_m: object, chi_ad: object, chi_eq: object
     out = g * (1.0 / ca - 1.0 / ce)
     return float(out) if out.ndim == 0 else out
 
-def integrated_closure_drift(r_m: object, nu_prime_per_m: object, chi_ad: object, chi_eq: object) -> float:
+
+def integrated_closure_drift(
+    r_m: object,
+    nu_prime_per_m: object,
+    chi_ad: object,
+    chi_eq: object,
+) -> float:
     """Trapezoid-integrate the closure drift over one smooth phase segment."""
     r = _finite_real_array(r_m, "r_m")
     g = _finite_real_array(nu_prime_per_m, "nu_prime_per_m")
@@ -54,8 +68,14 @@ def integrated_closure_drift(r_m: object, nu_prime_per_m: object, chi_ad: object
         raise ArithmeticError("integrated closure drift is not finite")
     return result
 
-def interface_multiplier(h_inner_j_m3: float, h_outer_j_m3: float, nu_inner: float,
-                          nu_outer: float, determinant_transfer: complex | float) -> complex | float:
+
+def interface_multiplier(
+    h_inner_j_m3: float,
+    h_outer_j_m3: float,
+    nu_inner: float,
+    nu_outer: float,
+    determinant_transfer: complex | float,
+) -> complex | float:
     """Return J=Omega_outer/Omega_inner for y_outer=T*y_inner."""
     hi, ho, ni, no = map(float, (h_inner_j_m3, h_outer_j_m3, nu_inner, nu_outer))
     det_t = complex(determinant_transfer)
@@ -72,13 +92,17 @@ def interface_multiplier(h_inner_j_m3: float, h_outer_j_m3: float, nu_inner: flo
         return float(value.real)
     return value
 
-def compensate_concomitant(omega: complex | float, bulk_drift_integral: float,
-                            crossed_interface_multipliers: Iterable[complex | float] = ()) -> complex | float:
+
+def compensate_concomitant(
+    omega: complex | float,
+    bulk_drift_integral: float,
+    crossed_interface_multipliers: Iterable[complex | float] = (),
+) -> complex | float:
     """Return K=Omega*exp(-integral(delta))*product(J_k**-1).
 
-    The bulk integral runs from the fixed reference point to the evaluation
-    point, and interface multipliers are ordered from reference point outward.
-    Each crossed interface must appear exactly once.
+    ``bulk_drift_integral`` is the integral from the fixed reference point to
+    the evaluation point, and the interface multipliers are ordered from
+    reference point outward. Each crossed interface must appear exactly once.
     """
     om = complex(omega)
     integral = float(bulk_drift_integral)

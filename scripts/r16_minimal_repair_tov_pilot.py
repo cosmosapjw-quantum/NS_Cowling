@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+import importlib.util
 import json
 import math
 import os
@@ -14,17 +15,25 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python_frontend"))
-sys.path.insert(0, str(ROOT / "scripts"))
 
 from compose_cowling.native_table_cutoff_scan import (  # noqa: E402
     load_native_eos_rows,
     select_native_density_knots,
 )
 from compose_cowling.solver import solve_v5_tov_star  # noqa: E402
-from r16_minimal_hermite_pressure_repair import (  # noqa: E402
-    audit_hermite_cell,
-    minimal_admissible_delta_p,
+
+# Load the helper by its exact file path. Do not add ROOT/scripts to sys.path:
+# scripts/compose_cowling.py would shadow the compose_cowling package.
+_HELPER_PATH = ROOT / "scripts/r16_minimal_hermite_pressure_repair.py"
+_HELPER_SPEC = importlib.util.spec_from_file_location(
+    "r16_minimal_hermite_pressure_repair", _HELPER_PATH
 )
+if _HELPER_SPEC is None or _HELPER_SPEC.loader is None:
+    raise ImportError(f"cannot load repair helper at {_HELPER_PATH}")
+_HELPER = importlib.util.module_from_spec(_HELPER_SPEC)
+_HELPER_SPEC.loader.exec_module(_HELPER)
+audit_hermite_cell = _HELPER.audit_hermite_cell
+minimal_admissible_delta_p = _HELPER.minimal_admissible_delta_p
 
 SUMMARY = ROOT / "oscillation_release_v1/data/spectrum_summary_234.csv"
 SOURCE_DIR = ROOT / "oscillation_release_v1/data/eos_original_normalized"

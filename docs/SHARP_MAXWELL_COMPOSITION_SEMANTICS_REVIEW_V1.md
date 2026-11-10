@@ -1,8 +1,8 @@
 # Sharp Maxwell Composition Semantics Review (v1)
 
 Status: **OPEN / BLOCKED_REVIEW_REQUIRED**  
-Selected sources: \`SPG_M1\`, \`GPPVA_FSU2\` only  
-Purpose: adjudicate the meaning and validity of the \`eos.compo\` nuclear-group abundance fields before changing the native composition mapping or entering C7.
+Selected sources: `SPG_M1`, `GPPVA_FSU2` only  
+Purpose: adjudicate the meaning and validity of the `eos.compo` nuclear-group abundance fields before changing the native composition mapping or entering C7.
 
 ## 1. Decision summary
 
@@ -33,7 +33,7 @@ The raw \(Y_I\) and the group baryon/mass fraction \(X_h\) are not interchangeab
 
 ### 2.2 Native verifier semantics
 
-Source: \`fortran_eos/src/compose_eos_verify.f90\`, C6-run identity blob SHA \`f1aa41c4a6e13ef7ea31c5f3c2329139b273b2d0\`.
+Source: `fortran_eos/src/compose_eos_verify.f90`, C6-run identity blob SHA `f1aa41c4a6e13ef7ea31c5f3c2329139b273b2d0`.
 
 The verifier evaluates:
 \[
@@ -53,7 +53,7 @@ The reader maps CompOSE particle-pair identifiers as follows:
 - 0: electron
 - 1: muon
 
-The code's particle-pair mapping was inspected in \`fortran_eos/src/compose_eos_io.f90\`. Do not assume the nuclear-group quadruple's last field uses the same representation as verifier \`Yh\`.
+The code's particle-pair mapping was inspected in `fortran_eos/src/compose_eos_io.f90`. Do not assume the nuclear-group quadruple's last field uses the same representation as verifier `Yh`.
 
 ## 3. Provider evidence and phase labels
 
@@ -62,7 +62,7 @@ The code's particle-pair mapping was inspected in \`fortran_eos/src/compose_eos_
 Official [SPG(M1) data sheet](https://compose.obspm.fr/download/1D/Crust/M1/eos.pdf):
 - Submitted by Luigi Scurto; data sheet dated 26 February 2024.
 - Describes a BSk22 outer crust below \(n_B=2\times10^{-3}\,\mathrm{fm}^{-3}\), and an inner-crust EoS computed with a compressible liquid-drop approach.
-- States that \`eos.compo\` contains four particle pairs (neutrons, protons, electrons, muons) and one heavy-nucleus quadruple.
+- States that `eos.compo` contains four particle pairs (neutrons, protons, electrons, muons) and one heavy-nucleus quadruple.
 - Explicitly labels \(Iphase=0\) outer crust and \(Iphase=7\) inner crust.
 
 The data sheet does not, by itself, explain any non-standard normalization of the nuclear-group abundance field.
@@ -73,28 +73,28 @@ Original-work references listed by the data sheet include the BSk22 outer-crust 
 
 Official [GPPVA(FSU2) data sheet](https://compose.obspm.fr/download/1D/Crust/FSU2/eos.pdf) and [CompOSE model entry](https://compose.obspm.fr/eos/209):
 - The crust combines a BsK22 outer crust with an inner crust calculated in a self-consistent Thomas-Fermi approach using FSU2.
-- \`eos.compo\` contains four particle pairs (neutrons, protons, electrons, muons) and one heavy-nucleus quadruple.
+- `eos.compo` contains four particle pairs (neutrons, protons, electrons, muons) and one heavy-nucleus quadruple.
 - The data sheet explicitly labels \(Iphase=0\) outer crust, \(Iphase=7\) inner crust and \(Iphase=6\) homogeneous matter.
-- Its extra \`eos.thermo\` quantity describes pasta geometry: 0 outer crust, 1 droplets, 2 rods, 3 slabs, 4 tubes, 5 bubbles, 6 core.
+- Its extra `eos.thermo` quantity describes pasta geometry: 0 outer crust, 1 droplets, 2 rods, 3 slabs, 4 tubes, 5 bubbles, 6 core.
 
-Thus \(Iphase=7\) means inner crust in both selected provider data sheets. The fact that GPPVA uses a separate geometry code in \`eos.thermo\` must not be conflated with the \`Iphase\` code in \`eos.compo\`.
+Thus \(Iphase=7\) means inner crust in both selected provider data sheets. The fact that GPPVA uses a separate geometry code in `eos.thermo` must not be conflated with the `Iphase` code in `eos.compo`.
 
 Original references identified by the provider include Grill et al., Phys. Rev. C 90, 045803 (2014); Chen and Piekarewicz, Phys. Rev. C 90, 044305 (2014); Providência et al., Front. Astron. Space Sci. 6, 13 (2019); and the BsK22 outer-crust work. The agent should retrieve and inspect the primary papers/data-generation descriptions where available.
 
 ## 4. Pinned raw source identity and representative rows
 
 Source authority commit:
-\`a09ec30d74b363652d2d1aefe990557c468679dd\`.
+`a09ec30d74b363652d2d1aefe990557c468679dd`.
 
-Raw \`eos.compo\` blob identities:
-- SPG_M1: \`ab79da517271bea1f7de37294e87e019de611699\`
-- GPPVA_FSU2: \`fa1ad2b809eb1c95825e2ee6eb2650cf3f248693\`
+Raw `eos.compo` blob identities:
+- SPG_M1: `ab79da517271bea1f7de37294e87e019de611699`
+- GPPVA_FSU2: `fa1ad2b809eb1c95825e2ee6eb2650cf3f248693`
 
 Manifest metadata:
 - SPG_M1: 365 rows; \(Iphase=0\): 217; \(Iphase=7\): 148; boundary knots 217/218.
 - GPPVA_FSU2: 269 rows; \(Iphase=0\): 217; \(Iphase=7\): 52; boundary knots 217/218.
 - Both sources contain four particle pairs and one nuclear-group quadruple per row.
-- GPPVA_FSU2 has \(Nadd=1\); its extra-column histogram is 0:217, 1:52. Do not treat that extra thermodynamic geometry code as the \`Iphase\` code.
+- GPPVA_FSU2 has \(Nadd=1\); its extra-column histogram is 0:217, 1:52. Do not treat that extra thermodynamic geometry code as the `Iphase` code.
 
 ### 4.1 Outer-crust representative row
 
@@ -153,10 +153,10 @@ This row is therefore close to closure under \(Y_h=1\), but the stored raw \(Y_I
 ## 5. C6 native execution evidence
 
 Evidence directory:
-\`artifacts/sharp_maxwell/C6_NATIVE_EXECUTION_20261110T093714Z/\`.
+`artifacts/sharp_maxwell/C6_NATIVE_EXECUTION_20261110T093714Z/`.
 
 Execution head:
-\`43eea8bd9bee7ebb222e3c66babf5078b398d7ae\`.
+`43eea8bd9bee7ebb222e3c66babf5078b398d7ae`.
 
 Toolchain: gfortran 13.3.0, Python 3.12.3.
 
@@ -167,14 +167,14 @@ Verified:
 - Native read/write/read round-trip: PASS.
 - Source hashes: 18 files unchanged.
 - Legacy output hashes: 234 files unchanged.
-- All 65 pair records unchanged and remain \`BLOCKED_BEFORE_ROOT_SEARCH\`.
+- All 65 pair records unchanged and remain `BLOCKED_BEFORE_ROOT_SEARCH`.
 
 Scientific composition checks:
 - SPG_M1: C3/C4 fail on all 148 \(Iphase=7\) rows; C3 maximum absolute residual \(0.042790704812013594\); C4 maximum absolute residual \(0.9779100000000001\).
 - GPPVA_FSU2: C3/C4 fail on all 52 \(Iphase=7\) rows; C3 maximum absolute residual \(0.04628324324324324\); C4 maximum absolute residual \(0.98856\).
 - All \(Iphase=0\) rows pass C3/C4.
 
-Interpretation: the native path and round-trip work, but physical composition semantics remain unresolved. The current \`Yh=YI\` mapping is not a scientific PASS.
+Interpretation: the native path and round-trip work, but physical composition semantics remain unresolved. The current `Yh=YI` mapping is not a scientific PASS.
 
 ## 6. Competing hypotheses to investigate
 
@@ -198,7 +198,7 @@ The C6 raw parser and native reader may agree on row ordering while still sharin
 
 ## 7. C6B investigation DAG
 
-\`\`\`mermaid
+```mermaid
 flowchart TD
     A["C6B-0: Freeze source/code identity"] --> B["C6B-1: Read CompOSE spec and both Data Sheets"]
     B --> C["C6B-2: Retrieve original provider papers and data provenance"]
@@ -211,14 +211,14 @@ flowchart TD
     H -->|Yes| I["C6B-7: Propose minimal code/data contract change"]
     H -->|No| J["STOP: PROVIDER_SEMANTICS_UNRESOLVED__BLOCKED"]
     I --> K["C6B-8: Independent review and explicit approval gate"]
-\`\`\`
+```
 
 ### Required tasks
 
-1. Freeze the exact repository head, C5 code blob, verifier blob, raw source blob SHAs and C6 evidence identity. Current known branch head at task handoff is \`3f9531e6796a849b6f77b193bea2ecece74348f5\`; fetch it again before work because it may have advanced.
+1. Freeze the exact repository head, C5 code blob, verifier blob, raw source blob SHAs and C6 evidence identity. Current known branch head at task handoff is `3f9531e6796a849b6f77b193bea2ecece74348f5`; fetch it again before work because it may have advanced.
 2. Read the CompOSE Reference Manual's definitions and record exact equation/page references. Do not conflate group number fraction \(Y_I\), group mass fraction \(X_h\), electron fraction \(Y_e\), or average \(A/Z\).
 3. Inspect both official provider data sheets and retrieve the original provider papers, supplementary materials, repository data products and/or export scripts. The GPPVA(FSU2) record is associated with the Thomas-Fermi FSU2 model and the references above; SPG(M1) uses the BSk22 outer crust plus a compressible-liquid-drop inner crust. Trace the actual source of the exact submitted tables.
-4. Independently parse every row of both raw \`eos.compo\` files directly from pinned source blobs. Validate count fields and keys; retain exact raw columns. Confirm that the raw reader's positional interpretation matches the official schema.
+4. Independently parse every row of both raw `eos.compo` files directly from pinned source blobs. Validate count fields and keys; retain exact raw columns. Confirm that the raw reader's positional interpretation matches the official schema.
 5. Build a per-row audit table with at least: source ID, row, \(Iphase\), any extra geometry code, particle IDs and fractions, \(A_{\rm av}\), \(Z_{\rm av}\), raw last quadruple field, \(Y_e+Y_\mu\), candidate \(Y_h\) values, C3 residual and C4 residual.
 6. Evaluate at least these candidate interpretations without promoting any:
    - direct field \(Y_h=Y_I\);
@@ -245,7 +245,7 @@ C6B is **resolved** only if all of the following are satisfied:
 - Proposed mapping(s) satisfy the provider's documented physics and reproduce the published/provider composition where a comparison is possible.
 - Independent review can reproduce the conclusion from pinned source files and documented equations.
 
-If these criteria are not met, report \`PROVIDER_SEMANTICS_UNRESOLVED__BLOCKED\`. Lack of documentation is not permission to guess.
+If these criteria are not met, report `PROVIDER_SEMANTICS_UNRESOLVED__BLOCKED`. Lack of documentation is not permission to guess.
 
 ## 9. Strict scope and stop conditions
 
@@ -256,7 +256,7 @@ Allowed:
 - a proposed minimal remediation design.
 
 Not allowed:
-- modifying raw \`eos.nb\`, \`eos.thermo\`, \`eos.compo\`, or any source file;
+- modifying raw `eos.nb`, `eos.thermo`, `eos.compo`, or any source file;
 - changing the current reader/writer mapping, verifier equations, or tolerances;
 - inventing provider-specific phase-dependent conversions;
 - changing any of the 65 pair records or their statuses;
@@ -270,7 +270,7 @@ On any missing or contradictory provider evidence, stop with the exact unresolve
 
 Until C6B is resolved and the proposed semantics are explicitly accepted, preserve:
 
-\`\`\`text
+```text
 C6: C6_PARTIAL
 C6B: OPEN / BLOCKED_REVIEW_REQUIRED
 C7: NOT_RUN / NOT_RECOMMENDED
@@ -278,6 +278,6 @@ C7: NOT_RUN / NOT_RECOMMENDED
 legacy maxwell: LEGACY_NON_MAXWELL_READ_ONLY
 sharp_transition_search: NOT_RUN
 tov_cowling: NOT_RUN
-\`\`\`
+```
 
 This review is a semantics/provenance investigation, not a mechanism for weakening scientific gates.

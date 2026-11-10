@@ -3,7 +3,7 @@
 Date: 2026-11-11  
 Command: PYTHONPATH=<package-root> python -m pytest -q mode_identity/tests
 
-Observed fresh local result: 42 passed in 0.65s (32 test functions; 42 collected cases after parameter expansion).
+Observed fresh local result: 43 passed in 0.74s (33 test functions; 43 collected cases after parameter expansion). The zero-inner-concomitant JSON-safety test was first observed failing against NaN output, then passed after the minimal null/status correction (red-green).
 
 ## Assertions tested
 
@@ -18,6 +18,7 @@ Observed fresh local result: 42 passed in 0.65s (32 test functions; 42 collected
 - Surface boundary null vector reproduces the current normalized ell=2 surface residual zero set.
 - Independent center-outward and surface-inward integrations produce a weighted determinant spread of 4.673260016455182e-12 at five match radii with DOP853 max_step=100 m.
 - Negative control: the same synthetic two-sided case without a max-step cap gives 3.576076639831998e-4 spread. This is retained as a numerical-conditioning finding.
+- Zero inner concomitant: the ratio is explicitly undefined and now serializes as null plus UNDEFINED_ZERO_DENOMINATOR; strict JSON with allow_nan=false passes for those diagnostic fields.
 
 Separate smooth-phase run: maximum relative drift 7.907195134185742e-11; endpoint drift 4.723167073919359e-11; 602 RHS evaluations.
 

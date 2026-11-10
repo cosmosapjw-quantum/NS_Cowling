@@ -114,7 +114,7 @@
       "Q7": "epsilon/(n_B*m_n) - 1",
       "Nadd": "Count of provider-defined additional eos.thermo columns; meaning must be taken from that model's Data Sheet. Preserve all values and ordering."
     },
-    "composition_fields": "eos.compo is retained as a structured source: Iphase, Npairs particle pairs, Nquad nucleus quadruples. Iphase is provider-defined, not a universal physical phase label. Y_I is the nuclear number-density fraction; Y_h=Abar*Y_I.",
+    "composition_fields": "eos.compo stores Iphase, Npairs particle pairs, and Nquad nuclear-group quadruples. Under the standard CompOSE convention, particle fractions are Y_i=n_i/n_b; for a nuclear group, Y_I=sum_j Y_j is the combined group number fraction, while its baryon/mass fraction is X_h=A_av*Y_I. The native verifier variable Yh is used as a baryon/mass fraction in C3 (Z_av/A_av*Yh) and C4 (Yn+Yp+Yh=1). Provider conformance of the selected raw rows to this convention is unresolved: see c6_native_execution.",
     "crust_models": {
       "SPG_M1": {
         "role": "low_density_crust_source",
@@ -2569,11 +2569,11 @@
     "c5_compose_roundtrips": 0
   },
   "next_research_steps": [
-    "C6: execute the committed SPG_M1 and GPPVA_FSU2 native read-write-read/verifier probe on a Linux/gfortran host; run the exact committed helper tests and preserve the JSON receipt, compiler/build identity and command/exit status. Separate reader/runtime failure from scientific gate FAIL.",
-    "C7: extend source parsing and physical audits to the remaining 16 EOS; check thermodynamic/composition closure, segmentwise source metadata and whole-interval stability/causality without crossing Iphase boundaries.",
+    "C6B: adjudicate SPG_M1 and GPPVA_FSU2 eos.compo nuclear-group abundance semantics against the CompOSE manual, official data sheets, original provider papers/workflows and source records; independently audit every row of both sources. No code, verifier, tolerance, or raw-data repair before the evidence supports a unique mapping.",
+    "C7: after C6B resolves composition semantics and C3/C4 closure, extend source parsing and physical audits to the remaining 16 EOS; check thermodynamic/composition closure, segmentwise source metadata and whole-interval stability/causality without crossing Iphase boundaries.",
     "C7/C5: resolve provider Data Sheet semantics of Iphase and Nadd, preserve additional thermodynamic columns, and implement a segment-preserving phase-chain adapter.",
     "C8: quantify density reconstruction drift by segment and select an acceptance threshold only through resolution/refinement and observable-sensitivity tests.",
-    "C7: normalize source rest-mass references with explicit reversible transformations and report full-source versus causal-domain results separately.",
+    "Normalize source rest-mass references with explicit reversible transformations and report full-source versus causal-domain results separately.",
     "Only after source, adapter and physical gates: run one sharp-Maxwell pilot and independently verify common pressure, common chemical potential, positive density jump, energy jump and whole-segment admissibility.",
     "Only after a successful pilot: execute the 65-pair sweep and then multi-segment TOV stable-branch, Seidov, slow-conversion and rapid-conversion Cowling analyses."
   ],
@@ -2594,16 +2594,18 @@
     "next_action": "Implement a read-only native-reader/C1-C11 vertical slice for SPG_M1 and one Nadd=1 GPPVA source with provenance receipts."
   },
   "compouse_group_fraction_mapping": {
-    "authority": "CompOSE Reference Manual v3.01, Eq. (4.22), DOI 10.1140/epja/s10050-022-00847-y",
-    "definition": "Y_I = (sum_j A_j Y_j)/A_av = sum_j Y_j; the stored group fraction is already the combined baryon fraction.",
-    "previous_reader_mapping": "Yh = Abar * YI (incorrect)",
-    "previous_writer_mapping": "YI = Yh / Abar (incorrect)",
-    "corrected_reader_mapping": "Yh = YI",
-    "corrected_writer_mapping": "YI = Yh",
-    "rationale": "The selected crust files contain Abar=56, YI=1 records; the previous reader mapped these to Yh=56, conflicting with its own upper bound Yh<=1 and C3/C4 baryon-fraction closure.",
+    "authority": "CompOSE Reference Manual v3.01, Eqs. (3.10)-(3.12), (4.20)-(4.22), DOI 10.1140/epja/s10050-022-00847-y",
+    "definition": "Under standard CompOSE semantics, Y_i=n_i/n_b; Eq. (4.22) defines the combined nuclear-group number fraction Y_I=sum_j Y_j. The corresponding baryon/mass fraction is X_h=A_av*Y_I by Eq. (3.12).",
+    "verifier_quantity": "compose_eos_verify.f90 uses Yh as a baryon/mass fraction: C3 contains (Zbar/Abar)*Yh and C4 contains Yn+Yp+Yh=1.",
+    "current_reader_mapping": "Yh = YI (C5 implementation; retained raw field mapping only; not physically validated for these providers).",
+    "current_writer_mapping": "YI = Yh (inverse of the current provisional field-preservation mapping; native round-trip success is not semantic validation).",
+    "c5_claim_status": "SUPERSEDED: the earlier C5 statement that Eq. (4.22) makes YI itself the combined baryon/mass fraction was incorrect.",
+    "source_observation": "The selected raw providers do not admit a simple blind identification: outer-crust rows with Abar=56, Zbar=26, YI=1, Ye=0.46429 satisfy C3/C4 only when Yh=YI, whereas the standard X_h=Abar*YI gives 56. Inner-crust rows also fail C3/C4 under the current Yh=YI mapping; applying Abar*YI gives values far above unity.",
+    "unresolved_interpretation": "Provider-specific meaning, production of the eos.compo nuclear-group abundance, and/or consistency/alignment of composition records must be adjudicated against the original provider workflow. Data sheets identify Iphase=7 as inner crust; the phase label itself is not unknown.",
+    "no_repair_policy": "Do not change source data, parser mapping, C3/C4 definitions, or tolerances until provider-level evidence and independent row-wise closure analysis establish the correct interpretation.",
     "implementation_file": "fortran_eos/src/compose_eos_io.f90",
     "implementation_blob_sha": "5b01b4051d9392362ca1ed915b946f1031d0e3c2",
-    "implementation_status": "COMMITTED__NATIVE_ROUNDTRIP_NOT_RUN"
+    "implementation_status": "PROVISIONAL__COMPOSITION_SEMANTICS_REVIEW_REQUIRED"
   },
   "c5_vertical_slice": {
     "runner": "scripts/sharp_maxwell_source_probe.py",
@@ -2645,19 +2647,19 @@
       "Q1-Q7 row-wise",
       "Nadd and q_extra row-wise",
       "Iphase row-wise and boundary",
-      "composition particle fields and Yh=YI",
+      "composition particle/group fields preserved row-wise without assuming that raw YI is the verifier's Yh",
       "native Compose write-read round-trip"
     ],
     "runner_status_contract": "Runner completion is distinct from scientific PASS/FAIL; C1-C6/C10-C11 remain native hard gates and C7-C9 diagnostics.",
     "implementation_status": "COMMITTED",
     "helper_test_status": "EQUIVALENT_STAGING_HELPERS_6_PASS__COMMITTED_TEST_FILE_NOT_RUN",
-    "helper_test_note": "Six equivalent pure-helper tests passed in an isolated staging copy; the exact committed test file was not executed in this runtime.",
-    "native_reader_execution_status": "NOT_RUN",
-    "native_writer_roundtrip_status": "NOT_RUN",
-    "native_verifier_execution_status": "NOT_RUN",
+    "helper_test_note": "Six equivalent pure-helper tests passed in an isolated staging copy; the exact committed test file was not executed at C5 time. C6 later executed the committed test file and passed 6/6; see c6_native_execution.",
+    "native_reader_execution_status": "SUPERSEDED_BY_C6__PASS_ON_TWO_SOURCES",
+    "native_writer_roundtrip_status": "SUPERSEDED_BY_C6__PASS_ON_TWO_SOURCES",
+    "native_verifier_execution_status": "SUPERSEDED_BY_C6__EXECUTED_SCIENTIFIC_FAIL_C3_C4",
     "github_actions_status": "NOT_RUN",
     "native_subagent": "NOT_RUN",
-    "runtime_blocker": "The authorized Desktop Commander device cosmosapjw was offline; the local container could not resolve github.com to obtain the source tree.",
+    "runtime_blocker": "Historical C5-time blocker; superseded for the selected two-source native probe by C6 execution.",
     "source_mutation": "NONE",
     "source_data_mutation": "NONE",
     "roots": "NOT_RUN",
@@ -2666,9 +2668,8 @@
     "all_65_pair_admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
     "legacy_maxwell_policy": "LEGACY_NON_MAXWELL_READ_ONLY",
     "not_claimed": [
-      "native source read PASS",
-      "native Compose round-trip PASS",
-      "native C1-C11 scientific PASS",
+      "physical validity of current Yh=YI interpretation",
+      "native composition C3/C4 scientific PASS",
       "full physical source admission",
       "whole-interval Hermite stability/causality",
       "Maxwell roots",
@@ -2691,7 +2692,7 @@
     "native_reader_execution_status": "PASS",
     "native_writer_roundtrip_status": "PASS",
     "native_verifier_execution_status": "PASS",
-    "composition_mapping_Yh_equals_YI": "PASS",
+    "composition_mapping_Yh_equals_YI": "RAW_FIELD_PRESERVATION_AND_ROUNDTRIP_PASS__PHYSICAL_SEMANTICS_UNRESOLVED",
     "scientific_status": {
       "SPG_M1": {
         "status": "FAIL",
@@ -2710,7 +2711,7 @@
         "rows_failing_C4_all_in_Iphase_7": 52
       }
     },
-    "open_issue": "BLOCKED_REVIEW_REQUIRED: C3/C4 closure fails on Iphase=7 rows (Yh=Y_I<1, Yn=Yp=0). Do not reinterpret Yh or edit the verifier without review. C5 doc claim that Yh matches the C3/C4 baryon fraction holds for Iphase=0 rows only.",
+    "open_issue": "BLOCKED_REVIEW_REQUIRED: C3 and C4 fail on all Iphase=7 rows in both sources (SPG_M1: 148/148; GPPVA_FSU2: 52/52); all Iphase=0 rows pass. Official provider data sheets identify Iphase=7 as inner crust (SPG M1; FSU2). Under CompOSE Manual v3.01, YI is a combined nuclear-group number fraction and X_h=Abar*YI is its baryon/mass fraction, while native C3/C4 use Yh as a baryon/mass fraction. Yet blindly applying Abar*YI to selected raw rows gives values >1 (including Iphase=0 Abar=56,YI=1), and current Yh=YI fails C3/C4 on every Iphase=7 row. This points to unresolved provider-specific encoding, raw composition validity/alignment, or applicability of the verifier's composition formulas. No code, definition, or tolerance changed.",
     "stale_text_note": "source_catalog.composition_fields still contains the pre-correction phrase Y_h=Abar*Y_I; c4/c5 history left unmodified; compouse_group_fraction_mapping is authoritative.",
     "c5_vertical_slice_note": "c5_vertical_slice NOT_RUN/COMMITTED_TEST_FILE_NOT_RUN fields are C5-time historical values, superseded by this block.",
     "raw_sources_unchanged": true,
@@ -2719,6 +2720,22 @@
     "sharp_transition_search": "NOT_RUN",
     "tov_cowling": "NOT_RUN",
     "C7_scientific_verification": "NOT_RUN",
-    "c7_entry": "NOT_RECOMMENDED_UNTIL_C3_C4_IPHASE7_REVIEW"
+    "c7_entry": "NOT_RECOMMENDED_PENDING_COMPOSITION_SEMANTICS_REVIEW",
+    "interpretation_note": "The earlier C5 claim that Eq. (4.22) defines YI itself as the combined baryon/mass fraction is superseded. Current Yh=YI is only the committed raw-field mapping exercised by round-trip; it is not endorsed as the physical mapping.",
+    "provider_phase_labels": {
+      "SPG_M1": {
+        "0": "outer crust",
+        "7": "inner crust",
+        "source": "https://compose.obspm.fr/download/1D/Crust/M1/eos.pdf"
+      },
+      "GPPVA_FSU2": {
+        "0": "outer crust",
+        "6": "homogeneous matter",
+        "7": "inner crust",
+        "source": "https://compose.obspm.fr/download/1D/Crust/FSU2/eos.pdf",
+        "note": "Data sheet separately documents the eos.thermo extra geometry code: 0 outer crust; 1 droplets; 2 rods; 3 slabs; 4 tubes; 5 bubbles; 6 core."
+      }
+    },
+    "review_note": "Review only SPG_M1 and GPPVA_FSU2 raw eos.compo semantics and provider provenance. Do not infer an Iphase-dependent remapping from two examples."
   }
 }

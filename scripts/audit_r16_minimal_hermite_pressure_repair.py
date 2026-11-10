@@ -24,6 +24,7 @@ PROJECTED_DIR=ROOT/"oscillation_release_v1/data/eos_projected"
 SUMMARY_SHA256="ce54c111510f32086065f95356903cd6abad675adce12cab1a06b5cc82350965"
 EXPECTED_TABLES=234
 REPAIR_MARGIN_FRACTION=1.0e-8
+FORTRAN_AUDIT_CELLS=[]
 REQUIRED=("source_row","mu_b_mev","pressure_mev_fm3","energy_mev_fm3","n_b_fm3","mu_b_j","pressure_pa","n_b_m3")
 
 
@@ -137,6 +138,14 @@ def audit_one(ref):
             raise RuntimeError(f"{name}: SI-native repaired cell {i+1} not admitted: {cell_si}")
         min_d2_si=min(min_d2_si,cell_si["min_d2p"])
         min_g_si=min(min_g_si,cell_si["min_causal_margin"])
+        FORTRAN_AUDIT_CELLS.append({
+            "mu0_j":mu_si[i],
+            "p0_pa":p_repaired_si[i],
+            "n0_m3":n_si[i],
+            "mu1_j":mu_si[i+1],
+            "p1_pa":p_repaired_si[i+1],
+            "n1_m3":n_si[i+1],
+        })
 
         # Same repaired pressure, converted for a separate normalized-unit check.
         p0_mev=p_repaired_si[-2]/pressure_unit_pa
@@ -245,6 +254,7 @@ def main(argv=None):
     if len(refs)!=EXPECTED_TABLES or len({x["name"] for x in refs})!=EXPECTED_TABLES:
         raise RuntimeError("frozen 234 table inventory mismatch")
     records=[];failures=[]
+    FORTRAN_AUDIT_CELLS.clear()
     for ref in refs:
         try: records.append(audit_one(ref))
         except Exception as exc: failures.append({"name":ref.get("name"),"error":f"{type(exc).__name__}: {exc}"[:2000]})
@@ -311,10 +321,13 @@ def main(argv=None):
     recpath=out/"r16_minimal_hermite_pressure_repair_receipt.json"
     recpath.write_text(json.dumps(receipt,indent=2,sort_keys=True)+"\n",encoding="utf-8")
     write_csv(out/"r16_minimal_hermite_pressure_repair_tables.csv",records)
+    write_csv(out/"r16_minimal_hermite_pressure_repair_fortran_cells.csv",FORTRAN_AUDIT_CELLS)
     manifest={
         "schema":"ns-cowling-r16-minimal-hermite-repair-manifest-v1",
         "receipt_sha256":sha256(recpath),
         "tables_csv_sha256":sha256(out/"r16_minimal_hermite_pressure_repair_tables.csv"),
+        "fortran_cells_csv_sha256":sha256(out/"r16_minimal_hermite_pressure_repair_fortran_cells.csv"),
+        "fortran_cell_count":len(FORTRAN_AUDIT_CELLS),
         "source_summary_sha256":SUMMARY_SHA256,
         "table_count":len(records),
         "synthetic_eos_tables_written":0,

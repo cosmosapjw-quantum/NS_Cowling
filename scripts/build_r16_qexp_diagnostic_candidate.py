@@ -7,6 +7,7 @@ separate derived evidence table, not a solver input or a physical EOS release.
 from __future__ import annotations
 
 import argparse
+from collections import defaultdict
 import csv
 import hashlib
 import json

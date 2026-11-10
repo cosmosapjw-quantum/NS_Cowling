@@ -120,3 +120,52 @@ def compensate_concomitant(
     if not np.iscomplexobj(omega) and value.imag == 0.0:
         return float(value.real)
     return value
+
+
+def trace_first_drift_density(
+    trace_m_per_m: object,
+    dlog_h_dr_per_m: object,
+    nu_prime_per_m: object,
+) -> np.ndarray | float:
+    """Return Gamma=tr(M)+d(log h)/dr-nu_prime for a general 2x2 system.
+
+    This is the trace-first formula. It makes no barotropic or sound-speed
+    assumption. The caller must supply the trace of the complete implemented
+    RHS and the equilibrium background derivative d(log h)/dr.
+    """
+    trm = _finite_real_array(trace_m_per_m, "trace_m_per_m")
+    dlogh = _finite_real_array(dlog_h_dr_per_m, "dlog_h_dr_per_m")
+    nup = _finite_real_array(nu_prime_per_m, "nu_prime_per_m")
+    try:
+        trm, dlogh, nup = np.broadcast_arrays(trm, dlogh, nup)
+    except ValueError as exc:
+        raise ValueError("trace-first inputs are not broadcast-compatible") from exc
+    out = trm + dlogh - nup
+    return float(out) if out.ndim == 0 else out
+
+
+def integrated_trace_first_drift(
+    r_m: object,
+    trace_m_per_m: object,
+    dlog_h_dr_per_m: object,
+    nu_prime_per_m: object,
+) -> float:
+    """Integrate Gamma on one smooth segment; never cross an interface here."""
+    r = _finite_real_array(r_m, "r_m")
+    trm = _finite_real_array(trace_m_per_m, "trace_m_per_m")
+    dlogh = _finite_real_array(dlog_h_dr_per_m, "dlog_h_dr_per_m")
+    nup = _finite_real_array(nu_prime_per_m, "nu_prime_per_m")
+    if r.ndim != 1 or r.size < 2 or np.any(np.diff(r) <= 0.0):
+        raise ValueError("r_m must be one-dimensional, strictly increasing and length >= 2")
+    try:
+        trm, dlogh, nup = np.broadcast_arrays(trm, dlogh, nup)
+    except ValueError as exc:
+        raise ValueError("trace-first arrays are not broadcast-compatible") from exc
+    if trm.ndim != 1 or trm.size != r.size:
+        raise ValueError("trace-first arrays must be one-dimensional and match r_m length")
+    gamma = np.asarray(trace_first_drift_density(trm, dlogh, nup), dtype=float)
+    trapz = getattr(np, "trapezoid", np.trapz)
+    result = float(trapz(gamma, r))
+    if not math.isfinite(result):
+        raise ArithmeticError("integrated trace-first drift is not finite")
+    return result

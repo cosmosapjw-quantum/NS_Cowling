@@ -47,7 +47,7 @@ Dependencies: Python 3.10+, NumPy, SciPy, pytest.
 
 ## Current synthetic evidence
 
-37 deterministic tests passed. Smooth-phase maximum relative drift was 7.9072e-11. A two-sided synthetic integration gave 4.6733e-12 spread at five matching radii with 100 m maximum step; the same setup with an unlimited step gave 3.5761e-4. The latter is retained as a negative control and mandates max-step convergence in the local plan.
+42 deterministic pytest cases passed (32 test functions after parameter expansion). Smooth-phase maximum relative drift was 7.9072e-11. A two-sided synthetic integration gave 4.6733e-12 spread at five matching radii with 100 m maximum step; the same setup with an unlimited step gave 3.5761e-4. The latter is retained as a negative control and mandates max-step convergence in the local plan.
 
 No actual four native fixture-root profiles have been processed by the new helper. No native Fortran source was changed/rebuilt. Zero-jump star comparison and finite-jump continuation are not run. No physical f, p1 or discontinuity-g label is asserted.
 

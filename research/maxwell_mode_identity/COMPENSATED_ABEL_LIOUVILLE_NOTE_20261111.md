@@ -149,3 +149,19 @@ No inspected source is cited as proving K. The boxed expressions above are deriv
 - NOT CLAIMED: canonical covariant symplectic current, finite-rate/dissipative interface physics, actual EOS results, actual four fixture-root profiles, or physical f/p1/g labels.
 
 The existing C7X D3–D6 source blocker remains unchanged. No raw EOS, pair manifest, production adapter, source-authority code, TOV result, or source-backed Cowling result is touched.
+
+
+
+## 9. General trace-first form (preferred when the full RHS is available)
+
+The sound-speed expression is only a shortcut for the specified Cowling trace. For any smooth linear system Y'=M(r)Y with a square fundamental matrix and any positive scalar weight w(r)=h(r)exp[-nu(r)], Abel-Liouville gives
+
+    d[w det(Y)]/dr = Gamma(r) w det(Y)
+    Gamma(r) = tr(M(r)) + h'/h - nu'.
+
+Thus the robust compensator is K=w det(Y) exp[-integral(Gamma dr)], with the same one-sided interface multiplier J=(w_o/w_i)det(T). This is the general determinant identity. It is not a physical symplectic current and does not assign a conserved physical charge to an arbitrary basis determinant. For an n x n system the same Liouville determinant formula holds, but the state dimension, weight, interface map and physical interpretation must be specified explicitly.
+
+The closure-mismatch formula follows only after substituting the exact matrix trace tr(M)=nu'*(2+1/chi_ad) and the equilibrium first law h'/h=-(1+1/chi_eq)nu'. If composition-gradient terms modify the trace, use the full trace-first Gamma, not the sound-speed shortcut. If the model introduces additional independent perturbation variables, do not compress it to the 2x2 formula without a derivation.
+
+The implementation exposes trace_first_drift_density and integrated_trace_first_drift. Three additional tests verify reduction to the sound-speed shortcut under its hypotheses, retention of extra trace/background-gradient terms, and exact compensation of a general constant 2x2 matrix exponential. SymPy returned the exact zero residual for the arbitrary 2x2 determinant derivative.
+

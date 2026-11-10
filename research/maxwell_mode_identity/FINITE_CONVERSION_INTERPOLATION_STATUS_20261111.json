@@ -1,0 +1,92 @@
+{
+  "schema": "ns-cowling.finite-conversion-interpolation-status.v1",
+  "date": "2026-11-11",
+  "scope": "analytic sharp-Maxwell nonradial Cowling interface; research helper only",
+  "status": "ALGEBRAIC_FAMILY_DERIVED_AND_TESTED__PHYSICAL_FINITE_RATE_LAW_NOT_ESTABLISHED",
+  "parameter_contract": {
+    "theta": {
+      "meaning": "dimensionless interpolation of two kinematic boundary constraints only",
+      "domain": [
+        0,
+        1
+      ],
+      "physical_rate": false,
+      "timescale": false,
+      "mobility": false
+    },
+    "kappa": {
+      "meaning": "h_inner/h_outer",
+      "positive": true,
+      "distinct_from": "theta"
+    }
+  },
+  "convention": {
+    "jump": "[X]_i^o=X_outer-X_inner",
+    "Q": "A*V+nu_prime*W",
+    "pressure": "Q_outer=kappa*Q_inner"
+  },
+  "assumptions": [
+    "sharp no-thin-shell Maxwell surface as an assumed geometry; admissibility of interpolated law is NOT established",
+    "pressure, radius and metric potentials continuous",
+    "A and nu_prime evaluated on common interface geometry",
+    "DeltaP continuity implies Q_outer=kappa*Q_inner",
+    "positive A and nu_prime on interface",
+    "two-charge or finite-temperature kinetics are outside scope"
+  ],
+  "constraint": "(1-theta)[W]_i^o + theta[W-Q/nu_prime]_i^o = 0",
+  "transfer_matrix": [
+    [
+      "1+theta*(kappa-1)",
+      "theta*(kappa-1)*A/nu_prime"
+    ],
+    [
+      "(1-theta)*(kappa-1)*nu_prime/A",
+      "1+(1-theta)*(kappa-1)"
+    ]
+  ],
+  "exact_properties": {
+    "determinant": "kappa for all theta in [0,1]",
+    "theta_zero": "slow endpoint map",
+    "theta_one": "rapid endpoint map",
+    "kappa_one": "identity map",
+    "conformal_alternating_form": "T^T J T=kappa J; in 2D this follows from determinant and is not independent",
+    "weighted_concomitant_jump": "exp[-(nu_outer-nu_inner)]; equals one for continuous lapse"
+  },
+  "test_receipt": {
+    "red_green": "RED import/collection failure before implementation; GREEN after implementation",
+    "cases": 12,
+    "functions": 7,
+    "latest_stdout": "12 passed in 0.04s",
+    "command": "PYTHONPATH=/mnt/data/NS_Cowling_research_20261111/finite_rate_audit python -m pytest -q /mnt/data/NS_Cowling_research_20261111/finite_rate_audit/research/maxwell_mode_identity/tests/test_algebraic_interpolation.py",
+    "compileall": "PASS",
+    "ast_parse": "PASS",
+    "json_parse": "PASS",
+    "sympy": "PASS",
+    "wolfram": "PASS_CLEAN_MODULE"
+  },
+  "literature": {
+    "nonradial_physical_endpoints": "Tonetto & Lugones 2020, arXiv:2003.01259",
+    "radial_algebraic_interpolation": "Rau & Sedrakian 2023, arXiv:2212.09828",
+    "full_gr_polar_algebraic_interpolation": "Dong, Kuan & Yunes 2026, arXiv:2609.33002",
+    "physical_finite_rate_conclusion": "none of the algebraic determinant results establishes a calibrated microscopic conversion rate"
+  },
+  "not_run": [
+    "PR6 full-suite replay",
+    "PR7 compensated Abel suite replay",
+    "native Fortran build or run",
+    "native q-to-r RHS comparison",
+    "actual four fixture roots or profiles",
+    "two-sided stellar fixture matching",
+    "zero-jump or finite-jump stellar continuation",
+    "source-backed CompOSE EOS, TOV or Cowling",
+    "physical finite-rate model",
+    "physical f/p1/interface-g labels"
+  ],
+  "mutation": {
+    "research_only": true,
+    "production_solver_changed": false,
+    "source_authority_changed": false,
+    "raw_eos_changed": false,
+    "c7x_blocker_changed": false
+  }
+}

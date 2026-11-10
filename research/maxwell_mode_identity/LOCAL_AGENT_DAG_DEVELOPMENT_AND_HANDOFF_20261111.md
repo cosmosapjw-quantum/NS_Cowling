@@ -52,7 +52,7 @@ If any gate fails, report PARTIAL_BLOCKED or INCONCLUSIVE_SCOPED.
 
 Repository cosmosapjw-quantum/NS_Cowling.
 Source authority: research/maxwell-native-fortran-v1 at snapshot a09ec30d74b363652d2d1aefe990557c468679dd.
-Mode identity branch snapshot: research/maxwell-mode-identity-v1 at snapshot 3268942dc28b3a236ce484485b0db184cbb634fd.
+Mode identity branch snapshot: research/maxwell-mode-identity-v1 at snapshot 1a02d7abe51ee079fdf381fa5f9290936b6dae2b.
 PR #6: https://github.com/cosmosapjw-quantum/NS_Cowling/pull/6, open/draft/unmerged at snapshot.
 Native module ns_maxwell_cowling blob ce4fac829d3a5c211139d5174541a7053793afc6.
 Native spectrum module ns_maxwell_mode_spectrum blob 726a03b219827e77412175c68e3d7c28ef32ef84.
@@ -331,7 +331,7 @@ GOAL:
 Implement and validate a two-sided matching cross-check for the existing analytic two-phase sharp-Maxwell relativistic Cowling fixture using Omega=h exp(-nu)(W1 V2-V1 W2). Export complete native/Python phase-resolved profiles, including distinct one-sided interface values. Integrate a regular center solution outward and a surface-compatible line inward. Evaluate the raw weighted determinant at at least three match radii; compare with the existing outward surface residual. Validate the zero-jump limit before any finite-jump continuation.
 
 PROVENANCE:
-Repo cosmosapjw-quantum/NS_Cowling. Source-authority snapshot a09ec30d74b363652d2d1aefe990557c468679dd. Prior mode-identity branch snapshot research/maxwell-mode-identity-v1 at 3268942dc28b3a236ce484485b0db184cbb634fd. Fetch current head and update run_identity.json if it changed. Do not assume old refs remain current.
+Repo cosmosapjw-quantum/NS_Cowling. Source-authority snapshot a09ec30d74b363652d2d1aefe990557c468679dd. Prior mode-identity branch snapshot research/maxwell-mode-identity-v1 at 1a02d7abe51ee079fdf381fa5f9290936b6dae2b. Fetch current head and update run_identity.json if it changed. Do not assume old refs remain current.
 
 ISOLATION:
 Record repo root, branch, HEAD, clean status, remotes, instructions, Python/NumPy/SciPy and compiler/FPM versions. Stop if dirty. Create an isolated worktree and child branch research/maxwell-two-sided-matching-v1 from the exact observed mode-identity head. Never work on main, source-authority or shared PR #6 branch.

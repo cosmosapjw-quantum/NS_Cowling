@@ -9,7 +9,7 @@
     "source_authority_branch": "research/maxwell-native-fortran-v1",
     "source_authority_commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
     "mode_identity_branch_snapshot": "research/maxwell-mode-identity-v1",
-    "mode_identity_head_snapshot": "0b8477693b671413f45e1f4dfbb4654598e93fc1",
+    "mode_identity_head_snapshot": "9d43806e6b6f318934738ad6d94db261d15c2b98",
     "pr_number": 6,
     "native_cowling_module": {
       "name": "ns_maxwell_cowling",
@@ -21,7 +21,13 @@
       "blob_sha": "726a03b219827e77412175c68e3d7c28ef32ef84"
     },
     "python_solver_blob": "8959f90a37aba63191227bb363e97302988864e9",
-    "snapshot_requires_live_fetch": true
+    "snapshot_requires_live_fetch": true,
+    "snapshot_semantics": {
+      "observed_pr6_head_at_task_start": "9d43806e6b6f318934738ad6d94db261d15c2b98",
+      "branch_created_for_this_increment": "research/maxwell-abel-closure-compensation-v1",
+      "source_authority_commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
+      "rule": "A pinned start snapshot is provenance only. Before local work, fetch the published child branch and record its exact live head; never substitute the PR6 head for the child branch head."
+    }
   },
   "objective": "Implement and validate an independent two-sided matching cross-check for the existing analytic two-phase sharp-Maxwell relativistic Cowling fixture using the weighted Abel-Liouville determinant invariant.",
   "mathematical_contract": {
@@ -56,6 +62,19 @@
       "zero_denominator_ratio": "null plus UNDEFINED_ZERO_DENOMINATOR; no NaN or infinity",
       "center": "finite-r_c regular series; leading W+ell*r_c*V=0",
       "surface": "same finite-pressure cutoff in both directions; not assumed P=0"
+    },
+    "conditional_closure_mismatch": {
+      "applicable_only_to_exact_matrix": "M=[[nu_prime/chi_ad,A/chi_ad-ell*(ell+1)*exp(lambda)],[-exp(lambda)/r^2,2*nu_prime]]",
+      "equilibrium_first_law": "h_prime/h=-(1+1/chi_eq)*nu_prime",
+      "smooth_drift": "delta=nu_prime*(1/chi_ad-1/chi_eq)",
+      "interface_multiplier": "J=(h_outer/h_inner)*exp(-(nu_outer-nu_inner))*det(T_inner_to_outer)",
+      "globally_compensated": "K=Omega*exp(-integral(delta dr))*product(crossed_J^-1)",
+      "limitations": [
+        "A generic nonbarotropic system may contain composition-gradient terms or additional variables; recompute the complete trace before using this formula.",
+        "The finite-rate reactive interface condition from radial literature is not automatically a transfer map for this nonradial 2x2 system.",
+        "A singular transfer matrix makes the inverse jump factor undefined.",
+        "This is an algebraic determinant concomitant, not a canonical covariant symplectic current."
+      ]
     }
   },
   "non_goals": [
@@ -152,7 +171,7 @@
       ],
       "name": "invariant and interface regression",
       "gate": "M1",
-      "status": "LOCAL_43_CASES_PASS_EXPORTED_SNAPSHOT_GITHUB_CI_NOT_RUN",
+      "status": "HISTORICAL_42_CASE_RECEIPT_ONLY; CURRENT_PR6_HEAD_NOT_REPLAYED",
       "outputs": [
         "weighted_wronskian_results.json",
         "test logs"
@@ -165,13 +184,14 @@
         "chain telescope",
         "nonbarotropic and lapse-jump negative controls",
         "step/scale convergence",
-        "zero or near-zero inner concomitant returns JSON null plus UNDEFINED_ZERO_DENOMINATOR, never NaN or infinity"
+        "zero or near-zero inner concomitant returns JSON null plus UNDEFINED_ZERO_DENOMINATOR, never NaN or infinity",
+        "complex interface jump diagnostics preserve real and imaginary parts in strict JSON; no small imaginary component is silently discarded"
       ],
       "stop": [
         "self-referential expected values",
         "tolerance weakening"
       ],
-      "status_at_handoff": "LOCAL_SYNTHETIC_SUITE_42_COLLECTED_CASES_PASS_32_FUNCTIONS_REMOTE_REPLAY_REQUIRED"
+      "status_at_handoff": "The checked manifest and captured stdout contain 42 collected cases and no authenticated Git commit. A prose report and status file elsewhere claim 43 cases but lack a matching 43-case manifest/stdout. Do not promote 43 to PASS until replaying the exact live child-branch source and capturing a consistent manifest."
     },
     {
       "id": "LA4",
@@ -278,7 +298,8 @@
         "LA4",
         "LA5",
         "LA6",
-        "LA7"
+        "LA7",
+        "LA9"
       ],
       "name": "final receipts and checkpoint",
       "gate": "M1",
@@ -299,6 +320,46 @@
         "unreviewed diff",
         "unknown status promoted to PASS"
       ]
+    },
+    {
+      "id": "LA9",
+      "depends_on": [
+        "LA0",
+        "LA1",
+        "LA3"
+      ],
+      "name": "closure-mismatch compensated Abel-Liouville invariant and complex diagnostic integrity",
+      "gate": "M1",
+      "status": "DERIVED_AND_SYNTHETICALLY_CHECKED; NATIVE_CLOSURE_AND_DIAGNOSTIC_REPAIR_LOCAL_EXECUTION_REQUIRED",
+      "outputs": [
+        "closure_mismatch_equation_audit.md",
+        "closure_drift_integral_results.json",
+        "piecewise_compensated_invariant_results.json",
+        "complex_interface_jump_diagnostics.json",
+        "native_python_closure_comparison.md"
+      ],
+      "acceptance": [
+        "re-derive the complete trace from the live native and Python RHS before substituting chi_ad",
+        "verify the background first law uses chi_eq and the perturbation matrix uses the exact recorded chi_ad",
+        "compute delta=nu_prime*(1/chi_ad-1/chi_eq) only if the exact 2x2 matrix form is verified",
+        "integrate delta independently on every smooth phase and preserve ordered one-sided interface multipliers J",
+        "verify the compensated K across each smooth segment and interface, including lapse jumps and at least two interfaces",
+        "equal-closure limit recovers the previous invariant",
+        "add a failing test before changing complex interface diagnostics",
+        "preserve the legacy real-projection fields and add explicit re, im and absolute-magnitude fields for W and V",
+        "strict JSON serialization passes with allow_nan=false and a nonzero imaginary component smaller than 1e-15 is retained",
+        "separate quadrature, ODE, interface and scaling errors; run step and tolerance refinement",
+        "all outputs identify synthetic versus native inputs and record exact source hashes"
+      ],
+      "stop": [
+        "native q-to-r chain rule does not match the stated radial system",
+        "additional composition-gradient terms change the trace or require a larger perturbation state",
+        "transfer orientation or one-sided enthalpy/lapse values are ambiguous",
+        "transfer determinant is zero or non-finite",
+        "a finite-rate interface law is proposed without its own derivation and approval",
+        "complex diagnostics would require a breaking API change"
+      ],
+      "local_execution_rule": "The published compensated_abel.py and 12 tests validate only the algebraic synthetic helper. They do not complete this node. Local agent must verify the actual native/Python source, and must not infer a stellar result."
     }
   ],
   "required_artifacts": [
@@ -312,7 +373,13 @@
     "cross_validation_results.json",
     "convergence_matrix.csv",
     "VALIDATION_REPORT.md",
-    "SHA256SUMS"
+    "SHA256SUMS",
+    "closure_mismatch_equation_audit.md",
+    "closure_drift_integral_results.json",
+    "piecewise_compensated_invariant_results.json",
+    "complex_interface_jump_diagnostics.json",
+    "native_python_closure_comparison.md",
+    "strict_json_validation.log"
   ],
   "failure_taxonomy": [
     "THEORY_CONVENTION_MISMATCH",
@@ -337,17 +404,46 @@
     "dropbox_upload": false
   },
   "handoff_document": "LOCAL_AGENT_DAG_DEVELOPMENT_AND_HANDOFF_20261111.md",
-  "math_note": "WEIGHTED_ABEL_LIOUVILLE_AND_TWO_SIDED_MATCHING_20261111.md",
+  "math_note": "COMPENSATED_ABEL_LIOUVILLE_NOTE_20261111.md",
   "handoff_prompt": "HANDOFF_PROMPT_20261111.txt",
   "validation_baseline": {
-    "pytest_cases": 43,
-    "test_functions": 33,
-    "case_counts_by_file": {
-      "tests/test_interface_transfer.py": 9,
-      "tests/test_mode_identity.py": 13,
-      "tests/test_weighted_wronskian.py": 21
-    },
-    "runtime_seconds": 0.74,
-    "status": "LOCAL_EXPORTED_SNAPSHOT_FRESH_RERUN_PASS; GITHUB_ACTIONS_NOT_RUN"
-  }
+    "historical_pr6_receipt_cases": 42,
+    "historical_pr6_receipt_status": "CAPTURED_EXPORTED_SNAPSHOT_ONLY; SOURCE_COMMIT_UNAUTHENTICATED",
+    "prose_claim_43_case_status": "UNVERIFIED_CONFLICT",
+    "current_pr6_head_replay": "NOT_RUN",
+    "compensated_abel_cases": 12,
+    "compensated_abel_status": "STANDALONE_LOCAL_SYNTHETIC_PASS",
+    "github_actions": "NOT_CONFIRMED"
+  },
+  "contract_revision": "1.1.0",
+  "updated_at": "2026-11-11",
+  "validation_reconciliation": {
+    "historical_manifest_cases": 42,
+    "historical_manifest_source_commit": "not_available_exported_container_snapshot",
+    "later_43_case_claim": "UNAUTHENTICATED_NO_MATCHING_43_CASE_MANIFEST_AND_STDOUT",
+    "current_live_pr6_head": "9d43806e6b6f318934738ad6d94db261d15c2b98",
+    "current_live_pr6_head_replay": "NOT_RUN_IN_THIS_SESSION",
+    "new_compensated_helper_cases": 12,
+    "new_compensated_helper_status": "LOCAL_STANDALONE_SYNTHETIC_TESTS_PASS; NOT_FULL_REPOSITORY_REPLAY"
+  },
+  "anti_drift_self_audit": [
+    "confirm repository, branch, exact HEAD, clean status and remote before mutation",
+    "distinguish source-authority commit, PR6 snapshot, continuation branch and local child branch",
+    "hash all read source files and verify no hidden stale checkout",
+    "derive the complete native q-to-r chain rule rather than copying the target formula",
+    "verify W,V ordering, r units, c convention, chi_eq versus chi_ad and one-sided h,nu",
+    "prove expected values independently from the implementation under test",
+    "keep complex determinant bilinear without conjugation and retain tiny imaginary phases",
+    "never use a non-holomorphic normalized norm as a complex-frequency analytic determinant",
+    "record every QR or column scale factor including complex phase and log magnitude",
+    "never interpolate, average or zero-fill across an interface",
+    "separate physical mode character from spectral branch identity",
+    "do not import radial reactive boundary rules into the nonradial system without derivation",
+    "capture stdout, stderr, exit status, versions, input/output hashes and exact run identity",
+    "reconcile test count against collection inventory and captured stdout; prose alone is not evidence",
+    "unknown, missing or inaccessible means NOT_RUN or BLOCKED, never PASS",
+    "classify theory, implementation, numerical conditioning, environment and provenance failures separately",
+    "do not touch C7X blockers, raw EOS, pair manifests or source authority",
+    "do not push, create a PR, merge, deploy or upload from the local agent without separate authorization"
+  ]
 }

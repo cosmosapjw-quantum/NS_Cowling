@@ -130,3 +130,26 @@ Detailed result and artifact provenance: `docs/R15_FULL_COHORT_TOV_RESULTS_20261
 Detailed evidence: `docs/R17_JOINT_Q_RECONSTRUCTION_PILOT_20261110.md`.
 
 **Next:** R18 should localize the 447 R16 source pressure-secant decreases by exact source row/density, matching metadata/bridge construction, and available phase/composition provenance. Preserve raw CompOSE package, normalized matched table, and projected solver input as distinct identity layers. Do not scale joint-q fitting or rerun TOV until a distinct reconstruction has a source-backed mechanism and a meaningful Pareto advantage. MD-31/32 and full-star radial/Cowling modes remain blocked.
+
+
+## R16 follow-on: cellwise-minimal Hermite repair matched-pressure TOV pilot (2026-11-10)
+
+**Status: PASS_144_OF_144, bounded three-pair exploratory structural pilot only.** This is not a full-cohort replacement run and does not calculate radial stability or Cowling modes.
+
+- Workflow [42752885366](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42752885366), code/source commit `5fc8abe69c9ed8eeab51fcf6ee05068b4b176771`.
+- Three crossed pairs: GPPVA_FSU2 × BBB_BHF2; SPG_M2 × BBB_BHF2; GPPVA_FSU2 × GM_GM1. All six bridge tokens, eight low-density source-row markers: 144 TOV integrations.
+- The derived EOS is made from each normalized source table using the SI-native cellwise-minimal pressure-increment repair already admitted by the compiled production `construct_bridge_endpoints` audit. Across 18 tables, 1,586 increments were adjusted and 6,448 preserved; no rows added.
+- All 144 cases use the same frozen (P_c) and exact absolute (P_{cut}) as their corresponding R15 projected-EOS case. Pcut matched bitwise in 144/144. The source-row index is only a density marker; its repaired-table pressure is not necessarily the matched absolute Pcut.
+- 144/144 case results are `ok`; 144/144 background profiles pass SHA-256 and row-count validation; 18/18 derived EOS hashes match receipts. All normalized-source and projected-parent hashes remain unchanged. All 144 cases use the same v5 Fortran backend build key as R15.
+- Mean response versus the R15 q-linear projected reference:
+  - GPPVA_FSU2 × BBB_BHF2: (Delta M/M=-0.263900\%), (Delta r/r=-0.335693\%).
+  - SPG_M2 × BBB_BHF2: (-0.256384\%), (-0.335217\%).
+  - GPPVA_FSU2 × GM_GM1: (-0.006094\%), (-0.000610\%).
+  - all 144 cases: mass (-0.175459\%), internal-isobar radius (-0.223840\%).
+- The contrast is core-conditioned and nearly independent of the selected low-density cutoff row. It measures a global pressure-closure difference: the q-linear projector reintegrates pressure in every cell, while minimal repair preserves source (Delta P) in already-admissible cells. It must not be called an outer-crust-only repair effect.
+- Representative nearest-central-pressure comparison: q-linear versus minimal-repair (P) differs by -0.6190% for GPPVA_FSU2 × BBB_BHF2, -0.4941% for SPG_M2 × BBB_BHF2, but +0.000785% for GPPVA_FSU2 × GM_GM1. Corresponding (epsilon) differences are +0.09255%, +0.09584%, and -0.0000845%. These are one-CSS-table diagnostics, not cohort extrema.
+- The 56.5-MB artifact (ID `13734297622`) and receipt/CSV/profile hashes independently verify. ZIP SHA-256: `d8acfd1dad803e6580c97c2fcd1084d6c002ddd043abd6883fdad143d51717bc`.
+
+Detailed report: `docs/R16_MINIMAL_REPAIR_MATCHED_PRESSURE_TOV_PILOT_20261110.md`.
+
+**Next:** R18 source/matching localization of the 447 raw pressure-secant decreases remains the gate before any full 234-table minimal-repair propagation. Preserve raw CompOSE, normalized matched input, q-linear projected input, and minimal-repair diagnostic EOS as separate identities. MD-31/32, radial (\omega_0^2), and complete-star Cowling modes remain blocked.

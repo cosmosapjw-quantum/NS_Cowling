@@ -9,7 +9,7 @@
     "source_authority_branch": "research/maxwell-native-fortran-v1",
     "source_authority_commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
     "mode_identity_branch_snapshot": "research/maxwell-mode-identity-v1",
-    "mode_identity_head_snapshot": "1a02d7abe51ee079fdf381fa5f9290936b6dae2b",
+    "mode_identity_head_snapshot": "0b8477693b671413f45e1f4dfbb4654598e93fc1",
     "pr_number": 6,
     "native_cowling_module": {
       "name": "ns_maxwell_cowling",
@@ -43,8 +43,20 @@
       "not a canonical covariant symplectic current",
       "not a cross-frequency invariant",
       "normalised angle is not a holomorphic Evans function",
-      "nonbarotropic chi_ad != chi_eq requires a new weight/system derivation"
-    ]
+      "nonbarotropic chi_ad != chi_eq requires a new weight/system derivation",
+      "raw determinant is the exact analytic matching scalar only when coefficient and endpoint basis dependence is analytic; scale factors must be retained",
+      "normalized determinant angle is real-frequency diagnostic only and is generally non-holomorphic for complex omega",
+      "at Omega_inner=0 the observed interface ratio is undefined and must serialize as null plus status"
+    ],
+    "root_function_policy": {
+      "raw_weighted_determinant": "exact_zero_set; preferred analytic scalar only with holomorphic ODE and endpoint bases",
+      "normalized_angle": "real_frequency_conditioning_diagnostic_only",
+      "complex_frequency": "use holomorphic scaled/exterior or multiple_shooting determinant; retain all scale phases",
+      "qr_rule": "Y=Q*R; retain det(Q)*det(R), not Q alone",
+      "zero_denominator_ratio": "null plus UNDEFINED_ZERO_DENOMINATOR; no NaN or infinity",
+      "center": "finite-r_c regular series; leading W+ell*r_c*V=0",
+      "surface": "same finite-pressure cutoff in both directions; not assumed P=0"
+    }
   },
   "non_goals": [
     "C7X D3/D4/D5/D6 resolution",
@@ -140,7 +152,7 @@
       ],
       "name": "invariant and interface regression",
       "gate": "M1",
-      "status": "LOCAL_37_SYNTHETIC_TESTS_PASS_REMOTE_REPLAY_REQUIRED",
+      "status": "LOCAL_43_CASES_PASS_EXPORTED_SNAPSHOT_GITHUB_CI_NOT_RUN",
       "outputs": [
         "weighted_wronskian_results.json",
         "test logs"
@@ -152,7 +164,8 @@
         "general jump law",
         "chain telescope",
         "nonbarotropic and lapse-jump negative controls",
-        "step/scale convergence"
+        "step/scale convergence",
+        "zero or near-zero inner concomitant returns JSON null plus UNDEFINED_ZERO_DENOMINATOR, never NaN or infinity"
       ],
       "stop": [
         "self-referential expected values",
@@ -327,13 +340,14 @@
   "math_note": "WEIGHTED_ABEL_LIOUVILLE_AND_TWO_SIDED_MATCHING_20261111.md",
   "handoff_prompt": "HANDOFF_PROMPT_20261111.txt",
   "validation_baseline": {
-    "pytest_cases": 42,
-    "test_functions": 32,
+    "pytest_cases": 43,
+    "test_functions": 33,
     "case_counts_by_file": {
-      "test_interface_transfer.py": 9,
-      "test_mode_identity.py": 13,
-      "test_weighted_wronskian.py": 20
+      "tests/test_interface_transfer.py": 9,
+      "tests/test_mode_identity.py": 13,
+      "tests/test_weighted_wronskian.py": 21
     },
-    "runtime_seconds": 0.65
+    "runtime_seconds": 0.74,
+    "status": "LOCAL_EXPORTED_SNAPSHOT_FRESH_RERUN_PASS; GITHUB_ACTIONS_NOT_RUN"
   }
 }

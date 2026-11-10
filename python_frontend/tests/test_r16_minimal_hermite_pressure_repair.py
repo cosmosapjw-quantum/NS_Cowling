@@ -56,3 +56,20 @@ def test_no_nonempty_cubic_hermite_admissibility_interval_is_rejected():
             mu0=1.0, n0=1.0, mu1=2.0, n1=1.0000000001,
             delta_p_source=1.0,
         )
+
+
+def test_fortran_cell_acceptance_is_unit_consistent_in_si():
+    mev_to_j = 1.602176634e-13
+    mev_fm3_to_pa = 1.602176634e32
+    fm3_inverse_to_m3_inverse = 1.0e45
+    result = audit_hermite_cell(
+        mu0=2.0 * mev_to_j,
+        p0=0.5 * mev_fm3_to_pa,
+        n0=1.0 * fm3_inverse_to_m3_inverse,
+        mu1=3.0 * mev_to_j,
+        p1=2.0 * mev_fm3_to_pa,
+        n1=2.0 * fm3_inverse_to_m3_inverse,
+    )
+    assert result["status"] == "PASS_NATIVE_CELL_ADMISSIBLE"
+    assert result["stable_interval"] is True
+    assert result["causal_interval"] is True

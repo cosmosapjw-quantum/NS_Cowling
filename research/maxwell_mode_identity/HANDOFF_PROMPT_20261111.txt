@@ -237,3 +237,50 @@ LA10 INTERMEDIATE-CONVERSION GATE:
 - Do not wire theta into production roots or claim finite-rate physics. Physical kinetics remains blocked pending a sourced kinetic law, reaction flux, chemical affinity and interface entropy/dissipation balance.
 - Preserve no-thin-shell admissibility of the interpolated map as unresolved.
 - Preserve PR #7's LA9 trace-first general identity, its 15-case suite, final timing and negative controls; do not overwrite with earlier 12-case receipts.
+
+
+---
+
+# LA11 — finite-interval analytic matching and interface chart gate
+
+Read ANALYTIC_MATCHING_GAUGE_AUDIT_20261111.md, ANALYTIC_MATCHING_STATUS_20261111.json, ANALYTIC_MATCHING_RESULTS.json, analytic_matching.py and tests/test_analytic_matching.py.
+
+Do not call this a whole-line Evans problem. For complex spectral parameter zeta, check each smooth layer Y'=M_j(r,zeta)Y, each sharp interface map, and both endpoint frames. The matching determinant is
+D(zeta;rm)=det([Phi_center(rm,zeta),Phi_surface(rm,zeta)])
+with no complex conjugation.
+
+Holomorphy requires M_j holomorphic in zeta with locally uniform L1 bounds in r; interface graph maps holomorphic and invertible over the domain, or a square full-rank implicit matching relation; fixed complementary endpoint dimensions and full-rank holomorphic endpoint frames; no unhandled coefficient, endpoint or interface singularities.
+
+Zero set: endpoint-admissible subspaces intersect nontrivially. Do NOT claim zero order equals physical algebraic multiplicity until the production BVP is shown to be a regular holomorphic Fredholm pencil (index zero, nonempty resolvent) and the matching matrix is an analytic invertible reduction. Do NOT use argument principle before proving holomorphy on/inside the contour.
+
+Basis changes Phi_c -> Phi_c A_c, Phi_s -> Phi_s A_s give
+D_tilde=D det(A_c) det(A_s). These factors must be holomorphic units over the entire contour interior. A basis factor may be nonzero on the contour but have an interior zero, changing winding/root count.
+
+For y=G(r,zeta) z:
+    M_z=G^-1 M_y G-G^-1 G_prime
+    T_z=G_outer^-1 T_y G_inner
+    D_y=det(G_match) D_z
+    tr(M_z)=tr(M_y)-d_r log(det G)
+Retain every basis, gauge, interface, volume, phase, scale and chart factor.
+
+LA10 has A proportional to omega^2. For theta<1 and kappa!=1,
+T_21=(1-theta)(kappa-1)nu_prime/A is a graph-chart pole, not by itself a singularity of the implicit constraint. Use:
+    C_i=[[-kappa*nu_prime,-kappa*A],
+         [-(1-theta)*nu_prime,theta*A]]
+    C_o=[[nu_prime,A],[(1-theta)*nu_prime,-theta*A]]
+    C_o T + C_i = 0 (only if A != 0)
+    E_imp=det([C_i*y_i,C_o*y_o])
+    E_imp=A*nu_prime*det([T*y_i,y_o]) (A != 0, theta<1, kappa!=1)
+
+At A=0, C_o loses rank while the combined implicit constraints retain row rank two. Never invert C_o there. Use implicit/multiple-shooting matching. At theta=1, use the explicitly selected regular rapid extension [V]=0; at kappa=1 return the exact identity no-interface map. Neither establishes a physical zero-frequency mode or finite-rate kinetics.
+
+The dimensionless condition number is only a real-frequency diagnostic: with x=A/(nu_prime*L) and (W/L^3,V/L^2), cond2 scales as O(|x|^-2). Do not use norms, Gram-Schmidt, unitary QR/SVD or polar factors as the holomorphic characteristic scalar. Restore full volume, phase, scale and chart cocycles if used.
+
+Acceptance:
+1. Run the 22-case tests and exact symbolic checks.
+2. Reconcile stdout, collection, manifest, source SHA256, Git blob SHA1 and SHA256SUMS for the same bytes.
+3. Verify local source/test blobs equal the published branch blobs.
+4. Audit native RHS, q-to-r, endpoint frames and interface source before any production interpretation.
+5. Keep algebraic multiplicity, argument-principle counts, native roots, stellar profiles and physical mode labels BLOCKED until their separate analytic/source gates pass.
+
+Mutation gates remain the unified DAG M0-M5. This handoff authorizes local research only, not push, PR, merge, deployment, provider contact or Dropbox upload. Raw EOS, C7X, pair manifests and source-authority Fortran remain protected.

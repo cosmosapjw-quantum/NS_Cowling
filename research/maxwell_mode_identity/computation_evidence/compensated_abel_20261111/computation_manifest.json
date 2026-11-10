@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "claim_id": "COWLING_COMPENSATED_ABEL_INTERFACE_SYNTHETIC_V1",
+  "run_date": "2026-11-11",
+  "repository_context": {
+    "repository": "cosmosapjw-quantum/NS_Cowling",
+    "source_branch_at_authoring": "research/maxwell-abel-closure-compensation-v1",
+    "parent_branch": "research/maxwell-mode-identity-v1",
+    "parent_commit": "9d43806e6b6f318934738ad6d94db261d15c2b98",
+    "source_authority_commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
+    "local_git_worktree": "NOT_AVAILABLE_EXPORTED_CONTAINER",
+    "local_source_revision_authentication": "NOT_CLAIMED"
+  },
+  "commands": [
+    "PYTHONPATH=/mnt/data/NS_Cowling_research_20261111/research python -m pytest -q /mnt/data/NS_Cowling_research_20261111/research/maxwell_mode_identity/tests/test_compensated_abel.py",
+    "python -m compileall -q /mnt/data/NS_Cowling_research_20261111/research/maxwell_mode_identity/compensated_abel.py",
+    "PYTHONPATH=/mnt/data/NS_Cowling_research_20261111/research python -m pytest --collect-only -q -p no:cacheprovider /mnt/data/NS_Cowling_research_20261111/research/maxwell_mode_identity/tests/test_compensated_abel.py",
+    "python -m json.tool /mnt/data/NS_Cowling_research_20261111/research/maxwell_mode_identity/COMPENSATED_ABEL_RESULTS.json"
+  ],
+  "environment": {
+    "python": "3.13.5",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "pytest": "9.0.2",
+    "platform": "Linux x86_64 container"
+  },
+  "run": {
+    "pytest_cases": 12,
+    "test_functions": 12,
+    "pytest_exit_status": 0,
+    "compileall_exit_status": 0,
+    "collection_exit_status": 0,
+    "json_parse_exit_status": 0,
+    "pytest_stdout": "12 passed in 0.56s",
+    "collection_stdout": "12 tests collected in 0.29s"
+  },
+  "mathematics": {
+    "closure_drift": "delta=nu_prime*(1/chi_ad-1/chi_eq)",
+    "interface_multiplier": "J=(h_outer/h_inner)*exp(-(nu_outer-nu_inner))*det(T_inner_to_outer)",
+    "piecewise_invariant": "K=Omega*exp(-integral(delta dr))*product(crossed_J^-1)",
+    "constant_integral": -0.009343853820598002,
+    "analytic_integral": -0.009343853820598004,
+    "absolute_integral_error": 1.734723475976807e-18,
+    "matrix_exponential_chain_relative_tolerance": 2e-12,
+    "dop853_relative_tolerance": 2e-9,
+    "wolfram_exact_residuals": [
+      "bulk compensation residual = 0",
+      "slow transfer determinant minus alpha = 0",
+      "rapid transfer determinant minus alpha = 0",
+      "standard interface multiplier residual = 0"
+    ]
+  },
+  "non_claims": [
+    "native q-to-r equivalence",
+    "actual fixture-root profiles",
+    "zero-jump stellar comparison",
+    "finite-jump stellar continuation",
+    "TOV or source-backed Cowling result",
+    "physical f/p1/discontinuity-g classification",
+    "canonical covariant symplectic current",
+    "generic nonbarotropic theorem"
+  ],
+  "evidence_files": [
+    "research/maxwell_mode_identity/compensated_abel.py",
+    "research/maxwell_mode_identity/tests/test_compensated_abel.py",
+    "research/maxwell_mode_identity/COMPENSATED_ABEL_LIOUVILLE_NOTE_20261111.md",
+    "research/maxwell_mode_identity/COMPENSATED_ABEL_RESULTS.json",
+    "research/maxwell_mode_identity/COMPENSATED_ABEL_VALIDATION_REPORT.md",
+    "research/maxwell_mode_identity/computation_evidence/compensated_abel_20261111/pytest.stdout.txt",
+    "research/maxwell_mode_identity/computation_evidence/compensated_abel_20261111/pytest.stderr.txt",
+    "research/maxwell_mode_identity/computation_evidence/compensated_abel_20261111/test_inventory.txt",
+    "research/maxwell_mode_identity/computation_evidence/compensated_abel_20261111/environment.txt"
+  ]
+}

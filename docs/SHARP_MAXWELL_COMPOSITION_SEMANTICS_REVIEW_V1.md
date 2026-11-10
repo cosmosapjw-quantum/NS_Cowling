@@ -281,3 +281,22 @@ tov_cowling: NOT_RUN
 ```
 
 This review is a semantics/provenance investigation, not a mechanism for weakening scientific gates.
+
+## 11. C6B execution record (appended; earlier sections unchanged)
+
+Evidence: `artifacts/sharp_maxwell/C6B_COMPOSITION_SEMANTICS_20261110T100954Z/`. Executed on head de029388e78f03f9da2aceef78621e7947e1a299. Terminal status for both sources: **PROVIDER_SEMANTICS_UNRESOLVED__BLOCKED**. C6B stays OPEN; C7 not recommended.
+
+### 11.1 Verified
+- Raw eos.compo/eos.thermo/eos.nb/eos.t/eos.yq of both sources match their Git blobs at a09ec30d. An independent parser reproduces Eq. 4.19 layout (18 fields/row), and (iT,inb,iYq) equal the eos.thermo keys row by row. H4 (parser/indexing defect) is rejected.
+- C6 residual maxima are reproduced exactly from the pinned files.
+- Outer crust (rows 1-217, identical in both sources): last field = 1.0, Yn=Yp=0, Ye=Z/A. Direct Yh=Y_I closes; Aav*Y_I (56, 128, ...) fails. Under Eq. 4.22 the stored 1.0 behaves as the baryon fraction X_h, not as the number fraction Y_I (which would be 1/Aav).
+- Inner crust (Iphase=7): the last field equals Ye+Ymu to print precision in 200 of 200 rows (SPG_M1 148, GPPVA_FSU2 52). It is not a group number fraction. Yn=Yp=0 in all 634 rows.
+- GPPVA_FSU2 inner rows: Aav, Zav are integers, Ye=Z/A within 5e-6, and C3-implied and C4-implied Yh agree (0.9996-1.0004) in 52/52 rows. The record closes with X_h=1; the stored field is not 1.
+- SPG_M1 inner rows: Aav, Zav non-integer, Z/A != Ye; C3-implied Yh in [0.096, 0.543] vs C4-implied 1 in 148/148 rows. About 0.46-0.90 of the baryons are not accounted for and Yn is not recorded.
+- Provenance: SPG(M1) matches the five CompOSE models of Scurto, Pais, Gulminelli, PRD 109, 103015 (arXiv:2402.15548; M1 = highest likelihood; datasheet J, Ksym, Mmax match its Table IX). That paper's CLD cell has a cluster part and a gas part. GPPVA(FSU2) is documented by Grill et al. 2014 and Providencia et al. 2019, whose published tables carry no composition.
+
+### 11.2 Not established
+No data sheet or paper defines the fourth quadruple value, the group index, or whether Aav, Zav are cluster or cell values, and no published composition values exist to compare. Hypotheses H1 (documented convention) and H2/H3 (mis-populated field; omitted gas for SPG) are numerically suggestive but unconfirmed. No remediation is proposed: a Yh=1 rule would close GPPVA and the outer crust but ignores the stored field, is undocumented, and does not close SPG.
+
+### 11.3 Minimal next evidence
+Ask the data-sheet submitters: what is the fourth quadruple value in Iphase 0 and 7 rows and why does it equal Ye+Ymu; are Aav, Zav cluster or whole-cell values; where is SPG's free-neutron fraction recorded given Yn=0; is Yn=Yp=0 intentional. Wording is in `hypothesis_adjudication.md`.

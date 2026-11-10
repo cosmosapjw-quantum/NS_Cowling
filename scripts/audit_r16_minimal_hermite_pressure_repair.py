@@ -24,7 +24,7 @@ PROJECTED_DIR=ROOT/"oscillation_release_v1/data/eos_projected"
 SUMMARY_SHA256="ce54c111510f32086065f95356903cd6abad675adce12cab1a06b5cc82350965"
 EXPECTED_TABLES=234
 REPAIR_MARGIN_FRACTION=1.0e-10
-REQUIRED=("source_row","mu_b_mev","pressure_mev_fm3","energy_mev_fm3","n_b_fm3")
+REQUIRED=("source_row","mu_b_mev","pressure_mev_fm3","energy_mev_fm3","n_b_fm3","mu_b_j","pressure_pa","n_b_m3")
 
 
 def sha256(path:Path)->str:
@@ -69,15 +69,21 @@ def audit_one(ref):
     n=[float(x["n_b_fm3"]) for x in sr]
     p=[float(x["pressure_mev_fm3"]) for x in sr]
     eps=[float(x["energy_mev_fm3"]) for x in sr]
+    mu_si=[float(x["mu_b_j"]) for x in sr]
+    n_si=[float(x["n_b_m3"]) for x in sr]
+    p_si_source=[float(x["pressure_pa"]) for x in sr]
     p_proj=[float(x["pressure_mev_fm3"]) for x in pr]
     n_proj=[float(x["n_b_fm3"]) for x in pr]
     mu_proj=[float(x["mu_b_mev"]) for x in pr]
 
     p_repaired=[p[0]]
+    p_repaired_si=[p_si_source[0]]
     repair_records=[]
     source_hermite_failures=0
     source_status_counts={"REJECT_NONPOSITIVE_COMPRESSIBILITY":0,"REJECT_ACAUSAL_NATIVE_CELL":0,"PASS_NATIVE_CELL_ADMISSIBLE":0}
     min_d2=float("inf"); min_g=float("inf")
+    min_d2_si=float("inf"); min_g_si=float("inf")
+    si_pass_cells=0; si_fail_cells=0
     max_abs_local_repair=0.0
     sum_abs_increment_repair=0.0
     adjusted=0
@@ -102,6 +108,7 @@ def audit_one(ref):
         sum_abs_increment_repair += abs(repair["delta_p_adjustment"])
         max_abs_local_repair=max(max_abs_local_repair,abs(repair["delta_p_adjustment"])/max(abs(delta_source),1e-300))
         p_repaired.append(p_repaired[-1]+delta_star)
+        p_repaired_si.append(p_repaired_si[-1] + delta_star*1.602176634e32)
 
         cell=audit_hermite_cell(
             mu0=mu[i],p0=p_repaired[i],n0=n[i],
@@ -111,9 +118,23 @@ def audit_one(ref):
             raise RuntimeError(f"{name}: repaired cell {i+1} not admitted: {cell}")
         min_d2=min(min_d2,cell["min_d2p"])
         min_g=min(min_g,cell["min_causal_margin"])
-        repair_records.append((repair,cell))
+        cell_si=audit_hermite_cell(
+            mu0=mu_si[i],p0=p_repaired_si[i],n0=n_si[i],
+            mu1=mu_si[i+1],p1=p_repaired_si[i+1],n1=n_si[i+1]
+        )
+        if cell_si["status"]=="PASS_NATIVE_CELL_ADMISSIBLE":
+            si_pass_cells+=1
+        else:
+            si_fail_cells+=1
+            raise RuntimeError(f"{name}: SI-unit repaired cell {i+1} not admitted: {cell_si}")
+        min_d2_si=min(min_d2_si,cell_si["min_d2p"])
+        min_g_si=min(min_g_si,cell_si["min_causal_margin"])
+        repair_records.append((repair,cell,cell_si))
 
     eps_repaired=[m*nn-pp for m,nn,pp in zip(mu,n,p_repaired)]
+    eps_repaired_si=[m*nn-pp for m,nn,pp in zip(mu_si,n_si,p_repaired_si)]
+    if any(x<=0.0 for x in eps_repaired_si) or any(b<=a for a,b in zip(eps_repaired_si,eps_repaired_si[1:])):
+        raise RuntimeError(f"{name}: SI-unit repaired energy density positivity/monotonicity failure")
     if any(x<=0.0 for x in eps_repaired):
         raise RuntimeError(f"{name}: repaired energy density became nonpositive")
     if any(b<=a for a,b in zip(eps_repaired,eps_repaired[1:])):
@@ -160,6 +181,10 @@ def audit_one(ref):
         "repaired_min_delta_energy_mev_fm3":min(b-a for a,b in zip(eps_repaired,eps_repaired[1:])),
         "repaired_min_cell_d2p":min_d2,
         "repaired_min_causal_margin":min_g,
+        "si_repaired_cell_pass_count":si_pass_cells,
+        "si_repaired_cell_fail_count":si_fail_cells,
+        "si_repaired_min_cell_d2p":min_d2_si,
+        "si_repaired_min_causal_margin":min_g_si,
         "source_row217_pressure":p[216],"source_row218_pressure":p[217],
         "repaired_row217_pressure":p_repaired[216],"repaired_row218_pressure":p_repaired[217],
         "projected_row217_pressure":p_proj[216],"projected_row218_pressure":p_proj[217],
@@ -225,14 +250,17 @@ def main(argv=None):
         len(records)==EXPECTED_TABLES and not failures and
         all(x["source_hermite_reject_cells"]==x["minimal_repair_adjusted_cells"] for x in records) and
         all(x["source_hermite_pass_cells"]==x["source_pressure_increments_preserved_cells"] for x in records) and
-        all(x["status"]=="PASS_DIAGNOSTIC_ONLY_NO_TABLE_WRITTEN" for x in records)
+        all(x["status"]=="PASS_DIAGNOSTIC_ONLY_NO_TABLE_WRITTEN" for x in records) and
+        all(x["si_repaired_cell_pass_count"]==x["cell_count"] and x["si_repaired_cell_fail_count"]==0 for x in records)
     )
     receipt={
         "schema":"ns-cowling-r16-minimal-hermite-pressure-repair-diagnostic-v1",
         "status":"PASS_R16_MINIMAL_HERMITE_PRESSURE_REPAIR_DIAGNOSTIC" if all_pass else "FAIL_R16_MINIMAL_HERMITE_PRESSURE_REPAIR_DIAGNOSTIC",
         "source_commit":os.environ.get("GITHUB_SHA","UNAVAILABLE_LOCAL_RUN"),
         "source_summary_sha256":SUMMARY_SHA256,
-        "repair_definition":"clip each raw DeltaP to exact Fortran cubic-Hermite admissible interval [L,U] with 1e-10 interior margin; preserve DeltaP exactly where already admitted; integrate repaired increments cumulatively from source P_1",
+        "repair_definition":"clip each raw DeltaP to exact Fortran cubic-Hermite admissible interval [L,U] with 1e-10 interior margin; preserve DeltaP exactly where already admitted; integrate repaired increments cumulatively from source P_1; re-evaluate every cell in production SI units",
+        "si_conversion": {"MeV_to_J":1.602176634e-13,"MeV_fm3_to_Pa":1.602176634e32,"fm3_inverse_to_m3_inverse":1.0e45},
+        "si_unit_validation": "all repaired cells are rechecked using source mu_b_j and n_b_m3 columns and pressure_pa endpoint reconstruction",
         "L":"h*(2*n0+n1)/3 + h^2*n0/(6*mu0)",
         "U":"h*(n0+2*n1)/3 - h^2*n1/(6*mu1)",
         "source_tables_modified":False,

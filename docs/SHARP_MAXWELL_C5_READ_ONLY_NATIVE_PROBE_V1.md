@@ -6,19 +6,29 @@ This C5 deliverable implements a runnable vertical slice from immutable CompOSE 
 
 The default cohort slice is SPG_M1 (Nadd=0) and GPPVA_FSU2 (Nadd=1). Both have source file blob identities pinned in the 65-pair cohort manifest. The Nadd=1 input exercises the provider-defined extra thermodynamic column without assigning it a physical meaning.
 
-## CompOSE nuclear-group fraction correction
+## CompOSE nuclear-group abundance semantics: provisional mapping
 
-The input review exposed a concrete reader/writer defect in the current Fortran IO layer. CompOSE Reference Manual v3.01, Eq. (4.22), defines the final quantity in a nuclear-group quadruple as
+The previous version of this section made an incorrect semantic inference from Eq. (4.22): it described the stored \(Y_I\) as the baryon/mass fraction itself. That claim is superseded.
 
-    Y_I = (sum_j A_j Y_j) / A_av = sum_j Y_j.
+Under the standard CompOSE definitions:
 
-This is already the combined group fraction. It is not A_av times the stored value. The source rows in these crust tables include A_av=56 and Y_I=1; multiplying them gives 56 and then fails the reader's own Y_h <= 1 bound. The internal Yh representation is the same combined baryon fraction used by C3/C4 composition closure.
+- Eq. (3.10): \(Y_i=n_i/n_b\), the particle number fraction.
+- Eq. (3.12): \(X_i=B_iY_i\), the particle mass-number (baryon) fraction.
+- Eqs. (4.20)-(4.22): for a nuclear group, \(A_{\rm av}\) and \(Z_{\rm av}\) are abundance-weighted averages and \(Y_I=\sum_jY_j\) is the combined group number fraction.
 
-The Fortran IO correction therefore makes the mapping symmetric:
-- read: Yh = YI;
-- write: YI = Yh.
+Thus the standard baryon/mass fraction carried by the nuclear group is \(X_h=A_{\rm av}Y_I\). The native verifier's internal \`Yh\` is used as a baryon/mass fraction: C3 evaluates \(Y_p+(Z_{\rm av}/A_{\rm av})Y_h-Y_e-Y_\mu\), and C4 evaluates \(Y_n+Y_p+Y_h-1\).
 
-Both old expressions (Yh=Abar*YI on read and YI=Yh/Abar on write) were inconsistent with the CompOSE definition. This correction does not change raw source files or infer the provider-specific identity of Iphase / Nadd.
+The C5 reader/writer currently maps \`Yh = YI\` and \`YI = Yh\`. That mapping is retained as the committed raw-field-preservation path exercised by the read/write/read test. **It is not a validated physical conversion and is not endorsed by the CompOSE equations.** Round-trip equality proves serialization consistency only.
+
+The C6 result exposed the unresolved provider-data issue:
+
+- Both official data sheets identify \`Iphase=0\` as outer crust and \`Iphase=7\` as inner crust. The GPPVA(FSU2) sheet additionally identifies \`Iphase=6\` as homogeneous matter. The phase label \`7\` is therefore known; the unresolved issue is the physical meaning and consistency of the composition values in those records.
+- An outer-crust example from each source has \((A_{\rm av},Z_{\rm av},Y_I,Y_e)=(56,26,1,0.46429)\). The direct mapping \`Yh=YI\` closes C3/C4 on these rows; the standard product \(A_{\rm av}Y_I=56\) cannot be a normalized mass fraction.
+- At the first inner-crust row (row 218), SPG_M1 reports \((82.107,24.387,0.06087,0.06087)\), while GPPVA_FSU2 reports \((740,36,0.04865,0.04865)\), with the listed free-neutron, free-proton and muon fractions zero. The current native verifier fails C3/C4 on all inner-crust rows in both sources.
+
+These observations do not establish a provider-specific replacement formula. In particular, neither applying \(A_{\rm av}\) blindly nor assuming that the field named \(Y_I\) is already a mass fraction resolves both sources and phases. The provenance of the provider's group-abundance values, possible source-table inconsistency or alignment issues, and the applicability of the verifier's composition closure must be reviewed against the original provider workflow.
+
+No raw source file, parser mapping, verifier equation or tolerance is changed by this note. Until the evidence establishes a unique interpretation, the composition mapping remains provisional and physical admission remains blocked.
 
 ## Execution
 
@@ -63,11 +73,13 @@ This probe does not establish full physical source admission. It does not determ
 
 All 65 pair records remain BLOCKED_BEFORE_ROOT_SEARCH; historical maxwell output remains LEGACY_NON_MAXWELL_READ_ONLY. No new sharp_maxwell result is produced.
 
-## C5 implementation and execution status
+## C5 implementation and C6 execution status
 
-The equivalent pure-helper staging suite passed six of six tests before publication. Those tests cover Git blob identity, raw density/thermodynamic parsing, CompOSE group-fraction semantics, Iphase knot indexing, and refusal to coerce non-integer extra-column values. The exact committed test file and the native integration runner have not been executed on this runtime.
+C5 committed the native reader/writer mapping and the read-only source probe, with six pure-helper regression tests. The exact committed test file and native integration path were not run at C5 time; that historical status is preserved in the manifest.
 
-The actual native read/write/read/verifier run remains NOT_RUN in this checkpoint: the connected development device is offline and the current local runtime cannot fetch the repository source tree. No GitHub Actions result is claimed. C6 must execute the exact committed tests and runner on a Linux/gfortran host and preserve its real receipt, classifying scientific FAIL separately from parser/runtime failure.
+C6 later executed the official Fortran build and the exact committed test file on a Linux/gfortran host. The committed tests passed 6/6. Native read/write/read, verifier execution and round-trip completed for SPG_M1 and GPPVA_FSU2. The runner completed, but the scientific composition checks failed: C3 and C4 fail on every \(Iphase=7\) row (148/148 for SPG_M1 and 52/52 for GPPVA_FSU2), while every \(Iphase=0\) row passes. The C6 report and complete evidence are in [SHARP_MAXWELL_C6_NATIVE_EXECUTION_VERIFICATION_V1.md](SHARP_MAXWELL_C6_NATIVE_EXECUTION_VERIFICATION_V1.md) and \`artifacts/sharp_maxwell/C6_NATIVE_EXECUTION_20261110T093714Z/\`.
 
-## C6 update
-Executed in C6 (see SHARP_MAXWELL_C6_NATIVE_EXECUTION_VERIFICATION_V1.md): native build and the committed tests passed. The probe ran natively on both sources with round-trip PASS, but native C3/C4 failed on Iphase=7 rows. The sentence above about C3/C4 closure is superseded by that note. C5 text otherwise unchanged.
+The C6 run was executed on commit \`43eea8bd9bee7ebb222e3c66babf5078b398d7ae\`; the branch subsequently advanced to include the C6 documentation and manifest updates. Do not describe the native run as having been executed on the later branch head.
+
+Status: \`C6_PARTIAL\`; composition semantics \`BLOCKED_REVIEW_REQUIRED\`. This note supersedes the earlier assertion that CompOSE Eq. (4.22) directly establishes \`Yh=YI\` as a baryon/mass fraction. No C7, root search, pair sweep, TOV or Cowling run is authorized by this result.
+

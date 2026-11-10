@@ -71,3 +71,9 @@ The continuation adds a conditional piecewise compensated Abel–Liouville invar
 The single local execution contract is still LOCAL_AGENT_DAG.v1.json and LOCAL_AGENT_DAG_DEVELOPMENT_AND_HANDOFF_20261111.md. Revision 1.1 adds node LA9 for native closure audit, piecewise compensation, complex diagnostic serialization and anti-drift validation. HANDOFF_PROMPT_20261111.txt is the standalone invocation text.
 
 No physical nonbarotropic theorem, native q-to-r verification, actual stellar profile, or f/p1/interface-g classification is claimed. The current PR #6 source also has an identified complex-jump reporting loss; LA9 requires an additive compatibility-preserving regression and output fix.
+
+
+
+## Revision 1.2: general trace-first compensation
+
+In addition to the conditional chi_ad/chi_eq shortcut, the helper now implements the general algebraic formula Gamma=tr(M)+d(log h)/dr-nu_prime. The source-derived full trace is the local agent's default; the sound-speed specialization is forbidden until its exact matrix trace and equilibrium first law have been checked against source. Three tests cover shortcut reduction, extra trace/background terms and a general matrix-exponential case. The final synthetic test suite has 15 passing cases; see trace_first_drift_results.json and TEST_SCALE_NEGATIVE_CONTROL.md.

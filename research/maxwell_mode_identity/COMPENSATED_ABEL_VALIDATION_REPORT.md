@@ -80,6 +80,9 @@ The final local exported-package replay used byte-identical `compensated_abel.py
 
 The helper also exposes trace_first_drift_density and integrated_trace_first_drift, implementing Gamma=tr(M)+d(log h)/dr-nu_prime without a barotropic or sound-speed shortcut. Exact SymPy verification of the arbitrary 2x2 determinant derivative returned zero residual. Three additional tests cover reduction to the conditional closure formula, retention of extra trace/background-gradient terms, and matrix-exponential compensation for a general constant 2x2 system.
 
-Final test stdout: 15 passed in 0.58s. Collection: 15 tests collected in 0.33s. The module/test source SHA256 values are pinned in the computation manifest and SHA256SUMS.
+Final test stdout: 15 passed in 0.59s. Collection: 15 tests collected in 0.31s. The module/test source SHA256 values are pinned in the computation manifest and SHA256SUMS.
 
 Negative control preserved: the first generalized matrix-exponential test used O(1) m^-1 coefficients over 4000 m and overflowed. The synthetic scale was corrected to O(1e-5) m^-1; no tolerance was relaxed. See TEST_SCALE_NEGATIVE_CONTROL.md. The initial failure was observed in-session but its raw pytest output was not separately captured.
+
+
+Final exact local rerun: 15 passed in 0.59 s; 15 collected in 0.31 s. Source and test bytes match the published GitHub blobs. This remains an exported-package test, not a full repository, native Fortran or CI execution.

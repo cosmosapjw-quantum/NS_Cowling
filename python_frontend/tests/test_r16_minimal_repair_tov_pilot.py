@@ -19,7 +19,10 @@ def _normalized_rows():
             delta_p_source=1.0e30,
             interior_margin_fraction=1.0e-8,
         )
-        dp.append(repair["delta_p_lower"] * (0.8 if i == 0 else 1.5))
+        dp.append(
+            repair["delta_p_lower"] * 0.8
+            if i == 0 else 0.5 * (repair["delta_p_lower"] + repair["delta_p_upper"])
+        )
     p_pa = [1.0e20, 1.0e20 + dp[0], 1.0e20 + dp[0] + dp[1]]
     rows = []
     for i in range(3):

@@ -60,3 +60,13 @@ The 43-case claim in the prior prose/status files does not have a matching 43-ca
 - PR #6 historical 42-case receipt was not rerun; the later 43-case claim remains unauthenticated. PR #7 LA9's separately captured 15-case trace-first suite passed according to its receipt, but was not rerun in LA10.
 - No native Fortran, actual fixture roots/profiles, two-sided stellar matching, zero/finite-jump continuation, physical finite-rate model, TOV, or source-backed EOS calculation was run.
 - `theta` is algebraic boundary-condition interpolation only, not a physical conversion rate.
+
+
+## LA11 analytic matching validation (2026-11-11)
+
+- 22 synthetic tests passed in 0.21 s; collection: 22 in 0.01 s.
+- Python compileall, AST parsing and strict JSON parsing passed.
+- SymPy exact residuals: 7; Wolfram clean Module exact residuals: 10; all zero.
+- Helper/test bytes match GitHub blob SHA1 values 97e9f5c6a134110e92afc68b1b2080dbabbf6756 and 8bedc9870cc80ae63b25f03d86454afd59941c9a.
+- SHA256SUMS verifies the exported local package's source, receipts and note files.
+- No native Fortran, q-to-r, actual endpoint frames, actual stellar roots, regular Fredholm pencil/multiplicity equivalence, or GitHub Actions CI result is claimed.

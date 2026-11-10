@@ -248,7 +248,7 @@ def build_one(reference: dict[str, str]) -> tuple[dict, list[dict], list[dict]]:
         "crust":reference["crust"],
         "core":reference["core"],
         "matching_method":reference["matching_method"],
-        "row_count":len(rows),
+        "row_count":len(source_rows),
         "normalized_source_sha256":source_sha_before,
         "projected_sha256":projected_sha_before,
         "source_unchanged":source_after==source_sha_before,

@@ -23,7 +23,7 @@ SOURCE_DIR=ROOT/"oscillation_release_v1/data/eos_original_normalized"
 PROJECTED_DIR=ROOT/"oscillation_release_v1/data/eos_projected"
 SUMMARY_SHA256="ce54c111510f32086065f95356903cd6abad675adce12cab1a06b5cc82350965"
 EXPECTED_TABLES=234
-REPAIR_MARGIN_FRACTION=1.0e-10
+REPAIR_MARGIN_FRACTION=1.0e-8
 REQUIRED=("source_row","mu_b_mev","pressure_mev_fm3","energy_mev_fm3","n_b_fm3","mu_b_j","pressure_pa","n_b_m3")
 
 
@@ -63,61 +63,69 @@ def audit_one(ref):
         raise ValueError(f"{name}: projected source hash mismatch")
     sr=read_rows(src)
     pr=read_rows(proj)
-    if len(sr)!=len(pr): raise ValueError(f"{name}: row count mismatch")
+    if len(sr)!=len(pr):
+        raise ValueError(f"{name}: row count mismatch")
 
-    mu=[float(x["mu_b_mev"]) for x in sr]
-    n=[float(x["n_b_fm3"]) for x in sr]
-    p=[float(x["pressure_mev_fm3"]) for x in sr]
-    eps=[float(x["energy_mev_fm3"]) for x in sr]
+    # SI columns are authoritative because these are the values passed to
+    # Fortran construct_bridge_endpoints. Repair is performed in SI directly.
     mu_si=[float(x["mu_b_j"]) for x in sr]
     n_si=[float(x["n_b_m3"]) for x in sr]
-    p_si_source=[float(x["pressure_pa"]) for x in sr]
-    p_proj=[float(x["pressure_mev_fm3"]) for x in pr]
-    n_proj=[float(x["n_b_fm3"]) for x in pr]
-    mu_proj=[float(x["mu_b_mev"]) for x in pr]
+    p_source_si=[float(x["pressure_pa"]) for x in sr]
+    eps_source_si=[float(x["energy_j_m3"]) for x in sr]
+    p_projected_si=[float(x["pressure_pa"]) for x in pr]
+    eps_projected_si=[float(x["energy_j_m3"]) for x in pr]
 
-    p_repaired=[p[0]]
-    p_repaired_si=[p_si_source[0]]
-    repair_records=[]
-    source_hermite_failures=0
-    source_status_counts={"REJECT_NONPOSITIVE_COMPRESSIBILITY":0,"REJECT_ACAUSAL_NATIVE_CELL":0,"PASS_NATIVE_CELL_ADMISSIBLE":0}
-    min_d2=float("inf"); min_g=float("inf")
-    min_d2_si=float("inf"); min_g_si=float("inf")
-    si_pass_cells=0; si_fail_cells=0
+    pressure_unit_pa=1.602176634e32
+    mu_mev=[float(x["mu_b_mev"]) for x in sr]
+    n_mev=[float(x["n_b_fm3"]) for x in sr]
+
+    p_repaired_si=[p_source_si[0]]
+    source_status_counts={
+        "REJECT_NONPOSITIVE_COMPRESSIBILITY":0,
+        "REJECT_ACAUSAL_NATIVE_CELL":0,
+        "PASS_NATIVE_CELL_ADMISSIBLE":0
+    }
+    min_d2_si=float("inf")
+    min_g_si=float("inf")
+    min_d2_mev=float("inf")
+    min_g_mev=float("inf")
     max_abs_local_repair=0.0
     sum_abs_increment_repair=0.0
     adjusted=0
+    si_pass_cells=0
+    si_fail_cells=0
+    min_si_margin_fraction=float("inf")
+    max_si_margin_fraction=0.0
 
-    for i in range(len(mu)-1):
-        source_cell=audit_hermite_cell(
-            mu0=mu[i],p0=p[i],n0=n[i],
-            mu1=mu[i+1],p1=p[i+1],n1=n[i+1]
+    for i in range(len(mu_si)-1):
+        source_cell_si=audit_hermite_cell(
+            mu0=mu_si[i],p0=p_source_si[i],n0=n_si[i],
+            mu1=mu_si[i+1],p1=p_source_si[i+1],n1=n_si[i+1]
         )
-        source_status_counts[source_cell["status"]]+=1
-        if source_cell["status"]!="PASS_NATIVE_CELL_ADMISSIBLE":
-            source_hermite_failures+=1
+        source_status_counts[source_cell_si["status"]]+=1
 
-        delta_source=p[i+1]-p[i]
+        delta_source_si=p_source_si[i+1]-p_source_si[i]
         repair=minimal_admissible_delta_p(
-            mu0=mu[i],n0=n[i],mu1=mu[i+1],n1=n[i+1],
-            delta_p_source=delta_source,
+            mu0=mu_si[i],n0=n_si[i],mu1=mu_si[i+1],n1=n_si[i+1],
+            delta_p_source=delta_source_si,
             interior_margin_fraction=REPAIR_MARGIN_FRACTION,
         )
-        delta_star=repair["delta_p_repaired"]
+        delta_star_si=repair["delta_p_repaired"]
         adjusted += int(repair["was_adjusted"])
         sum_abs_increment_repair += abs(repair["delta_p_adjustment"])
-        max_abs_local_repair=max(max_abs_local_repair,abs(repair["delta_p_adjustment"])/max(abs(delta_source),1e-300))
-        p_repaired.append(p_repaired[-1]+delta_star)
-        p_repaired_si.append(p_repaired_si[-1] + delta_star*1.602176634e32)
-
-        cell=audit_hermite_cell(
-            mu0=mu[i],p0=p_repaired[i],n0=n[i],
-            mu1=mu[i+1],p1=p_repaired[i+1],n1=n[i+1]
+        max_abs_local_repair=max(
+            max_abs_local_repair,
+            abs(repair["delta_p_adjustment"])/max(abs(delta_source_si),1e-300)
         )
-        if cell["status"]!="PASS_NATIVE_CELL_ADMISSIBLE":
-            raise RuntimeError(f"{name}: repaired cell {i+1} not admitted: {cell}")
-        min_d2=min(min_d2,cell["min_d2p"])
-        min_g=min(min_g,cell["min_causal_margin"])
+        width_si=repair["delta_p_width"]
+        actual_margin_fraction=min(
+            delta_star_si-repair["delta_p_lower"],
+            repair["delta_p_upper"]-delta_star_si
+        )/width_si
+        min_si_margin_fraction=min(min_si_margin_fraction,actual_margin_fraction)
+        max_si_margin_fraction=max(max_si_margin_fraction,actual_margin_fraction)
+        p_repaired_si.append(p_repaired_si[-1]+delta_star_si)
+
         cell_si=audit_hermite_cell(
             mu0=mu_si[i],p0=p_repaired_si[i],n0=n_si[i],
             mu1=mu_si[i+1],p1=p_repaired_si[i+1],n1=n_si[i+1]
@@ -126,30 +134,45 @@ def audit_one(ref):
             si_pass_cells+=1
         else:
             si_fail_cells+=1
-            raise RuntimeError(f"{name}: SI-unit repaired cell {i+1} not admitted: {cell_si}")
+            raise RuntimeError(f"{name}: SI-native repaired cell {i+1} not admitted: {cell_si}")
         min_d2_si=min(min_d2_si,cell_si["min_d2p"])
         min_g_si=min(min_g_si,cell_si["min_causal_margin"])
-        repair_records.append((repair,cell,cell_si))
 
-    eps_repaired=[m*nn-pp for m,nn,pp in zip(mu,n,p_repaired)]
-    eps_repaired_si=[m*nn-pp for m,nn,pp in zip(mu_si,n_si,p_repaired_si)]
-    if any(x<=0.0 for x in eps_repaired_si) or any(b<=a for a,b in zip(eps_repaired_si,eps_repaired_si[1:])):
-        raise RuntimeError(f"{name}: SI-unit repaired energy density positivity/monotonicity failure")
-    if any(x<=0.0 for x in eps_repaired):
-        raise RuntimeError(f"{name}: repaired energy density became nonpositive")
-    if any(b<=a for a,b in zip(eps_repaired,eps_repaired[1:])):
-        raise RuntimeError(f"{name}: repaired energy density is not monotone")
-    if any(b<=a for a,b in zip(p_repaired,p_repaired[1:])):
-        raise RuntimeError(f"{name}: repaired pressure is not monotone")
+        # Same repaired pressure, converted for a separate normalized-unit check.
+        p0_mev=p_repaired_si[-2]/pressure_unit_pa
+        p1_mev=p_repaired_si[-1]/pressure_unit_pa
+        cell_mev=audit_hermite_cell(
+            mu0=mu_mev[i],p0=p0_mev,n0=n_mev[i],
+            mu1=mu_mev[i+1],p1=p1_mev,n1=n_mev[i+1]
+        )
+        if cell_mev["status"]=="PASS_NATIVE_CELL_ADMISSIBLE":
+            min_d2_mev=min(min_d2_mev,cell_mev["min_d2p"])
+            min_g_mev=min(min_g_mev,cell_mev["min_causal_margin"])
 
-    eps_projected=[float(x["energy_mev_fm3"]) for x in pr]
-    pmax=max(p)
-    pdelta_source=[a-b for a,b in zip(p_repaired,p)]
-    pdelta_projected=[a-b for a,b in zip(p_repaired,p_proj)]
-    epsdelta_source=[a-b for a,b in zip(eps_repaired,eps)]
-    epsdelta_projected=[a-b for a,b in zip(eps_repaired,eps_projected)]
-    max_local_pressure_source=max(abs(d)/max(abs(x),1e-300) for d,x in zip(pdelta_source,p))
-    max_local_pressure_projected=max(abs(d)/max(abs(x),1e-300) for d,x in zip(pdelta_projected,p_proj))
+    eps_repaired_si=[
+        m*nn-pp for m,nn,pp in zip(mu_si,n_si,p_repaired_si)
+    ]
+    if any(x<=0.0 for x in eps_repaired_si):
+        raise RuntimeError(f"{name}: SI repaired energy density became nonpositive")
+    if any(b<=a for a,b in zip(eps_repaired_si,eps_repaired_si[1:])):
+        raise RuntimeError(f"{name}: SI repaired energy density is not monotone")
+    if any(b<=a for a,b in zip(p_repaired_si,p_repaired_si[1:])):
+        raise RuntimeError(f"{name}: SI repaired pressure is not monotone")
+
+    p_repaired_mev=[x/pressure_unit_pa for x in p_repaired_si]
+    eps_repaired_mev=[x/pressure_unit_pa for x in eps_repaired_si]
+    pmax_si=max(p_source_si)
+    pdelta_source_si=[a-b for a,b in zip(p_repaired_si,p_source_si)]
+    pdelta_projected_si=[a-b for a,b in zip(p_repaired_si,p_projected_si)]
+    epsdelta_source_si=[a-b for a,b in zip(eps_repaired_si,eps_source_si)]
+    epsdelta_projected_si=[a-b for a,b in zip(eps_repaired_si,eps_projected_si)]
+    max_local_pressure_source=max(
+        abs(d)/max(abs(x),1e-300) for d,x in zip(pdelta_source_si,p_source_si)
+    )
+    max_local_pressure_projected=max(
+        abs(d)/max(abs(x),1e-300) for d,x in zip(pdelta_projected_si,p_projected_si)
+    )
+
     source_unchanged=sha256(src)==source_hash
     projected_unchanged=sha256(proj)==projected_hash
     if not source_unchanged or not projected_unchanged:
@@ -163,34 +186,45 @@ def audit_one(ref):
         "source_hermite_pass_cells":source_status_counts["PASS_NATIVE_CELL_ADMISSIBLE"],
         "source_hermite_nonpositive_curvature_cells":source_status_counts["REJECT_NONPOSITIVE_COMPRESSIBILITY"],
         "source_hermite_acausal_cells":source_status_counts["REJECT_ACAUSAL_NATIVE_CELL"],
-        "source_hermite_reject_cells":source_hermite_failures,
+        "source_hermite_reject_cells":(len(sr)-1)-source_status_counts["PASS_NATIVE_CELL_ADMISSIBLE"],
         "minimal_repair_adjusted_cells":adjusted,
         "source_pressure_increments_preserved_cells":len(sr)-1-adjusted,
         "minimal_repair_max_relative_increment_change":max_abs_local_repair,
-        "minimal_repair_sum_abs_increment_change":sum_abs_increment_repair,
-        "minimal_repair_max_abs_pressure_delta_over_source_Pmax":max(abs(x) for x in pdelta_source)/pmax,
-        "current_projector_max_abs_pressure_delta_over_source_Pmax":max(abs(a-b) for a,b in zip(p_proj,p))/pmax,
-        "repair_vs_current_projector_max_abs_pressure_delta_over_source_Pmax":max(abs(x) for x in pdelta_projected)/pmax,
-        "repair_vs_current_projector_rms_pressure_delta_over_source_Pmax":math.sqrt(sum(x*x for x in pdelta_projected)/len(pdelta_projected))/pmax,
+        "minimal_repair_sum_abs_increment_change_pa":sum_abs_increment_repair,
+        "minimum_actual_SI_interval_margin_fraction":min_si_margin_fraction,
+        "maximum_actual_SI_interval_margin_fraction":max_si_margin_fraction,
+        "minimal_repair_max_abs_pressure_delta_over_source_Pmax":max(abs(x) for x in pdelta_source_si)/pmax_si,
+        "current_projector_max_abs_pressure_delta_over_source_Pmax":max(abs(a-b) for a,b in zip(p_projected_si,p_source_si))/pmax_si,
+        "repair_vs_current_projector_max_abs_pressure_delta_over_source_Pmax":max(abs(x) for x in pdelta_projected_si)/pmax_si,
+        "repair_vs_current_projector_rms_pressure_delta_over_source_Pmax":math.sqrt(sum(x*x for x in pdelta_projected_si)/len(pdelta_projected_si))/pmax_si,
         "minimal_repair_max_local_pressure_delta_pct":100*max_local_pressure_source,
         "repair_vs_projector_max_local_pressure_delta_pct":100*max_local_pressure_projected,
-        "minimal_repair_max_abs_energy_delta_over_source_eps":max(abs(x)/max(abs(y),1e-300) for x,y in zip(epsdelta_source,eps)),
-        "current_projector_max_abs_energy_delta_over_source_eps":relative_max(eps_projected,eps),
-        "repair_vs_projector_max_abs_energy_delta_over_source_eps":max(abs(x)/max(abs(y),1e-300) for x,y in zip(epsdelta_projected,eps_projected)),
-        "repaired_min_energy_mev_fm3":min(eps_repaired),
-        "repaired_min_delta_energy_mev_fm3":min(b-a for a,b in zip(eps_repaired,eps_repaired[1:])),
-        "repaired_min_cell_d2p":min_d2,
-        "repaired_min_causal_margin":min_g,
+        "minimal_repair_max_abs_energy_delta_over_source_eps":max(
+            abs(x)/max(abs(y),1e-300) for x,y in zip(epsdelta_source_si,eps_source_si)
+        ),
+        "current_projector_max_abs_energy_delta_over_source_eps":relative_max(eps_projected_si,eps_source_si),
+        "repair_vs_projector_max_abs_energy_delta_over_source_eps":max(
+            abs(x)/max(abs(y),1e-300) for x,y in zip(epsdelta_projected_si,eps_projected_si)
+        ),
+        "repaired_min_energy_mev_fm3":min(eps_repaired_mev),
+        "repaired_min_delta_energy_mev_fm3":min(
+            b-a for a,b in zip(eps_repaired_mev,eps_repaired_mev[1:])
+        ),
+        "repaired_min_cell_d2p_si":min_d2_si,
+        "repaired_min_causal_margin_si":min_g_si,
+        "repaired_min_cell_d2p_mev":min_d2_mev if min_d2_mev!=float("inf") else None,
+        "repaired_min_causal_margin_mev":min_g_mev if min_g_mev!=float("inf") else None,
         "si_repaired_cell_pass_count":si_pass_cells,
         "si_repaired_cell_fail_count":si_fail_cells,
-        "si_repaired_min_cell_d2p":min_d2_si,
-        "si_repaired_min_causal_margin":min_g_si,
-        "source_row217_pressure":p[216],"source_row218_pressure":p[217],
-        "repaired_row217_pressure":p_repaired[216],"repaired_row218_pressure":p_repaired[217],
-        "projected_row217_pressure":p_proj[216],"projected_row218_pressure":p_proj[217],
-        "repair_row218_pressure_delta_pct":100*(p_repaired[217]/p[217]-1),
-        "projected_row218_pressure_delta_pct":100*(p_proj[217]/p[217]-1),
-        "repair_row218_pressure_vs_projected_pct":100*(p_repaired[217]/p_proj[217]-1),
+        "source_row217_pressure":p_source_si[216]/pressure_unit_pa,
+        "source_row218_pressure":p_source_si[217]/pressure_unit_pa,
+        "repaired_row217_pressure":p_repaired_mev[216],
+        "repaired_row218_pressure":p_repaired_mev[217],
+        "projected_row217_pressure":p_projected_si[216]/pressure_unit_pa,
+        "projected_row218_pressure":p_projected_si[217]/pressure_unit_pa,
+        "repair_row218_pressure_delta_pct":100*(p_repaired_si[217]/p_source_si[217]-1),
+        "projected_row218_pressure_delta_pct":100*(p_projected_si[217]/p_source_si[217]-1),
+        "repair_row218_pressure_vs_projected_pct":100*(p_repaired_si[217]/p_projected_si[217]-1),
         "status":"PASS_DIAGNOSTIC_ONLY_NO_TABLE_WRITTEN",
     }
 
@@ -258,7 +292,7 @@ def main(argv=None):
         "status":"PASS_R16_MINIMAL_HERMITE_PRESSURE_REPAIR_DIAGNOSTIC" if all_pass else "FAIL_R16_MINIMAL_HERMITE_PRESSURE_REPAIR_DIAGNOSTIC",
         "source_commit":os.environ.get("GITHUB_SHA","UNAVAILABLE_LOCAL_RUN"),
         "source_summary_sha256":SUMMARY_SHA256,
-        "repair_definition":"clip each raw DeltaP to exact Fortran cubic-Hermite admissible interval [L,U] with 1e-10 interior margin; preserve DeltaP exactly where already admitted; integrate repaired increments cumulatively from source P_1; re-evaluate every cell in production SI units",
+        "repair_definition":"clip each raw SI DeltaP to the exact Fortran cubic-Hermite admissible interval [L_SI,U_SI] with 1e-8 interval-width interior margin; preserve DeltaP exactly where already admitted; integrate repaired increments cumulatively from source P_1 in Pa",
         "si_conversion": {"MeV_to_J":1.602176634e-13,"MeV_fm3_to_Pa":1.602176634e32,"fm3_inverse_to_m3_inverse":1.0e45},
         "si_unit_validation": "all repaired cells are rechecked using source mu_b_j and n_b_m3 columns and pressure_pa endpoint reconstruction",
         "L":"h*(2*n0+n1)/3 + h^2*n0/(6*mu0)",

@@ -43,13 +43,19 @@
     "two_segment_compensated_relative_tolerance": 2e-12,
     "dop853_drift_and_compensation_relative_tolerance": 2e-9,
     "multiple_interface_telescoping": "PASS",
-    "tiny_complex_phase_tdd": "RED_THEN_GREEN"
+    "tiny_complex_phase_tdd": "RED_THEN_GREEN",
+    "final_test_command": "PYTHONPATH=research python -m pytest -q research/maxwell_mode_identity/tests/test_compensated_abel.py",
+    "final_test_cases_collected": 12,
+    "final_test_stdout": "12 passed in 0.56s"
   },
   "diagnostic_integrity": {
     "status": "STATIC_SOURCE_AUDIT_CONFIRMED_INFORMATION_LOSS",
     "path": "research/maxwell_mode_identity/diagnostics.py",
     "pattern": "float(real(outer_interface_value-inner_interface_value))",
-    "example_jump": {"re": -0.75, "im": -1.25},
+    "example_jump": {
+      "re": -0.75,
+      "im": -1.25
+    },
     "legacy_emitted_real_projection": -0.75,
     "imaginary_component_magnitude_discarded": 1.25,
     "fix_status": "NOT_PATCHED; ADDITIVE_FIELDS_AND_TDD_ASSIGNED_TO_LOCAL_DAG_LA9"
@@ -69,5 +75,11 @@
     "finite-rate or dissipative interface law",
     "source-backed EOS/TOV/Cowling result",
     "C7X D3/D4/D5/D6 blocker resolution"
-  ]
+  ],
+  "provenance": {
+    "run_type": "exported_container_package_without_git_metadata",
+    "exact_parent_snapshot": "9d43806e6b6f318934738ad6d94db261d15c2b98",
+    "local_git_commit_authentication": "NOT_CLAIMED",
+    "manifest": "computation_evidence/compensated_abel_20261111/computation_manifest.json"
+  }
 }

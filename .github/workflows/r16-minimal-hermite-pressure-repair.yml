@@ -11,9 +11,10 @@ on:
       - "oscillation_release_v1/data/spectrum_summary_234.csv"
       - "oscillation_release_v1/data/eos_original_normalized/**"
       - "oscillation_release_v1/data/eos_projected/**"
-      - "oscillation_source/methods/src/eos/ns_mu_bridge.f90"
+      - "oscillation_source/methods/src/**"
       - "oscillation_source/methods/fpm.toml"
       - "oscillation_source/methods/app/r16_bridge_cell_audit.f90"
+      - "oscillation_source/support/src/**"
   workflow_dispatch:
 
 permissions:
@@ -22,7 +23,7 @@ permissions:
 jobs:
   minimal-admissible-pressure-repair:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -40,7 +41,7 @@ jobs:
           echo "${RUNNER_TEMP}/fpm-env/bin" >> "${GITHUB_PATH}"
       - name: Test exact Hermite admissible pressure interval
         run: python -m pytest -q python_frontend/tests/test_r16_minimal_hermite_pressure_repair.py
-      - name: Compare minimal local pressure repair with current q-linear projector
+      - name: Compare minimal SI-native pressure repair with current q-linear projector
         run: |
           python scripts/audit_r16_minimal_hermite_pressure_repair.py \
             --output-dir dist/r16-minimal-hermite-repair
@@ -55,35 +56,14 @@ jobs:
         run: |
           set -euo pipefail
           fpm run --target r16_bridge_cell_audit --compiler gfortran --flag "-std=f2018 -O0 -g -fcheck=all -ffree-line-length-none -fimplicit-none" -- ../../dist/r16-minimal-hermite-repair/r16_minimal_hermite_pressure_repair_fortran_cells.csv 2>&1 | tee ../../dist/r16-fortran-bridge-audit.log
-          grep -E '^r16_fortran_cells_total=109776        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ns-cowling-r16-minimal-hermite-repair-${{ github.run_id }}
-          path: dist/r16-minimal-hermite-repair/
-          if-no-files-found: error
-          retention-days: 30
- ../../dist/r16-fortran-bridge-audit.log
-          grep -E '^r16_fortran_cells_pass=109776        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ns-cowling-r16-minimal-hermite-repair-${{ github.run_id }}
-          path: dist/r16-minimal-hermite-repair/
-          if-no-files-found: error
-          retention-days: 30
- ../../dist/r16-fortran-bridge-audit.log
-          grep -E '^r16_fortran_cells_fail=0        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ns-cowling-r16-minimal-hermite-repair-${{ github.run_id }}
-          path: dist/r16-minimal-hermite-repair/
-          if-no-files-found: error
-          retention-days: 30
- ../../dist/r16-fortran-bridge-audit.log
-      - name: Upload diagnostic-only repair comparison
+          grep -F 'r16_fortran_cells_total=109776' ../../dist/r16-fortran-bridge-audit.log
+          grep -F 'r16_fortran_cells_pass=109776' ../../dist/r16-fortran-bridge-audit.log
+          grep -F 'r16_fortran_cells_fail=0' ../../dist/r16-fortran-bridge-audit.log
+      - name: Upload diagnostic-only repair and compiled Fortran evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ns-cowling-r16-minimal-hermite-repair-${{ github.run_id }}
-          path: dist/r16-minimal-hermite-repair/
+          path: dist/
           if-no-files-found: error
           retention-days: 30

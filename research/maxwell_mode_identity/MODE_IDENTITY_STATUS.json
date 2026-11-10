@@ -13,7 +13,13 @@
   "weighted_abel_liouville_invariant": {
     "status": "DERIVED_CONDITIONALLY_AND_NUMERICALLY_CHECKED_IN_SYNTHETIC_RANGE",
     "expression": "Omega=h*exp(-nu)*(W1*V2-V1*W2)",
-    "hypotheses": ["same 2x2 linear Cowling system for both columns","cold one-parameter barotrope","chi=dP/depsilon is the same derivative in the perturbation matrix and background First Law","P_prime=-h*nu_prime","h>0"],
+    "hypotheses": [
+      "same 2x2 linear Cowling system for both columns",
+      "cold one-parameter barotrope",
+      "chi=dP/depsilon is the same derivative in the perturbation matrix and background First Law",
+      "P_prime=-h*nu_prime",
+      "h>0"
+    ],
     "interface_jump_law": "Omega_outer/Omega_inner=(h_outer/h_inner)*exp(-(nu_outer-nu_inner))*det(T_inner_to_outer)",
     "slow_rapid_interface_continuity": "both current maps have det(T)=h_inner/h_outer and nu is continuous",
     "canonical_covariant_symplectic_current": "NOT_ESTABLISHED_OR_CLAIMED",
@@ -27,17 +33,25 @@
     "actual_native_fortran_integration": false
   },
   "synthetic_computation": {
-    "tests_passed": 37,
+    "tests_passed": 42,
     "tests_failed": 0,
     "test_command": "PYTHONPATH=<package-root> python -m pytest -q mode_identity/tests",
     "smooth_phase_max_relative_drift": 7.907195134185742e-11,
     "smooth_phase_endpoint_relative_drift": 4.723167073919359e-11,
     "two_sided_max_relative_spread_max_step_100m": 4.673260016455182e-12,
-    "two_sided_spread_unlimited_max_step_negative_control": 3.576076639831998e-4,
+    "two_sided_spread_unlimited_max_step_negative_control": 0.0003576076639831998,
     "two_sided_rhs_evaluations_outward": 992,
     "two_sided_rhs_evaluations_inward": 947,
     "python_compileall": "PASS",
-    "json_parse": "PASS"
+    "json_parse": "PASS",
+    "test_functions": 32,
+    "case_counts_by_file": {
+      "tests/test_interface_transfer.py": 9,
+      "tests/test_mode_identity.py": 13,
+      "tests/test_weighted_wronskian.py": 20
+    },
+    "test_run_runtime_seconds": 0.65,
+    "test_collection_command": "PYTHONPATH=. python -m pytest --collect-only -q -p no:cacheprovider mode_identity/tests"
   },
   "integration_and_physics": {
     "native_fortran_modified": false,

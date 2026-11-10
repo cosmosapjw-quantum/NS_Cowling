@@ -75,6 +75,24 @@
         "A singular transfer matrix makes the inverse jump factor undefined.",
         "This is an algebraic determinant concomitant, not a canonical covariant symplectic current."
       ]
+    },
+    "trace_first_general": {
+      "identity": "For Y'=M(r)Y and Omega=w(r)*det(Y), Gamma=tr(M)+d(log w)/dr; for w=h*exp(-nu), Gamma=tr(M)+h_prime/h-nu_prime.",
+      "compensated_quantity": "K=Omega*exp(-integral(Gamma dr))*product(crossed_J_k^-1)",
+      "interface_multiplier": "J=(w_outer/w_inner)*det(T_inner_to_outer)",
+      "required_order": [
+        "derive and verify the complete implemented matrix M or square system Jacobian",
+        "calculate its full trace directly from the source equations",
+        "derive d(log h)/dr and nu_prime from the equilibrium background",
+        "use Gamma=tr(M)+d(log h)/dr-nu_prime",
+        "only then simplify to the chi_ad/chi_eq shortcut if the exact 2x2 Cowling trace and cold first law are verified"
+      ],
+      "limitations": [
+        "determinant identity is algebraic and basis-dependent, not a canonical symplectic current",
+        "for an n-by-n system use the complete square fundamental matrix and the determinant of the actual n-by-n interface map",
+        "if the perturbation system is not square or the map loses rank, stop and reformulate instead of forcing the 2x2 formula",
+        "do not infer a physical conservation law from the compensated determinant"
+      ]
     }
   },
   "non_goals": [
@@ -328,15 +346,17 @@
         "LA1",
         "LA3"
       ],
-      "name": "closure-mismatch compensated Abel-Liouville invariant and complex diagnostic integrity",
+      "name": "full trace-first compensated Abel-Liouville audit, closure mismatch, interface compensation and complex diagnostic integrity",
       "gate": "M1",
-      "status": "DERIVED_AND_SYNTHETICALLY_CHECKED; NATIVE_CLOSURE_AND_DIAGNOSTIC_REPAIR_LOCAL_EXECUTION_REQUIRED",
+      "status": "GENERAL TRACE-FIRST IDENTITY DERIVED; 15 SYNTHETIC TESTS PASS; NATIVE AUDIT STILL LOCAL/NOT_RUN",
       "outputs": [
         "closure_mismatch_equation_audit.md",
         "closure_drift_integral_results.json",
         "piecewise_compensated_invariant_results.json",
         "complex_interface_jump_diagnostics.json",
-        "native_python_closure_comparison.md"
+        "native_python_closure_comparison.md",
+        "trace_first_drift_results.json",
+        "TEST_SCALE_NEGATIVE_CONTROL.md"
       ],
       "acceptance": [
         "re-derive the complete trace from the live native and Python RHS before substituting chi_ad",
@@ -349,7 +369,12 @@
         "preserve the legacy real-projection fields and add explicit re, im and absolute-magnitude fields for W and V",
         "strict JSON serialization passes with allow_nan=false and a nonzero imaginary component smaller than 1e-15 is retained",
         "separate quadrature, ODE, interface and scaling errors; run step and tolerance refinement",
-        "all outputs identify synthetic versus native inputs and record exact source hashes"
+        "all outputs identify synthetic versus native inputs and record exact source hashes",
+        "derive Gamma=tr(M)+d(log h)/dr-nu_prime from the full implemented square system before applying any sound-speed shortcut",
+        "verify the arbitrary 2x2 Abel-Liouville determinant derivative independently",
+        "use chi_ad/chi_eq reduction only when the exact stated Cowling trace and equilibrium first law hold",
+        "if additional state variables exist, derive the full n-by-n determinant and interface map; stop if the formulation is not square or the interface map is rank-deficient",
+        "run the 15-case trace-first synthetic suite and reconcile stdout, collection inventory, manifest and SHA256SUMS"
       ],
       "stop": [
         "native q-to-r chain rule does not match the stated radial system",
@@ -357,7 +382,9 @@
         "transfer orientation or one-sided enthalpy/lapse values are ambiguous",
         "transfer determinant is zero or non-finite",
         "a finite-rate interface law is proposed without its own derivation and approval",
-        "complex diagnostics would require a breaking API change"
+        "complex diagnostics would require a breaking API change",
+        "actual perturbation system is non-square or a square interface map is singular and no mathematically justified reduced formulation exists",
+        "trace is copied from the sound-speed shortcut without source-level derivation"
       ],
       "local_execution_rule": "The published compensated_abel.py and 12 tests validate only the algebraic synthetic helper. They do not complete this node. Local agent must verify the actual native/Python source, and must not infer a stellar result."
     }
@@ -379,7 +406,9 @@
     "piecewise_compensated_invariant_results.json",
     "complex_interface_jump_diagnostics.json",
     "native_python_closure_comparison.md",
-    "strict_json_validation.log"
+    "strict_json_validation.log",
+    "trace_first_drift_results.json",
+    "TEST_SCALE_NEGATIVE_CONTROL.md"
   ],
   "failure_taxonomy": [
     "THEORY_CONVENTION_MISMATCH",
@@ -411,17 +440,19 @@
     "historical_pr6_receipt_status": "CAPTURED_EXPORTED_SNAPSHOT_ONLY; SOURCE_COMMIT_UNAUTHENTICATED",
     "prose_claim_43_case_status": "UNVERIFIED_CONFLICT",
     "current_pr6_head_replay": "NOT_RUN",
-    "compensated_abel_cases": 12,
+    "compensated_abel_cases": 15,
     "compensated_abel_status": "STANDALONE_LOCAL_SYNTHETIC_PASS",
     "github_actions": "NO_STATUS_RECORDS_RETURNED_NOT_CI_PASS",
-    "compensated_abel_functions": 12,
-    "compensated_abel_stdout": "12 passed in 0.53s",
-    "compensated_abel_collection": "12 tests collected in 0.32s",
+    "compensated_abel_functions": 15,
+    "compensated_abel_stdout": "15 passed in 0.58s",
+    "compensated_abel_collection": "15 tests collected in 0.33s",
     "compensated_abel_module_sha256": "9c107c136e7773ae22fe36548767784b26e85256985cc183a555c489ca86a5e5",
     "compensated_abel_tests_sha256": "4c188e802855b164af331c10a3cc77beb34500f9353fbad20b3899c12610647a",
-    "compensated_abel_local_git_metadata": "UNAVAILABLE_EXPORTED_ARTIFACT_RUN"
+    "compensated_abel_local_git_metadata": "UNAVAILABLE_EXPORTED_ARTIFACT_RUN",
+    "compensated_abel_helper_sha256": "089607c9d67be1be8f974e081063df1c6d124aca27783ff5fff45014609c3ffb",
+    "compensated_abel_test_sha256": "0a75dabc830cdfa081bf8d2513de093c22c0c69548235d7e2defe89f4ad70de5"
   },
-  "contract_revision": "1.1.0",
+  "contract_revision": "1.2.0",
   "updated_at": "2026-11-11",
   "validation_reconciliation": {
     "historical_manifest_cases": 42,
@@ -465,5 +496,13 @@
     "pr7_draft": true,
     "pr7_merged": false,
     "rule": "Keep PR draft; fetch current refs before local work. Do not merge automatically."
+  },
+  "negative_test_history": {
+    "status": "PRESERVED",
+    "event": "initial matrix-exponential synthetic test overflowed under O(1) m^-1 coefficients over 4000 m",
+    "classification": "INVALID_SYNTHETIC_TEST_SCALE",
+    "correction": "rescaled matrix coefficients to O(1e-5) m^-1 without relaxing tolerance",
+    "receipt": "TEST_SCALE_NEGATIVE_CONTROL.md",
+    "raw_failure_log": "not separately captured; failure was observed in-session"
   }
 }

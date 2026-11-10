@@ -84,5 +84,22 @@
     "exact_parent_snapshot": "9d43806e6b6f318934738ad6d94db261d15c2b98",
     "local_git_commit_authentication": "NOT_CLAIMED",
     "manifest": "computation_evidence/compensated_abel_20261111/computation_manifest.json"
-  }
+  },
+  "general_trace_first": {
+    "status": "DERIVED_AND_SYMPY_SYMBOLICALLY_CHECKED",
+    "formula": "Gamma=tr(M)+d(log h)/dr-nu_prime",
+    "identity": "K=h*exp(-nu)*det(Y)*exp(-integral(Gamma dr))*product(crossed_J^-1)",
+    "tests": 3,
+    "scope": "general square linear system determinant identity; not a canonical symplectic current"
+  },
+  "tests": {
+    "passed": 15,
+    "failed": 0,
+    "collected": 15,
+    "functions": 15,
+    "stdout": "15 passed in 0.58s",
+    "collection": "15 tests collected in 0.33s",
+    "command": "PYTHONPATH=research python -m pytest -q -p no:cacheprovider research/maxwell_mode_identity/tests/test_compensated_abel.py"
+  },
+  "test_scale_negative_control": "Initial test matrix exp overflowed due O(1) per-m coefficients over 4000 m; corrected to O(1e-5) per m, no tolerance relaxation; see computation_evidence/compensated_abel_20261111/TEST_SCALE_NEGATIVE_CONTROL.md."
 }

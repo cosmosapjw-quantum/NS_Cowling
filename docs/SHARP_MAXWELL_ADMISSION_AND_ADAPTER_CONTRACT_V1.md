@@ -99,6 +99,8 @@ A separate implementation issue is confirmed in `oscillation_source/solutions/sr
 4. Split interpolation domains at every `Iphase` change. Never smooth, differentiate, or construct a Hermite interval across a segment boundary. The 217/218 crust boundary is an observed source boundary, not automatically a Maxwell transition.
 5. Preserve particle-pair and nuclear-quadruple content. For the CompOSE nuclear quadruple, retain `Y_I`; convert to mass fraction only with `Y_h=Abar*Y_I` and keep the raw value as provenance.
 
+   **Provider-conformance caveat from C6:** the conversion above is the standard CompOSE interpretation, not an already validated mapping for every source table. For the pinned SPG_M1 and GPPVA_FSU2 rows, blindly applying `Abar*Y_I` produces values above unity, while the provisional direct mapping `Y_h=Y_I` fails native C3/C4 on every `Iphase=7` (inner-crust) row. Their composition semantics remain `BLOCKED_REVIEW_REQUIRED`; see [the C6B composition semantics review](SHARP_MAXWELL_COMPOSITION_SEMANTICS_REVIEW_V1.md). Do not apply either mapping to these providers as an admitted adapter conversion until the provider-level review is complete.
+
 ### B. Thermodynamic normalization and admission
 
 1. Compute `P=n_B Q1`, `epsilon=n_B m_n(1+Q7)`, `mu_Q3=m_n(1+Q3)`, and `mu_E=m_n(1+Q7)+Q1` from the raw headers.

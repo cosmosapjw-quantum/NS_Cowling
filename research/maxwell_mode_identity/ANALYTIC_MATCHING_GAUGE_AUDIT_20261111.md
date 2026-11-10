@@ -169,3 +169,10 @@ All inputs are synthetic. Native q-to-r, actual endpoint frames, stellar roots, 
 ## 9. Non-claims
 
 No whole-line Evans theorem, essential-spectrum result, canonical covariant symplectic current, physical finite-rate interface law, physical zero-frequency stellar mode, native Fortran/q-to-r validation, actual EOS/TOV/Cowling result, or physical f/p1/interface-g label is claimed. Algebraic multiplicity and argument-principle root counting remain blocked until their analytic pencil and contour conditions are verified for the actual solver.
+
+
+## Final source and run receipt (2026-11-11)
+
+The exact helper blob SHA1 is 97e9f5c6a134110e92afc68b1b2080dbabbf6756 and the exact test blob SHA1 is 8bedc9870cc80ae63b25f03d86454afd59941c9a. These match the exported local helper/test bytes used for the final run. Captured result: 22 passed in 0.21s; collection: 22 tests collected in 0.01s. Local Git metadata was unavailable in the exported container, so this is not described as a local committed-checkout replay. The computation manifest and SHA256SUMS record file identity and execution receipts.
+
+No GitHub Actions combined-status records were returned for the LA11 head; CI is NOT_CONFIRMED, not PASS. Native q-to-r, actual endpoint analyticity, regular Fredholm-pencil equivalence, physical multiplicity, argument-principle count, native Fortran and stellar data remain NOT_RUN/BLOCKED.

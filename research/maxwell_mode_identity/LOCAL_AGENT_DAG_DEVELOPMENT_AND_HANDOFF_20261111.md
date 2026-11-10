@@ -620,3 +620,94 @@ SymPy identities, strict input validation and the mandatory result label
 Physical finite-rate work remains blocked until a sourced constitutive
 kinetic relation, flux, chemical-potential affinity, interface dissipation/
 entropy balance, and valid junction conditions are derived.
+
+
+---
+
+# LA11 (2026-11-11): finite-interval analytic matching, basis/gauge covariance, and interface chart regularization
+
+Node: LA11  
+Branch: research/maxwell-analytic-matching-la11-v1  
+Parent: PR #9 / research/maxwell-interface-interpolation-la10-v1 at 104b4fa76e191db42e6af26f072533617f45441c  
+Evidence: conditional derivation + exact symbolic checks + 22 synthetic tests; native source audit not run.
+
+## 1. Finite-interval characteristic determinant
+
+This node concerns the finite-interval BVP. It is not automatically a whole-line Evans problem: do not introduce asymptotic stable/unstable subspaces, essential spectrum, exponential dichotomy, or far-field spectral gaps unless the actual solver problem is reformulated on the whole line.
+
+For a declared complex spectral parameter zeta in Omega subset C, each smooth layer obeys Y'=M_j(r,zeta)Y. A sharp interface obeys y_o=T_k(zeta)y_i. Let the center and surface admissible endpoint frames at a common match radius have complementary, fixed dimensions p and n-p:
+\[
+D(\zeta;r_m)=\det[\Phi_c(r_m,\zeta)\ \Phi_s(r_m,\zeta)].
+\]
+The determinant is bilinear and contains no complex conjugation.
+
+Sufficient holomorphy conditions are: (i) every layer matrix is holomorphic in zeta and locally uniformly L1-bounded in r; (ii) every graph interface map is holomorphic and invertible on the claimed domain, or its full implicit relation is used in a square, full-rank matching system; (iii) endpoint dimensions are fixed and full-rank holomorphic endpoint frames exist; and (iv) the domain contains no unhandled coefficient, endpoint or interface singularity. The Volterra integral equation for the fundamental propagator has a locally uniformly convergent ordered-integral series under these assumptions, so the finite product of layer propagators and interface maps is holomorphic. Consequently D is holomorphic. Its zero set is exactly the set where the propagated endpoint-admissible subspaces intersect nontrivially.
+
+Multiplicity gate: zero order equals physical BVP algebraic multiplicity only after the actual BVP is proved to be a regular holomorphic Fredholm pencil of index zero with nonempty resolvent, and the matching matrix is an analytic invertible reduction. LA11 does not establish this for the production Cowling problem. Do not use the argument principle until holomorphy is verified on and inside the contour and all allowed normalizing factors are holomorphic units throughout the interior.
+
+## 2. Basis and gauge covariance
+
+For holomorphic invertible basis changes Phi_c -> Phi_c A_c(zeta), Phi_s -> Phi_s A_s(zeta),
+\[
+\widetilde D=D\det A_c\det A_s.
+\]
+The factor must be nonzero in the entire contour interior. A multiplier nonzero only on the contour can still introduce an interior zero and change winding/root counts.
+
+For y=G(r,zeta)z, with G invertible, piecewise C1 in radius and holomorphic in zeta,
+\[
+M_z=G^{-1}M_yG-G^{-1}G',\quad
+T_z=G_o^{-1}T_yG_i,\quad
+D_y=\det G(r_m,\zeta)D_z,
+\]
+and tr(M_z)=tr(M_y)-partial_r log(det G). The weighted trace-first determinant and interface multipliers transform by the corresponding determinant cocycle. Every gauge, interface, endpoint basis, chart and column-scale determinant factor must be retained.
+
+## 3. Match-radius factors
+
+On a smooth layer,
+\[
+D(r_2)=\det U(r_2,r_1;\zeta)D(r_1)
+=\exp\left(\int_{r_1}^{r_2}\operatorname{tr}M\,dr\right)D(r_1).
+\]
+At an interface, D(r_k+)=det(T_k)D(r_k-). The determinant value and phase change, but the zero set is unchanged when every factor is finite and nonzero. Any zero/pole of a basis/gauge/chart multiplier inside a contour is an analytic-unit failure.
+
+## 4. LA10 graph-chart pole and implicit matching
+
+With [X]_i^o=X_o-X_i, Q=AV+nu_prime W,
+\[
+Q_o-\kappa Q_i=0,\qquad
+(1-\theta)\nu'[W]_i^o-\theta A[V]_i^o=0
+\]
+for 0<=theta<1. This is C_i y_i+C_o y_o=0, with
+\[
+C_i=\begin{pmatrix}-\kappa\nu'&-\kappa A\\-(1-\theta)\nu'&\theta A\end{pmatrix},\quad
+C_o=\begin{pmatrix}\nu'&A\\(1-\theta)\nu'&-\theta A\end{pmatrix}.
+\]
+The exact determinants are det C_i=-kappa*A*nu_prime, det C_o=-A*nu_prime. For A!=0, T_theta=-C_o^{-1}C_i recovers LA10 and det T_theta=kappa. However, for theta<1,kappa!=1, T_21=(1-theta)(kappa-1)nu_prime/A proportional to omega^-2.
+
+At A=0, C_o loses rank but the combined implicit block relation retains row rank two. It no longer defines a unique outer state as a graph. Use implicit/multiple-shooting matching, never invert singular C_o. For one-dimensional endpoint lines u_i,v_o,
+\[
+E_{\rm imp}=\det[C_i u_i,C_o v_o]
+=A\nu'\det[T_\theta u_i,v_o]\quad(A\ne0,\theta<1,\kappa\ne1).
+\]
+The implicit scalar has a finite limit in the tested synthetic case. This is a chart regularization, not evidence of a physical zero-frequency mode.
+
+At theta=1, the rapid relation is equivalent to [V]=0 for A!=0; the helper uses the explicitly selected analytic extension [V]=0 at A=0. At kappa=1, return the exact no-jump identity before forming rank-degenerate blocks. theta remains an algebraic interpolation parameter, not a microscopic rate.
+
+## 5. Conditioning, not holomorphy
+
+In dimensionless states (W/L^3,V/L^2) and x=A/(nu_prime*L), the transfer has a lower-left entry proportional to 1/x, while its determinant remains kappa. The synthetic real-frequency 2-norm condition scan is consistent with cond2=O(|x|^-2)=O(|omega|^-4). This exponent is meaningful only in the stated dimensionless coordinates.
+
+Hermitian norms, Gram-Schmidt, ordinary unitary QR/SVD and polar factors involve conjugation and are generally nonholomorphic in complex zeta. They are conditioning diagnostics, not Evans/characteristic scalars. If used internally, restore the full phase, volume/radial factor, triangular determinant, column/row scales and chart-transition cocycles. For the current two-state problem direct bilinear determinants are preferred. For larger n, exterior algebra scales as binomial(n,p); Grassmann charts and polar continuous orthogonalization are viable only with analytic frame/volume cocycles. Magnus methods are per smooth layer; never smear an interface through a smooth step.
+
+## 6. LA11 tests and evidence
+
+- 22/22 synthetic pytest cases pass; captured stdout: 22 passed in 0.21s; collection: 22 tests collected in 0.01s.
+- Exact SymPy residuals: 7 checks; all zero.
+- Clean Wolfram Language Module: 10 exact checks; all zero.
+- Coverage: complex bilinear matching, basis and gauge determinant cocycles, trace transformation, smooth match-radius factor, LA10 implicit blocks for five theta values, E_imp=A nu' E_graph, A=0 implicit rank, rapid extension, no-jump identity, nonholomorphic norm warning, interior-zero basis multiplier, dimensionless conditioning and finite synthetic A-to-zero limit.
+- The test run was from an exported package without Git metadata. The exact helper/test bytes were matched to GitHub blobs 97e9f5c6a134110e92afc68b1b2080dbabbf6756 and 8bedc9870cc80ae63b25f03d86454afd59941c9a.
+- Native q-to-r, actual endpoint-frame analyticity, actual Cowling BVP pencil, Fredholm/multiplicity equivalence, physical contour root counts, native Fortran, actual stellar roots/profiles and production integration remain NOT_RUN/BLOCKED.
+
+## 7. Literature boundary
+
+Theorem 3.9 of Beyn–Latushkin–Rottmann-Mathes (arXiv:1210.3952) supports the holomorphic determinant of complementary holomorphic subspaces and its intersection zero set; Fredholm-pencil and multiplicity results apply only after verifying their hypotheses for this BVP. Humpherys–Zumbrun (math/0508020) motivate polar continuous orthogonalization with a retained analytic volume factor. Ledoux–Malham–Thümmler (0710.1037) motivate analytic Grassmann patch switching. Zumbrun (0904.0268v2) and Malham–Niesen (math/0605581) provide whole-line Evans numerical/error context; their gap assumptions are not imported into this finite-interval problem. Full bibliographic URLs are in ANALYTIC_MATCHING_GAUGE_AUDIT_20261111.md.

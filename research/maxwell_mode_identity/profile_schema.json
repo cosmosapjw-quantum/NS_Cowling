@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cosmosapjw-quantum/NS_Cowling/blob/research/maxwell-mode-identity-v1/research/maxwell_mode_identity/profile_schema.json",
+  "title": "Phase-resolved Maxwell Cowling mode profile",
+  "description": "JSON interchange profile for real-valued finite-frequency Cowling shots currently emitted by NS_Cowling. Programmatic helper objects may also hold complex arrays, but no complex JSON encoding is defined in this v1 schema.",
+  "type": "object",
+  "required": ["schema", "model_id", "frequency_hz", "ell", "conversion", "core", "envelope", "identity"],
+  "properties": {
+    "schema": {"const": "ns-cowling.phase-resolved-mode-profile.v1"},
+    "model_id": {"type": "string", "minLength": 1},
+    "frequency_hz": {"type": "number", "exclusiveMinimum": 0},
+    "ell": {"type": "integer", "minimum": 1},
+    "conversion": {"enum": ["slow", "rapid"]},
+    "units": {
+      "type": "object",
+      "required": ["r_m", "W_m3", "V_m2", "enthalpy_j_m3"],
+      "properties": {
+        "r_m": {"const": "m"},
+        "W_m3": {"const": "m^3"},
+        "V_m2": {"const": "m^2"},
+        "enthalpy_j_m3": {"const": "J m^-3"}
+      }
+    },
+    "core": {"$ref": "#/$defs/phase"},
+    "envelope": {"$ref": "#/$defs/phase"},
+    "identity": {
+      "type": "object",
+      "required": ["spectral_branch_id", "physical_character", "identity_status"],
+      "properties": {
+        "spectral_branch_id": {"type": ["string", "null"]},
+        "physical_character": {"type": "string", "default": "unresolved"},
+        "identity_status": {"enum": ["UNRESOLVED", "DIAGNOSTICS_ONLY_NO_AUTOMATIC_F_P_G_LABEL", "MATCHED_BY_PROFILE_OVERLAP", "AMBIGUOUS_DO_NOT_FORCE_ID"]}
+      }
+    }
+  },
+  "$defs": {
+    "phase": {
+      "type": "object",
+      "required": ["r_m", "W_m3", "V_m2", "enthalpy_j_m3", "nu", "lambda"],
+      "properties": {
+        "r_m": {"type": "array", "minItems": 3, "items": {"type": "number"}},
+        "W_m3": {"type": "array", "minItems": 3, "items": {"type": "number"}},
+        "V_m2": {"type": "array", "minItems": 3, "items": {"type": "number"}},
+        "enthalpy_j_m3": {"type": "array", "minItems": 3, "items": {"type": "number", "exclusiveMinimum": 0}},
+        "nu": {"type": "array", "minItems": 3, "items": {"type": "number"}},
+        "lambda": {"type": "array", "minItems": 3, "items": {"type": "number"}}
+      }
+    }
+  }
+}

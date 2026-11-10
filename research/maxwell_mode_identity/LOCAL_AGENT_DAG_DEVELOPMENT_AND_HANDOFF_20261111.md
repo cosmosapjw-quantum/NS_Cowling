@@ -158,6 +158,24 @@ A synthetic test showed weighted determinant spread 3.5761e-4 with unlimited DOP
 
 Expose rtol, atol, max_step, sample grid and accepted/rejected/evaluation counts. Test at least three max_step values and two tolerances. If QR/log-amplitude scaling is used, record and undo every determinant scaling factor. Compare direct and rescaled paths.
 
+
+### 4.6 Characteristic-function choice and scale accounting
+
+Do not use one scalar's magnitude as both the exact eigencondition and the numerical conditioning diagnostic.
+
+- **Raw weighted determinant:** E(omega;rm)=h exp(-nu) det(y_center,y_surface) has the correct exact zero set. It is independent of matching radius for the same system, interface maps and boundary subspaces. It is the preferred analytic characteristic scalar when the coefficient matrix and endpoint basis vectors depend holomorphically on complex omega. Its raw magnitude is not a convergence metric: exponential growth/decay can overflow, underflow or erase the transverse component by cancellation.
+- **Normalized determinant angle:** det(y_center,y_surface)/(||z_center|| ||z_surface||), with z=(W/r^3,V/r^2), is bounded and useful as a real-frequency subspace-angle diagnostic. Complex Euclidean norms involve conjugation, so this normalized value is generally non-holomorphic in omega. Never use it for complex-frequency contour counts, winding-number arguments or an Evans-function claim.
+- **Scaled/exterior or multiple-shooting determinant:** for large dynamic range, propagate short-interval fundamental matrices or assemble center, interface and surface continuity equations into a multiple-shooting matching matrix. The determinant of that global matching matrix is a characteristic scalar. Any nonzero column or row scaling leaves its zero set unchanged only when every factor is retained. Store the sign/complex phase and logarithmic magnitude of every scale factor.
+- **QR accounting:** if a propagated fundamental matrix is represented as Y=Q R, retain det(Q) det(R), including complex phase. Q alone stores only the subspace orientation. Discarding R or normalizing two columns independently without recording their factors changes the determinant amplitude and may introduce non-holomorphic parameter dependence.
+- **False-root guard:** a small residual is not accepted when a column has collapsed, a scale factor is missing, overflow/underflow occurred, or the result changes under matching-radius, max-step and tolerance refinement. Compare zero sets with the existing outward shooting residual and reconstruct the profile.
+
+The center is a singular endpoint. Verify the actual regular series; at leading order W~C r^(ell+1), V~-C r^ell/ell, so at a finite center cutoff W+ell*r_c*V=0 up to higher-order terms. Do not start exactly at r=0 using the singular first-order RHS.
+
+The current outer endpoint is a finite-pressure cutoff. Its surface null line is the project's finite-cutoff condition, not automatically the exact P=0 free-surface line. Keep the same cutoff in both shooting directions. If a future calculation targets the true surface, propagate the true surface condition inward through the omitted layer or derive its impedance; do not silently move the boundary.
+
+### 4.7 Undefined determinant ratios and strict JSON
+
+At an eigencondition, the inner weighted determinant can be exactly zero. Therefore Omega_outer/Omega_inner is mathematically undefined when |Omega_inner| is at or below the declared relative floor. The diagnostic API must return null plus status UNDEFINED_ZERO_DENOMINATOR, not NaN, infinity or a made-up ratio. Keep the absolute/relative jump residuals as separate diagnostics. When serializing complex Omega values, encode them explicitly as {re,im}; JSON does not define complex numbers. All JSON outputs must pass a strict serializer with allow_nan=false.
 ## 5. DAG and exact dependencies
 
 LA0 identity/environment preflight

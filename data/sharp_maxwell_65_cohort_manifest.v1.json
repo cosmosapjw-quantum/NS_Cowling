@@ -3,8 +3,8 @@
   "schema_version": "1.0.0",
   "manifest_id": "sharp_maxwell_65_cohort_manifest",
   "created_date": "2026-11-10",
-  "research_loop_stage": "C4_EXECUTION_DAG_COMPLETE",
-  "status": "C4_EXECUTION_PLAN_COMPLETE__SOURCE_ADMISSION_IMPLEMENTATION_PENDING",
+  "research_loop_stage": "C5_IMPLEMENTATION_COMPLETE",
+  "status": "C5_IMPLEMENTATION_COMPLETE__NATIVE_EXECUTION_PENDING",
   "purpose": "Create a new exact first-order Maxwell cohort from the 13 crust x 5 core source grid. All historical smooth maxwell outputs are immutable legacy references and are not inputs, priors, seeds, or fallback results for this cohort.",
   "authority": {
     "raw_source_branch": "research/maxwell-native-fortran-v1",
@@ -2563,16 +2563,19 @@
     "core_sources_with_reported_acausal_tails": 2,
     "sharp_transition_searches_run": 0,
     "new_sharp_outputs_created": 0,
-    "TOV_Cowling_runs": 0
+    "TOV_Cowling_runs": 0,
+    "c5_probe_sources_implemented": 2,
+    "c5_native_probe_runs": 0,
+    "c5_compose_roundtrips": 0
   },
   "next_research_steps": [
-    "C5: implement a read-only source-audit vertical slice by reusing compose_eos.api.read_compose and native check_consistency on SPG_M1 and one Nadd=1 GPPVA source; retain q_extra, eos.compo and Iphase.",
-    "C5/C6: extend to all 18 sources with deterministic parser receipts and tests for row-key alignment, Nadd widths, composition shapes, source hashes and no source mutation.",
-    "C7: perform thermodynamic/composition closure and whole-interval stability/causality checks independently on every smooth Iphase segment; preserve full-source and connected causal-domain results.",
-    "C8: quantify density reconstruction drift by segment and establish an acceptance threshold through resolution/refinement and observable-sensitivity tests; do not invent or widen the tolerance.",
-    "C5/C7: implement the segment-preserving adapter/phase-chain representation and resolve Iphase/Nadd provider semantics and rest-mass transformations with reversible provenance.",
-    "Only after all relevant gates: run one sharp-Maxwell pilot, independently verify the exact coexistence point, and then execute the 65-pair sweep.",
-    "Only after the multi-segment envelope is represented in TOV: verify stable branches and Seidov diagnostics, then calculate slow- and rapid-conversion Cowling spectra separately."
+    "C6: execute the committed SPG_M1 and GPPVA_FSU2 native read-write-read/verifier probe on a Linux/gfortran host; run the exact committed helper tests and preserve the JSON receipt, compiler/build identity and command/exit status. Separate reader/runtime failure from scientific gate FAIL.",
+    "C7: extend source parsing and physical audits to the remaining 16 EOS; check thermodynamic/composition closure, segmentwise source metadata and whole-interval stability/causality without crossing Iphase boundaries.",
+    "C7/C5: resolve provider Data Sheet semantics of Iphase and Nadd, preserve additional thermodynamic columns, and implement a segment-preserving phase-chain adapter.",
+    "C8: quantify density reconstruction drift by segment and select an acceptance threshold only through resolution/refinement and observable-sensitivity tests.",
+    "C7: normalize source rest-mass references with explicit reversible transformations and report full-source versus causal-domain results separately.",
+    "Only after source, adapter and physical gates: run one sharp-Maxwell pilot and independently verify common pressure, common chemical potential, positive density jump, energy jump and whole-segment admissibility.",
+    "Only after a successful pilot: execute the 65-pair sweep and then multi-segment TOV stable-branch, Seidov, slow-conversion and rapid-conversion Cowling analyses."
   ],
   "c4_execution_plan": {
     "plan_id": "sharp_maxwell_c4_execution_dag_v1",
@@ -2589,5 +2592,87 @@
     "selected_stage_scope": "C4 plan only; source verification, adapter implementation, root search, TOV and Cowling not run.",
     "next_stage": "C5",
     "next_action": "Implement a read-only native-reader/C1-C11 vertical slice for SPG_M1 and one Nadd=1 GPPVA source with provenance receipts."
+  },
+  "compouse_group_fraction_mapping": {
+    "authority": "CompOSE Reference Manual v3.01, Eq. (4.22), DOI 10.1140/epja/s10050-022-00847-y",
+    "definition": "Y_I = (sum_j A_j Y_j)/A_av = sum_j Y_j; the stored group fraction is already the combined baryon fraction.",
+    "previous_reader_mapping": "Yh = Abar * YI (incorrect)",
+    "previous_writer_mapping": "YI = Yh / Abar (incorrect)",
+    "corrected_reader_mapping": "Yh = YI",
+    "corrected_writer_mapping": "YI = Yh",
+    "rationale": "The selected crust files contain Abar=56, YI=1 records; the previous reader mapped these to Yh=56, conflicting with its own upper bound Yh<=1 and C3/C4 baryon-fraction closure.",
+    "implementation_file": "fortran_eos/src/compose_eos_io.f90",
+    "implementation_blob_sha": "5b01b4051d9392362ca1ed915b946f1031d0e3c2",
+    "implementation_status": "COMMITTED__NATIVE_ROUNDTRIP_NOT_RUN"
+  },
+  "c5_vertical_slice": {
+    "runner": "scripts/sharp_maxwell_source_probe.py",
+    "runner_blob_sha": "a9faad478bbe0d0159111fe8e7cf0b40216b8a3e",
+    "human_contract": "docs/SHARP_MAXWELL_C5_READ_ONLY_NATIVE_PROBE_V1.md",
+    "human_contract_blob_sha": "556d0214ac2bc3c802c02829792eed2c37f6a1e1",
+    "test_file": "python_frontend/tests/test_sharp_maxwell_source_probe.py",
+    "test_file_blob_sha": "0fa3c779d043f19aa1ec306a0b919fd5100e9a46",
+    "selected_source_ids": [
+      "SPG_M1",
+      "GPPVA_FSU2"
+    ],
+    "selected_source_contract": {
+      "SPG_M1": {
+        "rows": 365,
+        "Nadd": 0,
+        "composition": true,
+        "Iphase_boundary": [
+          217,
+          218
+        ]
+      },
+      "GPPVA_FSU2": {
+        "rows": 269,
+        "Nadd": 1,
+        "composition": true,
+        "Iphase_boundary": [
+          217,
+          218
+        ]
+      }
+    },
+    "receipt_schema": "sharp_maxwell_c5_native_source_probe_receipt.v1",
+    "implemented_path": "native read_compose -> native write_compose in temporary directory -> native read_compose -> native check_consistency",
+    "preservation_checks": [
+      "pinned source Git blob SHA-1",
+      "raw source SHA-256 before/after",
+      "eos.nb row-wise",
+      "Q1-Q7 row-wise",
+      "Nadd and q_extra row-wise",
+      "Iphase row-wise and boundary",
+      "composition particle fields and Yh=YI",
+      "native Compose write-read round-trip"
+    ],
+    "runner_status_contract": "Runner completion is distinct from scientific PASS/FAIL; C1-C6/C10-C11 remain native hard gates and C7-C9 diagnostics.",
+    "implementation_status": "COMMITTED",
+    "helper_test_status": "EQUIVALENT_STAGING_HELPERS_6_PASS__COMMITTED_TEST_FILE_NOT_RUN",
+    "helper_test_note": "Six equivalent pure-helper tests passed in an isolated staging copy; the exact committed test file was not executed in this runtime.",
+    "native_reader_execution_status": "NOT_RUN",
+    "native_writer_roundtrip_status": "NOT_RUN",
+    "native_verifier_execution_status": "NOT_RUN",
+    "github_actions_status": "NOT_RUN",
+    "native_subagent": "NOT_RUN",
+    "runtime_blocker": "The authorized Desktop Commander device cosmosapjw was offline; the local container could not resolve github.com to obtain the source tree.",
+    "source_mutation": "NONE",
+    "source_data_mutation": "NONE",
+    "roots": "NOT_RUN",
+    "TOV_Cowling": "NOT_RUN",
+    "all_65_pairs_unchanged": true,
+    "all_65_pair_admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+    "legacy_maxwell_policy": "LEGACY_NON_MAXWELL_READ_ONLY",
+    "not_claimed": [
+      "native source read PASS",
+      "native Compose round-trip PASS",
+      "native C1-C11 scientific PASS",
+      "full physical source admission",
+      "whole-interval Hermite stability/causality",
+      "Maxwell roots",
+      "TOV/Cowling"
+    ]
   }
 }

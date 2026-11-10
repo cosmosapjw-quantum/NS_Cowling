@@ -2605,7 +2605,14 @@
     "no_repair_policy": "Do not change source data, parser mapping, C3/C4 definitions, or tolerances until provider-level evidence and independent row-wise closure analysis establish the correct interpretation.",
     "implementation_file": "fortran_eos/src/compose_eos_io.f90",
     "implementation_blob_sha": "5b01b4051d9392362ca1ed915b946f1031d0e3c2",
-    "implementation_status": "PROVISIONAL__COMPOSITION_SEMANTICS_REVIEW_REQUIRED"
+    "implementation_status": "PROVISIONAL__COMPOSITION_SEMANTICS_REVIEW_REQUIRED",
+    "pre_c5_mapping_history": {
+      "reader_at_base_commit": "Yh = Abar * YI",
+      "writer_at_base_commit": "YI = Yh / Abar",
+      "c5_change": "Changed to direct Yh=YI / YI=Yh field preservation after the Abar=56,YI=1 source rows violated the internal Yh<=1 guard under the prior mapping.",
+      "review": "The C5 rationale that this direct mapping followed from Eq. (4.22) was not supported. The prior mapping is the standard CompOSE conversion only for a source that actually conforms to the standard YI convention; these raw provider rows do not currently demonstrate such conformance.",
+      "status": "HISTORICAL_IMPLEMENTATION_PROVENANCE__NOT_A_PHYSICAL_DECISION"
+    }
   },
   "c5_vertical_slice": {
     "runner": "scripts/sharp_maxwell_source_probe.py",

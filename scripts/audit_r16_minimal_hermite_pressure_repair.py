@@ -191,7 +191,7 @@ def main(argv=None):
         except Exception as exc: failures.append({"name":ref.get("name"),"error":f"{type(exc).__name__}: {exc}"[:2000]})
 
     def aggregate(key):
-        rows=[x for x in records if x["core"]==key] if key else records
+        rows=records if key is None else [x for x in records if x["core"]==key]
         return {
             "tables":len(rows),
             "cells":sum(x["cell_count"] for x in rows),

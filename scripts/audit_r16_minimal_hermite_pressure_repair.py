@@ -263,8 +263,8 @@ def main(argv=None):
             "max_current_projection_delta_over_source_Pmax":max(x["current_projector_max_abs_pressure_delta_over_source_Pmax"] for x in rows),
             "max_repair_vs_projection_delta_over_source_Pmax":max(x["repair_vs_current_projector_max_abs_pressure_delta_over_source_Pmax"] for x in rows),
             "max_repair_energy_delta_rel_source":max(x["minimal_repair_max_abs_energy_delta_over_source_eps"] for x in rows),
-            "max_repaired_min_causal_margin":min(x["repaired_min_causal_margin"] for x in rows),
-            "max_repaired_min_d2p":min(x["repaired_min_cell_d2p"] for x in rows),
+            "minimum_repaired_causal_margin_si":min(x["repaired_min_causal_margin_si"] for x in rows),
+            "minimum_repaired_d2p_si":min(x["repaired_min_cell_d2p_si"] for x in rows),
         }
     summary={
         "all_cohort":aggregate(None),
@@ -295,6 +295,7 @@ def main(argv=None):
         "repair_definition":"clip each raw SI DeltaP to the exact Fortran cubic-Hermite admissible interval [L_SI,U_SI] with 1e-8 interval-width interior margin; preserve DeltaP exactly where already admitted; integrate repaired increments cumulatively from source P_1 in Pa",
         "si_conversion": {"MeV_to_J":1.602176634e-13,"MeV_fm3_to_Pa":1.602176634e32,"fm3_inverse_to_m3_inverse":1.0e45},
         "si_unit_validation": "all repaired cells are rechecked using source mu_b_j and n_b_m3 columns and pressure_pa endpoint reconstruction",
+        "repair_margin_fraction_of_SI_admissible_interval": REPAIR_MARGIN_FRACTION,
         "L":"h*(2*n0+n1)/3 + h^2*n0/(6*mu0)",
         "U":"h*(n0+2*n1)/3 - h^2*n1/(6*mu1)",
         "source_tables_modified":False,

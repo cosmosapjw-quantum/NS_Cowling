@@ -9,6 +9,8 @@ from maxwell_mode_identity.compensated_abel import (
     integrated_closure_drift,
     interface_multiplier,
     compensate_concomitant,
+    trace_first_drift_density,
+    integrated_trace_first_drift,
 )
 
 
@@ -143,3 +145,46 @@ def test_tiny_complex_phase_is_never_silently_dropped():
     z = compensate_concomitant(1.0 + 1.0e-18j, 0.0, [])
     assert isinstance(j, complex) and j.imag != 0.0
     assert isinstance(z, complex) and z.imag != 0.0
+
+
+def test_trace_first_formula_reduces_to_sound_speed_shortcut():
+    nu_prime = 2.0e-6
+    chi_ad, chi_eq = 0.41, 0.28
+    trace_m = nu_prime * (2.0 + 1.0 / chi_ad)
+    dlogh = -(1.0 + 1.0 / chi_eq) * nu_prime
+    generic = trace_first_drift_density(trace_m, dlogh, nu_prime)
+    shortcut = closure_drift_density(nu_prime, chi_ad, chi_eq)
+    assert generic == pytest.approx(shortcut, rel=2e-15)
+
+
+def test_trace_first_formula_retains_extra_composition_terms():
+    nu_prime = np.array([1.0e-6, 1.5e-6, 2.0e-6])
+    base_trace = nu_prime * (2.0 + 1.0 / 0.4)
+    extra_trace = np.array([0.2e-6, -0.1e-6, 0.3e-6])
+    base_dlogh = -(1.0 + 1.0 / 0.3) * nu_prime
+    extra_background = np.array([-0.05e-6, 0.04e-6, 0.02e-6])
+    expected = nu_prime * (1.0 / 0.4 - 1.0 / 0.3) + extra_trace + extra_background
+    got = trace_first_drift_density(base_trace + extra_trace, base_dlogh + extra_background, nu_prime)
+    assert np.allclose(got, expected, rtol=2e-15, atol=0.0)
+
+
+def test_trace_first_matrix_exponential_compensation_is_exact():
+    from scipy.linalg import expm
+    r0, r1 = 100.0, 4100.0
+    length = r1 - r0
+    M = np.array([[4.0e-5, 2.0e-5], [-1.0e-5, -2.0e-5]], dtype=float)
+    trace_m = float(np.trace(M))
+    dlogh, nu_prime = 0.5e-5, -0.3e-5
+    gamma = trace_m + dlogh - nu_prime
+    y0 = np.array([[1.0 + 0.3j, 0.7 - 0.2j], [0.4 - 0.1j, 1.3 + 0.5j]])
+    y1 = expm(M * length) @ y0
+    nu0, h0 = 0.08, 7.0e34
+    nu1 = nu0 + nu_prime * length
+    h1 = h0 * np.exp(dlogh * length)
+    omega0 = h0 * np.exp(-nu0) * np.linalg.det(y0)
+    omega1 = h1 * np.exp(-nu1) * np.linalg.det(y1)
+    I = integrated_trace_first_drift(
+        [r0, r1], [trace_m, trace_m], [dlogh, dlogh], [nu_prime, nu_prime]
+    )
+    assert I == pytest.approx(gamma * length, rel=2e-15)
+    assert compensate_concomitant(omega1, I) == pytest.approx(omega0, rel=2e-12)

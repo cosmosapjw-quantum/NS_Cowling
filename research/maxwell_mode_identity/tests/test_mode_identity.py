@@ -41,6 +41,16 @@ def test_norm_is_quadratic_and_trapping_is_scale_invariant():
     assert b["core_trapping_fraction"] == pytest.approx(a["core_trapping_fraction"], rel=1e-12)
 
 
+def test_real_interface_sign_reversal_is_separate_from_phase_local_nodes():
+    p = make_profile()
+    e = p.envelope
+    env = PhaseProfile(e.r_m, -e.W_m3, -e.V_m2, e.enthalpy_j_m3, e.nu, e.lambda_)
+    d = diagnose_mode(ModeProfile(p.core, env, p.frequency_hz, p.ell, p.conversion))
+    assert d["interface_W_sign_reversal"] is True
+    assert "W_nodes_core_sampled" not in d
+    assert d["physical_character"] == "unresolved"
+
+
 def test_overlap_is_one_under_global_sign_and_scale_change():
     a, b = make_profile(), make_profile(scale=7.0, sign=-1.0, freq=1900.0)
     ov = phase_profile_overlap(a, b)
@@ -90,6 +100,17 @@ def test_ambiguous_duplicate_profiles_are_not_forced_into_ids():
     c = [make_profile(freq=1805.0), make_profile(freq=1815.0)]
     out = track_spectra(p, c, ["B0", "B1"], ambiguity_margin=0.05)
     assert all(m["spectral_branch_id"] is None for m in out["matches"])
+
+
+def test_global_assignment_nonbest_local_pair_is_ambiguous():
+    p0, p1 = make_profile(freq=1800.0), make_profile(freq=1810.0)
+    c0, c1 = make_profile(freq=1805.0), make_profile(mode="core", freq=1850.0)
+    out = track_spectra([p0, p1], [c0, c1], ["B0", "B1"],
+                        min_overlap=0.0, ambiguity_margin=0.0, frequency_weight=0.0)
+    suboptimal = [m for m in out["matches"]
+                  if m["overlap"] < max(out["overlap_matrix"][m["previous_index"]])]
+    assert suboptimal
+    assert all(m["spectral_branch_id"] is None for m in suboptimal)
 
 
 def test_slow_and_rapid_continuations_are_separate():

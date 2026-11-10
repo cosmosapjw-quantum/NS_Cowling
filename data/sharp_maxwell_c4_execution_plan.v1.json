@@ -1,0 +1,323 @@
+{
+  "schema": "ns-cowling.sharp-maxwell-c4-execution-plan",
+  "schema_version": "1.0.0",
+  "plan_id": "sharp_maxwell_c4_execution_dag_v1",
+  "created_date": "2026-11-10",
+  "selected_stage": "C4",
+  "selected_stage_definition": "Implementation DAG, execution order, computational platform, parallelization and checkpoints only. Source-admission calculations are planned but not executed in this stage.",
+  "active_branch": "research/sharp-maxwell-cohort-admission-v1",
+  "pr4_head": "934d5e9c643213bedda3193ad53f03f190dd9a81",
+  "source_authority": {
+    "branch": "research/maxwell-native-fortran-v1",
+    "commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
+    "root": "eos_generator/eos_data"
+  },
+  "legacy_authority": {
+    "branch": "main",
+    "commit": "261fcdcbeaf6b5d842480e82e249312e8da5532a",
+    "policy": "Read-only provenance; never reused as sharp output."
+  },
+  "inputs": {
+    "crust_models": 13,
+    "core_models": 5,
+    "source_models": 18,
+    "pairs": 65,
+    "raw_files": 52,
+    "raw_file_bytes": 1594597,
+    "raw_file_mib": 1.520726203918457,
+    "thermodynamic_knots": 6214
+  },
+  "implementation_seams": {
+    "reader": "python_frontend/compose_eos/api.py::read_compose delegates to native Fortran",
+    "baseline_verifier": "python_frontend/compose_eos/api.py::check_consistency calls native C1-C11 verification",
+    "compose_reader": "fortran_eos/src/compose_eos_io.f90::read_compose",
+    "consistency": "fortran_eos/src/compose_eos_verify.f90::check_consistency",
+    "interval_kernel": "fortran_eos/src/compose_eos_phase_transition.f90::validate_phase",
+    "tov_limit": "oscillation_source/solutions/src/structure/ns_maxwell_tov.f90 currently accepts two callbacks and one sharp interface"
+  },
+  "dag": [
+    {
+      "id": "C4-D0",
+      "name": "Freeze exact input/source identity",
+      "deps": [],
+      "output": "run_identity.json",
+      "gate": [
+        "Pin source branch and commit",
+        "Verify 52 input blob SHAs",
+        "Verify 65 unique pair IDs and immutable legacy paths"
+      ]
+    },
+    {
+      "id": "C4-D1",
+      "name": "Read 18 CompOSE sources through existing native reader",
+      "deps": [
+        "C4-D0"
+      ],
+      "output": "source_read_receipts/<model>.json",
+      "gate": [
+        "Use compose_eos.api.read_compose / Fortran read_compose",
+        "Retain Nadd/q_extra, Iphase and composition data",
+        "Record row counts and (iT,inb,iYq) coverage"
+      ]
+    },
+    {
+      "id": "C4-D2",
+      "name": "Structural and metadata audit",
+      "deps": [
+        "C4-D1"
+      ],
+      "output": "source_structure_audit.json",
+      "gate": [
+        "Finite values and row widths",
+        "Strict key coverage and selected T/Yq slice",
+        "Composition record shapes and exact phase boundaries"
+      ]
+    },
+    {
+      "id": "C4-D3",
+      "name": "Thermodynamic and beta-equilibrium audit",
+      "deps": [
+        "C4-D2"
+      ],
+      "output": "source_thermo_audit.json",
+      "gate": [
+        "P=nQ1; epsilon=n mn(1+Q7); mu_Q3=mn(1+Q3); mu_E=(epsilon+P)/n",
+        "Report Q2, Q5, Q6-Q7 and Q3-Euler residuals separately",
+        "Keep strict adapter Q3-Euler gate 2e-6"
+      ]
+    },
+    {
+      "id": "C4-D4",
+      "name": "Composition and provider-semantics audit",
+      "deps": [
+        "C4-D2"
+      ],
+      "output": "source_composition_audit.json",
+      "gate": [
+        "Check charge and baryon closure",
+        "Retain raw YI and test Yh=Abar*YI",
+        "Resolve provider Data Sheet meanings for Iphase/Nadd or leave unresolved"
+      ]
+    },
+    {
+      "id": "C4-D5",
+      "name": "Segmentwise whole-interval stability and causality",
+      "deps": [
+        "C4-D3",
+        "C4-D4"
+      ],
+      "output": "source_segment_audit.json",
+      "gate": [
+        "Split at every Iphase boundary",
+        "Never differentiate/interpolate across a source boundary",
+        "Use analytic Hermite extrema for n>0, dn/dmu>0 and 0<cs2/c2<=1",
+        "Report full source and connected causal-domain results separately"
+      ]
+    },
+    {
+      "id": "C4-D6",
+      "name": "Density reconstruction and 65-pair compatibility",
+      "deps": [
+        "C4-D5"
+      ],
+      "output": "density_reconstruction_audit.json; pair_compatibility_65.json",
+      "gate": [
+        "Record reconstructed_n_max_rel without inventing threshold",
+        "Check T/Yq/Il, neutrality, mass conventions and common mu support",
+        "Create all 65 pair records without running roots"
+      ]
+    },
+    {
+      "id": "C4-D7",
+      "name": "Segment-preserving adapter intermediate representation",
+      "deps": [
+        "C4-D6"
+      ],
+      "output": "sharp_maxwell/adapted_sources/ and adapter_receipts/",
+      "gate": [
+        "Keep raw source immutable",
+        "Represent each smooth Iphase segment separately",
+        "Every projection/drop must have reversible provenance and documented semantic authority"
+      ]
+    },
+    {
+      "id": "C4-D8",
+      "name": "One-pair sharp-Maxwell pilot",
+      "deps": [
+        "C4-D7"
+      ],
+      "output": "sharp_maxwell/<pair>/pilot_receipt.json",
+      "gate": [
+        "Isolate all pressure roots/stationary points",
+        "Require exactly one root for promotion",
+        "Independently verify common P, common mu and Delta epsilon=mu_t Delta n_B"
+      ]
+    },
+    {
+      "id": "C4-D9",
+      "name": "65-pair sharp-Maxwell sweep",
+      "deps": [
+        "C4-D8"
+      ],
+      "output": "sharp_maxwell/cohort_results.json",
+      "gate": [
+        "Exactly 65 unique terminal statuses",
+        "Keep NO_ROOT/MULTIPLE_ROOT/INPUT_REJECTED/ACAUSAL",
+        "Never write into legacy maxwell paths"
+      ]
+    },
+    {
+      "id": "C4-D10",
+      "name": "Phase-chain TOV, stable branch and Cowling spectra",
+      "deps": [
+        "C4-D9"
+      ],
+      "output": "stable-sequence and slow/rapid mode receipts",
+      "gate": [
+        "Retain internal crust segments and separate core-crust sharp interface",
+        "Check stable branch and Seidov diagnostic first",
+        "Calculate slow and rapid conversion spectra separately"
+      ]
+    }
+  ],
+  "resources": {
+    "platform": "CPU-only Linux (GitHub ubuntu-latest and user WSL/Linux)",
+    "compiler": "gfortran; Fortran 2018; existing FPM/build.sh paths",
+    "python": "Python 3.13 in current Maxwell CI workflow; project minimum Python >=3.10",
+    "memory_budget": "2 GiB planning ceiling, not a measured peak; arrays scale O(N_knots)",
+    "parallelism": "Initial serial deterministic run; after parser parity, max 4 independent source workers locally and max 2 on shared CI; one coordinator alone writes aggregate manifests",
+    "gpu": "NOT_REQUIRED",
+    "timeout_minutes": 20,
+    "why_cpu": "52 source files total 1,594,597 bytes and 6,214 thermodynamic knots; parsing, algebraic closure and Hermite extrema are CPU tasks."
+  },
+  "checkpoints": [
+    {
+      "id": "CP0",
+      "when": "Before C5 implementation",
+      "artifact": "run_identity.json",
+      "fields": [
+        "branch/commit",
+        "52 source blob SHAs",
+        "65-pair identity",
+        "legacy no-write policy"
+      ]
+    },
+    {
+      "id": "CP1",
+      "when": "Reader vertical slice passes on SPG_M1 and one Nadd=1 GPPVA",
+      "artifact": "parser_receipts/",
+      "fields": [
+        "row/key counts",
+        "Nadd/q_extra retention",
+        "Iphase/composition retention",
+        "source blob identity"
+      ]
+    },
+    {
+      "id": "CP2",
+      "when": "All 18 source reads complete",
+      "artifact": "source_structure_audit.json",
+      "fields": [
+        "per-model parse status",
+        "key/shape gaps",
+        "phase boundary indices"
+      ]
+    },
+    {
+      "id": "CP3",
+      "when": "Thermodynamic and composition audits complete",
+      "artifact": "source_thermo_audit.json; source_composition_audit.json",
+      "fields": [
+        "Q3-Euler",
+        "Q2/Q5/Q6-Q7",
+        "charge/baryon closure",
+        "source masses"
+      ]
+    },
+    {
+      "id": "CP4",
+      "when": "Segmentwise stability/casualty pass complete",
+      "artifact": "source_segment_audit.json",
+      "fields": [
+        "segment boundaries",
+        "stability margins",
+        "max cs2",
+        "causal connected domain and gaps"
+      ]
+    },
+    {
+      "id": "CP5",
+      "when": "Pair compatibility complete",
+      "artifact": "pair_compatibility_65.json",
+      "fields": [
+        "65 pair statuses",
+        "common mu support",
+        "metadata compatibility",
+        "density drift"
+      ]
+    },
+    {
+      "id": "CP6",
+      "when": "Before full sweep",
+      "artifact": "single-pair pilot receipt",
+      "fields": [
+        "root count",
+        "Pt/mut",
+        "one-sided states",
+        "Maxwell identity residual",
+        "projection provenance"
+      ]
+    }
+  ],
+  "ci_plan": {
+    "current_workflow": "maxwell-native-fortran.yml",
+    "gap": "PR #3 workflow pull_request filter targets research/maxwell-reference-validation-v1 while PR #4 base is research/maxwell-native-fortran-v1; it also checks out the fixed PR #3 branch. It cannot establish PR #4 head validity as configured.",
+    "new_workflow": ".github/workflows/sharp-maxwell-source-admission.yml",
+    "triggers": [
+      "pull_request targeting research/maxwell-native-fortran-v1",
+      "workflow_dispatch",
+      "push to cohort branch"
+    ],
+    "checkout": "Use event PR head/merge SHA; do not hardcode branch.",
+    "checks": [
+      "gfortran Fortran 2018 debug build with -fcheck=all",
+      "native FPM tests",
+      "pytest reader/verifier and source-admission tests",
+      "18 source receipts and aggregate audit",
+      "65 unique pair records",
+      "assert zero Maxwell roots and zero TOV/Cowling in source-audit job"
+    ],
+    "artifacts": [
+      "exact head SHA",
+      "compiler/tool versions",
+      "per-source receipts",
+      "aggregate JSON",
+      "SHA256SUMS"
+    ]
+  },
+  "delegation": {
+    "native_subagent": "NOT_RUN",
+    "reason": "No native spawn/create/wait lifecycle was exposed in the live host inventory; no simulated delegation.",
+    "execution": "Serial parent/coordinator; bounded process parallelism only after parser determinism is established."
+  },
+  "scope": {
+    "done": [
+      "Repository and workflow readback",
+      "52-file size and 6,214-knot inventory",
+      "Existing reader/verifier/interval-kernel seam mapping",
+      "Dependency DAG, resource plan, parallelism and checkpoint design"
+    ],
+    "not_done": [
+      "18-source execution",
+      "C1-C11 source verification",
+      "whole-interval stability/causality run",
+      "density reconstruction",
+      "65-pair compatibility execution",
+      "Maxwell root search",
+      "sharp EOS generation",
+      "TOV/Cowling or mode spectra"
+    ]
+  },
+  "next_stage": "C5",
+  "next_action": "Implement a read-only vertical slice: native read_compose and C1-C11 verifier on SPG_M1 plus one GPPVA Nadd=1 source; emit receipts, do not edit sources and do not call the Maxwell constructor."
+}

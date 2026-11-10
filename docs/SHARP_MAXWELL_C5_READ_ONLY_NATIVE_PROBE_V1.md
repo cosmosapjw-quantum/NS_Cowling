@@ -65,6 +65,6 @@ All 65 pair records remain BLOCKED_BEFORE_ROOT_SEARCH; historical maxwell output
 
 ## C5 implementation and execution status
 
-The runner syntax check and six isolated helper tests passed. They cover Git blob identity, raw density and thermodynamic parsing, CompOSE group-fraction semantics, Iphase knot indexing, and refusal to coerce non-integer extra-column values. These helper tests do not execute the native EOS reader.
+The equivalent pure-helper staging suite passed six of six tests before publication. Those tests cover Git blob identity, raw density/thermodynamic parsing, CompOSE group-fraction semantics, Iphase knot indexing, and refusal to coerce non-integer extra-column values. The exact committed test file and the native integration runner have not been executed on this runtime.
 
-The actual native read/write/read/verifier run remains NOT_RUN in this checkpoint: the connected development device is offline and the current local runtime cannot fetch the repository source tree. No GitHub Actions result is claimed. C6 must execute this runner on a Linux/gfortran host and preserve its real receipt, classifying scientific FAIL separately from parser/runtime failure.
+The actual native read/write/read/verifier run remains NOT_RUN in this checkpoint: the connected development device is offline and the current local runtime cannot fetch the repository source tree. No GitHub Actions result is claimed. C6 must execute the exact committed tests and runner on a Linux/gfortran host and preserve its real receipt, classifying scientific FAIL separately from parser/runtime failure.

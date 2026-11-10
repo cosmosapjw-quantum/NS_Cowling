@@ -159,6 +159,16 @@ Defect interpretation:
 - endpoint-only defect: check singular variables and conditioning;
 - finite-rate residual after numerical checks: possible physical interface source, requiring a larger-state derivation.
 
+## Numerical characteristic scalar and scale accounting
+
+The raw weighted determinant is the exact matching scalar and retains holomorphic dependence on complex frequency when the ODE coefficients and initial/terminal basis choices are holomorphic. Its magnitude can nevertheless be numerically unusable when the two columns grow or decay at very different rates. The Euclidean-normalized determinant angle is a real-frequency diagnostic only: conjugation in the norm generally destroys holomorphic dependence.
+
+For robust complex-frequency work, use a multiple-shooting matching matrix or a scaled/exterior determinant. If Y=Q R is used, reconstruct det(Y)=det(Q)det(R), including determinant phase and logarithmic amplitude. Record all nonzero column/row scale factors; Q-only tracking loses determinant information. A scale choice based on a non-holomorphic max-component pivot is not an analytic Evans function.
+
+The center is a singular endpoint. Use a verified regular center series at finite r_c, whose leading relation is W+ell*r_c*V=0; do not evaluate the singular RHS at r=0. The current outer condition is imposed at the finite-pressure cutoff and must not be silently replaced by a true zero-pressure surface.
+
+At a mode root the inner concomitant can be zero. Its ratio to the outer concomitant is then undefined. Return a null value and an explicit UNDEFINED_ZERO_DENOMINATOR status, not NaN or infinity. Complex numbers require explicit {re,im} serialization; strict JSON checks must reject non-finite values.
+
 ## Numerical evidence from this increment
 
 42 deterministic pytest cases pass (32 test functions: the earlier interface/profile-helper suite contributes 22 collected cases, and the weighted-invariant file contributes 14 test functions expanding to 20 collected cases). Reported checks:

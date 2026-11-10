@@ -203,3 +203,23 @@ def test_unlimited_max_step_is_a_recorded_negative_control():
     values=np.array([weighted_wronskian(out.sol(r),inward.sol(r),h(r),nu(r)) for r in radii],complex)
     spread=np.max(np.abs(values-values[-1]))/abs(values[-1])
     assert spread > 1e-5
+
+
+def test_zero_inner_concomitant_has_json_safe_undefined_ratio():
+    import json
+
+    res = interface_invariant_residual(
+        [1.0, 2.0], [2.0, 4.0],
+        [3.0, 1.0], [6.0, 2.0],
+        enthalpy_inner_j_m3=2.0e35,
+        enthalpy_outer_j_m3=1.0e35,
+        nu_inner=0.1,
+        nu_outer=0.1,
+        determinant_transfer=2.0,
+    )
+    assert res["observed_omega_ratio"] is None
+    assert res["observed_omega_ratio_status"] == "UNDEFINED_ZERO_DENOMINATOR"
+    json.dumps({
+        "observed_omega_ratio": res["observed_omega_ratio"],
+        "observed_omega_ratio_status": res["observed_omega_ratio_status"],
+    }, allow_nan=False)

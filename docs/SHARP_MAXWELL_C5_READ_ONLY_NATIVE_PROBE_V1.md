@@ -16,14 +16,14 @@ Under the standard CompOSE definitions:
 - Eq. (3.12): \(X_i=B_iY_i\), the particle mass-number (baryon) fraction.
 - Eqs. (4.20)-(4.22): for a nuclear group, \(A_{\rm av}\) and \(Z_{\rm av}\) are abundance-weighted averages and \(Y_I=\sum_jY_j\) is the combined group number fraction.
 
-Thus the standard baryon/mass fraction carried by the nuclear group is \(X_h=A_{\rm av}Y_I\). The native verifier's internal \`Yh\` is used as a baryon/mass fraction: C3 evaluates \(Y_p+(Z_{\rm av}/A_{\rm av})Y_h-Y_e-Y_\mu\), and C4 evaluates \(Y_n+Y_p+Y_h-1\).
+Thus the standard baryon/mass fraction carried by the nuclear group is \(X_h=A_{\rm av}Y_I\). The native verifier's internal `Yh` is used as a baryon/mass fraction: C3 evaluates \(Y_p+(Z_{\rm av}/A_{\rm av})Y_h-Y_e-Y_\mu\), and C4 evaluates \(Y_n+Y_p+Y_h-1\).
 
-The C5 reader/writer currently maps \`Yh = YI\` and \`YI = Yh\`. That mapping is retained as the committed raw-field-preservation path exercised by the read/write/read test. **It is not a validated physical conversion and is not endorsed by the CompOSE equations.** Round-trip equality proves serialization consistency only.
+The C5 reader/writer currently maps `Yh = YI` and `YI = Yh`. That mapping is retained as the committed raw-field-preservation path exercised by the read/write/read test. **It is not a validated physical conversion and is not endorsed by the CompOSE equations.** Round-trip equality proves serialization consistency only.
 
 The C6 result exposed the unresolved provider-data issue:
 
-- Both official data sheets identify \`Iphase=0\` as outer crust and \`Iphase=7\` as inner crust. The GPPVA(FSU2) sheet additionally identifies \`Iphase=6\` as homogeneous matter. The phase label \`7\` is therefore known; the unresolved issue is the physical meaning and consistency of the composition values in those records.
-- An outer-crust example from each source has \((A_{\rm av},Z_{\rm av},Y_I,Y_e)=(56,26,1,0.46429)\). The direct mapping \`Yh=YI\` closes C3/C4 on these rows; the standard product \(A_{\rm av}Y_I=56\) cannot be a normalized mass fraction.
+- Both official data sheets identify `Iphase=0` as outer crust and `Iphase=7` as inner crust. The GPPVA(FSU2) sheet additionally identifies `Iphase=6` as homogeneous matter. The phase label `7` is therefore known; the unresolved issue is the physical meaning and consistency of the composition values in those records.
+- An outer-crust example from each source has \((A_{\rm av},Z_{\rm av},Y_I,Y_e)=(56,26,1,0.46429)\). The direct mapping `Yh=YI` closes C3/C4 on these rows; the standard product \(A_{\rm av}Y_I=56\) cannot be a normalized mass fraction.
 - At the first inner-crust row (row 218), SPG_M1 reports \((82.107,24.387,0.06087,0.06087)\), while GPPVA_FSU2 reports \((740,36,0.04865,0.04865)\), with the listed free-neutron, free-proton and muon fractions zero. The current native verifier fails C3/C4 on all inner-crust rows in both sources.
 
 These observations do not establish a provider-specific replacement formula. In particular, neither applying \(A_{\rm av}\) blindly nor assuming that the field named \(Y_I\) is already a mass fraction resolves both sources and phases. The provenance of the provider's group-abundance values, possible source-table inconsistency or alignment issues, and the applicability of the verifier's composition closure must be reviewed against the original provider workflow.
@@ -77,9 +77,9 @@ All 65 pair records remain BLOCKED_BEFORE_ROOT_SEARCH; historical maxwell output
 
 C5 committed the native reader/writer mapping and the read-only source probe, with six pure-helper regression tests. The exact committed test file and native integration path were not run at C5 time; that historical status is preserved in the manifest.
 
-C6 later executed the official Fortran build and the exact committed test file on a Linux/gfortran host. The committed tests passed 6/6. Native read/write/read, verifier execution and round-trip completed for SPG_M1 and GPPVA_FSU2. The runner completed, but the scientific composition checks failed: C3 and C4 fail on every \(Iphase=7\) row (148/148 for SPG_M1 and 52/52 for GPPVA_FSU2), while every \(Iphase=0\) row passes. The C6 report and complete evidence are in [SHARP_MAXWELL_C6_NATIVE_EXECUTION_VERIFICATION_V1.md](SHARP_MAXWELL_C6_NATIVE_EXECUTION_VERIFICATION_V1.md) and \`artifacts/sharp_maxwell/C6_NATIVE_EXECUTION_20261110T093714Z/\`.
+C6 later executed the official Fortran build and the exact committed test file on a Linux/gfortran host. The committed tests passed 6/6. Native read/write/read, verifier execution and round-trip completed for SPG_M1 and GPPVA_FSU2. The runner completed, but the scientific composition checks failed: C3 and C4 fail on every \(Iphase=7\) row (148/148 for SPG_M1 and 52/52 for GPPVA_FSU2), while every \(Iphase=0\) row passes. The C6 report and complete evidence are in [SHARP_MAXWELL_C6_NATIVE_EXECUTION_VERIFICATION_V1.md](SHARP_MAXWELL_C6_NATIVE_EXECUTION_VERIFICATION_V1.md) and `artifacts/sharp_maxwell/C6_NATIVE_EXECUTION_20261110T093714Z/`.
 
-The C6 run was executed on commit \`43eea8bd9bee7ebb222e3c66babf5078b398d7ae\`; the branch subsequently advanced to include the C6 documentation and manifest updates. Do not describe the native run as having been executed on the later branch head.
+The C6 run was executed on commit `43eea8bd9bee7ebb222e3c66babf5078b398d7ae`; the branch subsequently advanced to include the C6 documentation and manifest updates. Do not describe the native run as having been executed on the later branch head.
 
-Status: \`C6_PARTIAL\`; composition semantics \`BLOCKED_REVIEW_REQUIRED\`. This note supersedes the earlier assertion that CompOSE Eq. (4.22) directly establishes \`Yh=YI\` as a baryon/mass fraction. No C7, root search, pair sweep, TOV or Cowling run is authorized by this result.
+Status: `C6_PARTIAL`; composition semantics `BLOCKED_REVIEW_REQUIRED`. This note supersedes the earlier assertion that CompOSE Eq. (4.22) directly establishes `Yh=YI` as a baryon/mass fraction. No C7, root search, pair sweep, TOV or Cowling run is authorized by this result.
 

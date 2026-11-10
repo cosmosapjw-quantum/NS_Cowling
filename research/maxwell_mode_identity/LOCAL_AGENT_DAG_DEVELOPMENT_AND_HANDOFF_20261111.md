@@ -533,3 +533,13 @@ Every JSON file must parse under strict JSON and contain no NaN/Infinity. Every 
 ## H. Stop and report conditions
 
 Stop at the smallest failed DAG node if the native ODE differs from the assumed matrix, additional composition terms are unresolved, interface orientation is ambiguous, a transfer determinant is singular, output fields cannot be preserved compatibly, or a numerical invariant does not converge. Classify failures as theory/convention, thermodynamic, interface, implementation, numerical conditioning, serialization, native/Python, environment, provenance, scope/policy or resource-limit. Never promote the node status by rewriting its acceptance criteria.
+
+
+
+## I. Publication and receipt reconciliation at 2026-11-11
+
+- PR #6 live head observed: \`7c4607c7db0a7e10375a33b43642a29557a1df1e\`. Its only commit after the earlier pin added four literature lines to the weighted Abel note; the continuation branch now carries that note byte-for-byte.
+- PR #7 branch head before this receipt update: \`dffb95a5db89c156609b02257f09e64bba9a7e15\`. At that check it compared 32 commits ahead / 1 behind its base and GitHub reported mergeable=true. It remains Draft and Unmerged. The ancestry offset is not erased; local work must fetch the live ref and use a new isolated worktree.
+- The final exported-package replay was repeated against the exact helper and test files now in the GitHub branch: 12 tests collected, 12 passed in 0.53 s; collection inventory 12 tests in 0.32 s. Python 3.13.5, NumPy 2.3.5, SciPy 1.17.0, pytest 9.0.2. Module and test file SHA256 values are pinned in LOCAL_AGENT_DAG.v1.json and the computation manifest.
+- This run used an exported artifact directory without Git metadata. It is not a full repository replay, not a native Fortran build and not evidence for GitHub Actions. The combined-status endpoint returned no status records.
+- PR #6's test claim remains a separate provenance issue: its captured computation manifest and stdout report 42 cases, while its later validation prose/status and PR body claim 43. The additional one-case receipt was not among the changed files inspected here. Do not resolve this mismatch by selecting the larger count; require a fresh run on the exact live checkout and mutually consistent inventory, stdout and manifest.

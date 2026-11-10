@@ -229,6 +229,8 @@ M5 EXTERNAL_PUBLISH: push, PR, merge, release, deployment, provider contact and 
 
 Local commits on the isolated branch are allowed only after validation. No push or merge.
 
+Current helper baseline at this snapshot: 32 test functions and 42 collected pytest cases (9 interface-transfer, 13 profile/mode-identity, 20 weighted-invariant/two-sided). Re-run the full suite on the exact local child-branch revision; this baseline is not a substitute for fresh verification.
+
 ## 7. TDD and validation commands
 
 For every new behavior:

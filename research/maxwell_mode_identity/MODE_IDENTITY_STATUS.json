@@ -33,7 +33,7 @@
     "actual_native_fortran_integration": false
   },
   "synthetic_computation": {
-    "tests_passed": 42,
+    "tests_passed": 43,
     "tests_failed": 0,
     "test_command": "PYTHONPATH=<package-root> python -m pytest -q mode_identity/tests",
     "smooth_phase_max_relative_drift": 7.907195134185742e-11,
@@ -44,14 +44,16 @@
     "two_sided_rhs_evaluations_inward": 947,
     "python_compileall": "PASS",
     "json_parse": "PASS",
-    "test_functions": 32,
+    "test_functions": 33,
     "case_counts_by_file": {
       "tests/test_interface_transfer.py": 9,
       "tests/test_mode_identity.py": 13,
-      "tests/test_weighted_wronskian.py": 20
+      "tests/test_weighted_wronskian.py": 21
     },
     "test_run_runtime_seconds": 0.65,
-    "test_collection_command": "PYTHONPATH=. python -m pytest --collect-only -q -p no:cacheprovider mode_identity/tests"
+    "test_collection_command": "PYTHONPATH=. python -m pytest --collect-only -q -p no:cacheprovider mode_identity/tests",
+    "runtime_seconds": 0.74,
+    "zero_denominator_ratio": "JSON-safe null with UNDEFINED_ZERO_DENOMINATOR; red-green regression test"
   },
   "integration_and_physics": {
     "native_fortran_modified": false,
@@ -67,7 +69,9 @@
     "For nonbarotropic stars with chi_ad != chi_eq the h exp(-nu) weight has predicted drift nu_prime*(1/chi_ad-1/chi_eq), before additional composition terms.",
     "Two-sided numerical matching showed maximum-step sensitivity; step-cap refinement and exact QR/log-determinant accounting are required.",
     "The current surface line belongs to a finite-pressure cutoff and both directions must use the same policy.",
-    "The native q-to-r ODE equivalence has not yet been locally re-audited."
+    "The native q-to-r ODE equivalence has not yet been locally re-audited.",
+    "Observed interface concomitant ratio is undefined if inner Omega is zero or below relative_floor; helper now emits null plus UNDEFINED_ZERO_DENOMINATOR rather than NaN.",
+    "The normalized determinant angle is only a real-frequency diagnostic; complex-frequency characteristic calculations require holomorphic scaling or a multiple-shooting determinant with full scale accounting."
   ],
   "next_local_phase": {
     "status": "IMPLEMENTATION_SPEC_READY__LOCAL_EXECUTION_REQUIRED",

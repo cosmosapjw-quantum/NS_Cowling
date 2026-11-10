@@ -1,0 +1,101 @@
+{
+ "overall_status": "C6_PARTIAL",
+ "created_utc": "2026-11-10T09:37:46.320000+00:00",
+ "repository_identity": {
+  "repository": "cosmosapjw-quantum/NS_Cowling",
+  "branch": "research/sharp-maxwell-cohort-admission-v1",
+  "head": "43eea8bd9bee7ebb222e3c66babf5078b398d7ae",
+  "pr": 4,
+  "pr_state": "OPEN",
+  "pr_is_draft": true,
+  "base_branch": "research/maxwell-native-fortran-v1",
+  "base_sha": "a09ec30d74b363652d2d1aefe990557c468679dd",
+  "c5_io_commit": "5ecbca8eec11ce17156d360d4a02376765bf055c",
+  "c5_blobs": {
+   "fortran_eos/src/compose_eos_io.f90": "5b01b4051d9392362ca1ed915b946f1031d0e3c2",
+   "scripts/sharp_maxwell_source_probe.py": "a9faad478bbe0d0159111fe8e7cf0b40216b8a3e",
+   "python_frontend/tests/test_sharp_maxwell_source_probe.py": "0fa3c779d043f19aa1ec306a0b919fd5100e9a46",
+   "docs/SHARP_MAXWELL_C5_READ_ONLY_NATIVE_PROBE_V1.md": "07a61a8fea06680615f03fd3145581b6142dd008",
+   "data/sharp_maxwell_65_cohort_manifest.v1.json": "2ca3a5b5cec26ef286e61911406a9a4bdbd96dbf"
+  },
+  "c5_blobs_match_handoff": true
+ },
+ "gates": {
+  "Identity": "PASS",
+  "Inputs": "PASS",
+  "Native build": "PASS",
+  "Python tests": "PASS",
+  "Native probe": "PASS (runner executed native binary for both sources; scientific_status FAIL for both)",
+  "Round-trip": "PASS (read/write/re-read and structural checks; verifier executed)",
+  "Composition": "PARTIAL: Yh==Y_I mapping PASS (raw rows, both sources); native C3/C4 composition closure FAIL on all Iphase=7 rows",
+  "Preservation": "PASS",
+  "Cohort": "PASS",
+  "Evidence": "PASS"
+ },
+ "process_status": {
+  "native_build_rc": 0,
+  "pytest_rc": 0,
+  "pytest": "6 passed",
+  "probe_rc": 0,
+  "runner_status": "PASS"
+ },
+ "sources": {
+  "SPG_M1": {
+   "process": "PASS",
+   "native_read": "PASS",
+   "roundtrip": "PASS",
+   "verifier_execution": "PASS",
+   "scientific_status": "FAIL",
+   "failed_checks": [
+    "C3",
+    "C4"
+   ],
+   "C3_max_abs": 0.042790704812013594,
+   "C4_max_abs": 0.9779100000000001,
+   "rows_failing_C4": 148,
+   "rows": 365
+  },
+  "GPPVA_FSU2": {
+   "process": "PASS",
+   "native_read": "PASS",
+   "roundtrip": "PASS",
+   "verifier_execution": "PASS",
+   "scientific_status": "FAIL",
+   "failed_checks": [
+    "C3",
+    "C4"
+   ],
+   "C3_max_abs": 0.04628324324324324,
+   "C4_max_abs": 0.98856,
+   "rows_failing_C4": 52,
+   "rows": 269
+  }
+ },
+ "failure_classification": {
+  "C3_C4": "THEORY/IMPLEMENTATION undetermined -> BLOCKED_REVIEW_REQUIRED; not repaired in C6",
+  "finding": "Native C3 (charge) and C4 (baryon sum Yn+Yp+Yh=1) fail on exactly the Iphase=7 rows (SPG_M1 148/148, GPPVA_FSU2 52/52) and pass on all Iphase=0 rows. There Yh=Y_I<1 with Yn=Yp=0 in the source. The C5 doc statement that Yh=Y_I is the same baryon fraction used by C3/C4 holds for Iphase=0 rows only."
+ },
+ "preservation": {
+  "raw_source_hashes_unchanged": true,
+  "legacy_hashes_unchanged": true,
+  "legacy_files_hashed": 234,
+  "pairs": 65,
+  "pair_admission_state": "BLOCKED_BEFORE_ROOT_SEARCH x65",
+  "legacy_status": "LEGACY_NON_MAXWELL_READ_ONLY x65"
+ },
+ "not_run": [
+  "sharp_transition_search",
+  "tov_cowling",
+  "C7",
+  "C8",
+  "C9",
+  "C10",
+  "65-pair sweep"
+ ],
+ "reproduce": [
+  "bash fortran_eos/build.sh <BUILD_DIR>",
+  "export COMPOSE_EOS_FORTRAN_EXE=<BUILD_DIR>/compose_eos_fortran",
+  "python -m pytest -q python_frontend/tests/test_sharp_maxwell_source_probe.py",
+  "python scripts/sharp_maxwell_source_probe.py --manifest data/sharp_maxwell_65_cohort_manifest.v1.json --source-id SPG_M1 --source-id GPPVA_FSU2 --output <OUT>.json"
+ ]
+}

@@ -3,8 +3,8 @@
   "schema_version": "1.0.0",
   "manifest_id": "sharp_maxwell_65_cohort_manifest",
   "created_date": "2026-11-10",
-  "research_loop_stage": "C5_IMPLEMENTATION_COMPLETE",
-  "status": "C5_IMPLEMENTATION_COMPLETE__NATIVE_EXECUTION_PENDING",
+  "research_loop_stage": "C6_NATIVE_EXECUTION_PARTIAL",
+  "status": "C6_PARTIAL__NATIVE_EXECUTION_VERIFIED__C3_C4_IPHASE7_REVIEW_REQUIRED",
   "purpose": "Create a new exact first-order Maxwell cohort from the 13 crust x 5 core source grid. All historical smooth maxwell outputs are immutable legacy references and are not inputs, priors, seeds, or fallback results for this cohort.",
   "authority": {
     "raw_source_branch": "research/maxwell-native-fortran-v1",
@@ -2674,5 +2674,51 @@
       "Maxwell roots",
       "TOV/Cowling"
     ]
+  },
+  "c6_native_execution": {
+    "schema": "sharp_maxwell_c6_native_execution_summary.v1",
+    "overall_status": "C6_PARTIAL",
+    "evidence_directory": "artifacts/sharp_maxwell/C6_NATIVE_EXECUTION_20261110T093714Z",
+    "executed_on_head": "43eea8bd9bee7ebb222e3c66babf5078b398d7ae",
+    "c5_identity_preserved": true,
+    "native_executable_sha256": "8c9153a93dac329b8bec5fafa85d7318f9a82dd5767d5b4cceea21f79a912d0f",
+    "toolchain": {
+      "gfortran": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+      "python": "3.12.3"
+    },
+    "native_build_status": "PASS",
+    "committed_test_file_status": "PASS_6_OF_6",
+    "native_reader_execution_status": "PASS",
+    "native_writer_roundtrip_status": "PASS",
+    "native_verifier_execution_status": "PASS",
+    "composition_mapping_Yh_equals_YI": "PASS",
+    "scientific_status": {
+      "SPG_M1": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C3",
+          "C4"
+        ],
+        "rows_failing_C4_all_in_Iphase_7": 148
+      },
+      "GPPVA_FSU2": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C3",
+          "C4"
+        ],
+        "rows_failing_C4_all_in_Iphase_7": 52
+      }
+    },
+    "open_issue": "BLOCKED_REVIEW_REQUIRED: C3/C4 closure fails on Iphase=7 rows (Yh=Y_I<1, Yn=Yp=0). Do not reinterpret Yh or edit the verifier without review. C5 doc claim that Yh matches the C3/C4 baryon fraction holds for Iphase=0 rows only.",
+    "stale_text_note": "source_catalog.composition_fields still contains the pre-correction phrase Y_h=Abar*Y_I; c4/c5 history left unmodified; compouse_group_fraction_mapping is authoritative.",
+    "c5_vertical_slice_note": "c5_vertical_slice NOT_RUN/COMMITTED_TEST_FILE_NOT_RUN fields are C5-time historical values, superseded by this block.",
+    "raw_sources_unchanged": true,
+    "legacy_outputs_unchanged": true,
+    "pairs_unchanged": true,
+    "sharp_transition_search": "NOT_RUN",
+    "tov_cowling": "NOT_RUN",
+    "C7_scientific_verification": "NOT_RUN",
+    "c7_entry": "NOT_RECOMMENDED_UNTIL_C3_C4_IPHASE7_REVIEW"
   }
 }

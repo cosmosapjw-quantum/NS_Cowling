@@ -68,3 +68,6 @@ All 65 pair records remain BLOCKED_BEFORE_ROOT_SEARCH; historical maxwell output
 The equivalent pure-helper staging suite passed six of six tests before publication. Those tests cover Git blob identity, raw density/thermodynamic parsing, CompOSE group-fraction semantics, Iphase knot indexing, and refusal to coerce non-integer extra-column values. The exact committed test file and the native integration runner have not been executed on this runtime.
 
 The actual native read/write/read/verifier run remains NOT_RUN in this checkpoint: the connected development device is offline and the current local runtime cannot fetch the repository source tree. No GitHub Actions result is claimed. C6 must execute the exact committed tests and runner on a Linux/gfortran host and preserve its real receipt, classifying scientific FAIL separately from parser/runtime failure.
+
+## C6 update
+Executed in C6 (see SHARP_MAXWELL_C6_NATIVE_EXECUTION_VERIFICATION_V1.md): native build and the committed tests passed. The probe ran natively on both sources with round-trip PASS, but native C3/C4 failed on Iphase=7 rows. The sentence above about C3/C4 closure is superseded by that note. C5 text otherwise unchanged.

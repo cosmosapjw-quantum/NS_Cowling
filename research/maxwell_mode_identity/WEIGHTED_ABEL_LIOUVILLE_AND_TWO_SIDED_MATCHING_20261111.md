@@ -197,6 +197,10 @@ Tonetto & Lugones (2020), Discontinuity gravity modes in hybrid stars, Phys. Rev
 
 Dong, Kuan & Yunes (2026), Hybrid-star asteroseismology across sharp phase interfaces, arXiv:2609.33002, is a full-GR contextual source for two-sided basis matching and interface-local tangential displacement. Its formulation is not identical to this Cowling system.
 
+Townsend & Teitler (2013), GYRE: An open-source stellar oscillation code based on a new Magnus Multiple Shooting Scheme, MNRAS, DOI 10.1093/MNRAS/STT1533, provides an established stellar-oscillation example of multiple shooting and discriminant-based eigenfrequency finding. It motivates the numerical architecture, but does not validate this solver's interface matching or this particular weighted concomitant.
+
+Townsend, Kuenzi & Christensen-Dalsgaard (2025), Tools for Characterizing the Numerical Error of Stellar Oscillation Codes, ApJ, DOI 10.3847/1538-4357/addf32, motivates explicit error characterization beyond a single tolerance setting. It does not provide a universal max_step or error threshold for the current Cowling fixture.
+
 No inspected source explicitly states the precise Omega identity derived here. Treat it as an independent derivation for the stated equations; do not attribute it to these papers.
 
 ## Final disposition

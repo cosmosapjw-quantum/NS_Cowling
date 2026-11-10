@@ -3,8 +3,8 @@
   "schema_version": "1.0.0",
   "manifest_id": "sharp_maxwell_65_cohort_manifest",
   "created_date": "2026-11-10",
-  "research_loop_stage": "C2_CODE_DATA_EQUATION_MAPPING__C3_NUMERICAL_ADAPTER_DESIGN",
-  "status": "C2_C3_METADATA_PREFLIGHT_COMPLETE__SOURCE_ADMISSION_AND_ROOT_SEARCH_PENDING",
+  "research_loop_stage": "C4_EXECUTION_DAG_COMPLETE",
+  "status": "C4_EXECUTION_PLAN_COMPLETE__SOURCE_ADMISSION_IMPLEMENTATION_PENDING",
   "purpose": "Create a new exact first-order Maxwell cohort from the 13 crust x 5 core source grid. All historical smooth maxwell outputs are immutable legacy references and are not inputs, priors, seeds, or fallback results for this cohort.",
   "authority": {
     "raw_source_branch": "research/maxwell-native-fortran-v1",
@@ -2566,10 +2566,28 @@
     "TOV_Cowling_runs": 0
   },
   "next_research_steps": [
-    "C4: validate the 18 raw source files and all grid alignment, monotonicity, thermodynamic, composition, and whole-interval causality properties; record exact failing rows/intervals.",
-    "Resolve provider Data Sheet semantics for every Nadd and Iphase transition; keep unknown semantics as unresolved rather than guessing.",
-    "Design a multi-segment crust envelope / explicit phase-chain provider compatible with the one-interface sharp Maxwell core-crust transition, or document a justified alternative without dropping source segments.",
-    "Select and justify the density-reconstruction drift acceptance threshold by resolution/refinement and observable-sensitivity studies.",
-    "Only after these gates: implement adapter, generate one of the 65 pairs, independently verify its exact coexistence point, then scale to the full 65 sweep."
-  ]
+    "C5: implement a read-only source-audit vertical slice by reusing compose_eos.api.read_compose and native check_consistency on SPG_M1 and one Nadd=1 GPPVA source; retain q_extra, eos.compo and Iphase.",
+    "C5/C6: extend to all 18 sources with deterministic parser receipts and tests for row-key alignment, Nadd widths, composition shapes, source hashes and no source mutation.",
+    "C7: perform thermodynamic/composition closure and whole-interval stability/causality checks independently on every smooth Iphase segment; preserve full-source and connected causal-domain results.",
+    "C8: quantify density reconstruction drift by segment and establish an acceptance threshold through resolution/refinement and observable-sensitivity tests; do not invent or widen the tolerance.",
+    "C5/C7: implement the segment-preserving adapter/phase-chain representation and resolve Iphase/Nadd provider semantics and rest-mass transformations with reversible provenance.",
+    "Only after all relevant gates: run one sharp-Maxwell pilot, independently verify the exact coexistence point, and then execute the 65-pair sweep.",
+    "Only after the multi-segment envelope is represented in TOV: verify stable branches and Seidov diagnostics, then calculate slow- and rapid-conversion Cowling spectra separately."
+  ],
+  "c4_execution_plan": {
+    "plan_id": "sharp_maxwell_c4_execution_dag_v1",
+    "human_document": "docs/SHARP_MAXWELL_C4_EXECUTION_DAG_V1.md",
+    "machine_plan": "data/sharp_maxwell_c4_execution_plan.v1.json",
+    "source_models": 18,
+    "raw_files": 52,
+    "raw_file_bytes": 1594597,
+    "raw_file_mib": 1.520726203918457,
+    "thermodynamic_knots": 6214,
+    "resource_policy": "CPU-only; serial deterministic first pass; max four local or two shared-CI source workers after parser parity; one aggregate writer.",
+    "native_subagent": "NOT_RUN",
+    "ci_gap": "Existing maxwell-native-fortran.yml PR branch filter and hardcoded checkout do not validate PR #4 head; dedicated sharp-maxwell-source-admission.yml planned.",
+    "selected_stage_scope": "C4 plan only; source verification, adapter implementation, root search, TOV and Cowling not run.",
+    "next_stage": "C5",
+    "next_action": "Implement a read-only native-reader/C1-C11 vertical slice for SPG_M1 and one Nadd=1 GPPVA source with provenance receipts."
+  }
 }

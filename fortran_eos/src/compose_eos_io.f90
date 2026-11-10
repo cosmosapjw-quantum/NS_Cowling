@@ -221,7 +221,9 @@ contains
           if(qid/=1.or.a<0._wp.or.z<0._wp.or.z>a.or.yi<0._wp) then
             close(u);status='unsupported or invalid nuclear group';return
           endif
-          eos%abar(k)=a;eos%zbar(k)=z;eos%yh(k)=a*yi
+          ! CompOSE reference manual Eq. (4.22): the stored group fraction Y_I is
+          ! already the combined abundance sum_j Y_j; it is not Abar*Y_I.
+          eos%abar(k)=a;eos%zbar(k)=z;eos%yh(k)=yi
           if(a>0._wp.and.yi>0._wp)eos%composition_available=.true.
           pos=pos+4
         enddo
@@ -452,7 +454,8 @@ contains
           eos%iT,eos%inb_start+i-1,eos%iYq,eos%iphase(i),4,10,eos%yn(i),11,eos%yp(i),0,eos%ye(i),1
         ! Re-write each row in a simple internal formatted string to avoid format ambiguities.
         if(nquad==1)then
-          yi=eos%yh(i)/eos%abar(i)
+          ! Yh stores the CompOSE combined group fraction Y_I directly (Eq. 4.22).
+          yi=eos%yh(i)
           write(u,'(es25.16e3,1x,i0,1x,i0,1x,es25.16e3,1x,es25.16e3,1x,es25.16e3)') &
             eos%ymu(i),1,1,eos%abar(i),eos%zbar(i),yi
         else

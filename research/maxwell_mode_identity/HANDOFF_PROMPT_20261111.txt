@@ -31,6 +31,16 @@ Reuse existing maxwell_cowling_shot_t q/r/W/V arrays and separate inner/outer in
 TWO-SIDED MATCH:
 Construct center regular solution at finite r0 and propagate outward. Construct the exact current finite-cutoff surface boundary line and propagate inward. Apply exactly the same existing interface transfer at the one-sided interface. At >=3 match radii evaluate E=h exp(-nu) det(y_center,y_surface). Its raw value must converge to a match-radius-independent constant. At R, the unweighted determinant must reproduce the existing surface boundary linear form. Compare zero sets against current outward shooting. Account for every QR/column rescaling factor. Slow and rapid separate.
 
+
+ROOT FUNCTION AND RESCALING POLICY:
+- The raw weighted determinant E=h*exp(-nu)*det(y_center,y_surface) has the exact zero set. Its small/large magnitude alone is not a root-quality metric.
+- The normalized determinant angle divides by Euclidean norms. Use it only as a real-frequency subspace-angle diagnostic; the complex norm uses conjugation and is generally non-holomorphic in omega. Never use it for complex-frequency contour or winding-number counts.
+- For large dynamic range, use multiple shooting or an analytically scaled determinant. Every nonzero row/column/QR scale factor, complex phase and log magnitude must be retained. For Y=Q R, det(Y)=det(Q)*det(R); Q alone is insufficient. Scaling factors must depend analytically on omega if a complex analytic characteristic is required.
+- A near-zero residual is rejected when either column collapses, factors are missing, overflow/underflow occurs, or match-radius/step/tolerance refinement does not converge.
+- Check the center regular expansion before finite-r0 start; leading order is W~C*r^(ell+1), V~-C*r^ell/ell, hence W+ell*r_c*V=0 only at leading order.
+- Keep the exact current finite-pressure surface cutoff in both directions. It is not automatically the true P=0 surface.
+- If the inner Omega is zero or below relative_floor, observed Omega_outer/Omega_inner is undefined: serialize null with observed_omega_ratio_status=UNDEFINED_ZERO_DENOMINATOR. Never emit NaN/Infinity. Serialize complex Omega values as {re,im}; strict JSON validation must use allow_nan=false.
+
 ZERO JUMP:
 Make one-sided transition P, epsilon, n, mu, h, chi and background derivatives equal. Both maps must be identity. Compare smooth and two-phase TOV/background, root sets and profiles under identical settings. Do not label by frequency order.
 

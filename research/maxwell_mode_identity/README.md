@@ -54,3 +54,10 @@ No actual four native fixture-root profiles have been processed by the new helpe
 ## Mutation boundary
 
 The local-agent contract forbids raw EOS, canonical pair manifests, C7X statuses, source-authority solver semantics and production adapter changes. Additive native profile export is limited to M2. Any RHS, transfer map, root, physical gate or public API change requires explicit approval. Push, PR, merge and Dropbox actions are not authorized by the local handoff.
+
+
+## Numerical characteristic and JSON policy
+
+The raw weighted determinant carries the exact matching zero set when endpoint bases and the ODE depend analytically on omega. The normalized determinant angle is real-frequency diagnostic only; complex norms are generally non-holomorphic. Complex-frequency calculations must use analytic scaling or multiple shooting and preserve all determinant scale factors. QR requires det(Q)*det(R), not Q alone.
+
+If the inner concomitant is zero or below relative_floor, the observed interface ratio is undefined and is returned as null with UNDEFINED_ZERO_DENOMINATOR. No NaN or Infinity is allowed in JSON receipts. Complex scalar fields must be encoded explicitly as real/imaginary pairs.

@@ -161,7 +161,7 @@ Defect interpretation:
 
 ## Numerical evidence from this increment
 
-37 deterministic synthetic tests pass. Reported checks:
+42 deterministic pytest cases pass (32 test functions: the earlier interface/profile-helper suite contributes 22 collected cases, and the weighted-invariant file contributes 14 test functions expanding to 20 collected cases). Reported checks:
 - smooth-phase maximum relative drift: 7.9072e-11, 201 sampled radii, DOP853;
 - smooth endpoint relative drift: 4.7232e-11;
 - both interface maps preserve the determinant for complex columns;

@@ -1,0 +1,47 @@
+{
+  "schema": "ns-cowling.analytic-matching-results.v1",
+  "claim_id": "NSCOWLING_LA11_FINITE_INTERVAL_CHARACTERISTIC_DETERMINANT",
+  "result": "CONDITIONAL_ANALYTIC_DETERMINANT_AND_IMPLICIT_INTERFACE_REGULARIZATION",
+  "formulas": {
+    "basis_change": "D_tilde=D*det(A_c)*det(A_s)",
+    "state_gauge": "M_z=G^-1*M_y*G-G^-1*G_prime",
+    "interface_gauge": "T_z=G_outer^-1*T_y*G_inner",
+    "smooth_match_radius": "D(r2)=exp(integral(tr(M)dr))*D(r1)",
+    "interface_match_radius": "D(rk+)=det(T_k)*D(rk-)",
+    "C_inner": [
+      [
+        "-kappa*nu_prime",
+        "-kappa*A"
+      ],
+      [
+        "-(1-theta)*nu_prime",
+        "theta*A"
+      ]
+    ],
+    "C_outer": [
+      [
+        "nu_prime",
+        "A"
+      ],
+      [
+        "(1-theta)*nu_prime",
+        "-theta*A"
+      ]
+    ],
+    "implicit_scalar": "E_imp=det[C_inner*y_inner,C_outer*y_outer]",
+    "implicit_graph_relation": "E_imp=A*nu_prime*det[T_theta*y_inner,y_outer]"
+  },
+  "evidence": {
+    "sympy_version": "1.14.0",
+    "sympy_exact_checks": 7,
+    "wolfram_exact_checks": 10,
+    "pytest_collected": 22,
+    "pytest_passed": 22,
+    "pytest_failed": 0,
+    "pytest_stdout": "22 passed in 0.17s",
+    "collection_stdout": "22 tests collected in 0.01s",
+    "helper_sha256": "087ab499e9466b2008fedca79409e04db6038808bb8d4df03fde9d0f74f4b096",
+    "test_sha256": "c8d9dee337c502a48a01d78c1c045a320d93a7c928a16016ae133c5326dedd79"
+  },
+  "qualification": "Synthetic proof/test package only. Actual Cowling RHS, endpoint frames, Fredholm-pencil equivalence and stellar root domain remain unverified."
+}

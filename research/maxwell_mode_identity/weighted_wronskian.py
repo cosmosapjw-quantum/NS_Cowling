@@ -35,7 +35,12 @@ def interface_invariant_residual(
     enthalpy_inner_j_m3, enthalpy_outer_j_m3, nu_inner, nu_outer,
     relative_floor=1e-300, determinant_transfer=None
 ):
-    """Compare one-sided concomitants and return the general jump diagnostics."""
+    """Compare one-sided concomitants and return the general jump diagnostics.
+
+    If the inner concomitant is zero or below relative_floor, the observed
+    ratio is mathematically undefined. Return None plus an explicit status
+    instead of a NaN, because NaN is not valid strict JSON.
+    """
     omega_i = complex(weighted_wronskian(
         state_1_inner, state_2_inner, enthalpy_inner_j_m3, nu_inner))
     omega_o = complex(weighted_wronskian(
@@ -46,7 +51,12 @@ def interface_invariant_residual(
     scale = max(abs(omega_i), abs(omega_o), floor)
     h_ratio = enthalpy_inner_j_m3 / enthalpy_outer_j_m3
     nu_jump = nu_outer - nu_inner
-    observed = omega_o / omega_i if abs(omega_i) > floor else complex(float("nan"), float("nan"))
+    if abs(omega_i) > floor:
+        observed = omega_o / omega_i
+        observed_status = "DEFINED"
+    else:
+        observed = None
+        observed_status = "UNDEFINED_ZERO_DENOMINATOR"
     predicted = None
     if determinant_transfer is not None:
         predicted = (1.0 / h_ratio) * math.exp(-nu_jump) * determinant_transfer
@@ -60,6 +70,7 @@ def interface_invariant_residual(
         "determinant_transfer": determinant_transfer,
         "predicted_omega_ratio": predicted,
         "observed_omega_ratio": observed,
+        "observed_omega_ratio_status": observed_status,
     }
 
 

@@ -1,0 +1,46 @@
+{
+  "patch_schema":"ns-cowling-local-agent-dag-patch.v1",
+  "target_ssot":"research/maxwell_mode_identity/LOCAL_AGENT_DAG.v1.json",
+  "parent":{"branch":"research/maxwell-interface-interpolation-la10-v1","sha":"104b4fa76e191db42e6af26f072533617f45441c","pr":9},
+  "operation":"LA11 inserted before LA8; LA8 dependency extended; no parallel DAG",
+  "node":{
+    "id":"LA11",
+    "depends_on":["LA0","LA1","LA3","LA4","LA9","LA10"],
+    "name":"finite-interval analytic characteristic determinant, basis/gauge covariance and LA10 implicit-interface regularization",
+    "gate":"M1",
+    "status":"CONDITIONAL_THEORY_DERIVED_AND_22_SYNTHETIC_TESTS_PASS__NATIVE_ENDPOINT_ANALYTICITY_UNVERIFIED",
+    "acceptance":[
+      "M_j holomorphic in zeta with locally uniform L1 bounds on each smooth layer",
+      "endpoint frames are complementary, full-rank and holomorphic with constant dimensions",
+      "interface graph maps are holomorphic/invertible on domain or full-rank implicit matching used",
+      "D=det[Phi_center,Phi_surface] zero-set equals endpoint subspace intersection",
+      "basis determinant cocycles are holomorphic units over full contour interior",
+      "state gauge transforms M, T, trace and matching determinant with all determinant factors retained",
+      "smooth match-radius and interface determinant multipliers verified",
+      "multiplicity claim blocked until regular holomorphic Fredholm-pencil equivalence",
+      "LA10 C_i/C_o blocks and E_imp=A*nu_prime*E_graph factor verified",
+      "A=0 intermediate branch uses implicit form, never inverse C_o",
+      "rapid theta=1 extension [V]=0 explicitly selected; kappa=1 identity branch",
+      "norm/QR/SVD conditioning separated from holomorphic determinant; all scale/phase/chart factors restored",
+      "22-case synthetic suite, exact symbolic checks, manifest and SHA256 verified"
+    ],
+    "stop":[
+      "missing holomorphy or locally uniform L1 bounds",
+      "endpoint dimensions vary or holomorphic full-rank frames unavailable",
+      "interface transfer singularity has no full-rank implicit replacement",
+      "rank loss or non-square global matching relation",
+      "lost basis/gauge/chart/volume determinant factors",
+      "nonholomorphic normalization presented as holomorphic scalar",
+      "multiplicity or argument-principle claim without pencil/contour gate"
+    ],
+    "result_policy":{
+      "zero_set":"CONDITIONAL_ON_ANALYTIC_ENDPOINT_ODE_INTERFACE_HYPOTHESES",
+      "multiplicity":"BLOCKED_UNTIL_REGULAR_HOLOMORPHIC_FREDHOLM_PENCIL_EQUIVALENCE",
+      "argument_principle":"BLOCKED_UNTIL_D_HOLOMORPHIC_ON_AND_INSIDE_CONTOUR_AND_ALL_UNITS_NONZERO",
+      "native_solver":"NOT_RUN"
+    }
+  },
+  "mutation_gates":"retain single DAG M0-M5 unchanged; LA11 research-only M1; no production API/RHS change",
+  "test_receipt":{"collected":22,"passed":22,"stdout":"22 passed in 0.21s","collection":"22 tests collected in 0.01s","sympy_exact_checks":7,"wolfram_exact_checks":10},
+  "source_blobs":{"analytic_matching.py":"97e9f5c6a134110e92afc68b1b2080dbabbf6756","tests/test_analytic_matching.py":"8bedc9870cc80ae63b25f03d86454afd59941c9a"}
+}

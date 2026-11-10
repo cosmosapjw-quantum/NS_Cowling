@@ -73,3 +73,28 @@ def test_fortran_cell_acceptance_is_unit_consistent_in_si():
     assert result["status"] == "PASS_NATIVE_CELL_ADMISSIBLE"
     assert result["stable_interval"] is True
     assert result["causal_interval"] is True
+
+
+def test_si_native_rounding_stress_cell_is_repaired_inside_fortran_interval():
+    mu0 = 1.4909949042277088e-10
+    mu1 = 1.4909978440241237e-10
+    n0 = 4.8362199999999995e36
+    n1 = 4.9256699999999993e36
+    p0 = 5.2332536170932295e22
+    p1 = 5.3762638798395212e22
+
+    result = minimal_admissible_delta_p(
+        mu0=mu0, n0=n0, mu1=mu1, n1=n1,
+        delta_p_source=p1-p0,
+        interior_margin_fraction=1.0e-8,
+    )
+    repaired = audit_hermite_cell(
+        mu0=mu0, p0=p0, n0=n0,
+        mu1=mu1, p1=p0+result["delta_p_repaired"], n1=n1,
+    )
+
+    assert result["was_adjusted"] is True
+    assert result["delta_p_repaired"] > result["delta_p_lower"]
+    assert repaired["status"] == "PASS_NATIVE_CELL_ADMISSIBLE"
+    assert repaired["causal_margin_low"] > 0.0
+    assert repaired["causal_margin_high"] > 0.0

@@ -73,3 +73,13 @@ The test was run in an exported package without Git metadata. It is not a full-r
 ## Reconciled exact-source run
 
 The final local exported-package replay used byte-identical `compensated_abel.py` and `tests/test_compensated_abel.py` files to those published on this branch. Captured stdout: `12 passed in 0.53s`; collection inventory: `12 tests collected in 0.32s`. SHA256 values and the matching manifest are under `computation_evidence/compensated_abel_20261111/`. The test run remains an exported-package run without Git metadata, not a full repository or native Fortran test.
+
+
+
+## General trace-first extension and final 15-case suite
+
+The helper also exposes trace_first_drift_density and integrated_trace_first_drift, implementing Gamma=tr(M)+d(log h)/dr-nu_prime without a barotropic or sound-speed shortcut. Exact SymPy verification of the arbitrary 2x2 determinant derivative returned zero residual. Three additional tests cover reduction to the conditional closure formula, retention of extra trace/background-gradient terms, and matrix-exponential compensation for a general constant 2x2 system.
+
+Final test stdout: 15 passed in 0.58s. Collection: 15 tests collected in 0.33s. The module/test source SHA256 values are pinned in the computation manifest and SHA256SUMS.
+
+Negative control preserved: the first generalized matrix-exponential test used O(1) m^-1 coefficients over 4000 m and overflowed. The synthetic scale was corrected to O(1e-5) m^-1; no tolerance was relaxed. See TEST_SCALE_NEGATIVE_CONTROL.md. The initial failure was observed in-session but its raw pytest output was not separately captured.

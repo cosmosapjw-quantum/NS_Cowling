@@ -61,3 +61,13 @@ The local-agent contract forbids raw EOS, canonical pair manifests, C7X statuses
 The raw weighted determinant carries the exact matching zero set when endpoint bases and the ODE depend analytically on omega. The normalized determinant angle is real-frequency diagnostic only; complex norms are generally non-holomorphic. Complex-frequency calculations must use analytic scaling or multiple shooting and preserve all determinant scale factors. QR requires det(Q)*det(R), not Q alone.
 
 If the inner concomitant is zero or below relative_floor, the observed interface ratio is undefined and is returned as null with UNDEFINED_ZERO_DENOMINATOR. No NaN or Infinity is allowed in JSON receipts. Complex scalar fields must be encoded explicitly as real/imaginary pairs.
+
+
+
+## 2026-11-11 continuation: closure-mismatch Abel compensation
+
+The continuation adds a conditional piecewise compensated Abel–Liouville invariant for the exact 2x2 Cowling matrix when the perturbation closure chi_ad differs from the equilibrium derivative chi_eq. Read COMPENSATED_ABEL_LIOUVILLE_NOTE_20261111.md for the derivation and scope limitations. The helper and its 12-test synthetic suite are separate from the native solver.
+
+The single local execution contract is still LOCAL_AGENT_DAG.v1.json and LOCAL_AGENT_DAG_DEVELOPMENT_AND_HANDOFF_20261111.md. Revision 1.1 adds node LA9 for native closure audit, piecewise compensation, complex diagnostic serialization and anti-drift validation. HANDOFF_PROMPT_20261111.txt is the standalone invocation text.
+
+No physical nonbarotropic theorem, native q-to-r verification, actual stellar profile, or f/p1/interface-g classification is claimed. The current PR #6 source also has an identified complex-jump reporting loss; LA9 requires an additive compatibility-preserving regression and output fix.

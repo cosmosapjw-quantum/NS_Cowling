@@ -39,3 +39,11 @@ All numerical assertions use synthetic cold-barotropic coefficient functions and
 3. A nonbarotropic or frozen-composition chi requires a new derivation.
 4. The concomitant is not established as a canonical covariant symplectic current.
 5. Physical labels remain unresolved pending zero-jump seeding and actual fixture continuation.
+
+
+
+## 2026-11-11 supplemental compensated Abel–Liouville check
+
+The separate 12-test synthetic helper suite passes. See COMPENSATED_ABEL_VALIDATION_REPORT.md and COMPENSATED_ABEL_RESULTS.json for exact commands and tested range. This does not authenticate or replace the historical 42-case PR #6 test receipt and does not constitute a full repository replay.
+
+The 43-case claim in the prior prose/status files does not have a matching 43-case manifest and captured stdout in the inspected branch. It is therefore not counted as verified. The current PR #6 combined-status endpoint returned no status records; GitHub Actions/CI pass is not claimed.

@@ -506,21 +506,21 @@ This is a current-tree trim only. There was **no Git history rewrite**. Removed 
 
 ## Latest verified cloud baseline (2026-11-11)
 
-The dedicated cloud branch has a complete green CI baseline at commit `afc74ce4a14e9f319569319954cacaf307a92463`.
+The current lean cloud branch HEAD `e188fe355acdbea768ab179cd93eeabb44b99002` has a complete green CI baseline.
 
-- GitHub Actions run [#43026837527](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43026837527): **SUCCESS**.
+- GitHub Actions run [#43027594881](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43027594881): **SUCCESS**.
 - Environment: GNU Fortran 15.2; Python 3.13.
 - Native Fortran build: PASS.
 - Frontend and pipeline tests: **80 passed in 31.74 s**.
 - Native quartic polynomial-extrema test: PASS.
 - Native CSS high-density segment analytic test: PASS.
 - Handoff byte diagnostic: PASS.
-- SHA-256 manifest: PASS.
-- Verified source snapshot artifact ID `13857636805`, 55,101,928 bytes, SHA-256 `3d477cd5f535f9cafbc27f5b83e8b8c5c468f22d7433c410d3b9b2cb7f8b1463`, expires `2026-12-11T13:12:20Z`.
+- Runner-measured SHA-256 manifest: PASS.
+- Source snapshot packaged and uploaded as artifact ID `13858705154`, 55,110,489 bytes, SHA-256 `876304d90d7293264d01bcb3f4b03e346e8899f447134c8617f1fa1e2bd12732`, expires `2026-12-11T13:17:27Z`.
 
-This is a verified source/build/test baseline, not an EOS390 production run. The original 18-provider raw archive has not been staged in the cloud workspace. No new 390 generation, native readback of regenerated outputs, physical validation, or Dropbox EOS-output backup is claimed. The next hard blocker is the user-provided `NS_Cowling_EOS390_raw_inputs_v1.tar.zst` with its `SHA256SUMS.txt`, staged outside the Git worktree.
+This is a verified source/build/test baseline, not an EOS390 production run. The original 18-provider raw archive has not been staged in the cloud workspace. No new 390 generation, native readback of regenerated outputs, physical validation, or Dropbox EOS-output backup is claimed. The next hard blocker is the original-source archive `NS_Cowling_EOS390_raw_inputs_v1.tar.zst` with `SHA256SUMS.txt`, staged outside the Git worktree.
 
-The duplicate CompOSE row-key guards are now CI-verified. Per-row composition masks, generic multidimensional CompOSE support, provider-specific SPG/GPPVA abundance adjudication, and the complete Fortran production path remain incomplete and are tracked in the single machine DAG.
+Duplicate CompOSE row-key guards are CI-verified. Per-row composition masks, generic multidimensional CompOSE support, provider-specific SPG/GPPVA abundance adjudication, and the complete Fortran production path remain incomplete and are tracked in the single machine DAG.
 
 ## 13. Current bounded implementation status
 

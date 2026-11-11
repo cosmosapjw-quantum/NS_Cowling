@@ -28,3 +28,8 @@ This matrix is intentionally conservative. Native master reconstruction and the 
 
 
 2026-11-08: this feature remains PARTIAL; historic global-spline selection, microscopic solvers and complete BPS nuclide generation remain unimplemented.
+
+
+### Il=0 true-Maxwell convention correction (2026-11-11)
+
+The thermo-only native one-charge Maxwell kernel now uses Euler mu_E=(epsilon+P)/n_B as its P(mu) coordinate while preserving the CompOSE stored Q3 convention. For Il=0, mn*(1+Q3)=mu_E-Yq*mn*Q4; for Il=1 and Q5≈0, mn*(1+Q3)=mu_E. Input validation and both output-row paths use this convention. An analytic Il=0 two-phase regression checks output Q3 plus native C2 closure. This does not add composition reconstruction, Gibbs equilibrium, Seidov classification or TOV/Cowling interface verification. The historical smooth match_crust_core(method="maxwell") remains a near-pressure plateau with zero density jump and is_exact_maxwell=false.

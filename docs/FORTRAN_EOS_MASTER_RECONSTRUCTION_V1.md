@@ -344,3 +344,17 @@ This operation does not yet port:
 4. L. Suleiman, J. L. Zdunik and P. Haensel (2024), *Layers of electron captures in the crust of accreting neutron stars*, Astronomy & Astrophysics **690**, A301, [doi:10.1051/0004-6361/202348340](https://doi.org/10.1051/0004-6361/202348340). This work gives the zero-temperature degenerate-electron EOS and a linear-mixing-rule lattice pressure for parent/daughter nuclear mixtures. The present implementation uses only the single-species BCC limit with the supplied nuclear charge number; it does not implement the mixture function or electron-capture kinetics.
 
 The thermodynamic identities and interval-extremum criteria in this note are derived from the stated master function and implemented in the native Fortran module. The local smoothing and dissolution rules are implementation choices whose numerical convergence and model dependence should be assessed with each source EOS.
+
+
+## 12. Reconstruction validation cross-link (2026-11-11)
+
+The native reconstruction output keeps the Euler quantity \(\mu_H=F+Q_1=d\epsilon/dn_B\) as the denominator of \(c_s^2/c^2=(Q_1+F'')/\mu_H\). It does **not** use the CompOSE Q3 convention-adjusted potential as a sound-speed denominator. For the supported cold branches, the source/output Q3 contract is
+
+\[
+ m_n(1+Q_3)=\begin{cases}
+ \mu_H-Y_qm_nQ_4,&I_l=0,\\
+ \mu_H,&I_l=1,\ Q_5\simeq0.
+ \end{cases}
+\]
+
+This identity is a metadata convention layer on top of the Euler thermodynamics. The same distinction is now enforced in the true Maxwell input/output kernel. See FORTRAN_EOS_MAXWELL_TRANSITION_V1.md and the 2026-11-11 regression receipt in FORTRAN_EOS_GAP_FILL_TESTS.log.

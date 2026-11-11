@@ -1,12 +1,12 @@
 {
   "schema": "ns-cowling.sharp-maxwell-c4-execution-plan",
-  "schema_version": "1.1.0",
+  "schema_version": "1.2.0",
   "plan_id": "sharp_maxwell_c4_execution_dag_v1",
   "created_date": "2026-11-10",
   "selected_stage": "C4",
   "selected_stage_definition": "Implementation DAG, execution order, computational platform, parallelization and checkpoints only. Source-admission calculations are planned but not executed in this stage.",
   "active_branch": "research/sharp-maxwell-cohort-admission-v1",
-  "pr4_head": "934d5e9c643213bedda3193ad53f03f190dd9a81",
+  "pr4_head": "eef56512a8ba8d70e20f6a68c9ca101104d22fad",
   "source_authority": {
     "branch": "research/maxwell-native-fortran-v1",
     "commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
@@ -183,16 +183,128 @@
         "Test rejection of Q5!=0, composition-bearing, Nadd!=0, internal Iphase discontinuity, incompatible masses and incompatible Il/Yq metadata",
         "Do not run any of the 65 cohort root searches or production TOV/Cowling"
       ],
-      "status": "BOUNDED_SYNTHETIC_AND_EXACT_HEAD_NATIVE_INTEGRATION_TESTS_PASS__SOURCE_COHORT_ADMISSION_BLOCKED",
+      "status": "PARTIAL_EXACT_HEAD_CI_PASS_ROOT_TOPOLOGY_AND_LOCAL_REPLAY_NOT_VERIFIED__SOURCE_COHORT_BLOCKED",
       "result_policy": {
         "current_il0_fix": "TDD_RED_GREEN_REPRODUCED_IN_EXPORTED_PR1_SOURCE_ARTIFACT; 68 frontend/pipeline tests passed locally; local run directory has no Git metadata",
         "native_source_commit_to_replay": "FETCH_LIVE_PR1_HEAD",
-        "all_six_smooth_methods": "EXISTING_REGRESSION_RECEIPTS_MUST_BE_REPLAYED_AT_EXACT_HEAD",
-        "true_maxwell_kernel": "Il0_Il1_analytic_fixtures_and_negative_controls_required",
+        "all_six_smooth_methods": {
+          "status": "EXACT_HEAD_CI_COVERED",
+          "code_path": "fortran_eos/src/compose_eos_matching.f90::match_crust_core",
+          "test_path": "python_frontend/tests/test_native_crust_core_matching.py",
+          "parameterized_methods": [
+            "maxwell",
+            "css",
+            "cubic_F",
+            "cubic_P",
+            "quintic_F",
+            "quintic_P"
+          ],
+          "test_identity": "test_native_smooth_matching_differential_against_legacy",
+          "interpretation": "The test is explicitly parameterized over all six identifiers and checks native/legacy differential outputs. The same test asserts that historical maxwell is not exact Maxwell and has zero density jump."
+        },
+        "true_maxwell_kernel": {
+          "status": "ANALYTIC_FIXTURE_AND_NEGATIVE_CONTROLS_INCLUDED_IN_EXACT_HEAD_CI",
+          "code_path": "fortran_eos/src/compose_eos_phase_transition.f90::construct_maxwell_transition",
+          "test_path": "python_frontend/tests/test_native_maxwell_transition.py",
+          "current_test_coverage": [
+            "analytic single transverse coexistence root",
+            "composition-bearing input rejection",
+            "non-overlapping Euler chemical-potential support rejection",
+            "acausal phase rejection",
+            "provider First-Law mismatch rejection",
+            "explicit local-neutrality confirmation",
+            "phase-barotrope output/composition restrictions",
+            "incompatible charge-fraction metadata rejection",
+            "Nadd rejection",
+            "Il=0 Q3 charge-potential convention"
+          ],
+          "not_yet_demonstrated": [
+            "overlapping support with no root",
+            "exact tangential/even-multiplicity root",
+            "multiple distinct roots",
+            "shared-knot root deduplicated once",
+            "duplicate endpoint/stationary root deduplicated once",
+            "near-tangent non-root tolerance control",
+            "root/table refinement convergence"
+          ],
+          "interpretation": "Current kernel logic splits P_L-P_H at stationary points derived from quadratic n_L-n_H, but code inspection is not a substitute for the missing deterministic regression cases."
+        },
         "provider_composition": "REMAINS_BLOCKED_BY_C6B",
         "cohort_root_search": "NOT_RUN_UNTIL_C4_D0_D7_AND_C4_D3R_PASS",
         "exact_head_native_integration": "PR1 head df3462fd: FPM 12/33/79 checks, phase-aware Python 8, EOS frontend/pipeline 76; slow/rapid analytic two-table CLI roots and SciPy reference pass",
-        "source_cohort": "NOT_ADMITTED; C4-D0..D7 and C6B remain separate prerequisites"
+        "source_cohort": "NOT_ADMITTED; C4-D0..D7 and C6B remain separate prerequisites.",
+        "historical_local_receipt": {
+          "status": "PROVENANCE_LIMITED_HISTORICAL_RECEIPT",
+          "prior_claim": "An earlier exported PR1 source artifact reported 68 frontend/pipeline tests passing, but its run directory had no Git metadata.",
+          "treatment": "Preserved as historical context only; not counted as current exact-head or local reproduction evidence."
+        },
+        "exact_head_ci": {
+          "status": "PASS",
+          "workflow_run_id": 42952472519,
+          "event": "pull_request",
+          "eos_branch": "research/fortran-eos-gap-fill-v1",
+          "eos_branch_head": "ecf2271e89b68f0a6ef2e6a9c551deba7862f192",
+          "tested_merge_snapshot": "9129d53dfc5b4a216ad53cb118c3fc08ab319572",
+          "base_branch": "main",
+          "base_sha": "6eed9c5178afd820c9d814e4138dd0f15d1f5a73",
+          "runner": {
+            "python": "3.13",
+            "gfortran": "15.2.0",
+            "pytest": "9.2.0",
+            "numpy": "2.5.4",
+            "scipy": "1.18.1"
+          },
+          "commands": {
+            "build": "bash fortran_eos/build.sh build/compose_eos_fortran",
+            "frontend_and_pipeline_tests": "python -m pytest -q python_frontend/tests pipeline/tests",
+            "native_extrema": "gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all -Ibuild/compose_eos_fortran/mod fortran_eos/tests/test_polynomial_extrema.f90 build/compose_eos_fortran/obj/compose_eos_types.o build/compose_eos_fortran/obj/compose_eos_reconstruct.o -o build/compose_eos_fortran/test_polynomial_extrema && build/compose_eos_fortran/test_polynomial_extrema",
+            "manifest": "sha256sum -c SHA256SUMS_v4.txt"
+          },
+          "outcomes": {
+            "native_build": "PASS",
+            "frontend_and_pipeline": {
+              "status": "PASS",
+              "passed": 76,
+              "elapsed_seconds": 45.77
+            },
+            "polynomial_extrema": "PASS",
+            "sha256_manifest": "PASS",
+            "artifact_upload": "PASS"
+          },
+          "artifact": {
+            "id": 13826230310,
+            "size_bytes": 280171082,
+            "sha256": "6b4d884929f6ef8e75057969086e1805f91fa5e28c785f1295161d329db7c5ff",
+            "expiry": "2026-12-11"
+          },
+          "interpretation": "CI integration evidence applies to the PR merge snapshot combining the cited PR1 head and base. It is not local sandbox reproduction or physical source-cohort admission."
+        },
+        "reconstruction": {
+          "code_path": "fortran_eos/src/compose_eos_reconstruct.f90::reconstruct_master",
+          "regression_path": "python_frontend/tests/test_native_reconstruct_master.py",
+          "current_exact_head_ci": "Included in the passing 76-test frontend/pipeline suite.",
+          "limitations": "No separate local replay in this session; full historical generator parity is not claimed."
+        },
+        "independent_analytic_check": {
+          "status": "DERIVED_AND_EXACTLY_CHECKED_WITH_WOLFRAM",
+          "phase_models": {
+            "low": "P=n^2; epsilon=939 n+n^2",
+            "high": "P=(1/4)n^2; epsilon=940 n+(1/4)n^2"
+          },
+          "coexistence": {
+            "mu_t_MeV": 941,
+            "pressure_t_MeV_fm3": 1,
+            "n_low_fm3": 1,
+            "n_high_fm3": 2,
+            "epsilon_low_MeV_fm3": 940,
+            "epsilon_high_MeV_fm3": 1881,
+            "delta_epsilon_MeV_fm3": 941,
+            "mu_delta_n_MeV_fm3": 941,
+            "identity_residual": 0
+          },
+          "interpretation": "Exact analytic fixture independently solved symbolically and numerically in Wolfram; agrees with the repository's quadratic two-phase regression fixture. This checks the thermodynamic identity for this fixture only."
+        },
+        "root_topology": "PARTIAL: exact-head CI covers one transverse root and disjoint-support rejection; the additional topology controls listed above remain NOT_VERIFIED."
       }
     },
     {
@@ -444,7 +556,7 @@
   },
   "next_stage": "C5",
   "next_action": "C5 source-reader and C1-C11 read-only admission only. Preserve C6B; no source Maxwell root, one-pair pilot, 65-pair sweep, production TOV or Cowling spectrum until C4-D0..D7, C4-D3R and provider semantics pass. PR3 analytic implementation validation is now PASS but does not satisfy the source-admission gates.",
-  "plan_revision": "1.1.0",
+  "plan_revision": "1.2.0",
   "updated_date": "2026-11-11",
   "mutation_policy": {
     "M0": "READ_ONLY: inspect/fetch/test only; stop if branch/worktree identity is dirty or ambiguous",
@@ -468,7 +580,13 @@
     "No interpolation or derivative stencil crosses an Iphase discontinuity",
     "No 65-pair roots/TOV/Cowling until C4-D0..D7 plus C4-D3R have all passed and C6B is resolved",
     "Tests, collection counts, raw stdout, manifests and SHA256SUMS must describe the same exact source bytes",
-    "NOT_RUN/BLOCKED is retained for unavailable evidence; never promote a planned gate to PASS"
+    "NOT_RUN/BLOCKED is retained for unavailable evidence; never promote a planned gate to PASS",
+    "2026-11-11: distinguish PR1 branch HEAD ecf2271e89b68f0a6ef2e6a9c551deba7862f192 from PR merge snapshot 9129d53dfc5b4a216ad53cb118c3fc08ab319572 when citing CI.",
+    "2026-11-11: exact-head CI reports 76 frontend/pipeline tests and polynomial extrema PASS; this does not demonstrate explicit tangential, multiple-root or duplicate-endpoint topology regressions.",
+    "2026-11-11: the six smooth matching identifiers are covered by a parameterized legacy differential test; historical maxwell remains a smooth zero-jump compatibility token.",
+    "2026-11-11: record local shell ClientError, DNS failure, offline workstation and Dropbox binary URL policy as runtime blockers, not EOS numerical failures.",
+    "2026-11-11: native subagent execution is NOT_RUN because no native delegation tool was available; do not report role-play or serial work as subagent execution.",
+    "2026-11-11: independent Wolfram analytic fixture residual is zero for the documented two quadratic phases; this does not admit any provider EOS pair."
   ],
   "failure_taxonomy": [
     "THERMODYNAMIC_CONVENTION_MISMATCH",
@@ -725,6 +843,58 @@
       },
       "local_artifact_path": "/mnt/data/maxwell-native-fortran-42951568702.zip",
       "local_artifact_materialization": "PASS_FILE_MATERIALIZED; ZIP_INTERNAL_CRC_NOT_RECHECKED_DUE_CONTAINER_RUNTIME_FAILURE"
+    }
+  },
+  "pr4_head_semantics": "The branch HEAD immediately before the 2026-11-11 plan update; the resulting commit SHA is recorded in GitHub after publication.",
+  "local_agent_contract": {
+    "document": "docs/EOS_RECONSTRUCTION_MAXWELL_LOCAL_AGENT_CONTRACT_20261111.md",
+    "role": "Detailed coding contract and copyable handoff for executing C4-D3R within the existing DAG; this is not a second DAG.",
+    "selected_stages": [
+      "C5",
+      "C6"
+    ],
+    "execution_mode": {
+      "requested_plugin": "physmath-research-loop",
+      "native_subagent_status": "NOT_RUN",
+      "reason": "No native task-delegation tool was available in the active tool inventory. Work in this session was performed serially; no simulated subagent is claimed."
+    },
+    "session_runtime": {
+      "initial_sandbox_versions": {
+        "python": "3.13.5",
+        "git": "2.47.3",
+        "gfortran": "14.2.0",
+        "cmake": "3.31.6"
+      },
+      "direct_github_clone": "BLOCKED_DNS_COULD_NOT_RESOLVE_GITHUB_COM",
+      "github_actions_artifact_download": "PASS",
+      "github_actions_artifact_id": 13826230310,
+      "github_actions_artifact_name": "NS_Cowling-9129d53dfc5b4a216ad53cb118c3fc08ab319572",
+      "github_actions_artifact_size_bytes": 280171082,
+      "github_actions_artifact_sha256": "6b4d884929f6ef8e75057969086e1805f91fa5e28c785f1295161d329db7c5ff",
+      "sandbox_execution_after_artifact_download": "BLOCKED_CLIENT_ERROR",
+      "dropbox_text_fetch": "PASS",
+      "dropbox_binary_transfer_to_sandbox": "BLOCKED_RUNTIME_URL_ACCESS_POLICY",
+      "connected_local_workstation": "OFFLINE",
+      "interpretation": "These are environment/tooling limitations; they are not evidence of an EOS numerical failure."
+    },
+    "verification_scope": {
+      "required_outputs": [
+        "eos_reconstruction_validation.json",
+        "smooth_matching_validation.json",
+        "true_maxwell_kernel_validation.json",
+        "run_receipt.json",
+        "RED_GREEN_regression_logs"
+      ],
+      "stop_before": [
+        "C4-D8",
+        "C4-D9",
+        "C4-D10"
+      ],
+      "prohibited_until_admission": [
+        "65-pair source root searches",
+        "production TOV sequence",
+        "Cowling spectra"
+      ]
     }
   }
 }

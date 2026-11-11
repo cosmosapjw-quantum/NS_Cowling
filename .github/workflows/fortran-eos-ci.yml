@@ -60,6 +60,16 @@ jobs:
             -o build/compose_eos_fortran/test_polynomial_extrema
           build/compose_eos_fortran/test_polynomial_extrema
 
+      - name: Run native Fortran CSS segment analytic tests
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/test_css_segment.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_css.o \
+            -o build/compose_eos_fortran/test_css_segment
+          build/compose_eos_fortran/test_css_segment
+
       - name: Verify tracked SHA-256 manifest
         run: sha256sum -c SHA256SUMS_v4.txt
 

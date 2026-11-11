@@ -1,6 +1,6 @@
 # EOS390 Native Fortran Unification Contract
 
-**Version:** 1.0.0  
+**Version:** 1.1.0  
 **Date:** 2026-11-11  
 **Repository:** `cosmosapjw-quantum/NS_Cowling`  
 **Work branch:** `research/eos390-fortran-unification-v1`  
@@ -446,3 +446,50 @@ Old SPG source sheets say “in preparation”, while current official SPG(M3)/(
 This host could not copy arXiv PDF bytes into attachments despite confirmed public PDF URLs. Local agent must download and SHA-256 the listed sources. The GM1 Glendenning-Moszkowski PRL 67,2414 (1991) complete PDF was not retrieved; APS returned 403. Request that specific PDF from the user only if local access also fails.
 
 **Still incomplete:** local execution has not occurred; source-cohort admission remains blocked; sharp Maxwell kernel is composition-free; composition-aware Maxwell, literature solvers, five composition-aware smooth methods, native TOV/tidal/Cowling integration and all 390 tasks remain pending. CI PASS is not EOS390 physics completion.
+
+
+## 14. Phase classification is thermodynamic, not syntactic
+
+A method token, interpolation order, CSS label, or CompOSE Iphase integer does not determine phase-transition order. Record one of: `FIRST_ORDER_SHARP`, `SECOND_ORDER_CANDIDATE`, `CROSSOVER_SMOOTH`, `MIXED_PHASE_GIBBS`, or `UNRESOLVED_INTERFACE`.
+
+A first-order local-neutrality Maxwell interface requires common (P_t,mu_t), positive (n_+-n_-), and (Deltaepsilon=mu_tDelta n_B). A second-order candidate requires a named thermodynamic potential and a resolved higher-derivative/susceptibility nonanalyticity. A crossover requires a smooth resolved interval without an established nonanalyticity. A zero density jump is not sufficient evidence for either second order or crossover. If the source only supplies a categorical Iphase change or a density-grid gap, retain it as unresolved until supported by thermodynamics and source literature.
+
+An interface may occur at crust-medium or any other intermediate layer. Keep interface topology separate from the interpolation/branch model. All derivative stencils and interpolation intervals must be phase-local.
+
+## 15. Standard CSS branch with explicit jump
+
+The standard sharp constant-sound-speed (CSS) high-density branch is distinct from the historical smooth two-segment `css` matching bridge. It follows Alford, Han & Prakash (2013), arXiv:1302.4732, and Alford et al. (2015), arXiv:1501.07902. Its transition is specified by (P_t), (Deltaepsilon), and constant high-side (c_s^2).
+
+Let the low-side state be ((P_t,epsilon_-,n_-)). Then
+
+```text
+mu_t = (epsilon_- + P_t)/n_-
+epsilon_+ = epsilon_- + Delta_epsilon
+n_+ = (epsilon_+ + P_t)/mu_t
+epsilon(P) = epsilon_+ + (P-P_t)/cs2
+n(P) = n_+ * [1 + (1+cs2)(P-P_t)/
+               (cs2*(epsilon_+ + P_t))]**(1/(1+cs2))
+mu(P) = (epsilon(P)+P)/n(P)
+```
+
+For (Deltaepsilon>0), this is a sharp first-order interface and (Deltaepsilon=mu_t(n_+-n_-)). For (Deltaepsilon=0), preserve the continuous state but classify it as `CONTINUOUS_UNCLASSIFIED`; higher-order classification requires independent thermodynamic information. Require (0<c_s^2leq1); the high-side branch obeys (dP/depsilon=c_s^2) and (depsilon/dn_B=mu_B).
+
+The initial analytic Fortran kernel is `fortran_eos/src/compose_eos_css.f90`; test is `fortran_eos/tests/test_css_segment.f90`. It is a branch-state evaluator only. It is not yet connected to the common matcher, full CompOSE writer, stellar solver or 390 runner.
+
+## 16. Historical smooth-pressure method nomenclature
+
+The historical Python `build_maxwell_plateau_bridge` code uses a smooth Hermite (P(u)) bridge with interior knots at (u=0.22,0.78), (delta P=0.015(P_2-P_1)), a 64-point Gauss-Legendre root solve for the integral constraint, and 16-point partial integrals. Its baryon density is continuous; it has no Maxwell density jump or latent heat. This specific implementation has no verified primary-literature attribution in the repository or source searches.
+
+Use the project-defined descriptive name **Legacy Near-Pressure-Plateau Hermite Bridge (NPPHB)**. This is not asserted to be an established literature name. The literature does contain other finite-width interpolations around a Maxwell crossing, such as the polynomial replacement interpolation discussed by Ayriyan et al. (2018) and the Mixing Interpolation Method (MIM) of Ayriyan et al. (2020); these are not algebraically identical to the NPPHB code. Keep historical source immutable and never expose NPPHB as production `maxwell`.
+
+## 17. Generic CompOSE generator upgrade
+
+The current implementation is narrower than the standard CompOSE provider format. The target is a typed Fortran table model supporting 1D, 2D and 3D T-n_B-Y_q grids, exact cell indices, and required `eos.t/eos.nb/eos.yq/eos.thermo` files plus optional `eos.compo/eos.micro/eos.mr`. The generator must retain arbitrary species and nuclear-group identifiers, source-local Iphase, Nadd/q_extra semantics, axis indices, optional metadata and exact provenance. A requested cold beta-equilibrium barotrope is an explicit slice selected from the generic table; it is not the underlying storage model.
+
+Do not make a parser universal by silently skipping unknown fields. Preserve recognized optional content; fail closed on unsupported required semantics. Lossless read/write round-trip tests for all 18 source models and independent CompOSE fixtures at each supported dimensionality are required before source-cohort admission.
+
+## 18. Local-only execution and self-audit
+
+The integrated local-agent execution plan, exact mutation gates, anti-drift/hallucination audit, local command sequence, output receipts and copy-ready prompt are in `docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md`. That document and `data/eos390_native_fortran_unification_dag.v1.json` are the only consolidated execution specification for this task. Do not create a competing second DAG. All physical/numerical calculations stay in Fortran; local execution verifies native build, source admission, full validation and 390 regeneration.
+
+Primary phase/CSS references: Alford, Han & Prakash (2013), https://arxiv.org/abs/1302.4732; Alford et al. (2015), https://arxiv.org/abs/1501.07902; Douchin & Haensel (2001), https://www.aanda.org/articles/aa/abs/2001/46/aa1755/aa1755.html; Ayriyan et al. (2020), https://link.springer.com/article/10.1140/epja/s10050-020-00111-1.

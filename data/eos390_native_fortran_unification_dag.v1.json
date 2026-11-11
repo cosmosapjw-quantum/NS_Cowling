@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.0.2",
+  "revision": "1.1.0",
   "created_utc": "2026-11-11",
-  "status": "IN_PROGRESS_INITIAL_SAFETY_SLICE_GITHUB_CI_PASS_LOCAL_RUNTIME_AND_EOS390_PORT_PENDING",
+  "status": "IN_PROGRESS_NATIVE_CSS_SEGMENT_PRIMITIVE_ADDED_CI_PENDING_FULL_MIGRATION_AND_390_REGENERATION_PENDING",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "research/eos390-fortran-unification-v1",
@@ -321,6 +321,29 @@
         "Dropbox progress snapshot and local execution receipt are saved"
       ],
       "status": "PENDING"
+    },
+    {
+      "id": "M5A",
+      "name": "Native CSS high-density branch with explicit sharp-interface jump",
+      "acceptance": [
+        "Use P_t, epsilon_low, n_low, Delta epsilon>=0, and 0<cs2<=1.",
+        "Ensure equality of P_t and mu_t across interface and Delta epsilon=mu_t Delta n_B.",
+        "Allow the declared interface at crust-medium or any other phase boundary.",
+        "Do not classify a zero jump as second-order or crossover without extra thermodynamic evidence.",
+        "Integrate the branch into the generic phase topology and CompOSE writer in a later gate."
+      ],
+      "status": "ANALYTIC_FORTRAN_KERNEL_ADDED_CI_PENDING"
+    },
+    {
+      "id": "M10",
+      "name": "Generic CompOSE standard generator",
+      "acceptance": [
+        "General 1D/2D/3D CompOSE schema support and slice selection.",
+        "Arbitrary registered species/nuclear groups and optional eos.micro/eos.mr handling.",
+        "Lossless source round-trip, provenance and explicit unsupported-field diagnostics.",
+        "Cold EOS390 pipeline uses the generic reader/writer instead of a special-case parser."
+      ],
+      "status": "PENDING"
     }
   ],
   "nodes": [
@@ -476,6 +499,44 @@
         "summary and manifests",
         "Dropbox research snapshot"
       ]
+    },
+    {
+      "id": "E390-05A",
+      "gate": "M5A",
+      "title": "Add analytic CSS high-density segment kernel with optional sharp density jump",
+      "depends_on": [
+        "E390-00",
+        "E390-02"
+      ],
+      "status": "CODE_ADDED_CI_PENDING",
+      "files": [
+        "fortran_eos/src/compose_eos_css.f90",
+        "fortran_eos/tests/test_css_segment.f90",
+        "fortran_eos/build.sh",
+        ".github/workflows/fortran-eos-ci.yml"
+      ],
+      "outputs": [
+        "CSS transition-state identities",
+        "high-branch epsilon(P), n(P), mu(P)",
+        "first-order versus continuous-unclassified interface flag",
+        "analytic first-law and constant-sound-speed tests"
+      ]
+    },
+    {
+      "id": "E390-10",
+      "gate": "M10",
+      "title": "Upgrade native CompOSE support from cold one-dimensional slices to the standard multidimensional provider format",
+      "depends_on": [
+        "E390-02"
+      ],
+      "status": "PENDING",
+      "outputs": [
+        "generic CompOSE table data model",
+        "1D/2D/3D axes and cell-index parser",
+        "arbitrary species/group/optional file support",
+        "lossless round-trip test corpus",
+        "explicit slice selector for EOS390"
+      ]
     }
   ],
   "mutation_policy": {
@@ -504,7 +565,7 @@
     "output_versioning": "Each regeneration gets a fresh versioned folder; retries write a new attempt ID, not over existing output."
   },
   "local_agent": {
-    "goal": "Complete M0-M9, execute the native Fortran build and all 390 source-backed regeneration tasks, and produce an auditable new output set without modifying the frozen legacy inputs.",
+    "goal": "Complete the native Fortran migration and regenerate all 390 source-backed crust/core/method combinations using a generic CompOSE generator, with CSS/Maxwell/second-order/crossover thermodynamic semantics kept distinct. Local machine is for build, full validation, and native 390 execution; Python is frontend only.",
     "required_access_paths": [
       "/home/cosmosapjw/Dropbox/ns_eos",
       "/home/cosmosapjw/Dropbox/ns_oscillation_followup_20261106",
@@ -572,7 +633,10 @@
       "regenerated_390": "NOT_RUN"
     },
     "open_source_pdf_download": "PUBLIC_ARXIV_PDF_URLS_CONFIRMED_DIRECT_CONTAINER_DOWNLOAD_TOOL_FAILED",
-    "source_bibliography": "UPDATED_FROM_ALL_18_DROPBOX_EOS_DATASHEETS"
+    "source_bibliography": "UPDATED_FROM_ALL_18_DROPBOX_EOS_DATASHEETS",
+    "css_kernel": "CODE_ADDED_CI_PENDING",
+    "generator_upgrade": "PLANNED_NOT_IMPLEMENTED",
+    "native_subagent": "NOT_RUN_NO_NATIVE_DELEGATION_TOOL_EXPOSED"
   },
   "legacy_feature_inventory": [
     {
@@ -725,5 +789,160 @@
       "status": "NOT_RUN",
       "evidence": "M7-M9 are not implemented or source-cohort admitted."
     }
-  ]
+  ],
+  "phase_ontology": {
+    "authority": "Thermodynamic phase classification is independent of interpolation method, EOS parametrization, CompOSE Iphase integer, and source-provider phase labels.",
+    "classifications": [
+      {
+        "id": "FIRST_ORDER_SHARP",
+        "criterion": "At common coexistence (P_t,mu_t), n_plus>n_minus and epsilon_plus>epsilon_minus, with Delta epsilon=mu_t*Delta n_B for one conserved baryon charge and the declared neutrality condition.",
+        "required_evidence": [
+          "pressure continuity",
+          "baryon chemical-potential continuity",
+          "positive density and energy-density jumps",
+          "Euler/first-law closure on both sides",
+          "phase-specific composition and charge closure"
+        ],
+        "note": "Maxwell means local electric neutrality in each phase here; global-neutrality mixed phases are Gibbs-like and require an independent charge chemical potential and volume fraction."
+      },
+      {
+        "id": "SECOND_ORDER_CANDIDATE",
+        "criterion": "The relevant thermodynamic potential and first derivatives remain continuous while a higher derivative/susceptibility or order-parameter derivative has a reproducible nonanalyticity.",
+        "required_evidence": [
+          "identified thermodynamic potential",
+          "resolved derivative/susceptibility signature",
+          "grid/refinement robustness",
+          "microphysical or model provenance"
+        ],
+        "note": "A continuous n_B or zero energy jump alone does not prove second order."
+      },
+      {
+        "id": "CROSSOVER_SMOOTH",
+        "criterion": "No thermodynamic nonanalyticity is established; the EOS and relevant derivatives remain smooth over a resolved finite-density interval.",
+        "required_evidence": [
+          "smooth thermodynamic potential/derivatives over interval",
+          "resolution and interpolation robustness"
+        ],
+        "note": "A broad or narrow softening peak is not by itself proof of a phase transition."
+      },
+      {
+        "id": "MIXED_PHASE_GIBBS",
+        "criterion": "Two or more conserved charges with global neutrality and a varying phase fraction over a finite interval.",
+        "required_evidence": [
+          "P(mu_B,mu_Q) or equivalent multicharge thermodynamic surface",
+          "phase charge densities",
+          "volume-fraction neutrality root",
+          "stability across the mixed domain"
+        ]
+      },
+      {
+        "id": "UNRESOLVED_INTERFACE",
+        "criterion": "A discontinuity, kink, or phase label is present but thermodynamic evidence is insufficient to classify the transition.",
+        "required_evidence": [
+          "preserve raw samples and categorical phase metadata",
+          "no smoothing across interface",
+          "request/source further evidence"
+        ]
+      }
+    ],
+    "inference_guards": [
+      "Never infer transition order from method names such as CSS, Maxwell, cubic, or quintic.",
+      "Never infer physical phase identity from numeric Iphase values without provider-local provenance.",
+      "Never infer second-order or crossover from Delta epsilon=0 alone.",
+      "Never classify a sharp jump as Maxwell until P and mu_B continuity and the first-law jump identity pass.",
+      "A crust-to-medium or medium-to-core interface may carry a density jump; interface location does not force continuity.",
+      "Do not smooth interpolation stencils across declared Iphase or physical interface boundaries."
+    ]
+  },
+  "css_segment_contract": {
+    "status": "ANALYTIC_FORTRAN_KERNEL_ADDED_CI_PENDING_NOT_YET_IN_TABLE_GENERATOR",
+    "source": "Alford, Han & Prakash (2013), arXiv:1302.4732, PRD 88, 083013; Alford et al. (2015), arXiv:1501.07902, PRD 92, 083002.",
+    "orthogonal_to_matching_method": true,
+    "interface_may_occur_at": [
+      "crust-medium",
+      "medium-core",
+      "hadron-quark",
+      "any_source_declared_phase_boundary"
+    ],
+    "inputs": {
+      "p_transition": "MeV fm^-3",
+      "epsilon_low": "MeV fm^-3",
+      "nb_low": "fm^-3",
+      "delta_epsilon": "MeV fm^-3; nonnegative",
+      "cs2": "dimensionless c_s^2/c^2; 0<cs2<=1"
+    },
+    "equations": {
+      "mu_t": "(epsilon_low + P_t)/n_low",
+      "epsilon_high_transition": "epsilon_low + Delta_epsilon",
+      "n_high_transition": "(epsilon_high_transition + P_t)/mu_t",
+      "epsilon_high_P": "epsilon_high_transition + (P-P_t)/cs2",
+      "n_high_P": "n_high_transition * [1 + (1+cs2)(P-P_t)/(cs2(epsilon_high_transition+P_t))]^(1/(1+cs2))",
+      "mu_high_P": "(epsilon_high_P+P)/n_high_P"
+    },
+    "acceptance": [
+      "At P=P_t, high-side epsilon,n,mu recover the declared transition state.",
+      "Delta epsilon=mu_t*(n_high_transition-n_low) within floating-point tolerance.",
+      "For positive Delta epsilon, classify sharp first-order interface.",
+      "For Delta epsilon=0, report CONTINUOUS_UNCLASSIFIED; never infer second-order or crossover.",
+      "For every high-side sample, dP/depsilon=cs2 and d epsilon/d n_B=mu_B.",
+      "Reject cs2<=0, cs2>1, negative Delta epsilon, nonfinite inputs, and pressure samples below P_t.",
+      "This branch primitive is not yet a CompOSE writer, common matcher, TOV/Love/Cowling integration, or 390 runner."
+    ],
+    "implementation": {
+      "module": "fortran_eos/src/compose_eos_css.f90",
+      "test": "fortran_eos/tests/test_css_segment.f90",
+      "status": "CODE_ADDED_CI_PENDING"
+    }
+  },
+  "legacy_method_semantics": {
+    "existing_public_token": "maxwell",
+    "actual_algorithm": "smooth Hermite pressure bridge with knots u={0,0.22,0.78,1}, plateau offset 0.015*(P2-P1), 64-point Gauss-Legendre endpoint integral root and 16-point partial integrals",
+    "observed_physics": "continuous density, no latent heat, no exact common-pressure/common-mu coexistence; Delta n_B=0",
+    "project_name": "Legacy Near-Pressure-Plateau Hermite Bridge (NPPHB)",
+    "naming_status": "PROJECT_DEFINED_DESCRIPTIVE_NAME_NOT_A_LITERATURE_ATTRIBUTION",
+    "research_note": "Literature has distinct finite-width P(mu_B) replacement/interpolation schemes around a Maxwell crossing, including parabolic replacement interpolation and the Mixing Interpolation Method (MIM). The historical NPPHB parameterization is not identified as the same published construction. Preserve it only as an immutable legacy reference; exclude it from physical Maxwell and new production method naming."
+  },
+  "generator_upgrade": {
+    "status": "PLANNED_NOT_IMPLEMENTED",
+    "target": "Generic CompOSE provider reader/writer/generator, with safe extraction of a requested thermodynamic slice for the cold EOS390 workflow.",
+    "dimensions": [
+      "1D fixed-T/fixed-Yq slice",
+      "2D T-nB",
+      "2D nB-Yq",
+      "2D T-nB at fixed Yq",
+      "3D T-nB-Yq"
+    ],
+    "files": {
+      "required": [
+        "eos.t",
+        "eos.nb",
+        "eos.yq",
+        "eos.thermo"
+      ],
+      "optional": [
+        "eos.compo",
+        "eos.micro",
+        "eos.mr"
+      ],
+      "preserve_unknown": "Preserve recognized optional files and provider metadata; reject unsupported mandatory semantics explicitly."
+    },
+    "requirements": [
+      "Parse and retain axis index bounds, axis values, and each (iT,inb,iYq) cell identity.",
+      "Validate every thermo row index against the axes; never silently flatten a multidimensional table.",
+      "Support zero-temperature beta-equilibrium and finite-temperature/non-beta-equilibrium provider tables as distinct declared data modes.",
+      "Represent all supported particle species, arbitrary nuclear-group counts/IDs and optional microscopic fields without fixed four-particle/one-group assumptions.",
+      "Preserve Nadd and provider-defined q_extra semantics; do not interpolate categorical or unknown provider fields.",
+      "Treat eos.compo with Npairs=0,Nquad=0 as valid phase-only metadata and keep composition_file_present distinct from composition_available.",
+      "Preserve Iphase as source-local categorical metadata and emit deterministic mapping/provenance when tables are combined.",
+      "Support lossless read-write round trips before any EOS calculation or normalization.",
+      "Expose explicit slice selection by (iT,iYq); derive the cold beta-equilibrium selector only from validated metadata.",
+      "For every export, record schema version, units, source hashes, provider identifiers, code commit, and field-loss report."
+    ],
+    "acceptance": [
+      "CompOSE v3.01/v3.02 files parse and round-trip for all registered source fixtures.",
+      "An independently downloaded open CompOSE table from each supported grid dimensionality passes parser and write/read comparison.",
+      "Unknown required species/field semantics fail closed with exact diagnostics.",
+      "No unsupported axis, particle, nuclear group, Nadd, or Iphase information is silently dropped."
+    ]
+  }
 }

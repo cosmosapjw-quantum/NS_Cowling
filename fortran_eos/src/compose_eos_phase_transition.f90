@@ -231,6 +231,10 @@ contains
     max_euler=0._wp
     do i=1,npts
       mu_source=eos%q(3,i)*eos%mn+eos%mn
+      ! CompOSE Il=0 stores the charge-shifted baryon chemical potential:
+      ! mu_Q3 = mu_Euler - Yq*mu_q. Recover Euler mu before comparing.
+      ! Il=1 with Q5~0 uses mu_Q3=mu_Euler.
+      if(eos%il==0)mu_source=mu_source+eos%charge_fraction_grid*eos%q(4,i)*eos%mn
       residual=abs(mu_source-mu_grid(i))/max(abs(mu_grid(i)),1._wp)
       max_euler=max(max_euler,residual)
     enddo
@@ -610,6 +614,7 @@ contains
     out%q(2,k)=0._wp
     out%q(3,k)=mu_t/out%mn-1._wp
     out%q(4,k)=q4
+    if(eos%il==0)out%q(3,k)=out%q(3,k)-eos%charge_fraction_grid*out%q(4,k)
     out%q(5,k)=0._wp
     eps=mu_t*n_transition-pressure
     out%q(6,k)=eps/(n_transition*out%mn)-1._wp
@@ -628,6 +633,7 @@ contains
     out%q(2,k)=0._wp
     out%q(5,k)=0._wp
     out%q(3,k)=mu_euler/out%mn-1._wp
+    if(eos%il==0)out%q(3,k)=out%q(3,k)-eos%charge_fraction_grid*out%q(4,k)
     out%q(6,k)=eos%q(7,i)
     out%q(7,k)=eos%q(7,i)
     out%q_extra(k)=0._wp

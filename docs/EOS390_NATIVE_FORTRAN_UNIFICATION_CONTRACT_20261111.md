@@ -1,495 +1,533 @@
-# EOS390 Native Fortran Unification Contract
+# NS_Cowling EOS390: Cloud Execution Developer Contract
 
-**Version:** 1.1.0  
+**Version:** 1.2.0  
 **Date:** 2026-11-11  
-**Repository:** `cosmosapjw-quantum/NS_Cowling`  
-**Work branch:** `research/eos390-fortran-unification-v1`  
-**Base:** `research/fortran-eos-gap-fill-v1` at `ecf2271e89b68f0a6ef2e6a9c551deba7862f192`  
-**Canonical machine DAG:** `data/eos390_native_fortran_unification_dag.v1.json`  
-**Model bibliography:** `data/eos390_source_bibliography.v1.json`
+**Repository:** \`cosmosapjw-quantum/NS_Cowling\`  
+**Execution branch:** \`cloud/eos390-fortran-unification-v1\`  
+**Parent feature branch:** \`research/eos390-fortran-unification-v1\`  
+**Pinned parent commit:** \`b12ba451b6755bf8f13d22c882075a23eae800a7\`  
+**Machine authority:** \`data/eos390_native_fortran_unification_dag.v1.json\`  
+**Model-paper registry:** \`data/eos390_source_bibliography.v1.json\`  
+**Existing sharp-Maxwell 65-pair DAG:** separate, immutable, not replaced by this plan.
 
-## 1. Goal and authority
+## 0. Non-negotiable task definition
 
-The goal is to regenerate the original 390 crust-core combinations from the original CompOSE EOS inputs using the repository's native Fortran calculation path.
+The end goal is to regenerate exactly the original **390 crust × core × method** outputs with one scientifically authoritative Fortran backend and a thin Python frontend. The historical 390 outputs and the raw EOS source tables are immutable reference material. The objective is not to force every model through every method: an input EOS that fails causality, composition closure, or source-data validation must remain a failed or diagnostic-only result with its original evidence.
 
-There is one scientific-computation authority: **Fortran**. Python is a frontend only. It may validate command arguments and paths, serialize/deserialize data, invoke native executables, decode native reports, and present results. It must not perform production EOS interpolation, root finding, EOS reconstruction, composition solving, crust-core matching, causality calculations, TOV/tidal integration, Cowling integration, or batch numerical orchestration.
+The execution target for this handoff is an **ephemeral cloud sandbox** (GitHub Actions or an authorized online coding-agent workspace). Do not use the user's desktop, WSL, local Dropbox mount, or a guessed local filesystem path. A tool that merely reads GitHub metadata is not an execution sandbox; use the cloud runner for compiler, tests, numerical runs, and artifacts.
 
-The historical Python implementation is preserved as read-only legacy/reference material. The canonical historical source in this repository is `eos_generator/compose_eos_pkg/`; the source Dropbox package is `/ns_eos/EoS_matching_code_package/`. `python_frontend/compose_cowling/maxwell.py` and other Python numerical solver modules are also legacy/reference surfaces until replaced by native Fortran-backed frontend calls. Do not silently keep them as production solvers under a new name.
+The single source of truth is:
 
-The previous C4 sharp-Maxwell 65-pair DAG is a separate research task and remains unchanged. This contract governs the 390-combination reconstruction/matching matrix.
+1. Current checked-out branch HEAD for code.
+2. \`data/eos390_native_fortran_unification_dag.v1.json\` for machine-readable authority, dependencies, statuses, gates, and next actions.
+3. This document for the human-readable contract and copyable agent prompt.
+4. \`data/eos390_source_bibliography.v1.json\` for EOS-specific literature provenance.
+5. A user-supplied raw EOS archive plus a verified SHA-256 manifest for byte-level source identity.
+6. The v3.2 Dropbox release and old \`/ns_eos/matched_eos_all_combinations\` as immutable historical baselines, not as new-run evidence.
 
-## 2. Approaches and selected architecture
+Do not create another EOS390 plan, another competing schema, or another “improved” output authority. Extend the existing DAG in place.
 
-Three routes were considered:
+## 1. Frozen 390 task space and historical truth
 
-1. Retain Python/SciPy as a calculation fallback and gradually add native routines. **Rejected.** It creates two authorities for formulas, root selection, composition and stellar integration; a successful Python run would not prove the native Fortran product.
-2. Port only the five smooth methods and leave Maxwell/composition as Python reference. **Rejected.** This does not satisfy the user's target and repeats the existing mismatch.
-3. Move the full supported legacy feature surface into the existing Fortran code, keep Python as a thin frontend, and preserve Python only as immutable characterization/differential evidence. **Selected.**
-
-Implement incrementally through the single DAG. Do not create a second EOS390 plan. The current repository already contains a Fortran EOS reader/writer, reconstruction and verification modules, five smooth interpolation kernels, a thermo-only sharp Maxwell kernel, and phase-segmented TOV/Cowling code. The migration must connect these components into one production path instead of adding another numerical package.
-
-## 3. Exact target set and frozen baseline
-
-The target cardinality is:
+The exact matrix is:
 
 | Axis | Count | IDs |
 |---|---:|---|
-| Crust | 13 | SPG_M1, SPG_M2, SPG_M3, SPG_M4, SPG_M5, GPPVA_DD2, GPPVA_DDME2, GPPVA_FSU2, GPPVA_FSU2H, GPPVA_FSU2R, GPPVA_NL3wrL55, GPPVA_TM1e, GPPVA_TW |
-| Core | 5 | APR_APR, BBB_BHF2, GM_GM1, RG_SLY4, RG_KDE0v1 |
-| Method | 6 | maxwell, css, cubic_F, cubic_P, quintic_F, quintic_P |
-| **Total** | **390** | **13 × 5 × 6** |
+| Crust models | 13 | \`SPG_M1\`, \`SPG_M2\`, \`SPG_M3\`, \`SPG_M4\`, \`SPG_M5\`, \`GPPVA_DD2\`, \`GPPVA_DDME2\`, \`GPPVA_FSU2\`, \`GPPVA_FSU2H\`, \`GPPVA_FSU2R\`, \`GPPVA_NL3wrL55\`, \`GPPVA_TM1e\`, \`GPPVA_TW\` |
+| Core models | 5 | \`APR_APR\`, \`BBB_BHF2\`, \`GM_GM1\`, \`RG_SLY4\`, \`RG_KDE0v1\` |
+| Method IDs | 6 | \`maxwell\`, \`css\`, \`cubic_F\`, \`cubic_P\`, \`quintic_F\`, \`quintic_P\` |
+| **Total** | **390** | \`13 × 5 × 6\` |
 
-The frozen v3.2 baseline records 390 generated/read-back pair-method outputs, 234 full-table hard-gate passes, 156 diagnostic-only full-table failures, and a causal-domain pass count of 390. The 156 full-table failures are associated with high-density C10 acausality in APR_APR and RG_KDE0v1. Treat those numbers as historical baseline evidence, not new results from this session. Do not clip, truncate, relabel, or smooth an acausal microscopic tail to make it pass.
+The recorded v3.2 baseline contains 390 constructed/read-back combinations, with 234 whole-table hard-gate PASS and 156 diagnostic-only whole-table C10 causality failures. The 156 failures are associated with the high-density source tails of \`APR_APR\` and \`RG_KDE0v1\` (78 pair-method combinations each). The historic causal-domain subrange count does not convert a full-table C10 failure into PASS. These are recorded historical values, not a new independent execution from this session.
 
-Never overwrite:
+Never overwrite or “clean up”:
 
-- `/ns_eos/matched_eos_all_combinations`
-- `/ns_eos/Crust_Core_Matching_390_Summary.csv`
-- `/EoS_core_crust_release_v3_2_20261106`
-- any raw or normalized source EOS directory.
+- \`/ns_eos/matched_eos_all_combinations\`
+- \`/ns_eos/Crust_Core_Matching_390_Summary.csv\`
+- any original/raw EOS input directory
+- the v3.2 release archive, checksums, or per-model papers
+- prior attempt outputs or receipts.
 
-The new output must be written only to a new versioned location, initially:
+New generated data must be written under a new immutable attempt path, for example:
 
-`/home/cosmosapjw/Dropbox/ns_eos/matched_eos_all_combinations_native_fortran_v1_20261111/`
+\`\`\`text
+<cloud-workspace>/artifacts/eos390/<UTC_RUN_ID>/
+\`\`\`
 
-A retry gets a new attempt identifier or new versioned directory; never overwrite an earlier receipt.
+The path is relative to the cloud workspace. Do not use the previous local Dropbox absolute path in a cloud job.
 
-## 4. Method semantics: Maxwell is not a smooth matching method
+## 2. Branch and cloud bootstrap contract
 
-The legacy Python `method="maxwell"` calls `build_maxwell_plateau_bridge`. It constructs a smooth, near-pressure plateau with continuous baryon density. Its output has zero density jump, even though some metadata called it “1st-Order (Maxwell Plateau)”. That label is physically incorrect. The old implementation must remain in the read-only legacy package for characterization only.
+The active development branch is \`cloud/eos390-fortran-unification-v1\`. Its parent is the reviewed E390 feature head \`b12ba451b6755bf8f13d22c882075a23eae800a7\`, not \`main\`. The branch is intentionally separate from both \`main\` and the existing feature branch. Do not merge or push to \`main\`.
 
-The native smooth matching API now has five methods:
+A cloud agent must begin from a clean shallow checkout:
 
-- `css`
-- `cubic_F`
-- `cubic_P`
-- `quintic_F`
-- `quintic_P`
+\`\`\`bash
+set -euo pipefail
+git clone --depth 1 --branch cloud/eos390-fortran-unification-v1 \\
+  https://github.com/cosmosapjw-quantum/NS_Cowling.git NS_Cowling
+cd NS_Cowling
+test "$(git branch --show-current)" = "cloud/eos390-fortran-unification-v1"
+git status --porcelain
+git rev-parse HEAD
+git rev-parse HEAD^{tree}
+git log -1 --format='%H%n%T%n%P%n%s'
+\`\`\`
 
-The old `maxwell` alias is fail-closed in the native `match_crust_core` route until the composition-aware sharp construction is integrated. This is a temporary safety guard, not the target API.
+The agent must record the exact branch, commit SHA, tree SHA, parent SHA, clean/dirty state, compiler version, Python version, OS image, and command line before editing. If the branch or parent differs from the contract, stop and reconcile before continuing.
 
-The final public `method="maxwell"` must call the native sharp first-order construction through the same Fortran-owned matching pipeline. It must not call the old Python plateau or recreate a continuous-density bridge.
+Expected cloud build and tests:
 
-### 4.1 Sharp Maxwell conditions
+\`\`\`bash
+set -euo pipefail
+gfortran --version
+python --version
+python -m pip install --upgrade pip
+python -m pip install -e '.[test]'
+bash fortran_eos/build.sh build/compose_eos_fortran
+PYTHONPATH=python_frontend \\
+COMPOSE_EOS_FORTRAN_ROOT="$PWD" \\
+COMPOSE_EOS_FORTRAN_EXE="$PWD/build/compose_eos_fortran/compose_eos_fortran" \\
+python -m pytest -q python_frontend/tests pipeline/tests
+\`\`\`
 
-For two cold, beta-equilibrated, locally charge-neutral branches with one globally conserved baryon charge:
+Also compile and run the native analytic unit tests exactly as the repository workflow does:
+
+\`\`\`bash
+gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \\
+  -Ibuild/compose_eos_fortran/mod \\
+  fortran_eos/tests/test_polynomial_extrema.f90 \\
+  build/compose_eos_fortran/obj/compose_eos_types.o \\
+  build/compose_eos_fortran/obj/compose_eos_reconstruct.o \\
+  -o build/compose_eos_fortran/test_polynomial_extrema
+build/compose_eos_fortran/test_polynomial_extrema
+
+gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \\
+  -Ibuild/compose_eos_fortran/mod \\
+  fortran_eos/tests/test_css_segment.f90 \\
+  build/compose_eos_fortran/obj/compose_eos_types.o \\
+  build/compose_eos_fortran/obj/compose_eos_css.o \\
+  -o build/compose_eos_fortran/test_css_segment
+build/compose_eos_fortran/test_css_segment
+
+sha256sum -c SHA256SUMS_v4.txt
+\`\`\`
+
+Never report a command as passed unless its actual return code and logs were inspected. A skipped, unavailable, or unexecuted step is \`NOT_RUN\`, not PASS.
+
+## 3. Input source identity and required user upload
+
+Dropbox is not automatically mounted inside a clean cloud sandbox. Do not assume a cloud agent can call the user's Dropbox connector or access the user's local \`/home/.../Dropbox\` path. The current repository contains normalized/derived EOS material for development fixtures. For example, its normalized \`GPPVA_DD2/eos.compo\` differs in size and numeric serialization from the Dropbox source file. **The normalized GitHub tree is not a byte-identical raw-source archive.**
+
+Before any source-cohort validation, the cloud agent requires a single archive staged by the user:
+
+\`NS_Cowling_EOS390_raw_inputs_v1.tar.zst\`
+
+It must contain the exact 18 provider directories under one root and a \`SHA256SUMS.txt\` file. Include the original files as supplied, not outputs from a normalizer:
+
+- required where present: \`README.txt\`, \`eos.init\`, \`eos.nb\`, \`eos.t\`, \`eos.yq\`, \`eos.thermo\`, \`eos.compo\`
+- preserve optional provider files: \`eos.micro\`, \`eos.mr\`, other release sidecars
+- include each CompOSE provider data sheet or a stable source record (the registry points to the papers and datasheets)
+- retain missing files as missing; the manifest covers files that actually exist.
+
+The staging root is \`<cloud-workspace>/inputs/raw_compose/\`, outside the Git worktree. After extraction:
+
+\`\`\`bash
+set -euo pipefail
+mkdir -p "$WORKSPACE/inputs/raw_compose"
+tar --zstd -xf "$UPLOAD_ARCHIVE" -C "$WORKSPACE/inputs/raw_compose"
+cd "$WORKSPACE/inputs/raw_compose"
+sha256sum -c SHA256SUMS.txt
+find . -type f -print0 | sort -z | xargs -0 -r sha256sum > "$WORKSPACE/artifacts/eos390/source_manifest_recomputed.sha256"
+\`\`\`
+
+Compare the supplied and recomputed manifests. If any file is missing, modified, ambiguously normalized, or not covered by a checksum, stop at M0. Do not copy this archive into a public repository unless its redistribution rights are independently established. Generated scientific output and receipts belong in the attempt artifact, not beside source files.
+
+**The raw source archive is the one required user-supplied cloud input not established by this session.** The Dropbox connector could enumerate and extract text from source files but did not transfer original bytes into a persistent cloud workspace. The existing 18-model Dropbox directory and normalized GitHub fixture tree are not a substitute for that archive.
+
+## 4. Single backend and typed data contract
+
+Fortran owns all production scientific calculations. Python is restricted to:
+
+- command argument and path validation
+- input file staging and SHA-256 calculation
+- serialization/deserialization
+- calling the native Fortran executable
+- decoding native JSON/CSV receipts
+- presentation and summary generation without new numerical inference.
+
+Python must not be the production implementation for EOS interpolation, EOS reconstruction, composition solving, root finding, branch selection, crust-core matching, causality, TOV, tidal, Cowling, or numerical batch orchestration. No silent Python/SciPy fallback is allowed. Historical Python modules remain read-only characterization oracles until a named native feature gate is passed.
+
+### 4.1 CompOSE key and row rules
+
+The unique row identity is the full integer triple:
 
 \[
-P_L(\mu_t)=P_H(\mu_t)=P_t,
-\qquad
-\mu_{B,L}(\mu_t)=\mu_{B,H}(\mu_t)=\mu_t,
+(i_T,i_{n_B},i_{Y_q}).
 \]
 
+Each individual CompOSE table must contain at most one record for any key. Duplicate keys must fail closed **before writing into the destination arrays**. A row outside the selected grid or a mismatched T/Yq slice must fail before using its indices.
+
+A present numerical zero is not equivalent to missing data. File presence, row presence, and individual field presence are three distinct facts. Do not encode missing fields as zeros and later use a global Boolean to claim all species are available.
+
+The limited current EOS data view is not the general CompOSE ontology. The generic reader must retain row-local fields before projecting them into a cold one-dimensional EOS.
+
+### 4.2 Row-level composition and applicability
+
+The internal raw representation must carry:
+
+\`\`\`text
+compose_cell:
+  key:
+    iT: integer
+    inb: integer
+    iYq: integer
+  row_present: boolean
+  Iphase:
+    present: boolean
+    value: integer
+  particles:
+    - particle_id: integer
+      value: float64
+      present: boolean
+  nuclear_groups:
+    - group_id: integer
+      Abar: float64
+      Zbar: float64
+      YI: float64
+      present: boolean
+  thermo_extensions:
+    - extension_id: provider-defined
+      value: typed scalar or raw token
+      present: boolean
+\`\`\`
+
+Do not turn an absent species into a measured zero. For each row evaluate C3 and C4 independently:
+
+- C3 applicability requires the complete baryon abundance inventory needed for \(Y_n+Y_p+Y_h=1\).
+- C4 applicability requires the proton, nuclear charge contribution, electron and muon terms needed for \(Y_p+(\bar Z/\bar A)Y_h=Y_e+Y_\mu\).
+- Store the applicability and result per row, not in one table-global Boolean.
+
+Per-row result states are exactly:
+
+- \`CHECKED\`: all required values exist and the check was evaluated.
+- \`PARTIAL\`: some required data exist but the check cannot be completed.
+- \`NOT_AVAILABLE\`: the provider does not supply the required field and no approved derivation exists.
+- \`FAIL\`: all required data exist and the numerical/physical closure fails.
+
+Unknown particle IDs and multiple nuclear-group records must be retained as typed/raw records in the generic table model. If the current reduced EOS view cannot represent them, mark the projection unsupported with a precise reason. Do not silently discard or remap them.
+
+### 4.3 Provider semantics are a separate claim gate
+
+CompOSE v3.01 defines the standard field syntax, particle number fractions, and nuclear-group number abundance. For a group:
+
 \[
-n_L=\frac{dP_L}{d\mu_B},\qquad
-n_H=\frac{dP_H}{d\mu_B},\qquad n_H>n_L>0,
+Y_I=\frac{n_I}{n_B},\qquad Y_h=\bar A\,Y_I.
 \]
 
-\[
-\epsilon_i=\mu_t n_i-P_t,
-\qquad
-\Delta\epsilon=\mu_t\Delta n_B.
-\]
-
-This is a local-neutrality, one-conserved-charge Maxwell construction. It is not a Gibbs construction with global charge neutrality and not a finite-width mixed phase. The caller/data contract must justify local neutrality on each branch; it may not be inferred from pressure matching alone.
-
-The resulting EOS has continuous pressure and baryon chemical potential at the interface, but a nonzero density and energy-density jump. The serialized density grid is increasing, with the low-side and high-side coexistence rows adjacent, equal pressure/chemical potential, and distinct densities. There must be no artificial sequence of intermediate densities across the jump.
-
-The Seidov rapid-onset diagnostic must be recorded from the actual jump. It is not a substitute for integrating the complete stellar sequence and does not by itself establish a stable branch, maximum mass, twin-star solution, or a realistic EOS claim.
-
-### 4.2 Branch selection and interpolation
-
-The legacy `find_convex_transition_window` and `get_core_start_index` define important source behavior. Port their scientific meaning to Fortran, then test it against all 65 crust-core model pairs before scaling to 390 method runs.
-
-The low-density provider may contain an outer-crust segment, an inner-crust segment, and provider-specific categorical phase changes. The high-density provider may likewise contain multiple composition labels. Do not search the full tables indiscriminately and accept the first pressure crossing.
-
-- Select a thermodynamically eligible high-density crust branch and a homogeneous/appropriate core branch using explicit criteria.
-- Keep source thermodynamic rows and composition rows aligned by the complete CompOSE index triple.
-- Do not interpolate across an unresolved source grid gap or a true input thermodynamic discontinuity.
-- A change of `Iphase` is categorical composition metadata; it is not by itself proof of a Maxwell density jump. Decide whether a boundary is composition-only, a smooth thermodynamic change, a tabulation gap, or a genuine thermodynamic discontinuity using the physical arrays and model datasheet.
-- Piecewise interpolation must respect source phase boundaries. Never interpolate an integer `Iphase` as a continuous quantity.
-- Use the existing Hermite P(μ) kernel and stationary-point/root isolation only after the correct provider branches have been selected.
-- Require exactly the number of admissible coexistence roots declared by the branch-selection contract. Multiple roots are an explicit ambiguous result, not permission to choose one arbitrarily.
-
-For each interpolated phase interval, check the full represented polynomial interval, not just endpoints or a coarse fixed mesh:
+For the supported one-group composition closure:
 
 \[
-n_B>0,\qquad \frac{dn_B}{d\mu_B}>0,\qquad
-\mu_B\frac{dn_B}{d\mu_B}-n_B\ge 0.
-\]
-
-The last inequality is the causal bound (c_s^2/c^2\le 1) for the one-charge cold barotrope.
-
-## 5. CompOSE and composition contract
-
-Authority: CompOSE Reference Manual v3.01 (2022), arXiv:2203.03209, plus each EOS's own CompOSE data sheet. The supported legacy feature set is narrower than all CompOSE formats and must remain explicit: cold T=0, one-dimensional fixed-((i_T,i_{Y_q})) slice; species IDs 0, 1, 10, 11; at most one nuclear-group quadruple with group ID 1; and Nadd 0 or 1. Other species, multiple group quadruples, multiple thermodynamic slices, or unsupported Nadd layouts must fail explicitly.
-
-### 5.1 Thermodynamic fields
-
-The native reader/writer owns:
-
-- `eos.nb`, `eos.t`, `eos.yq`, `eos.thermo`, optional `eos.compo`
-- full source index identity ((i_T,i_{n_B},i_{Y_q}))
-- Q1..Q7, Il, Nadd and q_extra
-- nucleon masses, fixed-slice metadata, and row order
-- source duplicate-index policy and explicit diagnostics.
-
-Do not use the first line of `eos.yq` as a physical proton fraction. For cold beta-equilibrium tables it may be a coordinate placeholder.
-
-### 5.2 Particle and nuclear-group composition
-
-CompOSE `eos.compo` particle IDs:
-
-| ID | Meaning |
-|---:|---|
-| 0 | electron |
-| 1 | muon |
-| 10 | neutron |
-| 11 | proton |
-
-The supported nuclear group has ID 1 and is stored as ((I,\bar A,\bar Z,Y_I)), where:
-
-\[
-Y_I=\frac{n_I}{n_B},\qquad
-Y_h=\bar A Y_I.
-\]
-
-The current internal representation uses the baryon fraction (Y_h), not the CompOSE number abundance. Serialization must use (Y_I=Y_h/\bar A), not (Y_h).
-
-Required closure checks (using the supported one-group convention):
-
-\[
-Y_n+Y_p+Y_h=1,
-\qquad
+Y_n+Y_p+Y_h=1,\qquad
 Y_p+\frac{\bar Z}{\bar A}Y_h=Y_e+Y_\mu.
 \]
 
-The legacy writer uses a 2e-3 abundance-closure tolerance; the C3/C4 scientific verification tolerance remains 2e-5 unless a separately justified contract changes it. Do not widen the verification tolerance because a generated table fails.
+This standard is not proof that a particular provider export actually encodes a disputed field with the expected meaning. The sampled SPG/GPPVA rows do not satisfy one consistent interpretation of their last group field across outer and inner crust. That provider-specific semantic problem is currently \`BLOCKED\`.
 
-CompOSE v3.01 permits `Npairs=0` and `Nquad=0`. This is useful for a phase-only `eos.compo` sidecar: preserve `Iphase` without inventing particle fractions or a nuclear group. Therefore keep these states distinct:
+Do not choose between \(Y_I\), \(Y_h\), \(X_h\), a charge fraction, or a provider-specific quantity by making whichever formula pass. Preserve the source token and metadata and require a written model/provider definition plus independent closure. Until then, do not use the disputed field to construct a physical matched composition. This block does not prevent byte-preserving intake or metadata-only row-key tests.
 
-- `composition_file_present`: whether the sidecar exists.
-- `composition_available`: whether usable composition abundances/group values are present.
+### 4.4 Nadd and categorical extensions
 
-The first native patch adds phase-only writer support and baryon/charge closure guards. GitHub Actions run #43005633832 (commit 9e3d4b255062935a87fecc3df256528ba95984ad) compiled the native Fortran executable, ran 78 frontend/pipeline tests including the new phase-only round-trip and false-Maxwell regressions, passed the Fortran quartic-extrema test, verified every entry in SHA256SUMS_v4.txt, and uploaded the source archive. This establishes CI verification for the safety slice; local replay remains NOT_RUN.
+Nadd counts additional \`eos.thermo\` columns. Their meanings are provider-specific. GPPVA_FSU2H uses an observed extension value that behaves as a categorical pasta-geometry label. It must not be numerically interpolated or confused with \`Iphase\`. Preserve the raw extension ID/value and provider declaration. If the extension cannot be represented across a combined output, stop or emit a named loss receipt; never silently set it to zero or treat it as a real-valued thermodynamic variable.
 
-### 5.3 Iphase and source phase boundaries
+### 4.5 General axes and dimensions
 
-`Iphase` is a categorical, model/provider-specific label. Do not assume that 0, 3, 4, 6, or 7 has a universal physical meaning.
+The existing reader is deliberately narrow: one cold T=0, one-dimensional fixed-\((i_T,i_{Y_q})\) slice, a small particle-ID set, at most one nuclear group, and a limited Nadd layout. This is not universal CompOSE support. The M10 generic generator must retain the full T, \(n_B\), and \(Y_q\) axes and their exact bounds, support valid 1D/2D/3D layouts, and make slice selection explicit. No implicit flattening, axis averaging, nearest-index substitution, or temperature/charge-fraction guessing is permitted.
 
-Observed source examples from the normalized tables:
+## 5. Physical conventions and numerical claims
 
-- SPG_M1: 365 rows; `Iphase=0` for 217 rows and `Iphase=7` for 148 rows, switching at row 218. The corresponding density grid has a large source gap from approximately (2.69021\times10^{-4}) to (2.51189\times10^{-3}\,\mathrm{fm}^{-3}). Do not interpolate across that gap as a normal smooth EOS interval.
-- GPPVA_FSU2H: 300 rows; `Iphase=0` for 217 rows and `Iphase=7` for 83 rows, switching at row 218. The source table has `Nadd=1`.
-- RG_SLY4: 197 rows; `Iphase=4` for 143 rows and `Iphase=3` for 54 rows.
-- RG_KDE0v1: 1240 rows; `Iphase=4` for 966 rows and `Iphase=3` for 274 rows.
+Project EOS units:
 
-These labels must be preserved and interpreted from each model's datasheet. They are not automatically mechanical first-order jumps. The composite output must define a deterministic provider-local-to-output phase-ID mapping and store it in a provenance report/phase legend.
+- \(n_B\): \(\mathrm{fm}^{-3}\)
+- \(P,\epsilon\): \(\mathrm{MeV\,fm}^{-3}\)
+- \(\mu_B\): \(\mathrm{MeV}\)
+- \(c_s^2/c^2\): dimensionless.
 
-For smooth matching, use the legacy-comparable composition bridge only after validating it physically. The legacy construction uses the quintic smootherstep
+Spacetime calculations use metric signature \((- ,+,+,+)\). Do not silently change units or signature between modules.
 
-\[
-s(u)=6u^5-15u^4+10u^3
-\]
-
-and evolves the nuclear-group baryon fraction and proton fraction from the selected crust boundary toward core composition. Preserve source composition rows outside the bridge exactly. The bridge must solve charge/lepton partition and maintain abundance closure. Preserve provider Q4 in unmodified regions and use the documented lepton/lattice correction only in the bridge. This must be ported to Fortran, not executed by Python.
-
-For a sharp Maxwell transition, **do not use the smooth composition bridge**. Preserve the low-phase and high-phase composition independently at their respective coexistence rows. Evaluate each side from its own provider branch without averaging across the density jump.
-
-### 5.4 Il, Q3, Q4 and Q5
-
-Preserve the CompOSE lepton-inclusion flag and model convention.
-
-For Il=0, the stored Q3 potential is charge-shifted. Recover Euler chemical potential using
+For cold matter, keep the project master-function conventions:
 
 \[
-\mu_{B,\mathrm{Euler}}=(Q_3+1)m_n+Y_q Q_4 m_n.
+x=\ln n_B,\qquad F=\frac{\epsilon}{n_B},
+\]
+\[
+Q_1=\frac{dF}{dx}=\frac{P}{n_B},\qquad
+P=n_B Q_1,\qquad
+\mu_B=F+Q_1=\frac{d\epsilon}{dn_B},
+\]
+\[
+\frac{c_s^2}{c^2}=
+\frac{Q_1+dQ_1/dx}{F+Q_1}.
 \]
 
-For Il=1, the supported cold beta-equilibrium Q5≈0 branch maps Q3 to the Euler baryon chemical potential. Keep source/reconstruction algebraic tolerance and sharp-Maxwell Euler consistency tolerance separate.
-
-### 5.5 Nadd
-
-The supported reader/writer accepts Nadd=0 or 1. Preserve q_extra exactly on untouched rows. The 390 source set mixes Nadd=0 and Nadd=1 (SPG_M1 and GPPVA_FSU2H are confirmed examples). Do not assume two providers' q_extra columns mean the same thing just because both have Nadd=1. If their documented semantics cannot be unified into one output column, record an explicit loss/unsupported status and the reason. Never silently set Nadd=0 or relabel a provider-specific flag.
-
-## 6. Native literature-derived composition
-
-For APR_APR and BBB_BHF2, the source CompOSE core tables may not contain `eos.compo`. The legacy Python path has an explicitly named `literature_beta_eq` approximation, which must be ported as a native Fortran module with provenance. It is not the same as reading an original tabulated composition.
-
-The legacy symmetry-energy approximations recorded in its solver are:
-
-- APR: (S(n)=13u^{2/3}+19.6u^{0.62}\) MeV
-- BHF2: (S(n)=13u^{2/3}+17.0u^{0.72}\) MeV
-- (u=n_B/0.16\,\mathrm{fm}^{-3})
-
-Solve
+At \(T=0\), test the declared Q6=Q7 relation only where the source contract supports it. For \(I_l=0\), preserve the established charge-potential convention:
 
 \[
-4[1-2Y_p(n)]S(n)=\mu_e=\mu_\mu
+\mu_{B,\mathrm{Euler}}=(Q_3+1)m_n+Y_q Q_4m_n.
 \]
 
-with a free relativistic electron/muon gas and the correct muon threshold; enforce charge neutrality and (Y_n+Y_p=1) in the homogeneous core. Label every output row/report as literature-derived approximate composition, store model and reference keys, and test it against the legacy solver only as a differential oracle. Do not label the result as provider-tabulated composition.
+Do not use a barotropic \(\mu_B\) identity to erase the charge-potential correction when checking the source thermodynamic columns.
 
-For DD2, DDME2, TW, FSU2, FSU2H, FSU2R, NL3wrL55, TM1e and the SPG family, use the exact provider table where present. Any further microscopic solver or parameter set must be tied to its original paper and independently checked before use.
+### 5.1 First-order sharp Maxwell interface
 
-## 7. Required native code boundaries
+For two locally charge-neutral cold branches with one globally conserved baryon charge:
 
-Expected native modules (extend existing modules when possible; do not create duplicate competing authorities):
+\[
+P_L(\mu_t)=P_H(\mu_t)=P_t,
+\quad
+\mu_{B,L}(\mu_t)=\mu_{B,H}(\mu_t)=\mu_t,
+\]
+\[
+n_L=\frac{dP_L}{d\mu_B},\quad
+n_H=\frac{dP_H}{d\mu_B},\quad n_H>n_L>0,
+\]
+\[
+\epsilon_i=\mu_t n_i-P_t,\quad
+\Delta\epsilon=\mu_t\Delta n_B>0.
+\]
 
-- `compose_eos_types.f90`: the single canonical EOS data type and typed metadata.
-- `compose_eos_io.f90`: strict CompOSE read/write, row identity, composition/Nadd preservation, phase-only rows, transactional output or rollback.
-- `compose_eos_reconstruct.f90`: first-law master reconstruction and supported outer-crust corrections.
-- a native composition/literature module: particle fractions, nuclear-group conversions, beta equilibrium, electron/muon splitting, model parameter tables and provenance.
-- `compose_eos_matching.f90`: five smooth methods plus the public `method=maxwell` route to the true sharp construction.
-- `compose_eos_phase_transition.f90`: P(μ) interpolation, root topology, Maxwell coexistence, jump output and composition-aware branch sampling.
-- `compose_eos_verify.f90`: C1-C11 and composition/phase-edge verification.
-- native TOV/tidal/Cowling modules under `oscillation_source/solutions/src`: reuse and integrate existing Fortran implementations; do not retain Python/SciPy as a production fallback.
-- `compose_eos_fortran.f90`: manifest-driven batch command(s) and native reports.
+Pressure and chemical potential are continuous; density and energy density have a positive finite jump. The two one-sided rows are adjacent. No derivative stencil, spline, interpolation interval, or root search may cross the interface. This is a locally neutral Maxwell construction, not global-neutrality Gibbs matter.
 
-Python modules become thin wrappers. Move or quarantine all numerical Python implementations (including the phase-aware `python_frontend/compose_cowling/maxwell.py` reference path) under legacy or test-only namespace before claiming the frontend-only architecture is complete. A frontend wrapper must not contain a hidden fallback to NumPy/SciPy numerical solvers.
+The old Python \`method="maxwell"\` implementation is a smooth near-pressure-plateau Hermite bridge with continuous density. It is not a Maxwell phase transition. Keep it read-only and do not use it as a physical Maxwell oracle. The native public \`maxwell\` route must stay fail-closed until true sharp coexistence is integrated.
 
-## 8. Numerical and scientific validation
+### 5.2 CSS high-density branch
 
-Every generated result must keep separate statuses for:
+A constant-sound-speed high-density branch is distinct from the interpolation name and from a phase-order classification. For a sharp interface with \(s=c_s^2/c^2\), high-side state \((P_t,\epsilon_+,n_+)\), and \(0<s\le1\):
 
-1. scientific/thermodynamic validity,
-2. composition validity,
-3. numerical interpolation/root validity,
-4. causality domain and full-table causality,
-5. TOV/tidal/Cowling validity,
-6. source provenance,
-7. serialization/readback validity.
+\[
+\epsilon(P)=\epsilon_+ + \frac{P-P_t}{s},
+\]
+\[
+n(P)=n_+\left[1+
+\frac{(1+s)(P-P_t)}{s(\epsilon_++P_t)}
+\right]^{1/(1+s)}.
+\]
 
-Required minimum tests:
+With \(\mu_t=(\epsilon_++P_t)/n_+\), the branch obeys \(dP/d\epsilon=s\), \(d\epsilon/dn_B=\mu_B\), and \(dP/dn_B=s\mu_B\). The analytic form was symbolically checked with Wolfram Language: \(d\epsilon/dP=1/s\), \(dP/dn_B\;/\;\mu_B=s\), \(d\epsilon/dn_B\;/\;\mu_B=1\), and the stated \(\mu_B(P)\) expression has unit residual. This symbolic check does not substitute for a native test of the compiled kernel.
 
-- CompOSE round-trip for composition-present, composition-absent, phase-only, Nadd=0, Nadd=1, group-present, group-absent, Iphase changes, and source index offsets.
-- Negative tests for unsupported species, Nquad>1, Nadd>1, malformed rows, mismatched index keys, nonfinite/negative fractions, abundance closure, missing sidecars, and stale output sidecars.
-- Smooth matching: all five methods; native/legacy differential tests; source-row retention; composition closures; Q4 preservation; first-law residual; interval-wide extrema.
-- Maxwell: analytic two-phase fixture; no root, one transverse root, tangent root, multiple roots, near-tangent root, shared-knot root, duplicate-endpoint root, interpolation refinement; equal P and μ; positive Δn; Δε=μΔn; nonzero density jump; composition side preservation; Iphase mapping; Nadd policy.
-- Fortran-only TOV/tidal/Cowling: analytic smooth limit; small-jump limit; strong-jump interface fixture; slow and rapid conversion boundary conditions; center/surface conditions; convergence with radial/frequency refinement; compare against independently validated reference results.
-- 390 output: exactly 390 unique pair-method records; no duplicate or missing keys; each CompOSE output read back; SHA-256 manifest; C1-C11 receipts; diagnostic-only failures retained and never omitted.
+A zero jump does not establish a second-order transition. Use \`CONTINUOUS_UNCLASSIFIED\` unless a thermodynamic potential, derivative continuity, resolved nonanalytic higher derivative/susceptibility, and refinement robustness establish a stronger classification.
 
-A coarse finite sample cannot prove no narrow negative/unstable/ acausal interval. Use the exact polynomial extrema or stationary-point isolation already used by the native kernels wherever available.
+### 5.3 TOV, tidal and Cowling interface conditions
 
-## 9. Mutation gates and permissions
+The native stellar solver must be used for production. A true sharp transition requires phase-segmented background integration and the appropriate slow/rapid conversion perturbation interface conditions. Tidal matching must use the finite-pressure jump term from Takátsy & Kovács (2020), arXiv:2007.01139, with its assumptions documented. Do not infer stellar stability from a local Seidov flag alone. The Cowling equations, surface boundary condition, central regularity, matching/interface conditions, and mode-shooting normalization must all be explicit and independently tested before M6 passes.
 
-- **M0 Source lock:** read and hash sources; never edit raw EOS inputs.
-- **M1 Design lock:** define branch selectors, model metadata, phase mapping and Nadd policy before changing calculation formulas.
-- **M2 I/O lock:** schema and round-trip tests before writing matched data.
-- **M3 Composition lock:** literature approximations are explicitly named and sourced; no guessed fractions.
-- **M4 Smooth-method lock:** all five methods verified with composition and first-law closure.
-- **M5 Maxwell lock:** no release of `method=maxwell` until true coexistence, nonzero Δn, composition and provenance pass.
-- **M6 Stellar lock:** no production stellar observables until Fortran TOV/tidal/Cowling interfaces pass.
-- **M7 Batch lock:** no 390 run before M0-M6 pass.
-- **M8 Publication lock:** new versioned output only; readback and checksums required.
+## 6. Single DAG and dependency order
 
-Allowed repository mutation is limited to `research/eos390-fortran-unification-v1` and its proposed PR into `research/fortran-eos-gap-fill-v1`. Do not merge or mutate `main` without a separate request. Dropbox output mutation is allowed only in the new versioned output folder and progress snapshot. The following are protected: all raw EOS files, v3.2 archive and generated outputs, the frozen legacy Python code and the old 390 summary.
+The JSON DAG is the only machine-readable execution authority. The intended dependency structure is:
 
-## 10. Anti-drift and anti-hallucination self-audit
+\`\`\`text
+M0 source lock
+  -> M1 legacy semantics and model bibliography
+  -> M2 strict native CompOSE I/O and phase metadata
+      -> M2A row/field presence masks and independent C3/C4 applicability
+      -> M10 generic 1D/2D/3D CompOSE table model
+M2 + M2A + M10 + provider semantic resolution
+  -> M3 literature/provider composition solvers
+  -> M4 five smooth matching methods
+  -> M5 true sharp Maxwell matcher
+M2 + M3 + M4 + M5 + M5A
+  -> M6 native TOV / tidal / Cowling and interface validation
+M6
+  -> M7 exact manifest-driven 390 task runner
+  -> M8 independent physics, differential, convergence and readback validation
+  -> M9 immutable output release, checksum and backup
+\`\`\`
 
-Before every substantive commit, the agent must answer these questions in its receipt:
+The implementation task added in this cloud branch is the bounded parser-integrity slice E390-02B: reject duplicate \((i_T,i_{n_B},i_{Y_q})\) keys in \`eos.thermo\` and \`eos.compo\` before any destination array is overwritten. It does not resolve missingness, provider semantics, multidimensional tables, or the 390 output goal.
 
-1. **Authority:** Is each formula owned by exactly one Fortran module? Is there any Python/SciPy production fallback?
-2. **Physics:** Does `maxwell` have Δn>0 and satisfy equal P, equal μ_B and Δε=μ_tΔn? If not, the result is not a Maxwell transition.
-3. **Composition:** Are Y_I and Y_h kept distinct? Are baryon/charge closures checked? Are Iphase labels provider-specific and mapped? Is Q4/Il=0 treated correctly?
-4. **Nadd:** Is q_extra semantics known for both branches? If not, is the drop or block explicit?
-5. **Provenance:** Can every output row trace to a raw provider row, a specified interpolation interval, or a named derived solver with paper key?
-6. **Numerics:** Were root topology and interval extrema checked? Were tolerances fixed before observing the result?
-7. **Failures:** Are FAIL, diagnostic-only, blocked, not-run, no-source and unsupported distinct? Were any failed rows clipped or hidden?
-8. **Mutation:** Are raw and v3.2 paths untouched? Is the output versioned?
-9. **Evidence:** Are build/test commands, environment, exit codes, logs, source SHA and output hashes attached? Did the agent avoid claiming runtime PASS without execution?
-10. **Scope:** Did the agent avoid changing the separate C4 65-pair DAG or introducing a second EOS390 DAG?
+Current blockers remain explicit:
 
-If any answer is unknown, record it as unresolved/blocked and do not convert it to PASS. Do not invent test output, agent delegation, paper download, root count, or source-row provenance.
+- E390-02A: per-row/per-species/per-group presence masks not yet implemented end-to-end.
+- E390-10: general CompOSE axes and dimensions not yet implemented.
+- C6B: SPG/GPPVA disputed provider abundance meaning not resolved by the manual alone.
+- M3–M6: native composition solvers, complete matchers, and production stellar integration still need acceptance evidence.
+- M7–M9: no new 390 regeneration is authorized yet.
 
-## 11. Failure taxonomy
+## 7. Test and numerical verification contract
 
-Use distinct machine-readable statuses:
+Every code change follows test-first development:
 
-- `THEORY_CONVENTION_ERROR`
-- `NUMERICAL_ALGORITHM_FAILURE`
-- `IMPLEMENTATION_DEFECT`
-- `COMPOSE_DATA_SEMANTIC_ERROR`
-- `SOURCE_PROVENANCE_MISSING`
-- `UNSUPPORTED_COMPOSE_LAYOUT`
-- `RUNTIME_ENVIRONMENT_BLOCKED`
-- `AUTHORIZATION_BLOCKED`
-- `NOT_ATTEMPTED`
-- `DIAGNOSTIC_ONLY`
-- `PASS`
+1. Read the exact source module, its callers, serialization types, and relevant tests.
+2. Add the smallest regression test that demonstrates the defect.
+3. Run it against the unmodified code and record the actual failure.
+4. Implement the smallest scientifically neutral correction.
+5. Run the targeted test, full \`python_frontend/tests\` and \`pipeline/tests\`, native analytic tests, and checksum verification.
+6. Inspect logs and return codes. Record each result as \`PASS\`, \`FAIL\`, \`BLOCKED\`, or \`NOT_RUN\`.
+7. A passing compile does not establish scientific validity; a passing regression does not establish that 18 sources or 390 outputs are correct.
 
-A file existing is not proof of correct physics. A CI pass is not a source-cohort admission. A TOV solution is not proof of a stable physical branch unless the EOS and stability criteria are independently validated.
+For CompOSE round-trip and source-cohort validation, test:
 
-## 12. Local-agent handoff prompt
+- duplicate, missing, out-of-range, and shuffled row keys
+- independent T/Yq selection and grid lower/upper bounds
+- zero-valued present field versus absent field or absent row
+- empty composition row, phase-only row, partial particle pairs, missing lepton species
+- multiple particle IDs, multiple nuclear groups, unknown groups, non-default Iphase
+- Nadd=0, Nadd=1 continuous extension, and categorical extension values
+- exact Q1..Q7 and raw metadata preservation
+- readback of every generated file, not merely existence or row count.
 
-The following prompt is intended to be copied verbatim into the local coding agent session.
+For every physics kernel, include analytic fixtures, dimension checks, monotonicity, limiting cases, boundary conditions, and independent residual calculations. Use scale-aware tolerances fixed before execution. Never tune a tolerance after observing a failure unless a separate mathematical/numerical justification is recorded.
 
-```text
-You are the local implementation and execution agent for cosmosapjw-quantum/NS_Cowling.
+## 8. Mutation gates
 
-PRIMARY GOAL
-Regenerate the original 390 crust-core EOS pair-method products with the correct Fortran implementation. All scientific computation must be native Fortran. Python is frontend only. The historical Python implementation is read-only legacy/reference code.
+| Gate | Required evidence | Abort condition |
+|---|---|---|
+| G0 Branch lock | exact repo, branch, HEAD, tree SHA, clean worktree | wrong branch, moved/unexpected parent |
+| G1 Source lock | file-level input/old-output SHA-256 manifest | hash mismatch, missing source, substituted normalized data |
+| G2 Read-before-edit | full module, callers, tests, relevant DAG read | invented symbols or unreviewed authority |
+| G3 Physics gate | equations, units, hypotheses, boundary conditions, cited/derived status | unsupported physical interpretation |
+| G4 Build/static | compiler and Python versions, clean compile, exact tests, manifest | build/test failure or unexecuted test reported as pass |
+| G5 Independent validation | analytic and independent-oracle results | residual mismatch, unexplained divergence |
+| G6 Isolated output | immutable attempt directory and run ID | any write to source or historic output |
+| G7 Readback | native readback plus per-task JSON and SHA-256 | missing row/file/check or malformed output |
+| G8 Git mutation lease | expected branch SHA, commit parent, reviewable diff | force push, main mutation, unexpected branch head |
+| G9 Publish | 390 manifest, statuses, readbacks, failures, hashes | incomplete task matrix or unresolved blockers |
+| G10 Closeout | DAG status, provenance, anti-drift audit, next action | unsupported PASS or omitted failed task |
 
-CANONICAL CONTRACTS
-- Branch: research/eos390-fortran-unification-v1
-- Base: research/fortran-eos-gap-fill-v1
-- Machine DAG: data/eos390_native_fortran_unification_dag.v1.json
-- Full contract: docs/EOS390_NATIVE_FORTRAN_UNIFICATION_CONTRACT_20261111.md
-- Bibliography: data/eos390_source_bibliography.v1.json
-- Do not change the separate 65-pair sharp-Maxwell C4 DAG.
+GitHub mutations must be serialized per file. Re-fetch the current blob SHA before updating a file. Re-fetch the branch head before commit/ref changes. Never force push. Do not delete or rewrite the history of the base branch.
 
-LOCAL SOURCE DIRECTORIES (ALL THREE MUST BE READABLE)
-- /home/cosmosapjw/Dropbox/ns_eos
-- /home/cosmosapjw/Dropbox/ns_oscillation_followup_20261106
-- /home/cosmosapjw/Dropbox/EoS_core_crust_release_v3_2_20261106
+## 9. Anti-drift / hallucination self-audit
 
-LOCKED INPUTS AND BASELINES
-- Raw EOS source root: /home/cosmosapjw/Dropbox/EoS_core_crust_release_v3_2_20261106/EoS_complete_core_crust_release_v3_2/code_package/eos_data
-- Normalized EOS root: /home/cosmosapjw/Dropbox/EoS_core_crust_release_v3_2_20261106/EoS_complete_core_crust_release_v3_2/code_package/eos_data_normalized
-- Legacy Python source: /home/cosmosapjw/Dropbox/ns_eos/EoS_matching_code_package
-- Historical 390 summary: /home/cosmosapjw/Dropbox/ns_eos/Crust_Core_Matching_390_Summary.csv
-- Historical matched outputs: /home/cosmosapjw/Dropbox/ns_eos/matched_eos_all_combinations
-- Do not modify these inputs, the v3.2 release, the old summary, or the old matched outputs.
+The agent must answer each item with a file path, line/range, receipt, or hash. A bare assertion is not evidence.
 
-EXACT MATRIX
-Crust: SPG_M1, SPG_M2, SPG_M3, SPG_M4, SPG_M5, GPPVA_DD2, GPPVA_DDME2, GPPVA_FSU2, GPPVA_FSU2H, GPPVA_FSU2R, GPPVA_NL3wrL55, GPPVA_TM1e, GPPVA_TW.
-Core: APR_APR, BBB_BHF2, GM_GM1, RG_SLY4, RG_KDE0v1.
-Methods: maxwell, css, cubic_F, cubic_P, quintic_F, quintic_P.
-Expected total: exactly 390.
+1. What exact repository, branch, commit SHA, tree SHA and parent SHA did I inspect?
+2. Was the tree clean before the change and clean after tests?
+3. Did I read the full target implementation and all affected callers/tests before editing?
+4. Is every physics equation cited to a primary source or labelled as a direct derivation?
+5. Are units, metric signature, approximations, boundary conditions and interpolation domain explicit?
+6. Did I conflate Maxwell, CSS, interpolation law, and transition order?
+7. Did I infer physical phase meaning from an integer \`Iphase\` or a categorical \`q_extra\` value?
+8. Did I turn missing composition into zero, discard an unknown species/group, or collapse row-level presence into a global Boolean?
+9. Did I treat the normalized GitHub table as byte-identical to the Dropbox raw provider file?
+10. Did any interpolation/root/derivative stencil cross an unresolved source boundary or sharp interface?
+11. Did Python do any production numerical work that belongs in Fortran?
+12. Did I modify a source EOS, historic v3.2 output, or previous attempt directory?
+13. Does every 390 pair-method key appear exactly once in the task manifest, with a receipt even when it failed?
+14. Does each result include input and output hashes, compiler and code version, parameters, physical gate results, and readback state?
+15. Did I silently skip, retry-overwrite, smooth, clip, or relabel a failed EOS?
+16. Which gates remain \`BLOCKED\` or \`NOT_RUN\`, and what exact evidence would unblock them?
 
-NON-NEGOTIABLE PHYSICS
-- The old Python method=maxwell is a fake smooth pressure plateau with zero density jump. It is never a first-order Maxwell construction.
-- Final method=maxwell must satisfy equal pressure and baryon chemical potential, positive nonzero density jump, and Delta epsilon = mu_t Delta n_B. It must not create intermediate densities across the jump.
-- Five smooth methods remain css, cubic_F, cubic_P, quintic_F, quintic_P.
-- The sharp construction assumes one globally conserved baryon charge with local charge neutrality on each phase; do not call it a Gibbs construction.
-- Preserve CompOSE Q1..Q7, Il, Iphase, species ids 0/1/10/11, nuclear-group id 1, Abar/Zbar/Y_I, and Nadd/q_extra semantics. Y_h = Abar*Y_I internally; serialize Y_I = Y_h/Abar. Check baryon and charge closure.
-- Iphase is model/provider-specific categorical metadata. Preserve it and produce deterministic provider-to-output phase-ID provenance. Do not interpret label changes as a density jump without checking P, epsilon, mu and n.
-- Do not interpolate across unresolved source gaps or real thermodynamic jumps.
-- For Il=0, recover Euler mu_B by adding Yq*Q4*m_n to the Q3-derived potential.
-- APR_APR and BBB_BHF2 composition may be literature-derived; keep this status explicit and use the exact source approximations/references recorded in the contract.
-- Never clip or repair acausal source tails by altering original EOS rows. Keep full-table and causal-domain status separate.
+Any unsupported answer is a blocker. Never fabricate citations, paper contents, source hashes, CI states, numerical results, or successful outputs.
 
-PYTHON BOUNDARY
-Python can validate arguments, serialize data, invoke native binaries, decode reports and display results. It must not contain production EOS, composition, interpolation, root-finding, TOV, tidal, Cowling or batch numerical logic. Preserve old Python in the legacy tree for differential checks only.
+## 10. Literature and source provenance
 
-FIRST ACTIONS
-1. cd into the repository and verify git status.
-2. git fetch origin and checkout research/eos390-fortran-unification-v1.
-3. Verify the exact HEAD against the GitHub handoff and do not force-push.
-4. Verify the three Dropbox directories above exist and are readable.
-5. Hash all raw and normalized input files and the v3.2 baseline outputs before executing anything.
-6. Inspect all 18 model READMEs and eos.pdf datasheets. Update per-model source mapping from official CompOSE pages and original papers. Prefer arXiv, HAL, author repositories, open journal PDFs, CompOSE and Zenodo. If a needed original paper cannot be accessed after these routes, report the exact citation and ask the user for that document; do not invent the source.
-7. Build and run the current native tests before further modifications; record exact commands, environment, stdout/stderr and return codes.
+The bibliography JSON contains per-provider references. Important shared and model-specific anchors include:
 
-BUILD / BASELINE COMMANDS
-bash fortran_eos/build.sh build/compose_eos_fortran
-COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran PYTHONPATH=python_frontend python -m pytest -q python_frontend/tests pipeline/tests
+- CompOSE Reference Manual v3.01, S. Typel et al. (2022), arXiv:2203.03209. Use it for file grammar and standard field meanings; it does not settle undocumented provider-specific export semantics.
+- Pearson et al., MNRAS 481, 2994 (2018), DOI 10.1093/mnras/sty2413, for the BSk22 outer crust.
+- Grill et al., PRC 90, 045803 (2014), arXiv:1404.2753, for the GPPVA Thomas-Fermi inner crust.
+- Gögelein et al., PRC 77, 025802 (2008), DOI 10.1103/PhysRevC.77.025802, for the SPG density-dependent RMF functional.
+- Scurto, Pais & Gulminelli, PRD 109, 103015 (2024), arXiv:2402.15548. The local Dropbox data sheets carry an earlier “in preparation” annotation; current CompOSE pages link this later publication to SPG variants. Verify exact variant-to-paper correspondence before using it to infer undocumented columns.
+- APR: Akmal, Pandharipande & Ravenhall, PRC 58, 1804 (1998), arXiv:nucl-th/9804027.
+- BHF2: Baldo, Bombaci & Burgio, A&A 328, 274 (1997), arXiv:astro-ph/9707277.
+- GM1: Glendenning & Moszkowski, PRL 67, 2414 (1991), DOI 10.1103/PhysRevLett.67.2414.
+- SLy4: Chabanat et al., NPA 635, 231 (1998), DOI 10.1016/S0375-9474(98)00180-8; Gulminelli & Raduta (2015), arXiv:1504.04493.
+- KDE0v1: Agrawal, Shlomo & Au, PRC 72, 014310 (2005), arXiv:nucl-th/0505071; also Gulminelli & Raduta (2015).
+- DD2: Typel et al., PRC 81, 015803 (2010), arXiv:0908.2344.
+- Other GPPVA parameterizations (DDME2, FSU2, FSU2R/FSU2H, NL3wrL55, TM1e, TW) are in \`data/eos390_source_bibliography.v1.json\`; retain exact per-model mapping rather than treating the common GPPVA reference as a complete parameter citation.
+- Tidal phase-interface jump: Takátsy & Kovács, PRD 102, 028501 (2020), arXiv:2007.01139.
+
+Use public arXiv full texts when available and record the exact version. Do not commit publisher PDFs, paywalled full text, or third-party copyrighted course materials to this public repository. Cite source and DOI/arXiv in code comments and bibliography. If a non-open original is essential and not already accessible in the user's Dropbox, ask the user for that PDF rather than scraping or copying a restricted version.
+
+## 11. Required run receipts and release contents
+
+Each task receipt must include:
+
+\`\`\`json
+{
+  "schema": "ns-cowling.eos390.task-receipt",
+  "schema_version": "1.0.0",
+  "run_id": "UTC_RUN_ID",
+  "task_id": "CRUST__CORE__METHOD",
+  "input_files": [{"path": "relative/path", "sha256": "..."}],
+  "code": {"branch": "...", "commit": "...", "tree": "..."},
+  "environment": {
+    "os": "...",
+    "compiler": "gfortran ...",
+    "python": "...",
+    "build_flags": ["..."]
+  },
+  "selection": {"iT": 1, "iYq": 1, "method": "..."},
+  "status": "PASS | FAIL | DIAGNOSTIC_ONLY | BLOCKED",
+  "checks": {"C1": "PASS", "C2": "NOT_APPLICABLE"},
+  "readback": {"performed": false, "status": "NOT_RUN"},
+  "output_files": [{"path": "...", "sha256": "..."}],
+  "failure_reasons": [],
+  "provenance": {"crust_model": "...", "core_model": "...", "references": []}
+}
+\`\`\`
+
+The pair-method manifest must have exactly 390 unique IDs and no duplicate task keys. Every task, including failed and blocked ones, has a receipt. The run summary must count statuses by model, method, source family and physical check. Every table generated must be opened by the native reader and compared with the exact output manifest. Publish only the output from one immutable run ID, never a mixture of attempts.
+
+## 12. Current bounded implementation status
+
+**Implemented in the cloud branch, not yet CI-verified:** duplicate row-key guards in \`fortran_eos/src/compose_eos_io.f90\` reject repeated \((i_T,i_{n_B},i_{Y_q})\) keys for both \`eos.thermo\` and \`eos.compo\` before assignment. The phase index is now range-checked before indexing the destination phase array. Two regression tests were added. The first CI attempt compiled Fortran and reported 78 passed, 2 failed; both new tests failed because the test helper initially wrote literal backslash-n characters instead of line breaks. That helper was corrected in commit \`2265580a4bbdb204a4a4ea0b699d0f9ff5411838\`. A new CI run is required. Do not mark this slice PASS until the new run completes successfully.
+
+**Established blocker:** the prior 18-source native verification receipt showed broad reader/semantic failures for 15/18 input tables, independent C3/C4 coverage problems for GM_GM1, and source causality failure in APR_APR. The source-set review also identified multidimensional table axes for RG_SLY4 and RG_KDE0v1. A prior 70-test/build receipt exists in Dropbox but is not a new run from this cloud branch.
+
+**Not yet done:** row-level masks, generic 1D/2D/3D parser, provider semantics adjudication, native literature composition solver, all match methods, production sharp-Maxwell integration, final TOV/tidal/Cowling pipeline, 390 regeneration, readback, Dropbox backup.
+
+## 13. Copyable cloud-agent handoff prompt
+
+\`\`\`text
+You are the authorized cloud coding agent for cosmosapjw-quantum/NS_Cowling.
+
+GOAL
+Regenerate the historical NS_Cowling 390 crust-core EOS pair-method combinations using a single Fortran numerical backend and a Python orchestration/serialization frontend. Preserve all source and historical outputs. Do not force failed EOS models to pass.
+
+STARTUP
+1. Shallow-clone exactly:
+   https://github.com/cosmosapjw-quantum/NS_Cowling.git
+   branch cloud/eos390-fortran-unification-v1
+2. Verify branch, HEAD, tree SHA, parent SHA and a clean worktree.
+3. Read these before editing:
+   data/eos390_native_fortran_unification_dag.v1.json
+   docs/EOS390_NATIVE_FORTRAN_UNIFICATION_CONTRACT_20261111.md
+   data/eos390_source_bibliography.v1.json
+   data/receipts/eos390_m0/E390-02_C6B_adjudication_20261111.json
+4. Keep main and research/eos390-fortran-unification-v1 untouched.
+
+MANDATORY INPUT
+Do not use the normalized GitHub EOS tables as byte-identical originals.
+Require user upload of NS_Cowling_EOS390_raw_inputs_v1.tar.zst containing all 18 original provider directories and SHA256SUMS.txt. Stage outside the Git worktree at inputs/raw_compose/. Verify every checksum. If missing or mismatched, stop at M0 and request the archive.
 
 IMPLEMENTATION ORDER
-Follow the canonical DAG M0 through M9:
-- Finish strict CompOSE read/write round-trips, including phase-only eos.compo rows Npairs=0,Nquad=0, full composition closures, Nadd and q_extra rules.
-- Port all required composition and literature beta-equilibrium logic from legacy to Fortran.
-- Port the five smooth methods with composition preservation.
-- Route method=maxwell through the sharp native kernel, selected source branches, composition-aware side sampling and provider-local phase remapping.
-- Integrate the native phase-segmented TOV/tidal/Cowling path. Do not use SciPy as production fallback.
-- Add a Fortran-owned manifest-driven 390 batch runner.
-- Run all exact 390 pair-method tasks, write per-task receipts, perform CompOSE readback, C1-C11, full-table and causal-domain reports, and preserve all diagnostic-only failures.
+A. Finish E390-02A: add per-row/per-species/per-group presence masks; distinguish row absence, field absence, and numerical zero. Evaluate C3 and C4 independently per row. Preserve raw unknown IDs/groups and Nadd extensions.
+B. Implement E390-10: generic CompOSE T, n_B, Yq axes and 1D/2D/3D data model; no implicit flattening or slice guessing.
+C. Re-run original 18-provider cohort with exact source hashes and readback. Keep unsupported dimensions explicit.
+D. Resolve SPG/GPPVA abundance-field semantics from written provider documentation and independent closure. The CompOSE manual is not sufficient evidence for undocumented provider conventions. Do not guess YI/Yh/Xh.
+E. Port literature composition solvers for APR/BHF2 with source provenance and correct electron/muon threshold.
+F. Port all five smooth match methods and the true sharp Maxwell method into the common Fortran matcher. The historical smooth maxwell plateau is not a Maxwell transition.
+G. Integrate phase-segmented Fortran TOV, tidal jump and slow/rapid Cowling interface conditions.
+H. Construct exactly 390 tasks, each with an immutable machine receipt, failure state, source/output hashes and readback.
+I. Only after all predecessor gates PASS, execute the 390 run in a new attempt directory and package the output artifact.
 
-NEW OUTPUT ONLY
-Write generated files to:
- /home/cosmosapjw/Dropbox/ns_eos/matched_eos_all_combinations_native_fortran_v1_20261111/
-Never overwrite the original v3.2 outputs or source EOS. Use one directory per crust/core/method, a pair manifest, summary.json/csv, provenance.json, failure_catalog.json and SHA-256 manifests.
+ENGINEERING RULES
+- Fortran owns all production numerical calculations. No Python/SciPy fallback.
+- Add failing tests before code. Do not weaken tolerances to clear failures.
+- Preserve raw EOS files, provider metadata, phases, optional fields and categorical q_extra.
+- Never interpolate Iphase or categorical extensions.
+- No interpolation/root/derivative stencil may cross a sharp interface or unresolved source boundary.
+- Acausal source tails remain failures or diagnostic-only. Never clip them to force PASS.
+- Do not infer transition order from an interpolation method or phase integer.
+- Never write to historic v3.2 outputs or previous attempts.
+- Use a fresh attempt ID and output directory for every run.
+- Re-fetch GitHub blob SHA and branch HEAD before every mutation; no force-push.
+- Inspect CI logs and all return codes. A skipped test is NOT_RUN.
+- Record provenance, exact equations, units, assumptions, boundary conditions and model-paper citations.
+- Run the anti-drift questionnaire in section 9 before each commit and at closeout.
+- Do not claim 390 regeneration or publication until all 390 task receipts, readbacks, checksum and independent validation reports exist.
 
-FAILURE / STOP RULES
-- Never claim PASS without the actual command and observed exit code/output.
-- If an input is missing, record the exact path and source model. Do not silently substitute a similarly named table.
-- If a paper cannot be retrieved, ask the user for that specific paper.
-- If a root is absent, tangent, multiple or ambiguous, record that exact topology; do not choose the visually convenient root.
-- If Nadd meanings cannot be unified, stop that combination or use an explicitly recorded loss policy. Do not invent a shared meaning.
-- Never alter raw input rows, original outputs, main or the C4 DAG.
-- Keep theory, numerical, implementation, data-semantic, provenance and runtime failures separate.
-- Do not fabricate subagent receipts, downloads, tests, or outputs.
-
-DELIVERABLES
-1. Updated Fortran modules and thin Python frontend.
-2. Native 390 pair manifest runner.
-3. Per-combination CompOSE output and machine-readable validation receipts.
-4. Summary of 390 statuses, preserving FAIL/DIAGNOSTIC_ONLY/BLOCKED.
-5. Environment, source and output hashes.
-6. Updated DAG status and a concise Dropbox progress snapshot.
-7. Exact build/test/batch commands, output paths and any paper requests.
-
-The end goal is the 390 source-backed EOS pair-method regeneration, not merely a passing unit-test suite. Do not claim the goal is complete until all 390 records have explicit outcomes and the generated outputs have been read back and hashed.
-```
-
-## 13. Current execution state
-
-Initial safety slice is committed on `research/eos390-fortran-unification-v1`, CI-verified at `e59e475f00d65f2d4eb6ad7f1518da283bee8d48`.
-
-- Draft [PR #11](https://github.com/cosmosapjw-quantum/NS_Cowling/pull/11) targets `research/fortran-eos-gap-fill-v1`; `main` and the C4 65-pair DAG were not modified.
-- [Push run #187](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43005622594): PASS.
-- [PR run #188](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43005633832): PASS.
-- Both workflows completed Fortran build, frontend/direct-provider pytest, native polynomial-extrema tests, SHA-256 manifest verification and source packaging/upload.
-
-The verified code slice disables the historical zero-density-jump `maxwell` plateau in native Fortran and the Python frontend; retains five smooth method IDs; writes phase-only CompOSE `eos.compo` rows (`Npairs=0,Nquad=0`); adds composition range and baryon/charge closure guards; and tests fail-closed Maxwell plus Iphase-only round-trip.
-
-### Legacy sharp-transition reference and composition warning
-
-The read-only `phase_transitions.py` includes a sharp Maxwell construction, phase-aware TOV/Love integration and tidal jump, a Maxwell-CSS builder, and a distinct two-charge Gibbs path. The legacy Maxwell output drops particle/nuclear composition; it cannot be ported verbatim. Gibbs uses global charge neutrality with two chemical potentials and is not the one-charge local-neutrality Maxwell path.
-
-### Literature provenance and access
-
-The bibliography was checked against all 18 EOS-specific `eos.pdf` datasheets. Public full-text URLs were located for APR `nucl-th/9804027`, BBB_BHF2 `astro-ph/9707277`, KDE0v1 `nucl-th/0505071`, SPG `2402.15548`, FSU2 `1408.4159`, FSU2H/R `1804.00334`, TM1e `2001.10143`, GPPVA common crust `1404.2753`, CompOSE manual `2203.03209`, and tidal jump `2007.01139`. The DD-ME2 APS Harvest fulltext endpoint was also located.
-
-Old SPG source sheets say “in preparation”, while current official SPG(M3)/(M5) CompOSE pages cite the 2024 paper; preserve both facts as provenance.
-
-This host could not copy arXiv PDF bytes into attachments despite confirmed public PDF URLs. Local agent must download and SHA-256 the listed sources. The GM1 Glendenning-Moszkowski PRL 67,2414 (1991) complete PDF was not retrieved; APS returned 403. Request that specific PDF from the user only if local access also fails.
-
-**Still incomplete:** local execution has not occurred; source-cohort admission remains blocked; sharp Maxwell kernel is composition-free; composition-aware Maxwell, literature solvers, five composition-aware smooth methods, native TOV/tidal/Cowling integration and all 390 tasks remain pending. CI PASS is not EOS390 physics completion.
-
-
-## 14. Phase classification is thermodynamic, not syntactic
-
-A method token, interpolation order, CSS label, or CompOSE Iphase integer does not determine phase-transition order. Record one of: `FIRST_ORDER_SHARP`, `SECOND_ORDER_CANDIDATE`, `CROSSOVER_SMOOTH`, `MIXED_PHASE_GIBBS`, or `UNRESOLVED_INTERFACE`.
-
-A first-order local-neutrality Maxwell interface requires common (P_t,mu_t), positive (n_+-n_-), and (Deltaepsilon=mu_tDelta n_B). A second-order candidate requires a named thermodynamic potential and a resolved higher-derivative/susceptibility nonanalyticity. A crossover requires a smooth resolved interval without an established nonanalyticity. A zero density jump is not sufficient evidence for either second order or crossover. If the source only supplies a categorical Iphase change or a density-grid gap, retain it as unresolved until supported by thermodynamics and source literature.
-
-An interface may occur at crust-medium or any other intermediate layer. Keep interface topology separate from the interpolation/branch model. All derivative stencils and interpolation intervals must be phase-local.
-
-## 15. Standard CSS branch with explicit jump
-
-The standard sharp constant-sound-speed (CSS) high-density branch is distinct from the historical smooth two-segment `css` matching bridge. It follows Alford, Han & Prakash (2013), arXiv:1302.4732, and Alford et al. (2015), arXiv:1501.07902. Its transition is specified by (P_t), (Deltaepsilon), and constant high-side (c_s^2).
-
-Let the low-side state be ((P_t,epsilon_-,n_-)). Then
-
-```text
-mu_t = (epsilon_- + P_t)/n_-
-epsilon_+ = epsilon_- + Delta_epsilon
-n_+ = (epsilon_+ + P_t)/mu_t
-epsilon(P) = epsilon_+ + (P-P_t)/cs2
-n(P) = n_+ * [1 + (1+cs2)(P-P_t)/
-               (cs2*(epsilon_+ + P_t))]**(1/(1+cs2))
-mu(P) = (epsilon(P)+P)/n(P)
-```
-
-For (Deltaepsilon>0), this is a sharp first-order interface and (Deltaepsilon=mu_t(n_+-n_-)). For (Deltaepsilon=0), preserve the continuous state but classify it as `CONTINUOUS_UNCLASSIFIED`; higher-order classification requires independent thermodynamic information. Require (0<c_s^2leq1); the high-side branch obeys (dP/depsilon=c_s^2) and (depsilon/dn_B=mu_B).
-
-The initial analytic Fortran kernel is `fortran_eos/src/compose_eos_css.f90`; test is `fortran_eos/tests/test_css_segment.f90`. It is a branch-state evaluator only. It is not yet connected to the common matcher, full CompOSE writer, stellar solver or 390 runner.
-
-## 16. Historical smooth-pressure method nomenclature
-
-The historical Python `build_maxwell_plateau_bridge` code uses a smooth Hermite (P(u)) bridge with interior knots at (u=0.22,0.78), (delta P=0.015(P_2-P_1)), a 64-point Gauss-Legendre root solve for the integral constraint, and 16-point partial integrals. Its baryon density is continuous; it has no Maxwell density jump or latent heat. This specific implementation has no verified primary-literature attribution in the repository or source searches.
-
-Use the project-defined descriptive name **Legacy Near-Pressure-Plateau Hermite Bridge (NPPHB)**. This is not asserted to be an established literature name. The literature does contain other finite-width interpolations around a Maxwell crossing, such as the polynomial replacement interpolation discussed by Ayriyan et al. (2018) and the Mixing Interpolation Method (MIM) of Ayriyan et al. (2020); these are not algebraically identical to the NPPHB code. Keep historical source immutable and never expose NPPHB as production `maxwell`.
-
-## 17. Generic CompOSE generator upgrade
-
-The current implementation is narrower than the standard CompOSE provider format. The target is a typed Fortran table model supporting 1D, 2D and 3D T-n_B-Y_q grids, exact cell indices, and required `eos.t/eos.nb/eos.yq/eos.thermo` files plus optional `eos.compo/eos.micro/eos.mr`. The generator must retain arbitrary species and nuclear-group identifiers, source-local Iphase, Nadd/q_extra semantics, axis indices, optional metadata and exact provenance. A requested cold beta-equilibrium barotrope is an explicit slice selected from the generic table; it is not the underlying storage model.
-
-Do not make a parser universal by silently skipping unknown fields. Preserve recognized optional content; fail closed on unsupported required semantics. Lossless read/write round-trip tests for all 18 source models and independent CompOSE fixtures at each supported dimensionality are required before source-cohort admission.
-
-## 18. Local-only execution and self-audit
-
-The integrated local-agent execution plan, exact mutation gates, anti-drift/hallucination audit, local command sequence, output receipts and copy-ready prompt are in `docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md`. That document and `data/eos390_native_fortran_unification_dag.v1.json` are the only consolidated execution specification for this task. Do not create a competing second DAG. All physical/numerical calculations stay in Fortran; local execution verifies native build, source admission, full validation and 390 regeneration.
-
-Primary phase/CSS references: Alford, Han & Prakash (2013), https://arxiv.org/abs/1302.4732; Alford et al. (2015), https://arxiv.org/abs/1501.07902; Douchin & Haensel (2001), https://www.aanda.org/articles/aa/abs/2001/46/aa1755/aa1755.html; Ayriyan et al. (2020), https://link.springer.com/article/10.1140/epja/s10050-020-00111-1.
+CLOSEOUT
+Return exact commit/tree SHA, run ID, build/test logs, source manifest hash, all 390 status counts, failed/blocked task catalogue, readback/checksum result, artifact URI and exact next action. If any source or physical semantics remain unresolved, stop at the corresponding DAG gate and preserve that failure.
+\`\`\`

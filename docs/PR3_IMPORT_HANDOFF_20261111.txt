@@ -177,3 +177,40 @@ ANTI-DRIFT SELF-AUDIT (MUST RUN BEFORE EVERY PROMOTION)
 TERMINAL RULE
 Do not merge PR #1 or PR #3. Do not close PR #4 C6B. Do not launch source
 cohort roots or star spectra until their declared upstream gates pass.
+
+
+## 2026-11-11 exact-head verification update
+
+The full PR3 import was verified on PR1 branch head:
+1df21d42c88f797b9806295b64f395eb9f97a5a5.
+
+EOS frontend CI run 42951568832 completed successfully:
+- Fortran EOS executable build: PASS.
+- Frontend/direct-provider tests: PASS.
+- Native polynomial-extrema test: PASS.
+- SHA256SUMS_v4.txt: PASS after refreshing README.md and python_frontend/compose_cowling/__init__.py entries.
+- Full source snapshot package and upload: PASS.
+- Source artifact ID 13824779447, size 280,178,269 bytes,
+  GitHub artifact digest sha256:13132bd4bfa340d4c4b648302ad3671cefb7a8e51bf5673548f506d69f54b19e.
+
+Native sharp-Maxwell TOV/Cowling CI run 42951568702 completed successfully on the same PR1 head:
+- FPM runtime-check tests and production case-driver build: PASS.
+- Python Maxwell reference tests: PASS.
+- Normalized-table production CLI checks: PASS.
+- Independent Python/SciPy phase-aware TOV/Cowling reference: PASS.
+- EOS frontend/pipeline regression: PASS.
+- Exact-source identity and evidence artifact upload: PASS.
+- Artifact ID 13825093092, size 31,873 bytes,
+  GitHub artifact digest sha256:4f118cacdaa3c392d2401a8f1bea373e080ed6237b3e6d275174f3593f3e9438.
+
+The earlier run 42951042321 failed only at SHA256SUMS_v4.txt because README.md and
+python_frontend/compose_cowling/__init__.py hashes had not been refreshed.
+This is retained as a provenance/manifest failure. Both manifest files were
+updated, and run 42951568832 then passed their manifest/package gates.
+
+The imported analytic tests establish implementation behavior only. They do not
+admit any of the 18 source EOS, settle C6B provider semantics, run a 65-pair
+coexistence search, or establish source-backed TOV/Cowling spectra.
+
+Current source-backed cohort status remains:
+C6B=BLOCKED; C4-D8=NOT_RUN; C4-D9=NOT_RUN; source TOV/Cowling=NOT_RUN.

@@ -1,0 +1,94 @@
+{
+  "schema": "ns-cowling.eos-reconstruction-validation",
+  "schema_version": "1.0.0",
+  "created_utc": "2026-11-11",
+  "status": "PARTIAL_EXACT_HEAD_CI_COVERED_LOCAL_REPLAY_NOT_RUN",
+  "implementation": "fortran_eos/src/compose_eos_reconstruct.f90::reconstruct_master",
+  "test_module": "python_frontend/tests/test_native_reconstruct_master.py",
+  "source_branch": "research/fortran-eos-gap-fill-v1",
+  "source_commit": "ecf2271e89b68f0a6ef2e6a9c551deba7862f192",
+  "source_blobs": {
+    "reconstruct_fortran": "c1caa29f8fc3198163a2041f834743b5622e208d",
+    "reconstruct_pytest": "728465835887db4a2eb0df8aed1fc6143a2e2bbf",
+    "verifier_fortran": "f1aa41c4a6e13ef7ea31c5f3c2329139b273b2d0"
+  },
+  "thermodynamic_contract": {
+    "x": "ln(n_B)",
+    "F": "epsilon/n_B",
+    "Q1": "P/n_B",
+    "first_law": "dF/dln(n_B)=Q1",
+    "pressure": "P=n_B*F'",
+    "euler_mu": "mu_E=F+F'",
+    "sound_speed": "c_s^2/c^2=(F'+F'')/(F+F')"
+  },
+  "test_inventory": [
+    "test_native_master_reconstruction_obeys_exact_first_law_without_inventing_composition",
+    "test_native_master_unsmoothed_pchip_path_preserves_free_energy_knots",
+    "test_native_master_reconstruction_solves_electron_muon_and_charge_constraints",
+    "test_native_master_dissolves_an_inconsistent_last_nuclear_row",
+    "test_native_master_outer_crust_uses_relativistic_electron_and_lattice_pressure",
+    "test_native_master_preserves_extra_thermo_column_unless_explicitly_declared_cs2",
+    "test_native_master_rejects_phase_pressure_plateau_instead_of_smoothing_across_it",
+    "test_native_master_rejects_invalid_smoothing_and_temperature_controls",
+    "test_native_master_rejects_nonzero_entropy_even_with_cold_metadata",
+    "test_native_master_rejects_trapped_lepton_potential_for_neutrino_transparent_rebuild",
+    "test_native_master_rejects_cold_source_with_inconsistent_free_and_internal_energy",
+    "test_native_master_rejects_source_baryon_chemical_potential_euler_mismatch",
+    "test_native_master_preserves_compose_il_zero_charge_potential_convention"
+  ],
+  "ci": {
+    "provider": "GitHub Actions",
+    "workflow_run_id": 42952472519,
+    "job_id": 130299748780,
+    "tested_pr_head": "ecf2271e89b68f0a6ef2e6a9c551deba7862f192",
+    "tested_merge_snapshot": "9129d53dfc5b4a216ad53cb118c3fc08ab319572",
+    "base_branch": "main",
+    "base_sha": "6eed9c5178afd820c9d814e4138dd0f15d1f5a73",
+    "status": "success",
+    "runtime": {
+      "python": "3.13",
+      "gfortran": "15.2.0",
+      "pytest": "9.2.0",
+      "numpy": "2.5.4",
+      "scipy": "1.18.1"
+    },
+    "commands": {
+      "build": "bash fortran_eos/build.sh build/compose_eos_fortran",
+      "pytest": "python -m pytest -q python_frontend/tests pipeline/tests",
+      "extrema": "gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all -Ibuild/compose_eos_fortran/mod fortran_eos/tests/test_polynomial_extrema.f90 build/compose_eos_fortran/obj/compose_eos_types.o build/compose_eos_fortran/obj/compose_eos_reconstruct.o -o build/compose_eos_fortran/test_polynomial_extrema && build/compose_eos_fortran/test_polynomial_extrema",
+      "manifest": "sha256sum -c SHA256SUMS_v4.txt"
+    },
+    "outcomes": {
+      "native_build": "PASS",
+      "frontend_pipeline": "76 passed in 45.77 seconds",
+      "polynomial_extrema": "PASS",
+      "sha256_manifest": "PASS",
+      "artifact_upload": "PASS"
+    },
+    "artifact": {
+      "id": 13826230310,
+      "name": "NS_Cowling-9129d53dfc5b4a216ad53cb118c3fc08ab319572",
+      "size_bytes": 280171082,
+      "sha256": "6b4d884929f6ef8e75057969086e1805f91fa5e28c785f1295161d329db7c5ff",
+      "expires": "2026-12-11"
+    },
+    "provenance_note": "Pull-request integration run over the stated PR head plus base merge snapshot; not a local sandbox replay and not source-cohort admission.",
+    "per_module_count": "NOT_REPORTED_BY_NON_VERBOSE_CI_LOG",
+    "suite_total": "76 passed"
+  },
+  "local_execution": {
+    "status": "NOT_RUN",
+    "reason": "Container/Python runtime returned ClientError before repository commands started; connected local workstation was offline."
+  },
+  "limitations": [
+    "No local replay was completed in this session.",
+    "Full historical EOS-generator parity is not claimed.",
+    "Provider/source cohort admission remains a separate blocked C4-D0..D7/C6B workflow.",
+    "Whole-gap physical acceptance requires interval checks, not knot-only checks."
+  ],
+  "non_claims": [
+    "No production EOS source was modified.",
+    "No 65-pair root search was run.",
+    "No TOV or Cowling computation was run."
+  ]
+}

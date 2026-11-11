@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.1.6",
+  "revision": "1.1.7",
   "created_utc": "2026-11-11",
-  "status": "IN_PROGRESS_CSS_VERIFIED_MANIFEST_HASH_REPAIRED_CI_PENDING_FULL_MIGRATION",
+  "status": "IN_PROGRESS_CI_VERIFIED_CSS_AND_MANIFEST_FULL_NATIVE_MIGRATION_PENDING",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "research/eos390-fortran-unification-v1",
@@ -609,7 +609,7 @@
   "evidence_status": {
     "code_execution_in_this_turn": "GITHUB_ACTIONS_EXACT_HEAD_BUILD_78_PYTEST_POLYNOMIAL_EXTREMA_CSS_ANALYTIC_TEST_SHA256_MANIFEST_AND_ARCHIVE_PASS_LOCAL_RUNTIME_NOT_RUN",
     "static_source_patch": "COMMITTED_CI_VERIFIED",
-    "github_ci": "CSS_KERNEL_PASS_HANDOFF_DOC_CHECKSUM_LINE_REPAIRED_CI_PENDING",
+    "github_ci": "PASS_CURRENT_HEAD_D7B0743_CODE_TESTS_MANIFEST_AND_ARTIFACT",
     "local_runtime": "NOT_RUN_DESKTOP_COMMANDER_OFFLINE_CONTAINER_EXEC_UNAVAILABLE",
     "source_cohort_admission": "NOT_ADMITTED",
     "regenerated_390": "NOT_RUN",
@@ -649,14 +649,14 @@
         "id": 43010496646,
         "head_sha": "8762d03c1c57552e94f2a97e8af4557037aca53e",
         "conclusion": "failure",
-        "failure": "Only handoff document manifest entry failed; Fortran build, 78 pytest and both Fortran unit tests passed."
+        "failure": "Only handoff document manifest line wrong; all code/pytest/Fortran tests passed. Fixed by using verified CI raw byte SHA."
       },
       "eol_repair_run_43011091262": {
         "id": 43011091262,
         "head_sha": "cb950178d0f15b92ddc6d0b89253153d51f08ac2",
         "status": "CANCELLED",
         "note": "Triggered by .gitattributes eol=lf and checkout-byte diagnostic; diagnostic Python source initially contained over-escaped CRLF/LF byte literals. Preserve its eventual result; corrected diagnostic is committed separately.",
-        "cancel_reason": "Newer commit superseded the run after the over-escaped diagnostic assertion failed."
+        "cancel_reason": "Superseded after over-escaped diagnostic literal caused assertion failure."
       },
       "checkout_eol_retry_43011261697": {
         "id": 43011261697,
@@ -667,10 +667,10 @@
           "78 pytest PASS",
           "polynomial-extrema PASS",
           "CSS analytic PASS",
-          "LF-only checkout check PASS",
-          "manifest failed for handoff document only"
+          "LF-only check PASS",
+          "manifest failed only because the manifest expected hash was wrong"
         ],
-        "diagnosis": "The checkout and git blob were byte-identical: 31195 bytes, SHA-256 c9e09221b6fdfd726080b170115153462348dede46c5ad6c41544f74d1e5c835, CRLF=0, CR=0, LF=355. Therefore the manifest line, not checkout normalization, was wrong."
+        "diagnosis": "Checkout and git blob were byte-identical: 31195 bytes, SHA c9e09221b6fdfd726080b170115153462348dede46c5ad6c41544f74d1e5c835. No line-ending transformation."
       },
       "manifest_hash_repair": {
         "source_run_ids": [
@@ -681,8 +681,43 @@
         "checkout_bytes": 31195,
         "checkout_sha256": "c9e09221b6fdfd726080b170115153462348dede46c5ad6c41544f74d1e5c835",
         "git_blob_sha256": "c9e09221b6fdfd726080b170115153462348dede46c5ad6c41544f74d1e5c835",
-        "replacement_manifest_line": "c9e09221b6fdfd726080b170115153462348dede46c5ad6c41544f74d1e5c835  docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md",
-        "status": "COMMITTED_CI_PENDING"
+        "status": "CI_PASS_RUN_43011967628",
+        "fix": "Updated only the handoff-document SHA256SUMS_v4.txt entry to the measured checkout/blob byte hash; added .gitattributes LF and diagnostic step."
+      },
+      "current_head": {
+        "commit": "d7b07438b35828d0418d51805b26a83a02fcb677",
+        "run_id": 43011967628,
+        "run_number": 205,
+        "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43011967628",
+        "conclusion": "success",
+        "compiler": "GNU Fortran 15.2",
+        "tests": {
+          "pytest": "78 passed in 34.03 s",
+          "polynomial_extrema": "PASS",
+          "css_segment_analytic": "PASS",
+          "fortran_eos_build": "PASS",
+          "handoff_doc_blob_checkout_diagnostic": "PASS",
+          "sha256_manifest": "PASS",
+          "artifact_upload": "PASS"
+        },
+        "handoff_document": {
+          "checkout_bytes": 31195,
+          "git_blob_bytes": 31195,
+          "checkout_sha256": "c9e09221b6fdfd726080b170115153462348dede46c5ad6c41544f74d1e5c835",
+          "git_blob_sha256": "c9e09221b6fdfd726080b170115153462348dede46c5ad6c41544f74d1e5c835",
+          "line_endings": {
+            "crlf": 0,
+            "cr": 0,
+            "lf": 355
+          }
+        },
+        "artifact": {
+          "id": 13850547956,
+          "name": "NS_Cowling-d7b07438b35828d0418d51805b26a83a02fcb677",
+          "size_bytes": 199195043,
+          "sha256": "86847f2c7273a590249fcfa6e23905d8b48cffe75adf69aa9d365628eef38f10",
+          "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43011967628/artifacts/13850547956"
+        }
       }
     },
     "open_source_pdf_download": "PUBLIC_ARXIV_PDF_URLS_CONFIRMED_DIRECT_CONTAINER_DOWNLOAD_TOOL_FAILED; LOCAL_AGENT_DOWNLOAD_REQUIRED",

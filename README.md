@@ -53,3 +53,11 @@ See [the self-contained Fortran physics guide](docs/NS_COWLING_PHYSICS_AND_CODE_
 ## Verified v4 Fortran snapshot
 
 Verified code head: \`1dbb75c27b704209cfeef43f7c49be0cfb28fd44\`. GitHub Actions reports 67 Python tests passed, the native Fortran polynomial-extrema test passed, all 69 tracked SHA-256 entries passed, and the source archive was uploaded. See the [final adversarial audit](docs/ADVERSARIAL_AUDIT_V4_FINAL_20261108.md) for run IDs and artifact digests.
+
+## Sharp Maxwell phase-interface TOV/Cowling reference path (2026-11-09)
+
+The sharp-interface follow-up is implemented on the `research/maxwell-reference-validation-v1` branch and tracked in [PR #2](https://github.com/cosmosapjw-quantum/NS_Cowling/pull/2). It consumes the existing native one-charge Maxwell construction as two separate phase providers, integrates the high-density core to exact `P_t`, and restarts the low-density envelope without interpolating across the density jump. Its `ell=2` Cowling reference path distinguishes slow conversion (`[xi^r]=[Delta P]=0`) from rapid conversion (`[Delta P]=0`, `[xi^r-Delta P/P'_0]=0`).
+
+**Implementation boundary (updated 2026-11-09):** the phase-segmented stellar TOV/Cowling reference solver remains available in Python/SciPy, and native Fortran now exposes production generic `solve_tov_star` and `solve_cowling_spectrum` entry points for both smooth and one-sharp-Maxwell backgrounds. The native Maxwell route accepts two already-coexisting phase EOS providers and preserves separate core/envelope backgrounds. Its Cowling spectrum route performs a bounded frequency-grid scan and bracket refinement for slow or rapid conversion; it does not yet assign `f`, `p1`, or interface-mode identities. No realistic CompOSE hybrid-EOS result, stable-branch, maximum-mass, twin-star or full-GR claim is made. The strong-jump analytic fixture is for interface-condition testing only; its rapid-onset Seidov diagnostic is unstable. The small-jump fixture validates convergence toward the smooth-EOS solution.
+
+See [the interface derivation](docs/MAXWELL_TOV_COWLING_INTERFACE_V1.md), [the independent validation record](docs/MAXWELL_REFERENCE_VALIDATION_V1_20261109.md), and [the final adversarial audit](docs/ADVERSARIAL_AUDIT_MAXWELL_TOV_COWLING_20261109.md).

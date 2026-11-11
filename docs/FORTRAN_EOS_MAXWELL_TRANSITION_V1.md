@@ -10,12 +10,12 @@ The native kernel lives in fortran_eos/src/compose_eos_phase_transition.f90. The
 
 ## 2. CompOSE convention and units
 
-The definitions below follow the updated CompOSE Reference Manual (Typel et al. 2022). The CompOSE thermodynamic table defines
+The definitions below follow the updated CompOSE Reference Manual (Typel et al. 2022). The thermodynamic table quantities are
 
 \[
 Q_1=\frac{P}{n_B},\qquad
 Q_2=\frac{s}{n_B},\qquad
-Q_3=\frac{\mu_B}{m_n}-1,
+Q_3=\frac{\mu_{Q_3}}{m_n}-1,
 \]
 \[
 Q_4=\frac{\mu_q}{m_n},\qquad
@@ -24,29 +24,33 @@ Q_6=\frac{f}{n_Bm_n}-1,\qquad
 Q_7=\frac{\epsilon}{n_Bm_n}-1.
 \]
 
-Here \(n_B\) is in fm\(^{-3}\), \(P\) and \(\epsilon\) are in MeV fm\(^{-3}\), \(m_n\), \(m_p\), \(\mu_B\), \(\mu_q\), and \(\mu_l\) are in MeV, and \(Q_2\) is dimensionless. Thus
+Here \(n_B\) is in fm\(^{-3}\), \(P\) and \(\epsilon\) are in MeV fm\(^{-3}\), \(m_n\), \(m_p\), and the chemical potentials are in MeV. The pressure and energy density are
 
 \[
-P=n_BQ_1,\qquad
-\epsilon=n_Bm_n(1+Q_7),\qquad
-\mu_B^{(Q_3)}=m_n(1+Q_3).
+P=n_BQ_1,\qquad \epsilon=n_Bm_n(1+Q_7).
 \]
 
-The Euler chemical potential reconstructed independently from the pressure and energy density is
+The Euler baryon chemical potential used as the independent variable by the Maxwell kernel is reconstructed independently:
 
 \[
-\mu_B^{(E)}=\frac{\epsilon+P}{n_B}.
+\mu_E=\frac{\epsilon+P}{n_B}.
 \]
 
-For a cold beta-equilibrated table the implementation requires \(T=0\), \(Q_2=0\), \(Q_5=0\), and \(Q_6=Q_7\), within the stated numerical tolerances. It also requires the tabulated \(Q_3\) chemical potential to agree with the Euler value to relative tolerance \(5\times10^{-4}\). We recompute the output chemical potential from the Euler relation rather than silently retaining a discrepant input value.
-
-The sound-speed convention is kept explicit:
+**Important CompOSE lepton-flag convention.** The stored Q3 quantity must not be compared with \(\mu_E\) without applying the selected \(I_l\) convention. In the repository's validated cold, neutrino-transparent branches,
 
 \[
-\frac{c_s^2}{c^2}=\left.\frac{dP}{d\epsilon}\right|_{T=0}.
+\mu_{Q_3}=m_n(1+Q_3)=
+\begin{cases}
+\mu_E-Y_q\mu_q=\mu_E-Y_qm_nQ_4,& I_l=0,\\
+\mu_E,& I_l=1,\quad Q_5\simeq0.
+\end{cases}
 \]
 
-No assumption \(c=1\) is needed to interpret this dimensionless ratio.
+Equivalently, the Euler value recovered from Q3 is \(\mu_E=m_n(1+Q_3)+Y_qm_nQ_4\) for \(I_l=0\), and \(\mu_E=m_n(1+Q_3)\) for the supported \(I_l=1,Q_5\simeq0\) branch. This is a CompOSE convention correction, not a physical extra conserved charge in the one-charge Maxwell construction. The coexistence search is performed in the **Euler** \(\mu_E\), while input/output Q3 retains the CompOSE convention so that the ordinary C2 verifier remains valid.
+
+For a cold beta-equilibrated table the implementation requires \(T=0\), \(Q_2=0\), \(Q_5=0\), and \(Q_6=Q_7\), within the stated numerical tolerances. It checks the source Q3 against the Euler value after applying the \(I_l\)-dependent correction. The Maxwell v1 local kernel uses a relative Q3/Euler residual tolerance of \(5\times10^{-4}\); this is distinct from the stricter \(2\times10^{-6}\) source-admission/reconstruction gate used by other repository workflows. Output transition and copied source rows are written with the same \(I_l\)-dependent Q3 convention.
+
+No assumption \(c=1\) is needed to interpret the dimensionless sound-speed ratio.
 
 ## 3. Thermodynamic Maxwell conditions
 

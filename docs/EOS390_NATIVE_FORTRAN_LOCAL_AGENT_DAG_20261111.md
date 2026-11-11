@@ -1,10 +1,10 @@
 # EOS390 Native Fortran Local-Agent Execution DAG and Developer Contract
 
-**Version:** 1.1.0  
+**Version:** 1.2.0  
 **Date:** 2026-11-11  
 **Repository:** `cosmosapjw-quantum/NS_Cowling`  
 **Branch:** `research/eos390-fortran-unification-v1`  
-**Parent before this slice:** `ce24f85cbb4861c28c9f9eea0f3ddea28950fab8`  
+**Verified branch HEAD before this update:** `6ecf8ad195a39240e922e65df6ce028f33a4d8f9`  
 **Machine-readable DAG (authority):** `data/eos390_native_fortran_unification_dag.v1.json`  
 **Existing 65-pair C4 sharp-Maxwell DAG:** separate and immutable.
 
@@ -347,9 +347,194 @@ Open full-text sources found for this matrix include:
 
 The GPPVA_TW data sheet found in Dropbox under `/EoS_core_crust_release_v3_2_20261106/.../GPPVA_TW/eos.pdf` is dated 2025-06-26 and explicitly cites three current table-construction papers: C.-J. Xia et al., *Unified neutron star EOSs and neutron star structures in RMF models*, arXiv:2208.12893, Commun. Theor. Phys. 74, 095303 (2022), DOI 10.1088/1572-9494/ac71fd; J.-X. Niu et al., *Properties and microscopic structures of dense stellar matter in RMF models*, arXiv:2506.11492 v2 (2025), later published in PRC 113, 025804 (2026), DOI 10.1103/x9fk-ykm1; and C.-J. Xia et al., *Unified nuclear matter EOSs constrained by the in-medium balance in density-dependent covariant density functionals*, arXiv:2201.12053, PRC 105, 045803 (2022), DOI 10.1103/PhysRevC.105.045803, in addition to Typel & Wolter (1999). Do not collapse these into one citation. The data sheet also records seven extra EOS thermo columns (c_e^2,c_s^2,d,Z,A,R_d,R_W); (d) is a categorical pasta geometry code, not a differentiable quantity. The generic generator must preserve these extra fields and their units/semantics.
 
-Exact original PDFs not retrieved here:
-- Glendenning & Moszkowski, PRL 67, 2414 (1991), DOI 10.1103/PhysRevLett.67.2414. APS page requires credentials; broad Dropbox and public searches did not find the source paper. Ask the researcher for a PDF if local institutional access fails.
-- Typel & Wolter, NPA 656, 331 (1999), DOI 10.1016/S0375-9474(99)00310-3. Later open expositions of TW-99 are available, but not the exact original paper. Ask the researcher for the original if local institutional access fails.
-- BPS (1971) and Chabanat et al. (1998) are cited in source data sheets, but their exact article PDFs have not been retrieved. Continue lawful repository/arXiv search; do not substitute an unrelated review silently.
+The four exact original PDFs below were found in Dropbox /NS_Cowling, and text extraction was inspected on 2026-11-11:
+- Glendenning & Moszkowski (1991): `/NS_Cowling/glendenning1991.pdf`.
+- Typel & Wolter (1999): `/NS_Cowling/typel1999.pdf`.
+- Baym, Bethe & Pethick (1971): `/NS_Cowling/baym1971.pdf`.
+- Chabanat et al. (1998): `/NS_Cowling/chabanat1998.pdf`.
+
+Do not request these files again. Their exact binary byte counts and SHA-256 hashes remain to be recorded by the local agent.
 
 Download policy: public arXiv or institutional PDFs must be downloaded and SHA-256 recorded locally. The connected host in this session could verify their URLs and extracted metadata but could not write the binary PDFs into Dropbox. Do not claim that a PDF has been downloaded merely because its abstract or landing page was fetched.
+
+
+## 14. Verified E390-02 adjudication update (2026-11-11)
+
+This section supersedes earlier statements that the E390-02 composition failure might be a parser-width/indexing defect. The machine authority is `data/eos390_native_fortran_unification_dag.v1.json`, revision 1.1.8, field `e390_02_adjudication`.
+
+### 14.1 Established CompOSE semantics
+
+CompOSE Reference Manual v3.01 (Typel et al., 2022; arXiv:2203.03209) defines a composition row as grid key, provider-local `Iphase`, `Npairs` particle-index/fraction pairs, and `Nquad` group quadruples `(I,Aav,Zav,YI)`. Particle fractions (Y_i=n_i/n_B) are number fractions. (A_{m av}) and (Z_{m av}) are group-average mass and charge numbers. (Y_I) is the combined **number fraction** of the nuclear group; its baryon fraction is (X_h=A_{m av}Y_I). `Iphase` is a model-specific categorical label. `Npairs=0,Nquad=0` is legal for phase-only rows.
+
+### 14.2 Provider stop decision
+
+Sampled SPG_M1, GPPVA_DD2 and GPPVA_FSU2H `eos.compo` inputs use the expected 18-token structure, four particle pairs ordered by IDs `10,11,0,1`, one group quadruple, and keys aligned with `eos.thermo`. The earlier parser-width/index hypothesis is rejected for these samples.
+
+The final tuple value cannot be interpreted as standard (Y_I) over outer and inner crust:
+- Representative outer rows have (A_{m av}=56), (Z_{m av}=26), final value (1), (Y_e=26/56), and (Y_n=Y_p=Y_mu=0). Standard (Y_I=1) gives (X_h=56), violating baryon normalization. Interpreting the value as (X_h=1) is only a diagnostic, not a documented convention.
+- In sampled inner-crust rows, the final value equals (Y_e+Y_mu) to print precision. In SPG_M1, C3- and C4-implied cluster baryon fractions disagree in all 148 inner rows. GPPVA admits a near-unit (X_h) diagnostic in the sample but this does not prove the last field means (X_h).
+- The SPG 2024 CLD paper contains distinct cluster and gas components, but does not define this CompOSE export mapping.
+- Inspected provider datasheets do not define the final tuple field.
+
+Status: `BLOCKED_PROVIDER_SEMANTICS_UNRESOLVED`. Do not map the final field to (Y_I), (X_h), (Y_e), gas fraction or any guessed aggregate. Do not relax C3/C4, drop composition or invent (Y_n/Y_p). Request a written definition separately for `Iphase=0` and `Iphase=7`, for (A_{m av}/Z_{m av}), and for the free-neutron-gas representation.
+
+### 14.3 Nadd is not Iphase
+
+`Iphase` is in `eos.compo`; `Nadd` counts additional `eos.thermo` columns. Their individual types are provider-specific. Sampled GPPVA_FSU2H `q_extra` is a categorical pasta-geometry code, separate from `Iphase`. Do not spline, average or interpolate it as a continuous observable.
+
+### 14.4 GM1 coverage design issue: absent is not zero
+
+The current internal type uses a global `composition_available` flag and zero-initializes abundance arrays. GM_GM1 has mixed source coverage: outer-crust rows contain legal `Npairs=0,Nquad=0` records, and core rows do not necessarily contain all lepton species. A global boolean cannot distinguish a missing record from a measured zero, so C3/C4 can be evaluated on unsupported fields.
+
+Implement E390-02A before composition-aware matching:
+- Track row-level presence for every particle ID and nuclear-group record/field.
+- Assess C3 and C4 independently per row.
+- Distinguish `CHECKED`, `PARTIAL`, `NOT_AVAILABLE`, and physical `FAIL`.
+- Propagate masks through serialization, transforms, matching, and CompOSE write/read.
+- Never convert absent abundance to zero.
+- Do not remap SPG/GPPVA ambiguous fields in this task.
+
+This is a diagnosed design gap, **not a completed code patch**. Production Fortran files were not changed.
+
+### 14.5 Current CI evidence
+
+Branch HEAD was re-read at `6ecf8ad195a39240e922e65df6ce028f33a4d8f9` before this update. GitHub Actions run `43016176896` (run 212) passed native Fortran build, `78 passed in 45.79 s` pytest, polynomial-extrema, CSS analytic, SHA256 manifest and source archive upload. CI success does not close E390-02, admit the source cohort, rerun local Dropbox verification in this session, or regenerate the 390 outputs.
+
+### 14.6 Paper inventory correction
+
+Four exact source PDFs are already in Dropbox `/NS_Cowling`: `glendenning1991.pdf`, `typel1999.pdf`, `baym1971.pdf`, and `chabanat1998.pdf`. Hash these existing binaries. Download remaining open-access full texts from the bibliography into a new versioned archive with URL, DOI/arXiv version, timestamp, bytes and SHA-256. Do not overwrite originals or claim a landing-page fetch is a PDF download.
+
+### 14.7 Current execution priority
+
+1. Re-read remote branch HEAD/tree and hash source baselines.
+2. Hash the 18 raw models, historical 390/v3.2 outputs, model datasheets and four existing PDFs.
+3. Run baseline build/tests with full receipts.
+4. Implement E390-02A presence masks and GM1 tests.
+5. Implement E390-10 multidimensional CompOSE parsing losslessly, preserving all axes, species, groups, optional files and typed extensions.
+6. Obtain provider-authored SPG/GPPVA field semantics and independently verify closure.
+7. Complete M3-M8; no production 390 batch before admission gates close.
+8. Regenerate into a new versioned directory, read back every table, preserve failures and hash all products.
+
+### 14.8 Copy-ready local-agent handoff (supersedes the earlier handoff block)
+
+```text
+ROLE
+Local coding and execution agent for NS_Cowling EOS390. Follow the current repository and
+machine DAG. Do not infer hidden project state.
+
+MANDATORY GOAL
+Regenerate the exact original 390 crust-core x method outputs from Dropbox /ns_eos:
+13 crust models x 5 core models x 6 method IDs = 390 unique outputs.
+Production numerical calculations must be Fortran. Python is limited to argument/path checking,
+serialization, native invocation, report decoding and presentation.
+
+AUTHORITIES
+Repo: https://github.com/cosmosapjw-quantum/NS_Cowling
+Branch: research/eos390-fortran-unification-v1
+Machine DAG: data/eos390_native_fortran_unification_dag.v1.json
+Developer document: docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md
+Bibliography: data/eos390_source_bibliography.v1.json
+Checkpoint before this update: 6ecf8ad195a39240e922e65df6ce028f33a4d8f9.
+Fetch actual HEAD/tree before every mutation.
+
+SOURCE ROOTS
+/home/cosmosapjw/Dropbox/ns_eos
+/home/cosmosapjw/Dropbox/NS_Cowling
+/home/cosmosapjw/Dropbox/ns_oscillation_followup_20261106
+/home/cosmosapjw/Dropbox/EoS_core_crust_release_v3_2_20261106
+Raw EOS sources, historical 390 products and v3.2 are immutable.
+
+FIRST ACTIONS
+1. Record repo/branch/HEAD/parent/tree/dirty state, compiler and runtime.
+2. Verify all source roots and exact model inventory.
+3. Hash 18 raw EOS folders, per-model README/eos.pdf, old 390 outputs, v3.2 and all paper PDFs.
+4. These exact PDFs already exist; do not request or overwrite:
+   /home/cosmosapjw/Dropbox/NS_Cowling/glendenning1991.pdf
+   /home/cosmosapjw/Dropbox/NS_Cowling/typel1999.pdf
+   /home/cosmosapjw/Dropbox/NS_Cowling/baym1971.pdf
+   /home/cosmosapjw/Dropbox/NS_Cowling/chabanat1998.pdf
+5. Download remaining open-access papers to a new versioned archive; record URL, DOI/arXiv
+   version, timestamp, bytes and SHA-256.
+6. Run baseline build/tests before source mutation.
+
+STOP: SPG/GPPVA COMPOSITION
+CompOSE v3.01 defines a group tuple (group_id,Aav,Zav,YI); YI is combined group number
+fraction, Xh=Aav*YI is its baryon fraction. Iphase is provider-specific categorical metadata.
+Npairs=0,Nquad=0 is legal.
+Sampled SPG_M1/GPPVA_DD2/GPPVA_FSU2H rows are structurally valid and grid-aligned, but the
+last tuple value cannot be mapped to standard YI across outer/inner crust. C6B rejects
+global remappings. Meaning remains BLOCKED.
+Do not map it to YI, Xh, Ye, gas fraction or another quantity without written provider evidence.
+Do not relax C3/C4, drop composition, or fabricate Yn/Yp. Obtain definitions for Iphase=0/7,
+Aav/Zav, the fourth value and neutron-gas representation. No SPG/GPPVA production admission
+before written semantics and independent closure.
+
+E390-02A: PRESENCE MASKS
+Implement per-row/per-species/per-group presence masks. Missing is not zero.
+C3/C4 applicability is independent and row-aware.
+Reports distinguish CHECKED/PARTIAL/NOT_AVAILABLE/FAIL.
+Masks survive CSV, transforms, matching and CompOSE write/read.
+Include phase-only fixtures and GM_GM1 outer/core coverage tests.
+Do not reinterpret SPG/GPPVA fields in this task.
+
+E390-10: MULTIDIMENSIONAL COMPOSE I/O
+Implement lossless T/Yq dimensions with exact (iT,inb,iYq) keys.
+Preserve arbitrary species/group IDs, optional files, Nadd/q_extra, Iphase and source metadata.
+Unknown mandatory semantics stop. Never flatten axes or discard fields.
+Nadd counts extra thermo fields; each extension is provider-specific. Sampled GPPVA FSU2H
+q_extra is categorical pasta geometry, distinct from Iphase, and never interpolated numerically.
+
+MUTATION GATES
+G0: re-fetch HEAD/tree and verify no concurrent update.
+G1: hash source/papers/historical outputs; protect raw inputs.
+G2: baseline build/tests pass or exact failures are preserved.
+G3: E390-02A masks pass synthetic and GM1 coverage fixtures.
+G4: E390-10 passes lossless multi-D round-trip tests.
+G5: provider semantics are documented and independent baryon/charge closure passes.
+G6: M3-M8 numerical/physical tests pass.
+G7: exact 390-key manifest has no duplicates or omissions.
+G8: run into a unique output directory, read back every table, hash all outputs.
+G9: back up only new versioned products and receipts.
+Never force-push, mutate main, raw EOS sources, old 390 outputs or v3.2.
+
+BUILD AND TEST
+bash fortran_eos/build.sh build/compose_eos_fortran
+COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran PYTHONPATH=python_frontend python -m pytest -q python_frontend/tests pipeline/tests
+Run all native Fortran unit/analytic tests too. Record exact commands, compiler, flags,
+exit codes and full logs.
+
+390 MATRIX
+Crust:
+SPG_M1,SPG_M2,SPG_M3,SPG_M4,SPG_M5,
+GPPVA_DD2,GPPVA_DDME2,GPPVA_FSU2,GPPVA_FSU2H,
+GPPVA_FSU2R,GPPVA_NL3wrL55,GPPVA_TM1e,GPPVA_TW
+Core: APR_APR,BBB_BHF2,GM_GM1,RG_SLY4,RG_KDE0v1
+Methods: maxwell,css,cubic_F,cubic_P,quintic_F,quintic_P
+Exactly 390 unique keys. Do not run until source/physical admission gates close.
+The 156 historical v3.2 acausal diagnostics remain explicit; never clip or delete tails.
+A smooth pressure plateau is not a sharp first-order Maxwell construction.
+
+ANTI-DRIFT / HALLUCINATION SELF-AUDIT
+Before each commit/run record exact HEAD/tree/dirty state; source/paper hashes; model-paper
+authority; field-semantic evidence labels; equations/units/assumptions; changed files;
+commands/compiler/flags/exit codes/test counts; all 390 PASS/FAIL/BLOCKED/NOT_RUN counts;
+output hashes. Check for invented fields, missing-as-zero, silent drops of species/axes/groups,
+interpolation across categorical boundaries and raw/historical modifications.
+Missing evidence means BLOCKED or NOT_RUN. Never invent a citation, mapping, hash, result,
+permission or PASS claim.
+
+REQUIRED RECEIPTS
+environment.json; source_manifest.sha256; paper_source_registry.json; build.log; pytest.log;
+native_unit_tests.log; composition_coverage_matrix.json; provider_semantics_answers.json;
+390_pair_manifest.json; per_pair/<key>/result.json; readback.json; C1_C11.json;
+summary.json; failure_catalog.json; phase_topology_and_composition_mapping_receipt.json;
+legacy_feature_parity_inventory.json; output_manifest.sha256; handoff_result.json.
+Final handoff_result.json records repo/branch/HEAD/parent/tree/dirty state, source/paper hashes,
+compiler, commands/exit codes, task-key hash, all status counts, failures, output/readback counts,
+output hash and Dropbox upload receipt, plus raw-source/historical-output immutability.
+
+FINAL RULE
+The goal remains all 390 original outputs. Never pass off a reduced matrix as complete.
+If provider meaning is unavailable or closure fails, preserve the evidence and block that provider.
+Continue only on independent coding work that does not reinterpret unresolved fields.
+```

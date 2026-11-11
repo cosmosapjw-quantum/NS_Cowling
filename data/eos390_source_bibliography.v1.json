@@ -13,7 +13,9 @@
     {
       "key": "BPS_1971",
       "citation": "G. Baym, H. A. Bethe and C. J. Pethick, Nucl. Phys. A 175, 225 (1971)",
-      "role": "classic crust reference"
+      "role": "classic crust reference",
+      "local_pdf_path": "/NS_Cowling/baym1971.pdf",
+      "access_status": "LOCAL_DROPBOX_PDF_PRESENT_TEXT_EXTRACTED_SHA256_PENDING"
     },
     {
       "key": "GDFM_2008",
@@ -47,6 +49,14 @@
       "url": "https://arxiv.org/abs/2007.01139",
       "pdf_url": "https://arxiv.org/pdf/2007.01139",
       "role": "tidal y-function jump at a first-order phase interface"
+    },
+    {
+      "key": "CHABANAT_1998",
+      "citation": "E. Chabanat, P. Bonche, P. Haensel, J. Meyer and R. Schaeffer, Nucl. Phys. A 635, 231-256 (1998)",
+      "doi": "10.1016/S0375-9474(98)00180-8",
+      "role": "SLy4 Skyrme interaction source",
+      "local_pdf_path": "/NS_Cowling/chabanat1998.pdf",
+      "access_status": "LOCAL_DROPBOX_PDF_PRESENT_TEXT_EXTRACTED_SHA256_PENDING"
     }
   ],
   "core_models": [
@@ -105,8 +115,9 @@
           "open_access": "FULL_TEXT_NOT_FOUND_REQUEST_USER_PDF",
           "url": "https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.67.2414",
           "pdf_url": "https://journals.aps.org/prl/pdf/10.1103/PhysRevLett.67.2414",
-          "access_status": "APS page credential-gated; no open copy located in current Dropbox searches or public searches",
-          "user_pdf_requested": true
+          "access_status": "LOCAL_DROPBOX_PDF_PRESENT_TEXT_EXTRACTED_SHA256_PENDING",
+          "user_pdf_requested": false,
+          "local_pdf_path": "/NS_Cowling/glendenning1991.pdf"
         },
         {
           "citation": "F. Douchin and P. Haensel, A&A 380, 151 (2001)",
@@ -314,7 +325,7 @@
           "open_access": "ORIGINAL_PUBLISHER_PDF_NOT_FOUND_OPEN_REPRODUCTION_AND_CURRENT_TABLE_SOURCES_FOUND",
           "doi": "10.1016/S0375-9474(99)00310-3",
           "url": "https://doi.org/10.1016/S0375-9474(99)00310-3",
-          "original_access_status": "Exact Typel-Wolter NPA 656 331 (1999) full text was not found in current web or Dropbox search. Ask for user PDF if local institutional access fails.",
+          "original_access_status": "LOCAL_DROPBOX_PDF_PRESENT_TEXT_EXTRACTED_SHA256_PENDING",
           "supporting_open_sources": [
             {
               "citation": "S. S. Avancini, M. E. Bracco, M. Chiapparini and D. P. Menezes, Phys. Rev. C 67, 024301 (2003)",
@@ -394,7 +405,9 @@
               }
             ],
             "access_note": "The data sheet was created 2025-06-26; arXiv:2506.11492 v2 (2025-06-16) was later published as PRC 113, 025804 (2026). Do not rewrite its historical creation date."
-          }
+          },
+          "local_pdf_path": "/NS_Cowling/typel1999.pdf",
+          "access_status": "LOCAL_DROPBOX_PDF_PRESENT_TEXT_EXTRACTED_SHA256_PENDING"
         }
       ],
       "compose_pages": [
@@ -484,13 +497,8 @@
       "arXiv:nucl-th/0212080 and arXiv:0704.0407 (open TW-99 expositions)",
       "arXiv:2506.11492 (current TW99 CompOSE data-sheet cited companion)"
     ],
-    "not_yet_secured": [
-      "Glendenning-Moszkowski PRL 67, 2414 (1991), exact original full text (APS is credential-gated; user PDF requested)",
-      "Typel-Wolter NPA 656, 331 (1999), exact original full text (open later TW-99 expositions exist; user PDF requested if local institutional access fails)",
-      "Baym-Bethe-Pethick NPA 175, 225 (1971), exact full text not yet retrieved",
-      "Chabanat et al. NPA 635, 231 (1998), exact full text not yet retrieved"
-    ],
-    "user_request_rule": "Request only exact GMPR_1991 and TW99 original PDFs from the user if the local agent cannot access them institutionally. Other open model-source URLs are recorded and should be downloaded, hashed and archived by local agent. Do not substitute a later review for a primary paper without labeling its role.",
+    "not_yet_secured": [],
+    "user_request_rule": "Do not request GM_GM1, TW99, BPS_1971 or Chabanat_1998 PDFs from the researcher. Exact originals already exist in Dropbox /NS_Cowling and text extraction was inspected. Hash existing bytes locally; request other papers only after exact local absence and lawful OA/institutional routes are confirmed.",
     "direct_download_attempts": [
       {
         "url": "https://arxiv.org/pdf/nucl-th/9804027",
@@ -505,6 +513,31 @@
         "result": "WEB_FETCH_403"
       }
     ],
-    "local_download_policy": "The connected host could verify open arXiv/institutional URLs and paper metadata but cannot materialize the public PDF bytes into the user's Dropbox from this session. The local agent must download the exact URLs, record version/bytes/SHA-256 and report failures."
+    "local_download_policy": "Hash the four existing PDFs first. Download remaining public arXiv/institutional full-text PDFs into a new versioned archive, recording URL, DOI/arXiv version, timestamp, bytes and SHA-256. Do not overwrite originals or report a PDF download from an abstract/landing page.",
+    "local_pdf_intake": {
+      "status": "FOUR_EXACT_ORIGINAL_PDFS_PRESENT_TEXT_EXTRACTED_BINARY_SHA_PENDING",
+      "files": [
+        {
+          "paper": "Glendenning & Moszkowski 1991",
+          "path": "/NS_Cowling/glendenning1991.pdf",
+          "sha256": "PENDING_LOCAL_HASH"
+        },
+        {
+          "paper": "Typel & Wolter 1999",
+          "path": "/NS_Cowling/typel1999.pdf",
+          "sha256": "PENDING_LOCAL_HASH"
+        },
+        {
+          "paper": "Baym, Bethe & Pethick 1971",
+          "path": "/NS_Cowling/baym1971.pdf",
+          "sha256": "PENDING_LOCAL_HASH"
+        },
+        {
+          "paper": "Chabanat et al. 1998",
+          "path": "/NS_Cowling/chabanat1998.pdf",
+          "sha256": "PENDING_LOCAL_HASH"
+        }
+      ]
+    }
   }
 }

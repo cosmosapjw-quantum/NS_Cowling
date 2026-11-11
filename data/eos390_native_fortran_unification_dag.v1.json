@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.1.7",
+  "revision": "1.1.8",
   "created_utc": "2026-11-11",
-  "status": "IN_PROGRESS_CI_VERIFIED_CSS_AND_MANIFEST_FULL_NATIVE_MIGRATION_PENDING",
+  "status": "BLOCKED_E390_02_PROVIDER_COMPOSITION_SEMANTICS_AND_ROW_COVERAGE",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "research/eos390-fortran-unification-v1",
@@ -174,14 +174,21 @@
       "phase_metadata": "Iphase is an integer categorical label whose physical meaning is model/provider-specific. Never interpret a numeric ID as a universal phase name.",
       "phase_only_rows": "When no abundance values exist but Iphase metadata must be retained, CompOSE v3.01 permits Npairs=0 and Nquad=0. Keep composition_file_present separate from composition_available.",
       "output_mapping": "When two provider tables are combined, remap source-local Iphase labels deterministically and write the complete (provider,source_Iphase)->output_Iphase mapping and human-readable phase legend into provenance metadata.",
-      "no_fabrication": "Never fabricate particle fractions, Abar, Zbar, or Y_I when source composition is absent. For APR_APR and BBB_BHF2, only create model-derived beta-equilibrium composition through the explicitly ported and provenance-labelled legacy literature solver."
+      "no_fabrication": "Never fabricate particle fractions, Abar, Zbar, or Y_I when source composition is absent. For APR_APR and BBB_BHF2, only create model-derived beta-equilibrium composition through the explicitly ported and provenance-labelled legacy literature solver.",
+      "current_adjudication": {
+        "status": "BLOCKED_PROVIDER_SEMANTICS_UNRESOLVED",
+        "reference": "CompOSE Reference Manual v3.01 (2022), arXiv:2203.03209",
+        "standard_field": "YI is the combined nuclear-group number fraction; Xh=Aav*YI is its baryon fraction.",
+        "source_finding": "Sampled SPG_M1/GPPVA_DD2/GPPVA_FSU2H rows are structurally valid but their last tuple values do not obey one standard YI interpretation across outer and inner crust.",
+        "decision": "Retain raw values; block production use pending provider clarification."
+      }
     },
     "nadd": {
       "supported_values": [
         0,
         1
       ],
-      "policy": "Preserve Nadd/q_extra on untouched rows whenever the same declared meaning is valid across the combined output. If provider-specific Nadd meanings cannot be unified, either retain an explicit source sidecar or drop only under a named DROP_WITH_RECEIPT policy; never silently relabel or interpolate categorical flags.",
+      "policy": "Nadd counts additional eos.thermo extension columns. Each extension type is provider-specific. The sampled GPPVA_FSU2H q_extra is categorical pasta geometry, separate from Iphase, and must not be numerically interpolated.",
       "source_observation": "SPG_M1 was observed with Nadd=0; GPPVA_FSU2H was observed with Nadd=1 and q_extra values 0/1."
     },
     "q3_convention": {
@@ -241,9 +248,12 @@
         "Fortran reader/writer round-trip raw Q1..Q7, Iphase, species fractions, Abar/Zbar/Y_I and supported Nadd",
         "Phase-only eos.compo round-trips Iphase with Npairs=0,Nquad=0",
         "Baryon and charge abundance closure are tested",
-        "Unsupported formats are explicit errors"
+        "Unsupported formats are explicit errors",
+        "Missing composition is distinct from measured zero and is tracked row-wise.",
+        "Standard YI is rejected where Aav*YI violates baryon normalization.",
+        "Provider-specific mapping requires written source definition and independent closure."
       ],
-      "status": "GITHUB_CI_PASS_PHASE_ONLY_ROUNDTRIP_TEST_PASS_LOCAL_REPLAY_PENDING"
+      "status": "CI_PASS_RUNTIME_FAIL_CLOSED_PROVIDER_SEMANTICS_UNRESOLVED"
     },
     {
       "id": "M3",
@@ -344,6 +354,17 @@
         "Cold EOS390 pipeline uses the generic reader/writer instead of a special-case parser."
       ],
       "status": "PENDING"
+    },
+    {
+      "id": "M2A",
+      "name": "Per-row composition presence and coverage",
+      "status": "PENDING_IMPLEMENTATION",
+      "acceptance": [
+        "Row/per-species/group presence is serialized losslessly.",
+        "C3 and C4 applicability are independently evaluated per row.",
+        "Missing values are not converted into numerical zeros.",
+        "CHECKED/PARTIAL/NOT_AVAILABLE/FAIL are distinct."
+      ]
     }
   ],
   "nodes": [
@@ -385,11 +406,13 @@
       "depends_on": [
         "E390-00"
       ],
-      "status": "GITHUB_CI_PASS_LOCAL_RUNTIME_PENDING",
+      "status": "RUNTIME_FAIL_CLOSED_C6B_PROVIDER_SEMANTICS_UNRESOLVED",
       "outputs": [
-        "phase-only eos.compo writer",
-        "composition closure guards",
-        "roundtrip tests"
+        "phase-only eos.compo round-trip",
+        "current branch CI build/tests pass",
+        "18-provider local verification receipt retained",
+        "C6B composition semantics adjudication BLOCKED",
+        "per-row/per-species composition presence masks required before closure"
       ]
     },
     {
@@ -399,7 +422,8 @@
       "depends_on": [
         "E390-01",
         "E390-02",
-        "E390-10"
+        "E390-10",
+        "E390-02A"
       ],
       "status": "PENDING",
       "outputs": [
@@ -415,7 +439,8 @@
       "depends_on": [
         "E390-02",
         "E390-03",
-        "E390-10"
+        "E390-10",
+        "E390-02A"
       ],
       "status": "PENDING",
       "outputs": [
@@ -431,7 +456,8 @@
       "depends_on": [
         "E390-02",
         "E390-03",
-        "E390-10"
+        "E390-10",
+        "E390-02A"
       ],
       "status": "PENDING",
       "outputs": [
@@ -543,6 +569,30 @@
         "lossless round-trip test corpus",
         "explicit slice selector for EOS390"
       ]
+    },
+    {
+      "id": "E390-02A",
+      "gate": "M2A",
+      "title": "Represent per-row composition coverage without converting missing data to zero",
+      "depends_on": [
+        "E390-00",
+        "E390-02"
+      ],
+      "status": "PENDING_IMPLEMENTATION",
+      "outputs": [
+        "per-row/per-species/group presence masks",
+        "independent C3/C4 applicability",
+        "lossless serialization and round-trip",
+        "CHECKED/PARTIAL/NOT_AVAILABLE/FAIL coverage report"
+      ],
+      "acceptance": [
+        "Npairs=0,Nquad=0 preserves Iphase and records composition as absent, not measured zero.",
+        "Every particle ID and group record has explicit row-level presence.",
+        "C3 and C4 applicability is independent and row-aware.",
+        "GM_GM1 missing outer/core species are not checked as zero-filled physical abundances.",
+        "Masks survive transformations and CompOSE read/write; otherwise fail closed.",
+        "No SPG/GPPVA final-tuple remapping is made."
+      ]
     }
   ],
   "mutation_policy": {
@@ -575,17 +625,20 @@
     "required_access_paths": [
       "/home/cosmosapjw/Dropbox/ns_eos",
       "/home/cosmosapjw/Dropbox/ns_oscillation_followup_20261106",
-      "/home/cosmosapjw/Dropbox/EoS_core_crust_release_v3_2_20261106"
+      "/home/cosmosapjw/Dropbox/EoS_core_crust_release_v3_2_20261106",
+      "/home/cosmosapjw/Dropbox/NS_Cowling"
     ],
     "first_actions": [
-      "checkout exact work branch",
-      "record git HEAD and dirty state",
-      "verify all three directories",
-      "hash source and baseline files",
-      "inspect model READMEs/eos.pdf and references",
-      "run baseline build/tests before changing more code",
-      "Inspect eos_generator/compose_eos_pkg/compose_eos/phase_transitions.py as a read-only numerical reference; do not copy its composition-dropping output.",
-      "Download and SHA-256 all public PDFs listed in the source bibliography; do not request BBB_BHF2 or other models with open arXiv sources."
+      "Read the machine DAG, the single developer document, C6B adjudication and E390-02 receipt before editing.",
+      "Fetch latest remote branch HEAD/tree; record parent, dirty state, compiler and runtime.",
+      "Verify Dropbox /ns_eos, /NS_Cowling, /ns_oscillation_followup_20261106 and EoS_core_crust_release_v3_2_20261106.",
+      "Hash all raw EOS folders, model README/eos.pdf files, existing four original PDFs, historical 390 outputs and v3.2 baseline.",
+      "Run baseline native build and all current tests before production mutations.",
+      "Implement E390-02A per-row/per-species/group presence masks and GM_GM1 tests.",
+      "Do not map SPG/GPPVA final quadruple values until written provider semantics arrive.",
+      "Implement E390-10 multidimensional T/Yq parsing as lossless generic I/O, preserving every axis and field.",
+      "Download/hash public OA papers into a new versioned archive; do not overwrite the four existing PDFs.",
+      "Proceed to M3-M8 only when all scientific admission gates close."
     ],
     "build_command": "bash fortran_eos/build.sh build/compose_eos_fortran",
     "test_command": "COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran PYTHONPATH=python_frontend python -m pytest -q python_frontend/tests pipeline/tests",
@@ -602,16 +655,22 @@
       "C1-C11 reports",
       "failure_catalog.json",
       "phase_topology_and_composition_mapping_receipt.json",
-      "legacy_feature_parity_inventory.json"
+      "legacy_feature_parity_inventory.json",
+      "paper_source_registry.json with PDF version/bytes/SHA-256",
+      "composition_coverage_matrix.json",
+      "provider_semantics_answers.json",
+      "per_row_presence_mask_roundtrip.log"
     ],
-    "native_subagent": "NOT_RUN_BY_CHATGPT_HOST_NO_NATIVE_DELEGATION_TOOL"
+    "native_subagent": "NOT_RUN_BY_CHATGPT_HOST_NO_NATIVE_DELEGATION_TOOL",
+    "current_goal": "MANDATORY: regenerate the exact original 390 crust-core x method outputs from Dropbox /ns_eos using one production Fortran numerical backend. Python is invocation/serialization/reporting only. Preserve all input source provenance, categorical fields and failures.",
+    "provider_semantics_stop": "Production EOS390 composition matching for SPG/GPPVA is blocked until providers define the raw field. Generic parser and presence-mask work may continue only without assigning that field a meaning."
   },
   "evidence_status": {
     "code_execution_in_this_turn": "GITHUB_ACTIONS_EXACT_HEAD_BUILD_78_PYTEST_POLYNOMIAL_EXTREMA_CSS_ANALYTIC_TEST_SHA256_MANIFEST_AND_ARCHIVE_PASS_LOCAL_RUNTIME_NOT_RUN",
-    "static_source_patch": "COMMITTED_CI_VERIFIED",
-    "github_ci": "PASS_CURRENT_HEAD_D7B0743_CODE_TESTS_MANIFEST_AND_ARTIFACT",
-    "local_runtime": "NOT_RUN_DESKTOP_COMMANDER_OFFLINE_CONTAINER_EXEC_UNAVAILABLE",
-    "source_cohort_admission": "NOT_ADMITTED",
+    "static_source_patch": "NO_PRODUCTION_CODE_PATCH; DAG/CONTRACT/PROVENANCE UPDATE ONLY",
+    "github_ci": "PASS_BRANCH_HEAD_6ECF8AD_RUN_212",
+    "local_runtime": "CURRENT_REMOTE_DESKTOP_DEVICE_OFFLINE; PRIOR_LOCAL_E390_02_RECEIPT_EXISTS_IN_DROPBOX",
+    "source_cohort_admission": "BLOCKED_SP_GPPVA_PROVIDER_SEMANTICS; GM1_ROW_COVERAGE_MASK_REQUIRED; RG_MULTIDIMENSIONAL_READER_REQUIRED",
     "regenerated_390": "NOT_RUN",
     "github_actions_execution": {
       "previous_head_before_css": {
@@ -732,6 +791,34 @@
       "tw_supporting": "arXiv:nucl-th/0212080; arXiv:0704.0407",
       "tw_current_datasheet": "arXiv:2208.12893; arXiv:2201.12053; arXiv:2506.11492",
       "gm1_original": "BLOCKED_PDF_NOT_FOUND_APS_403_REQUEST_USER"
+    },
+    "branch_before_update": "6ecf8ad195a39240e922e65df6ce028f33a4d8f9",
+    "current_head": {
+      "commit": "6ecf8ad195a39240e922e65df6ce028f33a4d8f9",
+      "run_id": 43016176896,
+      "run_number": 212,
+      "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43016176896",
+      "conclusion": "success",
+      "tests": {
+        "fortran_build": "PASS",
+        "pytest": "78 passed in 45.79 s",
+        "polynomial_extrema": "PASS",
+        "css_segment_analytic": "PASS",
+        "sha256_manifest": "PASS",
+        "source_archive_upload": "PASS"
+      },
+      "artifact": {
+        "id": 13852892302,
+        "name": "NS_Cowling-938dc92a6850db549560737a277326452c9ff3f6.zip",
+        "size_bytes": 199210037,
+        "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43016176896/artifacts/13852892302"
+      }
+    },
+    "c6b": {
+      "status": "PROVIDER_SEMANTICS_UNRESOLVED__BLOCKED",
+      "tests": "10 passed in prior C6B audit",
+      "production_changed": false,
+      "pairs_before_root_search": "65 BLOCKED"
     }
   },
   "legacy_feature_inventory": [
@@ -884,6 +971,16 @@
       "area": "native 390 manifest runner and regeneration",
       "status": "NOT_RUN",
       "evidence": "M7-M9 are not implemented or source-cohort admitted."
+    },
+    {
+      "area": "row-level composition presence/coverage",
+      "status": "DIAGNOSED_NOT_IMPLEMENTED",
+      "evidence": "Global composition_available conflates missing records with measured zero; GM_GM1 phase-only and partial species coverage requires presence masks."
+    },
+    {
+      "area": "SPG/GPPVA final eos.compo tuple semantics",
+      "status": "BLOCKED_PROVIDER_CLARIFICATION",
+      "evidence": "C6B rejects global remapping hypotheses; no provider-authored definition for the final tuple field was found."
     }
   ],
   "phase_ontology": {
@@ -1045,6 +1142,7 @@
     "M0",
     "M1",
     "M2",
+    "M2A",
     "M10",
     "M3",
     "M4",
@@ -1057,14 +1155,11 @@
   ],
   "source_paper_registry": {
     "bibliography_path": "data/eos390_source_bibliography.v1.json",
-    "status": "MODEL_SPECIFIC_DATASHEETS_READ_18_OF_18_OPEN_SOURCES_IDENTIFIED_FOR_LOCAL_DOWNLOAD",
+    "status": "FOUR_ORIGINAL_PDFS_PRESENT_IN_DROPBOX_OPEN_ACCESS_BINARY_DOWNLOADS_PENDING",
     "source_datasheet_authority": "Each model's CompOSE eos.pdf",
     "downloaded_to_dropbox": false,
     "verified_open_fulltext_count": "arXiv/institutional records verified; binary download to Dropbox not performed by this host",
-    "user_requested_originals": [
-      "GM_GM1: Glendenning & Moszkowski PRL 67 2414 (1991), DOI 10.1103/PhysRevLett.67.2414",
-      "GPPVA_TW: Typel & Wolter NPA 656 331 (1999), DOI 10.1016/S0375-9474(99)00310-3"
-    ],
+    "user_requested_originals": [],
     "no_user_request_for": [
       "APR",
       "BBB_BHF2",
@@ -1079,6 +1174,133 @@
       "NL3wrL55",
       "TM1e",
       "GPPVA common"
+    ],
+    "local_existing_pdf_paths": [
+      "/NS_Cowling/glendenning1991.pdf",
+      "/NS_Cowling/typel1999.pdf",
+      "/NS_Cowling/baym1971.pdf",
+      "/NS_Cowling/chabanat1998.pdf"
+    ],
+    "note": "Four exact original PDFs are in Dropbox /NS_Cowling and text extraction was inspected. Their binary hashes remain pending. Local agent must hash them and download remaining open full texts into a new versioned archive."
+  },
+  "e390_02_adjudication": {
+    "schema": "ns-cowling.e390-02-c6b-adjudication",
+    "version": "1.0.0",
+    "date": "2026-11-11",
+    "status": "BLOCKED_PROVIDER_SEMANTICS_UNRESOLVED",
+    "manual": {
+      "title": "CompOSE Reference Manual v3.01 (2022)",
+      "arxiv": "2203.03209",
+      "row_schema": "iT inb iYq Iphase Npairs (particle_id,Y_i)* Nquad (group_id,Aav,Zav,YI)*",
+      "definitions": {
+        "Yi": "particle number fraction n_i/n_B",
+        "Aav": "number-abundance-weighted group-average mass number",
+        "Zav": "number-abundance-weighted group-average charge number",
+        "YI": "combined nuclear-group number fraction",
+        "Xh": "Aav*YI, the group's baryon fraction",
+        "Iphase": "model-specific categorical phase index",
+        "empty": "Npairs=0 and Nquad=0 is legal for phase-only metadata"
+      }
+    },
+    "sampled_raw_files": [
+      {
+        "model": "SPG_M1",
+        "rows": 365,
+        "Iphase": {
+          "0": 217,
+          "7": 148
+        },
+        "row_width": 18,
+        "pair_ids": [
+          10,
+          11,
+          0,
+          1
+        ],
+        "path": "/ns_eos/EoS_matching_code_package/eos_data/SPG_M1/eos.compo"
+      },
+      {
+        "model": "GPPVA_DD2",
+        "rows": 283,
+        "Iphase": {
+          "0": 217,
+          "7": 66
+        },
+        "row_width": 18,
+        "pair_ids": [
+          10,
+          11,
+          0,
+          1
+        ],
+        "path": "/ns_eos/EoS_matching_code_package/eos_data/GPPVA_DD2/eos.compo"
+      },
+      {
+        "model": "GPPVA_FSU2H",
+        "rows": 300,
+        "Iphase": {
+          "0": 217,
+          "7": 83
+        },
+        "row_width": 18,
+        "pair_ids": [
+          10,
+          11,
+          0,
+          1
+        ],
+        "path": "/ns_eos/EoS_matching_code_package/eos_data/GPPVA_FSU2H/eos.compo"
+      }
+    ],
+    "established": {
+      "schema": "The sampled records satisfy the official 18-token row grammar and (iT,inb,iYq) keys align row-by-row with eos.thermo.",
+      "parser_hypothesis": "The prior parser-width/indexing hypothesis is rejected for the sampled sources.",
+      "nadd": "Nadd counts separate eos.thermo extension columns. In sampled GPPVA_FSU2H, q_extra is a categorical pasta-geometry value and is not Iphase."
+    },
+    "numerical_findings": {
+      "outer_crust": "Representative Aav=56,Zav=26 rows have final tuple value=1, Ye=26/56, Yn=Yp=Ymu=0. Treating final value as standard YI gives Xh=56, violating baryon normalization. Interpreting it as Xh=1 is only a diagnostic hypothesis, not a documented convention.",
+      "inner_crust": "In sampled SPG_M1/GPPVA_FSU2H rows, final value equals Ye+Ymu to printed precision. SPG_M1 C3- and C4-implied cluster baryon fractions disagree in all 148 Iphase=7 rows; C6B records C3-implied range 0.096..0.543 versus C4-implied 1.",
+      "rejected_maps": [
+        "Yh=Aav*last_value: global baryon-normalization failure",
+        "Yh=last_value: outer rows only; fails SPG inner rows",
+        "Yh=1: diagnostic only, undocumented, and fails SPG inner charge closure"
+      ]
+    },
+    "questions_for_providers": [
+      "Define the fourth tuple value separately for Iphase=0 and Iphase=7.",
+      "Are Aav/Zav representative cluster/group quantities or transformed whole-cell quantities?",
+      "Why does the final tuple value equal Ye+Ymu in inspected inner-crust rows?",
+      "Where is free-neutron gas represented in SPG inner crust if Yn=0?",
+      "Are Yn=Yp=0 intended zeros or missing/unexported abundances?"
+    ],
+    "stop_rules": [
+      "Do not infer the final value to mean YI, Xh, Ye, gas fraction, or another aggregate.",
+      "Do not relax C3/C4, drop composition, or fabricate Yn/Yp.",
+      "Do not interpolate Iphase or categorical Nadd values.",
+      "Block SPG/GPPVA composition production admission until written provider semantics and independent closure exist."
+    ],
+    "gm1_coverage_issue": {
+      "status": "DIAGNOSED_NOT_PATCHED",
+      "reason": "A global composition_available flag conflates absent/partial data with measured zero. GM_GM1 contains phase-only Npairs=0,Nquad=0 rows in the outer-crust segment and core rows without complete lepton coverage.",
+      "required_design": "Add row-level masks for each particle ID and group field; assess C3 and C4 independently per row; distinguish CHECKED/PARTIAL/NOT_AVAILABLE/FAIL; preserve masks through CSV, transformations, matching, and CompOSE round-trip.",
+      "required_tests": [
+        "Phase-only fixture retains Iphase and records composition as absent.",
+        "GM_GM1 outer rows do not fail from zero-initialized missing data.",
+        "GM_GM1 core C3 is unavailable unless the required charge-carrier inventory is complete; C4 is independently applicable only with complete baryon inventory.",
+        "Mixed source coverage yields row-level CHECKED/PARTIAL/NOT_AVAILABLE/FAIL receipts.",
+        "No SPG/GPPVA ambiguous-field remapping is made by the coverage-mask task."
+      ]
+    },
+    "historical_c6b": {
+      "path": "/NS_Cowling_wt/eos_recon/artifacts/sharp_maxwell/C6B_COMPOSITION_SEMANTICS_20261110T100954Z/",
+      "tests": "10 passed; deterministic audit rerun; no production change; 65 pairs BLOCKED_BEFORE_ROOT_SEARCH"
+    },
+    "evidence_paths": [
+      "Dropbox:/NS_Cowling_wt/eos_recon/artifacts/sharp_maxwell/C6B_COMPOSITION_SEMANTICS_20261110T100954Z/hypothesis_adjudication.md",
+      "Dropbox:/NS_Cowling_wt/eos_recon/artifacts/sharp_maxwell/C6B_COMPOSITION_SEMANTICS_20261110T100954Z/provider_provenance.md",
+      "Dropbox:/ns_eos/EoS_matching_code_package/eos_data/SPG_M1/eos.compo",
+      "Dropbox:/ns_eos/EoS_matching_code_package/eos_data/GPPVA_DD2/eos.compo",
+      "Dropbox:/ns_eos/EoS_matching_code_package/eos_data/GPPVA_FSU2H/eos.compo"
     ]
   }
 }

@@ -1,0 +1,88 @@
+{
+  "schema": "ns-cowling.smooth-matching-validation",
+  "schema_version": "1.0.0",
+  "created_utc": "2026-11-11",
+  "status": "PARTIAL_EXACT_HEAD_CI_COVERED_LOCAL_REPLAY_NOT_RUN",
+  "implementation": "fortran_eos/src/compose_eos_matching.f90::match_crust_core",
+  "test_module": "python_frontend/tests/test_native_crust_core_matching.py",
+  "source_branch": "research/fortran-eos-gap-fill-v1",
+  "source_commit": "ecf2271e89b68f0a6ef2e6a9c551deba7862f192",
+  "source_blobs": {
+    "matching_fortran": "58ff6171778553a7c68929ae5d62e42fa4db65e2",
+    "matching_pytest": "a897d2c5973ddf9a3ec9e45f4cf4bf137bab2e9d"
+  },
+  "methods": [
+    "maxwell",
+    "css",
+    "cubic_F",
+    "cubic_P",
+    "quintic_F",
+    "quintic_P"
+  ],
+  "differential_test": "test_native_smooth_matching_differential_against_legacy",
+  "assertions": [
+    "Native/legacy matching indices agree.",
+    "Matched nb/Q1/Q3/Q4/Q6/Q7 arrays agree at rtol=8e-7 and atol=2e-9.",
+    "Source density knots outside the bridge are retained.",
+    "Density, pressure and energy density are strictly increasing.",
+    "Q1 is positive; bridge cs2 diagnostics lie between zero and one.",
+    "First-law relative residual is below 5e-9.",
+    "Q6 equals Q7.",
+    "Composition drop requires explicit drop_composition=True and is recorded.",
+    "Historical maxwell has is_exact_maxwell=false and density_jump_fm3=0."
+  ],
+  "ci": {
+    "provider": "GitHub Actions",
+    "workflow_run_id": 42952472519,
+    "job_id": 130299748780,
+    "tested_pr_head": "ecf2271e89b68f0a6ef2e6a9c551deba7862f192",
+    "tested_merge_snapshot": "9129d53dfc5b4a216ad53cb118c3fc08ab319572",
+    "base_branch": "main",
+    "base_sha": "6eed9c5178afd820c9d814e4138dd0f15d1f5a73",
+    "status": "success",
+    "runtime": {
+      "python": "3.13",
+      "gfortran": "15.2.0",
+      "pytest": "9.2.0",
+      "numpy": "2.5.4",
+      "scipy": "1.18.1"
+    },
+    "commands": {
+      "build": "bash fortran_eos/build.sh build/compose_eos_fortran",
+      "pytest": "python -m pytest -q python_frontend/tests pipeline/tests",
+      "extrema": "gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all -Ibuild/compose_eos_fortran/mod fortran_eos/tests/test_polynomial_extrema.f90 build/compose_eos_fortran/obj/compose_eos_types.o build/compose_eos_fortran/obj/compose_eos_reconstruct.o -o build/compose_eos_fortran/test_polynomial_extrema && build/compose_eos_fortran/test_polynomial_extrema",
+      "manifest": "sha256sum -c SHA256SUMS_v4.txt"
+    },
+    "outcomes": {
+      "native_build": "PASS",
+      "frontend_pipeline": "76 passed in 45.77 seconds",
+      "polynomial_extrema": "PASS",
+      "sha256_manifest": "PASS",
+      "artifact_upload": "PASS"
+    },
+    "artifact": {
+      "id": 13826230310,
+      "name": "NS_Cowling-9129d53dfc5b4a216ad53cb118c3fc08ab319572",
+      "size_bytes": 280171082,
+      "sha256": "6b4d884929f6ef8e75057969086e1805f91fa5e28c785f1295161d329db7c5ff",
+      "expires": "2026-12-11"
+    },
+    "provenance_note": "Pull-request integration run over the stated PR head plus base merge snapshot; not a local sandbox replay and not source-cohort admission.",
+    "per_method_stdout": "NOT_REPORTED_BY_NON_VERBOSE_CI_LOG",
+    "suite_total": "76 passed"
+  },
+  "local_execution": {
+    "status": "NOT_RUN",
+    "reason": "Container/Python runtime returned ClientError; connected local workstation was offline."
+  },
+  "limitations": [
+    "Native/legacy per-method numerical values were not regenerated in this session.",
+    "The benchmark test skips if source EOS inputs are absent; exact CI reported 76 passed without a skipped count.",
+    "This is a smooth single-valued thermo-only construction, not physical phase coexistence."
+  ],
+  "non_claims": [
+    "Historical maxwell is not a sharp transition.",
+    "No density jump or latent-energy jump is inferred.",
+    "No production source was modified."
+  ]
+}

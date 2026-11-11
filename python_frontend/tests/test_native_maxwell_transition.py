@@ -59,6 +59,33 @@ def acausal_cubic_phase() -> EOSData:
     )
 
 
+def test_compose_phase_only_sidecar_roundtrips_Iphase_without_fabricating_composition(tmp_path):
+    from compose_eos import read_compose, write_compose
+
+    data = quadratic_phase(rest_mass=939.0, stiffness=1.0, n_min=0.3, n_max=1.4)
+    data.Iphase[:] = np.where(data.nb < 0.85, 4, 3)
+    data.composition_file_present = True
+    data.composition_available = False
+
+    target = tmp_path / "phase_only_compose"
+    write_compose(target, data)
+    restored = read_compose(target)
+
+    assert restored.composition_file_present is True
+    assert restored.composition_available is False
+    np.testing.assert_array_equal(restored.Iphase, data.Iphase)
+    for field in (restored.Yn, restored.Yp, restored.Ye, restored.Ymu,
+                  restored.Aav, restored.Zav, restored.Yh):
+        assert np.all(field == 0.0)
+    rows = (target / "eos.compo").read_text(encoding="utf-8").splitlines()
+    assert len(rows) == data.n
+    for i, row in enumerate(rows):
+        fields = row.split()
+        assert len(fields) == 6
+        assert int(fields[3]) == int(data.Iphase[i])
+        assert fields[4:] == ["0", "0"]
+
+
 def test_native_maxwell_transition_recovers_exact_analytic_coexistence():
     low = quadratic_phase(rest_mass=939.0, stiffness=1.0, n_min=0.3, n_max=1.4)
     high = quadratic_phase(rest_mass=940.0, stiffness=0.25, n_min=1.3, n_max=2.8)

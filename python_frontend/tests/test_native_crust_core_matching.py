@@ -12,6 +12,7 @@ import pytest
 from compose_eos import (
     NativeExecutionError,
     NativeFeatureUnavailable,
+    executable,
     match_crust_core,
     read_compose,
 )
@@ -20,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[2]
 CRUST = ROOT / "eos_generator" / "eos_data_normalized" / "GPPVA_FSU2H"
 CORE = ROOT / "eos_generator" / "eos_data_normalized" / "GM_GM1"
 LEGACY_ROOT = ROOT / "eos_generator" / "compose_eos_pkg"
-METHODS = ("maxwell", "css", "cubic_F", "cubic_P", "quintic_F", "quintic_P")
+METHODS = ("css", "cubic_F", "cubic_P", "quintic_F", "quintic_P")
 
 
 def _require_reference_inputs():
@@ -121,6 +122,30 @@ def test_native_smooth_matching_differential_against_legacy(method, tmp_path):
     assert info["is_exact_maxwell"] is False
     assert info["density_jump_fm3"] == 0.0
     assert "consistency" in info and "overall" in info["consistency"]
+
+
+def test_historical_maxwell_alias_is_rejected_instead_of_emitting_a_fake_plateau():
+    crust = read_compose(CRUST)
+    core = read_compose(CORE)
+    with pytest.raises(NativeFeatureUnavailable, match="not a first-order transition"):
+        match_crust_core(
+            crust, core, method="maxwell", drop_composition=True
+        )
+
+
+def test_native_cli_also_rejects_the_legacy_maxwell_alias(tmp_path):
+    crust = read_compose(CRUST)
+    core = read_compose(CORE)
+    cdir, kdir, out = tmp_path / "crust", tmp_path / "core", tmp_path / "out"
+    cdir.mkdir(); kdir.mkdir(); out.mkdir()
+    crust.write_internal_directory(cdir)
+    core.write_internal_directory(kdir)
+    result = subprocess.run(
+        [str(executable()), "match-core", str(cdir), str(kdir), str(out), "maxwell", "40", "true"],
+        capture_output=True, text=True, check=False,
+    )
+    assert result.returncode != 0
+    assert "maxwell requires a sharp coexistence construction" in result.stdout
 
 
 def test_native_matching_requires_explicit_composition_drop():

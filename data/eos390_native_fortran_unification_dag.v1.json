@@ -1,0 +1,544 @@
+{
+  "schema": "ns-cowling.eos390-native-fortran-unification-dag",
+  "schema_version": "1.0.0",
+  "plan_id": "eos390_native_fortran_unification_v1",
+  "revision": "1.0.0",
+  "created_utc": "2026-11-11",
+  "status": "IN_PROGRESS_SPEC_AND_INITIAL_SAFETY_PATCH_PUBLISHED_CI_PENDING",
+  "authority": {
+    "repository": "cosmosapjw-quantum/NS_Cowling",
+    "work_branch": "research/eos390-fortran-unification-v1",
+    "base_branch": "research/fortran-eos-gap-fill-v1",
+    "base_commit": "ecf2271e89b68f0a6ef2e6a9c551deba7862f192",
+    "main_branch_must_not_be_modified": true,
+    "existing_sharp_maxwell_65_pair_dag": "data/sharp_maxwell_c4_execution_plan.v1.json",
+    "existing_c4_dag_must_remain_separate": true
+  },
+  "objective": {
+    "required_end_state": "Regenerate the original 390 crust-core EOS combinations using one native Fortran calculation backend, preserving source provenance and the supported CompOSE composition semantics. Python is an invocation/serialization/reporting frontend only. The historical Python implementation is read-only legacy/reference code.",
+    "matrix": {
+      "crust_models": [
+        "SPG_M1",
+        "SPG_M2",
+        "SPG_M3",
+        "SPG_M4",
+        "SPG_M5",
+        "GPPVA_DD2",
+        "GPPVA_DDME2",
+        "GPPVA_FSU2",
+        "GPPVA_FSU2H",
+        "GPPVA_FSU2R",
+        "GPPVA_NL3wrL55",
+        "GPPVA_TM1e",
+        "GPPVA_TW"
+      ],
+      "core_models": [
+        "APR_APR",
+        "BBB_BHF2",
+        "GM_GM1",
+        "RG_SLY4",
+        "RG_KDE0v1"
+      ],
+      "methods": [
+        "maxwell",
+        "css",
+        "cubic_F",
+        "cubic_P",
+        "quintic_F",
+        "quintic_P"
+      ],
+      "expected_pairs": 390,
+      "cardinality_check": "13 * 5 * 6 == 390"
+    },
+    "output_root": "/home/cosmosapjw/Dropbox/ns_eos/matched_eos_all_combinations_native_fortran_v1_20261111",
+    "baseline_output_is_immutable": true
+  },
+  "architecture": {
+    "scientific_calculation_owner": "Fortran",
+    "python_role": [
+      "argument validation",
+      "file/path selection",
+      "serialization/deserialization",
+      "native executable invocation",
+      "report decoding",
+      "presentation"
+    ],
+    "python_production_numerics_forbidden": [
+      "EOS interpolation",
+      "root finding",
+      "EOS reconstruction",
+      "composition solving",
+      "matching construction",
+      "causality computation",
+      "TOV integration",
+      "tidal integration",
+      "Cowling integration",
+      "batch numerical orchestration"
+    ],
+    "legacy_reference_roots": [
+      "eos_generator/compose_eos_pkg",
+      "python_frontend/compose_cowling/maxwell.py",
+      "/ns_eos/EoS_matching_code_package"
+    ],
+    "legacy_policy": "READ_ONLY_REFERENCE_NO_PRODUCTION_IMPORT_NO_GENERATED_OUTPUT_AUTHORITY",
+    "single_physics_ssot": "fortran_eos and integrated native stellar solver modules",
+    "exact_legacy_python_source_must_be_preserved": true
+  },
+  "physical_contract": {
+    "units": {
+      "density": "fm^-3",
+      "pressure": "MeV fm^-3",
+      "energy_density": "MeV fm^-3",
+      "chemical_potential": "MeV",
+      "sound_speed": "c_s^2/c^2"
+    },
+    "metric_signature": "(-,+,+,+)",
+    "cold_slice": {
+      "temperature_MeV": 0,
+      "beta_equilibrium": true,
+      "entropy_per_baryon": 0
+    },
+    "first_law": {
+      "master_variable": "x = ln(n_B)",
+      "master_function": "F = epsilon/n_B",
+      "equations": [
+        "Q1 = dF/dx = P/n_B",
+        "P = n_B Q1",
+        "mu_Euler = F + Q1",
+        "c_s^2/c^2 = (Q1 + dQ1/dx)/(F + Q1)",
+        "Q6 = Q7 at T=0 within the source contract"
+      ]
+    },
+    "sharp_maxwell": {
+      "conserved_charge": "baryon number",
+      "charge_assumption": "local electric charge neutrality in each coexisting phase; not a Gibbs/global-neutrality construction",
+      "coexistence": [
+        "P_L(mu_t) = P_H(mu_t) = P_t",
+        "mu_B,L(mu_t) = mu_B,H(mu_t) = mu_t",
+        "n_L = dP_L/dmu_B",
+        "n_H = dP_H/dmu_B",
+        "n_H > n_L > 0",
+        "epsilon_i = mu_t*n_i - P_t",
+        "Delta epsilon = mu_t*Delta n_B"
+      ],
+      "output_invariants": [
+        "P is continuous at the interface",
+        "mu_B is continuous at the interface",
+        "n_B and epsilon have a positive finite jump",
+        "Delta n_B > 0",
+        "no continuous-density plateau is labelled first-order Maxwell"
+      ],
+      "multiple_root_policy": "Do not choose a root by arbitrary order. Restrict to the native branch-selection window; require the prescribed unique admissible coexistence root or return AMBIGUOUS_MULTIPLE_ROOTS.",
+      "seidov": "Record the Seidov rapid-onset diagnostic separately; it is not a proof of a complete stable TOV branch."
+    },
+    "smooth_methods": [
+      "css",
+      "cubic_F",
+      "cubic_P",
+      "quintic_F",
+      "quintic_P"
+    ],
+    "legacy_maxwell_policy": "The historical Python and native smooth-pressure-plateau implementation is scientifically mislabelled because Delta n_B=0. It is read-only legacy and the native match_crust_core alias is temporarily fail-closed. The final method token maxwell must invoke the sharp construction."
+  },
+  "compose_contract": {
+    "supported_scope": "Cold T=0, one-dimensional fixed-(iT,iYq) CompOSE slice; particle IDs {0,1,10,11}; at most one nuclear-group quadruple with group ID 1; Nadd 0 or 1. Unsupported general CompOSE dimensions/species/layouts must fail explicitly, not be silently flattened.",
+    "identity_key": "(iT,inb,iYq)",
+    "thermo_columns": [
+      "Q1",
+      "Q2",
+      "Q3",
+      "Q4",
+      "Q5",
+      "Q6",
+      "Q7",
+      "Nadd",
+      "optional q_extra"
+    ],
+    "composition": {
+      "particle_ids": {
+        "0": "electron",
+        "1": "muon",
+        "10": "neutron",
+        "11": "proton"
+      },
+      "nuclear_group_id": 1,
+      "max_Npairs": 4,
+      "max_Nquad": 1,
+      "stored_quantity": "CompOSE nuclear-group abundance Y_I = n_I/n_B",
+      "internal_quantity": "Y_h = Abar * Y_I",
+      "serialization": "Y_I = Y_h/Abar when Abar>0; otherwise no nuclear-group quadruple",
+      "closures": [
+        "Y_n + Y_p + Y_h = 1",
+        "Y_p + (Zbar/Abar)*Y_h = Y_e + Y_mu"
+      ],
+      "phase_metadata": "Iphase is an integer categorical label whose physical meaning is model/provider-specific. Never interpret a numeric ID as a universal phase name.",
+      "phase_only_rows": "When no abundance values exist but Iphase metadata must be retained, CompOSE v3.01 permits Npairs=0 and Nquad=0. Keep composition_file_present separate from composition_available.",
+      "output_mapping": "When two provider tables are combined, remap source-local Iphase labels deterministically and write the complete (provider,source_Iphase)->output_Iphase mapping and human-readable phase legend into provenance metadata.",
+      "no_fabrication": "Never fabricate particle fractions, Abar, Zbar, or Y_I when source composition is absent. For APR_APR and BBB_BHF2, only create model-derived beta-equilibrium composition through the explicitly ported and provenance-labelled legacy literature solver."
+    },
+    "nadd": {
+      "supported_values": [
+        0,
+        1
+      ],
+      "policy": "Preserve Nadd/q_extra on untouched rows whenever the same declared meaning is valid across the combined output. If provider-specific Nadd meanings cannot be unified, either retain an explicit source sidecar or drop only under a named DROP_WITH_RECEIPT policy; never silently relabel or interpolate categorical flags.",
+      "source_observation": "SPG_M1 was observed with Nadd=0; GPPVA_FSU2H was observed with Nadd=1 and q_extra values 0/1."
+    },
+    "q3_convention": {
+      "Il_1": "Q3+1 maps to Euler baryon chemical potential divided by m_n on the supported beta-equilibrium branch with Q5 approximately zero.",
+      "Il_0": "Recover Euler mu_B by adding Yq*mu_q to the stored Q3-derived potential: mu_Euler = (Q3+1)*m_n + Yq*Q4*m_n.",
+      "tolerances": "Keep the source/reconstruction algebraic tolerance distinct from the sharp-Maxwell kernel Euler consistency tolerance."
+    }
+  },
+  "input_locations": {
+    "dropbox_paths": [
+      "/home/cosmosapjw/Dropbox/ns_eos",
+      "/home/cosmosapjw/Dropbox/ns_oscillation_followup_20261106",
+      "/home/cosmosapjw/Dropbox/EoS_core_crust_release_v3_2_20261106"
+    ],
+    "raw_eos_root": "/EoS_core_crust_release_v3_2_20261106/EoS_complete_core_crust_release_v3_2/code_package/eos_data",
+    "normalized_eos_root": "/EoS_core_crust_release_v3_2_20261106/EoS_complete_core_crust_release_v3_2/code_package/eos_data_normalized",
+    "legacy_code_root": "/ns_eos/EoS_matching_code_package",
+    "legacy_390_summary": "/ns_eos/Crust_Core_Matching_390_Summary.csv",
+    "legacy_390_output": "/ns_eos/matched_eos_all_combinations",
+    "v3_2_release_root": "/EoS_core_crust_release_v3_2_20261106",
+    "oscillation_followup_root": "/ns_oscillation_followup_20261106"
+  },
+  "baseline": {
+    "source": "Dropbox EOS core-crust release v3.2 dated 2026-11-06",
+    "reported_total": 390,
+    "reported_full_table_pass": 234,
+    "reported_diagnostic_only": 156,
+    "reported_causal_domain_pass": 390,
+    "reported_full_table_failures": "APR_APR and RG_KDE0v1 high-density C10 acausality",
+    "policy": "These are recorded historical v3.2 results, not new independent execution evidence. Preserve source EOS tables unchanged. Never clip or relabel an acausal tail as a repaired microscopic EOS."
+  },
+  "gates": [
+    {
+      "id": "M0",
+      "name": "Immutable source lock",
+      "acceptance": [
+        "All raw/normalized EOS file manifests are hashed before execution",
+        "Original v3.2 outputs and source folders are read-only",
+        "All 18 model readmes and datasheets are indexed"
+      ],
+      "status": "PARTIAL_SOURCE_INTAKE_RECONNAISSANCE"
+    },
+    {
+      "id": "M1",
+      "name": "Legacy behavior characterization",
+      "acceptance": [
+        "All six method IDs are characterized",
+        "Historical maxwell plateau is documented as Delta n_B=0 and not first-order",
+        "Composition, Nadd, Q3/Il, phase and TOV/tidal behaviors are recorded"
+      ],
+      "status": "PARTIAL_SOURCE_AUDIT"
+    },
+    {
+      "id": "M2",
+      "name": "CompOSE native I/O and composition",
+      "acceptance": [
+        "Fortran reader/writer round-trip raw Q1..Q7, Iphase, species fractions, Abar/Zbar/Y_I and supported Nadd",
+        "Phase-only eos.compo round-trips Iphase with Npairs=0,Nquad=0",
+        "Baryon and charge abundance closure are tested",
+        "Unsupported formats are explicit errors"
+      ],
+      "status": "PATCHED_STATIC_ONLY_CI_PENDING"
+    },
+    {
+      "id": "M3",
+      "name": "Native literature composition solvers",
+      "acceptance": [
+        "APR and BHF2 beta-equilibrium solvers ported from legacy symmetry-energy model with provenance",
+        "Provider-table composition preserved for supported core models",
+        "Lepton threshold and electron/muon split verified"
+      ],
+      "status": "PENDING"
+    },
+    {
+      "id": "M4",
+      "name": "Five smooth matching methods in Fortran",
+      "acceptance": [
+        "css,cubic_F,cubic_P,quintic_F,quintic_P ported with composition handling",
+        "Source rows outside the selected gap are byte/value preserved where contractually possible",
+        "Bridge composition uses the characterized legacy smootherstep policy or an explicitly approved superior physical policy"
+      ],
+      "status": "PENDING"
+    },
+    {
+      "id": "M5",
+      "name": "Sharp Maxwell in common native matching API",
+      "acceptance": [
+        "method=maxwell produces nonzero density and energy jumps",
+        "Unique coexistence root with equal P and mu_B",
+        "Low/high composition is preserved without interpolating across the jump",
+        "Provider-local Iphase and Nadd semantics are handled",
+        "Delta epsilon=mu_t*Delta n_B is checked"
+      ],
+      "status": "PENDING"
+    },
+    {
+      "id": "M6",
+      "name": "Native TOV, tidal and Cowling integration",
+      "acceptance": [
+        "Smooth EOS paths use Fortran TOV/tidal solver",
+        "Sharp Maxwell path uses phase-segmented Fortran TOV and interface-aware Cowling",
+        "No Python/SciPy numerical integration is used in production",
+        "Slow/rapid conversion interface conditions are tested"
+      ],
+      "status": "PENDING"
+    },
+    {
+      "id": "M7",
+      "name": "Fortran-owned 390 batch runner",
+      "acceptance": [
+        "Fortran consumes one exact pair/method manifest",
+        "Exactly 390 unique tasks are scheduled",
+        "Each task writes an isolated output folder and machine receipt",
+        "Failures remain failures/diagnostic-only; no silent skipping"
+      ],
+      "status": "PENDING"
+    },
+    {
+      "id": "M8",
+      "name": "Differential, physical and numerical validation",
+      "acceptance": [
+        "Native results are compared with immutable v3.2 outputs and legacy references only as validation oracles",
+        "Analytic Maxwell fixtures recover known coexistence exactly",
+        "Root topology, phase-edge, composition and Nadd cases are covered",
+        "C1-C11, interpolation interval extrema, TOV/tidal and convergence evidence are preserved"
+      ],
+      "status": "PENDING"
+    },
+    {
+      "id": "M9",
+      "name": "New versioned 390 regeneration and handoff",
+      "acceptance": [
+        "All 390 pair-method statuses exist",
+        "All generated CompOSE tables read back",
+        "New output manifest and SHA-256 are complete",
+        "Historical 390 outputs remain unchanged",
+        "Dropbox progress snapshot and local execution receipt are saved"
+      ],
+      "status": "PENDING"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "E390-00",
+      "gate": "M0",
+      "title": "Freeze and hash all source/data baselines",
+      "depends_on": [],
+      "status": "PARTIAL",
+      "files": [
+        "data/eos390_native_fortran_unification_dag.v1.json"
+      ],
+      "outputs": [
+        "raw-source manifest",
+        "model/readme/pdf registry",
+        "legacy output manifest"
+      ]
+    },
+    {
+      "id": "E390-01",
+      "gate": "M1",
+      "title": "Characterize all legacy Python semantics",
+      "depends_on": [
+        "E390-00"
+      ],
+      "status": "PARTIAL",
+      "outputs": [
+        "legacy method equations",
+        "composition schema map",
+        "Nadd policy",
+        "model bibliography",
+        "390 baseline receipt"
+      ]
+    },
+    {
+      "id": "E390-02",
+      "gate": "M2",
+      "title": "Complete native CompOSE I/O and phase-only metadata",
+      "depends_on": [
+        "E390-00"
+      ],
+      "status": "PATCHED_STATIC_ONLY_RUNTIME_PENDING",
+      "outputs": [
+        "phase-only eos.compo writer",
+        "composition closure guards",
+        "roundtrip tests"
+      ]
+    },
+    {
+      "id": "E390-03",
+      "gate": "M3",
+      "title": "Port literature-backed model composition solvers to Fortran",
+      "depends_on": [
+        "E390-01",
+        "E390-02"
+      ],
+      "status": "PENDING",
+      "outputs": [
+        "native symmetry-energy functions",
+        "native beta-equilibrium solver",
+        "electron/muon branch report"
+      ]
+    },
+    {
+      "id": "E390-04",
+      "gate": "M4",
+      "title": "Port all five smooth methods plus composition bridge",
+      "depends_on": [
+        "E390-02",
+        "E390-03"
+      ],
+      "status": "PENDING",
+      "outputs": [
+        "native five-method matcher",
+        "composition-preserving output",
+        "method differential receipts"
+      ]
+    },
+    {
+      "id": "E390-05",
+      "gate": "M5",
+      "title": "Route method=maxwell to the true sharp transition",
+      "depends_on": [
+        "E390-02",
+        "E390-03"
+      ],
+      "status": "PENDING",
+      "outputs": [
+        "branch selector",
+        "composition-aware P(mu) interpolation/root isolation",
+        "jump-aware CompOSE output",
+        "Maxwell receipts"
+      ]
+    },
+    {
+      "id": "E390-06",
+      "gate": "M6",
+      "title": "Make TOV/tidal/Cowling production path Fortran-only",
+      "depends_on": [
+        "E390-04",
+        "E390-05"
+      ],
+      "status": "PENDING",
+      "outputs": [
+        "native stellar interfaces",
+        "tidal Love solver or justified migration mapping",
+        "slow/rapid Cowling interface receipts"
+      ]
+    },
+    {
+      "id": "E390-07",
+      "gate": "M7",
+      "title": "Implement native manifest-driven 390 batch orchestration",
+      "depends_on": [
+        "E390-04",
+        "E390-05",
+        "E390-06"
+      ],
+      "status": "PENDING",
+      "outputs": [
+        "pair manifest",
+        "Fortran batch command",
+        "per-pair receipts"
+      ]
+    },
+    {
+      "id": "E390-08",
+      "gate": "M8",
+      "title": "Differential/physical/numerical validation",
+      "depends_on": [
+        "E390-07"
+      ],
+      "status": "PENDING",
+      "outputs": [
+        "390 result comparison",
+        "C1-C11 reports",
+        "root and composition edge-case suite",
+        "convergence receipts"
+      ]
+    },
+    {
+      "id": "E390-09",
+      "gate": "M9",
+      "title": "Regenerate into new versioned folder and publish progress",
+      "depends_on": [
+        "E390-08"
+      ],
+      "status": "PENDING",
+      "outputs": [
+        "new 390 tables",
+        "summary and manifests",
+        "Dropbox research snapshot"
+      ]
+    }
+  ],
+  "mutation_policy": {
+    "protected": [
+      "main",
+      "all raw CompOSE source folders",
+      "EoS_core_crust_release_v3_2_20261106",
+      "/ns_eos/matched_eos_all_combinations",
+      "/ns_eos/Crust_Core_Matching_390_Summary.csv",
+      "eos_generator/compose_eos_pkg"
+    ],
+    "allowed": [
+      "research/eos390-fortran-unification-v1",
+      "new docs/data artifacts in this branch",
+      "new versioned output directory matched_eos_all_combinations_native_fortran_v1_20261111"
+    ],
+    "never": [
+      "rewrite raw EOS source rows",
+      "overwrite v3.2 outputs",
+      "clip acausal tails",
+      "claim smooth plateau is sharp Maxwell",
+      "silently drop composition or Nadd",
+      "perform Python/SciPy EOS/TOV/Cowling calculations in production"
+    ],
+    "commits": "Use exact branch HEAD as parent and expected-SHA update. Never force-push or mutate main.",
+    "output_versioning": "Each regeneration gets a fresh versioned folder; retries write a new attempt ID, not over existing output."
+  },
+  "local_agent": {
+    "goal": "Complete M0-M9, execute the native Fortran build and all 390 source-backed regeneration tasks, and produce an auditable new output set without modifying the frozen legacy inputs.",
+    "required_access_paths": [
+      "/home/cosmosapjw/Dropbox/ns_eos",
+      "/home/cosmosapjw/Dropbox/ns_oscillation_followup_20261106",
+      "/home/cosmosapjw/Dropbox/EoS_core_crust_release_v3_2_20261106"
+    ],
+    "first_actions": [
+      "checkout exact work branch",
+      "record git HEAD and dirty state",
+      "verify all three directories",
+      "hash source and baseline files",
+      "inspect model READMEs/eos.pdf and references",
+      "run baseline build/tests before changing more code"
+    ],
+    "build_command": "bash fortran_eos/build.sh build/compose_eos_fortran",
+    "test_command": "COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran PYTHONPATH=python_frontend python -m pytest -q python_frontend/tests pipeline/tests",
+    "required_local_receipts": [
+      "environment.json",
+      "source_manifest.sha256",
+      "build.log",
+      "pytest.log",
+      "390_pair_manifest.json",
+      "per_pair/*.json",
+      "summary.json",
+      "output_manifest.sha256",
+      "readback.log",
+      "C1-C11 reports",
+      "failure_catalog.json"
+    ],
+    "native_subagent": "NOT_RUN_BY_CHATGPT_HOST; do not simulate delegation or fabricate child receipts."
+  },
+  "evidence_status": {
+    "code_execution_in_this_turn": "NOT_RUN",
+    "static_source_patch": "PREPARED_AS_GITHUB_BLOBS_PENDING_COMMIT",
+    "github_ci": "PENDING",
+    "local_runtime": "UNAVAILABLE_TO_CHATGPT_HOST_DESKTOP_COMMANDER_OFFLINE",
+    "source_cohort_admission": "NOT_ADMITTED",
+    "regenerated_390": "NOT_RUN"
+  }
+}

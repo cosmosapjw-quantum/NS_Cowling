@@ -469,7 +469,42 @@ Each task receipt must include:
 
 The pair-method manifest must have exactly 390 unique IDs and no duplicate task keys. Every task, including failed and blocked ones, has a receipt. The run summary must count statuses by model, method, source family and physical check. Every table generated must be opened by the native reader and compared with the exact output manifest. Publish only the output from one immutable run ID, never a mixture of attempts.
 
-## 12. Current bounded implementation status
+## 12. Static audit and lean cloud branch
+
+A source-level audit on the cloud branch found that the repository is not yet completely free of Python numerical calculations. Treat the following as explicit migration/containment issues rather than silently describing them as a pure Fortran production path:
+
+| File / symbol | Current numerical behavior | Required status |
+|---|---|---|
+| `python_frontend/compose_eos/api.py::find_density_gap` | NumPy adjacent-density ratio and `argmax`; called by `fill_density_gap` before the native command | Move gap selection and phase-crossing check into Fortran; Python only sends threshold/options and decodes receipt |
+| `python_frontend/compose_cowling/solver.py::count_nodes` | NumPy sign-change count on native solver output | Diagnostic post-processing only until native node counter exists; do not put in a production numerical claim without explicit review |
+| `pipeline/compose_cowling/adapter.py` | Python PAV projection, Hermite interpolation, pressure integration and sampled causality checks | Diagnostic/reference-only; prohibit import from production EOS390 orchestration |
+| `pipeline/compose_cowling/direct_barotrope.py` | SciPy PCHIP, Gauss-Legendre integration, inverse evaluation/root search | Diagnostic/reference-only; port approved interpolation to Fortran before production use |
+| `pipeline/compose_cowling/intake.py` | NumPy first-law, monotonicity and sampled sound-speed checks | Diagnostic intake only; authoritative physical checks remain native Fortran |
+| `python_frontend/compose_eos/eos_data.py` | NumPy arrays for typed data transport, serialization and copy operations | Allowed frontend representation; no physical solving/interpolation |
+
+The Python adapter/direct-barotrope code is useful as an independent diagnostic or future differential oracle. Its existence does not mean it is the production EOS390 engine. Add import/call-graph tests that prevent these modules from entering the production Fortran pipeline. The remaining numerical selector in `find_density_gap` is small but real: do not waive it merely because the subsequent fill operation is native.
+
+### Lean cloud tree
+
+The cloud branch removes history-heavy payloads from the checkout while leaving the parent feature branch intact. After pruning, the recursive tree contained **1,996 blobs / 109,588,218 bytes (109.59 MB decimal)** versus **4,674 blobs / 360,093,413 bytes (360.09 MB)** before pruning: approximately **250.5 MB / 69.6% fewer tracked bytes**.
+
+Removed from this branch's current tree:
+
+- the old `oscillation_release_v1/` output/release snapshot
+- `data/eos_cowling_adapter_v2/` and duplicate `DATA_ADAPTERS_V2.zip`
+- the archived v3.2 EOS code-package ZIP (its separate checksum and provenance records remain where tracked)
+- old `fortran_eos/differential_corpus/`, `_v2/`, `_v3/`, and per-model v4 differential payload directories.
+
+Retained because current tests or the active source tree depend on them:
+
+- `data/eos_original_normalized/` and `data/eos_cowling_adapter_v1/`
+- `eos_generator/eos_data/` and `eos_generator/eos_data_normalized/`
+- `fortran_eos/differential_corpus_v4/fortran_compose_differential.json`
+- the active `oscillation_source/` Fortran solver and method source.
+
+This is a current-tree trim only. There was **no Git history rewrite**. Removed content remains available from the parent feature branch history. Use a shallow clone for the online agent so old blobs are not fetched into its working checkout.
+
+## 13. Current bounded implementation status
 
 **Implemented in the cloud branch, not yet CI-verified:** duplicate row-key guards in \`fortran_eos/src/compose_eos_io.f90\` reject repeated \((i_T,i_{n_B},i_{Y_q})\) keys for both \`eos.thermo\` and \`eos.compo\` before assignment. The phase index is now range-checked before indexing the destination phase array. Two regression tests were added. The first CI attempt compiled Fortran and reported 78 passed, 2 failed; both new tests failed because the test helper initially wrote literal backslash-n characters instead of line breaks. That helper was corrected in commit \`2265580a4bbdb204a4a4ea0b699d0f9ff5411838\`. A new CI run is required. Do not mark this slice PASS until the new run completes successfully.
 
@@ -477,7 +512,7 @@ The pair-method manifest must have exactly 390 unique IDs and no duplicate task 
 
 **Not yet done:** row-level masks, generic 1D/2D/3D parser, provider semantics adjudication, native literature composition solver, all match methods, production sharp-Maxwell integration, final TOV/tidal/Cowling pipeline, 390 regeneration, readback, Dropbox backup.
 
-## 13. Copyable cloud-agent handoff prompt
+## 14. Copyable cloud-agent handoff prompt
 
 \`\`\`text
 You are the authorized cloud coding agent for cosmosapjw-quantum/NS_Cowling.
@@ -502,7 +537,7 @@ Do not use the normalized GitHub EOS tables as byte-identical originals.
 Require user upload of NS_Cowling_EOS390_raw_inputs_v1.tar.zst containing all 18 original provider directories and SHA256SUMS.txt. Stage outside the Git worktree at inputs/raw_compose/. Verify every checksum. If missing or mismatched, stop at M0 and request the archive.
 
 IMPLEMENTATION ORDER
-A. Finish E390-02A: add per-row/per-species/per-group presence masks; distinguish row absence, field absence, and numerical zero. Evaluate C3 and C4 independently per row. Preserve raw unknown IDs/groups and Nadd extensions.
+A. Verify E390-02B and finish E390-02C: migrate the remaining production-path Python numerical selector(s) to Fortran; keep Python/SciPy adapter kernels diagnostic-only.\nB. Finish E390-02A: add per-row/per-species/per-group presence masks; distinguish row absence, field absence, and numerical zero. Evaluate C3 and C4 independently per row. Preserve raw unknown IDs/groups and Nadd extensions.
 B. Implement E390-10: generic CompOSE T, n_B, Yq axes and 1D/2D/3D data model; no implicit flattening or slice guessing.
 C. Re-run original 18-provider cohort with exact source hashes and readback. Keep unsupported dimensions explicit.
 D. Resolve SPG/GPPVA abundance-field semantics from written provider documentation and independent closure. The CompOSE manual is not sufficient evidence for undocumented provider conventions. Do not guess YI/Yh/Xh.

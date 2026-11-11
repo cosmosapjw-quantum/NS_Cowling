@@ -392,7 +392,12 @@
       "Built full Fortran executable with GNU Fortran 14.2 and ran native polynomial-extrema test",
       "PR3 native sharp-Maxwell TOV/Cowling solver, Python/SciPy phase-aware reference, interface-transfer updates, mode spectrum and tests imported into PR1 implementation branch",
       "PR3 implementation/design/audit/handoff documentation and paired-matching sensitivity imported",
-      "PR3 unsafe auto-commit/push workflow intentionally not imported; its read-only validation commands are consolidated into PR1 exact-head workflow"
+      "PR3 unsafe auto-commit/push workflow intentionally not imported; its read-only validation commands are consolidated into PR1 exact-head workflow",
+      "TDD Il0 Q3 convention correction implemented on PR1 EOS Maxwell kernel",
+      "Local analytic Il0 Maxwell regression and 36 focused reconstruction/matching/Maxwell tests passed",
+      "Local full frontend/pipeline 68-case suite passed on exported source artifact",
+      "Exact PR1 head df3462fd native Maxwell TOV/Cowling workflow passed push and PR validation with 76 EOS frontend/pipeline tests",
+      "Exact-head Maxwell native validation evidence artifact uploaded"
     ],
     "not_done": [
       "18-source execution",
@@ -412,11 +417,18 @@
       "Exact current PR1-head FPM/native Maxwell TOV/Cowling tests and Python/SciPy reference validation",
       "PR1 imported solver verification with full EOS frontend/pipeline regression",
       "C4-D4/C6B composition/provider semantics remain unresolved; no 65-pair source-driven phase transition",
-      "Source-backed TOV/Cowling sequence and mode spectrum remain NOT_RUN"
+      "Source-backed TOV/Cowling sequence and mode spectrum remain NOT_RUN",
+      "18-source C4 source-admission execution",
+      "C1-C11 validation over the complete 18-source cohort",
+      "C6B provider composition and Iphase/Nadd semantics resolution",
+      "65-pair compatibility promotion and true-Maxwell roots",
+      "Seidov stability assessment on admitted source phases",
+      "65-pair TOV/Cowling mode cohort sweep",
+      "local materialization/inspection of 31KB exact-head Maxwell artifact; artifact remains downloadable from GitHub Actions"
     ]
   },
   "next_stage": "C5",
-  "next_action": "First verify the imported PR3 native TOV/Cowling and Python/SciPy reference on exact PR1 head under the new read-only maxwell-native-fortran.yml workflow. Then continue C5 read-only 18-source admission. C4-D4/C6B remains a hard blocker before C4-D8/D9; D10 imports do not authorize production source calculations.",
+  "next_action": "Resume the original C4 workflow from its first incomplete checkpoint. Treat C4-D3R as validated on the synthetic/local and exact-head CI evidence listed above, but C4-D4/C6B remains blocked. Do not run C4-D8 until C4-D0..D7, including source admission and provider semantics, are independently complete.",
   "plan_revision": "1.1.0",
   "updated_date": "2026-11-11",
   "mutation_policy": {
@@ -485,6 +497,64 @@
       "interface_transfer_updates": "imported",
       "source_eos_admission": "BLOCKED_BY_C6B",
       "actual_mode_spectrum": "NOT_RUN_ON_SOURCE_EOS"
+    },
+    "il0_q3_compose_convention_fix": "TDD RED/GREEN; output transition and copied rows preserve Il0 convention",
+    "local_full_frontend_pipeline": "68 passed in 13.57s (exported artifact, no .git metadata)",
+    "local_focused_reconstruction_matching_maxwell": "36 passed in 8.04s; 36 collected in 0.01s",
+    "latest_exact_head": "df3462fd77ad6e6a2a556dcc0e569d3f5a262e6a",
+    "latest_native_maxwell_workflow_pr_run": 42950840157,
+    "latest_native_maxwell_workflow_push_run": 42950834447,
+    "latest_exact_head_eos_frontend_in_maxwell_workflow": "76 passed in 15.41s",
+    "latest_maxwell_evidence_artifact_id": 13825216369,
+    "latest_maxwell_evidence_artifact_sha256": "ac60d5fd23afb6603703bbe2e2c1307e65eb95d4a3ead276da225e36132f54e8"
+  },
+  "project": {
+    "eos_validation_latest": {
+      "implementation_branch": "research/fortran-eos-gap-fill-v1",
+      "pr_number": 1,
+      "exact_head": "df3462fd77ad6e6a2a556dcc0e569d3f5a262e6a",
+      "eos_q3_fix_baseline_head": "eef60bf4a10864c194936b70b548217d1843b218",
+      "source_authority_branch": "research/maxwell-native-fortran-v1",
+      "source_authority_commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
+      "tdd_il0_regression": "RED_BEFORE_FIX_GREEN_AFTER_FIX_ON_EXPORTED_SOURCE_ARTIFACT",
+      "local_full_frontend_pipeline": "68 passed in 13.57s; exported source artifact without .git",
+      "local_focused_reconstruction_matching_maxwell": "36 passed in 8.04s; collected 36 in 0.01s",
+      "exact_head_ci": {
+        "workflow": "Native Fortran sharp-Maxwell TOV/Cowling validation",
+        "pr_run_id": 42950840157,
+        "push_run_id": 42950834447,
+        "pr_run_url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42950840157",
+        "push_run_url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42950834447",
+        "both": "SUCCESS",
+        "steps": [
+          "native Fortran tests with runtime checks",
+          "build production case driver",
+          "Python Maxwell reference tests",
+          "normalized-table production case driver",
+          "independent Python/SciPy phase-aware reference validation",
+          "EOS frontend and pipeline regression: 76 passed in 15.41s",
+          "source identity receipts",
+          "artifact upload"
+        ],
+        "evidence_artifact_id": 13825216369,
+        "evidence_artifact_name": "maxwell-native-fortran-42950840157",
+        "evidence_artifact_bytes": 31871,
+        "evidence_artifact_sha256": "ac60d5fd23afb6603703bbe2e2c1307e65eb95d4a3ead276da225e36132f54e8"
+      },
+      "historical_eos_ci_at_eef60": {
+        "workflow": "Fortran EOS frontend CI",
+        "pr_run_id": 42950099132,
+        "push_run_id": 42950093266,
+        "both": "SUCCESS",
+        "native_build": "PASS",
+        "frontend_pipeline": "PASS",
+        "polynomial_extrema": "PASS",
+        "tracked_sha256_manifest_72_entries": "PASS",
+        "verified_source_artifact_id": 13824248434,
+        "verified_source_artifact_sha256": "371422d02bbbe56031f15fdc4cd18f634a4c663d84d603c778f824b2576f046e8",
+        "limitation": "CI-tested EOS fix/docs manifest exact head was eef60bf4; branch later advanced to df3462fd with the read-only Maxwell TOV/Cowling validation additions."
+      },
+      "scope": "validation only; C4-D3R not a 65-pair source admission, root sweep, or physical observational result"
     }
   }
 }

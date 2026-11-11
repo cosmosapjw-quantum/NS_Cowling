@@ -100,7 +100,7 @@ contains
     character(len=*),intent(in)::directory
     type(eos_data_t),intent(out)::eos
     character(len=*),intent(out)::status
-    integer::nb0,nb1,t0,t1,y0,y1,u,ios,i,k,nt,it,ib,iy,nadd,extraid,npairs,nquad,pos,pid,qid
+    integer::nb0,nb1,t0,t1,y0,y1,u,ios,i,k,nt,it,ib,iy,nadd,extraid,npairs,nquad,pos,pid,qid,phase
     character(len=4096)::line
     character(len=96)::tok(256)
     real(wp),allocatable::nb(:),tv(:),yv(:)
@@ -145,6 +145,7 @@ contains
       endif
       k=ib-nb0+1
       if(k<1.or.k>eos%n) then;close(u);status='thermo density index outside eos.nb';return;endif
+      if(seen(k)) then;close(u);status='duplicate eos.thermo row key';return;endif
       do i=1,7
         call token_real(tok,3+i,qv(i),ok)
         if(.not.ok) then;close(u);status='invalid/nonfinite Q column';return;endif
@@ -184,12 +185,14 @@ contains
         call token_int(tok,1,it,ok);if(.not.ok) then;close(u);status='invalid compo iT';return;endif
         call token_int(tok,2,ib,ok);if(.not.ok) then;close(u);status='invalid compo inb';return;endif
         call token_int(tok,3,iy,ok);if(.not.ok) then;close(u);status='invalid compo iYq';return;endif
-        call token_int(tok,4,eos%iphase(max(1,min(eos%n,ib-nb0+1))),ok)
-        if(.not.ok) then;close(u);status='invalid compo phase';return;endif
         k=ib-nb0+1
         if(k<1.or.k>eos%n.or.it/=t0.or.iy/=y0) then
           close(u);status='composition key outside selected thermo slice';return
         endif
+        if(seen(k)) then;close(u);status='duplicate eos.compo row key';return;endif
+        call token_int(tok,4,phase,ok)
+        if(.not.ok) then;close(u);status='invalid compo phase';return;endif
+        eos%iphase(k)=phase
         call token_int(tok,5,npairs,ok)
         if(.not.ok.or.npairs<0.or.npairs>16) then;close(u);status='invalid Npairs';return;endif
         pos=6

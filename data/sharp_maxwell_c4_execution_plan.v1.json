@@ -42,6 +42,18 @@
       "il0_q3": "mn*(1+Q3)=mu_E-Yq*mn*Q4; recover mu_E by adding Yq*mn*Q4 before the P(mu_E) phase validation",
       "il1_q3": "mn*(1+Q3)=mu_E for supported cold beta-equilibrated Q5≈0 branch",
       "root_coordinate": "mu_E=(epsilon+P)/n_B; never use charge-shifted raw Q3 as the Maxwell root coordinate"
+    },
+    "stellar_maxwell": {
+      "native_tov": "oscillation_source/solutions/src/structure/ns_maxwell_tov.f90::integrate_maxwell_tov",
+      "native_cowling": "oscillation_source/solutions/src/modes/ns_maxwell_cowling.f90::shoot_maxwell_cowling",
+      "native_spectrum": "oscillation_source/solutions/src/modes/ns_maxwell_mode_spectrum.f90::scan_maxwell_modes",
+      "production_dispatch": "oscillation_source/solutions/src/production/ns_production_solvers.f90::solve_tov_star/solve_cowling_spectrum",
+      "production_cases": "oscillation_source/solutions/src/structure/ns_maxwell_cases.f90::run_maxwell_case",
+      "interface_transfer": "oscillation_source/solutions/src/modes/ns_interface_transfer.f90::material_interface_transfer/rapid_interface_transfer",
+      "python_reference": "python_frontend/compose_cowling/maxwell.py::MaxwellEOS/solve_maxwell_tov/scan_maxwell_cowling_modes",
+      "tests": "oscillation_source/solutions/tests_fortran/maxwell_checks.f90; oscillation_source/solutions/tests_fortran/maxwell_table_checks.f90; python_frontend/tests/test_maxwell_star.py",
+      "validation": "scripts/validate_maxwell_interface.py; scripts/validate_native_maxwell_reference.py",
+      "provenance": "Imported from PR #3 head a09ec30d74b363652d2d1aefe990557c468679dd into PR #1 branch; native validation pending exact-head CI."
     }
   },
   "dag": [
@@ -216,9 +228,18 @@
       ],
       "output": "stable-sequence and slow/rapid mode receipts",
       "gate": [
-        "Retain internal crust segments and separate core-crust sharp interface",
-        "Check stable branch and Seidov diagnostic first",
-        "Calculate slow and rapid conversion spectra separately"
+        "Use two phase EOS providers with common Maxwell pressure and Euler mu_t; integrate core and envelope as separate segments and meet exact P_t, never interpolate across the density jump",
+        "Use native integrate_maxwell_tov and production solve_tov_star path; compare against the independent Python/SciPy MaxwellEOS reference on the same analytic fixtures",
+        "Use native shoot_maxwell_cowling and scan_maxwell_modes; compare interface transfer against independent Python/SciPy reference for slow/material and rapid conversion separately",
+        "Verify slow: [xi^r]=[Delta P]=0; rapid: [Delta P]=0 and [xi^r-Delta P/P'_0]=0 under the exact interface convention documented in MAXWELL_TOV_COWLING_INTERFACE_V1.md",
+        "Retain one-sided inner/outer state values; no averaging or derivative stencil across the interface",
+        "Run TOV interface-pressure continuity, mass/radius and interface-radius convergence before mode spectra",
+        "Check stable branch and Seidov onset diagnostic separately; do not interpret Seidov criterion as a universal stability test outside its GR assumptions",
+        "Run independent ODE tolerance and root-grid refinement for each conversion mode; do not merge slow/rapid mode lists",
+        "Root ordering is only numerical matching; mode-family identity is unresolved outside the documented small-jump smooth-limit cross-match",
+        "Preserve NO_ROOT/MULTIPLE_ROOT/ACAUSAL/UNSTABLE_ONSET/NUMERICAL_INCONCLUSIVE as distinct statuses",
+        "Run native maxwell_checks and maxwell_table_checks plus Python test_maxwell_star and validate_native_maxwell_reference",
+        "Do not claim full stable-branch maximum-mass, complete GR polar modes, damping, realistic EOS cohort predictions or production CompOSE composition"
       ]
     }
   ],
@@ -368,7 +389,10 @@
       "Dependency DAG, resource plan, parallelism and checkpoint design",
       "Read and TDD-corrected true-Maxwell Il=0 Q3/Euler convention bug in native phase kernel",
       "Added analytic Il=0 regression and ran 68-case frontend/pipeline suite in exported PR1 source artifact",
-      "Built full Fortran executable with GNU Fortran 14.2 and ran native polynomial-extrema test"
+      "Built full Fortran executable with GNU Fortran 14.2 and ran native polynomial-extrema test",
+      "PR3 native sharp-Maxwell TOV/Cowling solver, Python/SciPy phase-aware reference, interface-transfer updates, mode spectrum and tests imported into PR1 implementation branch",
+      "PR3 implementation/design/audit/handoff documentation and paired-matching sensitivity imported",
+      "PR3 unsafe auto-commit/push workflow intentionally not imported; its read-only validation commands are consolidated into PR1 exact-head workflow"
     ],
     "not_done": [
       "18-source execution",
@@ -384,11 +408,15 @@
       "All 18 raw EOS source-admission receipts and C1-C11 verification",
       "C6B provider composition semantics adjudication",
       "65-pair compatibility execution and sharp-Maxwell root search",
-      "Seidov, TOV phase-chain and Cowling spectra"
+      "Seidov, TOV phase-chain and Cowling spectra",
+      "Exact current PR1-head FPM/native Maxwell TOV/Cowling tests and Python/SciPy reference validation",
+      "PR1 imported solver verification with full EOS frontend/pipeline regression",
+      "C4-D4/C6B composition/provider semantics remain unresolved; no 65-pair source-driven phase transition",
+      "Source-backed TOV/Cowling sequence and mode spectrum remain NOT_RUN"
     ]
   },
   "next_stage": "C5",
-  "next_action": "At the exact live PR1 head, replay the Il-aware EOS reconstruction/matching validation C4-D3R. Then execute C5 read-only native read_compose/C1-C11 vertical slices on SPG_M1 and one Nadd=1 GPPVA source; do not run roots. Preserve C6B provider-semantics blocker and only progress to one-pair pilot after C4-D0..D7 plus C4-D3R pass.",
+  "next_action": "First verify the imported PR3 native TOV/Cowling and Python/SciPy reference on exact PR1 head under the new read-only maxwell-native-fortran.yml workflow. Then continue C5 read-only 18-source admission. C4-D4/C6B remains a hard blocker before C4-D8/D9; D10 imports do not authorize production source calculations.",
   "plan_revision": "1.1.0",
   "updated_date": "2026-11-11",
   "mutation_policy": {
@@ -446,6 +474,17 @@
     "cohort_18_sources": "NOT_RUN",
     "pair_65_root_search": "NOT_RUN",
     "tov_cowling": "NOT_RUN",
-    "current_ci_after_pr_update": "PENDING"
+    "current_ci_after_pr_update": "PENDING",
+    "pr3_import": {
+      "source_head": "a09ec30d74b363652d2d1aefe990557c468679dd",
+      "source_pr": "https://github.com/cosmosapjw-quantum/NS_Cowling/pull/3",
+      "target_branch": "research/fortran-eos-gap-fill-v1",
+      "status": "IMPORTED_PENDING_EXACT_HEAD_BUILD_AND_TEST",
+      "native_tov_cowling": "imported",
+      "python_phase_aware_reference": "imported",
+      "interface_transfer_updates": "imported",
+      "source_eos_admission": "BLOCKED_BY_C6B",
+      "actual_mode_spectrum": "NOT_RUN_ON_SOURCE_EOS"
+    }
   }
 }

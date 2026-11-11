@@ -1,0 +1,261 @@
+{
+  "schema": "ns-cowling.pr3-import-manifest",
+  "schema_version": "1.0.0",
+  "created": "2026-11-11",
+  "purpose": "Import every transferable PR #3 sharp-Maxwell production TOV/Cowling, one-sided interface, Python reference, test and documentation component into the PR #1 EOS reconstruction/matching branch without merging divergent branch history.",
+  "repository": "cosmosapjw-quantum/NS_Cowling",
+  "source": {
+    "pr": 3,
+    "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/pull/3",
+    "branch": "research/maxwell-native-fortran-v1",
+    "head": "a09ec30d74b363652d2d1aefe990557c468679dd",
+    "base_branch": "research/maxwell-reference-validation-v1",
+    "base_sha": "2b7a00984dfa215bcca48c7d7adb5f3619013502"
+  },
+  "target": {
+    "pr": 1,
+    "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/pull/1",
+    "branch": "research/fortran-eos-gap-fill-v1",
+    "base_branch": "main",
+    "base_sha": "6eed9c5178afd820c9d814e4138dd0f15d1f5a73",
+    "head_before_manifest_commit": "df3462fd77ad6e6a2a556dcc0e569d3f5a262e6a"
+  },
+  "comparison": {
+    "merge_base": "ca71d8e394f9043d778676c941f88ce01ca7faa9",
+    "status": "diverged",
+    "pr3_ahead_by": 51,
+    "pr3_behind_by": 13,
+    "files_changed": 34,
+    "imported_or_adapted": 32,
+    "excluded_as_active_workflow": 2
+  },
+  "files": [
+    {
+      "path": ".github/workflows/maxwell-native-fortran.yml",
+      "source_blob": "0cf6f6a8c7ac533202c859b714540edb23f631d9",
+      "disposition": "ADAPTED_READ_ONLY_EXACT_HEAD",
+      "target_blob": "b6d90c76a074d13c788c27ca2509a66b54a623e8"
+    },
+    {
+      "path": ".github/workflows/maxwell-reference-regression.yml",
+      "source_blob": "b6873d094ff81e715949fd40cf6a08b1d46805ee",
+      "disposition": "VALIDATION_STEPS_INTEGRATED_INTO_MAXWELL_NATIVE_WORKFLOW"
+    },
+    {
+      "path": ".github/workflows/maxwell-sharp-interface-gate.yml",
+      "source_blob": "d38860e1792b5ebb128447f3ccf695f92245b8f7",
+      "disposition": "NOT_IMPORTED_AS_ACTIVE_WORKFLOW_CONTENTS_WRITE_AND_AUTOMATIC_COMMIT_PUSH; READ_ONLY_CHECKS_PORTED"
+    },
+    {
+      "path": "README.md",
+      "source_blob": "0b5b4af67fd6c38bf15f8798dd5ad4007813af44",
+      "disposition": "MAXWELL_PRODUCTION_SECTION_APPENDED",
+      "target_blob": "02421bf67a33f7695f5c0bb816d6fc81ac458738"
+    },
+    {
+      "path": "docs/ADVERSARIAL_AUDIT_MAXWELL_NATIVE_FORTRAN_20261109.md",
+      "source_blob": "c659fd16a62c87ed73e99870cc3a037e4c87560c",
+      "disposition": "COPIED"
+    },
+    {
+      "path": "docs/ADVERSARIAL_AUDIT_MAXWELL_TOV_COWLING_20261109.md",
+      "source_blob": "605713e8fcd91bf5ff937514050f938e7490d605",
+      "disposition": "COPIED"
+    },
+    {
+      "path": "docs/GITHUB_MAXWELL_HANDOFF_20261109.md",
+      "source_blob": "d0767e4e67bbc5d465a0eee39a95816b3cd07115",
+      "disposition": "COPIED"
+    },
+    {
+      "path": "docs/LOCAL_AGENT_RESUME_MAXWELL_PRODUCTION_DISPATCH_20261109.md",
+      "source_blob": "412efebd938567013e6b80620931571d19463d5e",
+      "disposition": "COPIED"
+    },
+    {
+      "path": "docs/MAXWELL_NATIVE_FORTRAN_DAG_20261109.md",
+      "source_blob": "ff20d9759602d49487f8befb87c5bbab524bb53b",
+      "disposition": "COPIED"
+    },
+    {
+      "path": "docs/MAXWELL_NATIVE_FORTRAN_V1.md",
+      "source_blob": "74fd69c44b177df973888b553b20f364931d655c",
+      "disposition": "COPIED"
+    },
+    {
+      "path": "docs/MAXWELL_REFERENCE_VALIDATION_V1_20261109.md",
+      "source_blob": "2b5666b43cb2b7b1492e57baa3ddd18db8c9c957",
+      "disposition": "COPIED"
+    },
+    {
+      "path": "docs/MAXWELL_TOV_COWLING_INTERFACE_V1.md",
+      "source_blob": "78a2305e4aa1b4a4502053937ec9ecb325943a71",
+      "disposition": "COPIED"
+    },
+    {
+      "path": "docs/V5_PAIRED_MATCHING_SENSITIVITY_20261109.md",
+      "source_blob": "1cbad0dfa90d0208f4fca0de314dfb989d195a53",
+      "disposition": "COPIED"
+    },
+    {
+      "path": "oscillation_source/solutions/app/case_driver.f90",
+      "source_blob": "4996c728f52a5bff59c12d9ccc79a9e3c73f4b89",
+      "disposition": "UPDATED_FROM_PR3"
+    },
+    {
+      "path": "oscillation_source/solutions/fpm.toml",
+      "source_blob": "211ccb34e58758aec95c447a25f105a585396922",
+      "disposition": "UPDATED_FROM_PR3"
+    },
+    {
+      "path": "oscillation_source/solutions/src/modes/ns_interface_cases.f90",
+      "source_blob": "938e247ac03ce8b41c5aa5eac07f55113feb3278",
+      "disposition": "UPDATED_FROM_PR3"
+    },
+    {
+      "path": "oscillation_source/solutions/src/modes/ns_interface_transfer.f90",
+      "source_blob": "fce0ae1775174d9311556b01643842057d6f696f",
+      "disposition": "UPDATED_FROM_PR3_ONE_SIDED_TRANSFER"
+    },
+    {
+      "path": "oscillation_source/solutions/src/modes/ns_maxwell_cowling.f90",
+      "source_blob": "ce4fac829d3a5c211139d5174541a7053793afc6",
+      "disposition": "COPIED"
+    },
+    {
+      "path": "oscillation_source/solutions/src/modes/ns_maxwell_mode_spectrum.f90",
+      "source_blob": "08b8154b0b1b429992db8832e21ae70d896e19bc",
+      "disposition": "COPIED"
+    },
+    {
+      "path": "oscillation_source/solutions/src/modes/ns_mode_cases.f90",
+      "source_blob": "35b01d848e5ac2983ff0269481d876e33a78a8dc",
+      "disposition": "UPDATED_FROM_PR3"
+    },
+    {
+      "path": "oscillation_source/solutions/src/production/ns_production_solvers.f90",
+      "source_blob": "3539dac7f6aaefb5af76c493ff26e009df0e7010",
+      "disposition": "COPIED"
+    },
+    {
+      "path": "oscillation_source/solutions/src/structure/ns_maxwell_cases.f90",
+      "source_blob": "25cddb0d6539e00b232b32d63416629cac58cae6",
+      "disposition": "COPIED"
+    },
+    {
+      "path": "oscillation_source/solutions/src/structure/ns_maxwell_tov.f90",
+      "source_blob": "6e54f73c07ae68c8113ceb3ff31aff2dd12170e6",
+      "disposition": "COPIED"
+    },
+    {
+      "path": "oscillation_source/solutions/src/structure/ns_table_star_cases.f90",
+      "source_blob": "165757c25893149f90a71f93b0c997f4cf89f92b",
+      "disposition": "UPDATED_FROM_PR3"
+    },
+    {
+      "path": "oscillation_source/solutions/src/structure/ns_tov_cases.f90",
+      "source_blob": "c6fdc36a548cbd28e68e74efa0725f4895e884d1",
+      "disposition": "UPDATED_FROM_PR3"
+    },
+    {
+      "path": "oscillation_source/solutions/tests_fortran/maxwell_checks.f90",
+      "source_blob": "98921c529c98ebfed11c5772966d6311232f0ead",
+      "disposition": "COPIED"
+    },
+    {
+      "path": "oscillation_source/solutions/tests_fortran/maxwell_table_checks.f90",
+      "source_blob": "d7603776ee3a944cb00bf6205f94ce3a29edabd9",
+      "disposition": "COPIED"
+    },
+    {
+      "path": "python_frontend/compose_cowling/__init__.py",
+      "source_blob": "ebdaee7e6875d78a7405fa04ce8b870dadf74cfe",
+      "disposition": "UPDATED_FROM_PR3_EXPORTS"
+    },
+    {
+      "path": "python_frontend/compose_cowling/maxwell.py",
+      "source_blob": "8959f90a37aba63191227bb363e97302988864e9",
+      "disposition": "COPIED"
+    },
+    {
+      "path": "python_frontend/tests/test_maxwell_star.py",
+      "source_blob": "4a368b418fa1995d6202f8b75f3e1607154640a3",
+      "disposition": "COPIED"
+    },
+    {
+      "path": "research_artifacts/maxwell/NS_Cowling_V5_MAXWELL_V1.patch",
+      "source_blob": "7f4d4524e1c4c90d3366d9f141c384259fe67194",
+      "disposition": "COPIED_READ_ONLY_PROVENANCE_ARTIFACT"
+    },
+    {
+      "path": "scripts/validate_maxwell_interface.py",
+      "source_blob": "512e9862616974f3b1f471bb9592c0608bff7731",
+      "disposition": "COPIED"
+    },
+    {
+      "path": "scripts/validate_native_maxwell_reference.py",
+      "source_blob": "ed310492b7618044d3ecd4291b922c23693b0320",
+      "disposition": "COPIED"
+    },
+    {
+      "path": "validation/MAXWELL_REFERENCE_VALIDATION_20261109.json",
+      "source_blob": "708e41a9f457ffe107c81e6602836ad5251e93f5",
+      "disposition": "COPIED_HISTORICAL_REFERENCE_RECEIPT"
+    }
+  ],
+  "imported_capabilities": [
+    "Two-phase native Maxwell TOV integration with separate core/envelope pressure interface",
+    "One-sided Cowling interface transfer for material/slow and rapid conversion",
+    "Native Maxwell Cowling shooting and mode-spectrum frequency scanning",
+    "Production dispatch for smooth and sharp-Maxwell TOV/Cowling",
+    "Fortran FPM analytic and table-driven integration tests",
+    "Python/SciPy phase-aware reference EOS, TOV and Cowling solvers",
+    "Independent transfer, TOV, mode-root and convergence validation scripts",
+    "PR3 design, source convention, interface, audit, validation, handoff and matching sensitivity documents"
+  ],
+  "non_imported_workflows": [
+    {
+      "path": ".github/workflows/maxwell-reference-regression.yml",
+      "reason": "Its regression checks were folded into the new exact-head native workflow to avoid duplicate branch-pinned workflows."
+    },
+    {
+      "path": ".github/workflows/maxwell-sharp-interface-gate.yml",
+      "reason": "It requests contents:write and automatically commits/pushes a patch from CI. Its read-only validation intent was ported; the mutating workflow was intentionally not installed."
+    }
+  ],
+  "ci": {
+    "workflow": ".github/workflows/maxwell-native-fortran.yml",
+    "permissions": "contents:read",
+    "checkout": "github.event.pull_request.head.sha || github.sha",
+    "push_branch": "research/fortran-eos-gap-fill-v1",
+    "pull_request_base": "main",
+    "runs": [
+      "FPM tests with gfortran runtime checks",
+      "FPM production case-driver build",
+      "Python phase-aware Maxwell TOV/Cowling tests",
+      "table-driven CLI checks for slow and rapid mode spectra",
+      "native/Python SciPy reference comparison",
+      "ODE/root-grid convergence",
+      "full EOS frontend/pipeline regression",
+      "SHA-256 evidence capture and exact-head artifact upload"
+    ],
+    "latest_observed_runs": {
+      "maxwell_pr": 42950840157,
+      "eos_pr": 42950840108,
+      "maxwell_push": 42950834447,
+      "eos_push": 42950834409,
+      "status_at_record": "IN_PROGRESS_OR_PENDING"
+    }
+  },
+  "critical_constraints": {
+    "original_smooth_match_maxwell": "unchanged; near-pressure-plateau compatibility method, not a density-jump phase transition",
+    "true_maxwell": "separate construct_maxwell_transition; equal pressure and Euler baryon chemical potential, positive density jump and latent-energy identity",
+    "il0_q3": "mu_Q3=mu_E-Yq*mn*Q4; Maxwell root coordinate remains mu_E=(epsilon+P)/n_B",
+    "composition_provider": "C6B remains unresolved/blocked; no composition projection or inferred local neutrality",
+    "raw_eos": "protected; no raw EOS bytes, canonical 65-pair manifest or legacy output mutation",
+    "cohort_roots": "NOT_RUN until C4-D0..D7, C4-D3R and C6B pass",
+    "tov_cowling_source_models": "NOT_RUN; imported analytic fixtures are implementation validation only"
+  },
+  "status": "FILES_IMPORTED__EXACT_HEAD_CI_PENDING",
+  "next_action": "Wait for the exact-head workflows listed above; inspect each failure by compile, numerical, implementation, fixture, environment or provenance category; then retain their logs and promote only bounded claims."
+}

@@ -1,0 +1,47 @@
+{
+  "schema": "ns-cowling.e390-spg-gppva-reconstruction-decision",
+  "schema_version": "1.0.0",
+  "date": "2026-11-11",
+  "status": "DECIDED_RECONSTRUCT_FROM_PAPERS_NOT_PROVIDER_COMPOSE",
+  "decision_authority": "Researcher directive 2026-11-11: 'SPG_M1/GPPVA_DD2는 provider 답변 오기 전까지 compose original source는 제외하고 논문에 따라 reconstruct하는 방향으로 진행'",
+  "trigger": "C6B v2 adjudication (RESOLVED_STANDARD_DOCUMENTED_PROVIDER_EXPORT_DEVIATES) found that the SPG/GPPVA provider exports a final group field that deviates from the CompOSE manual definition in inner-crust rows (YI = Ye instead of the combined number fraction). The CompOSE original source tables therefore cannot be used directly for production composition until the provider clarifies. The researcher directed that reconstruction from the published physics papers proceed instead, with the CompOSE original source excluded.",
+  "scope": {
+    "in_scope": [
+      "SPG_M1, SPG_M2, SPG_M3, SPG_M4, SPG_M5 (5 crust models, family SPG)",
+      "GPPVA_DD2, GPPVA_DDME2, GPPVA_FSU2, GPPVA_FSU2H, GPPVA_FSU2R, GPPVA_NL3wrL55, GPPVA_TM1e, GPPVA_TW (8 crust models, family GPPVA)"
+    ],
+    "out_of_scope": [
+      "APR_APR, BBB_BHF2, GM_GM1, RG_SLY4, RG_KDE0v1 (core-only or different families; not affected by the SPG/GPPVA provider deviation)",
+      "The CompOSE original eos.thermo tables for the 13 SPG/GPPVA models remain admissible for byte-preserving intake and thermodynamic-only use (pressure, energy, chemical potentials) where the C6B dispute does not touch. Only the composition (eos.compo) is excluded for production matching."
+    ]
+  },
+  "decision": "Reconstruct the SPG/GPPVA inner-crust composition from the published CLD/Thomas-Fermi physics (Grill 2014, Scurto 2024) combined with each model's RMF parameterization paper, rather than consuming the CompOSE provider's eos.compo export. The reconstructed composition must satisfy the CompOSE manual v3.01 definitions (YI = combined number fraction, Y_h = Aav*YI) and the baryon/charge closure (Yn+Yp+Yh=1, Yp+(Z/A)Yh=Ye+Ymu) by construction, with the free-neutron gas explicitly represented (Yn > 0 where the CLD model has a gas phase).",
+  "rationale": [
+    "The CompOSE manual v3.01 standard is now documented (C6B v2). Reconstructing to the standard is preferable to waiting on a provider whose export deviates from that standard in undocumented ways.",
+    "The physics model (CLD within Wigner-Seitz cells, 4-variable minimization) is fully documented in Scurto 2024 eq. 21 and Grill 2014's Thomas-Fermi approach. Both papers are collected and text-extracted.",
+    "The RMF parameterization papers for each GPPVA core model are collected (DD2: arXiv:0908.2344; DD-ME2: Lalazissis 2005 user-supplied; FSU2: arXiv:1408.4159; FSU2H/FSU2R: arXiv:1804.00334; NL3wrL55: arXiv:1607.05899; TM1e: arXiv:2001.10143; TW99: arXiv:nucl-th/0212080 + arXiv:0704.0407 + arXiv:2506.11492). The SPG density-dependent RMF functional is Gogelein 2008 (DOI 10.1103/PhysRevC.77.025802) - NOT YET COLLECTED; this is the one remaining paper to request.",
+    "The outer crust for both SPG and GPPVA uses BSk22 (Pearson 2018, already in the bibliography) - this is the standard outer-crust model and is independent of the inner-crust dispute."
+  ],
+  "remaining_papers_to_collect": [
+    {
+      "key": "GOGELEIN_2008",
+      "citation": "P. Gogelein, E. N. E. van Dalen, C. Fuchs, H. Muther, Phys. Rev. C 77, 025802 (2008)",
+      "doi": "10.1103/PhysRevC.77.025802",
+      "url": "https://journals.aps.org/prc/abstract/10.1103/PhysRevC.77.025802",
+      "role": "SPG density-dependent RMF GDFM functional - the SPG crust-model physics basis. APS paywalled; no arXiv preprint. Request from researcher or fetch via institutional access.",
+      "priority": "C6B_RECONSTRUCTION_CRITICAL"
+    }
+  ],
+  "what_is_NOT_decided": [
+    "The exact numerical implementation of the CLD minimizer (4-variable minimization of eq. 21). This is a design question for the reconstruction design document (E390-02_RECONSTRUCTION_DESIGN_20261111).",
+    "Whether to reconstruct the pasta phases (rod, slab) or restrict to spherical droplets as Scurto 2024 does (pasta has negligible effect per Scurto 2024).",
+    "Whether the reconstructed SPG/GPPVA composition must byte-match the CompOSE provider export on the rows where they happen to agree (outer crust). The decision is to reconstruct to the manual standard, not to match the provider."
+  ],
+  "implications_for_dag": [
+    "C6B is no longer a parser blocker for SPG/GPPVA. It is a provider-data-quality blocker that the reconstruction direction bypasses.",
+    "M3 (literature/provider composition solvers) becomes the active node: implement the CLD reconstruction.",
+    "The 390 batch can proceed for the 13 SPG/GPPVA models using reconstructed composition once M3 is done, without waiting for the provider's written clarification.",
+    "The CompOSE original eos.compo for the 13 SPG/GPPVA models remains admissible for byte-preserving intake tests (M2 round-trip) but NOT for production composition matching."
+  ],
+  "c6b_status_update": "C6B transitions from RESOLVED_STANDARD_DOCUMENTED_PROVIDER_EXPORT_DEVIATES to RESOLVED_VIA_RECONSTRUCTION_DECISION. The provider clarification questions in C6B v2 remain open but are no longer on the critical path; reconstruction proceeds in parallel."
+}

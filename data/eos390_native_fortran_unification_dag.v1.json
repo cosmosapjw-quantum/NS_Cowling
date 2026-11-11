@@ -2,7 +2,7 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.3.0",
+  "revision": "1.3.1",
   "created_utc": "2026-11-11",
   "status": "CLOUD_BRANCH_CI_PASS_BLOCKED_ON_RAW_SOURCE_ARCHIVE_AND_PHYSICS_GATES",
   "authority": {
@@ -446,9 +446,9 @@
         "Normal unique-key inputs retain their existing behavior.",
         "Cloud CI confirms both new negative tests and all pre-existing tests."
       ],
-      "verified_commit": "afc74ce4a14e9f319569319954cacaf307a92463",
+      "verified_commit": "e188fe355acdbea768ab179cd93eeabb44b99002",
       "verification": {
-        "run_id": 43026837527,
+        "run_id": 43027594881,
         "pytest": "80 passed",
         "native_build": "PASS",
         "sha256_manifest": "PASS"
@@ -1429,7 +1429,7 @@
       "require_exact_branch": true
     },
     "source_of_truth": {
-      "code": "cloud branch HEAD; latest verified baseline afc74ce4a14e9f319569319954cacaf307a92463",
+      "code": "cloud branch HEAD e188fe355acdbea768ab179cd93eeabb44b99002; latest complete CI run 43027594881",
       "machine_plan": "data/eos390_native_fortran_unification_dag.v1.json",
       "developer_contract": "docs/EOS390_NATIVE_FORTRAN_UNIFICATION_CONTRACT_20261111.md",
       "bibliography": "data/eos390_source_bibliography.v1.json",
@@ -1667,9 +1667,46 @@
     "branch_parent_commit": "b12ba451b6755bf8f13d22c882075a23eae800a7",
     "new_branch_initial_ref": "cloud/eos390-fortran-unification-v1",
     "note": "CI run 43024762506 compiled the Fortran backend and passed 78 tests; the two new tests failed because their fixture helper wrote literal backslash-n sequences, not real newlines. The helper was corrected in commit 2265580a4bbdb204a4a4ea0b699d0f9ff5411838. A new CI run is required; duplicate-key behavior is not yet declared implementation-verified.",
-    "verified_head_commit": "afc74ce4a14e9f319569319954cacaf307a92463",
+    "verified_head_commit": "e188fe355acdbea768ab179cd93eeabb44b99002",
     "verified_tree_sha": "e76308ea02b830001c57ab662f392b3a9dd8ff07",
     "latest_ci": {
+      "run_id": 43027594881,
+      "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43027594881",
+      "head_sha": "e188fe355acdbea768ab179cd93eeabb44b99002",
+      "conclusion": "success",
+      "compiler": "GNU Fortran 15.2",
+      "python": "3.13",
+      "pytest": "80 passed in 31.74s",
+      "native_tests": {
+        "polynomial_extrema": "PASS",
+        "css_segment_analytic": "PASS"
+      },
+      "handoff_checkout_byte_diagnostic": "PASS",
+      "sha256_manifest": "PASS",
+      "package_and_upload": "PASS",
+      "source_artifact": {
+        "id": 13858705154,
+        "name": "NS_Cowling-e188fe355acdbea768ab179cd93eeabb44b99002",
+        "size_bytes": 55110489,
+        "sha256": "876304d90d7293264d01bcb3f4b03e346e8899f447134c8617f1fa1e2bd12732",
+        "expires_at": "2026-12-11T13:17:27Z"
+      }
+    },
+    "earlier_failures_resolved": [
+      {
+        "run_id": 43024762506,
+        "reason": "test helper encoded literal backslash-n instead of actual newline"
+      },
+      {
+        "run_id": 43025568308,
+        "reason": "same fixture serialization bug; corrected in commit 2265580a4bbdb204a4a4ea0b699d0f9ff5411838"
+      },
+      {
+        "run_id": 43026577488,
+        "reason": "workflow source manifest entry differed from runner-observed bytes; corrected from SHA emitted by the GitHub runner"
+      }
+    ],
+    "previous_verified_ci": {
       "run_id": 43026837527,
       "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43026837527",
       "head_sha": "afc74ce4a14e9f319569319954cacaf307a92463",
@@ -1689,20 +1726,6 @@
         "sha256": "3d477cd5f535f9cafbc27f5b83e8b8c5c468f22d7433c410d3b9b2cb7f8b1463",
         "expires_at": "2026-12-11T13:12:20Z"
       }
-    },
-    "earlier_failures_resolved": [
-      {
-        "run_id": 43024762506,
-        "reason": "test helper encoded literal backslash-n instead of actual newline"
-      },
-      {
-        "run_id": 43025568308,
-        "reason": "same fixture serialization bug; corrected in commit 2265580a4bbdb204a4a4ea0b699d0f9ff5411838"
-      },
-      {
-        "run_id": 43026577488,
-        "reason": "workflow source manifest entry differed from runner-observed bytes; corrected from SHA emitted by the GitHub runner"
-      }
-    ]
+    }
   }
 }

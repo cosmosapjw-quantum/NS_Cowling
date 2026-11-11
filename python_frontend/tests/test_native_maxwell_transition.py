@@ -192,3 +192,29 @@ def test_native_maxwell_rejects_provider_specific_nadd():
     high.q_extra_count = 1
     with pytest.raises(NativeExecutionError, match="provider-specific Nadd"):
         construct_maxwell_transition(low, high, assume_local_charge_neutrality=True)
+
+def test_native_maxwell_respects_il0_compose_q3_charge_potential_convention():
+    """I_l=0 Q3 is Euler mu minus Yq*muq, including across the jump."""
+    yq = 0.1
+    low = quadratic_phase(rest_mass=939.0, stiffness=1.0, n_min=0.3, n_max=1.4)
+    high = quadratic_phase(rest_mass=940.0, stiffness=0.25, n_min=1.3, n_max=2.8)
+    for phase in (low, high):
+        phase.Il = 0
+        phase.charge_fraction_grid = yq
+        phase.Q4[:] = 0.2
+        phase.Q3[:] -= yq * phase.Q4
+
+    out, report = construct_maxwell_transition(
+        low, high, assume_local_charge_neutrality=True, return_report=True
+    )
+
+    assert report["status"] == "ok"
+    mu_euler = (out.eps + out.p) / out.nb
+    expected_q3 = (mu_euler / out.mn) - 1.0 - yq * out.Q4
+    np.testing.assert_allclose(out.Q3, expected_q3, rtol=2e-13, atol=2e-14)
+    np.testing.assert_allclose(out.mub, mu_euler - yq * out.Q4 * out.mn,
+                               rtol=2e-13, atol=2e-12)
+    verification = check_consistency(out)
+    assert verification["C2"]["pass_"] is True
+    assert verification["overall"]["pass_"] is True
+

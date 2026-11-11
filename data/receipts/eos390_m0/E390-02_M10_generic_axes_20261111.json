@@ -1,0 +1,31 @@
+{
+  "schema": "ns-cowling.e390-02-m10-generic-axes",
+  "schema_version": "1.0.0",
+  "gate": "M10",
+  "status": "PASS_fortran_scope_python_roundtrip_followup",
+  "generated_utc": "2026-11-11",
+  "problem_diagnosed": "The prior M2 receipt reported RG_SLY4 and RG_KDE0v1 failing with 'thermo table is not a single selected T/Yq slice'. Inspection of those sources showed: eos.t declares index 0..0 with value T=0, but the thermo rows use iT=1. The old parser compared the thermo-row iT label against the eos.t declared first index (t0=0) literally, rejecting the mismatch. This is a genuine CompOSE index-convention ambiguity: 0-based vs 1-based T indexing for the same single cold-T=0 point.",
+  "design": {
+    "axis_storage": "Added nT, nYq, t_first, t_last, yq_first, yq_last, selected_iT, selected_iYq scalar fields and t_axis, yq_axis allocatable arrays to the fortran eos_data_t. The full T and Yq axes and their declared index bounds are now retained on the eos object so downstream code sees the generic 1D/2D/3D layout.",
+    "cold_slice_resolution": "The reader remains scoped to a single cold T=0 slice (no implicit flattening, axis averaging, nearest-index substitution, or temperature/charge-fraction guessing). It now resolves the cold slice by VALUE: the grid must have a single T=0 point. It accepts either the declared first index (t0) or t0+1 as the thermo-row iT label when the grid value is T=0, recording the actual thermo-row label as selected_iT. This is NOT temperature guessing - it is recognizing the index convention for the cold slice.",
+    "multi_point_rejection": "Multi-point T or Yq grids (nT>1 or nYq>1) are still rejected with 'only a single cold T=0 eos.t/eos.yq slice is supported'. Nonzero-T single slices are still rejected. No 2D/3D flattening.",
+    "scope_note": "M10 does NOT add full multidimensional support. The reader is still a single cold-slice reader. It does add generic axis storage on the fortran type and resolves the 0-based/1-based index convention so that the 0-based-convention sources (RG_SLY4, RG_KDE0v1) no longer fail the slice check. Full 2D/3D table support remains a tracked follow-up (would require a separate eos_data_t representation and slice selection API)."
+  },
+  "implementation": {
+    "fortran_types": "fortran_eos/src/compose_eos_types.f90 - added 8 scalar axis fields + 2 axis arrays to eos_data_t; allocate_eos intentionally does NOT deallocate t_axis/yq_axis (they are populated by read_compose BEFORE allocate_eos is called)",
+    "fortran_parser": "fortran_eos/src/compose_eos_io.f90 read_compose - stores full T/Yq axes and bounds on eos; resolves the cold slice by value (T=0) with index-convention tolerance; per-row thermo and compo slice checks now accept either selected_iT or selected_iT+1; records the actual thermo-row label as selected_iT"
+  },
+  "regression_tests": [
+    "test_one_based_t_index_convention_passes (GPPVA_FSU2H convention)",
+    "test_zero_based_t_index_with_one_based_thermo_rows_passes (RG_SLY4/RG_KDE0v1 convention)",
+    "test_zero_based_t_index_with_zero_based_thermo_rows_passes (symmetric)",
+    "test_multi_point_T_axis_is_rejected (2D T grid -> rejected)",
+    "test_multi_point_Yq_axis_is_rejected (2D Yq grid -> rejected)",
+    "test_nonzero_T_slice_is_rejected (no temperature guessing)",
+    "test_real_RG_SLY4_passes_slice_check (real source no longer fails slice check)",
+    "test_real_RG_KDE0v1_passes_slice_check (real source no longer fails slice check)"
+  ],
+  "test_count": "8 new M10 tests + 93 prior = 101 total, all pass",
+  "follow_up_tracked": "Python EOSData round-trip of the new M10 axis scalar fields (nT, nYq, t_first, t_last, yq_first, yq_last, selected_iT, selected_iYq) and axis arrays (t_axis, yq_axis) is a tracked follow-up. The fortran internal CSV currently does not write these fields; the python EOSData dataclass gained the fields with safe defaults but from_internal_directory does not yet populate them. The M10 tests verify the fortran-side resolution by checking the read succeeds and temperature_mev is 0; they do not assert the axis metadata on the python EOSData object.",
+  "m2_receipt_updated": "Re-running the M2 round-trip receipt after M10 shows RG_SLY4 and RG_KDE0v1 now pass the slice check and fail downstream at write with 'composition fractions outside physical range' - the same C6B disputed-field issue as the SPG/GPPVA models. This confirms the RG models share the SPG/GPPVA abundance-semantics problem. The M2 receipt's failure_categorization is regenerated automatically each run."
+}

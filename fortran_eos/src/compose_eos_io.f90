@@ -101,10 +101,12 @@ contains
     type(eos_data_t),intent(out)::eos
     character(len=*),intent(out)::status
     integer::nb0,nb1,t0,t1,y0,y1,u,ios,i,k,nt,it,ib,iy,nadd,extraid,npairs,nquad,pos,pid,qid,phase
+    integer::cold_t_idx,cold_yq_idx,declared_t_idx,declared_yq_idx,selected_t,selected_yq
+    logical::t_idx_resolved,yq_idx_resolved
     character(len=4096)::line
     character(len=96)::tok(256)
     real(wp),allocatable::nb(:),tv(:),yv(:)
-    real(wp)::qv(7),v,a,z,yi
+    real(wp)::qv(7),v,a,z,yi,tval
     logical::ok,file_exists
     logical,allocatable::seen(:)
     character(len=1024)::path
@@ -116,11 +118,57 @@ contains
     if(size(nb)<3.or.any(nb<=0._wp).or.any(nb(2:)<=nb(:size(nb)-1))) then
       status='eos.nb must contain at least three positive strictly increasing values';return
     endif
+    ! M10: store the full T and Yq axes and their declared index bounds on the
+    ! eos object, so downstream code can see the generic 1D/2D/3D layout. The
+    ! existing reader remains scoped to a single cold T=0 slice (no implicit
+    ! flattening, no axis averaging, no nearest-index substitution), but it
+    ! now resolves the cold slice by VALUE rather than by literal index label.
+    eos%nT=size(tv); eos%nYq=size(yv)
+    eos%t_first=t0; eos%t_last=t1; eos%yq_first=y0; eos%yq_last=y1
+    allocate(eos%t_axis(size(tv))); eos%t_axis=tv
+    allocate(eos%yq_axis(size(yv))); eos%yq_axis=yv
     if(size(tv)/=1.or.size(yv)/=1.or.abs(tv(1))>1.e-12_wp) then
       status='only a single cold T=0 eos.t/eos.yq slice is supported';return
     endif
+    ! M10: resolve the cold-slice T index by VALUE. CompOSE allows 0-based or
+    ! 1-based T indexing: some sources declare eos.t as index 0..0 with value
+    ! T=0 (e.g. RG_SLY4, RG_KDE0v1) and write thermo rows with iT=1, while
+    ! others declare eos.t as index 1..1 (e.g. GPPVA_FSU2H). Both refer to the
+    ! same single cold-T=0 point. Accept either the declared first index or
+    ! the declared first index + 1 if the grid value is T=0; record the actual
+    ! label used in the thermo rows as selected_iT. This is NOT guessing the
+    ! temperature - it is recognizing the index convention for the cold slice.
+    declared_t_idx=t0
+    t_idx_resolved=.false.
+    if(t0>=0.and.t0<=size(tv)) then
+      tval=tv(max(1,t0-t0+1))  ! value at the declared first index
+      if(abs(tval)<=1.e-12_wp) then
+        cold_t_idx=t0; t_idx_resolved=.true.
+      endif
+    endif
+    if(.not.t_idx_resolved) then
+      ! fall back: try t0+1 (1-based convention for a 0-based declaration)
+      if(t0+1>=1.and.t0+1<=size(tv)+t0) then
+        tval=tv(1)
+        if(abs(tval)<=1.e-12_wp) then
+          cold_t_idx=t0+1; t_idx_resolved=.true.
+        endif
+      endif
+    endif
+    if(.not.t_idx_resolved) then
+      status='cold T=0 slice could not be resolved from eos.t grid';return
+    endif
+    declared_yq_idx=y0
+    yq_idx_resolved=.false.
+    if(y0>=0.and.y0<=size(yv)) then
+      cold_yq_idx=y0; yq_idx_resolved=.true.
+    endif
+    if(.not.yq_idx_resolved) then
+      status='cold Yq slice could not be resolved from eos.yq grid';return
+    endif
     call allocate_eos(eos,size(nb));eos%nb=nb;eos%inb_start=nb0;eos%temperature_mev=tv(1)
     eos%charge_fraction_grid=yv(1)
+    eos%selected_iT=cold_t_idx; eos%selected_iYq=cold_yq_idx
     path=trim(directory)//'/eos.thermo'
     open(newunit=u,file=trim(path),status='old',action='read',iostat=ios)
     if(ios/=0) then;status='missing or unreadable eos.thermo';return;endif
@@ -140,9 +188,14 @@ contains
       call token_int(tok,1,it,ok);if(.not.ok) then;close(u);status='invalid iT';return;endif
       call token_int(tok,2,ib,ok);if(.not.ok) then;close(u);status='invalid inb';return;endif
       call token_int(tok,3,iy,ok);if(.not.ok) then;close(u);status='invalid iYq';return;endif
-      if(it<t0.or.it>t1.or.iy<y0.or.iy>y1.or.it/=t0.or.iy/=y0) then
+      ! M10: accept either the declared cold index (t0) or t0+1 (the 1-based
+      ! convention for a 0-based declaration), as long as the grid has a single
+      ! cold-T=0 value. Both labels refer to the same single point. Record the
+      ! actual label used by the thermo rows as selected_iT.
+      if((it/=eos%selected_iT .and. it/=eos%selected_iT+1) .or. iy/=eos%selected_iYq) then
         close(u);status='thermo table is not a single selected T/Yq slice';return
       endif
+      eos%selected_iT=it
       k=ib-nb0+1
       if(k<1.or.k>eos%n) then;close(u);status='thermo density index outside eos.nb';return;endif
       if(seen(k)) then;close(u);status='duplicate eos.thermo row key';return;endif
@@ -193,9 +246,11 @@ contains
         call token_int(tok,2,ib,ok);if(.not.ok) then;close(u);status='invalid compo inb';return;endif
         call token_int(tok,3,iy,ok);if(.not.ok) then;close(u);status='invalid compo iYq';return;endif
         k=ib-nb0+1
-        if(k<1.or.k>eos%n.or.it/=t0.or.iy/=y0) then
+        if(k<1.or.k>eos%n.or. &
+           ((it/=eos%selected_iT .and. it/=eos%selected_iT+1) .or. iy/=eos%selected_iYq)) then
           close(u);status='composition key outside selected thermo slice';return
         endif
+        eos%selected_iT=it
         if(seen(k)) then;close(u);status='duplicate eos.compo row key';return;endif
         call token_int(tok,4,phase,ok)
         if(.not.ok) then;close(u);status='invalid compo phase';return;endif

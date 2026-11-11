@@ -7,6 +7,16 @@ module compose_eos_types
     integer :: n=0, il=1, iT=1, iYq=1, inb_start=1, nadd=0
     real(wp) :: mn=939._wp, mp=939._wp, temperature_mev=0._wp, charge_fraction_grid=0._wp
     logical :: composition_file_present=.false., composition_available=.false., beta_equilibrated=.false.
+    !--- M10 generic CompOSE axes -------------------------------------------
+    ! Full T and Yq axis storage: the grid values and their index bounds.
+    ! nT and nYq are the axis lengths; t_first/t_last and yq_first/yq_last are
+    ! the declared first/last index labels (CompOSE allows 0-based or 1-based).
+    ! The cold slice selection is recorded in selected_iT and selected_iYq,
+    ! which are the actual iT/iYq labels used in the thermo rows (may differ
+    ! from t_first when the source uses a different index convention).
+    integer :: nT=0, nYq=0, t_first=0, t_last=-1, yq_first=0, yq_last=-1
+    integer :: selected_iT=0, selected_iYq=0
+    real(wp), allocatable :: t_axis(:), yq_axis(:)
     real(wp), allocatable :: nb(:), q(:,:), q_extra(:)
     integer, allocatable :: iphase(:)
     real(wp), allocatable :: yn(:), yp(:), ye(:), ymu(:), abar(:), zbar(:), yh(:)
@@ -52,6 +62,9 @@ contains
     if(allocated(eos%yh_present)) deallocate(eos%yh_present)
     if(allocated(eos%c3_applicable)) deallocate(eos%c3_applicable)
     if(allocated(eos%c4_applicable)) deallocate(eos%c4_applicable)
+    ! M10 axes (t_axis/yq_axis) are intentionally NOT deallocated here: they
+    ! are populated by read_compose BEFORE allocate_eos is called, and must
+    ! survive so the cold-slice selection is recorded on the resulting eos.
     eos%n=n
     allocate(eos%nb(n),eos%q(7,n),eos%q_extra(n),eos%iphase(n))
     allocate(eos%yn(n),eos%yp(n),eos%ye(n),eos%ymu(n),eos%abar(n),eos%zbar(n),eos%yh(n))

@@ -73,6 +73,17 @@ class EOSData:
     Yh_present: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=bool))
     C3_applicable: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=bool))
     C4_applicable: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=bool))
+    # M10 generic CompOSE axes metadata (scalar; axis values stored separately).
+    nT: int = 0
+    nYq: int = 0
+    t_first: int = 0
+    t_last: int = -1
+    yq_first: int = 0
+    yq_last: int = -1
+    selected_iT: int = 0
+    selected_iYq: int = 0
+    t_axis: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=float))
+    yq_axis: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=float))
     source_dir: str | None = field(default=None, repr=False, compare=False)
 
     @property

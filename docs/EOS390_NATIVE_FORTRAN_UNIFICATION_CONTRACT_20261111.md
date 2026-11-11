@@ -171,7 +171,7 @@ CompOSE v3.01 permits `Npairs=0` and `Nquad=0`. This is useful for a phase-only 
 - `composition_file_present`: whether the sidecar exists.
 - `composition_available`: whether usable composition abundances/group values are present.
 
-The first native patch adds phase-only writer support and baryon/charge closure guards. This code change is only static until the exact branch CI and local round-trip tests run.
+The first native patch adds phase-only writer support and baryon/charge closure guards. GitHub Actions run #43005633832 (commit 9e3d4b255062935a87fecc3df256528ba95984ad) compiled the native Fortran executable, ran 78 frontend/pipeline tests including the new phase-only round-trip and false-Maxwell regressions, passed the Fortran quartic-extrema test, verified every entry in SHA256SUMS_v4.txt, and uploaded the source archive. This establishes CI verification for the safety slice; local replay remains NOT_RUN.
 
 ### 5.3 Iphase and source phase boundaries
 
@@ -438,17 +438,17 @@ The read-only module `eos_generator/compose_eos_pkg/compose_eos/phase_transition
 
 The Gibbs path uses P(mu_B,mu_Q) surfaces and global charge neutrality. It is a separate native feature-parity task and must not be conflated with the one-charge locally neutral Maxwell path.
 
-### First GitHub Actions execution
+### Exact-head GitHub Actions verification
 
-Run: [43004945078](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43004945078) (run number 185), commit `64c6556c84f6aeec1a25877a4c7afdb878bcd18b`.
+Latest run: [43005633832](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43005633832) (run number 188), exact integration commit `9e3d4b255062935a87fecc3df256528ba95984ad`.
 
-Observed:
-- Fortran build: PASS.
-- Python frontend/direct-provider tests: PASS.
-- Native Fortran polynomial-extrema test: PASS.
-- `sha256sum -c SHA256SUMS_v4.txt`: FAIL because the manifest still contained pre-change hashes for edited tracked files.
-- Source archive packaging/upload: skipped after manifest failure.
+Observed from the completed native job:
+- `bash fortran_eos/build.sh build/compose_eos_fortran`: PASS (gfortran 15.2.0).
+- `python -m pytest -q python_frontend/tests pipeline/tests`: **78 passed in 33.26 s**.
+- Native Fortran quartic polynomial-extrema test: PASS.
+- `sha256sum -c SHA256SUMS_v4.txt`: PASS; all listed entries were `OK`.
+- Source archive upload: PASS. Artifact ID `13848990197`, 199,163,410 bytes, SHA-256 `91298b373bc3513aaacbdc5fc0fae8a4a73d422e546e10cd67ea6f1211bb49b9`.
 
-This is a checksum-maintenance failure, not a build/test failure. The follow-up commit refreshes the manifest against exact current branch contents; the checksum gate is not bypassed. A second Actions run is pending.
+An earlier run #43004945078 failed only at the stale checksum-manifest step after build/tests had passed. The manifest was refreshed in the follow-up commit; this run confirms the checksum gate now passes. This is CI verification of the EOS390 safety/specification slice only.
 
-**Not yet verified:** no local build or pytest was run in the ChatGPT host environment. The sharp Maxwell kernel in the common native matcher remains thermo-only; composition-aware Maxwell matching, provider literature solvers, full five-method composition matching, native TOV/tidal/Cowling production wiring and 390 regeneration remain pending. The old 390 outputs and raw sources remain immutable.
+**Remaining implementation gaps:** native literature composition solvers; composition-preserving five-method matching; sharp Maxwell routing through the common matcher with branch-specific composition, Iphase and Nadd provenance; native TOV/tidal Love/Cowling production integration (the inspected Fortran solutions tree has TOV/Cowling but no tidal/Love module); removal/quarantine of Python numerical adapter/direct-barotrope/phase-aware Maxwell code from the production namespace; native manifest-driven 390 runner; source-backed 390 regeneration. The local Desktop Commander device is offline, so local build/pytest/source replay is still NOT_RUN. The sharp Maxwell source kernel is thermo-only, source-cohort admission is NOT_ADMITTED, and regenerated_390 is NOT_RUN. Raw source files, historical 390 outputs, and the separate 65-pair C4 DAG remain immutable.

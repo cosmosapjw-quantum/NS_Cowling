@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.0.0",
+  "revision": "1.0.1",
   "created_utc": "2026-11-11",
-  "status": "IN_PROGRESS_INITIAL_SAFETY_PATCH_BUILD_AND_TESTS_PASS_MANIFEST_REPAIR_CI_RETRY_PENDING",
+  "status": "IN_PROGRESS_M2_SAFETY_SLICE_GITHUB_CI_VERIFIED_FULL_MIGRATION_PENDING",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "research/eos390-fortran-unification-v1",
@@ -243,7 +243,7 @@
         "Baryon and charge abundance closure are tested",
         "Unsupported formats are explicit errors"
       ],
-      "status": "PATCHED_BUILD_PYTEST_FORTRAN_UNIT_PASS_SHA256_REPAIR_COMMITTED_CI_RETRY_PENDING"
+      "status": "PHASE_ONLY_COMPOSE_IO_AND_FALSE_MAXWELL_GUARD_GITHUB_CI_PASS_LOCAL_REPLAY_PENDING"
     },
     {
       "id": "M3",
@@ -362,7 +362,7 @@
       "depends_on": [
         "E390-00"
       ],
-      "status": "PATCHED_STATIC_ONLY_RUNTIME_PENDING",
+      "status": "PATCHED_GITHUB_CI_BUILD_78_TESTS_AND_MANIFEST_PASS_LOCAL_REPLAY_PENDING",
       "outputs": [
         "phase-only eos.compo writer",
         "composition closure guards",
@@ -536,27 +536,31 @@
       "phase_topology_and_composition_mapping_receipt.json",
       "legacy_feature_parity_inventory.json"
     ],
-    "native_subagent": "NOT_RUN_BY_CHATGPT_HOST; do not simulate delegation or fabricate child receipts."
+    "native_subagent": "NOT_RUN_BY_CHATGPT_HOST_NO_NATIVE_DELEGATION_TOOL"
   },
   "evidence_status": {
-    "code_execution_in_this_turn": "GITHUB_ACTIONS_BUILD_AND_TESTS_EXECUTED_LOCAL_RUNTIME_NOT_RUN",
-    "static_source_patch": "PREPARED_AS_GITHUB_BLOBS_PENDING_COMMIT",
-    "github_ci": "PENDING",
-    "local_runtime": "UNAVAILABLE_TO_CHATGPT_HOST_DESKTOP_COMMANDER_OFFLINE",
+    "code_execution_in_this_turn": "GITHUB_ACTIONS_EXACT_HEAD_BUILD_PYTEST_FORTRAN_UNIT_CHECKSUM_AND_SOURCE_ARCHIVE_PASS_LOCAL_RUNTIME_NOT_RUN",
+    "static_source_patch": "COMMITTED_AND_CI_VERIFIED_FOR_M2_SAFETY_SLICE",
+    "github_ci": "PASS",
+    "local_runtime": "NOT_RUN_DESKTOP_COMMANDER_OFFLINE_CONTAINER_EXEC_UNAVAILABLE",
     "source_cohort_admission": "NOT_ADMITTED",
     "regenerated_390": "NOT_RUN",
     "github_actions_execution": {
-      "first_run_id": 43004945078,
-      "first_run_number": 185,
-      "result": "PARTIAL",
+      "run_id": 43005633832,
+      "run_number": 188,
+      "commit": "9e3d4b255062935a87fecc3df256528ba95984ad",
+      "conclusion": "success",
       "build": "PASS",
-      "pytest": "PASS",
+      "pytest": "78 passed in 33.26s",
       "fortran_polynomial_extrema": "PASS",
-      "checksum_manifest": "FAIL_STALE_HASHES",
-      "source_archive": "SKIPPED",
-      "manifest_repair": "COMMITTED_IN_FOLLOWUP",
-      "ci_retry": "PENDING",
-      "local_runtime": "NOT_RUN"
+      "sha256_manifest": "PASS_ALL_ENTRIES",
+      "source_archive": {
+        "artifact_id": 13848990197,
+        "artifact_name": "NS_Cowling-9e3d4b255062935a87fecc3df256528ba95984ad.zip",
+        "bytes": 199163410,
+        "sha256": "91298b373bc3513aaacbdc5fc0fae8a4a73d422e546e10cd67ea6f1211bb49b9"
+      },
+      "evidence_url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43005633832"
     }
   },
   "legacy_feature_inventory": [
@@ -677,5 +681,38 @@
       }
     ],
     "policy": "Track separately from the 390 matrix; never reinterpret EOS390 method=maxwell."
-  }
+  },
+  "last_update_utc": "2026-11-11",
+  "known_remaining_implementation_gaps": [
+    {
+      "area": "native literature-derived composition",
+      "status": "PENDING",
+      "evidence": "Legacy literature_solvers.py inspected; APR/BBB and RMF/Skyrme/SPG solver families remain Python reference only."
+    },
+    {
+      "area": "composition-preserving five-method matching",
+      "status": "PENDING",
+      "evidence": "Current native smooth matcher remains strict thermo-only; provider composition bridge, Iphase mapping and mixed Nadd policy are not integrated."
+    },
+    {
+      "area": "sharp Maxwell in common matcher",
+      "status": "PENDING",
+      "evidence": "Current native sharp kernel is a separate thermo-only two-branch operation; public method=maxwell remains fail-closed."
+    },
+    {
+      "area": "native tidal Love number with Maxwell jump",
+      "status": "NOT_FOUND_IN_INSPECTED_NATIVE_SOLUTIONS_TREE",
+      "evidence": "Legacy phase_transitions.py contains pressure-corrected jump Δy=-4πr_t^3Δε/(m_t+4πr_t^3P_t) and TOV+Love solver. Inspected Fortran solutions tree has phase-segmented TOV/Cowling but no tidal/Love module was found."
+    },
+    {
+      "area": "Python numerical modules still outside frontend-only target",
+      "status": "PENDING_MIGRATION",
+      "evidence": "python_frontend/compose_cowling/adapter.py (PAV and q/P adapter), direct_barotrope.py (thermodynamic interpolation), and maxwell.py (SciPy TOV/Cowling) still contain numerical routines."
+    },
+    {
+      "area": "native 390 manifest runner and regeneration",
+      "status": "NOT_RUN",
+      "evidence": "M7-M9 are not implemented or source-cohort admitted."
+    }
+  ]
 }

@@ -577,6 +577,13 @@ contains
     logical::ok1,ok2,ok3
     character(len=512)::msg
     status='uninitialized';report=match_report_t()
+    ! Historical method="maxwell" built a continuous-density pressure plateau.
+    ! It was not a first-order Maxwell construction. Fail closed until the
+    ! composition-aware sharp transition is routed through this matching API.
+    if(trim(method)=='maxwell')then
+      status='maxwell requires a sharp coexistence construction with Delta n_B>0; the legacy smooth plateau is disabled'
+      return
+    endif
     call validate_eos(cr,ok1,msg);if(.not.ok1)then;status='invalid crust EOS: '//trim(msg);return;endif
     call validate_eos(co,ok1,msg);if(.not.ok1)then;status='invalid core EOS: '//trim(msg);return;endif
     if(abs(cr%temperature_mev)>1.e-12_wp.or.abs(co%temperature_mev)>1.e-12_wp)then

@@ -19,11 +19,12 @@ def read_compose(directory: str | Path) -> EOSData:
 def write_compose(directory: str | Path, data: EOSData, copy_from: str | Path | None = None, *,
                   composition_tolerance: float = 2e-3) -> None:
     """Write a complete CompOSE table using the Fortran backend."""
-    if any(data.Iphase[i] != data.Iphase[i - 1] for i in range(1, data.n)) and (
-        not data.composition_available or not data.composition_file_present
-    ):
+    if data.composition_available and not data.composition_file_present:
+        raise NativeFeatureUnavailable("composition values cannot be exported without an eos.compo sidecar")
+    if any(int(value) != 0 for value in data.Iphase) and not data.composition_file_present:
         raise NativeFeatureUnavailable(
-            "a phase-discontinuous barotrope without phase composition cannot be exported as a complete CompOSE table"
+            "a phase-discontinuous barotrope without phase composition cannot be exported; "
+            "non-default Iphase labels require an eos.compo sidecar"
         )
     del copy_from, composition_tolerance
     target = Path(directory).expanduser().resolve()
@@ -294,7 +295,12 @@ def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
         )
     if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
         raise TypeError("d_cr and d_co must both be EOSData instances")
-    methods = {"maxwell", "css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+    if method == "maxwell":
+        raise NativeFeatureUnavailable(
+            "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+            "the legacy smooth pressure plateau is not a first-order transition"
+        )
+    methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
     if method not in methods:
         raise ValueError(f"method must be one of {sorted(methods)}")
     if not isinstance(n_bridge, int) or isinstance(n_bridge, bool) or n_bridge < 8:

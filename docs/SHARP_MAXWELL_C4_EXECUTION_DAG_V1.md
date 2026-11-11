@@ -119,3 +119,78 @@ Not performed: source parser execution across all 18 EOS, C1-C11 source verifica
 ## 9. Immediate next stage
 
 C5 should implement a read-only vertical slice first: native read_compose plus C1-C11 verification on SPG_M1 and one GPPVA Nadd=1 source. Emit receipts preserving Iphase, composition and q_extra; do not edit raw sources or call the Maxwell constructor. Then extend the verified path to the remaining 16 sources.
+
+
+---
+
+## 10. C4-D3R: EOS reconstruction, smooth matching and true-Maxwell kernel validation (2026-11-11)
+
+The original C4-D0..D10 chain remains the sole admission and downstream science DAG. C4-D3R is an additive validation gate; it does not replace C4-D3 source thermodynamic admission or C4-D4 provider composition semantics. C4-D8 one-pair pilot now depends on both C4-D7 and C4-D3R.
+
+### 10.1 CompOSE Q3 convention correction
+
+Use Euler baryon chemical potential for thermodynamics and the Maxwell root coordinate:
+
+\[
+\mu_E=\frac{\epsilon+P}{n_B}.
+\]
+
+The stored Q3 column is convention-dependent on the supported cold, neutrino-transparent branches:
+
+\[
+m_n(1+Q_3)=
+\begin{cases}
+\mu_E-Y_qm_nQ_4,&I_l=0,\\
+\mu_E,&I_l=1,\quad Q_5\simeq0.
+\end{cases}
+\]
+
+For Il=0, recover mu_E from stored Q3 by adding Yq*mn*Q4. Do not use the charge-shifted Q3 potential as the independent variable in P(mu_E) coexistence search. Write output Q3 using the same Il-dependent convention so the native C2 verifier remains valid.
+
+Keep the strict 2e-6 source/reconstruction Q3/Euler admission threshold separate from the true-Maxwell v1 local kernel's 5e-4 Q3/Euler gate. These tolerances belong to different contracts; do not silently exchange or widen them.
+
+### 10.2 Master reconstruction and smooth matching validation
+
+C4-D3R must verify the existing native reconstruct_master first-law identities:
+
+\[
+F(x)=f/n_B,\quad x=\ln n_B,\quad Q_1=F'(x),
+\]
+\[
+P=n_BQ_1,\quad \epsilon=n_BF,\quad \mu_E=F+Q_1,
+\quad \frac{c_s^2}{c^2}=\frac{Q_1+F''}{F+Q_1}.
+\]
+
+The represented intervals must satisfy positive density, positive chemical potential, mechanical stability and causal sound speed over their full polynomial domains. Point sampling may summarize but cannot certify an interval.
+
+The six match_crust_core methods remain historical smooth bridges: maxwell, css, cubic_F, cubic_P, quintic_F, quintic_P. The historical maxwell token remains a smooth near-pressure plateau with no density jump, no latent-energy discontinuity, is_exact_maxwell=false, and seidov_applicable=false. It is not interchangeable with construct_maxwell_transition.
+
+### 10.3 True Maxwell regression gate
+
+Use both analytic Il=0 and Il=1,Q5≈0 two-phase fixtures. Verify:
+- input Q3/Euler convention and output Q3 serialization;
+- equal Euler chemical potential and pressure at coexistence;
+- strictly positive density jump for a nontrivial first-order transition;
+- Delta epsilon=mu_t*Delta n_B;
+- native C2 and overall output verification;
+- non-overlap, no-root, tangential-root, multiple-root and endpoint-duplicate negative controls;
+- full-interval stability and causality from exact Hermite polynomial extrema.
+
+Reject unsupported Q5, composition-bearing, Nadd, internal Iphase jumps, mass-convention mismatches and Il/Yq metadata mismatches rather than projecting them away.
+
+### 10.4 Mutation and anti-drift controls
+
+- M0 read-only identity and source audit.
+- M1 isolated changes confined to the existing implementation and C4 DAG branches.
+- M2 every production fix must have a RED regression first.
+- M3 thermodynamic formulas, units, composition semantics, source parser/indexing, row order, tolerance widening and production TOV/Cowling APIs require explicit human approval.
+- M4 raw EOS bytes, source-authority SHA, canonical 65-pair identity, legacy outputs and C6/C6B provider semantics stay protected.
+- M5 merge/release/deploy/provider contact/Dropbox require separate authorization.
+
+Before promotion, record exact live branch heads, native source hashes, Q3 convention, root topology, interval extrema, test inventory/stdout and refreshed SHA256 manifest. Unknown provider meaning remains BLOCKED, not inferred. No 65-pair root search, TOV or Cowling run is enabled by C4-D3R alone.
+
+### 10.5 Current bounded local evidence
+
+A new Il=0 analytic two-phase test failed before the fix at the intended native source-Q3 validation gate and passed after the correction. The exported PR #1 source artifact built with GNU Fortran 14.2.0; the full frontend/pipeline suite passed 68 tests in 13.57 s and the native quartic-extrema test passed. The exported source had no .git metadata, so this is not a committed checkout replay. Re-fetch and rerun the exact live PR #1 head after the remote update. C4-D3R remains a required gate until the exact-head replay receipts are present.
+
+C4-D4/C6B remains the independent provider-semantics blocker. No C4-D8 pilot or 65-pair search has been run or authorized by this validation increment.

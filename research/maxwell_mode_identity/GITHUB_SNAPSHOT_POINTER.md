@@ -1,23 +1,34 @@
-# GitHub snapshot pointer — LA11
+# GitHub snapshot pointer and local archive scope
 
 Repository: https://github.com/cosmosapjw-quantum/NS_Cowling
-Working branch: research/maxwell-analytic-matching-la11-v1
-Immutable parent branch: research/maxwell-interface-interpolation-la10-v1
-Parent commit at branch creation: 104b4fa76e191db42e6af26f072533617f45441c
-Source-authority pin: a09ec30d74b363652d2d1aefe990557c468679dd
 
-The sole machine-readable SSOT is research/maxwell_mode_identity/LOCAL_AGENT_DAG.v1.json (contract v1.4; nodes LA0-LA11 plus terminal LA8).
-The sole detailed local-agent development contract is research/maxwell_mode_identity/LOCAL_AGENT_DAG_DEVELOPMENT_AND_HANDOFF_20261111.md.
-The canonical standalone handoff is research/maxwell_mode_identity/HANDOFF_PROMPT_20261111.txt.
+LA11 branch: `research/maxwell-analytic-matching-la11-v1`
+LA11 branch HEAD: `ffc6a75006d63c222871b9c9fc13abdbc699014a`
+Draft PR #10: https://github.com/cosmosapjw-quantum/NS_Cowling/pull/10
+PR base: `research/maxwell-interface-interpolation-la10-v1` at `104b4fa76e191db42e6af26f072533617f45441c`
+PR state: OPEN / DRAFT / UNMERGED. CI status query returned no status records, which is NOT a CI PASS.
 
-LA11 source/test:
-- research/maxwell_mode_identity/analytic_matching.py
-- research/maxwell_mode_identity/tests/test_analytic_matching.py
-- research/maxwell_mode_identity/ANALYTIC_MATCHING_GAUGE_AUDIT_20261111.md
-- research/maxwell_mode_identity/ANALYTIC_MATCHING_STATUS_20261111.json
-- research/maxwell_mode_identity/ANALYTIC_MATCHING_RESULTS.json
-- research/maxwell_mode_identity/computation_evidence/analytic_matching_20261111/
+## Canonical project files on the branch
 
-Final local exported-artifact run: 22 passed in 0.21 s; 22 collected in 0.01 s. Exact Python helper/test Git blob SHA1: 97e9f5c6a134110e92afc68b1b2080dbabbf6756 and 8bedc9870cc80ae63b25f03d86454afd59941c9a. SymPy 7 and Wolfram 10 exact identities have zero residual.
+The sole machine-readable DAG is:
+`research/maxwell_mode_identity/LOCAL_AGENT_DAG.v1.json` (contract `NSCOWLING-MODEID-WRONSKIAN-LOCAL-AGENT-v1.4`).
 
-Do not treat this as native verification. Native q-to-r, actual endpoint-frame holomorphy, regular Fredholm-pencil equivalence, algebraic multiplicity, actual stellar roots/profiles and GitHub Actions status remain NOT_RUN/BLOCKED/NOT_CONFIRMED.
+The single detailed development contract is:
+`research/maxwell_mode_identity/LOCAL_AGENT_DAG_DEVELOPMENT_AND_HANDOFF_20261111.md`.
+
+The canonical integrated handoff is:
+`research/maxwell_mode_identity/HANDOFF_PROMPT_20261111.txt`.
+
+LA11 scientific note, machine-readable results/status, helper, tests and computation receipts are in the same directory. Fetch these files from the branch at the live HEAD above; do not rebuild or replace the SSOT from a patch.
+
+## This archive
+
+This archive is a **LA11 evidence and handoff companion**, not a full repository clone. It contains the LA11 audit, exact helper/test bytes, machine-readable LA11 result/status, the LA11 DAG patch for inspection, a standalone local-agent prompt, and computation evidence/receipts. The complete LA0-LA10 context and integrated single DAG/development document remain on the GitHub branch and are fetched live by the handoff prompt.
+
+The local helper and test source bytes were matched to GitHub content blobs:
+- helper blob SHA1 `97e9f5c6a134110e92afc68b1b2080dbabbf6756`; SHA256 `087ab499e9466b2008fedca79409e04db6038808bb8d4df03fde9d0f74f4b096`
+- test blob SHA1 `8bedc9870cc80ae63b25f03d86454afd59941c9a`; SHA256 `32c31ac29d044c9141077ac5440b60689e6d0d6f11b2b67db291b881bd090e45`
+
+Local receipt: 22 tests passed in 0.21 s; 22 collected in 0.01 s; JSON/AST/compileall and SHA256SUMS verification passed. The local run directory is not a Git worktree, so Git commit identity is taken from the GitHub branch, and the exact source Git blob identities are separately compared.
+
+No native Fortran/q-to-r run, actual endpoint-frame analyticity proof, BVP Fredholm-pencil equivalence, physical multiplicity, stellar root/profile calculation or production integration is claimed.

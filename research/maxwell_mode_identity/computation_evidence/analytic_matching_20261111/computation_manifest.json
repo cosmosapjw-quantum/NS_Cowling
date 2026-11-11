@@ -9,19 +9,24 @@
     "parent_commit": "104b4fa76e191db42e6af26f072533617f45441c",
     "source_authority_commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
     "local_git_metadata": "NOT_A_GIT_WORKTREE_EXPORTED_ARTIFACT_RUN",
-    "source_test_blob_identity": "EXACT_MATCH_TO_PUBLISHED_GITHUB_BLOBS",
-    "helper_blob_sha1": "97e9f5c6a134110e92afc68b1b2080dbabbf6756",
-    "test_blob_sha1": "8bedc9870cc80ae63b25f03d86454afd59941c9a"
+    "source_test_blob_identity": "EXACT_MATCH_TO_PUBLISHED_GITHUB_CONTENT_BLOBS",
+    "pr_number": 10,
+    "pr_url": "https://github.com/cosmosapjw-quantum/NS_Cowling/pull/10",
+    "branch_head": "ffc6a75006d63c222871b9c9fc13abdbc699014a",
+    "base_branch": "research/maxwell-interface-interpolation-la10-v1",
+    "base_commit": "104b4fa76e191db42e6af26f072533617f45441c",
+    "github_pr_state": "OPEN_DRAFT_UNMERGED",
+    "github_ci_status": "NO_STATUS_RECORDS_RETURNED_NOT_PASS"
   },
   "commands": {
-    "pytest": "PYTHONPATH=. PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider research/maxwell_mode_identity/tests/test_analytic_matching.py",
-    "collect": "PYTHONPATH=. PYTHONDONTWRITEBYTECODE=1 python -m pytest --collect-only -q -p no:cacheprovider research/maxwell_mode_identity/tests/test_analytic_matching.py",
+    "pytest": "PYTHONPATH=/mnt/data/NS_Cowling_AnalyticMatching_LA11_20261111 python -m pytest -q -p no:cacheprovider research/maxwell_mode_identity/tests/test_analytic_matching.py",
+    "collect": "PYTHONPATH=/mnt/data/NS_Cowling_AnalyticMatching_LA11_20261111 python -m pytest --collect-only -q -p no:cacheprovider research/maxwell_mode_identity/tests/test_analytic_matching.py",
     "compileall": "python -m compileall -q research/maxwell_mode_identity/analytic_matching.py",
-    "json_ast": "python -m json.tool for all JSON files; ast.parse for research Python files"
+    "json_ast": "python -m json.tool for each JSON file; ast.parse for both Python files"
   },
   "environment": {
     "python": "3.13.5",
-    "platform": "linux",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
     "numpy": "2.3.5",
     "scipy": "1.17.0",
     "pytest": "9.0.2",
@@ -39,7 +44,8 @@
     "pytest_stdout": "...................... [100%]\n22 passed in 0.21s\n",
     "collection_stdout_tail": "22 tests collected in 0.01s",
     "red_before_implementation_exit_status": 2,
-    "red_reason": "ModuleNotFoundError before analytic_matching.py was created"
+    "red_reason": "ModuleNotFoundError before analytic_matching.py was created",
+    "pytest_elapsed_seconds": 0.21
   },
   "source_hashes": {
     "analytic_matching.py": {
@@ -75,5 +81,15 @@
     "actual star roots/profiles",
     "argument principle on a physical contour",
     "production integration"
+  ],
+  "not_run_or_blocked": [
+    "native q-to-r derivation and source validation",
+    "actual endpoint-frame holomorphy",
+    "regular Fredholm-pencil equivalence and physical algebraic multiplicity",
+    "native Fortran build/run",
+    "actual stellar roots/profiles",
+    "argument-principle count on a physical contour",
+    "production integration",
+    "physical finite-rate kinetics"
   ]
 }

@@ -1,0 +1,143 @@
+{
+  "schema": "ns-cowling.true-maxwell-kernel-validation",
+  "schema_version": "1.0.0",
+  "created_utc": "2026-11-11",
+  "status": "PARTIAL_ANALYTIC_FIXTURE_AND_NEGATIVE_CONTROLS_CI_COVERED_ROOT_TOPOLOGY_INCOMPLETE",
+  "implementation": "fortran_eos/src/compose_eos_phase_transition.f90::construct_maxwell_transition",
+  "test_module": "python_frontend/tests/test_native_maxwell_transition.py",
+  "source_branch": "research/fortran-eos-gap-fill-v1",
+  "source_commit": "ecf2271e89b68f0a6ef2e6a9c551deba7862f192",
+  "source_blobs": {
+    "phase_transition_fortran": "123ef96decfba53f470feb8e7b53263e4dcb8ee9",
+    "phase_transition_pytest": "2a08c37d00a180e2c18625dca8c1970bd6294a15"
+  },
+  "physical_contract": {
+    "coexistence": [
+      "P_L(mu_t)=P_H(mu_t)=P_t",
+      "mu_E,L(mu_t)=mu_E,H(mu_t)=mu_t"
+    ],
+    "branch_thermodynamics": [
+      "n_B=dP/dmu_E",
+      "epsilon=mu_E*n_B-P"
+    ],
+    "density_jump": "n_H>n_L",
+    "latent_energy_identity": "Delta_epsilon=mu_t*(n_H-n_L)",
+    "neutrality": "Caller explicitly confirms local electric neutrality in both supplied phases.",
+    "scope": "One globally conserved baryon charge; not Gibbs mixed phase."
+  },
+  "test_inventory": [
+    "test_native_maxwell_transition_recovers_exact_analytic_coexistence",
+    "test_native_maxwell_rejects_composition_instead_of_silently_dropping_it",
+    "test_native_maxwell_rejects_nonoverlapping_mu_domains",
+    "test_native_maxwell_rejects_acausal_phase_before_finding_a_transition",
+    "test_native_maxwell_rejects_provider_first_law_mismatch",
+    "test_maxwell_requires_explicit_local_neutrality_assumption",
+    "test_maxwell_phase_barotrope_cannot_be_written_as_complete_compose_without_composition",
+    "test_native_cli_writer_rejects_phase_barotrope_without_composition",
+    "test_native_maxwell_rejects_mismatched_charge_fraction_metadata",
+    "test_native_maxwell_rejects_provider_specific_nadd",
+    "test_native_maxwell_respects_il0_compose_q3_charge_potential_convention"
+  ],
+  "ci": {
+    "provider": "GitHub Actions",
+    "workflow_run_id": 42952472519,
+    "job_id": 130299748780,
+    "tested_pr_head": "ecf2271e89b68f0a6ef2e6a9c551deba7862f192",
+    "tested_merge_snapshot": "9129d53dfc5b4a216ad53cb118c3fc08ab319572",
+    "base_branch": "main",
+    "base_sha": "6eed9c5178afd820c9d814e4138dd0f15d1f5a73",
+    "status": "success",
+    "runtime": {
+      "python": "3.13",
+      "gfortran": "15.2.0",
+      "pytest": "9.2.0",
+      "numpy": "2.5.4",
+      "scipy": "1.18.1"
+    },
+    "commands": {
+      "build": "bash fortran_eos/build.sh build/compose_eos_fortran",
+      "pytest": "python -m pytest -q python_frontend/tests pipeline/tests",
+      "extrema": "gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all -Ibuild/compose_eos_fortran/mod fortran_eos/tests/test_polynomial_extrema.f90 build/compose_eos_fortran/obj/compose_eos_types.o build/compose_eos_fortran/obj/compose_eos_reconstruct.o -o build/compose_eos_fortran/test_polynomial_extrema && build/compose_eos_fortran/test_polynomial_extrema",
+      "manifest": "sha256sum -c SHA256SUMS_v4.txt"
+    },
+    "outcomes": {
+      "native_build": "PASS",
+      "frontend_pipeline": "76 passed in 45.77 seconds",
+      "polynomial_extrema": "PASS",
+      "sha256_manifest": "PASS",
+      "artifact_upload": "PASS"
+    },
+    "artifact": {
+      "id": 13826230310,
+      "name": "NS_Cowling-9129d53dfc5b4a216ad53cb118c3fc08ab319572",
+      "size_bytes": 280171082,
+      "sha256": "6b4d884929f6ef8e75057969086e1805f91fa5e28c785f1295161d329db7c5ff",
+      "expires": "2026-12-11"
+    },
+    "provenance_note": "Pull-request integration run over the stated PR head plus base merge snapshot; not a local sandbox replay and not source-cohort admission.",
+    "suite_total": "76 passed"
+  },
+  "independent_analytic_check": {
+    "status": "WOLFRAM_SYMBOLIC_AND_NUMERIC_CHECK_PASS",
+    "phases": {
+      "low": {
+        "pressure": "P_L=n^2",
+        "energy_density": "epsilon_L=939*n+n^2"
+      },
+      "high": {
+        "pressure": "P_H=(1/4)*n^2",
+        "energy_density": "epsilon_H=940*n+(1/4)*n^2"
+      }
+    },
+    "solution": {
+      "mu_t_MeV": 941,
+      "P_t_MeV_fm3": 1,
+      "n_L_fm3": 1,
+      "n_H_fm3": 2,
+      "epsilon_L_MeV_fm3": 940,
+      "epsilon_H_MeV_fm3": 1881,
+      "delta_epsilon_MeV_fm3": 941,
+      "mu_delta_n_MeV_fm3": 941,
+      "identity_residual_MeV_fm3": 0
+    },
+    "interpretation": "Independent Wolfram solve/check validates this analytic fixture only; it does not admit any provider EOS pair."
+  },
+  "root_finder_inspection": {
+    "status": "SOURCE_INSPECTED",
+    "method": "Union of phase mu_E knot grids; on each union interval P_L-P_H is cubic and n_L-n_H quadratic. Stationary points split monotone subintervals; endpoints/sign changes are tested, transverse roots are bisected and roots deduplicated before exactly-one-root admission.",
+    "interval_admissibility": "n>0, dn/dmu_E>0 and mu_E*dn/dmu_E-n>=0 are checked from polynomial extrema; finite samples are diagnostics only."
+  },
+  "root_topology_coverage": {
+    "demonstrated": [
+      "One transverse root",
+      "Disjoint chemical-potential support rejection"
+    ],
+    "not_demonstrated": [
+      "Overlapping support with no pressure root",
+      "Exact tangential/even-multiplicity root",
+      "Multiple distinct roots",
+      "Shared union-grid knot root counted once",
+      "Duplicate endpoint/stationary root counted once",
+      "Near-tangent non-root tolerance control",
+      "Root/table refinement convergence"
+    ],
+    "status": "NOT_VERIFIED"
+  },
+  "local_execution": {
+    "status": "NOT_RUN",
+    "reason": "Container/Python runtime returned ClientError; connected local workstation was offline."
+  },
+  "blockers": {
+    "source_cohort": "BLOCKED_BY_C6B_PROVIDER_COMPOSITION_SEMANTICS",
+    "pair_root_search": "NOT_RUN",
+    "tov": "NOT_RUN",
+    "cowling_spectra": "NOT_RUN"
+  },
+  "non_claims": [
+    "No Gibbs construction.",
+    "No local-neutrality physical adjudication.",
+    "No Seidov stability analysis.",
+    "No source-cohort admission.",
+    "No TOV/Cowling result."
+  ]
+}

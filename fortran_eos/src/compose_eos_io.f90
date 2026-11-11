@@ -176,6 +176,13 @@ contains
     eos%composition_file_present=file_exists
     if(eos%composition_file_present) then
       allocate(seen(eos%n));seen=.false.;eos%composition_available=.false.
+      ! M2A: per-row presence masks. row_status starts NOT_AVAILABLE (0).
+      ! The parser fills presence flags as each field is read; range/C3/C4
+      ! checks then promote to CHECKED (2) or FAIL (3), or leave PARTIAL (1).
+      eos%row_status=0
+      eos%yn_present=.false.; eos%yp_present=.false.; eos%ye_present=.false.; eos%ymu_present=.false.
+      eos%abar_present=.false.; eos%zbar_present=.false.; eos%yh_present=.false.
+      eos%c3_applicable=.false.; eos%c4_applicable=.false.
       do
         call next_line(u,line,ios)
         if(ios<0) exit
@@ -201,10 +208,10 @@ contains
           call token_int(tok,pos,pid,ok);if(.not.ok) then;close(u);status='invalid particle id';return;endif
           call token_real(tok,pos+1,v,ok);if(.not.ok) then;close(u);status='invalid particle fraction';return;endif
           select case(pid)
-          case(10);eos%yn(k)=v
-          case(11);eos%yp(k)=v
-          case(0);eos%ye(k)=v
-          case(1);eos%ymu(k)=v
+          case(10);eos%yn(k)=v;eos%yn_present(k)=.true.
+          case(11);eos%yp(k)=v;eos%yp_present(k)=.true.
+          case(0);eos%ye(k)=v;eos%ye_present(k)=.true.
+          case(1);eos%ymu(k)=v;eos%ymu_present(k)=.true.
           case default
             close(u);status='unsupported CompOSE particle id in this EOSData model';return
           end select
@@ -225,6 +232,7 @@ contains
             close(u);status='unsupported or invalid nuclear group';return
           endif
           eos%abar(k)=a;eos%zbar(k)=z;eos%yh(k)=a*yi
+          eos%abar_present(k)=.true.;eos%zbar_present(k)=.true.;eos%yh_present(k)=.true.
           if(a>0._wp.and.yi>0._wp)eos%composition_available=.true.
           pos=pos+4
         enddo
@@ -233,12 +241,44 @@ contains
       enddo
       close(u)
       if(.not.all(seen)) then;status='eos.compo does not cover the thermo grid';return;endif
-      if(any(eos%yn< -1.e-10_wp).or.any(eos%yp< -1.e-10_wp).or.any(eos%ye< -1.e-10_wp).or. &
-         any(eos%ymu< -1.e-10_wp).or.any(eos%yh>1._wp+5.e-3_wp)) then
-        status='composition fractions outside physical range';return
-      endif
+      ! M2A: per-row status + C3/C4 applicability. Phase-only rows (Npairs=0
+      ! and Nquad=0) are PARTIAL (1), not FAIL. The old global range check is
+      ! replaced by a per-row range check that sets row_status=FAIL only on the
+      ! offending rows; the read still succeeds so partial-coverage sources
+      ! (e.g. GM_GM1 outer-crust phase-only rows) do not abort the whole read.
+      do k=1,eos%n
+        if(.not.seen(k)) then
+          eos%row_status(k)=0  ! NOT_AVAILABLE
+          cycle
+        endif
+        ! per-row range: a written fraction outside [-1e-10, 1+5e-3] -> FAIL.
+        if((eos%yn_present(k).and.eos%yn(k)< -1.e-10_wp).or. &
+           (eos%yp_present(k).and.eos%yp(k)< -1.e-10_wp).or. &
+           (eos%ye_present(k).and.eos%ye(k)< -1.e-10_wp).or. &
+           (eos%ymu_present(k).and.eos%ymu(k)< -1.e-10_wp).or. &
+           (eos%yh_present(k).and.eos%yh(k)>1._wp+5.e-3_wp)) then
+          eos%row_status(k)=3  ! FAIL
+          cycle
+        endif
+        ! C3: complete baryon inventory for Yn+Yp+Yh=1 (Yn, Yp, Yh all present).
+        eos%c3_applicable(k) = eos%yn_present(k).and.eos%yp_present(k).and.eos%yh_present(k)
+        ! C4: complete charge inventory for Yp+(Z/A)Yh=Ye+Ymu (Yp, Abar>0, Zbar, Yh, Ye, Ymu).
+        eos%c4_applicable(k) = eos%yp_present(k).and.eos%abar_present(k).and. &
+                              eos%zbar_present(k).and.eos%yh_present(k).and. &
+                              eos%ye_present(k).and.eos%ymu_present(k).and. &
+                              eos%abar(k)>0._wp
+        ! status: CHECKED (2) if every required field for both C3 and C4 is
+        ! present and in range; PARTIAL (1) otherwise (e.g. phase-only rows,
+        ! or rows with only some lepton coverage). FAIL was already set above.
+        if(eos%c3_applicable(k).and.eos%c4_applicable(k)) then
+          eos%row_status(k)=2
+        else
+          eos%row_status(k)=1
+        endif
+      enddo
     else
       eos%composition_available=.false.
+      ! M2A: no compo file -> every row NOT_AVAILABLE (0); stays at default.
     endif
     eos%beta_equilibrated=maxval(abs(eos%q(5,:)))<1.e-8_wp
     status='ok'
@@ -251,11 +291,16 @@ contains
     integer::u,ios,i
     open(newunit=u,file=trim(path),status='replace',action='write',iostat=ios)
     if(ios/=0) then;status='cannot create internal EOS CSV';return;endif
-    write(u,'(a)')'nb,Q1,Q2,Q3,Q4,Q5,Q6,Q7,q_extra,Iphase,Yn,Yp,Ye,Ymu,Abar,Zbar,Yh'
+    write(u,'(a)')'nb,Q1,Q2,Q3,Q4,Q5,Q6,Q7,q_extra,Iphase,Yn,Yp,Ye,Ymu,Abar,Zbar,Yh,'// &
+      'row_status,yn_present,yp_present,ye_present,ymu_present,abar_present,zbar_present,yh_present,c3_applicable,c4_applicable'
     do i=1,eos%n
-      write(u,'(es25.16e3,7(",",es25.16e3),",",es25.16e3,",",i0,7(",",es25.16e3))') &
+      write(u,'(es25.16e3,7(",",es25.16e3),",",es25.16e3,",",i0,7(",",es25.16e3),",",i0,9(",",i0))') &
         eos%nb(i),eos%q(:,i),eos%q_extra(i),eos%iphase(i),eos%yn(i),eos%yp(i),eos%ye(i), &
-        eos%ymu(i),eos%abar(i),eos%zbar(i),eos%yh(i)
+        eos%ymu(i),eos%abar(i),eos%zbar(i),eos%yh(i),eos%row_status(i), &
+        merge(1,0,eos%yn_present(i)),merge(1,0,eos%yp_present(i)), &
+        merge(1,0,eos%ye_present(i)),merge(1,0,eos%ymu_present(i)), &
+        merge(1,0,eos%abar_present(i)),merge(1,0,eos%zbar_present(i)), &
+        merge(1,0,eos%yh_present(i)),merge(1,0,eos%c3_applicable(i)),merge(1,0,eos%c4_applicable(i))
     enddo
     close(u);status='ok'
   end subroutine write_internal_csv
@@ -264,7 +309,7 @@ contains
     character(len=*),intent(in)::path,meta_path
     type(eos_data_t),intent(out)::eos
     character(len=*),intent(out)::status
-    integer::u,ios,n,i,nt,k
+    integer::u,ios,n,i,nt,k,ival
     character(len=4096)::line
     character(len=96)::tok(64)
     logical::ok
@@ -306,7 +351,9 @@ contains
       call next_line(u,line,ios)
       if(ios/=0)then;close(u);status='unexpected EOF in internal EOS CSV';return;endif
       call split_tokens(line,tok,nt)
-      if(nt/=17)then;close(u);status='internal EOS CSV must have 17 fields';return;endif
+      ! M2A: accept either the legacy 17-field CSV (no masks; defaults applied)
+      ! or the new 27-field CSV (with masks). 27 is the current writer output.
+      if(nt/=17.and.nt/=27)then;close(u);status='internal EOS CSV must have 17 or 27 fields';return;endif
       do k=1,9
         if(k==10)cycle
         call token_real(tok,k,v,ok);if(.not.ok)then;close(u);status='invalid internal EOS value';return;endif
@@ -330,6 +377,29 @@ contains
         case(17);eos%yh(i)=v
         end select
       enddo
+      if(nt==27) then
+        ! M2A per-row mask columns 18..27. Read each as 0/1 integer.
+        call token_int(tok,18,ival,ok);if(.not.ok)then;close(u);status='invalid row_status';return;endif
+        eos%row_status(i)=ival
+        call token_int(tok,19,ival,ok);if(.not.ok)then;close(u);status='invalid yn_present';return;endif
+        eos%yn_present(i)=ival/=0
+        call token_int(tok,20,ival,ok);if(.not.ok)then;close(u);status='invalid yp_present';return;endif
+        eos%yp_present(i)=ival/=0
+        call token_int(tok,21,ival,ok);if(.not.ok)then;close(u);status='invalid ye_present';return;endif
+        eos%ye_present(i)=ival/=0
+        call token_int(tok,22,ival,ok);if(.not.ok)then;close(u);status='invalid ymu_present';return;endif
+        eos%ymu_present(i)=ival/=0
+        call token_int(tok,23,ival,ok);if(.not.ok)then;close(u);status='invalid abar_present';return;endif
+        eos%abar_present(i)=ival/=0
+        call token_int(tok,24,ival,ok);if(.not.ok)then;close(u);status='invalid zbar_present';return;endif
+        eos%zbar_present(i)=ival/=0
+        call token_int(tok,25,ival,ok);if(.not.ok)then;close(u);status='invalid yh_present';return;endif
+        eos%yh_present(i)=ival/=0
+        call token_int(tok,26,ival,ok);if(.not.ok)then;close(u);status='invalid c3_applicable';return;endif
+        eos%c3_applicable(i)=ival/=0
+        call token_int(tok,27,ival,ok);if(.not.ok)then;close(u);status='invalid c4_applicable';return;endif
+        eos%c4_applicable(i)=ival/=0
+      endif
     enddo
     close(u);status='ok'
   end subroutine read_internal_csv

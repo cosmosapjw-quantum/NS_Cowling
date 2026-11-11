@@ -60,6 +60,19 @@ class EOSData:
     composition_file_present: bool = False
     composition_available: bool = False
     beta_equilibrated: bool = False
+    # M2A per-row presence masks: row_status in {0=NOT_AVAILABLE, 1=PARTIAL,
+    # 2=CHECKED, 3=FAIL}; *_present is per-row logical (a written zero is True,
+    # a missing entry is False); c3/c4_applicable per-row logical.
+    row_status: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=np.int64))
+    Yn_present: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=bool))
+    Yp_present: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=bool))
+    Ye_present: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=bool))
+    Ymu_present: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=bool))
+    Abar_present: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=bool))
+    Zbar_present: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=bool))
+    Yh_present: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=bool))
+    C3_applicable: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=bool))
+    C4_applicable: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=bool))
     source_dir: str | None = field(default=None, repr=False, compare=False)
 
     @property
@@ -98,11 +111,27 @@ class EOSData:
         directory = Path(directory)
         metadata = _read_metadata(directory / "eos_data.nml")
         with (directory / "eos_data.csv").open(newline="", encoding="utf-8") as stream:
-            rows = list(csv.DictReader(stream))
+            reader = csv.DictReader(stream)
+            rows = list(reader)
+            header = reader.fieldnames or []
         if not rows:
             raise ValueError("Fortran backend produced an empty EOSData CSV")
-        def col(name: str, dtype=float):
+        def col(name: str, dtype=float, default=None):
+            if name not in header:
+                if default is None:
+                    raise ValueError(f"missing required column {name}")
+                n = len(rows)
+                if dtype is int:
+                    return np.asarray([default] * n, dtype=np.int64)
+                if dtype is bool:
+                    return np.asarray([default] * n, dtype=bool)
+                return np.asarray([default] * n, dtype=dtype)
+            if dtype is bool:
+                # the fortran writes 0/1 integers; convert via int to avoid
+                # bool('0') being True (non-empty string).
+                return np.asarray([bool(int(row[name])) for row in rows], dtype=bool)
             return np.asarray([dtype(row[name]) for row in rows])
+        has_masks = "row_status" in header
         return cls(
             nb=col("nb"), mn=float(metadata["mn"]), mp=float(metadata["mp"]),
             Q1=col("Q1"), Q2=col("Q2"), Q3=col("Q3"), Q4=col("Q4"),
@@ -114,24 +143,84 @@ class EOSData:
             charge_fraction_grid=float(metadata["charge_fraction_grid"]), q_extra_count=int(metadata["nadd"]),
             composition_file_present=bool(metadata["composition_file_present"]),
             composition_available=bool(metadata["composition_available"]),
-            beta_equilibrated=bool(metadata["beta_equilibrated"]), source_dir=source_dir,
+            beta_equilibrated=bool(metadata["beta_equilibrated"]),
+            # M2A masks: default to 0 / False if the backend wrote a legacy 17-col CSV.
+            # NOTE: the Fortran CSV header uses lowercase column names (row_status,
+            # yn_present, ...) which differ from the dataclass field names. The col
+            # helper looks up by exact name, so use the lowercase header names here.
+            row_status=col("row_status", int, default=0),
+            Yn_present=col("yn_present", bool, default=False),
+            Yp_present=col("yp_present", bool, default=False),
+            Ye_present=col("ye_present", bool, default=False),
+            Ymu_present=col("ymu_present", bool, default=False),
+            Abar_present=col("abar_present", bool, default=False),
+            Zbar_present=col("zbar_present", bool, default=False),
+            Yh_present=col("yh_present", bool, default=False),
+            C3_applicable=col("c3_applicable", bool, default=False),
+            C4_applicable=col("c4_applicable", bool, default=False),
+            source_dir=source_dir,
         )
 
     def write_internal_directory(self, directory: str | Path) -> Path:
         directory = Path(directory)
         directory.mkdir(parents=True, exist_ok=True)
         csv_path = directory / "eos_data.csv"
+        n = self.n
+        # M2A masks: if a caller constructed an EOSData directly (e.g. reconstruct_master)
+        # the mask arrays may be empty. Derive safe defaults from the existing
+        # composition arrays so legacy-constructed objects still round-trip:
+        #   row_status: 2 (CHECKED) if composition_available else 0 (NOT_AVAILABLE)
+        #   *_present: True where the corresponding array has a nonzero/positive entry
+        #   C3/C4: not re-derived here (set by the parser); default False.
+        def _mask_arr(arr, default):
+            if arr is None or arr.size == 0:
+                return np.asarray([default] * n)
+            if arr.size != n:
+                # mismatched -> pad/truncate is unsafe; fall back to default
+                return np.asarray([default] * n)
+            return arr
+        rs = _mask_arr(getattr(self, "row_status", None), 2 if self.composition_available else 0).astype(int)
+        def _bool_from(arr, default):
+            a = _mask_arr(arr, default)
+            return a.astype(bool)
+        # default *_present: derived from the existing arrays (a written zero is still
+        # present in the legacy CSV; we cannot distinguish written-zero from missing in
+        # the legacy format, so mark as present iff composition_available).
+        yn_p = _bool_from(getattr(self, "Yn_present", None), self.composition_available)
+        yp_p = _bool_from(getattr(self, "Yp_present", None), self.composition_available)
+        ye_p = _bool_from(getattr(self, "Ye_present", None), self.composition_available)
+        ymu_p = _bool_from(getattr(self, "Ymu_present", None), self.composition_available)
+        abar_p = _bool_from(getattr(self, "Abar_present", None), self.composition_available)
+        zbar_p = _bool_from(getattr(self, "Zbar_present", None), self.composition_available)
+        yh_p = _bool_from(getattr(self, "Yh_present", None), self.composition_available)
+        c3 = _bool_from(getattr(self, "C3_applicable", None), False)
+        c4 = _bool_from(getattr(self, "C4_applicable", None), False)
         fields = ["nb", "Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "q_extra",
-                  "Iphase", "Yn", "Yp", "Ye", "Ymu", "Abar", "Zbar", "Yh"]
+                  "Iphase", "Yn", "Yp", "Ye", "Ymu", "Abar", "Zbar", "Yh",
+                  # M2A per-row masks
+                  "row_status", "Yn_present", "Yp_present", "Ye_present", "Ymu_present",
+                  "Abar_present", "Zbar_present", "Yh_present",
+                  "C3_applicable", "C4_applicable"]
         arrays = [self.nb, self.Q1, self.Q2, self.Q3, self.Q4, self.Q5, self.Q6, self.Q7,
                   self.q_extra, self.Iphase, self.Yn, self.Yp, self.Ye, self.Ymu,
-                  self.Aav, self.Zav, self.Yh]
+                  self.Aav, self.Zav, self.Yh,
+                  rs, yn_p, yp_p, ye_p, ymu_p, abar_p, zbar_p, yh_p, c3, c4]
+        # integer columns (Iphase=10, row_status=18); bool columns are 19..26
+        int_idx = {9, 17}
+        bool_idx = {18, 19, 20, 21, 22, 23, 24, 25, 26}
         with csv_path.open("w", newline="", encoding="utf-8") as stream:
             writer = csv.writer(stream)
             writer.writerow(fields)
-            for i in range(self.n):
-                writer.writerow([format(float(a[i]), ".17e") if j != 9 else int(a[i])
-                                 for j, a in enumerate(arrays)])
+            for i in range(n):
+                row = []
+                for j, a in enumerate(arrays):
+                    if j in int_idx:
+                        row.append(int(a[i]))
+                    elif j in bool_idx:
+                        row.append(1 if bool(a[i]) else 0)
+                    else:
+                        row.append(format(float(a[i]), ".17e"))
+                writer.writerow(row)
         (directory / "eos_data.nml").write_text(
             "&metadata\n"
             f" mn={self.mn:.17e}\n mp={self.mp:.17e}\n il={self.Il}\n iT={self.iT}\n"
@@ -146,9 +235,17 @@ class EOSData:
         return directory
 
     def copy(self) -> "EOSData":
-        values = {name: np.array(getattr(self, name), copy=True) for name in
-                  ("nb","Q1","Q2","Q3","Q4","Q5","Q6","Q7","q_extra","Iphase",
-                   "Yn","Yp","Ye","Ymu","Aav","Zav","Yh")}
+        names = ("nb","Q1","Q2","Q3","Q4","Q5","Q6","Q7","q_extra","Iphase",
+                 "Yn","Yp","Ye","Ymu","Aav","Zav","Yh",
+                 "row_status","Yn_present","Yp_present","Ye_present","Ymu_present",
+                 "Abar_present","Zbar_present","Yh_present","C3_applicable","C4_applicable")
+        values = {}
+        for name in names:
+            a = getattr(self, name, None)
+            if a is None:
+                values[name] = np.zeros(0, dtype=np.int64 if name == "row_status" else bool)
+            else:
+                values[name] = np.array(a, copy=True)
         return EOSData(**values, mn=self.mn, mp=self.mp, Il=self.Il, iT=self.iT, iYq=self.iYq,
             inb_start=self.inb_start, temperature_mev=self.temperature_mev,
             charge_fraction_grid=self.charge_fraction_grid, q_extra_count=self.q_extra_count,

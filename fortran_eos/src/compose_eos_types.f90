@@ -10,6 +10,21 @@ module compose_eos_types
     real(wp), allocatable :: nb(:), q(:,:), q_extra(:)
     integer, allocatable :: iphase(:)
     real(wp), allocatable :: yn(:), yp(:), ye(:), ymu(:), abar(:), zbar(:), yh(:)
+    !--- M2A per-row presence masks (zero != missing) -----------------------
+    ! row_status: 0=NOT_AVAILABLE (no compo row), 1=PARTIAL (some required field
+    !   missing), 2=CHECKED (all required fields present and in physical range),
+    !   3=FAIL (present but out of range or C3/C4 violated).
+    ! *_present: per-row logical, .true. iff the particle-id/group field was
+    !   explicitly written in the eos.compo row (so a written zero is .true.,
+    !   a missing entry is .false.). This is the zero-vs-missing distinction.
+    ! c3_applicable: per-row, .true. iff the complete baryon inventory needed
+    !   for Yn+Yp+Yh=1 is present (Yn, Yp, and the group baryon fraction Yh).
+    ! c4_applicable: per-row, .true. iff the complete charge inventory needed
+    !   for Yp+(Z/A)Yh=Ye+Ymu is present (Yp, Abar>0 with Zbar, Yh, Ye, Ymu).
+    integer, allocatable :: row_status(:)
+    logical, allocatable :: yn_present(:), yp_present(:), ye_present(:), ymu_present(:)
+    logical, allocatable :: abar_present(:), zbar_present(:), yh_present(:)
+    logical, allocatable :: c3_applicable(:), c4_applicable(:)
   end type eos_data_t
   public :: allocate_eos, validate_eos, eos_pressure, eos_energy, eos_mu_b, eos_mu_q, eos_mu_l, eos_free_energy
 contains
@@ -27,12 +42,31 @@ contains
     if(allocated(eos%abar)) deallocate(eos%abar)
     if(allocated(eos%zbar)) deallocate(eos%zbar)
     if(allocated(eos%yh)) deallocate(eos%yh)
+    if(allocated(eos%row_status)) deallocate(eos%row_status)
+    if(allocated(eos%yn_present)) deallocate(eos%yn_present)
+    if(allocated(eos%yp_present)) deallocate(eos%yp_present)
+    if(allocated(eos%ye_present)) deallocate(eos%ye_present)
+    if(allocated(eos%ymu_present)) deallocate(eos%ymu_present)
+    if(allocated(eos%abar_present)) deallocate(eos%abar_present)
+    if(allocated(eos%zbar_present)) deallocate(eos%zbar_present)
+    if(allocated(eos%yh_present)) deallocate(eos%yh_present)
+    if(allocated(eos%c3_applicable)) deallocate(eos%c3_applicable)
+    if(allocated(eos%c4_applicable)) deallocate(eos%c4_applicable)
     eos%n=n
     allocate(eos%nb(n),eos%q(7,n),eos%q_extra(n),eos%iphase(n))
     allocate(eos%yn(n),eos%yp(n),eos%ye(n),eos%ymu(n),eos%abar(n),eos%zbar(n),eos%yh(n))
+    allocate(eos%row_status(n))
+    allocate(eos%yn_present(n),eos%yp_present(n),eos%ye_present(n),eos%ymu_present(n))
+    allocate(eos%abar_present(n),eos%zbar_present(n),eos%yh_present(n))
+    allocate(eos%c3_applicable(n),eos%c4_applicable(n))
     eos%nb=0._wp; eos%q=0._wp; eos%q_extra=0._wp; eos%iphase=0
     eos%yn=0._wp; eos%yp=0._wp; eos%ye=0._wp; eos%ymu=0._wp
     eos%abar=0._wp; eos%zbar=0._wp; eos%yh=0._wp
+    ! M2A defaults: no compo row yet (NOT_AVAILABLE), nothing present, C3/C4 not applicable.
+    eos%row_status=0
+    eos%yn_present=.false.; eos%yp_present=.false.; eos%ye_present=.false.; eos%ymu_present=.false.
+    eos%abar_present=.false.; eos%zbar_present=.false.; eos%yh_present=.false.
+    eos%c3_applicable=.false.; eos%c4_applicable=.false.
   end subroutine allocate_eos
 
   subroutine validate_eos(eos,ok,message)

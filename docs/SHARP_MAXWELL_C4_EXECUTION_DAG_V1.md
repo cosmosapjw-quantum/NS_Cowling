@@ -194,3 +194,26 @@ Before promotion, record exact live branch heads, native source hashes, Q3 conve
 A new Il=0 analytic two-phase test failed before the fix at the intended native source-Q3 validation gate and passed after the correction. The exported PR #1 source artifact built with GNU Fortran 14.2.0; the full frontend/pipeline suite passed 68 tests in 13.57 s and the native quartic-extrema test passed. The exported source had no .git metadata, so this is not a committed checkout replay. Re-fetch and rerun the exact live PR #1 head after the remote update. C4-D3R remains a required gate until the exact-head replay receipts are present.
 
 C4-D4/C6B remains the independent provider-semantics blocker. No C4-D8 pilot or 65-pair search has been run or authorized by this validation increment.
+
+
+## 11. PR #3 native phase-aware stellar solver import (2026-11-11)
+
+The PR #3 solver components have now been imported into the PR #1 EOS implementation branch for exact-head validation. The C4-D0..D10 DAG remains the sole cohort workflow; this import does not change C6B provider semantics or admit any source/pair.
+
+Imported production seams:
+- ns_maxwell_tov::integrate_maxwell_tov: separate high-density core and low-density envelope integrated to/from the exact transition pressure.
+- ns_maxwell_cowling::shoot_maxwell_cowling: phase-resolved Cowling shot with one-sided interface transfer.
+- ns_maxwell_mode_spectrum::scan_maxwell_modes: frequency scanning and root bracketing, retaining slow and rapid conversion separately.
+- ns_production_solvers::solve_tov_star/solve_cowling_spectrum: smooth and sharp-Maxwell production dispatch.
+- ns_maxwell_cases: table and analytic fixture command-driver entry points.
+- ns_interface_transfer: material/rapid one-sided transfer maps.
+- python_frontend/compose_cowling/maxwell.py: independent Python/SciPy reference.
+- Native checks: maxwell_checks.f90, maxwell_table_checks.f90; Python checks: test_maxwell_star.py; reference scripts: validate_maxwell_interface.py, validate_native_maxwell_reference.py.
+
+C4-D10 now requires exact Pt core/envelope stitching, separate slow/material and rapid boundary-condition checks, TOV mass/radius/interface-radius convergence, independent Python/SciPy comparison, ODE and root-grid refinement, and distinct NO_ROOT, MULTIPLE_ROOT, ACAUSAL, UNSTABLE_ONSET, and NUMERICAL_INCONCLUSIVE statuses.
+
+The native import is NOT YET exact-head implementation-verified on the PR #1 branch. The read-only workflow .github/workflows/maxwell-native-fortran.yml builds/tests the FPM production dispatch and runs the independent references on the exact PR head SHA. A green run is required before marking any imported solver seam verified.
+
+The old maxwell-sharp-interface-gate.yml was deliberately not copied as an active workflow because it has contents: write and automatically commits/pushes a patch from CI. Its useful validation intent is represented by explicit read-only tests and logs instead. The old maxwell-reference-regression.yml checks were folded into the new exact-head workflow to avoid duplicate hardcoded-branch jobs.
+
+The source-backed 65-pair calculations remain blocked until C4-D0..D7, C4-D3R, and C6B provider semantics are resolved. The imported analytic solver fixtures do not substitute for admitted CompOSE phase branches.

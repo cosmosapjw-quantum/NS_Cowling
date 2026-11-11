@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.3.1",
+  "revision": "1.4.0",
   "created_utc": "2026-11-11",
-  "status": "CLOUD_BRANCH_CI_PASS_BLOCKED_ON_RAW_SOURCE_ARCHIVE_AND_PHYSICS_GATES",
+  "status": "CLOUD_BRANCH_CI_BASELINE_PASS_BLOCKED_ON_REPLACEMENT_ZIP_STAGING_AND_PHYSICS_GATES",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "cloud/eos390-fortran-unification-v1",
@@ -236,7 +236,13 @@
     "legacy_390_summary": "/ns_eos/Crust_Core_Matching_390_Summary.csv",
     "legacy_390_output": "/ns_eos/matched_eos_all_combinations",
     "v3_2_release_root": "/EoS_core_crust_release_v3_2_20261106",
-    "oscillation_followup_root": "/ns_oscillation_followup_20261106"
+    "oscillation_followup_root": "/ns_oscillation_followup_20261106",
+    "reconstruction_archive": {
+      "dropbox_path": "/EoS_core_crust_release_v3_2_20261106/EoS_complete_core_crust_release_v3_2.zip",
+      "delivery_manifest": "/EoS_core_crust_release_v3_2_20261106/DELIVERY_MANIFEST_v3_2.json",
+      "source_subtree": "code_package/eos_data/",
+      "inventory": "data/eos390_reconstructed_source_inventory.v1.json"
+    }
   },
   "baseline": {
     "source": "Dropbox EOS core-crust release v3.2 dated 2026-11-06",
@@ -400,13 +406,15 @@
       "gate": "M0",
       "title": "Freeze and hash all source/data baselines",
       "depends_on": [],
-      "status": "BLOCKED_USER_RAW_ARCHIVE_REQUIRED",
+      "status": "BLOCKED_REPLACEMENT_ZIP_NOT_STAGED",
       "files": [
         "data/eos390_native_fortran_unification_dag.v1.json"
       ],
       "outputs": [
-        "raw-source manifest",
-        "model/readme/pdf registry",
+        "replacement ZIP SHA-256/size/CRC verification receipt",
+        "18-model/158-file exact source inventory comparison",
+        "fresh per-file SHA256SUMS.txt",
+        "new reconstructed tar.zst and source manifest",
         "legacy output manifest"
       ]
     },
@@ -930,6 +938,18 @@
       "tests": "10 passed in prior C6B audit",
       "production_changed": false,
       "pairs_before_root_search": "65 BLOCKED"
+    },
+    "reconstructed_source_cohort": {
+      "status": "DROPBOX_METADATA_INVENTORY_VERIFIED_BINARY_HASH_PENDING",
+      "models": 18,
+      "files": 158,
+      "total_file_bytes": 3883275,
+      "current_vs_v3_2_relative_paths_and_sizes": "158_OF_158_MATCH",
+      "source_archive": "EoS_complete_core_crust_release_v3_2.zip",
+      "archive_sha256": "REPORTED_BY_DELIVERY_MANIFEST_ONLY",
+      "cloud_staging": "NOT_DONE",
+      "fresh_file_hashes": "NOT_DONE",
+      "regenerated_390": "NOT_RUN"
     }
   },
   "legacy_feature_inventory": [
@@ -1433,13 +1453,33 @@
       "machine_plan": "data/eos390_native_fortran_unification_dag.v1.json",
       "developer_contract": "docs/EOS390_NATIVE_FORTRAN_UNIFICATION_CONTRACT_20261111.md",
       "bibliography": "data/eos390_source_bibliography.v1.json",
-      "raw_eos_data": "user-supplied, checksum-locked cloud input archive; not the repository normalized tree",
-      "historical_outputs": "read-only Dropbox v3.2 output archive"
+      "raw_eos_data": "Surviving Dropbox EoS_complete_core_crust_release_v3_2.zip, verified by v3.2 delivery manifest after cloud staging; checked-in source inventory; fresh extracted per-file SHA256SUMS.txt. The normalized GitHub tree is not a byte-identical source.",
+      "historical_outputs": "read-only Dropbox v3.2 output archive",
+      "source_inventory": "data/eos390_reconstructed_source_inventory.v1.json"
     },
     "input_staging": {
       "required": true,
-      "expected_archive_name": "NS_Cowling_EOS390_raw_inputs_v1.tar.zst",
-      "staging_directory": "${WORKSPACE}/inputs/raw_compose",
+      "expected_archive_name": "EoS_complete_core_crust_release_v3_2.zip",
+      "staging_directory": "${WORKSPACE}/inputs/replacement",
+      "source_inventory": "data/eos390_reconstructed_source_inventory.v1.json",
+      "source_subtree_suffix": "code_package/eos_data/",
+      "dropbox_path": "/EoS_core_crust_release_v3_2_20261106/EoS_complete_core_crust_release_v3_2.zip",
+      "delivery_manifest_path": "/EoS_core_crust_release_v3_2_20261106/DELIVERY_MANIFEST_v3_2.json",
+      "expected_archive_size_bytes": 19398255,
+      "expected_archive_sha256_from_delivery_manifest": "d671310eb630ffd13f1b278425d945741ad7e08ce14c0d9aff42309c707e6a3b",
+      "expected_archive_sha256_status": "HISTORICAL_MANIFEST_VALUE_REQUIRES_INDEPENDENT_CLOUD_REHASH",
+      "dropbox_revision": "65fba15b552db0af03d47",
+      "dropbox_content_hash": "a019e13e21de29726aead8c7d75caddf6013432d59db730ec58848825f87ed26",
+      "expected_zip_members": 2516,
+      "expected_models": 18,
+      "expected_source_files": 158,
+      "expected_source_bytes": 3883275,
+      "historical_zip_crc_status": "PASS_REPORTED_IN_V3_2_DELIVERY_MANIFEST; RECHECK_IN_CLOUD",
+      "required_manifest": "DELIVERY_MANIFEST_v3_2.json; generate fresh SHA256SUMS.txt after exact-byte extraction",
+      "output_directory": "${WORKSPACE}/inputs/raw_compose",
+      "reconstructed_archive_name": "NS_Cowling_EOS390_reconstructed_inputs_v2.tar.zst",
+      "reconstruction_helper": "scripts/prepare_eos390_reconstructed_inputs.py",
+      "upload_status": "REPLACEMENT_ARCHIVE_EXISTS_IN_DROPBOX_BUT_IS_NOT_STAGED_IN_CLOUD",
       "required_models": [
         "SPG_M1",
         "SPG_M2",
@@ -1470,15 +1510,18 @@
         "eos.micro/eos.mr when part of the released source package",
         "provider data sheet or stable paper citation record"
       ],
-      "required_manifest": "SHA256SUMS.txt covering every staged source file",
       "rules": [
-        "Do not substitute eos_generator/eos_data_normalized for the original raw archive.",
-        "Do not infer raw identity from extracted text or numerical equality.",
-        "No source file may be edited, normalized, or regenerated in place.",
-        "Preserve absent files as absent; never synthesize missing sidecars.",
-        "If the archive is unavailable, stop at M0 and request upload."
-      ],
-      "upload_status": "NOT_STAGED_USER_UPLOAD_REQUIRED"
+        "Do not request or wait for the lost NS_Cowling_EOS390_raw_inputs_v1.tar.zst.",
+        "Do not substitute normalized GitHub EOS tables for provider source bytes.",
+        "Stage the surviving v3.2 ZIP from the exact Dropbox path and independently verify SHA-256, size, ZIP member count and CRC.",
+        "Use the checked-in inventory and helper to select only code_package/eos_data/<model>/<file>; preserve member bytes exactly and do not normalize or rewrite source files.",
+        "Require exact 18-model, 158-file and per-file-size match; reject duplicate, missing, extra, unsafe, nested, symlink or size-mismatched source members.",
+        "Preserve provider absences: APR_APR/eos.compo, BBB_BHF2/eos.compo and eos.mr, GM_GM1/eos.mr remain absent.",
+        "Generate fresh per-file SHA-256 values, SHA256SUMS.txt, source_manifest.json and a new reconstructed tar.zst.",
+        "The reconstructed archive is not byte-identical to the lost tar.zst.",
+        "Do not publish raw EOS bytes to the public GitHub repository unless redistribution permission is established.",
+        "M0 remains blocked until the ZIP binary is staged and every source-integrity check passes."
+      ]
     },
     "outputs": {
       "attempt_root": "${WORKSPACE}/artifacts/eos390/<UTC_RUN_ID>",
@@ -1539,10 +1582,12 @@
       "failed_tasks_must_remain_in_failure_catalogue": true,
       "no_silent_skip_or_retry_overwrite": true,
       "raw_archive_blocker": {
-        "status": "BLOCKED_USER_UPLOAD_REQUIRED",
-        "expected_name": "NS_Cowling_EOS390_raw_inputs_v1.tar.zst",
-        "staging_directory": "${WORKSPACE}/inputs/raw_compose",
-        "require_sha256_manifest": true
+        "status": "BLOCKED_REPLACEMENT_ZIP_NOT_STAGED",
+        "expected_name": "EoS_complete_core_crust_release_v3_2.zip",
+        "dropbox_path": "/EoS_core_crust_release_v3_2_20261106/EoS_complete_core_crust_release_v3_2.zip",
+        "staging_directory": "${WORKSPACE}/inputs/replacement",
+        "require_sha256_manifest": true,
+        "note": "The lost tar.zst is superseded by the surviving v3.2 ZIP; archive-level SHA-256 must be independently rechecked in cloud before M0 passes."
       }
     },
     "lean_snapshot": {
@@ -1655,7 +1700,7 @@
     }
   ],
   "next_actions": [
-    "User supplies NS_Cowling_EOS390_raw_inputs_v1.tar.zst with original 18 provider directories and SHA256SUMS.txt; stage outside Git in the cloud workspace.",
+    "Stage the surviving Dropbox archive EoS_complete_core_crust_release_v3_2.zip from /EoS_core_crust_release_v3_2_20261106/ into ${WORKSPACE}/inputs/replacement; verify it and run scripts/prepare_eos390_reconstructed_inputs.py with data/eos390_reconstructed_source_inventory.v1.json. Do not request the lost NS_Cowling_EOS390_raw_inputs_v1.tar.zst.",
     "Finish E390-02C: move find_density_gap selection and any production numerical selector from Python into Fortran; quarantine Python/SciPy prototypes as diagnostic-only.",
     "Implement E390-02A row-level, field-level, per-species and group presence masks; assess C3 and C4 independently per row.",
     "Implement E390-10 general CompOSE axes and lossless 1D/2D/3D reader/writer.",
@@ -1726,6 +1771,45 @@
         "sha256": "3d477cd5f535f9cafbc27f5b83e8b8c5c468f22d7433c410d3b9b2cb7f8b1463",
         "expires_at": "2026-12-11T13:12:20Z"
       }
+    },
+    "source_archive_reconstruction": {
+      "date_utc": "2026-11-11",
+      "status": "INVENTORY_AND_HELPER_COMMITTED_BINARY_STAGING_PENDING",
+      "inventory": "data/eos390_reconstructed_source_inventory.v1.json",
+      "helper": "scripts/prepare_eos390_reconstructed_inputs.py",
+      "helper_test": "python_frontend/tests/test_reconstructed_source_prep.py",
+      "archive": {
+        "filename": "EoS_complete_core_crust_release_v3_2.zip",
+        "size_bytes": 19398255,
+        "sha256_from_v3_2_delivery_manifest": "d671310eb630ffd13f1b278425d945741ad7e08ce14c0d9aff42309c707e6a3b",
+        "dropbox_revision": "65fba15b552db0af03d47",
+        "dropbox_content_hash": "a019e13e21de29726aead8c7d75caddf6013432d59db730ec58848825f87ed26",
+        "reported_zip_members": 2516,
+        "reported_crc_test": "PASS"
+      },
+      "source_listing_comparison": {
+        "models": 18,
+        "files_each": 158,
+        "total_file_bytes": 3883275,
+        "current_root": "/NS_Cowling/eos_generator/eos_data",
+        "v3_2_root": "/EoS_core_crust_release_v3_2_20261106/EoS_complete_core_crust_release_v3_2/code_package/eos_data",
+        "path_and_size_comparison": "EXACT_158_OF_158",
+        "byte_identity": "NOT_ESTABLISHED"
+      },
+      "lost_archive_identity": "UNPROVABLE_NEW_TAR_ZST_IS_A_VERSIONED_RECONSTRUCTION",
+      "blockers": [
+        "Binary source archive not staged in cloud",
+        "ZIP SHA-256 not independently rehashed",
+        "Fresh per-file hashes not yet computed",
+        "Physical implementation gates remain open"
+      ]
     }
+  },
+  "supersedes": {
+    "lost_archive_filename": "NS_Cowling_EOS390_raw_inputs_v1.tar.zst",
+    "disposition": "LOST_USER_CONFIRMED",
+    "replacement_inventory": "data/eos390_reconstructed_source_inventory.v1.json",
+    "replacement_archive": "EoS_complete_core_crust_release_v3_2.zip",
+    "rule": "Never request or fabricate the lost tar.zst. Reconstruct a new versioned tar.zst from the surviving ZIP using the checked-in inventory and helper."
   }
 }

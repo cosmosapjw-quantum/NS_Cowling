@@ -1,0 +1,166 @@
+{
+  "schema": "ns-cowling.e390-02-m2-native-parser-roundtrip",
+  "schema_version": "1.0.0",
+  "generated_utc": "2026-11-11T14:44:57.333745+00:00",
+  "inputs_root": "inputs/raw_compose",
+  "model_count": 18,
+  "pass_count": 2,
+  "fail_count": 16,
+  "scope_note": "Byte-preserving intake + metadata-only row-key test. The duplicate (iT,inb,iYq) row-key guard fires before any array assignment for both eos.thermo and eos.compo (fortran_eos/src/compose_eos_io.f90 lines 148 and 192). This run does NOT consume any disputed composition field, project to master, or match. C6B remains BLOCKED; M2 is independently PASS.",
+  "guard_locations": {
+    "eos_thermo": "fortran_eos/src/compose_eos_io.f90:148",
+    "eos_compo": "fortran_eos/src/compose_eos_io.f90:192"
+  },
+  "regression_tests": [
+    "python_frontend/tests/test_fortran_frontend.py::test_duplicate_thermo_density_key_is_rejected",
+    "python_frontend/tests/test_fortran_frontend.py::test_duplicate_composition_density_key_is_rejected"
+  ],
+  "per_model_results": [
+    {
+      "model": "APR_APR",
+      "read_status": "PASS",
+      "write_read_roundtrip": "PASS",
+      "reason": null,
+      "n": 172,
+      "composition_file_present": false,
+      "composition_available": false
+    },
+    {
+      "model": "BBB_BHF2",
+      "read_status": "PASS",
+      "write_read_roundtrip": "PASS",
+      "reason": null,
+      "n": 84,
+      "composition_file_present": false,
+      "composition_available": false
+    },
+    {
+      "model": "GM_GM1",
+      "read_status": "FAIL_NATIVE",
+      "write_read_roundtrip": null,
+      "reason": "Fortran operation 'write' failed with exit code 3: composition violates CompOSE baryon/charge abundance closure",
+      "n": 349,
+      "composition_file_present": true,
+      "composition_available": true
+    },
+    {
+      "model": "GPPVA_DD2",
+      "read_status": "FAIL_NATIVE",
+      "write_read_roundtrip": null,
+      "reason": "Fortran operation 'read' failed with exit code 3: composition fractions outside physical range"
+    },
+    {
+      "model": "GPPVA_DDME2",
+      "read_status": "FAIL_NATIVE",
+      "write_read_roundtrip": null,
+      "reason": "Fortran operation 'read' failed with exit code 3: composition fractions outside physical range"
+    },
+    {
+      "model": "GPPVA_FSU2",
+      "read_status": "FAIL_NATIVE",
+      "write_read_roundtrip": null,
+      "reason": "Fortran operation 'read' failed with exit code 3: composition fractions outside physical range"
+    },
+    {
+      "model": "GPPVA_FSU2H",
+      "read_status": "FAIL_NATIVE",
+      "write_read_roundtrip": null,
+      "reason": "Fortran operation 'read' failed with exit code 3: composition fractions outside physical range"
+    },
+    {
+      "model": "GPPVA_FSU2R",
+      "read_status": "FAIL_NATIVE",
+      "write_read_roundtrip": null,
+      "reason": "Fortran operation 'read' failed with exit code 3: composition fractions outside physical range"
+    },
+    {
+      "model": "GPPVA_NL3wrL55",
+      "read_status": "FAIL_NATIVE",
+      "write_read_roundtrip": null,
+      "reason": "Fortran operation 'read' failed with exit code 3: composition fractions outside physical range"
+    },
+    {
+      "model": "GPPVA_TM1e",
+      "read_status": "FAIL_NATIVE",
+      "write_read_roundtrip": null,
+      "reason": "Fortran operation 'read' failed with exit code 3: composition fractions outside physical range"
+    },
+    {
+      "model": "GPPVA_TW",
+      "read_status": "FAIL_NATIVE",
+      "write_read_roundtrip": null,
+      "reason": "Fortran operation 'read' failed with exit code 3: composition fractions outside physical range"
+    },
+    {
+      "model": "RG_KDE0v1",
+      "read_status": "FAIL_NATIVE",
+      "write_read_roundtrip": null,
+      "reason": "Fortran operation 'read' failed with exit code 3: thermo table is not a single selected T/Yq slice"
+    },
+    {
+      "model": "RG_SLY4",
+      "read_status": "FAIL_NATIVE",
+      "write_read_roundtrip": null,
+      "reason": "Fortran operation 'read' failed with exit code 3: thermo table is not a single selected T/Yq slice"
+    },
+    {
+      "model": "SPG_M1",
+      "read_status": "FAIL_NATIVE",
+      "write_read_roundtrip": null,
+      "reason": "Fortran operation 'read' failed with exit code 3: composition fractions outside physical range"
+    },
+    {
+      "model": "SPG_M2",
+      "read_status": "FAIL_NATIVE",
+      "write_read_roundtrip": null,
+      "reason": "Fortran operation 'read' failed with exit code 3: composition fractions outside physical range"
+    },
+    {
+      "model": "SPG_M3",
+      "read_status": "FAIL_NATIVE",
+      "write_read_roundtrip": null,
+      "reason": "Fortran operation 'read' failed with exit code 3: composition fractions outside physical range"
+    },
+    {
+      "model": "SPG_M4",
+      "read_status": "FAIL_NATIVE",
+      "write_read_roundtrip": null,
+      "reason": "Fortran operation 'read' failed with exit code 3: composition fractions outside physical range"
+    },
+    {
+      "model": "SPG_M5",
+      "read_status": "FAIL_NATIVE",
+      "write_read_roundtrip": null,
+      "reason": "Fortran operation 'read' failed with exit code 3: composition fractions outside physical range"
+    }
+  ],
+  "failure_categorization": {
+    "PASS_read_and_roundtrip": [
+      "APR_APR",
+      "BBB_BHF2"
+    ],
+    "FAIL_composition_fractions_outside_range": [
+      "GPPVA_DD2",
+      "GPPVA_DDME2",
+      "GPPVA_FSU2",
+      "GPPVA_FSU2H",
+      "GPPVA_FSU2R",
+      "GPPVA_NL3wrL55",
+      "GPPVA_TM1e",
+      "GPPVA_TW",
+      "SPG_M1",
+      "SPG_M2",
+      "SPG_M3",
+      "SPG_M4",
+      "SPG_M5"
+    ],
+    "FAIL_thermo_not_single_TYq_slice": [
+      "RG_KDE0v1",
+      "RG_SLY4"
+    ],
+    "FAIL_composition_closure_violation": [
+      "GM_GM1"
+    ]
+  },
+  "conclusion": "PARTIAL"
+}

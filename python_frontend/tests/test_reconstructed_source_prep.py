@@ -18,14 +18,16 @@ from prepare_eos390_reconstructed_inputs import (  # noqa: E402
 
 
 def _inventory():
+    models = {
+        "MODEL_A": [
+            {"name": "eos.nb", "size_bytes": 3},
+            {"name": "eos.thermo", "size_bytes": 4},
+        ]
+    }
+    models.update({f"EMPTY_{index:02d}": [] for index in range(17)})
     return {
         "counts": {"files": 2},
-        "models": {
-            "MODEL_A": [
-                {"name": "eos.nb", "size_bytes": 3},
-                {"name": "eos.thermo", "size_bytes": 4},
-            ]
-        },
+        "models": models,
         "replacement_archive": {
             "filename": "source.zip",
             "size_bytes": 123,

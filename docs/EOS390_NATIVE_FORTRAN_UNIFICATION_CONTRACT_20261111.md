@@ -424,12 +424,31 @@ The end goal is the 390 source-backed EOS pair-method regeneration, not merely a
 
 ## 13. Current execution state
 
-Initial safety patch prepared on the new branch:
+Initial safety patch has been committed on the new branch.
 
-- The native smooth matcher rejects the historical `maxwell` plateau token.
-- The Python frontend rejects the same false alias rather than invoking the plateau.
-- The five genuine smooth method tests remain separate.
-- The native CompOSE writer now has a phase-only serialization path and composition baryon/charge closure checks; it removes a stale `eos.compo` when the output contract says no sidecar.
-- Regression tests cover the temporary Maxwell fail-closed behavior and phase-only Iphase round-trip.
+- Native smooth `match_crust_core(method="maxwell")` rejects the historical zero-density-jump plateau.
+- Python frontend rejects that same false alias; only the five genuine smooth methods remain in the smooth API.
+- Native CompOSE writer supports phase-only `eos.compo` rows (`Npairs=0,Nquad=0`) to preserve provider-specific Iphase without fabricating particle fractions.
+- Native writer has composition range, baryon-closure and charge-closure guards; thermo-only rewrites remove stale composition sidecars.
+- Regression tests cover the fail-closed alias and phase-only sidecar round-trip.
 
-**Not yet verified:** no local Fortran build or pytest execution was possible in this ChatGPT host environment. The branch CI result is the next code-verification evidence. The sharp Maxwell kernel is still thermo-only; composition-aware integration into `match_crust_core`, native literature composition, and the complete 390 run remain pending. Do not describe the initial safety patch as a completed EOS390 implementation.
+### Legacy sharp-transition reference discovered
+
+The read-only module `eos_generator/compose_eos_pkg/compose_eos/phase_transitions.py` contains a separate sharp Maxwell construction (`build_maxwell_eos`), sharp-interface TOV plus Love integration (`solve_tov_with_phase_transition`), the pressure-corrected tidal jump (`tidal_y_jump`), a phenomenological Maxwell-CSS builder, and a physically distinct two-charge Gibbs path (`gibbs_mixed_phase`). These are reference algorithms only. The legacy Maxwell writer currently builds a sharp thermodynamic jump but sets particle and nuclear composition arrays to zero. It cannot be ported verbatim as the final EOS390 implementation. Use it to cross-check coexistence, Seidov and tidal-jump mathematics; implement branch-specific composition and provenance in Fortran.
+
+The Gibbs path uses P(mu_B,mu_Q) surfaces and global charge neutrality. It is a separate native feature-parity task and must not be conflated with the one-charge locally neutral Maxwell path.
+
+### First GitHub Actions execution
+
+Run: [43004945078](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43004945078) (run number 185), commit `64c6556c84f6aeec1a25877a4c7afdb878bcd18b`.
+
+Observed:
+- Fortran build: PASS.
+- Python frontend/direct-provider tests: PASS.
+- Native Fortran polynomial-extrema test: PASS.
+- `sha256sum -c SHA256SUMS_v4.txt`: FAIL because the manifest still contained pre-change hashes for edited tracked files.
+- Source archive packaging/upload: skipped after manifest failure.
+
+This is a checksum-maintenance failure, not a build/test failure. The follow-up commit refreshes the manifest against exact current branch contents; the checksum gate is not bypassed. A second Actions run is pending.
+
+**Not yet verified:** no local build or pytest was run in the ChatGPT host environment. The sharp Maxwell kernel in the common native matcher remains thermo-only; composition-aware Maxwell matching, provider literature solvers, full five-method composition matching, native TOV/tidal/Cowling production wiring and 390 regeneration remain pending. The old 390 outputs and raw sources remain immutable.

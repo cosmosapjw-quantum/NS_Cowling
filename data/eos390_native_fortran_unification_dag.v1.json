@@ -4,7 +4,7 @@
   "plan_id": "eos390_native_fortran_unification_v1",
   "revision": "1.0.0",
   "created_utc": "2026-11-11",
-  "status": "IN_PROGRESS_SPEC_AND_INITIAL_SAFETY_PATCH_PUBLISHED_CI_PENDING",
+  "status": "IN_PROGRESS_INITIAL_SAFETY_PATCH_BUILD_AND_TESTS_PASS_MANIFEST_REPAIR_CI_RETRY_PENDING",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "research/eos390-fortran-unification-v1",
@@ -243,7 +243,7 @@
         "Baryon and charge abundance closure are tested",
         "Unsupported formats are explicit errors"
       ],
-      "status": "PATCHED_STATIC_ONLY_CI_PENDING"
+      "status": "PATCHED_BUILD_PYTEST_FORTRAN_UNIT_PASS_SHA256_REPAIR_COMMITTED_CI_RETRY_PENDING"
     },
     {
       "id": "M3",
@@ -412,7 +412,8 @@
         "branch selector",
         "composition-aware P(mu) interpolation/root isolation",
         "jump-aware CompOSE output",
-        "Maxwell receipts"
+        "Maxwell receipts",
+        "Port legacy phase_transitions.py sharp Maxwell coexistence and Maxwell-CSS semantics, upgrading output to preserve both phases' CompOSE composition and provenance."
       ]
     },
     {
@@ -427,7 +428,8 @@
       "outputs": [
         "native stellar interfaces",
         "tidal Love solver or justified migration mapping",
-        "slow/rapid Cowling interface receipts"
+        "slow/rapid Cowling interface receipts",
+        "Port phase-transition TOV/Love tidal jump Delta y=-4*pi*r_t^3*Delta epsilon/(m_t+4*pi*r_t^3*P_t), and integrate existing phase-segmented Cowling boundary solvers."
       ]
     },
     {
@@ -514,7 +516,8 @@
       "verify all three directories",
       "hash source and baseline files",
       "inspect model READMEs/eos.pdf and references",
-      "run baseline build/tests before changing more code"
+      "run baseline build/tests before changing more code",
+      "Inspect eos_generator/compose_eos_pkg/compose_eos/phase_transitions.py as a read-only numerical reference; do not copy its composition-dropping output."
     ],
     "build_command": "bash fortran_eos/build.sh build/compose_eos_fortran",
     "test_command": "COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran PYTHONPATH=python_frontend python -m pytest -q python_frontend/tests pipeline/tests",
@@ -529,16 +532,150 @@
       "output_manifest.sha256",
       "readback.log",
       "C1-C11 reports",
-      "failure_catalog.json"
+      "failure_catalog.json",
+      "phase_topology_and_composition_mapping_receipt.json",
+      "legacy_feature_parity_inventory.json"
     ],
     "native_subagent": "NOT_RUN_BY_CHATGPT_HOST; do not simulate delegation or fabricate child receipts."
   },
   "evidence_status": {
-    "code_execution_in_this_turn": "NOT_RUN",
+    "code_execution_in_this_turn": "GITHUB_ACTIONS_BUILD_AND_TESTS_EXECUTED_LOCAL_RUNTIME_NOT_RUN",
     "static_source_patch": "PREPARED_AS_GITHUB_BLOBS_PENDING_COMMIT",
     "github_ci": "PENDING",
     "local_runtime": "UNAVAILABLE_TO_CHATGPT_HOST_DESKTOP_COMMANDER_OFFLINE",
     "source_cohort_admission": "NOT_ADMITTED",
-    "regenerated_390": "NOT_RUN"
+    "regenerated_390": "NOT_RUN",
+    "github_actions_execution": {
+      "first_run_id": 43004945078,
+      "first_run_number": 185,
+      "result": "PARTIAL",
+      "build": "PASS",
+      "pytest": "PASS",
+      "fortran_polynomial_extrema": "PASS",
+      "checksum_manifest": "FAIL_STALE_HASHES",
+      "source_archive": "SKIPPED",
+      "manifest_repair": "COMMITTED_IN_FOLLOWUP",
+      "ci_retry": "PENDING",
+      "local_runtime": "NOT_RUN"
+    }
+  },
+  "legacy_feature_inventory": [
+    {
+      "source": "eos_generator/compose_eos_pkg/compose_eos/matching.py",
+      "functions": [
+        "get_core_start_index",
+        "get_gauge_shifts",
+        "find_convex_transition_window",
+        "build_monotone_hermite_bridge",
+        "build_maxwell_plateau_bridge",
+        "match_crust_core",
+        "solve_star_3stage",
+        "solve_star_at_target_mass"
+      ],
+      "status": "READ_ONLY_REFERENCE; five smooth methods to port; the pressure-plateau build_maxwell is mislabelled and forbidden in production"
+    },
+    {
+      "source": "eos_generator/compose_eos_pkg/compose_eos/phase_transitions.py",
+      "functions": [
+        "build_maxwell_eos",
+        "write_maxwell_eos",
+        "read_maxwell_eos",
+        "tidal_y_jump",
+        "solve_tov_with_phase_transition",
+        "maxwell_tidal_jump_report",
+        "build_maxwell_css_eos",
+        "gibbs_mixed_phase",
+        "write_gibbs_eos",
+        "read_gibbs_eos"
+      ],
+      "status": "READ_ONLY_REFERENCE; true Maxwell and distinct Gibbs algorithms to port in Fortran; legacy Maxwell output drops composition and cannot be copied verbatim"
+    },
+    {
+      "source": "eos_generator/compose_eos_pkg/compose_eos/literature_solvers.py",
+      "functions": [
+        "dd_bulk_thermo",
+        "nl_bulk_thermo",
+        "gdfm_bulk_thermo",
+        "gm1_couplings_from_sat",
+        "solve_gm1_point",
+        "solve_apr_beta",
+        "solve_skyrme_beta"
+      ],
+      "status": "READ_ONLY_REFERENCE; port model-specific functions and parameters to Fortran with paper provenance"
+    },
+    {
+      "source": "eos_generator/compose_eos_pkg/compose_eos/io.py",
+      "functions": [
+        "read_compose",
+        "write_compose",
+        "_load_thermo",
+        "_load_compo",
+        "_extra_count"
+      ],
+      "status": "READ_ONLY_REFERENCE; port supported CompOSE semantics with no silent losses"
+    },
+    {
+      "source": "eos_generator/compose_eos_pkg/compose_eos/reconstruct.py",
+      "functions": [
+        "reconstruct_master",
+        "first_law_integral"
+      ],
+      "status": "READ_ONLY_REFERENCE; all scientific calculations move to native reconstruction"
+    },
+    {
+      "source": "eos_generator/compose_eos_pkg/compose_eos/consistency.py",
+      "functions": [
+        "check_consistency",
+        "phase_edge_derivative_mask",
+        "composition_closure"
+      ],
+      "status": "READ_ONLY_REFERENCE; native C1-C11 are authoritative"
+    },
+    {
+      "source": "eos_generator/compose_eos_pkg/compose_eos/tov.py",
+      "functions": [
+        "solve_tov",
+        "solve_tov_sequence",
+        "tidal_deformability"
+      ],
+      "status": "READ_ONLY_REFERENCE; Fortran stellar solvers are production"
+    },
+    {
+      "source": "python_frontend/compose_cowling/maxwell.py",
+      "functions": [
+        "phase-aware TOV/Cowling/interface workflows"
+      ],
+      "status": "PYTHON_NUMERICS_NOT_PRODUCTION; replace with native Fortran frontend wrappers"
+    }
+  ],
+  "non_matrix_feature_parity": {
+    "status": "PENDING_NOT_REQUIRED_TO_LABEL_A_390_ONE_CHARGE_MATRIX_RESULT",
+    "items": [
+      {
+        "id": "GIBBS_NATIVE_PARITY",
+        "scope": "Two conserved charges and global charge neutrality using P(mu_B,mu_Q) surfaces; distinct from locally neutral Maxwell.",
+        "legacy_source": "eos_generator/compose_eos_pkg/compose_eos/phase_transitions.py::gibbs_mixed_phase",
+        "native_target": "native Fortran phase-transition module",
+        "acceptance": [
+          "two-charge interpolation surfaces",
+          "global charge-neutrality root solve",
+          "mixed fraction in [0,1]",
+          "monotone stable mixed path",
+          "no one-charge Maxwell shortcut"
+        ]
+      },
+      {
+        "id": "MAXWELL_CSS_NATIVE_PARITY",
+        "scope": "Phenomenological CSS high-density phase builder with explicit Pt, energy jump and high-phase cs2.",
+        "legacy_source": "eos_generator/compose_eos_pkg/compose_eos/phase_transitions.py::build_maxwell_css_eos",
+        "native_target": "Fortran phase-transition module",
+        "acceptance": [
+          "explicit model-parameter provenance",
+          "sharp interface",
+          "no fabricated microscopic composition"
+        ]
+      }
+    ],
+    "policy": "Track separately from the 390 matrix; never reinterpret EOS390 method=maxwell."
   }
 }

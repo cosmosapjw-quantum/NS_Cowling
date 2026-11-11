@@ -295,3 +295,12 @@ The six native strict-thermo-only matching methods were built and tested on bran
 The push run reports a successful native `gfortran` build, 44 frontend/direct-provider tests passed in 23.50 s, 58/58 tracked SHA-256 checks passed, source archive creation and artifact upload. The pull-request run independently reports 44 tests passed in 18.52 s with the same manifest and packaging gates successful.
 
 The exact branch source snapshot is available as [`NS_Cowling-e2b7ef319b9bb73dc85023a757dc1449c8f22e3c`](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42378176837/artifacts/13576661259), artifact ID `13576661259`, size 198,970,172 bytes, uploaded ZIP SHA-256 `28793bbbfa0708a8b24d0cc2e128b0833e9eea16e3d30ea547172b172b62474b`, retention expiry 2026-12-07. The artifact ZIP digest and the repository's 58-entry source manifest are distinct integrity checks.
+
+
+## 12. Validation boundary with genuine Maxwell coexistence (2026-11-11)
+
+The six methods documented here remain smooth, one-dimensional, first-law-controlled crust-core bridges. In particular method="maxwell" is the historical smooth near-pressure-plateau compatibility bridge. It has no density jump, no latent-energy discontinuity, is_exact_maxwell=false, and seidov_applicable=false. None of the six methods is the genuine one-charge Maxwell construction.
+
+The separate native construct_maxwell_transition operation lives in compose_eos_phase_transition.f90 and uses two supplied cold phases in P(mu_E), with common Euler baryon chemical potential and pressure. Its Il=0 Q3 convention correction is now covered by a native regression; it does not alter any of the six smooth bridge algorithms or their API tokens. Do not compare a smooth-bridge pressure plateau with a physical coexistence pressure as though they were the same object.
+
+The documented six-method differential suite remains the historical reference for the smooth methods. The new full 68-case frontend/pipeline run also includes the genuine-Maxwell Il=0 regression; it is not a claim of 18-source admission or 65-pair physical validation.

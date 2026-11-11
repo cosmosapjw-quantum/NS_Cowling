@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.1.4",
+  "revision": "1.1.5",
   "created_utc": "2026-11-11",
-  "status": "IN_PROGRESS_CHECKOUT_EOL_REPAIR_CI_WITH_ASSERTION_FIX_PENDING",
+  "status": "IN_PROGRESS_MANIFEST_WORKTREE_BLOB_DIAGNOSTIC_CI_PENDING",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "research/eos390-fortran-unification-v1",
@@ -609,7 +609,7 @@
   "evidence_status": {
     "code_execution_in_this_turn": "GITHUB_ACTIONS_EXACT_HEAD_BUILD_78_PYTEST_POLYNOMIAL_EXTREMA_CSS_ANALYTIC_TEST_SHA256_MANIFEST_AND_ARCHIVE_PASS_LOCAL_RUNTIME_NOT_RUN",
     "static_source_patch": "COMMITTED_CI_VERIFIED",
-    "github_ci": "CSS_KERNEL_PASS_CHECKOUT_EOL_REPAIR_AND_DIAGNOSTIC_ASSERTION_FIX_PENDING",
+    "github_ci": "CSS_KERNEL_PASS_WORKTREE_BLOB_MANIFEST_DIAGNOSTIC_PENDING",
     "local_runtime": "NOT_RUN_DESKTOP_COMMANDER_OFFLINE_CONTAINER_EXEC_UNAVAILABLE",
     "source_cohort_admission": "NOT_ADMITTED",
     "regenerated_390": "NOT_RUN",
@@ -646,18 +646,26 @@
       "source_cohort_admission": "NOT_ADMITTED",
       "regenerated_390": "NOT_RUN",
       "latest_docs_ci": {
-        "id": 43010496646,
-        "head_sha": "8762d03c1c57552e94f2a97e8af4557037aca53e",
+        "id": 43011261697,
+        "head_sha": "ff014752c721cbaaabe8f3fb75734a4743119e54",
         "conclusion": "failure",
-        "failure": "Only docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md failed sha256sum -c; Fortran build, 78 pytest, polynomial-extrema and CSS analytic tests all passed.",
-        "diagnosis": "GitHub repository blob content hash matches manifest; checkout byte representation differed. Pin document eol=lf and add explicit CI checkout-byte assertion.",
-        "retry": "PENDING"
+        "results": [
+          "Fortran build PASS",
+          "78 pytest PASS",
+          "polynomial-extrema PASS",
+          "CSS analytic PASS",
+          "LF-only checkout assertion PASS",
+          "SHA-256 manifest FAIL only for docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md"
+        ],
+        "observation": "The checkout file was 31195 bytes and LF-only while repository API blob text length was 31190 UTF-16 code units; exact worktree/blob hashes were not yet printed. Do not assume CRLF remains the cause.",
+        "next": "Run checkout-vs-git-blob SHA and byte-count diagnostic, then choose a deterministic manifest policy."
       },
       "eol_repair_run_43011091262": {
         "id": 43011091262,
         "head_sha": "cb950178d0f15b92ddc6d0b89253153d51f08ac2",
-        "status": "IN_PROGRESS",
-        "note": "Triggered by .gitattributes eol=lf and checkout-byte diagnostic; diagnostic Python source initially contained over-escaped CRLF/LF byte literals. Preserve its eventual result; corrected diagnostic is committed separately."
+        "status": "CANCELLED",
+        "note": "Triggered by .gitattributes eol=lf and checkout-byte diagnostic; diagnostic Python source initially contained over-escaped CRLF/LF byte literals. Preserve its eventual result; corrected diagnostic is committed separately.",
+        "cancel_reason": "Newer commit superseded the run after the over-escaped diagnostic assertion failed."
       }
     },
     "open_source_pdf_download": "PUBLIC_ARXIV_PDF_URLS_CONFIRMED_DIRECT_CONTAINER_DOWNLOAD_TOOL_FAILED; LOCAL_AGENT_DOWNLOAD_REQUIRED",

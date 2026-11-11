@@ -70,15 +70,25 @@ jobs:
             -o build/compose_eos_fortran/test_css_segment
           build/compose_eos_fortran/test_css_segment
 
-      - name: Assert local-agent handoff document line endings
+      - name: Diagnose local-agent handoff document checkout bytes
         run: |
-          git check-attr text eol -- docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md
+          git check-attr -a -- docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md
+          git config --get core.autocrlf || true
+          git config --get core.eol || true
+          git hash-object docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md
+          git rev-parse :docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md
+          sha256sum docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md
           python - <<'PY'
           from pathlib import Path
-          data = Path("docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md").read_bytes()
-          assert b"\r\n" not in data, "handoff document contains CRLF after checkout"
-          assert data.endswith(b"\n"), "handoff document must end with LF"
-          print(f"handoff document checkout bytes: {len(data)}; LF-only: PASS")
+          from hashlib import sha256
+          import subprocess
+          name = "docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md"
+          worktree = Path(name).read_bytes()
+          blob = subprocess.check_output(["git", "show", f"HEAD:{name}"])
+          for label, data in (("worktree", worktree), ("git_blob", blob)):
+              print(f"{label}: bytes={len(data)} sha256={sha256(data).hexdigest()} "
+                    f"CRLF={data.count(bytes([13, 10]))} CR={data.count(bytes([13]))} "
+                    f"LF={data.count(bytes([10]))}")
           PY
 
       - name: Verify tracked SHA-256 manifest

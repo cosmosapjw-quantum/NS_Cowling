@@ -1,12 +1,12 @@
 {
   "schema": "ns-cowling.sharp-maxwell-c4-execution-plan",
-  "schema_version": "1.2.0",
+  "schema_version": "1.3.0",
   "plan_id": "sharp_maxwell_c4_execution_dag_v1",
   "created_date": "2026-11-10",
   "selected_stage": "C4",
   "selected_stage_definition": "Implementation DAG, execution order, computational platform, parallelization and checkpoints only. Source-admission calculations are planned but not executed in this stage.",
   "active_branch": "research/sharp-maxwell-cohort-admission-v1",
-  "pr4_head": "eef56512a8ba8d70e20f6a68c9ca101104d22fad",
+  "pr4_head": "b89e6878e03f0d6beaf44d6cb4c210b06aa0ceb2",
   "source_authority": {
     "branch": "research/maxwell-native-fortran-v1",
     "commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
@@ -183,7 +183,7 @@
         "Test rejection of Q5!=0, composition-bearing, Nadd!=0, internal Iphase discontinuity, incompatible masses and incompatible Il/Yq metadata",
         "Do not run any of the 65 cohort root searches or production TOV/Cowling"
       ],
-      "status": "PARTIAL_EXACT_HEAD_CI_PASS_ROOT_TOPOLOGY_AND_LOCAL_REPLAY_NOT_VERIFIED__SOURCE_COHORT_BLOCKED",
+      "status": "PARTIAL_EXACT_HEAD_CI_PASS_RECEIPTS_PUBLISHED_LOCAL_REPLAY_AND_ROOT_TOPOLOGY_NOT_VERIFIED_SOURCE_COHORT_BLOCKED",
       "result_policy": {
         "current_il0_fix": "TDD_RED_GREEN_REPRODUCED_IN_EXPORTED_PR1_SOURCE_ARTIFACT; 68 frontend/pipeline tests passed locally; local run directory has no Git metadata",
         "native_source_commit_to_replay": "FETCH_LIVE_PR1_HEAD",
@@ -304,7 +304,19 @@
           },
           "interpretation": "Exact analytic fixture independently solved symbolically and numerically in Wolfram; agrees with the repository's quadratic two-phase regression fixture. This checks the thermodynamic identity for this fixture only."
         },
-        "root_topology": "PARTIAL: exact-head CI covers one transverse root and disjoint-support rejection; the additional topology controls listed above remain NOT_VERIFIED."
+        "root_topology": "PARTIAL: one transverse root and disjoint-support rejection are represented in existing tests; tangential, multiple, shared-knot/deduplication and refinement controls remain NOT_VERIFIED.",
+        "local_execution": {
+          "status": "NOT_RUN",
+          "reason": "Repeated container.exec and Python runtime attempts returned ClientError before shell commands could begin; Desktop Commander device was offline."
+        },
+        "artifact_handling": {
+          "github_artifact_download": "PASS",
+          "artifact_id": 13826230310,
+          "artifact_sha256": "6b4d884929f6ef8e75057969086e1805f91fa5e28c785f1295161d329db7c5ff",
+          "extraction": "NOT_RUN",
+          "execution": "NOT_RUN"
+        },
+        "dropbox_backup": "PENDING_EXACT_DESTINATION_CONFIRMATION"
       }
     },
     {
@@ -556,7 +568,7 @@
   },
   "next_stage": "C5",
   "next_action": "C5 source-reader and C1-C11 read-only admission only. Preserve C6B; no source Maxwell root, one-pair pilot, 65-pair sweep, production TOV or Cowling spectrum until C4-D0..D7, C4-D3R and provider semantics pass. PR3 analytic implementation validation is now PASS but does not satisfy the source-admission gates.",
-  "plan_revision": "1.2.0",
+  "plan_revision": "1.3.0",
   "updated_date": "2026-11-11",
   "mutation_policy": {
     "M0": "READ_ONLY: inspect/fetch/test only; stop if branch/worktree identity is dirty or ambiguous",
@@ -586,7 +598,10 @@
     "2026-11-11: the six smooth matching identifiers are covered by a parameterized legacy differential test; historical maxwell remains a smooth zero-jump compatibility token.",
     "2026-11-11: record local shell ClientError, DNS failure, offline workstation and Dropbox binary URL policy as runtime blockers, not EOS numerical failures.",
     "2026-11-11: native subagent execution is NOT_RUN because no native delegation tool was available; do not report role-play or serial work as subagent execution.",
-    "2026-11-11: independent Wolfram analytic fixture residual is zero for the documented two quadratic phases; this does not admit any provider EOS pair."
+    "2026-11-11: independent Wolfram analytic fixture residual is zero for the documented two quadratic phases; this does not admit any provider EOS pair.",
+    "2026-11-11: four component validation receipts were written to the existing C4 branch and read back with exact blob SHAs.",
+    "2026-11-11: Dropbox /NS_Cowling_eos_wt/docs was inspected; no new Dropbox files were written pending exact destination confirmation.",
+    "2026-11-11: a second sandbox execution attempt again returned ClientError; do not equate GitHub artifact download with ZIP extraction or code execution."
   ],
   "failure_taxonomy": [
     "THERMODYNAMIC_CONVENTION_MISMATCH",
@@ -845,7 +860,7 @@
       "local_artifact_materialization": "PASS_FILE_MATERIALIZED; ZIP_INTERNAL_CRC_NOT_RECHECKED_DUE_CONTAINER_RUNTIME_FAILURE"
     }
   },
-  "pr4_head_semantics": "The branch HEAD immediately before the 2026-11-11 plan update; the resulting commit SHA is recorded in GitHub after publication.",
+  "pr4_head_semantics": "C4 branch tip immediately before this plan refresh; the resulting commit SHA is recorded by GitHub.",
   "local_agent_contract": {
     "document": "docs/EOS_RECONSTRUCTION_MAXWELL_LOCAL_AGENT_CONTRACT_20261111.md",
     "role": "Detailed coding contract and copyable handoff for executing C4-D3R within the existing DAG; this is not a second DAG.",
@@ -895,6 +910,56 @@
         "production TOV sequence",
         "Cowling spectra"
       ]
+    },
+    "published_receipts": {
+      "directory": "artifacts/sharp_maxwell/C4D3R_EOS_VALIDATION_20261111/",
+      "files": [
+        {
+          "role": "reconstruction",
+          "path": "artifacts/sharp_maxwell/C4D3R_EOS_VALIDATION_20261111/EOS_RECONSTRUCTION_VALIDATION_20261111.json",
+          "blob_sha": "e87766ae0f7005047c7d70114c6f9af5dee07b44",
+          "bytes": 4554,
+          "status": "PARTIAL_EXACT_HEAD_CI_COVERED_LOCAL_REPLAY_NOT_RUN"
+        },
+        {
+          "role": "smooth_matching",
+          "path": "artifacts/sharp_maxwell/C4D3R_EOS_VALIDATION_20261111/EOS_SMOOTH_MATCHING_VALIDATION_20261111.json",
+          "blob_sha": "90cba1439159f9f6494732f647bb547217399db3",
+          "bytes": 3894,
+          "status": "PARTIAL_EXACT_HEAD_CI_COVERED_LOCAL_REPLAY_NOT_RUN"
+        },
+        {
+          "role": "true_maxwell",
+          "path": "artifacts/sharp_maxwell/C4D3R_EOS_VALIDATION_20261111/EOS_TRUE_MAXWELL_KERNEL_VALIDATION_20261111.json",
+          "blob_sha": "a5acc6325bde070346d117fbc015ad5623085f92",
+          "bytes": 6123,
+          "status": "PARTIAL_ANALYTIC_FIXTURE_AND_NEGATIVE_CONTROLS_CI_COVERED_ROOT_TOPOLOGY_INCOMPLETE"
+        },
+        {
+          "role": "runtime",
+          "path": "artifacts/sharp_maxwell/C4D3R_EOS_VALIDATION_20261111/EOS_LOCAL_RUNTIME_RECEIPT_20261111.json",
+          "blob_sha": "268fa52bcb71465491d7a8db6f2c4e0bd63dc04a",
+          "bytes": 4633,
+          "status": "CI_PASS_LOCAL_RUNTIME_BLOCKED"
+        }
+      ],
+      "repository_branch": "research/sharp-maxwell-cohort-admission-v1",
+      "parent_head": "b89e6878e03f0d6beaf44d6cb4c210b06aa0ceb2",
+      "note": "Each JSON was fetched back from GitHub after creation; blob SHAs and byte counts are read-back values."
+    },
+    "dropbox_backup": {
+      "status": "PENDING_EXACT_DESTINATION_CONFIRMATION",
+      "existing_project_backup_folder": "/NS_Cowling_eos_wt/docs",
+      "existing_handoff_file": "/NS_Cowling_eos_wt/docs/EOS_RECONSTRUCTION_MAXWELL_HANDOFF_20261111.txt",
+      "proposed_additions": [
+        "EOS_RECONSTRUCTION_MAXWELL_LOCAL_AGENT_CONTRACT_20261111.md",
+        "EOS_RECONSTRUCTION_VALIDATION_20261111.json",
+        "EOS_SMOOTH_MATCHING_VALIDATION_20261111.json",
+        "EOS_TRUE_MAXWELL_KERNEL_VALIDATION_20261111.json",
+        "EOS_LOCAL_RUNTIME_RECEIPT_20261111.json"
+      ],
+      "write_occurred": false,
+      "reason": "Dropbox file upload requires user-confirmed exact destination path and source file attachments; existing backup directory is known but no Dropbox write has been made."
     }
   }
 }

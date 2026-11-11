@@ -6,8 +6,19 @@ import pytest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "python_frontend"))
 
-from compose_eos import read_compose, write_compose, check_consistency, NativeFeatureUnavailable
+from compose_eos import (read_compose, write_compose, check_consistency,
+                         NativeFeatureUnavailable, NativeExecutionError)
 SAMPLE = ROOT / "eos_generator" / "eos_data_normalized" / "GPPVA_FSU2H"
+
+
+def _append_duplicate_first_record(path: Path, *, skip_header: bool = False) -> None:
+    lines = path.read_text(encoding="utf-8").splitlines()
+    records = [line for line in lines if line.strip() and not line.lstrip().startswith("#")]
+    if not records:
+        raise AssertionError(f"fixture has no records: {path}")
+    first = records[1] if skip_header else records[0]
+    lines.append(first)
+    path.write_text("\\n".join(lines) + "\\n", encoding="utf-8")
 
 
 def test_fortran_reader_verifier_and_roundtrip(tmp_path):
@@ -119,3 +130,23 @@ def test_internal_metadata_parses_fortran_l1_logical_values(tmp_path):
     assert parsed["composition_file_present"] is False
     assert parsed["composition_available"] is False
     assert parsed["beta_equilibrated"] is True
+
+
+def test_duplicate_thermo_density_key_is_rejected(tmp_path):
+    import shutil
+
+    source = tmp_path / "duplicate-thermo"
+    shutil.copytree(SAMPLE, source)
+    _append_duplicate_first_record(source / "eos.thermo", skip_header=True)
+    with pytest.raises(NativeExecutionError, match="duplicate eos.thermo row key"):
+        read_compose(source)
+
+
+def test_duplicate_composition_density_key_is_rejected(tmp_path):
+    import shutil
+
+    source = tmp_path / "duplicate-compo"
+    shutil.copytree(SAMPLE, source)
+    _append_duplicate_first_record(source / "eos.compo")
+    with pytest.raises(NativeExecutionError, match="duplicate eos.compo row key"):
+        read_compose(source)

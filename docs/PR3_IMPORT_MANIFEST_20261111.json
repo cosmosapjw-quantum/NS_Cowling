@@ -18,7 +18,8 @@
     "branch": "research/fortran-eos-gap-fill-v1",
     "base_branch": "main",
     "base_sha": "6eed9c5178afd820c9d814e4138dd0f15d1f5a73",
-    "head_before_manifest_commit": "df3462fd77ad6e6a2a556dcc0e569d3f5a262e6a"
+    "head_before_manifest_commit": "df3462fd77ad6e6a2a556dcc0e569d3f5a262e6a",
+    "head_after_hash_manifest_refresh": "1df21d42c88f797b9806295b64f395eb9f97a5a5"
   },
   "comparison": {
     "merge_base": "ca71d8e394f9043d778676c941f88ce01ca7faa9",
@@ -256,6 +257,59 @@
     "cohort_roots": "NOT_RUN until C4-D0..D7, C4-D3R and C6B pass",
     "tov_cowling_source_models": "NOT_RUN; imported analytic fixtures are implementation validation only"
   },
-  "status": "FILES_IMPORTED__EXACT_HEAD_CI_PENDING",
-  "next_action": "Wait for the exact-head workflows listed above; inspect each failure by compile, numerical, implementation, fixture, environment or provenance category; then retain their logs and promote only bounded claims."
+  "status": "IMPORTED__EXACT_HEAD_EOS_AND_NATIVE_MAXWELL_CI_PASS",
+  "next_action": "Wait for the exact-head workflows listed above; inspect each failure by compile, numerical, implementation, fixture, environment or provenance category; then retain their logs and promote only bounded claims.",
+  "validation": {
+    "exact_head": "1df21d42c88f797b9806295b64f395eb9f97a5a5",
+    "eos_frontend_ci": {
+      "run_id": 42951568832,
+      "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42951568832",
+      "conclusion": "success",
+      "gates": [
+        "Fortran EOS executable build",
+        "frontend/direct-provider pytest suite",
+        "native polynomial-extrema unit test",
+        "SHA256SUMS_v4.txt",
+        "source snapshot packaging",
+        "artifact upload"
+      ],
+      "artifact_id": 13824779447,
+      "artifact_name": "NS_Cowling-b3d0e5e6be863b2108a10e059a1a69869d4ce240",
+      "artifact_size_bytes": 280178269,
+      "artifact_digest": "sha256:13132bd4bfa340d4c4b648302ad3671cefb7a8e51bf5673548f506d69f54b19e"
+    },
+    "native_maxwell_tov_cowling_ci": {
+      "run_id": 42951568702,
+      "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42951568702",
+      "conclusion": "success",
+      "gates": [
+        "FPM runtime-check tests",
+        "FPM production case-driver build",
+        "Python Maxwell reference tests",
+        "normalized-table production case-driver",
+        "independent Python/SciPy phase-aware reference",
+        "EOS frontend/pipeline regression",
+        "exact source identity",
+        "artifact upload"
+      ],
+      "artifact_id": 13825093092,
+      "artifact_name": "maxwell-native-fortran-42951568702",
+      "artifact_size_bytes": 31873,
+      "artifact_digest": "sha256:4f118cacdaa3c392d2401a8f1bea373e080ed6237b3e6d275174f3593f3e9438"
+    },
+    "prior_code_head_import_validation": {
+      "run_id": 42951042129,
+      "tested_head": "2967d04859fdb72361e26a966211dd831c8e4ae0",
+      "conclusion": "success",
+      "artifact_id": 13823904595,
+      "artifact_digest": "sha256:9c1457d2a9d95dcbb69a91d77777c3f2a13e9665c145badfd960620295447246"
+    },
+    "earlier_manifest_failure": {
+      "run_id": 42951042321,
+      "tested_head": "2967d04859fdb72361e26a966211dd831c8e4ae0",
+      "failure_class": "PROVENANCE_OR_MANIFEST_DRIFT",
+      "cause": "README.md and python_frontend/compose_cowling/__init__.py checksums were stale after PR3 import",
+      "disposition": "Corrected both entries in SHA256SUMS_v4.txt and docs/MANIFEST_v4.sha256; exact current head 1df21d... then passed full EOS CI and checksum gate."
+    }
+  }
 }

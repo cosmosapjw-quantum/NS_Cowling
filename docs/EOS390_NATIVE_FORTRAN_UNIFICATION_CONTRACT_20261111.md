@@ -424,31 +424,25 @@ The end goal is the 390 source-backed EOS pair-method regeneration, not merely a
 
 ## 13. Current execution state
 
-Initial safety patch has been committed on the new branch.
+Initial safety slice is committed on `research/eos390-fortran-unification-v1`, CI-verified at `e59e475f00d65f2d4eb6ad7f1518da283bee8d48`.
 
-- Native smooth `match_crust_core(method="maxwell")` rejects the historical zero-density-jump plateau.
-- Python frontend rejects that same false alias; only the five genuine smooth methods remain in the smooth API.
-- Native CompOSE writer supports phase-only `eos.compo` rows (`Npairs=0,Nquad=0`) to preserve provider-specific Iphase without fabricating particle fractions.
-- Native writer has composition range, baryon-closure and charge-closure guards; thermo-only rewrites remove stale composition sidecars.
-- Regression tests cover the fail-closed alias and phase-only sidecar round-trip.
+- Draft [PR #11](https://github.com/cosmosapjw-quantum/NS_Cowling/pull/11) targets `research/fortran-eos-gap-fill-v1`; `main` and the C4 65-pair DAG were not modified.
+- [Push run #187](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43005622594): PASS.
+- [PR run #188](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43005633832): PASS.
+- Both workflows completed Fortran build, frontend/direct-provider pytest, native polynomial-extrema tests, SHA-256 manifest verification and source packaging/upload.
 
-### Legacy sharp-transition reference discovered
+The verified code slice disables the historical zero-density-jump `maxwell` plateau in native Fortran and the Python frontend; retains five smooth method IDs; writes phase-only CompOSE `eos.compo` rows (`Npairs=0,Nquad=0`); adds composition range and baryon/charge closure guards; and tests fail-closed Maxwell plus Iphase-only round-trip.
 
-The read-only module `eos_generator/compose_eos_pkg/compose_eos/phase_transitions.py` contains a separate sharp Maxwell construction (`build_maxwell_eos`), sharp-interface TOV plus Love integration (`solve_tov_with_phase_transition`), the pressure-corrected tidal jump (`tidal_y_jump`), a phenomenological Maxwell-CSS builder, and a physically distinct two-charge Gibbs path (`gibbs_mixed_phase`). These are reference algorithms only. The legacy Maxwell writer currently builds a sharp thermodynamic jump but sets particle and nuclear composition arrays to zero. It cannot be ported verbatim as the final EOS390 implementation. Use it to cross-check coexistence, Seidov and tidal-jump mathematics; implement branch-specific composition and provenance in Fortran.
+### Legacy sharp-transition reference and composition warning
 
-The Gibbs path uses P(mu_B,mu_Q) surfaces and global charge neutrality. It is a separate native feature-parity task and must not be conflated with the one-charge locally neutral Maxwell path.
+The read-only `phase_transitions.py` includes a sharp Maxwell construction, phase-aware TOV/Love integration and tidal jump, a Maxwell-CSS builder, and a distinct two-charge Gibbs path. The legacy Maxwell output drops particle/nuclear composition; it cannot be ported verbatim. Gibbs uses global charge neutrality with two chemical potentials and is not the one-charge local-neutrality Maxwell path.
 
-### Exact-head GitHub Actions verification
+### Literature provenance and access
 
-Latest run: [43005633832](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43005633832) (run number 188), exact integration commit `9e3d4b255062935a87fecc3df256528ba95984ad`.
+The bibliography was checked against all 18 EOS-specific `eos.pdf` datasheets. Public full-text URLs were located for APR `nucl-th/9804027`, BBB_BHF2 `astro-ph/9707277`, KDE0v1 `nucl-th/0505071`, SPG `2402.15548`, FSU2 `1408.4159`, FSU2H/R `1804.00334`, TM1e `2001.10143`, GPPVA common crust `1404.2753`, CompOSE manual `2203.03209`, and tidal jump `2007.01139`. The DD-ME2 APS Harvest fulltext endpoint was also located.
 
-Observed from the completed native job:
-- `bash fortran_eos/build.sh build/compose_eos_fortran`: PASS (gfortran 15.2.0).
-- `python -m pytest -q python_frontend/tests pipeline/tests`: **78 passed in 33.26 s**.
-- Native Fortran quartic polynomial-extrema test: PASS.
-- `sha256sum -c SHA256SUMS_v4.txt`: PASS; all listed entries were `OK`.
-- Source archive upload: PASS. Artifact ID `13848990197`, 199,163,410 bytes, SHA-256 `91298b373bc3513aaacbdc5fc0fae8a4a73d422e546e10cd67ea6f1211bb49b9`.
+Old SPG source sheets say “in preparation”, while current official SPG(M3)/(M5) CompOSE pages cite the 2024 paper; preserve both facts as provenance.
 
-An earlier run #43004945078 failed only at the stale checksum-manifest step after build/tests had passed. The manifest was refreshed in the follow-up commit; this run confirms the checksum gate now passes. This is CI verification of the EOS390 safety/specification slice only.
+This host could not copy arXiv PDF bytes into attachments despite confirmed public PDF URLs. Local agent must download and SHA-256 the listed sources. The GM1 Glendenning-Moszkowski PRL 67,2414 (1991) complete PDF was not retrieved; APS returned 403. Request that specific PDF from the user only if local access also fails.
 
-**Remaining implementation gaps:** native literature composition solvers; composition-preserving five-method matching; sharp Maxwell routing through the common matcher with branch-specific composition, Iphase and Nadd provenance; native TOV/tidal Love/Cowling production integration (the inspected Fortran solutions tree has TOV/Cowling but no tidal/Love module); removal/quarantine of Python numerical adapter/direct-barotrope/phase-aware Maxwell code from the production namespace; native manifest-driven 390 runner; source-backed 390 regeneration. The local Desktop Commander device is offline, so local build/pytest/source replay is still NOT_RUN. The sharp Maxwell source kernel is thermo-only, source-cohort admission is NOT_ADMITTED, and regenerated_390 is NOT_RUN. Raw source files, historical 390 outputs, and the separate 65-pair C4 DAG remain immutable.
+**Still incomplete:** local execution has not occurred; source-cohort admission remains blocked; sharp Maxwell kernel is composition-free; composition-aware Maxwell, literature solvers, five composition-aware smooth methods, native TOV/tidal/Cowling integration and all 390 tasks remain pending. CI PASS is not EOS390 physics completion.

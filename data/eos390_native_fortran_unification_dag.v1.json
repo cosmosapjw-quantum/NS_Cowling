@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.0.1",
+  "revision": "1.0.2",
   "created_utc": "2026-11-11",
-  "status": "IN_PROGRESS_M2_SAFETY_SLICE_GITHUB_CI_VERIFIED_FULL_MIGRATION_PENDING",
+  "status": "IN_PROGRESS_INITIAL_SAFETY_SLICE_GITHUB_CI_PASS_LOCAL_RUNTIME_AND_EOS390_PORT_PENDING",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "research/eos390-fortran-unification-v1",
@@ -243,7 +243,7 @@
         "Baryon and charge abundance closure are tested",
         "Unsupported formats are explicit errors"
       ],
-      "status": "PHASE_ONLY_COMPOSE_IO_AND_FALSE_MAXWELL_GUARD_GITHUB_CI_PASS_LOCAL_REPLAY_PENDING"
+      "status": "GITHUB_CI_PASS_PHASE_ONLY_ROUNDTRIP_TEST_PASS_LOCAL_REPLAY_PENDING"
     },
     {
       "id": "M3",
@@ -362,7 +362,7 @@
       "depends_on": [
         "E390-00"
       ],
-      "status": "PATCHED_GITHUB_CI_BUILD_78_TESTS_AND_MANIFEST_PASS_LOCAL_REPLAY_PENDING",
+      "status": "GITHUB_CI_PASS_LOCAL_RUNTIME_PENDING",
       "outputs": [
         "phase-only eos.compo writer",
         "composition closure guards",
@@ -517,7 +517,8 @@
       "hash source and baseline files",
       "inspect model READMEs/eos.pdf and references",
       "run baseline build/tests before changing more code",
-      "Inspect eos_generator/compose_eos_pkg/compose_eos/phase_transitions.py as a read-only numerical reference; do not copy its composition-dropping output."
+      "Inspect eos_generator/compose_eos_pkg/compose_eos/phase_transitions.py as a read-only numerical reference; do not copy its composition-dropping output.",
+      "Download and SHA-256 all public PDFs listed in the source bibliography; do not request BBB_BHF2 or other models with open arXiv sources."
     ],
     "build_command": "bash fortran_eos/build.sh build/compose_eos_fortran",
     "test_command": "COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran PYTHONPATH=python_frontend python -m pytest -q python_frontend/tests pipeline/tests",
@@ -540,28 +541,38 @@
   },
   "evidence_status": {
     "code_execution_in_this_turn": "GITHUB_ACTIONS_EXACT_HEAD_BUILD_PYTEST_FORTRAN_UNIT_CHECKSUM_AND_SOURCE_ARCHIVE_PASS_LOCAL_RUNTIME_NOT_RUN",
-    "static_source_patch": "COMMITTED_AND_CI_VERIFIED_FOR_M2_SAFETY_SLICE",
-    "github_ci": "PASS",
+    "static_source_patch": "COMMITTED_CI_VERIFIED",
+    "github_ci": "PASS_INITIAL_SAFETY_SLICE_ONLY",
     "local_runtime": "NOT_RUN_DESKTOP_COMMANDER_OFFLINE_CONTAINER_EXEC_UNAVAILABLE",
     "source_cohort_admission": "NOT_ADMITTED",
     "regenerated_390": "NOT_RUN",
     "github_actions_execution": {
-      "run_id": 43005633832,
-      "run_number": 188,
-      "commit": "9e3d4b255062935a87fecc3df256528ba95984ad",
-      "conclusion": "success",
-      "build": "PASS",
-      "pytest": "78 passed in 33.26s",
-      "fortran_polynomial_extrema": "PASS",
-      "sha256_manifest": "PASS_ALL_ENTRIES",
-      "source_archive": {
-        "artifact_id": 13848990197,
-        "artifact_name": "NS_Cowling-9e3d4b255062935a87fecc3df256528ba95984ad.zip",
-        "bytes": 199163410,
-        "sha256": "91298b373bc3513aaacbdc5fc0fae8a4a73d422e546e10cd67ea6f1211bb49b9"
+      "first_run": {
+        "id": 43004945078,
+        "run_number": 185,
+        "conclusion": "failure",
+        "failure_step": "stale SHA-256 manifest",
+        "build": "success",
+        "pytest": "success",
+        "fortran_polynomial_extrema": "success"
       },
-      "evidence_url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43005633832"
-    }
+      "retry_push": {
+        "id": 43005622594,
+        "run_number": 187,
+        "conclusion": "success"
+      },
+      "retry_pr": {
+        "id": 43005633832,
+        "run_number": 188,
+        "conclusion": "success"
+      },
+      "current_head": "e59e475f00d65f2d4eb6ad7f1518da283bee8d48",
+      "local_runtime": "NOT_RUN",
+      "source_cohort_admission": "NOT_ADMITTED",
+      "regenerated_390": "NOT_RUN"
+    },
+    "open_source_pdf_download": "PUBLIC_ARXIV_PDF_URLS_CONFIRMED_DIRECT_CONTAINER_DOWNLOAD_TOOL_FAILED",
+    "source_bibliography": "UPDATED_FROM_ALL_18_DROPBOX_EOS_DATASHEETS"
   },
   "legacy_feature_inventory": [
     {

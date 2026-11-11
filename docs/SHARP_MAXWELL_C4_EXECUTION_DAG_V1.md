@@ -242,3 +242,14 @@ The slow roots are approximately 1764.899 and 4937.645 Hz; rapid roots approxima
 The earlier exact-head EOS frontend workflow at PR1 head eef60bf4a10864c194936b70b548217d1843b218 also passed its Fortran build, frontend/pipeline tests, native polynomial-extrema test and refreshed 72-entry SHA-256 manifest check. Its source artifact was uploaded with ID 13824248434, SHA256 371422d02bbbe56031f15fdc4cd18f634a4c663d84d603c778f824b2576f046e8. The PR1 branch subsequently advanced to df3462fd; the later Maxwell workflow reran the EOS frontend/pipeline suite on that current head.
 
 **C4 admission remains separate:** this integration workflow does not execute the canonical 18-source C4 admission or the 65-pair cohort root search. C4-D4/C6B provider composition/Iphase/Nadd semantics remain blocked. C4-D8 remains NOT_RUN until C4-D0..D7, C4-D3R and C6B independently pass on admitted source evidence. No source-backed M-R stable branch, maximum mass, twin-star or astrophysical inference is promoted.
+## 10.7 Current live PR1 head and rerun (2026-11-11)
+
+The implementation branch advanced from df3462fd77ad6e6a2a556dcc0e569d3f5a262e6a to current HEAD 1df21d42c88f797b9806295b64f395eb9f97a5a5. The four-commit increment since df only refreshed SHA manifests and added PR3 import handoff/manifest provenance; no EOS kernel or test source changed. The latest head has new exact-head CI:
+- EOS frontend push [42951563121](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42951563121): SUCCESS.
+- EOS frontend PR [42951568832](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42951568832): SUCCESS.
+- Native Maxwell TOV/Cowling PR [42951568702](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42951568702): SUCCESS.
+- Latest native evidence artifact ID 13825093092, 31,873 bytes, SHA256 4f118cacdaa3c392d2401a8f1bea373e080ed6237b3e6d275174f3593f3e9438.
+
+The native Maxwell workflow on the code-bearing parent df3462fd executed 12 cell, 33 Maxwell and 79 normalized-table FPM checks, 8 Python phase-aware tests, 76 EOS frontend/pipeline tests, normalized-table CLI TOV/Cowling and slow/rapid two-root scans. It ran ODE and grid/root refinement plus independent Python/SciPy TOV/Cowling cross-validation. The 1df head then reran both exact-head EOS CI and native Maxwell PR CI after the source-manifest/PR3-import metadata refresh. It is therefore safe to treat 1df as the current exact validated head for those code paths, while retaining the generated analytic fixture and unresolved mode-family identity qualifications in section 10.6.
+
+C4-D3R remains a bounded validation gate, not full cohort admission. C4-D4/C6B provider semantics remain BLOCKED, and C4-D8 remains NOT_RUN.

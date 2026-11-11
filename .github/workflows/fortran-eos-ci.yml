@@ -1,0 +1,76 @@
+name: Fortran EOS frontend CI
+
+on:
+  push:
+    branches:
+      - main
+      - research/fortran-eos-gap-fill-v1
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fortran-eos-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install native compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gfortran
+
+      - name: Install Python package and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+
+      - name: Build Fortran EOS executable
+        run: bash fortran_eos/build.sh build/compose_eos_fortran
+
+      - name: Run frontend and direct-provider tests
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+        run: python -m pytest -q python_frontend/tests pipeline/tests
+      - name: Run native Fortran polynomial-extrema unit tests
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/test_polynomial_extrema.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_reconstruct.o \
+            -o build/compose_eos_fortran/test_polynomial_extrema
+          build/compose_eos_fortran/test_polynomial_extrema
+
+      - name: Verify tracked SHA-256 manifest
+        run: sha256sum -c SHA256SUMS_v4.txt
+
+      - name: Package verified source snapshot
+        run: |
+          mkdir -p dist
+          git archive --format=tar.gz --prefix=NS_Cowling-${GITHUB_SHA}/ HEAD > "dist/NS_Cowling-${GITHUB_SHA}.tar.gz"
+          sha256sum "dist/NS_Cowling-${GITHUB_SHA}.tar.gz" > "dist/NS_Cowling-${GITHUB_SHA}.tar.gz.sha256"
+
+      - name: Upload verified source package
+        uses: actions/upload-artifact@v4
+        with:
+          name: NS_Cowling-${{ github.sha }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 30

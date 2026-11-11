@@ -15,8 +15,11 @@ def _read_metadata(path: Path) -> dict[str, Any]:
         key, raw = line.strip().rstrip(",").split("=", 1)
         key = key.strip().lower()
         value = raw.strip()
-        if value.lower() in (".true.", ".false."):
-            result[key] = value.lower() == ".true."
+        logical_value = value.lower()
+        if logical_value in (".true.", "true", "t"):
+            result[key] = True
+        elif logical_value in (".false.", "false", "f"):
+            result[key] = False
         elif re.fullmatch(r"[+-]?\d+", value):
             result[key] = int(value)
         else:

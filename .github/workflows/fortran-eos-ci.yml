@@ -70,6 +70,17 @@ jobs:
             -o build/compose_eos_fortran/test_css_segment
           build/compose_eos_fortran/test_css_segment
 
+      - name: Assert local-agent handoff document line endings
+        run: |
+          git check-attr text eol -- docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md
+          python - <<'PY'
+          from pathlib import Path
+          data = Path("docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md").read_bytes()
+          assert b"\\r\\n" not in data, "handoff document contains CRLF after checkout"
+          assert data.endswith(b"\\n"), "handoff document must end with LF"
+          print(f"handoff document checkout bytes: {len(data)}; LF-only: PASS")
+          PY
+
       - name: Verify tracked SHA-256 manifest
         run: sha256sum -c SHA256SUMS_v4.txt
 

@@ -66,3 +66,11 @@
 - Native Fortran build passed; Python frontend/pipeline suite: 67 passed; native quartic polynomial-extrema test passed.
 - All 69 tracked SHA-256 manifest entries passed.
 - Source archive uploaded as artifact \`13603276568\`; artifact ZIP and embedded source tarball digests were independently checked. See the final adversarial audit and machine-readable trace.
+
+
+## 2026-11-11 — true Maxwell Il=0 CompOSE convention
+
+- Corrected the thermo-only native one-charge Maxwell kernel to recover Euler mu_E from CompOSE Q3 for Il=0 by restoring Yq*mn*Q4 before the source/Euler check.
+- Preserved the stored CompOSE Q3 convention in both coexistence rows and copied phase rows, so C2 verification remains valid.
+- Added an analytic Il=0 two-phase regression covering output Q3 and native C2/overall consistency.
+- No changes to the historical smooth maxwell crust-core plateau, EOS source rows, EOS pair manifests, composition semantics, or production TOV/Cowling APIs.

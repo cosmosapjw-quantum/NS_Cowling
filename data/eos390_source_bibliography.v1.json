@@ -581,11 +581,11 @@
     },
     "open_access_pdf_intake": {
       "status": "OPEN_ACCESS_PDFS_COLLECTED_20261111",
-      "policy": "Downloaded public arXiv full-text PDFs (and attempted the DD-ME2 Zagreb institutional full text) into inputs/open_access_pdfs/, recording URL, arXiv id, timestamp, bytes and SHA-256. Each file verified as a real PDF (magic %PDF-) before hashing. The DD-ME2 Zagreb URL returns a verify-human bot-detection challenge to automated requests; the paper has no arXiv preprint and is behind the APS paywall. The DD-ME2 framework is documented in the open TW-99 expositions already collected.",
+      "policy": "Downloaded public arXiv full-text PDFs into inputs/open_access_pdfs/, recording URL, arXiv id, timestamp, bytes and SHA-256. Each file verified as a real PDF (magic %PDF-) before hashing. The DD-ME2 paper (Lalazissis et al. PRC 71 024312 2005) was supplied directly by the researcher (USER_SUPPLIED) after the Zagreb institutional repository returned a verify-human bot-detection challenge to automated requests; the paper has no arXiv preprint. SHA-256 verified against the user upload.",
       "manifest_path": "inputs/open_access_pdfs/open_access_pdf_manifest.json",
       "local_directory": "inputs/open_access_pdfs/",
-      "pdf_count": 17,
-      "blocked_count": 1,
+      "pdf_count": 18,
+      "blocked_count": 0,
       "files": [
         {
           "key": "GRILL_2014",
@@ -814,12 +814,13 @@
           "arxiv": null,
           "pdf_url": "https://repozitorij.pmf.unizg.hr/object/pmf:6864/FILE0/download",
           "local_path": "inputs/open_access_pdfs/ddme2_2005_lalazissis_zagreb.pdf",
-          "sha256": null,
-          "bytes": null,
-          "downloaded_utc": null,
-          "status": "BLOCKED_BY_KNOWN_BLOCKER",
+          "sha256": "66dfece6eccc1e13b9516f2a114a403f950a53ddf32e29655c5b2540764a18a9",
+          "bytes": 167923,
+          "downloaded_utc": "2026-11-11T22:16:09.080251+00:00",
+          "status": "USER_SUPPLIED",
           "priority": "FRAMEWORK",
-          "known_blocker": "HTTP 418 + verify-human bot-detection challenge; requires interactive human verification. The DD-ME2 paper (PRC 71 024312 2005) has no arXiv preprint; only the Zagreb institutional full text and the APS paywalled PRC. The DD-ME2 framework is documented in the open TW-99 expositions (arXiv:nucl-th/0212080, arXiv:0704.0407) already collected. Treat as OPEN_ACCESS_NOT_AUTOMATABLE; request from researcher if the exact DD-ME2 coupling tables are needed."
+          "known_blocker": "Previously BLOCKED_BY_KNOWN_BLOCKER (Zagreb verify-human challenge). Resolved 2026-11-11 by user-supplied PDF (SHA-256 verified).",
+          "user_pdf_source": "/home/z/my-project/upload/lalazissis2005.pdf (user-supplied exact original)"
         }
       ]
     },

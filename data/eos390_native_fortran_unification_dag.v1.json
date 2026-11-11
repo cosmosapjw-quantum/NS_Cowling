@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.2.0",
+  "revision": "1.3.0",
   "created_utc": "2026-11-11",
-  "status": "BLOCKED_E390_02A_ROW_LEVEL_COMPOSITION_PRESENCE_AND_E390_10_MULTIDIMENSIONAL_COMPOSE",
+  "status": "CLOUD_BRANCH_CI_PASS_BLOCKED_ON_RAW_SOURCE_ARCHIVE_AND_PHYSICS_GATES",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "cloud/eos390-fortran-unification-v1",
@@ -256,7 +256,7 @@
         "Original v3.2 outputs and source folders are read-only",
         "All 18 model readmes and datasheets are indexed"
       ],
-      "status": "PARTIAL_SOURCE_INTAKE_RECONNAISSANCE"
+      "status": "BLOCKED_USER_RAW_ARCHIVE_REQUIRED"
     },
     {
       "id": "M1",
@@ -280,7 +280,7 @@
         "Standard YI is rejected where Aav*YI violates baryon normalization.",
         "Provider-specific mapping requires written source definition and independent closure."
       ],
-      "status": "CI_PASS_RUNTIME_FAIL_CLOSED_PROVIDER_SEMANTICS_UNRESOLVED"
+      "status": "PARTIAL_CI_PASS_DUPLICATE_KEY_GUARD_PROVIDER_SEMANTICS_BLOCKED"
     },
     {
       "id": "M3",
@@ -380,12 +380,12 @@
         "Lossless source round-trip, provenance and explicit unsupported-field diagnostics.",
         "Cold EOS390 pipeline uses the generic reader/writer instead of a special-case parser."
       ],
-      "status": "PENDING"
+      "status": "NOT_IMPLEMENTED"
     },
     {
       "id": "M2A",
       "name": "Per-row composition presence and coverage",
-      "status": "PENDING_IMPLEMENTATION",
+      "status": "NOT_IMPLEMENTED",
       "acceptance": [
         "Row/per-species/group presence is serialized losslessly.",
         "C3 and C4 applicability are independently evaluated per row.",
@@ -400,7 +400,7 @@
       "gate": "M0",
       "title": "Freeze and hash all source/data baselines",
       "depends_on": [],
-      "status": "PARTIAL",
+      "status": "BLOCKED_USER_RAW_ARCHIVE_REQUIRED",
       "files": [
         "data/eos390_native_fortran_unification_dag.v1.json"
       ],
@@ -417,7 +417,7 @@
       "depends_on": [
         "E390-00"
       ],
-      "status": "PARTIAL",
+      "status": "PARTIAL_LEGACY_SEMANTICS_CHARACTERIZED",
       "outputs": [
         "legacy method equations",
         "composition schema map",
@@ -433,7 +433,7 @@
       "depends_on": [
         "E390-00"
       ],
-      "status": "CODE_COMMITTED_CI_PENDING",
+      "status": "CI_PASS",
       "commit": "8d7e9301b428de010d9d561ae825cc5dbb0def50",
       "files": [
         "fortran_eos/src/compose_eos_io.f90",
@@ -445,7 +445,14 @@
         "CompOSE row keys are checked before indexing any output array.",
         "Normal unique-key inputs retain their existing behavior.",
         "Cloud CI confirms both new negative tests and all pre-existing tests."
-      ]
+      ],
+      "verified_commit": "afc74ce4a14e9f319569319954cacaf307a92463",
+      "verification": {
+        "run_id": 43026837527,
+        "pytest": "80 passed",
+        "native_build": "PASS",
+        "sha256_manifest": "PASS"
+      }
     },
     {
       "id": "E390-02",
@@ -454,7 +461,7 @@
       "depends_on": [
         "E390-00"
       ],
-      "status": "BLOCKED_PROVIDER_SEMANTICS_AND_ROW_MASKS",
+      "status": "PARTIAL_DUPLICATE_ROW_GUARD_CI_PASS_ROW_MASKS_AND_PROVIDER_SEMANTICS_BLOCKED",
       "outputs": [
         "phase-only eos.compo round-trip",
         "current branch CI build/tests pass",
@@ -474,7 +481,7 @@
         "E390-01",
         "E390-02"
       ],
-      "status": "STATIC_AUDIT_IDENTIFIED_NOT_IMPLEMENTED",
+      "status": "STATIC_AUDIT_COMPLETE_MIGRATION_NOT_IMPLEMENTED",
       "findings": [
         {
           "file": "python_frontend/compose_eos/api.py",
@@ -639,7 +646,7 @@
         "E390-00",
         "E390-02"
       ],
-      "status": "GITHUB_CI_PASS_LOCAL_REPLAY_PENDING",
+      "status": "CI_PASS_LOCAL_REPLAY_PENDING",
       "files": [
         "fortran_eos/src/compose_eos_css.f90",
         "fortran_eos/tests/test_css_segment.f90",
@@ -679,7 +686,7 @@
         "E390-00",
         "E390-02"
       ],
-      "status": "PARTIAL_IMPLEMENTATION_DUPLICATE_ROW_KEY_GUARD_ONLY",
+      "status": "NOT_IMPLEMENTED",
       "outputs": [
         "per-row/per-species/group presence masks",
         "independent C3/C4 applicability",
@@ -1422,7 +1429,7 @@
       "require_exact_branch": true
     },
     "source_of_truth": {
-      "code": "this cloud branch HEAD",
+      "code": "cloud branch HEAD; latest verified baseline afc74ce4a14e9f319569319954cacaf307a92463",
       "machine_plan": "data/eos390_native_fortran_unification_dag.v1.json",
       "developer_contract": "docs/EOS390_NATIVE_FORTRAN_UNIFICATION_CONTRACT_20261111.md",
       "bibliography": "data/eos390_source_bibliography.v1.json",
@@ -1470,7 +1477,8 @@
         "No source file may be edited, normalized, or regenerated in place.",
         "Preserve absent files as absent; never synthesize missing sidecars.",
         "If the archive is unavailable, stop at M0 and request upload."
-      ]
+      ],
+      "upload_status": "NOT_STAGED_USER_UPLOAD_REQUIRED"
     },
     "outputs": {
       "attempt_root": "${WORKSPACE}/artifacts/eos390/<UTC_RUN_ID>",
@@ -1529,7 +1537,13 @@
       ],
       "all_390_tasks_must_be_enumerated_before_execution": true,
       "failed_tasks_must_remain_in_failure_catalogue": true,
-      "no_silent_skip_or_retry_overwrite": true
+      "no_silent_skip_or_retry_overwrite": true,
+      "raw_archive_blocker": {
+        "status": "BLOCKED_USER_UPLOAD_REQUIRED",
+        "expected_name": "NS_Cowling_EOS390_raw_inputs_v1.tar.zst",
+        "staging_directory": "${WORKSPACE}/inputs/raw_compose",
+        "require_sha256_manifest": true
+      }
     },
     "lean_snapshot": {
       "tracked_blobs": 1996,
@@ -1641,17 +1655,54 @@
     }
   ],
   "next_actions": [
-    "Resolve E390-02C: migrate numerical density-gap and production mode diagnostics out of Python, quarantine Python/SciPy adapter prototypes.",
-    "Verify CI on cloud/eos390-fortran-unification-v1 after test-fixture newline correction.",
-    "Finish E390-02A row-level presence masks in Fortran and Python serialization without interpreting provider composition values.",
-    "Implement M10 generic CompOSE grid/axis and raw record preservation before claiming the 18-source cohort is supported.",
-    "Resolve C6B SPG/GPPVA provider abundance semantics from written source documentation; keep composition-bearing production blocked.",
-    "Only after M0/M2/M2A/M10/C6B/M3-M6 pass, run the 390 manifest-driven generation."
+    "User supplies NS_Cowling_EOS390_raw_inputs_v1.tar.zst with original 18 provider directories and SHA256SUMS.txt; stage outside Git in the cloud workspace.",
+    "Finish E390-02C: move find_density_gap selection and any production numerical selector from Python into Fortran; quarantine Python/SciPy prototypes as diagnostic-only.",
+    "Implement E390-02A row-level, field-level, per-species and group presence masks; assess C3 and C4 independently per row.",
+    "Implement E390-10 general CompOSE axes and lossless 1D/2D/3D reader/writer.",
+    "Resolve SPG/GPPVA provider-specific abundance semantics from written data sheets and independent closure.",
+    "Proceed through M3-M6 only when their predecessor gates pass; keep M7-M9 and the 390 generation NOT_RUN until then."
   ],
   "provenance": {
     "last_reconciled_utc": "2026-11-11",
     "branch_parent_commit": "b12ba451b6755bf8f13d22c882075a23eae800a7",
     "new_branch_initial_ref": "cloud/eos390-fortran-unification-v1",
-    "note": "CI run 43024762506 compiled the Fortran backend and passed 78 tests; the two new tests failed because their fixture helper wrote literal backslash-n sequences, not real newlines. The helper was corrected in commit 2265580a4bbdb204a4a4ea0b699d0f9ff5411838. A new CI run is required; duplicate-key behavior is not yet declared implementation-verified."
+    "note": "CI run 43024762506 compiled the Fortran backend and passed 78 tests; the two new tests failed because their fixture helper wrote literal backslash-n sequences, not real newlines. The helper was corrected in commit 2265580a4bbdb204a4a4ea0b699d0f9ff5411838. A new CI run is required; duplicate-key behavior is not yet declared implementation-verified.",
+    "verified_head_commit": "afc74ce4a14e9f319569319954cacaf307a92463",
+    "verified_tree_sha": "e76308ea02b830001c57ab662f392b3a9dd8ff07",
+    "latest_ci": {
+      "run_id": 43026837527,
+      "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43026837527",
+      "head_sha": "afc74ce4a14e9f319569319954cacaf307a92463",
+      "conclusion": "success",
+      "compiler": "GNU Fortran 15.2",
+      "python": "3.13",
+      "pytest": "80 passed in 31.74s",
+      "native_tests": {
+        "polynomial_extrema": "PASS",
+        "css_segment_analytic": "PASS"
+      },
+      "checksum_manifest": "PASS",
+      "source_artifact": {
+        "id": 13857636805,
+        "name": "NS_Cowling-afc74ce4a14e9f319569319954cacaf307a92463",
+        "size_bytes": 55101928,
+        "sha256": "3d477cd5f535f9cafbc27f5b83e8b8c5c468f22d7433c410d3b9b2cb7f8b1463",
+        "expires_at": "2026-12-11T13:12:20Z"
+      }
+    },
+    "earlier_failures_resolved": [
+      {
+        "run_id": 43024762506,
+        "reason": "test helper encoded literal backslash-n instead of actual newline"
+      },
+      {
+        "run_id": 43025568308,
+        "reason": "same fixture serialization bug; corrected in commit 2265580a4bbdb204a4a4ea0b699d0f9ff5411838"
+      },
+      {
+        "run_id": 43026577488,
+        "reason": "workflow source manifest entry differed from runner-observed bytes; corrected from SHA emitted by the GitHub runner"
+      }
+    ]
   }
 }

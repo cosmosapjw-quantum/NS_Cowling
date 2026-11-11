@@ -504,6 +504,24 @@ Retained because current tests or the active source tree depend on them:
 
 This is a current-tree trim only. There was **no Git history rewrite**. Removed content remains available from the parent feature branch history. Use a shallow clone for the online agent so old blobs are not fetched into its working checkout.
 
+## Latest verified cloud baseline (2026-11-11)
+
+The dedicated cloud branch has a complete green CI baseline at commit `afc74ce4a14e9f319569319954cacaf307a92463`.
+
+- GitHub Actions run [#43026837527](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43026837527): **SUCCESS**.
+- Environment: GNU Fortran 15.2; Python 3.13.
+- Native Fortran build: PASS.
+- Frontend and pipeline tests: **80 passed in 31.74 s**.
+- Native quartic polynomial-extrema test: PASS.
+- Native CSS high-density segment analytic test: PASS.
+- Handoff byte diagnostic: PASS.
+- SHA-256 manifest: PASS.
+- Verified source snapshot artifact ID `13857636805`, 55,101,928 bytes, SHA-256 `3d477cd5f535f9cafbc27f5b83e8b8c5c468f22d7433c410d3b9b2cb7f8b1463`, expires `2026-12-11T13:12:20Z`.
+
+This is a verified source/build/test baseline, not an EOS390 production run. The original 18-provider raw archive has not been staged in the cloud workspace. No new 390 generation, native readback of regenerated outputs, physical validation, or Dropbox EOS-output backup is claimed. The next hard blocker is the user-provided `NS_Cowling_EOS390_raw_inputs_v1.tar.zst` with its `SHA256SUMS.txt`, staged outside the Git worktree.
+
+The duplicate CompOSE row-key guards are now CI-verified. Per-row composition masks, generic multidimensional CompOSE support, provider-specific SPG/GPPVA abundance adjudication, and the complete Fortran production path remain incomplete and are tracked in the single machine DAG.
+
 ## 13. Current bounded implementation status
 
 **Implemented in the cloud branch, not yet CI-verified:** duplicate row-key guards in \`fortran_eos/src/compose_eos_io.f90\` reject repeated \((i_T,i_{n_B},i_{Y_q})\) keys for both \`eos.thermo\` and \`eos.compo\` before assignment. The phase index is now range-checked before indexing the destination phase array. Two regression tests were added. The first CI attempt compiled Fortran and reported 78 passed, 2 failed; both new tests failed because the test helper initially wrote literal backslash-n characters instead of line breaks. That helper was corrected in commit \`2265580a4bbdb204a4a4ea0b699d0f9ff5411838\`. A new CI run is required. Do not mark this slice PASS until the new run completes successfully.

@@ -154,3 +154,29 @@ On commit 37f7fdcba998b05f73f8ab2ee94e85c24ea37b19, push CI [run 42381968318](ht
 ## 9. Exact Maxwell release evidence
 
 On commit 37f7fdcba998b05f73f8ab2ee94e85c24ea37b19, push CI [run 42381968318](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42381968318) and PR CI [run 42381971708](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42381971708) both completed successfully. The push workflow reported 54 passed in 21.41 s, 62/62 manifest entries, source archive packaging and artifact upload. Later master-reconstruction revisions build and test on the same feature branch; see the separate master reconstruction audit.
+
+
+## 10. Cycle 6: CompOSE Il=0 Q3 convention (2026-11-11)
+
+**Claim under audit:** the true one-charge Maxwell kernel accepts only source phases whose stored Q3 agrees with the Euler baryon chemical potential after the CompOSE lepton-flag convention is applied, and writes all retained/output rows in that same convention.
+
+**Source-level defect:** validate_phase formed mu_source=mn*(1+Q3) and compared it directly to mu_E=(epsilon+P)/n_B for both Il=0 and Il=1. The module permits either flag. The repository C2 verifier and reconstruct_master instead apply the Il=0 correction mu_Q3=mu_E-Yq*mn*Q4. The set_transition_row and copy_source_row output paths also wrote Q3 as if Il=1 for both. A valid Il=0 phase could therefore be rejected, and an Il=0 output would fail ordinary C2 verification.
+
+**Required convention:**
+
+\[
+\mu_E=\frac{\epsilon+P}{n_B},\qquad
+m_n(1+Q_3)=
+\begin{cases}
+\mu_E-Y_qm_nQ_4,&I_l=0,\\
+\mu_E,&I_l=1,\ Q_5\simeq0.
+\end{cases}
+\]
+
+The coexistence coordinate remains Euler mu_E for both branches. This correction does not create another conserved charge, does not change Maxwell equilibrium conditions, and does not authorize Gibbs/global-neutrality construction.
+
+**TDD evidence:** the new analytic two-phase Il=0 regression was run before the native edit and failed at the intended input gate (provider Q3 chemical potential disagrees with the Euler value). The minimal native fix adds Yq*mn*Q4 to stored Q3 before source/Euler comparison, and subtracts Yq*Q4 from Q3 when writing both coexistence rows and copied source rows. After the fix, the targeted regression passed and check_consistency returned C2 pass and overall pass.
+
+**Verification:** GNU Fortran 14.2.0 build passed; native polynomial-extrema test passed; the complete documented frontend/pipeline suite collected and passed 68 tests in 13.57 s. The exact source bytes were executed from the PR #1 GitHub Actions source artifact exported into a local directory without .git metadata. This is an artifact-based local execution, not a committed Git worktree replay. The repository SHA256 manifest was refreshed after the final tracked edits and checked separately before publication.
+
+**Scope limits retained:** only the two supported cold branches Il=0 and Il=1,Q5≈0 are covered. Nonzero-Q5/lepton-rich states remain rejected; composition-bearing/Nadd inputs remain outside Maxwell v1; no microscopic charge neutrality is inferred; no Gibbs mixed phase, Seidov verdict, phase-interface TOV stability or Cowling spectrum is established. The original single-phase reconstruction and six smooth crust-core methods were not altered.

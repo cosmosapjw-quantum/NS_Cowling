@@ -217,3 +217,28 @@ The native import is NOT YET exact-head implementation-verified on the PR #1 bra
 The old maxwell-sharp-interface-gate.yml was deliberately not copied as an active workflow because it has contents: write and automatically commits/pushes a patch from CI. Its useful validation intent is represented by explicit read-only tests and logs instead. The old maxwell-reference-regression.yml checks were folded into the new exact-head workflow to avoid duplicate hardcoded-branch jobs.
 
 The source-backed 65-pair calculations remain blocked until C4-D0..D7, C4-D3R, and C6B provider semantics are resolved. The imported analytic solver fixtures do not substitute for admitted CompOSE phase branches.
+
+## 10.6 Latest exact-head native Maxwell TOV/Cowling integration evidence (2026-11-11)
+
+Implementation branch PR #1 is now observed at exact HEAD df3462fd77ad6e6a2a556dcc0e569d3f5a262e6a. This head includes a bounded native phase-aware TOV/Cowling production path added by a separate subsequent commit; do not attribute those new solver files to the earlier C4-D3R thermodynamic Q3 fix.
+
+Exact-head Native Fortran sharp-Maxwell TOV/Cowling validation:
+- Pull-request run [42950840157](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42950840157): SUCCESS.
+- Push run [42950834447](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42950834447): SUCCESS.
+- Evidence artifact ID 13825216369, 31,871 bytes, SHA256 ac60d5fd23afb6603703bbe2e2c1307e65eb95d4a3ead276da225e36132f54e8.
+- FPM runtime-check graph: 12 cell checks, 33 Maxwell checks, 79 normalized-table checks.
+- Python phase-aware Maxwell tests: 8 passed in 22.30 s.
+- EOS frontend/pipeline regression at the same exact head: 76 passed in 15.41 s.
+- Both slow and rapid generated normalized-table CLI spectra: two roots, both marked valid.
+- ODE refinement maximum relative root shifts: slow 6.74e-6, rapid 3.28e-5.
+- Frequency-grid/root refinement maximum relative shifts: slow 2.66e-10, rapid 2.28e-10.
+- Independent Python/SciPy phase-aware reference: PASS; mass relative difference 5.47e-10, radius 2.15e-10, interface radius 2.67e-10, maximum Cowling-root relative difference 5.21e-5.
+- Fortran/Python one-sided transfer diagnostics: W relative difference zero; V relative difference about 2.13e-16; interface condition residual at most 4.17e-16.
+
+**Fixture and claim boundary:** this is a generated analytic, normalized two-table phase fixture whose input tables already encode the same coexistence Pt and mu_t. It exercises native phase-segmented TOV, interface transfer, Cowling shooting, root scans and independent Python/SciPy comparison. It does not demonstrate coexistence-root construction from arbitrary raw CompOSE phase tables or source admission. The sample star is a tiny analytic fixture (M about 9.64e-4 solar masses, R about 643 m), not a realistic neutron-star prediction.
+
+The slow roots are approximately 1764.899 and 4937.645 Hz; rapid roots approximately 4937.016 and 19493.633 Hz for this generated fixture. Numerical root sets are sorted for comparison only: root-family identity remains UNRESOLVED. Do not pair slow and rapid roots by rank or frequency, and do not assign f/p1/interface-mode names. A fixture-level Seidov ratio 0.2128 below its computed critical value 0.5016 is only an input-case diagnostic, not a source-backed cohort or global stable-branch verdict.
+
+The earlier exact-head EOS frontend workflow at PR1 head eef60bf4a10864c194936b70b548217d1843b218 also passed its Fortran build, frontend/pipeline tests, native polynomial-extrema test and refreshed 72-entry SHA-256 manifest check. Its source artifact was uploaded with ID 13824248434, SHA256 371422d02bbbe56031f15fdc4cd18f634a4c663d84d603c778f824b2576f046e8. The PR1 branch subsequently advanced to df3462fd; the later Maxwell workflow reran the EOS frontend/pipeline suite on that current head.
+
+**C4 admission remains separate:** this integration workflow does not execute the canonical 18-source C4 admission or the 65-pair cohort root search. C4-D4/C6B provider composition/Iphase/Nadd semantics remain blocked. C4-D8 remains NOT_RUN until C4-D0..D7, C4-D3R and C6B independently pass on admitted source evidence. No source-backed M-R stable branch, maximum mass, twin-star or astrophysical inference is promoted.

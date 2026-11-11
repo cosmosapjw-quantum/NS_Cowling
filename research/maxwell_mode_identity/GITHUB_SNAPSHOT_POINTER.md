@@ -3,7 +3,7 @@
 Repository: https://github.com/cosmosapjw-quantum/NS_Cowling
 
 LA11 branch: `research/maxwell-analytic-matching-la11-v1`
-LA11 branch HEAD: `ffc6a75006d63c222871b9c9fc13abdbc699014a`
+Code/source validation snapshot: `ffc6a75006d63c222871b9c9fc13abdbc699014a` (the helper and test blobs were verified at this commit). Fetch the current PR #10 head live; later metadata commits may advance the branch.
 Draft PR #10: https://github.com/cosmosapjw-quantum/NS_Cowling/pull/10
 PR base: `research/maxwell-interface-interpolation-la10-v1` at `104b4fa76e191db42e6af26f072533617f45441c`
 PR state: OPEN / DRAFT / UNMERGED. CI status query returned no status records, which is NOT a CI PASS.
@@ -19,7 +19,7 @@ The single detailed development contract is:
 The canonical integrated handoff is:
 `research/maxwell_mode_identity/HANDOFF_PROMPT_20261111.txt`.
 
-LA11 scientific note, machine-readable results/status, helper, tests and computation receipts are in the same directory. Fetch these files from the branch at the live HEAD above; do not rebuild or replace the SSOT from a patch.
+LA11 scientific note, machine-readable results/status, helper, tests and computation receipts are in the same directory. Fetch these files from the branch at the live HEAD; do not rebuild or replace the SSOT from a patch.
 
 ## This archive
 

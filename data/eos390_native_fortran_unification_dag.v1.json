@@ -467,6 +467,56 @@
       ]
     },
     {
+      "id": "E390-02C",
+      "gate": "FORTRAN_BACKEND_PARITY",
+      "title": "Remove remaining production-path numerical selectors from Python",
+      "depends_on": [
+        "E390-01",
+        "E390-02"
+      ],
+      "status": "STATIC_AUDIT_IDENTIFIED_NOT_IMPLEMENTED",
+      "findings": [
+        {
+          "file": "python_frontend/compose_eos/api.py",
+          "symbol": "find_density_gap",
+          "line": 92,
+          "finding": "Uses NumPy argmax of adjacent density ratios to select the largest gap; fill_density_gap calls this selector before invoking the native Fortran fill-gap command.",
+          "required_change": "Move the index selection and phase-boundary safety check into a native Fortran operation; Python may pass the requested threshold and decode the native report."
+        },
+        {
+          "file": "python_frontend/compose_cowling/solver.py",
+          "symbol": "count_nodes",
+          "finding": "Uses NumPy sign-change counting for mode diagnostics after native solver output.",
+          "required_change": "Classify as post-processing only or port to Fortran if included in the production claim; test exact node counting near zeros and interfaces."
+        },
+        {
+          "file": "pipeline/compose_cowling/adapter.py",
+          "finding": "Contains Python PAV projection, Hermite interpolation, pressure integration and sampled causality calculations.",
+          "required_change": "Keep as explicitly diagnostic/reference-only; do not call from the EOS390 production path. Port only the approved method to Fortran with a differential oracle."
+        },
+        {
+          "file": "pipeline/compose_cowling/direct_barotrope.py",
+          "finding": "Contains SciPy PCHIP, Gauss-Legendre integration and Python inverse/root operations.",
+          "required_change": "Keep as direct-provider diagnostic/reference-only; forbid production EOS390 imports until a Fortran implementation has parity evidence."
+        },
+        {
+          "file": "pipeline/compose_cowling/intake.py",
+          "finding": "Contains NumPy first-law/monotonicity/sampled-sound-speed calculations.",
+          "required_change": "Treat as diagnostic-only; move authoritative physics checks into native Fortran."
+        },
+        {
+          "file": "python_frontend/compose_eos/eos_data.py",
+          "finding": "Uses NumPy arrays for typed transport, serialization and copying.",
+          "required_change": "Allowed frontend data representation; it must not perform physical interpolation or solve calculations."
+        }
+      ],
+      "acceptance": [
+        "No production EOS390 call graph reaches Python/SciPy numerical kernels.",
+        "Each migrated selector has a Fortran unit test plus frontend integration test.",
+        "Python modules retained as research/diagnostic oracles are explicitly tagged and excluded from production entry points."
+      ]
+    },
+    {
       "id": "E390-03",
       "gate": "M3",
       "title": "Port literature-backed model composition solvers to Fortran",
@@ -1480,6 +1530,35 @@
       "all_390_tasks_must_be_enumerated_before_execution": true,
       "failed_tasks_must_remain_in_failure_catalogue": true,
       "no_silent_skip_or_retry_overwrite": true
+    },
+    "lean_snapshot": {
+      "tracked_blobs": 1996,
+      "tracked_bytes": 109588218,
+      "tracked_megabytes_decimal": 109.59,
+      "baseline_blobs": 4674,
+      "baseline_bytes": 360093413,
+      "saved_bytes": 250505195,
+      "reduction_fraction": 0.69566,
+      "history_rewrite": false,
+      "parent_branch_preserves_removed_paths": true,
+      "removed_paths": [
+        "oscillation_release_v1/",
+        "data/eos_cowling_adapter_v2/",
+        "DATA_ADAPTERS_V2.zip",
+        "eos_generator/provenance/EoS_revised_code_package_upgraded_v3_2.zip",
+        "fortran_eos/differential_corpus/",
+        "fortran_eos/differential_corpus_v2/",
+        "fortran_eos/differential_corpus_v3/",
+        "per-model subdirectories under fortran_eos/differential_corpus_v4/"
+      ],
+      "retained_references": [
+        "fortran_eos/differential_corpus_v4/fortran_compose_differential.json",
+        "data/eos_cowling_adapter_v1/",
+        "data/eos_original_normalized/",
+        "eos_generator/eos_data/",
+        "eos_generator/eos_data_normalized/",
+        "oscillation_source/"
+      ]
     }
   },
   "execution_domains": {
@@ -1562,6 +1641,7 @@
     }
   ],
   "next_actions": [
+    "Resolve E390-02C: migrate numerical density-gap and production mode diagnostics out of Python, quarantine Python/SciPy adapter prototypes.",
     "Verify CI on cloud/eos390-fortran-unification-v1 after test-fixture newline correction.",
     "Finish E390-02A row-level presence masks in Fortran and Python serialization without interpreting provider composition values.",
     "Implement M10 generic CompOSE grid/axis and raw record preservation before claiming the 18-source cohort is supported.",

@@ -253,3 +253,17 @@ The implementation branch advanced from df3462fd77ad6e6a2a556dcc0e569d3f5a262e6a
 The native Maxwell workflow on the code-bearing parent df3462fd executed 12 cell, 33 Maxwell and 79 normalized-table FPM checks, 8 Python phase-aware tests, 76 EOS frontend/pipeline tests, normalized-table CLI TOV/Cowling and slow/rapid two-root scans. It ran ODE and grid/root refinement plus independent Python/SciPy TOV/Cowling cross-validation. The 1df head then reran both exact-head EOS CI and native Maxwell PR CI after the source-manifest/PR3-import metadata refresh. It is therefore safe to treat 1df as the current exact validated head for those code paths, while retaining the generated analytic fixture and unresolved mode-family identity qualifications in section 10.6.
 
 C4-D3R remains a bounded validation gate, not full cohort admission. C4-D4/C6B provider semantics remain BLOCKED, and C4-D8 remains NOT_RUN.
+
+## 12. PR #3 imported solver exact-head verification result (2026-11-11)
+
+The PR #3 import has now passed the dedicated native Maxwell TOV/Cowling workflow and the EOS frontend workflow on the same PR #1 code head:
+
+- Tested PR #1 code head: 1df21d42c88f797b9806295b64f395eb9f97a5a5.
+- EOS frontend CI run 42951568832: success. The native EOS executable built; the frontend/direct-provider suite passed; the polynomial-extrema executable passed; the refreshed SHA256SUMS_v4.txt passed; and the exact source snapshot was packaged and uploaded.
+- Native sharp-Maxwell TOV/Cowling CI run 42951568702: success. FPM runtime-check tests, production case-driver build, Python Maxwell reference tests, normalized-table production CLI, independent Python/SciPy phase-aware validation, EOS frontend/pipeline regression, source identity and evidence upload all passed.
+- The EOS source artifact is run artifact 13824779447 (280,178,269 bytes, digest sha256:13132bd4bfa340d4c4b648302ad3671cefb7a8e51bf5673548f506d69f54b19e).
+- The native Maxwell evidence artifact is run artifact 13825093092 (31,873 bytes, digest sha256:4f118cacdaa3c392d2401a8f1bea373e080ed6237b3e6d275174f3593f3e9438).
+
+The prior EOS manifest failure (run 42951042321) is retained as a provenance failure caused by two stale hashes: README.md and python_frontend/compose_cowling/__init__.py. Both SHA256SUMS_v4.txt and docs/MANIFEST_v4.sha256 were refreshed, and the exact-head EOS CI subsequently passed.
+
+**Bounded conclusion:** the imported native and Python/SciPy phase-aware Maxwell stellar solver is implementation-verified on analytic and normalized-table synthetic fixtures. It is not yet verified against any admitted physical CompOSE pair. C6B provider semantics remain unresolved, all 65 pair root searches remain unstarted, and source-backed TOV/Cowling spectra remain NOT_RUN. C4-D10 analytic implementation coverage must not be promoted to a physical cohort result.

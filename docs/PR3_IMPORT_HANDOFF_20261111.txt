@@ -1,0 +1,179 @@
+NS_COWLING PR3 IMPORT + EOS RECONSTRUCTION/MAXWELL HANDOFF
+Date: 2026-11-11
+Repository: cosmosapjw-quantum/NS_Cowling
+Working branch: research/fortran-eos-gap-fill-v1
+PR: https://github.com/cosmosapjw-quantum/NS_Cowling/pull/1
+
+AUTHORITATIVE IMPORT RECORDS
+1. docs/PR3_IMPORT_MANIFEST_20261111.json
+   Machine-readable 34-file source inventory, source blob SHA, import disposition,
+   exact PR3 source HEAD, branch divergence and workflow exclusions.
+2. data/sharp_maxwell_c4_execution_plan.v1.json
+   Sole machine-readable EOS/source admission and downstream C4 DAG.
+3. docs/SHARP_MAXWELL_C4_EXECUTION_DAG_V1.md
+   Human-readable DAG, C4-D3R and PR3 solver import contract.
+4. docs/FORTRAN_EOS_MASTER_RECONSTRUCTION_V1.md
+   Single-phase reconstruction SSOT for F(log n_B).
+5. docs/FORTRAN_EOS_CRUST_CORE_MATCHING_V1.md
+   Six historical smooth matching methods.
+6. docs/FORTRAN_EOS_MAXWELL_TRANSITION_V1.md
+   True one-charge/local-neutrality Maxwell construction and Q3 convention.
+7. docs/MAXWELL_TOV_COWLING_INTERFACE_V1.md
+   One-sided interface, slow/material and rapid conversion boundary conditions.
+8. docs/MAXWELL_NATIVE_FORTRAN_DAG_20261109.md
+   Native production TOV/Cowling implementation and execution plan.
+9. docs/ADVERSARIAL_AUDIT_MAXWELL_TOV_COWLING_20261109.md
+   Bounded audit and non-claims.
+10. .github/workflows/maxwell-native-fortran.yml
+    Read-only exact-head build/test workflow.
+
+IDENTITY AND PROVENANCE
+- PR #1 base: main @ 6eed9c5178afd820c9d814e4138dd0f15d1f5a73.
+- PR #3 imported source: research/maxwell-native-fortran-v1 @
+  a09ec30d74b363652d2d1aefe990557c468679dd.
+- Common ancestor: ca71d8e394f9043d778676c941f88ce01ca7faa9.
+- PR #1 and PR #3 diverged (PR #3 was 51 ahead and 13 behind the PR #1
+  head at comparison time); DO NOT merge the entire branch history.
+- Imported file-by-file, not by branch merge. All 34 changed paths are
+  accounted for in the import manifest: 32 copied/adapted, 2 active
+  workflows excluded for safety/duplication.
+- PR #1 branch head after manifest commit: 85ecf97dff3c8f389a8b0031e4d2bbfb8aa8246b.
+- Imported code exact-head CI was triggered on source head
+  df3462fd77ad6e6a2a556dcc0e569d3f5a262e6a before the final documentation-only
+  import-manifest commit. Inspect live Actions; do not assume PASS.
+- New native CI workflow uses contents: read and checks out
+  github.event.pull_request.head.sha || github.sha.
+- PR #3 workflow maxwell-sharp-interface-gate.yml was NOT installed because
+  it uses contents: write and automatically commits/pushes from CI. Its
+  useful read-only validations are incorporated into maxwell-native-fortran.yml.
+- PR #3 maxwell-reference-regression.yml was not copied as a duplicate;
+  its key focused and full-suite checks are folded into the new workflow.
+
+IMPORTED CAPABILITIES
+- Native two-phase TOV integration across exact P_t with separate core/envelope.
+- Native one-sided Cowling interface transfer.
+- Separate material/slow and rapid conversion conditions.
+- Native Cowling shots and frequency-root scans.
+- Production dispatch for sharp-Maxwell backgrounds.
+- Python/SciPy phase-aware MaxwellEOS, TOV and Cowling reference.
+- Analytic and normalized-table Fortran tests, Python tests and independent
+  interface/TOV/mode validation scripts.
+- Paired matching sensitivity note and PR #3 native implementation/audit docs.
+
+CRITICAL PHYSICS CONTRACTS
+A. Keep three operations distinct:
+   (i) reconstruct_master: single-phase F(log n_B) reconstruction.
+   (ii) match_crust_core(method="maxwell"): historical smooth near-pressure
+        plateau bridge; zero density jump; is_exact_maxwell=false.
+   (iii) construct_maxwell_transition: true two-phase, one conserved baryon
+         charge, local neutrality explicitly assumed for both phases; equal P
+         and Euler mu_B, nonzero density jump and latent-energy identity.
+B. Use Euler mu_E=(epsilon+P)/n_B as the true Maxwell independent coordinate.
+C. CompOSE Q3 for supported cold branches:
+   Il=0: mn*(1+Q3)=mu_E-Yq*mn*Q4.
+   Il=1,Q5~0: mn*(1+Q3)=mu_E.
+   For Il=0 restore Yq*mn*Q4 before using Q3 to reconstruct mu_E.
+   Preserve the convention when writing output Q3.
+D. Keep source/reconstruction Q3 tolerance 2e-6 distinct from the true-Maxwell
+   v1 kernel local Q3 tolerance 5e-4.
+E. Slow/material interface: [xi^r]=0 and [Delta P]=0.
+   Rapid interface: [Delta P]=0 and [xi^r-Delta P/P'_0]=0 under the
+   exact convention in MAXWELL_TOV_COWLING_INTERFACE_V1.md.
+F. Keep one-sided inner/outer values. Never average or interpolate across a
+   sharp density jump. Never put finite-difference stencils across Iphase jumps.
+G. Slow and rapid spectra are separate datasets. Do not pair modes by frequency
+   order outside the explicitly documented small-jump smooth-limit cross-match.
+H. Seidov is a GR onset-stability diagnostic with assumptions, not a universal
+   stable-branch verdict. No full stable branch/maximum mass claim is inherited.
+
+NEXT EXECUTION ORDER
+0. Fetch origin and exact live PR #1 HEAD. Inspect git status; stop on dirty/
+   ambiguous branch identity. Create an isolated worktree from the live PR #1
+   branch. Never use a stale local branch snapshot.
+1. Verify the imported file list and source blobs against
+   docs/PR3_IMPORT_MANIFEST_20261111.json. For exact copied files, compare
+   git hash-object FILE with the recorded Git blob SHA. For adapted files,
+   verify the documented transformation rather than expecting byte identity.
+2. Run the exact commands in .github/workflows/maxwell-native-fortran.yml:
+   - FPM runtime-check tests.
+   - FPM production case-driver build.
+   - Python test_maxwell_star.py.
+   - Slow and rapid table-driven Cowling spectrum CLI cases.
+   - validate_native_maxwell_reference.py and validate_maxwell_interface.py.
+   - Full python_frontend/tests and pipeline/tests with the native EOS binary.
+3. Inspect logs and artifacts from the exact current head. Preserve every
+   failed, blocked, timed-out or inconclusive run. Do not infer a pass from
+   workflow creation or an in-progress run.
+4. If a failure occurs, classify it exactly:
+   THEORY_CONVENTION_MISMATCH, THERMODYNAMIC_IDENTITY_FAILURE,
+   INTERFACE_MAP_FAILURE, ODE_IMPLEMENTATION_FAILURE, NUMERICAL_CONDITIONING,
+   ROOT_TOPOLOGY_FAILURE, PYTHON_NATIVE_DIVERGENCE, COMPILE_OR_LINK_FAILURE,
+   FIXTURE_OR_SCHEMA_FAILURE, ENVIRONMENT_OR_BUILD_FAILURE,
+   PROVENANCE_FAILURE, SCOPE_OR_POLICY_BLOCK, RESOURCE_INCONCLUSIVE.
+5. Make production fixes TDD-first: write one behavior-specific regression,
+   observe expected RED, implement minimal change, observe GREEN, then run
+   the full project suites. Never weaken tolerances or alter fixtures merely
+   to obtain a green result.
+6. Continue the sole C4 DAG, not a parallel plan:
+   - C4-D0 exact source identity.
+   - C4-D1 native reader vertical slices on SPG_M1 and Nadd=1 GPPVA.
+   - C4-D2 structure/metadata.
+   - C4-D3 thermodynamics with Il-aware Q3.
+   - C4-D4 provider composition semantics.
+   - C4-D5 segmentwise stability/causality.
+   - C4-D6 density reconstruction and 65-pair compatibility.
+   - C4-D7 segment-preserving adapters.
+   - C4-D3R reconstruction/smooth/true-Maxwell kernel validation.
+   - C4-D8 one-pair sharp-Maxwell pilot.
+   - C4-D9 65-pair sweep.
+   - C4-D10 phase-chain TOV/Cowling.
+7. PR3 import test fixtures are analytic implementation tests, not source-
+   backed EOS results. Keep that distinction explicit.
+
+CURRENT BLOCKERS / NON-CLAIMS
+- C6B provider composition semantics for SPG_M1 and GPPVA_FSU2 remain
+  unresolved. Do not infer Yh, Yn, Abar, Zav or Iphase semantics.
+- Local-neutrality of actual source phases is not inferred from composition-
+  free barotropes. The caller's explicit assumption is required for the
+  current thermo-only true-Maxwell kernel.
+- No one-pair root search or 65-pair sweep is authorized by this handoff.
+  D3R success alone is insufficient: C4-D0..D7 and C6B must also pass.
+- No real source-backed TOV/Cowling sequence, stable branch, maximum mass,
+  Seidov verdict for cohort models, or physical mode spectra are claimed.
+- Gibbs/global-neutrality mixed phase, phase-composition reconstruction,
+  finite-temperature and non-beta-equilibrated transitions are out of scope.
+- Imported PR #3 implementation is NOT implementation-verified on PR #1
+  until the exact-head native workflow and all relevant test receipts pass.
+
+MUTATION GATES
+M0 READ_ONLY: inspect, fetch, hash and test only.
+M1 RESEARCH_ONLY: changes on the existing PR #1 feature branch, confined to
+   relevant source/tests/docs; no main mutation.
+M2 TDD_REQUIRED: every production behavior change needs a failing test first.
+M3 HUMAN_APPROVAL_REQUIRED: equations, units, charge/composition semantics,
+   Iphase/Nadd parser semantics, raw source ordering, tolerance widening,
+   production API or solver equations.
+M4 PROTECTED: raw CompOSE EOS bytes, 52-file source authority, canonical
+   65-pair manifest, legacy outputs, C6B evidence and existing failure receipts.
+M5 SEPARATE_AUTHORIZATION: merge, release, deploy, provider contact, Dropbox
+   upload, or any branch push outside explicitly assigned PR #1 work.
+
+ANTI-DRIFT SELF-AUDIT (MUST RUN BEFORE EVERY PROMOTION)
+- Confirm repository, branch, exact HEAD, clean status and PR base/head.
+- Read raw source modules; do not rely on summaries alone.
+- Re-derive mu_E and Il-dependent Q3 relation.
+- Confirm root search uses mu_E, not stored Q3 where Il=0.
+- Confirm exact P_t matching and one-sided state ordering.
+- Confirm slow/material and rapid interface maps are not swapped.
+- Confirm TOV core/envelope segments never cross-interpolate.
+- Confirm density jump and Delta epsilon=mu_t Delta n_B independently.
+- Confirm Seidov assumptions and never promote its value into a universal claim.
+- Confirm slow/rapid root sets remain separate and roots are not physically
+  labelled by sorted frequency alone.
+- Confirm all test counts, logs, manifests and hashes refer to the same exact
+  source bytes.
+- Unknown or unavailable evidence stays NOT_RUN/BLOCKED/INCONCLUSIVE.
+
+TERMINAL RULE
+Do not merge PR #1 or PR #3. Do not close PR #4 C6B. Do not launch source
+cohort roots or star spectra until their declared upstream gates pass.

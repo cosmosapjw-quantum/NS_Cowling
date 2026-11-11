@@ -1,6 +1,6 @@
 # NS_Cowling EOS390: Cloud Execution Developer Contract
 
-**Version:** 1.2.0  
+**Version:** 1.3.0  
 **Date:** 2026-11-11  
 **Repository:** \`cosmosapjw-quantum/NS_Cowling\`  
 **Execution branch:** \`cloud/eos390-fortran-unification-v1\`  
@@ -22,7 +22,8 @@ The single source of truth is:
 2. \`data/eos390_native_fortran_unification_dag.v1.json\` for machine-readable authority, dependencies, statuses, gates, and next actions.
 3. This document for the human-readable contract and copyable agent prompt.
 4. \`data/eos390_source_bibliography.v1.json\` for EOS-specific literature provenance.
-5. A user-supplied raw EOS archive plus a verified SHA-256 manifest for byte-level source identity.
+6. \`data/eos390_reconstructed_source_inventory.v1.json\` for the surviving replacement source cohort.
+5. The surviving v3.2 source ZIP, its delivery manifest, the checked-in 18-model/158-file inventory, and a freshly generated per-file SHA-256 manifest.
 6. The v3.2 Dropbox release and old \`/ns_eos/matched_eos_all_combinations\` as immutable historical baselines, not as new-run evidence.
 
 Do not create another EOS390 plan, another competing schema, or another “improved” output authority. Extend the existing DAG in place.
@@ -115,35 +116,65 @@ sha256sum -c SHA256SUMS_v4.txt
 
 Never report a command as passed unless its actual return code and logs were inspected. A skipped, unavailable, or unexecuted step is \`NOT_RUN\`, not PASS.
 
-## 3. Input source identity and required user upload
+## 3. Surviving source archive and reconstruction contract
 
-Dropbox is not automatically mounted inside a clean cloud sandbox. Do not assume a cloud agent can call the user's Dropbox connector or access the user's local \`/home/.../Dropbox\` path. The current repository contains normalized/derived EOS material for development fixtures. For example, its normalized \`GPPVA_DD2/eos.compo\` differs in size and numeric serialization from the Dropbox source file. **The normalized GitHub tree is not a byte-identical raw-source archive.**
+Dropbox is not automatically mounted inside a clean cloud sandbox. Do not assume a cloud agent can call the user's Dropbox connector or access the user's local `/home/.../Dropbox` path. The GitHub `eos_generator/eos_data` tree is retained for source development, but normalized GitHub tables are not byte-identical provider inputs.
 
-Before any source-cohort validation, the cloud agent requires a single archive staged by the user:
+The previously required archive `NS_Cowling_EOS390_raw_inputs_v1.tar.zst` is **lost**. Do not ask the researcher to upload it again, and do not attempt to recreate its byte identity from extracted text, screenshots, normalized GitHub files, or inferred values. Its exact bytes and original checksum cannot be recovered from the evidence currently available.
 
-\`NS_Cowling_EOS390_raw_inputs_v1.tar.zst\`
+A surviving replacement package has been identified in Dropbox:
 
-It must contain the exact 18 provider directories under one root and a \`SHA256SUMS.txt\` file. Include the original files as supplied, not outputs from a normalizer:
+- Archive: `EoS_complete_core_crust_release_v3_2.zip`
+- Dropbox path: `/EoS_core_crust_release_v3_2_20261106/EoS_complete_core_crust_release_v3_2.zip`
+- Size: **19,398,255 bytes**
+- Dropbox revision: `65fba15b552db0af03d47`
+- Dropbox content hash: `a019e13e21de29726aead8c7d75caddf6013432d59db730ec58848825f87ed26`
+- SHA-256 stated by `DELIVERY_MANIFEST_v3_2.json`: `d671310eb630ffd13f1b278425d945741ad7e08ce14c0d9aff42309c707e6a3b`
+- ZIP member count stated by the delivery manifest: **2,516**
+- ZIP CRC test: **PASS as reported by the v3.2 delivery manifest**
 
-- required where present: \`README.txt\`, \`eos.init\`, \`eos.nb\`, \`eos.t\`, \`eos.yq\`, \`eos.thermo\`, \`eos.compo\`
-- preserve optional provider files: \`eos.micro\`, \`eos.mr\`, other release sidecars
-- include each CompOSE provider data sheet or a stable source record (the registry points to the papers and datasheets)
-- retain missing files as missing; the manifest covers files that actually exist.
+The SHA-256, size, member count and CRC above are historical Dropbox/manifest evidence. The ZIP bytes were not staged into this cloud workspace during the inventory operation, so the SHA-256 has **not** been independently recomputed in this turn. The cloud agent must recompute it before admitting the source cohort.
 
-The staging root is \`<cloud-workspace>/inputs/raw_compose/\`, outside the Git worktree. After extraction:
+The checked-in inventory is `data/eos390_reconstructed_source_inventory.v1.json`. It records the 18 EOS models and all **158 files** in the surviving `code_package/eos_data/` subtree (3,883,275 bytes in total), including each relative filename and listed size. A second Dropbox listing of the v3.2 release's extracted `code_package/eos_data/` directory has exactly the same 158 relative paths and file sizes: no missing paths, extra paths, or size mismatches. This is a path-and-size comparison only, not a byte-identity proof. A sample text extraction of GPPVA_DD2 `eos.thermo` and `eos.compo` matched between the two Dropbox roots, but text extraction is explicitly not used as binary evidence.
 
-\`\`\`bash
+Provider absences are intentional and must remain absent: APR_APR has no `eos.compo`; BBB_BHF2 has no `eos.compo` or `eos.mr`; GM_GM1 has no `eos.mr`. Never synthesize these files or encode missing composition as zero.
+
+### 3.1 Cloud staging and reconstruction
+
+The replacement ZIP, not the lost tar.zst, is the source input for the next cloud run. Stage it outside the Git worktree:
+
+```bash
 set -euo pipefail
-mkdir -p "$WORKSPACE/inputs/raw_compose"
-tar --zstd -xf "$UPLOAD_ARCHIVE" -C "$WORKSPACE/inputs/raw_compose"
-cd "$WORKSPACE/inputs/raw_compose"
-sha256sum -c SHA256SUMS.txt
-find . -type f -print0 | sort -z | xargs -0 -r sha256sum > "$WORKSPACE/artifacts/eos390/source_manifest_recomputed.sha256"
-\`\`\`
+mkdir -p "$WORKSPACE/inputs/replacement"
+# Stage the exact Dropbox file:
+# /EoS_core_crust_release_v3_2_20261106/EoS_complete_core_crust_release_v3_2.zip
+ZIP="$WORKSPACE/inputs/replacement/EoS_complete_core_crust_release_v3_2.zip"
 
-Compare the supplied and recomputed manifests. If any file is missing, modified, ambiguously normalized, or not covered by a checksum, stop at M0. Do not copy this archive into a public repository unless its redistribution rights are independently established. Generated scientific output and receipts belong in the attempt artifact, not beside source files.
+test "$(stat -c %s "$ZIP")" = "19398255"
+echo "d671310eb630ffd13f1b278425d945741ad7e08ce14c0d9aff42309c707e6a3b  $ZIP" | sha256sum -c -
+python - <<'PY' "$ZIP"
+import sys, zipfile
+p=sys.argv[1]
+with zipfile.ZipFile(p) as z:
+    assert len(z.infolist()) == 2516, len(z.infolist())
+    bad=z.testzip()
+    assert bad is None, bad
+print("ZIP member count and CRC: PASS")
+PY
+python scripts/prepare_eos390_reconstructed_inputs.py \
+  --archive "$ZIP" \
+  --inventory data/eos390_reconstructed_source_inventory.v1.json \
+  --output-root "$WORKSPACE/inputs/raw_compose" \
+  --output-archive "$WORKSPACE/inputs/NS_Cowling_EOS390_reconstructed_inputs_v2.tar.zst"
+```
 
-**The raw source archive is the one required user-supplied cloud input not established by this session.** The Dropbox connector could enumerate and extract text from source files but did not transfer original bytes into a persistent cloud workspace. The existing 18-model Dropbox directory and normalized GitHub fixture tree are not a substitute for that archive.
+The helper selects only `code_package/eos_data/<model>/<file>`, checks the exact inventory, rejects duplicates/missing/extra/unsafe/nested/symlink/size-mismatched members, preserves extracted file bytes, writes fresh `SHA256SUMS.txt` and `source_manifest.json`, and creates a newly versioned `NS_Cowling_EOS390_reconstructed_inputs_v2.tar.zst`. Its unit tests are in `python_frontend/tests/test_reconstructed_source_prep.py`.
+
+After reconstruction, independently verify the new tar.zst listing, its SHA-256, every file hash, the 18 model directories, and the exact 158-file count. Stage the resulting archive or extracted tree into the cloud workspace's `inputs/raw_compose/` and attach the fresh source manifest to the M0 receipt. Do not overwrite any existing input, output, or historical release.
+
+**Identity limitation:** the new tar.zst is a newly versioned reconstruction from the surviving v3.2 ZIP. It is not byte-identical to the lost `NS_Cowling_EOS390_raw_inputs_v1.tar.zst`; that equivalence is unprovable. Public GitHub should contain the inventory, provenance and reconstruction procedure, not raw EOS data bytes, unless redistribution rights are independently established.
+
+**Current M0 state:** replacement archive identified and inventoried, but binary staging and independent rehash are pending. M0 remains BLOCKED until all cloud-side checks pass.
 
 ## 4. Single backend and typed data contract
 
@@ -506,25 +537,25 @@ This is a current-tree trim only. There was **no Git history rewrite**. Removed 
 
 ## Latest verified cloud baseline (2026-11-11)
 
-The current lean cloud branch HEAD `e188fe355acdbea768ab179cd93eeabb44b99002` has a complete green CI baseline.
+The last verified parser/code baseline before the source-reconstruction helper was added is branch HEAD `cf89b3bb7ad5d1ee82e2f92b9736cadcdc582656`.
 
-- GitHub Actions run [#43027594881](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43027594881): **SUCCESS**.
+- GitHub Actions run [#43028463767](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43028463767): **SUCCESS**; PR run [#43028475287](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43028475287): **SUCCESS**.
 - Environment: GNU Fortran 15.2; Python 3.13.
 - Native Fortran build: PASS.
-- Frontend and pipeline tests: **80 passed in 31.74 s**.
+- Frontend and pipeline tests: **80 passed in 44.31 s**.
 - Native quartic polynomial-extrema test: PASS.
 - Native CSS high-density segment analytic test: PASS.
 - Handoff byte diagnostic: PASS.
 - Runner-measured SHA-256 manifest: PASS.
-- Source snapshot packaged and uploaded as artifact ID `13858705154`, 55,110,489 bytes, SHA-256 `876304d90d7293264d01bcb3f4b03e346e8899f447134c8617f1fa1e2bd12732`, expires `2026-12-11T13:17:27Z`.
+- Source snapshot packaged and uploaded as artifact ID `13860950517`, 55,105,617 bytes, SHA-256 `fa85568129cbc2b959735014982ee2b9a2c1a0b7b606b214f164358c0059126a`, expires `2026-12-11T13:23:24Z`.
 
-This is a verified source/build/test baseline, not an EOS390 production run. The original 18-provider raw archive has not been staged in the cloud workspace. No new 390 generation, native readback of regenerated outputs, physical validation, or Dropbox EOS-output backup is claimed. The next hard blocker is the original-source archive `NS_Cowling_EOS390_raw_inputs_v1.tar.zst` with `SHA256SUMS.txt`, staged outside the Git worktree.
+This is a verified parser/code baseline, not an EOS390 production run. The replacement v3.2 ZIP has been identified and its 18-model/158-file metadata inventory is committed, but its binary has not been staged in the cloud workspace and its manifest SHA-256 has not been independently rehashed there. The next hard blocker is staging `EoS_complete_core_crust_release_v3_2.zip` from the Dropbox path documented in section 3, then producing `NS_Cowling_EOS390_reconstructed_inputs_v2.tar.zst` with fresh hashes. No new 390 generation, native readback of regenerated outputs, physical validation, or Dropbox EOS-output backup is claimed.
 
 Duplicate CompOSE row-key guards are CI-verified. Per-row composition masks, generic multidimensional CompOSE support, provider-specific SPG/GPPVA abundance adjudication, and the complete Fortran production path remain incomplete and are tracked in the single machine DAG.
 
 ## 13. Current bounded implementation status
 
-**Implemented in the cloud branch, not yet CI-verified:** duplicate row-key guards in \`fortran_eos/src/compose_eos_io.f90\` reject repeated \((i_T,i_{n_B},i_{Y_q})\) keys for both \`eos.thermo\` and \`eos.compo\` before assignment. The phase index is now range-checked before indexing the destination phase array. Two regression tests were added. The first CI attempt compiled Fortran and reported 78 passed, 2 failed; both new tests failed because the test helper initially wrote literal backslash-n characters instead of line breaks. That helper was corrected in commit \`2265580a4bbdb204a4a4ea0b699d0f9ff5411838\`. A new CI run is required. Do not mark this slice PASS until the new run completes successfully.
+**CI-verified parser slice:** duplicate row-key guards in \`fortran_eos/src/compose_eos_io.f90\` reject repeated \((i_T,i_{n_B},i_{Y_q})\) keys for both \`eos.thermo\` and \`eos.compo\` before assignment. The phase index is now range-checked before indexing the destination phase array. Two regression tests were added. The first CI attempt compiled Fortran and reported 78 passed, 2 failed; both new tests failed because the test helper initially wrote literal backslash-n characters instead of line breaks. That helper was corrected in commit \`2265580a4bbdb204a4a4ea0b699d0f9ff5411838\`. A new CI run is required. Do not mark this slice PASS until the new run completes successfully.
 
 **Established blocker:** the prior 18-source native verification receipt showed broad reader/semantic failures for 15/18 input tables, independent C3/C4 coverage problems for GM_GM1, and source causality failure in APR_APR. The source-set review also identified multidimensional table axes for RG_SLY4 and RG_KDE0v1. A prior 70-test/build receipt exists in Dropbox but is not a new run from this cloud branch.
 
@@ -551,8 +582,13 @@ STARTUP
 4. Keep main and research/eos390-fortran-unification-v1 untouched.
 
 MANDATORY INPUT
-Do not use the normalized GitHub EOS tables as byte-identical originals.
-Require user upload of NS_Cowling_EOS390_raw_inputs_v1.tar.zst containing all 18 original provider directories and SHA256SUMS.txt. Stage outside the Git worktree at inputs/raw_compose/. Verify every checksum. If missing or mismatched, stop at M0 and request the archive.
+Do not use normalized GitHub EOS tables as byte-identical provider sources. The earlier NS_Cowling_EOS390_raw_inputs_v1.tar.zst was lost; do not request it again or claim to recreate its exact bytes.
+Use the surviving Dropbox archive:
+  /EoS_core_crust_release_v3_2_20261106/EoS_complete_core_crust_release_v3_2.zip
+Read data/eos390_reconstructed_source_inventory.v1.json. Stage the ZIP outside Git at inputs/replacement/EoS_complete_core_crust_release_v3_2.zip. Independently verify size 19,398,255 bytes, SHA-256 d671310eb630ffd13f1b278425d945741ad7e08ce14c0d9aff42309c707e6a3b, 2,516 ZIP members and CRC. The hash is a value reported by the v3.2 delivery manifest and must be recomputed from the staged ZIP.
+Then run:
+  python scripts/prepare_eos390_reconstructed_inputs.py --archive inputs/replacement/EoS_complete_core_crust_release_v3_2.zip --inventory data/eos390_reconstructed_source_inventory.v1.json --output-root inputs/raw_compose --output-archive inputs/NS_Cowling_EOS390_reconstructed_inputs_v2.tar.zst
+Require exact 18-model/158-file/3,883,275-byte match, fresh per-file SHA256SUMS.txt, source_manifest.json, and a verified tar.zst. Preserve provider absences and source bytes. This new archive is a reconstruction, not a byte-identical restoration of the lost tar.zst. If the replacement ZIP is not staged or any check fails, stop at M0 without requesting the lost filename.
 
 IMPLEMENTATION ORDER
 A. Verify E390-02B and finish E390-02C: migrate the remaining production-path Python numerical selector(s) to Fortran; keep Python/SciPy adapter kernels diagnostic-only.\nB. Finish E390-02A: add per-row/per-species/per-group presence masks; distinguish row absence, field absence, and numerical zero. Evaluate C3 and C4 independently per row. Preserve raw unknown IDs/groups and Nadd extensions.

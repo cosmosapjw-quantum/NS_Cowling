@@ -1,7 +1,7 @@
 {
-  "schema_version": "1.1.0",
+  "schema_version": "1.2.0",
   "schema_name": "ns-cowling-local-agent-two-sided-matching-dag",
-  "contract_id": "NSCOWLING-MODEID-WRONSKIAN-LOCAL-AGENT-v1.3",
+  "contract_id": "NSCOWLING-MODEID-WRONSKIAN-LOCAL-AGENT-v1.4",
   "snapshot_date": "2026-11-11",
   "status": "LOCAL_IMPLEMENTATION_SPEC_READY__LA9_TRACE_FIRST_AND_LA10_INTERPOLATION_GATES_DEFINED",
   "project": {
@@ -24,20 +24,25 @@
     "snapshot_requires_live_fetch": true,
     "snapshot_semantics": {
       "observed_pr6_head_at_task_start": "9d43806e6b6f318934738ad6d94db261d15c2b98",
-      "branch_created_for_this_increment": "research/maxwell-interface-interpolation-la10-v1",
+      "branch_created_for_this_increment": "research/maxwell-analytic-matching-la11-v1",
       "source_authority_commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
-      "rule": "Immutable parent pin. Fetch live refs before new work. Never overwrite a moved branch.",
+      "rule": "Fetch current live refs before local work. Never overwrite a moved branch; work in an isolated child branch.",
       "parent_branch_at_start": "research/maxwell-abel-closure-compensation-v1",
-      "parent_sha_at_start": "d1eba5ab7ebad6f2e08a52f6b9826ea8bd3a24c9"
+      "parent_sha_at_start": "d1eba5ab7ebad6f2e08a52f6b9826ea8bd3a24c9",
+      "immutable_parent_branch": "research/maxwell-interface-interpolation-la10-v1",
+      "immutable_parent_sha": "104b4fa76e191db42e6af26f072533617f45441c"
     },
     "continuation_branch_snapshot": "research/maxwell-abel-closure-compensation-v1",
     "continuation_head_snapshot": "d1eba5ab7ebad6f2e08a52f6b9826ea8bd3a24c9",
-    "active_local_child_branch": "research/maxwell-interface-interpolation-la10-v1",
-    "active_pr_number": 7,
+    "active_local_child_branch": "research/maxwell-analytic-matching-la11-v1",
+    "active_pr_number": 10,
     "upstream_research_prs": [
       6,
-      7
-    ]
+      7,
+      9
+    ],
+    "active_parent_branch": "research/maxwell-interface-interpolation-la10-v1",
+    "active_parent_sha": "104b4fa76e191db42e6af26f072533617f45441c"
   },
   "objective": "Implement and validate an independent two-sided matching cross-check for the existing analytic two-phase sharp-Maxwell relativistic Cowling fixture using the weighted Abel-Liouville determinant invariant.",
   "mathematical_contract": {
@@ -103,6 +108,74 @@
         "if the perturbation system is not square or the map loses rank, stop and reformulate instead of forcing the 2x2 formula",
         "do not infer a physical conservation law from the compensated determinant"
       ]
+    },
+    "analytic_finite_interval_matching": {
+      "parameter": "zeta in a declared complex domain Omega; do not conflate the spectral parameter with the metric potential lambda",
+      "ode": "Y'=M_j(r,zeta)Y on each smooth layer",
+      "interface": "y_o=T_k(zeta)y_i, with every T_k holomorphic and invertible on the claimed domain, or use a full-rank implicit interface constraint",
+      "endpoint_frames": "Phi_c and Phi_s must be holomorphic, full column rank, with fixed complementary dimensions p and n-p",
+      "determinant": "D(zeta;rm)=det[Phi_c(rm,zeta),Phi_s(rm,zeta)] using a bilinear determinant without conjugation",
+      "sufficient_hypotheses": [
+        "M_j(r,zeta) is holomorphic in zeta and locally uniformly L1 in r on each layer",
+        "the endpoint admissible subspaces have constant dimension and full-rank holomorphic frames",
+        "all interface maps or implicit constraint matrices are holomorphic on the domain and have the required rank",
+        "the parameter domain excludes unresolved coefficient, endpoint and interface singularities"
+      ],
+      "zero_set": "D=0 iff the propagated center and surface admissible subspaces intersect nontrivially",
+      "multiplicity": "zero order equals BVP algebraic multiplicity only after the actual BVP is shown to be a regular holomorphic Fredholm pencil and the matching matrix an analytic invertible reduction",
+      "basis_cocycle": "D_tilde=D*det(A_c)*det(A_s); A_c,A_s must be holomorphic units on the whole contour interior",
+      "gauge_equations": {
+        "state": "y=G(r,zeta)z",
+        "matrix": "M_z=G^-1*M_y*G-G^-1*G_prime",
+        "interface": "T_z=G_outer^-1*T_y*G_inner",
+        "matching_determinant": "D_y=det(G_at_match)*D_z",
+        "trace": "tr(M_z)=tr(M_y)-d(log(det(G)))/dr"
+      },
+      "match_radius_factors": {
+        "smooth": "D(r2)=exp(integral(tr(M)dr))*D(r1)",
+        "interface": "D(r_k+)=det(T_k)*D(r_k-)"
+      },
+      "normalization": "Hermitian norms, Gram-Schmidt, unitary QR/SVD and polar decompositions are not holomorphic in complex zeta. They may be conditioning diagnostics only; any numerical frame factor used in D must be restored in full including volume and phase.",
+      "scope": "finite-interval characteristic determinant; do not import whole-line stable/unstable, essential-spectrum or exponential-dichotomy hypotheses unless the actual problem is whole-line"
+    },
+    "la10_implicit_interface_regularization": {
+      "A": "A=(omega*r_t/c)^2*exp(lambda_metric-2*nu_metric)",
+      "constraints": "Q_o-kappa*Q_i=0; (1-theta)*nu_prime*[W]-theta*A*[V]=0",
+      "C_inner": [
+        [
+          "-kappa*nu_prime",
+          "-kappa*A"
+        ],
+        [
+          "-(1-theta)*nu_prime",
+          "theta*A"
+        ]
+      ],
+      "C_outer": [
+        [
+          "nu_prime",
+          "A"
+        ],
+        [
+          "(1-theta)*nu_prime",
+          "-theta*A"
+        ]
+      ],
+      "determinants": {
+        "C_inner": "-kappa*A*nu_prime",
+        "C_outer": "-A*nu_prime",
+        "T_theta": "kappa"
+      },
+      "graph_map": "T_theta=-C_outer^-1*C_inner for A!=0",
+      "implicit_scalar": "E_imp=det[C_inner*y_inner,C_outer*y_outer]",
+      "prefactor": "E_imp=A*nu_prime*det[T_theta*y_inner,y_outer] for theta<1, kappa!=1, A!=0",
+      "zero_A": {
+        "theta_lt_1_kappa_ne_1": "C_outer loses rank and no graph transfer exists; keep C_inner/C_outer implicit and use multi-domain matching",
+        "theta_eq_1": "use explicit analytic rapid endpoint extension [V]=0; this agrees with original rapid relation for A!=0, but is a selected extension at A=0",
+        "kappa_eq_1": "no enthalpy jump; use exact identity map"
+      },
+      "conditioning": "with x=A/(nu_prime*L), dimensionless state (W/L^3,V/L^2), cond2(T_hat)=O(|x|^-2)=O(|omega|^-4); condition number is real-frequency diagnostic only",
+      "epistemic_scope": "algebraic family only; theta is not a physical conversion rate or finite-rate kinetic law"
     }
   },
   "non_goals": [
@@ -405,6 +478,61 @@
       }
     },
     {
+      "id": "LA11",
+      "depends_on": [
+        "LA0",
+        "LA1",
+        "LA3",
+        "LA4",
+        "LA9",
+        "LA10"
+      ],
+      "name": "finite-interval analytic characteristic determinant, basis/gauge covariance and LA10 implicit-interface regularization",
+      "gate": "M1",
+      "status": "CONDITIONAL_THEORY_DERIVED_AND_22_SYNTHETIC_TESTS_PASS__NATIVE_ENDPOINT_ANALYTICITY_UNVERIFIED",
+      "outputs": [
+        "ANALYTIC_MATCHING_GAUGE_AUDIT_20261111.md",
+        "ANALYTIC_MATCHING_STATUS_20261111.json",
+        "ANALYTIC_MATCHING_RESULTS.json",
+        "analytic_matching.py",
+        "tests/test_analytic_matching.py",
+        "computation_evidence/analytic_matching_20261111/"
+      ],
+      "acceptance": [
+        "declare a complex spectral parameter zeta and the exact domain used; distinguish zeta from metric lambda",
+        "verify the full source-derived M_j is holomorphic in zeta with locally uniform L1 bounds on each smooth layer",
+        "verify endpoint admissible subspaces have fixed complementary dimensions and full-rank holomorphic frames",
+        "verify each sharp interface graph map is holomorphic and invertible on the domain, or use a square full-rank implicit interface matching system",
+        "derive D(zeta)=det[Phi_c,Phi_s] and its zero-set equivalence to the finite-interval BVP",
+        "verify basis covariance D_tilde=D*det(A_c)*det(A_s) and require the multiplier to be nonzero throughout contour interior",
+        "verify state-gauge transformation of M, T, frames, trace and determinant factors",
+        "verify smooth match-radius and interface Liouville factors",
+        "do not assert zero-order/algebraic-multiplicity equality until the actual BVP is a regular holomorphic Fredholm pencil and the matching matrix is an analytic invertible reduction",
+        "derive the LA10 C_inner/C_outer constraint blocks and exact determinant factors independently",
+        "for theta<1,kappa!=1,A=0 use implicit interface matching; do not invert singular C_outer",
+        "at theta=1 record [V]=0 as a selected analytic rapid extension at A=0; at kappa=1 use exact no-jump identity",
+        "separate holomorphic characteristic determinant from Hermitian norm/QR/SVD condition diagnostics and restore all volume/phase/chart factors",
+        "run the 22-case synthetic test suite and reconcile source/test SHA, collection, stdout, manifest and SHA256SUMS"
+      ],
+      "stop": [
+        "M_j is not holomorphic or local uniform L1 bounds cannot be justified on the claimed domain",
+        "endpoint dimension changes or no full-rank holomorphic endpoint frame is available",
+        "T_k has a pole, zero determinant or unresolved rank change inside the contour and no implicit formulation is available",
+        "combined interface constraints are rank-deficient or the global matching matrix is nonsquare",
+        "basis, gauge, interface, chart, column-scale or volume factors are lost",
+        "a norm/QR/SVD-normalized quantity is presented as holomorphic without proof",
+        "whole-line Evans hypotheses are imported into this finite interval without an applicable whole-line formulation",
+        "algebraic multiplicity or argument-principle counts are asserted without their analytic pencil/contour gates"
+      ],
+      "result_policy": {
+        "zero_set": "CONDITIONAL_ON_HOLOMORPHIC_ENDPOINT_ODE_AND_INTERFACE_HYPOTHESES",
+        "algebraic_multiplicity": "BLOCKED_UNTIL_REGULAR_FREDHOLM_PENCIL_EQUIVALENCE",
+        "argument_principle": "BLOCKED_UNTIL_D_HOLOMORPHIC_AND_NONZERO_ON_CONTOUR_WITH_ALL_HOLOMORPHIC_UNITS_NONZERO_INSIDE",
+        "native_solver": "NOT_RUN",
+        "physical_zero_frequency_claim": "NOT_PERMITTED_FROM_SYNTHETIC_EXTENSION"
+      }
+    },
+    {
       "id": "LA8",
       "depends_on": [
         "LA0",
@@ -416,7 +544,8 @@
         "LA6",
         "LA7",
         "LA9",
-        "LA10"
+        "LA10",
+        "LA11"
       ],
       "name": "final receipts and checkpoint",
       "gate": "M1",
@@ -464,7 +593,13 @@
     "finite_conversion_interpolation.py",
     "tests/test_algebraic_interpolation.py",
     "computation_evidence/finite_conversion_interpolation_20261111/environment.txt",
-    "computation_evidence/finite_conversion_interpolation_20261111/pytest.stdout.txt"
+    "computation_evidence/finite_conversion_interpolation_20261111/pytest.stdout.txt",
+    "ANALYTIC_MATCHING_GAUGE_AUDIT_20261111.md",
+    "ANALYTIC_MATCHING_STATUS_20261111.json",
+    "ANALYTIC_MATCHING_RESULTS.json",
+    "analytic_matching.py",
+    "tests/test_analytic_matching.py",
+    "computation_evidence/analytic_matching_20261111/"
   ],
   "failure_taxonomy": [
     "THEORY_CONVENTION_MISMATCH",
@@ -477,7 +612,12 @@
     "ENVIRONMENT_OR_BUILD_FAILURE",
     "PROVENANCE_FAILURE",
     "SCOPE_OR_POLICY_BLOCK",
-    "INCONCLUSIVE_RESOURCE_LIMIT"
+    "INCONCLUSIVE_RESOURCE_LIMIT",
+    "ANALYTICITY_DOMAIN_FAILURE",
+    "BASIS_GAUGE_COVARIANCE_FAILURE",
+    "INTERFACE_CHART_SINGULARITY",
+    "MULTIPLICITY_PENCIL_UNVERIFIED",
+    "NONHOLOMORPHIC_NORMALIZATION"
   ],
   "external_actions": {
     "git_push": false,
@@ -515,9 +655,20 @@
     "intermediate_conversion_command": "PYTHONPATH=. python -m pytest -q research/maxwell_mode_identity/tests/test_algebraic_interpolation.py",
     "wolfram_interpolation": "EXACT_IDENTITIES_PASS_CLEAN_MODULE",
     "sympy_interpolation": "EXACT_IDENTITIES_PASS",
-    "physical_finite_rate_law": "NOT_ESTABLISHED"
+    "physical_finite_rate_law": "NOT_ESTABLISHED",
+    "la11_cases": 22,
+    "la11_stdout": "22 passed in 0.21s",
+    "la11_collection": "22 tests collected in 0.01s",
+    "la11_module_sha256": "087ab499e9466b2008fedca79409e04db6038808bb8d4df03fde9d0f74f4b096",
+    "la11_tests_sha256": "c8d9dee337c502a48a01d78c1c045a320d93a7c928a16016ae133c5326dedd79",
+    "la11_local_git_metadata": "EXPORTED_LOCAL_ARTIFACT_RUN; exact bytes will be matched to published GitHub blobs",
+    "la11_helper_git_blob_sha1": "97e9f5c6a134110e92afc68b1b2080dbabbf6756",
+    "la11_test_git_blob_sha1": "8bedc9870cc80ae63b25f03d86454afd59941c9a",
+    "la11_github_blob_identity": "PASS_EXACT_BLOB_MATCH_FOR_HELPER_AND_TESTS",
+    "la11_native_audit": "NOT_RUN",
+    "la11_ci": "NOT_CONFIRMED_EMPTY_COMBINED_STATUS"
   },
-  "contract_revision": "1.3.0",
+  "contract_revision": "1.4.0",
   "updated_at": "2026-11-11",
   "validation_reconciliation": {
     "historical_manifest_cases": 42,
@@ -556,7 +707,14 @@
     "is theta kept distinct from kappa and never called a physical conversion rate, timescale or mobility?",
     "is the 2023 radial interpolation kept separate from the nonradial Cowling derivation?",
     "does any proposed physical finite-rate law supply a sourced constitutive relation, flux, chemical affinity and dissipation/entropy balance?",
-    "is no-thin-shell admissibility explicitly unresolved unless derived?"
+    "is no-thin-shell admissibility explicitly unresolved unless derived?",
+    "record the exact complex spectral parameter domain and distinguish it from metric lambda",
+    "verify all determinant multipliers are holomorphic units on the complete contour interior, not only nonzero on the contour",
+    "check transfer-map invertibility separately from the rank of the full implicit interface constraints",
+    "at A proportional to omega squared, distinguish the LA10 graph-chart pole from the finite implicit interface relation",
+    "do not assert algebraic multiplicity without the regular holomorphic BVP/Fredholm pencil reduction",
+    "do not treat a norm/QR/SVD condition number as a holomorphic characteristic function",
+    "do not call a finite-interval characteristic determinant a whole-line Evans function without far-field assumptions"
   ],
   "publication_reconciliation": {
     "pr6_head": "7c4607c7db0a7e10375a33b43642a29557a1df1e",
@@ -575,7 +733,12 @@
     "la10_parent_branch": "research/maxwell-abel-closure-compensation-v1",
     "la10_parent_sha": "d1eba5ab7ebad6f2e08a52f6b9826ea8bd3a24c9",
     "intended_base_pr": 7,
-    "local_agent_publication_permission": false
+    "local_agent_publication_permission": false,
+    "la11_parent_pr": 9,
+    "la11_parent_sha": "104b4fa76e191db42e6af26f072533617f45441c",
+    "la11_branch": "research/maxwell-analytic-matching-la11-v1",
+    "la11_native_source_audit": "NOT_RUN",
+    "la11_ci": "NOT_CONFIRMED_COMBINED_STATUS_EMPTY"
   },
   "negative_test_history": {
     "status": "PRESERVED",

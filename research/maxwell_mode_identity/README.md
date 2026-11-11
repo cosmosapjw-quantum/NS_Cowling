@@ -82,3 +82,8 @@ In addition to the conditional chi_ad/chi_eq shortcut, the helper now implements
 ## LA10: nonradial interface interpolation (algebraic only)
 
 The single local-agent DAG includes LA10 for an independently symbolically checked and 12-case tested algebraic interpolation between slow and rapid nonradial Cowling kinematic constraints. The dimensionless `theta` is **not** a physical conversion rate, timescale or microscopic mobility. See `FINITE_CONVERSION_INTERPOLATION_AUDIT_20261111.md` and `FINITE_CONVERSION_INTERPOLATION_STATUS_20261111.json`. Physical finite-rate kinetics and no-thin-shell admissibility remain unestablished. The prior LA9 trace-first helper and its 15-case receipt are preserved as a separate node.
+
+
+## LA11: finite-interval analytic matching and interface chart regularization
+
+LA11 adds the conditional holomorphic finite-interval characteristic determinant, endpoint basis and state-gauge determinant cocycles, smooth/interface match-radius factors, and an implicit LA10 interface scalar that stays finite when the graph transfer chart reaches A=0. It explicitly separates zero-set equivalence from algebraic multiplicity and blocks argument-principle use until the actual BVP pencil/endpoint/interface analyticity is verified. The 22-case synthetic suite passed; native endpoint/source verification remains local and NOT_RUN. See ANALYTIC_MATCHING_GAUGE_AUDIT_20261111.md and the single DAG's LA11 node.

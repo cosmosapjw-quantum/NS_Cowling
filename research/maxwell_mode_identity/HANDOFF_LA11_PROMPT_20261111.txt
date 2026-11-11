@@ -1,0 +1,150 @@
+You are the local implementation/verification agent for cosmosapjw-quantum/NS_Cowling.
+
+Current review pin (fetch live before use): PR #10 https://github.com/cosmosapjw-quantum/NS_Cowling/pull/10; branch research/maxwell-analytic-matching-la11-v1; observed HEAD ffc6a75006d63c222871b9c9fc13abdbc699014a. PR is draft/unmerged; CI status API returned no records.
+
+READ THE LIVE REPOSITORY CONTRACT FIRST. The sole SSOT is
+research/maxwell_mode_identity/LOCAL_AGENT_DAG.v1.json, contract revision v1.4.
+Also read LOCAL_AGENT_DAG_DEVELOPMENT_AND_HANDOFF_20261111.md and
+HANDOFF_PROMPT_20261111.txt for the complete LA0-LA10 contract. Then read
+ANALYTIC_MATCHING_GAUGE_AUDIT_20261111.md, ANALYTIC_MATCHING_STATUS_20261111.json,
+ANALYTIC_MATCHING_RESULTS.json, analytic_matching.py and its tests.
+
+IDENTITY AND MUTATION
+1. Fetch the live branch research/maxwell-analytic-matching-la11-v1 and record
+   its exact HEAD. The commit embedded in this prompt is only a historical pin.
+2. Check repository root, remote, branch, git status, toolchain versions and
+   all applicable AGENTS.md/CLAUDE.md instructions.
+3. If dirty or ambiguous, stop. Never run git reset --hard or git clean -fdx.
+4. Create a fresh isolated worktree/child branch from the exact live HEAD.
+5. Preserve M0-M5 in the unified DAG. This handoff authorizes local research
+   only; do not push, create PRs, merge, release, deploy, contact providers or
+   upload to Dropbox without separate explicit authorization.
+6. Do not touch raw EOS, canonical pair manifests, C7X gates, source-authority
+   branches, production Fortran, production RHS, center/surface conditions,
+   root-finding policy or solver APIs.
+
+LA11 OBJECTIVE
+Verify the actual finite-interval Cowling characteristic determinant and the
+LA10 interface matching representation against the native and Python source.
+Do not assume that a generic Evans-function theorem proves the production code.
+
+MATHEMATICAL CONTRACT
+For a declared complex spectral parameter zeta, on each smooth layer:
+    Y_prime = M_j(r,zeta) Y.
+At each sharp interface:
+    y_outer = T_k(zeta) y_inner.
+Let Phi_c and Phi_s be complementary center/surface endpoint frames at a
+common matching radius r_m, with fixed dimensions p and n-p:
+    D(zeta;r_m) = det([Phi_c(r_m,zeta), Phi_s(r_m,zeta)]).
+The determinant is bilinear and contains no conjugation.
+
+Sufficient holomorphy conditions to verify:
+- M_j is holomorphic in zeta and locally uniformly L1 in r on each layer.
+- Every graph T_k is holomorphic and invertible on the entire parameter domain,
+  or the full implicit interface relation is used in a square full-rank matching
+  system.
+- Endpoint admissible spaces have constant dimensions and full-rank holomorphic
+  frames.
+- The domain contains no unhandled coefficient, endpoint or interface poles.
+Then D is holomorphic and D=0 iff the endpoint-admissible subspaces intersect.
+This is a finite-interval characteristic determinant. Do not import whole-line
+stable/unstable, essential-spectrum or exponential-dichotomy assumptions.
+
+BASIS AND GAUGE COVARIANCE
+For holomorphic invertible endpoint basis changes:
+    Phi_c -> Phi_c A_c, Phi_s -> Phi_s A_s
+    D_tilde = D det(A_c) det(A_s).
+The multiplier must be nonzero throughout the whole contour interior, not merely
+on the boundary. A zero/pole inside changes argument-principle counts.
+
+For y=G(r,zeta) z:
+    M_z = G^-1 M_y G - G^-1 G_prime
+    T_z = G_outer^-1 T_y G_inner
+    D_y = det(G_at_match) D_z
+    tr(M_z) = tr(M_y) - d_r log(det G).
+Retain every determinant factor. Verify the smooth and interface cocycles.
+
+MULTIPLICITY AND ROOT-COUNTING GATES
+Do not assert that zero order equals physical algebraic multiplicity until the
+actual BVP is proved to be a regular holomorphic Fredholm pencil (index zero,
+nonempty resolvent) and the matching matrix is shown to be an analytic
+invertible reduction. Do not run the argument principle unless the characteristic
+scalar is holomorphic on and inside the contour and nonzero on the contour.
+Do not use a norm-normalized determinant, Gram-Schmidt, ordinary unitary QR/SVD,
+or polar factor as a holomorphic Evans function. If conditioning tools are used,
+restore the full determinant phase, radial/volume factor, QR triangular factor,
+column/row scales and chart-transition cocycles.
+
+LA10 LOW-FREQUENCY INTERFACE GATE
+The LA10 family has A proportional to omega^2 and, for theta<1, kappa!=1,
+    T_21 = (1-theta)(kappa-1) nu_prime/A.
+Thus the graph transfer has a pole at omega=0 although det(T)=kappa remains finite.
+For the implicit pressure and mixed kinematic constraints use:
+    C_i = [[-kappa*nu_prime,-kappa*A],[-(1-theta)*nu_prime,theta*A]]
+    C_o = [[nu_prime,A],[(1-theta)*nu_prime,-theta*A]]
+    C_o T + C_i = 0 (only when A != 0)
+    det(C_i)=-kappa*A*nu_prime, det(C_o)=-A*nu_prime.
+For one-dimensional endpoint lines u_i and v_o use
+    E_imp = det([C_i u_i, C_o v_o])
+and verify, for A!=0, theta<1, kappa!=1,
+    E_imp = A*nu_prime*det([T u_i, v_o]).
+At A=0 and theta<1,kappa!=1, C_o loses rank but the combined implicit
+constraint matrix remains row-rank two. Use the implicit relation; do not invert C_o.
+At theta=1, use the explicitly documented regular rapid extension [V]=0; it
+agrees with the rapid constraint for A!=0 but is a selected extension at A=0.
+At kappa=1 there is no density/enthalpy jump, so use exact T=I before forming
+rank-degenerate interface blocks. Theta remains an algebraic constraint
+interpolation, never a physical rate or mobility.
+
+NUMERICAL CONDITIONING
+Use W_hat=W/L^3, V_hat=V/L^2 and x=A/(nu_prime L). The dimensionless transfer
+has T_hat_21=(1-theta)(kappa-1)/x and, generically, cond_2(T_hat)=O(|x|^-2),
+which becomes O(|omega|^-4) as A is proportional to omega^2. Condition numbers
+use singular values and are diagnostics only, never complex analytic scalars.
+
+LOCAL EXECUTION
+1. LA0: identity/clean-state/toolchain/source hash receipt.
+2. LA1: rederive the full native q-to-r RHS and actual interface conditions.
+3. LA3/LA4: replay prior invariants and verify two-sided matching prerequisites.
+4. LA9/LA10: read and replay the trace-first and algebraic-interface evidence.
+5. LA11: verify analytic domains, endpoint frames, basis/gauge cocycles, match-
+   radius factors, interface block ranks, transfer pole and implicit determinant.
+6. If the actual source differs from the assumed equations or cannot support the
+   required holomorphy, classify the first failed implication and stop.
+7. LA8: update only the existing machine DAG and validation report after every
+   node has exact receipts or is honestly marked BLOCKED/NOT_RUN.
+
+REQUIRED RECEIPTS
+run_identity.json; source_manifest.json; endpoint_frame_analyticity_audit.md;
+characteristic_determinant_results.json; basis_gauge_cocycle_results.json;
+interface_chart_singularity_results.json; argument_principle_gate.json (or
+explicit BLOCKED); multiplicity_equivalence_audit.md (or NOT_ESTABLISHED);
+convergence_matrix.csv; VALIDATION_REPORT.md; SHA256SUMS.
+
+ANTI-DRIFT SELF-AUDIT
+- Exact repo, branch, HEAD, clean status, remotes and source hashes recorded?
+- Source-authority, PR6, PR7, PR9 and LA11 branch pins kept distinct?
+- Actual native RHS read and chain rule derived, not guessed?
+- Complex spectral parameter and metric lambda distinguished?
+- Holomorphy and local uniform L1 bounds checked per smooth layer?
+- Endpoint dimensions constant and frames full rank/holomorphic?
+- Every T invertible across the full domain or replaced by a rank-checked
+  implicit interface system?
+- Basis/gauge/match-radius/chart determinants and phases retained exactly once?
+- Any QR/SVD/norm diagnostic kept separate from raw analytic D?
+- Zero order/algebraic multiplicity gate satisfied, or explicitly not established?
+- Whole-line Evans hypotheses avoided unless actually applicable?
+- Theta not called a physical rate; finite-rate kinetics remains blocked?
+- Collection inventory, stdout, manifest and source hashes agree?
+- Failures classified as theory/convention, analyticity-domain, basis/gauge,
+  interface chart, multiplicity-pencil, numerical, implementation, environment,
+  provenance or scope/policy?
+- Unknown/inaccessible remains NOT_RUN/BLOCKED, never PASS?
+- M0-M5 and all protected EOS/C7X/source-authority files unchanged?
+
+FINAL REPORT
+Return exact source pins, LA0-LA11 node states, changed paths, protected-file
+hash comparison, test inventory/stdout, symbolic identities, root-domain
+hypotheses, numerical convergence, all negative controls, failure taxonomy,
+non-claims and local checkpoint SHA. No production mutation or remote mutation
+is authorized by this local handoff.

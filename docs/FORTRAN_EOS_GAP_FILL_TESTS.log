@@ -80,3 +80,40 @@ Follow-up: Hermite fallback correctness audit (2026-11-07)
     Native Fortran build: PASS.
     Targeted frontend/direct-provider suite: 24 passed in 18.97s.
     SHA-256 manifest: all 50 tracked entries OK.
+
+
+Follow-up: true-Maxwell Il=0 CompOSE Q3 convention (2026-11-11)
+  Branch target: research/fortran-eos-gap-fill-v1 (PR #1)
+  Source run identity: Actions artifact from workflow run 42445584718,
+    exact branch head ca71d8e394f9043d778676c941f88ce01ca7faa9.
+  Artifact ZIP SHA256:
+    889040d46ea25f34b9fc60dfc99d3d9304062d23b289ed1d9c8b7b625d00e366
+  Embedded source tarball SHA256:
+    a1705402af9536af42031b3b9865a21b09c3184bb90d41f10f60bbd6cb22036d
+  Local execution environment:
+    Python 3.13.5; NumPy 2.3.5; SciPy 1.17.0; pytest 9.0.2;
+    GNU Fortran 14.2.0.
+  RED:
+    test_native_maxwell_respects_il0_compose_q3_charge_potential_convention
+    failed at the intended native input validation gate:
+    provider Q3 chemical potential disagrees with the Euler value.
+  GREEN:
+    same test passes after the Il=0-aware input-Q3 reconstruction and
+    Il=0-aware Q3 writing in the transition and copied source rows.
+  Native build:
+    bash fortran_eos/build.sh build/compose_eos_fortran
+    PASS (GNU Fortran 14.2.0).
+  Native polynomial extrema:
+    test_polynomial_extrema executable -> quartic polynomial extrema: PASS.
+  Full EOS frontend/pipeline suite:
+    PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. \
+    COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran \
+    python -m pytest -q python_frontend/tests pipeline/tests
+    68 passed in 13.57s.
+  Previous exact baseline before Il=0 regression: 67 passed in 20.91s.
+  Status: implementation and synthetic Il=0 regression verified in the
+    exported artifact source tree. Local Git metadata was unavailable;
+    this is not a committed-checkout replay. Exact source/test hashes and
+    final SHA256SUMS_v4.txt verification are retained in the evidence bundle.
+  Non-claims: no 18-source cohort audit, no 65-pair roots, no Gibbs,
+    no Seidov, no physical TOV/Cowling phase-interface calculation.

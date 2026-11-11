@@ -321,3 +321,35 @@ When stopped, preserve the exact blocker and partial evidence. Do not silently c
 
 Deliver a concise final handoff with exact commit, test evidence, source admission state, 390 counts, output path, checksums, Dropbox upload receipt, and known remaining gaps.
 ```
+
+
+## 13. EOS-specific paper access registry (checked 2026-11-11)
+
+The source-of-record for which paper applies to which EOS is each model's CompOSE `eos.pdf` datasheet, not an assumed family-wide citation. The local agent must archive the exact PDF bytes, DOI/arXiv version, byte count, SHA-256 and source URL in `paper_source_registry.json`.
+
+Open full-text sources found for this matrix include:
+- APR: Akmal, Pandharipande & Ravenhall, PRC 58, 1804 (1998), https://arxiv.org/abs/nucl-th/9804027
+- BBB_BHF2: Baldo, Bombaci & Burgio, A&A 328, 274 (1997), https://arxiv.org/abs/astro-ph/9707277
+- KDE0v1 and SLy4 source discussion: Gulminelli & Raduta (2015), https://arxiv.org/abs/1504.04493
+- KDE0v1 parameter paper: Agrawal, Shlomo & Au, PRC 72, 014310 (2005), https://arxiv.org/abs/nucl-th/0505071
+- SPG M1-M5: Scurto, Pais & Gulminelli, PRD 109, 103015 (2024), https://arxiv.org/abs/2402.15548
+- GPPVA common inner-crust Thomas-Fermi construction: Grill et al., PRC 90, 045803 (2014), https://arxiv.org/abs/1404.2753
+- DD2: Typel et al., PRC 81, 015803 (2010), https://arxiv.org/abs/0908.2344
+- DD-ME2: Lalazissis et al., PRC 71, 024312 (2005), published version in University of Zagreb repository, https://repozitorij.pmf.unizg.hr/object/pmf:6864/FILE0/download
+- FSU2: Chen & Piekarewicz, PRC 90, 044305 (2014), https://arxiv.org/abs/1408.4159
+- FSU2R/FSU2H: Negreiros et al., ApJ 863, 104 (2018), https://arxiv.org/abs/1804.00334
+- NL3ωρ-L55: Pais & Providência, PRC 94, 015808 (2016), https://arxiv.org/abs/1607.05899
+- TM1e: Shen et al., ApJ 891, 148 (2020), https://arxiv.org/abs/2001.10143
+- TW-99 open supporting expositions: Avancini et al. (2003), https://arxiv.org/abs/nucl-th/0212080; and https://arxiv.org/abs/0704.0407. These are later TW-99 expositions, **not** the original Typel & Wolter (1999) paper.
+- CompOSE reference manual: Typel et al., https://arxiv.org/abs/2203.03209
+- Inner-crust CompOSE paper: Malik & Pais, https://arxiv.org/abs/2207.14153
+- Tidal density-jump matching reference: Takátsy & Kovács, https://arxiv.org/abs/2007.01139
+
+The GPPVA_TW data sheet found in Dropbox under `/EoS_core_crust_release_v3_2_20261106/.../GPPVA_TW/eos.pdf` is dated 2025-06-26 and explicitly cites three current table-construction papers: C.-J. Xia et al., Commun. Theor. Phys. 74, 095303 (2022); J.-X. Niu et al., arXiv:2506.11492; and C.-J. Xia et al., PRC 105, 045803 (2022), in addition to Typel & Wolter (1999). Do not collapse these into one citation. The data sheet also records seven extra EOS thermo columns (c_e^2,c_s^2,d,Z,A,R_d,R_W); (d) is a categorical pasta geometry code, not a differentiable quantity. The generic generator must preserve these extra fields and their units/semantics.
+
+Exact original PDFs not retrieved here:
+- Glendenning & Moszkowski, PRL 67, 2414 (1991), DOI 10.1103/PhysRevLett.67.2414. APS page requires credentials; broad Dropbox and public searches did not find the source paper. Ask the researcher for a PDF if local institutional access fails.
+- Typel & Wolter, NPA 656, 331 (1999), DOI 10.1016/S0375-9474(99)00310-3. Later open expositions of TW-99 are available, but not the exact original paper. Ask the researcher for the original if local institutional access fails.
+- BPS (1971) and Chabanat et al. (1998) are cited in source data sheets, but their exact article PDFs have not been retrieved. Continue lawful repository/arXiv search; do not substitute an unrelated review silently.
+
+Download policy: public arXiv or institutional PDFs must be downloaded and SHA-256 recorded locally. The connected host in this session could verify their URLs and extracted metadata but could not write the binary PDFs into Dropbox. Do not claim that a PDF has been downloaded merely because its abstract or landing page was fetched.

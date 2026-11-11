@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.1.0",
+  "revision": "1.1.1",
   "created_utc": "2026-11-11",
-  "status": "IN_PROGRESS_NATIVE_CSS_SEGMENT_PRIMITIVE_ADDED_CI_PENDING_FULL_MIGRATION_AND_390_REGENERATION_PENDING",
+  "status": "IN_PROGRESS_CSS_SEGMENT_GITHUB_CI_VERIFIED_FULL_NATIVE_MIGRATION_AND_390_REGENERATION_PENDING",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "research/eos390-fortran-unification-v1",
@@ -398,7 +398,8 @@
       "title": "Port literature-backed model composition solvers to Fortran",
       "depends_on": [
         "E390-01",
-        "E390-02"
+        "E390-02",
+        "E390-10"
       ],
       "status": "PENDING",
       "outputs": [
@@ -413,7 +414,8 @@
       "title": "Port all five smooth methods plus composition bridge",
       "depends_on": [
         "E390-02",
-        "E390-03"
+        "E390-03",
+        "E390-10"
       ],
       "status": "PENDING",
       "outputs": [
@@ -428,7 +430,8 @@
       "title": "Route method=maxwell to the true sharp transition",
       "depends_on": [
         "E390-02",
-        "E390-03"
+        "E390-03",
+        "E390-10"
       ],
       "status": "PENDING",
       "outputs": [
@@ -445,7 +448,8 @@
       "title": "Make TOV/tidal/Cowling production path Fortran-only",
       "depends_on": [
         "E390-04",
-        "E390-05"
+        "E390-05",
+        "E390-05A"
       ],
       "status": "PENDING",
       "outputs": [
@@ -508,7 +512,7 @@
         "E390-00",
         "E390-02"
       ],
-      "status": "CODE_ADDED_CI_PENDING",
+      "status": "GITHUB_CI_PASS_LOCAL_REPLAY_PENDING",
       "files": [
         "fortran_eos/src/compose_eos_css.f90",
         "fortran_eos/tests/test_css_segment.f90",
@@ -520,7 +524,9 @@
         "high-branch epsilon(P), n(P), mu(P)",
         "first-order versus continuous-unclassified interface flag",
         "analytic first-law and constant-sound-speed tests"
-      ]
+      ],
+      "ci_run_id": 43009330939,
+      "commit": "6c580cc33c03009e82c9aef798daa63fdb0a7073"
     },
     {
       "id": "E390-10",
@@ -565,7 +571,7 @@
     "output_versioning": "Each regeneration gets a fresh versioned folder; retries write a new attempt ID, not over existing output."
   },
   "local_agent": {
-    "goal": "Complete the native Fortran migration and regenerate all 390 source-backed crust/core/method combinations using a generic CompOSE generator, with CSS/Maxwell/second-order/crossover thermodynamic semantics kept distinct. Local machine is for build, full validation, and native 390 execution; Python is frontend only.",
+    "goal": "Complete all Fortran scientific/numerical migration and regenerate the exact 390 original Dropbox/ns_eos outputs. Upgrade native generator to generic CompOSE 1D/2D/3D. Keep Python frontend only. Preserve every source/failure and classify transitions thermodynamically; CSS and any declared crust-medium/intermediate interface may carry a sharp density jump.",
     "required_access_paths": [
       "/home/cosmosapjw/Dropbox/ns_eos",
       "/home/cosmosapjw/Dropbox/ns_oscillation_followup_20261106",
@@ -601,41 +607,49 @@
     "native_subagent": "NOT_RUN_BY_CHATGPT_HOST_NO_NATIVE_DELEGATION_TOOL"
   },
   "evidence_status": {
-    "code_execution_in_this_turn": "GITHUB_ACTIONS_EXACT_HEAD_BUILD_PYTEST_FORTRAN_UNIT_CHECKSUM_AND_SOURCE_ARCHIVE_PASS_LOCAL_RUNTIME_NOT_RUN",
+    "code_execution_in_this_turn": "GITHUB_ACTIONS_EXACT_HEAD_BUILD_78_PYTEST_POLYNOMIAL_EXTREMA_CSS_ANALYTIC_TEST_SHA256_MANIFEST_AND_ARCHIVE_PASS_LOCAL_RUNTIME_NOT_RUN",
     "static_source_patch": "COMMITTED_CI_VERIFIED",
-    "github_ci": "PASS_INITIAL_SAFETY_SLICE_ONLY",
+    "github_ci": "PASS_CURRENT_CSS_SEGMENT_SLICE_ONLY",
     "local_runtime": "NOT_RUN_DESKTOP_COMMANDER_OFFLINE_CONTAINER_EXEC_UNAVAILABLE",
     "source_cohort_admission": "NOT_ADMITTED",
     "regenerated_390": "NOT_RUN",
     "github_actions_execution": {
-      "first_run": {
-        "id": 43004945078,
-        "run_number": 185,
-        "conclusion": "failure",
-        "failure_step": "stale SHA-256 manifest",
-        "build": "success",
-        "pytest": "success",
-        "fortran_polynomial_extrema": "success"
+      "previous_head_before_css": {
+        "id": 43007372958,
+        "run_number": 193,
+        "head_sha": "ce24f85cbb4861c28c9f9eea0f3ddea28950fab8",
+        "conclusion": "success",
+        "pytest": "78 passed in 33.26 s"
       },
-      "retry_push": {
-        "id": 43005622594,
-        "run_number": 187,
-        "conclusion": "success"
+      "current_css": {
+        "id": 43009330939,
+        "run_number": 194,
+        "head_sha": "6c580cc33c03009e82c9aef798daa63fdb0a7073",
+        "conclusion": "success",
+        "job_id": 130484668591,
+        "steps": [
+          "Fortran EOS executable build: success",
+          "frontend and direct-provider tests: 78 passed in 44.87 s",
+          "polynomial extrema: PASS",
+          "CSS segment analytic checks: PASS",
+          "sha256sum -c SHA256SUMS_v4.txt: all entries OK",
+          "source archive upload: success"
+        ],
+        "artifact": {
+          "id": 13848959429,
+          "name": "NS_Cowling-cd8076f757bddc97c80d7c3ea7940072838eae51",
+          "size_bytes": 199200919,
+          "sha256": "dbeb061fe5bb59b19fc5054d8d41cd555435827f9416a4a95af22ffe70844c05"
+        }
       },
-      "retry_pr": {
-        "id": 43005633832,
-        "run_number": 188,
-        "conclusion": "success"
-      },
-      "current_head": "e59e475f00d65f2d4eb6ad7f1518da283bee8d48",
       "local_runtime": "NOT_RUN",
       "source_cohort_admission": "NOT_ADMITTED",
       "regenerated_390": "NOT_RUN"
     },
-    "open_source_pdf_download": "PUBLIC_ARXIV_PDF_URLS_CONFIRMED_DIRECT_CONTAINER_DOWNLOAD_TOOL_FAILED",
-    "source_bibliography": "UPDATED_FROM_ALL_18_DROPBOX_EOS_DATASHEETS",
-    "css_kernel": "CODE_ADDED_CI_PENDING",
-    "generator_upgrade": "PLANNED_NOT_IMPLEMENTED",
+    "open_source_pdf_download": "PUBLIC_ARXIV_PDF_URLS_CONFIRMED_DIRECT_CONTAINER_DOWNLOAD_TOOL_FAILED; LOCAL_AGENT_DOWNLOAD_REQUIRED",
+    "source_bibliography": "UPDATED_WITH_18_COMPOSE_DATASHEETS_AND_OPEN_URLS_WHERE_FOUND",
+    "css_kernel": "GITHUB_CI_PASS_LOCAL_REPLAY_PENDING",
+    "generator_upgrade": "M10_SPECIFIED_NOT_IMPLEMENTED",
     "native_subagent": "NOT_RUN_NO_NATIVE_DELEGATION_TOOL_EXPOSED"
   },
   "legacy_feature_inventory": [
@@ -891,7 +905,7 @@
     "implementation": {
       "module": "fortran_eos/src/compose_eos_css.f90",
       "test": "fortran_eos/tests/test_css_segment.f90",
-      "status": "CODE_ADDED_CI_PENDING"
+      "status": "GITHUB_CI_PASS_LOCAL_REPLAY_PENDING"
     }
   },
   "legacy_method_semantics": {
@@ -944,5 +958,19 @@
       "Unknown required species/field semantics fail closed with exact diagnostics.",
       "No unsupported axis, particle, nuclear group, Nadd, or Iphase information is silently dropped."
     ]
-  }
+  },
+  "execution_order": [
+    "M0",
+    "M1",
+    "M2",
+    "M10",
+    "M3",
+    "M4",
+    "M5",
+    "M5A",
+    "M6",
+    "M7",
+    "M8",
+    "M9"
+  ]
 }

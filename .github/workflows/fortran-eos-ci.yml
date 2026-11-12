@@ -12,6 +12,7 @@ on:
       - main
       - research/fortran-eos-gap-fill-v1
       - research/eos390-fortran-unification-v1
+      - cloud/eos390-fortran-unification-v1
 
 permissions:
   contents: read
@@ -26,6 +27,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Test the exact PR head, not the synthetic merge ref.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -51,7 +55,7 @@ jobs:
           PYTHONPATH: python_frontend
           COMPOSE_EOS_FORTRAN_ROOT: .
           COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
-        run: python -m pytest -q python_frontend/tests pipeline/tests
+        run: python -m pytest -q -rs python_frontend/tests pipeline/tests
       - name: Run native Fortran polynomial-extrema unit tests
         run: |
           gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
@@ -119,13 +123,15 @@ jobs:
       - name: Package verified source snapshot
         run: |
           mkdir -p dist
-          git archive --format=tar.gz --prefix=NS_Cowling-${GITHUB_SHA}/ HEAD > "dist/NS_Cowling-${GITHUB_SHA}.tar.gz"
-          sha256sum "dist/NS_Cowling-${GITHUB_SHA}.tar.gz" > "dist/NS_Cowling-${GITHUB_SHA}.tar.gz.sha256"
+          EXACT_SHA="$(git rev-parse HEAD)"
+          echo "exact checked-out head: ${EXACT_SHA} (GITHUB_SHA=${GITHUB_SHA})"
+          git archive --format=tar.gz --prefix=NS_Cowling-${EXACT_SHA}/ HEAD > "dist/NS_Cowling-${EXACT_SHA}.tar.gz"
+          sha256sum "dist/NS_Cowling-${EXACT_SHA}.tar.gz" > "dist/NS_Cowling-${EXACT_SHA}.tar.gz.sha256"
 
       - name: Upload verified source package
         uses: actions/upload-artifact@v4
         with:
-          name: NS_Cowling-${{ github.sha }}
+          name: NS_Cowling-${{ github.event.pull_request.head.sha || github.sha }}
           path: dist/*
           if-no-files-found: error
           retention-days: 30

@@ -1,0 +1,553 @@
+{
+ "schema": "ns-cowling.eos05b-legacy-npphb",
+ "schema_version": "1.0.0",
+ "node": "EOS-05b",
+ "date": "2026-11-13",
+ "physics_contract_id": "NSCOWLING-EOS05B-LEGACY-NPPHB-v1",
+ "token_semantics": {
+  "historical_task_key": "maxwell",
+  "identity": "LEGACY_NPPHB",
+  "type": "smooth_interpolation",
+  "internal_kernel_name": "legacy_npphb",
+  "construction_kind": "legacy_npphb_smooth_plateau",
+  "not": [
+   "sharp first-order Maxwell transition",
+   "coexistence construction",
+   "matrix token"
+  ],
+  "bare_maxwell_api_cli": "still rejected (negative controls retained)",
+  "sharp_maxwell": "untouched; separate token/manifest if ever authorized"
+ },
+ "execution_backend": "native_fortran",
+ "executable_sha256": "6dc20b523b3c7928cd9ee31d60889679141763e926c1ec3bcee42c220a2b424d",
+ "previous_executable_sha256": "d80ac4904223d6cbbe3d9afebce86de72c8a6aa55c8f6bc104b9494b209cfce5",
+ "build_flags": "-std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all (fortran_eos/build.sh)",
+ "gfortran": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+ "composition_dropped": true,
+ "complete_combined_eos": false,
+ "compose_readback_pass": null,
+ "scope": "characterization: native legacy_npphb vs frozen *__maxwell.csv on 13 crusts x {BBB_BHF2,GM_GM1}; NOT a production PASS",
+ "tolerances": {
+  "rtol": 8e-07,
+  "atol": 2e-09
+ },
+ "n_bridge": 40,
+ "status_counts": {
+  "PARITY_MATCH": 26,
+  "PARITY_MISMATCH": 0
+ },
+ "worst_max_rel_diff": 1.2019926725609739e-12,
+ "validate_bridge_rejections": 0,
+ "not_covered": [
+  "APR_APR",
+  "RG_KDE0v1",
+  "RG_SLY4 (native-rejected, F-EOS05A-1)",
+  "composition-aware output"
+ ],
+ "policy_supersession": {
+  "governing": "data/ns_cowling_cloud_agent_dag.v1.json method_ontology.historical_maxwell + EOS-07 acceptance 'maxwell token routes to native NPPHB smooth bridge'",
+  "supersedes_statements_in": "data/eos390_native_fortran_unification_dag.v1.json (file NOT edited; blob pinned at 8cffda81e581d4fce541a977d6dbf9fb7ff6b84f)",
+  "statements": [
+   {
+    "line": 143,
+    "text": "The final method token maxwell must invoke the sharp construction."
+   },
+   {
+    "line": 968,
+    "text": "the pressure-plateau build_maxwell is mislabelled and forbidden in production"
+   },
+   {
+    "line": 1227,
+    "text": "exclude it from physical Maxwell and new [production method naming]"
+   }
+  ],
+  "authority": "DAG.md section 2: the cloud DAG governs execution order and the corrected token interpretation"
+ },
+ "scope_or_policy_drift": {
+  "id": "F-EOS05B-2",
+  "text": "Existing rejection texts (compose_eos_matching.f90 maxwell guard; api.py NativeFeatureUnavailable) say 'maxwell' will later invoke the sharp construction. That contradicts 'never repurpose the historical token'. Left unchanged in this commit because tests pin the wording; flagged for a separate wording change."
+ },
+ "legacy_quadrature_defect": {
+  "finding": "The legacy NPPHB kernel computes the bridge free energy with 16-point partial Gauss integrals while its first-law root solve uses a 64-point rule. Against a 200-point-per-interval composite oracle the bridge F has an error, and the endpoint residual is nonzero; the native first_law_relative_residual uses the same 64-point rule and therefore cannot see it.",
+  "measured_over_26_pairs": {
+   "max_bridge_F_error_over_dF": 0.0014235312601388497,
+   "min_bridge_F_error_over_dF": 0.00018910283106970464,
+   "max_abs_endpoint_residual_exact_over_dF": 2.379502790509934e-05,
+   "max_abs_endpoint_residual_64pt_over_dF": 1.3015133915380499e-15
+  },
+  "disposition": "Characterized legacy property; intentionally NOT fixed (would change historical identity). first_law_relative_residual must not be cited as thermodynamic evidence for legacy_npphb.",
+  "oracle": "scratch re-implementation of matching.py:276-342 from native endpoint data (npphb_quadrature_defect.py)"
+ },
+ "cases": [
+  {
+   "case": "SPG_M1__BBB_BHF2__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 420,
+   "max_rel_diff": 1.1566416709035003e-12,
+   "first_law_residual_same_rule": 9.211190562292028e-14,
+   "cs2_min_bridge": 0.0005114126301288244,
+   "cs2_max_bridge": 0.04006740035450984,
+   "pressure_span_bridge": 1.0354358721498635,
+   "dP": 1.0354358721498635
+  },
+  {
+   "case": "SPG_M2__BBB_BHF2__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 431,
+   "max_rel_diff": 1.2013569395529463e-12,
+   "first_law_residual_same_rule": 6.820717402939155e-14,
+   "cs2_min_bridge": 0.0010923419021681316,
+   "cs2_max_bridge": 0.07756009902810103,
+   "pressure_span_bridge": 2.8629542818192864,
+   "dP": 2.8629542818192864
+  },
+  {
+   "case": "SPG_M3__BBB_BHF2__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 421,
+   "max_rel_diff": 1.13016368635753e-12,
+   "first_law_residual_same_rule": 1.3934123726414692e-13,
+   "cs2_min_bridge": 0.0005113870907941968,
+   "cs2_max_bridge": 0.0396277840958468,
+   "pressure_span_bridge": 0.9739148294956221,
+   "dP": 0.9739148294956221
+  },
+  {
+   "case": "SPG_M4__BBB_BHF2__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 429,
+   "max_rel_diff": 1.1248316744011361e-12,
+   "first_law_residual_same_rule": 1.2016988677095885e-13,
+   "cs2_min_bridge": 0.0011275585573797718,
+   "cs2_max_bridge": 0.08278678484423971,
+   "pressure_span_bridge": 2.7359298355236543,
+   "dP": 2.7359298355236543
+  },
+  {
+   "case": "SPG_M5__BBB_BHF2__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 418,
+   "max_rel_diff": 1.0979868166148795e-12,
+   "first_law_residual_same_rule": 1.6092385912631156e-14,
+   "cs2_min_bridge": 0.0005463121264448363,
+   "cs2_max_bridge": 0.06184681817871842,
+   "pressure_span_bridge": 1.1479600948868656,
+   "dP": 1.1479600948868656
+  },
+  {
+   "case": "GPPVA_DD2__BBB_BHF2__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 338,
+   "max_rel_diff": 1.0821918094036179e-12,
+   "first_law_residual_same_rule": 1.935254808973001e-13,
+   "cs2_min_bridge": 0.0005416496070074597,
+   "cs2_max_bridge": 0.053847287914668945,
+   "pressure_span_bridge": 1.1833868824670475,
+   "dP": 1.1833868824670475
+  },
+  {
+   "case": "GPPVA_DDME2__BBB_BHF2__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 343,
+   "max_rel_diff": 1.1498073881368617e-12,
+   "first_law_residual_same_rule": 1.8847446764718356e-14,
+   "cs2_min_bridge": 0.000535701288113203,
+   "cs2_max_bridge": 0.041197090693601925,
+   "pressure_span_bridge": 1.1099268736646344,
+   "dP": 1.1099268736646344
+  },
+  {
+   "case": "GPPVA_FSU2__BBB_BHF2__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 323,
+   "max_rel_diff": 1.1047409964846886e-12,
+   "first_law_residual_same_rule": 6.768376174111521e-14,
+   "cs2_min_bridge": 0.0009065070219383513,
+   "cs2_max_bridge": 0.06190110162517992,
+   "pressure_span_bridge": 3.0533201650748123,
+   "dP": 3.0533201650748123
+  },
+  {
+   "case": "GPPVA_FSU2H__BBB_BHF2__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 355,
+   "max_rel_diff": 1.1384807473851591e-12,
+   "first_law_residual_same_rule": 1.81041129346995e-13,
+   "cs2_min_bridge": 0.0007091634653074726,
+   "cs2_max_bridge": 0.07109560380256666,
+   "pressure_span_bridge": 1.2265768867200935,
+   "dP": 1.2265768867200935
+  },
+  {
+   "case": "GPPVA_FSU2R__BBB_BHF2__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 351,
+   "max_rel_diff": 1.089679526528244e-12,
+   "first_law_residual_same_rule": 7.308248106954376e-14,
+   "cs2_min_bridge": 0.0006967754727288247,
+   "cs2_max_bridge": 0.07036652797998305,
+   "pressure_span_bridge": 1.2692568799595534,
+   "dP": 1.2692568799595534
+  },
+  {
+   "case": "GPPVA_NL3wrL55__BBB_BHF2__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 353,
+   "max_rel_diff": 1.1923748108621612e-12,
+   "first_law_residual_same_rule": 1.330780364466903e-13,
+   "cs2_min_bridge": 0.0005493689879953655,
+   "cs2_max_bridge": 0.06272562176284517,
+   "pressure_span_bridge": 1.014866847276788,
+   "dP": 1.014866847276788
+  },
+  {
+   "case": "GPPVA_TM1e__BBB_BHF2__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 358,
+   "max_rel_diff": 1.1613094569536814e-12,
+   "first_law_residual_same_rule": 1.0042183328164112e-13,
+   "cs2_min_bridge": 0.0006967818109746295,
+   "cs2_max_bridge": 0.05897901311857361,
+   "pressure_span_bridge": 1.1710968786502336,
+   "dP": 1.1710968786502336
+  },
+  {
+   "case": "GPPVA_TW__BBB_BHF2__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 344,
+   "max_rel_diff": 1.2019926725609739e-12,
+   "first_law_residual_same_rule": 1.4123139599156653e-13,
+   "cs2_min_bridge": 0.000560961967070036,
+   "cs2_max_bridge": 0.05945273393683656,
+   "pressure_span_bridge": 1.1379468485981923,
+   "dP": 1.1379468485981923
+  },
+  {
+   "case": "SPG_M1__GM_GM1__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 670,
+   "max_rel_diff": 2.1922203999619893e-14,
+   "first_law_residual_same_rule": 0.0,
+   "cs2_min_bridge": 0.002164694684207787,
+   "cs2_max_bridge": 0.22252046359901012,
+   "pressure_span_bridge": 4.489335607886363,
+   "dP": 4.489335607886363
+  },
+  {
+   "case": "SPG_M2__GM_GM1__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 687,
+   "max_rel_diff": 8.345778004129419e-14,
+   "first_law_residual_same_rule": 5.754500649573926e-14,
+   "cs2_min_bridge": 0.0023510684344774145,
+   "cs2_max_bridge": 0.2750108758011351,
+   "pressure_span_bridge": 3.1872498393748465,
+   "dP": 3.1872498393748465
+  },
+  {
+   "case": "SPG_M3__GM_GM1__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 671,
+   "max_rel_diff": 9.966683110064606e-14,
+   "first_law_residual_same_rule": 4.870445699813834e-14,
+   "cs2_min_bridge": 0.002265287028738497,
+   "cs2_max_bridge": 0.24043595601308024,
+   "pressure_span_bridge": 4.427814565232121,
+   "dP": 4.427814565232121
+  },
+  {
+   "case": "SPG_M4__GM_GM1__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 684,
+   "max_rel_diff": 1.7987393026326604e-13,
+   "first_law_residual_same_rule": 9.143965286419869e-14,
+   "cs2_min_bridge": 0.0026867317370984508,
+   "cs2_max_bridge": 0.32604072215216956,
+   "pressure_span_bridge": 3.3067922139363377,
+   "dP": 3.3067922139363377
+  },
+  {
+   "case": "SPG_M5__GM_GM1__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 673,
+   "max_rel_diff": 2.421486950625068e-13,
+   "first_law_residual_same_rule": 1.237466872595836e-13,
+   "cs2_min_bridge": 0.0018373531310825401,
+   "cs2_max_bridge": 0.1955547454217536,
+   "pressure_span_bridge": 3.263568949117234,
+   "dP": 3.263568949117234
+  },
+  {
+   "case": "GPPVA_DD2__GM_GM1__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 592,
+   "max_rel_diff": 2.002160610367701e-14,
+   "first_law_residual_same_rule": 0.0,
+   "cs2_min_bridge": 0.0018322059519713086,
+   "cs2_max_bridge": 0.18869127474168115,
+   "pressure_span_bridge": 3.5455625575545384,
+   "dP": 3.5455625575545384
+  },
+  {
+   "case": "GPPVA_DDME2__GM_GM1__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 593,
+   "max_rel_diff": 1.2399623512420518e-13,
+   "first_law_residual_same_rule": 6.209521168609271e-14,
+   "cs2_min_bridge": 0.0021519444995426306,
+   "cs2_max_bridge": 0.21827947248443724,
+   "pressure_span_bridge": 4.563826609401134,
+   "dP": 4.563826609401134
+  },
+  {
+   "case": "GPPVA_FSU2__GM_GM1__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 588,
+   "max_rel_diff": 4.16685616833315e-14,
+   "first_law_residual_same_rule": 2.405618891873355e-14,
+   "cs2_min_bridge": 0.001070181587560179,
+   "cs2_max_bridge": 0.10752517681775968,
+   "pressure_span_bridge": 1.5950052152376633,
+   "dP": 1.5950052152376633
+  },
+  {
+   "case": "GPPVA_FSU2H__GM_GM1__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 609,
+   "max_rel_diff": 3.5242637559482977e-13,
+   "first_law_residual_same_rule": 1.6780226235252822e-13,
+   "cs2_min_bridge": 0.0015598029431160402,
+   "cs2_max_bridge": 0.2888155349950699,
+   "pressure_span_bridge": 3.5887525618075844,
+   "dP": 3.5887525618075844
+  },
+  {
+   "case": "GPPVA_FSU2R__GM_GM1__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 605,
+   "max_rel_diff": 9.097925788470462e-14,
+   "first_law_residual_same_rule": 3.107400606437019e-14,
+   "cs2_min_bridge": 0.001009812265566618,
+   "cs2_max_bridge": 0.266268685224938,
+   "pressure_span_bridge": 3.6314325550470445,
+   "dP": 3.6314325550470445
+  },
+  {
+   "case": "GPPVA_NL3wrL55__GM_GM1__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 606,
+   "max_rel_diff": 6.833903110079673e-14,
+   "first_law_residual_same_rule": 4.112862503291252e-14,
+   "cs2_min_bridge": 0.002174443357954621,
+   "cs2_max_bridge": 0.24041703894477673,
+   "pressure_span_bridge": 3.633975489185767,
+   "dP": 3.633975489185767
+  },
+  {
+   "case": "GPPVA_TM1e__GM_GM1__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 609,
+   "max_rel_diff": 3.9462999572105165e-13,
+   "first_law_residual_same_rule": 1.6659371411687039e-13,
+   "cs2_min_bridge": 0.0026176209558593385,
+   "cs2_max_bridge": 0.30604565833286573,
+   "pressure_span_bridge": 4.335888495484436,
+   "dP": 4.335888495484436
+  },
+  {
+   "case": "GPPVA_TW__GM_GM1__maxwell",
+   "status": "PARITY_MATCH",
+   "rows": 598,
+   "max_rel_diff": 3.6472740437040176e-13,
+   "first_law_residual_same_rule": 1.8837769170748635e-13,
+   "cs2_min_bridge": 0.0019687682711529526,
+   "cs2_max_bridge": 0.212126484461715,
+   "pressure_span_bridge": 3.5001225236856834,
+   "dP": 3.5001225236856834
+  }
+ ],
+ "quadrature_defect_by_pair": {
+  "SPG_M1__BBB_BHF2": {
+   "max_abs_F_err_MeV": 0.0012994621153197272,
+   "max_rel_to_dF": 0.00021057130996991833,
+   "endpoint_residual_exact_over_dF": -1.0302595516767738e-06,
+   "endpoint_residual_64pt_over_dF": 1.4392485253581292e-16,
+   "dF_MeV": 6.171126140143997
+  },
+  "SPG_M2__BBB_BHF2": {
+   "max_abs_F_err_MeV": 0.003257430270174666,
+   "max_rel_to_dF": 0.000390863388900766,
+   "endpoint_residual_exact_over_dF": -4.2481685728224397e-07,
+   "endpoint_residual_64pt_over_dF": 0.0,
+   "dF_MeV": 8.333935494280013
+  },
+  "SPG_M3__BBB_BHF2": {
+   "max_abs_F_err_MeV": 0.0010800070606116208,
+   "max_rel_to_dF": 0.00018910283106970464,
+   "endpoint_residual_exact_over_dF": -8.627741425227587e-07,
+   "endpoint_residual_64pt_over_dF": 0.0,
+   "dF_MeV": 5.71121571529261
+  },
+  "SPG_M4__BBB_BHF2": {
+   "max_abs_F_err_MeV": 0.002654636734997773,
+   "max_rel_to_dF": 0.0003507523410975914,
+   "endpoint_residual_exact_over_dF": 5.493990019526613e-10,
+   "endpoint_residual_64pt_over_dF": 8.214738353483515e-16,
+   "dF_MeV": 7.568407745165018
+  },
+  "SPG_M5__BBB_BHF2": {
+   "max_abs_F_err_MeV": 0.0019720218873100492,
+   "max_rel_to_dF": 0.000279139941568756,
+   "endpoint_residual_exact_over_dF": -3.6397704434546753e-06,
+   "endpoint_residual_64pt_over_dF": -1.257217649424309e-16,
+   "dF_MeV": 7.064635308825245
+  },
+  "GPPVA_DD2__BBB_BHF2": {
+   "max_abs_F_err_MeV": 0.0020472546653715895,
+   "max_rel_to_dF": 0.0002904146979364486,
+   "endpoint_residual_exact_over_dF": -2.924687305684876e-06,
+   "endpoint_residual_64pt_over_dF": -1.2599315162584642e-16,
+   "dF_MeV": 7.049418228204104
+  },
+  "GPPVA_DDME2__BBB_BHF2": {
+   "max_abs_F_err_MeV": 0.0014983682417319955,
+   "max_rel_to_dF": 0.0002484053232190387,
+   "endpoint_residual_exact_over_dF": -1.02511541836617e-06,
+   "endpoint_residual_64pt_over_dF": 1.4724567784936215e-16,
+   "dF_MeV": 6.031949003004115
+  },
+  "GPPVA_FSU2__BBB_BHF2": {
+   "max_abs_F_err_MeV": 0.00575019083116679,
+   "max_rel_to_dF": 0.00042792392899481426,
+   "endpoint_residual_exact_over_dF": -1.2157852117012917e-06,
+   "endpoint_residual_64pt_over_dF": -1.3219484715061565e-16,
+   "dF_MeV": 13.43741361852301
+  },
+  "GPPVA_FSU2H__BBB_BHF2": {
+   "max_abs_F_err_MeV": 0.0015005470705888868,
+   "max_rel_to_dF": 0.0003413647295652018,
+   "endpoint_residual_exact_over_dF": -2.870171304574947e-06,
+   "endpoint_residual_64pt_over_dF": 0.0,
+   "dF_MeV": 4.395729671604158
+  },
+  "GPPVA_FSU2R__BBB_BHF2": {
+   "max_abs_F_err_MeV": 0.0017083596220031083,
+   "max_rel_to_dF": 0.0003660674716532476,
+   "endpoint_residual_exact_over_dF": -3.148174504646424e-06,
+   "endpoint_residual_64pt_over_dF": -1.9031896111860355e-16,
+   "dF_MeV": 4.666788923604031
+  },
+  "GPPVA_NL3wrL55__BBB_BHF2": {
+   "max_abs_F_err_MeV": 0.0013565066836616069,
+   "max_rel_to_dF": 0.00022684023876001639,
+   "endpoint_residual_exact_over_dF": -3.073490936990576e-06,
+   "endpoint_residual_64pt_over_dF": 0.0,
+   "dF_MeV": 5.9800090631041485
+  },
+  "GPPVA_TM1e__BBB_BHF2": {
+   "max_abs_F_err_MeV": 0.0010583935784538312,
+   "max_rel_to_dF": 0.0003116333300961112,
+   "endpoint_residual_exact_over_dF": 1.7709167514426337e-06,
+   "endpoint_residual_64pt_over_dF": -3.9227278625641063e-16,
+   "dF_MeV": 3.396278498604147
+  },
+  "GPPVA_TW__BBB_BHF2": {
+   "max_abs_F_err_MeV": 0.0017596643345134666,
+   "max_rel_to_dF": 0.0002732504652918311,
+   "endpoint_residual_exact_over_dF": -3.0983280488818906e-06,
+   "endpoint_residual_64pt_over_dF": -1.379212851480142e-16,
+   "dF_MeV": 6.439748721504088
+  },
+  "SPG_M1__GM_GM1": {
+   "max_abs_F_err_MeV": 0.007503380070677856,
+   "max_rel_to_dF": 0.0010054692406879985,
+   "endpoint_residual_exact_over_dF": 1.6278261080235782e-05,
+   "endpoint_residual_64pt_over_dF": -1.1901783900581147e-16,
+   "dF_MeV": 7.462565503787687
+  },
+  "SPG_M2__GM_GM1": {
+   "max_abs_F_err_MeV": 0.0037694525113369792,
+   "max_rel_to_dF": 0.0009539942072336488,
+   "endpoint_residual_exact_over_dF": 1.5178672003165707e-05,
+   "endpoint_residual_64pt_over_dF": 1.1239259081199074e-16,
+   "dF_MeV": 3.951232075368125
+  },
+  "SPG_M3__GM_GM1": {
+   "max_abs_F_err_MeV": 0.006774665556886106,
+   "max_rel_to_dF": 0.0009674424172717035,
+   "endpoint_residual_exact_over_dF": 1.5692080333246702e-05,
+   "endpoint_residual_64pt_over_dF": -1.2683452343265194e-16,
+   "dF_MeV": 7.0026550789363
+  },
+  "SPG_M4__GM_GM1": {
+   "max_abs_F_err_MeV": 0.003306080449810622,
+   "max_rel_to_dF": 0.0008863730540558948,
+   "endpoint_residual_exact_over_dF": 1.4223637880344178e-05,
+   "endpoint_residual_64pt_over_dF": 0.0,
+   "dF_MeV": 3.729897287245535
+  },
+  "SPG_M5__GM_GM1": {
+   "max_abs_F_err_MeV": 0.005665875671303944,
+   "max_rel_to_dF": 0.0010278723535633203,
+   "endpoint_residual_exact_over_dF": 1.684085196685568e-05,
+   "endpoint_residual_64pt_over_dF": 0.0,
+   "dF_MeV": 5.512236662132295
+  },
+  "GPPVA_DD2__GM_GM1": {
+   "max_abs_F_err_MeV": 0.006662289678529554,
+   "max_rel_to_dF": 0.0011028067017434572,
+   "endpoint_residual_exact_over_dF": 1.811552453342027e-05,
+   "endpoint_residual_64pt_over_dF": 4.4105967806194035e-16,
+   "dF_MeV": 6.041212542503558
+  },
+  "GPPVA_DDME2__GM_GM1": {
+   "max_abs_F_err_MeV": 0.007912038630584206,
+   "max_rel_to_dF": 0.0010803794957286758,
+   "endpoint_residual_exact_over_dF": 1.7348623362958254e-05,
+   "endpoint_residual_64pt_over_dF": -1.2127971032439982e-16,
+   "dF_MeV": 7.323388366647805
+  },
+  "GPPVA_FSU2__GM_GM1": {
+   "max_abs_F_err_MeV": 0.0034522052589789354,
+   "max_rel_to_dF": 0.0007304882742855331,
+   "endpoint_residual_exact_over_dF": 1.1762282150477263e-05,
+   "endpoint_residual_64pt_over_dF": 1.8793897592760585e-16,
+   "dF_MeV": 4.725887301004832
+  },
+  "GPPVA_FSU2H__GM_GM1": {
+   "max_abs_F_err_MeV": 0.00477304272212864,
+   "max_rel_to_dF": 0.0014090063249708456,
+   "endpoint_residual_exact_over_dF": 2.3402805247652992e-05,
+   "endpoint_residual_64pt_over_dF": 1.3109551746291268e-16,
+   "dF_MeV": 3.387523985903613
+  },
+  "GPPVA_FSU2R__GM_GM1": {
+   "max_abs_F_err_MeV": 0.005174644620532742,
+   "max_rel_to_dF": 0.0014143848271436406,
+   "endpoint_residual_exact_over_dF": 2.3093378914776475e-05,
+   "endpoint_residual_64pt_over_dF": 0.0,
+   "dF_MeV": 3.6585832379034855
+  },
+  "GPPVA_NL3wrL55__GM_GM1": {
+   "max_abs_F_err_MeV": 0.005143502168915681,
+   "max_rel_to_dF": 0.0009303855059251192,
+   "endpoint_residual_exact_over_dF": 1.498834602135581e-05,
+   "endpoint_residual_64pt_over_dF": 1.6065869153481453e-16,
+   "dF_MeV": 5.52835586556273
+  },
+  "GPPVA_TM1e__GM_GM1": {
+   "max_abs_F_err_MeV": 0.005828674925256294,
+   "max_rel_to_dF": 0.0014235312601388497,
+   "endpoint_residual_exact_over_dF": 2.379502790509934e-05,
+   "endpoint_residual_64pt_over_dF": 1.3015133915380499e-15,
+   "dF_MeV": 4.094518391319184
+  },
+  "GPPVA_TW__GM_GM1": {
+   "max_abs_F_err_MeV": 0.005794130532897235,
+   "max_rel_to_dF": 0.001066755891411261,
+   "endpoint_residual_exact_over_dF": 1.7508490980325002e-05,
+   "endpoint_residual_64pt_over_dF": 3.2704460365883045e-16,
+   "dF_MeV": 5.431543035803543
+  }
+ }
+}

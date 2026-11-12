@@ -1,0 +1,81 @@
+...FFF                                                                   [100%]
+=================================== FAILURES ===================================
+____________ test_errata_corrects_pass_by_method_from_raw_receipts _____________
+
+    def test_errata_corrects_pass_by_method_from_raw_receipts():
+>       assert ERRATA.is_file(), "errata receipt must exist (originals stay untouched)"
+E       AssertionError: errata receipt must exist (originals stay untouched)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/home/cosmosapjw/ns_cowling_wt/eos05/data/receipts/ns_cowling/NS_COWLING_AUDIT_ERRATA_20261113.json').is_file
+
+python_frontend/tests/test_ns_cowling_receipts.py:52: AssertionError
+______ test_errata_supersedes_stale_ci_field_without_editing_the_original ______
+
+    def test_errata_supersedes_stale_ci_field_without_editing_the_original():
+>       errata = _load(ERRATA)
+                 ^^^^^^^^^^^^^
+
+python_frontend/tests/test_ns_cowling_receipts.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_ns_cowling_receipts.py:24: in _load
+    return json.loads(path.read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/pathlib.py:1029: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/cosmosapjw/ns_cowling_wt/eos05/data/receipts/ns_cowling/NS_COWLING_AUDIT_ERRATA_20261113.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/cosmosapjw/ns_cowling_wt/eos05/data/receipts/ns_cowling/NS_COWLING_AUDIT_ERRATA_20261113.json'
+
+/usr/lib/python3.12/pathlib.py:1015: FileNotFoundError
+_________________ test_cloud00_run_identity_records_exact_pins _________________
+
+    def test_cloud00_run_identity_records_exact_pins():
+>       ident = _load(RUN_IDENTITY)
+                ^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_ns_cowling_receipts.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_ns_cowling_receipts.py:24: in _load
+    return json.loads(path.read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/pathlib.py:1029: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/cosmosapjw/ns_cowling_wt/eos05/data/receipts/ns_cowling/CLOUD00_20261113/run_identity.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/cosmosapjw/ns_cowling_wt/eos05/data/receipts/ns_cowling/CLOUD00_20261113/run_identity.json'
+
+/usr/lib/python3.12/pathlib.py:1015: FileNotFoundError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_ns_cowling_receipts.py::test_errata_corrects_pass_by_method_from_raw_receipts
+FAILED python_frontend/tests/test_ns_cowling_receipts.py::test_errata_supersedes_stale_ci_field_without_editing_the_original
+FAILED python_frontend/tests/test_ns_cowling_receipts.py::test_cloud00_run_identity_records_exact_pins
+3 failed, 3 passed in 0.19s

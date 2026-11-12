@@ -1,0 +1,2900 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF..FFFFFFFFFFFFFF     [100%]
+=================================== FAILURES ===================================
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[SPG_M1-BBB_BHF2] __
+
+crust = 'SPG_M1', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.67962000e-10, 5.84964000e-10, 7.33846000e-10, 9.22290000e-10,
+       1.16133000e-09, 1.46524000e-0..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'SPG_M1', co_name = 'BBB_BHF2', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[SPG_M2-BBB_BHF2] __
+
+crust = 'SPG_M2', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.67962000e-10, 5.84964000e-10, 7.33846000e-10, 9.22290000e-10,
+       1.16133000e-09, 1.46524000e-0..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'SPG_M2', co_name = 'BBB_BHF2', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[SPG_M3-BBB_BHF2] __
+
+crust = 'SPG_M3', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.67962000e-10, 5.84964000e-10, 7.33846000e-10, 9.22290000e-10,
+       1.16133000e-09, 1.46524000e-0..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'SPG_M3', co_name = 'BBB_BHF2', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[SPG_M4-BBB_BHF2] __
+
+crust = 'SPG_M4', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.67962000e-10, 5.84964000e-10, 7.33846000e-10, 9.22290000e-10,
+       1.16133000e-09, 1.46524000e-0..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'SPG_M4', co_name = 'BBB_BHF2', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[SPG_M5-BBB_BHF2] __
+
+crust = 'SPG_M5', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.67962000e-10, 5.84964000e-10, 7.33846000e-10, 9.22290000e-10,
+       1.16133000e-09, 1.46524000e-0..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'SPG_M5', co_name = 'BBB_BHF2', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[GPPVA_DD2-BBB_BHF2] _
+
+crust = 'GPPVA_DD2', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_DD2', co_name = 'BBB_BHF2', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[GPPVA_DDME2-BBB_BHF2] _
+
+crust = 'GPPVA_DDME2', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_DDME2', co_name = 'BBB_BHF2', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[GPPVA_FSU2-BBB_BHF2] _
+
+crust = 'GPPVA_FSU2', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_FSU2', co_name = 'BBB_BHF2', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[GPPVA_FSU2H-BBB_BHF2] _
+
+crust = 'GPPVA_FSU2H', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_FSU2H', co_name = 'BBB_BHF2', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[GPPVA_FSU2R-BBB_BHF2] _
+
+crust = 'GPPVA_FSU2R', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_FSU2R', co_name = 'BBB_BHF2', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[GPPVA_NL3wrL55-BBB_BHF2] _
+
+crust = 'GPPVA_NL3wrL55', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_NL3wrL55', co_name = 'BBB_BHF2', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[GPPVA_TM1e-BBB_BHF2] _
+
+crust = 'GPPVA_TM1e', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_TM1e', co_name = 'BBB_BHF2', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[GPPVA_TW-BBB_BHF2] _
+
+crust = 'GPPVA_TW', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_TW', co_name = 'BBB_BHF2', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+__ test_legacy_npphb_matches_frozen_historical_maxwell_output[SPG_M1-GM_GM1] ___
+
+crust = 'SPG_M1', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.67962000e-10, 5.84964000e-10, 7.33846000e-10, 9.22290000e-10,
+       1.16133000e-09, 1.46524000e-0..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'SPG_M1', co_name = 'GM_GM1', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+__ test_legacy_npphb_matches_frozen_historical_maxwell_output[SPG_M2-GM_GM1] ___
+
+crust = 'SPG_M2', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.67962000e-10, 5.84964000e-10, 7.33846000e-10, 9.22290000e-10,
+       1.16133000e-09, 1.46524000e-0..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'SPG_M2', co_name = 'GM_GM1', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+__ test_legacy_npphb_matches_frozen_historical_maxwell_output[SPG_M3-GM_GM1] ___
+
+crust = 'SPG_M3', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.67962000e-10, 5.84964000e-10, 7.33846000e-10, 9.22290000e-10,
+       1.16133000e-09, 1.46524000e-0..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'SPG_M3', co_name = 'GM_GM1', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+__ test_legacy_npphb_matches_frozen_historical_maxwell_output[SPG_M4-GM_GM1] ___
+
+crust = 'SPG_M4', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.67962000e-10, 5.84964000e-10, 7.33846000e-10, 9.22290000e-10,
+       1.16133000e-09, 1.46524000e-0..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'SPG_M4', co_name = 'GM_GM1', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+__ test_legacy_npphb_matches_frozen_historical_maxwell_output[SPG_M5-GM_GM1] ___
+
+crust = 'SPG_M5', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.67962000e-10, 5.84964000e-10, 7.33846000e-10, 9.22290000e-10,
+       1.16133000e-09, 1.46524000e-0..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'SPG_M5', co_name = 'GM_GM1', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[GPPVA_DD2-GM_GM1] _
+
+crust = 'GPPVA_DD2', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_DD2', co_name = 'GM_GM1', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[GPPVA_DDME2-GM_GM1] _
+
+crust = 'GPPVA_DDME2', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_DDME2', co_name = 'GM_GM1', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[GPPVA_FSU2-GM_GM1] _
+
+crust = 'GPPVA_FSU2', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_FSU2', co_name = 'GM_GM1', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[GPPVA_FSU2H-GM_GM1] _
+
+crust = 'GPPVA_FSU2H', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_FSU2H', co_name = 'GM_GM1', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[GPPVA_FSU2R-GM_GM1] _
+
+crust = 'GPPVA_FSU2R', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_FSU2R', co_name = 'GM_GM1', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[GPPVA_NL3wrL55-GM_GM1] _
+
+crust = 'GPPVA_NL3wrL55', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_NL3wrL55', co_name = 'GM_GM1', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[GPPVA_TM1e-GM_GM1] _
+
+crust = 'GPPVA_TM1e', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_TM1e', co_name = 'GM_GM1', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_matches_frozen_historical_maxwell_output[GPPVA_TW-GM_GM1] __
+
+crust = 'GPPVA_TW', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_matches_frozen_historical_maxwell_output(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_TW', co_name = 'GM_GM1', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[SPG_M1-BBB_BHF2] _
+
+crust = 'SPG_M1', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.67962000e-10, 5.84964000e-10, 7.33846000e-10, 9.22290000e-10,
+       1.16133000e-09, 1.46524000e-0..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'SPG_M1', co_name = 'BBB_BHF2', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[SPG_M2-BBB_BHF2] _
+
+crust = 'SPG_M2', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.67962000e-10, 5.84964000e-10, 7.33846000e-10, 9.22290000e-10,
+       1.16133000e-09, 1.46524000e-0..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'SPG_M2', co_name = 'BBB_BHF2', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[SPG_M3-BBB_BHF2] _
+
+crust = 'SPG_M3', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.67962000e-10, 5.84964000e-10, 7.33846000e-10, 9.22290000e-10,
+       1.16133000e-09, 1.46524000e-0..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'SPG_M3', co_name = 'BBB_BHF2', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[SPG_M4-BBB_BHF2] _
+
+crust = 'SPG_M4', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.67962000e-10, 5.84964000e-10, 7.33846000e-10, 9.22290000e-10,
+       1.16133000e-09, 1.46524000e-0..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'SPG_M4', co_name = 'BBB_BHF2', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[SPG_M5-BBB_BHF2] _
+
+crust = 'SPG_M5', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.67962000e-10, 5.84964000e-10, 7.33846000e-10, 9.22290000e-10,
+       1.16133000e-09, 1.46524000e-0..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'SPG_M5', co_name = 'BBB_BHF2', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[GPPVA_DD2-BBB_BHF2] _
+
+crust = 'GPPVA_DD2', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_DD2', co_name = 'BBB_BHF2', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[GPPVA_DDME2-BBB_BHF2] _
+
+crust = 'GPPVA_DDME2', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_DDME2', co_name = 'BBB_BHF2', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[GPPVA_FSU2-BBB_BHF2] _
+
+crust = 'GPPVA_FSU2', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_FSU2', co_name = 'BBB_BHF2', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[GPPVA_FSU2H-BBB_BHF2] _
+
+crust = 'GPPVA_FSU2H', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_FSU2H', co_name = 'BBB_BHF2', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[GPPVA_FSU2R-BBB_BHF2] _
+
+crust = 'GPPVA_FSU2R', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_FSU2R', co_name = 'BBB_BHF2', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[GPPVA_NL3wrL55-BBB_BHF2] _
+
+crust = 'GPPVA_NL3wrL55', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_NL3wrL55', co_name = 'BBB_BHF2', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[GPPVA_TM1e-BBB_BHF2] _
+
+crust = 'GPPVA_TM1e', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_TM1e', co_name = 'BBB_BHF2', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[GPPVA_TW-BBB_BHF2] _
+
+crust = 'GPPVA_TW', core = 'BBB_BHF2'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_TW', co_name = 'BBB_BHF2', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[SPG_M1-GM_GM1] _
+
+crust = 'SPG_M1', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.67962000e-10, 5.84964000e-10, 7.33846000e-10, 9.22290000e-10,
+       1.16133000e-09, 1.46524000e-0..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'SPG_M1', co_name = 'GM_GM1', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[SPG_M2-GM_GM1] _
+
+crust = 'SPG_M2', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.67962000e-10, 5.84964000e-10, 7.33846000e-10, 9.22290000e-10,
+       1.16133000e-09, 1.46524000e-0..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'SPG_M2', co_name = 'GM_GM1', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[SPG_M3-GM_GM1] _
+
+crust = 'SPG_M3', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.67962000e-10, 5.84964000e-10, 7.33846000e-10, 9.22290000e-10,
+       1.16133000e-09, 1.46524000e-0..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'SPG_M3', co_name = 'GM_GM1', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[SPG_M4-GM_GM1] _
+
+crust = 'SPG_M4', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.67962000e-10, 5.84964000e-10, 7.33846000e-10, 9.22290000e-10,
+       1.16133000e-09, 1.46524000e-0..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'SPG_M4', co_name = 'GM_GM1', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[SPG_M5-GM_GM1] _
+
+crust = 'SPG_M5', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.67962000e-10, 5.84964000e-10, 7.33846000e-10, 9.22290000e-10,
+       1.16133000e-09, 1.46524000e-0..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'SPG_M5', co_name = 'GM_GM1', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[GPPVA_DD2-GM_GM1] _
+
+crust = 'GPPVA_DD2', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_DD2', co_name = 'GM_GM1', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[GPPVA_DDME2-GM_GM1] _
+
+crust = 'GPPVA_DDME2', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_DDME2', co_name = 'GM_GM1', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[GPPVA_FSU2-GM_GM1] _
+
+crust = 'GPPVA_FSU2', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_FSU2', co_name = 'GM_GM1', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[GPPVA_FSU2H-GM_GM1] _
+
+crust = 'GPPVA_FSU2H', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_FSU2H', co_name = 'GM_GM1', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[GPPVA_FSU2R-GM_GM1] _
+
+crust = 'GPPVA_FSU2R', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_FSU2R', co_name = 'GM_GM1', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[GPPVA_NL3wrL55-GM_GM1] _
+
+crust = 'GPPVA_NL3wrL55', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_NL3wrL55', co_name = 'GM_GM1', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[GPPVA_TM1e-GM_GM1] _
+
+crust = 'GPPVA_TM1e', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_TM1e', co_name = 'GM_GM1', method = 'legacy_npphb'
+n_bridge = 40, core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+_ test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition[GPPVA_TW-GM_GM1] _
+
+crust = 'GPPVA_TW', core = 'GM_GM1'
+
+    @pytest.mark.parametrize("crust,core", PAIRS)
+    def test_legacy_npphb_is_labelled_smooth_and_never_a_sharp_transition(crust, core):
+>       matched, info = _native(crust, core)
+                        ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_legacy_npphb.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_native_legacy_npphb.py:56: in _native
+    return match_crust_core(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d_cr = EOSData(nb=array([4.6796200e-10, 5.8496400e-10, 7.3384600e-10, 9.2229000e-10,
+       1.1613300e-09, 1.4652400e-09, 1.8..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+d_co = EOSData(nb=array([7.92405960e-15, 2.50580766e-14, 7.92405960e-14, 2.50580766e-13,
+       7.92405960e-13, 2.50580766e-1..._first=0, yq_last=-1, selected_iT=0, selected_iYq=0, t_axis=array([], dtype=float64), yq_axis=array([], dtype=float64))
+cr_name = 'GPPVA_TW', co_name = 'GM_GM1', method = 'legacy_npphb', n_bridge = 40
+core_compo_mode = 'strict_thermo_only', drop_composition = True
+
+    def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
+                        cr_name: str = "", co_name: str = "",
+                        method: str = "quintic_P", n_bridge: int = 40, *,
+                        core_compo_mode: str = "strict_thermo_only",
+                        drop_composition: bool = False):
+        """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    
+        The native v1 implementation is deliberately strict-thermo-only. Any input
+        carrying an eos.compo file or usable composition requires the caller to opt
+        in to dropping that information with drop_composition=True.
+        """
+        import math
+        if d_cr is None or d_co is None:
+            raise NativeFeatureUnavailable(
+                "match_crust_core requires both crust and core EOSData inputs; "
+                "the native smooth thermo-only matching API is available when both are supplied."
+            )
+        if not isinstance(d_cr, EOSData) or not isinstance(d_co, EOSData):
+            raise TypeError("d_cr and d_co must both be EOSData instances")
+        if method == "maxwell":
+            raise NativeFeatureUnavailable(
+                "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
+                "the legacy smooth pressure plateau is not a first-order transition"
+            )
+        methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+        if method not in methods:
+>           raise ValueError(f"method must be one of {sorted(methods)}")
+E           ValueError: method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+
+python_frontend/compose_eos/api.py:305: ValueError
+___ test_native_cli_accepts_the_internal_kernel_name_but_not_the_bare_token ____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-73/test_native_cli_accepts_the_in0')
+
+    def test_native_cli_accepts_the_internal_kernel_name_but_not_the_bare_token(tmp_path):
+        cdir, kdir = tmp_path / "crust", tmp_path / "core"
+        for d in (cdir, kdir):
+            d.mkdir()
+        _model("GPPVA_FSU2H").write_internal_directory(cdir)
+        _model("GM_GM1").write_internal_directory(kdir)
+    
+        ok_out = tmp_path / "ok"
+        ok_out.mkdir()
+        accepted = subprocess.run(
+            [str(executable()), "match-core", str(cdir), str(kdir), str(ok_out), KERNEL, "40", "true"],
+            capture_output=True, text=True, check=False,
+        )
+>       assert accepted.returncode == 0, accepted.stdout
+E       AssertionError: {"status":"error","message":"unknown matching method"}
+E         
+E       assert 3 == 0
+E        +  where 3 = CompletedProcess(args=['/home/cosmosapjw/ns_cowling_wt/eos05/build/compose_eos_fortran/compose_eos_fortran', 'match-co...hb', '40', 'true'], returncode=3, stdout='{"status":"error","message":"unknown matching method"}\n', stderr='STOP 3\n').returncode
+
+python_frontend/tests/test_native_legacy_npphb.py:119: AssertionError
+__ test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb[SPG_M1] ___
+
+crust = 'SPG_M1'
+
+    @pytest.mark.parametrize("crust", CRUSTS)
+    def test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb(crust):
+        """Same documented limitation as the smooth tokens (EOS-05a F-EOS05A-1)."""
+>       with pytest.raises(ValueError, match="native matching requires beta-equilibrated inputs"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'native matching requires beta-equilibrated inputs'
+E         Actual message: "method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']"
+
+python_frontend/tests/test_native_legacy_npphb.py:136: AssertionError
+__ test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb[SPG_M2] ___
+
+crust = 'SPG_M2'
+
+    @pytest.mark.parametrize("crust", CRUSTS)
+    def test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb(crust):
+        """Same documented limitation as the smooth tokens (EOS-05a F-EOS05A-1)."""
+>       with pytest.raises(ValueError, match="native matching requires beta-equilibrated inputs"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'native matching requires beta-equilibrated inputs'
+E         Actual message: "method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']"
+
+python_frontend/tests/test_native_legacy_npphb.py:136: AssertionError
+__ test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb[SPG_M3] ___
+
+crust = 'SPG_M3'
+
+    @pytest.mark.parametrize("crust", CRUSTS)
+    def test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb(crust):
+        """Same documented limitation as the smooth tokens (EOS-05a F-EOS05A-1)."""
+>       with pytest.raises(ValueError, match="native matching requires beta-equilibrated inputs"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'native matching requires beta-equilibrated inputs'
+E         Actual message: "method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']"
+
+python_frontend/tests/test_native_legacy_npphb.py:136: AssertionError
+__ test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb[SPG_M4] ___
+
+crust = 'SPG_M4'
+
+    @pytest.mark.parametrize("crust", CRUSTS)
+    def test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb(crust):
+        """Same documented limitation as the smooth tokens (EOS-05a F-EOS05A-1)."""
+>       with pytest.raises(ValueError, match="native matching requires beta-equilibrated inputs"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'native matching requires beta-equilibrated inputs'
+E         Actual message: "method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']"
+
+python_frontend/tests/test_native_legacy_npphb.py:136: AssertionError
+__ test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb[SPG_M5] ___
+
+crust = 'SPG_M5'
+
+    @pytest.mark.parametrize("crust", CRUSTS)
+    def test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb(crust):
+        """Same documented limitation as the smooth tokens (EOS-05a F-EOS05A-1)."""
+>       with pytest.raises(ValueError, match="native matching requires beta-equilibrated inputs"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'native matching requires beta-equilibrated inputs'
+E         Actual message: "method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']"
+
+python_frontend/tests/test_native_legacy_npphb.py:136: AssertionError
+_ test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb[GPPVA_DD2] _
+
+crust = 'GPPVA_DD2'
+
+    @pytest.mark.parametrize("crust", CRUSTS)
+    def test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb(crust):
+        """Same documented limitation as the smooth tokens (EOS-05a F-EOS05A-1)."""
+>       with pytest.raises(ValueError, match="native matching requires beta-equilibrated inputs"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'native matching requires beta-equilibrated inputs'
+E         Actual message: "method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']"
+
+python_frontend/tests/test_native_legacy_npphb.py:136: AssertionError
+_ test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb[GPPVA_DDME2] _
+
+crust = 'GPPVA_DDME2'
+
+    @pytest.mark.parametrize("crust", CRUSTS)
+    def test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb(crust):
+        """Same documented limitation as the smooth tokens (EOS-05a F-EOS05A-1)."""
+>       with pytest.raises(ValueError, match="native matching requires beta-equilibrated inputs"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'native matching requires beta-equilibrated inputs'
+E         Actual message: "method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']"
+
+python_frontend/tests/test_native_legacy_npphb.py:136: AssertionError
+_ test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb[GPPVA_FSU2] _
+
+crust = 'GPPVA_FSU2'
+
+    @pytest.mark.parametrize("crust", CRUSTS)
+    def test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb(crust):
+        """Same documented limitation as the smooth tokens (EOS-05a F-EOS05A-1)."""
+>       with pytest.raises(ValueError, match="native matching requires beta-equilibrated inputs"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'native matching requires beta-equilibrated inputs'
+E         Actual message: "method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']"
+
+python_frontend/tests/test_native_legacy_npphb.py:136: AssertionError
+_ test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb[GPPVA_FSU2H] _
+
+crust = 'GPPVA_FSU2H'
+
+    @pytest.mark.parametrize("crust", CRUSTS)
+    def test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb(crust):
+        """Same documented limitation as the smooth tokens (EOS-05a F-EOS05A-1)."""
+>       with pytest.raises(ValueError, match="native matching requires beta-equilibrated inputs"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'native matching requires beta-equilibrated inputs'
+E         Actual message: "method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']"
+
+python_frontend/tests/test_native_legacy_npphb.py:136: AssertionError
+_ test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb[GPPVA_FSU2R] _
+
+crust = 'GPPVA_FSU2R'
+
+    @pytest.mark.parametrize("crust", CRUSTS)
+    def test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb(crust):
+        """Same documented limitation as the smooth tokens (EOS-05a F-EOS05A-1)."""
+>       with pytest.raises(ValueError, match="native matching requires beta-equilibrated inputs"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'native matching requires beta-equilibrated inputs'
+E         Actual message: "method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']"
+
+python_frontend/tests/test_native_legacy_npphb.py:136: AssertionError
+_ test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb[GPPVA_NL3wrL55] _
+
+crust = 'GPPVA_NL3wrL55'
+
+    @pytest.mark.parametrize("crust", CRUSTS)
+    def test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb(crust):
+        """Same documented limitation as the smooth tokens (EOS-05a F-EOS05A-1)."""
+>       with pytest.raises(ValueError, match="native matching requires beta-equilibrated inputs"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'native matching requires beta-equilibrated inputs'
+E         Actual message: "method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']"
+
+python_frontend/tests/test_native_legacy_npphb.py:136: AssertionError
+_ test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb[GPPVA_TM1e] _
+
+crust = 'GPPVA_TM1e'
+
+    @pytest.mark.parametrize("crust", CRUSTS)
+    def test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb(crust):
+        """Same documented limitation as the smooth tokens (EOS-05a F-EOS05A-1)."""
+>       with pytest.raises(ValueError, match="native matching requires beta-equilibrated inputs"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'native matching requires beta-equilibrated inputs'
+E         Actual message: "method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']"
+
+python_frontend/tests/test_native_legacy_npphb.py:136: AssertionError
+_ test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb[GPPVA_TW] __
+
+crust = 'GPPVA_TW'
+
+    @pytest.mark.parametrize("crust", CRUSTS)
+    def test_rg_sly4_core_still_rejected_by_native_guard_for_legacy_npphb(crust):
+        """Same documented limitation as the smooth tokens (EOS-05a F-EOS05A-1)."""
+>       with pytest.raises(ValueError, match="native matching requires beta-equilibrated inputs"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'native matching requires beta-equilibrated inputs'
+E         Actual message: "method must be one of ['css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']"
+
+python_frontend/tests/test_native_legacy_npphb.py:136: AssertionError
+66 failed, 2 passed in 2.79s

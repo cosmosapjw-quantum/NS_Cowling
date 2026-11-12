@@ -43,7 +43,10 @@
       "actual_description": "Project-defined near-pressure-plateau Hermite bridge; continuous density, no latent heat, no common-P/common-mu coexistence in the historical algorithm.",
       "physical_classification": "UNRESOLVED",
       "literature_attribution": false,
-      "production_status": "BLOCKED_NATIVE_M2_M10_PORT"
+      "production_status": "BLOCKED_COMPOSITION_RG_GUARD_AND_M7_GATES",
+      "native_kernel_name": "legacy_npphb",
+      "native_kernel_status": "PARITY_CHARACTERIZED_COMPOSITION_DROPPED_NOT_PRODUCTION_PASS",
+      "known_legacy_property": "16-point partial Gauss integrals vs 64-point first-law root rule: bridge F error up to ~1.4e-3*dF; endpoint residual ~2.4e-5*dF against a dense oracle; native first-law residual cannot detect it (EOS05B receipt). Characterized, not fixed."
     },
     "sharp_maxwell": {
       "token": "sharp_maxwell",
@@ -135,14 +138,20 @@
       "name": "Live repository snapshot and branch isolation",
       "track": "shared",
       "depends_on": [],
-      "status": "IN_PROGRESS",
+      "status": "PASS_SNAPSHOT_ISOLATION_ERRATA",
       "cloud_action": true,
       "acceptance": [
         "fetch exact PR #3/#13 heads and bases",
         "record tree/parent/branch and clean-state",
         "create isolated child branch/worktree per independent patch",
         "no force push or implicit merge"
-      ]
+      ],
+      "evidence": {
+        "receipts": "data/receipts/ns_cowling/CLOUD00_20261113/",
+        "errata": "data/receipts/ns_cowling/NS_COWLING_AUDIT_ERRATA_20261113.json",
+        "scope": "live refs vs pins, isolated clone+worktrees outside Dropbox, CI result at 08fe5b8, corrected M7 PASS-by-method; no EOS/Cowling physics claim",
+        "date": "2026-11-13"
+      }
     },
     {
       "id": "EOS-01",
@@ -255,7 +264,7 @@
       "depends_on": [
         "EOS-04"
       ],
-      "status": "NOT_RUN",
+      "status": "PARTIAL_NATIVE_PARITY_CHARACTERIZED",
       "cloud_action": true,
       "acceptance": [
         "native cubic/quintic F/P kernels",
@@ -263,7 +272,29 @@
         "frozen legacy parity fixtures",
         "invalid/nonmonotone/extremum edge tests",
         "no Python production fallback"
-      ]
+      ],
+      "evidence": {
+        "date": "2026-11-13",
+        "finding": "Native cubic/quintic F/P and NPPHB kernels already existed in fortran_eos/src/compose_eos_matching.f90; EOS-05 is a parity/routing/validation task, not a port.",
+        "eos05a": {
+          "receipt": "data/receipts/ns_cowling/EOS05A_20261113/",
+          "result": "104 PARITY_MATCH (13 crusts x {BBB_BHF2,GM_GM1} x 4 smooth tokens), worst max-rel 1.2e-12; 52 RG_SLY4 cases NATIVE_REJECTED (OPEN_BLOCKER F-EOS05A-1)"
+        },
+        "eos05b": {
+          "receipt": "data/receipts/ns_cowling/EOS05B_20261113/",
+          "result": "26 PARITY_MATCH for internal kernel legacy_npphb vs frozen *__maxwell.csv; bare maxwell still rejected; historical key stays maxwell",
+          "supersedes_statements": "data/eos390_native_fortran_unification_dag.v1.json lines 143/968/1227 (file not edited)"
+        },
+        "scope_limits": "composition DROPPED in all parity cases; no C1-C11, no combined-composition output, no read-back claim; not a production PASS",
+        "still_open": [
+          "RG_SLY4/RG_KDE0v1 native guard (constant source Q5 != 0) needs a source-semantics decision",
+          "APR_APR and RG_KDE0v1 have no row-level frozen fixtures",
+          "composition-preserving matching",
+          "native unit tests of bridge_profile/construct_bridge (routines private)",
+          "analytic extrema gates",
+          "css (EOS-06 BLOCKED, DAG definition unchanged)"
+        ]
+      }
     },
     {
       "id": "EOS-06",
@@ -304,7 +335,8 @@
         "no placeholder copies",
         "no stale output overwrite",
         "per-task machine receipt"
-      ]
+      ],
+      "status_note_20261113": "Unchanged BLOCKED. Native smooth kernels have characterized frozen parity on BBB_BHF2/GM_GM1 only with composition dropped; M7 remains fail-closed and no native PASS exists."
     },
     {
       "id": "EOS-08",
@@ -635,6 +667,14 @@
       "citation": "Dong, Kuan & Yunes (2026)",
       "url": "https://arxiv.org/abs/2609.33002",
       "role": "full-GR context only; not a drop-in Cowling derivation"
+    }
+  ],
+  "continuations": [
+    {
+      "date": "2026-11-13",
+      "base_head": "08fe5b814cbe2b3d6e41b9aa44d2e5f687bc1351",
+      "branch": "cloud/eos05-native-smooth-parity-v1",
+      "summary": "CLOUD-00 errata; EOS-05a/05b native parity characterization; CI trigger/exact-head fix. No 390 regeneration, no Dropbox operation."
     }
   ]
 }

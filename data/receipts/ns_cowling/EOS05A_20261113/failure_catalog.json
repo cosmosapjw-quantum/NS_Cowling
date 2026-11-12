@@ -1,0 +1,24 @@
+{
+  "schema": "ns-cowling.failure-catalog",
+  "node": "EOS-05a",
+  "entries": [
+    {
+      "id": "F-EOS05A-1",
+      "class": "COMPATIBILITY_OR_PARITY",
+      "secondary": [
+        "SOURCE_SEMANTICS"
+      ],
+      "status": "OPEN_BLOCKER",
+      "affected": "13 crusts x 4 smooth tokens x RG_SLY4 = 52 cases observed NATIVE_REJECTED. RG_KDE0v1 was observed with beta_equilibrated=False at read time (same guard), but its matching was NOT_RUN. 156 of 390 historical tasks use an RG_* core.",
+      "what": "Native match-core rejects RG_SLY4 with 'native matching requires beta-equilibrated inputs'. Fortran reader sets beta_equilibrated = max|Q5|<1e-8 (compose_eos_io.f90:354); the RG_SLY4 source has constant Q5=0.001383223 on all 197 rows. Legacy matching never checked Q5 and the frozen outputs set Q5=0.",
+      "not_done": "Guard not relaxed and Q5 not reinterpreted: the meaning of the constant Q5 offset in RG sources needs a source-semantics decision (provider/paper), not a tolerance change.",
+      "evidence": "EOS05A_20261113/parity_cases.json (52 NATIVE_REJECTED), test_rg_sly4_core_is_rejected_by_native_guard_with_exact_message"
+    },
+    {
+      "id": "F-EOS05A-2",
+      "class": "THEORY_OR_CONVENTION",
+      "status": "RECORDED",
+      "what": "Prediction in plan review that RG_SLY4 would be compared with a bridge-Q4 divergence was falsified by observation; comparison was impossible due to F-EOS05A-1."
+    }
+  ]
+}

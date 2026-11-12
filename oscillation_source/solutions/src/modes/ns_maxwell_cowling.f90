@@ -47,6 +47,11 @@ contains
         result=maxwell_cowling_shot_t()
         call fail_status(result%status,NS_INVALID_INPUT,'physics','invalid native Maxwell Cowling shot')
         if(.not.star%valid.or.options%ell/=2.or..not.ieee_is_finite(omega).or.omega<=0._wp) return
+        if(star%jump%inner%side/=SIDE_INNER.or.star%jump%outer%side/=SIDE_OUTER) then
+            call fail_status(result%status,NS_MATCHING_INCONSISTENT,'physics', &
+                'Maxwell star does not carry distinct inner/outer interface states')
+            return
+        end if
         if(options%amplitude==0._wp.or..not.ieee_is_finite(options%amplitude)) return
         if(.not.allocated(options%ode%atol).or.size(options%ode%atol)/=2) return
         if(.not.all(ieee_is_finite(options%ode%atol)).or.any(options%ode%atol<=0._wp)) return

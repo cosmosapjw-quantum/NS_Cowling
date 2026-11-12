@@ -19,7 +19,7 @@ program maxwell_checks
     real(wp) :: jump_eta,pt,pc,pcut,rel_m,rel_r,dp_rel,freq_grid(3)
     integer :: checks
     type(star_options_t) :: star_options
-    type(maxwell_star_t) :: star
+    type(maxwell_star_t) :: star,wrong_side_star
     type(star_profile_t) :: smooth_profile
     type(cowling_options_t) :: cowling_options
     type(maxwell_cowling_shot_t) :: slow_shot,rapid_shot,overflow_shot
@@ -77,6 +77,12 @@ program maxwell_checks
     star_options%ode%h_min=1e-15_wp
     star_options%ode%h_max=0.05_wp
     star_options%ode%max_steps=100000
+
+    ! A callback that ignores the requested core side must never be admitted.
+    call solve_tov_star(eos_wrong_core_side,eos_low,pc,pt,star_options,wrong_side_star)
+    call require(.not.wrong_side_star%valid.and. &
+        wrong_side_star%status%code==NS_MATCHING_INCONSISTENT, &
+        'wrong one-sided core EOS callback fails closed')
 
     ! A finite but small first-order density jump, below the Seidov rapid-onset
     ! threshold. This fixture tests a true nonzero discontinuity.
@@ -170,6 +176,14 @@ contains
             stop 1
         end if
         checks=checks+1
+    end subroutine
+
+    subroutine eos_wrong_core_side(p,side,state,st)
+        real(wp),intent(in) :: p
+        integer,intent(in) :: side
+        type(eos_state_t),intent(out) :: state
+        type(status_t),intent(out) :: st
+        call quadratic_eos(p,1._wp,939._wp,SIDE_OUTER,state,st)
     end subroutine
 
     subroutine eos_low(p,side,state,st)

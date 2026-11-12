@@ -127,9 +127,10 @@ contains
         ! the zero-temperature identity Delta epsilon = mu_t Delta n_B.
         call fail_status(star%status,NS_MATCHING_INCONSISTENT,'physics', &
             'EOS callbacks do not satisfy thermodynamic Maxwell coexistence')
-        if(.not.high_t%valid.or..not.low_t%valid) then
+        if(.not.high_t%valid.or..not.low_t%valid.or. &
+           high_t%side/=SIDE_INNER.or.low_t%side/=SIDE_OUTER) then
             call fail_status(star%status,NS_MATCHING_INCONSISTENT,'physics', &
-                'invalid one-sided EOS state at exact Maxwell pressure')
+                'invalid or mislabelled one-sided EOS state at exact Maxwell pressure')
             return
         end if
         if(.not.all(ieee_is_finite([high_t%pressure_pa,low_t%pressure_pa, &
@@ -200,8 +201,10 @@ contains
         call fail_status(status,NS_INVALID_INPUT,'physics','finite central pressure, radius and lapse required')
         if(.not.all(ieee_is_finite([pc,r0,nu0])).or.pc<=0._wp.or.r0<=0._wp) return
         call eos(pc,side,s,status);if(.not.is_ok(status)) return
-        if(.not.s%valid.or.s%energy_j_m3<=0._wp) then
-            call fail_status(status,NS_INVALID_INPUT,'physics','invalid central EOS state');return
+        if(.not.s%valid.or.s%side/=side.or.s%energy_j_m3<=0._wp) then
+            call fail_status(status,NS_MATCHING_INCONSISTENT,'physics', &
+                'central EOS callback returned an invalid or wrong-side state')
+            return
         end if
         alpha=(2._wp*pi*g_si/3._wp)*((s%energy_j_m3+pc)/c_si**2)* &
               ((s%energy_j_m3+3._wp*pc)/c_si**2)
@@ -221,8 +224,9 @@ contains
         end if
         call eos(p_start,side,starter,status)
         if(.not.is_ok(status)) return
-        if(starter%pressure_pa/=p_start) then
-            call fail_status(status,NS_INVALID_INPUT,'physics','central EOS callback returned a different pressure')
+        if(starter%pressure_pa/=p_start.or.starter%side/=side) then
+            call fail_status(status,NS_MATCHING_INCONSISTENT,'physics', &
+                'central EOS callback returned a different pressure or phase side')
             return
         end if
         call clear_status(status)
@@ -261,8 +265,11 @@ contains
                 call fail_status(st,NS_INVALID_INPUT,'physics','invalid Maxwell TOV stage state');return
             end if
             call eos(p,side,state,st);if(.not.is_ok(st)) return
-            if(.not.state%valid.or..not.all(ieee_is_finite([state%energy_j_m3,state%pressure_pa]))) then
-                call fail_status(st,NS_INVALID_INPUT,'physics','invalid one-sided Maxwell EOS state');return
+            if(.not.state%valid.or.state%side/=side.or. &
+               .not.all(ieee_is_finite([state%energy_j_m3,state%pressure_pa]))) then
+                call fail_status(st,NS_MATCHING_INCONSISTENT,'physics', &
+                    'Maxwell EOS callback returned an invalid or wrong-side phase state')
+                return
             end if
             if(state%energy_j_m3<=0._wp.or.abs(state%pressure_pa/p-1._wp)>256._wp*epsilon(1._wp)) then
                 call fail_status(st,NS_MATCHING_INCONSISTENT,'physics','Maxwell EOS state does not match requested pressure');return
@@ -306,8 +313,11 @@ contains
         do i=1,n
             call pressure_at_q(traj%x(i),p_start,p_end,q_end,p,status);if(.not.is_ok(status)) return
             call eos(p,side,s,status);if(.not.is_ok(status)) return
-            if(.not.s%valid.or..not.all(ieee_is_finite([s%energy_j_m3,s%n_b_m3,s%mu_j,s%chi]))) then
-                call fail_status(status,NS_INVALID_INPUT,'physics','Maxwell background EOS fields invalid');return
+            if(.not.s%valid.or.s%side/=side.or. &
+               .not.all(ieee_is_finite([s%energy_j_m3,s%n_b_m3,s%mu_j,s%chi]))) then
+                call fail_status(status,NS_MATCHING_INCONSISTENT,'physics', &
+                    'Maxwell background EOS fields are invalid or carry the wrong phase side')
+                return
             end if
             if(s%energy_j_m3<=0._wp.or.s%n_b_m3<=0._wp.or.s%mu_j<=0._wp.or.s%chi<=0._wp.or.s%chi>1._wp) then
                 call fail_status(status,NS_OUT_OF_DOMAIN,'physics','Maxwell Cowling background requires 0<chi<=1');return

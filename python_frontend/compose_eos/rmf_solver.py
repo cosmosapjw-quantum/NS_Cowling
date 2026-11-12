@@ -195,8 +195,14 @@ def solve_homogeneous(model: RMFModel, rho_B: float, rho_p: float,
         omega0 = g_w * rho_B_M / (m_w ** 2)
         rho03 = g_r * (rho_p_M - rho_n_M) / (m_r ** 2)
         delta0 = g_d * rs_3 / (m_d ** 2) if has_delta else 0.0
-        Mstar_n_new = M_N - g_s * sigma0 - (g_d * delta0 if has_delta else 0.0)
-        Mstar_p_new = M_P - g_s * sigma0 + (g_d * delta0 if has_delta else 0.0)
+        # Gögelein eq. 5: m*_i = M + g_sigma*sigma + g_delta*delta*tau_3, with
+        # delta = -g_delta*rho_3s/m_delta^2 (KG eq. 8 has minus sign). Our convention
+        # sigma0>0, delta0 = g_d*rs_3/m_d^2 (sign follows rs_3). To match Gögelein's
+        # m*_n = M + g_sigma*sigma - g_delta*delta (neutron lighter in neutron-rich
+        # matter, delta>0 there), we use M*_n = M - g_s*sigma0 + g_d*delta0 and
+        # M*_p = M - g_s*sigma0 - g_d*delta0 (delta0<0 in neutron-rich -> M*_n drops).
+        Mstar_n_new = M_N - g_s * sigma0 + (g_d * delta0 if has_delta else 0.0)
+        Mstar_p_new = M_P - g_s * sigma0 - (g_d * delta0 if has_delta else 0.0)
         if Mstar_n_new <= 10 or Mstar_p_new <= 10:
             break
         dn = abs(Mstar_n_new - Mstar_n)

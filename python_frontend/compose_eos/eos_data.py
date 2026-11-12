@@ -86,6 +86,43 @@ class EOSData:
     yq_axis: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=float))
     source_dir: str | None = field(default=None, repr=False, compare=False)
 
+    def __post_init__(self) -> None:
+        """Initialize masks for directly constructed full-composition records.
+
+        Programmatic EOSData constructors supply every composition array. If
+        composition_available is true and no row masks were provided, those
+        supplied values (including zeros) are explicit. Parser-created objects
+        carry length-n masks and therefore retain their exact sparse coverage.
+        """
+        n = self.n
+        presence_names = (
+            "Yn_present", "Yp_present", "Ye_present", "Ymu_present",
+            "Abar_present", "Zbar_present", "Yh_present",
+        )
+        state_names = presence_names + ("C3_applicable", "C4_applicable", "row_status")
+        all_empty = all(np.asarray(getattr(self, name)).size == 0 for name in state_names)
+        if not all_empty:
+            return
+        if self.composition_available:
+            for name in presence_names:
+                setattr(self, name, np.ones(n, dtype=bool))
+            self.C3_applicable = self.Yn_present & self.Yp_present & self.Yh_present
+            self.C4_applicable = (
+                self.Yp_present & self.Abar_present & self.Zbar_present &
+                self.Yh_present & self.Ye_present & self.Ymu_present & (self.Aav > 0.0)
+            )
+            self.row_status = np.where(
+                self.C3_applicable & self.C4_applicable, 2, 1
+            ).astype(np.int64)
+        else:
+            for name in presence_names:
+                setattr(self, name, np.zeros(n, dtype=bool))
+            self.C3_applicable = np.zeros(n, dtype=bool)
+            self.C4_applicable = np.zeros(n, dtype=bool)
+            self.row_status = np.full(
+                n, 1 if self.composition_file_present else 0, dtype=np.int64
+            )
+
     @property
     def n(self) -> int:
         return int(self.nb.size)

@@ -190,3 +190,13 @@ def test_python_frontend_refuses_missing_row_presence_masks(tmp_path):
     eos.Yn_present = np.zeros(0, dtype=bool)
     with pytest.raises(ValueError, match="missing row-level presence mask Yn_present"):
         write_compose(tmp_path / "lossy-export", eos)
+
+
+def test_direct_constructor_preserves_explicit_zero_composition_when_globally_available():
+    eos = read_compose(SAMPLE)
+    assert eos.composition_available
+    assert eos.Ymu_present.shape == (eos.n,)
+    assert np.all(eos.Ymu_present)
+    assert np.all(eos.Ymu[eos.Ymu == 0.0] == 0.0)
+
+

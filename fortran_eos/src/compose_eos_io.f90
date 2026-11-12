@@ -333,25 +333,14 @@ contains
                               eos%zbar_present(k).and.eos%yh_present(k).and. &
                               eos%ye_present(k).and.eos%ymu_present(k).and. &
                               eos%abar(k)>0._wp
-        ! Evaluate C3 and C4 independently on the rows where their complete
-        ! inventories exist. A missing field is NOT zero and does not create a
-        ! closure failure; a present zero remains part of the closure equation.
-        if(eos%c3_applicable(k)) then
-          residual=eos%yn(k)+eos%yp(k)+eos%yh(k)-1._wp
-          if(abs(residual)>2.e-3_wp) then
-            eos%row_status(k)=3
-            cycle
-          endif
-        endif
-        if(eos%c4_applicable(k)) then
-          residual=eos%yp(k)+(eos%zbar(k)/eos%abar(k))*eos%yh(k)-eos%ye(k)-eos%ymu(k)
-          if(abs(residual)>2.e-3_wp) then
-            eos%row_status(k)=3
-            cycle
-          endif
-        endif
-        ! CHECKED requires both independent closures; otherwise this row is
-        ! PARTIAL, while a present-but-invalid row is FAIL.
+        ! C3/C4 applicability is a data-coverage statement, not a closure
+        ! verdict. CompOSE permits relevant particle subsets to be omitted;
+        ! absent pairs are not zero. Keep row_status as the M2A input-range/
+        ! coverage label; the verifier evaluates closure only where applicable.
+        eos%c3_applicable(k)=eos%yn_present(k).and.eos%yp_present(k).and.eos%yh_present(k)
+        eos%c4_applicable(k)=eos%yp_present(k).and.eos%abar_present(k).and. &
+          eos%zbar_present(k).and.eos%yh_present(k).and.eos%ye_present(k).and. &
+          eos%ymu_present(k).and.eos%abar(k)>0._wp
         if(eos%c3_applicable(k).and.eos%c4_applicable(k))then
           eos%row_status(k)=2
         else
@@ -596,7 +585,7 @@ contains
       return
     endif
     if(any(eos%iphase/=0).and..not.eos%composition_file_present)then
-      status='a phase-discontinuous barotrope without phase composition cannot be exported'
+      status='cannot export a phase-discontinuous barotrope without phase composition'
       return
     endif
     if(eos%composition_file_present)then
@@ -742,7 +731,7 @@ contains
           endif
           write(u,'(1x,i0,3(1x,es25.16e3))')1,eos%abar(i),eos%zbar(i),yi
         else
-          write(u,'(1x,i0)')0
+          write(u,'(a)')''
         endif
       enddo
       close(u)

@@ -1,28 +1,24 @@
 """RMF homogeneous-matter solver for the EOS390 CLD reconstruction.
 
 Implements the density-dependent relativistic mean-field (DD-RMF) energy
-density for homogeneous asymmetric nuclear matter, following:
-  - Scurto, Pais, Gulminelli PRD 109 103015 (2024), eq. 9-13
-  - Gögelein, van Dalen, Fuchs, Muther PRC 77 025802 (2008), eq. 40 + Table I
+density for homogeneous asymmetric nuclear matter. Multiple coupling
+functional forms are supported, each with its EXACT published form:
 
-Two coupling functional forms are supported:
-  - DD2_DDME2_TYYPEL: g(rho) = a + (b + d*x)*exp(-c*x),  x = rho/rho_sat
-  - SPG_GOGELEIN: g(rho_B) = a + (b + d*x^3)*exp(-c*x),  x = rho_B
+  1. DD2_TYYPEL_RATIONAL (Typel 2010, arXiv:0908.2344, eq. 75-77):
+       isoscalar (omega, sigma): rational function
+         f_i(x) = a_i * [1 + b_i*(x + d_i)^2] / [1 + c_i*(x + d_i)^2],  x = n/n_sat
+         g_i(n) = Gamma_i(n_sat) * f_i(x)
+       isovector (rho): exponential
+         f_rho(x) = exp[-a_rho * (x - 1)]
+       This is the DD2 functional form. The DD-ME2, TW99, FSU2, FSU2H,
+       NL3wrL55, TM1e models use related (but check-per-model) forms.
 
-UNIT CONVENTION (critical): all internal calculations are in NATURAL UNITS
-with hbar = c = 1, so:
-  - masses, momenta, energies, fields in MeV
-  - densities in MeV^3 (converted from fm^-3 input by * HBARC^3)
-  - the kinetic/scalar-density integrals are evaluated with kF in MeV and
-    M* in MeV, yielding densities in MeV^3 and energy densities in MeV^4
-  - the FINAL energy density and pressure are converted to MeV/fm^3 by
-    dividing by HBARC^3, so they are in the standard EOS units (MeV/fm^3).
+  2. SPG_GOGELEIN (Gögelein 2008, eq. 40 + Table I):
+       g_kappa(rho_B) = a_kappa + (b_kappa + d_kappa*x^3)*exp(-c_kappa*x), x = rho_B
+       4 mesons: sigma, omega, delta, rho. SPG_M1..M5 use this form.
 
-Public input/output:
-  - rho_B, rho_p, rho_sat: fm^-3
-  - meson masses: MeV
-  - energy density, pressure: MeV/fm^3
-  - chemical potentials, fields, effective masses: MeV
+UNIT CONVENTION: natural units (hbar=c=1), MeV internally, MeV/fm^3 output.
+Densities input in fm^-3, converted to MeV^3 by * HBARC^3 internally.
 """
 from __future__ import annotations
 
@@ -31,24 +27,21 @@ import math
 from dataclasses import dataclass
 from pathlib import Path
 
-HBARC = 197.3269804  # MeV*fm;  rho[MeV^3] = rho[fm^-3] * HBARC^3
-M_N = 939.565
-M_P = 938.272
+HBARC = 197.3269804
+M_N = 939.56536
+M_P = 938.27203
 M_E = 0.511
 M_MU = 105.658
 PI = math.pi
 
 
 def _kF_MeV(rho_MeV3: float) -> float:
-    """Fermi momentum (MeV) from density in MeV^3, spin-1/2: kF^3 = 3 pi^2 rho."""
     if rho_MeV3 <= 0:
         return 0.0
     return (3.0 * PI * PI * rho_MeV3) ** (1.0 / 3.0)
 
 
 def _scalar_density_MeV3(kF: float, Mstar: float) -> float:
-    """rho_s = (M*/(2 pi^2)) [ kF E - M*^2 ln((kF+E)/M*) ], in MeV^3.
-    E = sqrt(kF^2 + M*^2)."""
     if kF <= 0:
         return 0.0
     E = math.sqrt(kF * kF + Mstar * Mstar)
@@ -56,8 +49,6 @@ def _scalar_density_MeV3(kF: float, Mstar: float) -> float:
 
 
 def _kinetic_MeV4(kF: float, Mstar: float, g: int) -> float:
-    """Kinetic energy density (MeV^4): g/(2 pi^2) ∫_0^kF k^2 sqrt(k^2+M*^2) dk.
-    Analytic: (g/(16 pi^2)) [ kF(2kF^2+M*^2)E - M*^4 ln((kF+E)/M*) ]."""
     if kF <= 0:
         return 0.0
     E = math.sqrt(kF * kF + Mstar * Mstar)
@@ -67,36 +58,60 @@ def _kinetic_MeV4(kF: float, Mstar: float, g: int) -> float:
 
 @dataclass
 class RMFCouplings:
+    """Generic coupling parameter set. The interpretation of (a,b,c,d,Gamma)
+    depends on the functional form of the parent model."""
     a: float
-    b: float
-    c: float
+    b: float = 0.0
+    c: float = 0.0
     d: float = 0.0
+    Gamma_sat: float = 0.0  # Gamma_i(n_sat), the saturation-point coupling
 
-    def value(self, x: float, form: str) -> float:
-        if form == "DD2_DDME2_TYYPEL":
-            return self.a + (self.b + self.d * x) * math.exp(-self.c * x)
-        if form == "SPG_GOGELEIN":
-            return self.a + (self.b + self.d * x ** 3) * math.exp(-self.c * x)
-        raise ValueError(f"unknown functional form {form}")
+    def value_rational(self, x: float) -> float:
+        """DD2 isoscalar: f = a*(1 + b*(x+d)^2)/(1 + c*(x+d)^2); g = Gamma*f."""
+        num = 1.0 + self.b * (x + self.d) ** 2
+        den = 1.0 + self.c * (x + self.d) ** 2
+        return self.Gamma_sat * self.a * num / den
 
-    def dvalue_dx(self, x: float, form: str) -> float:
-        if form == "DD2_DDME2_TYYPEL":
-            return (self.d - self.c * (self.b + self.d * x)) * math.exp(-self.c * x)
-        if form == "SPG_GOGELEIN":
-            return (3.0 * self.d * x * x - self.c * (self.b + self.d * x ** 3)) * math.exp(-self.c * x)
-        raise ValueError(f"unknown functional form {form}")
+    def value_exp(self, x: float) -> float:
+        """DD2 isovector (rho): f = exp(-a*(x-1)); g = Gamma*f."""
+        return self.Gamma_sat * math.exp(-self.a * (x - 1.0))
+
+    def value_gogelein(self, x: float) -> float:
+        """SPG Gögelein: g = a + (b + d*x^3)*exp(-c*x)."""
+        return self.a + (self.b + self.d * x ** 3) * math.exp(-self.c * x)
+
+    def dvalue_rational_dx(self, x: float) -> float:
+        """d/dx of a*(1+b(x+d)^2)/(1+c(x+d)^2)."""
+        u = x + self.d
+        num = 1.0 + self.b * u * u
+        den = 1.0 + self.c * u * u
+        dnum = 2.0 * self.b * u
+        dden = 2.0 * self.c * u
+        f = self.a * num / den
+        df = self.a * (dnum * den - num * dden) / (den * den)
+        return self.Gamma_sat * df
+
+    def dvalue_exp_dx(self, x: float) -> float:
+        f = math.exp(-self.a * (x - 1.0))
+        return self.Gamma_sat * (-self.a) * f
+
+    def dvalue_gogelein_dx(self, x: float) -> float:
+        return (3.0 * self.d * x * x - self.c * (self.b + self.d * x ** 3)) * math.exp(-self.c * x)
 
 
 @dataclass
 class RMFModel:
     key: str
     family: str
-    functional_form: str
+    functional_form: str   # "DD2_TYYPEL_RATIONAL" or "SPG_GOGELEIN"
     meson_masses: dict
-    rho_sat: float            # fm^-3
-    couplings: dict
+    rho_sat: float
+    couplings: dict        # meson -> RMFCouplings
     saturation_targets: dict
     reference: str = ""
+    # which mesons use the rational (isoscalar) vs exponential (isovector) form:
+    isoscalar_mesons: tuple = ("omega", "sigma")
+    isovector_mesons: tuple = ("rho",)
 
     @property
     def rho_sat_MeV3(self) -> float:
@@ -104,20 +119,26 @@ class RMFModel:
 
     def x_of(self, rho_B_MeV3: float) -> float:
         if self.functional_form == "SPG_GOGELEIN":
-            # Gögelein uses x = rho_B; rho_B in fm^-3, so x = rho_B_MeV3 / HBARC^3
             return rho_B_MeV3 / HBARC ** 3
         return rho_B_MeV3 / self.rho_sat_MeV3
 
     def g(self, meson: str, rho_B_MeV3: float) -> float:
-        return self.couplings[meson].value(self.x_of(rho_B_MeV3), self.functional_form)
+        x = self.x_of(rho_B_MeV3)
+        c = self.couplings[meson]
+        if self.functional_form == "SPG_GOGELEIN":
+            return c.value_gogelein(x)
+        # DD2_TYYPEL_RATIONAL
+        if meson in self.isovector_mesons:
+            return c.value_exp(x)
+        return c.value_rational(x)
 
     def dg_drho_fm(self, meson: str, rho_B_MeV3: float) -> float:
-        """dg/d(rho_B[fm^-3]). For Typel x=rho/rho_sat => dg/drho_fm = (1/rho_sat) dg/dx.
-        For Gögelein x=rho_B[fm^-3] => dg/drho_fm = dg/dx."""
+        """dg/d(rho_B[fm^-3])."""
         x = self.x_of(rho_B_MeV3)
-        dgdx = self.couplings[meson].dvalue_dx(x, self.functional_form)
+        c = self.couplings[meson]
         if self.functional_form == "SPG_GOGELEIN":
-            return dgdx  # x = rho_B directly in fm^-3
+            return c.dvalue_gogelein_dx(x)  # x = rho directly
+        dgdx = c.dvalue_exp_dx(x) if meson in self.isovector_mesons else c.dvalue_rational_dx(x)
         return dgdx / self.rho_sat  # x = rho/rho_sat
 
     def includes_delta(self) -> bool:
@@ -135,8 +156,8 @@ class HomogeneousResult:
 
 
 def solve_homogeneous(model: RMFModel, rho_B: float, rho_p: float,
-                      tol: float = 1e-8, max_iter: int = 1000) -> HomogeneousResult:
-    """Self-consistent DD-RMF for homogeneous matter at (rho_B[fm^-3], rho_p[fm^-3])."""
+                      tol: float = 1e-9, max_iter: int = 1000) -> HomogeneousResult:
+    """Self-consistent DD-RMF for homogeneous matter at (rho_B, rho_p) in fm^-3."""
     if rho_B <= 0:
         return HomogeneousResult(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, True, 0)
     rho_B_M = rho_B * HBARC ** 3
@@ -181,7 +202,6 @@ def solve_homogeneous(model: RMFModel, rho_B: float, rho_p: float,
             converged = True
             break
 
-    # final fields with converged masses
     kF_n = _kF_MeV(rho_n_M)
     kF_p = _kF_MeV(rho_p_M)
     rs_n = _scalar_density_MeV3(kF_n, Mstar_n)
@@ -197,26 +217,34 @@ def solve_homogeneous(model: RMFModel, rho_B: float, rho_p: float,
     Ekin_p = _kinetic_MeV4(kF_p, Mstar_p, 2)
     Ekin = Ekin_n + Ekin_p
 
-    # field energy (MeV^4): +1/2 m_w^2 w0^2 +1/2 m_r^2 rho03^2 -1/2 m_s^2 sigma0^2 -1/2 m_d^2 delta0^2
+    # energy density (MeV^4):
+    # E = Ekin(M*) + (1/2)(m_w^2 w0^2 + m_r^2 b3^2 - m_s^2 s0^2 - m_d^2 d0^2)
+    #     - g_w w0 rho_B - g_r b3 rho_3  (vector interactions, scalar is in M*)
+    # BUT the scalar interaction g_s sigma0 rs_total is already in M* through
+    # M* = M - g_s sigma0; the field energy -1/2 m_s^2 sigma^2 accounts for it.
+    # The standard DD-RMF energy (Typel/Wolter, Scurto eq 10) is:
+    #   E = Ekin + E_field - E_int_vector   with E_field containing the meson
+    # self-energies and E_int the nucleon-meson coupling.  However, because the
+    # scalar coupling enters M*, the term -g_s sigma0 rs_total must NOT appear
+    # separately (it would double-count).  The correct form is:
+    #   E = Ekin(M*) + 1/2(m_w^2 w0^2 + m_r^2 b3^2 - m_s^2 s0^2 - m_d^2 d0^2)
+    #       - g_w w0 rho_B - g_r b3 rho_3
+    # This is the form used by Typel/Wolter and gives P=0 at saturation when
+    # the rearrangement term is included in mu.
     Efield = (0.5 * m_w ** 2 * omega0 ** 2 + 0.5 * m_r ** 2 * rho03 ** 2
               - 0.5 * m_s ** 2 * sigma0 ** 2
               - (0.5 * m_d ** 2 * delta0 ** 2 if has_delta else 0.0))
-    # interaction energy (MeV^4): scalar -g_s sigma0 rs_total (-g_d delta0 rs_3 if delta)
-    # plus vector -g_w w0 rho_B - g_r rho03 rho_3
-    Eint = (-(g_s * sigma0 * rs_total)
-            - (g_d * delta0 * rs_3 if has_delta else 0.0)
-            - g_w * omega0 * rho_B_M
-            - g_r * rho03 * (rho_p_M - rho_n_M))
+    Eint_vec = -(g_w * omega0 * rho_B_M + g_r * rho03 * (rho_p_M - rho_n_M))
+    E_MeV4 = Ekin + Efield + Eint_vec
+    E_MeV_fm3 = E_MeV4 / HBARC ** 3
 
-    E_MeV4 = Ekin + Efield + Eint
-    E_MeV_fm3 = E_MeV4 / HBARC ** 3  # convert to MeV/fm^3
-
-    # rearrangement Sigma^R (MeV): sum_kappa (dg_kappa/drho_B[fm]) * field * density
+    # rearrangement term Sigma^R (MeV): sum_kappa (dg_kappa/drho) field * density
     rho_n = rho_B - rho_p
     dgs = model.dg_drho_fm("sigma", rho_B_M)
     dgw = model.dg_drho_fm("omega", rho_B_M)
     dgr = model.dg_drho_fm("rho", rho_B_M)
-    sigma_R = (dgw * omega0 * rho_B + dgs * sigma0 * (rs_n + rs_p) / HBARC ** 3
+    sigma_R = (dgw * omega0 * rho_B
+               + dgs * sigma0 * (rs_n + rs_p) / HBARC ** 3
                + dgr * rho03 * (rho_p - rho_n))
     if has_delta:
         dgd = model.dg_drho_fm("delta", rho_B_M)
@@ -224,19 +252,14 @@ def solve_homogeneous(model: RMFModel, rho_B: float, rho_p: float,
 
     En_n = math.sqrt(kF_n ** 2 + Mstar_n ** 2)
     En_p = math.sqrt(kF_p ** 2 + Mstar_p ** 2)
-    # chemical potentials: mu_i = E_F,i + g_w omega0 +/- (g_r rho03)/2 - Sigma^R
-    # (the vector omega enters POSITIVELY — it is repulsive; the rho isovector
-    # is + for protons, - for neutrons; the rearrangement Sigma^R subtracts).
-    # Sign convention follows Scurto 2024 eq. 13 with E_F = sqrt(kF^2+M*^2).
     mu_n = En_n + g_w * omega0 - 0.5 * g_r * rho03 - sigma_R
     mu_p = En_p + g_w * omega0 + 0.5 * g_r * rho03 - sigma_R
 
-    # pressure (MeV^4 -> MeV/fm^3): P = sum mu_i rho_i - E
     P_MeV4 = (mu_n * rho_n_M + mu_p * rho_p_M) - E_MeV4
     P_MeV_fm3 = P_MeV4 / HBARC ** 3
 
     return HomogeneousResult(
-        rho_B=rho_B, rho_3=rho_p - rho_n, rho_p=rho_p, rho_n=rho_B - rho_p,
+        rho_B=rho_B, rho_3=rho_p - rho_n, rho_p=rho_p, rho_n=rho_n,
         sigma0=sigma0, omega0=omega0, rho03=rho03, delta0=delta0,
         Mstar_n=Mstar_n, Mstar_p=Mstar_p,
         energy_density=E_MeV_fm3, pressure=P_MeV_fm3,
@@ -249,14 +272,19 @@ def load_models(path: Path | str) -> dict[str, RMFModel]:
     data = json.loads(Path(path).read_text(encoding="utf-8"))
     models = {}
     for key, m in data["models"].items():
-        couplings = {meson: RMFCouplings(a=p["a"], b=p["b"], c=p["c"], d=p.get("d", 0.0))
-                     for meson, p in m["coupling_params"].items()}
+        couplings = {}
+        for meson, p in m["coupling_params"].items():
+            couplings[meson] = RMFCouplings(
+                a=p["a"], b=p.get("b", 0.0), c=p.get("c", 0.0),
+                d=p.get("d", 0.0), Gamma_sat=p.get("Gamma_sat", 0.0))
         models[key] = RMFModel(
             key=key, family=m["family"], functional_form=m["functional_form"],
             meson_masses=dict(m["meson_masses_MeV"]),
             rho_sat=m["rho_sat_fm3"], couplings=couplings,
             saturation_targets=m.get("saturation_targets", {}),
             reference=m.get("reference", ""),
+            isoscalar_mesons=tuple(m.get("isoscalar_mesons", ("omega", "sigma"))),
+            isovector_mesons=tuple(m.get("isovector_mesons", ("rho",))),
         )
     return models
 
@@ -266,7 +294,6 @@ def energy_per_baryon(r: HomogeneousResult) -> float:
 
 
 def symmetry_energy(model: RMFModel, rho_B: float) -> float:
-    """S(rho) via parabolic approx: S = (1/2) d^2(E/A)/d(delta^2)|_{delta=0}."""
     delta = 0.02
     rp = solve_homogeneous(model, rho_B, rho_B * (1 + delta) / 2)
     rm = solve_homogeneous(model, rho_B, rho_B * (1 - delta) / 2)

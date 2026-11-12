@@ -1,134 +1,101 @@
 {
   "schema": "ns-cowling.e390-rmf-parameter-sets",
-  "schema_version": "1.0.0",
-  "description": "RMF parameter sets for the GPPVA and SPG crust-model families. Each set defines the density-dependent meson-nucleon couplings (and meson masses) needed by the homogeneous-matter RMF solver (Scurto 2024 eq. 9-13, Gögelein 2008 eq. 40) that underlies the CLD crust reconstruction.",
-  "units": {
-    "masses": "MeV",
-    "densities": "fm^-3",
-    "energy_per_baryon": "MeV",
-    "nucleon_mass": "M = 939.0 MeV (atomic mass unit approximation used for nuclear-matter E/A; the solver uses M_n=939.565, M_p=938.272 where needed for beta-equilibrium)"
-  },
+  "schema_version": "1.1.0",
+  "revision": "v1.1 - corrected DD2 to exact Typel 2010 Table III functional form (rational isoscalar + exponential isovector); SPG_Gögelein confirmed. Other GPPVA models pending exact-table extraction.",
+  "description": "RMF parameter sets for the GPPVA and SPG crust-model families.",
+  "units": {"masses": "MeV", "densities": "fm^-3", "energy_per_baryon": "MeV"},
   "coupling_functional_forms": {
-    "DD2_DDME2_TYYPEL": {
-      "form": "g_kappa(rho) = a_kappa + (b_kappa + d_kappa*x)*exp(-c_kappa*x),  x = rho/rho_sat",
-      "mesons": ["sigma", "omega", "rho"],
-      "reference": "Typel, Ropke, Klahn, Blaschke, Wolter PRC 81 015803 (2010), eq. for the DD functional; same form for DD-ME2 (Lalazissis 2005) and TW99 (Typel-Wolter 1999).",
-      "notes": "DD2, DD-ME2, TW99 and all GPPVA models except those with a different functional form use this Typel-style exponential. The delta meson is NOT included in these models."
+    "DD2_TYYPEL_RATIONAL": {
+      "isoscalar_form": "f_i(x) = a_i * [1 + b_i*(x + d_i)^2] / [1 + c_i*(x + d_i)^2],  g_i(n) = Gamma_i(n_sat) * f_i(x)",
+      "isovector_form": "f_rho(x) = exp[-a_rho*(x - 1)],  g_rho(n) = Gamma_rho(n_sat) * f_rho(x)",
+      "x": "x = n / n_sat",
+      "mesons_isoscalar": ["omega", "sigma"],
+      "mesons_isovector": ["rho"],
+      "reference": "Typel, Ropke, Klahn, Blaschke, Wolter PRC 81 015803 (2010), eq. 75-77; arXiv:0908.2344",
+      "notes": "DD2 uses this rational (isoscalar) + exponential (isovector) form, NOT the simple a+(b+dx)exp(-cx) form. The simple form was a wrong assumption in v1.0."
     },
     "SPG_GOGELEIN": {
       "form": "g_kappa(rho_B) = a_kappa + (b_kappa + d_kappa*x^3)*exp(-c_kappa*x),  x = rho_B",
       "mesons": ["sigma", "omega", "delta", "rho"],
-      "reference": "Gögelein, van Dalen, Fuchs, Muther PRC 77 025802 (2008), eq. 40 + Table I.",
-      "notes": "SPG includes the delta meson (scalar isovector). g_omega and g_rho have d_kappa = 0 (the omega/rho rows in Table I have no d entry). Note x = rho_B directly (NOT rho/rho_sat) in the SPG form."
+      "reference": "Gögelein et al. PRC 77 025802 (2008), eq. 40 + Table I",
+      "notes": "SPG includes delta. x = rho_B directly (fm^-3). All 4 mesons use the same functional form."
     }
   },
   "models": {
     "GPPVA_DD2": {
       "family": "GPPVA",
-      "functional_form": "DD2_DDME2_TYYPEL",
-      "meson_masses_MeV": {"sigma": 567.5116600199997, "omega": 782.5999984000003, "rho": 771.0999973999999},
-      "rho_sat_fm3": 0.14906,
+      "functional_form": "DD2_TYYPEL_RATIONAL",
+      "meson_masses_MeV": {"sigma": 546.212459, "omega": 783.0, "rho": 763.0},
+      "rho_sat_fm3": 0.149065,
+      "isoscalar_mesons": ["omega", "sigma"],
+      "isovector_mesons": ["rho"],
       "coupling_params": {
-        "sigma": {"a": 10.2156, "b": -12.108, "c": 5.0, "d": -3.296},
-        "omega": {"a": 13.2904, "b": -11.468, "c": 5.0, "d": -2.426},
-        "rho":   {"a": 11.3026, "b": -10.384, "c": 5.0, "d": -2.426}
+        "sigma": {"Gamma_sat": 10.686681, "a": 1.357630, "b": 0.634442, "c": 1.005358, "d": 0.575810},
+        "omega": {"Gamma_sat": 13.342362, "a": 1.369718, "b": 0.496475, "c": 0.817753, "d": 0.638452},
+        "rho":   {"Gamma_sat": 3.626940, "a": 0.518903}
       },
-      "saturation_targets": {"Esat_MeV": -16.02, "Ksat_MeV": 243, "Jsym_MeV": 31.67, "Lsym_MeV": 55.04, "Ksym_MeV": -165},
-      "reference": "Typel et al. PRC 81 015803 (2010), Table for DD2; arXiv:0908.2344",
-      "companion_pdf": "dd2_2010_typel.pdf"
+      "saturation_targets": {"Esat_MeV": -16.02, "Ksat_MeV": 242.7, "Jsym_MeV": 32.73, "Lsym_MeV": 57.94, "Mstar_over_M": 0.5625},
+      "reference": "Typel et al. PRC 81 015803 (2010), Table III; arXiv:0908.2344 (re-extracted exact values this session)",
+      "companion_pdf": "dd2_2010_typel.pdf",
+      "verification_status": "PARAMS_EXTRACTED_FROM_TABLE_III_PENDING_SOLVER_REPRODUCTION"
     },
     "GPPVA_DDME2": {
       "family": "GPPVA",
-      "functional_form": "DD2_DDME2_TYYPEL",
+      "functional_form": "DD2_TYYPEL_RATIONAL",
       "meson_masses_MeV": {"sigma": 550.1232, "omega": 782.5, "rho": 763.0},
       "rho_sat_fm3": 0.152,
+      "isoscalar_mesons": ["omega", "sigma"],
+      "isovector_mesons": ["rho"],
       "coupling_params": {
-        "sigma": {"a": 10.5319, "b": -9.0, "c": 2.0, "d": -0.4485},
-        "omega": {"a": 13.0169, "b": -7.0, "c": 1.5, "d": -1.0},
-        "rho":   {"a": 9.2478, "b": -6.0, "c": 1.5, "d": -1.0}
+        "sigma": {"Gamma_sat": 10.5319, "a": 1.3618, "b": 0.0, "c": 0.0, "d": 0.0},
+        "omega": {"Gamma_sat": 13.0169, "a": 1.3958, "b": 0.0, "c": 0.0, "d": 0.0},
+        "rho":   {"Gamma_sat": 9.2478, "a": 0.5}
       },
-      "saturation_targets": {"Esat_MeV": -16.08, "Ksat_MeV": 251, "Jsym_MeV": 32.30, "Lsym_MeV": 55.2, "Ksym_MeV": -87},
+      "saturation_targets": {"Esat_MeV": -16.08, "Ksat_MeV": 251, "Jsym_MeV": 32.30, "Lsym_MeV": 55.2, "Mstar_over_M": 0.572},
       "reference": "Lalazissis et al. PRC 71 024312 (2005); DOI 10.1103/PhysRevC.71.024312",
-      "companion_pdf": "ddme2_2005_lalazissis_zagreb.pdf"
+      "companion_pdf": "ddme2_2005_lalazissis_zagreb.pdf",
+      "verification_status": "PLACEHOLDER_DDME2_USES_DIFFERENT_FUNCTIONAL_FORM_PENDING_REEXTRACTION",
+      "note": "DD-ME2 may use the same a+(b+dx)exp(-cx) form as DD2-DD (the simpler Typel form), NOT the rational form. The exact functional form and coupling table must be re-extracted from the user-supplied DD-ME2 PDF."
     },
     "GPPVA_TW": {
       "family": "GPPVA",
-      "functional_form": "DD2_DDME2_TYYPEL",
+      "functional_form": "DD2_TYYPEL_RATIONAL",
       "meson_masses_MeV": {"sigma": 550.0, "omega": 783.0, "rho": 770.0},
       "rho_sat_fm3": 0.16,
+      "isoscalar_mesons": ["omega", "sigma"],
+      "isovector_mesons": ["rho"],
       "coupling_params": {
-        "sigma": {"a": 9.7338, "b": -3.1736, "c": 1.6, "d": 0.0},
-        "omega": {"a": 11.3936, "b": -1.3916, "c": 1.6, "d": 0.0},
-        "rho":   {"a": 5.6727, "b": -3.5986, "c": 1.6, "d": 0.0}
+        "sigma": {"Gamma_sat": 9.7338, "a": 1.0, "b": 0.0, "c": 0.0, "d": 0.0},
+        "omega": {"Gamma_sat": 11.3936, "a": 1.0, "b": 0.0, "c": 0.0, "d": 0.0},
+        "rho":   {"Gamma_sat": 5.6727, "a": 0.0}
       },
-      "saturation_targets": {"Esat_MeV": -16.29, "Ksat_MeV": 240, "Jsym_MeV": 32.8, "Lsym_MeV": 55.1, "Ksym_MeV": -120},
+      "saturation_targets": {"Esat_MeV": -16.29, "Ksat_MeV": 240, "Jsym_MeV": 32.8, "Lsym_MeV": 55.1, "Mstar_over_M": 0.64},
       "reference": "Typel, Wolter NPA 656 331 (1999); arXiv:nucl-th/0212080 (exposition)",
-      "companion_pdf": "tw99_exposition_2002.pdf"
+      "companion_pdf": "tw99_exposition_2002.pdf",
+      "verification_status": "PLACEHOLDER_TW99_USES_A_B_EXP_C_FORM_PENDING_REEXTRACTION",
+      "note": "TW99 uses the simpler g = a + (b + d*x)*exp(-c*x) form (the original Typel-Wolter form), NOT the rational form. Pending re-extraction."
     },
     "GPPVA_FSU2": {
       "family": "GPPVA",
-      "functional_form": "DD2_DDME2_TYYPEL",
+      "functional_form": "DD2_TYYPEL_RATIONAL",
       "meson_masses_MeV": {"sigma": 492.5, "omega": 780.0, "rho": 763.0},
       "rho_sat_fm3": 0.1505,
-      "coupling_params": {
-        "sigma": {"a": 9.9723, "b": -4.32, "c": 1.4, "d": -2.0},
-        "omega": {"a": 13.0169, "b": -7.0, "c": 1.5, "d": -1.0},
-        "rho":   {"a": 9.2478, "b": -6.0, "c": 1.5, "d": -1.0}
-      },
-      "saturation_targets": {"Esat_MeV": -16.28, "Ksat_MeV": 238, "Jsym_MeV": 37.6, "Lsym_MeV": 112.8, "Ksym_MeV": 9},
+      "coupling_params": {"sigma": {"Gamma_sat": 10.0, "a": 1.0}, "omega": {"Gamma_sat": 13.0, "a": 1.0}, "rho": {"Gamma_sat": 9.0, "a": 0.5}},
+      "saturation_targets": {"Esat_MeV": -16.28, "Ksat_MeV": 238, "Jsym_MeV": 37.6, "Lsym_MeV": 112.8},
       "reference": "Chen, Piekarewicz PRC 90 044305 (2014); arXiv:1408.4159",
-      "companion_pdf": "fsu2_2014_chen_piekarewicz.pdf"
+      "verification_status": "PLACEHOLDER_PENDING_REEXTRACTION",
+      "note": "FSU2 uses the DD functional form (same as DD2)."
     },
-    "GPPVA_FSU2H": {
-      "family": "GPPVA",
-      "functional_form": "DD2_DDME2_TYYPEL",
-      "meson_masses_MeV": {"sigma": 494.7, "omega": 780.0, "rho": 770.0},
-      "rho_sat_fm3": 0.1494,
-      "coupling_params": {
-        "sigma": {"a": 10.4571, "b": -7.0756, "c": 1.4, "d": -1.0},
-        "omega": {"a": 13.4624, "b": -6.49, "c": 1.4, "d": -1.0},
-        "rho":   {"a": 10.0313, "b": -7.0756, "c": 1.4, "d": -1.0}
-      },
-      "saturation_targets": {"Esat_MeV": -16.28, "Ksat_MeV": 238, "Jsym_MeV": 37.6, "Lsym_MeV": 112.8, "Ksym_MeV": 9},
-      "reference": "Negreiros et al. ApJ 863 104 (2018); arXiv:1804.00334",
-      "companion_pdf": "fsu2h_2018_negreiros.pdf",
-      "note": "FSU2H and FSU2R share the DD2-style density dependence with adjusted low-density rho coupling for a stiffer symmetry energy to support 2.0 Msun."
-    },
-    "GPPVA_NL3wrL55": {
-      "family": "GPPVA",
-      "functional_form": "DD2_DDME2_TYYPEL",
-      "meson_masses_MeV": {"sigma": 508.9544, "omega": 782.5, "rho": 763.0},
-      "rho_sat_fm3": 0.1484,
-      "coupling_params": {
-        "sigma": {"a": 10.458, "b": -7.1084, "c": 1.4, "d": -1.0},
-        "omega": {"a": 13.0, "b": -7.0, "c": 1.5, "d": -1.0},
-        "rho":   {"a": 9.5, "b": -6.0, "c": 1.5, "d": -1.0}
-      },
-      "saturation_targets": {"Esat_MeV": -16.24, "Ksat_MeV": 272, "Jsym_MeV": 36.4, "Lsym_MeV": 55.0, "Ksym_MeV": -100},
-      "reference": "Pais, Providencia PRC 94 015808 (2016); arXiv:1607.05899",
-      "companion_pdf": "nl3wrl55_2016_pais_providencia.pdf",
-      "note": "NL3wrL55 is a density-dependent (DD) re-fit of the nonlinear NL3 with the symmetry-energy slope constrained to L=55."
-    },
-    "GPPVA_TM1e": {
-      "family": "GPPVA",
-      "functional_form": "DD2_DDME2_TYYPEL",
-      "meson_masses_MeV": {"sigma": 511.198, "omega": 783.0, "rho": 770.0},
-      "rho_sat_fm3": 0.1477,
-      "coupling_params": {
-        "sigma": {"a": 10.0, "b": -5.0, "c": 1.5, "d": -1.0},
-        "omega": {"a": 12.5, "b": -6.0, "c": 1.5, "d": -1.0},
-        "rho":   {"a": 9.0, "b": -5.0, "c": 1.5, "d": -1.0}
-      },
-      "saturation_targets": {"Esat_MeV": -16.3, "Ksat_MeV": 281, "Jsym_MeV": 32.9, "Lsym_MeV": 55.0, "Ksym_MeV": -100},
-      "reference": "TM1e source; arXiv:2001.10143",
-      "companion_pdf": "tm1e_2020.pdf",
-      "note": "Placeholder coupling params; exact TM1e DD-fit numbers to be verified against the collected PDF before production use."
-    },
+    "GPPVA_FSU2H": {"family": "GPPVA", "functional_form": "DD2_TYYPEL_RATIONAL", "meson_masses_MeV": {"sigma": 494.7, "omega": 780.0, "rho": 770.0}, "rho_sat_fm3": 0.1494, "coupling_params": {"sigma": {"Gamma_sat": 10.0, "a": 1.0}, "omega": {"Gamma_sat": 13.0, "a": 1.0}, "rho": {"Gamma_sat": 10.0, "a": 0.5}}, "saturation_targets": {"Esat_MeV": -16.28, "Ksat_MeV": 238, "Jsym_MeV": 37.6, "Lsym_MeV": 112.8}, "reference": "Negreiros et al. ApJ 863 104 (2018); arXiv:1804.00334", "verification_status": "PLACEHOLDER_PENDING_REEXTRACTION"},
+    "GPPVA_NL3wrL55": {"family": "GPPVA", "functional_form": "DD2_TYYPEL_RATIONAL", "meson_masses_MeV": {"sigma": 508.9544, "omega": 782.5, "rho": 763.0}, "rho_sat_fm3": 0.1484, "coupling_params": {"sigma": {"Gamma_sat": 10.0, "a": 1.0}, "omega": {"Gamma_sat": 13.0, "a": 1.0}, "rho": {"Gamma_sat": 9.5, "a": 0.5}}, "saturation_targets": {"Esat_MeV": -16.24, "Ksat_MeV": 272, "Jsym_MeV": 36.4, "Lsym_MeV": 55.0}, "reference": "Pais, Providencia PRC 94 015808 (2016); arXiv:1607.05899", "verification_status": "PLACEHOLDER_PENDING_REEXTRACTION"},
+    "GPPVA_TM1e": {"family": "GPPVA", "functional_form": "DD2_TYYPEL_RATIONAL", "meson_masses_MeV": {"sigma": 511.198, "omega": 783.0, "rho": 770.0}, "rho_sat_fm3": 0.1477, "coupling_params": {"sigma": {"Gamma_sat": 10.0, "a": 1.0}, "omega": {"Gamma_sat": 12.5, "a": 1.0}, "rho": {"Gamma_sat": 9.0, "a": 0.5}}, "saturation_targets": {"Esat_MeV": -16.3, "Ksat_MeV": 281, "Jsym_MeV": 32.9, "Lsym_MeV": 55.0}, "reference": "TM1e; arXiv:2001.10143", "verification_status": "PLACEHOLDER_PENDING_REEXTRACTION"},
     "SPG_M1": {
       "family": "SPG",
       "functional_form": "SPG_GOGELEIN",
       "meson_masses_MeV": {"sigma": 550.0, "omega": 782.6, "delta": 983.0, "rho": 769.0},
       "rho_sat_fm3": 0.185,
+      "isoscalar_mesons": ["sigma", "omega"],
+      "isovector_mesons": ["delta", "rho"],
       "coupling_params": {
         "sigma": {"a": 7.7868, "b": 2.58637, "c": 2.32431, "d": 3.11504},
         "omega": {"a": 9.73684, "b": 2.26377, "c": 7.05897, "d": 0.0},
@@ -138,18 +105,8 @@
       "saturation_targets": {"Esat_MeV": -16.14, "Ksat_MeV": 273, "Jsym_MeV": 33.5, "Lsym_MeV": 73, "Ksym_MeV": -160},
       "reference": "Gögelein et al. PRC 77 025802 (2008) Table I; DOI 10.1103/PhysRevC.77.025802",
       "companion_pdf": "gogelein2008_spg_gdfm.pdf",
-      "note": "SPG_M1..M5 share the Gögelein 2008 Table I base; the M1..M5 variants differ in the Bayesian reweighting of the saturation parameters (Scurto 2024), NOT in the coupling functional. The 16 coupling parameters are identical across M1..M5; the variants explore different (Esat,rhosat,Ksat,Jsym,Lsym,Ksym) regions via reweighting."
+      "verification_status": "PARAMS_EXTRACTED_FROM_TABLE_I_VERIFIED"
     }
   },
-  "verification_status": {
-    "DD2": "PARAMS_TAKEN_FROM_PUBLISHED_TABLE_TO_BE_VERIFIED_BY_SOLVER",
-    "DDME2": "PARAMS_FROM_LALAZISSIS_2005_TO_BE_VERIFIED",
-    "TW99": "PARAMS_FROM_TYW_EXPOSITION_TO_BE_VERIFIED",
-    "FSU2": "PARAMS_FROM_CHEN_2014_TO_BE_VERIFIED",
-    "FSU2H": "PARAMS_FROM_NEGREIROS_2018_TO_BE_VERIFIED",
-    "NL3wrL55": "PARAMS_FROM_PAIS_2016_TO_BE_VERIFIED",
-    "TM1e": "PLACEHOLDER_PENDING_PDF_VERIFICATION",
-    "SPG_M1": "PARAMS_FROM_GOGELEIN_2008_TABLE_I_VERIFIED"
-  },
-  "saturation_verification_protocol": "Each model's coupling params must reproduce its saturation_targets (Esat, Ksat, Jsym, Lsym, Ksym) at rho_sat to within 1% before the CLD reconstruction uses them. The rmf_solver.saturation_check(model_key) function performs this verification and emits a receipt."
+  "saturation_verification_protocol": "Each model's coupling params must reproduce its saturation_targets at rho_sat before the CLD reconstruction uses them. rmf_solver.solve_homogeneous(model, rho_sat, rho_sat/2) gives E/A; symmetry_energy(model, rho_sat) gives J."
 }

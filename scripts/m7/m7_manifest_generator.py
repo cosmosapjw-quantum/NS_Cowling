@@ -38,38 +38,42 @@ METHODS = ['maxwell', 'css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
 # Physics reference for each matching method (provenance)
 METHOD_PHYSICS = {
     'maxwell': {
-        'kind': 'sharp_first_order',
-        'description': 'Sharp Maxwell construction: equal P and mu_B coexistence with density jump',
-        'reference': 'Glendenning 1991 PhysRevD.46.1274 (relativistic two-phase); Maxwell 1875',
-        'acceptance_node': 'M5',
+        'kind': 'legacy_smooth_interpolation',
+        'method_identity': 'LEGACY_NPPHB',
+        'description': 'Legacy near-pressure-plateau Hermite bridge (NPPHB); smooth interpolation with no density jump and no latent heat. This token is not a sharp Maxwell phase transition.',
+        'physical_classification': 'UNRESOLVED',
+        'reference': 'Project-defined legacy parameterization; no literature attribution claimed',
+        'acceptance_node': 'E390-02C',
     },
     'css': {
-        'kind': 'sharp_first_order_high_density_branch',
-        'description': 'Constant-Sound-Speed high-density branch with sharp interface jump',
+        'kind': 'css_high_density_extension',
+        'method_identity': 'CSS_PARAMETERIZED_EXTENSION',
+        'description': 'Constant-sound-speed high-density extension. A first-order interface requires an explicitly sourced positive Delta_epsilon and independent one-charge first-law/jump validation; the method name alone does not classify the transition.',
+        'physical_classification': 'PARAMETER_DEPENDENT',
         'reference': 'Alford, Han & Prakash 2013 PRD 88 083013 (arXiv:1302.4732); 2015 PRD 92 083002 (arXiv:1501.07902)',
         'acceptance_node': 'M5A',
     },
     'cubic_F': {
-        'kind': 'smooth_crossover',
-        'description': 'Cubic Hermite interpolation in free energy F = eps/n_B (continuous, no jump)',
+        'kind': 'smooth_interpolation',
+        'description': 'Cubic Hermite interpolation in free energy F = eps/n_B; this method does not itself classify a physical transition',
         'reference': 'Legacy NPPHB Hermite bridge (project-defined; not a literature attribution per legacy_method_semantics)',
         'acceptance_node': 'E390-02C',
     },
     'cubic_P': {
         'kind': 'smooth_crossover',
-        'description': 'Cubic Hermite interpolation in pressure P (continuous, no jump)',
+        'description': 'Cubic Hermite interpolation in pressure P; this method does not itself classify a physical transition',
         'reference': 'Legacy NPPHB Hermite bridge (project-defined)',
         'acceptance_node': 'E390-02C',
     },
     'quintic_F': {
         'kind': 'smooth_crossover',
-        'description': 'Quintic Hermite interpolation in free energy F (continuous, no jump, C2 smooth)',
+        'description': 'Quintic Hermite interpolation in free energy F; method continuity is not a thermodynamic phase classification',
         'reference': 'Legacy NPPHB Hermite bridge (project-defined)',
         'acceptance_node': 'E390-02C',
     },
     'quintic_P': {
         'kind': 'smooth_crossover',
-        'description': 'Quintic Hermite interpolation in pressure P (continuous, no jump, C2 smooth)',
+        'description': 'Quintic Hermite interpolation in pressure P; method continuity is not a thermodynamic phase classification',
         'reference': 'Legacy NPPHB Hermite bridge (project-defined)',
         'acceptance_node': 'E390-02C',
     },
@@ -193,27 +197,29 @@ def write_manifest(manifest: dict, path: str) -> None:
     os.replace(tmp, p)
 
 
-if __name__ == '__main__':
-    import sys
-    # Default: full 390 manifest with the 6 crust models we actually have
-    available_crust = ['SPG_M1', 'SPG_M3', 'SPG_M5', 'GPPVA_DD2', 'GPPVA_DDME2', 'GPPVA_TW']
-    # Core models: synthetic polytropes stand in for the real APR/BBB/GM/RG models
-    # (the real cores would come from the M0 replacement ZIP)
-    available_core = ['APR_APR', 'BBB_BHF2', 'GM_GM1', 'RG_SLY4', 'RG_KDE0v1']
-    out_root = '/home/z/my-project/download/m7_batch/outputs'
+if __name__ == "__main__":
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--output-root", required=True)
+    ap.add_argument("--manifest", required=True)
+    ap.add_argument("--crust-root", required=True)
+    ap.add_argument("--core-root", required=True)
+    ap.add_argument("--available-crust", nargs="*", default=None)
+    ap.add_argument("--available-core", nargs="*", default=None)
+    args = ap.parse_args()
     manifest = generate_manifest(
-        output_root=out_root,
-        crust_eos_root='/home/z/my-project/download/m4_spliced',
-        core_eos_root='/home/z/my-project/download/m7_batch/inputs_core_synth',
-        available_crust=available_crust,
-        available_core=available_core,
+        output_root=args.output_root,
+        crust_eos_root=args.crust_root,
+        core_eos_root=args.core_root,
+        available_crust=args.available_crust,
+        available_core=args.available_core,
     )
-    out_path = '/home/z/my-project/download/m7_batch/M7_BATCH_MANIFEST.json'
-    write_manifest(manifest, out_path)
-    print(f'manifest written: {out_path}')
-    print(f'task_count: {manifest["task_count"]}')
-    print(f'unique_triples: {manifest["unique_triple_count"]}')
-    print(f'unique_ids: {manifest["unique_id_count"]}')
-    print(f'status_summary: {manifest["status_summary"]}')
-    print(f'crust coverage: {manifest["available_sources"]["crust_coverage"]}')
-    print(f'core coverage: {manifest["available_sources"]["core_coverage"]}')
+    write_manifest(manifest, args.manifest)
+    print(json.dumps({
+        "manifest": str(Path(args.manifest).resolve()),
+        "task_count": manifest["task_count"],
+        "unique_triples": manifest["unique_triple_count"],
+        "unique_ids": manifest["unique_id_count"],
+        "status_summary": manifest["status_summary"],
+        "available_sources": manifest["available_sources"],
+    }, indent=2))

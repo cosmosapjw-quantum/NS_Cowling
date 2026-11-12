@@ -168,10 +168,9 @@ def test_row_level_composition_presence_roundtrip_preserves_partial_and_explicit
     eos.C4_applicable[0] = False
     eos.row_status[0] = 1
 
-    # A zero muon fraction is nevertheless explicitly present in the selected row.
-    zero_muon = int(np.argmin(np.abs(eos.Ymu)))
-    eos.Ymu[zero_muon] = 0.0
-    eos.Ymu_present[zero_muon] = True
+    # A zero muon fraction is nevertheless explicitly present in the phase-only row.
+    eos.Ymu[0] = 0.0
+    eos.Ymu_present[0] = True
 
     out = tmp_path / "partial-roundtrip"
     write_compose(out, eos)
@@ -182,8 +181,8 @@ def test_row_level_composition_presence_roundtrip_preserves_partial_and_explicit
     assert not again.Ye_present[0] and not again.Ymu_present[0]
     assert not again.Abar_present[0] and not again.Zbar_present[0] and not again.Yh_present[0]
     assert again.row_status[0] == 1
-    assert again.Ymu_present[zero_muon]
-    assert again.Ymu[zero_muon] == 0.0
+    assert again.Ymu_present[0]
+    assert again.Ymu[0] == 0.0
 
 
 def test_python_frontend_refuses_missing_row_presence_masks(tmp_path):

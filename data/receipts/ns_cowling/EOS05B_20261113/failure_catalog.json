@@ -1,0 +1,37 @@
+{
+  "schema": "ns-cowling.failure-catalog",
+  "node": "EOS-05b",
+  "entries": [
+    {
+      "id": "F-EOS05B-1",
+      "class": "FORTRAN_IMPLEMENTATION",
+      "status": "RESOLVED",
+      "what": "NPPHB port unreachable: no route to construct_bridge case 'maxwell'; resolved by internal kernel name legacy_npphb",
+      "evidence": "red_test.log (66 failed/2 passed) -> green_test.log (68 passed)"
+    },
+    {
+      "id": "F-EOS05B-2",
+      "class": "SCOPE_OR_POLICY",
+      "status": "OPEN_RECORDED",
+      "what": "Rejection text for bare maxwell promises later repurposing as sharp; contradicts DAG; wording unchanged because tests pin it"
+    },
+    {
+      "id": "F-EOS05B-3",
+      "class": "NUMERICAL_CONVERGENCE_OR_CONDITIONING",
+      "status": "CHARACTERIZED_NOT_FIXED",
+      "what": "Legacy NPPHB 16/64-point quadrature mismatch (see legacy_quadrature_defect); native first-law gate blind to it"
+    },
+    {
+      "id": "F-EOS05B-4",
+      "class": "COMPATIBILITY_OR_PARITY",
+      "status": "OPEN_BLOCKER",
+      "what": "RG_SLY4/RG_KDE0v1 cores not matchable natively (see F-EOS05A-1); legacy_npphb inherits the guard"
+    },
+    {
+      "id": "F-EOS05B-5",
+      "class": "FORTRAN_IMPLEMENTATION",
+      "status": "OPEN_RECORDED",
+      "what": "match_report_t character(len=32) fields silently truncate pre-existing labels (cubic_pressure_chemical_potentia, quintic_C2_pressure_chemical_pot); not widened here; new label chosen <=32"
+    }
+  ]
+}

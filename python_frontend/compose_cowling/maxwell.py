@@ -533,6 +533,59 @@ def shoot_maxwell_cowling(
     )
 
 
+def _sampled_segment_nodes(values: np.ndarray, relative_zero_tol: float = 128.0 * np.finfo(float).eps) -> int:
+    """Count resolved sign transitions in one continuous phase segment only.
+
+    Samples smaller than a segment-relative threshold are treated as zeros.
+    The function never compares the last inner-phase sample to the first
+    outer-phase sample, so a finite interface jump is not a radial node.
+    """
+    arr = np.asarray(values, dtype=float)
+    if arr.ndim != 1 or arr.size == 0 or np.any(~np.isfinite(arr)):
+        raise ValueError("node-count segment must be a nonempty finite 1-D array")
+    tol = float(relative_zero_tol)
+    if not np.isfinite(tol) or tol < 0.0 or tol >= 0.1:
+        raise ValueError("relative_zero_tol must satisfy 0 <= tol < 0.1")
+    scale = float(np.max(np.abs(arr)))
+    if scale <= np.finfo(float).tiny:
+        return 0
+    resolved = arr[np.abs(arr) > tol * scale]
+    if resolved.size < 2:
+        return 0
+    return int(np.count_nonzero(np.signbit(resolved[1:]) != np.signbit(resolved[:-1])))
+
+
+def _sampled_phase_nodes(
+    w_inner: np.ndarray,
+    w_outer: np.ndarray,
+    v_inner: np.ndarray,
+    v_outer: np.ndarray,
+    relative_zero_tol: float = 128.0 * np.finfo(float).eps,
+) -> dict[str, int]:
+    """Return sampled W/V node counts separately in each sharp-interface phase."""
+    arrays = {
+        "w_inner": np.asarray(w_inner, dtype=float),
+        "w_outer": np.asarray(w_outer, dtype=float),
+        "v_inner": np.asarray(v_inner, dtype=float),
+        "v_outer": np.asarray(v_outer, dtype=float),
+    }
+    if any(x.ndim != 1 or x.size < 2 for x in arrays.values()):
+        raise ValueError("each phase-segment profile must contain at least two samples")
+    result = {
+        "w_nodes_inner_sampled": _sampled_segment_nodes(arrays["w_inner"], relative_zero_tol),
+        "w_nodes_outer_sampled": _sampled_segment_nodes(arrays["w_outer"], relative_zero_tol),
+        "v_nodes_inner_sampled": _sampled_segment_nodes(arrays["v_inner"], relative_zero_tol),
+        "v_nodes_outer_sampled": _sampled_segment_nodes(arrays["v_outer"], relative_zero_tol),
+    }
+    result["w_nodes_total_sampled"] = (
+        result["w_nodes_inner_sampled"] + result["w_nodes_outer_sampled"]
+    )
+    result["v_nodes_total_sampled"] = (
+        result["v_nodes_inner_sampled"] + result["v_nodes_outer_sampled"]
+    )
+    return result
+
+
 def scan_maxwell_cowling_modes(
     star: MaxwellStar,
     frequency_grid_hz: np.ndarray,
@@ -570,21 +623,15 @@ def scan_maxwell_cowling_modes(
             continue
         shot = shoot_maxwell_cowling(star, root_hz, conversion=conversion,
                                      rtol=rtol, max_step_m=max_step_m)
-        def sampled_nodes(values: np.ndarray) -> int:
-            signs = np.sign(np.asarray(values, dtype=float))
-            signs = signs[signs != 0]
-            return int(np.count_nonzero(signs[1:] != signs[:-1]))
-
-        # Do not count a finite jump in W across the interface as a radial node.
-        w_nodes_inner = sampled_nodes(shot.w_inner_m3)
-        w_nodes_outer = sampled_nodes(shot.w_outer_m3)
-        w_nodes = w_nodes_inner + w_nodes_outer
+        # Count W and V separately in each phase. The interface transfer is
+        # one-sided, and the finite jump must never be counted as an interior node.
+        nodes = _sampled_phase_nodes(
+            shot.w_inner_m3, shot.w_outer_m3, shot.v_inner_m2, shot.v_outer_m2
+        )
         roots.append({
             "frequency_hz": root_hz,
             "residual": shot.residual,
-            "w_node_transitions_sampled": w_nodes,
-            "w_nodes_inner_sampled": w_nodes_inner,
-            "w_nodes_outer_sampled": w_nodes_outer,
+            **nodes,
             "conversion": conversion,
             "interface_diagnostics": shot.interface_diagnostics,
             "shot": shot,

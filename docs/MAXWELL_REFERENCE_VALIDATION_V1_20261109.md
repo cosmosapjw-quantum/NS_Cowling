@@ -89,7 +89,7 @@ This fixture has Seidov ratio 1.00106, above its critical value 0.501596. It is 
 - Python compile check: python -m compileall -q python_frontend/compose_cowling python_frontend/compose_eos scripts/validate_maxwell_interface.py, passed.
 - Earlier compact regression run: 76 passed, 8 documented corpus/legacy differential tests deselected.
 - A later broader rerun exceeded its 120 s execution bound after 19 tests; this rerun is recorded as **timed out**, not passed.
-- No GitHub Actions workflow has run on this increment yet.
+- Historical note: no GitHub Actions workflow had run when this initial bounded validation note was first prepared. The later exact-PR-head run is recorded below.
 
 The phase-aware sharp-interface TOV/Cowling solver is Python/SciPy reference code. The Fortran code independently implements and tests the slow/rapid interface-transfer algebra, but native Fortran solve_tov_star and solve_cowling_spectrum remain smooth-EOS-only. No realistic CompOSE hybrid-EOS cohort, stable branch, maximum mass, twin-star sequence, full-GR polar perturbation, gravitational-wave damping, or generalized mode-family continuation is claimed.
 
@@ -113,4 +113,11 @@ The source patch is now applied to `research/maxwell-reference-validation-v1` at
 - Full `python_frontend/tests pipeline/tests`: **74 passed**.
 - Evidence artifact ID: `13657075483`; ZIP SHA-256: `93347a170c238458fa937f2359e9ae4a8737098c5f9ec9dbdb09a26351f9946b`.
 
-This does not change the implementation boundary: sharp-interface phase-segmented TOV/Cowling remains a Python/SciPy reference path. Fortran currently provides native slow/rapid interface-transfer algebra and its direct test harness, not a production phase-segmented `solve_tov_star` or `solve_cowling_spectrum`. The analytic strong-jump fixture remains a boundary-condition test and is not a stable hybrid-star prediction.
+This does not change the PR #2 implementation boundary: its sharp-interface phase-segmented TOV/Cowling path is Python/SciPy, while its Fortran contribution provides the slow/rapid interface-transfer algebra and direct tests. The separate native phase-segmented TOV/Cowling integration is tracked on research/maxwell-native-fortran-v1. The analytic strong-jump fixture remains a boundary-condition test and is not a stable hybrid-star prediction.
+
+A follow-up exact-PR-head Actions run, [42579770412](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42579770412), checked PR #2 head 2b7a00984dfa215bcca48c7d7adb5f3619013502 and completed with conclusion success. Its exact-head artifact is 13656363884 (SHA-256 0cfba640210b84d3141213b820f5c335d67ea1abef4a9e39b204d4a41b82e4f6).
+
+
+## Native Fortran follow-up (2026-11-09)
+
+A separate native phase-segmented Fortran TOV/Cowling path has since been added on `research/maxwell-native-fortran-v1` and is under draft [PR #3](https://github.com/cosmosapjw-quantum/NS_Cowling/pull/3). Exact head `98d2f9ce6033015109286e5713639c6626a6f7fb` passed both push and PR GitHub Actions runs `42581655510` and `42581660400`; its analytic fixture passed 18 checks and the production case driver built. This is a new sibling implementation, not a modification of `solve_tov_star` or `solve_cowling_spectrum` in this branch. It still lacks an executed realistic two-table EOS case and a complete mode spectrum. The earlier PR #2 implementation boundary remains unchanged.

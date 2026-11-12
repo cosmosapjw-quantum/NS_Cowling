@@ -22,7 +22,7 @@ program maxwell_checks
     type(maxwell_star_t) :: star
     type(star_profile_t) :: smooth_profile
     type(cowling_options_t) :: cowling_options
-    type(maxwell_cowling_shot_t) :: slow_shot,rapid_shot
+    type(maxwell_cowling_shot_t) :: slow_shot,rapid_shot,overflow_shot
     type(mode_options_t) :: mode_options
     type(mode_spectrum_t) :: smooth_spectrum
     type(maxwell_mode_spectrum_t) :: slow_spectrum,rapid_spectrum
@@ -118,6 +118,13 @@ program maxwell_checks
         max(abs(rapid_shot%delta_p_inner_pa),abs(rapid_shot%delta_p_outer_pa),tiny(1._wp))
     call require(dp_rel<1e-9_wp,'rapid interface conserves Delta P')
     call require(size(slow_shot%r_m)>=4.and.size(rapid_shot%r_m)>=4,'piecewise Cowling profiles retained')
+
+    ! Finite input amplitudes must not silently overflow the returned profile.
+    cowling_options%amplitude=huge(1._wp)
+    call shoot_maxwell_cowling(star,two_pi*1800._wp,'slow',cowling_options,overflow_shot)
+    call require(.not.overflow_shot%valid.and.overflow_shot%status%code==NS_RANGE_ERROR, &
+        'unrepresentable Maxwell Cowling output amplitude fails closed')
+    cowling_options%amplitude=1._wp
 
     ! The production spectrum facade dispatches smooth profiles and a true
     ! phase-segmented Maxwell star without flattening the interface.

@@ -127,6 +127,11 @@ contains
         ! the zero-temperature identity Delta epsilon = mu_t Delta n_B.
         call fail_status(star%status,NS_MATCHING_INCONSISTENT,'physics', &
             'EOS callbacks do not satisfy thermodynamic Maxwell coexistence')
+        if(.not.high_t%valid.or..not.low_t%valid) then
+            call fail_status(star%status,NS_MATCHING_INCONSISTENT,'physics', &
+                'invalid one-sided EOS state at exact Maxwell pressure')
+            return
+        end if
         if(.not.all(ieee_is_finite([high_t%pressure_pa,low_t%pressure_pa, &
             high_t%energy_j_m3,low_t%energy_j_m3,high_t%n_b_m3,low_t%n_b_m3,high_t%mu_j,low_t%mu_j]))) return
         if(min(high_t%energy_j_m3,low_t%energy_j_m3,high_t%n_b_m3,low_t%n_b_m3, &

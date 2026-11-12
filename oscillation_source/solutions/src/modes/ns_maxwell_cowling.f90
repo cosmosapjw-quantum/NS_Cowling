@@ -82,6 +82,12 @@ contains
                 SIDE_INNER,SIDE_OUTER,y_interface(1),y_interface(2),dpi,dpo,st)
         end if
         if(.not.is_ok(st)) then;result%status=st;return;end if
+        if(scale_overflows(amp_scale,[dpi,dpo,core_ode%y(1,size(core_ode%x)), &
+             core_ode%y(2,size(core_ode%x)),y_interface(1),y_interface(2)])) then
+            call fail_status(result%status,NS_RANGE_ERROR,'numerics', &
+                'requested Maxwell Cowling interface amplitude is unrepresentable')
+            return
+        end if
         result%delta_p_inner_pa=amp_scale*dpi;result%delta_p_outer_pa=amp_scale*dpo
         result%w_inner_m3=amp_scale*core_ode%y(1,size(core_ode%x))
         result%v_inner_m2=amp_scale*core_ode%y(2,size(core_ode%x))
@@ -100,6 +106,11 @@ contains
         do i=1,nc
             call background_at_q(star%core,core_ode%x(i),surface_point,st,options%nu_shift)
             if(.not.is_ok(st)) then;result%status=st;return;end if
+            if(scale_overflows(amp_scale,[core_ode%y(1,i),core_ode%y(2,i)])) then
+                call fail_status(result%status,NS_RANGE_ERROR,'numerics', &
+                    'requested Maxwell Cowling core profile amplitude is unrepresentable')
+                return
+            end if
             result%q(i)=core_ode%x(i);result%r_m(i)=surface_point%r_m
             result%w_m3(i)=amp_scale*core_ode%y(1,i)
             result%v_m2(i)=amp_scale*core_ode%y(2,i)
@@ -107,6 +118,11 @@ contains
         do i=2,no
             call background_at_q(star%envelope,outer_ode%x(i),surface_point,st,options%nu_shift)
             if(.not.is_ok(st)) then;result%status=st;return;end if
+            if(scale_overflows(amp_scale,[outer_ode%y(1,i),outer_ode%y(2,i)])) then
+                call fail_status(result%status,NS_RANGE_ERROR,'numerics', &
+                    'requested Maxwell Cowling envelope profile amplitude is unrepresentable')
+                return
+            end if
             result%q(nc+i-1)=qti+outer_ode%x(i);result%r_m(nc+i-1)=surface_point%r_m
             result%w_m3(nc+i-1)=amp_scale*outer_ode%y(1,i)
             result%v_m2(nc+i-1)=amp_scale*outer_ode%y(2,i)
@@ -134,6 +150,19 @@ contains
             call phase_rhs(star%envelope,q,omega,options%nu_shift,y,dydq,status)
         end subroutine
     end subroutine
+
+    pure logical function scale_overflows(scale,values)
+        real(wp),intent(in) :: scale,values(:)
+        real(wp) :: limit
+        scale_overflows=.false.
+        if(.not.ieee_is_finite(scale).or.scale<0._wp.or..not.all(ieee_is_finite(values))) then
+            scale_overflows=.true.
+            return
+        end if
+        if(scale<=1._wp) return
+        limit=huge(1._wp)/scale
+        scale_overflows=any(abs(values)>limit)
+    end function
 
     subroutine phase_rhs(background,q,omega,nu_shift,y,dydq,status)
         type(background_table_t),intent(in) :: background

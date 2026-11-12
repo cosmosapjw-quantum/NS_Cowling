@@ -123,3 +123,19 @@ Release requires: (1) source-locked input inventory and paper checksums, (2) pro
 - Alford, Han & Prakash, Phys. Rev. D 88, 083013 (2013), [arXiv:1302.4732](https://arxiv.org/abs/1302.4732).
 - Dong, Kuan & Yunes, 2026, [arXiv:2609.33002](https://arxiv.org/abs/2609.33002). This is full-GR context, not a drop-in Cowling derivation.
 - The NPPHB legacy parameterization is project-defined and is not attributed to those papers.
+
+## 8. Continuation 2026-11-13 (branch cloud/eos05-native-smooth-parity-v1)
+
+Base: `08fe5b814cbe2b3d6e41b9aa44d2e5f687bc1351`. This section is additive; earlier sections are historical evidence.
+
+- **CI at the pinned head.** Runs 43232391185 and 43232373861 at `08fe5b8` succeeded (build, pytest, native extrema/CSS tests, SHA manifest). The pytest count (106 passed, 2 skipped) is from the GitHub job log and was reproduced locally (106 passed, 2 skipped, exit 0; the two skips are the M10 real-input tests because `inputs/` is not staged). The `latest_ci` field of the 2026-11-12 audit receipt is superseded by `data/receipts/ns_cowling/NS_COWLING_AUDIT_ERRATA_20261113.json`.
+- **Errata.** The protected M9 adjudication lists `m7_pass_by_method` without `quintic_P` (sum 120 vs 150 PASS). The corrected map, derived from the raw M7 receipts, is css/cubic_F/cubic_P/quintic_F/quintic_P = 30 each. The M7 `maxwell` rows are 30 FAIL and 35 BLOCKED. These remain historical labels: none of the 150 is a valid complete native combined EOS.
+- **EOS-05 is not a port task.** The native cubic/quintic F/P bridges and the NPPHB bridge already exist in `compose_eos_matching.f90`.
+  - EOS-05a: 104 native-vs-frozen cases (13 crusts x {BBB_BHF2, GM_GM1} x 4 smooth tokens) are `PARITY_MATCH` (worst max relative difference 1.2e-12; branches exact_single_cubic 21, monotone_1knot_cubic 31, exact_single_quintic 9, adaptive_2knot_c2_hermite 43).
+  - EOS-05b: the historical `maxwell` key (LEGACY_NPPHB, smooth, no latent heat) is routed to the native kernel under the internal name `legacy_npphb`; 26 pairs `PARITY_MATCH`. Bare `maxwell` stays rejected. `sharp_maxwell` is untouched.
+  - **Not a production PASS:** composition is dropped in every case; there is no C1-C11 record, no combined-composition output and no read-back claim. M7 stays fail-closed.
+- **Open blocker F-EOS05A-1.** All 52 RG_SLY4 smooth-token cases are rejected by the native guard `beta_equilibrated = max|Q5| < 1e-8` because the RG_SLY4 source has a constant `Q5 = 0.001383223`. RG_KDE0v1 also reads `beta_equilibrated=False`; its matching was not run. 156 of the 390 historical tasks use an RG core. The guard was not relaxed: the meaning of the constant Q5 offset is a source-semantics question.
+- **Legacy NPPHB property.** Bridge free energy uses 16-point partial integrals while the first-law root uses a 64-point rule. Against a dense oracle the bridge F error is up to 1.4e-3 of the endpoint dF and the endpoint residual 2.4e-5 of dF; the native first-law residual (same 64-point rule) reads 1.3e-15 and cannot see it. Characterized, not fixed (historical identity).
+- **Policy supersession.** `legacy_npphb` follows this cloud DAG, not `data/eos390_native_fortran_unification_dag.v1.json` lines 143/968/1227 (that file is pinned and was not edited). The rejection text of bare `maxwell` still promises a future sharp reuse of the token; this wording drift is logged (F-EOS05B-2).
+- **`css` is unchanged** (user decision): historical `css` remains as defined by the cloud DAG and EOS-06 stays BLOCKED. Source evidence that legacy `css` was a continuous two-segment bridge is recorded here as an unresolved ontology question, not a routing change.
+- **No Dropbox operation was performed; the 390 matrix was not regenerated.**

@@ -94,3 +94,10 @@ Record exact HEAD/tree and changed files; source file blob/hash; input/paper sou
 
 FINAL ACCEPTANCE
 Do not claim all 390 regenerated unless exactly 390 unique, correctly interpreted tasks have complete native Fortran outputs, every CompOSE output reads back, C1-C11 pass or have justified scope status, all source and output hashes are recorded, historical data is unchanged against a trusted baseline, and Dropbox confirms the new versioned upload. If a provider semantic blocker remains, preserve it and report exact affected tasks. Keep moving on independent native code work without bypassing the blocker.
+
+CONTINUATION 2026-11-13 (additive; branch cloud/eos05-native-smooth-parity-v1, base 08fe5b8)
+- Live refs matched the pins; CI at 08fe5b8 was green (106 passed / 2 skipped). Corrections to stale receipts are in data/receipts/ns_cowling/NS_COWLING_AUDIT_ERRATA_20261113.json.
+- EOS-05 correction: the native smooth and NPPHB kernels already exist; work is parity, routing and validation. 104 native-vs-frozen smooth cases (BBB_BHF2, GM_GM1) PARITY_MATCH; historical `maxwell` key routes to internal kernel `legacy_npphb` (26 PARITY_MATCH); bare `maxwell` still rejected. Composition is dropped in all of these: no production PASS, M7 still fail-closed.
+- Open blocker: RG_SLY4/RG_KDE0v1 (156 of 390 tasks) are rejected by the native beta-equilibrated guard because the source Q5 is a constant non-zero value. Needs a source-semantics decision before any change.
+- `css` meaning is unchanged per the DAG; EOS-06 stays BLOCKED. Never repurpose `maxwell`; a sharp transition needs the separate token `sharp_maxwell` and a new manifest.
+- Next smallest nodes: resolve the RG Q5 semantics; composition-preserving matching; native unit tests for bridge_profile/construct_bridge; EOS-10 reader fixes; COW-01..03 on a branch from PR #3 head.

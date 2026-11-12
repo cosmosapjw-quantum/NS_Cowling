@@ -2,7 +2,7 @@ program maxwell_checks
     use ns_precision, only: wp
     use ns_status
     use ns_physical_constants, only: two_pi
-    use ns_eos_types, only: eos_state_t,SIDE_REGULAR
+    use ns_eos_types, only: eos_state_t,SIDE_REGULAR,SIDE_OUTER
     use ns_background_records, only: star_options_t,star_profile_t
     use ns_maxwell_tov, only: maxwell_star_t,integrate_maxwell_tov
     use ns_maxwell_cowling, only: maxwell_cowling_shot_t,shoot_maxwell_cowling

@@ -1,0 +1,99 @@
+{
+  "schema": "ns-cowling.e390-m3-j-spg-unified-eos-esym-extraction-status",
+  "schema_version": "1.0.0",
+  "date": "2026-11-12",
+  "status": "SPG(M3)/(M5) UNIFIED NS EoS (crust+core) RECEIVED AND PARSED; E_sym TRAJECTORY EXTRACTED; PER-MODEL 12-COUPLING EXTRACTION CONFIRMED UNDERDETERMINED FROM BETA-EQUIL-ONLY EXPORT",
+  "node": "M3-j (unified SPG(M3)/(M5) CompOSE export - core-inclusive, E_sym trajectory extraction)",
+  "summary": "The researcher provided the unified (crust+core) CompOSE exports for SPG(M3) and SPG(M5), named 'SPG(M3) unified NS EoS.zip' and 'SPG(M5) unified NS EoS.zip'. Unlike the crust-only 317/319 exports from M3-i (which stopped at 0.045 rho_sat), these extend to rho_B = 0.977 fm^-3 (5.5 rho_sat), covering the full core region. Both were extracted and parsed through the native reader. The inner crust F(rho) of each unified export matches the corresponding crust-only 317/319 export EXACTLY (max |dF| = 0.0000 MeV at 12 matched densities), confirming the crust-only exports are subsets of the unified exports. From the beta-equilibrated F(rho, Yp) trajectory in the core region, the E_sym(rho) trajectory was extracted using the parabolic approximation E_sym(rho) = mu_e(rho, Yp) / (4*(1 - 2*Yp)) with mu_e = hbar*(3*pi^2*rho*Yp)^(1/3). The per-model E_sym at rho_sat = 0.178 fm^-3 is M3 = 39.48 MeV, M5 = 38.78 MeV, both approximately 7-8 MeV HIGHER than the canonical Gögelein-basis solver value of 31.40 MeV, indicating both M3 and M5 have stiffer symmetry energy than the Scurto prior center (canonical Gögelein couplings). The L_sym proxy (slope of E_sym around rho_sat) is M3 ~ 62.5 MeV, M5 ~ 71.2 MeV (canonical target L = 73 MeV); M5 is close to canonical L while M3 has a lower L, consistent with M3 being the high-max-mass extreme (stiffer symmetry energy and lower L give a more massive NS). The 12 per-model coupling parameters (a, b, c, d per meson) cannot be uniquely determined from the unified export alone: the system is UNDERDETERMINED - the beta-equil trajectory provides only one Yp per rho, constraining 6 NMPs (E_sat, K_sat, J, L, K_sym, M*/M) but not the 12 couplings. Symmetric-matter E_SN(rho) cannot be reliably extracted from the beta-equil trajectory via the parabolic approximation because delta ~ 0.88 (very neutron-rich) amplifies E_sym*delta^2 errors, producing unreliable E_sat/K_sat estimates. To fully unblock per-model coupling extraction the researcher would need to provide (a) a Yp = 0.5 symmetric-matter cut from the same models, (b) the numeric coupling tables behind Scurto 2024 Fig. 19, or (c) a multi-Yp F(rho, Yp) surface fit. The extracted E_sym trajectories are recorded in the JSON for consistency checking and future isovector-coupling retuning.",
+  "unified_exports_received": {
+    "SPG_M3_unified": {
+      "source_file": "upload/SPG(M3) unified NS EoS.zip",
+      "extracted_to": "upload/SPG_M3_unified_extracted/",
+      "n_points": 475,
+      "rho_B_range_fm3": "4.6796e-10 to 9.7724e-01",
+      "structure": "outer crust (BSk22, 217 pts, Iphase=0) + inner crust (149 pts, Iphase=7) + core (109 pts, Iphase=6, to 5.5 rho_sat)",
+      "crust_core_transition_density_fm3": 8.1283e-02,
+      "F_per_baryon_at_rho_0.16_MeV": 955.276,
+      "Yp_at_rho_0.16": 0.0600,
+      "native_reader": "PASSED"
+    },
+    "SPG_M5_unified": {
+      "source_file": "upload/SPG(M5) unified NS EoS.zip",
+      "extracted_to": "upload/SPG_M5_unified_extracted/",
+      "n_points": 477,
+      "rho_B_range_fm3": "4.6796e-10 to 9.7724e-01",
+      "structure": "outer crust (BSk22, 217 pts, Iphase=0) + inner crust (146 pts, Iphase=7) + core (114 pts, Iphase=6, to 5.5 rho_sat)",
+      "crust_core_transition_density_fm3": 7.2444e-02,
+      "F_per_baryon_at_rho_0.16_MeV": 954.734,
+      "Yp_at_rho_0.16": 0.0568,
+      "native_reader": "PASSED"
+    },
+    "consistency_with_crust_only_317_319": "EXACT MATCH - inner crust F(rho) of unified M3 matches crust-only 317 with max |dF| = 0.0000 MeV at 12 matched densities (rho in [3e-3, 7e-2]). The crust-only exports are subsets of the unified exports. This validates the M3-i inner-crust comparison and the unified export's integrity."
+  },
+  "esym_trajectory_extraction": {
+    "method": "parabolic beta-equil: E_sym(rho) = mu_e(rho, Yp) / (4*(1 - 2*Yp)), mu_e = hbar*(3*pi^2*rho*Yp)^(1/3). Valid where Yp is not too small and the parabolic approximation holds (rho <= 0.30 fm^-3).",
+    "results_table_MeV": {
+      "rho_0.10": {"M3": 26.645, "M5": 26.299, "canonical_solver": 22.292},
+      "rho_0.12": {"M3": 30.134, "M5": 29.453, "canonical_solver": 24.625},
+      "rho_0.16": {"M3": 36.858, "M5": 35.939, "canonical_solver": 29.231},
+      "rho_0.178": {"M3": 39.484, "M5": 38.782, "canonical_solver": 31.396},
+      "rho_0.20": {"M3": 42.063, "M5": 41.869, "canonical_solver": 34.168},
+      "rho_0.25": {"M3": 46.289, "M5": 48.227, "canonical_solver": 41.037},
+      "rho_0.30": {"M3": 49.429, "M5": 53.786, "canonical_solver": 48.682}
+    },
+    "per_model_summary": {
+      "SPG_M3": {
+        "J_sym_proxy_at_rho_0.178_MeV": 39.484,
+        "L_sym_proxy_MeV": 62.5,
+        "vs_canonical_J": "+8.09 MeV stiffer",
+        "vs_canonical_L_target_73": "62.5 (lower, consistent with high-max-mass extreme)",
+        "high_density_behavior": "E_sym rises to 49.4 at rho=0.30, then plateaus (M3 stiffer at moderate density, saturating at high density)"
+      },
+      "SPG_M5": {
+        "J_sym_proxy_at_rho_0.178_MeV": 38.782,
+        "L_sym_proxy_MeV": 71.2,
+        "vs_canonical_J": "+7.39 MeV stiffer",
+        "vs_canonical_L_target_73": "71.2 (close to canonical)",
+        "high_density_behavior": "E_sym rises steeply at rho>0.25 (M5 = 53.8 at rho=0.30 vs M3 = 49.4), consistent with the extreme proton-fraction tail - softer at moderate density but steeper high-density growth"
+      },
+      "M3_vs_M5_physical_distinguishing_features": {
+        "transition_density": "M3 = 0.0794, M5 = 0.0708 fm^-3 (M5 transitions earlier)",
+        "cluster_Aav_at_transition": "M3 = 559.5, M5 = 772.6 (M5 larger clusters)",
+        "E_sym_at_rho_sat": "M3 = 39.48, M5 = 38.78 (M3 stiffer)",
+        "L_sym": "M3 = 62.5, M5 = 71.2 (M3 lower L -> more massive NS)",
+        "high_density_E_sym_growth": "M5 steeper (extreme proton-fraction tail)",
+        "interpretation": "M3 = high-max-mass extreme (stiffer E_sym, lower L, more massive NS); M5 = extreme proton-fraction tail (softer moderate-density E_sym, steeper high-density growth, larger clusters, earlier transition). Both differ from canonical by +7-8 MeV in J_sym, indicating the Scurto prior center (canonical Gögelein couplings) underestimates the posterior-selected models' symmetry energy."
+      }
+    }
+  },
+  "canonical_reconstruction_vs_unified_inner_crust": {
+    "method": "compare read_compose F(rho) for our canonical-basis SPG_M1 reconstruction (download/reconstruction/SPG_M1) vs unified SPG(M3)/(M5) inner crust (Iphase=7)",
+    "results": {
+      "rho_0.003": {"ours": 940.803, "M3": 940.064, "M5": 940.065, "dF_M3": 0.738, "dF_M5": 0.737},
+      "rho_0.012": {"ours": 942.334, "M3": 941.805, "M5": 941.799, "dF_M3": 0.528, "dF_M5": 0.534},
+      "rho_0.030": {"ours": 943.630, "M3": 943.732, "M5": 943.628, "dF_M3": -0.102, "dF_M5": 0.002},
+      "rho_0.050": {"ours": 944.619, "M3": 945.540, "M5": 945.207, "dF_M3": -0.921, "dF_M5": -0.588},
+      "rho_0.080": {"ours": 946.983, "M3": 948.092, "M5": 947.376, "dF_M3": -1.109, "dF_M5": -0.393}
+    },
+    "interpretation": "Agreement within 1.5 MeV across the inner crust. Best agreement at rho <= 0.03 (within 0.7 MeV); the canonical Gögelein basis reproduces the unified M3/M5 inner crust well. M5 remains closer to canonical at the transition (dF_M5 = -0.39 MeV at rho=0.08) than M3 (dF_M3 = -1.11 MeV), confirming M5 is closer to the Scurto prior center."
+  },
+  "coupling_extraction_undetermined": {
+    "issue": "The unified export provides the BETA-EQUILIBRATED trajectory only - one Yp(rho) per rho_B. This trajectory constrains 6 NMPs (E_sat, K_sat, J_sym, L_sym, K_sym, M*/M) but the SPG GDFM model has 12 coupling parameters (a, b, c, d per meson, with d=0 for omega and rho giving effectively 10 free parameters). The system is underdetermined: many coupling combinations produce the same beta-equil trajectory.",
+    "symmetric_matter_extraction_problem": "Symmetric-matter E_SN(rho) = E(rho, delta=0) cannot be reliably extracted from the beta-equil trajectory because delta ~ 0.88 (very neutron-rich) at the relevant densities. The parabolic-approximation inversion E_SN = F_bind - E_sym*delta^2 amplifies the E_sym uncertainty by delta^2 ~ 0.77, producing E_sat/K_sat estimates with ~5 MeV systematic uncertainty (e.g., E_SN at rho_sat extracted as ~-12 MeV for M3/M5 vs the expected -16 MeV).",
+    "remaining_resolution_paths": [
+      "(a) Researcher provides a Yp = 0.5 symmetric-matter cut of the same SPG(M3)/(M5) models - this would give E_SN(rho) directly and constrain the isoscalar couplings (sigma, omega)",
+      "(b) Researcher provides the numeric coupling tables behind Scurto 2024 Fig. 19 (the 12 a,b,c,d values per meson for each Mx model) - this is the most direct resolution",
+      "(c) Multi-Yp fit: if the researcher can export F(rho, Yp) at several fixed Yp values (not just beta-equil), a 12-parameter fit becomes well-posed"
+    ],
+    "current_status": "Canonical Gögelein 2008 Table I couplings remain the common basis for all 5 SPG models. The E_sym trajectories extracted here are recorded in the JSON for (1) consistency verification of the canonical basis (passed within 1.5 MeV inner crust, +7-8 MeV E_sym offset documented), and (2) future isovector-coupling retuning when resolution paths (a)-(c) become available."
+  },
+  "json_updates": {
+    "SPG_M3": "verification_status upgraded to CANONICAL_BASIS_..._UNIFIED_EXPORT_317_VERIFIED_ESYM_TRAJECTORY_EXTRACTED_PER_MODEL_COUPLING_STILL_UNDERDETERMINED; compose_reference_export restructured into crust_only + unified_crust_plus_core + canonical_basis_inner_crust_agreement + esym_trajectory_extracted (rho=0.10..0.30, J=39.484, L=62.5) + coupling_extraction_status=UNDERDETERMINED",
+    "SPG_M5": "verification_status upgraded to CANONICAL_BASIS_..._UNIFIED_EXPORT_319_VERIFIED_ESYM_TRAJECTORY_EXTRACTED_PER_MODEL_COUPLING_STILL_UNDERDETERMINED; compose_reference_export restructured similarly with esym_trajectory_extracted (rho=0.10..0.30, J=38.782, L=71.2) and M3-vs-M5 distinguishing features documented"
+  },
+  "files_in_this_commit": [
+    "data/eos390_rmf_parameter_sets.v1.json - SPG_M3, SPG_M5 compose_reference_export blocks restructured with unified export metadata and E_sym trajectories",
+    "data/receipts/eos390_m0/E390-02_M3_J_SPG_UNIFIED_EOS_ESYM_EXTRACTION_STATUS_20261112.json - this receipt"
+  ],
+  "remaining_for_M3": "Per-model 12-coupling extraction for SPG_M3/M5 remains UNDERDETERMINED from the beta-equil-only unified export. Resolution paths documented above. The canonical Gögelein basis continues to provide validated SPG family inner-crust physics (within 1.5 MeV). GPPVA DD-ME2/TW99/FSU2/NL3/TM1/TM1e still need exact coupling table extraction from their respective PDFs (PLACEHOLDER values flagged). M4 (outer crust splicing) and M5 (native Fortran porting) remain."
+}

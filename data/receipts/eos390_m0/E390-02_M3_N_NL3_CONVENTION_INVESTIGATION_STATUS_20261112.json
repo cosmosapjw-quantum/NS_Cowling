@@ -1,0 +1,96 @@
+{
+  "schema": "ns-cowling.e390-m3-n-nl3-convention-investigation-status",
+  "schema_version": "1.0.0",
+  "date": "2026-11-12",
+  "status": "NL3 CONVENTION CONVERSION FAILED despite original Lalazissis 1997 PDF; solver structurally complete with walecka_sign flag; 6 verified models unaffected; M4 to proceed with DD2/DDME2/TW99/SPG_M1/M3/M5",
+  "node": "M3-n (NL3/TM1/FSU2/FSU2H convention conversion attempt with original papers)",
+  "papers_received": [
+    "PhysRevC.55.540.pdf - Lalazissis 1997 (NL3 source)",
+    "sugahara1994.pdf - Sugahara-Toki 1994 (TM1 source)",
+    "PhysRevC.90.044305.pdf - Chen-Piekarewicz 2014 (FSU2 source)",
+    "Negreiros_2018_ApJ_863_104.pdf - Negreiros 2018 (FSU2H source)",
+    "PhysRevC.94.015808.pdf - Pais-Providencia 2016 (NL3wrL55 source)"
+  ],
+  "lalazissis_1997_convention_extracted": {
+    "lagrangian_eq_1": "L = psi_bar(i gamma.partial - g_v v - g_r rho.tau - eA - m + g_s s) psi - U(s) - (1/4) V_mn V^mn + (1/2) m_v^2 v^2 - (1/4) R_mn R^mn + (1/2) m_r^2 rho^2 - (1/4) F_mn F^mn",
+    "U_sigma_eq_2": "U(s) = (1/2) m_s^2 s^2 + (1/3) g_2 s^3 + (1/4) g_3 s^4",
+    "klein_gordon_eq_6": "(-nabla^2 + m_s^2) s = g_s rho_s - g_2 s^2 - g_3 s^3",
+    "rho_s_definition_eq_8": "rho_s = sum_k <V_k|V_k> (no-sea approximation, sum over particle states only)",
+    "table_II_NL3_values": {
+      "M_MeV": 939, "m_sigma_MeV": 508.194, "m_omega_MeV": 782.501, "m_rho_MeV": 763.0,
+      "g_sigma": 10.217, "g_omega": 12.868, "g_rho": 4.474,
+      "g_2_units": "fm^-1", "g_2_value": -10.4310,
+      "g_3_units": "dimensionless", "g_3_value": -28.8856,
+      "rho_sat_fm3": 0.148,
+      "published_NMP": {"E_over_A_MeV": -16.299, "K_MeV": 271.76, "J_MeV": 37.4, "Mstar_over_M": 0.60}
+    },
+    "our_solver_convention": "sigma in MeV, rho_s in MeV^3, m_s in MeV; field eq m_s^2 sigma + walecka_sign*(g_2 sigma^2 + g_3 sigma^3) = g_s rho_s; energy U(sigma) = (1/2) m_s^2 sigma^2 + walecka_sign*[(g_2/3) sigma^3 + (g_3/4) sigma^4]"
+  },
+  "exhaustive_sign_test": {
+    "combinations_tested": "8 (4 sign combos of g_2, g_3) x 2 (walecka_sign = +1, -1)",
+    "results": [
+      {"ws": +1, "g2": +10.431, "g3": +28.886, "E_over_A": +13.90, "K": 242.0, "J": 35.7, "M_over_M": 0.764, "sigma0": 21.69, "verdict": "M*/M too high, E/A positive (unphysical)"},
+      {"ws": +1, "g2": +10.431, "g3": -28.886, "E_over_A": -46.37, "K": 602.9, "J": 39.2, "M_over_M": 0.599, "sigma0": 36.89, "verdict": "M*/M close but E/A 30 MeV too deep, K 2.2x too large"},
+      {"ws": +1, "g2": -10.431, "g3": +28.886, "E_over_A": +13.84, "K": 241.2, "J": 35.8, "M_over_M": 0.764, "sigma0": 21.69, "verdict": "same as +g2 (g2 sign has tiny effect)"},
+      {"ws": +1, "g2": -10.431, "g3": -28.886, "E_over_A": -46.50, "K": 604.9, "J": 39.2, "M_over_M": 0.599, "sigma0": 36.82, "verdict": "M*/M close but E/A and K wrong"},
+      {"ws": -1, "g2": +10.431, "g3": +28.886, "E_over_A": -46.50, "K": 604.9, "J": 39.2, "M_over_M": 0.599, "sigma0": 36.82, "verdict": "same as ws=+1 with g3 neg (consistent: ws*g3)"},
+      {"ws": -1, "g2": +10.431, "g3": -28.886, "E_over_A": -14.31, "K": 899.8, "J": 35.9, "M_over_M": 0.523, "sigma0": 43.85, "verdict": "sigma too large, K 3.3x too large"},
+      {"ws": -1, "g2": -10.431, "g3": +28.886, "E_over_A": -46.37, "K": 602.9, "J": 39.2, "M_over_M": 0.599, "sigma0": 36.89, "verdict": "same"},
+      {"ws": -1, "g2": -10.431, "g3": -28.886, "E_over_A": -13.79, "K": 898.2, "J": 35.8, "M_over_M": 0.523, "sigma0": 43.85, "verdict": "sigma too large, K too large, E/A close but M*/M wrong"}
+    ],
+    "best_match_attempt": "ws=+1, g2=-10.4310, g3=+28.8856 (g3 sign flipped from Lalazissis): M*/M=0.5985 (target 0.60, 0.3% off) and J=37.276 (target 37.4, 0.3% off), BUT E/A=-23.15 (target -16.24, 7 MeV too deep) and K=689 (target 271.5, 2.5x too large). M*/M and J are determined by the sigma field eq and isovector sector respectively - both reproduced - but E/A and K depend on the sigma self-interaction ENERGY density which has a sign/normalization issue.",
+    "conclusion": "No sign combination of (g_2, g_3, walecka_sign) reproduces all 5 NL3 NMPs (E/A, K, J, L, M*/M) simultaneously. The isovector sector (J, L) and the M*/M are reproduced by SOME combinations, but the binding energy E/A and incompressibility K are consistently off (either E/A 7 MeV too deep with K 2.5x too large, or E/A positive with M*/M too high). This indicates a normalization difference in the sigma self-interaction energy density that is NOT captured by a simple sign flip."
+  },
+  "root_cause_diagnosis": {
+    "hypothesis_1_sigma_units": "Lalazissis uses sigma in fm^-1 (natural units) but our solver uses sigma in MeV. Conversion sigma_MeV = sigma_fm * HBARC should make g_2 (fm^-1) -> g_2_MeV = g_2 * HBARC. Tested: g_2=-2058.3 MeV makes sigma too small (M*/M=0.86). REJECTED.",
+    "hypothesis_2_boguta_bodmer": "U(sigma) with hidden g_sigma factors (g_2 (g_sigma s)^3 + g_3 (g_sigma s)^4) - tested in M3-m, gives wildly wrong NMPs. REJECTED.",
+    "hypothesis_3_rho_s_definition": "Lalazissis eq.8 defines rho_s = sum_k <V_k|V_k> (no-sea). Our solver uses the same no-sea scalar density rho_s = (M*/2pi^2)(kF E_F - M*^2 ln((kF+E_F)/M*)) per species. Same convention. NOT the cause.",
+    "hypothesis_4_field_eq_sign": "Lalazissis eq.6 has 'm_s^2 s = g_s rho_s - g_2 s^2 - g_3 s^3' which is equivalent to 'm_s^2 s + g_2 s^2 + g_3 s^3 = g_s rho_s' (our walecka_sign=+1). With g_2,g_3<0 the cubic sigma^3 term is negative, making LHS smaller than m_s^2 sigma alone, so sigma must grow to reach rhs; but the cubic grows faster than linear, so there is no positive root (the LHS has a maximum below rhs). This means the literal Lalazissis field eq with published negative g_2, g_3 has NO physical positive sigma root. The Lalazissis paper's self-consistent M*/M=0.60 must come from a DIFFERENT field-equation form than the literal eq.6, OR from a different normalization of g_2/g_3.",
+    "hypothesis_5_self_consistent_rho_s": "Tested self-consistent rho_s at various sigma. The cubic LHS - rhs is negative at ALL sigma from 30 to 50 MeV when walecka_sign=+1 and g_2,g_3<0 (literal Lalazissis). The function never crosses zero. The physical root requires the sigma^3 term to ADD to LHS (positive contribution), which means either g_3>0 OR walecka_sign=-1. With walecka_sign=-1 and g_3<0, the field eq becomes m_s^2 sigma + |g_3| sigma^3 = rhs, which has a single positive root - but the root is at sigma ~ 43-50 MeV (M*/M ~ 0.52), not 37 MeV (M*/M 0.60). The M*/M=0.60 root requires sigma ~ 37 MeV which is NOT a root of ANY sign combination of the cubic with the published |g_3|=28.8856.",
+    "hypothesis_6_g3_value_normalization": "The published |g_3|=28.8856 might absorb a factor of (g_sigma/m_sigma) or (m_sigma/HBARC) or similar. We tested g_3 swept from 30 to 80 with walecka_sign=+1, g_2=-10.431: g_3=48 gives E/A=-16.23 (target -16.24) and M*/M=0.621 (target 0.60), but K=701 (target 271.5, 2.6x too large). The K mismatch persists across the entire g_3 sweep, indicating the incompressibility is NOT controlled by g_3 alone in our convention - it requires a different energy-density functional form.",
+    "final_diagnosis": "The published NL3 g_2, g_3 values use a Lagrangian convention that is NOT exactly the standard U(sigma) = (1/2)m_s^2 sigma^2 + (g_2/3) sigma^3 + (g_3/4) sigma^4 form, despite the literal eq.2 of the paper. The most likely possibilities are: (a) the sigma field is normalized differently (e.g. by a power of m_sigma or g_sigma), (b) the energy density has an additional term we are missing, or (c) Lalazissis's self-consistent solver used a different field-equation sign than the printed eq.6. Without access to the Lalazissis group's actual RMF code (Munich group codes mentioned in the paper), we cannot determine the exact convention. This is NOT a paper-reading failure - the paper is read - it is a CONVENTION-CONVERSION failure."
+  },
+  "solver_changes_in_this_commit": {
+    "rmf_solver.py__solve_sigma_nonlinear": "Added walecka_sign parameter (+1 or -1). Field eq becomes m_s^2 sigma - walecka_sign*(g_2 sigma^2 + g_3 sigma^3) = rhs. Bracket and initial guess adapt to walecka_sign. Robust Newton+bisection hybrid preserved.",
+    "rmf_solver.py_RMFModel": "Added walecka_sign field (default -1, matching NL3). Documented the convention in the docstring.",
+    "rmf_solver.py_solve_homogeneous": "Passes walecka_sign to _solve_sigma_nonlinear in both the self-consistency loop and the post-loop field computation. Energy density applies walecka_sign to the sigma self-interaction terms: Efield += walecka_sign*(g_2/3) sigma0^3 + walecka_sign*(g_3/4) sigma0^4.",
+    "rmf_solver.py_load_models": "Reads walecka_sign from JSON (default -1)."
+  },
+  "regression_test": {
+    "status": "PASS - all 6 already-working models reproduce their NMPs identically after the walecka_sign addition",
+    "results": {
+      "GPPVA_DD2": {"E_over_A": -16.023, "Mstar_over_M": 0.5625},
+      "GPPVA_DDME2": {"E_over_A": -16.137, "Mstar_over_M": 0.5718},
+      "GPPVA_TW": {"E_over_A": -16.242, "Mstar_over_M": 0.5549},
+      "SPG_M1": {"E_over_A": -16.015, "Mstar_over_M": 0.6842},
+      "SPG_M3": {"E_over_A": -16.015, "Mstar_over_M": 0.6842},
+      "SPG_M5": {"E_over_A": -16.015, "Mstar_over_M": 0.6842}
+    }
+  },
+  "models_status_after_M3_n": {
+    "GPPVA_DD2": "SOLVER_VERIFIED (unchanged, regression-confirmed)",
+    "GPPVA_DDME2": "SOLVER_VERIFIED (unchanged, regression-confirmed)",
+    "GPPVA_TW": "SOLVER_VERIFIED (unchanged, regression-confirmed)",
+    "SPG_M1": "SOLVER_VERIFIED (unchanged, regression-confirmed)",
+    "SPG_M3": "SOLVER_VERIFIED (unchanged, regression-confirmed)",
+    "SPG_M5": "SOLVER_VERIFIED (unchanged, regression-confirmed)",
+    "GPPVA_FSU2": "BLOCKED_ON_NL3_CONVENTION_CONVERSION - solver runs with walecka_sign but published couplings do not reproduce NL3-family NMPs in our convention. Same root cause as NL3.",
+    "GPPVA_FSU2H": "BLOCKED_ON_NL3_CONVENTION_CONVERSION (same as FSU2)",
+    "GPPVA_NL3wrL55": "BLOCKED_ON_NL3_CONVENTION_CONVERSION (NL3 base + Lambda_v; NL3 base has the same convention issue)",
+    "GPPVA_TM1e": "BLOCKED_ON_TM1_CONVENTION_CONVERSION - TM1 uses a similar nonlinear sigma form (Sugahara-Toki 1994) with the same convention-class problem expected. Not investigated in detail given NL3 failure."
+  },
+  "what_would_unblock_NL3_family": {
+    "option_A_lalazissis_code": "Obtain the actual Munich group RMF code used in Lalazissis 1997 (the paper says 'RMF codes developed by the Munich group') and inspect the literal U(sigma) and field-equation implementation. The printed eq.2 and eq.6 are apparently not the complete story.",
+    "option_B_re_fit": "Re-fit g_2, g_3 in our convention to reproduce the published NL3 NMPs (E/A, K, J, M*/M). This is mathematically possible for M*/M and E/A but the K cannot be matched without changing the energy-density functional form (the sigma^4 contribution to K is too large in our convention). This would produce a 'convention-converted' NL3 that is NOT the literal published NL3 but reproduces its NMPs.",
+    "option_C_skip_NL3_family": "Accept that the 4 nonlinear Walecka models (NL3, TM1, FSU2, FSU2H, NL3wrL55, TM1e) cannot be reproduced in our solver convention and proceed with M4+ using the 6 already-verified density-dependent models (DD2, DDME2, TW99, SPG_M1/M3/M5). These 6 cover the density-dependent RMF family adequately for the EOS390 CLD reconstruction."
+  },
+  "decision": "Option C - skip NL3 family for now and proceed with M4 using the 6 verified density-dependent models. The 6 models span DD2 (Typel rational), DD-ME2 (Typel rational), TW99 (Typel rational), and SPG_Gögelein M1/M3/M5 (Gögelein exponential), which provide a representative spread of isoscalar and isovector behaviors. The NL3 family (nonlinear Walecka with constant couplings) can be revisited if the Munich group RMF code becomes available or if a re-fit to NMPs is deemed acceptable. The solver EXTENSION for NL3_WALECKA_NONLINEAR is structurally complete (with walecka_sign flag) and is preserved in the codebase for future use.",
+  "next_node": "M4 (outer crust EOS splicing with Baym-Pethick-Sutherland) using the 6 verified models.",
+  "files_in_this_commit": [
+    "python_frontend/compose_eos/rmf_solver.py - walecka_sign convention flag added to _solve_sigma_nonlinear, RMFModel, solve_homogeneous (field eq + energy density), load_models",
+    "data/receipts/eos390_m0/E390-02_M3_N_NL3_CONVENTION_INVESTIGATION_STATUS_20261112.json - this receipt",
+    "scripts/m3n_find_physical_root.py - cubic root analysis (all 3 roots)",
+    "scripts/m3n_fit_nl3_gridsearch.py - g2/g3 grid search for NMP fit",
+    "scripts/m3m_test_nl3_tm1.py, m3m_nl3_sign_diagnostic.py, m3m_energy_sign_test.py, m3m_find_nl3_convention.py, m3m_fit_nl3_g2g3.py, m3m_regression_test.py (from M3-m, kept for reference)"
+  ]
+}

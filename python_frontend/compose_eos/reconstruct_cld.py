@@ -97,19 +97,30 @@ def emit_compose_set(results: list[CLDCellResult], outdir: Path,
     for i, r in enumerate(results):
         inb = i + 1
         iyq = 1  # single Yq slice
-        F = r.E_cell
-        # real chemical potentials from the CLD cell (cluster-phase beta-equil)
-        # convert to per-baryon (subtract rest mass to match CompOSE binding-like
-        # convention used in the FSU2 example where mu_n ~ -9.69e-3 MeV)
-        mu_n_per = r.mu_n - M_N
-        mu_p_per = r.mu_p - M_P
-        # free energy per baryon (binding convention, negative for bound matter)
-        f_per_baryon = r.E_binding_per_baryon
-        # row: iT=1 inb iyq nb T mu_n mu_p 0 F F 1 0  (matches FSU2 column layout)
+        # CompOSE eos.thermo column convention (manual v3.01, sec 3.4):
+        #   col0=iT, col1=inb, col2=iYq, col3=nb (fm^-3), col4=T,
+        #   col5=Q3 = mu_n/mn - 1 (dimensionless; mub = (Q3+1)*mn),
+        #   col6=Q4 = mu_q/mn  (dimensionless; muq = Q4*mn, mu_q = -mu_e),
+        #   col7=Q5 = mu_l/mn (dimensionless, often 0),
+        #   col8=Q6 = F/mn - 1 (dimensionless; F = (Q6+1)*mn),
+        #   col9=Q7 = eps/mn - 1 (dimensionless; eps = nb*(Q7+1)*mn),
+        #   flags...
+        # The native reader (eos_data.py) reconstructs mub=(Q3+1)*mn, F=(Q6+1)*mn.
+        # Previous code wrote mu_n - M_N (MeV) and E_bind (MeV) directly into the
+        # dimensionless Q slots, which inflated F by a factor of mn. We now divide
+        # by the nucleon mass to make the columns dimensionless.
+        Q3 = (r.mu_n - M_N) / M_N     # mu_n/mn - 1 (dimensionless, ~-0.01 near sat)
+        Q4 = (r.mu_p - M_P) / M_N     # use mu_p in Q4 slot for crust (mu_q ~ mu_p for
+                                      # the cluster phase; mu_q = -mu_e in beta-equil,
+                                      # but the provider 317/319 writes mu_p-like
+                                      # small values here for crust rows)
+        Q5 = 0.0                      # mu_l (leptons folded in mu_e; set 0)
+        Q6 = r.E_binding_per_baryon / M_N  # F/mn - 1 (dimensionless; binding ~0.001)
+        Q7 = r.E_binding_per_baryon / M_N  # eps/nb/mn - 1 ~ same for cold matter
         thermo_lines.append(
             f" 1  {inb:4d}  {iyq:4d}  {r.rho_B:14.7E}  0.0000000000E+00  "
-            f"{mu_n_per:14.7E}  {mu_p_per:14.7E}  0.0000000000E+00  "
-            f"{f_per_baryon:14.7E}  {f_per_baryon:14.7E}  1  0"
+            f"{Q3:14.7E}  {Q4:14.7E}  {Q5:14.7E}  "
+            f"{Q6:14.7E}  {Q7:14.7E}  1  0"
         )
     (outdir / "eos.thermo").write_text("\n".join(thermo_lines) + "\n")
 

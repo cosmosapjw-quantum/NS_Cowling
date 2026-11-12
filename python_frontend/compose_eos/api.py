@@ -300,7 +300,9 @@ def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
             "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
             "the legacy smooth pressure plateau is not a first-order transition"
         )
-    methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+    # "legacy_npphb" is the internal kernel name of the historical smooth NPPHB bridge; the bare
+    # token "maxwell" stays rejected above.
+    methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P", "legacy_npphb"}
     if method not in methods:
         raise ValueError(f"method must be one of {sorted(methods)}")
     if not isinstance(n_bridge, int) or isinstance(n_bridge, bool) or n_bridge < 8:

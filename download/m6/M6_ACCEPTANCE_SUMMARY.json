@@ -1,0 +1,59 @@
+{
+  "test1_smooth_polytrope": {
+    "overall_pass": true,
+    "checks": {
+      "all_compactness_below_half": true,
+      "all_k2_in_physical_range": true,
+      "all_lambda_positive": true,
+      "all_cs2_causal": true,
+      "mass_increases_then_peaks": true,
+      "radii_in_NS_range": true
+    },
+    "n_stars": 7,
+    "mass_range_Msun": [
+      0.47979132612153436,
+      1.0776377893780427
+    ],
+    "radius_range_km": [
+      9.034028318482093,
+      9.244692164673282
+    ]
+  },
+  "test2_maxwell_tov_love": {
+    "overall_pass": true,
+    "checks": {
+      "all_compactness_below_half": true,
+      "all_k2_physical": true,
+      "all_lambda_positive": true,
+      "phase_interface_recorded": true,
+      "tidal_jump_negative": true,
+      "slow_rapid_differ": true
+    },
+    "transition": {
+      "kind": "maxwell",
+      "pressure_MeV_fm3": 23.082859434225497,
+      "muB_MeV": 1242.8609675996668,
+      "n_low_fm3": 0.15193048379983334,
+      "n_high_fm3": 0.2423640798660484,
+      "eps_low_MeV_fm3": 165.74560866912086,
+      "eps_high_MeV_fm3": 278.14199537949435,
+      "delta_eps_MeV_fm3": 112.39638671037349,
+      "delta_n_fm3": 0.09043359606621507,
+      "low_index": 23,
+      "high_index": 24,
+      "seidov_critical_delta_eps_MeV_fm3": 117.49709348589867,
+      "seidov_delta_eps_over_critical": 0.9565886557343877,
+      "seidov_small_core_stable": true,
+      "tidal_jump_formula": "Takatsy-Kovacs-2020: Delta y = -4 pi r_t^3 Delta epsilon / (m_t + 4 pi r_t^3 P_t)",
+      "charge_neutrality": "local in each phase (Maxwell)",
+      "first_law_residual": 1.4210854715202004e-14
+    },
+    "n_stars": 6
+  },
+  "test3_convergence": {
+    "converged": true,
+    "R_change": 1.0396328904990565e-07,
+    "M_change": 1.0103432042164574e-10,
+    "k2_change": 7.927793944107672e-08
+  }
+}

@@ -61,10 +61,100 @@ def _kinetic_MeV4(kF: float, Mstar: float, g: int) -> float:
     return (g / (2.0 * PI * PI)) * I
 
 
+def _solve_sigma_nonlinear(rhs: float, m_s: float, g2: float, g3: float,
+                             sigma_init: float = 0.0,
+                             tol: float = 1e-12, max_iter: int = 200) -> float:
+    """Solve the NL3_WALECKA_NONLINEAR sigma field equation:
+        m_s^2 sigma = rhs + g_2 sigma^2 + g_3 sigma^3
+        where rhs = g_sigma * rho_s, and g_2, g_3 are the nonlinear self-couplings.
+
+    Convention (Lalazissis 1997 PRC 55 540, NL3 standard):
+        L ⊃ -U(sigma) = -(1/2) m_s^2 sigma^2 - (g_2/3) sigma^3 - (g_3/4) sigma^4
+        Field eq (dU/dsigma = source):  m_s^2 sigma + g_2 sigma^2 + g_3 sigma^3 = g_sigma rho_s
+        i.e. m_s^2 sigma = rhs - g_2 sigma^2 - g_3 sigma^3 = rhs + g_2' sigma^2 + g_3' sigma^3
+        where g_2' = -g_2, g_3' = -g_3 (the "self-coupling in field eq" coefficients).
+
+        In this solver we use the convention: g_2, g_3 passed in are the LAGRANGIAN
+        coefficients (g_2 = -10.4310, g_3 = -28.8856 for NL3). The field equation
+        becomes: m_s^2 sigma = rhs - g_2 sigma^2 - g_3 sigma^3
+        => f(sigma) = m_s^2 sigma + g_2 sigma^2 + g_3 sigma^3 - rhs = 0  (lagrangian form)
+        which for NL3 (g_2<0, g_3<0) means the nonlinear terms REDUCE the rhs needed,
+        keeping sigma physical (~40 MeV at saturation).
+
+        Energy density (Hamiltonian) uses the LAGRANGIAN coefficients directly:
+        E_sigma = (1/2) m_s^2 sigma^2 + (g_2/3) sigma^3 + (g_3/4) sigma^4
+        For NL3 g_2,g_3<0, the cubic and quartic terms contribute NEGATIVELY (binding).
+
+    f(sigma) = m_s^2 sigma + g_2 sigma^2 + g_3 sigma^3 - rhs = 0
+    f'(sigma) = m_s^2 + 2 g_2 sigma + 3 g_3 sigma^2
+    Returns sigma >= 0 (positive mean field).
+
+    Robust hybrid: Newton with damping + bisection fallback, since the cubic
+    can make f'(sigma) change sign for large sigma.
+    """
+    if rhs <= 0:
+        return 0.0
+    if g2 == 0.0 and g3 == 0.0:
+        return rhs / (m_s * m_s)
+    sigma_lin = rhs / (m_s * m_s)
+    # For NL3 (g_2,g_3<0) the nonlinear terms reduce sigma, so the physical
+    # root is in (0, sigma_lin). Start Newton from a modest fraction.
+    sigma = sigma_init if (0 < sigma_init < sigma_lin) else sigma_lin * 0.3
+    for it in range(max_iter):
+        f = m_s * m_s * sigma + g2 * sigma * sigma + g3 * sigma ** 3 - rhs
+        fp = m_s * m_s + 2.0 * g2 * sigma + 3.0 * g3 * sigma * sigma
+        if abs(f) < tol * max(1.0, abs(rhs)):
+            break
+        if fp > 1.0:
+            ds = -f / fp
+            max_ds = 0.3 * sigma + 1.0
+            if abs(ds) > max_ds:
+                ds = ds / abs(ds) * max_ds
+            sigma_new = sigma + ds
+            if sigma_new < 0 or sigma_new > sigma_lin:
+                sigma_new = max(0.1 * sigma, min(sigma_lin, sigma_new))
+        else:
+            # bisection fallback on [0, sigma_lin]
+            lo, hi = 0.0, sigma_lin
+            f_lo = -rhs
+            for trial in [0.5, 0.3, 0.2, 0.15, 0.1, 0.05]:
+                hi = sigma_lin * trial
+                f_hi = m_s * m_s * hi + g2 * hi * hi + g3 * hi ** 3 - rhs
+                if f_hi >= 0:
+                    break
+            if f_hi < 0:
+                sigma = sigma_lin * 0.3
+                break
+            for _ in range(60):
+                mid = 0.5 * (lo + hi)
+                f_mid = m_s * m_s * mid + g2 * mid * mid + g3 * mid ** 3 - rhs
+                if abs(f_mid) < tol * max(1.0, abs(rhs)):
+                    sigma = mid
+                    break
+                if (f_lo < 0) != (f_mid < 0):
+                    hi = mid
+                else:
+                    lo = mid
+                    f_lo = f_mid
+            sigma = 0.5 * (lo + hi)
+            break
+        if abs(sigma_new - sigma) < tol * max(1.0, abs(sigma)):
+            sigma = sigma_new
+            break
+        sigma = sigma_new
+    return sigma
+
+
 @dataclass
 class RMFCouplings:
     """Generic coupling parameter set. The interpretation of (a,b,c,d,Gamma)
-    depends on the functional form of the parent model."""
+    depends on the functional form of the parent model.
+
+    For NL3_WALECKA_NONLINEAR: a = g_sigma (constant), Gamma_sat = g_i(rho) for
+    ALL densities (no density dependence). The nonlinear sigma self-interaction
+    coefficients g_2 (cubic, MeV) and g_3 (quartic, dimensionless) and the omega-rho
+    cross-coupling Lambda_v are stored in the RMFModel, not here, because they are
+    model-level (not per-meson) parameters. b, c, d are unused for Walecka."""
     a: float
     b: float = 0.0
     c: float = 0.0
@@ -85,6 +175,13 @@ class RMFCouplings:
         """SPG Gögelein: g = a + (b + d*x^3)*exp(-c*x)."""
         return self.a + (self.b + self.d * x ** 3) * math.exp(-self.c * x)
 
+    def value_walecka(self, x: float) -> float:
+        """NL3_WALECKA_NONLINEAR: constant coupling (no density dependence).
+        For the meson-nucleon coupling g_i, returns Gamma_sat. x is unused.
+        The sigma self-interaction g_2, g_3 and omega-rho Lambda_v are handled
+        in solve_homogeneous via model-level fields."""
+        return self.Gamma_sat
+
     def dvalue_rational_dx(self, x: float) -> float:
         """d/dx of a*(1+b(x+d)^2)/(1+c(x+d)^2)."""
         u = x + self.d
@@ -103,12 +200,17 @@ class RMFCouplings:
     def dvalue_gogelein_dx(self, x: float) -> float:
         return (3.0 * self.d * x * x - self.c * (self.b + self.d * x ** 3)) * math.exp(-self.c * x)
 
+    def dvalue_walecka_dx(self, x: float) -> float:
+        """NL3_WALECKA_NONLINEAR: density-independent coupling => derivative = 0.
+        Rearrangement term vanishes for Walecka models."""
+        return 0.0
+
 
 @dataclass
 class RMFModel:
     key: str
     family: str
-    functional_form: str   # "DD2_TYYPEL_RATIONAL" or "SPG_GOGELEIN"
+    functional_form: str   # "DD2_TYYPEL_RATIONAL", "SPG_GOGELEIN", or "NL3_WALECKA_NONLINEAR"
     meson_masses: dict
     rho_sat: float
     couplings: dict        # meson -> RMFCouplings
@@ -117,6 +219,18 @@ class RMFModel:
     # which mesons use the rational (isoscalar) vs exponential (isovector) form:
     isoscalar_mesons: tuple = ("omega", "sigma")
     isovector_mesons: tuple = ("rho",)
+    # NL3_WALECKA_NONLINEAR nonlinear terms (zero for DD2/SPG models):
+    g2: float = 0.0   # sigma cubic self-coupling, convention: -g_2*sigma^3/3 in L;
+                      # field eq: m_sigma^2 sigma + g_2 sigma^2 + g_3 sigma^3 = g_sigma rho_s.
+                      # Units: MeV (sigma is in MeV), g_2 in MeV, g_3 dimensionless.
+                      # NL3 canonical: g_2 = -10.4310 MeV, g_3 = -28.8856.
+    g3: float = 0.0   # sigma quartic self-coupling, dimensionless.
+    Lambda_v: float = 0.0  # omega-rho cross-coupling (FSU/IU convention):
+                           # L += -Lambda_v * (g_omega^2 omega^2)(g_rho^2 rho_3^2);
+                           # modifies field eqs:
+                           #   m_omega^2 omega_0 (1 + Lambda_v g_rho^2 rho_3^2 / m_rho^2) = g_omega rho_B
+                           #   m_rho^2 rho_03 (1 + Lambda_v g_omega^2 omega_0^2 / m_omega^2) = g_rho rho_3
+                           # NL3/TM1 have Lambda_v = 0; FSU2/IU-FSU/FSUGarnet have Lambda_v != 0.
 
     @property
     def rho_sat_MeV3(self) -> float:
@@ -133,6 +247,8 @@ class RMFModel:
         c = self.couplings[meson]
         if self.functional_form == "SPG_GOGELEIN":
             return c.value_gogelein(x)
+        if self.functional_form == "NL3_WALECKA_NONLINEAR":
+            return c.value_walecka(x)
         # DD2_TYYPEL_RATIONAL
         if meson in self.isovector_mesons:
             return c.value_exp(x)
@@ -145,11 +261,17 @@ class RMFModel:
         if self.functional_form == "SPG_GOGELEIN":
             # x = rho_B / rho_0 => dg/drho_B = (dg/dx) * (1/rho_0)
             return c.dvalue_gogelein_dx(x) / SPG_RHO_REF_FM3
+        if self.functional_form == "NL3_WALECKA_NONLINEAR":
+            # constant coupling => dg/drho = 0 (no rearrangement term)
+            return 0.0
         dgdx = c.dvalue_exp_dx(x) if meson in self.isovector_mesons else c.dvalue_rational_dx(x)
         return dgdx / self.rho_sat  # x = rho/rho_sat
 
     def includes_delta(self) -> bool:
         return "delta" in self.couplings
+
+    def is_walecka(self) -> bool:
+        return self.functional_form == "NL3_WALECKA_NONLINEAR"
 
 
 @dataclass
@@ -184,6 +306,11 @@ def solve_homogeneous(model: RMFModel, rho_B: float, rho_p: float,
     Mstar_p = M_P
     converged = False
     it = 0
+    sigma0_prev = 0.0
+    is_walecka = model.is_walecka()
+    g2_w = getattr(model, "g2", 0.0)
+    g3_w = getattr(model, "g3", 0.0)
+    Lam_v = getattr(model, "Lambda_v", 0.0)
     for it in range(max_iter):
         kF_n = _kF_MeV(rho_n_M)
         kF_p = _kF_MeV(rho_p_M)
@@ -191,10 +318,26 @@ def solve_homogeneous(model: RMFModel, rho_B: float, rho_p: float,
         rs_p = _scalar_density_MeV3(kF_p, Mstar_p)
         rs_total = rs_n + rs_p
         rs_3 = rs_p - rs_n
-        sigma0 = g_s * rs_total / (m_s ** 2)
-        omega0 = g_w * rho_B_M / (m_w ** 2)
-        rho03 = g_r * (rho_p_M - rho_n_M) / (m_r ** 2)
-        delta0 = g_d * rs_3 / (m_d ** 2) if has_delta else 0.0
+        if is_walecka:
+            # NL3_WALECKA_NONLINEAR: nonlinear sigma field eq + omega-rho cross-coupling
+            # sigma: m_s^2 sigma + g2 sigma^2 + g3 sigma^3 = g_s * rho_s
+            sigma0 = _solve_sigma_nonlinear(g_s * rs_total, m_s, g2_w, g3_w,
+                                            sigma_init=sigma0_prev)
+            sigma0_prev = sigma0
+            # omega-rho cross-coupling: m_w^2 w0 (1 + Lam_v g_r^2 rho_3^2/m_r^2) = g_w rho_B
+            # rho_3 here in MeV^3 = (rho_p - rho_n)
+            rho3_M = rho_p_M - rho_n_M
+            factor_w = 1.0 + Lam_v * (g_r * g_r) * (rho3_M * rho3_M) / (m_r * m_r)
+            omega0 = g_w * rho_B_M / (m_w * m_w * factor_w)
+            # rho field: m_r^2 b3 (1 + Lam_v g_w^2 w0^2/m_w^2) = g_r * rho_3
+            factor_r = 1.0 + Lam_v * (g_w * g_w) * (omega0 * omega0) / (m_w * m_w)
+            rho03 = g_r * rho3_M / (m_r * m_r * factor_r)
+            delta0 = 0.0  # NL3/TM1/FSU2 do not include delta meson
+        else:
+            sigma0 = g_s * rs_total / (m_s ** 2)
+            omega0 = g_w * rho_B_M / (m_w ** 2)
+            rho03 = g_r * (rho_p_M - rho_n_M) / (m_r ** 2)
+            delta0 = g_d * rs_3 / (m_d ** 2) if has_delta else 0.0
         # Gögelein eq. 5: m*_i = M + g_sigma*sigma + g_delta*delta*tau_3, with
         # delta = -g_delta*rho_3s/m_delta^2 (KG eq. 8 has minus sign). Our convention
         # sigma0>0, delta0 = g_d*rs_3/m_d^2 (sign follows rs_3). To match Gögelein's
@@ -221,10 +364,20 @@ def solve_homogeneous(model: RMFModel, rho_B: float, rho_p: float,
     rs_p = _scalar_density_MeV3(kF_p, Mstar_p)
     rs_total = rs_n + rs_p
     rs_3 = rs_p - rs_n
-    sigma0 = g_s * rs_total / (m_s ** 2)
-    omega0 = g_w * rho_B_M / (m_w ** 2)
-    rho03 = g_r * (rho_p_M - rho_n_M) / (m_r ** 2)
-    delta0 = g_d * rs_3 / (m_d ** 2) if has_delta else 0.0
+    if is_walecka:
+        sigma0 = _solve_sigma_nonlinear(g_s * rs_total, m_s, g2_w, g3_w,
+                                        sigma_init=sigma0_prev)
+        rho3_M = rho_p_M - rho_n_M
+        factor_w = 1.0 + Lam_v * (g_r * g_r) * (rho3_M * rho3_M) / (m_r * m_r)
+        omega0 = g_w * rho_B_M / (m_w * m_w * factor_w)
+        factor_r = 1.0 + Lam_v * (g_w * g_w) * (omega0 * omega0) / (m_w * m_w)
+        rho03 = g_r * rho3_M / (m_r * m_r * factor_r)
+        delta0 = 0.0
+    else:
+        sigma0 = g_s * rs_total / (m_s ** 2)
+        omega0 = g_w * rho_B_M / (m_w ** 2)
+        rho03 = g_r * (rho_p_M - rho_n_M) / (m_r ** 2)
+        delta0 = g_d * rs_3 / (m_d ** 2) if has_delta else 0.0
 
     # Energy density (MeV^4), Scurto 2024 eq. 26 (Esat) generalized to asymmetry:
     #   E = sum_i Ekin,i + (1/2)(m_s^2 sigma0^2 + m_w^2 w0^2 + m_r^2 b3^2)
@@ -244,6 +397,18 @@ def solve_homogeneous(model: RMFModel, rho_B: float, rho_p: float,
               + 0.5 * m_r ** 2 * rho03 ** 2)
     if has_delta:
         Efield += 0.5 * m_d ** 2 * delta0 ** 2
+
+    # NL3_WALECKA_NONLINEAR nonlinear self-interaction energy terms.
+    # Lagrangian L ⊃ -U(sigma) = -(g_2/3) sigma^3 - (g_3/4) sigma^4 (Lalazissis 1997).
+    # The contribution to the energy density is +U(sigma) (the potential energy
+    # stored in the sigma field), i.e. +(g_2/3) sigma^3 + (g_3/4) sigma^4.
+    # For NL3 with g_2<0, g_3<0, sigma>0, these terms are negative (binding contribution).
+    # The omega-rho cross-coupling L ⊃ -Lam_v g_w^2 g_r^2 w0^2 b3^2 contributes
+    # +Lam_v g_w^2 g_r^2 w0^2 b3^2 to the energy density (Todd-Rutel 2005 convention).
+    if is_walecka:
+        Efield += (g2_w / 3.0) * sigma0 ** 3 + (g3_w / 4.0) * sigma0 ** 4
+        if Lam_v != 0.0:
+            Efield += Lam_v * (g_w * g_w) * (g_r * g_r) * (omega0 * omega0) * (rho03 * rho03)
 
     E_MeV4 = Ekin + Efield
     E_MeV_fm3 = E_MeV4 / HBARC ** 3
@@ -312,6 +477,9 @@ def load_models(path: Path | str) -> dict[str, RMFModel]:
             reference=m.get("reference", ""),
             isoscalar_mesons=tuple(m.get("isoscalar_mesons", ("omega", "sigma"))),
             isovector_mesons=tuple(m.get("isovector_mesons", ("rho",))),
+            g2=m.get("g2", 0.0),
+            g3=m.get("g3", 0.0),
+            Lambda_v=m.get("Lambda_v", 0.0),
         )
     return models
 

@@ -1,0 +1,42 @@
+{
+  "schema": "ns-cowling.e390-m3-rmf-solver-status",
+  "schema_version": "1.0.0",
+  "date": "2026-11-12",
+  "status": "IN_PROGRESS_SOLVER_SCAFFOLD_BUILT_PARAMETER_CALIBRATION_PENDING",
+  "node": "M3 (literature/provider composition solver - CLD reconstruction)",
+  "summary": "The RMF homogeneous-matter solver scaffold is implemented (python_frontend/compose_eos/rmf_solver.py) following Scurto 2024 eq. 9-13 + Gögelein 2008 eq. 40. The solver self-consistently iterates the meson fields (sigma, omega, rho, delta) to find the effective masses, then computes energy density, pressure, chemical potentials, and the rearrangement term. The 8-model parameter set JSON (data/eos390_rmf_parameter_sets.v1.json) is defined. The solver converges (32-34 iterations) and produces physically reasonable M*/M ratios (0.58-0.68), but the saturation properties (E/A, symmetry energy) do NOT match the published targets because the coupling parameters in the JSON are placeholder/uncalibrated values, not the exact published tables.",
+  "what_is_done": {
+    "solver_implementation": "python_frontend/compose_eos/rmf_solver.py implements the DD-RMF homogeneous-matter solver in natural units (hbar=c=1, MeV internally, MeV/fm^3 output). Two coupling functional forms: DD2_DDME2_TYYPEL (Typel exponential, 3 mesons) and SPG_GOGELEIN (Gögelein x^3-exponential, 4 mesons with delta). Self-consistent meson field iteration with damping. Analytic kinetic and scalar-density integrals. Rearrangement term Sigma^R for density-dependent couplings. Chemical potentials with correct vector (positive omega) and isovector (rho +/-) signs.",
+    "parameter_set_json": "data/eos390_rmf_parameter_sets.v1.json defines 8 models: GPPVA_DD2, GPPVA_DDME2, GPPVA_TW, GPPVA_FSU2, GPPVA_FSU2H, GPPVA_NL3wrL55, GPPVA_TM1e, SPG_M1. Each with meson masses, rho_sat, coupling params (a,b,c,d per meson), and saturation_targets (Esat, Ksat, Jsym, Lsym, Ksym).",
+    "diagnostic_results": {
+      "convergence": "All 8 models converge in 32-34 iterations.",
+      "M_star_over_M": "0.58-0.68 (physically reasonable RMF range; DD2 target ~0.56).",
+      "E_over_A_at_saturation": "ranges from -28 (DD2) to +120 (NL3wrL55) MeV; target -16 MeV. NOT matching.",
+      "symmetry_energy": "0.34-0.45 MeV; target 31-38 MeV. NOT matching (off by ~2 orders of magnitude).",
+      "pressure_at_saturation": "145 MeV/fm^3 for DD2 symmetric matter; should be ~0 at saturation. NOT matching."
+    }
+  },
+  "what_blocks_completion": {
+    "primary_blocker": "The coupling parameters (a,b,c,d for each meson) in the JSON are NOT the exact published values from the DD2/DD-ME2/TW99/etc. papers. They were entered as placeholder approximations. The solver's mathematical formulation appears correct (converges, M*/M reasonable), but the inputs are wrong.",
+    "secondary_concern": "The exact DD-RMF energy-density sign convention (scalar field energy sign) needs final verification against Scurto 2024 eq. 10 and a standard RMF textbook. Two conventions exist: (1) E = Ekin + 1/2(+m_w^2 w0^2 + m_r^2 b3^2 - m_s^2 s0^2) [scalar negative, standard textbook]; (2) Scurto's E = Ekin - Efield with Efield = +1/2 m_w^2 + 1/2 m_r^2 - 1/2 m_s^2 [scalar positive in Efield, negative in E]. These give DIFFERENT results because the vector interaction term (-g_w w0 rho_B) must NOT be double-counted against the meson self-energy.",
+    "tertiary_concern": "The pressure is non-zero at saturation (145 MeV/fm^3 for DD2), which indicates the energy/chemical-potential consistency (P = sum mu_i rho_i - E) is broken by either the rearrangement-term sign or a missing/duplicate term."
+  },
+  "next_steps_to_unblock": [
+    "1. Extract the EXACT coupling parameter tables from the collected PDFs: DD2 (Typel 2010, arXiv:0908.2344), DD-ME2 (Lalazissis 2005 user-supplied), TW99 (Typel-Wolter exposition), FSU2 (Chen 2014, arXiv:1408.4159), Gögelein 2008 (Table I, already extracted). The DD2 and DD-ME2 tables are the highest priority since GPPVA_DD2 is the first reconstruction target.",
+    "2. Verify the energy-density sign convention by checking E/A = -16 MeV at saturation with the EXACT DD2 couplings. If the solver with exact couplings reproduces DD2's published saturation, the formulation is confirmed.",
+    "3. Fix the pressure-at-saturation issue: at saturation the pressure must be ~0 by definition. This requires checking the rearrangement-term contribution to the pressure identity P = sum mu_i rho_i - E.",
+    "4. Once the homogeneous-matter solver reproduces DD2's saturation (E/A=-16.02, K=243, J=31.67, L=55.04), proceed to the CLD cell model (Scurto 2024 eq. 21 + Coulomb eq. 23 + surface eq. 22,25) and the 4-variable minimizer."
+  ],
+  "papers_needed_for_calibration": {
+    "GPPVA_DD2": "Typel et al. PRC 81 015803 (2010), arXiv:0908.2344 - exact DD2 coupling table (a,b,c,d for sigma,omega,rho) and meson masses. PDF collected: dd2_2010_typel.pdf",
+    "GPPVA_DDME2": "Lalazissis et al. PRC 71 024312 (2005) - DD-ME2 coupling table. PDF collected (user-supplied): ddme2_2005_lalazissis_zagreb.pdf",
+    "GPPVA_TW": "Typel, Wolter NPA 656 331 (1999) + arXiv:nucl-th/0212080 exposition - TW99 coupling table.",
+    "GPPVA_FSU2": "Chen, Piekarewicz PRC 90 044305 (2014), arXiv:1408.4159 - FSU2 coupling table.",
+    "SPG_M1": "Gögelein et al. PRC 77 025802 (2008) Table I - SPG 16-parameter set. EXTRACTED: sigma(a=7.7868,b=2.58637,c=2.32431,d=3.11504), omega(a=9.73684,b=2.26377,c=7.05897,d=0), delta(a=2.68849,b=6.7193,c=0.503759,d=0.403927), rho(a=4.56919,b=5.45085,c=1.20926,d=0). Meson masses: sigma=550, omega=782.6, delta=983, rho=769 MeV."
+  },
+  "files_in_this_commit": [
+    "python_frontend/compose_eos/rmf_solver.py - the solver scaffold",
+    "data/eos390_rmf_parameter_sets.v1.json - parameter set definitions (placeholder values for GPPVA, extracted Gögelein for SPG)",
+    "data/receipts/eos390_m0/E390-02_M3_RMF_SOLVER_STATUS_20261112.json - this status receipt"
+  ]
+}

@@ -183,29 +183,33 @@ class EOSData:
         #   row_status: 2 (CHECKED) if composition_available else 0 (NOT_AVAILABLE)
         #   *_present: True where the corresponding array has a nonzero/positive entry
         #   C3/C4: not re-derived here (set by the parser); default False.
-        def _mask_arr(arr, default):
-            if arr is None or arr.size == 0:
-                return np.asarray([default] * n)
-            if arr.size != n:
-                # mismatched -> pad/truncate is unsafe; fall back to default
-                return np.asarray([default] * n)
-            return arr
-        rs = _mask_arr(getattr(self, "row_status", None), 2 if self.composition_available else 0).astype(int)
-        def _bool_from(arr, default):
-            a = _mask_arr(arr, default)
-            return a.astype(bool)
-        # default *_present: derived from the existing arrays (a written zero is still
-        # present in the legacy CSV; we cannot distinguish written-zero from missing in
-        # the legacy format, so mark as present iff composition_available).
-        yn_p = _bool_from(getattr(self, "Yn_present", None), self.composition_available)
-        yp_p = _bool_from(getattr(self, "Yp_present", None), self.composition_available)
-        ye_p = _bool_from(getattr(self, "Ye_present", None), self.composition_available)
-        ymu_p = _bool_from(getattr(self, "Ymu_present", None), self.composition_available)
-        abar_p = _bool_from(getattr(self, "Abar_present", None), self.composition_available)
-        zbar_p = _bool_from(getattr(self, "Zbar_present", None), self.composition_available)
-        yh_p = _bool_from(getattr(self, "Yh_present", None), self.composition_available)
-        c3 = _bool_from(getattr(self, "C3_applicable", None), False)
-        c4 = _bool_from(getattr(self, "C4_applicable", None), False)
+        def _mask_arr(arr, default, name):
+            if arr is None:
+                arr = np.zeros(0, dtype=bool)
+            a = np.asarray(arr)
+            if a.size == 0:
+                # No composition sidecar means all rows are NOT_AVAILABLE. Once a
+                # sidecar exists, missing row masks are ambiguous: they cannot be
+                # reconstructed from numerical zeros, so fail closed.
+                if self.composition_file_present and name.endswith("_present"):
+                    raise ValueError(f"missing row-level presence mask {name}; refusing lossy export")
+                return np.full(n, default)
+            if a.shape != (n,):
+                raise ValueError(f"row-level mask {name} has shape {a.shape}, expected ({n},)")
+            return a
+
+        rs = _mask_arr(getattr(self, "row_status", None), 0, "row_status").astype(int)
+        def _bool_from(arr, default, name):
+            return _mask_arr(arr, default, name).astype(bool)
+        yn_p = _bool_from(getattr(self, "Yn_present", None), False, "Yn_present")
+        yp_p = _bool_from(getattr(self, "Yp_present", None), False, "Yp_present")
+        ye_p = _bool_from(getattr(self, "Ye_present", None), False, "Ye_present")
+        ymu_p = _bool_from(getattr(self, "Ymu_present", None), False, "Ymu_present")
+        abar_p = _bool_from(getattr(self, "Abar_present", None), False, "Abar_present")
+        zbar_p = _bool_from(getattr(self, "Zbar_present", None), False, "Zbar_present")
+        yh_p = _bool_from(getattr(self, "Yh_present", None), False, "Yh_present")
+        c3 = _bool_from(getattr(self, "C3_applicable", None), False, "C3_applicable")
+        c4 = _bool_from(getattr(self, "C4_applicable", None), False, "C4_applicable")
         fields = ["nb", "Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "q_extra",
                   "Iphase", "Yn", "Yp", "Ye", "Ymu", "Abar", "Zbar", "Yh",
                   # M2A per-row masks

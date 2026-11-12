@@ -106,7 +106,7 @@ contains
     character(len=4096)::line
     character(len=96)::tok(256)
     real(wp),allocatable::nb(:),tv(:),yv(:)
-    real(wp)::qv(7),v,a,z,yi,tval
+    real(wp)::qv(7),v,a,z,yi,tval,residual
     logical::ok,file_exists
     logical,allocatable::seen(:)
     character(len=1024)::path
@@ -263,14 +263,24 @@ contains
           call token_int(tok,pos,pid,ok);if(.not.ok) then;close(u);status='invalid particle id';return;endif
           call token_real(tok,pos+1,v,ok);if(.not.ok) then;close(u);status='invalid particle fraction';return;endif
           select case(pid)
-          case(10);eos%yn(k)=v;eos%yn_present(k)=.true.
-          case(11);eos%yp(k)=v;eos%yp_present(k)=.true.
-          case(0);eos%ye(k)=v;eos%ye_present(k)=.true.
-          case(1);eos%ymu(k)=v;eos%ymu_present(k)=.true.
+          case(10)
+            if(eos%yn_present(k))then;close(u);status='duplicate CompOSE neutron id in eos.compo row';return;endif
+            eos%yn(k)=v;eos%yn_present(k)=.true.
+          case(11)
+            if(eos%yp_present(k))then;close(u);status='duplicate CompOSE proton id in eos.compo row';return;endif
+            eos%yp(k)=v;eos%yp_present(k)=.true.
+          case(0)
+            if(eos%ye_present(k))then;close(u);status='duplicate CompOSE electron id in eos.compo row';return;endif
+            eos%ye(k)=v;eos%ye_present(k)=.true.
+          case(1)
+            if(eos%ymu_present(k))then;close(u);status='duplicate CompOSE muon id in eos.compo row';return;endif
+            eos%ymu(k)=v;eos%ymu_present(k)=.true.
           case default
             close(u);status='unsupported CompOSE particle id in this EOSData model';return
           end select
-          if(abs(v)>1.e-14_wp)eos%composition_available=.true.
+          ! Presence, not numerical magnitude, defines availability: an explicit
+          ! zero is a measured/written value and must survive round-trip.
+          eos%composition_available=.true.
           pos=pos+2
         enddo
         if(pos>nt) then;close(u);status='missing Nquad';return;endif
@@ -286,9 +296,10 @@ contains
           if(qid/=1.or.a<0._wp.or.z<0._wp.or.z>a.or.yi<0._wp) then
             close(u);status='unsupported or invalid nuclear group';return
           endif
+          if(eos%abar_present(k))then;close(u);status='duplicate CompOSE nuclear group in eos.compo row';return;endif
           eos%abar(k)=a;eos%zbar(k)=z;eos%yh(k)=a*yi
           eos%abar_present(k)=.true.;eos%zbar_present(k)=.true.;eos%yh_present(k)=.true.
-          if(a>0._wp.and.yi>0._wp)eos%composition_available=.true.
+          eos%composition_available=.true.
           pos=pos+4
         enddo
         if(pos/=nt+1) then;close(u);status='trailing fields in eos.compo row';return;endif
@@ -322,10 +333,26 @@ contains
                               eos%zbar_present(k).and.eos%yh_present(k).and. &
                               eos%ye_present(k).and.eos%ymu_present(k).and. &
                               eos%abar(k)>0._wp
-        ! status: CHECKED (2) if every required field for both C3 and C4 is
-        ! present and in range; PARTIAL (1) otherwise (e.g. phase-only rows,
-        ! or rows with only some lepton coverage). FAIL was already set above.
-        if(eos%c3_applicable(k).and.eos%c4_applicable(k)) then
+        ! Evaluate C3 and C4 independently on the rows where their complete
+        ! inventories exist. A missing field is NOT zero and does not create a
+        ! closure failure; a present zero remains part of the closure equation.
+        if(eos%c3_applicable(k)) then
+          residual=eos%yn(k)+eos%yp(k)+eos%yh(k)-1._wp
+          if(abs(residual)>2.e-3_wp) then
+            eos%row_status(k)=3
+            cycle
+          endif
+        endif
+        if(eos%c4_applicable(k)) then
+          residual=eos%yp(k)+(eos%zbar(k)/eos%abar(k))*eos%yh(k)-eos%ye(k)-eos%ymu(k)
+          if(abs(residual)>2.e-3_wp) then
+            eos%row_status(k)=3
+            cycle
+          endif
+        endif
+        ! CHECKED requires both independent closures; otherwise this row is
+        ! PARTIAL, while a present-but-invalid row is FAIL.
+        if(eos%c3_applicable(k).and.eos%c4_applicable(k))then
           eos%row_status(k)=2
         else
           eos%row_status(k)=1
@@ -530,7 +557,8 @@ contains
     character(len=*),intent(in)::directory
     type(eos_data_t),intent(in)::eos
     character(len=*),intent(out)::status
-    integer::u,ios,i,nquad
+    integer::u,ios,i,nquad,npairs
+    logical::any_composition,group_any,group_complete
     character(len=1024)::path
     real(wp)::yi,baryon_residual,charge_residual,max_baryon_residual,max_charge_residual
     if(eos%n<1.or..not.allocated(eos%iphase)) then
@@ -541,51 +569,128 @@ contains
       status='cannot write inconsistent EOS phase metadata'
       return
     endif
-    if(eos%composition_available.and..not.eos%composition_file_present)then
-      status='cannot export composition values without an eos.compo sidecar'
+    if(.not.allocated(eos%yn_present).or..not.allocated(eos%yp_present).or. &
+       .not.allocated(eos%ye_present).or..not.allocated(eos%ymu_present).or. &
+       .not.allocated(eos%abar_present).or..not.allocated(eos%zbar_present).or. &
+       .not.allocated(eos%yh_present).or..not.allocated(eos%c3_applicable).or. &
+       .not.allocated(eos%c4_applicable).or..not.allocated(eos%row_status))then
+      status='row-level composition masks are missing; refusing lossy CompOSE export'
+      return
+    endif
+    if(size(eos%yn_present)/=eos%n.or.size(eos%yp_present)/=eos%n.or. &
+       size(eos%ye_present)/=eos%n.or.size(eos%ymu_present)/=eos%n.or. &
+       size(eos%abar_present)/=eos%n.or.size(eos%zbar_present)/=eos%n.or. &
+       size(eos%yh_present)/=eos%n.or.size(eos%c3_applicable)/=eos%n.or. &
+       size(eos%c4_applicable)/=eos%n.or.size(eos%row_status)/=eos%n)then
+      status='row-level composition mask shape mismatch'
+      return
+    endif
+    any_composition=any(eos%yn_present.or.eos%yp_present.or.eos%ye_present.or. &
+                        eos%ymu_present.or.eos%abar_present.or.eos%zbar_present.or.eos%yh_present)
+    if(any_composition.and..not.eos%composition_file_present)then
+      status='present composition fields require an eos.compo sidecar'
+      return
+    endif
+    if(eos%composition_available.and..not.any_composition)then
+      status='global composition_available conflicts with all row-level presence masks being false'
       return
     endif
     if(any(eos%iphase/=0).and..not.eos%composition_file_present)then
-      status='cannot export a phase-discontinuous barotrope without phase composition: non-default Iphase labels require an eos.compo sidecar'
+      status='a phase-discontinuous barotrope without phase composition cannot be exported'
       return
     endif
-    if(eos%composition_available)then
+    if(eos%composition_file_present)then
       max_baryon_residual=0._wp;max_charge_residual=0._wp
       do i=1,eos%n
-        if(.not.all(ieee_is_finite([eos%yn(i),eos%yp(i),eos%ye(i),eos%ymu(i), &
-          eos%abar(i),eos%zbar(i),eos%yh(i)])))then
-          status='composition contains nonfinite values';return
+        if(eos%row_status(i)==3)then
+          status='row-level composition status is FAIL; refusing CompOSE export'
+          return
         endif
-        if(eos%yn(i)<-1.e-10_wp.or.eos%yp(i)<-1.e-10_wp.or.eos%ye(i)<-1.e-10_wp.or. &
-           eos%ymu(i)<-1.e-10_wp.or.eos%yh(i)<-1.e-10_wp.or.eos%yh(i)>1.002_wp)then
-          status='composition fractions outside physical range';return
+        group_any=eos%abar_present(i).or.eos%zbar_present(i).or.eos%yh_present(i)
+        group_complete=eos%abar_present(i).and.eos%zbar_present(i).and.eos%yh_present(i)
+        if(group_any.neqv.group_complete)then
+          status='partial nuclear-group tuple cannot be represented in CompOSE eos.compo'
+          return
         endif
-        if(eos%abar(i)>0._wp)then
-          if(eos%abar(i)<1._wp.or.eos%zbar(i)<0._wp.or.eos%zbar(i)>eos%abar(i))then
-            status='invalid Abar/Zbar in nuclear-group composition';return
+        if(eos%yn_present(i))then
+          if(.not.ieee_is_finite(eos%yn(i)).or.eos%yn(i)<-1.e-10_wp.or.eos%yn(i)>1._wp+5.e-3_wp)then
+            status='neutron fraction outside physical range';return
           endif
-          yi=eos%yh(i)/eos%abar(i)
+        else if(abs(eos%yn(i))>1.e-14_wp)then
+          status='unmarked neutron value would be lost during CompOSE export';return
+        endif
+        if(eos%yp_present(i))then
+          if(.not.ieee_is_finite(eos%yp(i)).or.eos%yp(i)<-1.e-10_wp.or.eos%yp(i)>1._wp+5.e-3_wp)then
+            status='proton fraction outside physical range';return
+          endif
+        else if(abs(eos%yp(i))>1.e-14_wp)then
+          status='unmarked proton value would be lost during CompOSE export';return
+        endif
+        if(eos%ye_present(i))then
+          if(.not.ieee_is_finite(eos%ye(i)).or.eos%ye(i)<-1.e-10_wp.or.eos%ye(i)>1._wp+5.e-3_wp)then
+            status='electron fraction outside physical range';return
+          endif
+        else if(abs(eos%ye(i))>1.e-14_wp)then
+          status='unmarked electron value would be lost during CompOSE export';return
+        endif
+        if(eos%ymu_present(i))then
+          if(.not.ieee_is_finite(eos%ymu(i)).or.eos%ymu(i)<-1.e-10_wp.or.eos%ymu(i)>1._wp+5.e-3_wp)then
+            status='muon fraction outside physical range';return
+          endif
+        else if(abs(eos%ymu(i))>1.e-14_wp)then
+          status='unmarked muon value would be lost during CompOSE export';return
+        endif
+        if(group_complete)then
+          if(.not.all(ieee_is_finite([eos%abar(i),eos%zbar(i),eos%yh(i)])))then
+            status='nuclear-group composition contains nonfinite values';return
+          endif
+          if(eos%yh(i)<-1.e-10_wp.or.eos%yh(i)>1.002_wp.or. &
+             eos%zbar(i)<0._wp.or.eos%zbar(i)>eos%abar(i).or. &
+             (eos%abar(i)>0._wp.and.eos%abar(i)<1._wp))then
+            status='nuclear-group composition outside physical range';return
+          endif
+          if(eos%abar(i)>0._wp)then
+            yi=eos%yh(i)/eos%abar(i)
+          else
+            if(abs(eos%zbar(i))>1.e-10_wp.or.abs(eos%yh(i))>1.e-10_wp)then
+              status='nuclear-group values are nonzero although Abar is zero';return
+            endif
+            yi=0._wp
+          endif
         else
-          if(abs(eos%yh(i))>1.e-10_wp.or.abs(eos%zbar(i))>1.e-10_wp)then
-            status='nuclear-group values are nonzero although Abar is zero';return
-          endif
           yi=0._wp
+          if(abs(eos%abar(i))+abs(eos%zbar(i))+abs(eos%yh(i))>1.e-14_wp)then
+            status='unmarked nuclear-group values would be lost during CompOSE export';return
+          endif
         endif
-        baryon_residual=eos%yn(i)+eos%yp(i)+eos%abar(i)*yi-1._wp
-        charge_residual=eos%yp(i)+eos%zbar(i)*yi-eos%ye(i)-eos%ymu(i)
-        max_baryon_residual=max(max_baryon_residual,abs(baryon_residual))
-        max_charge_residual=max(max_charge_residual,abs(charge_residual))
+        if(eos%c3_applicable(i))then
+          if(.not.(eos%yn_present(i).and.eos%yp_present(i).and.eos%yh_present(i)))then
+            status='C3 marked applicable without complete baryon inventory';return
+          endif
+          baryon_residual=eos%yn(i)+eos%yp(i)+eos%yh(i)-1._wp
+          max_baryon_residual=max(max_baryon_residual,abs(baryon_residual))
+          if(abs(baryon_residual)>2.e-3_wp)then
+            status='C3 baryon abundance closure failed on an applicable row';return
+          endif
+        endif
+        if(eos%c4_applicable(i))then
+          if(.not.(eos%yp_present(i).and.eos%abar_present(i).and.eos%zbar_present(i).and. &
+             eos%yh_present(i).and.eos%ye_present(i).and.eos%ymu_present(i)).or.eos%abar(i)<=0._wp)then
+            status='C4 marked applicable without complete charge inventory';return
+          endif
+          charge_residual=eos%yp(i)+(eos%zbar(i)/eos%abar(i))*eos%yh(i)-eos%ye(i)-eos%ymu(i)
+          max_charge_residual=max(max_charge_residual,abs(charge_residual))
+          if(abs(charge_residual)>2.e-3_wp)then
+            status='C4 charge abundance closure failed on an applicable row';return
+          endif
+        endif
       enddo
-      if(max_baryon_residual>2.e-3_wp.or.max_charge_residual>2.e-3_wp)then
-        status='composition violates CompOSE baryon/charge abundance closure'
-        return
-      endif
     else
       if(any(abs(eos%yn)>1.e-14_wp).or.any(abs(eos%yp)>1.e-14_wp).or. &
          any(abs(eos%ye)>1.e-14_wp).or.any(abs(eos%ymu)>1.e-14_wp).or. &
          any(abs(eos%abar)>1.e-14_wp).or.any(abs(eos%zbar)>1.e-14_wp).or. &
          any(abs(eos%yh)>1.e-14_wp))then
-        status='phase-only output has nonzero composition arrays while composition_available is false'
+        status='composition values are present without an eos.compo sidecar'
         return
       endif
     endif
@@ -615,26 +720,31 @@ contains
     if(eos%composition_file_present)then
       open(newunit=u,file=trim(directory)//'/eos.compo',status='replace',action='write',iostat=ios)
       if(ios/=0)then;status='cannot write eos.compo';return;endif
-      if(eos%composition_available)then
-        do i=1,eos%n
-          nquad=0;if(eos%abar(i)>0._wp)nquad=1
-          write(u,'(5(i0,1x),i0,1x,es25.16e3,1x,i0,1x,es25.16e3,1x,i0,1x,es25.16e3,1x,i0,1x,i0)',advance='no') &
-            eos%iT,eos%inb_start+i-1,eos%iYq,eos%iphase(i),4,10,eos%yn(i),11,eos%yp(i),0,eos%ye(i),1
-          if(nquad==1)then
+      do i=1,eos%n
+        npairs=0
+        if(eos%yn_present(i))npairs=npairs+1
+        if(eos%yp_present(i))npairs=npairs+1
+        if(eos%ye_present(i))npairs=npairs+1
+        if(eos%ymu_present(i))npairs=npairs+1
+        group_complete=eos%abar_present(i).and.eos%zbar_present(i).and.eos%yh_present(i)
+        nquad=merge(1,0,group_complete)
+        write(u,'(5(i0,1x))',advance='no')eos%iT,eos%inb_start+i-1,eos%iYq,eos%iphase(i),npairs
+        if(eos%yn_present(i))write(u,'(i0,1x,es25.16e3,1x)',advance='no')10,eos%yn(i)
+        if(eos%yp_present(i))write(u,'(i0,1x,es25.16e3,1x)',advance='no')11,eos%yp(i)
+        if(eos%ye_present(i))write(u,'(i0,1x,es25.16e3,1x)',advance='no')0,eos%ye(i)
+        if(eos%ymu_present(i))write(u,'(i0,1x,es25.16e3,1x)',advance='no')1,eos%ymu(i)
+        write(u,'(i0)',advance='no')nquad
+        if(nquad==1)then
+          if(eos%abar(i)>0._wp)then
             yi=eos%yh(i)/eos%abar(i)
-            write(u,'(es25.16e3,1x,i0,1x,i0,1x,es25.16e3,1x,es25.16e3,1x,es25.16e3)') &
-              eos%ymu(i),1,1,eos%abar(i),eos%zbar(i),yi
           else
-            write(u,'(es25.16e3,1x,i0)')eos%ymu(i),0
+            yi=0._wp
           endif
-        enddo
-      else
-        ! CompOSE v3.01 permits Npairs=0 and Nquad=0. Preserve Iphase without
-        ! fabricating particle abundances or nuclear-group number abundances.
-        do i=1,eos%n
-          write(u,'(6(i0,1x))')eos%iT,eos%inb_start+i-1,eos%iYq,eos%iphase(i),0,0
-        enddo
-      endif
+          write(u,'(1x,i0,3(1x,es25.16e3))')1,eos%abar(i),eos%zbar(i),yi
+        else
+          write(u,'(1x,i0)')0
+        endif
+      enddo
       close(u)
     else
       ! Avoid a stale composition sidecar surviving a thermo-only rewrite.

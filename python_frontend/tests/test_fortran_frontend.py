@@ -150,3 +150,44 @@ def test_duplicate_composition_density_key_is_rejected(tmp_path):
     _append_duplicate_first_record(source / "eos.compo")
     with pytest.raises(NativeExecutionError, match="duplicate eos.compo row key"):
         read_compose(source)
+
+
+def test_row_level_composition_presence_roundtrip_preserves_partial_and_explicit_zero(tmp_path):
+    eos = read_compose(SAMPLE)
+    assert eos.composition_file_present
+    assert eos.composition_available
+
+    # Row 0 is an explicit phase-only row. Preserve Iphase but do not invent
+    # particle/group abundances from numerical zero placeholders.
+    for name in ("Yn_present", "Yp_present", "Ye_present", "Ymu_present",
+                 "Abar_present", "Zbar_present", "Yh_present"):
+        getattr(eos, name)[0] = False
+    for name in ("Yn", "Yp", "Ye", "Ymu", "Aav", "Zav", "Yh"):
+        getattr(eos, name)[0] = 0.0
+    eos.C3_applicable[0] = False
+    eos.C4_applicable[0] = False
+    eos.row_status[0] = 1
+
+    # A zero muon fraction is nevertheless explicitly present in the selected row.
+    zero_muon = int(np.argmin(np.abs(eos.Ymu)))
+    eos.Ymu[zero_muon] = 0.0
+    eos.Ymu_present[zero_muon] = True
+
+    out = tmp_path / "partial-roundtrip"
+    write_compose(out, eos)
+    again = read_compose(out)
+
+    assert again.Iphase[0] == eos.Iphase[0]
+    assert not again.Yn_present[0] and not again.Yp_present[0]
+    assert not again.Ye_present[0] and not again.Ymu_present[0]
+    assert not again.Abar_present[0] and not again.Zbar_present[0] and not again.Yh_present[0]
+    assert again.row_status[0] == 1
+    assert again.Ymu_present[zero_muon]
+    assert again.Ymu[zero_muon] == 0.0
+
+
+def test_python_frontend_refuses_missing_row_presence_masks(tmp_path):
+    eos = read_compose(SAMPLE)
+    eos.Yn_present = np.zeros(0, dtype=bool)
+    with pytest.raises(ValueError, match="missing row-level presence mask Yn_present"):
+        write_compose(tmp_path / "lossy-export", eos)

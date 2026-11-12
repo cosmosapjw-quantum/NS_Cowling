@@ -47,7 +47,7 @@ def run_maxwell_task(crust_dir: str, core_dir: str, output_dir: str) -> dict:
     390-matrix task rather than calling a different algorithm.
     """
     raise BackendUnavailable(
-        "legacy maxwell/NPPHB requires the native M2/M10 smooth Hermite kernel; "
+        "legacy maxwell/NPPHB requires the native Fortran M2/M10 smooth Hermite kernel; "
         "the Python M5 sharp-Maxwell oracle is not a compatible substitute"
     )
 
@@ -61,7 +61,7 @@ def run_css_task(crust_dir: str, core_dir: str, output_dir: str) -> dict:
     inferred from Alford, Han & Prakash, PRD 88, 083013 (2013), arXiv:1302.4732.
     """
     raise BackendUnavailable(
-        "CSS is blocked pending source-backed per-task parameters and a native "
+        "CSS is blocked pending source-backed per-task parameters and a native Fortran "
         "complete crust-core branch join with CompOSE read-back"
     )
 
@@ -71,7 +71,7 @@ def run_smooth_task(method: str, crust_dir: str, core_dir: str, output_dir: str)
     if method not in ("cubic_F", "cubic_P", "quintic_F", "quintic_P"):
         raise ValueError(f"unsupported smooth method: {method}")
     raise BackendUnavailable(
-        f"{method} requires the native M2/M10 interpolation kernel; "
+        f"{method} requires the native Fortran M2/M10 interpolation kernel; "
         "Python placeholder copies are forbidden"
     )
 

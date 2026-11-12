@@ -30,7 +30,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from .rmf_solver import (
-    HBARC, M_E, M_MU, RMFModel, solve_homogeneous, energy_per_baryon,
+    HBARC, M_E, M_MU, M_N, M_P, RMFModel, solve_homogeneous, energy_per_baryon,
     HomogeneousResult,
 )
 
@@ -181,77 +181,188 @@ def cld_cell_energy(model: RMFModel, rho_B: float, f: float, R_d: float,
     return E_cell, info
 
 
+def solve_beta_equilibrium_cluster(model: RMFModel, rho_I: float,
+                                   rho_IIp_gas: float, f: float) -> tuple[float, float, float, float]:
+    """Solve for the cluster proton density rho_Ip from beta-equilibrium at the
+    CLUSTER phase (the dense, equilibrating phase):
+        mu_n(I) - mu_p(I) = mu_e(cell)
+    with cell charge neutrality:
+        rho_e = f*rho_Ip + (1-f)*rho_IIp_gas   (rho_IIp_gas fixed = 0 for pure neutron gas)
+        mu_e = sqrt((3*pi^2*rho_e)^(2/3)*hbar^2 + m_e^2)
+    At rho_Ip=0 (pure neutron cluster) mu_n-mu_p is large positive; at rho_Ip=rho_I
+    (symmetric cluster) mu_n-mu_p ~ 0; mu_e grows with rho_Ip. Sign change exists.
+    Returns (rho_Ip, rho_e, mu_e, |residual|).
+    """
+    rho_IIp_gas = 0.0  # pure neutron gas (low-density inner-crust approximation)
+    def residual(rho_Ip):
+        rho_Ip = max(0.0, min(rho_Ip, rho_I))
+        rI = solve_homogeneous(model, rho_I, rho_Ip)
+        rho_e = f * rho_Ip + (1.0 - f) * rho_IIp_gas
+        rho_e = max(0.0, rho_e)
+        mu_e = electron_chemical_potential(rho_e) if rho_e > 0 else 0.511
+        return (rI.mu_n - rI.mu_p) - mu_e
+    r_lo = residual(0.0)
+    r_hi = residual(rho_I)
+    if r_lo * r_hi > 0:
+        # no sign change: return endpoint with smaller |residual|
+        if abs(r_lo) < abs(r_hi):
+            return 0.0, f * 0.0 + (1 - f) * rho_IIp_gas, 0.511, abs(r_lo)
+        rho_Ip = rho_I; rho_e = f * rho_Ip + (1 - f) * rho_IIp_gas
+        return rho_Ip, max(0.0, rho_e), electron_chemical_potential(max(0.0, rho_e)), abs(r_hi)
+    lo, hi = 0.0, rho_I
+    for _ in range(60):
+        mid = 0.5 * (lo + hi)
+        r_mid = residual(mid)
+        if r_mid == 0 or (hi - lo) < 1e-12:
+            break
+        if r_lo * r_mid < 0:
+            hi = mid; r_hi = r_mid
+        else:
+            lo = mid; r_lo = r_mid
+    rho_Ip = 0.5 * (lo + hi)
+    rho_e = max(0.0, f * rho_Ip + (1.0 - f) * rho_IIp_gas)
+    mu_e = electron_chemical_potential(rho_e) if rho_e > 0 else 0.511
+    return rho_Ip, rho_e, mu_e, abs(residual(rho_Ip))
+
+
+def _cld_objective(model: RMFModel, rho_B: float, sigma_0: float, b: float,
+                   x: tuple[float, float, float]) -> tuple[float, dict]:
+    """Objective for the Nelder-Mead: x = (f, log R_d, rho_I).
+    The cluster proton density rho_Ip is solved from beta-equilibrium at the
+    cluster phase (mu_n - mu_p = mu_e), with the gas treated as pure neutron
+    (rho_IIp = 0) - the standard low-density inner-crust approximation.
+    Returns (E_cell, info)."""
+    f, log_Rd, rho_I = x
+    f = max(1e-4, min(0.95, f))
+    R_d = math.exp(max(math.log(2.0), min(math.log(40.0), log_Rd)))
+    rho_I = max(0.01, min(0.5, rho_I))
+    if f < 1:
+        rho_II = (rho_B - f * rho_I) / (1.0 - f)
+    else:
+        rho_II = 0.0
+    if rho_II < 0 or rho_II > rho_I:
+        return float("inf"), {}
+    # beta-equilibrium at the cluster: solve for rho_Ip
+    rho_Ip, rho_e, mu_e, beta_resid = solve_beta_equilibrium_cluster(model, rho_I, 0.0, f)
+    rho_IIp = 0.0  # pure neutron gas
+    try:
+        E, info = cld_cell_energy(model, rho_B, f, R_d, rho_I, rho_Ip, rho_II, rho_IIp,
+                                  sigma_0, b)
+    except (ValueError, ZeroDivisionError):
+        return float("inf"), {}
+    if not math.isfinite(E):
+        return float("inf"), {}
+    info["rho_Ip"] = rho_Ip; info["rho_IIp"] = rho_IIp
+    info["rho_e"] = rho_e; info["mu_e"] = mu_e; info["beta_resid"] = beta_resid
+    return E, info
+
+
+def _nelder_mead(model, rho_B, sigma_0, b, x0, max_iter=120, tol=1e-6):
+    """Lightweight Nelder-Mead (no scipy) in 3 variables (f, log R_d, rho_I).
+    Returns (best_x, best_E, best_info, n_iter)."""
+    n = 3
+    simplex = [list(x0)]
+    steps = [0.02, math.log(1.5), 0.02 * model.rho_sat]
+    for i in range(n):
+        xi = list(x0); xi[i] += steps[i]; simplex.append(xi)
+    fvals = [None] * len(simplex)
+    infos = [None] * len(simplex)
+    for i in range(len(simplex)):
+        fvals[i], infos[i] = _cld_objective(model, rho_B, sigma_0, b, tuple(simplex[i]))
+    alpha, gamma, rho_coef, sigma_coef = 1.0, 2.0, 0.5, 0.5
+    for it in range(max_iter):
+        order = sorted(range(len(simplex)), key=lambda k: fvals[k])
+        simplex = [simplex[k] for k in order]
+        fvals = [fvals[k] for k in order]
+        infos = [infos[k] for k in order]
+        if abs(fvals[-1] - fvals[0]) < tol and fvals[0] != float("inf"):
+            break
+        centroid = [sum(simplex[j][i] for j in range(n)) / n for i in range(n)]
+        xr = [centroid[i] + alpha * (centroid[i] - simplex[-1][i]) for i in range(n)]
+        fr, ir = _cld_objective(model, rho_B, sigma_0, b, tuple(xr))
+        if fvals[0] <= fr < fvals[-2]:
+            simplex[-1], fvals[-1], infos[-1] = xr, fr, ir
+            continue
+        if fr < fvals[0]:
+            xe = [centroid[i] + gamma * (xr[i] - centroid[i]) for i in range(n)]
+            fe, ie = _cld_objective(model, rho_B, sigma_0, b, tuple(xe))
+            if fe < fr:
+                simplex[-1], fvals[-1], infos[-1] = xe, fe, ie
+            else:
+                simplex[-1], fvals[-1], infos[-1] = xr, fr, ir
+            continue
+        xc = [centroid[i] + rho_coef * (simplex[-1][i] - centroid[i]) for i in range(n)]
+        fc, ic = _cld_objective(model, rho_B, sigma_0, b, tuple(xc))
+        if fc < fvals[-1]:
+            simplex[-1], fvals[-1], infos[-1] = xc, fc, ic
+            continue
+        for j in range(1, len(simplex)):
+            simplex[j] = [simplex[0][i] + sigma_coef * (simplex[j][i] - simplex[0][i]) for i in range(n)]
+            fvals[j], infos[j] = _cld_objective(model, rho_B, sigma_0, b, tuple(simplex[j]))
+    bi = min(range(len(simplex)), key=lambda k: fvals[k])
+    return simplex[bi], fvals[bi], infos[bi], it + 1
+
+
 def minimize_cld_cell(model: RMFModel, rho_B: float, sigma_0: float, b: float,
                      verbose: bool = False) -> Optional[CLDCellResult]:
     """Minimize the CLD cell energy at fixed total baryon density rho_B.
 
-    Four variational variables: f (volume fraction), R_d (cluster radius fm),
-    rho_I (cluster density), rho_Ip (cluster proton density). The gas density
-    rho_II is set by baryon conservation; rho_IIp is determined by beta-equilibrium
-    (mu_n - mu_p = mu_e in the gas) and cell charge neutrality.
+    Two-stage optimization (3 free variables: f, R_d, rho_I; the cluster proton
+    density rho_Ip is solved from beta-equilibrium mu_n(I) - mu_p(I) = mu_e; the
+    gas is treated as pure neutron, rho_IIp = 0):
+      1. Coarse grid scan over (f, R_d, rho_I) for a good starting point.
+      2. Nelder-Mead simplex refinement.
 
-    Uses a coarse grid + local Nelder-Mead-like refinement. For a first
-    implementation we scan a coarse 4-D grid and refine; this is sufficient
-    for the reconstruction demonstration. The CLD model gives the equilibrium
-    cluster properties at each rho_B in the inner crust.
+    The gas density rho_II is set by baryon conservation. beta-equilibrium is
+    enforced at the cluster phase (the dense, equilibrating phase); the pure-
+    neutron gas approximation is the standard low-density inner-crust limit.
     """
-    best = None
-    # coarse grid: f in (0.01, 0.5), R_d in (5, 25) fm, rho_I in (0.5-1.5)*rho_sat,
-    # rho_Ip in (0.01, 0.5)*rho_I
     rho_sat = model.rho_sat
-    f_grid = [0.01, 0.05, 0.1, 0.2, 0.3, 0.5]
-    Rd_grid = [5.0, 8.0, 12.0, 18.0, 25.0]
-    rhoI_grid = [0.6 * rho_sat, 0.9 * rho_sat, 1.1 * rho_sat, 1.3 * rho_sat]
-    # rho_Ip: scan a few proton fractions of the cluster
-    yI_grid = [0.05, 0.1, 0.2, 0.3, 0.4]
-    # gas proton fraction: start from neutron-rich (rho_IIp small)
-    rhoIIp_grid = [0.0, 0.001, 0.005, 0.01]
+    f_grid = [0.005, 0.01, 0.03, 0.08, 0.15, 0.25, 0.4]
+    Rd_grid = [4.0, 6.0, 9.0, 13.0, 20.0]
+    rhoI_grid = [0.5 * rho_sat, 0.7 * rho_sat, 0.9 * rho_sat, 1.1 * rho_sat, 1.3 * rho_sat]
 
+    best_E = float("inf"); best_x = None; best_info = None
     for f in f_grid:
         for R_d in Rd_grid:
             for rho_I in rhoI_grid:
-                if rho_I <= 0:
-                    continue
-                for yI in yI_grid:
-                    rho_Ip = yI * rho_I
-                    for rho_IIp in rhoIIp_grid:
-                        # baryon conservation gives rho_II
-                        if f < 1:
-                            rho_II = (rho_B - f * rho_I) / (1 - f)
-                        else:
-                            rho_II = 0.0
-                        if rho_II < 0 or rho_II > rho_I:
-                            continue
-                        try:
-                            E, info = cld_cell_energy(
-                                model, rho_B, f, R_d, rho_I, rho_Ip, rho_II, rho_IIp,
-                                sigma_0, b)
-                        except (ValueError, ZeroDivisionError):
-                            continue
-                        if not (math.isfinite(E)):
-                            continue
-                        if best is None or E < best["E"]:
-                            best = {
-                                "E": E, "f": f, "R_d": R_d, "rho_I": rho_I,
-                                "rho_Ip": rho_Ip, "rho_II": rho_II,
-                                "rho_IIp": rho_IIp, "info": info,
-                            }
-    if best is None:
+                x = (f, math.log(R_d), rho_I)
+                E, info = _cld_objective(model, rho_B, sigma_0, b, x)
+                if E < best_E:
+                    best_E = E; best_x = x; best_info = info
+    if best_x is None:
         return CLDCellResult(rho_B, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                             0, 0, 0, False, 0, "no feasible point")
-    # compute final properties
-    rho_e = best["f"] * best["rho_Ip"] + (1 - best["f"]) * best["rho_IIp"]
-    yp_cell = (best["f"] * best["rho_Ip"] + (1 - best["f"]) * best["rho_IIp"]) / rho_B if rho_B > 0 else 0
-    mu_e = electron_chemical_potential(rho_e)
+    x_nm, E_nm, info_nm, n_iter_nm = _nelder_mead(model, rho_B, sigma_0, b, best_x)
+    if E_nm < best_E:
+        best_x, best_E, best_info = x_nm, E_nm, info_nm
+    f, log_Rd, rho_I = best_x
+    f = max(1e-4, min(0.95, f))
+    R_d = math.exp(max(math.log(2.0), min(math.log(40.0), log_Rd)))
+    rho_I = max(0.01, min(0.5, rho_I))
+    # final beta-equilibrium solve
+    rho_Ip, rho_e, mu_e, beta_resid = solve_beta_equilibrium_cluster(model, rho_I, 0.0, f)
+    rho_IIp = 0.0
+    if f < 1:
+        rho_II = (rho_B - f * rho_I) / (1.0 - f)
+    else:
+        rho_II = 0.0
+    rho_II = max(0.0, rho_II)
+    E_cell, info = cld_cell_energy(model, rho_B, f, R_d, rho_I, rho_Ip, rho_II, rho_IIp,
+                                   sigma_0, b)
+    info["rho_Ip"] = rho_Ip; info["rho_IIp"] = rho_IIp
+    info["rho_e"] = rho_e; info["mu_e"] = mu_e; info["beta_resid"] = beta_resid
+    # cell mu_n/mu_p from the cluster phase (equilibrating)
+    rI = solve_homogeneous(model, rho_I, rho_Ip)
+    mu_n_cell = rI.mu_n; mu_p_cell = rI.mu_p
+    P_cell = 0.0  # filled by emitter via finite difference
+    yp_cell = (f * rho_Ip + (1 - f) * rho_IIp) / rho_B if rho_B > 0 else 0
     return CLDCellResult(
-        rho_B=rho_B, f=best["f"], R_d=best["R_d"],
-        rho_I=best["rho_I"], rho_Ip=best["rho_Ip"],
-        rho_II=best["rho_II"], rho_IIp=best["rho_IIp"],
-        rho_e=rho_e, y_p_cell=yp_cell,
-        E_cell=best["E"], E_binding_per_baryon=best["E"] / rho_B,
-        E_coul=best["info"]["E_coul"], E_surf=best["info"]["E_surf"],
-        E_L=best["info"]["E_L"], P_cell=0.0,  # pressure computed separately
-        mu_n=0.0, mu_p=0.0, mu_e=mu_e,
-        converged=True, n_iter=len(f_grid) * len(Rd_grid) * len(rhoI_grid) * len(yI_grid) * len(rhoIIp_grid),
-        message="coarse grid minimum",
+        rho_B=rho_B, f=f, R_d=R_d, rho_I=rho_I, rho_Ip=rho_Ip,
+        rho_II=rho_II, rho_IIp=rho_IIp, rho_e=rho_e, y_p_cell=yp_cell,
+        E_cell=E_cell, E_binding_per_baryon=E_cell / rho_B if rho_B > 0 else 0,
+        E_coul=info["E_coul"], E_surf=info["E_surf"], E_L=info["E_L"],
+        P_cell=P_cell, mu_n=mu_n_cell, mu_p=mu_p_cell, mu_e=mu_e,
+        converged=True, n_iter=n_iter_nm,
+        message=f"Nelder-Mead + beta-equil (resid={beta_resid:.3e})",
     )

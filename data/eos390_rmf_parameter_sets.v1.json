@@ -93,7 +93,7 @@
       "family": "SPG",
       "functional_form": "SPG_GOGELEIN",
       "meson_masses_MeV": {"sigma": 550.0, "omega": 782.6, "delta": 983.0, "rho": 769.0},
-      "rho_sat_fm3": 0.185,
+      "rho_sat_fm3": 0.178,
       "isoscalar_mesons": ["sigma", "omega"],
       "isovector_mesons": ["delta", "rho"],
       "coupling_params": {
@@ -102,10 +102,12 @@
         "delta": {"a": 2.68849, "b": 6.7193, "c": 0.503759, "d": 0.403927},
         "rho":   {"a": 4.56919, "b": 5.45085, "c": 1.20926, "d": 0.0}
       },
-      "saturation_targets": {"Esat_MeV": -16.14, "Ksat_MeV": 273, "Jsym_MeV": 33.5, "Lsym_MeV": 73, "Ksym_MeV": -160},
-      "reference": "Gögelein et al. PRC 77 025802 (2008) Table I; DOI 10.1103/PhysRevC.77.025802",
+      "spg_rho_ref_fm3": 0.16,
+      "saturation_targets": {"Esat_MeV": -16.25, "Ksat_MeV": 337, "Jsym_MeV": 32.11, "Lsym_MeV": 73, "Ksym_MeV": -160},
+      "reference": "Gögelein et al. PRC 77 025802 (2008) Table I (couplings) + Table II (DDRMF saturation after omega correction); DOI 10.1103/PhysRevC.77.025802",
       "companion_pdf": "gogelein2008_spg_gdfm.pdf",
-      "verification_status": "PARAMS_EXTRACTED_FROM_TABLE_I_VERIFIED"
+      "verification_status": "PARAMS_AND_RHO_REF_CORRECTED_TABLE_II_PENDING_SOLVER_REPRODUCTION",
+      "note": "rho_sat corrected to 0.178 fm^-3 (DDRMF after omega correction, Table II). x = rho_B/0.16 (rho_0 fixed reference, NOT rho_sat). saturation_targets from Table II DDRMF column."
     }
   },
   "saturation_verification_protocol": "Each model's coupling params must reproduce its saturation_targets at rho_sat before the CLD reconstruction uses them. rmf_solver.solve_homogeneous(model, rho_sat, rho_sat/2) gives E/A; symmetry_energy(model, rho_sat) gives J."

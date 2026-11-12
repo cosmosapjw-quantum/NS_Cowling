@@ -33,6 +33,11 @@ M_P = 938.27203
 M_E = 0.511
 M_MU = 105.658
 PI = math.pi
+# Gögelein 2008 PRC 77 025802 eq. 40: SPG functional form uses x = rho_B / rho_0
+# with the FIXED reference saturation density rho_0 = 0.16 fm^-3 (NOT the model's
+# actual rho_sat, which is 0.178 fm^-3 after the omega correction). This is the
+# density at which the DBHF fit was anchored.
+SPG_RHO_REF_FM3 = 0.16
 
 
 def _kF_MeV(rho_MeV3: float) -> float:
@@ -119,7 +124,8 @@ class RMFModel:
 
     def x_of(self, rho_B_MeV3: float) -> float:
         if self.functional_form == "SPG_GOGELEIN":
-            return rho_B_MeV3 / HBARC ** 3
+            # Gögelein eq. 40: x = rho_B / rho_0 with rho_0 = 0.16 fm^-3 (fixed)
+            return rho_B_MeV3 / HBARC ** 3 / SPG_RHO_REF_FM3
         return rho_B_MeV3 / self.rho_sat_MeV3
 
     def g(self, meson: str, rho_B_MeV3: float) -> float:
@@ -137,7 +143,8 @@ class RMFModel:
         x = self.x_of(rho_B_MeV3)
         c = self.couplings[meson]
         if self.functional_form == "SPG_GOGELEIN":
-            return c.dvalue_gogelein_dx(x)  # x = rho directly
+            # x = rho_B / rho_0 => dg/drho_B = (dg/dx) * (1/rho_0)
+            return c.dvalue_gogelein_dx(x) / SPG_RHO_REF_FM3
         dgdx = c.dvalue_exp_dx(x) if meson in self.isovector_mesons else c.dvalue_rational_dx(x)
         return dgdx / self.rho_sat  # x = rho/rho_sat
 

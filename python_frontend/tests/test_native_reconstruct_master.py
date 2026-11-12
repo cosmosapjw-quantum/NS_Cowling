@@ -158,6 +158,9 @@ def test_native_master_dissolves_an_inconsistent_last_nuclear_row():
     assert out.Aav[k] == 0.0
     assert out.Zav[k] == 0.0
     assert out.Yh[k] == 0.0
+    assert out.C3_applicable[k] is True
+    assert out.C4_applicable[k] is False
+    assert out.row_status[k] == 1
     assert out.Yp[k] == pytest.approx(0.5 * (0.4 * source.Yh[k - 1] + source.Yp[k + 1]), rel=2e-12)
     np.testing.assert_allclose(out.Ye[k] + out.Ymu[k], out.Yp[k], rtol=2e-12, atol=2e-13)
 

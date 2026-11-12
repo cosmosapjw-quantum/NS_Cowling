@@ -178,10 +178,9 @@ def test_row_level_composition_presence_roundtrip_preserves_partial_and_explicit
 
     assert again.Iphase[0] == eos.Iphase[0]
     assert not again.Yn_present[0] and not again.Yp_present[0]
-    assert not again.Ye_present[0] and not again.Ymu_present[0]
+    assert not again.Ye_present[0] and again.Ymu_present[0]
     assert not again.Abar_present[0] and not again.Zbar_present[0] and not again.Yh_present[0]
     assert again.row_status[0] == 1
-    assert again.Ymu_present[0]
     assert again.Ymu[0] == 0.0
 
 

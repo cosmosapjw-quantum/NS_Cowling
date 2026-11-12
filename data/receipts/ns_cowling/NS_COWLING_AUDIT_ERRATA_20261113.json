@@ -1,0 +1,74 @@
+{
+  "schema": "ns-cowling.audit-errata",
+  "schema_version": "1.0.0",
+  "date": "2026-11-13",
+  "repository": "cosmosapjw-quantum/NS_Cowling",
+  "branch": "cloud/eos05-native-smooth-parity-v1",
+  "base_head": "08fe5b814cbe2b3d6e41b9aa44d2e5f687bc1351",
+  "rule": "Protected originals are never edited; corrections are additive receipts derived from raw artifacts.",
+  "protected_original": {
+    "path": "download/m9/M9_CORRECTED_ADJUDICATION_20261112.json",
+    "sha256": "55c8a0226004ed544d623907c9df6b92f2fc5c95863ffed9d6b9c8a8f95afcc3",
+    "modified": false
+  },
+  "defect_in_original": {
+    "field": "evidence.m7_pass_by_method",
+    "omits": "quintic_P",
+    "recorded_sum": 120,
+    "raw_pass_total": 150
+  },
+  "corrected_m7_pass_by_method": {
+    "css": 30,
+    "cubic_F": 30,
+    "cubic_P": 30,
+    "quintic_F": 30,
+    "quintic_P": 30
+  },
+  "corrected_m7_fail_by_method": {
+    "maxwell": 30
+  },
+  "corrected_derivation": "Counted from receipts[] in download/m7_batch/M7_BATCH_SUMMARY.json; not copied from the adjudication.",
+  "validity_note": "Counts describe historical M7 receipt labels only. All 150 PASS remain invalid as complete native combined EOS outputs (see M9 adjudication invalid_pass_analysis).",
+  "superseded_latest_ci": {
+    "receipt": "data/receipts/ns_cowling/NS_COWLING_AUDIT_20261112.json",
+    "receipt_sha256": "501aadb9721b07be15f95c8b8f45b2f07f64b7d156f23b5e7d0ec4e53f554420",
+    "stale_head": "0cbe52ac1ace0535dea541beae31a49410abdbe5",
+    "stale_run_id": 43230679373,
+    "stale_conclusion": "failure",
+    "current_head": "08fe5b814cbe2b3d6e41b9aa44d2e5f687bc1351",
+    "current_run_ids": [
+      43232391185,
+      43232373861
+    ],
+    "current_conclusion": "success",
+    "current_steps_success": [
+      "Build Fortran EOS executable",
+      "Run frontend and direct-provider tests",
+      "Run native Fortran polynomial-extrema unit tests",
+      "Run native Fortran CSS segment analytic tests",
+      "Verify tracked SHA-256 manifest"
+    ],
+    "pytest_counts": {
+      "passed": 106,
+      "skipped": 2,
+      "failed": 0
+    },
+    "pytest_counts_source": "GitHub Actions job log (not a repository file)",
+    "local_reproduction": {
+      "passed": 106,
+      "skipped": 2,
+      "exit_code": 0,
+      "log": "CLOUD00_20261113/pytest.log"
+    }
+  },
+  "post_pin_commits_since_0cbe52a": [
+    "08fe5b814cbe2b3d6e41b9aa44d2e5f687bc1351 chore(checksums): refresh exact CI-verified source hashes",
+    "58c522d38e55fb289d3e38ec9d778ccc23fc2395 test(ci): correct backend blocker assertions and refresh checksum pins",
+    "062b10726de1a593254cc3dffb74be0ec38dc2c0 docs(audit): unify EOS390 and sharp Cowling cloud DAG"
+  ],
+  "failure_classes": [
+    "SCOPE_OR_POLICY",
+    "DATA_PROVENANCE"
+  ],
+  "scope_or_policy_note": "docs/NS_COWLING_CLOUD_AGENT_DAG_20261112.md section 12 lists download/m9/M9_CORRECTED_ADJUDICATION_20261112.json as an artifact to update, but download/m9 is a protected path in the handoff prompt. Errata therefore live in data/receipts."
+}

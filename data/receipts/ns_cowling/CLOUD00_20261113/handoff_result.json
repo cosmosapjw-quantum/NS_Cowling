@@ -1,0 +1,26 @@
+{
+  "node": "CLOUD-00",
+  "status": "PASS",
+  "scope": "snapshot/isolation/errata only",
+  "not_claimed": [
+    "EOS-05 complete",
+    "390 regeneration",
+    "M7 native PASS",
+    "Dropbox upload"
+  ],
+  "red_test": "python_frontend/tests/test_ns_cowling_receipts.py (3 failed / 3 passed before receipts existed)",
+  "baseline": {
+    "pytest": "106 passed, 2 skipped, exit 0",
+    "native_unit_tests": "2/2 PASS",
+    "sha256sum_c": "OK exit 0"
+  },
+  "not_run_390_specific": [
+    "390_pair_manifest.json",
+    "per_pair/<task_id>/task_receipt.json",
+    "readback_report.json",
+    "C1_C11_report.json",
+    "historical_immutability_report.json",
+    "output_manifest.sha256",
+    "dropbox_upload_receipt.json"
+  ]
+}

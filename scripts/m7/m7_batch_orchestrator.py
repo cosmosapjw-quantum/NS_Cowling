@@ -130,7 +130,10 @@ def run_task(task: dict) -> dict:
         if method == FIRST_LAW_HERMITE_PRESSURE_BRIDGE:
             result = run_first_law_constrained_hermite_pressure_bridge_task(crust_dir, core_dir, str(out_dir))
         elif method == "maxwell":
-            result = run_maxwell_task(crust_dir, core_dir, str(out_dir))
+            raise BackendUnavailable(
+                "maxwell is the sharp first-order transition method and is not part of the six-method smooth EOS390 v2 matrix; "
+                "use the separate M5 sharp-Maxwell workflow"
+            )
         elif method == "css":
             result = run_css_task(crust_dir, core_dir, str(out_dir))
         elif method in ("cubic_F", "cubic_P", "quintic_F", "quintic_P"):
@@ -192,6 +195,15 @@ def run_batch(manifest_path: str, *, max_pending: int = None) -> dict:
     (useful in the sandbox to avoid long runs; None = run all)."""
     with open(manifest_path, 'r', encoding='utf-8') as f:
         manifest = json.load(f)
+    if manifest.get("schema") != "ns-cowling.eos390-m7-batch-manifest" or manifest.get("schema_version") != "2.0.0":
+        raise ValueError(
+            "M7 accepts only the v2 six-smooth-method manifest. Historical v1 manifests used "
+            "method=maxwell for NPPHB and are immutable; regenerate a v2 manifest with "
+            "first_law_constrained_hermite_pressure_bridge. The sharp method ID maxwell "
+            "belongs to the separate M5 transition workflow."
+        )
+    if "maxwell" in manifest.get("matrix", {}).get("methods", []):
+        raise ValueError("method=maxwell is forbidden in the M7 smooth EOS390 manifest")
     tasks = manifest['tasks']
     receipts = []
     counts = {'PASS': 0, 'FAIL': 0, 'BLOCKED': 0, 'PARTIAL': 0, 'PENDING': 0}

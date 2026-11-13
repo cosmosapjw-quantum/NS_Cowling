@@ -36,7 +36,8 @@ The exact matrix is:
 |---|---:|---|
 | Crust models | 13 | \`SPG_M1\`, \`SPG_M2\`, \`SPG_M3\`, \`SPG_M4\`, \`SPG_M5\`, \`GPPVA_DD2\`, \`GPPVA_DDME2\`, \`GPPVA_FSU2\`, \`GPPVA_FSU2H\`, \`GPPVA_FSU2R\`, \`GPPVA_NL3wrL55\`, \`GPPVA_TM1e\`, \`GPPVA_TW\` |
 | Core models | 5 | \`APR_APR\`, \`BBB_BHF2\`, \`GM_GM1\`, \`RG_SLY4\`, \`RG_KDE0v1\` |
-| Method IDs | 6 | \`maxwell\`, \`css\`, \`cubic_F\`, \`cubic_P\`, \`quintic_F\`, \`quintic_P\` |
+| Smooth EOS390 method IDs | 6 | `first_law_constrained_hermite_pressure_bridge`, `css`, `cubic_F`, `cubic_P`, `quintic_F`, `quintic_P` |
+| Separate sharp-transition method ID | 1 | `maxwell` (existing 65-pair sharp-Maxwell workflow; not part of the 390 smooth matrix) |
 | **Total** | **390** | \`13 × 5 × 6\` |
 
 The recorded v3.2 baseline contains 390 constructed/read-back combinations, with 234 whole-table hard-gate PASS and 156 diagnostic-only whole-table C10 causality failures. The 156 failures are associated with the high-density source tails of \`APR_APR\` and \`RG_KDE0v1\` (78 pair-method combinations each). The historic causal-domain subrange count does not convert a full-table C10 failure into PASS. These are recorded historical values, not a new independent execution from this session.
@@ -329,7 +330,7 @@ n_H=\frac{dP_H}{d\mu_B},\quad n_H>n_L>0,
 
 Pressure and chemical potential are continuous; density and energy density have a positive finite jump. The two one-sided rows are adjacent. No derivative stencil, spline, interpolation interval, or root search may cross the interface. This is a locally neutral Maxwell construction, not global-neutrality Gibbs matter.
 
-The old Python \`method="maxwell"\` implementation is a smooth near-pressure-plateau Hermite bridge with continuous density. It is not a Maxwell phase transition. Keep it read-only and do not use it as a physical Maxwell oracle. The native public \`maxwell\` route must stay fail-closed until true sharp coexistence is integrated.
+The historical v1 EOS390 token method="maxwell" named the smooth NPPHB pressure bridge. Active code now identifies that kernel as first_law_constrained_hermite_pressure_bridge. Existing v1 manifests, task receipts, output folders and hashes containing __maxwell are immutable historical provenance and must not be rewritten. The public method ID maxwell now means only a true sharp local-neutrality first-order coexistence construction. The common native matcher remains fail-closed for maxwell until composition-aware M5 integration is complete.
 
 ### 5.2 CSS high-density branch
 
@@ -596,7 +597,7 @@ B. Implement E390-10: generic CompOSE T, n_B, Yq axes and 1D/2D/3D data model; n
 C. Re-run original 18-provider cohort with exact source hashes and readback. Keep unsupported dimensions explicit.
 D. Resolve SPG/GPPVA abundance-field semantics from written provider documentation and independent closure. The CompOSE manual is not sufficient evidence for undocumented provider conventions. Do not guess YI/Yh/Xh.
 E. Port literature composition solvers for APR/BHF2 with source provenance and correct electron/muon threshold.
-F. Port all five smooth match methods and the true sharp Maxwell method into the common Fortran matcher. The historical smooth maxwell plateau is not a Maxwell transition.
+F. Port the five production smooth methods and the distinct FLCHPB legacy parity method; integrate the true sharp Maxwell method under the canonical ID maxwell. The historical v1 maxwell token is not retained as an active smooth alias.
 G. Integrate phase-segmented Fortran TOV, tidal jump and slow/rapid Cowling interface conditions.
 H. Construct exactly 390 tasks, each with an immutable machine receipt, failure state, source/output hashes and readback.
 I. Only after all predecessor gates PASS, execute the 390 run in a new attempt directory and package the output artifact.

@@ -43,7 +43,7 @@ The following are preserved row by row: particle/group values, Iphase, row_statu
 
 ## Verification and evidence semantics
 
-The CI regression covers all five admitted source models, exact output row counts, strict density monotonicity, native readback, and fail-closed source-hash/overwrite controls. Each production execution writes a model receipt and a root manifest with input/output file SHA-256 values.
+The CI regression covers all five admitted source models, exact output row counts, strict density monotonicity, native readback, and fail-closed source-hash/overwrite controls. The workflow also runs scripts/build_e390_03a_core_only.py on the source cohort and uploads the five CompOSE directories, per-model receipts and root manifest as a 30-day GitHub Actions artifact named E390-03A-core-only-<commit>. Each run writes a model receipt and root manifest with input/output file SHA-256 values.
 
 A successful extraction/readback establishes implementation-verified row preservation for the declared models. It does not establish physical admissibility. C1-C11 diagnostics are recorded separately; any non-PASS first-law, stability, causality, beta-equilibrium or composition-closure result remains a downstream blocker and is never repaired here.
 

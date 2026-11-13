@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.4.3",
+  "revision": "1.4.4",
   "created_utc": "2026-11-11",
-  "status": "M10_PHASE3_CI_PASS_MULTIDIM_EXPORT_FAIL_CLOSED_SOURCE_COMPOSITION_GATE_BLOCKED_PHASES4_5_PENDING",
+  "status": "M1_SOURCE_AUDIT_COMPLETE_CORE_CRUST_COMPONENT_CONTRACT_NEXT_M10B_PHASE3_ONLY",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "cloud/eos390-fortran-unification-v1",
@@ -282,7 +282,7 @@
         "Historical maxwell plateau is documented as Delta n_B=0 and not first-order",
         "Composition, Nadd, Q3/Il, phase and TOV/tidal behaviors are recorded"
       ],
-      "status": "PARTIAL_SOURCE_AUDIT"
+      "status": "IMPLEMENTED_SOURCE_AUDIT_COMPLETE"
     },
     {
       "id": "M2",
@@ -438,14 +438,22 @@
       "depends_on": [
         "E390-00"
       ],
-      "status": "PARTIAL_LEGACY_SEMANTICS_CHARACTERIZED",
+      "status": "SOURCE_AUDIT_COMPLETE_RECEIPT_RECORDED",
       "outputs": [
         "legacy method equations",
         "composition schema map",
         "Nadd policy",
         "model bibliography",
-        "390 baseline receipt"
-      ]
+        "390 baseline receipt",
+        "source-grounded E390-01 audit receipt",
+        "six-method equations and legacy Maxwell disambiguation",
+        "core/crust builder gap identified and promoted to E390-01A"
+      ],
+      "resolved_date": "2026-11-13",
+      "receipt": "data/receipts/eos390_m1/E390-01_LEGACY_BEHAVIOR_AUDIT_20261113.json",
+      "status_detail": "Six legacy method IDs, candidate-window/gauge logic, core selection heuristic, reconstruction side effects, CompOSE YI/Iphase/missingness, Nadd, Q3/Il, sharp Maxwell/Gibbs, tidal jump and historical 390 baseline have been source-audited. Historical maxwell is NPPHB (smooth, Delta n_B=0), not a first-order transition. This closes source characterization only; it does not implement native matching or standalone core-only/crust-only builders.",
+      "audit_commit": "7174ce459fcbbcfed5755e00ded9c7a87bea8314",
+      "audit_parent": "3fc18026a4d648f9a71965c81a8970461827b283"
     },
     {
       "id": "E390-02B",
@@ -766,6 +774,36 @@
       "status_detail": "Per-row/per-species/per-group presence masks implemented in Fortran backend + EOSData + Python API; 8 M2A tests PASS covering all 6 acceptance criteria.",
       "resolved_date": "2026-11-13",
       "receipt": "data/receipts/eos390_m2a/E390-02A-RESOLVED_20261113.json"
+    },
+    {
+      "id": "E390-01A",
+      "gate": "M1A",
+      "title": "Specify standalone core-only and crust-only EOS construction contracts",
+      "depends_on": [
+        "E390-00",
+        "E390-01",
+        "E390-02A",
+        "E390-10A"
+      ],
+      "status": "READY_NEXT_NODE",
+      "outputs": [
+        "source-authoritative component boundaries and model-specific policies for all five core and thirteen crust inputs",
+        "separate raw-source, normalized/reconstructed, core-only, crust-only and matched-composite artifact contracts",
+        "cold T=0 thermodynamic and composition acceptance matrix",
+        "matching-ready component interface metadata and provenance schema"
+      ],
+      "acceptance": [
+        "Core-only selection is provider/model-specific and uses documented homogeneous-matter support; the legacy n_B>=0.045 fm^-3 fallback is not accepted as the sole physical boundary criterion.",
+        "Crust-only construction preserves the complete source-supported outer-crust, neutron-drip, inner-crust and cluster/pasta regimes and never imports an unverified high-density core tail.",
+        "The five core and thirteen crust models each have explicit source EOS identity, units, rest-mass convention, T/Yq slice, source support and reconstruction policy.",
+        "The cold component EOS obeys F=epsilon/n_B, P=n_B*dF/dln(n_B), mu_B=F+P/n_B and c_s^2/c^2=(dP/dln(n_B))/(n_B*mu_B), with C1-C11 applicability reported rather than inferred from missing fields.",
+        "Composition is preserved when source-valid; literature-derived composition is explicitly provenance-labelled; missing values never become measured zeros; SPG/GPPVA uses the resolved dual-track standard-parser plus literature-reconstruction bypass.",
+        "Nadd and categorical q_extra are preserved or explicitly unsupported; no categorical field is interpolated as a scalar.",
+        "Rest-mass alignment is derived from documented nucleon mass conventions only; no empirical gauge fitting.",
+        "Raw source hashes and all intermediate outputs are immutable/versioned; reconstruction changes are recorded as transformations.",
+        "The component constructors do not extrapolate outside source support and report source gaps, duplicate rows, unsupported fields and acausal/stability failures explicitly."
+      ],
+      "status_detail": "Design-first node. It fixes exact component identities, model-specific core/crust boundaries, cold-slice contracts, first-law/composition checks and immutable provenance before implementing native builders. It does not run the 390 pair-method matrix."
     }
   ],
   "mutation_policy": {
@@ -1125,7 +1163,7 @@
     ],
     "policy": "Track separately from the 390 matrix; never reinterpret EOS390 method=maxwell."
   },
-  "last_update_utc": "2026-11-13T11:02:10.419Z",
+  "last_update_utc": "2026-11-13T20:35:00+09:00",
   "known_remaining_implementation_gaps": [
     {
       "area": "native literature-derived composition",
@@ -1167,6 +1205,16 @@
       "status": "RESOLVED_DUAL_TRACK_20261113",
       "evidence": "C6B standard (Yh=Abar*YI, M2A FAIL flag, byte-preserve) IMPLEMENTED_CI_PASS + production bypass DECIDED (reconstruct from Grill2014/Scurto2024/RMF papers, M3 pipeline OPERATIONAL, GPPVA_DD2 done). Provider clarification no longer a hard gate.",
       "resolution_receipt": "data/receipts/eos390_m2a/E390-02-SPG_GPPVA_ABUNDANCE_SEMANTICS_RESOLVED_20261113.json"
+    },
+    {
+      "area": "standalone core-only and crust-only EOS construction",
+      "status": "NOT_EXPLICITLY_IMPLEMENTED_IN_AUDITED_LEGACY_API",
+      "evidence": "The audited legacy matcher slices tables through get_core_start_index/find_convex_transition_window and joins them in match_crust_core; reconstruct_master transforms a supplied full table. No explicit source-authoritative standalone core_only/crust_only builder contract was found in the audited production path. Promoted to E390-01A before native implementation."
+    },
+    {
+      "area": "legacy core/crust interface locator",
+      "status": "HEURISTIC_ONLY_REQUIRES_MODEL_SPECIFIC_REPLACEMENT",
+      "evidence": "Core start uses homogeneous composition when available, otherwise n_B>=0.045 fm^-3; transition-window secant inequalities are screening criteria, not stability/causality or phase-boundary proofs."
     }
   ],
   "phase_ontology": {
@@ -1328,9 +1376,11 @@
   "execution_order": [
     "M0",
     "M1",
+    "M1A",
     "M2",
     "M2A",
-    "M10",
+    "M10A",
+    "M10B",
     "M3",
     "M4",
     "M5",
@@ -1793,14 +1843,16 @@
     }
   ],
   "next_actions": [
-    "Implement M10 multi-T parsing with explicit grid-index to tensor-slot mapping and complete (T,Yq,nb) coverage.",
-    "Tensorize composition for all cells: Iphase, sparse species/group presence masks, row status and C3/C4 applicability.",
-    "Implement lossless full T x Yq x nb CompOSE writer/readback, preserving all axes, Nadd, sparse masks and categorical q_extra.",
-    "Provision raw source cohort into Actions via controlled non-public artifact/cache or secure input; rerun source-backed RG_SLY4/RG_KDE0v1 checks and attribute every skip.",
-    "Obtain provider-authored Iphase and group abundance meanings; normalized closure is reconstruction, not source truth.",
-    "Integrate native smooth kernels only after NPPHB knot-split quadrature convergence and RG_* Q5 semantics resolve.",
-    "Keep historical maxwell=NPPHB separate from sharp_maxwell.",
-    "Run M7/M9 only after all 390 complete native composition-preserving outputs and per-task C1-C11 receipts."
+    "E390-01A (next): specify source-authoritative core-only and crust-only construction contracts for all five core and thirteen crust models; separate raw, reconstructed component and composite EOS artifacts.",
+    "Implement native core-only EOS construction from each approved core source interval, with explicit composition provenance and no fixed-density-only boundary inference.",
+    "Implement native crust-only EOS construction preserving outer crust, neutron drip, inner crust and cluster/pasta fields; use the published CLD/Thomas-Fermi reconstruction bypass for SPG/GPPVA rather than silently remapping non-conformant provider abundance fields.",
+    "Complete M10B phase 4 multi-T parsing with explicit grid-index-to-tensor-slot mapping and complete (T,Yq,nb) coverage; cold T=0 component work may use the already-passing M10A selected-slice path but must not claim full multidimensional support.",
+    "Tensorize composition for all cells: Iphase, sparse species/group presence masks, row status and independent C3/C4 applicability.",
+    "Implement lossless full T x Yq x nb CompOSE writer/readback, preserving all axes, arbitrary Nadd, sparse masks and categorical q_extra.",
+    "Port literature-derived core beta-equilibrium solvers and crust CLD/Thomas-Fermi composition reconstruction into the native Fortran production path; retain current Python implementation as a differential reference only.",
+    "Integrate the five smooth matching kernels only after NPPHB knot-split quadrature convergence and source-specific Q5 semantics are resolved; keep historical legacy_npphb distinct from sharp_maxwell.",
+    "Port exact sharp Maxwell and separate two-charge Gibbs semantics with composition/provenance preservation.",
+    "Complete native TOV/tidal/Cowling interface treatment, manifest-driven 390 runner, C1-C11/differential/convergence validation, and versioned 390 regeneration only after all component and matching gates close."
   ],
   "provenance": {
     "last_reconciled_utc": "2026-11-11",
@@ -1910,5 +1962,12 @@
     "replacement_inventory": "data/eos390_reconstructed_source_inventory.v1.json",
     "replacement_archive": "EoS_complete_core_crust_release_v3_2.zip",
     "rule": "Never request or fabricate the lost tar.zst. Reconstruct a new versioned tar.zst from the surviving ZIP using the checked-in inventory and helper."
+  },
+  "latest_evidence_receipt": {
+    "node": "E390-01",
+    "path": "data/receipts/eos390_m1/E390-01_LEGACY_BEHAVIOR_AUDIT_20261113.json",
+    "audit_commit": "7174ce459fcbbcfed5755e00ded9c7a87bea8314",
+    "backup_branch": "backup/e390-01-pre-20261113",
+    "backup_parent_sha": "3fc18026a4d648f9a71965c81a8970461827b283"
   }
 }

@@ -33,17 +33,31 @@ CRUST_MODELS = [
     'GPPVA_TM1e', 'GPPVA_TW',
 ]
 CORE_MODELS = ['APR_APR', 'BBB_BHF2', 'GM_GM1', 'RG_SLY4', 'RG_KDE0v1']
-METHODS = ['maxwell', 'css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
+FIRST_LAW_HERMITE_PRESSURE_BRIDGE = 'first_law_constrained_hermite_pressure_bridge'
+MAXWELL_METHOD_ID = 'maxwell'
+# The EOS390 v2 six-method matrix is the historical smooth-interpolation matrix.
+# The sharp local-neutrality Maxwell construction remains a separate 65-pair
+# transition workflow, with the canonical physical method ID "maxwell".
+METHODS = [FIRST_LAW_HERMITE_PRESSURE_BRIDGE, 'css', 'cubic_F', 'cubic_P', 'quintic_F', 'quintic_P']
 
-# Physics reference for each matching method (provenance)
+# Physics reference for each smooth/transition method (provenance).
+# MAXWELL_METHOD_ID is deliberately registered but excluded from METHODS.
 METHOD_PHYSICS = {
-    'maxwell': {
+    FIRST_LAW_HERMITE_PRESSURE_BRIDGE: {
         'kind': 'legacy_smooth_interpolation',
-        'method_identity': 'LEGACY_NPPHB',
-        'description': 'Legacy near-pressure-plateau Hermite bridge (NPPHB); smooth interpolation with no density jump and no latent heat. This token is not a sharp Maxwell phase transition.',
+        'method_identity': 'LEGACY_NPPHB_FLCHPB',
+        'description': 'Project-defined first-law-constrained Hermite pressure bridge (historical NPPHB parameterization); continuous density and no latent-heat jump. It is not a Maxwell phase transition.',
         'physical_classification': 'UNRESOLVED',
-        'reference': 'Project-defined legacy parameterization; no literature attribution claimed',
+        'reference': 'Project-defined Hermite pressure bridge; no literature attribution claimed',
         'acceptance_node': 'E390-02C',
+    },
+    MAXWELL_METHOD_ID: {
+        'kind': 'sharp_maxwell_phase_transition',
+        'method_identity': 'SHARP_MAXWELL_LOCAL_NEUTRALITY',
+        'description': 'True first-order Maxwell coexistence between two locally charge-neutral phases: equal P and mu_B with positive density and energy-density jumps and Delta epsilon=mu_t*Delta n_B.',
+        'physical_classification': 'FIRST_ORDER_SHARP',
+        'reference': 'Thermodynamic Maxwell coexistence construction; see the project phase-transition contract',
+        'acceptance_node': 'M5',
     },
     'css': {
         'kind': 'css_high_density_extension',
@@ -56,25 +70,25 @@ METHOD_PHYSICS = {
     'cubic_F': {
         'kind': 'smooth_interpolation',
         'description': 'Cubic Hermite interpolation in free energy F = eps/n_B; this method does not itself classify a physical transition',
-        'reference': 'Legacy NPPHB Hermite bridge (project-defined; not a literature attribution per legacy_method_semantics)',
+        'reference': 'Project-defined cubic Hermite interpolation of the cold free-energy representation; no literature attribution implied',
         'acceptance_node': 'E390-02C',
     },
     'cubic_P': {
         'kind': 'smooth_crossover',
         'description': 'Cubic Hermite interpolation in pressure P; this method does not itself classify a physical transition',
-        'reference': 'Legacy NPPHB Hermite bridge (project-defined)',
+        'reference': 'Project-defined Hermite interpolation of the corresponding pressure/chemical-potential representation; no literature attribution implied',
         'acceptance_node': 'E390-02C',
     },
     'quintic_F': {
         'kind': 'smooth_crossover',
         'description': 'Quintic Hermite interpolation in free energy F; method continuity is not a thermodynamic phase classification',
-        'reference': 'Legacy NPPHB Hermite bridge (project-defined)',
+        'reference': 'Project-defined quintic Hermite interpolation of the cold free-energy representation; no literature attribution implied',
         'acceptance_node': 'E390-02C',
     },
     'quintic_P': {
         'kind': 'smooth_crossover',
         'description': 'Quintic Hermite interpolation in pressure P; method continuity is not a thermodynamic phase classification',
-        'reference': 'Legacy NPPHB Hermite bridge (project-defined)',
+        'reference': 'Project-defined quintic Hermite interpolation of the pressure/chemical-potential representation; no literature attribution implied',
         'acceptance_node': 'E390-02C',
     },
 }
@@ -159,7 +173,11 @@ def generate_manifest(*, output_root: str, crust_eos_root: str = None,
         raise AssertionError('matrix cardinality drift: 13x5x6 != 390 - update CRUST/CORE/METHOD')
     manifest = {
         'schema': 'ns-cowling.eos390-m7-batch-manifest',
-        'schema_version': '1.0.0',
+        'schema_version': '2.0.0',
+        'method_registry_version': '2.0.0',
+        'matrix_kind': 'historical_smooth_core_crust_reproduction',
+        'separate_sharp_transition_method_id': MAXWELL_METHOD_ID,
+        'historical_v1_method_token_map': {'maxwell': FIRST_LAW_HERMITE_PRESSURE_BRIDGE},
         'matrix': {
             'crust_models': CRUST_MODELS,
             'core_models': CORE_MODELS,

@@ -24,10 +24,10 @@ They share EOS provenance, phase ontology, input contracts and reproducibility g
 ## 3. Non-negotiable method ontology
 
 The immutable historical six-token matrix is:
-- maxwell: legacy project-defined NPPHB smooth near-pressure-plateau Hermite bridge; continuous-density historical method, not a sharp phase transition.
+- first_law_constrained_hermite_pressure_bridge: the legacy project-defined NPPHB smooth near-pressure-plateau Hermite bridge; continuous density and no latent-heat jump. Existing v1 artifact paths with __maxwell are immutable provenance only; active code uses the renamed FLCHPB token.
 - css: CSS high-density parameterized extension; physical jump classification depends on explicit input parameters and independent thermodynamic checks.
 - cubic_F, cubic_P, quintic_F, quintic_P: smooth interpolation method families. Smoothness of a numerical interpolant does not establish the thermodynamic class CROSSOVER_SMOOTH.
-- A genuine sharp Maxwell construction is a separate operation. If added as a new matrix dimension, use a new token sharp_maxwell and a new versioned matrix. Do not silently repurpose historical maxwell or alter 390-key identity.
+- A genuine sharp first-order Maxwell construction uses the canonical method token maxwell and remains a separate 65-pair transition workflow, not part of the six-method smooth EOS390 matrix. It requires common P_t and mu_t and positive Delta n_B and Delta epsilon. The old v1 token maxwell is mapped only in the migration receipt to FLCHPB; old output paths and receipts are not rewritten.
 
 For a sharp one-charge locally neutral Maxwell transition require P_-=P_+=P_t, mu_B,-=mu_B,+=mu_t, n_+>n_->0 and Delta epsilon=mu_t Delta n_B>0. Preserve two adjacent one-sided states. Interpolation, splines, finite-difference stencils and root brackets must be phase-local and must never cross the discontinuity.
 

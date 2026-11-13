@@ -1,0 +1,151 @@
+{
+  "schema": "ns-cowling.eos-04-crust-reconstruct-splice-verification",
+  "schema_version": "1.0.0",
+  "date": "2026-11-13",
+  "node": "EOS-04",
+  "node_name": "Crust reconstruction and splice",
+  "track": "eos390",
+  "status": "PASS",
+  "status_scope": "This PASS is scoped to the EOS-04 crust-reconstruction-and-splice contract (the 5 acceptance criteria) on the NATIVE Fortran path: native interpolation/derivative/reconstruction, the assembled crust+core table passing the full C1-C11 consistency gate (closing the legacy M4 receipt's C6/C10/C11 gap on the native path), no interpolation of categorical columns, one-sided discontinuities retained, and source columns/knots preserved. It is NOT a 390-batch PASS, NOT a complete-combined-crust-core-core-CSS-EOS PASS (EOS-06/07), NOT a Dropbox PASS, NOT a CLD cell-level beta-equilibrium reconstruction PASS (EOS-03 source-blocked). The native matcher remains strict-thermo-only; composition-aware matching is not ported.",
+  "supersedes_dag_status": "PARTIAL",
+  "dag": "data/ns_cowling_cloud_agent_dag.v1.json",
+  "depends_on": [
+    "EOS-02A",
+    "EOS-03"
+  ],
+  "dependency_note": "EOS-02A is PASS. EOS-03 (Core model couplings and thermodynamic reconstruction) remains PARTIAL_OR_SOURCE_BLOCKED; the EOS-04 splice works on the strict-thermo-only barotrope (Q1-Q7) and does NOT require the EOS-03 coupling-resolution or cell-level CLD beta-equilibrium. The legacy M4 receipt attributed its C6/C10/C11 assembled-table failures to 'known M3 CLD reconstruction limitations (coarse pressure, no cell-level beta-equilibrium)'; on the native matching path those failures do not occur because the matcher reconstructs Q1 from the first law and enforces thermodynamic closure, so the assembled crust+core table passes the full consistency gate. EOS-03 source-blocked items (per-model coupling extraction, cell-level CLD) remain out of scope for EOS-04.",
+  "repository": {
+    "repo": "cosmosapjw-quantum/NS_Cowling",
+    "branch_at_verification": "cloud/eos-04-crust-reconstruct-splice (child of cloud/eos-05-native-hermite-kernels -> cloud/eos-10-multidim-compose-io -> cloud/eos-02a-presence-masks-completion -> cloud/eos390-fortran-unification-v1 / EOS PR #13)",
+    "base_head": "6da387b (EOS-05 PASS)",
+    "eos_pr_13_head_unchanged": "08fe5b8 (no merge into the PR #13 branch)"
+  },
+  "build_provenance": {
+    "compiler": "GNU Fortran (conda-forge gcc 16.2.0-7) 16.2.0",
+    "executable_sha256": "f0acd9e15a933394a2ece21d1fbc3025efbd59dd5fef251eae96f6c4d8bc6ad3",
+    "note": "No Fortran source was changed in this node. The EOS-04 fix is test-only (a new regression file asserting the assembled crust+core table passes the full native consistency gate, plus source-knot/endpoint, categorical-column and causal-stability preservation). The executable SHA is identical to the EOS-05/EOS-10 build."
+  },
+  "implementation_files_sha256": {
+    "python_frontend/tests/test_eos04_crust_splice_verification.py": "55f05aa25fc4eacceef60505475fb6b1f56325bc91619e0df06a798bdfe1a7f0"
+  },
+  "native_splice_architecture": {
+    "reconstruct_master": "fortran_eos/src/compose_eos_reconstruct.f90:763 reconstruct_master subroutine + CLI action 'reconstruct-master' (compose_eos_fortran.f90:180). Reconstructs the cold crust barotrope (outer + inner crust) from the source thermodynamic columns using native PCHIP/Hermite kernels, enforces the first law (mu_B = F + P/n_B), electron/muon/charge constraints, rejects phase-pressure plateaus (one-sided discontinuities retained), and preserves the extra thermo column unless explicitly declared cs2.",
+    "match_crust_core": "fortran_eos/src/compose_eos_matching.f90:571 match_crust_core subroutine + CLI action 'match-core' (compose_eos_fortran.f90:139). Splices a cold beta-equilibrated crust barotrope to a cold beta-equilibrated core barotrope via the four cubic/quintic F/P Hermite bridge kernels (EOS-05) plus css. Computes endpoint sound speeds (endpoint_cs2), the matching window (find_window), and assembles crust-knots + bridge + core-knots. Validates inputs (validate_eos) and the assembled table (strictly-increasing nb/p/eps).",
+    "consistency_gate": "fortran_eos/src/compose_eos_verify.f90:47 check_consistency subroutine. Computes the CompOSE C1-C11 consistency record on an EOSData; the native hard gate is C1-C6/C10/C11 (C7-C9 are finite-difference diagnostics). C6 = dP/dn_B > 0, C10 = causal sound speed (0 < cs2 < 1), C11 = dmu_B/dn_B > 0, C1 = cold-T=0 + zero entropy + zero Q6-Q7, C2 = thermodynamic closure.",
+    "api_wiring": "python_frontend/compose_eos/api.py:281 match_crust_core calls the Fortran match-core action, then check_consistency(matched) (api.py:198) and stores info['consistency']; it raises if consistency['overall']['pass_'] is False (api.py:199-207)."
+  },
+  "legacy_M4_receipt_resolution": {
+    "legacy_receipt": "data/receipts/eos390_m0/E390-02_M4_OUTER_INNER_CRUST_SPLICE_STATUS_20261112.json",
+    "legacy_status": "M4 OUTER-INNER CRUST SPLICING PIPELINE OPERATIONAL - 6 verified models spliced; C6/C10/C11 consistency failures trace to the known M3 CLD reconstruction limitations (coarse pressure, no cell-level beta-equilibrium), not to a splicing bug.",
+    "legacy_failed_checks_per_model": [
+      "C6",
+      "C10",
+      "C11"
+    ],
+    "legacy_path": "Python (cld_cell.py + rmf_solver.py + direct concatenation, Q1 reconstructed post-hoc from Q3-Q6)",
+    "native_path_resolution": "On the native matching path (match_crust_core), the assembled crust+core table for ALL FIVE methods (css, cubic_F, cubic_P, quintic_F, quintic_P) on the GPPVA_FSU2H crust + GM_GM1 core benchmark passes the full consistency gate: overall=True, C6/C10/C11 all pass (verified directly in this node's test_assembled_crust_core_table_passes_full_consistency_gate). The native matcher reconstructs Q1 from the first law inside the bridge and enforces thermodynamic closure, so the assembled table does not inherit the legacy coarse-CLD-pressure inconsistency. The legacy receipt's attribution ('not a splicing bug') is confirmed: the native splice itself is consistent; the legacy inconsistency was a source-resolution artifact of the Python CLD path, which the native strict-thermo-only path does not reproduce.",
+    "caveat": "This closes the C6/C10/C11 gap for the smooth-matching assembled table on the native path. The cell-level CLD beta-equilibrium reconstruction (EOS-03 PARTIAL_OR_SOURCE_BLOCKED) is NOT claimed; the native matcher is strict-thermo-only and the benchmark GPPVA_FSU2H crust is a cold beta-equilibrated barotrope, not a cell-level CLD reconstruction."
+  },
+  "acceptance_criteria_verification": [
+    {
+      "criterion": "native Fortran interpolation/derivative/reconstruction",
+      "status": "PASS",
+      "evidence_test": "test_native_reconstruct_master.py (13 tests, all PASS); test_eos05_kernel_edge_cases.py (8 tests); test_native_density_gap.py; test_fortran_frontend.py",
+      "evidence_detail": "reconstruct_master (compose_eos_reconstruct.f90:763) performs native PCHIP/Hermite interpolation and derivative reconstruction of the cold crust barotrope, with analytic derivatives (hermite_value, hermite_second_derivative, pchip_value) and the Fritsch-Carlson monotone-slope edge logic. The 13 reconstruct-master tests cover: exact first law without inventing composition, unsmoothed PCHIP free-energy knot preservation, electron/muon/charge constraint solution, last-nuclear-row dissolution, relativistic-electron + lattice outer-crust pressure, extra-thermo-column preservation, phase-pressure-plateau rejection (one-sided discontinuities), invalid-control rejection, nonzero-entropy rejection, trapped-lepton rejection, free/internal-energy inconsistency rejection, baryon-chemical-potential Euler mismatch rejection, and CompOSE Il=0 zero-charge-potential convention preservation."
+    },
+    {
+      "criterion": "local matching with endpoint/causality checks",
+      "status": "PASS",
+      "evidence_test": "test_eos04_crust_splice_verification.py::test_assembled_crust_core_table_passes_full_consistency_gate[5 methods] + test_assembled_table_causal_stability_across_splice[5 methods]; test_native_crust_core_matching.py parity tests (endpoint i1/i2 + cs2_min/cs2_max + first_law_residual); test_eos05_kernel_edge_cases.py per-method monotonicity/causality smoke",
+      "evidence_detail": "The assembled crust+core table passes the full native C1-C11 consistency gate (hard checks C1-C6/C10/C11) for all 5 methods: overall=True, C6 (dP/dn_B>0)=True, C10 (0<cs2<1)=True, C11 (dmu_B/dn_B>0)=True, C1 (cold T=0/zero entropy/zero Q6-Q7)=True, C2 (closure)=True. This is the bridge + source-knots combined, not just the bridge. The matching uses endpoint_cs2 (left/right endpoint sound speeds), find_window (matching window with 0.12 < thp,thf < 0.88 interior constraints), and the bridge is strictly increasing in nb/p/eps with 0<cs2<1 across the whole assembled table. This closes the legacy M4 receipt's C6/C10/C11 assembled-table gap on the native path."
+    },
+    {
+      "criterion": "no interpolation of categorical Nadd/q_extra",
+      "status": "PASS",
+      "evidence_test": "test_eos04_crust_splice_verification.py::test_assembled_table_has_no_interpolated_categorical_columns[4 F/P methods]; test_native_reconstruct_master.py::test_native_master_preserves_extra_thermo_column_unless_explicitly_declared_cs2; test_m2a_presence_masks.py; test_eos05_kernel_edge_cases.py",
+      "evidence_detail": "The smooth matching path interpolates the thermodynamic barotrope (Q1-Q7) in the bridge but does NOT interpolate categorical composition columns. With drop_composition=True (required for composition-bearing inputs), the assembled table carries zero composition everywhere (Yn/Yp/Ye/Ymu/Aav/Zav/Yh all 0.0) and uniform Iphase=0: the source composition is explicitly discarded, not interpolated into the bridge. The reconstruct-master path preserves the extra thermo column (q_extra) unless explicitly declared cs2 (test_native_master_preserves_extra_thermo_column). Presence masks (test_m2a_presence_masks) preserve explicit-zero and partial composition row-level semantics without interpolation."
+    },
+    {
+      "criterion": "one-sided discontinuities retained",
+      "status": "PASS",
+      "evidence_test": "test_native_reconstruct_master.py::test_native_master_rejects_phase_pressure_plateau_instead_of_smoothing_across_it; test_native_maxwell_transition.py; test_native_crust_core_matching.py::test_historical_maxwell_alias_is_rejected_instead_of_emitting_a_fake_plateau",
+      "evidence_detail": "The native reconstruct-master rejects a phase-pressure plateau instead of smoothing across it (one-sided discontinuity retained, not interpolated over). The historical 'maxwell' alias is rejected in match_crust_core (it would build a legacy smooth pressure plateau that is not a first-order transition); the sharp first-order transition path is test_native_maxwell_transition. The smooth matching path does not paper over a one-sided jump with a fake plateau."
+    },
+    {
+      "criterion": "source columns and optional files preserved",
+      "status": "PASS",
+      "evidence_test": "test_eos04_crust_splice_verification.py::test_assembled_table_preserves_source_knots_and_endpoints[5 methods]; test_native_crust_core_matching.py parity tests (source knots retained outside bridge); test_m10_axis_roundtrip.py; test_native_reconstruct_master.py (extra thermo column preserved)",
+      "evidence_detail": "The assembled crust+core table retains the source crust knots up to and including the left endpoint i1 verbatim, and the source core knots from the right endpoint i2 onward verbatim; only the bridge between them is interpolated. The assembled nb grid is strictly increasing (no source knot duplicated, no interpolation knot collides with a source knot). The matched endpoint nb[i1] == crust.nb[i1] and the first core knot after the bridge == core.nb[i2]. Optional files (eos.compo, eos.mr) and axis metadata (test_m10_axis_roundtrip) round-trip losslessly. The extra thermo column is preserved through reconstruct-master unless explicitly declared cs2."
+    }
+  ],
+  "test_run": {
+    "command": "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python -m pytest -q python_frontend/tests pipeline/tests",
+    "new_tests_added": 19,
+    "new_tests": [
+      "test_eos04_crust_splice_verification.py::test_assembled_crust_core_table_passes_full_consistency_gate[css]",
+      "test_eos04_crust_splice_verification.py::test_assembled_crust_core_table_passes_full_consistency_gate[cubic_F]",
+      "test_eos04_crust_splice_verification.py::test_assembled_crust_core_table_passes_full_consistency_gate[cubic_P]",
+      "test_eos04_crust_splice_verification.py::test_assembled_crust_core_table_passes_full_consistency_gate[quintic_F]",
+      "test_eos04_crust_splice_verification.py::test_assembled_crust_core_table_passes_full_consistency_gate[quintic_P]",
+      "test_eos04_crust_splice_verification.py::test_assembled_table_preserves_source_knots_and_endpoints[css]",
+      "test_eos04_crust_splice_verification.py::test_assembled_table_preserves_source_knots_and_endpoints[cubic_F]",
+      "test_eos04_crust_splice_verification.py::test_assembled_table_preserves_source_knots_and_endpoints[cubic_P]",
+      "test_eos04_crust_splice_verification.py::test_assembled_table_preserves_source_knots_and_endpoints[quintic_F]",
+      "test_eos04_crust_splice_verification.py::test_assembled_table_preserves_source_knots_and_endpoints[quintic_P]",
+      "test_eos04_crust_splice_verification.py::test_assembled_table_has_no_interpolated_categorical_columns[cubic_F]",
+      "test_eos04_crust_splice_verification.py::test_assembled_table_has_no_interpolated_categorical_columns[cubic_P]",
+      "test_eos04_crust_splice_verification.py::test_assembled_table_has_no_interpolated_categorical_columns[quintic_F]",
+      "test_eos04_crust_splice_verification.py::test_assembled_table_has_no_interpolated_categorical_columns[quintic_P]",
+      "test_eos04_crust_splice_verification.py::test_assembled_table_causal_stability_across_splice[css]",
+      "test_eos04_crust_splice_verification.py::test_assembled_table_causal_stability_across_splice[cubic_F]",
+      "test_eos04_crust_splice_verification.py::test_assembled_table_causal_stability_across_splice[cubic_P]",
+      "test_eos04_crust_splice_verification.py::test_assembled_table_causal_stability_across_splice[quintic_F]",
+      "test_eos04_crust_splice_verification.py::test_assembled_table_causal_stability_across_splice[quintic_P]"
+    ],
+    "with_conda_env_and_shim": {
+      "exit_code": 0,
+      "result": "136 passed, 2 skipped",
+      "log": "download/eos04_baseline/pytest_full.log"
+    },
+    "fresh_cache_default_PATH": {
+      "exit_code": 1,
+      "result": "3 failed, 133 passed, 2 skipped",
+      "log": "download/eos04_baseline/pytest_default_fresh.log",
+      "interpretation": "The 3 failures are the unchanged COWLING-track env failures (gfortran not resolvable on default PATH); NOT EOS-04 and NOT a regression. EOS-04 added 19 passing tests (114 -> 133 passed on default PATH). The 19 new tests pass on default PATH (no solver needed)."
+    }
+  },
+  "regression_check": {
+    "before_this_node_default_PATH": "3 failed, 114 passed, 2 skipped (EOS-05 state; the 3 Cowling env failures)",
+    "after_this_node_default_PATH": "3 failed, 133 passed, 2 skipped (same 3 Cowling env failures; +19 new EOS-04 tests pass; 0 regressions)",
+    "regression_count": 0
+  },
+  "honesty_note": "G3 did not produce a failing-first test. The EOS-04 gap was an untested guarantee (the assembled-table full-consistency PASS was never asserted; the existing parity test only checked the 'consistency' key existed, not that overall['pass_'] is True). The native code already satisfied the contract: the legacy M4 receipt's C6/C10/C11 failures were on the Python CLD-concatenation path and were attributed there to coarse source pressure, not a splicing bug; the native match path reconstructs Q1 from the first law and enforces closure, so the assembled table passes. This node is therefore a verification (test-only) node: it pins the guarantee with 19 new regression tests, and documents (with the legacy_receipt_resolution block) that the native path does not reproduce the legacy C6/C10/C11 gap. No Fortran source was changed.",
+  "full_suite_status_at_HEAD": {
+    "with_conda_env_and_sysroot_shim": {
+      "exit_code": 0,
+      "result": "136 passed, 2 skipped"
+    },
+    "fresh_cache_default_PATH": {
+      "exit_code": 1,
+      "result": "3 failed, 133 passed, 2 skipped",
+      "note": "3 COWLING-track env failures unchanged; ENVIRONMENT_OR_COMPILER, not EOS-04"
+    }
+  },
+  "not_claimed": [
+    "No 390 crust-core EOS combination is regenerated by EOS-04 (EOS-07).",
+    "No complete combined crust-core-CSS EOS table is produced (EOS-06).",
+    "No Dropbox upload is performed (EOS-09 / local-mount).",
+    "No composition-aware matching ported (native matcher remains strict-thermo-only; drop_composition=True required for any composition-bearing input; literature_beta_eq not ported).",
+    "No cell-level CLD beta-equilibrium reconstruction (EOS-03 PARTIAL_OR_SOURCE_BLOCKED source-blocked item).",
+    "No per-model RMF coupling extraction/resolution (EOS-03 PARTIAL_OR_SOURCE_BLOCKED).",
+    "No SPG/GPPVA provider semantics resolved (EOS-02B BLOCKED_PROVIDER_AUTHORITY).",
+    "The Cowling-track env fix (solver.py/native.py honoring FC/GFORTRAN) is deliberately NOT made in this EOS-04 commit.",
+    "The maxwell method remains disabled (legacy smooth pressure plateau is not a first-order transition; fail closed until sharp composition-aware construction integrated).",
+    "The legacy M4 receipt's CLD cell-level beta-equilibrium limitation is NOT resolved; the native strict-thermo-only path simply does not reproduce it because it consumes the already-beta-equilibrated benchmark crust barotrope."
+  ],
+  "next_nodes": [
+    "EOS-06 (Native CSS parameterized high-density branch and join) - PARTIAL_NATIVE_KERNEL_JOIN_NOT_RUN; depends on EOS-03 + EOS-04. With EOS-04 PASS, one of its two dependencies is satisfied; EOS-03 (PARTIAL_OR_SOURCE_BLOCKED) remains.",
+    "EOS-07 (Native manifest-driven historical 390 batch) - BLOCKED_KERNELS_AND_PROVIDER_SEMANTICS; depends on EOS-02A + EOS-04 + EOS-05 + EOS-06. With EOS-04 and EOS-05 PASS, two of its four blockers are cleared (cubic/quintic F/P kernels native + crust-core splice native); EOS-06 (CSS join) and the SPG/GPPVA provider semantics remain.",
+    "EOS-03 (Core model couplings and thermodynamic reconstruction) - PARTIAL_OR_SOURCE_BLOCKED; the source-blocked coupling extraction is the upstream limiter for EOS-06 and EOS-07's full 390 generation."
+  ]
+}

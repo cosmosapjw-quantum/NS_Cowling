@@ -2,7 +2,7 @@ module compose_eos_component
   use compose_eos_types
   implicit none
   private
-  public :: extract_core_rows, verify_core_roundtrip
+  public :: extract_core_rows, extract_crust_rows, verify_core_roundtrip
 contains
   subroutine extract_core_rows(source,first_row,last_row,expected_source_n,expected_phase,core,status)
     type(eos_data_t),intent(in)::source
@@ -215,4 +215,50 @@ contains
     endif
     status='ok'
   end subroutine verify_core_roundtrip
+
+  subroutine extract_crust_rows(source,expected_source_n,outer_last,expected_outer_phase, &
+      expected_inner_phase,crust,status)
+    type(eos_data_t),intent(in)::source
+    integer,intent(in)::expected_source_n,outer_last,expected_outer_phase,expected_inner_phase
+    type(eos_data_t),intent(out)::crust
+    character(len=*),intent(out)::status
+
+    crust=eos_data_t()
+    status='uninitialized'
+    if(source%n/=expected_source_n)then
+      status='source point count does not match the admitted crust manifest';return
+    endif
+    if(outer_last<1.or.outer_last>=source%n)then
+      status='adjudicated outer-crust row boundary is outside the source grid';return
+    endif
+    if(.not.source%composition_file_present.or..not.allocated(source%iphase))then
+      status='crust phase coverage requires the source eos.compo Iphase field';return
+    endif
+    if(any(source%iphase(1:outer_last)/=expected_outer_phase))then
+      status='source outer-crust rows do not match the adjudicated Iphase code';return
+    endif
+    if(any(source%iphase(outer_last+1:source%n)/=expected_inner_phase))then
+      status='source inner-crust rows do not match the adjudicated Iphase code';return
+    endif
+    ! The BSk22 physical neutron-drip marker is the 217 -> 218 boundary.
+    ! The separate provider splice is nB=2e-3 fm^-3; source grids contain no
+    ! sampled rows in the interval between these markers. Never fill that gap.
+    if(abs(source%nb(outer_last)-2.69021e-4_wp)>2.0e-9_wp)then
+      status='source outer-crust endpoint disagrees with the BSk22 neutron-drip marker';return
+    endif
+    if(source%nb(outer_last+1)<2.0e-3_wp)then
+      status='source has an unadjudicated sampled regime between neutron drip and the 2e-3 provider splice';return
+    endif
+
+    ! E390-03B is a source-faithful exact projection. The source thermo values
+    ! were generated through the model's admitted CLD/Thomas-Fermi route;
+    ! no new microphysical solver or numerical repair runs in this constructor.
+    call extract_core_rows(source,1,source%n,expected_source_n,-1,crust,status)
+    if(status/='ok')return
+    if(crust%n/=source%n.or.crust%inb_start/=source%inb_start)then
+      status='crust projection changed source density-grid support or row labels';return
+    endif
+    status='ok'
+  end subroutine extract_crust_rows
+
 end module compose_eos_component

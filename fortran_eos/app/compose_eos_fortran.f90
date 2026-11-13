@@ -1,6 +1,6 @@
 program compose_eos_fortran
   use compose_eos_types
-  use compose_eos_component, only: extract_core_rows, verify_core_roundtrip
+  use compose_eos_component, only: extract_core_rows, extract_crust_rows, verify_core_roundtrip
   use compose_eos_io
   use compose_eos_verify
   use compose_eos_reconstruct, only: fill_density_gap, reconstruct_master
@@ -19,6 +19,7 @@ program compose_eos_fortran
   character(len=512)::status
   integer::narg,ios,n_fill,fit_points,gap_phase,n_points,n_bridge
   integer::core_first,core_last,expected_source_n,expected_phase
+  integer::crust_outer_last,expected_outer_phase,expected_inner_phase
   real(wp)::cs2_extension,n_max_requested,smooth_sigma,dissolution_tol
   real(wp)::min_ratio_local,best_sel
   integer::igap_sel
@@ -29,7 +30,7 @@ program compose_eos_fortran
   action='';arg1='';arg2='';arg3='';arg4='';arg5='';arg6='';arg7=''
   narg=command_argument_count()
   if(narg<2)then
-    write(*,'(a)')'usage: compose_eos_fortran {read|verify|verify-csv|normalize|write|extract-core|fill-gap|reconstruct-master|causal-complete|match-core|maxwell-transition} INPUT OUTPUT [OPTIONS]'
+    write(*,'(a)')'usage: compose_eos_fortran {read|verify|verify-csv|normalize|write|extract-core|extract-crust|fill-gap|reconstruct-master|causal-complete|match-core|maxwell-transition} INPUT OUTPUT [OPTIONS]'
     stop 2
   endif
   call get_command_argument(1,action,status=ios)
@@ -318,6 +319,34 @@ program compose_eos_fortran
       ',"first_source_row":'//integer_text(core_first)//',"last_source_row":'//integer_text(core_last)// &
       ',"source_inb_start":'//integer_text(eos%inb_start)//',"output_inb_start":'//integer_text(out%inb_start)// &
       ',"expected_phase":'//integer_text(expected_phase)//',"native_readback":"PASS"}'
+  case('extract-crust')
+    if(narg/=7)then
+      call emit_failure('extract-crust requires SOURCE_COMPOSE OUTPUT_COMPOSE EXPECTED_SOURCE_N OUTER_LAST EXPECTED_OUTER_Iphase EXPECTED_INNER_Iphase');stop 2
+    endif
+    read(arg3,*,iostat=ios)expected_source_n
+    if(ios/=0)then;call emit_failure('invalid EXPECTED_SOURCE_N');stop 2;endif
+    read(arg4,*,iostat=ios)crust_outer_last
+    if(ios/=0)then;call emit_failure('invalid OUTER_LAST');stop 2;endif
+    read(arg5,*,iostat=ios)expected_outer_phase
+    if(ios/=0)then;call emit_failure('invalid EXPECTED_OUTER_Iphase');stop 2;endif
+    read(arg6,*,iostat=ios)expected_inner_phase
+    if(ios/=0)then;call emit_failure('invalid EXPECTED_INNER_Iphase');stop 2;endif
+    call read_compose(trim(arg1),eos,status)
+    if(status/='ok')then;call emit_failure('invalid source CompOSE table: '//trim(status));stop 3;endif
+    call extract_crust_rows(eos,expected_source_n,crust_outer_last,expected_outer_phase, &
+      expected_inner_phase,out,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    call write_compose(trim(arg2),out,status)
+    if(status/='ok')then;call emit_failure('native crust-only CompOSE write failed: '//trim(status));stop 3;endif
+    call read_compose(trim(arg2),readback,status)
+    if(status/='ok')then;call emit_failure('native crust-only CompOSE readback failed: '//trim(status));stop 3;endif
+    call verify_core_roundtrip(out,readback,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 4;endif
+    write(*,'(a)')'{"status":"ok","operation":"extract-crust","n":'//integer_text(out%n)// &
+      ',"outer_last_source_row":'//integer_text(crust_outer_last)// &
+      ',"inner_first_source_row":'//integer_text(crust_outer_last+1)// &
+      ',"outer_neutron_drip_nb":'//real_text(out%nb(crust_outer_last))// &
+      ',"native_readback":"PASS"}'
   case default
     call emit_failure('unknown operation: '//trim(action));stop 2
   end select

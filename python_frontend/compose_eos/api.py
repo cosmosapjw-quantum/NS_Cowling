@@ -134,6 +134,24 @@ _CORE_ONLY_SOURCE_SPECS: dict[str, dict[str, Any]] = {
 }
 
 
+# E390-03B exact source support and model-specific crust-construction provenance.
+# eos.nb Git blob identities are source authority; row limits are 1-based.
+_CRUST_ONLY_SOURCE_SPECS: dict[str, dict[str, Any]] = {
+    "SPG_M1": {"source_n":365,"last_nb_fm3":0.07413102413,"eos_nb_git_blob_sha1":"671e4c2b8fe5e77539cb4854586c153f81be3f31","method":"CLD","method_reference":"Scurto, Pais & Gulminelli, PRD 109, 103015 (2024), arXiv:2402.15548","expected_nadd":0},
+    "SPG_M2": {"source_n":377,"last_nb_fm3":0.08912509381,"eos_nb_git_blob_sha1":"f9c032b24a2735547e7bf359906b678be5a63455","method":"CLD","method_reference":"Scurto, Pais & Gulminelli, PRD 109, 103015 (2024), arXiv:2402.15548","expected_nadd":0},
+    "SPG_M3": {"source_n":366,"last_nb_fm3":0.07943282347,"eos_nb_git_blob_sha1":"5afee15e44ca5aa84145d0cf9c04889c99547b39","method":"CLD","method_reference":"Scurto, Pais & Gulminelli, PRD 109, 103015 (2024), arXiv:2402.15548","expected_nadd":0},
+    "SPG_M4": {"source_n":375,"last_nb_fm3":0.0977237221,"eos_nb_git_blob_sha1":"47d96bf925e646e50a5c71da71ef372c7e4b941f","method":"CLD","method_reference":"Scurto, Pais & Gulminelli, PRD 109, 103015 (2024), arXiv:2402.15548","expected_nadd":0},
+    "SPG_M5": {"source_n":363,"last_nb_fm3":0.07079457844,"eos_nb_git_blob_sha1":"c979d1ba6c4642496b0c9177c427899b2412c9ad","method":"CLD","method_reference":"Scurto, Pais & Gulminelli, PRD 109, 103015 (2024), arXiv:2402.15548","expected_nadd":0},
+    "GPPVA_DD2": {"source_n":283,"last_nb_fm3":0.067000002,"eos_nb_git_blob_sha1":"d9238f1fdd0e3a580b689253d709cf4493c95358","method":"Thomas-Fermi","method_reference":"Grill et al., PRC 90, 045803 (2014), arXiv:1404.2753","expected_nadd":1},
+    "GPPVA_DDME2": {"source_n":288,"last_nb_fm3":0.071999997,"eos_nb_git_blob_sha1":"8a068e43a31f5fd4e94b8091a0cd672ae40dc3a7","method":"Thomas-Fermi","method_reference":"Grill et al., PRC 90, 045803 (2014), arXiv:1404.2753","expected_nadd":1},
+    "GPPVA_FSU2": {"source_n":269,"last_nb_fm3":0.054000001,"eos_nb_git_blob_sha1":"abf5acef150c448297fd0b02314c1dff168cfb42","method":"Thomas-Fermi","method_reference":"Grill et al., PRC 90, 045803 (2014), arXiv:1404.2753","expected_nadd":1},
+    "GPPVA_FSU2H": {"source_n":300,"last_nb_fm3":0.086999997,"eos_nb_git_blob_sha1":"b5936f64781c2381585683ba69472b8e0d7cb24c","method":"Thomas-Fermi","method_reference":"Grill et al., PRC 90, 045803 (2014), arXiv:1404.2753","expected_nadd":1},
+    "GPPVA_FSU2R": {"source_n":296,"last_nb_fm3":0.082999997,"eos_nb_git_blob_sha1":"756b25cc31d84d5c4124e3593fe0e122685e8ac3","method":"Thomas-Fermi","method_reference":"Grill et al., PRC 90, 045803 (2014), arXiv:1404.2753","expected_nadd":1},
+    "GPPVA_NL3wrL55": {"source_n":298,"last_nb_fm3":0.082000002,"eos_nb_git_blob_sha1":"f829b08138181ea68c9e99adae5193a7d7308d75","method":"Thomas-Fermi","method_reference":"Grill et al., PRC 90, 045803 (2014), arXiv:1404.2753","expected_nadd":1},
+    "GPPVA_TM1e": {"source_n":303,"last_nb_fm3":0.089000002,"eos_nb_git_blob_sha1":"e39714a8993e7aea62c1f880644cc46e60e6307d","method":"Thomas-Fermi","method_reference":"Grill et al., PRC 90, 045803 (2014), arXiv:1404.2753","expected_nadd":1},
+}
+
+
 def _git_blob_sha1(path: Path) -> str:
     raw = path.read_bytes()
     header = f"blob {len(raw)}\0".encode("ascii")
@@ -445,6 +463,359 @@ def build_core_only(
     (target_root / "core_only_manifest.v1.json").write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
+    )
+    return receipts
+
+
+def build_crust_only(
+    output_root: str | Path,
+    *,
+    source_root: str | Path | None = None,
+    model_ids: list[str] | tuple[str, ...] | None = None,
+) -> list[dict[str, Any]]:
+    """Build the 12 source-admitted crust-only CompOSE components natively.
+
+    The source tables already contain the BSk22 outer-crust segment and the
+    model-specific CLD or Thomas-Fermi inner-crust segment. This operation is
+    an exact native Fortran projection over the full source support: it does
+    not re-solve either microphysical method or reconstruct composition.
+    """
+    import math
+    import numpy as np
+
+    repo_root = Path(__file__).resolve().parents[2]
+    inputs = Path(source_root).expanduser().resolve() if source_root is not None else (
+        repo_root / "eos_generator" / "eos_data"
+    )
+    target_root = Path(output_root).expanduser().resolve()
+    if target_root.exists():
+        raise FileExistsError(
+            f"crust-only output root already exists; use a fresh attempt path: {target_root}"
+        )
+    if not inputs.is_dir():
+        raise FileNotFoundError(f"crust-only source root does not exist: {inputs}")
+
+    selected = list(_CRUST_ONLY_SOURCE_SPECS) if model_ids is None else list(model_ids)
+    if not selected or len(selected) != len(set(selected)):
+        raise ValueError("model_ids must be nonempty and contain no duplicates")
+    unknown = [model for model in selected if model not in _CRUST_ONLY_SOURCE_SPECS]
+    if unknown:
+        raise ValueError(
+            "models are not admitted for crust-only construction "
+            "(GPPVA_TW remains blocked by the BPS/BSk22 provider conflict): "
+            f"{unknown}"
+        )
+
+    target_root.mkdir(parents=True, exist_ok=False)
+    receipts: list[dict[str, Any]] = []
+    coverage: dict[str, Any] = {
+        "schema": "ns-cowling.e390-03b-crust-coverage",
+        "schema_version": "1.0.0",
+        "node_id": "E390-03B",
+        "density_unit": "fm^-3",
+        "row_index_convention": "1-based eos.nb data-row position",
+        "neutron_drip": {
+            "source_boundary_rows": [217, 218],
+            "published_nB_fm3": 2.69e-4,
+            "source_BSk22_boundary_nB_fm3": 2.69021e-4,
+            "source": "Pearson et al., MNRAS 481, 2994 (2018), Table 7",
+            "note": "The physical neutron-drip boundary is distinct from the BSk22-to-inner-crust provider splice at 2e-3 fm^-3.",
+        },
+        "provider_splice": {
+            "nominal_nB_fm3": 2.0e-3,
+            "source_sampling_policy": "retain exact source rows; do not fill any unsampled interval between neutron drip and the first inner-crust row",
+        },
+        "phase_semantics": {
+            "eos_compo_Iphase": {"0": "outer crust", "7": "inner crust"},
+            "eos_thermo_q_extra": {
+                "0": "outer-crust geometry",
+                "1": "droplets",
+                "2": "rods",
+                "3": "slabs",
+                "4": "tubes",
+                "5": "bubbles",
+                "6": "homogeneous core",
+            },
+            "warning": "Iphase and q_extra are independent categorical fields and are never merged, interpolated or numerically remapped.",
+        },
+        "components": [],
+        "blocked": {
+            "GPPVA_TW": "BLOCKED: official CompOSE live page 212 says BPS below 0.002 fm^-3 while its linked PDF says BSk22; no provider choice is inferred."
+        },
+    }
+
+    for model_id in selected:
+        spec = _CRUST_ONLY_SOURCE_SPECS[model_id]
+        source_dir = inputs / model_id
+        nb_path = source_dir / "eos.nb"
+        if not source_dir.is_dir() or not nb_path.is_file():
+            raise FileNotFoundError(
+                f"missing source CompOSE directory or eos.nb for {model_id}: {source_dir}"
+            )
+        observed_git_blob = _git_blob_sha1(nb_path)
+        if observed_git_blob != spec["eos_nb_git_blob_sha1"]:
+            raise ValueError(
+                f"{model_id} eos.nb Git blob identity mismatch: "
+                f"expected {spec['eos_nb_git_blob_sha1']}, observed {observed_git_blob}"
+            )
+        input_names = ("eos.nb", "eos.t", "eos.yq", "eos.thermo", "eos.compo")
+        input_hashes = _sha256_files(source_dir, input_names)
+        if set(input_hashes) != set(input_names):
+            missing = sorted(set(input_names) - set(input_hashes))
+            raise FileNotFoundError(f"{model_id} missing mandatory source files: {missing}")
+
+        source = read_compose(source_dir)
+        if source.n != spec["source_n"]:
+            raise ValueError(
+                f"{model_id} source point count differs from E390-01C: "
+                f"{source.n} != {spec['source_n']}"
+            )
+        if source.nT != 1 or source.nYq != 1 or not math.isclose(
+            source.temperature_mev, 0.0, rel_tol=0.0, abs_tol=1e-12
+        ):
+            raise NativeFeatureUnavailable(
+                f"{model_id} is not a single cold T=0/Yq slice"
+            )
+        if not source.composition_file_present:
+            raise ValueError(f"{model_id} source eos.compo is required for phase admission")
+        if len(source.nb) != spec["source_n"] or not np.all(np.diff(source.nb) > 0.0):
+            raise ValueError(f"{model_id} source density support is not strictly increasing")
+        if not math.isclose(float(source.nb[0]), 4.67962e-10, rel_tol=2e-8, abs_tol=1e-18):
+            raise ValueError(f"{model_id} source lower density endpoint differs from E390-01C")
+        if not math.isclose(float(source.nb[-1]), spec["last_nb_fm3"], rel_tol=2e-8, abs_tol=1e-12):
+            raise ValueError(f"{model_id} source upper density endpoint differs from E390-01C")
+        if not np.all(source.Iphase[:217] == 0) or not np.all(source.Iphase[217:] == 7):
+            raise ValueError(
+                f"{model_id} Iphase rows do not match the adjudicated 1-217 outer / 218-N inner dictionary"
+            )
+        if not math.isclose(float(source.nb[216]), 2.69021e-4, rel_tol=0.0, abs_tol=2e-9):
+            raise ValueError(f"{model_id} row 217 does not match the BSk22 neutron-drip marker")
+        if float(source.nb[217]) < 2.0e-3:
+            raise ValueError(
+                f"{model_id} has unadjudicated sampled support between neutron drip and the 2e-3 provider splice"
+            )
+        if source.q_extra_count != spec["expected_nadd"]:
+            raise ValueError(
+                f"{model_id} Nadd mismatch: {source.q_extra_count} != {spec['expected_nadd']}"
+            )
+        qextra_counts: dict[str, int] = {}
+        if source.q_extra_count == 1:
+            codes, counts = np.unique(source.q_extra, return_counts=True)
+            if not set(int(x) for x in codes).issubset({0, 1, 2, 3}):
+                raise ValueError(f"{model_id} has q_extra categories outside the adjudicated source set")
+            qextra_counts = {str(int(code)): int(count) for code, count in zip(codes, counts)}
+        iphase_codes, iphase_counts = np.unique(source.Iphase, return_counts=True)
+        iphase_counts_map = {
+            str(int(code)): int(count) for code, count in zip(iphase_codes, iphase_counts)
+        }
+
+        output_dir = target_root / model_id
+        output_dir.mkdir(parents=False, exist_ok=False)
+        native_report = run_native(
+            "extract-crust", source_dir, output_dir,
+            str(source.n), "217", "0", "7",
+        )
+        if native_report.get("native_readback") != "PASS":
+            raise NativeExecutionError(
+                f"{model_id} native crust-only write/readback was not certified"
+            )
+
+        crust = read_compose(output_dir)
+        row_slice = slice(0, source.n)
+        array_names = (
+            "nb", "Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "q_extra",
+            "Iphase", "Yn", "Yp", "Ye", "Ymu", "Aav", "Zav", "Yh",
+            "row_status", "Yn_present", "Yp_present", "Ye_present",
+            "Ymu_present", "Abar_present", "Zbar_present", "Yh_present",
+            "C3_applicable", "C4_applicable",
+        )
+        for name in array_names:
+            if not np.array_equal(
+                getattr(crust, name), getattr(source, name)[row_slice]
+            ):
+                raise NativeExecutionError(f"{model_id} native readback mismatch in {name}")
+        for name in ("q_full", "q_extra_full"):
+            required_tensor = (name == "q_full" and source.nYq > 1) or (
+                name == "q_extra_full" and source.q_extra_count > 1
+            )
+            if not required_tensor:
+                continue
+            expected_tensor = np.asarray(getattr(source, name))
+            actual_tensor = np.asarray(getattr(crust, name))
+            if actual_tensor.shape != expected_tensor.shape or not np.array_equal(
+                actual_tensor, expected_tensor
+            ):
+                raise NativeExecutionError(f"{model_id} native readback mismatch in {name}")
+        if crust.n != source.n or crust.inb_start != source.inb_start:
+            raise NativeExecutionError(f"{model_id} source density support or row labels changed")
+        scalar_names = (
+            "mn", "mp", "Il", "temperature_mev", "charge_fraction_grid",
+            "q_extra_count", "composition_file_present", "nT", "nYq",
+            "t_first", "t_last", "yq_first", "yq_last", "selected_iT", "selected_iYq",
+        )
+        for name in scalar_names:
+            if getattr(crust, name) != getattr(source, name):
+                raise NativeExecutionError(f"{model_id} native readback metadata mismatch in {name}")
+        expected_composition_available = bool(np.any(
+            crust.Yn_present | crust.Yp_present | crust.Ye_present | crust.Ymu_present |
+            crust.Abar_present | crust.Zbar_present | crust.Yh_present
+        ))
+        if crust.composition_available != expected_composition_available:
+            raise NativeExecutionError(f"{model_id} composition availability summary changed")
+        expected_beta_equilibrated = bool(np.max(np.abs(crust.Q5)) < 1e-8)
+        if crust.beta_equilibrated != expected_beta_equilibrated:
+            raise NativeExecutionError(f"{model_id} beta-equilibrium summary changed")
+
+        physical_report = check_consistency(crust)
+        output_names = ("eos.nb", "eos.t", "eos.yq", "eos.thermo", "eos.compo")
+        output_hashes = _sha256_files(output_dir, output_names)
+        if set(output_hashes) != set(output_names):
+            raise NativeExecutionError(f"{model_id} output CompOSE file set is incomplete")
+
+        method = spec["method"]
+        receipt: dict[str, Any] = {
+            "schema": "ns-cowling.component-construction-receipt",
+            "schema_version": "1.0.0",
+            "node_id": "E390-03B",
+            "model_id": model_id,
+            "component_role": "crust_only",
+            "status": "CRUST_ONLY_CONSTRUCTED_NATIVE_READBACK_PASS",
+            "source": {
+                "directory": str(source_dir),
+                "eos_nb_git_blob_sha1_expected": spec["eos_nb_git_blob_sha1"],
+                "eos_nb_git_blob_sha1_observed": observed_git_blob,
+                "input_file_sha256": input_hashes,
+            },
+            "construction_provenance": {
+                "outer_crust_provider": "BSk22",
+                "inner_crust_method": method,
+                "inner_crust_reference": spec["method_reference"],
+                "provider_splice_nB_fm3": 2.0e-3,
+                "source_thermodynamic_rows": "preserved exactly from the provider table generated through the admitted literature route",
+                "new_CLD_or_Thomas_Fermi_solve": False,
+                "composition_reconstruction": "DEFERRED_TO_E390-03; raw eos.compo values and per-row presence masks are preserved",
+            },
+            "selection": {
+                "row_index_convention": "1-based eos.nb data-row position",
+                "first_row": 1,
+                "outer_crust_rows": [1, 217],
+                "inner_crust_rows": [218, source.n],
+                "last_row": source.n,
+                "source_point_count": source.n,
+                "output_point_count": crust.n,
+                "first_nb_fm3": float(crust.nb[0]),
+                "last_nb_fm3": float(crust.nb[-1]),
+                "neutron_drip_boundary": {
+                    "last_outer_row": 217,
+                    "first_inner_row": 218,
+                    "last_outer_nb_fm3": float(crust.nb[216]),
+                    "first_inner_nb_fm3": float(crust.nb[217]),
+                    "physical_reference_nb_fm3": 2.69e-4,
+                },
+                "source_grid_has_no_rows_between_drip_and_provider_splice": True,
+                "source_density_row_labels_preserved": True,
+                "no_interpolation_or_extrapolation": True,
+                "no_homogeneous_core_tail_imported": True,
+            },
+            "categorical_fields": {
+                "Iphase_counts": iphase_counts_map,
+                "q_extra_counts": qextra_counts,
+                "q_extra_count": int(crust.q_extra_count),
+                "q_extra_semantics": "categorical pasta geometry; distinct from eos.compo Iphase; values copied verbatim",
+            },
+            "transform_chain": [
+                "native_fortran_compose_reader",
+                "native_fortran_exact_full_support_projection",
+                "native_fortran_compose_writer",
+                "native_fortran_compose_readback",
+            ],
+            "checks": {
+                "source_identity": "PASS",
+                "exact_source_support": "PASS",
+                "outer_inner_phase_boundary": "PASS",
+                "BSk22_neutron_drip_boundary": "PASS",
+                "Q1_Q7_and_Qextra_exact_row_preservation": "PASS",
+                "Iphase_and_row_composition_presence_exact_preservation": "PASS",
+                "C3_C4_masks_exact_preservation": "PASS",
+                "native_readback": "PASS",
+                "output_sha256": "PASS",
+                "physical_validation": physical_report["overall"],
+            },
+            "output": {
+                "directory": str(output_dir),
+                "file_sha256": output_hashes,
+                "n": crust.n,
+                "inb_start": crust.inb_start,
+                "composition_file_present": crust.composition_file_present,
+                "composition_available": crust.composition_available,
+                "nadd": crust.q_extra_count,
+            },
+            "non_claims": [
+                "No new CLD or Thomas-Fermi minimization was run; the source thermo rows carry that provider provenance.",
+                "No composition solver or abundance reconstruction was run; this is reserved for E390-03.",
+                "No interpolation, extrapolation, smoothing, renormalization, clipping or physical repair was performed.",
+                "No homogeneous high-density core tail was imported.",
+                "No core-crust matching, TOV/Cowling integration or oscillation calculation was executed.",
+                "eos.micro and eos.mr are not handled by this CompOSE frontend path.",
+            ],
+        }
+        (output_dir / "E390-03B_RECEIPT.json").write_text(
+            json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
+        receipts.append(receipt)
+        coverage["components"].append({
+            "model_id": model_id,
+            "source_point_count": source.n,
+            "source_rows": [1, source.n],
+            "outer_crust_rows": [1, 217],
+            "inner_crust_rows": [218, source.n],
+            "outer_crust_provider": "BSk22",
+            "inner_crust_method": method,
+            "inner_crust_reference": spec["method_reference"],
+            "neutron_drip_last_outer_nb_fm3": float(source.nb[216]),
+            "neutron_drip_first_inner_nb_fm3": float(source.nb[217]),
+            "provider_splice_first_source_row_at_or_above_2e-3": int(np.searchsorted(source.nb, 2e-3, side="left") + 1),
+            "terminal_nb_fm3": float(source.nb[-1]),
+            "Iphase_counts": iphase_counts_map,
+            "q_extra_count": int(source.q_extra_count),
+            "q_extra_counts": qextra_counts,
+            "construction_status": receipt["status"],
+            "physical_validation": physical_report["overall"],
+        })
+
+    coverage["status"] = "ALL_ADMITTED_CRUST_COMPONENTS_CONSTRUCTED_NATIVE_READBACK_VERIFIED"
+    coverage["admitted_model_count"] = len(receipts)
+    coverage["total_output_rows"] = int(sum(item["output"]["n"] for item in receipts))
+    (target_root / "crust_coverage_report.v1.json").write_text(
+        json.dumps(coverage, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    manifest = {
+        "schema": "ns-cowling.crust-only-component-manifest",
+        "schema_version": "1.0.0",
+        "node_id": "E390-03B",
+        "status": "ALL_ADMITTED_CRUST_COMPONENTS_CONSTRUCTED_NATIVE_READBACK_VERIFIED",
+        "admitted_model_count": len(receipts),
+        "total_output_rows": int(sum(item["output"]["n"] for item in receipts)),
+        "blocked_models": coverage["blocked"],
+        "coverage_report": str(target_root / "crust_coverage_report.v1.json"),
+        "components": [
+            {
+                "model_id": item["model_id"],
+                "directory": item["output"]["directory"],
+                "receipt": str(Path(item["output"]["directory"]) / "E390-03B_RECEIPT.json"),
+                "output_file_sha256": item["output"]["file_sha256"],
+                "physical_validation": item["checks"]["physical_validation"],
+            }
+            for item in receipts
+        ],
+        "non_claims": [
+            "The manifest certifies source-faithful construction and native readback, not physical admissibility.",
+            "It does not certify any matched core-crust EOS or the 390 smooth-method matrix.",
+            "GPPVA_TW remains blocked and is not included in the artifact.",
+        ],
+    }
+    (target_root / "crust_only_manifest.v1.json").write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     return receipts
 

@@ -65,6 +65,20 @@ jobs:
           path: build/e390_03a/core_only/
           if-no-files-found: error
           retention-days: 30
+      - name: Build admitted E390-03B standalone crust-only cohort
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+        run: python scripts/build_e390_03b_crust_only.py build/e390_03b/crust_only
+      - name: Upload E390-03B crust-only tables and construction receipts
+        uses: actions/upload-artifact@v4
+        with:
+          name: E390-03B-crust-only-${{ github.sha }}
+          path: build/e390_03b/crust_only/
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Run native Fortran polynomial-extrema unit tests
         run: |
           gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \

@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.4.1",
+  "revision": "1.4.2",
   "created_utc": "2026-11-11",
-  "status": "M10_PHASE3_IMPLEMENTED_CI_TESTS_PASS_CHECKSUM_REPAIR_PENDING_PHYSICS_GATES_BLOCKED",
+  "status": "M10_PHASE3_SYNTHETIC_CI_PASS_SOURCE_BACKED_INPUTS_NOT_IN_CI_PHASES4_5_PENDING_PHYSICS_GATES_BLOCKED",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "cloud/eos390-fortran-unification-v1",
@@ -425,7 +425,7 @@
         "new reconstructed tar.zst and source manifest",
         "legacy output manifest"
       ],
-      "status_detail": "Replacement ZIP staged in inputs/replacement/, independent SHA-256 rehash matches delivery manifest, 18-model/158-file exact inventory match, fresh per-file SHA256SUMS.txt (158 lines, 0 mismatches vs inventory), reproducible tar.zst generated + readback-verified, legacy manifest recorded.",
+      "status_detail": "E390-00 is resolved in the original project workspace: the user-provided EoS_complete_core_crust_release_v3_2.zip (19,398,255 bytes; SHA-256 d671310eb630ffd13f1b278425d945741ad7e08ce14c0d9aff42309c707e6a3b) was rehashed, ZIP CRC-tested, and the 18-model/158-file source inventory and reproducible tar.zst were verified per E390-00-RESOLVED_20261113.json. The extracted inputs/raw_compose tree is not committed and is absent from the GitHub Actions checkout; therefore CI cannot execute source-backed RG_SLY4/RG_KDE0v1 tests without a controlled provisioning step. This is a reproducibility boundary, not evidence that M0 failed.",
       "resolved_date": "2026-11-13",
       "receipt": "data/receipts/eos390_m2a/E390-00-RESOLVED_20261113.json"
     },
@@ -721,11 +721,13 @@
         "lossless round-trip test corpus for 2D/3D tables",
         "3D tensor data model extension (q_extra(nadd_max,n) or q_full(nT,nYq,n)) without breaking the cold-slice path"
       ],
-      "status_detail": "Phase 1 tensor model + select_slice, phase 2 arbitrary Nadd>=0 I/O, and phase 3 multi-Yq-at-T=0 reader are implemented. The latest PR13 CI at 9b77e336 reports 117 passed and 10 skipped; build and Python/native numerical tests completed before the checksum gate. The repository tree contains no inputs/raw_compose path, so the two source-dependent RG_SLY4/RG_KDE0v1 slice checks in test_m10_generic_axes.py are not reproduced in this CI run. Phases 4 (multi-T), 5 (lossless full-tensor writer/readback), and 6 (real-cohort acceptance) remain pending.",
+      "status_detail": "Phases 1-3 are implemented and synthetic-tested: tensor model/select_slice, arbitrary Nadd>=0 I/O, and 1T x multi-Yq reading. Follow-up commits f9dd6fef and 9f543b7d removed inappropriate raw-source skip guards from the synthetic Nadd/multi-Yq fixture tests. Latest PR13 CI on 9f543b7d: 124 passed, 3 skipped; Fortran build, native tests, full SHA256SUMS_v4 verification, packaging, and artifact upload all PASS. At least two of the three remaining skips are the source-backed RG_SLY4 and RG_KDE0v1 tests because inputs/raw_compose is not in the Actions checkout; the third skip is not yet attributed. Phases 4 (multi-T tensor reader), 5 (lossless multidimensional writer/readback), and source-backed acceptance remain pending.",
       "blocking_dependencies": [
-        "E390-00 (2 skipped test_m10 tests need raw_compose staged for real-data slice-check)"
+        "CI provisioning of the verified 18-model raw_compose source cohort (not committed to GitHub) for source-backed acceptance",
+        "E390-10B phase 4 multi-T parser and complete index/coverage mapping",
+        "E390-10B phase 5 lossless T x Yq x nb writer/readback"
       ],
-      "scope_note": "M10 deliberately preserves the selected 1D cold-slice API while exposing an opt-in 1T x nYq tensor. The current implementation is not yet general 3D T x Yq x nb support. Real source data are not present in this Git tree; synthetic parser/round-trip tests do not replace source-backed validation.",
+      "scope_note": "Current production compatibility remains a selected cold T=0 slice. M10 additionally reads all Yq values only for nT=1, T=0, storing q_full(1,nYq,7,nb) and q_extra_full. It does not yet read all T values or preserve multidimensional composition in a full tensor. Synthetic tests validate implemented Nadd/Yq behavior; they do not certify raw-source cohort acceptance.",
       "split_from": "E390-10",
       "design_receipt": "data/receipts/eos390_m2a/E390-10B-DESIGN_20261113.json",
       "phase_1_done_date": "2026-11-13",
@@ -1121,7 +1123,7 @@
     ],
     "policy": "Track separately from the 390 matrix; never reinterpret EOS390 method=maxwell."
   },
-  "last_update_utc": "2026-11-13T10:24:00Z",
+  "last_update_utc": "2026-11-13T10:39:15Z",
   "known_remaining_implementation_gaps": [
     {
       "area": "native literature-derived composition",
@@ -1672,15 +1674,29 @@
       ]
     },
     "latest_pr13_ci_20261113": {
-      "run_id": 43397008050,
-      "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43397008050",
-      "head_sha": "9b77e336d8a7ec690ae9c1ff11bcab2c53f2b624",
-      "result": "FAIL_CHECKSUM_MANIFEST_ONLY",
+      "run_id": 43410589930,
+      "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43410589930",
+      "event": "pull_request",
+      "head_sha": "9f543b7d233be0fa9239ee5a84b2b9786b4fce2c",
+      "conclusion": "success",
+      "test_summary": "124 passed, 3 skipped",
+      "build": "PASS",
+      "native_fortran_tests": "PASS",
+      "sha256_manifest": "PASS (90 tracked manifest entries)",
+      "source_snapshot_packaging": "PASS",
+      "artifact_id": 14029895606,
+      "artifact_size_bytes": 55503422,
+      "artifact_sha256": "0d797b73dd8f584f30ee0096d99e8fb4cf6822b60dbb619a0f24653740972d04",
+      "artifact_expires_utc": "2026-12-13T10:39:08Z"
+    },
+    "latest_pr13_push_ci_20261113": {
+      "run_id": 43410202477,
+      "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43410202477",
+      "head_sha": "f15b7711197ebb98c26abc626537e35e26c73325",
+      "conclusion": "success",
       "test_summary": "117 passed, 10 skipped",
-      "native_build": "PASS",
-      "native_fortran_unit_tests": "PASS",
-      "checksum_failures": 9,
-      "packaging_and_artifact_upload": "NOT_RUN_AFTER_CHECKSUM_FAILURE"
+      "sha256_manifest": "PASS",
+      "source_snapshot_artifact_id": 14028857610
     }
   },
   "execution_domains": {
@@ -1763,12 +1779,13 @@
     }
   ],
   "next_actions": [
-    "Repair the nine stale SHA256SUMS_v4.txt entries at the exact PR13 head and rerun CI.",
-    "Complete M10 phase 4 multi-T parsing and phase 5 full-tensor lossless writer/readback; keep 1D selected-slice consumers unchanged.",
-    "Stage and hash the actual raw CompOSE source cohort in an authorized CI workspace; rerun RG_SLY4 and RG_KDE0v1 source-backed tests and capture exact skip breakdown.",
-    "Integrate the sibling native smooth kernels only after reconciling branch history, NPPHB quadrature convergence, Q5 source semantics, and composition-preserving joins.",
-    "Port sharp_maxwell as a separate native operation and retain the historical maxwell/NPPHB key as a distinct legacy reproducibility path.",
-    "Do not execute M7/M9 PASS adjudication or claim EOS390 regeneration until all 390 native tasks produce complete composition-preserving outputs with per-task C1-C11 receipts."
+    "Implement M10 phase 4 only with an explicit globally consistent mapping from CompOSE declared T/Yq index bounds to tensor slots; verify full (T,Yq,nb) coverage and preserve the cold T=0 slice API.",
+    "Before enabling full-T read for composition-bearing tables, either add full T/Yq composition tensors (Iphase, sparse-presence masks, row status, C3/C4 applicability) or reject that layout explicitly; never attach selected-slice composition to a different thermo cell.",
+    "Implement M10 phase 5 full T x Yq x nb write_compose/readback, including axes, all Nadd extra columns, and sparse composition presence masks; verify no silent loss.",
+    "Provision the M0-verified raw_compose cohort into Actions as a controlled CI artifact/cache/secure input, without committing private/source binaries to Git; rerun the RG_SLY4 and RG_KDE0v1 tests and identify all remaining skips.",
+    "Integrate sibling native smooth kernels only after NPPHB knot-split quadrature convergence and RG_* Q5 provider semantics are resolved; do not infer missing data.",
+    "Keep historical maxwell=NPPHB legacy semantics separate from the new sharp_maxwell operation; do not silently repurpose the six-token historical matrix.",
+    "Only run M7/M9 production adjudication after all 390 tasks generate complete native Fortran composition-preserving outputs with C1-C11 receipts."
   ],
   "provenance": {
     "last_reconciled_utc": "2026-11-11",
@@ -1868,7 +1885,7 @@
       ]
     },
     "last_ci_reconciliation_receipt": "data/receipts/eos390_m2a/E390-10B-CI_RECONCILIATION_20261113.json",
-    "audit_note": "This revision reconciles the M10 phase-1-to-3 implementation with the latest GitHub CI evidence. It does not claim multi-T support, full tensor round-trip, raw source staging, or EOS390 regeneration."
+    "audit_note": "Current 9f543b7d evidence supersedes the earlier 9b77 checksum-failed CI: synthetic fixture skip guards were removed in f9dd6fef/9f543b7d and CI now reports 124 passed, 3 skipped. The GitHub Actions checkout still lacks inputs/raw_compose, so source-backed tests remain skipped. No multi-T, full-tensor writer or EOS390 regeneration is claimed."
   },
   "supersedes": {
     "lost_archive_filename": "NS_Cowling_EOS390_raw_inputs_v1.tar.zst",

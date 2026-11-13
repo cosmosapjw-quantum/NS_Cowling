@@ -4,21 +4,28 @@
   "receipt_id": "E390-10B-CI-RECONCILIATION-20261113",
   "created_utc": "2026-11-13T10:24:00Z",
   "branch": "cloud/eos390-fortran-unification-v1",
-  "base_head": "9b77e336d8a7ec690ae9c1ff11bcab2c53f2b624",
+  "base_head": "9f543b7d233be0fa9239ee5a84b2b9786b4fce2c",
   "pr_number": 13,
-  "disposition": "PARTIAL_IMPLEMENTATION_VERIFIED__SOURCE_BACKED_M10_ACCEPTANCE_PENDING",
+  "disposition": "PARTIAL_IMPLEMENTATION_VERIFIED_SYNTHETIC_CI_PASS_SOURCE_BACKED_ACCEPTANCE_PENDING",
   "design_record": "data/receipts/eos390_m2a/E390-10B-DESIGN_20261113.json",
   "authoritative_ci": {
-    "run_id": 43397008050,
-    "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43397008050",
-    "tested_head": "9b77e336d8a7ec690ae9c1ff11bcab2c53f2b624",
-    "result": "failure",
-    "test_summary": "117 passed, 10 skipped",
+    "run_id": 43410589930,
+    "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43410589930",
+    "event": "pull_request",
+    "tested_head": "9f543b7d233be0fa9239ee5a84b2b9786b4fce2c",
+    "result": "success",
+    "test_summary": "124 passed, 3 skipped",
     "build": "PASS",
     "python_frontend_and_native_tests": "PASS",
     "fortran_polynomial_extrema_and_css_analytic_tests": "PASS",
-    "checksum_manifest": "FAIL",
-    "packaging": "NOT_RUN"
+    "checksum_manifest": "PASS (90 tracked manifest entries)",
+    "packaging": "PASS",
+    "artifact_id": 14029895606,
+    "artifact_url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43410589930/artifacts/14029895606",
+    "artifact_name": "NS_Cowling-69056bade04aff4026e9db500f3451a1fc3b3af1",
+    "artifact_size_bytes": 55503422,
+    "artifact_sha256": "0d797b73dd8f584f30ee0096d99e8fb4cf6822b60dbb619a0f24653740972d04",
+    "artifact_expires_utc": "2026-12-13T10:39:08Z"
   },
   "phase_adjudication": [
     {
@@ -53,26 +60,40 @@
       "phase": 6,
       "scope": "source-backed acceptance and complete generic-axis regression",
       "status": "NOT_REPRODUCED_IN_THIS_CI"
+    },
+    {
+      "phase": "CI-followup",
+      "scope": "unconditional synthetic Nadd and multi-Yq fixture execution",
+      "status": "PASS",
+      "evidence": "Commits f9dd6fef and 9f543b7d remove inappropriate raw-data guards from synthetic tests; CI 124 passed, 3 skipped. This does not supply or validate actual raw eos source files."
     }
   ],
   "source_staging_reconciliation": {
-    "git_tree_head": "9b77e336d8a7ec690ae9c1ff11bcab2c53f2b624",
-    "inputs_raw_compose_entries": 0,
-    "affected_source_tests": [
-      "test_real_RG_SLY4_passes_slice_check",
-      "test_real_RG_KDE0v1_passes_slice_check"
-    ],
-    "test_guard": "Both tests call pytest.skip when inputs/raw_compose is absent.",
-    "status": "SOURCE_BACKED_TESTS_NOT_RUN_IN_THIS_CI",
-    "caution": "A design receipt records local staging as resolved, but this CI checkout does not contain the raw_compose tree. The local claim is not promoted to a cloud CI pass."
+    "m0_status": "IMPLEMENTED_CI_PASS_IN_ORIGINAL_PROJECT_WORKSPACE",
+    "archive": {
+      "name": "EoS_complete_core_crust_release_v3_2.zip",
+      "size_bytes": 19398255,
+      "sha256": "d671310eb630ffd13f1b278425d945741ad7e08ce14c0d9aff42309c707e6a3b",
+      "zip_members": 2516,
+      "zip_crc": "PASS",
+      "source_models": 18,
+      "source_files": 158
+    },
+    "original_workspace_outputs": "inputs/raw_compose/SHA256SUMS.txt (158 hashes), inputs/raw_compose/source_manifest.json, inputs/replacement/eos390_reconstructed_source_v1.tar.zst; see E390-00-RESOLVED_20261113.json",
+    "github_actions_checkout": {
+      "inputs_raw_compose_entries": 0,
+      "tests_skipped": [
+        "test_real_RG_SLY4_passes_slice_check",
+        "test_real_RG_KDE0v1_passes_slice_check"
+      ],
+      "synthetic_test_change": "The Nadd and multi-Yq synthetic fixture tests no longer gate on inputs/raw_compose and now execute in CI."
+    },
+    "interpretation": "M0 source ingestion was completed in the original project workspace. Its 18-model tree was not committed to the Git checkout, so GitHub Actions does not see those files. This is a CI input-provisioning gap, not a basis for invalidating the M0 source receipt or claiming cloud source tests passed.",
+    "status": "SOURCE_COHORT_VERIFIED_LOCALLY__SOURCE_BACKED_CI_TESTS_NOT_RUN"
   },
   "checksum_reconciliation": {
-    "status": "NINE_STALE_HASHES_IDENTIFIED",
+    "status": "NINE_ENTRIES_VERIFIED_AFTER_REPAIR_ON_f15; LATER_9f543_TEST_COMMITS_ALSO_PASS_MANIFEST",
     "mismatches": [
-      {
-        "path": "data/eos390_native_fortran_unification_dag.v1.json",
-        "sha256": "5f75ae84f867a9e4b20d7579302f7f3e0468bee1319793c780ad6d441b720f58"
-      },
       {
         "path": "fortran_eos/app/compose_eos_fortran.f90",
         "sha256": "46ecfe65f298224740aae280fa5db0691dc608e6ad51ef5ddbad5ad41859209c"
@@ -104,6 +125,10 @@
       {
         "path": "python_frontend/tests/test_native_density_gap.py",
         "sha256": "46da83a57b51acff81ffcd250611344b5ced9bf4402b9c665e889384118e6c07"
+      },
+      {
+        "path": "data/eos390_native_fortran_unification_dag.v1.json",
+        "sha256": "221b8afdf3cf035cfde04d609d7c1708f6b99326521717765b4581dec07969ea"
       }
     ],
     "note": "Digests independently recomputed from exact UTF-8 GitHub file contents; pure SHA-256 implementation verified against the standard abc vector and the workflow's printed actual values."
@@ -111,11 +136,19 @@
   "not_claimed": [
     "full 3D T x Yq x nb input support",
     "full multidimensional writer/readback",
-    "source-backed RG_SLY4 or RG_KDE0v1 test pass in this CI run",
+    "source-backed RG_SLY4 or RG_KDE0v1 test pass in this GitHub Actions checkout",
     "provider semantics for SPG/GPPVA composition resolved",
     "M7 production PASS",
     "M9 output regeneration",
     "any of the 390 EOS outputs regenerated",
-    "Dropbox source/output upload"
-  ]
+    "Dropbox raw source/output upload"
+  ],
+  "updated_phase_status": {
+    "phase_1": "IMPLEMENTED_SYNTHETIC_TESTED",
+    "phase_2": "IMPLEMENTED_SYNTHETIC_TESTED",
+    "phase_3": "IMPLEMENTED_SYNTHETIC_TESTED",
+    "phase_4": "PENDING_MULTI_T_READER",
+    "phase_5": "PENDING_FULL_TENSOR_WRITER_READBACK",
+    "source_acceptance": "PENDING_CONTROLLED_CI_DATA_PROVISIONING"
+  }
 }

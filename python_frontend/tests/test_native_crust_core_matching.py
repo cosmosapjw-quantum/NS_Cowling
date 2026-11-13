@@ -145,7 +145,7 @@ def test_native_cli_keeps_sharp_maxwell_fail_closed_until_m5_integration(tmp_pat
         capture_output=True, text=True, check=False,
     )
     assert result.returncode != 0
-    assert "maxwell requires a sharp coexistence construction" in result.stdout
+    assert "maxwell is the sharp coexistence method" in result.stdout
 
 
 def test_native_matching_requires_explicit_composition_drop():

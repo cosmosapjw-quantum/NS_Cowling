@@ -152,6 +152,10 @@ _CRUST_ONLY_SOURCE_SPECS: dict[str, dict[str, Any]] = {
 }
 
 
+_E390_02_COMPOSITION_AUDIT_PATH = Path("data/receipts/eos390_m0/E390-02_COMPOSITION_CLOSURE_SOURCE_RECONCILIATION_20261113.json")
+_E390_02_COMPOSITION_AUDIT_GIT_BLOB_SHA1 = "419c00b3bf75bf13a41a58ce8edd99b91caaafaf"
+
+
 def _git_blob_sha1(path: Path) -> str:
     raw = path.read_bytes()
     header = f"blob {len(raw)}\0".encode("ascii")
@@ -495,6 +499,49 @@ def build_crust_only(
     if not inputs.is_dir():
         raise FileNotFoundError(f"crust-only source root does not exist: {inputs}")
 
+    composition_audit_path = repo_root / _E390_02_COMPOSITION_AUDIT_PATH
+    if not composition_audit_path.is_file():
+        raise FileNotFoundError(
+            f"required E390-02 provider-composition adjudication is missing: {composition_audit_path}"
+        )
+    composition_audit_git_blob = _git_blob_sha1(composition_audit_path)
+    if composition_audit_git_blob != _E390_02_COMPOSITION_AUDIT_GIT_BLOB_SHA1:
+        raise ValueError(
+            "E390-02 provider-composition adjudication identity mismatch: "
+            f"{composition_audit_git_blob}"
+        )
+    composition_audit = json.loads(composition_audit_path.read_text(encoding="utf-8"))
+    if composition_audit.get("status") != (
+        "BLOCKED_PROVIDER_SEMANTICS_UNRESOLVED_NORMALIZED_CLOSURE_IS_RECONSTRUCTION"
+    ):
+        raise ValueError("E390-02 provider-composition adjudication is not in its expected blocked state")
+    composition_semantics = {
+        "status": "BLOCKED_PROVIDER_SEMANTICS_UNRESOLVED",
+        "standard_compose_mapping": {
+            "YI": "combined number fraction of the nuclear group, sum_j(Y_j)",
+            "Xh": "group baryon fraction, Abar*YI",
+            "reader_mapping": "Yh=Abar*YI",
+            "writer_mapping": "YI=Yh/Abar",
+            "authority": "CompOSE Reference Manual v3.01, Sec. 4.2.3, Eqs. 4.20-4.22",
+        },
+        "provider_adjudication": {
+            "receipt": str(_E390_02_COMPOSITION_AUDIT_PATH),
+            "git_blob_sha1": composition_audit_git_blob,
+            "status": composition_audit["status"],
+            "normative_reference": composition_audit["normative_reference"],
+            "aggregate_findings": composition_audit["aggregate_findings"],
+            "normalizer": composition_audit["normalizer"],
+        },
+        "reader_derived_status_provenance": {
+            "field": "EOSData.row_status",
+            "is_serialized_eos_compo_source_field": False,
+            "meaning": "computed by the native reader under the standard CompOSE YI interpretation; it is not an original row field in eos.compo",
+            "policy": "retain the derived diagnostic exactly on native readback; do not relabel it as provider-stored status or silently clear FAIL",
+        },
+        "scope": "Raw eos.compo records are preserved for E390-03 composition reconstruction; no provider group-field remapping is asserted here.",
+        "matching_gate": "Do not use raw provider composition as a validated matched-product composition until E390-03 adjudicates/reconstructs it.",
+    }
+
     selected = list(_CRUST_ONLY_SOURCE_SPECS) if model_ids is None else list(model_ids)
     if not selected or len(selected) != len(set(selected)):
         raise ValueError("model_ids must be nonempty and contain no duplicates")
@@ -538,6 +585,7 @@ def build_crust_only(
             },
             "warning": "Iphase and q_extra are independent categorical fields and are never merged, interpolated or numerically remapped.",
         },
+        "composition_semantics": composition_semantics,
         "components": [],
         "blocked": {
             "GPPVA_TW": "BLOCKED: official CompOSE live page 212 says BPS below 0.002 fm^-3 while its linked PDF says BSk22; no provider choice is inferred."
@@ -724,10 +772,27 @@ def build_crust_only(
                 "no_interpolation_or_extrapolation": True,
                 "no_homogeneous_core_tail_imported": True,
             },
-            "source_row_status": {
+            "reader_derived_composition_status": {
                 "counts": row_status_counts_map,
                 "fail_rows_1based": row_status_fail_rows,
-                "policy": "preserved from source values and presence masks; FAIL is not repaired or silently cleared",
+                "provenance": "computed by the native CompOSE reader; not serialized as a source eos.compo field",
+                "policy": "retained exactly across native readback; FAIL is not treated as raw-provider annotation and is not silently cleared",
+            },
+            "composition_semantics": composition_semantics,
+            "physical_diagnostics": {
+                "overall_C1_to_C11": physical_report["overall"],
+                "C1": physical_report["C1"],
+                "C2": physical_report["C2"],
+                "C3": physical_report["C3"],
+                "C4": physical_report["C4"],
+                "C5": physical_report["C5"],
+                "C6": physical_report["C6"],
+                "C7": physical_report["C7"],
+                "C8": physical_report["C8"],
+                "C9": physical_report["C9"],
+                "C10": physical_report["C10"],
+                "C11": physical_report["C11"],
+                "interpretation": "C1-C11 output is reported as returned by the native verifier. C3/C4 NOT_AVAILABLE means the standard-reader composition mapping did not produce rows eligible for independent closure checking; it is not a closure PASS.",
             },
             "categorical_fields": {
                 "Iphase_counts": iphase_counts_map,
@@ -743,7 +808,7 @@ def build_crust_only(
             ],
             "checks": {
                 "source_identity": "PASS",
-                "source_row_status_lossless_preservation": "PASS",
+                "reader_derived_status_stable_on_native_readback": "PASS",
                 "exact_source_support": "PASS",
                 "outer_inner_phase_boundary": "PASS",
                 "BSk22_neutron_drip_boundary": "PASS",
@@ -790,12 +855,15 @@ def build_crust_only(
             "provider_splice_first_source_row_at_or_above_2e-3": int(np.searchsorted(source.nb, 2e-3, side="left") + 1),
             "terminal_nb_fm3": float(source.nb[-1]),
             "Iphase_counts": iphase_counts_map,
-            "row_status_counts": row_status_counts_map,
-            "row_status_fail_rows_1based": row_status_fail_rows,
+            "reader_derived_status_counts": row_status_counts_map,
+            "reader_derived_status_fail_rows_1based": row_status_fail_rows,
             "q_extra_count": int(source.q_extra_count),
             "q_extra_counts": qextra_counts,
             "construction_status": receipt["status"],
             "physical_validation": physical_report["overall"],
+            "composition_semantics_status": composition_semantics["status"],
+            "C3_status": physical_report["C3"]["status"],
+            "C4_status": physical_report["C4"]["status"],
         })
 
     coverage["status"] = "ALL_ADMITTED_CRUST_COMPONENTS_CONSTRUCTED_NATIVE_READBACK_VERIFIED"
@@ -812,6 +880,7 @@ def build_crust_only(
         "admitted_model_count": len(receipts),
         "total_output_rows": int(sum(item["output"]["n"] for item in receipts)),
         "blocked_models": coverage["blocked"],
+        "composition_semantics_status": composition_semantics["status"],
         "coverage_report": str(target_root / "crust_coverage_report.v1.json"),
         "components": [
             {
@@ -825,6 +894,8 @@ def build_crust_only(
         ],
         "non_claims": [
             "The manifest certifies source-faithful construction and native readback, not physical admissibility.",
+            "The provider group-composition semantics remain blocked; the reader-derived row_status is not a raw eos.compo source field.",
+            "C3/C4 NOT_AVAILABLE is not a closure PASS. Matched-product composition must wait for E390-03 reconstruction/adjudication.",
             "It does not certify any matched core-crust EOS or the 390 smooth-method matrix.",
             "GPPVA_TW remains blocked and is not included in the artifact.",
         ],

@@ -56,7 +56,17 @@ def test_e390_03b_builds_all_twelve_admitted_crust_only_tables(tmp_path: Path) -
         assert receipt["checks"]["native_readback"] == "PASS"
         assert receipt["checks"]["BSk22_neutron_drip_boundary"] == "PASS"
         assert receipt["checks"]["C3_C4_masks_exact_preservation"] == "PASS"
-        assert receipt["checks"]["source_row_status_lossless_preservation"] == "PASS"
+        assert receipt["checks"]["reader_derived_status_stable_on_native_readback"] == "PASS"
+        derived = receipt["reader_derived_composition_status"]
+        assert derived["provenance"].startswith("computed by the native CompOSE reader")
+        assert "3" in derived["counts"]
+        assert receipt["composition_semantics"]["status"] == "BLOCKED_PROVIDER_SEMANTICS_UNRESOLVED"
+        assert receipt["composition_semantics"]["standard_compose_mapping"]["reader_mapping"] == "Yh=Abar*YI"
+        assert receipt["composition_semantics"]["standard_compose_mapping"]["writer_mapping"] == "YI=Yh/Abar"
+        assert receipt["physical_diagnostics"]["C3"]["status"] == "NOT_AVAILABLE"
+        assert receipt["physical_diagnostics"]["C4"]["status"] == "NOT_AVAILABLE"
+        assert receipt["physical_diagnostics"]["C3"]["pass_"] is None
+        assert receipt["physical_diagnostics"]["C4"]["pass_"] is None
 
         source = read_compose(source_root / model)
         output_dir = Path(receipt["output"]["directory"])
@@ -123,12 +133,12 @@ def test_e390_03b_never_overwrites_an_existing_attempt(tmp_path: Path) -> None:
         )
 
 
-def test_e390_03b_preserves_source_fail_status_without_relaxing_default_writer(tmp_path: Path) -> None:
+def test_e390_03b_reader_derived_fail_status_does_not_relax_default_writer(tmp_path: Path) -> None:
     source_root = ROOT / "eos_generator" / "eos_data"
     source = read_compose(source_root / "SPG_M1")
-    assert np.any(source.row_status == 3), "fixture must retain source rows marked FAIL"
+    assert np.any(source.row_status == 3), "standard reader must expose its derived composition-range diagnostic"
 
-    # Normal writes remain fail-closed; only the dedicated crust projection path
-    # opts into preserving finite source values without physical repair.
+    # Normal writes remain fail-closed. The dedicated crust projection path
+    # may serialize raw source values without changing the derived diagnostic.
     with pytest.raises(NativeExecutionError, match="row-level composition status is FAIL"):
         write_compose(tmp_path / "strict-output", source)

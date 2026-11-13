@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.5.0",
+  "revision": "1.5.1",
   "created_utc": "2026-11-11",
-  "status": "M3A_CORE_ONLY_CI_PASS_M3B_CRUST_ONLY_IMPLEMENTED_AWAITING_CI_AFTER_SOURCE_STATUS_PRESERVATION_FIX",
+  "status": "M3A_CORE_ONLY_CI_PASS_M3B_CRUST_CONSTRUCTION_CI_PASS_COMPOSITION_SEMANTICS_BLOCKED_E390_03_NEXT",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "cloud/eos390-fortran-unification-v1",
@@ -1007,7 +1007,7 @@
         "E390-02A",
         "E390-10A"
       ],
-      "status": "IMPLEMENTED_AWAITING_EXACT_HEAD_CI_AFTER_SOURCE_STATUS_PRESERVATION_FIX",
+      "status": "CONSTRUCTION_IMPLEMENTED_CI_PASS_COMPOSITION_SEMANTICS_BLOCKED_FOR_E390_03",
       "outputs": [
         "one standalone native-Fortran crust-only artifact per admitted model (12 models; GPPVA_TW excluded)",
         "outer-crust/neutron-drip/provider-splice/inner-crust/cluster-pasta coverage report",
@@ -1033,8 +1033,21 @@
         "eos.compo Iphase and eos.thermo q_extra are independent categorical fields and are preserved losslessly.",
         "Source thermo rows preserve literature-method provenance; no new CLD/Thomas-Fermi solve or composition reconstruction is run here.",
         "GPPVA_TW stays blocked by the official BPS-vs-BSk22 provider conflict.",
-        "Source rows already marked row_status=FAIL are retained only through a dedicated exact-source-preservation writer option; generic CompOSE writes remain fail-closed and no physical repair is performed."
-      ]
+        "CompOSE standard mapping remains Yh=Abar*YI on read and YI=Yh/Abar on write; YI is combined number fraction and Xh=Abar*YI is group baryon fraction.",
+        "EOSData.row_status is computed by the native reader, not serialized as a raw eos.compo source field. Record its derivation and do not call it provider-stored status.",
+        "E390-02 receipt 419c00b3bf75bf13a41a58ce8edd99b91caaafaf adjudicates provider composition semantics BLOCKED: Iphase=0 raw group values are Xh-compatible, Iphase=7 raw values match neither standard YI nor raw-as-Xh; normalized closure is reconstruction.",
+        "C3/C4 NOT_AVAILABLE is not PASS. E390-03 must reconstruct/adjudicate composition with row-level provenance before any matched product uses provider composition."
+      ],
+      "acceptance_verification": {
+        "source_identity_all_12": "PASS",
+        "exact_source_support_all_12": "PASS",
+        "native_fortran_build": "PASS",
+        "native_readback_all_12": "PASS",
+        "artifact_upload": "PASS",
+        "sha256_manifest": "PENDING_RUNNER_MEASURED_REPAIR",
+        "provider_composition_semantics": "BLOCKED_E390_03",
+        "GPPVA_TW": "BLOCKED_SOURCE_CONFLICT"
+      }
     },
     {
       "id": "E390-01B",
@@ -2264,9 +2277,11 @@
   },
   "latest_evidence_receipt": {
     "node_id": "E390-03B",
-    "status": "IMPLEMENTATION_WITH_EXPLICIT_SOURCE_STATUS_PRESERVATION_AWAITING_CI",
+    "status": "CONSTRUCTION_AND_NATIVE_READBACK_CI_PASS_SEMANTICS_BLOCKED_FOR_E390_03",
     "planned_path": "data/receipts/eos390_m3b/E390-03B_CRUST_ONLY_CONSTRUCTION_20261113.json",
-    "backup_branch": "backup/e390-03b-pre-20261113",
-    "parent_commit": "50a2d7bc507a4e6b622e824577ac7e423a5a1822"
+    "backup_branch": "backup/e390-03b-yh-semantics-pre-20261113",
+    "parent_commit": "419570ba9379065eafbcc5bcdb6316d49a8a64e1",
+    "source_composition_adjudication": "data/receipts/eos390_m0/E390-02_COMPOSITION_CLOSURE_SOURCE_RECONCILIATION_20261113.json",
+    "source_composition_adjudication_git_blob_sha1": "419c00b3bf75bf13a41a58ce8edd99b91caaafaf"
   }
 }

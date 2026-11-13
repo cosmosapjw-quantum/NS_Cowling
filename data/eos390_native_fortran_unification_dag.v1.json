@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.4.8",
+  "revision": "1.4.9",
   "created_utc": "2026-11-11",
-  "status": "M1C_SOURCE_BOUNDARIES_ADJUDICATED_TW_BLOCKED_M3A_CORE_CONSTRUCTION_NEXT",
+  "status": "M3A_CORE_ONLY_CONSTRUCTION_CI_PASS_PHYSICAL_DIAGNOSTICS_PARTIAL_FAIL_M3B_NEXT",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "cloud/eos390-fortran-unification-v1",
@@ -918,7 +918,7 @@
         "E390-02A",
         "E390-10A"
       ],
-      "status": "PENDING",
+      "status": "CONSTRUCTION_IMPLEMENTED_CI_PASS_PHYSICAL_DIAGNOSTICS_PARTIAL_FAIL",
       "outputs": [
         "one standalone core-only artifact per admitted model",
         "source-backed boundary selection and composition provenance",
@@ -930,6 +930,72 @@
         "No extrapolation or fixed-density-only selection.",
         "Thermodynamic and composition masks are preserved; unsupported composition remains explicitly unavailable.",
         "Fortran owns all numerical construction and output is read back and hashed."
+      ],
+      "resolved_date": "2026-11-13",
+      "receipt": "data/receipts/eos390_m3a/E390-03A_CORE_ONLY_CONSTRUCTION_20261113.json",
+      "receipt_blob": "7de1094d80e0ccd8a46784db1fb8df09d53dbe13",
+      "implementation_commit": "1dbd3c16ce81577f4eda60d073300d1731d837e7",
+      "backup_branch": "backup/e390-03a-close-pre-20261113",
+      "production_artifact": {
+        "workflow": "Fortran EOS frontend CI",
+        "push_run_id": 43442487415,
+        "push_run_number": 445,
+        "push_run_url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43442487415",
+        "pull_request_run_id": 43442506878,
+        "pull_request_run_number": 446,
+        "pull_request_run_url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43442506878",
+        "artifact_id": 14045374660,
+        "artifact_name": "E390-03A-core-only-1dbd3c16ce81577f4eda60d073300d1731d837e7",
+        "artifact_url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43442487415/artifacts/14045374660",
+        "artifact_bytes": 57270,
+        "artifact_sha256": "e999734e36a255bb03cb4ddb02ea93855d2c086e37d9245348f9e0e2cd0b3e1c",
+        "independently_downloaded_sha256": "e999734e36a255bb03cb4ddb02ea93855d2c086e37d9245348f9e0e2cd0b3e1c",
+        "zip_member_count": 29,
+        "uncompressed_bytes": 285336,
+        "root_manifest": "core_only_manifest.v1.json",
+        "root_manifest_status": "ALL_REQUESTED_COMPONENTS_CONSTRUCTED_AND_NATIVE_READBACK_VERIFIED",
+        "artifact_retention_days": 30
+      },
+      "verification": {
+        "exact_head_commit": "1dbd3c16ce81577f4eda60d073300d1731d837e7",
+        "push_ci": "PASS",
+        "pull_request_ci": "PASS",
+        "fortran_native_build": "PASS",
+        "python_frontend_and_pipeline_tests": "133 passed, 3 skipped",
+        "admitted_core_only_builder": "PASS",
+        "native_readback_all_five_models": "PASS",
+        "native_polynomial_extrema_tests": "PASS",
+        "native_css_segment_analytic_tests": "PASS",
+        "sha256_manifest": "PASS (103 entries)",
+        "source_snapshot_packaging": "PASS",
+        "source_snapshot_upload": "PASS",
+        "component_artifact_upload": "PASS"
+      },
+      "completed_outputs": [
+        "Five source-admitted core-only CompOSE directories generated in native Fortran and uploaded as one immutable run artifact.",
+        "Per-model E390-03A receipts and root core_only_manifest.v1.json with exact output SHA-256 values.",
+        "APR_APR rows 70-172 (103 rows); BBB_BHF2 rows 70-84 (15 rows); GM_GM1 rows 49-349 (301 rows); RG_KDE0v1 rows 967-1240 (274 rows); RG_SLY4 rows 144-197 (54 rows)."
+      ],
+      "acceptance_verification": {
+        "source_identity_all_five": "PASS",
+        "only_source_admitted_homogeneous_core_rows": "PASS",
+        "no_preattached_crust_or_cluster_rows": "PASS",
+        "no_interpolation_or_extrapolation": "PASS",
+        "thermo_Q1_Q7_and_Qextra_row_projection": "PASS",
+        "composition_presence_masks_Iphase_C3_C4": "PASS",
+        "original_density_row_keys": "PASS",
+        "T_Yq_values_and_index_bounds": "PASS",
+        "native_fortran_compose_write_readback": "PASS (5/5)",
+        "output_sha256_per_file_and_archive_sha256": "PASS",
+        "physical_validation": "PARTIAL: BBB_BHF2 and GM_GM1 PASS; APR_APR C10 FAIL; RG_KDE0v1 C2/C10 FAIL; RG_SLY4 C2 FAIL"
+      },
+      "physical_validation_status": "2_OF_5_PASS_3_OF_5_RECORDED_FAIL; DO_NOT_USE_FAILED_MODELS_FOR_MATCHED_PRODUCTION",
+      "status_detail": "Native Fortran exact-row extraction and CompOSE write/readback PASS for all five source-admitted core models. Push CI #445 and PR CI #446 pass on exact head 1dbd3c1: 133 passed, 3 skipped; Fortran build and analytic tests PASS; SHA256 manifest PASS. Production artifact 14045374660 was downloaded and independently checked: 29 files, 57,270 bytes, ZIP SHA-256 matches artifact digest, and every output file hash matches its per-model receipt. Physical checks are separate: BBB_BHF2 and GM_GM1 PASS; APR_APR C10 FAIL; RG_KDE0v1 C2/C10 FAIL; RG_SLY4 C2 FAIL. These failures are retained and block downstream matching/TOV use of those three products pending adjudication.",
+      "non_claims": [
+        "No crust-only EOS has been constructed.",
+        "No matching method or 390 smooth EOS composition matrix has been executed.",
+        "This node does not certify all five core EOS as physically admissible.",
+        "No composition reconstruction, interpolation, extrapolation or thermodynamic repair was performed."
       ]
     },
     {
@@ -1078,7 +1144,7 @@
   "evidence_status": {
     "code_execution_in_this_turn": "GITHUB_SOURCE_BLOB_AUDIT_OF_18_EOS_NB_GRIDS_AND_MODEL_BOUNDARY_PHASE_ADJUDICATION; NO_PRODUCTION_NUMERICAL_EXECUTION",
     "static_source_patch": "NO_PRODUCTION_CODE_OR_RAW_SOURCE_EOS_PATCH; M1C_RECEIPT_DOCUMENT_AND_DAG_ONLY",
-    "github_ci": "PASS_BRANCH_HEAD_6ECF8AD_RUN_212",
+    "github_ci": "PASS_EXACT_HEAD_1DBD3C1_PUSH_445_AND_PR_446",
     "local_runtime": "CURRENT_REMOTE_DESKTOP_DEVICE_OFFLINE; PRIOR_LOCAL_E390_02_RECEIPT_EXISTS_IN_DROPBOX",
     "source_cohort_admission": "CORE_ONLY_5_OF_5_ADMITTED; CRUST_ONLY_12_OF_13_ADMITTED; GPPVA_TW_BLOCKED_OFFICIAL_PROVIDER_CONFLICT",
     "regenerated_390": "NOT_RUN",
@@ -1241,6 +1307,16 @@
       "cloud_staging": "NOT_DONE",
       "fresh_file_hashes": "NOT_DONE",
       "regenerated_390": "NOT_RUN"
+    },
+    "e390_03a": {
+      "status": "CONSTRUCTION_IMPLEMENTED_CI_PASS_PHYSICAL_DIAGNOSTICS_PARTIAL_FAIL",
+      "source_cohort": "5/5 CORE_ONLY ADMITTED AND CONSTRUCTED",
+      "native_readback": "5/5 PASS",
+      "production_artifact_id": 14045374660,
+      "production_artifact_sha256": "e999734e36a255bb03cb4ddb02ea93855d2c086e37d9245348f9e0e2cd0b3e1c",
+      "physical_validation": "2/5 PASS; 3/5 FAIL retained in per-model receipts",
+      "matched_eos_generation": "NOT_RUN",
+      "crust_only_construction": "NOT_RUN"
     }
   },
   "legacy_feature_inventory": [
@@ -1362,7 +1438,7 @@
     ],
     "policy": "Track separately from the 390 matrix; never reinterpret EOS390 method=maxwell."
   },
-  "last_update_utc": "2026-11-13",
+  "last_update_utc": "2026-11-13T14:26:25Z",
   "known_remaining_implementation_gaps": [
     {
       "area": "native literature-derived composition",
@@ -2055,12 +2131,11 @@
     }
   ],
   "next_actions": [
-    "E390-03A (next): implement the native Fortran standalone core-only constructor for all five admitted core models using the exact model-specific source row ranges in the E390-01C receipt.",
-    "E390-03B: implement the native Fortran crust-only constructor for the twelve admitted SPG/GPPVA inputs; GPPVA_TW remains fail-closed pending resolution of its BPS-versus-BSk22 official-source conflict.",
-    "E390-03: port literature-backed model-composition solvers and SPG/GPPVA CLD/Thomas-Fermi reconstruction after the source-admitted standalone component artifacts are built.",
+    "E390-03B (next): implement native Fortran standalone crust-only construction for the twelve admitted SPG/GPPVA inputs, preserving exact outer-crust, neutron-drip, inner-crust, cluster/pasta and terminal source support; keep GPPVA_TW fail-closed.",
+    "E390-03: after standalone core-only and crust-only construction, implement and validate literature-backed model-composition solvers and SPG/GPPVA CLD/Thomas-Fermi reconstruction with explicit provenance.",
+    "Resolve or explicitly adjudicate E390-03A physical diagnostics: APR_APR C10; RG_KDE0v1 C2/C10; RG_SLY4 C2 before these core products enter matched-EOS/TOV/Cowling production cohorts.",
     "E390-10B: complete multi-T parsing, full composition tensorization and full-tensor CompOSE writer/readback without weakening the cold-slice path.",
-    "Integrate the five production smooth matching kernels plus FLCHPB legacy parity on validated core-only/crust-only inputs.",
-    "Integrate canonical method=maxwell sharp coexistence with composition/provenance preservation; keep the separate sharp-Maxwell 65-pair workflow distinct from the 390 smooth matrix.",
+    "Only after both component cohorts are validated, integrate the five smooth matching methods plus FLCHPB legacy parity, then the separate composition-aware sharp Maxwell workflow.",
     "Complete native TOV/tidal/Cowling, 390 smooth batch orchestration, differential/physical/convergence validation and versioned regeneration only after the component and matching gates close."
   ],
   "provenance": {
@@ -2173,12 +2248,13 @@
     "rule": "Never request or fabricate the lost tar.zst. Reconstruct a new versioned tar.zst from the surviving ZIP using the checked-in inventory and helper."
   },
   "latest_evidence_receipt": {
-    "node": "E390-01C",
-    "blob_sha": "c3492ac2260d904184dfd2cd1cedbf74cb6c2a84",
-    "status": "SOURCE_ADJUDICATION_COMPLETE_WITH_TW_BLOCKED",
-    "receipt": "data/receipts/eos390_m1c/E390-01C_SOURCE_BOUNDARY_PHASE_ADJUDICATION_20261113.json",
-    "document": "docs/E390_01C_SOURCE_BOUNDARY_PHASE_ADJUDICATION_20261113.md",
-    "backup_branch": "backup/e390-01c-pre-20261113",
-    "backup_parent_sha": "357d9a51d65c41cee45dd987c84a346ef0cc3370"
+    "node": "E390-03A",
+    "blob_sha": "7de1094d80e0ccd8a46784db1fb8df09d53dbe13",
+    "status": "CONSTRUCTION_IMPLEMENTED_CI_PASS_PHYSICAL_DIAGNOSTICS_PARTIAL_FAIL",
+    "receipt": "data/receipts/eos390_m3a/E390-03A_CORE_ONLY_CONSTRUCTION_20261113.json",
+    "backup_branch": "backup/e390-03a-close-pre-20261113",
+    "backup_parent_sha": "1dbd3c16ce81577f4eda60d073300d1731d837e7",
+    "artifact_id": 14045374660,
+    "artifact_sha256": "e999734e36a255bb03cb4ddb02ea93855d2c086e37d9245348f9e0e2cd0b3e1c"
   }
 }

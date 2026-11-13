@@ -1,0 +1,45 @@
+{
+ "status": "PROVIDER_SEMANTICS_UNRESOLVED__BLOCKED",
+ "c6b_state": "OPEN / BLOCKED_REVIEW_REQUIRED",
+ "c7": "NOT_RUN / NOT_RECOMMENDED",
+ "tests": "python_frontend/tests/test_sharp_maxwell_composition_semantics_audit.py: 10 passed",
+ "audit_deterministic_rerun": true,
+ "c6_residual_reproduction": "exact match (all four maxima)",
+ "per_source": {
+  "GPPVA_FSU2": {
+   "schema_keys_validated": true,
+   "standard_YI_conforms": false,
+   "direct_Yh_valid": "Iphase=0 only (as X_h numerically)",
+   "standard_Yh_valid": false,
+   "closure_explained_all_rows": false,
+   "provider_conversion_documented": false,
+   "status": "PROVIDER_SEMANTICS_UNRESOLVED__BLOCKED"
+  },
+  "SPG_M1": {
+   "schema_keys_validated": true,
+   "standard_YI_conforms": false,
+   "direct_Yh_valid": "Iphase=0 only (as X_h numerically)",
+   "standard_Yh_valid": false,
+   "closure_explained_all_rows": false,
+   "provider_conversion_documented": false,
+   "status": "PROVIDER_SEMANTICS_UNRESOLVED__BLOCKED"
+  }
+ },
+ "key_findings": [
+  "inner-crust last field == Ye+Ymu in 200/200 rows",
+  "outer-crust last field = 1.0 behaves as X_h not Y_I",
+  "GPPVA inner: C3/C4-implied Yh agree (~1.000) in 52/52 rows; Ye = Z/A",
+  "SPG inner: C3/C4-implied Yh incompatible in 148/148 rows; non-cluster baryon fraction 0.457-0.904 unrecorded (Yn=0)",
+  "Aav*Y_I fails all 634 rows",
+  "no provider/paper defines the field or tabulates composition"
+ ],
+ "no_production_change": true,
+ "pairs_unchanged": "65 x BLOCKED_BEFORE_ROOT_SEARCH",
+ "not_run": [
+  "C7",
+  "root search",
+  "65-pair sweep",
+  "TOV",
+  "Cowling"
+ ]
+}

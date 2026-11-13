@@ -1,0 +1,2817 @@
+{
+  "schema": "ns-cowling.sharp-maxwell-cohort-manifest",
+  "schema_version": "1.0.0",
+  "manifest_id": "sharp_maxwell_65_cohort_manifest",
+  "created_date": "2026-11-10",
+  "research_loop_stage": "C6_NATIVE_EXECUTION_PARTIAL",
+  "status": "C6_PARTIAL__NATIVE_EXECUTION_VERIFIED__C3_C4_IPHASE7_REVIEW_REQUIRED",
+  "purpose": "Create a new exact first-order Maxwell cohort from the 13 crust x 5 core source grid. All historical smooth maxwell outputs are immutable legacy references and are not inputs, priors, seeds, or fallback results for this cohort.",
+  "authority": {
+    "raw_source_branch": "research/maxwell-native-fortran-v1",
+    "raw_source_commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
+    "raw_source_root": "eos_generator/eos_data",
+    "raw_source_commit_status": "PR #3 head; open draft; unmerged",
+    "legacy_output_branch": "main",
+    "legacy_output_commit": "261fcdcbeaf6b5d842480e82e249312e8da5532a",
+    "legacy_output_root": "matched_eos_all_combinations/matched_eos_390",
+    "legacy_output_status": "65 pair directories and their method outputs observed on main; legacy maxwell is not sharp Maxwell",
+    "upstream_prs": [
+      {
+        "number": 2,
+        "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/pull/2",
+        "status": "open_draft_unmerged",
+        "head": "2b7a00984dfa215bcca48c7d7adb5f3619013502",
+        "role": "Native Fortran sharp-Maxwell EOS constructor and Python/SciPy reference"
+      },
+      {
+        "number": 3,
+        "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/pull/3",
+        "status": "open_draft_unmerged",
+        "head": "a09ec30d74b363652d2d1aefe990557c468679dd",
+        "role": "Two-provider phase-segmented TOV/Cowling and mode-spectrum dispatch"
+      }
+    ],
+    "code_refs": {
+      "maxwell_constructor": "fortran_eos/src/compose_eos_phase_transition.f90",
+      "maxwell_input_reader": "fortran_eos/src/compose_eos_io.f90",
+      "maxwell_input_contract": "docs/FORTRAN_EOS_MAXWELL_TRANSITION_V1.md",
+      "table_provider": "oscillation_source/solutions/src/eos/ns_table_eos.f90",
+      "tov_one_interface": "oscillation_source/solutions/src/structure/ns_maxwell_tov.f90",
+      "cowling_one_interface": "oscillation_source/solutions/src/modes/ns_maxwell_cowling.f90"
+    }
+  },
+  "cohort_definition": {
+    "crust_count": 13,
+    "core_count": 5,
+    "pair_count": 65,
+    "crust_ids": [
+      "SPG_M1",
+      "SPG_M2",
+      "SPG_M3",
+      "SPG_M4",
+      "SPG_M5",
+      "GPPVA_DD2",
+      "GPPVA_DDME2",
+      "GPPVA_FSU2",
+      "GPPVA_FSU2H",
+      "GPPVA_FSU2R",
+      "GPPVA_NL3wrL55",
+      "GPPVA_TM1e",
+      "GPPVA_TW"
+    ],
+    "core_ids": [
+      "APR_APR",
+      "BBB_BHF2",
+      "GM_GM1",
+      "RG_SLY4",
+      "RG_KDE0v1"
+    ],
+    "cross_product_complete": true,
+    "source_catalog_and_pairs_are_distinct_from_390_legacy_method_rows": true
+  },
+  "legacy_maxwell_audit": {
+    "summary_file": "matched_eos_all_combinations/Crust_Core_Matching_390_Summary.json",
+    "audit_file": "matched_eos_all_combinations/audit_matched_390_v3.json",
+    "historical_method_rows": 65,
+    "old_spline_mode": "maxwell_plateau",
+    "verdict": "LEGACY_NON_MAXWELL_CONFIRMED",
+    "reason": "The two endpoints of every reported legacy transition interval have unequal pressure and unequal baryon chemical potential. The finite reported delta-epsilon does not establish a Maxwell coexistence point.",
+    "endpoint_relative_mismatch_definition": "abs(x2-x1)/max(abs(x1),abs(x2))",
+    "pressure_relative_mismatch": {
+      "min": 0.4379594318244625,
+      "median": 0.6970048462699612,
+      "max": 0.8654625151148729
+    },
+    "chemical_potential_relative_mismatch": {
+      "min": 0.004081019553423929,
+      "median": 0.00932882174880572,
+      "max": 0.022816116020458146
+    },
+    "latent_energy_density_reported_mev_fm3": {
+      "min": 9.0265,
+      "median": 45.9983,
+      "max": 106.8832
+    },
+    "density_jump_reported_fm3": {
+      "min": 0.009427,
+      "median": 0.047859,
+      "max": 0.110875
+    },
+    "reuse_policy": "READ_ONLY_PROVENANCE_ONLY__NEVER_COPY_PATCH_OR_USE_AS_SHARP_MAXWELL",
+    "exact_maxwell_acceptance": "Require one common (P_t, mu_t) with two distinct one-sided n_B and epsilon values, plus delta_epsilon=mu_t*delta_n_B."
+  },
+  "source_catalog": {
+    "source_units": "CompOSE source tables; n_B in fm^-3; Q columns dimensionless; m_n,m_p and mu_B in MeV; P, epsilon in MeV fm^-3.",
+    "source_commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
+    "compose_definition_reference": "https://compose.obspm.fr/download/pdf/CompOSE_Quick_Guide_for_Providers.pdf",
+    "q_fields": {
+      "Q1": "P/n_B",
+      "Q2": "s/n_B",
+      "Q3": "mu_B/m_n - 1",
+      "Q4": "mu_q/m_n",
+      "Q5": "mu_l/m_n",
+      "Q6": "f/(n_B*m_n) - 1",
+      "Q7": "epsilon/(n_B*m_n) - 1",
+      "Nadd": "Count of provider-defined additional eos.thermo columns; meaning must be taken from that model's Data Sheet. Preserve all values and ordering."
+    },
+    "composition_fields": "eos.compo stores Iphase, Npairs particle pairs, and Nquad nuclear-group quadruples. Under the standard CompOSE convention, particle fractions are Y_i=n_i/n_b; for a nuclear group, Y_I=sum_j Y_j is the combined group number fraction, while its baryon/mass fraction is X_h=A_av*Y_I. The native verifier variable Yh is used as a baryon/mass fraction in C3 (Z_av/A_av*Yh) and C4 (Yn+Yp+Yh=1). Provider conformance of the selected raw rows to this convention is unresolved: see c6_native_execution.",
+    "crust_models": {
+      "SPG_M1": {
+        "role": "low_density_crust_source",
+        "raw_directory": "eos_generator/eos_data/SPG_M1",
+        "files": {
+          "eos.nb": {
+            "git_blob_sha": "671e4c2b8fe5e77539cb4854586c153f81be3f31"
+          },
+          "eos.thermo": {
+            "git_blob_sha": "2750bd1ba015b821061aa11cd18e5bca2d20405a"
+          },
+          "eos.compo": {
+            "git_blob_sha": "ab79da517271bea1f7de37294e87e019de611699"
+          }
+        },
+        "rows": 365,
+        "source_masses_mev": {
+          "m_n": 938.9,
+          "m_p": 938.9
+        },
+        "I_l": 1,
+        "eos_compo_present": true,
+        "eos_compo_rows": 365,
+        "Npairs_histogram": {
+          "4": 365
+        },
+        "Nquad_histogram": {
+          "1": 365
+        },
+        "Iphase_histogram": {
+          "0": 217,
+          "7": 148
+        },
+        "Iphase_boundary": {
+          "left_knot": 217,
+          "right_knot": 218,
+          "from": 0,
+          "to": 7
+        },
+        "Nadd_values": [
+          0
+        ],
+        "additional_column_value_counts": {},
+        "max_abs_Q3_vs_Euler_relative_residual": 0.0000014105003688878103,
+        "strict_Q3_gate_2e_6": "PASS",
+        "source_status": "METADATA_INSPECTED__FULL_PHYSICAL_ADMISSION_NOT_RUN"
+      },
+      "SPG_M2": {
+        "role": "low_density_crust_source",
+        "raw_directory": "eos_generator/eos_data/SPG_M2",
+        "files": {
+          "eos.nb": {
+            "git_blob_sha": "f9c032b24a2735547e7bf359906b678be5a63455"
+          },
+          "eos.thermo": {
+            "git_blob_sha": "a83d7f4825700f96494380b564961b1791fe0c8b"
+          },
+          "eos.compo": {
+            "git_blob_sha": "5142a25fd52e6d82078a21b0a5c2c0944f3678ee"
+          }
+        },
+        "rows": 377,
+        "source_masses_mev": {
+          "m_n": 938.9,
+          "m_p": 938.9
+        },
+        "I_l": 1,
+        "eos_compo_present": true,
+        "eos_compo_rows": 377,
+        "Npairs_histogram": {
+          "4": 377
+        },
+        "Nquad_histogram": {
+          "1": 377
+        },
+        "Iphase_histogram": {
+          "0": 217,
+          "7": 160
+        },
+        "Iphase_boundary": {
+          "left_knot": 217,
+          "right_knot": 218,
+          "from": 0,
+          "to": 7
+        },
+        "Nadd_values": [
+          0
+        ],
+        "additional_column_value_counts": {},
+        "max_abs_Q3_vs_Euler_relative_residual": 0.0000014105003688878103,
+        "strict_Q3_gate_2e_6": "PASS",
+        "source_status": "METADATA_INSPECTED__FULL_PHYSICAL_ADMISSION_NOT_RUN"
+      },
+      "SPG_M3": {
+        "role": "low_density_crust_source",
+        "raw_directory": "eos_generator/eos_data/SPG_M3",
+        "files": {
+          "eos.nb": {
+            "git_blob_sha": "5afee15e44ca5aa84145d0cf9c04889c99547b39"
+          },
+          "eos.thermo": {
+            "git_blob_sha": "6dc6ffc717f792e3fd5e8b6daf3d10fd2ae82663"
+          },
+          "eos.compo": {
+            "git_blob_sha": "36fdd1678c5e2931642a90d34d6e922201154b6f"
+          }
+        },
+        "rows": 366,
+        "source_masses_mev": {
+          "m_n": 938.9,
+          "m_p": 938.9
+        },
+        "I_l": 1,
+        "eos_compo_present": true,
+        "eos_compo_rows": 366,
+        "Npairs_histogram": {
+          "4": 366
+        },
+        "Nquad_histogram": {
+          "1": 366
+        },
+        "Iphase_histogram": {
+          "0": 217,
+          "7": 149
+        },
+        "Iphase_boundary": {
+          "left_knot": 217,
+          "right_knot": 218,
+          "from": 0,
+          "to": 7
+        },
+        "Nadd_values": [
+          0
+        ],
+        "additional_column_value_counts": {},
+        "max_abs_Q3_vs_Euler_relative_residual": 0.0000014105003688878103,
+        "strict_Q3_gate_2e_6": "PASS",
+        "source_status": "METADATA_INSPECTED__FULL_PHYSICAL_ADMISSION_NOT_RUN"
+      },
+      "SPG_M4": {
+        "role": "low_density_crust_source",
+        "raw_directory": "eos_generator/eos_data/SPG_M4",
+        "files": {
+          "eos.nb": {
+            "git_blob_sha": "47d96bf925e646e50a5c71da71ef372c7e4b941f"
+          },
+          "eos.thermo": {
+            "git_blob_sha": "766db8aeaa6b7223914fdb0e2ddcabed6a3d2d21"
+          },
+          "eos.compo": {
+            "git_blob_sha": "52b598c3febbe69a9d383f9da022080be0fdbb8f"
+          }
+        },
+        "rows": 375,
+        "source_masses_mev": {
+          "m_n": 938.9,
+          "m_p": 938.9
+        },
+        "I_l": 1,
+        "eos_compo_present": true,
+        "eos_compo_rows": 375,
+        "Npairs_histogram": {
+          "4": 375
+        },
+        "Nquad_histogram": {
+          "1": 375
+        },
+        "Iphase_histogram": {
+          "0": 217,
+          "7": 158
+        },
+        "Iphase_boundary": {
+          "left_knot": 217,
+          "right_knot": 218,
+          "from": 0,
+          "to": 7
+        },
+        "Nadd_values": [
+          0
+        ],
+        "additional_column_value_counts": {},
+        "max_abs_Q3_vs_Euler_relative_residual": 0.0000014105003688878103,
+        "strict_Q3_gate_2e_6": "PASS",
+        "source_status": "METADATA_INSPECTED__FULL_PHYSICAL_ADMISSION_NOT_RUN"
+      },
+      "SPG_M5": {
+        "role": "low_density_crust_source",
+        "raw_directory": "eos_generator/eos_data/SPG_M5",
+        "files": {
+          "eos.nb": {
+            "git_blob_sha": "c979d1ba6c4642496b0c9177c427899b2412c9ad"
+          },
+          "eos.thermo": {
+            "git_blob_sha": "a2886ed8b18fea0e7a041513329fb6a0e65f5f79"
+          },
+          "eos.compo": {
+            "git_blob_sha": "301cc71a8d3e063edd206aae8c1c3f37ba2e4ec0"
+          }
+        },
+        "rows": 363,
+        "source_masses_mev": {
+          "m_n": 938.9,
+          "m_p": 938.9
+        },
+        "I_l": 1,
+        "eos_compo_present": true,
+        "eos_compo_rows": 363,
+        "Npairs_histogram": {
+          "4": 363
+        },
+        "Nquad_histogram": {
+          "1": 363
+        },
+        "Iphase_histogram": {
+          "0": 217,
+          "7": 146
+        },
+        "Iphase_boundary": {
+          "left_knot": 217,
+          "right_knot": 218,
+          "from": 0,
+          "to": 7
+        },
+        "Nadd_values": [
+          0
+        ],
+        "additional_column_value_counts": {},
+        "max_abs_Q3_vs_Euler_relative_residual": 0.0000014105003688878103,
+        "strict_Q3_gate_2e_6": "PASS",
+        "source_status": "METADATA_INSPECTED__FULL_PHYSICAL_ADMISSION_NOT_RUN"
+      },
+      "GPPVA_DD2": {
+        "role": "low_density_crust_source",
+        "raw_directory": "eos_generator/eos_data/GPPVA_DD2",
+        "files": {
+          "eos.nb": {
+            "git_blob_sha": "d9238f1fdd0e3a580b689253d709cf4493c95358"
+          },
+          "eos.thermo": {
+            "git_blob_sha": "a360e837d76058a9343454a05ad02ca15429e356"
+          },
+          "eos.compo": {
+            "git_blob_sha": "10780ce49ec79136b4c063d23585d4e392bdba40"
+          }
+        },
+        "rows": 283,
+        "source_masses_mev": {
+          "m_n": 939,
+          "m_p": 939
+        },
+        "I_l": 1,
+        "eos_compo_present": true,
+        "eos_compo_rows": 283,
+        "Npairs_histogram": {
+          "4": 283
+        },
+        "Nquad_histogram": {
+          "1": 283
+        },
+        "Iphase_histogram": {
+          "0": 217,
+          "7": 66
+        },
+        "Iphase_boundary": {
+          "left_knot": 217,
+          "right_knot": 218,
+          "from": 0,
+          "to": 7
+        },
+        "Nadd_values": [
+          1
+        ],
+        "additional_column_value_counts": {
+          "0": 217,
+          "1": 58,
+          "2": 5,
+          "3": 3
+        },
+        "max_abs_Q3_vs_Euler_relative_residual": 0.00008758118038681777,
+        "strict_Q3_gate_2e_6": "FAIL",
+        "source_status": "METADATA_INSPECTED__FULL_PHYSICAL_ADMISSION_NOT_RUN"
+      },
+      "GPPVA_DDME2": {
+        "role": "low_density_crust_source",
+        "raw_directory": "eos_generator/eos_data/GPPVA_DDME2",
+        "files": {
+          "eos.nb": {
+            "git_blob_sha": "8a068e43a31f5fd4e94b8091a0cd672ae40dc3a7"
+          },
+          "eos.thermo": {
+            "git_blob_sha": "bdc343cc805e1ef90d04abf72a6216c36c03a028"
+          },
+          "eos.compo": {
+            "git_blob_sha": "e9c2668967d05ccb37f88b77b5604a64acb31ce1"
+          }
+        },
+        "rows": 288,
+        "source_masses_mev": {
+          "m_n": 939,
+          "m_p": 939
+        },
+        "I_l": 1,
+        "eos_compo_present": true,
+        "eos_compo_rows": 288,
+        "Npairs_histogram": {
+          "4": 288
+        },
+        "Nquad_histogram": {
+          "1": 288
+        },
+        "Iphase_histogram": {
+          "0": 217,
+          "7": 71
+        },
+        "Iphase_boundary": {
+          "left_knot": 217,
+          "right_knot": 218,
+          "from": 0,
+          "to": 7
+        },
+        "Nadd_values": [
+          1
+        ],
+        "additional_column_value_counts": {
+          "0": 217,
+          "1": 59,
+          "2": 8,
+          "3": 4
+        },
+        "max_abs_Q3_vs_Euler_relative_residual": 0.00008978397352317816,
+        "strict_Q3_gate_2e_6": "FAIL",
+        "source_status": "METADATA_INSPECTED__FULL_PHYSICAL_ADMISSION_NOT_RUN"
+      },
+      "GPPVA_FSU2": {
+        "role": "low_density_crust_source",
+        "raw_directory": "eos_generator/eos_data/GPPVA_FSU2",
+        "files": {
+          "eos.nb": {
+            "git_blob_sha": "abf5acef150c448297fd0b02314c1dff168cfb42"
+          },
+          "eos.thermo": {
+            "git_blob_sha": "5d0b7aa07fad342ee160916e13478d7017ed6a56"
+          },
+          "eos.compo": {
+            "git_blob_sha": "fa1ad2b809eb1c95825e2ee6eb2650cf3f248693"
+          }
+        },
+        "rows": 269,
+        "source_masses_mev": {
+          "m_n": 939,
+          "m_p": 939
+        },
+        "I_l": 1,
+        "eos_compo_present": true,
+        "eos_compo_rows": 269,
+        "Npairs_histogram": {
+          "4": 269
+        },
+        "Nquad_histogram": {
+          "1": 269
+        },
+        "Iphase_histogram": {
+          "0": 217,
+          "7": 52
+        },
+        "Iphase_boundary": {
+          "left_knot": 217,
+          "right_knot": 218,
+          "from": 0,
+          "to": 7
+        },
+        "Nadd_values": [
+          1
+        ],
+        "additional_column_value_counts": {
+          "0": 217,
+          "1": 52
+        },
+        "max_abs_Q3_vs_Euler_relative_residual": 0.000001198855527403862,
+        "strict_Q3_gate_2e_6": "PASS",
+        "source_status": "METADATA_INSPECTED__FULL_PHYSICAL_ADMISSION_NOT_RUN"
+      },
+      "GPPVA_FSU2H": {
+        "role": "low_density_crust_source",
+        "raw_directory": "eos_generator/eos_data/GPPVA_FSU2H",
+        "files": {
+          "eos.nb": {
+            "git_blob_sha": "b5936f64781c2381585683ba69472b8e0d7cb24c"
+          },
+          "eos.thermo": {
+            "git_blob_sha": "943596e41dd8f6d90bf1d805daa392dd60777e83"
+          },
+          "eos.compo": {
+            "git_blob_sha": "4675868214427d33cc86c9513e97130becc384dd"
+          }
+        },
+        "rows": 300,
+        "source_masses_mev": {
+          "m_n": 939,
+          "m_p": 939
+        },
+        "I_l": 1,
+        "eos_compo_present": true,
+        "eos_compo_rows": 300,
+        "Npairs_histogram": {
+          "4": 300
+        },
+        "Nquad_histogram": {
+          "1": 300
+        },
+        "Iphase_histogram": {
+          "0": 217,
+          "7": 83
+        },
+        "Iphase_boundary": {
+          "left_knot": 217,
+          "right_knot": 218,
+          "from": 0,
+          "to": 7
+        },
+        "Nadd_values": [
+          1
+        ],
+        "additional_column_value_counts": {
+          "0": 217,
+          "1": 40,
+          "2": 26,
+          "3": 17
+        },
+        "max_abs_Q3_vs_Euler_relative_residual": 0.0000015379877403605666,
+        "strict_Q3_gate_2e_6": "PASS",
+        "source_status": "METADATA_INSPECTED__FULL_PHYSICAL_ADMISSION_NOT_RUN"
+      },
+      "GPPVA_FSU2R": {
+        "role": "low_density_crust_source",
+        "raw_directory": "eos_generator/eos_data/GPPVA_FSU2R",
+        "files": {
+          "eos.nb": {
+            "git_blob_sha": "756b25cc31d84d5c4124e3593fe0e122685e8ac3"
+          },
+          "eos.thermo": {
+            "git_blob_sha": "a3c9f5a8512ff34495c60558ef17314bca26ce69"
+          },
+          "eos.compo": {
+            "git_blob_sha": "c414582f322cee04c4b22b90fae05b1ed776d03d"
+          }
+        },
+        "rows": 296,
+        "source_masses_mev": {
+          "m_n": 939,
+          "m_p": 939
+        },
+        "I_l": 1,
+        "eos_compo_present": true,
+        "eos_compo_rows": 296,
+        "Npairs_histogram": {
+          "4": 296
+        },
+        "Nquad_histogram": {
+          "1": 296
+        },
+        "Iphase_histogram": {
+          "0": 217,
+          "7": 79
+        },
+        "Iphase_boundary": {
+          "left_knot": 217,
+          "right_knot": 218,
+          "from": 0,
+          "to": 7
+        },
+        "Nadd_values": [
+          1
+        ],
+        "additional_column_value_counts": {
+          "0": 217,
+          "1": 36,
+          "2": 23,
+          "3": 20
+        },
+        "max_abs_Q3_vs_Euler_relative_residual": 0.0000025971666261375664,
+        "strict_Q3_gate_2e_6": "FAIL",
+        "source_status": "METADATA_INSPECTED__FULL_PHYSICAL_ADMISSION_NOT_RUN"
+      },
+      "GPPVA_NL3wrL55": {
+        "role": "low_density_crust_source",
+        "raw_directory": "eos_generator/eos_data/GPPVA_NL3wrL55",
+        "files": {
+          "eos.nb": {
+            "git_blob_sha": "f829b08138181ea68c9e99adae5193a7d7308d75"
+          },
+          "eos.thermo": {
+            "git_blob_sha": "59314d2714fd0059c0296d9404572726d1eb77f4"
+          },
+          "eos.compo": {
+            "git_blob_sha": "8cf520b7df55e17a97844964a130eedb26e5eb6f"
+          }
+        },
+        "rows": 298,
+        "source_masses_mev": {
+          "m_n": 939,
+          "m_p": 939
+        },
+        "I_l": 1,
+        "eos_compo_present": true,
+        "eos_compo_rows": 298,
+        "Npairs_histogram": {
+          "4": 298
+        },
+        "Nquad_histogram": {
+          "1": 298
+        },
+        "Iphase_histogram": {
+          "0": 217,
+          "7": 81
+        },
+        "Iphase_boundary": {
+          "left_knot": 217,
+          "right_knot": 218,
+          "from": 0,
+          "to": 7
+        },
+        "Nadd_values": [
+          1
+        ],
+        "additional_column_value_counts": {
+          "0": 217,
+          "1": 62,
+          "2": 11,
+          "3": 8
+        },
+        "max_abs_Q3_vs_Euler_relative_residual": 0.0000032139851048496636,
+        "strict_Q3_gate_2e_6": "FAIL",
+        "source_status": "METADATA_INSPECTED__FULL_PHYSICAL_ADMISSION_NOT_RUN"
+      },
+      "GPPVA_TM1e": {
+        "role": "low_density_crust_source",
+        "raw_directory": "eos_generator/eos_data/GPPVA_TM1e",
+        "files": {
+          "eos.nb": {
+            "git_blob_sha": "e39714a8993e7aea62c1f880644cc46e60e6307d"
+          },
+          "eos.thermo": {
+            "git_blob_sha": "8a8897bafb9ab7e0e51138e147aabe7d36605486"
+          },
+          "eos.compo": {
+            "git_blob_sha": "ac0075dbdc22875ae489e3128af6940718b4b8f8"
+          }
+        },
+        "rows": 303,
+        "source_masses_mev": {
+          "m_n": 938,
+          "m_p": 938
+        },
+        "I_l": 1,
+        "eos_compo_present": true,
+        "eos_compo_rows": 303,
+        "Npairs_histogram": {
+          "4": 303
+        },
+        "Nquad_histogram": {
+          "1": 303
+        },
+        "Iphase_histogram": {
+          "0": 217,
+          "7": 86
+        },
+        "Iphase_boundary": {
+          "left_knot": 217,
+          "right_knot": 218,
+          "from": 0,
+          "to": 7
+        },
+        "Nadd_values": [
+          1
+        ],
+        "additional_column_value_counts": {
+          "0": 217,
+          "1": 42,
+          "2": 31,
+          "3": 13
+        },
+        "max_abs_Q3_vs_Euler_relative_residual": 0.000003317330610940336,
+        "strict_Q3_gate_2e_6": "FAIL",
+        "source_status": "METADATA_INSPECTED__FULL_PHYSICAL_ADMISSION_NOT_RUN"
+      },
+      "GPPVA_TW": {
+        "role": "low_density_crust_source",
+        "raw_directory": "eos_generator/eos_data/GPPVA_TW",
+        "files": {
+          "eos.nb": {
+            "git_blob_sha": "1ae3b88523f9fcbe94ab6198cd2e6e99833b7c86"
+          },
+          "eos.thermo": {
+            "git_blob_sha": "84780bf48085cc8fab74f8fb8ff57d140c3fa5b3"
+          },
+          "eos.compo": {
+            "git_blob_sha": "ab2ab71bad88491b2446f66f126678851f6b0697"
+          }
+        },
+        "rows": 289,
+        "source_masses_mev": {
+          "m_n": 939,
+          "m_p": 939
+        },
+        "I_l": 1,
+        "eos_compo_present": true,
+        "eos_compo_rows": 289,
+        "Npairs_histogram": {
+          "4": 289
+        },
+        "Nquad_histogram": {
+          "1": 289
+        },
+        "Iphase_histogram": {
+          "0": 217,
+          "7": 72
+        },
+        "Iphase_boundary": {
+          "left_knot": 217,
+          "right_knot": 218,
+          "from": 0,
+          "to": 7
+        },
+        "Nadd_values": [
+          1
+        ],
+        "additional_column_value_counts": {
+          "0": 217,
+          "1": 59,
+          "2": 8,
+          "3": 5
+        },
+        "max_abs_Q3_vs_Euler_relative_residual": 0.000001475502610544452,
+        "strict_Q3_gate_2e_6": "PASS",
+        "source_status": "METADATA_INSPECTED__FULL_PHYSICAL_ADMISSION_NOT_RUN"
+      }
+    },
+    "core_models": {
+      "APR_APR": {
+        "role": "high_density_core_source",
+        "raw_directory": "eos_generator/eos_data/APR_APR",
+        "files": {
+          "eos.nb": {
+            "git_blob_sha": "bca7ab3da8bf11ef13cde8ba8454c2bc0d616b4f"
+          },
+          "eos.thermo": {
+            "git_blob_sha": "683d8048afb291465d67ae7ce091ae4766f4f54a"
+          },
+          "eos.compo": null
+        },
+        "rows": 172,
+        "source_masses_mev": {
+          "m_n": 939.56533,
+          "m_p": 938.272
+        },
+        "I_l": 1,
+        "Nadd_values": [
+          0
+        ],
+        "eos_compo_present": false,
+        "composition_note": "eos.compo absent",
+        "max_abs_Q3_vs_Euler_relative_residual": 3.6206782185295305e-16,
+        "max_abs_Q5": 0,
+        "strict_Q3_gate_2e_6": "PASS",
+        "cold_beta_equilibrium_gate_1e_8": "PASS",
+        "prior_reported_max_c_s2": 1.4515,
+        "prior_reported_causality_status": "ACAUSAL_HIGH_DENSITY_TAIL",
+        "prior_cs2_provenance": "Values supplied in the preceding source-admission review; not recomputed in this C2/C3 pass.",
+        "source_status": "METADATA_INSPECTED__FULL_PHYSICAL_ADMISSION_NOT_RUN"
+      },
+      "BBB_BHF2": {
+        "role": "high_density_core_source",
+        "raw_directory": "eos_generator/eos_data/BBB_BHF2",
+        "files": {
+          "eos.nb": {
+            "git_blob_sha": "60725116001613f77384bf97e7cc4889af59145d"
+          },
+          "eos.thermo": {
+            "git_blob_sha": "806e2dffd0cfaf210cfb99604e72aa4f2731a310"
+          },
+          "eos.compo": null
+        },
+        "rows": 84,
+        "source_masses_mev": {
+          "m_n": 939.56533,
+          "m_p": 938.272
+        },
+        "I_l": 1,
+        "Nadd_values": [
+          0
+        ],
+        "eos_compo_present": false,
+        "composition_note": "eos.compo absent",
+        "max_abs_Q3_vs_Euler_relative_residual": 3.6206782185295305e-16,
+        "max_abs_Q5": 0,
+        "strict_Q3_gate_2e_6": "PASS",
+        "cold_beta_equilibrium_gate_1e_8": "PASS",
+        "prior_reported_max_c_s2": 0.844,
+        "prior_reported_causality_status": "FULL_SOURCE_CAUSAL_REPORTED",
+        "prior_cs2_provenance": "Values supplied in the preceding source-admission review; not recomputed in this C2/C3 pass.",
+        "source_status": "METADATA_INSPECTED__FULL_PHYSICAL_ADMISSION_NOT_RUN"
+      },
+      "GM_GM1": {
+        "role": "high_density_core_source",
+        "raw_directory": "eos_generator/eos_data/GM_GM1",
+        "files": {
+          "eos.nb": {
+            "git_blob_sha": "ca4454a9018e78dd24224faeac48c18138634503"
+          },
+          "eos.thermo": {
+            "git_blob_sha": "3f05970cb7c9e46fa267c2689bee828f9292bbbb"
+          },
+          "eos.compo": {
+            "git_blob_sha": "7931ed572ab5928f00588aef26766a5d10c286ee"
+          }
+        },
+        "rows": 349,
+        "source_masses_mev": {
+          "m_n": 939.56533,
+          "m_p": 938.272
+        },
+        "I_l": 1,
+        "Nadd_values": [
+          0
+        ],
+        "eos_compo_present": true,
+        "composition_note": "eos.compo present; observed rows have Npairs=0 and Nquad=0 (no nonzero species fractions detected by v1 parser)",
+        "max_abs_Q3_vs_Euler_relative_residual": 2.730133217957746e-11,
+        "max_abs_Q5": 0,
+        "strict_Q3_gate_2e_6": "PASS",
+        "cold_beta_equilibrium_gate_1e_8": "PASS",
+        "prior_reported_max_c_s2": 0.7562,
+        "prior_reported_causality_status": "FULL_SOURCE_CAUSAL_REPORTED",
+        "prior_cs2_provenance": "Values supplied in the preceding source-admission review; not recomputed in this C2/C3 pass.",
+        "source_status": "METADATA_INSPECTED__FULL_PHYSICAL_ADMISSION_NOT_RUN"
+      },
+      "RG_SLY4": {
+        "role": "high_density_core_source",
+        "raw_directory": "eos_generator/eos_data/RG_SLY4",
+        "files": {
+          "eos.nb": {
+            "git_blob_sha": "b3e1aa85c0f8e64930b04e67fd86016b64fdccc4"
+          },
+          "eos.thermo": {
+            "git_blob_sha": "f94305f494dd83068b4c576b65c363fb06558d0f"
+          },
+          "eos.compo": {
+            "git_blob_sha": "1b6695d79c29e29d359fbd02d1b870c11cfd1e19"
+          }
+        },
+        "rows": 197,
+        "source_masses_mev": {
+          "m_n": 939.5654,
+          "m_p": 938.272
+        },
+        "I_l": 1,
+        "Nadd_values": [
+          1
+        ],
+        "eos_compo_present": true,
+        "composition_note": "eos.compo present with nonzero composition; first row Iphase=4, Npairs=4, Nquad=1",
+        "max_abs_Q3_vs_Euler_relative_residual": 0.00011284496804871064,
+        "max_abs_Q5": 0.001383223,
+        "strict_Q3_gate_2e_6": "FAIL",
+        "cold_beta_equilibrium_gate_1e_8": "FAIL",
+        "prior_reported_max_c_s2": 0.9493,
+        "prior_reported_causality_status": "FULL_SOURCE_CAUSAL_REPORTED",
+        "prior_cs2_provenance": "Values supplied in the preceding source-admission review; not recomputed in this C2/C3 pass.",
+        "source_status": "METADATA_INSPECTED__FULL_PHYSICAL_ADMISSION_NOT_RUN"
+      },
+      "RG_KDE0v1": {
+        "role": "high_density_core_source",
+        "raw_directory": "eos_generator/eos_data/RG_KDE0v1",
+        "files": {
+          "eos.nb": {
+            "git_blob_sha": "0af6fbac0213f60d640715674aa33601747d920f"
+          },
+          "eos.thermo": {
+            "git_blob_sha": "cb07acd09d0d2c4392523f560b235748467d1418"
+          },
+          "eos.compo": {
+            "git_blob_sha": "72521dbd1d47e9cba4e1201003c3a0a2f93199e7"
+          }
+        },
+        "rows": 1240,
+        "source_masses_mev": {
+          "m_n": 939.56533,
+          "m_p": 938.272
+        },
+        "I_l": 1,
+        "Nadd_values": [
+          1
+        ],
+        "eos_compo_present": true,
+        "composition_note": "eos.compo present with nonzero composition; first row Iphase=4, Npairs=4, Nquad=1",
+        "max_abs_Q3_vs_Euler_relative_residual": 0.00011512095283392864,
+        "max_abs_Q5": 0.00060345202606,
+        "strict_Q3_gate_2e_6": "FAIL",
+        "cold_beta_equilibrium_gate_1e_8": "FAIL",
+        "prior_reported_max_c_s2": 1.1023,
+        "prior_reported_causality_status": "ACAUSAL_HIGH_DENSITY_TAIL",
+        "prior_cs2_provenance": "Values supplied in the preceding source-admission review; not recomputed in this C2/C3 pass.",
+        "source_status": "METADATA_INSPECTED__FULL_PHYSICAL_ADMISSION_NOT_RUN"
+      }
+    }
+  },
+  "admission_policy": {
+    "mode": "STRICT_RAW_BY_DEFAULT",
+    "exact_kernel_v1_contract": {
+      "cold_T0": true,
+      "max_abs_Q2": 2e-8,
+      "max_abs_Q5": 1e-8,
+      "max_abs_Q6_minus_Q7": 0.000002,
+      "kernel_max_Q3_vs_Euler_rel": 0.0005,
+      "no_internal_Iphase_boundary": true,
+      "no_eos_compo_file": true,
+      "Nadd": 0,
+      "strictly_increasing_n_P_epsilon_mu": true,
+      "whole_interpolant_stability_and_causality": true,
+      "caller_must_assert_local_charge_neutrality": true
+    },
+    "adapter_level_gates": {
+      "max_Q3_vs_Euler_relative": 0.000002,
+      "policy": "STRICT_REJECT_DEFAULT; a looser value or a Q3 projection requires an explicitly selected repair mode and a per-knot receipt.",
+      "density_reconstruction": "Record reconstructed_n_max_rel. It is not currently part of ns_table_eos fully_admitted; no numerical acceptance threshold is set in this manifest. Until a threshold is approved and sensitivity-tested, density drift remains REVIEW_REQUIRED and cannot be silently admitted.",
+      "composition": "Preserve eos.compo rows and semantics. Do not delete them merely to satisfy the current constructor.",
+      "Nadd": "Preserve the extra column byte/row-wise. No generic interpolation or deletion until the provider Data Sheet meaning is resolved.",
+      "Iphase": "Preserve original IDs and knot positions; split the EOS into explicit source segments. No interpolation or derivative stencil may cross a change of Iphase.",
+      "rest_mass": "Use source mn/mp headers to reconstruct dimensional thermodynamics. No inherited smooth-matcher gauge shift. A reference-mass transformation must be explicit, applied consistently to epsilon and mu, and logged as a thermodynamic repair.",
+      "causality": "Report FULL_SOURCE and CAUSAL_DOMAIN results separately. No silent truncation or causal completion.",
+      "root_selection": "Isolate every stationary point/root on the common mu_B support. Accept exactly one root; preserve NO_ROOT and MULTIPLE_ROOT as terminal scientific outcomes.",
+      "output_identity": "All successful new results live only in sharp_maxwell/. Legacy maxwell files are immutable."
+    },
+    "output_status_vocabulary": [
+      "UNIQUE_ROOT",
+      "NO_ROOT",
+      "MULTIPLE_ROOT",
+      "INPUT_REJECTED",
+      "ACAUSAL",
+      "DENSITY_DRIFT_REVIEW",
+      "THERMODYNAMIC_REPAIR_REQUIRED",
+      "SOURCE_METADATA_UNRESOLVED",
+      "MULTI_SEGMENT_SOLVER_BLOCKED"
+    ],
+    "required_transition_checks": [
+      "P_low(mu_t)=P_high(mu_t)=P_t",
+      "mu_low=mu_high=mu_t",
+      "n_high>n_low>0",
+      "epsilon_side=mu_t*n_side-P_t",
+      "delta_epsilon=mu_t*delta_n_B",
+      "whole-interval mechanical stability and causality on each smooth segment"
+    ]
+  },
+  "solver_scope": {
+    "current_native_tov_cowling": "Two input table providers (high-density core and low-density envelope), one sharp Maxwell interface, separate side callbacks, one-sided interface states.",
+    "current_gap": "Each crust source has two Iphase segments (0 and 7). The current TOV provider is one smooth table per side; it does not yet represent a multi-segment crust envelope plus core with all source interfaces retained.",
+    "stop_condition": "Do not invoke TOV/Cowling for any pair until the input segments and all physical interfaces are represented without smoothing or dropping source phases.",
+    "modes": "Only after admitted structure and stable-branch checks: compute slow and rapid conversion spectra separately."
+  },
+  "pairs": [
+    {
+      "pair_id": "APR_APR__SPG_M1",
+      "core_id": "APR_APR",
+      "crust_id": "SPG_M1",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/APR_APR__SPG_M1/SPG_M1__APR_APR__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M1__APR_APR",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "APR_APR__SPG_M2",
+      "core_id": "APR_APR",
+      "crust_id": "SPG_M2",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/APR_APR__SPG_M2/SPG_M2__APR_APR__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M2__APR_APR",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "APR_APR__SPG_M3",
+      "core_id": "APR_APR",
+      "crust_id": "SPG_M3",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/APR_APR__SPG_M3/SPG_M3__APR_APR__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M3__APR_APR",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "APR_APR__SPG_M4",
+      "core_id": "APR_APR",
+      "crust_id": "SPG_M4",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/APR_APR__SPG_M4/SPG_M4__APR_APR__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M4__APR_APR",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "APR_APR__SPG_M5",
+      "core_id": "APR_APR",
+      "crust_id": "SPG_M5",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/APR_APR__SPG_M5/SPG_M5__APR_APR__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M5__APR_APR",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "APR_APR__GPPVA_DD2",
+      "core_id": "APR_APR",
+      "crust_id": "GPPVA_DD2",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/APR_APR__GPPVA_DD2/GPPVA_DD2__APR_APR__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_DD2__APR_APR",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "APR_APR__GPPVA_DDME2",
+      "core_id": "APR_APR",
+      "crust_id": "GPPVA_DDME2",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/APR_APR__GPPVA_DDME2/GPPVA_DDME2__APR_APR__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_DDME2__APR_APR",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "APR_APR__GPPVA_FSU2",
+      "core_id": "APR_APR",
+      "crust_id": "GPPVA_FSU2",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/APR_APR__GPPVA_FSU2/GPPVA_FSU2__APR_APR__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_FSU2__APR_APR",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "APR_APR__GPPVA_FSU2H",
+      "core_id": "APR_APR",
+      "crust_id": "GPPVA_FSU2H",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/APR_APR__GPPVA_FSU2H/GPPVA_FSU2H__APR_APR__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_FSU2H__APR_APR",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "APR_APR__GPPVA_FSU2R",
+      "core_id": "APR_APR",
+      "crust_id": "GPPVA_FSU2R",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/APR_APR__GPPVA_FSU2R/GPPVA_FSU2R__APR_APR__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_FSU2R__APR_APR",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "APR_APR__GPPVA_NL3wrL55",
+      "core_id": "APR_APR",
+      "crust_id": "GPPVA_NL3wrL55",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/APR_APR__GPPVA_NL3wrL55/GPPVA_NL3wrL55__APR_APR__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_NL3wrL55__APR_APR",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "APR_APR__GPPVA_TM1e",
+      "core_id": "APR_APR",
+      "crust_id": "GPPVA_TM1e",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/APR_APR__GPPVA_TM1e/GPPVA_TM1e__APR_APR__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_TM1e__APR_APR",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "APR_APR__GPPVA_TW",
+      "core_id": "APR_APR",
+      "crust_id": "GPPVA_TW",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/APR_APR__GPPVA_TW/GPPVA_TW__APR_APR__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_TW__APR_APR",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "BBB_BHF2__SPG_M1",
+      "core_id": "BBB_BHF2",
+      "crust_id": "SPG_M1",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/BBB_BHF2__SPG_M1/SPG_M1__BBB_BHF2__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M1__BBB_BHF2",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED"
+      ]
+    },
+    {
+      "pair_id": "BBB_BHF2__SPG_M2",
+      "core_id": "BBB_BHF2",
+      "crust_id": "SPG_M2",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/BBB_BHF2__SPG_M2/SPG_M2__BBB_BHF2__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M2__BBB_BHF2",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED"
+      ]
+    },
+    {
+      "pair_id": "BBB_BHF2__SPG_M3",
+      "core_id": "BBB_BHF2",
+      "crust_id": "SPG_M3",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/BBB_BHF2__SPG_M3/SPG_M3__BBB_BHF2__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M3__BBB_BHF2",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED"
+      ]
+    },
+    {
+      "pair_id": "BBB_BHF2__SPG_M4",
+      "core_id": "BBB_BHF2",
+      "crust_id": "SPG_M4",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/BBB_BHF2__SPG_M4/SPG_M4__BBB_BHF2__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M4__BBB_BHF2",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED"
+      ]
+    },
+    {
+      "pair_id": "BBB_BHF2__SPG_M5",
+      "core_id": "BBB_BHF2",
+      "crust_id": "SPG_M5",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/BBB_BHF2__SPG_M5/SPG_M5__BBB_BHF2__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M5__BBB_BHF2",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED"
+      ]
+    },
+    {
+      "pair_id": "BBB_BHF2__GPPVA_DD2",
+      "core_id": "BBB_BHF2",
+      "crust_id": "GPPVA_DD2",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/BBB_BHF2__GPPVA_DD2/GPPVA_DD2__BBB_BHF2__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_DD2__BBB_BHF2",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE"
+      ]
+    },
+    {
+      "pair_id": "BBB_BHF2__GPPVA_DDME2",
+      "core_id": "BBB_BHF2",
+      "crust_id": "GPPVA_DDME2",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/BBB_BHF2__GPPVA_DDME2/GPPVA_DDME2__BBB_BHF2__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_DDME2__BBB_BHF2",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE"
+      ]
+    },
+    {
+      "pair_id": "BBB_BHF2__GPPVA_FSU2",
+      "core_id": "BBB_BHF2",
+      "crust_id": "GPPVA_FSU2",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/BBB_BHF2__GPPVA_FSU2/GPPVA_FSU2__BBB_BHF2__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_FSU2__BBB_BHF2",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED"
+      ]
+    },
+    {
+      "pair_id": "BBB_BHF2__GPPVA_FSU2H",
+      "core_id": "BBB_BHF2",
+      "crust_id": "GPPVA_FSU2H",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/BBB_BHF2__GPPVA_FSU2H/GPPVA_FSU2H__BBB_BHF2__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_FSU2H__BBB_BHF2",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED"
+      ]
+    },
+    {
+      "pair_id": "BBB_BHF2__GPPVA_FSU2R",
+      "core_id": "BBB_BHF2",
+      "crust_id": "GPPVA_FSU2R",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/BBB_BHF2__GPPVA_FSU2R/GPPVA_FSU2R__BBB_BHF2__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_FSU2R__BBB_BHF2",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE"
+      ]
+    },
+    {
+      "pair_id": "BBB_BHF2__GPPVA_NL3wrL55",
+      "core_id": "BBB_BHF2",
+      "crust_id": "GPPVA_NL3wrL55",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/BBB_BHF2__GPPVA_NL3wrL55/GPPVA_NL3wrL55__BBB_BHF2__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_NL3wrL55__BBB_BHF2",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE"
+      ]
+    },
+    {
+      "pair_id": "BBB_BHF2__GPPVA_TM1e",
+      "core_id": "BBB_BHF2",
+      "crust_id": "GPPVA_TM1e",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/BBB_BHF2__GPPVA_TM1e/GPPVA_TM1e__BBB_BHF2__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_TM1e__BBB_BHF2",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE"
+      ]
+    },
+    {
+      "pair_id": "BBB_BHF2__GPPVA_TW",
+      "core_id": "BBB_BHF2",
+      "crust_id": "GPPVA_TW",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/BBB_BHF2__GPPVA_TW/GPPVA_TW__BBB_BHF2__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_TW__BBB_BHF2",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED"
+      ]
+    },
+    {
+      "pair_id": "GM_GM1__SPG_M1",
+      "core_id": "GM_GM1",
+      "crust_id": "SPG_M1",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/GM_GM1__SPG_M1/SPG_M1__GM_GM1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M1__GM_GM1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY"
+      ]
+    },
+    {
+      "pair_id": "GM_GM1__SPG_M2",
+      "core_id": "GM_GM1",
+      "crust_id": "SPG_M2",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/GM_GM1__SPG_M2/SPG_M2__GM_GM1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M2__GM_GM1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY"
+      ]
+    },
+    {
+      "pair_id": "GM_GM1__SPG_M3",
+      "core_id": "GM_GM1",
+      "crust_id": "SPG_M3",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/GM_GM1__SPG_M3/SPG_M3__GM_GM1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M3__GM_GM1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY"
+      ]
+    },
+    {
+      "pair_id": "GM_GM1__SPG_M4",
+      "core_id": "GM_GM1",
+      "crust_id": "SPG_M4",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/GM_GM1__SPG_M4/SPG_M4__GM_GM1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M4__GM_GM1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY"
+      ]
+    },
+    {
+      "pair_id": "GM_GM1__SPG_M5",
+      "core_id": "GM_GM1",
+      "crust_id": "SPG_M5",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/GM_GM1__SPG_M5/SPG_M5__GM_GM1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M5__GM_GM1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY"
+      ]
+    },
+    {
+      "pair_id": "GM_GM1__GPPVA_DD2",
+      "core_id": "GM_GM1",
+      "crust_id": "GPPVA_DD2",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/GM_GM1__GPPVA_DD2/GPPVA_DD2__GM_GM1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_DD2__GM_GM1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY"
+      ]
+    },
+    {
+      "pair_id": "GM_GM1__GPPVA_DDME2",
+      "core_id": "GM_GM1",
+      "crust_id": "GPPVA_DDME2",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/GM_GM1__GPPVA_DDME2/GPPVA_DDME2__GM_GM1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_DDME2__GM_GM1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY"
+      ]
+    },
+    {
+      "pair_id": "GM_GM1__GPPVA_FSU2",
+      "core_id": "GM_GM1",
+      "crust_id": "GPPVA_FSU2",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/GM_GM1__GPPVA_FSU2/GPPVA_FSU2__GM_GM1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_FSU2__GM_GM1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY"
+      ]
+    },
+    {
+      "pair_id": "GM_GM1__GPPVA_FSU2H",
+      "core_id": "GM_GM1",
+      "crust_id": "GPPVA_FSU2H",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/GM_GM1__GPPVA_FSU2H/GPPVA_FSU2H__GM_GM1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_FSU2H__GM_GM1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY"
+      ]
+    },
+    {
+      "pair_id": "GM_GM1__GPPVA_FSU2R",
+      "core_id": "GM_GM1",
+      "crust_id": "GPPVA_FSU2R",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/GM_GM1__GPPVA_FSU2R/GPPVA_FSU2R__GM_GM1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_FSU2R__GM_GM1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY"
+      ]
+    },
+    {
+      "pair_id": "GM_GM1__GPPVA_NL3wrL55",
+      "core_id": "GM_GM1",
+      "crust_id": "GPPVA_NL3wrL55",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/GM_GM1__GPPVA_NL3wrL55/GPPVA_NL3wrL55__GM_GM1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_NL3wrL55__GM_GM1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY"
+      ]
+    },
+    {
+      "pair_id": "GM_GM1__GPPVA_TM1e",
+      "core_id": "GM_GM1",
+      "crust_id": "GPPVA_TM1e",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/GM_GM1__GPPVA_TM1e/GPPVA_TM1e__GM_GM1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_TM1e__GM_GM1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY"
+      ]
+    },
+    {
+      "pair_id": "GM_GM1__GPPVA_TW",
+      "core_id": "GM_GM1",
+      "crust_id": "GPPVA_TW",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/GM_GM1__GPPVA_TW/GPPVA_TW__GM_GM1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_TW__GM_GM1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY"
+      ]
+    },
+    {
+      "pair_id": "RG_SLY4__SPG_M1",
+      "core_id": "RG_SLY4",
+      "crust_id": "SPG_M1",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_SLY4__SPG_M1/SPG_M1__RG_SLY4__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M1__RG_SLY4",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET"
+      ]
+    },
+    {
+      "pair_id": "RG_SLY4__SPG_M2",
+      "core_id": "RG_SLY4",
+      "crust_id": "SPG_M2",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_SLY4__SPG_M2/SPG_M2__RG_SLY4__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M2__RG_SLY4",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET"
+      ]
+    },
+    {
+      "pair_id": "RG_SLY4__SPG_M3",
+      "core_id": "RG_SLY4",
+      "crust_id": "SPG_M3",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_SLY4__SPG_M3/SPG_M3__RG_SLY4__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M3__RG_SLY4",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET"
+      ]
+    },
+    {
+      "pair_id": "RG_SLY4__SPG_M4",
+      "core_id": "RG_SLY4",
+      "crust_id": "SPG_M4",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_SLY4__SPG_M4/SPG_M4__RG_SLY4__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M4__RG_SLY4",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET"
+      ]
+    },
+    {
+      "pair_id": "RG_SLY4__SPG_M5",
+      "core_id": "RG_SLY4",
+      "crust_id": "SPG_M5",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_SLY4__SPG_M5/SPG_M5__RG_SLY4__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M5__RG_SLY4",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET"
+      ]
+    },
+    {
+      "pair_id": "RG_SLY4__GPPVA_DD2",
+      "core_id": "RG_SLY4",
+      "crust_id": "GPPVA_DD2",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_SLY4__GPPVA_DD2/GPPVA_DD2__RG_SLY4__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_DD2__RG_SLY4",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET"
+      ]
+    },
+    {
+      "pair_id": "RG_SLY4__GPPVA_DDME2",
+      "core_id": "RG_SLY4",
+      "crust_id": "GPPVA_DDME2",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_SLY4__GPPVA_DDME2/GPPVA_DDME2__RG_SLY4__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_DDME2__RG_SLY4",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET"
+      ]
+    },
+    {
+      "pair_id": "RG_SLY4__GPPVA_FSU2",
+      "core_id": "RG_SLY4",
+      "crust_id": "GPPVA_FSU2",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_SLY4__GPPVA_FSU2/GPPVA_FSU2__RG_SLY4__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_FSU2__RG_SLY4",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET"
+      ]
+    },
+    {
+      "pair_id": "RG_SLY4__GPPVA_FSU2H",
+      "core_id": "RG_SLY4",
+      "crust_id": "GPPVA_FSU2H",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_SLY4__GPPVA_FSU2H/GPPVA_FSU2H__RG_SLY4__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_FSU2H__RG_SLY4",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET"
+      ]
+    },
+    {
+      "pair_id": "RG_SLY4__GPPVA_FSU2R",
+      "core_id": "RG_SLY4",
+      "crust_id": "GPPVA_FSU2R",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_SLY4__GPPVA_FSU2R/GPPVA_FSU2R__RG_SLY4__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_FSU2R__RG_SLY4",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET"
+      ]
+    },
+    {
+      "pair_id": "RG_SLY4__GPPVA_NL3wrL55",
+      "core_id": "RG_SLY4",
+      "crust_id": "GPPVA_NL3wrL55",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_SLY4__GPPVA_NL3wrL55/GPPVA_NL3wrL55__RG_SLY4__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_NL3wrL55__RG_SLY4",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET"
+      ]
+    },
+    {
+      "pair_id": "RG_SLY4__GPPVA_TM1e",
+      "core_id": "RG_SLY4",
+      "crust_id": "GPPVA_TM1e",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_SLY4__GPPVA_TM1e/GPPVA_TM1e__RG_SLY4__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_TM1e__RG_SLY4",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET"
+      ]
+    },
+    {
+      "pair_id": "RG_SLY4__GPPVA_TW",
+      "core_id": "RG_SLY4",
+      "crust_id": "GPPVA_TW",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_SLY4__GPPVA_TW/GPPVA_TW__RG_SLY4__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_TW__RG_SLY4",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET"
+      ]
+    },
+    {
+      "pair_id": "RG_KDE0v1__SPG_M1",
+      "core_id": "RG_KDE0v1",
+      "crust_id": "SPG_M1",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_KDE0v1__SPG_M1/SPG_M1__RG_KDE0v1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M1__RG_KDE0v1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "RG_KDE0v1__SPG_M2",
+      "core_id": "RG_KDE0v1",
+      "crust_id": "SPG_M2",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_KDE0v1__SPG_M2/SPG_M2__RG_KDE0v1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M2__RG_KDE0v1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "RG_KDE0v1__SPG_M3",
+      "core_id": "RG_KDE0v1",
+      "crust_id": "SPG_M3",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_KDE0v1__SPG_M3/SPG_M3__RG_KDE0v1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M3__RG_KDE0v1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "RG_KDE0v1__SPG_M4",
+      "core_id": "RG_KDE0v1",
+      "crust_id": "SPG_M4",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_KDE0v1__SPG_M4/SPG_M4__RG_KDE0v1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M4__RG_KDE0v1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "RG_KDE0v1__SPG_M5",
+      "core_id": "RG_KDE0v1",
+      "crust_id": "SPG_M5",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_KDE0v1__SPG_M5/SPG_M5__RG_KDE0v1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/SPG_M5__RG_KDE0v1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "RG_KDE0v1__GPPVA_DD2",
+      "core_id": "RG_KDE0v1",
+      "crust_id": "GPPVA_DD2",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_KDE0v1__GPPVA_DD2/GPPVA_DD2__RG_KDE0v1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_DD2__RG_KDE0v1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "RG_KDE0v1__GPPVA_DDME2",
+      "core_id": "RG_KDE0v1",
+      "crust_id": "GPPVA_DDME2",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_KDE0v1__GPPVA_DDME2/GPPVA_DDME2__RG_KDE0v1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_DDME2__RG_KDE0v1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "RG_KDE0v1__GPPVA_FSU2",
+      "core_id": "RG_KDE0v1",
+      "crust_id": "GPPVA_FSU2",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_KDE0v1__GPPVA_FSU2/GPPVA_FSU2__RG_KDE0v1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_FSU2__RG_KDE0v1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "RG_KDE0v1__GPPVA_FSU2H",
+      "core_id": "RG_KDE0v1",
+      "crust_id": "GPPVA_FSU2H",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_KDE0v1__GPPVA_FSU2H/GPPVA_FSU2H__RG_KDE0v1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_FSU2H__RG_KDE0v1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "RG_KDE0v1__GPPVA_FSU2R",
+      "core_id": "RG_KDE0v1",
+      "crust_id": "GPPVA_FSU2R",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_KDE0v1__GPPVA_FSU2R/GPPVA_FSU2R__RG_KDE0v1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_FSU2R__RG_KDE0v1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "RG_KDE0v1__GPPVA_NL3wrL55",
+      "core_id": "RG_KDE0v1",
+      "crust_id": "GPPVA_NL3wrL55",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_KDE0v1__GPPVA_NL3wrL55/GPPVA_NL3wrL55__RG_KDE0v1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_NL3wrL55__RG_KDE0v1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "RG_KDE0v1__GPPVA_TM1e",
+      "core_id": "RG_KDE0v1",
+      "crust_id": "GPPVA_TM1e",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_KDE0v1__GPPVA_TM1e/GPPVA_TM1e__RG_KDE0v1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_TM1e__RG_KDE0v1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CRUST_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    },
+    {
+      "pair_id": "RG_KDE0v1__GPPVA_TW",
+      "core_id": "RG_KDE0v1",
+      "crust_id": "GPPVA_TW",
+      "legacy_method": "maxwell",
+      "legacy_output_status": "LEGACY_NON_MAXWELL_READ_ONLY",
+      "legacy_output_directory": "matched_eos_all_combinations/matched_eos_390/RG_KDE0v1__GPPVA_TW/GPPVA_TW__RG_KDE0v1__maxwell",
+      "sharp_output_namespace": "sharp_maxwell/GPPVA_TW__RG_KDE0v1",
+      "admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+      "kernel_v1_eligible": false,
+      "sharp_transition_search": "NOT_RUN",
+      "tov_cowling": "NOT_RUN",
+      "blockers": [
+        "CRUST_HAS_EOS_COMPO_AND_NONZERO_COMPOSITION",
+        "CRUST_HAS_INTERNAL_IPHASE_BOUNDARY_0_TO_7_AT_KNOTS_217_218",
+        "CURRENT_V1_KERNEL_REQUIRES_EACH_INPUT_PHASE_TO_HAVE_CONSTANT_IPHASE_AND_NO_COMPOSITION",
+        "CURRENT_TOV_V1_ACCEPTS_TWO_TABLE_PROVIDERS_AND_ONE_SHARP_INTERFACE_ONLY",
+        "REST_MASS_REFERENCE_ALIGNMENT_NOT_YET_SPECIFIED",
+        "RECONSTRUCTED_DENSITY_DRIFT_ACCEPTANCE_THRESHOLD_NOT_YET_FIXED",
+        "CRUST_NADD_EXTRA_COLUMN_PRESENT_VALUES_0_TO_3_SEMANTICS_UNRESOLVED",
+        "CORE_NADD_EXTRA_COLUMN_PRESENT_SEMANTICS_UNRESOLVED",
+        "CORE_EOS_COMPO_PRESENT_REQUIRES_EXPLICIT_STRICT_THERMO_ONLY_OR_COMPOSITION_POLICY",
+        "CORE_Q3_VS_EULER_RESIDUAL_EXCEEDS_STRICT_2E-6_ADMISSION_GATE",
+        "CORE_Q5_NONZERO_BETA_EQUILIBRIUM_CONTRACT_NOT_MET",
+        "CORE_HAS_REPORTED_ACAUSAL_HIGH_DENSITY_TAIL"
+      ]
+    }
+  ],
+  "totals": {
+    "pair_count": 65,
+    "legacy_non_maxwell_count": 65,
+    "source_crust_phase_boundaries": 13,
+    "crust_sources_with_composition_file": 13,
+    "crust_sources_with_Nadd_1": 8,
+    "crust_sources_failing_strict_Q3_2e_6": 5,
+    "crust_sources_passing_strict_Q3_2e_6": 8,
+    "core_sources_failing_strict_Q3_2e_6": 2,
+    "core_sources_with_nonzero_Q5": 2,
+    "core_sources_with_reported_acausal_tails": 2,
+    "sharp_transition_searches_run": 0,
+    "new_sharp_outputs_created": 0,
+    "TOV_Cowling_runs": 0,
+    "c5_probe_sources_implemented": 2,
+    "c5_native_probe_runs": 0,
+    "c5_compose_roundtrips": 0
+  },
+  "next_research_steps": [
+    "C6B: adjudicate SPG_M1 and GPPVA_FSU2 eos.compo nuclear-group abundance semantics against the CompOSE manual, official data sheets, original provider papers/workflows and source records; independently audit every row of both sources. No code, verifier, tolerance, or raw-data repair before the evidence supports a unique mapping.",
+    "C7: after C6B resolves composition semantics and C3/C4 closure, extend source parsing and physical audits to the remaining 16 EOS; check thermodynamic/composition closure, segmentwise source metadata and whole-interval stability/causality without crossing Iphase boundaries.",
+    "C7/C5: resolve provider Data Sheet semantics of Iphase and Nadd, preserve additional thermodynamic columns, and implement a segment-preserving phase-chain adapter.",
+    "C8: quantify density reconstruction drift by segment and select an acceptance threshold only through resolution/refinement and observable-sensitivity tests.",
+    "Normalize source rest-mass references with explicit reversible transformations and report full-source versus causal-domain results separately.",
+    "Only after source, adapter and physical gates: run one sharp-Maxwell pilot and independently verify common pressure, common chemical potential, positive density jump, energy jump and whole-segment admissibility.",
+    "Only after a successful pilot: execute the 65-pair sweep and then multi-segment TOV stable-branch, Seidov, slow-conversion and rapid-conversion Cowling analyses."
+  ],
+  "c4_execution_plan": {
+    "plan_id": "sharp_maxwell_c4_execution_dag_v1",
+    "human_document": "docs/SHARP_MAXWELL_C4_EXECUTION_DAG_V1.md",
+    "machine_plan": "data/sharp_maxwell_c4_execution_plan.v1.json",
+    "source_models": 18,
+    "raw_files": 52,
+    "raw_file_bytes": 1594597,
+    "raw_file_mib": 1.520726203918457,
+    "thermodynamic_knots": 6214,
+    "resource_policy": "CPU-only; serial deterministic first pass; max four local or two shared-CI source workers after parser parity; one aggregate writer.",
+    "native_subagent": "NOT_RUN",
+    "ci_gap": "Existing maxwell-native-fortran.yml PR branch filter and hardcoded checkout do not validate PR #4 head; dedicated sharp-maxwell-source-admission.yml planned.",
+    "selected_stage_scope": "C4 plan only; source verification, adapter implementation, root search, TOV and Cowling not run.",
+    "next_stage": "C5",
+    "next_action": "Implement a read-only native-reader/C1-C11 vertical slice for SPG_M1 and one Nadd=1 GPPVA source with provenance receipts."
+  },
+  "compouse_group_fraction_mapping": {
+    "authority": "CompOSE Reference Manual v3.01, Eqs. (3.10)-(3.12), (4.20)-(4.22), DOI 10.1140/epja/s10050-022-00847-y",
+    "definition": "Under standard CompOSE semantics, Y_i=n_i/n_b; Eq. (4.22) defines the combined nuclear-group number fraction Y_I=sum_j Y_j. The corresponding baryon/mass fraction is X_h=A_av*Y_I by Eq. (3.12).",
+    "verifier_quantity": "compose_eos_verify.f90 uses Yh as a baryon/mass fraction: C3 contains (Zbar/Abar)*Yh and C4 contains Yn+Yp+Yh=1.",
+    "current_reader_mapping": "Yh = YI (C5 implementation; retained raw field mapping only; not physically validated for these providers).",
+    "current_writer_mapping": "YI = Yh (inverse of the current provisional field-preservation mapping; native round-trip success is not semantic validation).",
+    "c5_claim_status": "SUPERSEDED: the earlier C5 statement that Eq. (4.22) makes YI itself the combined baryon/mass fraction was incorrect.",
+    "source_observation": "The selected raw providers do not admit a simple blind identification: outer-crust rows with Abar=56, Zbar=26, YI=1, Ye=0.46429 satisfy C3/C4 only when Yh=YI, whereas the standard X_h=Abar*YI gives 56. Inner-crust rows also fail C3/C4 under the current Yh=YI mapping; applying Abar*YI gives values far above unity.",
+    "unresolved_interpretation": "Provider-specific meaning, production of the eos.compo nuclear-group abundance, and/or consistency/alignment of composition records must be adjudicated against the original provider workflow. Data sheets identify Iphase=7 as inner crust; the phase label itself is not unknown.",
+    "no_repair_policy": "Do not change source data, parser mapping, C3/C4 definitions, or tolerances until provider-level evidence and independent row-wise closure analysis establish the correct interpretation.",
+    "implementation_file": "fortran_eos/src/compose_eos_io.f90",
+    "implementation_blob_sha": "5b01b4051d9392362ca1ed915b946f1031d0e3c2",
+    "implementation_status": "PROVISIONAL__COMPOSITION_SEMANTICS_REVIEW_REQUIRED",
+    "pre_c5_mapping_history": {
+      "reader_at_base_commit": "Yh = Abar * YI",
+      "writer_at_base_commit": "YI = Yh / Abar",
+      "c5_change": "Changed to direct Yh=YI / YI=Yh field preservation after the Abar=56,YI=1 source rows violated the internal Yh<=1 guard under the prior mapping.",
+      "review": "The C5 rationale that this direct mapping followed from Eq. (4.22) was not supported. The prior mapping is the standard CompOSE conversion only for a source that actually conforms to the standard YI convention; these raw provider rows do not currently demonstrate such conformance.",
+      "status": "HISTORICAL_IMPLEMENTATION_PROVENANCE__NOT_A_PHYSICAL_DECISION"
+    }
+  },
+  "c5_vertical_slice": {
+    "runner": "scripts/sharp_maxwell_source_probe.py",
+    "runner_blob_sha": "a9faad478bbe0d0159111fe8e7cf0b40216b8a3e",
+    "human_contract": "docs/SHARP_MAXWELL_C5_READ_ONLY_NATIVE_PROBE_V1.md",
+    "human_contract_blob_sha": "556d0214ac2bc3c802c02829792eed2c37f6a1e1",
+    "test_file": "python_frontend/tests/test_sharp_maxwell_source_probe.py",
+    "test_file_blob_sha": "0fa3c779d043f19aa1ec306a0b919fd5100e9a46",
+    "selected_source_ids": [
+      "SPG_M1",
+      "GPPVA_FSU2"
+    ],
+    "selected_source_contract": {
+      "SPG_M1": {
+        "rows": 365,
+        "Nadd": 0,
+        "composition": true,
+        "Iphase_boundary": [
+          217,
+          218
+        ]
+      },
+      "GPPVA_FSU2": {
+        "rows": 269,
+        "Nadd": 1,
+        "composition": true,
+        "Iphase_boundary": [
+          217,
+          218
+        ]
+      }
+    },
+    "receipt_schema": "sharp_maxwell_c5_native_source_probe_receipt.v1",
+    "implemented_path": "native read_compose -> native write_compose in temporary directory -> native read_compose -> native check_consistency",
+    "preservation_checks": [
+      "pinned source Git blob SHA-1",
+      "raw source SHA-256 before/after",
+      "eos.nb row-wise",
+      "Q1-Q7 row-wise",
+      "Nadd and q_extra row-wise",
+      "Iphase row-wise and boundary",
+      "composition particle/group fields preserved row-wise without assuming that raw YI is the verifier's Yh",
+      "native Compose write-read round-trip"
+    ],
+    "runner_status_contract": "Runner completion is distinct from scientific PASS/FAIL; C1-C6/C10-C11 remain native hard gates and C7-C9 diagnostics.",
+    "implementation_status": "COMMITTED",
+    "helper_test_status": "EQUIVALENT_STAGING_HELPERS_6_PASS__COMMITTED_TEST_FILE_NOT_RUN",
+    "helper_test_note": "Six equivalent pure-helper tests passed in an isolated staging copy; the exact committed test file was not executed at C5 time. C6 later executed the committed test file and passed 6/6; see c6_native_execution.",
+    "native_reader_execution_status": "SUPERSEDED_BY_C6__PASS_ON_TWO_SOURCES",
+    "native_writer_roundtrip_status": "SUPERSEDED_BY_C6__PASS_ON_TWO_SOURCES",
+    "native_verifier_execution_status": "SUPERSEDED_BY_C6__EXECUTED_SCIENTIFIC_FAIL_C3_C4",
+    "github_actions_status": "NOT_RUN",
+    "native_subagent": "NOT_RUN",
+    "runtime_blocker": "Historical C5-time blocker; superseded for the selected two-source native probe by C6 execution.",
+    "source_mutation": "NONE",
+    "source_data_mutation": "NONE",
+    "roots": "NOT_RUN",
+    "TOV_Cowling": "NOT_RUN",
+    "all_65_pairs_unchanged": true,
+    "all_65_pair_admission_state": "BLOCKED_BEFORE_ROOT_SEARCH",
+    "legacy_maxwell_policy": "LEGACY_NON_MAXWELL_READ_ONLY",
+    "not_claimed": [
+      "physical validity of current Yh=YI interpretation",
+      "native composition C3/C4 scientific PASS",
+      "full physical source admission",
+      "whole-interval Hermite stability/causality",
+      "Maxwell roots",
+      "TOV/Cowling"
+    ]
+  },
+  "c6_native_execution": {
+    "schema": "sharp_maxwell_c6_native_execution_summary.v1",
+    "overall_status": "C6_PARTIAL",
+    "evidence_directory": "artifacts/sharp_maxwell/C6_NATIVE_EXECUTION_20261110T093714Z",
+    "executed_on_head": "43eea8bd9bee7ebb222e3c66babf5078b398d7ae",
+    "c5_identity_preserved": true,
+    "native_executable_sha256": "8c9153a93dac329b8bec5fafa85d7318f9a82dd5767d5b4cceea21f79a912d0f",
+    "toolchain": {
+      "gfortran": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+      "python": "3.12.3"
+    },
+    "native_build_status": "PASS",
+    "committed_test_file_status": "PASS_6_OF_6",
+    "native_reader_execution_status": "PASS",
+    "native_writer_roundtrip_status": "PASS",
+    "native_verifier_execution_status": "PASS",
+    "composition_mapping_Yh_equals_YI": "RAW_FIELD_PRESERVATION_AND_ROUNDTRIP_PASS__PHYSICAL_SEMANTICS_UNRESOLVED",
+    "scientific_status": {
+      "SPG_M1": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C3",
+          "C4"
+        ],
+        "rows_failing_C4_all_in_Iphase_7": 148
+      },
+      "GPPVA_FSU2": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C3",
+          "C4"
+        ],
+        "rows_failing_C4_all_in_Iphase_7": 52
+      }
+    },
+    "open_issue": "BLOCKED_REVIEW_REQUIRED: C3 and C4 fail on all Iphase=7 rows in both sources (SPG_M1: 148/148; GPPVA_FSU2: 52/52); all Iphase=0 rows pass. Official provider data sheets identify Iphase=7 as inner crust (SPG M1; FSU2). Under CompOSE Manual v3.01, YI is a combined nuclear-group number fraction and X_h=Abar*YI is its baryon/mass fraction, while native C3/C4 use Yh as a baryon/mass fraction. Yet blindly applying Abar*YI to selected raw rows gives values >1 (including Iphase=0 Abar=56,YI=1), and current Yh=YI fails C3/C4 on every Iphase=7 row. This points to unresolved provider-specific encoding, raw composition validity/alignment, or applicability of the verifier's composition formulas. No code, definition, or tolerance changed.",
+    "stale_text_note": "Resolved as a documentation inconsistency in the C6 follow-up: source_catalog.composition_fields now states the standard CompOSE group-number-fraction and mass-fraction distinction. Provider conformance for SPG_M1 and GPPVA_FSU2 remains unresolved; see composition_semantics_review.",
+    "c5_vertical_slice_note": "c5_vertical_slice NOT_RUN/COMMITTED_TEST_FILE_NOT_RUN fields are C5-time historical values, superseded by this block.",
+    "raw_sources_unchanged": true,
+    "legacy_outputs_unchanged": true,
+    "pairs_unchanged": true,
+    "sharp_transition_search": "NOT_RUN",
+    "tov_cowling": "NOT_RUN",
+    "C7_scientific_verification": "NOT_RUN",
+    "c7_entry": "NOT_RECOMMENDED_PENDING_COMPOSITION_SEMANTICS_REVIEW",
+    "interpretation_note": "The earlier C5 claim that Eq. (4.22) defines YI itself as the combined baryon/mass fraction is superseded. Current Yh=YI is only the committed raw-field mapping exercised by round-trip; it is not endorsed as the physical mapping.",
+    "provider_phase_labels": {
+      "SPG_M1": {
+        "0": "outer crust",
+        "7": "inner crust",
+        "source": "https://compose.obspm.fr/download/1D/Crust/M1/eos.pdf"
+      },
+      "GPPVA_FSU2": {
+        "0": "outer crust",
+        "6": "homogeneous matter",
+        "7": "inner crust",
+        "source": "https://compose.obspm.fr/download/1D/Crust/FSU2/eos.pdf",
+        "note": "Data sheet separately documents the eos.thermo extra geometry code: 0 outer crust; 1 droplets; 2 rods; 3 slabs; 4 tubes; 5 bubbles; 6 core."
+      }
+    },
+    "review_note": "Review only SPG_M1 and GPPVA_FSU2 raw eos.compo semantics and provider provenance. Do not infer an Iphase-dependent remapping from two examples."
+  },
+  "c6b_composition_semantics": {
+    "schema": "sharp_maxwell_c6b_composition_semantics_summary.v1",
+    "status": "PROVIDER_SEMANTICS_UNRESOLVED__BLOCKED",
+    "c6b_state": "OPEN / BLOCKED_REVIEW_REQUIRED",
+    "evidence_directory": "artifacts/sharp_maxwell/C6B_COMPOSITION_SEMANTICS_20261110T100954Z",
+    "executed_on_head": "de029388e78f03f9da2aceef78621e7947e1a299",
+    "ssot_document": "docs/SHARP_MAXWELL_COMPOSITION_SEMANTICS_REVIEW_V1.md",
+    "audit_script": "scripts/audit_sharp_maxwell_composition_semantics.py",
+    "audit_test": "python_frontend/tests/test_sharp_maxwell_composition_semantics_audit.py",
+    "per_source": {
+      "SPG_M1": {
+        "provenance": "PRD 109, 103015 (arXiv:2402.15548) models M1-M5; composition fields undocumented",
+        "inner_crust_raw_field_equals_Yq_rows": "148/148",
+        "C3_C4_implied_Yh_consistent_rows": "0/148",
+        "status": "PROVIDER_SEMANTICS_UNRESOLVED__BLOCKED"
+      },
+      "GPPVA_FSU2": {
+        "provenance": "Grill 2014 PRC 90 045803; Providencia 2019 FASS 6 13; composition fields undocumented",
+        "inner_crust_raw_field_equals_Yq_rows": "52/52",
+        "C3_C4_implied_Yh_consistent_rows": "52/52",
+        "status": "PROVIDER_SEMANTICS_UNRESOLVED__BLOCKED"
+      }
+    },
+    "rejected": [
+      "parser/indexing defect (H4)",
+      "global Yh=Aav*Y_I",
+      "global Yh=Y_I as physical mapping",
+      "Iphase-dependent remap"
+    ],
+    "production_code_changed": false,
+    "raw_sources_changed": false,
+    "pairs_unchanged": true,
+    "c7": "NOT_RUN / NOT_RECOMMENDED",
+    "sharp_transition_search": "NOT_RUN",
+    "tov_cowling": "NOT_RUN"
+  },
+  "c6c_provider_clarification": {
+    "schema": "sharp_maxwell_c6c_provider_clarification_summary.v1",
+    "status": "C6C_READY_FOR_PROVIDER_QUERY",
+    "scope": "provider inquiry preparation only; does not resolve C6B",
+    "evidence_directory": "artifacts/sharp_maxwell/C6C_PROVIDER_CLARIFICATION_20261110T103036Z",
+    "human_document": "docs/SHARP_MAXWELL_C6C_PROVIDER_CLARIFICATION_READINESS_V1.md",
+    "head_at_start": "58eab171acd18fb85c7c86b1903487d42859d2d4",
+    "messages": "DRAFT_NOT_SENT",
+    "messages_sent": 0,
+    "c6b_integrity": "SHA256SUMS verified; 16 tests passed; audit rerun byte-identical",
+    "additional_primary_source_found": false,
+    "related_new_evidence": "GPPVA(FSU2) unified sibling product (compose eos/215) repeats rows 1-269; core rows Iphase=6 have Aav=Zav=Y_I=0 with Yn,Yp nonzero; RELATED only",
+    "unverified_leads": [
+      "Zenodo record 11077759 (HTTP 403; not bypassed)"
+    ],
+    "dossiers": {
+      "SPG_M1": "READY (contact route LISTED, possibly stale; Cc verified)",
+      "GPPVA_FSU2": "READY (contact route VERIFIED)"
+    },
+    "c6b_status_preserved": {
+      "SPG_M1": "PROVIDER_SEMANTICS_UNRESOLVED__BLOCKED",
+      "GPPVA_FSU2": "PROVIDER_SEMANTICS_UNRESOLVED__BLOCKED"
+    },
+    "c6": "C6_PARTIAL",
+    "c7": "NOT_RUN / NOT_RECOMMENDED",
+    "pairs": "BLOCKED_BEFORE_ROOT_SEARCH x65",
+    "legacy_maxwell": "LEGACY_NON_MAXWELL_READ_ONLY",
+    "sharp_transition_search": "NOT_RUN",
+    "tov_cowling": "NOT_RUN",
+    "production_code_changed": false,
+    "raw_sources_changed": false,
+    "pairs_unchanged": true
+  }
+}

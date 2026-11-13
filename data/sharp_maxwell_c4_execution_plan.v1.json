@@ -1,0 +1,965 @@
+{
+  "schema": "ns-cowling.sharp-maxwell-c4-execution-plan",
+  "schema_version": "1.3.0",
+  "plan_id": "sharp_maxwell_c4_execution_dag_v1",
+  "created_date": "2026-11-10",
+  "selected_stage": "C4",
+  "selected_stage_definition": "Implementation DAG, execution order, computational platform, parallelization and checkpoints only. Source-admission calculations are planned but not executed in this stage.",
+  "active_branch": "research/sharp-maxwell-cohort-admission-v1",
+  "pr4_head": "b89e6878e03f0d6beaf44d6cb4c210b06aa0ceb2",
+  "source_authority": {
+    "branch": "research/maxwell-native-fortran-v1",
+    "commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
+    "root": "eos_generator/eos_data"
+  },
+  "legacy_authority": {
+    "branch": "main",
+    "commit": "261fcdcbeaf6b5d842480e82e249312e8da5532a",
+    "policy": "Read-only provenance; never reused as sharp output."
+  },
+  "inputs": {
+    "crust_models": 13,
+    "core_models": 5,
+    "source_models": 18,
+    "pairs": 65,
+    "raw_files": 52,
+    "raw_file_bytes": 1594597,
+    "raw_file_mib": 1.520726203918457,
+    "thermodynamic_knots": 6214
+  },
+  "implementation_seams": {
+    "reader": "python_frontend/compose_eos/api.py::read_compose delegates to native Fortran",
+    "baseline_verifier": "python_frontend/compose_eos/api.py::check_consistency calls native C1-C11 verification",
+    "compose_reader": "fortran_eos/src/compose_eos_io.f90::read_compose",
+    "consistency": "fortran_eos/src/compose_eos_verify.f90::check_consistency",
+    "interval_kernel": "fortran_eos/src/compose_eos_phase_transition.f90::validate_phase",
+    "tov_limit": "oscillation_source/solutions/src/structure/ns_maxwell_tov.f90 currently accepts two callbacks and one sharp interface",
+    "thermodynamic_convention": {
+      "source_verifier": "fortran_eos/src/compose_eos_verify.f90::check_consistency C2",
+      "master_reconstruction": "fortran_eos/src/compose_eos_reconstruct.f90::reconstruct_master",
+      "smooth_matching": "fortran_eos/src/compose_eos_matching.f90::match_crust_core",
+      "true_maxwell": "fortran_eos/src/compose_eos_phase_transition.f90::construct_maxwell_transition",
+      "il0_q3": "mn*(1+Q3)=mu_E-Yq*mn*Q4; recover mu_E by adding Yq*mn*Q4 before the P(mu_E) phase validation",
+      "il1_q3": "mn*(1+Q3)=mu_E for supported cold beta-equilibrated Q5≈0 branch",
+      "root_coordinate": "mu_E=(epsilon+P)/n_B; never use charge-shifted raw Q3 as the Maxwell root coordinate"
+    },
+    "stellar_maxwell": {
+      "native_tov": "oscillation_source/solutions/src/structure/ns_maxwell_tov.f90::integrate_maxwell_tov",
+      "native_cowling": "oscillation_source/solutions/src/modes/ns_maxwell_cowling.f90::shoot_maxwell_cowling",
+      "native_spectrum": "oscillation_source/solutions/src/modes/ns_maxwell_mode_spectrum.f90::scan_maxwell_modes",
+      "production_dispatch": "oscillation_source/solutions/src/production/ns_production_solvers.f90::solve_tov_star/solve_cowling_spectrum",
+      "production_cases": "oscillation_source/solutions/src/structure/ns_maxwell_cases.f90::run_maxwell_case",
+      "interface_transfer": "oscillation_source/solutions/src/modes/ns_interface_transfer.f90::material_interface_transfer/rapid_interface_transfer",
+      "python_reference": "python_frontend/compose_cowling/maxwell.py::MaxwellEOS/solve_maxwell_tov/scan_maxwell_cowling_modes",
+      "tests": "oscillation_source/solutions/tests_fortran/maxwell_checks.f90; oscillation_source/solutions/tests_fortran/maxwell_table_checks.f90; python_frontend/tests/test_maxwell_star.py",
+      "validation": "scripts/validate_maxwell_interface.py; scripts/validate_native_maxwell_reference.py",
+      "provenance": "Imported from PR #3 head a09ec30d74b363652d2d1aefe990557c468679dd into PR #1 branch; native validation pending exact-head CI."
+    }
+  },
+  "dag": [
+    {
+      "id": "C4-D0",
+      "name": "Freeze exact input/source identity",
+      "deps": [],
+      "output": "run_identity.json",
+      "gate": [
+        "Pin source branch and commit",
+        "Verify 52 input blob SHAs",
+        "Verify 65 unique pair IDs and immutable legacy paths"
+      ]
+    },
+    {
+      "id": "C4-D1",
+      "name": "Read 18 CompOSE sources through existing native reader",
+      "deps": [
+        "C4-D0"
+      ],
+      "output": "source_read_receipts/<model>.json",
+      "gate": [
+        "Use compose_eos.api.read_compose / Fortran read_compose",
+        "Retain Nadd/q_extra, Iphase and composition data",
+        "Record row counts and (iT,inb,iYq) coverage"
+      ]
+    },
+    {
+      "id": "C4-D2",
+      "name": "Structural and metadata audit",
+      "deps": [
+        "C4-D1"
+      ],
+      "output": "source_structure_audit.json",
+      "gate": [
+        "Finite values and row widths",
+        "Strict key coverage and selected T/Yq slice",
+        "Composition record shapes and exact phase boundaries"
+      ]
+    },
+    {
+      "id": "C4-D3",
+      "name": "Thermodynamic and beta-equilibrium audit",
+      "deps": [
+        "C4-D2"
+      ],
+      "output": "source_thermo_audit.json",
+      "gate": [
+        "P=n_B*Q1; epsilon=n_B*mn*(1+Q7); mu_E=(epsilon+P)/n_B",
+        "Q3 is Il-dependent: Il=0 -> mn*(1+Q3)=mu_E-Yq*mn*Q4; Il=1,Q5≈0 -> mn*(1+Q3)=mu_E",
+        "The true Maxwell root variable is Euler mu_E; preserve stored CompOSE Q3 convention in outputs",
+        "Report Q2, Q5, Q6-Q7 and corrected Q3/Euler residual separately",
+        "Keep the strict source-admission/reconstruction Q3-Euler tolerance 2e-6 distinct from the true-Maxwell v1 kernel local input tolerance 5e-4; do not interchange or loosen",
+        "Keep exact mass-rest-energy convention source-specific until an explicit conversion is recorded"
+      ]
+    },
+    {
+      "id": "C4-D4",
+      "name": "Composition and provider-semantics audit",
+      "deps": [
+        "C4-D2"
+      ],
+      "output": "source_composition_audit.json",
+      "gate": [
+        "Check charge and baryon closure",
+        "Retain raw YI and test Yh=Abar*YI",
+        "Resolve provider Data Sheet meanings for Iphase/Nadd or leave unresolved"
+      ]
+    },
+    {
+      "id": "C4-D5",
+      "name": "Segmentwise whole-interval stability and causality",
+      "deps": [
+        "C4-D3",
+        "C4-D4"
+      ],
+      "output": "source_segment_audit.json",
+      "gate": [
+        "Split at every Iphase boundary",
+        "Never differentiate/interpolate across a source boundary",
+        "Use analytic Hermite extrema for n>0, dn/dmu>0 and 0<cs2/c2<=1",
+        "Report full source and connected causal-domain results separately"
+      ]
+    },
+    {
+      "id": "C4-D6",
+      "name": "Density reconstruction and 65-pair compatibility",
+      "deps": [
+        "C4-D5"
+      ],
+      "output": "density_reconstruction_audit.json; pair_compatibility_65.json",
+      "gate": [
+        "Record reconstructed_n_max_rel without inventing threshold",
+        "Check T/Yq/Il, neutrality, mass conventions and common mu support",
+        "Create all 65 pair records without running roots"
+      ]
+    },
+    {
+      "id": "C4-D7",
+      "name": "Segment-preserving adapter intermediate representation",
+      "deps": [
+        "C4-D6"
+      ],
+      "output": "sharp_maxwell/adapted_sources/ and adapter_receipts/",
+      "gate": [
+        "Keep raw source immutable",
+        "Represent each smooth Iphase segment separately",
+        "Every projection/drop must have reversible provenance and documented semantic authority"
+      ]
+    },
+    {
+      "id": "C4-D3R",
+      "name": "EOS reconstruction, smooth matching and true-Maxwell kernel validation",
+      "deps": [
+        "C4-D0"
+      ],
+      "output": "eos_reconstruction_validation.json; smooth_matching_validation.json; true_maxwell_kernel_validation.json",
+      "gate": [
+        "Re-read native reconstruct_master source and verify F(log n_B), P=n_B F', epsilon=n_B F, mu_E=F+F', and c_s^2/c^2=(F'+F'')/(F+F')",
+        "Verify Il-aware Q3 convention for Il=0 and supported Il=1,Q5≈0 in source validation, master reconstruction output and true-Maxwell input/output",
+        "Verify strict source/reconstruction tolerance 2e-6 is not silently replaced by the true-Maxwell v1 local Q3 tolerance 5e-4",
+        "Run and retain regressions for all six smooth methods maxwell/css/cubic_F/cubic_P/quintic_F/quintic_P on the documented analytic/source fixtures",
+        "Assert historical match_crust_core(method=maxwell) is smooth_near_pressure_plateau with zero density jump, is_exact_maxwell=false and seidov_applicable=false",
+        "Run true-Maxwell Il=0 and Il=1 analytic two-phase fixtures; require equal P and Euler mu, positive density jump, Delta epsilon=mu_t*Delta n_B, and native C2/overall output consistency",
+        "Test root-topology controls: non-overlapping mu support, no crossing, one transverse crossing, tangential crossing, multiple crossings and duplicate endpoint roots; keep exactly-one-root promotion rule",
+        "Test whole-interval Hermite n>0, dn/dmu>0 and mu*dn/dmu-n>=0 using exact polynomial extrema, not sampled diagnostics",
+        "Test rejection of Q5!=0, composition-bearing, Nadd!=0, internal Iphase discontinuity, incompatible masses and incompatible Il/Yq metadata",
+        "Do not run any of the 65 cohort root searches or production TOV/Cowling"
+      ],
+      "status": "PARTIAL_EXACT_HEAD_CI_PASS_RECEIPTS_PUBLISHED_LOCAL_REPLAY_AND_ROOT_TOPOLOGY_NOT_VERIFIED_SOURCE_COHORT_BLOCKED",
+      "result_policy": {
+        "current_il0_fix": "TDD_RED_GREEN_REPRODUCED_IN_EXPORTED_PR1_SOURCE_ARTIFACT; 68 frontend/pipeline tests passed locally; local run directory has no Git metadata",
+        "native_source_commit_to_replay": "FETCH_LIVE_PR1_HEAD",
+        "all_six_smooth_methods": {
+          "status": "EXACT_HEAD_CI_COVERED",
+          "code_path": "fortran_eos/src/compose_eos_matching.f90::match_crust_core",
+          "test_path": "python_frontend/tests/test_native_crust_core_matching.py",
+          "parameterized_methods": [
+            "maxwell",
+            "css",
+            "cubic_F",
+            "cubic_P",
+            "quintic_F",
+            "quintic_P"
+          ],
+          "test_identity": "test_native_smooth_matching_differential_against_legacy",
+          "interpretation": "The test is explicitly parameterized over all six identifiers and checks native/legacy differential outputs. The same test asserts that historical maxwell is not exact Maxwell and has zero density jump."
+        },
+        "true_maxwell_kernel": {
+          "status": "ANALYTIC_FIXTURE_AND_NEGATIVE_CONTROLS_INCLUDED_IN_EXACT_HEAD_CI",
+          "code_path": "fortran_eos/src/compose_eos_phase_transition.f90::construct_maxwell_transition",
+          "test_path": "python_frontend/tests/test_native_maxwell_transition.py",
+          "current_test_coverage": [
+            "analytic single transverse coexistence root",
+            "composition-bearing input rejection",
+            "non-overlapping Euler chemical-potential support rejection",
+            "acausal phase rejection",
+            "provider First-Law mismatch rejection",
+            "explicit local-neutrality confirmation",
+            "phase-barotrope output/composition restrictions",
+            "incompatible charge-fraction metadata rejection",
+            "Nadd rejection",
+            "Il=0 Q3 charge-potential convention"
+          ],
+          "not_yet_demonstrated": [
+            "overlapping support with no root",
+            "exact tangential/even-multiplicity root",
+            "multiple distinct roots",
+            "shared-knot root deduplicated once",
+            "duplicate endpoint/stationary root deduplicated once",
+            "near-tangent non-root tolerance control",
+            "root/table refinement convergence"
+          ],
+          "interpretation": "Current kernel logic splits P_L-P_H at stationary points derived from quadratic n_L-n_H, but code inspection is not a substitute for the missing deterministic regression cases."
+        },
+        "provider_composition": "REMAINS_BLOCKED_BY_C6B",
+        "cohort_root_search": "NOT_RUN_UNTIL_C4_D0_D7_AND_C4_D3R_PASS",
+        "exact_head_native_integration": "PR1 head df3462fd: FPM 12/33/79 checks, phase-aware Python 8, EOS frontend/pipeline 76; slow/rapid analytic two-table CLI roots and SciPy reference pass",
+        "source_cohort": "NOT_ADMITTED; C4-D0..D7 and C6B remain separate prerequisites.",
+        "historical_local_receipt": {
+          "status": "PROVENANCE_LIMITED_HISTORICAL_RECEIPT",
+          "prior_claim": "An earlier exported PR1 source artifact reported 68 frontend/pipeline tests passing, but its run directory had no Git metadata.",
+          "treatment": "Preserved as historical context only; not counted as current exact-head or local reproduction evidence."
+        },
+        "exact_head_ci": {
+          "status": "PASS",
+          "workflow_run_id": 42952472519,
+          "event": "pull_request",
+          "eos_branch": "research/fortran-eos-gap-fill-v1",
+          "eos_branch_head": "ecf2271e89b68f0a6ef2e6a9c551deba7862f192",
+          "tested_merge_snapshot": "9129d53dfc5b4a216ad53cb118c3fc08ab319572",
+          "base_branch": "main",
+          "base_sha": "6eed9c5178afd820c9d814e4138dd0f15d1f5a73",
+          "runner": {
+            "python": "3.13",
+            "gfortran": "15.2.0",
+            "pytest": "9.2.0",
+            "numpy": "2.5.4",
+            "scipy": "1.18.1"
+          },
+          "commands": {
+            "build": "bash fortran_eos/build.sh build/compose_eos_fortran",
+            "frontend_and_pipeline_tests": "python -m pytest -q python_frontend/tests pipeline/tests",
+            "native_extrema": "gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all -Ibuild/compose_eos_fortran/mod fortran_eos/tests/test_polynomial_extrema.f90 build/compose_eos_fortran/obj/compose_eos_types.o build/compose_eos_fortran/obj/compose_eos_reconstruct.o -o build/compose_eos_fortran/test_polynomial_extrema && build/compose_eos_fortran/test_polynomial_extrema",
+            "manifest": "sha256sum -c SHA256SUMS_v4.txt"
+          },
+          "outcomes": {
+            "native_build": "PASS",
+            "frontend_and_pipeline": {
+              "status": "PASS",
+              "passed": 76,
+              "elapsed_seconds": 45.77
+            },
+            "polynomial_extrema": "PASS",
+            "sha256_manifest": "PASS",
+            "artifact_upload": "PASS"
+          },
+          "artifact": {
+            "id": 13826230310,
+            "size_bytes": 280171082,
+            "sha256": "6b4d884929f6ef8e75057969086e1805f91fa5e28c785f1295161d329db7c5ff",
+            "expiry": "2026-12-11"
+          },
+          "interpretation": "CI integration evidence applies to the PR merge snapshot combining the cited PR1 head and base. It is not local sandbox reproduction or physical source-cohort admission."
+        },
+        "reconstruction": {
+          "code_path": "fortran_eos/src/compose_eos_reconstruct.f90::reconstruct_master",
+          "regression_path": "python_frontend/tests/test_native_reconstruct_master.py",
+          "current_exact_head_ci": "Included in the passing 76-test frontend/pipeline suite.",
+          "limitations": "No separate local replay in this session; full historical generator parity is not claimed."
+        },
+        "independent_analytic_check": {
+          "status": "DERIVED_AND_EXACTLY_CHECKED_WITH_WOLFRAM",
+          "phase_models": {
+            "low": "P=n^2; epsilon=939 n+n^2",
+            "high": "P=(1/4)n^2; epsilon=940 n+(1/4)n^2"
+          },
+          "coexistence": {
+            "mu_t_MeV": 941,
+            "pressure_t_MeV_fm3": 1,
+            "n_low_fm3": 1,
+            "n_high_fm3": 2,
+            "epsilon_low_MeV_fm3": 940,
+            "epsilon_high_MeV_fm3": 1881,
+            "delta_epsilon_MeV_fm3": 941,
+            "mu_delta_n_MeV_fm3": 941,
+            "identity_residual": 0
+          },
+          "interpretation": "Exact analytic fixture independently solved symbolically and numerically in Wolfram; agrees with the repository's quadratic two-phase regression fixture. This checks the thermodynamic identity for this fixture only."
+        },
+        "root_topology": "PARTIAL: one transverse root and disjoint-support rejection are represented in existing tests; tangential, multiple, shared-knot/deduplication and refinement controls remain NOT_VERIFIED.",
+        "local_execution": {
+          "status": "NOT_RUN",
+          "reason": "Repeated container.exec and Python runtime attempts returned ClientError before shell commands could begin; Desktop Commander device was offline."
+        },
+        "artifact_handling": {
+          "github_artifact_download": "PASS",
+          "artifact_id": 13826230310,
+          "artifact_sha256": "6b4d884929f6ef8e75057969086e1805f91fa5e28c785f1295161d329db7c5ff",
+          "extraction": "NOT_RUN",
+          "execution": "NOT_RUN"
+        },
+        "dropbox_backup": "PENDING_EXACT_DESTINATION_CONFIRMATION"
+      }
+    },
+    {
+      "id": "C4-D8",
+      "name": "One-pair sharp-Maxwell pilot",
+      "deps": [
+        "C4-D7",
+        "C4-D3R"
+      ],
+      "output": "sharp_maxwell/<pair>/pilot_receipt.json",
+      "gate": [
+        "Isolate all pressure roots/stationary points",
+        "Require exactly one root for promotion",
+        "Independently verify common P, common mu and Delta epsilon=mu_t Delta n_B"
+      ],
+      "status": "NOT_RUN_SOURCE_ADMISSION_AND_PROVIDER_SEMANTICS_GATES_OPEN"
+    },
+    {
+      "id": "C4-D9",
+      "name": "65-pair sharp-Maxwell sweep",
+      "deps": [
+        "C4-D8"
+      ],
+      "output": "sharp_maxwell/cohort_results.json",
+      "gate": [
+        "Exactly 65 unique terminal statuses",
+        "Keep NO_ROOT/MULTIPLE_ROOT/INPUT_REJECTED/ACAUSAL",
+        "Never write into legacy maxwell paths"
+      ]
+    },
+    {
+      "id": "C4-D10",
+      "name": "Phase-chain TOV, stable branch and Cowling spectra",
+      "deps": [
+        "C4-D9"
+      ],
+      "output": "stable-sequence and slow/rapid mode receipts",
+      "gate": [
+        "Use two phase EOS providers with common Maxwell pressure and Euler mu_t; integrate core and envelope as separate segments and meet exact P_t, never interpolate across the density jump",
+        "Use native integrate_maxwell_tov and production solve_tov_star path; compare against the independent Python/SciPy MaxwellEOS reference on the same analytic fixtures",
+        "Use native shoot_maxwell_cowling and scan_maxwell_modes; compare interface transfer against independent Python/SciPy reference for slow/material and rapid conversion separately",
+        "Verify slow: [xi^r]=[Delta P]=0; rapid: [Delta P]=0 and [xi^r-Delta P/P'_0]=0 under the exact interface convention documented in MAXWELL_TOV_COWLING_INTERFACE_V1.md",
+        "Retain one-sided inner/outer state values; no averaging or derivative stencil across the interface",
+        "Run TOV interface-pressure continuity, mass/radius and interface-radius convergence before mode spectra",
+        "Check stable branch and Seidov onset diagnostic separately; do not interpret Seidov criterion as a universal stability test outside its GR assumptions",
+        "Run independent ODE tolerance and root-grid refinement for each conversion mode; do not merge slow/rapid mode lists",
+        "Root ordering is only numerical matching; mode-family identity is unresolved outside the documented small-jump smooth-limit cross-match",
+        "Preserve NO_ROOT/MULTIPLE_ROOT/ACAUSAL/UNSTABLE_ONSET/NUMERICAL_INCONCLUSIVE as distinct statuses",
+        "Run native maxwell_checks and maxwell_table_checks plus Python test_maxwell_star and validate_native_maxwell_reference",
+        "Do not claim full stable-branch maximum-mass, complete GR polar modes, damping, realistic EOS cohort predictions or production CompOSE composition"
+      ]
+    }
+  ],
+  "resources": {
+    "platform": "CPU-only Linux (GitHub ubuntu-latest and user WSL/Linux)",
+    "compiler": "gfortran; Fortran 2018; existing FPM/build.sh paths",
+    "python": "Python 3.13 in current Maxwell CI workflow; project minimum Python >=3.10",
+    "memory_budget": "2 GiB planning ceiling, not a measured peak; arrays scale O(N_knots)",
+    "parallelism": "Initial serial deterministic run; after parser parity, max 4 independent source workers locally and max 2 on shared CI; one coordinator alone writes aggregate manifests",
+    "gpu": "NOT_REQUIRED",
+    "timeout_minutes": 20,
+    "why_cpu": "52 source files total 1,594,597 bytes and 6,214 thermodynamic knots; parsing, algebraic closure and Hermite extrema are CPU tasks."
+  },
+  "checkpoints": [
+    {
+      "id": "CP0",
+      "when": "Before C5 implementation",
+      "artifact": "run_identity.json",
+      "fields": [
+        "branch/commit",
+        "52 source blob SHAs",
+        "65-pair identity",
+        "legacy no-write policy"
+      ]
+    },
+    {
+      "id": "CP1",
+      "when": "Reader vertical slice passes on SPG_M1 and one Nadd=1 GPPVA",
+      "artifact": "parser_receipts/",
+      "fields": [
+        "row/key counts",
+        "Nadd/q_extra retention",
+        "Iphase/composition retention",
+        "source blob identity"
+      ]
+    },
+    {
+      "id": "CP2",
+      "when": "All 18 source reads complete",
+      "artifact": "source_structure_audit.json",
+      "fields": [
+        "per-model parse status",
+        "key/shape gaps",
+        "phase boundary indices"
+      ]
+    },
+    {
+      "id": "CP3",
+      "when": "Thermodynamic and composition audits complete",
+      "artifact": "source_thermo_audit.json; source_composition_audit.json; eos_reconstruction_validation.json; smooth_matching_validation.json; true_maxwell_kernel_validation.json",
+      "fields": [
+        "Q3-Euler",
+        "Q2/Q5/Q6-Q7",
+        "charge/baryon closure",
+        "source masses",
+        "Il-dependent Q3/Euler relation (Il=0 charge-shift; Il=1,Q5≈0 equality)",
+        "master reconstruction first-law/causal-extrema receipts",
+        "all six smooth matching method receipts and exact non-Maxwell semantics",
+        "true Maxwell Il=0/Il=1 coexistence and latent-energy receipts",
+        "separate 2e-6 source/reconstruction and 5e-4 Maxwell v1 local thresholds"
+      ]
+    },
+    {
+      "id": "CP4",
+      "when": "Segmentwise stability/casualty pass complete",
+      "artifact": "source_segment_audit.json",
+      "fields": [
+        "segment boundaries",
+        "stability margins",
+        "max cs2",
+        "causal connected domain and gaps"
+      ]
+    },
+    {
+      "id": "CP5",
+      "when": "Pair compatibility complete",
+      "artifact": "pair_compatibility_65.json",
+      "fields": [
+        "65 pair statuses",
+        "common mu support",
+        "metadata compatibility",
+        "density drift"
+      ]
+    },
+    {
+      "id": "CP6",
+      "when": "Before full sweep",
+      "artifact": "single-pair pilot receipt",
+      "fields": [
+        "root count",
+        "Pt/mut",
+        "one-sided states",
+        "Maxwell identity residual",
+        "projection provenance"
+      ]
+    },
+    {
+      "id": "CP3R",
+      "when": "Before one-pair true-Maxwell pilot; after C4-D0 identity and code/test replay",
+      "artifact": "eos_reconstruction_validation.json; smooth_matching_validation.json; true_maxwell_kernel_validation.json",
+      "fields": [
+        "exact implementation/source HEAD and compiler",
+        "TDD RED/GREEN output for Il=0 Q3 regression",
+        "master first-law and causal polynomial-extrema results",
+        "six smooth method distinct semantics and differential results",
+        "true Maxwell Il=0/Il=1 fixture P/mu/jump/latent-heat/C2 closure",
+        "rejection controls and full test inventory"
+      ]
+    }
+  ],
+  "ci_plan": {
+    "current_workflow": "maxwell-native-fortran.yml",
+    "gap": "PR #3 workflow pull_request filter targets research/maxwell-reference-validation-v1 while PR #4 base is research/maxwell-native-fortran-v1; it also checks out the fixed PR #3 branch. It cannot establish PR #4 head validity as configured.",
+    "new_workflow": ".github/workflows/sharp-maxwell-source-admission.yml",
+    "triggers": [
+      "pull_request targeting research/maxwell-native-fortran-v1",
+      "workflow_dispatch",
+      "push to cohort branch"
+    ],
+    "checkout": "Use event PR head/merge SHA; do not hardcode branch.",
+    "checks": [
+      "gfortran Fortran 2018 debug build with -fcheck=all",
+      "native FPM tests",
+      "pytest reader/verifier and source-admission tests",
+      "18 source receipts and aggregate audit",
+      "65 unique pair records",
+      "assert zero Maxwell roots and zero TOV/Cowling in source-audit job"
+    ],
+    "artifacts": [
+      "exact head SHA",
+      "compiler/tool versions",
+      "per-source receipts",
+      "aggregate JSON",
+      "SHA256SUMS"
+    ]
+  },
+  "delegation": {
+    "native_subagent": "NOT_RUN",
+    "reason": "No native spawn/create/wait lifecycle was exposed in the live host inventory; no simulated delegation.",
+    "execution": "Serial parent/coordinator; bounded process parallelism only after parser determinism is established."
+  },
+  "scope": {
+    "done": [
+      "Repository and workflow readback",
+      "52-file size and 6,214-knot inventory",
+      "Existing reader/verifier/interval-kernel seam mapping",
+      "Dependency DAG, resource plan, parallelism and checkpoint design",
+      "Read and TDD-corrected true-Maxwell Il=0 Q3/Euler convention bug in native phase kernel",
+      "Added analytic Il=0 regression and ran 68-case frontend/pipeline suite in exported PR1 source artifact",
+      "Built full Fortran executable with GNU Fortran 14.2 and ran native polynomial-extrema test",
+      "PR3 native sharp-Maxwell TOV/Cowling solver, Python/SciPy phase-aware reference, interface-transfer updates, mode spectrum and tests imported into PR1 implementation branch",
+      "PR3 implementation/design/audit/handoff documentation and paired-matching sensitivity imported",
+      "PR3 unsafe auto-commit/push workflow intentionally not imported; its read-only validation commands are consolidated into PR1 exact-head workflow",
+      "TDD Il0 Q3 convention correction implemented on PR1 EOS Maxwell kernel",
+      "Local analytic Il0 Maxwell regression and 36 focused reconstruction/matching/Maxwell tests passed",
+      "Local full frontend/pipeline 68-case suite passed on exported source artifact",
+      "Exact PR1 head df3462fd native Maxwell TOV/Cowling workflow passed push and PR validation with 76 EOS frontend/pipeline tests",
+      "Exact-head Maxwell native validation evidence artifact uploaded",
+      "Exact PR1 head df3462fd native sharp-Maxwell TOV/Cowling workflow passed both push and pull_request runs",
+      "Generated normalized-table slow/rapid CLI spectra each returned two valid roots and passed ODE/root-grid convergence plus independent Python/SciPy comparison",
+      "Latest exact-head EOS frontend/pipeline regression passed 76 tests; FPM checks passed 12+33+79; phase-aware Python suite passed 8",
+      "Downloaded and materialized the exact-head native Maxwell CI evidence artifact 13825093092 (31,873 bytes; GitHub SHA256 4f118cacdaa3c392d2401a8f1bea373e080ed6237b3e6d275174f3593f3e9438).",
+      "PR3 imported native TOV/Cowling stack passed exact PR1-head FPM, CLI and Python/SciPy validation on 1df21d42c88f797b9806295b64f395eb9f97a5a5",
+      "PR1 EOS frontend/pipeline tests, native polynomial-extrema check and SHA256SUMS_v4 manifest passed on the same exact code head",
+      "Full source snapshot artifact and separate native Maxwell evidence artifact uploaded successfully"
+    ],
+    "not_done": [
+      "18-source execution",
+      "C1-C11 source verification",
+      "whole-interval stability/causality run",
+      "density reconstruction",
+      "65-pair compatibility execution",
+      "Maxwell root search",
+      "sharp EOS generation",
+      "TOV/Cowling or mode spectra",
+      "Exact current PR1-head GitHub CI replay after Il=0 patch publication",
+      "Live source-manifest and all tracked SHA256SUMS_v4 entries after documentation updates",
+      "All 18 raw EOS source-admission receipts and C1-C11 verification",
+      "C6B provider composition semantics adjudication",
+      "65-pair compatibility execution and sharp-Maxwell root search",
+      "Seidov, TOV phase-chain and Cowling spectra",
+      "Exact current PR1-head FPM/native Maxwell TOV/Cowling tests and Python/SciPy reference validation",
+      "PR1 imported solver verification with full EOS frontend/pipeline regression",
+      "C4-D4/C6B composition/provider semantics remain unresolved; no 65-pair source-driven phase transition",
+      "Source-backed TOV/Cowling sequence and mode spectrum remain NOT_RUN",
+      "18-source C4 source-admission execution",
+      "C1-C11 validation over the complete 18-source cohort",
+      "C6B provider composition and Iphase/Nadd semantics resolution",
+      "65-pair compatibility promotion and true-Maxwell roots",
+      "Seidov stability assessment on admitted source phases",
+      "65-pair TOV/Cowling mode cohort sweep",
+      "Realistic CompOSE phase-pair TOV/Cowling input validation",
+      "C4-D8 one-pair pilot on an admitted raw-source pair",
+      "Source-backed phase topology, local-neutrality confirmation and 65-pair Maxwell roots",
+      "Mode-family identity, positive-root slow/rapid matching or f/p1/interface mode classification",
+      "Source-backed TOV/Cowling sequences and physical mode spectra for any admitted CompOSE pair",
+      "C6B composition/provider semantics and 65-pair root admission remain blocked"
+    ]
+  },
+  "next_stage": "C5",
+  "next_action": "C5 source-reader and C1-C11 read-only admission only. Preserve C6B; no source Maxwell root, one-pair pilot, 65-pair sweep, production TOV or Cowling spectrum until C4-D0..D7, C4-D3R and provider semantics pass. PR3 analytic implementation validation is now PASS but does not satisfy the source-admission gates.",
+  "plan_revision": "1.3.0",
+  "updated_date": "2026-11-11",
+  "mutation_policy": {
+    "M0": "READ_ONLY: inspect/fetch/test only; stop if branch/worktree identity is dirty or ambiguous",
+    "M1": "RESEARCH_ONLY: edits limited to existing EOS implementation branch code/tests/docs and this existing C4 DAG branch; no new DAG",
+    "M2": "TDD_REQUIRED: every production fix needs a failing regression first; additive tests/receipts are allowed; preserve exact RED/GREEN",
+    "M3": "HUMAN_APPROVAL_REQUIRED: thermodynamic formula changes, unit convention changes, composition/Iphase/Nadd semantics, source parser/indexing, row ordering, tolerance widening, production API/solver callback/TOV/Cowling changes",
+    "M4": "PROTECTED: raw CompOSE EOS bytes, 52 source files, source-authority SHA, 65-pair identity, legacy outputs and C6/C6B provider-semantics blockers",
+    "M5": "SEPARATE_AUTHORIZATION: merge/release/deploy/provider contact/Dropbox upload or any remote action outside the specifically authorized PR branch updates"
+  },
+  "anti_drift_self_audit": [
+    "Fetch exact live PR1 implementation head, PR3 source-authority head and PR4 DAG head before edits; record all three pins separately",
+    "Verify raw source files and canonical 65-pair manifest hashes are unchanged",
+    "Read native reconstruct_master, match_crust_core, construct_maxwell_transition and check_consistency before relying on notes",
+    "Use Euler mu_E=(epsilon+P)/n_B for Maxwell interpolation/root finding; do not use charge-shifted Il=0 Q3 as the root coordinate",
+    "Apply Il=0 Q3 relation mn*(1+Q3)=mu_E-Yq*mn*Q4 in validation and output; Il=1 equality only under Q5≈0",
+    "Keep the 2e-6 source/reconstruction Q3 threshold distinct from the 5e-4 true-Maxwell v1 kernel threshold",
+    "Keep historical smooth method=maxwell distinct from construct_maxwell_transition; the first has no density jump",
+    "Keep P(mu_E) root isolation exhaustive over every represented Hermite interval, including stationary/tangential roots; do not promote ambiguous/multiple roots",
+    "Prove stability and causality from interval extrema; 33-point samples are diagnostics only",
+    "Do not infer local neutrality, composition, Nadd, q_extra, Iphase or provider semantics from missing columns",
+    "No interpolation or derivative stencil crosses an Iphase discontinuity",
+    "No 65-pair roots/TOV/Cowling until C4-D0..D7 plus C4-D3R have all passed and C6B is resolved",
+    "Tests, collection counts, raw stdout, manifests and SHA256SUMS must describe the same exact source bytes",
+    "NOT_RUN/BLOCKED is retained for unavailable evidence; never promote a planned gate to PASS",
+    "2026-11-11: distinguish PR1 branch HEAD ecf2271e89b68f0a6ef2e6a9c551deba7862f192 from PR merge snapshot 9129d53dfc5b4a216ad53cb118c3fc08ab319572 when citing CI.",
+    "2026-11-11: exact-head CI reports 76 frontend/pipeline tests and polynomial extrema PASS; this does not demonstrate explicit tangential, multiple-root or duplicate-endpoint topology regressions.",
+    "2026-11-11: the six smooth matching identifiers are covered by a parameterized legacy differential test; historical maxwell remains a smooth zero-jump compatibility token.",
+    "2026-11-11: record local shell ClientError, DNS failure, offline workstation and Dropbox binary URL policy as runtime blockers, not EOS numerical failures.",
+    "2026-11-11: native subagent execution is NOT_RUN because no native delegation tool was available; do not report role-play or serial work as subagent execution.",
+    "2026-11-11: independent Wolfram analytic fixture residual is zero for the documented two quadratic phases; this does not admit any provider EOS pair.",
+    "2026-11-11: four component validation receipts were written to the existing C4 branch and read back with exact blob SHAs.",
+    "2026-11-11: Dropbox /NS_Cowling_eos_wt/docs was inspected; no new Dropbox files were written pending exact destination confirmation.",
+    "2026-11-11: a second sandbox execution attempt again returned ClientError; do not equate GitHub artifact download with ZIP extraction or code execution."
+  ],
+  "failure_taxonomy": [
+    "THERMODYNAMIC_CONVENTION_MISMATCH",
+    "COMPOSE_SOURCE_SCHEMA_UNRESOLVED",
+    "FIRST_LAW_CLOSURE_FAILURE",
+    "INTERPOLATION_EXTREMUM_FAILURE",
+    "MECHANICAL_INSTABILITY",
+    "ACAUSAL_INTERVAL",
+    "NO_COMMON_MU_SUPPORT",
+    "NO_ROOT",
+    "MULTIPLE_ROOT",
+    "MAXWELL_IDENTITY_FAILURE",
+    "PHASE_TOPOLOGY_FAILURE",
+    "COMPOSITION_PROVIDER_BLOCKED",
+    "NATIVE_PYTHON_DIVERGENCE",
+    "SERIALIZATION_FAILURE",
+    "BUILD_ENVIRONMENT_FAILURE",
+    "PROVENANCE_FAILURE",
+    "SCOPE_POLICY_BLOCK"
+  ],
+  "validation_baseline": {
+    "implementation_branch": "research/fortran-eos-gap-fill-v1",
+    "implementation_source_head_before_fix": "ca71d8e394f9043d778676c941f88ce01ca7faa9",
+    "il0_bugfix": "TDD_RED_GREEN_CONFIRMED_IN_EXPORTED_SOURCE_ARTIFACT",
+    "native_build": "PASS_GFORTRAN_14.2.0",
+    "native_polynomial_extrema": "PASS",
+    "targeted_pytest": "68 passed in 13.57s",
+    "targeted_command": "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python -m pytest -q python_frontend/tests pipeline/tests",
+    "local_git_metadata": "UNAVAILABLE_EXPORTED_ARTIFACT_RUN",
+    "cohort_18_sources": "NOT_RUN",
+    "pair_65_root_search": "NOT_RUN",
+    "tov_cowling": "NOT_RUN",
+    "current_ci_after_pr_update": "PENDING",
+    "pr3_import": {
+      "source_head": "a09ec30d74b363652d2d1aefe990557c468679dd",
+      "target_branch": "research/fortran-eos-gap-fill-v1",
+      "latest_pr1_code_head_tested": "1df21d42c88f797b9806295b64f395eb9f97a5a5",
+      "latest_pr1_docs_head": "ecf2271e89b68f0a6ef2e6a9c551deba7862f192",
+      "implementation_status": "ANALYTIC_NATIVE_AND_PYTHON_REFERENCE_VALIDATION_PASS",
+      "eos_ci": {
+        "run_id": 42951568832,
+        "conclusion": "success",
+        "artifact_id": 13824779447,
+        "artifact_digest": "sha256:13132bd4bfa340d4c4b648302ad3671cefb7a8e51bf5673548f506d69f54b19e"
+      },
+      "native_maxwell_ci": {
+        "run_id": 42951568702,
+        "conclusion": "success",
+        "artifact_id": 13825093092,
+        "artifact_digest": "sha256:4f118cacdaa3c392d2401a8f1bea373e080ed6237b3e6d275174f3593f3e9438"
+      },
+      "source_backed_eos_stellar_calculations": "NOT_RUN",
+      "cohort_roots": "BLOCKED_BY_C6B",
+      "interpretation": "The imported PR3 native TOV/Cowling, interface-transfer, mode-spectrum and Python/SciPy reference implementations compile and pass analytic/table-driven synthetic integration tests. This is not a source-backed 18-EOS or 65-pair physical result."
+    },
+    "il0_q3_compose_convention_fix": "TDD RED/GREEN; output transition and copied rows preserve Il0 convention",
+    "local_full_frontend_pipeline": "68 passed in 13.57s (exported artifact, no .git metadata)",
+    "local_focused_reconstruction_matching_maxwell": "36 passed in 8.04s; 36 collected in 0.01s",
+    "latest_exact_head": "1df21d42c88f797b9806295b64f395eb9f97a5a5",
+    "latest_native_maxwell_workflow_pr_run": 42950840157,
+    "latest_native_maxwell_workflow_push_run": 42950834447,
+    "latest_exact_head_eos_frontend_in_maxwell_workflow": "76 passed in 15.41s",
+    "latest_maxwell_evidence_artifact_id": 13825093092,
+    "latest_maxwell_evidence_artifact_sha256": "4f118cacdaa3c392d2401a8f1bea373e080ed6237b3e6d275174f3593f3e9438",
+    "latest_maxwell_native_ci": "PASS_BOUNDED_SYNTHETIC_TOV_COWLING_AND_ROOT_CONVERGENCE_AT_DF3462FD",
+    "latest_maxwell_native_ci_head": "df3462fd77ad6e6a2a556dcc0e569d3f5a262e6a",
+    "latest_fpm_checks": {
+      "cell": 12,
+      "maxwell": 33,
+      "normalized_table": 79
+    },
+    "latest_python_maxwell_reference": "8 passed in 22.30s",
+    "latest_eos_frontend_pipeline": "76 passed in 15.41s",
+    "latest_synthetic_root_family_identity": "UNRESOLVED",
+    "latest_synthetic_phase_cohort": "ONE_GENERATED_ANALYTIC_TWO_TABLE_FIXTURE_ONLY",
+    "latest_eos_ci_push": 42951563121,
+    "latest_eos_ci_pr": 42951568832,
+    "latest_eos_ci_conclusion": "SUCCESS",
+    "latest_native_maxwell_ci_pr": 42951568702,
+    "latest_native_maxwell_ci_head": "1df21d42c88f797b9806295b64f395eb9f97a5a5"
+  },
+  "project": {
+    "eos_validation_latest": {
+      "implementation_branch": "research/fortran-eos-gap-fill-v1",
+      "pr_number": 1,
+      "exact_head": "1df21d42c88f797b9806295b64f395eb9f97a5a5",
+      "eos_q3_fix_baseline_head": "eef60bf4a10864c194936b70b548217d1843b218",
+      "source_authority_branch": "research/maxwell-native-fortran-v1",
+      "source_authority_commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
+      "tdd_il0_regression": "RED_BEFORE_FIX_GREEN_AFTER_FIX_ON_EXPORTED_SOURCE_ARTIFACT",
+      "local_full_frontend_pipeline": "68 passed in 13.57s; exported source artifact without .git",
+      "local_focused_reconstruction_matching_maxwell": "36 passed in 8.04s; collected 36 in 0.01s",
+      "exact_head_ci": {
+        "workflow": "Native Fortran sharp-Maxwell TOV/Cowling validation",
+        "pr_run_id": 42950840157,
+        "push_run_id": 42950834447,
+        "pr_run_url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42950840157",
+        "push_run_url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42950834447",
+        "both": "SUCCESS",
+        "steps": [
+          "native Fortran tests with runtime checks",
+          "build production case driver",
+          "Python Maxwell reference tests",
+          "normalized-table production case driver",
+          "independent Python/SciPy phase-aware reference validation",
+          "EOS frontend and pipeline regression: 76 passed in 15.41s",
+          "source identity receipts",
+          "artifact upload"
+        ],
+        "evidence_artifact_id": 13825216369,
+        "evidence_artifact_name": "maxwell-native-fortran-42950840157",
+        "evidence_artifact_bytes": 31871,
+        "evidence_artifact_sha256": "ac60d5fd23afb6603703bbe2e2c1307e65eb95d4a3ead276da225e36132f54e8"
+      },
+      "historical_eos_ci_at_eef60": {
+        "workflow": "Fortran EOS frontend CI",
+        "pr_run_id": 42950099132,
+        "push_run_id": 42950093266,
+        "both": "SUCCESS",
+        "native_build": "PASS",
+        "frontend_pipeline": "PASS",
+        "polynomial_extrema": "PASS",
+        "tracked_sha256_manifest_72_entries": "PASS",
+        "verified_source_artifact_id": 13824248434,
+        "verified_source_artifact_sha256": "371422d02bbbe56031f15fdc4cd18f634a4c663d84d603c778f824b2576f046e8",
+        "limitation": "CI-tested EOS fix/docs manifest exact head was eef60bf4; branch later advanced to df3462fd with the read-only Maxwell TOV/Cowling validation additions."
+      },
+      "scope": "validation only; C4-D3R not a 65-pair source admission, root sweep, or physical observational result",
+      "latest_ci_runs": {
+        "push": 42951563121,
+        "pr": 42951568832,
+        "conclusion": "SUCCESS",
+        "build": "Fortran EOS executable PASS",
+        "frontend_pipeline": "PASS (exact count not read from this run log; the df Maxwell run had 76 passed)",
+        "polynomial_extrema": "PASS",
+        "tracked_sha256_manifest": "PASS",
+        "source_snapshot_artifact": "uploaded"
+      },
+      "maxwell_native_artifact_sha256": "4f118cacdaa3c392d2401a8f1bea373e080ed6237b3e6d275174f3593f3e9438",
+      "maxwell_native_artifact_id": 13825093092
+    },
+    "maxwell_tov_cowling_latest": {
+      "implementation_branch": "research/fortran-eos-gap-fill-v1",
+      "implementation_head": "1df21d42c88f797b9806295b64f395eb9f97a5a5",
+      "source_change_class": "CONCURRENT_PR1_COMMIT_AFTER_EOS_FIX; do not attribute these source edits to C4-D3R implementation",
+      "exact_head_workflow": "Native Fortran sharp-Maxwell TOV/Cowling validation",
+      "pull_request_run": {
+        "id": 42950840157,
+        "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42950840157",
+        "conclusion": "SUCCESS"
+      },
+      "push_run": {
+        "id": 42950834447,
+        "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42950834447",
+        "conclusion": "SUCCESS"
+      },
+      "evidence_artifact": {
+        "id": 13825093092,
+        "name": "maxwell-native-fortran-42951568702",
+        "bytes": 31873,
+        "sha256": "4f118cacdaa3c392d2401a8f1bea373e080ed6237b3e6d275174f3593f3e9438",
+        "expires": "2026-12-11T03:17:21Z"
+      },
+      "test_receipts": {
+        "fpm_cell_checks": "12 passed",
+        "fpm_maxwell_checks": "33 passed; smooth-limit dM/M=9.1343e-8; dR/R=2.8981e-8",
+        "fpm_normalized_table_checks": "79 passed",
+        "python_phase_aware_tests": "8 passed in 22.30s",
+        "eos_frontend_pipeline": "76 passed in 15.41s",
+        "build": "FPM full build with gfortran runtime checks PASS",
+        "slow_rapid_root_cases": "both found 2 valid roots in generated analytic two-table fixtures",
+        "independent_python_scipy_reference": "PASS_BOUNDED_REFERENCE_VALIDATION",
+        "fortran_python_transfer_slow": "W difference 0; V difference 2.12867e-16; interface condition residual 0",
+        "fortran_python_transfer_rapid": "W difference 0; V difference 2.12874e-16; interface condition residual 4.16056e-16"
+      },
+      "synthetic_root_results": {
+        "slow_baseline_hz": [
+          1764.8989380476999,
+          4937.644932260736
+        ],
+        "rapid_baseline_hz": [
+          4937.016233885661,
+          19493.632601825517
+        ],
+        "slow_ode_tight_max_relative_shift": 0.000006743738743870317,
+        "rapid_ode_tight_max_relative_shift": 0.000032810190935713894,
+        "slow_root_grid_tight_max_relative_shift": 2.6560311982215657e-10,
+        "rapid_root_grid_tight_max_relative_shift": 2.280228541659817e-10,
+        "root_family_identity": "UNRESOLVED; root sets numerically sorted only; no slow/rapid family pairing"
+      },
+      "independent_reference": {
+        "mass_relative_difference": 5.470890098561773e-10,
+        "radius_relative_difference": 2.1517494246891774e-10,
+        "interface_radius_relative_difference": 2.6673597613241844e-10,
+        "max_cowling_root_relative_difference": 0.000052045786797712784
+      },
+      "fixture_only_transition": {
+        "energy_jump_j_m3": 3.204353268e+34,
+        "density_jump_m3": 2.1253985121487173e+44,
+        "chemical_potential_mismatch_j": 1.0903274449214596e-21,
+        "seidov_ratio": 0.2127659574468085,
+        "seidov_critical": 0.5015957446808511,
+        "meaning": "fixture diagnostic only; not a source-cohort or global stable-branch result"
+      },
+      "claim_boundary": {
+        "input": "generated analytic two-table phase fixture with exact Pt and mu_t, not arbitrary raw CompOSE source phases",
+        "output": "bounded native TOV/Cowling case_driver plus mode-grid root/refinement checks",
+        "not_claimed": [
+          "realistic CompOSE hybrid EOS",
+          "18-source C4 admission",
+          "65-pair Maxwell root search",
+          "C4-D8 one-pair real-source cohort pilot",
+          "stable M-R branch/maximum mass/twin-star sequence",
+          "physical f/p1/interface-mode labels",
+          "slow/rapid root pairing",
+          "astrophysical inference"
+        ]
+      },
+      "exact_head_ci": {
+        "eos_frontend_push": {
+          "id": 42951563121,
+          "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42951563121",
+          "conclusion": "SUCCESS"
+        },
+        "eos_frontend_pr": {
+          "id": 42951568832,
+          "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42951568832",
+          "conclusion": "SUCCESS"
+        },
+        "native_maxwell_push": {
+          "id": 42950834447,
+          "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42950834447",
+          "head": "df3462fd77ad6e6a2a556dcc0e569d3f5a262e6a",
+          "conclusion": "SUCCESS"
+        },
+        "native_maxwell_pr": {
+          "id": 42951568702,
+          "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42951568702",
+          "head": "1df21d42c88f797b9806295b64f395eb9f97a5a5",
+          "conclusion": "SUCCESS"
+        }
+      },
+      "latest_exact_head_refreshed_only": {
+        "commit": "1df21d42c88f797b9806295b64f395eb9f97a5a5",
+        "message": "Refresh v4 source hashes after PR3 Maxwell import",
+        "parent_base": "df3462fd77ad6e6a2a556dcc0e569d3f5a262e6a",
+        "changed_paths": [
+          "SHA256SUMS_v4.txt",
+          "docs/MANIFEST_v4.sha256",
+          "docs/PR3_IMPORT_HANDOFF_20261111.txt",
+          "docs/PR3_IMPORT_MANIFEST_20261111.json"
+        ],
+        "meaning": "EOS source/test logic unchanged from exact-head Maxwell/eos validation at df3462fd; the refreshed manifests and PR3 import provenance are CI-verified at 1df."
+      },
+      "local_artifact_path": "/mnt/data/maxwell-native-fortran-42951568702.zip",
+      "local_artifact_materialization": "PASS_FILE_MATERIALIZED; ZIP_INTERNAL_CRC_NOT_RECHECKED_DUE_CONTAINER_RUNTIME_FAILURE"
+    }
+  },
+  "pr4_head_semantics": "C4 branch tip immediately before this plan refresh; the resulting commit SHA is recorded by GitHub.",
+  "local_agent_contract": {
+    "document": "docs/EOS_RECONSTRUCTION_MAXWELL_LOCAL_AGENT_CONTRACT_20261111.md",
+    "role": "Detailed coding contract and copyable handoff for executing C4-D3R within the existing DAG; this is not a second DAG.",
+    "selected_stages": [
+      "C5",
+      "C6"
+    ],
+    "execution_mode": {
+      "requested_plugin": "physmath-research-loop",
+      "native_subagent_status": "NOT_RUN",
+      "reason": "No native task-delegation tool was available in the active tool inventory. Work in this session was performed serially; no simulated subagent is claimed."
+    },
+    "session_runtime": {
+      "initial_sandbox_versions": {
+        "python": "3.13.5",
+        "git": "2.47.3",
+        "gfortran": "14.2.0",
+        "cmake": "3.31.6"
+      },
+      "direct_github_clone": "BLOCKED_DNS_COULD_NOT_RESOLVE_GITHUB_COM",
+      "github_actions_artifact_download": "PASS",
+      "github_actions_artifact_id": 13826230310,
+      "github_actions_artifact_name": "NS_Cowling-9129d53dfc5b4a216ad53cb118c3fc08ab319572",
+      "github_actions_artifact_size_bytes": 280171082,
+      "github_actions_artifact_sha256": "6b4d884929f6ef8e75057969086e1805f91fa5e28c785f1295161d329db7c5ff",
+      "sandbox_execution_after_artifact_download": "BLOCKED_CLIENT_ERROR",
+      "dropbox_text_fetch": "PASS",
+      "dropbox_binary_transfer_to_sandbox": "BLOCKED_RUNTIME_URL_ACCESS_POLICY",
+      "connected_local_workstation": "OFFLINE",
+      "interpretation": "These are environment/tooling limitations; they are not evidence of an EOS numerical failure."
+    },
+    "verification_scope": {
+      "required_outputs": [
+        "eos_reconstruction_validation.json",
+        "smooth_matching_validation.json",
+        "true_maxwell_kernel_validation.json",
+        "run_receipt.json",
+        "RED_GREEN_regression_logs"
+      ],
+      "stop_before": [
+        "C4-D8",
+        "C4-D9",
+        "C4-D10"
+      ],
+      "prohibited_until_admission": [
+        "65-pair source root searches",
+        "production TOV sequence",
+        "Cowling spectra"
+      ]
+    },
+    "published_receipts": {
+      "directory": "artifacts/sharp_maxwell/C4D3R_EOS_VALIDATION_20261111/",
+      "files": [
+        {
+          "role": "reconstruction",
+          "path": "artifacts/sharp_maxwell/C4D3R_EOS_VALIDATION_20261111/EOS_RECONSTRUCTION_VALIDATION_20261111.json",
+          "blob_sha": "e87766ae0f7005047c7d70114c6f9af5dee07b44",
+          "bytes": 4554,
+          "status": "PARTIAL_EXACT_HEAD_CI_COVERED_LOCAL_REPLAY_NOT_RUN"
+        },
+        {
+          "role": "smooth_matching",
+          "path": "artifacts/sharp_maxwell/C4D3R_EOS_VALIDATION_20261111/EOS_SMOOTH_MATCHING_VALIDATION_20261111.json",
+          "blob_sha": "90cba1439159f9f6494732f647bb547217399db3",
+          "bytes": 3894,
+          "status": "PARTIAL_EXACT_HEAD_CI_COVERED_LOCAL_REPLAY_NOT_RUN"
+        },
+        {
+          "role": "true_maxwell",
+          "path": "artifacts/sharp_maxwell/C4D3R_EOS_VALIDATION_20261111/EOS_TRUE_MAXWELL_KERNEL_VALIDATION_20261111.json",
+          "blob_sha": "a5acc6325bde070346d117fbc015ad5623085f92",
+          "bytes": 6123,
+          "status": "PARTIAL_ANALYTIC_FIXTURE_AND_NEGATIVE_CONTROLS_CI_COVERED_ROOT_TOPOLOGY_INCOMPLETE"
+        },
+        {
+          "role": "runtime",
+          "path": "artifacts/sharp_maxwell/C4D3R_EOS_VALIDATION_20261111/EOS_LOCAL_RUNTIME_RECEIPT_20261111.json",
+          "blob_sha": "268fa52bcb71465491d7a8db6f2c4e0bd63dc04a",
+          "bytes": 4633,
+          "status": "CI_PASS_LOCAL_RUNTIME_BLOCKED"
+        }
+      ],
+      "repository_branch": "research/sharp-maxwell-cohort-admission-v1",
+      "parent_head": "b89e6878e03f0d6beaf44d6cb4c210b06aa0ceb2",
+      "note": "Each JSON was fetched back from GitHub after creation; blob SHAs and byte counts are read-back values."
+    },
+    "dropbox_backup": {
+      "status": "PENDING_EXACT_DESTINATION_CONFIRMATION",
+      "existing_project_backup_folder": "/NS_Cowling_eos_wt/docs",
+      "existing_handoff_file": "/NS_Cowling_eos_wt/docs/EOS_RECONSTRUCTION_MAXWELL_HANDOFF_20261111.txt",
+      "proposed_additions": [
+        "EOS_RECONSTRUCTION_MAXWELL_LOCAL_AGENT_CONTRACT_20261111.md",
+        "EOS_RECONSTRUCTION_VALIDATION_20261111.json",
+        "EOS_SMOOTH_MATCHING_VALIDATION_20261111.json",
+        "EOS_TRUE_MAXWELL_KERNEL_VALIDATION_20261111.json",
+        "EOS_LOCAL_RUNTIME_RECEIPT_20261111.json"
+      ],
+      "write_occurred": false,
+      "reason": "Dropbox file upload requires user-confirmed exact destination path and source file attachments; existing backup directory is known but no Dropbox write has been made."
+    }
+  }
+}

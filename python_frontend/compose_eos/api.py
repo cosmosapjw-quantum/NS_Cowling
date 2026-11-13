@@ -185,6 +185,81 @@ def fill_density_gap(data: EOSData, n_fill: int = 60, fit_points: int = 12, *,
     return result
 
 
+def select_slice(data: EOSData, iT: int, iYq: int) -> EOSData:
+    """Materialize the (iT, iYq) cell of the full multidim thermo tensor into a
+    1D cold-slice EOSData view.
+
+    E390-10B phase 1: the data model carries an optional q_full tensor of shape
+    (nT, nYq, n, 7) and q_extra_full of shape (nT, nYq, n, nadd_max). When a
+    caller has populated q_full (e.g. a future multidim reader), select_slice
+    copies the chosen cell into the 1D Q1..Q7 / q_extra surface and returns a
+    new EOSData with selected_iT/selected_iYq recorded. This bridges the tensor
+    to the cold-slice surface API that M3-M6 and the app commands consume,
+    without changing their call sites.
+
+    Convention: iT/iYq are 1-based cell indices into the (nT, nYq) axes,
+    matching the Fortran select_slice subroutine. The caller is responsible
+    for converting any 0-based CompOSE axis labels to 1-based before calling.
+
+    Raises ValueError if q_full is not materialized on `data` (the cold-slice
+    reader and most production paths leave it empty by design), or if the
+    indices are out of range, or if the tensor shape is inconsistent.
+    """
+    import numpy as np
+    q_full = np.asarray(data.q_full)
+    if q_full.size == 0:
+        raise ValueError(
+            "q_full is not materialized on this EOSData; select_slice requires a "
+            "multidim tensor populated by a multidim reader (E390-10B phase 2+). "
+            "Cold-slice readers leave q_full empty by design."
+        )
+    # q_full has shape (nT, nYq, 7, n), matching the Fortran eos_data_t storage
+    # order q_full(nT,nYq,7,n) so the select_slice copy q(:,n)=q_full(iT,iYq,:,n)
+    # is a contiguous rank-2 slice.
+    if q_full.ndim != 4 or q_full.shape[2] != 7 or q_full.shape[3] != data.n:
+        raise ValueError(
+            f"q_full has shape {q_full.shape}; expected (nT, nYq, 7, n) = "
+            f"({data.nT}, {data.nYq}, 7, {data.n})"
+        )
+    nT, nYq, _, n = q_full.shape
+    if nT != data.nT or nYq != data.nYq:
+        raise ValueError(
+            f"q_full axis lengths {nT}x{nYq} disagree with data.nT={data.nT}, "
+            f"data.nYq={data.nYq}"
+        )
+    if iT < 1 or iT > nT or iYq < 1 or iYq > nYq:
+        raise ValueError(
+            f"iT/iYq out of range: iT={iT} (1..{nT}), iYq={iYq} (1..{nYq})"
+        )
+    # copy the chosen cell into the 1D Q surface. q_full[iT-1, iYq-1] has shape
+    # (7, n); transpose to (n, 7) so column k -> Q{k+1}.
+    cell = q_full[iT - 1, iYq - 1, :, :]  # shape (7, n)
+    qe_full = np.asarray(data.q_extra_full)
+    out = data.copy()
+    out.Q1 = cell[0, :].copy(); out.Q2 = cell[1, :].copy()
+    out.Q3 = cell[2, :].copy(); out.Q4 = cell[3, :].copy()
+    out.Q5 = cell[4, :].copy(); out.Q6 = cell[5, :].copy()
+    out.Q7 = cell[6, :].copy()
+    # extra quantities: copy the first extra-quantity slot of the chosen cell.
+    # q_extra_full has shape (nadd_max, nT, nYq, n); we read slot 0.
+    nadd = int(data.q_extra_count)
+    if qe_full.size > 0 and nadd >= 1:
+        if qe_full.ndim != 4 or qe_full.shape[0] < nadd or qe_full.shape[1] != nT \
+           or qe_full.shape[2] != nYq or qe_full.shape[3] != n:
+            raise ValueError(
+                f"q_extra_full has shape {qe_full.shape}; expected "
+                f"(nadd_max, nT, nYq, n) = (>={nadd}, {nT}, {nYq}, {n})"
+            )
+        out.q_extra = qe_full[0, iT - 1, iYq - 1, :].copy()
+    else:
+        out.q_extra = np.zeros(n, dtype=float)
+        out.q_extra_count = 0
+    out.selected_iT = iT
+    out.selected_iYq = iYq
+    # preserve the tensor on the view so a caller can select another cell
+    return out
+
+
 def causal_completion(data: EOSData, *, cs2: float = 1.0,
                       n_max: float | None = None, n_points: int = 200,
                       return_metadata: bool = False):

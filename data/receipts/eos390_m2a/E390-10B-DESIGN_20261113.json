@@ -54,10 +54,10 @@
     "tests": "test_m10_generic_axes.py rejection tests (test_multi_point_T_axis_is_rejected, test_multi_point_Yq_axis_is_rejected, test_nonzero_T_slice_is_rejected) become acceptance tests for the relaxed reader; they must be rewritten to assert successful read + correct cell counts, not rejection."
   },
   "phased_implementation_plan": {
-    "phase_1": "D1 data model (allocatable q_full, q_extra_full, nadd_max) + D3 select_slice; no reader change; unit test: cold-slice read still works, q_full unallocated.",
+    "phase_1": "DONE 2026-11-13. D1 data model (allocatable q_full(nT,nYq,7,n), q_extra_full(nadd_max,nT,nYq,n), nadd_max) + D3 select_slice implemented in Fortran (compose_eos_types.f90) and Python (eos_data.py, api.py select_slice). No reader change. 12 unit tests in test_e390_10b_tensor_model.py PASS: cold-slice read leaves q_full empty; select_slice copies chosen cell into Q surface + records selected_iT/iYq; deep-copy no mutation; nadd_max namelist round-trip (legacy default 0); copy() propagates tensor. Full suite 112 passed 0 skipped (was 100; +12 new).",
     "phase_2": "D2 Step 1 (Nadd relaxation); unit test: a synthetic Nadd=2 table reads; cold-slice Nadd in {0,1} unaffected.",
-    "phase_3": "D2 Step 2 (multi-point Yq); unit test: a synthetic 1T x 3Yq x n table reads into q_full(1,3,n); select_slice materializes each Yq.",
-    "phase_4": "D2 Step 3 (multi-point T); unit test: a synthetic 3T x 2Yq x n table reads into q_full(3,2,n); select_slice materializes each T/Yq.",
+    "phase_3": "D2 Step 2 (multi-point Yq); unit test: a synthetic 1T x 3Yq x n table reads into q_full(1,3,7,n); select_slice materializes each Yq.",
+    "phase_4": "D2 Step 3 (multi-point T); unit test: a synthetic 3T x 2Yq x n table reads into q_full(3,2,7,n); select_slice materializes each T/Yq.",
     "phase_5": "D4 writer extension; round-trip test: read multidim -> write -> read back, all cells bit-for-bit.",
     "phase_6": "Rewrite the 3 rejection tests as acceptance tests; the 2 real-data tests (RG_SLY4, RG_KDE0v1) are NOW PASSING post E390-00 RESOLVED 2026-11-13 (raw_compose staged, inputs/raw_compose/ present). Phase 6's real-data slice-check is already unblocked; only the 3-rejection-test rewrite remains for phase 6.",
     "blocking": "E390-00 RESOLVED 2026-11-13 — raw_compose is staged (inputs/raw_compose/, 18-model cohort). Phases 1-6 are ALL unblocked; phases 1-5 use synthetic test tables, phase 6 uses the staged real-data cohort. The 2 previously-skipped m10 tests now PASS (8 passed 0 skipped)."

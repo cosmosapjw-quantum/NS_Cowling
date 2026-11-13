@@ -705,20 +705,22 @@
     "E390-02",
     "E390-10A"
    ],
-   "status": "PENDING_DESIGN_COMPLETE",
+   "status": "PHASE_1_DONE_PHASES_2_6_PENDING",
    "outputs": [
     "2D/3D axes and cell-index parser (read all T x Yq thermo rows, not just cold slice)",
     "arbitrary Nadd (Nadd>=0) species/group/optional file support",
     "lossless round-trip test corpus for 2D/3D tables",
     "3D tensor data model extension (q_extra(nadd_max,n) or q_full(nT,nYq,n)) without breaking the cold-slice path"
    ],
-   "status_detail": "Design document drafted (data/receipts/eos390_m2a/E390-10B-DESIGN_20261113.json) covering 3D tensor extension, downstream impact on M3-M6 pipelines, and phased migration. Implementation pending: requires EOSData model change from q_extra(n) to a tensor + nT x nYq cell storage; existing cold-slice pipelines (M3-M6, splicing, causal-complete) depend on the 1D model.",
+   "status_detail": "E390-10B phase 1 (D1 data model + D3 select_slice) implemented in Fortran + Python; 12 unit tests PASS, full suite 112 passed 0 skipped. Phases 2-6 (Nadd relaxation, multi-Yq, multi-T, writer, rejection-test rewrite) remain pending per the design.",
    "blocking_dependencies": [
     "E390-00 (2 skipped test_m10 tests need raw_compose staged for real-data slice-check)"
    ],
    "scope_note": "Blocked from immediate implementation by the downstream coupling: the 1D cold-slice EOSData model is consumed by M3-M6, splicing, and causal-complete. A model extension must preserve the cold-slice surface API to avoid a breaking change.",
    "split_from": "E390-10",
-   "design_receipt": "data/receipts/eos390_m2a/E390-10B-DESIGN_20261113.json"
+   "design_receipt": "data/receipts/eos390_m2a/E390-10B-DESIGN_20261113.json",
+   "phase_1_done_date": "2026-11-13",
+   "receipt": "data/receipts/eos390_m2a/E390-10B-DESIGN_20261113.json"
   },
   {
    "id": "E390-02A",

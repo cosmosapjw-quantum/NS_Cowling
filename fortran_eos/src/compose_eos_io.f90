@@ -387,13 +387,13 @@ contains
     real(wp)::v
     integer::phase
     logical::composition_file_present,composition_available,beta_equilibrated
-    integer::il,iT,iYq,inb_start,nadd
+    integer::il,iT,iYq,inb_start,nadd,nadd_max
     real(wp)::mn,mp,temperature_mev,charge_fraction_grid
-    namelist /metadata/ mn,mp,il,iT,iYq,inb_start,nadd,temperature_mev,charge_fraction_grid, &
+    namelist /metadata/ mn,mp,il,iT,iYq,inb_start,nadd,nadd_max,temperature_mev,charge_fraction_grid, &
        composition_file_present,composition_available,beta_equilibrated
     open(newunit=u,file=trim(meta_path),status='old',action='read',iostat=ios)
     if(ios/=0) then;status='cannot open internal EOS metadata';return;endif
-    mn=939._wp;mp=939._wp;il=1;iT=1;iYq=1;inb_start=1;nadd=0
+    mn=939._wp;mp=939._wp;il=1;iT=1;iYq=1;inb_start=1;nadd=0;nadd_max=0
     temperature_mev=0._wp;charge_fraction_grid=0._wp
     composition_file_present=.false.;composition_available=.false.;beta_equilibrated=.false.
     read(u,nml=metadata,iostat=ios);close(u)
@@ -412,6 +412,7 @@ contains
     close(u)
     call allocate_eos(eos,n)
     eos%mn=mn;eos%mp=mp;eos%il=il;eos%iT=iT;eos%iYq=iYq;eos%inb_start=inb_start;eos%nadd=nadd
+    eos%nadd_max=nadd_max
     eos%temperature_mev=temperature_mev;eos%charge_fraction_grid=charge_fraction_grid
     eos%composition_file_present=composition_file_present;eos%composition_available=composition_available
     eos%beta_equilibrated=beta_equilibrated
@@ -490,6 +491,7 @@ contains
     write(u,'(a,i0)')' iYq=',eos%iYq
     write(u,'(a,i0)')' inb_start=',eos%inb_start
     write(u,'(a,i0)')' nadd=',eos%nadd
+    write(u,'(a,i0)')' nadd_max=',eos%nadd_max
     write(u,'(a,es25.16e3)')' temperature_mev=',eos%temperature_mev
     write(u,'(a,es25.16e3)')' charge_fraction_grid=',eos%charge_fraction_grid
     write(u,'(a,l1)')' composition_file_present=',eos%composition_file_present

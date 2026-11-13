@@ -16,6 +16,21 @@ module compose_eos_types
     ! from t_first when the source uses a different index convention).
     integer :: nT=0, nYq=0, t_first=0, t_last=-1, yq_first=0, yq_last=-1
     integer :: selected_iT=0, selected_iYq=0
+    !--- E390-10B phase 1: full multidim tensor view -------------------------
+    ! nadd_max: the declared maximum extra-quantity count across all cells
+    !   (0 when the table is Nadd=0; 1 for the current cold-slice cohort).
+    ! q_full(nT,nYq,7,n): the full thermo tensor (7 quantities per cell),
+    !   opt-in. Unallocated by default: a reader that only needs the cold slice
+    !   (the current EOS390 production path) never allocates it, so M3-M6 and
+    !   the app commands keep working unchanged. select_slice materializes the
+    !   selected (iT,iYq) cell into the 1D q(7,n)/q_extra(n) surface.
+    ! q_extra_full(nadd_max,nT,nYq,n): per-cell extra quantities; unallocated by
+    !   default and only allocated when the table is genuinely multidim + a
+    !   caller requests the full view.
+    ! The existing q(7,n), q_extra(n), nadd fields remain and continue to hold
+    !   the selected slice (the cold slice by default). See select_slice.
+    integer :: nadd_max=0
+    real(wp), allocatable :: q_full(:,:,:,:), q_extra_full(:,:,:,:)
     real(wp), allocatable :: t_axis(:), yq_axis(:)
     real(wp), allocatable :: nb(:), q(:,:), q_extra(:)
     integer, allocatable :: iphase(:)
@@ -36,7 +51,7 @@ module compose_eos_types
     logical, allocatable :: abar_present(:), zbar_present(:), yh_present(:)
     logical, allocatable :: c3_applicable(:), c4_applicable(:)
   end type eos_data_t
-  public :: allocate_eos, validate_eos, eos_pressure, eos_energy, eos_mu_b, eos_mu_q, eos_mu_l, eos_free_energy
+  public :: allocate_eos, validate_eos, eos_pressure, eos_energy, eos_mu_b, eos_mu_q, eos_mu_l, eos_free_energy, select_slice
 contains
   subroutine allocate_eos(eos,n)
     type(eos_data_t),intent(inout)::eos
@@ -44,6 +59,11 @@ contains
     if(allocated(eos%nb)) deallocate(eos%nb)
     if(allocated(eos%q)) deallocate(eos%q)
     if(allocated(eos%q_extra)) deallocate(eos%q_extra)
+    ! E390-10B phase 1: the full multidim tensors are opt-in and unallocated by
+    ! default. Deallocate them if a caller previously allocated them so
+    ! allocate_eos never leaves a stale tensor bound to the new 1D slice.
+    if(allocated(eos%q_full)) deallocate(eos%q_full)
+    if(allocated(eos%q_extra_full)) deallocate(eos%q_extra_full)
     if(allocated(eos%iphase)) deallocate(eos%iphase)
     if(allocated(eos%yn)) deallocate(eos%yn)
     if(allocated(eos%yp)) deallocate(eos%yp)
@@ -147,4 +167,64 @@ contains
     real(wp),intent(in)::x
     ieee_finite=ieee_is_finite(x)
   end function
+
+  !--- E390-10B phase 1: select_slice --------------------------------------
+  ! Materialize the (iT,iYq) cell of the full multidim thermo tensor into the
+  ! 1D q(7,n)/q_extra(n) surface that M3-M6 and the app commands consume. This
+  ! bridges the tensor to the cold-slice surface API without changing their
+  ! call sites. The 1D fields q/q_extra are the contract for downstream code;
+  ! select_slice is the only sanctioned way to populate them from q_full.
+  !
+  ! Convention: iT/iYq are 1-based cell indices into q_full(nT,nYq,n). The
+  ! caller is responsible for converting any 0-based CompOSE axis labels to
+  ! 1-based before calling. selected_iT/selected_iYq are updated to record the
+  ! chosen cell labels for provenance.
+  !
+  ! status: 'ok' on success; otherwise a human-readable reason:
+  !   'q_full not allocated' (cold-slice reader or opt-out caller)
+  !   'iT/iYq out of range [1,nT]/[1,nYq]'
+  !   'q_full cell shape mismatch'
+  subroutine select_slice(eos,iT,iYq,status)
+    type(eos_data_t),intent(inout)::eos
+    integer,intent(in)::iT,iYq
+    character(len=*),intent(out)::status
+    integer::n
+    status='uninitialized'
+    if(.not.allocated(eos%q_full)) then
+      status='q_full not allocated';return
+    endif
+    n=eos%n
+    if(n<1) then;status='eos%n must be >= 1';return;endif
+    if(iT<1.or.iT>eos%nT.or.iYq<1.or.iYq>eos%nYq) then
+      write(status,'(a,2(a,i0),a)')'iT/iYq out of range',' (iT=',iT,', nT=',eos%nT,')'
+      return
+    endif
+    if(size(eos%q_full,1)/=eos%nT.or.size(eos%q_full,2)/=eos%nYq.or.size(eos%q_full,3)/=7 &
+       .or.size(eos%q_full,4)/=n) then
+      status='q_full cell shape mismatch';return
+    endif
+    if(.not.allocated(eos%q).or.size(eos%q,2)/=n) then
+      status='q surface not allocated to eos%n';return
+    endif
+    eos%q(:,1:n)=eos%q_full(iT,iYq,:,1:n)
+    ! extra quantities: only copy if the tensor carries them and the surface
+    ! exists. nadd records how many extra columns this cell uses (<= nadd_max).
+    if(allocated(eos%q_extra_full)) then
+      if(size(eos%q_extra_full,1)/=eos%nadd_max.or.size(eos%q_extra_full,2)/=eos%nT &
+         .or.size(eos%q_extra_full,3)/=eos%nYq.or.size(eos%q_extra_full,4)/=n) then
+        status='q_extra_full cell shape mismatch';return
+      endif
+      if(allocated(eos%q_extra).and.size(eos%q_extra)/=n) then
+        status='q_extra surface not allocated to eos%n';return
+      endif
+      eos%q_extra(1:n)=0._wp
+      if(eos%nadd_max>=1.and.eos%nadd>=1) then
+        eos%q_extra(1:n)=eos%q_extra_full(1,iT,iYq,1:n)
+      endif
+    else
+      if(allocated(eos%q_extra)) eos%q_extra(1:n)=0._wp
+    endif
+    eos%selected_iT=iT;eos%selected_iYq=iYq
+    status='ok'
+  end subroutine select_slice
 end module compose_eos_types

@@ -84,6 +84,19 @@ class EOSData:
     selected_iYq: int = 0
     t_axis: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=float))
     yq_axis: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=float))
+    # E390-10B phase 1: full multidim tensor view (opt-in, unallocated by
+    # default). q_full has shape (nT, nYq, 7, n), matching the Fortran
+    # eos_data_t storage order q_full(nT,nYq,7,n) so select_slice can copy a
+    # contiguous (7,n) slice per cell; q_extra_full has shape
+    # (nadd_max, nT, nYq, n). An empty size-0 array means "not materialized";
+    # cold-slice readers (the current EOS390 production path) leave these
+    # empty so M3-M6 and the app commands keep working unchanged. select_slice
+    # (api.select_slice) materializes a (iT,iYq) cell into the 1D Q*/q_extra
+    # surface. nadd_max is the declared max extra-quantity count (0 for
+    # Nadd=0 tables, 1 for the current cohort).
+    nadd_max: int = 0
+    q_full: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=float))
+    q_extra_full: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=float))
     source_dir: str | None = field(default=None, repr=False, compare=False)
 
     def __post_init__(self) -> None:
@@ -192,6 +205,10 @@ class EOSData:
             composition_file_present=bool(metadata["composition_file_present"]),
             composition_available=bool(metadata["composition_available"]),
             beta_equilibrated=bool(metadata["beta_equilibrated"]),
+            # E390-10B phase 1: nadd_max round-trips via the namelist. q_full/
+            # q_extra_full tensors are in-memory only (not serialized to the
+            # 1D cold-slice CSV/namelist); they default empty on read.
+            nadd_max=int(metadata.get("nadd_max", 0)),
             # M2A masks: default to 0 / False if the backend wrote a legacy 17-col CSV.
             # NOTE: the Fortran CSV header uses lowercase column names (row_status,
             # yn_present, ...) which differ from the dataclass field names. The col
@@ -281,7 +298,8 @@ class EOSData:
             f" charge_fraction_grid={self.charge_fraction_grid:.17e}\n"
             f" composition_file_present={'.true.' if self.composition_file_present else '.false.'}\n"
             f" composition_available={'.true.' if self.composition_available else '.false.'}\n"
-            f" beta_equilibrated={'.true.' if self.beta_equilibrated else '.false.'}\n/\n",
+            f" beta_equilibrated={'.true.' if self.beta_equilibrated else '.false.'}\n"
+            f" nadd_max={int(self.nadd_max)}\n/\n",
             encoding="utf-8",
         )
         return directory
@@ -290,7 +308,8 @@ class EOSData:
         names = ("nb","Q1","Q2","Q3","Q4","Q5","Q6","Q7","q_extra","Iphase",
                  "Yn","Yp","Ye","Ymu","Aav","Zav","Yh",
                  "row_status","Yn_present","Yp_present","Ye_present","Ymu_present",
-                 "Abar_present","Zbar_present","Yh_present","C3_applicable","C4_applicable")
+                 "Abar_present","Zbar_present","Yh_present","C3_applicable","C4_applicable",
+                 "t_axis","yq_axis","q_full","q_extra_full")
         values = {}
         for name in names:
             a = getattr(self, name, None)
@@ -303,4 +322,7 @@ class EOSData:
             charge_fraction_grid=self.charge_fraction_grid, q_extra_count=self.q_extra_count,
             composition_file_present=self.composition_file_present,
             composition_available=self.composition_available,
-            beta_equilibrated=self.beta_equilibrated, source_dir=self.source_dir)
+            beta_equilibrated=self.beta_equilibrated, source_dir=self.source_dir,
+            nT=self.nT, nYq=self.nYq, t_first=self.t_first, t_last=self.t_last,
+            yq_first=self.yq_first, yq_last=self.yq_last, selected_iT=self.selected_iT,
+            selected_iYq=self.selected_iYq, nadd_max=self.nadd_max)

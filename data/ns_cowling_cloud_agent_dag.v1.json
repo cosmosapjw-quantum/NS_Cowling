@@ -227,7 +227,10 @@
       "depends_on": [
         "EOS-01"
       ],
-      "status": "PARTIAL_OR_SOURCE_BLOCKED",
+      "status": "PASS_OR_BLOCKED_SCOPED",
+      "status_scope": "EOS-03 core-model-couplings contract on the NATIVE rmf_solver path. PASS for 6 RESOLVED models (DD2, DDME2, TW, SPG_M1/M2/M4): criteria 1-3 satisfied (paper-linked, unit-reconciled, Euler/first-law saturation reproduction via solve_homogeneous). BLOCKED for 6 source-blocked models per contract criterion 4 ('ambiguous coupling source remains blocked'): GPPVA_FSU2/FSU2H/NL3wrL55/TM1e (Lalazissis 1997 PRC 55 540 PDF not in upload/, Walecca convention conversion blocked per M3-M receipt) and SPG_M3/M5 (Scurto 2024 posterior-extreme isovector-fit accuracy limit per M3-I/J/K receipts). The block is documented and pinned by a regression test against silent lifting. This mixed PASS+BLOCKED is the contract-permitted terminal state, NOT a defect. See data/receipts/eos390_m0/E390-03_CORE_COUPLINGS_THERMO_RECONSTRUCT_VERIFICATION_20261113.json.",
+      "verification_receipt": "data/receipts/eos390_m0/E390-03_CORE_COUPLINGS_THERMO_RECONSTRUCT_VERIFICATION_20261113.json",
+      "dependency_note": "EOS-01 (registry) is PARTIAL; the rmf_solver and parameter-set manifest are independent of the registry's provider-semantics layer, so EOS-03 verification does not require EOS-01 to PASS. Coupling parameters were extracted from original-paper PDFs per the M3-L/M3-K/M3-M receipts; the solver verification is the independent Euler/first-law check.",
       "cloud_action": true,
       "acceptance": [
         "each parameter is linked to correct original paper/data sheet",

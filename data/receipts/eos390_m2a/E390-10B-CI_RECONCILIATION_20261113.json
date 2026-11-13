@@ -6,7 +6,7 @@
   "branch": "cloud/eos390-fortran-unification-v1",
   "base_head": "9f543b7d233be0fa9239ee5a84b2b9786b4fce2c",
   "pr_number": 13,
-  "disposition": "PARTIAL_IMPLEMENTATION_VERIFIED_SYNTHETIC_CI_PASS_SOURCE_BACKED_ACCEPTANCE_PENDING",
+  "disposition": "M10_PHASE3_THERMO_ONLY_EXPORT_FAIL_CLOSED_CI_PASS_PROVIDER_COMPOSITION_GATE_BLOCKED",
   "design_record": "data/receipts/eos390_m2a/E390-10B-DESIGN_20261113.json",
   "authoritative_ci": {
     "run_id": 43410589930,
@@ -150,5 +150,30 @@
     "phase_4": "PENDING_MULTI_T_READER",
     "phase_5": "PENDING_FULL_TENSOR_WRITER_READBACK",
     "source_acceptance": "PENDING_CONTROLLED_CI_DATA_PROVISIONING"
+  },
+  "source_composition_audit": {
+    "path": "data/receipts/eos390_m0/E390-02_COMPOSITION_CLOSURE_SOURCE_RECONCILIATION_20261113.json",
+    "sha256": "5a38907b5282317e0222b5fe3827348433e8f72fe9b1f8e78e046e487f4d64d7",
+    "status": "BLOCKED_PROVIDER_SEMANTICS_UNRESOLVED_NORMALIZED_CLOSURE_IS_RECONSTRUCTION",
+    "rows": 4172,
+    "phase_counts": {
+      "0": 2821,
+      "7": 1351
+    },
+    "disposition": "Provider semantics BLOCKED; normalized closure is reconstruction, not independent source truth."
+  },
+  "latest_ci_85674051": {
+    "pr_run_id": 43412995065,
+    "push_run_id": 43412979766,
+    "result": "SUCCESS",
+    "test_summary": "127 passed, 3 skipped",
+    "artifact_id": 14029883858
+  },
+  "multidimensional_export_guard": {
+    "head_sha": "85674051e11276eb6a5c68fa7c5ea4dc1e1f09fd",
+    "status": "CI_PASS",
+    "python_api": "rejects nT>1 or nYq>1",
+    "native_fortran_cli": "rejects nT>1 or nYq>1 before output files",
+    "regression_tests": 2
   }
 }

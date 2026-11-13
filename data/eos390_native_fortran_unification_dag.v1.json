@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.4.2",
+  "revision": "1.4.3",
   "created_utc": "2026-11-11",
-  "status": "M10_PHASE3_SYNTHETIC_CI_PASS_SOURCE_BACKED_INPUTS_NOT_IN_CI_PHASES4_5_PENDING_PHYSICS_GATES_BLOCKED",
+  "status": "M10_PHASE3_CI_PASS_MULTIDIM_EXPORT_FAIL_CLOSED_SOURCE_COMPOSITION_GATE_BLOCKED_PHASES4_5_PENDING",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "cloud/eos390-fortran-unification-v1",
@@ -179,10 +179,10 @@
       "no_fabrication": "Never fabricate particle fractions, Abar, Zbar, or Y_I when source composition is absent. For APR_APR and BBB_BHF2, only create model-derived beta-equilibrium composition through the explicitly ported and provenance-labelled legacy literature solver.",
       "current_adjudication": {
         "status": "BLOCKED_PROVIDER_SEMANTICS_UNRESOLVED",
-        "reference": "CompOSE Reference Manual v3.01 (2022), arXiv:2203.03209",
-        "standard_field": "YI is the combined nuclear-group number fraction; Xh=Aav*YI is its baryon fraction.",
-        "source_finding": "Sampled SPG_M1/GPPVA_DD2/GPPVA_FSU2H rows are structurally valid but their last tuple values do not obey one standard YI interpretation across outer and inner crust.",
-        "decision": "Retain raw values; block production use pending provider clarification."
+        "reference": "CompOSE Reference Manual v3.01 (2022), arXiv:2203.03209, Sec. 4.2.3, Eqs. (4.20)-(4.22)",
+        "standard_field": "YI is the combined group number fraction; Xh=Abar*YI is the group baryon fraction. Iphase is provider-defined.",
+        "source_finding": "Across 13 raw crust eos.compo files (4,172 rows), Iphase=0 raw group values are 1.0 and closure-compatible with Xh rather than standard YI. Iphase=7 raw group values are compatible with neither YI nor Xh using the available n/p/e/mu fractions. The v3.2 normalizer ignores raw group values, derives Yh from n/p closure plus charge neutrality, and writes YI=Yh/Abar; small normalized residuals are therefore reconstructed, not independent source validation.",
+        "decision": "Retain raw fields and Iphase categories unchanged. Keep production composition blocked pending provider-authored semantics or independently validated microscopic source."
       },
       "row_level_status": [
         "CHECKED",
@@ -221,15 +221,17 @@
       "row_presence_and_field_presence_must_be_serialized": true
     },
     "tensor_support": {
-      "status": "PHASE_3_IMPLEMENTED",
-      "supported_tensor": "T=0 with multiple Yq values: q_full(1,nYq,7,nb), q_extra_full(nadd_max,1,nYq,nb)",
-      "selected_slice": "Legacy 1D q/q_extra surface is materialized from an explicit selected (iT,iYq) cell; downstream M3-M6 remain slice consumers.",
+      "status": "PHASE3_THERMO_ONLY_EXPORT_FAIL_CLOSED",
+      "supported_tensor": "T=0 multi-Yq thermo: q_full(1,nYq,7,nb), q_extra_full(nadd_max,1,nYq,nb)",
+      "composition": "One selected-Yq 1D composition surface only; select_slice refuses another Yq without materialized composition.",
+      "writer": "Python API and native Fortran writer reject nT>1 or nYq>1 rather than dropping unselected tensor cells.",
       "pending": [
-        "multiple T rows (phase 4)",
-        "lossless full tensor CompOSE writer/readback (phase 5)",
-        "real source cohort acceptance tests in cloud CI (phase 6)"
+        "multi-T reader",
+        "full composition tensors and sparse masks/Iphase/C3/C4 applicability",
+        "lossless full T x Yq x nb CompOSE writer/readback with Nadd and composition",
+        "controlled source-backed CI staging"
       ],
-      "fail_closed_policy": "Do not flatten or average unsupported T/Yq layouts; do not infer an unrequested thermodynamic slice."
+      "fail_closed_policy": "Never broadcast selected composition, flatten unselected tensor rows, or export only one slice."
     }
   },
   "input_locations": {
@@ -714,20 +716,20 @@
         "E390-02",
         "E390-10A"
       ],
-      "status": "PHASE_3_DONE_PHASES_4_6_PENDING",
+      "status": "PHASE3_THERMO_ONLY_EXPORT_FAIL_CLOSED_PHASES4_6_PENDING",
       "outputs": [
         "2D/3D axes and cell-index parser (read all T x Yq thermo rows, not just cold slice)",
         "arbitrary Nadd (Nadd>=0) species/group/optional file support",
         "lossless round-trip test corpus for 2D/3D tables",
         "3D tensor data model extension (q_extra(nadd_max,n) or q_full(nT,nYq,n)) without breaking the cold-slice path"
       ],
-      "status_detail": "Phases 1-3 are implemented and synthetic-tested: tensor model/select_slice, arbitrary Nadd>=0 I/O, and 1T x multi-Yq reading. Follow-up commits f9dd6fef and 9f543b7d removed inappropriate raw-source skip guards from the synthetic Nadd/multi-Yq fixture tests. Latest PR13 CI on 9f543b7d: 124 passed, 3 skipped; Fortran build, native tests, full SHA256SUMS_v4 verification, packaging, and artifact upload all PASS. At least two of the three remaining skips are the source-backed RG_SLY4 and RG_KDE0v1 tests because inputs/raw_compose is not in the Actions checkout; the third skip is not yet attributed. Phases 4 (multi-T tensor reader), 5 (lossless multidimensional writer/readback), and source-backed acceptance remain pending.",
+      "status_detail": "M10 phases 1-3 implemented: tensor model/select_slice, Nadd>=0 and T=0 multi-Yq thermo read. Latest PR and push CI on head 85674051 report 127 passed, 3 skipped; build, native analytic tests, SHA manifest, package and artifact upload all PASS. select_slice refuses unmaterialized Yq composition; Python API and native Fortran write CLI reject nT>1 or nYq>1 exports. Multi-T read, full composition tensorization, full-tensor CompOSE writer/readback and source-backed CI acceptance remain pending.",
       "blocking_dependencies": [
         "CI provisioning of the verified 18-model raw_compose source cohort (not committed to GitHub) for source-backed acceptance",
         "E390-10B phase 4 multi-T parser and complete index/coverage mapping",
         "E390-10B phase 5 lossless T x Yq x nb writer/readback"
       ],
-      "scope_note": "Current production compatibility remains a selected cold T=0 slice. M10 additionally reads all Yq values only for nT=1, T=0, storing q_full(1,nYq,7,nb) and q_extra_full. It does not yet read all T values or preserve multidimensional composition in a full tensor. Synthetic tests validate implemented Nadd/Yq behavior; they do not certify raw-source cohort acceptance.",
+      "scope_note": "Current support is 1T x multi-Yq thermodynamic tensor and Nadd columns only. Composition is a selected-Yq 1D surface; other Yq composition slices are not materialized. Both Python and native writers fail closed for nT>1 or nYq>1. No multidimensional composition tensor or lossless CompOSE tensor export is claimed.",
       "split_from": "E390-10",
       "design_receipt": "data/receipts/eos390_m2a/E390-10B-DESIGN_20261113.json",
       "phase_1_done_date": "2026-11-13",
@@ -1123,7 +1125,7 @@
     ],
     "policy": "Track separately from the 390 matrix; never reinterpret EOS390 method=maxwell."
   },
-  "last_update_utc": "2026-11-13T10:39:15Z",
+  "last_update_utc": "2026-11-13T11:02:10.419Z",
   "known_remaining_implementation_gaps": [
     {
       "area": "native literature-derived composition",
@@ -1674,20 +1676,32 @@
       ]
     },
     "latest_pr13_ci_20261113": {
-      "run_id": 43410589930,
-      "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43410589930",
-      "event": "pull_request",
-      "head_sha": "9f543b7d233be0fa9239ee5a84b2b9786b4fce2c",
-      "conclusion": "success",
-      "test_summary": "124 passed, 3 skipped",
+      "head_sha": "85674051e11276eb6a5c68fa7c5ea4dc1e1f09fd",
+      "pull_request_run": {
+        "id": 43412995065,
+        "result": "success",
+        "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43412995065"
+      },
+      "push_run": {
+        "id": 43412979766,
+        "result": "success",
+        "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43412979766"
+      },
+      "test_summary": "127 passed, 3 skipped",
       "build": "PASS",
-      "native_fortran_tests": "PASS",
-      "sha256_manifest": "PASS (90 tracked manifest entries)",
-      "source_snapshot_packaging": "PASS",
-      "artifact_id": 14029895606,
-      "artifact_size_bytes": 55503422,
-      "artifact_sha256": "0d797b73dd8f584f30ee0096d99e8fb4cf6822b60dbb619a0f24653740972d04",
-      "artifact_expires_utc": "2026-12-13T10:39:08Z"
+      "native_tests": "PASS",
+      "checksum_manifest": "PASS",
+      "packaging_upload": "PASS",
+      "pr_artifact": {
+        "id": 14029883858,
+        "size_bytes": 55501304,
+        "sha256": "f3ddab08154fda9c606aeac8689289319a3275115c86acb520fc1910000f7f84"
+      },
+      "push_artifact": {
+        "id": 14029859044,
+        "size_bytes": 55504817,
+        "sha256": "4d6e3e5cf890804d9f2e6294eb8806c45bb9875f9e93d63a6d2e8e5fed93aa10"
+      }
     },
     "latest_pr13_push_ci_20261113": {
       "run_id": 43410202477,
@@ -1779,13 +1793,14 @@
     }
   ],
   "next_actions": [
-    "Implement M10 phase 4 only with an explicit globally consistent mapping from CompOSE declared T/Yq index bounds to tensor slots; verify full (T,Yq,nb) coverage and preserve the cold T=0 slice API.",
-    "Before enabling full-T read for composition-bearing tables, either add full T/Yq composition tensors (Iphase, sparse-presence masks, row status, C3/C4 applicability) or reject that layout explicitly; never attach selected-slice composition to a different thermo cell.",
-    "Implement M10 phase 5 full T x Yq x nb write_compose/readback, including axes, all Nadd extra columns, and sparse composition presence masks; verify no silent loss.",
-    "Provision the M0-verified raw_compose cohort into Actions as a controlled CI artifact/cache/secure input, without committing private/source binaries to Git; rerun the RG_SLY4 and RG_KDE0v1 tests and identify all remaining skips.",
-    "Integrate sibling native smooth kernels only after NPPHB knot-split quadrature convergence and RG_* Q5 provider semantics are resolved; do not infer missing data.",
-    "Keep historical maxwell=NPPHB legacy semantics separate from the new sharp_maxwell operation; do not silently repurpose the six-token historical matrix.",
-    "Only run M7/M9 production adjudication after all 390 tasks generate complete native Fortran composition-preserving outputs with C1-C11 receipts."
+    "Implement M10 multi-T parsing with explicit grid-index to tensor-slot mapping and complete (T,Yq,nb) coverage.",
+    "Tensorize composition for all cells: Iphase, sparse species/group presence masks, row status and C3/C4 applicability.",
+    "Implement lossless full T x Yq x nb CompOSE writer/readback, preserving all axes, Nadd, sparse masks and categorical q_extra.",
+    "Provision raw source cohort into Actions via controlled non-public artifact/cache or secure input; rerun source-backed RG_SLY4/RG_KDE0v1 checks and attribute every skip.",
+    "Obtain provider-authored Iphase and group abundance meanings; normalized closure is reconstruction, not source truth.",
+    "Integrate native smooth kernels only after NPPHB knot-split quadrature convergence and RG_* Q5 semantics resolve.",
+    "Keep historical maxwell=NPPHB separate from sharp_maxwell.",
+    "Run M7/M9 only after all 390 complete native composition-preserving outputs and per-task C1-C11 receipts."
   ],
   "provenance": {
     "last_reconciled_utc": "2026-11-11",
@@ -1885,7 +1900,9 @@
       ]
     },
     "last_ci_reconciliation_receipt": "data/receipts/eos390_m2a/E390-10B-CI_RECONCILIATION_20261113.json",
-    "audit_note": "Current 9f543b7d evidence supersedes the earlier 9b77 checksum-failed CI: synthetic fixture skip guards were removed in f9dd6fef/9f543b7d and CI now reports 124 passed, 3 skipped. The GitHub Actions checkout still lacks inputs/raw_compose, so source-backed tests remain skipped. No multi-T, full-tensor writer or EOS390 regeneration is claimed."
+    "audit_note": "Current 9f543b7d evidence supersedes the earlier 9b77 checksum-failed CI: synthetic fixture skip guards were removed in f9dd6fef/9f543b7d and CI now reports 124 passed, 3 skipped. The GitHub Actions checkout still lacks inputs/raw_compose, so source-backed tests remain skipped. No multi-T, full-tensor writer or EOS390 regeneration is claimed.",
+    "source_composition_audit": "data/receipts/eos390_m0/E390-02_COMPOSITION_CLOSURE_SOURCE_RECONCILIATION_20261113.json",
+    "source_composition_audit_sha256": "5a38907b5282317e0222b5fe3827348433e8f72fe9b1f8e78e046e487f4d64d7"
   },
   "supersedes": {
     "lost_archive_filename": "NS_Cowling_EOS390_raw_inputs_v1.tar.zst",

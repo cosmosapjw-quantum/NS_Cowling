@@ -1,0 +1,50 @@
+{
+  "schema": "ns-cowling.m9-corrected-adjudication",
+  "schema_version": "1.0.0",
+  "date": "2026-11-12",
+  "supersedes_report": "download/m9/M9_HANDOFF_REPORT.json",
+  "status": "SUPERSEDED_HISTORICAL_M9_ACCEPTANCE_CLAIM",
+  "reason": "The historical M9 5/5 PASS conflated 390-key bookkeeping, reader acceptance, native generation, historical immutability and Dropbox upload; the criteria were not independent or evidenced.",
+  "evidence": {
+    "m7_summary_path": "download/m7_batch/M7_BATCH_SUMMARY.json",
+    "m7_status_counts": {
+      "total": 390,
+      "PASS": 150,
+      "FAIL": 30,
+      "BLOCKED": 210
+    },
+    "m7_pass_by_method": {
+      "css": 30,
+      "cubic_F": 30,
+      "cubic_P": 30,
+      "quintic_F": 30
+    },
+    "invalid_pass_analysis": {
+      "css": 30,
+      "css_reason": "outputs contain original core table plus a CSS sidecar; hard-coded Delta_epsilon=0.5*epsilon_low and cs2=1/3; no combined crust-core table",
+      "smooth": 120,
+      "smooth_reason": "outputs copy only the crust table and add a STUB_SMOOTH_KERNEL_NOT_NATIVE_PORTED sidecar; run_task previously promoted the stub to PASS",
+      "demonstrated_complete_native_combined_eos_passes": 0
+    },
+    "m9_manifest_path": "download/m9/M9_PAIR_METHOD_STATUS_MANIFEST.json",
+    "m9_status_counts": {
+      "total": 390,
+      "PASS": 26,
+      "FAIL": 364
+    },
+    "m9_vs_m7": "INCONSISTENT_STATUS_SNAPSHOTS; exact inputs/run logs required; do not average or choose preferred count",
+    "m9_criteria_reassessment": {
+      "C1_390_rows": "PASS_CARDINALITY_ONLY",
+      "C2_native_readback": "NOT_PROOF_OF_NATIVE_GENERATION_OR_COMPLETE_JOIN",
+      "C3_hash_presence": "HASHES_EXIST_BUT_NOT_PROOF_OF_PHYSICAL_VALIDITY",
+      "C4_historical_unchanged": "NOT_VERIFIED; old code sets true by construction",
+      "C5_dropbox_snapshot_upload": "NOT_VERIFIED; local JSON write is not Dropbox acknowledgement"
+    }
+  },
+  "required_followup": [
+    "Preserve all historical M7/M8/M9 files unchanged.",
+    "Use EOS390 unified cloud DAG and corrected method identity.",
+    "Regenerate only into a new versioned output root after all source/provider/backend gates pass.",
+    "M9 overall can be PASS only after complete native generation, every-file native read-back, hashes, independent baseline comparison and actual Dropbox upload acknowledgement."
+  ]
+}

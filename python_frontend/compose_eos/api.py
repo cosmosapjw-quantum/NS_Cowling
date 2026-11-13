@@ -23,7 +23,7 @@ def write_compose(directory: str | Path, data: EOSData, copy_from: str | Path | 
         raise NativeFeatureUnavailable("composition values cannot be exported without an eos.compo sidecar")
     if any(int(value) != 0 for value in data.Iphase) and not data.composition_file_present:
         raise NativeFeatureUnavailable(
-            "a phase-discontinuous barotrope without phase composition cannot be exported; "
+            "cannot export a phase-discontinuous barotrope without phase composition; "
             "non-default Iphase labels require an eos.compo sidecar"
         )
     del copy_from, composition_tolerance

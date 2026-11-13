@@ -993,6 +993,11 @@ contains
                 out%yh(last_crust)=0._wp
                 out%abar(last_crust)=0._wp
                 out%zbar(last_crust)=0._wp
+                ! Once the representative nuclear group dissolves, Z/A is
+                ! undefined and C4 must no longer be evaluated on this row.
+                ! The generated Yh=0 remains in the baryon inventory for C3.
+                out%c4_applicable(last_crust)=.false.
+                out%row_status(last_crust)=1
                 out%yp(last_crust)=nq
                 out%ymu(last_crust)=0._wp
               endif

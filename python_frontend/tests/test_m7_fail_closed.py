@@ -11,7 +11,7 @@ sys.path.insert(0, str(ROOT / "scripts" / "m7"))
 sys.path.insert(0, str(ROOT / "python_frontend"))
 
 import m7_batch_orchestrator as m7  # noqa: E402
-from m7_manifest_generator import METHODS, METHOD_PHYSICS  # noqa: E402
+from m7_manifest_generator import METHODS, METHOD_PHYSICS, generate_manifest  # noqa: E402
 
 
 def test_method_ids_distinguish_legacy_smooth_bridge_from_sharp_maxwell():
@@ -24,6 +24,17 @@ def test_method_ids_distinguish_legacy_smooth_bridge_from_sharp_maxwell():
     assert METHOD_PHYSICS["maxwell"]["kind"] == "sharp_maxwell_phase_transition"
     assert METHOD_PHYSICS["maxwell"]["method_identity"] == "SHARP_MAXWELL_LOCAL_NEUTRALITY"
     assert METHOD_PHYSICS["maxwell"]["physical_classification"] == "FIRST_ORDER_SHARP"
+
+
+def test_v2_smooth_manifest_retains_390_keys_with_renamed_legacy_method():
+    manifest = generate_manifest(output_root="matched_eos_native_v2")
+    assert manifest["schema_version"] == "2.0.0"
+    assert manifest["task_count"] == 390
+    assert manifest["unique_triple_count"] == 390
+    assert manifest["matrix"]["methods"] == METHODS
+    assert "maxwell" not in manifest["matrix"]["methods"]
+    assert "first_law_constrained_hermite_pressure_bridge" in manifest["matrix"]["methods"]
+    assert manifest["separate_sharp_transition_method_id"] == "maxwell"
 
 
 def test_python_oracle_and_placeholder_methods_are_blocked():

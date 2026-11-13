@@ -79,6 +79,9 @@ contains
     ! The parent unified table may have abundances only in its excluded crust.
     core%composition_available=any(core%yn_present.or.core%yp_present.or.core%ye_present.or. &
       core%ymu_present.or.core%abar_present.or.core%zbar_present.or.core%yh_present)
+    ! beta_equilibrated is likewise a property of the selected barotrope,
+    ! derived from Q5 on this component slice rather than copied globally.
+    core%beta_equilibrated=maxval(abs(core%q(5,:)))<1.e-8_wp
     if(allocated(source%q_full))core%q_full=source%q_full(:,:,:,first_row:last_row)
     if(allocated(source%q_extra_full))core%q_extra_full=source%q_extra_full(:,:,:,first_row:last_row)
 
@@ -112,10 +115,14 @@ contains
        expected%nadd/=actual%nadd.or.expected%nadd_max/=actual%nadd_max)then
       status='native CompOSE readback changed core thermodynamic metadata or axes';return
     endif
-    if(expected%composition_file_present.neqv.actual%composition_file_present.or. &
-       expected%composition_available.neqv.actual%composition_available.or. &
-       expected%beta_equilibrated.neqv.actual%beta_equilibrated)then
-      status='native CompOSE readback changed composition availability metadata';return
+    if(expected%composition_file_present.neqv.actual%composition_file_present)then
+      status='native CompOSE readback changed eos.compo sidecar presence';return
+    endif
+    if(expected%composition_available.neqv.actual%composition_available)then
+      status='native CompOSE readback changed slice-local abundance availability';return
+    endif
+    if(expected%beta_equilibrated.neqv.actual%beta_equilibrated)then
+      status='native CompOSE readback changed Q5-derived beta-equilibrium summary';return
     endif
     if(any(expected%nb/=actual%nb).or.any(expected%q/=actual%q).or. &
        any(expected%q_extra/=actual%q_extra).or.any(expected%iphase/=actual%iphase))then

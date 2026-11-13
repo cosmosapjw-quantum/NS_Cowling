@@ -54,6 +54,7 @@ def test_e390_03a_builds_all_five_admitted_core_only_tables(tmp_path: Path) -> N
             output.Abar_present | output.Zbar_present | output.Yh_present
         ))
         assert output.composition_available is expected_composition_available
+        assert output.beta_equilibrated is bool(np.max(np.abs(output.Q5)) < 1e-8)
         saved = json.loads(
             (Path(receipt["output"]["directory"]) / "E390-03A_RECEIPT.json").read_text()
         )

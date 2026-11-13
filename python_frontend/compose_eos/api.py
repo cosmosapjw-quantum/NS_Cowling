@@ -307,7 +307,7 @@ def build_core_only(
             )
         scalar_names = (
             "mn", "mp", "Il", "temperature_mev", "charge_fraction_grid",
-            "q_extra_count", "composition_file_present", "beta_equilibrated",
+            "q_extra_count", "composition_file_present",
             "nT", "nYq", "t_first", "t_last",
             "yq_first", "yq_last", "selected_iT", "selected_iYq",
         )
@@ -323,6 +323,11 @@ def build_core_only(
         if core.composition_available != expected_composition_available:
             raise NativeExecutionError(
                 f"{model_id} composition_available is inconsistent with the sliced row-presence masks"
+            )
+        expected_beta_equilibrated = bool(np.max(np.abs(core.Q5)) < 1e-8)
+        if core.beta_equilibrated != expected_beta_equilibrated:
+            raise NativeExecutionError(
+                f"{model_id} beta_equilibrated is inconsistent with the selected Q5 slice"
             )
         # For a one-point cold slice, CompOSE's mandatory eos.t/eos.yq files
         # are represented by the exact scalar value plus source index bounds
@@ -394,6 +399,8 @@ def build_core_only(
                 "composition_available": core.composition_available,
                 "source_parent_composition_available": source.composition_available,
                 "composition_availability_scope": "selected core-only rows; recomputed from row presence masks",
+                "source_parent_beta_equilibrated": source.beta_equilibrated,
+                "beta_equilibrium_scope": "selected core-only rows; recomputed from Q5",
                 "nadd": core.q_extra_count,
             },
             "non_claims": [

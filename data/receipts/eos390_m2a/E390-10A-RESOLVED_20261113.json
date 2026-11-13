@@ -36,8 +36,8 @@
     },
     "tests": {
       "file": "python_frontend/tests/test_m10_generic_axes.py",
-      "result": "6 passed, 2 skipped",
-      "skips": "test_real_RG_SLY4_passes_slice_check and test_real_RG_KDE0v1_passes_slice_check skip because inputs/raw_compose is not staged (E390-00 BLOCKED_REPLACEMENT_ZIP_NOT_STAGED). These are real-data slice-check tests; the unit tests for the cold-slice convention tolerance all pass."
+      "result": "8 passed, 0 skipped (post E390-00 RESOLVED 2026-11-13 — raw_compose staged)",
+      "skips_resolved": "test_real_RG_SLY4_passes_slice_check and test_real_RG_KDE0v1_passes_slice_check now PASS against the staged inputs/raw_compose (18-model cohort). Previously skipped because inputs/raw_compose was not staged (E390-00 BLOCKED). E390-00 resolved 2026-11-13 unblocked both; full python_frontend suite now 100 passed 0 skipped."
     }
   },
   "acceptance_verification": {
@@ -47,7 +47,7 @@
   },
   "production_path_evidence": {
     "cohort_survey": "All 13 reconstructed EoS in eos_generator/eos_data_normalized/ (APR, BBB, GM, GPPVA x8, RG x2) read successfully with q_extra_count (Nadd) in {0,1}. No cohort member exceeds the Nadd<=1 constraint, so the cold-slice reader does not block any current EOS390 model.",
-    "full_suite": "python_frontend full suite: 91 passed, 2 skipped, no regression."
+    "full_suite": "python_frontend full suite: 100 passed, 0 skipped (post E390-00 RESOLVED 2026-11-13). Was 91 passed/2 skipped before merge; the merge added remote M7-M9 tests and E390-00 staging unblocked the 2 m10 skips."
   },
   "downstream_impact": {
     "M3_M6": "cold-slice reader is the production input for M3-M6 reconstruction; confirmed non-blocking for the verified cohort.",

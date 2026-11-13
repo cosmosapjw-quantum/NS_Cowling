@@ -59,8 +59,8 @@
     "phase_3": "D2 Step 2 (multi-point Yq); unit test: a synthetic 1T x 3Yq x n table reads into q_full(1,3,n); select_slice materializes each Yq.",
     "phase_4": "D2 Step 3 (multi-point T); unit test: a synthetic 3T x 2Yq x n table reads into q_full(3,2,n); select_slice materializes each T/Yq.",
     "phase_5": "D4 writer extension; round-trip test: read multidim -> write -> read back, all cells bit-for-bit.",
-    "phase_6": "Rewrite the 3 rejection tests as acceptance tests; unskip the 2 real-data tests once E390-00 stages raw_compose.",
-    "blocking": "Phase 6 requires E390-00 (raw_compose staging). Phases 1-5 are unblocked and can proceed with synthetic test tables."
+    "phase_6": "Rewrite the 3 rejection tests as acceptance tests; the 2 real-data tests (RG_SLY4, RG_KDE0v1) are NOW PASSING post E390-00 RESOLVED 2026-11-13 (raw_compose staged, inputs/raw_compose/ present). Phase 6's real-data slice-check is already unblocked; only the 3-rejection-test rewrite remains for phase 6.",
+    "blocking": "E390-00 RESOLVED 2026-11-13 — raw_compose is staged (inputs/raw_compose/, 18-model cohort). Phases 1-6 are ALL unblocked; phases 1-5 use synthetic test tables, phase 6 uses the staged real-data cohort. The 2 previously-skipped m10 tests now PASS (8 passed 0 skipped)."
   },
   "open_questions_for_user": [
     "Q1: Is there a real CompOSE 2D/3D table the EOS390 pipeline must ingest (not just the cold slice)? If yes, providing one (even a small synthetic one in the standard format) would let phase 2-5 be validated against real data rather than synthetic tables.",

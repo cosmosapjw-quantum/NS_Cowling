@@ -143,7 +143,6 @@
       "quintic_F",
       "quintic_P"
     ],
-    "legacy_maxwell_policy": "The historical EOS390 matrix token 'maxwell' identifies the project-defined smooth NPPHB procedure for historical reproduction only; it is not a sharp first-order transition and has Delta n_B=0. Preserve its native implementation under the explicit legacy kernel name legacy_npphb and never classify it as FIRST_ORDER_SHARP. Keep an ambiguous public bare 'maxwell' alias fail-closed. A true sharp first-order construction is a separately versioned operation/token sharp_maxwell, outside the immutable historical six-token matrix unless a new manifest explicitly adds it. Do not silently repurpose the historical token.",
     "legacy_smooth_bridge": {
       "method_id": "first_law_constrained_hermite_pressure_bridge",
       "method_kind": "LEGACY_SMOOTH_INTERPOLATION",
@@ -153,7 +152,8 @@
       "historical_v1_artifacts_immutable": true,
       "active_code_alias_for_historical_v1_token": false,
       "matrix_role": "retained as one of the six smooth EOS390 reproduction methods under the renamed v2 method ID"
-    }
+    },
+    "legacy_smooth_bridge_policy": "The historical EOS390 matrix token 'maxwell' identifies the project-defined smooth NPPHB procedure for historical reproduction only; it is not a sharp first-order transition and has Delta n_B=0. Preserve its native implementation under the explicit legacy kernel name legacy_npphb and never classify it as FIRST_ORDER_SHARP. Keep an ambiguous public bare 'maxwell' alias fail-closed. A true sharp first-order construction is a separately versioned operation/token sharp_maxwell, outside the immutable historical six-token matrix unless a new manifest explicitly adds it. Do not silently repurpose the historical token."
   },
   "compose_contract": {
     "supported_scope": "Default production surface remains a selected cold T=0 EOS slice. Native I/O now supports arbitrary Nadd>=0 and an opt-in full T=0 x Yq x nb tensor (1 x nYq x nb), with explicit select_slice materialization for legacy 1D consumers. Multi-point T and full multidimensional tensor write/readback remain pending. Composition group/phase semantics remain provider-scoped and must not be fabricated or inferred.",
@@ -1219,7 +1219,7 @@
     ],
     "policy": "Track separately from the 390 matrix; never reinterpret EOS390 method=maxwell."
   },
-  "last_update_utc": "2026-11-13T11:39:34.884Z",
+  "last_update_utc": "2026-11-13T11:41:15.285Z",
   "known_remaining_implementation_gaps": [
     {
       "area": "native literature-derived composition",
@@ -2032,6 +2032,5 @@
     "path": "data/receipts/eos390_m1b/E390-01B_METHOD_IDENTITY_MIGRATION_20261113.json",
     "backup_branch": "backup/e390-02-pre-20261113",
     "backup_parent_sha": "0c9d66c7092627d70b5df742af5cc7178f28b081"
-  },
-  "legacy_smooth_bridge_policy": "The historical EOS390 v1 token 'maxwell' represented the project-defined smooth NPPHB pressure bridge. All active smooth-matcher code and v2 manifests now use first_law_constrained_hermite_pressure_bridge (FLCHPB). Existing v1 manifests, output directory names, receipts and checksums containing '__maxwell' are immutable historical provenance and are never rewritten. The public method ID 'maxwell' is reserved exclusively for the true sharp first-order local-neutrality coexistence construction with common P_t and mu_t, positive Delta n_B and Delta epsilon=mu_t*Delta n_B. The smooth matcher rejects maxwell until the composition-aware sharp route is integrated."
+  }
 }

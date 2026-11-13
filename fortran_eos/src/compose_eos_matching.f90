@@ -581,7 +581,7 @@ contains
     ! The public method="maxwell" is reserved for the physical sharp coexistence
     ! construction and must never enter this continuous-density bridge routine.
     if(trim(method)=='maxwell')then
-      status='maxwell requires a sharp coexistence construction with Delta n_B>0; the legacy smooth plateau is disabled'
+      status='maxwell is the sharp coexistence method and is not yet integrated in the common composition-aware matcher; require Delta n_B>0'
       return
     endif
     call validate_eos(cr,ok1,msg);if(.not.ok1)then;status='invalid crust EOS: '//trim(msg);return;endif

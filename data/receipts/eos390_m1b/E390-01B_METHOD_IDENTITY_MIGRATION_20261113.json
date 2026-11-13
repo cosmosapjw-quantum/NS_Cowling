@@ -5,7 +5,7 @@
   "date": "2026-11-13",
   "node": "E390-01B",
   "gate": "M1B",
-  "status": "CODE_AND_CONTRACT_MIGRATION_PUBLISHED_SHA256_MANIFEST_REFRESHED_CI_PENDING",
+  "status": "CI_PASS_CODE_AND_CONTRACT_MIGRATION_VERIFIED",
   "repository": "cosmosapjw-quantum/NS_Cowling",
   "branch": "cloud/eos390-fortran-unification-v1",
   "head_at_receipt": "f6bd31ebef83eaa7cb5455f2113e8b9a4b4d17f9",
@@ -63,7 +63,40 @@
     "native_fortran_kernel": "compose_eos_phase_transition.f90 exports MAXWELL_METHOD_ID='maxwell' and construct_maxwell_transition. This does not imply that the composition-aware common matcher, CompOSE export or 65-pair production runner is complete.",
     "legacy_quadrature": "The NPPHB/FLCHPB interior integral still has the previously recorded unsplit partial quadrature at Hermite knots u=0.22 and 0.78. FLCHPB remains legacy parity only until knot-split/adaptive or analytic quadrature convergence is validated.",
     "manifest": "M7 v2 generator and tests assert exactly 390 smooth tasks and separate method ID maxwell.",
-    "ci": "Not yet executed on this receipt head. Prior CI on an earlier head built Fortran and ran tests successfully but failed the tracked SHA256 manifest because the DAG hash was stale; the hash manifest is being refreshed for this migration.",
+    "ci": {
+      "status": "SUCCESS",
+      "run_id": 43419554959,
+      "run_number": 411,
+      "workflow": "Fortran EOS frontend CI",
+      "verified_commit": "8e1224344d68ddc50fef4bc79fa24f8ac684dbfe",
+      "job_id": 131865861915,
+      "job_name": "native",
+      "environment": {
+        "os": "GitHub Actions Ubuntu 26.04 runner (resolute)",
+        "compiler": "GNU Fortran 15.2.0",
+        "python": "CPython 3.13.18",
+        "pytest": "9.2.0"
+      },
+      "steps": {
+        "fortran_build": "PASS",
+        "python_tests": "PASS",
+        "python_test_summary": "130 passed, 3 skipped in 45.68s",
+        "polynomial_extrema_unit_test": "PASS",
+        "css_segment_analytic_test": "PASS",
+        "tracked_sha256_manifest": "PASS (all 96 entries reported OK)",
+        "source_snapshot_packaging": "PASS",
+        "source_snapshot_artifact_upload": "PASS"
+      },
+      "artifact": {
+        "id": 14033462692,
+        "name": "NS_Cowling-6abf6e282e77ae268257a88279a463bdb97f2f15",
+        "size_bytes": 55520695,
+        "sha256": "4e2e48ac62974bb2c8c8687ca1b808648e4447098309c025facbca78178ea4a5",
+        "expires_at": "2026-12-13T11:46:49Z",
+        "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43419554959/artifacts/14033462692"
+      },
+      "scope_note": "CI verifies the method-ID migration, manifest v2 code, current Fortran frontend build and tests, native polynomial/CSS unit tests, and repository checksum manifest. It does not validate composition-aware sharp Maxwell M5 common-matcher integration, FLCHPB quadrature convergence, the full 65-pair sharp-transition manifest, Dropbox source staging or the 390 production EOS generation."
+    },
     "sharp_65_pair_manifest": "The authoritative EOS DAG references data/sharp_maxwell_c4_execution_plan.v1.json as a separate 65-pair plan, but that file was not present in this branch checkout (GitHub contents lookup returned 404). Its separate scope is retained in the DAG, but its exact task manifest is not claimed as independently inspected in this turn.",
     "sha256_manifest": {
       "path": "SHA256SUMS_v4.txt",
@@ -84,7 +117,8 @@
     "unresolved": [
       "FLCHPB/NPPHB interior first-law integral quadrature remains a legacy parity kernel with the known unsplit u=0.22 and u=0.78 knot issue; knot-split/adaptive or analytic convergence remains required.",
       "Composition-aware M5 sharp Maxwell common-matcher integration and complete two-phase composition preservation remain pending.",
-      "The separate sharp-Maxwell 65-pair task manifest is referenced by the DAG but the referenced JSON path was not present in this working branch; do not claim its task list was revalidated."
+      "The separate sharp-Maxwell 65-pair task manifest is referenced by the DAG but the referenced JSON path was not present in this working branch; do not claim its task list was revalidated.",
+      "The exact M7 v2 manifest generator invariants are covered by tests, but no source-backed 390-task batch has been executed; all pair outputs remain pending."
     ]
   },
   "immutable_policy": {
@@ -153,5 +187,5 @@
   ],
   "next_node": "E390-01A",
   "next_node_title": "Specify standalone core-only and crust-only EOS construction contracts",
-  "head_before_receipt_refresh": "facb2cfabf280dc8143a52b9af3490f6f7693db0"
+  "head_before_receipt_refresh": "8e1224344d68ddc50fef4bc79fa24f8ac684dbfe"
 }

@@ -210,3 +210,18 @@ The thermodynamic contract uses the CompOSE v3.01 definitions of Q1-Q7 and reads
 **Status:** \`SPECIFICATION_COMPLETE_MODEL_BOUNDARY_ADMISSION_PENDING\`. No native builder or EOS artifact was created in this node, and no CI pass is claimed.
 
 **Next node: E390-01C**, to resolve exact source-row core boundaries and phase dictionaries for all 18 component models. Then E390-03A implements core-only construction and E390-03B implements crust-only construction. The composition reconstruction/solver and all matching methods follow only after these component products are validated.
+
+## 2026-11-13 authoritative continuation: EOS source contracts and admission
+
+This addendum supersedes earlier live-status statements in this document and the corresponding stale pins in the original authoring snapshot. The subsystem source of truth is data/eos390_native_fortran_unification_dag.v1.json (revision 1.4.7); the current 18-model component contract is data/eos390_component_source_contract.v1.json revision 1.0.1.
+
+- E390-00 source intake is resolved by its receipt: the 18-model/158-file archive cohort, ZIP hash and member inventory were verified. The original raw archive and per-file source manifest remain immutable.
+- E390-02A row-level presence masks and independent C3/C4 applicability are implemented and have an 8-test receipt. E390-02B duplicate row-key rejection is CI-passed.
+- E390-02 provider abundance semantics are resolved on a dual track: preserve/flag provider data with the standard CompOSE definition; production SPG/GPPVA group composition is reconstructed from the cited CLD/Thomas-Fermi and model-parameter literature. Provider clarification is no longer a hard blocker.
+- E390-10 is split: E390-10A cold-slice source reading is implemented; E390-10B multidimensional composition tensorization and full writer/readback remain incomplete and fail closed.
+- E390-01A specifies standalone core-only and crust-only artifacts before any match. It documents 5 core + 13 crust model identities, exact archived density-grid supports, CompOSE Q1-Q7 and mass conventions, composition/missingness, phase/Nadd handling, first-law checks, lineage and acceptance tests. It generates no EOS products.
+- The source correction pass fixes GPPVA_TW to BPS outer crust, records GPPVA_FSU2R outer crust as unresolved rather than assuming BSk22, and pins the repository's 172-point APR data to CompOSE page 68 rather than silently substituting the newer 1833-point page 328.
+- Next node: E390-01C, which must resolve source-exact core splice/onset rows, model-specific Iphase dictionaries, neutron-drip markers, and outer-crust/terminal support for all 13 crust tables. Unresolved evidence blocks component admission.
+- Following nodes: E390-03A native core-only builder, E390-03B native crust-only builder, then literature-based composition reconstruction, matching methods, sharp Maxwell integration, 390 smooth batch, and M8/M9 validation/regeneration.
+
+Current evidence and node status are recorded in the machine DAG and E390-01A receipt. The draft PR remains open and unmerged; no production 390 output regeneration is claimed.

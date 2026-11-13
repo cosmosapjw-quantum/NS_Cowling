@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.5.1",
+  "revision": "1.5.2",
   "created_utc": "2026-11-11",
-  "status": "M3A_CORE_ONLY_CI_PASS_M3B_CRUST_CONSTRUCTION_CI_PASS_COMPOSITION_SEMANTICS_BLOCKED_E390_03_NEXT",
+  "status": "E390-03A_CORE_ONLY_CONSTRUCTION_CI_PASS_E390-03B_CRUST_ONLY_CONSTRUCTION_CLOSED_E390-03_COMPOSITION_NEXT",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "cloud/eos390-fortran-unification-v1",
@@ -1007,7 +1007,7 @@
         "E390-02A",
         "E390-10A"
       ],
-      "status": "CONSTRUCTION_IMPLEMENTED_CI_PASS_COMPOSITION_SEMANTICS_BLOCKED_FOR_E390_03",
+      "status": "CONSTRUCTION_CLOSED_CI_PASS_COMPOSITION_SEMANTICS_BLOCKED_FOR_E390_03",
       "outputs": [
         "one standalone native-Fortran crust-only artifact per admitted model (12 models; GPPVA_TW excluded)",
         "outer-crust/neutron-drip/provider-splice/inner-crust/cluster-pasta coverage report",
@@ -1043,10 +1043,23 @@
         "exact_source_support_all_12": "PASS",
         "native_fortran_build": "PASS",
         "native_readback_all_12": "PASS",
-        "artifact_upload": "PASS",
-        "sha256_manifest": "PENDING_RUNNER_MEASURED_REPAIR",
+        "artifact_upload_and_per_file_hashes": "PASS",
+        "source_CLD_TF_provenance": "PASS_SOURCE_TABLE_PROVENANCE_ONLY_NO_NEW_SOLVE",
+        "Iphase_and_q_extra_categorical_preservation": "PASS",
         "provider_composition_semantics": "BLOCKED_E390_03",
-        "GPPVA_TW": "BLOCKED_SOURCE_CONFLICT"
+        "C3_C4_composition_closure": "NOT_AVAILABLE_NOT_A_PASS",
+        "GPPVA_TW": "BLOCKED_SOURCE_CONFLICT",
+        "physical_C2": "MIXED; five GPPVA models fail"
+      },
+      "closure": {
+        "status": "CONSTRUCTION_AND_NATIVE_READBACK_CI_PASS_PROVIDER_COMPOSITION_SEMANTICS_BLOCKED_FOR_E390_03",
+        "receipt_path": "data/receipts/eos390_m3b/E390-03B_CRUST_ONLY_CONSTRUCTION_20261113.json",
+        "workflow_run_id": 43448915849,
+        "artifact_id": 14048389252,
+        "artifact_sha256": "0fe10d7b21176f3f439c85f1737b970fdb2872e30c9523f2c4aa1175d1772a8f",
+        "admitted_models": 12,
+        "output_rows": 3883,
+        "physical_admissibility": "MIXED; five GPPVA models fail C2, while all models have C3/C4 NOT_AVAILABLE and provider composition semantics blocked."
       }
     },
     {
@@ -2159,7 +2172,6 @@
     }
   ],
   "next_actions": [
-    "E390-03B (next): implement native Fortran standalone crust-only construction for the twelve admitted SPG/GPPVA inputs, preserving exact outer-crust, neutron-drip, inner-crust, cluster/pasta and terminal source support; keep GPPVA_TW fail-closed.",
     "E390-03: after standalone core-only and crust-only construction, implement and validate literature-backed model-composition solvers and SPG/GPPVA CLD/Thomas-Fermi reconstruction with explicit provenance.",
     "Resolve or explicitly adjudicate E390-03A physical diagnostics: APR_APR C10; RG_KDE0v1 C2/C10; RG_SLY4 C2 before these core products enter matched-EOS/TOV/Cowling production cohorts.",
     "E390-10B: complete multi-T parsing, full composition tensorization and full-tensor CompOSE writer/readback without weakening the cold-slice path.",
@@ -2277,11 +2289,14 @@
   },
   "latest_evidence_receipt": {
     "node_id": "E390-03B",
-    "status": "CONSTRUCTION_AND_NATIVE_READBACK_CI_PASS_SEMANTICS_BLOCKED_FOR_E390_03",
-    "planned_path": "data/receipts/eos390_m3b/E390-03B_CRUST_ONLY_CONSTRUCTION_20261113.json",
-    "backup_branch": "backup/e390-03b-yh-semantics-pre-20261113",
-    "parent_commit": "419570ba9379065eafbcc5bcdb6316d49a8a64e1",
-    "source_composition_adjudication": "data/receipts/eos390_m0/E390-02_COMPOSITION_CLOSURE_SOURCE_RECONCILIATION_20261113.json",
-    "source_composition_adjudication_git_blob_sha1": "419c00b3bf75bf13a41a58ce8edd99b91caaafaf"
+    "status": "CONSTRUCTION_AND_NATIVE_READBACK_CI_PASS_PROVIDER_COMPOSITION_SEMANTICS_BLOCKED_FOR_E390_03",
+    "path": "data/receipts/eos390_m3b/E390-03B_CRUST_ONLY_CONSTRUCTION_20261113.json",
+    "receipt_artifact_id": 14048389252,
+    "receipt_artifact_sha256": "0fe10d7b21176f3f439c85f1737b970fdb2872e30c9523f2c4aa1175d1772a8f",
+    "workflow_run_id": 43448915849,
+    "workflow_run_url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43448915849",
+    "backup_branch": "backup/e390-03b-close-pre-20261113",
+    "parent_commit": "b6150a22d37a66b29387a7cd02c5c51dfdb3b52b",
+    "next_node": "E390-03"
   }
 }

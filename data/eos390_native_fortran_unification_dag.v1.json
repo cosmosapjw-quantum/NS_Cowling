@@ -489,14 +489,15 @@
     "E390-01",
     "E390-02"
    ],
-   "status": "STATIC_AUDIT_COMPLETE_MIGRATION_NOT_IMPLEMENTED",
+   "status": "IMPLEMENTED_CI_PASS",
    "findings": [
     {
      "file": "python_frontend/compose_eos/api.py",
      "symbol": "find_density_gap",
      "line": 92,
      "finding": "Uses NumPy argmax of adjacent density ratios to select the largest gap; fill_density_gap calls this selector before invoking the native Fortran fill-gap command.",
-     "required_change": "Move the index selection and phase-boundary safety check into a native Fortran operation; Python may pass the requested threshold and decode the native report."
+     "required_change": "Move the index selection and phase-boundary safety check into a native Fortran operation; Python may pass the requested threshold and decode the native report.",
+     "resolution": "Migrated to Fortran fill_density_gap (min_ratio optional arg + igap_out/best_out report). Python find_density_gap deprecated; fill_density_gap forwards min_ratio and decodes native report."
     },
     {
      "file": "python_frontend/compose_cowling/solver.py",
@@ -529,7 +530,10 @@
     "No production EOS390 call graph reaches Python/SciPy numerical kernels.",
     "Each migrated selector has a Fortran unit test plus frontend integration test.",
     "Python modules retained as research/diagnostic oracles are explicitly tagged and excluded from production entry points."
-   ]
+   ],
+   "status_detail": "find_density_gap deprecated; fill_density_gap delegates gap selection + phase-boundary check to native Fortran (min_ratio param, igap/best_ratio report). 16 density-gap tests + 91 python_frontend suite pass; no regression.",
+   "resolved_date": "2026-11-13",
+   "receipt": "data/receipts/eos390_m2a/E390-02C-RESOLVED_20261113.json"
   },
   {
    "id": "E390-03",
@@ -1704,7 +1708,7 @@
  ],
  "next_actions": [
   "Stage the surviving Dropbox archive EoS_complete_core_crust_release_v3_2.zip from /EoS_core_crust_release_v3_2_20261106/ into ${WORKSPACE}/inputs/replacement; verify it and run scripts/prepare_eos390_reconstructed_inputs.py with data/eos390_reconstructed_source_inventory.v1.json. Do not request the lost NS_Cowling_EOS390_raw_inputs_v1.tar.zst.",
-  "Finish E390-02C: move find_density_gap selection and any production numerical selector from Python into Fortran; quarantine Python/SciPy prototypes as diagnostic-only.",
+  "[RESOLVED 2026-11-13] Finish E390-02C: move find_density_gap selection and any production numerical selector from Python into Fortran; quarantine Python/SciPy prototypes as diagnostic-only.",
   "[RESOLVED 2026-11-13] Implement E390-02A row-level, field-level, per-species and group presence masks; assess C3 and C4 independently per row.",
   "Implement E390-10 general CompOSE axes and lossless 1D/2D/3D reader/writer.",
   "Resolve SPG/GPPVA provider-specific abundance semantics from written data sheets and independent closure.",

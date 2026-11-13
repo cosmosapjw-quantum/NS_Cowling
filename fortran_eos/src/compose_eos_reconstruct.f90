@@ -134,14 +134,18 @@ contains
     ok=all(ieee_is_finite(yq));if(.not.ok)message='nonfinite PCHIP interpolation result'
   end subroutine interp_fit_field
 
-  subroutine fill_density_gap(eos,n_fill,fit_points,gap_phase,has_gap_phase,out,status)
+  subroutine fill_density_gap(eos,n_fill,fit_points,gap_phase,has_gap_phase,out,status,min_ratio,igap_out,best_out)
     type(eos_data_t),intent(in)::eos
     integer,intent(in)::n_fill,fit_points,gap_phase
     logical,intent(in)::has_gap_phase
     type(eos_data_t),intent(out)::out
     character(len=*),intent(out)::status
+    real(wp),intent(in),optional::min_ratio
+    integer,intent(out),optional::igap_out
+    real(wp),intent(out),optional::best_out
     integer::n,igap,nfit,leftlo,righthi,k,j,ndense,lo,hi,phase_left,phase_right
     real(wp)::ratio,best,x0,x1,dx,f0,f1,q0,q1,ipc,deltaq,u,phi,intphi
+    real(wp)::min_ratio_local
     real(wp)::lv,dv,d2v,qbase,dqdx,ff,qq,mu,dpdn,cs2
     real(wp),allocatable::xfit(:),logq(:),slope(:),xfill(:),qfill(:),ffill(:),q4fit(:),q4fill(:)
     real(wp),allocatable::densex(:),densef(:),denseq(:),fitwork(:),fitout(:)
@@ -152,12 +156,26 @@ contains
     if(n<3)then;status='EOS requires at least three density points';return;endif
     if(n_fill<1)then;status='n_fill must be >= 1';return;endif
     if(fit_points<2)then;status='fit_points must be >= 2';return;endif
+    ! E390-02C: min_ratio is now a Fortran-side selector parameter (was hardcoded 5).
+    ! Python find_density_gap (NumPy argmax) is removed; the native fill-gap command
+    ! owns the gap selection and reports the chosen index/ratio back to Python.
+    if(present(min_ratio))then
+      min_ratio_local=min_ratio
+    else
+      min_ratio_local=5._wp
+    endif
+    if(min_ratio_local<=1._wp)then;status='min_ratio must exceed one';return;endif
     best=0._wp;igap=1
     do j=1,n-1
       ratio=eos%nb(j+1)/eos%nb(j)
       if(ratio>best)then;best=ratio;igap=j;endif
     enddo
-    if(best<5._wp)then;status='no density gap found (maximum adjacent ratio is below 5)';return;endif
+    if(present(igap_out))igap_out=igap
+    if(present(best_out))best_out=best
+    if(best<min_ratio_local)then
+      write(why,'(a,g0.6,a,g0.6)')'no density gap found (maximum adjacent ratio is below ',min_ratio_local,'; got ',best
+      status=trim(why);return
+    endif
     phase_left=eos%iphase(igap);phase_right=eos%iphase(igap+1)
     if(eos%composition_available.and.phase_left/=phase_right.and..not.has_gap_phase)then
       status='density gap crosses phase IDs; pass gap_phase explicitly';return

@@ -18,8 +18,12 @@ program compose_eos_fortran
   character(len=512)::status
   integer::narg,ios,n_fill,fit_points,gap_phase,n_points,n_bridge
   real(wp)::cs2_extension,n_max_requested,smooth_sigma,dissolution_tol
+  real(wp)::min_ratio_local,best_sel
+  integer::igap_sel
   logical::has_gap_phase,drop_composition,local_neutrality_confirmed
   logical::smooth_master_flag,fix_dissolution,recompute_extra_cs2,outer_crust_corrected
+  logical::has_min_ratio
+  character(len=256)::why
   action='';arg1='';arg2='';arg3='';arg4='';arg5='';arg6='';arg7=''
   narg=command_argument_count()
   if(narg<2)then
@@ -83,27 +87,50 @@ program compose_eos_fortran
     if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
     write(*,'(a)')'{"status":"ok","operation":"write","n":'//integer_text(eos%n)//'}'
   case('fill-gap')
-    if(narg/=5.and.narg/=6)then
-      call emit_failure('fill-gap requires input internal EOS directory, output directory, n_fill, fit_points, and optional gap_phase');stop 2
+    if(narg<5.or.narg>7)then
+      call emit_failure('fill-gap requires input internal EOS directory, output directory, n_fill, fit_points, and optional gap_phase and min_ratio');stop 2
     endif
     read(arg3,*,iostat=ios)n_fill
     if(ios/=0)then;call emit_failure('invalid n_fill');stop 2;endif
     read(arg4,*,iostat=ios)fit_points
     if(ios/=0)then;call emit_failure('invalid fit_points');stop 2;endif
-    has_gap_phase=narg==6;gap_phase=0
-    if(has_gap_phase)then
-      read(arg5,*,iostat=ios)gap_phase
-      if(ios/=0)then;call emit_failure('invalid gap_phase');stop 2;endif
+    has_gap_phase=.false.;gap_phase=0
+    min_ratio_local=5._wp
+    has_min_ratio=.false.
+    ! remaining args: gap_phase, then min_ratio (or just min_ratio)
+    if(narg>=6)then
+      ! arg5 could be gap_phase (int) or min_ratio (real); disambiguate by presence of a '.'
+      if(index(arg5,'.')>0.or.index(arg5,'e')>0.or.index(arg5,'E')>0)then
+        read(arg5,*,iostat=ios)min_ratio_local
+        if(ios/=0)then;call emit_failure('invalid min_ratio');stop 2;endif
+        has_min_ratio=.true.
+        if(narg==7)then;call emit_failure('fill-gap: gap_phase and min_ratio both given but gap_phase must come first');stop 2;endif
+      else
+        has_gap_phase=.true.
+        read(arg5,*,iostat=ios)gap_phase
+        if(ios/=0)then;call emit_failure('invalid gap_phase');stop 2;endif
+        if(narg==7)then
+          read(arg6,*,iostat=ios)min_ratio_local
+          if(ios/=0)then;call emit_failure('invalid min_ratio');stop 2;endif
+          has_min_ratio=.true.
+        endif
+      endif
     endif
     call read_internal_csv(trim(arg1)//'/eos_data.csv',trim(arg1)//'/eos_data.nml',eos,status)
     if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
-    call fill_density_gap(eos,n_fill,fit_points,gap_phase,has_gap_phase,out,status)
+    if(has_min_ratio)then
+      call fill_density_gap(eos,n_fill,fit_points,gap_phase,has_gap_phase,out,status,min_ratio_local,igap_sel,best_sel)
+    else
+      call fill_density_gap(eos,n_fill,fit_points,gap_phase,has_gap_phase,out,status,igap_out=igap_sel,best_out=best_sel)
+    endif
     if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
     call write_internal_csv(trim(arg2)//'/eos_data.csv',out,status)
     if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
     call write_metadata(trim(arg2)//'/eos_data.nml',out,status)
     if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
-    write(*,'(a)')'{"status":"ok","operation":"fill-gap","n":'//integer_text(out%n)//'}'
+    write(why,'(a,i0,a,i0,a,g0.6,a)')'{"status":"ok","operation":"fill-gap","n":',out%n,&
+      ',"igap":',igap_sel,',"best_ratio":',best_sel,'}'
+    write(*,'(a)')trim(why)
   case('causal-complete')
     if(narg/=6)then
       call emit_failure('causal-complete requires input internal directory, output directory, cs2_extension, n_max (zero selects source maximum), and n_points');stop 2

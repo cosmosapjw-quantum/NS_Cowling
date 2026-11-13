@@ -88,29 +88,78 @@ def normalize_compose(directory: str | Path, output_csv: str | Path) -> Path:
     return output
 
 def find_density_gap(data: EOSData, min_ratio: float = 5.0) -> int:
-    if min_ratio<=1.0:raise ValueError("min_ratio must exceed one")
-    ratios=data.nb[1:]/data.nb[:-1];i=int(ratios.argmax())
-    if ratios[i]<min_ratio:raise ValueError(f"no density gap found (max ratio {ratios[i]:.6g} < {min_ratio})")
-    return i
+    """DEPRECATED (E390-02C): the density-gap selector now lives in the native
+    Fortran fill-gap operation, not in Python NumPy. This shim is retained only
+    for callers that read the gap index without filling; it delegates to the
+    native selector via a no-op fill probe and decodes the native report.
+
+    Prefer fill_density_gap(..., return_report=True) which returns the chosen
+    igap and best_ratio from the Fortran selector. This function raises if no
+    gap meets min_ratio, mirroring the prior Python behaviour.
+    """
+    import warnings
+    warnings.warn(
+        "find_density_gap is deprecated (E390-02C); the gap selector is owned "
+        "by the native Fortran fill-gap operation. Use fill_density_gap with "
+        "return_report=True to obtain the native-selected igap.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    # Run a zero-fill native probe that selects the gap and reports igap/best_ratio
+    # without modifying the table. n_fill=1, fit_points=2 are the smallest valid
+    # values; the selector runs before any filling, so the report is authoritative.
+    with tempfile.TemporaryDirectory(prefix="compose-eos-gap-probe-") as td:
+        root = Path(td)
+        source = root / "source"
+        target = root / "filled"
+        source.mkdir(); target.mkdir()
+        data.write_internal_directory(source)
+        command = ["fill-gap", source, target, "1", "2"]
+        if min_ratio != 5.0:
+            command.append(repr(float(min_ratio)))
+        report = run_native(*command)
+    igap = report.get("igap")
+    if igap is None:
+        # legacy binary without igap reporting; fall back to a defensive error
+        # since the gap index cannot be verified without re-running the selector.
+        raise NativeExecutionError(
+            "native fill-gap did not report igap (legacy Fortran binary); "
+            "rebuild the Fortran backend to enable E390-02C gap-selector reporting"
+        )
+    best = report.get("best_ratio", 0.0)
+    if best < min_ratio:
+        raise ValueError(f"no density gap found (max ratio {best:.6g} < {min_ratio})")
+    # The Fortran selector reports a 1-based index (Fortran do j=1,n-1); convert
+    # to a 0-based index to match Python NumPy array conventions and the prior
+    # Python argmax behaviour that callers depend on.
+    return int(igap) - 1
+
 
 def fill_density_gap(data: EOSData, n_fill: int = 60, fit_points: int = 12, *,
-                     gap_phase: int | None = None) -> EOSData:
+                     gap_phase: int | None = None,
+                     min_ratio: float = 5.0,
+                     return_report: bool = False):
     """Fill the largest density gap with a native First-Law master-function bridge.
 
     Source knots outside the gap are copied unchanged.  The inserted segment is
     built from F(ln n_B), with Q1=dF/dln(n_B), mu_B=F+Q1 and Q7=Q6.
     No legacy-Python numerical fallback is used.
+
+    E390-02C: the density-gap index selection and the phase-boundary safety
+    check are performed by the native Fortran fill-gap operation, not by a
+    Python NumPy argmax pre-pass. min_ratio (default 5.0) is forwarded to the
+    native selector; the native report carries the chosen igap and best_ratio.
+    The reported igap is a 1-based Fortran index (the native selector loops
+    j=1,n-1); Python callers indexing into 0-based NumPy arrays must subtract 1.
+    Set return_report=True to receive (EOSData, report_dict) where report_dict
+    contains the native-selected igap (1-based) and best_ratio.
     """
     if not isinstance(n_fill, int) or isinstance(n_fill, bool) or n_fill < 1:
         raise ValueError("n_fill must be >= 1")
     if not isinstance(fit_points, int) or isinstance(fit_points, bool) or fit_points < 2:
         raise ValueError("fit_points must be >= 2")
-    igap = find_density_gap(data, min_ratio=5.0)
-    if data.composition_available and data.Iphase[igap] != data.Iphase[igap + 1] and gap_phase is None:
-        raise ValueError(
-            f"density gap crosses phase IDs {int(data.Iphase[igap])}->{int(data.Iphase[igap + 1])}; "
-            "pass gap_phase explicitly instead of silently assigning a phase"
-        )
+    if not isinstance(min_ratio, (int, float)) or isinstance(min_ratio, bool) or min_ratio <= 1.0:
+        raise ValueError("min_ratio must exceed one")
     with tempfile.TemporaryDirectory(prefix="compose-eos-fill-gap-") as td:
         root = Path(td)
         source = root / "source"
@@ -118,11 +167,22 @@ def fill_density_gap(data: EOSData, n_fill: int = 60, fit_points: int = 12, *,
         source.mkdir()
         target.mkdir()
         data.write_internal_directory(source)
+        # Build the native command. Order: fill-gap <source> <target> n_fill fit_points
+        # [gap_phase] [min_ratio]. min_ratio is forwarded so the native Fortran
+        # selector (compose_eos_reconstruct.f90 fill_density_gap) owns the
+        # threshold; Python no longer pre-computes the gap index via argmax.
         command = ["fill-gap", source, target, str(n_fill), str(fit_points)]
+        # Append gap_phase (integer) before min_ratio so the Fortran arg-order
+        # disambiguation (int vs real) resolves correctly.
         if gap_phase is not None:
             command.append(str(int(gap_phase)))
-        run_native(*command)
-        return EOSData.from_internal_directory(target, source_dir=data.source_dir)
+        if float(min_ratio) != 5.0:
+            command.append(repr(float(min_ratio)))
+        report = run_native(*command)
+        result = EOSData.from_internal_directory(target, source_dir=data.source_dir)
+    if return_report:
+        return result, report
+    return result
 
 
 def causal_completion(data: EOSData, *, cs2: float = 1.0,

@@ -71,6 +71,40 @@ def test_run_task_does_not_promote_python_results_to_pass(tmp_path, monkeypatch)
     assert receipt.get("execution_backend") != "native_fortran"
 
 
+def test_m7_smooth_runner_rejects_sharp_maxwell_method_id(tmp_path):
+    crust = tmp_path / "crust"
+    core = tmp_path / "core"
+    out = tmp_path / "sharp-output"
+    crust.mkdir()
+    core.mkdir()
+    task = {
+        "task_id": "sharp-maxwell-in-smooth-matrix",
+        "crust_model": "C",
+        "core_model": "H",
+        "method": "maxwell",
+        "method_kind": "sharp_maxwell_phase_transition",
+        "method_reference": "sharp local-neutrality coexistence",
+        "acceptance_node": "M5",
+        "output_folder": str(out),
+        "status": "PENDING",
+        "crust_eos_path": str(crust),
+        "core_eos_path": str(core),
+    }
+    receipt = m7.run_task(task)
+    assert receipt["status"] == "BLOCKED"
+    assert "separate M5 sharp-Maxwell workflow" in receipt["blocked_reason"]
+
+
+def test_m7_smooth_runner_rejects_a_historical_v1_manifest(tmp_path):
+    manifest = tmp_path / "v1.json"
+    manifest.write_text(
+        '{"schema":"ns-cowling.eos390-m7-batch-manifest","schema_version":"1.0.0","matrix":{"methods":["maxwell"]},"tasks":[]}',
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="Historical v1 manifests"):
+        m7.run_batch(str(manifest))
+
+
 def test_run_task_refuses_to_delete_or_overwrite_an_existing_output_folder(tmp_path):
     existing = tmp_path / "existing"
     existing.mkdir()
@@ -80,7 +114,7 @@ def test_run_task_refuses_to_delete_or_overwrite_an_existing_output_folder(tmp_p
         "task_id": "unit-test",
         "crust_model": "C",
         "core_model": "H",
-        "method": "maxwell",
+        "method": "first_law_constrained_hermite_pressure_bridge",
         "method_kind": "legacy_smooth_interpolation",
         "method_reference": "project-defined",
         "acceptance_node": "E390-02C",

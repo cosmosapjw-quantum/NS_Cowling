@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.4.5",
+  "revision": "1.4.6",
   "created_utc": "2026-11-11",
-  "status": "M1B_METHOD_IDENTITY_MIGRATION_CI_PASS_E390_01A_NEXT",
+  "status": "M1A_SPECIFICATION_COMPLETE_M1C_BOUNDARY_ADJUDICATION_NEXT",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "cloud/eos390-fortran-unification-v1",
@@ -604,7 +604,9 @@
         "E390-01",
         "E390-02",
         "E390-10",
-        "E390-02A"
+        "E390-02A",
+        "E390-03A",
+        "E390-03B"
       ],
       "status": "PENDING",
       "outputs": [
@@ -621,7 +623,9 @@
         "E390-02",
         "E390-03",
         "E390-10",
-        "E390-02A"
+        "E390-02A",
+        "E390-03A",
+        "E390-03B"
       ],
       "status": "PENDING",
       "outputs": [
@@ -639,7 +643,9 @@
         "E390-02",
         "E390-03",
         "E390-10",
-        "E390-02A"
+        "E390-02A",
+        "E390-03A",
+        "E390-03B"
       ],
       "status": "PENDING",
       "outputs": [
@@ -825,7 +831,7 @@
         "E390-02A",
         "E390-10A"
       ],
-      "status": "READY_NEXT_NODE",
+      "status": "SPECIFICATION_COMPLETE_MODEL_BOUNDARY_ADMISSION_PENDING",
       "outputs": [
         "source-authoritative component boundaries and model-specific policies for all five core and thirteen crust inputs",
         "separate raw-source, normalized/reconstructed, core-only, crust-only and matched-composite artifact contracts",
@@ -843,7 +849,90 @@
         "Raw source hashes and all intermediate outputs are immutable/versioned; reconstruction changes are recorded as transformations.",
         "The component constructors do not extrapolate outside source support and report source gaps, duplicate rows, unsupported fields and acausal/stability failures explicitly."
       ],
-      "status_detail": "Design-first node. It fixes exact component identities, model-specific core/crust boundaries, cold-slice contracts, first-law/composition checks and immutable provenance before implementing native builders. It does not run the 390 pair-method matrix."
+      "status_detail": "The source-authoritative component schema and model inventory are specified for all five core and thirteen crust inputs. Exact source-grid supports, model-specific prematched crust facts, CompOSE Q1-Q7/rest-mass conventions, sparse composition/missingness, artifact lineage and fail-closed tests are recorded. This is a specification completion only: four core boundaries still require model-specific adjudication; no component builder or output table was implemented, and no CI PASS is claimed.",
+      "files": [
+        "data/eos390_component_source_contract.v1.json",
+        "docs/E390_01A_STANDALONE_COMPONENT_CONSTRUCTION_CONTRACT_20261113.md",
+        "data/receipts/eos390_m1a/E390-01A_STANDALONE_COMPONENT_CONTRACT_20261113.json"
+      ],
+      "receipt": "data/receipts/eos390_m1a/E390-01A_STANDALONE_COMPONENT_CONTRACT_20261113.json",
+      "receipt_blob": "dd86859dba86b53977a0115da64507808f923cb4",
+      "contract": "data/eos390_component_source_contract.v1.json",
+      "contract_blob": "d4f76d4237e72438834d81593f953335f0219dd5",
+      "resolved_date": "2026-11-13"
+    },
+    {
+      "id": "E390-01C",
+      "gate": "M1C",
+      "title": "Adjudicate model-specific component boundaries and phase dictionaries",
+      "depends_on": [
+        "E390-01A",
+        "E390-00",
+        "E390-02A",
+        "E390-10A"
+      ],
+      "status": "READY_NEXT_NODE",
+      "outputs": [
+        "exact APR/SLy4 and BHF/SLy4 non-unified crust splice locators",
+        "GM1 source-row selection at the CompOSE Douchin-Haensel splice density",
+        "KDE0v1 and SLY4 EOS-specific Iphase dictionaries and homogeneous-core onset",
+        "13 crust-model phase dictionaries, neutron-drip markers, CLD/Thomas-Fermi endpoints and source-support lock"
+      ],
+      "acceptance": [
+        "APR_APR and BBB_BHF2 core onset is anchored to the exact source/data-sheet transition between their pre-attached BPS+SLy4 crust and homogeneous core; no density fallback.",
+        "GM_GM1 selection is tied to the CompOSE-documented 1.0e-3 fm^-3 crust splice and exact source row/index, without extrapolation.",
+        "RG_KDE0v1 and RG_SLY4 cluster-to-homogeneous boundaries use their own CompOSE Iphase dictionary and source paper; no cross-model numeric code mapping.",
+        "All 13 crust models preserve BSk22 outer-crust, neutron-drip and inner-crust/cluster/pasta coverage through the exact source endpoint; BSk22 splice at 2.0e-3 fm^-3 is not treated as neutron drip.",
+        "All boundaries have cited source evidence, exact source row/value/index and uncertainty/status; unresolved models remain BLOCKED_COMPONENT_ADMISSION.",
+        "No source, normalized or historical output artifact is modified."
+      ],
+      "status_detail": "Source adjudication node only; does not write component EOS or run matching."
+    },
+    {
+      "id": "E390-03A",
+      "gate": "M3A",
+      "title": "Implement native Fortran standalone core-only EOS constructor",
+      "depends_on": [
+        "E390-01C",
+        "E390-02A",
+        "E390-10A"
+      ],
+      "status": "PENDING",
+      "outputs": [
+        "one standalone core-only artifact per admitted model",
+        "source-backed boundary selection and composition provenance",
+        "per-model core-construction receipt"
+      ],
+      "acceptance": [
+        "Only source-admitted homogeneous core rows are included.",
+        "No prematched crust or cluster rows are imported.",
+        "No extrapolation or fixed-density-only selection.",
+        "Thermodynamic and composition masks are preserved; unsupported composition remains explicitly unavailable.",
+        "Fortran owns all numerical construction and output is read back and hashed."
+      ]
+    },
+    {
+      "id": "E390-03B",
+      "gate": "M3B",
+      "title": "Implement native Fortran standalone crust-only EOS constructor",
+      "depends_on": [
+        "E390-01C",
+        "E390-02A",
+        "E390-10A"
+      ],
+      "status": "PENDING",
+      "outputs": [
+        "one standalone crust-only artifact per admitted model",
+        "outer-crust/neutron-drip/inner-crust/cluster/pasta coverage report",
+        "per-model crust-construction receipt"
+      ],
+      "acceptance": [
+        "All source-supported crust regimes are preserved to each model's exact terminal support.",
+        "No homogeneous high-density core tail is imported.",
+        "SPG/GPPVA reconstructed fields follow the admitted CLD/Thomas-Fermi literature route and remain provenance-labelled.",
+        "Unknown or categorical phase/Nadd fields are losslessly preserved or explicitly unsupported.",
+        "Fortran owns all numerical construction and output is read back and hashed."
+      ]
     },
     {
       "id": "E390-01B",
@@ -1252,7 +1341,7 @@
     ],
     "policy": "Track separately from the 390 matrix; never reinterpret EOS390 method=maxwell."
   },
-  "last_update_utc": "2026-11-13T11:48:28.176Z",
+  "last_update_utc": "2026-11-13",
   "known_remaining_implementation_gaps": [
     {
       "area": "native literature-derived composition",
@@ -1297,13 +1386,13 @@
     },
     {
       "area": "standalone core-only and crust-only EOS construction",
-      "status": "NOT_EXPLICITLY_IMPLEMENTED_IN_AUDITED_LEGACY_API",
-      "evidence": "The audited legacy matcher slices tables through get_core_start_index/find_convex_transition_window and joins them in match_crust_core; reconstruct_master transforms a supplied full table. No explicit source-authoritative standalone core_only/crust_only builder contract was found in the audited production path. Promoted to E390-01A before native implementation."
+      "status": "SPECIFIED_NOT_IMPLEMENTED",
+      "evidence": "E390-01A v1 component source contract enumerates all 5 core and 13 crust tables and the thermodynamic/provenance interface; E390-03A/B builders are pending after source boundary adjudication."
     },
     {
-      "area": "legacy core/crust interface locator",
-      "status": "HEURISTIC_ONLY_REQUIRES_MODEL_SPECIFIC_REPLACEMENT",
-      "evidence": "Core start uses homogeneous composition when available, otherwise n_B>=0.045 fm^-3; transition-window secant inequalities are screening criteria, not stability/causality or phase-boundary proofs."
+      "area": "model-specific component boundary admission",
+      "status": "PENDING_E390_01C",
+      "evidence": "APR/BBB prematched BPS+SLy4 crust splices, KDE0v1/SLY4 unified cluster-to-core onsets and the per-model crust phase dictionaries require exact EOS-page/source-row locators; GM1 has a CompOSE-stated 1.0e-3 fm^-3 splice."
     }
   ],
   "phase_ontology": {
@@ -1476,10 +1565,13 @@
     "M1",
     "M1B",
     "M1A",
+    "M1C",
     "M2",
     "M2A",
     "M10A",
     "M10B",
+    "M3A",
+    "M3B",
     "M3",
     "M4",
     "M5",
@@ -1942,14 +2034,14 @@
     }
   ],
   "next_actions": [
-    "E390-01A (next): specify source-authoritative core-only and crust-only EOS construction contracts for all five core and thirteen crust models, separating raw, reconstructed component, core-only, crust-only and matched-composite artifacts.",
-    "Implement native core-only EOS construction from each approved core source interval, with explicit composition provenance and no fixed-density-only boundary inference.",
-    "Implement native crust-only EOS construction preserving outer crust, neutron drip, inner crust and cluster/pasta fields; use published CLD/Thomas-Fermi reconstruction for SPG/GPPVA rather than remapping provider values.",
-    "Complete M10B phase 4 multi-T parsing and full composition tensor/readback phases without weakening cold-slice fail-closed semantics.",
-    "Port literature-derived core composition and crust CLD/Thomas-Fermi reconstruction into the native Fortran production path.",
-    "Integrate the five production smooth kernels and the distinct legacy FLCHPB parity kernel with convergence and source-specific Q5 semantics.",
-    "Integrate canonical method=maxwell sharp coexistence with composition/provenance preservation; keep the existing sharp-Maxwell 65-pair scope separate from the 390 smooth EOS390 matrix.",
-    "Complete native TOV/tidal/Cowling interface treatment, manifest-driven 390 smooth runner, separate sharp-Maxwell runner, C1-C11/differential/convergence validation, and versioned regeneration only after all component and matching gates close."
+    "E390-01C (next): adjudicate source-exact model-specific core boundaries and phase dictionaries for all five core and thirteen crust models; block any unresolved component admission.",
+    "E390-03A: implement the native Fortran core-only constructor over the source-admitted homogeneous branch only.",
+    "E390-03B: implement the native Fortran crust-only constructor preserving the entire source-supported outer-crust, neutron-drip, inner-crust and cluster/pasta coverage.",
+    "E390-03: port literature-backed core composition solvers and SPG/GPPVA CLD/Thomas-Fermi reconstruction after the component constructors and source boundaries are admitted.",
+    "Complete E390-10B multi-T parsing, full composition tensorization and full-tensor CompOSE writer/readback without weakening the cold-slice path.",
+    "Integrate the five production smooth matching kernels and the distinct FLCHPB legacy parity kernel on validated core-only/crust-only inputs.",
+    "Integrate canonical method=maxwell sharp coexistence with composition/provenance preservation; keep the separate sharp-Maxwell 65-pair scope apart from the 390 smooth matrix.",
+    "Complete native TOV/tidal/Cowling, 390 smooth batch orchestration, differential/physical/convergence validation and versioned regeneration only after the component and matching gates close."
   ],
   "provenance": {
     "last_reconciled_utc": "2026-11-11",
@@ -2061,12 +2153,13 @@
     "rule": "Never request or fabricate the lost tar.zst. Reconstruct a new versioned tar.zst from the surviving ZIP using the checked-in inventory and helper."
   },
   "latest_evidence_receipt": {
-    "node": "E390-01B",
-    "path": "data/receipts/eos390_m1b/E390-01B_METHOD_IDENTITY_MIGRATION_20261113.json",
-    "blob_sha": "804bf5d3a35eb06021dbe4da690418fcdb9057e6",
-    "ci_run_id": 43419554959,
-    "ci_commit": "8e1224344d68ddc50fef4bc79fa24f8ac684dbfe",
-    "backup_branch": "backup/e390-02-pre-20261113",
-    "backup_parent_sha": "0c9d66c7092627d70b5df742af5cc7178f28b081"
+    "node": "E390-01A",
+    "path": "data/receipts/eos390_m1a/E390-01A_STANDALONE_COMPONENT_CONTRACT_20261113.json",
+    "blob_sha": "dd86859dba86b53977a0115da64507808f923cb4",
+    "status": "SPECIFICATION_COMPLETE_MODEL_BOUNDARY_ADMISSION_PENDING",
+    "contract": "data/eos390_component_source_contract.v1.json",
+    "contract_blob": "d4f76d4237e72438834d81593f953335f0219dd5",
+    "backup_branch": "backup/e390-01a-pre-20261113",
+    "backup_parent_sha": "4dd2a52356c77504d7d6e043238d8a79d24629be"
   }
 }

@@ -1,0 +1,51 @@
+{
+  "schema": "ns-cowling.dag-node-receipt",
+  "schema_version": "1.0.0",
+  "receipt_id": "E390-01A-STANDALONE-COMPONENT-CONTRACT-20261113",
+  "node_id": "E390-01A",
+  "gate": "M1A",
+  "status": "SPECIFICATION_COMPLETE_MODEL_BOUNDARY_ADMISSION_PENDING",
+  "date": "2026-11-13",
+  "repository": "cosmosapjw-quantum/NS_Cowling",
+  "branch": "cloud/eos390-fortran-unification-v1",
+  "parent_commit": "4dd2a52356c77504d7d6e043238d8a79d24629be",
+  "backup_branch": "backup/e390-01a-pre-20261113",
+  "source_contract": "data/eos390_component_source_contract.v1.json",
+  "document": "docs/E390_01A_STANDALONE_COMPONENT_CONSTRUCTION_CONTRACT_20261113.md",
+  "source_evidence": {
+    "model_count": 18,
+    "core_count": 5,
+    "crust_count": 13,
+    "exact_native_grid_ranges_read_from": "eos_generator/eos_data/<model>/eos.nb",
+    "exact_grid_range_scope": "source table support only; not physical core/crust transition",
+    "source_archive": "EoS_complete_core_crust_release_v3_2.zip",
+    "source_archive_sha256": "d671310eb630ffd13f1b278425d945741ad7e08ce14c0d9aff42309c707e6a3b",
+    "source_archive_hash_authority": "E390-00 receipt and source inventory"
+  },
+  "decisions": [
+    "APR and BHF-BBB2 inputs include BPS outer crust plus SLy4 inner crust; strip that pre-matched crust from core-only construction.",
+    "GM1 includes Douchin-Haensel crust below 1.0e-3 fm^-3; this boundary is explicit on its CompOSE source page.",
+    "KDE0v1 and SLy4 inputs are unified EOS tables; homogeneous core onset must be resolved from their model-specific phase dictionaries and data sheets.",
+    "All thirteen crust models use their own source grid bounds; do not interpret each upper grid endpoint as a universal crust-core transition.",
+    "The BSk22 low-density splice below 2.0e-3 fm^-3 is distinct from neutron drip.",
+    "CompOSE mn/mp/Il header and Q1-Q7 convention are retained; Q6/Q7 are normalized with source mn, not hard-coded mass.",
+    "Iphase is a per-EOS categorical label; missing composition remains missing.",
+    "Raw source, normalized source, reconstructed source, standalone component and matched composite are distinct immutable artifact classes."
+  ],
+  "unresolved_admission_gates": [
+    "APR_APR exact APR/SLy4 core boundary locator",
+    "BBB_BHF2 exact BHF/SLy4 core boundary locator",
+    "RG_KDE0v1 model-specific Iphase legend and homogeneous-core onset",
+    "RG_SLY4 model-specific Iphase legend and homogeneous-core onset",
+    "model-specific crust phase dictionary/terminal support lock for all SPG/GPPVA tables"
+  ],
+  "not_done": [
+    "No Fortran source code changed.",
+    "No core-only or crust-only output table generated.",
+    "No component numerical acceptance tests or compiler tests run.",
+    "No matching method or EOS390 pair generated.",
+    "No CI pass is claimed for this specification-only node."
+  ],
+  "next_node": "E390-01C",
+  "next_node_title": "Adjudicate model-specific core boundaries and phase dictionaries before standalone component admission"
+}

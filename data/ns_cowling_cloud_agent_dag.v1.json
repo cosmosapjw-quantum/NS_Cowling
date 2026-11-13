@@ -12,16 +12,21 @@
   "pins": {
     "eos_branch": "cloud/eos390-fortran-unification-v1",
     "eos_pr": 13,
-    "eos_head_at_authoring": "0cbe52ac1ace0535dea541beae31a49410abdbe5",
+    "eos_head_at_authoring": "4dd2a52356c77504d7d6e043238d8a79d24629be",
     "cowling_branch": "research/maxwell-native-fortran-v1",
     "cowling_pr": 3,
     "cowling_head": "99a0f9c314cab996c3a0bac28299e7b604b6cd01",
     "historical_eos_dag": "data/eos390_native_fortran_unification_dag.v1.json",
-    "historical_eos_dag_blob": "7610ee957a59bbb24b4a99abf1a0ac5ad9c5fa0f",
+    "historical_eos_dag_blob": "8aef11b383340b50bcda3b30722303ef14512c12",
     "supersedes": "No historical raw/source/output artifact; this is the top-level cloud execution DAG.",
     "method_identity_migration_receipt": "data/receipts/eos390_m1b/E390-01B_METHOD_IDENTITY_MIGRATION_20261113.json",
     "method_identity_migration_receipt_blob": "804bf5d3a35eb06021dbe4da690418fcdb9057e6",
-    "method_identity_migration_ci_run": 43419554959
+    "method_identity_migration_ci_run": 43419554959,
+    "component_source_contract": "data/eos390_component_source_contract.v1.json",
+    "component_source_contract_blob": "d4f76d4237e72438834d81593f953335f0219dd5",
+    "component_contract_receipt": "data/receipts/eos390_m1a/E390-01A_STANDALONE_COMPONENT_CONTRACT_20261113.json",
+    "component_contract_receipt_blob": "dd86859dba86b53977a0115da64507808f923cb4",
+    "eos01a_backup_branch": "backup/e390-01a-pre-20261113"
   },
   "authority": {
     "top_level": "data/ns_cowling_cloud_agent_dag.v1.json",
@@ -147,7 +152,7 @@
     ],
     "Iphase": "provider-defined categorical",
     "Nadd_q_extra": "provider-defined typed extension; categorical fields must never be averaged/interpolated",
-    "SPG_GPPVA_semantics": "BLOCKED until provider-authored definition for Iphase=0/7, Abar/Zbar, group fraction and neutron-gas representation",
+    "SPG_GPPVA_semantics": "RESOLVED_DUAL_TRACK: preserve raw provider CompOSE fields under standard parser/masks; production inner-crust composition is separately reconstructed from Grill 2014 / Scurto 2024 / model-specific RMF or GDFM sources. No provider-field remapping.",
     "axes": [
       "T",
       "nB",
@@ -213,7 +218,7 @@
         "EOS-02A",
         "EOS-01"
       ],
-      "status": "BLOCKED_PROVIDER_AUTHORITY",
+      "status": "RESOLVED_DUAL_TRACK_STANDARD_AND_RECONSTRUCTION",
       "cloud_action": "research_and_contract_only",
       "acceptance": [
         "obtain provider-written mappings",
@@ -221,7 +226,8 @@
         "resolve Abar/Zbar/group fraction and neutron gas",
         "independent baryon/charge closure on every applicable row",
         "do not guess, drop, or tolerance-relax"
-      ]
+      ],
+      "resolution_receipt": "data/receipts/eos390_m2a/E390-02-SPG_GPPVA_ABUNDANCE_SEMANTICS_RESOLVED_20261113.json"
     },
     {
       "id": "EOS-10",
@@ -262,7 +268,9 @@
       "track": "eos390",
       "depends_on": [
         "EOS-02A",
-        "EOS-03"
+        "EOS-03",
+        "EOS-03A",
+        "EOS-03B"
       ],
       "status": "PARTIAL",
       "cloud_action": true,
@@ -279,7 +287,9 @@
       "name": "Native M2/M10 smooth Hermite kernels",
       "track": "eos390",
       "depends_on": [
-        "EOS-04"
+        "EOS-04",
+        "EOS-03A",
+        "EOS-03B"
       ],
       "status": "NOT_RUN",
       "cloud_action": true,
@@ -297,7 +307,9 @@
       "track": "eos390",
       "depends_on": [
         "EOS-03",
-        "EOS-04"
+        "EOS-04",
+        "EOS-03A",
+        "EOS-03B"
       ],
       "status": "PARTIAL_NATIVE_KERNEL_JOIN_NOT_RUN",
       "cloud_action": true,
@@ -318,7 +330,9 @@
         "EOS-02A",
         "EOS-04",
         "EOS-05",
-        "EOS-06"
+        "EOS-06",
+        "EOS-03A",
+        "EOS-03B"
       ],
       "status": "BLOCKED_KERNELS_AND_PROVIDER_SEMANTICS",
       "cloud_action": true,
@@ -510,6 +524,66 @@
         "sharp Cowling physics/mode claims appropriately scoped",
         "handoff prompt and DAG consistent"
       ]
+    },
+    {
+      "id": "EOS-01A",
+      "name": "Specify standalone core-only and crust-only EOS source contracts",
+      "track": "eos390",
+      "depends_on": [
+        "CLOUD-00",
+        "EOS-01",
+        "EOS-02A",
+        "EOS-10A"
+      ],
+      "status": "SPECIFICATION_COMPLETE_MODEL_BOUNDARY_ADMISSION_PENDING",
+      "cloud_action": "specification_and_source_registry",
+      "outputs": [
+        "5 core + 13 crust source matrix",
+        "CompOSE Q1-Q7 / rest-mass / cold-slice contract",
+        "composition masks and artifact lineage",
+        "source-backed component construction acceptance matrix"
+      ],
+      "receipt": "data/receipts/eos390_m1a/E390-01A_STANDALONE_COMPONENT_CONTRACT_20261113.json",
+      "contract": "data/eos390_component_source_contract.v1.json"
+    },
+    {
+      "id": "EOS-01C",
+      "name": "Adjudicate model-specific component boundaries and phase dictionaries",
+      "track": "eos390",
+      "depends_on": [
+        "EOS-01A",
+        "EOS-02A",
+        "EOS-10A"
+      ],
+      "status": "READY_NEXT_NODE",
+      "acceptance": [
+        "exact core boundaries",
+        "per-model Iphase dictionaries",
+        "crust phase / neutron-drip / terminal support lock",
+        "source row/value/index and citation for all admitted boundaries"
+      ]
+    },
+    {
+      "id": "EOS-03A",
+      "name": "Native standalone core-only EOS constructor",
+      "track": "eos390",
+      "depends_on": [
+        "EOS-01C",
+        "EOS-02A",
+        "EOS-10A"
+      ],
+      "status": "PENDING"
+    },
+    {
+      "id": "EOS-03B",
+      "name": "Native standalone crust-only EOS constructor",
+      "track": "eos390",
+      "depends_on": [
+        "EOS-01C",
+        "EOS-02A",
+        "EOS-10A"
+      ],
+      "status": "PENDING"
     }
   ],
   "mutation_gates": [

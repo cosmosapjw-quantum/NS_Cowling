@@ -191,3 +191,22 @@ Local execution owns Dropbox file byte hashes, actual source-root verification, 
 ## 13. Stop conditions
 
 Stop at the smallest failed node if provider semantics remain ambiguous, the actual CompOSE source is inaccessible, a native method is not implemented, an EOS output cannot be read back, any species/group/axis/categorical field is dropped, an interface is interpolated across, an interface map is singular without implicit treatment, the actual RHS differs from the claimed system, mode identity remains ambiguous, the baseline is unavailable or a mutation gate fails. Keep blocked tasks in the manifest; do not reduce the requested scope and claim completion.
+
+
+---
+
+## 2026-11-13 addendum: standalone component construction contract (E390-01A)
+
+The subsystem DAG is now revision 1.4.6. E390-01A has delivered a source-authoritative design contract for all five core and thirteen crust inputs:
+
+- Machine contract: \`data/eos390_component_source_contract.v1.json\`
+- Detailed decision and acceptance criteria: \`docs/E390_01A_STANDALONE_COMPONENT_CONSTRUCTION_CONTRACT_20261113.md\`
+- Evidence receipt: \`data/receipts/eos390_m1a/E390-01A_STANDALONE_COMPONENT_CONTRACT_20261113.json\`
+
+The source audit establishes that APR(APR) and BBB(BHF-BBB2) already include BPS outer crust plus SLy4 inner crust; GM1 includes Douchin-Haensel crust below \(10^{-3}\,\mathrm{fm}^{-3}\); KDE0v1 and SLy4 are unified EOS tables. Consequently, the raw density minimum is not a core boundary and the former \(n_B\ge 0.045\,\mathrm{fm}^{-3}\) fallback is not accepted as a physical selection rule. Exact source-grid endpoints are recorded for all 18 models, but those endpoints are not promoted to physical interface densities.
+
+The thermodynamic contract uses the CompOSE v3.01 definitions of Q1-Q7 and reads \(m_n,m_p,I_l\) from each \`eos.thermo\` header. Composition missingness and per-row presence masks are preserved. BSk22's outer-crust splice below \(2\times10^{-3}\,\mathrm{fm}^{-3}\) is not conflated with neutron drip; all source-supported crust/cluster/pasta regimes remain in crust-only products.
+
+**Status:** \`SPECIFICATION_COMPLETE_MODEL_BOUNDARY_ADMISSION_PENDING\`. No native builder or EOS artifact was created in this node, and no CI pass is claimed.
+
+**Next node: E390-01C**, to resolve exact source-row core boundaries and phase dictionaries for all 18 component models. Then E390-03A implements core-only construction and E390-03B implements crust-only construction. The composition reconstruction/solver and all matching methods follow only after these component products are validated.

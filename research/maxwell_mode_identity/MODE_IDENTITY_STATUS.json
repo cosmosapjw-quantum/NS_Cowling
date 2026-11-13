@@ -1,0 +1,94 @@
+{
+  "schema": "ns-cowling.mode-identity-research-status.v2",
+  "date": "2026-11-11",
+  "scope": "analytic two-phase Maxwell fixture methodology; independent of blocked CompOSE crust composition admission",
+  "status": "PASS_SYNTHETIC_RESEARCH_HELPERS_AND_WEIGHTED_INVARIANT_NOT_PHYSICAL_MODE_CLASSIFICATION",
+  "interface_maps": {
+    "status": "DERIVED_AND_SYMBOLICALLY_CHECKED",
+    "slow_matrix": "[[1,0],[(alpha-1)*nu_prime/A,alpha]]",
+    "rapid_matrix": "[[alpha,(alpha-1)*A/nu_prime],[0,1]]",
+    "determinants": "alpha=h_inner/h_outer",
+    "zero_jump_limit": "identity at alpha=1"
+  },
+  "weighted_abel_liouville_invariant": {
+    "status": "DERIVED_CONDITIONALLY_AND_NUMERICALLY_CHECKED_IN_SYNTHETIC_RANGE",
+    "expression": "Omega=h*exp(-nu)*(W1*V2-V1*W2)",
+    "hypotheses": [
+      "same 2x2 linear Cowling system for both columns",
+      "cold one-parameter barotrope",
+      "chi=dP/depsilon is the same derivative in the perturbation matrix and background First Law",
+      "P_prime=-h*nu_prime",
+      "h>0"
+    ],
+    "interface_jump_law": "Omega_outer/Omega_inner=(h_outer/h_inner)*exp(-(nu_outer-nu_inner))*det(T_inner_to_outer)",
+    "slow_rapid_interface_continuity": "both current maps have det(T)=h_inner/h_outer and nu is continuous",
+    "canonical_covariant_symplectic_current": "NOT_ESTABLISHED_OR_CLAIMED",
+    "complex_convention": "bilinear_without_complex_conjugation"
+  },
+  "two_sided_matching": {
+    "status": "DERIVED_AND_SYNTHETICALLY_CHECKED",
+    "matching_scalar": "E(omega;rm)=h(rm)*exp(-nu(rm))*det(y_center(rm),y_surface(rm))",
+    "surface_condition_equivalence": "det(y_center(R),y_surface(R)) equals the existing unscaled ell=2 surface boundary linear form",
+    "actual_native_fixture_roots_processed": false,
+    "actual_native_fortran_integration": false
+  },
+  "synthetic_computation": {
+    "tests_passed": 43,
+    "tests_failed": 0,
+    "test_command": "PYTHONPATH=<package-root> python -m pytest -q mode_identity/tests",
+    "smooth_phase_max_relative_drift": 7.907195134185742e-11,
+    "smooth_phase_endpoint_relative_drift": 4.723167073919359e-11,
+    "two_sided_max_relative_spread_max_step_100m": 4.673260016455182e-12,
+    "two_sided_spread_unlimited_max_step_negative_control": 0.0003576076639831998,
+    "two_sided_rhs_evaluations_outward": 992,
+    "two_sided_rhs_evaluations_inward": 947,
+    "python_compileall": "PASS",
+    "json_parse": "PASS",
+    "test_functions": 33,
+    "case_counts_by_file": {
+      "tests/test_interface_transfer.py": 9,
+      "tests/test_mode_identity.py": 13,
+      "tests/test_weighted_wronskian.py": 21
+    },
+    "test_run_runtime_seconds": 0.65,
+    "test_collection_command": "PYTHONPATH=. python -m pytest --collect-only -q -p no:cacheprovider mode_identity/tests",
+    "runtime_seconds": 0.74,
+    "zero_denominator_ratio": "JSON-safe null with UNDEFINED_ZERO_DENOMINATOR; red-green regression test"
+  },
+  "integration_and_physics": {
+    "native_fortran_modified": false,
+    "production_api_integrated": false,
+    "actual_four_fixture_root_profiles_processed": false,
+    "smooth_zero_jump_star_comparison": false,
+    "finite_jump_continuation": false,
+    "physical_mode_character_labels": "UNRESOLVED",
+    "source_backed_compose_eos_used": false
+  },
+  "known_caveats": [
+    "The invariant is an algebraic Abel-Liouville determinant identity, not a proved canonical covariant symplectic current.",
+    "For nonbarotropic stars with chi_ad != chi_eq the h exp(-nu) weight has predicted drift nu_prime*(1/chi_ad-1/chi_eq), before additional composition terms.",
+    "Two-sided numerical matching showed maximum-step sensitivity; step-cap refinement and exact QR/log-determinant accounting are required.",
+    "The current surface line belongs to a finite-pressure cutoff and both directions must use the same policy.",
+    "The native q-to-r ODE equivalence has not yet been locally re-audited.",
+    "Observed interface concomitant ratio is undefined if inner Omega is zero or below relative_floor; helper now emits null plus UNDEFINED_ZERO_DENOMINATOR rather than NaN.",
+    "The normalized determinant angle is only a real-frequency diagnostic; complex-frequency characteristic calculations require holomorphic scaling or a multiple-shooting determinant with full scale accounting."
+  ],
+  "next_local_phase": {
+    "status": "IMPLEMENTATION_SPEC_READY__LOCAL_EXECUTION_REQUIRED",
+    "dag": "LOCAL_AGENT_DAG.v1.json",
+    "development_document": "LOCAL_AGENT_DAG_DEVELOPMENT_AND_HANDOFF_20261111.md",
+    "handoff_prompt": "HANDOFF_PROMPT_20261111.txt",
+    "profile_schema": "profile_schema.v2.json"
+  },
+  "provenance": {
+    "repository": "cosmosapjw-quantum/NS_Cowling",
+    "source_authority_branch": "research/maxwell-native-fortran-v1",
+    "source_authority_commit": "a09ec30d74b363652d2d1aefe990557c468679dd",
+    "mode_identity_branch_snapshot": "research/maxwell-mode-identity-v1",
+    "python_solver_blob": "8959f90a37aba63191227bb363e97302988864e9",
+    "native_cowling_blob": "ce4fac829d3a5c211139d5174541a7053793afc6",
+    "native_spectrum_blob": "726a03b219827e77412175c68e3d7c28ef32ef84",
+    "wolfram_checks": "Symbolic trace, weighted derivative cancellation, interface determinants and conformal alternating-form identities returned the stated exact expressions; the evaluator emitted Symbol::undefined2 warning retained in provenance.",
+    "mode_identity_head_before_handoff_sync": "1a02d7abe51ee079fdf381fa5f9290936b6dae2b"
+  }
+}

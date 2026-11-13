@@ -1,0 +1,73 @@
+{
+  "schema": "ns-cowling.weighted-abel-liouville-results.v1",
+  "date": "2026-11-11",
+  "evidence_label": "COMPUTATIONALLY_VERIFIED_IN_STATED_SYNTHETIC_RANGE",
+  "mathematical_status": "DERIVED_CONDITIONALLY",
+  "identity": "Omega=h*exp(-nu)*(W1*V2-V1*W2)",
+  "hypotheses": [
+    "both columns solve the same 2x2 Cowling coefficient matrix at fixed background, omega and ell",
+    "cold one-parameter barotrope with d epsilon/dP=1/chi",
+    "background satisfies P_prime=-h*nu_prime",
+    "perturbation matrix and background First Law use the same chi",
+    "same one-sided interface convention and transfer law"
+  ],
+  "synthetic_checks": {
+    "pytest_cases_passed": 42,
+    "pytest_functions": 32,
+    "case_counts_by_file": {
+      "test_interface_transfer.py": 9,
+      "test_mode_identity.py": 13,
+      "test_weighted_wronskian.py": 20
+    },
+    "smooth_phase": {
+      "r_m": [1200.0, 7200.0],
+      "chi": 0.37,
+      "nu_prime_per_m": 2e-6,
+      "ell": 2,
+      "frequency_hz": 1200.0,
+      "samples": 201,
+      "integrator": "SciPy DOP853",
+      "rtol": 2e-12,
+      "maximum_relative_drift": 7.907195134185742e-11,
+      "endpoint_relative_drift": 4.723167073919359e-11
+    },
+    "interface": {
+      "slow_determinant_expected": "h_inner/h_outer",
+      "rapid_determinant_expected": "h_inner/h_outer",
+      "both_maps_preserve_weighted_determinant": true,
+      "multi_interface_determinants_telescope": true,
+      "metric_potential_jump_negative_control_detected": true
+    },
+    "trace": {
+      "ell_values": [1, 2, 3, 5],
+      "method": "exact constant-coefficient matrix exponential"
+    },
+    "nonbarotropic_negative_control": {
+      "chi_ad": 0.42,
+      "chi_eq": 0.27,
+      "predicted_logarithmic_drift": "nu_prime*(1/chi_ad-1/chi_eq)",
+      "observed_ratio_matches_prediction": true
+    },
+    "two_sided_matching": {
+      "r_m": [1200.0, 7200.0],
+      "frequency_hz": 1350.0,
+      "matching_radii_m": [1800.0, 3100.0, 4700.0, 6200.0, 7200.0],
+      "integrator": "SciPy DOP853",
+      "rtol": 2e-12,
+      "max_step_m": 100.0,
+      "outward_rhs_evaluations": 992,
+      "inward_rhs_evaluations": 947,
+      "maximum_relative_spread": 4.673260016455182e-12,
+      "surface_basis_determinant_matches_existing_boundary_form": true,
+      "unlimited_max_step_negative_control_spread": 3.576076639831998e-4
+    }
+  },
+  "limitations": [
+    "No actual native fixture-root profile was processed.",
+    "No native Fortran q-to-r equivalence audit or native build was run.",
+    "No zero-jump star comparison or finite-jump continuation was run.",
+    "No physical f, p1, or discontinuity-g label is assigned.",
+    "This is an algebraic Abel-Liouville determinant concomitant, not an established canonical covariant symplectic current.",
+    "No C7X source admission, Maxwell pair root, source-backed TOV or source-backed Cowling result is claimed."
+  ]
+}

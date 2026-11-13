@@ -1,0 +1,33 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://github.com/cosmosapjw-quantum/NS_Cowling/blob/research/maxwell-mode-identity-v1/research/maxwell_mode_identity/profile_schema.v2.json",
+  "title":"Phase-resolved relativistic Cowling profile with sharp Maxwell interface",
+  "description":"Core and envelope are separate. Interface values are one-sided. Equal array lengths, strict radial monotonicity, finiteness and one-sided provenance require a semantic validator in addition to this schema.",
+  "type":"object",
+  "required":["schema","run_identity","model_id","frequency_hz","omega_rad_s","ell","conversion","root_residual","ode_settings","surface_cutoff","core","envelope","interface","identity"],
+  "properties":{
+    "schema":{"const":"ns-cowling.phase-resolved-mode-profile.v2"},
+    "run_identity":{"type":"object","required":["repository","source_authority_commit","working_branch","working_commit","python_version","numpy_version","scipy_version"],"properties":{"repository":{"type":"string","minLength":1},"source_authority_commit":{"type":"string","pattern":"^[0-9a-f]{40}$"},"working_branch":{"type":"string"},"working_commit":{"type":"string","pattern":"^[0-9a-f]{40}$"},"working_tree_clean":{"type":"boolean"},"python_version":{"type":"string"},"numpy_version":{"type":"string"},"scipy_version":{"type":"string"},"native_toolchain":{"type":"object"},"source_blob_hashes":{"type":"object","additionalProperties":{"type":"string"}},"fixture_hash":{"type":["string","null"]}},"additionalProperties":false},
+    "model_id":{"type":"string","minLength":1},
+    "frequency_hz":{"type":"number","minimum":0},
+    "omega_rad_s":{"type":"number","minimum":0},
+    "ell":{"type":"integer","minimum":1},
+    "conversion":{"enum":["slow","rapid"]},
+    "root_residual":{"type":"number"},
+    "ode_settings":{"type":"object","required":["method","rtol","atol_w","atol_v","max_step_m","accepted_steps","rejected_steps","rhs_evaluations"],"properties":{"method":{"type":"string"},"rtol":{"type":"number","exclusiveMinimum":0},"atol_w":{"type":"number","exclusiveMinimum":0},"atol_v":{"type":"number","exclusiveMinimum":0},"max_step_m":{"type":"number","exclusiveMinimum":0},"accepted_steps":{"type":"integer","minimum":0},"rejected_steps":{"type":"integer","minimum":0},"rhs_evaluations":{"type":"integer","minimum":0},"rescaling_method":{"type":"string"},"rescaling_log_determinants":{"type":"array","items":{"type":"number"}}},"additionalProperties":true},
+    "surface_cutoff":{"type":"object","required":["pressure_pa","radius_m","definition"],"properties":{"pressure_pa":{"type":"number","exclusiveMinimum":0},"radius_m":{"type":"number","exclusiveMinimum":0},"definition":{"type":"string"}}},
+    "core":{"$ref":"#/$defs/phase"},
+    "envelope":{"$ref":"#/$defs/phase"},
+    "interface":{"type":"object","required":["radius_m","inner","outer","transfer","diagnostics"],"properties":{"radius_m":{"type":"number","exclusiveMinimum":0},"inner":{"$ref":"#/$defs/oneSidedState"},"outer":{"$ref":"#/$defs/oneSidedState"},"transfer":{"type":"object","required":["orientation","conversion","matrix_2x2","determinant","expected_enthalpy_ratio"],"properties":{"orientation":{"const":"inner_to_outer"},"conversion":{"enum":["slow","rapid"]},"matrix_2x2":{"type":"array","minItems":2,"maxItems":2,"items":{"type":"array","minItems":2,"maxItems":2,"items":{"type":"number"}}},"determinant":{"type":"number"},"expected_enthalpy_ratio":{"type":"number","exclusiveMinimum":0}}},"diagnostics":{"type":"object"}}},
+    "identity":{"type":"object","required":["spectral_branch_id","physical_character","identity_status"],"properties":{"spectral_branch_id":{"type":["string","null"]},"physical_character":{"type":"string","default":"unresolved"},"identity_status":{"enum":["UNRESOLVED","DIAGNOSTICS_ONLY","MATCHED_BY_PROFILE_OVERLAP","AMBIGUOUS_DO_NOT_FORCE_ID"]}}},
+    "units":{"type":"object","properties":{"r_m":{"const":"m"},"q":{"type":"string"},"W_m3":{"const":"m^3"},"V_m2":{"const":"m^2"},"P_pa":{"const":"Pa"},"epsilon_j_m3":{"const":"J m^-3"},"h_j_m3":{"const":"J m^-3"},"chi":{"const":"dimensionless"},"nu":{"const":"dimensionless"},"lambda":{"const":"dimensionless"},"nu_prime_per_m":{"const":"m^-1"}}},
+    "quality":{"type":"object"}
+  },
+  "$defs":{
+    "numericArray":{"type":"array","minItems":3,"items":{"type":"number"}},
+    "positiveArray":{"type":"array","minItems":3,"items":{"type":"number","exclusiveMinimum":0}},
+    "phase":{"type":"object","required":["phase_side","r_m","q","W_m3","V_m2","P_pa","epsilon_j_m3","h_j_m3","chi","nu","lambda","nu_prime_per_m"],"properties":{"phase_side":{"enum":["CORE_INNER","ENVELOPE_OUTER"]},"r_m":{"$ref":"#/$defs/numericArray"},"q":{"$ref":"#/$defs/numericArray"},"W_m3":{"$ref":"#/$defs/numericArray"},"V_m2":{"$ref":"#/$defs/numericArray"},"P_pa":{"$ref":"#/$defs/positiveArray"},"epsilon_j_m3":{"$ref":"#/$defs/positiveArray"},"h_j_m3":{"$ref":"#/$defs/positiveArray"},"chi":{"$ref":"#/$defs/positiveArray"},"nu":{"$ref":"#/$defs/numericArray"},"lambda":{"$ref":"#/$defs/numericArray"},"nu_prime_per_m":{"$ref":"#/$defs/numericArray"}}},
+    "oneSidedState":{"type":"object","required":["r_m","W_m3","V_m2","P_pa","epsilon_j_m3","h_j_m3","chi","nu","lambda","nu_prime_per_m","side"],"properties":{"r_m":{"type":"number","exclusiveMinimum":0},"W_m3":{"type":"number"},"V_m2":{"type":"number"},"P_pa":{"type":"number","exclusiveMinimum":0},"epsilon_j_m3":{"type":"number","exclusiveMinimum":0},"h_j_m3":{"type":"number","exclusiveMinimum":0},"chi":{"type":"number","exclusiveMinimum":0},"nu":{"type":"number"},"lambda":{"type":"number"},"nu_prime_per_m":{"type":"number"},"side":{"enum":["inner","outer"]},"delta_p_pa":{"type":"number"}}}
+  },
+  "additionalProperties":false
+}

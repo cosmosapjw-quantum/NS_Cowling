@@ -1,0 +1,228 @@
+{
+  "schema_version": 2,
+  "claim_id": "COWLING_WEIGHTED_ABEL_LIOUVILLE_SYNTHETIC_V1",
+  "repository": {
+    "commit": "not_available_exported_container_snapshot",
+    "dirty": true
+  },
+  "command": [
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/mnt/data/NS_Cowling_research_20261111 python -m pytest -q -p no:cacheprovider /mnt/data/NS_Cowling_research_20261111/mode_identity/tests",
+    "python -m compileall -q /mnt/data/NS_Cowling_research_20261111/mode_identity",
+    "python -m json.tool <each relevant JSON contract> >/dev/null",
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/mnt/data/NS_Cowling_research_20261111 python -m pytest --collect-only -q -p no:cacheprovider /mnt/data/NS_Cowling_research_20261111/mode_identity/tests"
+  ],
+  "environment": {
+    "software": [
+      {
+        "name": "Python",
+        "version": "3.13.5"
+      },
+      {
+        "name": "NumPy",
+        "version": "2.3.5"
+      },
+      {
+        "name": "SciPy",
+        "version": "1.17.0"
+      },
+      {
+        "name": "pytest",
+        "version": "9.0.2"
+      }
+    ],
+    "hardware": "Linux x86_64 container; Intel Xeon Platinum 8573C; 3 CPUs; exported artifact directory without Git metadata"
+  },
+  "mathematics": {
+    "assertion_tested": "For finite synthetic cold-barotropic Cowling systems, Omega=h*exp(-nu)*(W1*V2-V1*W2) is constant in smooth phases and continuous across the current slow/rapid maps; two-sided matching determinant is invariant over tested radii.",
+    "coefficient_domain": "IEEE double precision; NumPy/SciPy floating point.",
+    "conventions": "State [W,V]; bilinear determinant without complex conjugation; inner-to-outer transfer; signature (-+++); r in m; h in J m^-3; chi dimensionless; omega in rad/s.",
+    "inputs": [
+      "Smooth phase r=[1200,7200] m, chi=.37, nu_prime=2e-6 m^-1, ell=2, f=1200 Hz, 201 radii, complex fundamental columns, DOP853 rtol 2e-12.",
+      "Two-sided phase r=[1200,7200] m, ell=2, f=1350 Hz; radii [1800,3100,4700,6200,7200] m; DOP853 rtol 2e-12, max_step 100 m.",
+      "Exact slow/rapid maps with alpha=h_inner/h_outer and complex columns.",
+      "Constant matrix exponential trace tests ell=[1,2,3,5].",
+      "Negative controls: chi_ad!=chi_eq, lapse jump, unlimited max_step."
+    ],
+    "bounds": {
+      "pytest_cases": 42,
+      "test_functions": 32,
+      "case_counts_by_file": {
+        "test_interface_transfer.py": 9,
+        "test_mode_identity.py": 13,
+        "test_weighted_wronskian.py": 20
+      },
+      "smooth_max_relative_drift": 7.907195134185742e-11,
+      "two_sided_match_radii_m": [
+        1800,
+        3100,
+        4700,
+        6200,
+        7200
+      ],
+      "two_sided_max_step_m": 100,
+      "unlimited_step_spread": 0.0003576076639831998
+    },
+    "non_claims": [
+      "Not universal beyond stated ODE/hypotheses.",
+      "Not a canonical covariant symplectic current or physical flux.",
+      "Native q-to-r ODE not locally audited.",
+      "Actual fixture roots and mode labels unprocessed.",
+      "No C7X/source-backed Maxwell/TOV/Cowling result."
+    ]
+  },
+  "randomness": {
+    "used": true,
+    "generator": "numpy.random.default_rng",
+    "seed": 20261111
+  },
+  "run": {
+    "started_at": "2026-11-10T16:22:27Z",
+    "runtime_seconds": 0.63,
+    "exit_status": 0,
+    "status": "completed",
+    "resource_limits": {
+      "memory_bytes": null,
+      "cpu_seconds": null,
+      "max_cores": 3,
+      "max_threads": 3
+    }
+  },
+  "outputs": [
+    {
+      "path": "computation_evidence/weighted_wronskian_20261111/pytest.stdout.txt",
+      "sha256": "b1134639100ea353eab2d183f9f6d05cf45055aaea9c4a41d55acf75b42eadf4",
+      "kind": "stdout"
+    },
+    {
+      "path": "computation_evidence/weighted_wronskian_20261111/pytest.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "stderr"
+    },
+    {
+      "path": "computation_evidence/weighted_wronskian_20261111/compileall.stdout.txt",
+      "sha256": "2c9534c620a065d1623945ea48f4adc675f6a881cab4a71bab73c1c3f50e6874",
+      "kind": "stdout"
+    },
+    {
+      "path": "computation_evidence/weighted_wronskian_20261111/compileall.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "stderr"
+    },
+    {
+      "path": "computation_evidence/weighted_wronskian_20261111/test_inventory.txt",
+      "sha256": "4327b95b5d586c93342af5e706a32a8acfd123ad7eb8674c41e16dff015be710",
+      "kind": "test_inventory"
+    },
+    {
+      "path": "computation_evidence/weighted_wronskian_20261111/test_inventory.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "stderr"
+    },
+    {
+      "path": "computation_evidence/weighted_wronskian_20261111/environment.txt",
+      "sha256": "098023a06b0d5c9c66174bdbb147fdddfb9d4fd1d7bb4271b0430d47d6cb4ab8",
+      "kind": "environment"
+    },
+    {
+      "path": "computation_evidence/weighted_wronskian_20261111/weighted_wronskian_results.json",
+      "sha256": "2fd5579f70c3d0262c59c61f444401fc6faa62d9cbb33465737b258928ac6d19",
+      "kind": "result"
+    }
+  ],
+  "checks": [
+    {
+      "name": "pytest",
+      "status": "PASS",
+      "detail": "42 passed in 0.63s; 32 test functions expanded to 42 collected cases"
+    },
+    {
+      "name": "pytest collection inventory",
+      "status": "PASS",
+      "detail": "42 collected in 0.48s: 9 interface transfer, 13 mode identity, 20 weighted invariant/two-sided"
+    },
+    {
+      "name": "compileall",
+      "status": "PASS",
+      "detail": "exit code 0"
+    },
+    {
+      "name": "JSON parsing",
+      "status": "PASS",
+      "detail": "profile_schema.v2, local DAG, mode status and legacy schema parse"
+    },
+    {
+      "name": "smooth invariant maximum relative drift",
+      "status": "NUMERICALLY_CHECKED",
+      "value": 7.907195134185742e-11
+    },
+    {
+      "name": "smooth invariant endpoint relative drift",
+      "status": "NUMERICALLY_CHECKED",
+      "value": 4.723167073919359e-11
+    },
+    {
+      "name": "two-sided match-radius spread max_step 100m",
+      "status": "NUMERICALLY_CHECKED",
+      "value": 4.673260016455182e-12
+    },
+    {
+      "name": "unlimited max_step negative control",
+      "status": "SENSITIVITY_OBSERVED",
+      "value": 0.0003576076639831998
+    }
+  ],
+  "result": "The weighted Abel-Liouville determinant identity and two-sided matching consequence were numerically checked in the stated finite synthetic range. The unlimited-step negative control records material numerical sensitivity.",
+  "residual_risks": [
+    "No Git worktree metadata in exported package; source commit/dirty status unauthenticated for these local tests.",
+    "Native q-to-r ODE equivalence not audited locally.",
+    "Actual fixture roots, zero-jump and finite-jump continuations not run.",
+    "Max-step and QR/log-determinant scaling must be validated on actual profiles."
+  ],
+  "input_artifacts": [
+    {
+      "path": "mode_identity/__init__.py",
+      "sha256": "b184ec10dfa6cd756e791ebc7a4782b6e5748ee344d276d66d36cd77d6200bd6",
+      "sha256_after": "b184ec10dfa6cd756e791ebc7a4782b6e5748ee344d276d66d36cd77d6200bd6"
+    },
+    {
+      "path": "mode_identity/diagnostics.py",
+      "sha256": "a80aef84ee9cf0833381ee95f4efb3cb0e3697b82866c83091ff5cc985a64c09",
+      "sha256_after": "a80aef84ee9cf0833381ee95f4efb3cb0e3697b82866c83091ff5cc985a64c09"
+    },
+    {
+      "path": "mode_identity/interface_transfer.py",
+      "sha256": "5e617955e2bc4aec08cfe8d873ed60d07c123510ffd3fd8dd12aa12a4103a9d5",
+      "sha256_after": "5e617955e2bc4aec08cfe8d873ed60d07c123510ffd3fd8dd12aa12a4103a9d5"
+    },
+    {
+      "path": "mode_identity/weighted_wronskian.py",
+      "sha256": "466fc29ffc1ff659bd2c0890a0ff10e94e23c647a339dc8d57b2a7f36656f30b",
+      "sha256_after": "466fc29ffc1ff659bd2c0890a0ff10e94e23c647a339dc8d57b2a7f36656f30b"
+    },
+    {
+      "path": "mode_identity/tests/test_interface_transfer.py",
+      "sha256": "fa7273cdd887b3f476f3254331cdcd5036e952de0ae2d95839b653de0970c0fc",
+      "sha256_after": "fa7273cdd887b3f476f3254331cdcd5036e952de0ae2d95839b653de0970c0fc"
+    },
+    {
+      "path": "mode_identity/tests/test_mode_identity.py",
+      "sha256": "606f8d2666537a6291bba9ba219912ade99dc751785d4ca2503408b1bec3e75d",
+      "sha256_after": "606f8d2666537a6291bba9ba219912ade99dc751785d4ca2503408b1bec3e75d"
+    },
+    {
+      "path": "mode_identity/tests/test_weighted_wronskian.py",
+      "sha256": "d5980432f2e91cd8e0a6234d2fb0f16e4b61ae5b2b5d50125fc0972634a54fff",
+      "sha256_after": "d5980432f2e91cd8e0a6234d2fb0f16e4b61ae5b2b5d50125fc0972634a54fff"
+    }
+  ],
+  "declared_results": [
+    "computation_evidence/weighted_wronskian_20261111/pytest.stdout.txt",
+    "computation_evidence/weighted_wronskian_20261111/pytest.stderr.txt",
+    "computation_evidence/weighted_wronskian_20261111/compileall.stdout.txt",
+    "computation_evidence/weighted_wronskian_20261111/compileall.stderr.txt",
+    "computation_evidence/weighted_wronskian_20261111/test_inventory.txt",
+    "computation_evidence/weighted_wronskian_20261111/test_inventory.stderr.txt",
+    "computation_evidence/weighted_wronskian_20261111/environment.txt",
+    "computation_evidence/weighted_wronskian_20261111/weighted_wronskian_results.json"
+  ]
+}

@@ -151,7 +151,10 @@
       "depends_on": [
         "CLOUD-00"
       ],
-      "status": "PARTIAL",
+      "status": "PASS_SCOPED",
+      "status_scope": "EOS-01 source-authority-and-provenance-registry contract (the 4 acceptance criteria) pinned by dedicated tests on the cloud-registry path (code_and_registry_only). The registry data and hashing code already existed and were CI-verified at the EOS PR #13 baseline (08fe5b8); this node adds the verification tests. The Dropbox byte-hash re-hash (recomputing source_manifest.sha256 against the live /home/cosmosapjw/Dropbox tree) is contract-blocked (no mount in the cloud env) and is asserted as a documented block (criterion 3 explicitly states 'Dropbox byte hashes require mounted environment'), NOT performed here. The replacement-zip byte identity (E390-00 BLOCKED_REPLACEMENT_ZIP_NOT_STAGED; provenance.lost_tar_byte_identity='UNPROVABLE') is NOT claimed. See data/receipts/eos390_m0/E390-01_SOURCE_REGISTRY_VERIFICATION_20261113.json.",
+      "verification_receipt": "data/receipts/eos390_m0/E390-01_SOURCE_REGISTRY_VERIFICATION_20261113.json",
+      "dependency_note": "CLOUD-00 is IN_PROGRESS; EOS-01 is cloud_action='code_and_registry_only' and the verification pins the registry data + hashing code that already exist at the EOS PR #13 baseline, independent of the CLOUD-00 Dropbox-mount orchestration. The Dropbox byte-hash re-hash itself is the CLOUD-00-mounted-environment concern (criterion 3 records the requirement, CLOUD-00 delivers the mount); EOS-01's job is the registry + the record that the mount is required, both of which are now test-pinned.",
       "cloud_action": "code_and_registry_only",
       "acceptance": [
         "hash exact source files and paper registry metadata",

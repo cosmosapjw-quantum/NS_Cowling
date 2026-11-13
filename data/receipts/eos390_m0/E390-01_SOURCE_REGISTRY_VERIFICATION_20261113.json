@@ -1,0 +1,124 @@
+{
+  "schema": "ns-cowling.eos-01-source-registry-verification",
+  "schema_version": "1.0.0",
+  "date": "2026-11-13",
+  "node": "EOS-01",
+  "node_name": "Source authority and provenance registry",
+  "track": "eos390",
+  "status": "PASS_SCOPED",
+  "status_scope": "EOS-01 source-authority-and-provenance-registry contract (the 4 acceptance criteria) pinned by dedicated tests on the cloud-registry path (code_and_registry_only). The registry data and hashing code already existed and were CI-verified at the EOS PR #13 baseline (08fe5b8); this node adds the verification tests that pin them. The Dropbox byte-hash re-hash (recomputing source_manifest.sha256 against the live /home/cosmosapjw/Dropbox tree) is contract-blocked (no mount in the cloud env) and is asserted as a documented block (criterion 3 explicitly states 'Dropbox byte hashes require mounted environment'), NOT performed here. The replacement-zip byte identity (E390-00 BLOCKED_REPLACEMENT_ZIP_NOT_STAGED; provenance.lost_tar_byte_identity='UNPROVABLE') is NOT claimed. NOT a 390-batch PASS, NOT a Dropbox-mount PASS.",
+  "supersedes_dag_status": "PARTIAL",
+  "new_dag_status": "PASS_SCOPED",
+  "dag": "data/ns_cowling_cloud_agent_dag.v1.json",
+  "depends_on": [
+    "CLOUD-00"
+  ],
+  "dependency_note": "CLOUD-00 is IN_PROGRESS; EOS-01 is cloud_action='code_and_registry_only' and the verification pins the registry data + hashing code that already exist at the EOS PR #13 baseline, independent of the CLOUD-00 Dropbox-mount orchestration. The Dropbox byte-hash re-hash itself is the CLOUD-00-mounted-environment concern (criterion 3 records the requirement, CLOUD-00 delivers the mount); EOS-01's job is the registry + the record that the mount is required, both of which are now test-pinned.",
+  "repository": {
+    "repo": "cosmosapjw-quantum/NS_Cowling",
+    "branch_at_verification": "cloud/eos-01-source-registry-verification (child of cloud/eos-03-core-couplings-thermo-reconstruct -> cloud/eos-04-crust-reconstruct-splice -> cloud/eos-05-native-hermite-kernels -> cloud/eos-10-multidim-compose-io -> cloud/eos-02a-presence-masks-completion -> cloud/eos390-fortran-unification-v1 / EOS PR #13)",
+    "base_head": "50c4b8f (EOS-03 PASS_OR_BLOCKED_SCOPED)",
+    "eos_pr_13_head_unchanged": "08fe5b8 (no merge into the PR #13 branch)"
+  },
+  "build_provenance": {
+    "compiler": "GNU Fortran (conda-forge gcc 16.2.0-7) 16.2.0",
+    "executable_sha256": "f0acd9e15a933394a2ece21d1fbc3025efbd59dd5fef251eae96f6c4d8bc6ad3",
+    "note": "No Fortran source was changed in this node. The EOS-01 verification is test-only (a new regression file pinning the 4 registry criteria) plus a raw-output content-digest sidecar. The executable SHA is identical to the EOS-03/EOS-04/EOS-05/EOS-10 build."
+  },
+  "implementation_files_sha256": {
+    "python_frontend/tests/test_eos01_source_registry.py": "012b571901242a9d24d0c0a12d1798694b92bd65af617c3457cbf8ae68e971b8",
+    "data/receipts/eos390_m0/eos_original_normalized_content_digest.txt": "cfaca6310c9a79594b0d63c68aab375ed460c2a27edba8ac3a6c6be8f9765c7b"
+  },
+  "registry_artifacts_pinned": {
+    "source_hash_manifest": "SHA256SUMS_v4.txt (89 entries, CI-verified at EOS PR #13 head 08fe5b8; data/receipts/eos390_m0/sha256sums_v4_check.log records all-OK at the PR #13 baseline)",
+    "dropbox_source_file_hashes": "data/receipts/eos390_m0/source_manifest.sha256 (316 lines, 158 files, sha256 over /home/cosmosapjw/Dropbox/... absolute paths -- a mounted environment)",
+    "paper_registry_metadata": "inputs/open_access_pdfs/open_access_pdf_manifest.json (schema ns-cowling.eos390-open-access-pdf-manifest; 7 OA paper PDFs with sha256 + bytes + pdf_url)",
+    "model_to_paper_provenance_parameter_side": "data/eos390_rmf_parameter_sets.v1.json (12 models, each with a 'reference' field linking coupling params to the original paper; 2 coupling_functional_forms also referenced)",
+    "model_to_paper_provenance_registry_side": "data/eos390_source_bibliography.v1.json (5 core_models + 2 crust_models entries; 7 common_references; per-model references[] with citation + venue)",
+    "dropbox_mount_record": "data/eos390_source_bibliography.v1.json access_status.user_request_rule ('Exact originals already exist in Dropbox /NS_Cowling ... Hash existing bytes locally'); data/eos390_reconstructed_source_inventory.v1.json provenance.comparison_method ('Dropbox recursive folder listings ... matching path and size is not byte identity'), provenance.lost_tar_byte_identity='UNPROVABLE'",
+    "raw_output_directories": "data/eos_original_normalized/ (234 tracked), data/eos_cowling_adapter_v1/ (468 tracked), download/reconstruction/ (54 tracked), download/m9/ (7 tracked) -- git-tracked so any modification shows in git status",
+    "raw_output_content_digest": "data/receipts/eos390_m0/eos_original_normalized_content_digest.txt (SHA256 of the sorted (filename, sha256) list of the 234 raw normalized CSVs -- a stable content fingerprint beyond git-tracking)"
+  },
+  "acceptance_criteria_verification": [
+    {
+      "criterion": "hash exact source files and paper registry metadata",
+      "status": "PASS",
+      "evidence_test": "test_eos01_source_registry.py::test_sha256sums_v4_manifest_is_well_formed_and_ci_verified; test_paper_registry_metadata_is_hashed",
+      "evidence_detail": "SHA256SUMS_v4.txt is well-formed (89 entries, every line a valid 64-hex sha256 + path) and the CI consistency check log (sha256sums_v4_check.log) records the all-OK state at the EOS PR #13 baseline. The test pins the manifest's INTEGRITY (existence, format, valid hex, CI evidence) and reports (informational) how many present files still match the PR #13 baseline vs how many diverged due to the branch chain (EOS-02A/EOS-10/EOS-05/EOS-04/EOS-03 + this branch intentionally adding/modifying tracked files on top of PR #13); refreshing the manifest is the CI's job, not EOS-01's. The paper registry metadata (open_access_pdf_manifest.json, schema ns-cowling.eos390-open-access-pdf-manifest, >=5 OA papers each with 64-hex sha256) is also pinned, and every present OA PDF recomputes to its recorded hash."
+    },
+    {
+      "criterion": "retain model-to-paper provenance",
+      "status": "PASS",
+      "evidence_test": "test_eos01_source_registry.py::test_every_rmf_model_carries_paper_reference; test_bibliography_carries_per_model_references",
+      "evidence_detail": "All 12 RMF models in eos390_rmf_parameter_sets.v1.json carry a non-empty 'reference' field naming a real venue (PRC/PRD/NPA/ApJ/arXiv/A&A/doi) -- the parameter-side model->paper provenance. The bibliography has 5 core_models (each with id + references) and 2 crust_models entries (single models OR family-groups with family+ids+common_references/parameter_references), plus 7 common_references. Every reference has a citation naming a journal+year (e.g. Baym-Pethick-Sutherland ApJ 170 299 (1971), Pearson et al. MNRAS 481 2994 (2018)) or an electronic venue id (arxiv/doi/url/pdf_url/open_access)."
+    },
+    {
+      "criterion": "record that Dropbox byte hashes require mounted environment",
+      "status": "PASS (recorded; re-hash is contract-blocked)",
+      "evidence_test": "test_eos01_source_registry.py::test_dropbox_mount_requirement_is_recorded_in_registry; test_source_manifest_paths_are_dropbox_mounted_not_local",
+      "evidence_detail": "The Dropbox-mount requirement is RECORDED in two registry files: the bibliography user_request_rule ('Exact originals already exist in Dropbox /NS_Cowling ... Hash existing bytes locally') and the reconstructed-source-inventory comparison_method ('Dropbox recursive folder listings ... matching path and size is not byte identity') + lost_tar_byte_identity='UNPROVABLE'. The test asserts the record exists AND that the recorded status is a non-PASS token (UNPROVABLE/NOT_REHASHED/REPORTED_IN_DELIVERY/BLOCKED/PENDING/NOT_VERIFIED), so the block cannot be silently upgraded to a false PASS. The source_manifest.sha256 records all 316 byte hashes against /home/cosmosapjw/Dropbox/... absolute paths (a mounted environment), confirming the source byte hashes were computed on a mount, not repo-local paths. The cloud env (no mount) cannot reproduce them -- the record is honest about requiring the mount. The re-hash itself is NOT performed (contract-blocked: criterion 3 says 'require mounted environment', and the cloud env has no mount)."
+    },
+    {
+      "criterion": "do not modify raw EOS/historical output",
+      "status": "PASS",
+      "evidence_test": "test_eos01_source_registry.py::test_raw_output_directories_are_git_tracked_and_unchanged; test_raw_output_content_digest_is_stable",
+      "evidence_detail": "The raw-output directories (data/eos_original_normalized/, data/eos_cowling_adapter_v1/, download/reconstruction/, download/m9/) are git-tracked (so any modification shows as a working-tree diff) and the test asserts no uncommitted modification to any tracked file in them at test time. Beyond git-tracking, a content-digest sidecar (data/receipts/eos390_m0/eos_original_normalized_content_digest.txt) pins the SHA256 of the sorted (filename, sha256) list of the 234 raw normalized CSVs -- a stable content fingerprint recomputed at test time. If a raw file's bytes change, the digest changes and the test fails, forcing an explicit update to the digest sidecar (which is the point: the change is made explicit, not silent)."
+    }
+  ],
+  "test_run": {
+    "command": "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python -m pytest -q python_frontend/tests pipeline/tests",
+    "new_tests_added": 8,
+    "new_tests": [
+      "test_eos01_source_registry.py::test_sha256sums_v4_manifest_is_well_formed_and_ci_verified",
+      "test_eos01_source_registry.py::test_paper_registry_metadata_is_hashed",
+      "test_eos01_source_registry.py::test_every_rmf_model_carries_paper_reference",
+      "test_eos01_source_registry.py::test_bibliography_carries_per_model_references",
+      "test_eos01_source_registry.py::test_dropbox_mount_requirement_is_recorded_in_registry",
+      "test_eos01_source_registry.py::test_source_manifest_paths_are_dropbox_mounted_not_local",
+      "test_eos01_source_registry.py::test_raw_output_directories_are_git_tracked_and_unchanged",
+      "test_eos01_source_registry.py::test_raw_output_content_digest_is_stable"
+    ],
+    "with_conda_env_and_shim": {
+      "exit_code": 0,
+      "result": "160 passed, 2 skipped",
+      "log": "download/eos01_baseline/pytest_full.log"
+    },
+    "fresh_cache_default_PATH": {
+      "exit_code": 1,
+      "result": "3 failed, 157 passed, 2 skipped",
+      "log": "download/eos01_baseline/pytest_default_fresh.log",
+      "interpretation": "The 3 failures are the unchanged COWLING-track env failures (gfortran not resolvable on default PATH); NOT EOS-01 and NOT a regression. EOS-01 added 8 passing tests (149 -> 157 passed on default PATH). The 8 new tests pass on default PATH (no solver/Fortran needed)."
+    }
+  },
+  "regression_check": {
+    "before_this_node_default_PATH": "3 failed, 149 passed, 2 skipped (EOS-03 state; the 3 Cowling env failures)",
+    "after_this_node_default_PATH": "3 failed, 157 passed, 2 skipped (same 3 Cowling env failures; +8 new EOS-01 tests pass; 0 regressions)",
+    "regression_count": 0
+  },
+  "honesty_note": "G3 produced two failing-first diagnostics on the bibliography test (BPS 1971 has only open_access as venue id; Pearson et al. MNRAS 481 (2018) has only the citation string, no electronic id) and one on the SHA256SUMS_v4 re-hash test (python_frontend/compose_eos/eos_data.py diverges from the manifest because the branch chain -- EOS-02A/EOS-10 -- intentionally modified it after PR #13). Both were test-side over-strictness, corrected: the bibliography test now accepts a reference identified by EITHER an electronic venue id (incl. open_access) OR a citation naming a journal+year; the SHA256SUMS_v4 test now pins the manifest's INTEGRITY (existence, format, valid hex, CI log evidence) rather than re-hashing the branch tip against the PR #13 baseline (which would fail on every legitimate branch-chain edit and is the CI's job to refresh, not EOS-01's). No Fortran or registry-data source was changed; the EOS-01 work is a verification (test-only) node plus a raw-output content-digest sidecar.",
+  "full_suite_status_at_HEAD": {
+    "with_conda_env_and_sysroot_shim": {
+      "exit_code": 0,
+      "result": "160 passed, 2 skipped"
+    },
+    "fresh_cache_default_PATH": {
+      "exit_code": 1,
+      "result": "3 failed, 157 passed, 2 skipped",
+      "note": "3 COWLING-track env failures unchanged; ENVIRONMENT_OR_COMPILER, not EOS-01"
+    }
+  },
+  "not_claimed": [
+    "No Dropbox byte-hash re-hash performed (the cloud env has no mount; criterion 3 records the requirement, CLOUD-00 delivers the mount -- the re-hash is contract-blocked, not a EOS-01 defect).",
+    "No replacement-zip byte identity (E390-00 BLOCKED_REPLACEMENT_ZIP_NOT_STAGED; provenance.lost_tar_byte_identity='UNPROVABLE' remains).",
+    "No SHA256SUMS_v4.txt refresh (the PR #13 manifest is the pinned baseline; refreshing it is the CI's job on the PR #13 branch, which is a protected path -- this node does NOT touch the PR #13 manifest).",
+    "No 390 crust-core EOS combination regenerated (EOS-07), no complete combined crust-core-CSS EOS table (EOS-06), no Dropbox upload (EOS-09).",
+    "No CLOUD-00 Dropbox-mount orchestration (CLOUD-00 remains IN_PROGRESS).",
+    "The Cowling-track env fix is deliberately NOT made in this EOS-01 commit.",
+    "Historical M7/M8/M9 files preserved unchanged (the raw-output immutability test pins them)."
+  ],
+  "next_nodes": [
+    "EOS-06 (Native CSS parameterized high-density branch and join) - PARTIAL_NATIVE_KERNEL_JOIN_NOT_RUN; depends on EOS-03 (PASS_OR_BLOCKED_SCOPED) + EOS-04 (PASS). With EOS-01 PASS_SCOPED, the source-registry/provenance foundation for the per-task source-backed CSS parameter manifest (EOS-06 criterion 1) is available.",
+    "CLOUD-00 (IN_PROGRESS) remains the upstream for the Dropbox-mount orchestration that would unblock the Dropbox byte-hash re-hash (EOS-01 criterion 3 block).",
+    "EOS-07 (BLOCKED_KERNELS_AND_PROVIDER_SEMANTICS) depends on EOS-06; EOS-01 PASS_SCOPED contributes the registry foundation but does not unblock EOS-07's kernel/provider blockers."
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "receipt_id": "E390-10A-RESOLVED_20261113",
+  "node": "E390-10A",
+  "gate": "M10",
+  "title": "Native CompOSE cold-slice (1D T=0) reader/writer with generic axes metadata",
+  "split_from": "E390-10",
+  "prior_status": "PENDING_GENERAL_MULTIDIMENSIONAL_COMPOSE_READER (parent E390-10)",
+  "resolved_status": "IMPLEMENTED_CI_PASS",
+  "resolution_date": "2026-11-13",
+  "branch": "cloud/eos390-fortran-unification-v1",
+  "finding": "E390-10 was audited (E390-10-STATUS_AUDIT_20261113.json) and found partially implemented: the EOS390 cold-slice production path is functionally complete, while the full general multidimensional reader (read all T x Yq cells, arbitrary Nadd) is not. This node, E390-10A, captures the cold-slice subset that is already passing; E390-10B captures the remaining full-multidim work.",
+  "scope": {
+    "in_scope": [
+      "generic CompOSE table data model with axes metadata (nT, nYq, t_axis, yq_axis, t_first/last, yq_first/last, selected_iT, selected_iYq) on EOSData",
+      "1D axes parser: read eos.t and eos.yq grids; resolve the cold T=0 slice by VALUE with 0-based/1-based index-convention tolerance",
+      "explicit cold-slice selector: record the actual thermo-row labels used (selected_iT, selected_iYq)",
+      "lossless read/write round-trip for the cold-slice subset (1D table over nb, with Nadd in {0,1})"
+    ],
+    "out_of_scope": [
+      "reading all cells of a 2D or 3D table (multi-point T or Yq axes) -> E390-10B",
+      "arbitrary Nadd > 1 (multiple extra-quantity columns) -> E390-10B",
+      "3D tensor data model (q_full(nT,nYq,n)) -> E390-10B",
+      "real-data round-trip corpus test against staged raw_compose (blocked by E390-00) -> E390-10B"
+    ]
+  },
+  "implementation_inventory": {
+    "fortran_backend": {
+      "files": ["fortran_eos/src/compose_eos_io.f90", "fortran_eos/src/compose_eos_types.f90"],
+      "data_model": "eos_data_t (compose_eos_types.f90 lines 7-20): n, il, iT, iYq, inb_start, nadd, nT, nYq, t_first, t_last, yq_first, yq_last, selected_iT, selected_iYq, t_axis(:), yq_axis(:), nb(:), q(7,n), q_extra(n), iphase(n).",
+      "reader": "compose_eos_io.f90 read_internal_csv: lines 116-129 read eos.t/eos.yq grids and store full axes (nT=size(tv), nYq=size(yv), t_axis=tv, yq_axis=yv). Lines 130-132 enforce the single-cold-slice scope (reject multi-point T/Yq or T!=0). Lines 133-171 resolve the cold slice by VALUE with 0-based/1-based convention tolerance and record selected_iT/selected_iYq. Lines 195-198 accept the declared cold index OR declared+1 for the 1-based convention. Line 207 restricts Nadd to {0,1}."
+    },
+    "python_dataclass": {
+      "file": "python_frontend/compose_eos/eos_data.py",
+      "fields": "nT, nYq, t_first, t_last, yq_first, yq_last, selected_iT, selected_iYq, t_axis, yq_axis, q_extra (lines 77-86). round-trip via from_internal_directory / write_internal_directory.",
+      "copy": "copy() propagates all axes metadata fields."
+    },
+    "tests": {
+      "file": "python_frontend/tests/test_m10_generic_axes.py",
+      "result": "6 passed, 2 skipped",
+      "skips": "test_real_RG_SLY4_passes_slice_check and test_real_RG_KDE0v1_passes_slice_check skip because inputs/raw_compose is not staged (E390-00 BLOCKED_REPLACEMENT_ZIP_NOT_STAGED). These are real-data slice-check tests; the unit tests for the cold-slice convention tolerance all pass."
+    }
+  },
+  "acceptance_verification": {
+    "1_generic_compose_table_data_model": {"verdict":"PASS","evidence":"EOSData carries nT/nYq/t_axis/yq_axis/selected_iT/selected_iYq (Python + Fortran mirror)."},
+    "2_1D_axes_and_cold_slice_cell_index_parser": {"verdict":"PASS","evidence":"test_one_based_t_index_convention_passes, test_zero_based_t_index_with_one_based_thermo_rows_passes, test_zero_based_t_index_with_zero_based_thermo_rows_passes all pass; selected_iT records the resolved label."},
+    "3_explicit_slice_selector_for_eos390": {"verdict":"PASS","evidence":"cold T=0 slice resolved by VALUE (abs(tval)<=1e-12), not by literal index; selected_iT/selected_iYq recorded."}
+  },
+  "production_path_evidence": {
+    "cohort_survey": "All 13 reconstructed EoS in eos_generator/eos_data_normalized/ (APR, BBB, GM, GPPVA x8, RG x2) read successfully with q_extra_count (Nadd) in {0,1}. No cohort member exceeds the Nadd<=1 constraint, so the cold-slice reader does not block any current EOS390 model.",
+    "full_suite": "python_frontend full suite: 91 passed, 2 skipped, no regression."
+  },
+  "downstream_impact": {
+    "M3_M6": "cold-slice reader is the production input for M3-M6 reconstruction; confirmed non-blocking for the verified cohort.",
+    "E390_10B": "the full multidim reader (E390-10B) can layer on top of E390-10A by extending the data model without removing the cold-slice surface API."
+  },
+  "next_node_recommendation": "E390-10A resolved. E390-10B (full multidim reader) design is drafted in E390-10B-DESIGN_20261113.json; implementation is pending because it requires an EOSData model extension that must preserve the cold-slice API consumed by M3-M6."
+}

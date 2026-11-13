@@ -675,20 +675,47 @@
    "commit": "6c580cc33c03009e82c9aef798daa63fdb0a7073"
   },
   {
-   "id": "E390-10",
+   "id": "E390-10A",
    "gate": "M10",
-   "title": "Upgrade native CompOSE support from cold one-dimensional slices to the standard multidimensional provider format",
+   "title": "Native CompOSE cold-slice (1D T=0) reader/writer with generic axes metadata",
    "depends_on": [
     "E390-02"
    ],
-   "status": "PENDING_GENERAL_MULTIDIMENSIONAL_COMPOSE_READER",
+   "status": "IMPLEMENTED_CI_PASS",
+   "resolved_date": "2026-11-13",
+   "receipt": "data/receipts/eos390_m2a/E390-10A-RESOLVED_20261113.json",
    "outputs": [
-    "generic CompOSE table data model",
-    "1D/2D/3D axes and cell-index parser",
-    "arbitrary species/group/optional file support",
-    "lossless round-trip test corpus",
-    "explicit slice selector for EOS390"
-   ]
+    "generic CompOSE table data model (EOSData carries nT/nYq/t_axis/yq_axis/selected_iT/selected_iYq)",
+    "1D axes metadata parser (eos.t/eos.yq grid read with 0-based/1-based index-convention tolerance for the cold T=0 slice)",
+    "explicit cold-slice selector for EOS390 (resolve T=0 slice by VALUE; record selected_iT/selected_iYq)"
+   ],
+   "status_detail": "Cold-slice production path PASS: all 13 reconstructed EoS read with Nadd in {0,1}; test_m10_generic_axes 6 passed 2 skipped (skips blocked by E390-00).",
+   "scope_note": "The reader remains scoped to a single cold T=0 slice (no implicit flattening, no axis averaging). Multi-point T/Yq axes and arbitrary Nadd>1 are E390-10B.",
+   "split_from": "E390-10",
+   "superseded_by_sibling": "E390-10B"
+  },
+  {
+   "id": "E390-10B",
+   "gate": "M10",
+   "title": "General multidimensional CompOSE reader/writer: read all T x Yq x nb cells, arbitrary Nadd",
+   "depends_on": [
+    "E390-02",
+    "E390-10A"
+   ],
+   "status": "PENDING_DESIGN_COMPLETE",
+   "outputs": [
+    "2D/3D axes and cell-index parser (read all T x Yq thermo rows, not just cold slice)",
+    "arbitrary Nadd (Nadd>=0) species/group/optional file support",
+    "lossless round-trip test corpus for 2D/3D tables",
+    "3D tensor data model extension (q_extra(nadd_max,n) or q_full(nT,nYq,n)) without breaking the cold-slice path"
+   ],
+   "status_detail": "Design document drafted (data/receipts/eos390_m2a/E390-10B-DESIGN_20261113.json) covering 3D tensor extension, downstream impact on M3-M6 pipelines, and phased migration. Implementation pending: requires EOSData model change from q_extra(n) to a tensor + nT x nYq cell storage; existing cold-slice pipelines (M3-M6, splicing, causal-complete) depend on the 1D model.",
+   "blocking_dependencies": [
+    "E390-00 (2 skipped test_m10 tests need raw_compose staged for real-data slice-check)"
+   ],
+   "scope_note": "Blocked from immediate implementation by the downstream coupling: the 1D cold-slice EOSData model is consumed by M3-M6, splicing, and causal-complete. A model extension must preserve the cold-slice surface API to avoid a breaking change.",
+   "split_from": "E390-10",
+   "design_receipt": "data/receipts/eos390_m2a/E390-10B-DESIGN_20261113.json"
   },
   {
    "id": "E390-02A",
@@ -1078,7 +1105,7 @@
   ],
   "policy": "Track separately from the 390 matrix; never reinterpret EOS390 method=maxwell."
  },
- "last_update_utc": "2026-11-11",
+ "last_update_utc": "2026-11-13T00:00:00Z",
  "known_remaining_implementation_gaps": [
   {
    "area": "native literature-derived composition",
@@ -1710,7 +1737,7 @@
   "Stage the surviving Dropbox archive EoS_complete_core_crust_release_v3_2.zip from /EoS_core_crust_release_v3_2_20261106/ into ${WORKSPACE}/inputs/replacement; verify it and run scripts/prepare_eos390_reconstructed_inputs.py with data/eos390_reconstructed_source_inventory.v1.json. Do not request the lost NS_Cowling_EOS390_raw_inputs_v1.tar.zst.",
   "[RESOLVED 2026-11-13] Finish E390-02C: move find_density_gap selection and any production numerical selector from Python into Fortran; quarantine Python/SciPy prototypes as diagnostic-only.",
   "[RESOLVED 2026-11-13] Implement E390-02A row-level, field-level, per-species and group presence masks; assess C3 and C4 independently per row.",
-  "Implement E390-10 general CompOSE axes and lossless 1D/2D/3D reader/writer.",
+  "[SPLIT 2026-11-13] Implement E390-10 general CompOSE axes and lossless 1D/2D/3D reader/writer. (E390-10A=RESOLVED cold-slice; E390-10B=PENDING full multidim reader, design drafted)",
   "Resolve SPG/GPPVA provider-specific abundance semantics from written data sheets and independent closure.",
   "Proceed through M3-M6 only when their predecessor gates pass; keep M7-M9 and the 390 generation NOT_RUN until then."
  ],

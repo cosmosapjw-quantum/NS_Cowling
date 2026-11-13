@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.4.4",
+  "revision": "1.4.5",
   "created_utc": "2026-11-11",
-  "status": "M1_SOURCE_AUDIT_COMPLETE_CORE_CRUST_COMPONENT_CONTRACT_NEXT_M10B_PHASE3_ONLY",
+  "status": "M1B_METHOD_IDENTITY_MIGRATION_CODE_AND_CONTRACT_COMPLETE_CI_PENDING",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "cloud/eos390-fortran-unification-v1",
@@ -131,7 +131,10 @@
         "no continuous-density plateau is labelled first-order Maxwell"
       ],
       "multiple_root_policy": "Do not choose a root by arbitrary order. Restrict to the native branch-selection window; require the prescribed unique admissible coexistence root or return AMBIGUOUS_MULTIPLE_ROOTS.",
-      "seidov": "Record the Seidov rapid-onset diagnostic separately; it is not a proof of a complete stable TOV branch."
+      "seidov": "Record the Seidov rapid-onset diagnostic separately; it is not a proof of a complete stable TOV branch.",
+      "method_id": "maxwell",
+      "method_kind": "FIRST_ORDER_SHARP_LOCAL_NEUTRALITY",
+      "public_method_name": "maxwell"
     },
     "smooth_methods": [
       "css",
@@ -140,7 +143,17 @@
       "quintic_F",
       "quintic_P"
     ],
-    "legacy_maxwell_policy": "The historical EOS390 matrix token 'maxwell' identifies the project-defined smooth NPPHB procedure for historical reproduction only; it is not a sharp first-order transition and has Delta n_B=0. Preserve its native implementation under the explicit legacy kernel name legacy_npphb and never classify it as FIRST_ORDER_SHARP. Keep an ambiguous public bare 'maxwell' alias fail-closed. A true sharp first-order construction is a separately versioned operation/token sharp_maxwell, outside the immutable historical six-token matrix unless a new manifest explicitly adds it. Do not silently repurpose the historical token."
+    "legacy_maxwell_policy": "The historical EOS390 matrix token 'maxwell' identifies the project-defined smooth NPPHB procedure for historical reproduction only; it is not a sharp first-order transition and has Delta n_B=0. Preserve its native implementation under the explicit legacy kernel name legacy_npphb and never classify it as FIRST_ORDER_SHARP. Keep an ambiguous public bare 'maxwell' alias fail-closed. A true sharp first-order construction is a separately versioned operation/token sharp_maxwell, outside the immutable historical six-token matrix unless a new manifest explicitly adds it. Do not silently repurpose the historical token.",
+    "legacy_smooth_bridge": {
+      "method_id": "first_law_constrained_hermite_pressure_bridge",
+      "method_kind": "LEGACY_SMOOTH_INTERPOLATION",
+      "method_identity": "LEGACY_NPPHB_FLCHPB",
+      "description": "Project-defined first-law-constrained Hermite pressure bridge (historical NPPHB parameterization); continuous density, zero latent-heat jump, and no Maxwell coexistence.",
+      "historical_v1_method_token": "maxwell",
+      "historical_v1_artifacts_immutable": true,
+      "active_code_alias_for_historical_v1_token": false,
+      "matrix_role": "retained as one of the six smooth EOS390 reproduction methods under the renamed v2 method ID"
+    }
   },
   "compose_contract": {
     "supported_scope": "Default production surface remains a selected cold T=0 EOS slice. Native I/O now supports arbitrary Nadd>=0 and an opt-in full T=0 x Yq x nb tensor (1 x nYq x nb), with explicit select_slice materialization for legacy 1D consumers. Multi-point T and full multidimensional tensor write/readback remain pending. Composition group/phase semantics remain provider-scoped and must not be fabricated or inferred.",
@@ -310,25 +323,28 @@
     },
     {
       "id": "M4",
-      "name": "Five smooth matching methods in Fortran",
+      "name": "Five production smooth matching methods in Fortran (plus FLCHPB legacy parity)",
       "acceptance": [
         "css,cubic_F,cubic_P,quintic_F,quintic_P ported with composition handling",
         "Source rows outside the selected gap are byte/value preserved where contractually possible",
-        "Bridge composition uses the characterized legacy smootherstep policy or an explicitly approved superior physical policy"
+        "Bridge composition uses the characterized legacy smootherstep policy or an explicitly approved superior physical policy",
+        "The historical FLCHPB pressure bridge remains a distinct legacy smooth method ID and never occupies the sharp Maxwell method ID."
       ],
       "status": "PENDING"
     },
     {
       "id": "M5",
-      "name": "Sharp Maxwell in common native matching API",
+      "name": "Canonical method=maxwell: sharp local-neutrality first-order transition in common native matcher",
       "acceptance": [
         "method=maxwell produces nonzero density and energy jumps",
         "Unique coexistence root with equal P and mu_B",
         "Low/high composition is preserved without interpolating across the jump",
         "Provider-local Iphase and Nadd semantics are handled",
-        "Delta epsilon=mu_t*Delta n_B is checked"
+        "Delta epsilon=mu_t*Delta n_B is checked",
+        "The method token maxwell is never routed to the historical FLCHPB pressure bridge."
       ],
-      "status": "PENDING"
+      "status": "PENDING",
+      "method_id": "maxwell"
     },
     {
       "id": "M6",
@@ -408,6 +424,18 @@
         "Missing values are not converted into numerical zeros.",
         "CHECKED/PARTIAL/NOT_AVAILABLE/FAIL are distinct."
       ]
+    },
+    {
+      "id": "M1B",
+      "name": "Method identity and artifact namespace migration",
+      "acceptance": [
+        "historical NPPHB smooth operation uses FLCHPB",
+        "canonical sharp Maxwell operation uses method=maxwell",
+        "390 smooth task cardinality remains unchanged",
+        "old v1 artifacts remain immutable",
+        "active code has no smooth maxwell alias"
+      ],
+      "status": "CODE_AND_CONTRACT_MIGRATION_COMPLETE_CI_PENDING"
     }
   ],
   "nodes": [
@@ -804,6 +832,34 @@
         "The component constructors do not extrapolate outside source support and report source gaps, duplicate rows, unsupported fields and acausal/stability failures explicitly."
       ],
       "status_detail": "Design-first node. It fixes exact component identities, model-specific core/crust boundaries, cold-slice contracts, first-law/composition checks and immutable provenance before implementing native builders. It does not run the 390 pair-method matrix."
+    },
+    {
+      "id": "E390-01B",
+      "gate": "M1B",
+      "title": "Migrate method identity: FLCHPB for historical NPPHB, maxwell for sharp first-order coexistence",
+      "depends_on": [
+        "E390-01"
+      ],
+      "status": "CODE_AND_CONTRACT_MIGRATION_COMPLETE_CI_PENDING",
+      "outputs": [
+        "smooth matcher method/function ID first_law_constrained_hermite_pressure_bridge",
+        "canonical sharp local-neutrality method ID maxwell",
+        "M7 six-smooth-method manifest registry with unchanged 390 task cardinality",
+        "immutable v1 historical-token to v2 method-ID migration receipt",
+        "native Fortran fail-closed sharp Maxwell dispatch and renamed smooth FLCHPB dispatch"
+      ],
+      "acceptance": [
+        "No active smooth matching code path dispatches method=maxwell to NPPHB.",
+        "The old NPPHB kernel/function is named first_law_constrained_hermite_pressure_bridge in Python and Fortran.",
+        "The physical sharp Maxwell API and method registry use the canonical ID maxwell.",
+        "The six-method smooth EOS390 matrix remains 13x5x6=390; its FLCHPB task IDs use the new method ID and a new manifest schema version.",
+        "The separate sharp-Maxwell 65-pair workflow remains separate and uses method ID maxwell.",
+        "Historical v1 artifacts with __maxwell names, task receipts and checksums are not edited or relabelled.",
+        "Both Python and Fortran smooth matchers fail closed for method=maxwell until the composition-aware M5 common route is integrated.",
+        "Tests verify FLCHPB smooth identity, maxwell sharp identity, and no Python numerical fallback."
+      ],
+      "status_detail": "Code and contract migration published. Execution remains fail-closed where native M5 or native FLCHPB production kernels are incomplete. CI must pass at the exact new head before this node is terminal PASS.",
+      "receipt": "data/receipts/eos390_m1b/E390-01B_METHOD_IDENTITY_MIGRATION_20261113.json"
     }
   ],
   "mutation_policy": {
@@ -1052,12 +1108,12 @@
         "get_gauge_shifts",
         "find_convex_transition_window",
         "build_monotone_hermite_bridge",
-        "build_maxwell_plateau_bridge",
+        "build_first_law_constrained_hermite_pressure_bridge",
         "match_crust_core",
         "solve_star_3stage",
         "solve_star_at_target_mass"
       ],
-      "status": "READ_ONLY_REFERENCE; five smooth methods to port; the pressure-plateau build_maxwell is mislabelled and forbidden in production"
+      "status": "READ_ONLY_REFERENCE; five smooth methods plus the separately identified FLCHPB legacy method to port/retain; historical maxwell name is not used for the smooth kernel"
     },
     {
       "source": "eos_generator/compose_eos_pkg/compose_eos/phase_transitions.py",
@@ -1163,7 +1219,7 @@
     ],
     "policy": "Track separately from the 390 matrix; never reinterpret EOS390 method=maxwell."
   },
-  "last_update_utc": "2026-11-13T20:35:00+09:00",
+  "last_update_utc": "2026-11-13T11:39:34.884Z",
   "known_remaining_implementation_gaps": [
     {
       "area": "native literature-derived composition",
@@ -1322,13 +1378,22 @@
     }
   },
   "legacy_method_semantics": {
-    "existing_public_token": "maxwell",
+    "existing_public_token": "first_law_constrained_hermite_pressure_bridge",
     "actual_algorithm": "smooth Hermite pressure bridge with knots u={0,0.22,0.78,1}, plateau offset 0.015*(P2-P1), 64-point Gauss-Legendre endpoint integral root and 16-point partial integrals",
     "observed_physics": "continuous density, no latent heat, no exact common-pressure/common-mu coexistence; Delta n_B=0",
-    "project_name": "Legacy Near-Pressure-Plateau Hermite Bridge (NPPHB)",
-    "naming_status": "PROJECT_DEFINED_DESCRIPTIVE_NAME_NOT_A_LITERATURE_ATTRIBUTION",
+    "project_name": "First-Law-Constrained Hermite Pressure Bridge (FLCHPB; historical NPPHB parameterization)",
+    "naming_status": "PROJECT_DEFINED_THERMODYNAMICALLY_DESCRIPTIVE_NAME_NOT_A_LITERATURE_ATTRIBUTION",
     "research_note": "Literature has distinct finite-width P(mu_B) replacement/interpolation schemes around a Maxwell crossing, including parabolic replacement interpolation and the Mixing Interpolation Method (MIM). The historical NPPHB parameterization is not identified as the same published construction. Preserve it only as an immutable legacy reference; exclude it from physical Maxwell and new production method naming.",
-    "quadrature_audit": "The historical path uses a 64-point whole-interval Gauss-Legendre integral for the plateau root and 16-point whole-interval partial integrals for interior F(u). The cubic-Hermite pressure spline has internal knots at u=0.22 and u=0.78, but the partial quadrature does not split at those knots. A separate 2026-11-13 scratch audit identifies a partial-integral accuracy defect; preserve this route as legacy parity only until knot-split/adaptive or analytic quadrature is independently validated. Endpoint-only first-law residual does not certify the interior F(u) profile."
+    "quadrature_audit": "The historical path uses a 64-point whole-interval Gauss-Legendre integral for the plateau root and 16-point whole-interval partial integrals for interior F(u). The cubic-Hermite pressure spline has internal knots at u=0.22 and u=0.78, but the partial quadrature does not split at those knots. A separate 2026-11-13 scratch audit identifies a partial-integral accuracy defect; preserve this route as legacy parity only until knot-split/adaptive or analytic quadrature is independently validated. Endpoint-only first-law residual does not certify the interior F(u) profile.",
+    "historical_v1_token": "maxwell",
+    "method_id": "first_law_constrained_hermite_pressure_bridge",
+    "public_method_policy": {
+      "historical_v1_token": "maxwell",
+      "active_smooth_method_id": "first_law_constrained_hermite_pressure_bridge",
+      "sharp_first_order_method_id": "maxwell",
+      "no_runtime_alias_from_historical_v1_token": true,
+      "preserve_historical_v1_output_paths_and_receipts": true
+    }
   },
   "generator_upgrade": {
     "status": "PLANNED_NOT_IMPLEMENTED",
@@ -1376,6 +1441,7 @@
   "execution_order": [
     "M0",
     "M1",
+    "M1B",
     "M1A",
     "M2",
     "M2A",
@@ -1845,14 +1911,12 @@
   "next_actions": [
     "E390-01A (next): specify source-authoritative core-only and crust-only construction contracts for all five core and thirteen crust models; separate raw, reconstructed component and composite EOS artifacts.",
     "Implement native core-only EOS construction from each approved core source interval, with explicit composition provenance and no fixed-density-only boundary inference.",
-    "Implement native crust-only EOS construction preserving outer crust, neutron drip, inner crust and cluster/pasta fields; use the published CLD/Thomas-Fermi reconstruction bypass for SPG/GPPVA rather than silently remapping non-conformant provider abundance fields.",
-    "Complete M10B phase 4 multi-T parsing with explicit grid-index-to-tensor-slot mapping and complete (T,Yq,nb) coverage; cold T=0 component work may use the already-passing M10A selected-slice path but must not claim full multidimensional support.",
-    "Tensorize composition for all cells: Iphase, sparse species/group presence masks, row status and independent C3/C4 applicability.",
-    "Implement lossless full T x Yq x nb CompOSE writer/readback, preserving all axes, arbitrary Nadd, sparse masks and categorical q_extra.",
-    "Port literature-derived core beta-equilibrium solvers and crust CLD/Thomas-Fermi composition reconstruction into the native Fortran production path; retain current Python implementation as a differential reference only.",
-    "Integrate the five smooth matching kernels only after NPPHB knot-split quadrature convergence and source-specific Q5 semantics are resolved; keep historical legacy_npphb distinct from sharp_maxwell.",
-    "Port exact sharp Maxwell and separate two-charge Gibbs semantics with composition/provenance preservation.",
-    "Complete native TOV/tidal/Cowling interface treatment, manifest-driven 390 runner, C1-C11/differential/convergence validation, and versioned 390 regeneration only after all component and matching gates close."
+    "Implement native crust-only EOS construction preserving outer crust, neutron drip, inner crust and cluster/pasta fields; use published CLD/Thomas-Fermi reconstruction for SPG/GPPVA rather than remapping provider values.",
+    "Complete M10B phase 4 multi-T parsing and full composition tensor/readback phases without weakening cold-slice fail-closed semantics.",
+    "Port literature-derived core composition and crust CLD/Thomas-Fermi reconstruction into the native Fortran production path.",
+    "Integrate the five production smooth kernels and the distinct legacy FLCHPB parity kernel with convergence and source-specific Q5 semantics.",
+    "Integrate canonical method=maxwell sharp coexistence with composition/provenance preservation; keep the existing sharp-Maxwell 65-pair scope separate from the 390 smooth EOS390 matrix.",
+    "Complete native TOV/tidal/Cowling interface treatment, manifest-driven 390 smooth runner, separate sharp-Maxwell runner, C1-C11/differential/convergence validation, and versioned regeneration only after all component and matching gates close."
   ],
   "provenance": {
     "last_reconciled_utc": "2026-11-11",
@@ -1964,10 +2028,10 @@
     "rule": "Never request or fabricate the lost tar.zst. Reconstruct a new versioned tar.zst from the surviving ZIP using the checked-in inventory and helper."
   },
   "latest_evidence_receipt": {
-    "node": "E390-01",
-    "path": "data/receipts/eos390_m1/E390-01_LEGACY_BEHAVIOR_AUDIT_20261113.json",
-    "audit_commit": "7174ce459fcbbcfed5755e00ded9c7a87bea8314",
-    "backup_branch": "backup/e390-01-pre-20261113",
-    "backup_parent_sha": "3fc18026a4d648f9a71965c81a8970461827b283"
-  }
+    "node": "E390-01B",
+    "path": "data/receipts/eos390_m1b/E390-01B_METHOD_IDENTITY_MIGRATION_20261113.json",
+    "backup_branch": "backup/e390-02-pre-20261113",
+    "backup_parent_sha": "0c9d66c7092627d70b5df742af5cc7178f28b081"
+  },
+  "legacy_smooth_bridge_policy": "The historical EOS390 v1 token 'maxwell' represented the project-defined smooth NPPHB pressure bridge. All active smooth-matcher code and v2 manifests now use first_law_constrained_hermite_pressure_bridge (FLCHPB). Existing v1 manifests, output directory names, receipts and checksums containing '__maxwell' are immutable historical provenance and are never rewritten. The public method ID 'maxwell' is reserved exclusively for the true sharp first-order local-neutrality coexistence construction with common P_t and mu_t, positive Delta n_B and Delta epsilon=mu_t*Delta n_B. The smooth matcher rejects maxwell until the composition-aware sharp route is integrated."
 }

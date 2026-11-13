@@ -5,25 +5,28 @@ program compose_eos_fortran
   use compose_eos_reconstruct, only: fill_density_gap, reconstruct_master
   use compose_eos_causality, only: causal_complete, causal_completion_report_t
   use compose_eos_matching, only: match_crust_core, match_report_t
+  use compose_eos_css_join, only: join_crust_core_css, css_join_report_t
   use compose_eos_phase_transition, only: construct_maxwell_transition, maxwell_transition_report_t
   implicit none
-  type(eos_data_t)::eos,out,crust,core,phase_low,phase_high
+  type(eos_data_t)::eos,out,crust,core,phase_low,phase_high,matched
   type(verify_report_t)::report
   type(causal_completion_report_t)::causal_report
   type(match_report_t)::match_report
   type(maxwell_transition_report_t)::phase_report
+  type(css_join_report_t)::css_join_report
   character(len=32)::action
   character(len=2048)::arg1,arg2,arg3
-  character(len=128)::arg4,arg5,arg6,arg7
+  character(len=128)::arg4,arg5,arg6,arg7,arg8
   character(len=512)::status
-  integer::narg,ios,n_fill,fit_points,gap_phase,n_points,n_bridge
+  integer::narg,ios,n_fill,fit_points,gap_phase,n_points,n_bridge,n_css
   real(wp)::cs2_extension,n_max_requested,smooth_sigma,dissolution_tol
+  real(wp)::css_p_transition,css_epsilon_low,css_nb_low,css_delta_epsilon,css_cs2
   logical::has_gap_phase,drop_composition,local_neutrality_confirmed
   logical::smooth_master_flag,fix_dissolution,recompute_extra_cs2,outer_crust_corrected
-  action='';arg1='';arg2='';arg3='';arg4='';arg5='';arg6='';arg7=''
+  action='';arg1='';arg2='';arg3='';arg4='';arg5='';arg6='';arg7='';arg8=''
   narg=command_argument_count()
   if(narg<2)then
-    write(*,'(a)')'usage: compose_eos_fortran {read|verify|verify-csv|normalize|write|fill-gap|reconstruct-master|causal-complete|match-core|maxwell-transition} INPUT OUTPUT [OPTIONS]'
+    write(*,'(a)')'usage: compose_eos_fortran {read|verify|verify-csv|normalize|write|fill-gap|reconstruct-master|causal-complete|match-core|maxwell-transition|css-join} INPUT OUTPUT [OPTIONS]'
     stop 2
   endif
   call get_command_argument(1,action,status=ios)
@@ -34,6 +37,7 @@ program compose_eos_fortran
   if(narg>=6)call get_command_argument(6,arg5,status=ios)
   if(narg>=7)call get_command_argument(7,arg6,status=ios)
   if(narg>=8)call get_command_argument(8,arg7,status=ios)
+  if(narg>=9)call get_command_argument(9,arg8,status=ios)
   select case(trim(action))
   case('read')
     if(narg/=3)then;call emit_failure('read requires input CompOSE directory and output directory');stop 2;endif
@@ -177,6 +181,49 @@ program compose_eos_fortran
       ',"composition_dropped":'//logical_text(match_report%composition_dropped)// &
       ',"is_exact_maxwell":'//logical_text(match_report%is_exact_maxwell)// &
       ',"seidov_applicable":'//logical_text(match_report%seidov_applicable)//'}'
+  case('css-join')
+    if(narg/=9)then
+      call emit_failure('css-join requires MATCHED_INTERNAL OUTPUT_INTERNAL P_TRANSITION EPSILON_LOW NB_LOW DELTA_EPSILON CS2 N_CSS');stop 2
+    endif
+    read(arg3,*,iostat=ios)css_p_transition
+    if(ios/=0)then;call emit_failure('invalid P_TRANSITION');stop 2;endif
+    read(arg4,*,iostat=ios)css_epsilon_low
+    if(ios/=0)then;call emit_failure('invalid EPSILON_LOW');stop 2;endif
+    read(arg5,*,iostat=ios)css_nb_low
+    if(ios/=0)then;call emit_failure('invalid NB_LOW');stop 2;endif
+    read(arg6,*,iostat=ios)css_delta_epsilon
+    if(ios/=0)then;call emit_failure('invalid DELTA_EPSILON');stop 2;endif
+    read(arg7,*,iostat=ios)css_cs2
+    if(ios/=0)then;call emit_failure('invalid CS2');stop 2;endif
+    read(arg8,*,iostat=ios)n_css
+    if(ios/=0)then;call emit_failure('invalid N_CSS');stop 2;endif
+    call read_internal_csv(trim(arg1)//'/eos_data.csv',trim(arg1)//'/eos_data.nml',matched,status)
+    if(status/='ok')then;call emit_failure('invalid matched crust+core input: '//trim(status));stop 3;endif
+    call join_crust_core_css(matched,css_p_transition,css_epsilon_low,css_nb_low, &
+      css_delta_epsilon,css_cs2,n_css,out,css_join_report,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    call write_internal_csv(trim(arg2)//'/eos_data.csv',out,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    call write_metadata(trim(arg2)//'/eos_data.nml',out,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    write(*,'(a)')'{"status":"ok","operation":"css-join","n_matched":'//integer_text(css_join_report%n_matched)// &
+      ',"n_css":'//integer_text(css_join_report%n_css)//',"n_total":'//integer_text(css_join_report%n_total)// &
+      ',"interface_class":'//integer_text(css_join_report%interface_class)// &
+      ',"p_transition":'//real_text(css_join_report%p_transition)// &
+      ',"epsilon_low":'//real_text(css_join_report%epsilon_low)// &
+      ',"nb_low":'//real_text(css_join_report%nb_low)// &
+      ',"delta_epsilon":'//real_text(css_join_report%delta_epsilon)// &
+      ',"cs2":'//real_text(css_join_report%cs2)// &
+      ',"mu_transition":'//real_text(css_join_report%mu_transition)// &
+      ',"epsilon_high":'//real_text(css_join_report%epsilon_high)// &
+      ',"nb_high":'//real_text(css_join_report%nb_high)// &
+      ',"first_law_jump_residual":'//real_text(css_join_report%first_law_jump_residual)// &
+      ',"cs2_min":'//real_text(css_join_report%cs2_min)// &
+      ',"cs2_max":'//real_text(css_join_report%cs2_max)// &
+      ',"nb_max":'//real_text(css_join_report%nb_max)// &
+      ',"jump_verified":'//logical_text(css_join_report%jump_verified)// &
+      ',"causal":'//logical_text(css_join_report%causal)// &
+      ',"pressure_strictly_increasing":'//logical_text(css_join_report%pressure_strictly_increasing)//'}'
   case('reconstruct-master')
     if(narg/=8)then
       call emit_failure('reconstruct-master requires INPUT_INTERNAL OUTPUT_INTERNAL SMOOTH SMOOTH_SIGMA FIX_DISSOLUTION DISSOLUTION_TOL RECOMPUTE_EXTRA_CS2');stop 2

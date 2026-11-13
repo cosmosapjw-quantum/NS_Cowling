@@ -291,7 +291,10 @@
         "EOS-03",
         "EOS-04"
       ],
-      "status": "PARTIAL_NATIVE_KERNEL_JOIN_NOT_RUN",
+      "status": "PASS_SCOPED",
+      "status_scope": "EOS-06 native CSS parameterized high-density branch and join contract (the 6 acceptance criteria) on the benchmark GPPVA_FSU2H crust + GM_GM1 core + Alford-Han-Prakash conformal first-order CSS segment. The analytic CSS kernel (compose_eos_css.f90) already existed and passed CI (M5A / E390-05A); this node closes the PARTIAL_NATIVE_KERNEL_JOIN_NOT_RUN remainder by adding the join subroutine (compose_eos_css_join.f90), the 'css-join' CLI action, the source-backed parameter manifest (eos390_css_segments.v1.json), the Python API (join_crust_core_css), and verification tests for all 6 criteria. The joined crust+core+CSS table is NOT sidecar-only, the Delta_epsilon first-law jump is verified at machine precision, the assembled sound speed is causal across the whole join, and the joined table is written to a CompOSE dir and read back losslessly. NOT a 390-batch PASS (EOS-07), NOT a complete-EOS PASS for the 6 EOS-03 source-blocked models. See data/receipts/eos390_m0/E390-06_CSS_BRANCH_JOIN_VERIFICATION_20261113.json.",
+      "verification_receipt": "data/receipts/eos390_m0/E390-06_CSS_BRANCH_JOIN_VERIFICATION_20261113.json",
+      "dependency_note": "EOS-03 is PASS_OR_BLOCKED_SCOPED (6 resolved models usable, 6 source-blocked); EOS-04 is PASS. The CSS join uses the EOS-04 match_crust_core output (matched crust+core table) as its base and the EOS-03-resolved core model (GM_GM1) for the benchmark. The 6 EOS-03 source-blocked models (GPPVA_FSU2/FSU2H/NL3wrL55/TM1e Walecca-blocked, SPG_M3/M5 posterior-extreme) are NOT in the EOS-06 PASS scope: their CSS branches remain out of scope until EOS-03's blocks are lifted (Lalazissis 1997 PDF; posterior-fit-J acceptance). The CSS parameter manifest documents these as blocked_segments.",
       "cloud_action": true,
       "acceptance": [
         "per-task source-backed parameter manifest",

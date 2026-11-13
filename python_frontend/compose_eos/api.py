@@ -391,3 +391,87 @@ def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
         "native_report": payload,
     }
     return matched, info
+
+
+def join_crust_core_css(matched: EOSData, *,
+                        p_transition: float, epsilon_low: float, nb_low: float,
+                        delta_epsilon: float, cs2: float, n_css: int = 8):
+    """EOS-06 native CSS parameterized high-density branch JOIN.
+
+    Append a source-backed CSS (Alford-Han-Prakash) high-density branch to a
+    matched crust+core table, producing a three-segment crust+core+CSS table.
+    The matched table (the output of match_crust_core) supplies the crust+core
+    base; the CSS parameters (p_transition, epsilon_low, nb_low, delta_epsilon,
+    cs2) describe the constant-sound-speed high-density phase and its optional
+    first-order jump at the transition. The joined table is NOT sidecar-only:
+    the CSS high-density branch is concatenated into the main EOSData and
+    written/read as a single CompOSE table.
+
+    The transition jump identity Delta_epsilon = mu_t * Delta_n_B is verified
+    by the Fortran kernel (compose_eos_css.f90 initialize_css_segment); the
+    joined table's pressure/density grids are asserted strictly increasing;
+    the assembled sound speed is checked causal (0 < cs2 <= 1) across the
+    whole join; and the joined table is re-read from the Fortran internal
+    representation to confirm native read-back.
+
+    Returns (joined, info) where info carries the css_join_report and the
+    native consistency record.
+    """
+    import math
+    if not isinstance(matched, EOSData):
+        raise TypeError("matched must be an EOSData instance (the output of match_crust_core)")
+    if matched.n < 2:
+        raise ValueError("matched crust+core table has fewer than 2 rows")
+    if not math.isfinite(float(p_transition)) or p_transition < 0:
+        raise ValueError("p_transition must be finite and nonnegative")
+    if epsilon_low <= 0 or nb_low <= 0:
+        raise ValueError("epsilon_low and nb_low must be positive")
+    if not math.isfinite(float(delta_epsilon)) or delta_epsilon < 0:
+        raise ValueError("delta_epsilon must be finite and nonnegative")
+    if not (0 < cs2 <= 1):
+        raise ValueError("cs2 must satisfy 0 < cs2 <= 1 (causal)")
+    if not isinstance(n_css, int) or isinstance(n_css, bool) or n_css < 4:
+        raise ValueError("n_css must be an integer >= 4")
+
+    with tempfile.TemporaryDirectory(prefix="compose-eos-css-join-") as td:
+        root = Path(td)
+        matched_dir = root / "matched"
+        joined_dir = root / "joined"
+        matched_dir.mkdir()
+        joined_dir.mkdir()
+        matched.write_internal_directory(matched_dir)
+        payload = run_native(
+            "css-join", matched_dir, joined_dir,
+            f"{p_transition:.16e}", f"{epsilon_low:.16e}", f"{nb_low:.16e}",
+            f"{delta_epsilon:.16e}", f"{cs2:.16e}", str(n_css),
+        )
+        joined = EOSData.from_internal_directory(joined_dir, source_dir=matched.source_dir)
+
+    consistency = check_consistency(joined)
+    info = {
+        "operation": "css-join",
+        "n_matched": int(payload["n_matched"]),
+        "n_css": int(payload["n_css"]),
+        "n_total": int(payload["n_total"]),
+        "interface_class": int(payload["interface_class"]),
+        "interface_class_name": ("first_order" if int(payload["interface_class"]) == 1
+                                 else "continuous_unclassified"),
+        "p_transition": float(payload["p_transition"]),
+        "epsilon_low": float(payload["epsilon_low"]),
+        "nb_low": float(payload["nb_low"]),
+        "delta_epsilon": float(payload["delta_epsilon"]),
+        "cs2": float(payload["cs2"]),
+        "mu_transition": float(payload["mu_transition"]),
+        "epsilon_high": float(payload["epsilon_high"]),
+        "nb_high": float(payload["nb_high"]),
+        "first_law_jump_residual": float(payload["first_law_jump_residual"]),
+        "jump_verified": bool(payload["jump_verified"]),
+        "cs2_min": float(payload["cs2_min"]),
+        "cs2_max": float(payload["cs2_max"]),
+        "nb_max": float(payload["nb_max"]),
+        "causal": bool(payload["causal"]),
+        "pressure_strictly_increasing": bool(payload["pressure_strictly_increasing"]),
+        "consistency": consistency,
+        "native_report": payload,
+    }
+    return joined, info

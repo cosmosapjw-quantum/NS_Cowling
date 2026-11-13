@@ -1,0 +1,143 @@
+{
+  "schema": "ns-cowling.eos-06-css-branch-join-verification",
+  "schema_version": "1.0.0",
+  "date": "2026-11-13",
+  "node": "EOS-06",
+  "node_name": "Native CSS parameterized high-density branch and join",
+  "track": "eos390",
+  "status": "PASS_SCOPED",
+  "status_scope": "EOS-06 native CSS parameterized high-density branch and join contract (the 6 acceptance criteria) on the benchmark GPPVA_FSU2H crust + GM_GM1 core + Alford-Han-Prakash conformal first-order CSS segment. The analytic CSS kernel (compose_eos_css.f90) already existed and passed CI (M5A / E390-05A); this node closes the PARTIAL_NATIVE_KERNEL_JOIN_NOT_RUN remainder by adding the join subroutine (compose_eos_css_join.f90), the 'css-join' CLI action, the source-backed parameter manifest (eos390_css_segments.v1.json), the Python API (join_crust_core_css), and verification tests for all 6 criteria. The joined crust+core+CSS table is NOT sidecar-only, the Delta_epsilon first-law jump is verified at machine precision, the assembled sound speed is causal across the whole join, and the joined table is written to a CompOSE dir and read back losslessly. NOT a 390-batch PASS (EOS-07), NOT a complete-EOS PASS for the 6 EOS-03 source-blocked models (their CSS branches remain out of scope), NOT a Dropbox upload PASS.",
+  "supersedes_dag_status": "PARTIAL_NATIVE_KERNEL_JOIN_NOT_RUN",
+  "new_dag_status": "PASS_SCOPED",
+  "dag": "data/ns_cowling_cloud_agent_dag.v1.json",
+  "depends_on": [
+    "EOS-03",
+    "EOS-04"
+  ],
+  "dependency_note": "EOS-03 is PASS_OR_BLOCKED_SCOPED (6 resolved models usable, 6 source-blocked); EOS-04 is PASS. The CSS join uses the EOS-04 match_crust_core output (matched crust+core table) as its base and the EOS-03-resolved core model (GM_GM1) for the benchmark. The 6 EOS-03 source-blocked models (GPPVA_FSU2/FSU2H/NL3wrL55/TM1e Walecca-blocked, SPG_M3/M5 posterior-extreme) are NOT in the EOS-06 PASS scope: their CSS branches remain out of scope until EOS-03's blocks are lifted (Lalazissis 1997 PDF; posterior-fit-J acceptance). The CSS parameter manifest documents these as blocked_segments.",
+  "repository": {
+    "repo": "cosmosapjw-quantum/NS_Cowling",
+    "branch_at_verification": "cloud/eos-06-css-branch-join (child of cloud/eos-01-source-registry-verification -> cloud/eos-03-core-couplings-thermo-reconstruct -> cloud/eos-04-crust-reconstruct-splice -> cloud/eos-05-native-hermite-kernels -> cloud/eos-10-multidim-compose-io -> cloud/eos-02a-presence-masks-completion -> cloud/eos390-fortran-unification-v1 / EOS PR #13)",
+    "base_head": "5dc44e5 (EOS-01 PASS_SCOPED)",
+    "eos_pr_13_head_unchanged": "08fe5b8 (no merge into the PR #13 branch)"
+  },
+  "build_provenance": {
+    "compiler": "GNU Fortran (conda-forge gcc 16.2.0-7) 16.2.0",
+    "executable_sha256": "9f3a9a8a5ff876cbe5abdf925ab67a99a5b8a9dc42f8df3269b04781d11e2105",
+    "note": "Fortran source was changed in this node (this is an implementation node, not test-only): a new module compose_eos_css_join.f90 (the join subroutine) was added, the CLI compose_eos_fortran.f90 gained the 'css-join' case, build.sh compiles the new module, and the executable SHA changed from f0acd9e1 (EOS-01 build) to 9f3a9a8a."
+  },
+  "implementation_files_sha256": {
+    "fortran_eos/src/compose_eos_css_join.f90": "d93ba62dc92a3848184146e629987d72738ffb960dfb03faead011bfd9e2ebc0",
+    "fortran_eos/app/compose_eos_fortran.f90": "578edb3b0561d53c9d78adecb2dd8c4ca04eb842a5aa82ccf42861a1f41c371c",
+    "fortran_eos/build.sh": "183d134d75b7252dfd571619d2317099a4b748fa4ca7296f4a0ceadad52d9fd6",
+    "python_frontend/compose_eos/api.py": "b0d55f901385aebf60adc4f66c4ea9b2982f92d4d2eaa023a719af2e6d85dbca",
+    "python_frontend/compose_eos/__init__.py": "a33b65653c3d744d1f674bdc3342985f842cf0b9109af2d9a6345013ada1878d",
+    "python_frontend/tests/test_eos06_css_branch_join.py": "84eae7da0b485f908e8230977959e68e307e9c27358d2e63a6c46ede2cc7f19f",
+    "data/eos390_css_segments.v1.json": "3dc92b5aa5c4dd70489b1226b98693c9106b50e313d46d2826b12c35eb9ac795"
+  },
+  "css_join_architecture": {
+    "analytic_kernel": "fortran_eos/src/compose_eos_css.f90 (pre-existing, M5A CI-pass): css_segment_t, initialize_css_segment (verifies Delta_epsilon = mu_t * Delta_n_B jump identity, residual < 64*eps*scale; sets interface_class = first_order when delta_epsilon>0), evaluate_css_segment (high-phase epsilon(P)=epsilon_high+(P-P_t)/cs2, nb(P)=nb_high*factor^(1/(1+cs2)), mu_B=(epsilon+P)/nb; rejects acausal cs2<=0 and cs2>1).",
+    "join_subroutine": "fortran_eos/src/compose_eos_css_join.f90 join_crust_core_css: takes a matched crust+core EOSData + CSS params (p_transition, epsilon_low, nb_low, delta_epsilon, cs2, n_css), initializes the css_segment_t (verifies the jump), samples a high-density pressure grid strictly above the matched table's top knot, evaluates epsilon(P)/nb(P)/mu_B(P), converts to CompOSE Q1-Q7 (code convention P=q1*nb, mu_B=(q3+1)*mn, F=(q6+1)*mn, energy=nb*(q7+1)*mn), assembles the joined table (matched knots verbatim + CSS tail), asserts strictly-increasing nb+P, asserts the first law mu_B=F+P/nb on every row, computes the finite-difference sound speed and asserts 0<cs2<=1.",
+    "cli_action": "fortran_eos/app/compose_eos_fortran.f90 case('css-join') (8 args: MATCHED_INTERNAL OUTPUT_INTERNAL P_TRANSITION EPSILON_LOW NB_LOW DELTA_EPSILON CS2 N_CSS): reads the matched internal CSV, calls join_crust_core_css, writes the joined internal CSV + metadata, emits a JSON report with n_matched/n_css/n_total/interface_class/jump_verified/causal/pressure_strictly_increasing.",
+    "python_api": "python_frontend/compose_eos/api.py join_crust_core_css: validates the CSS params, calls the native css-join action via run_native, reads the joined EOSData from the internal dir, computes the native consistency record, returns (joined, info).",
+    "parameter_manifest": "data/eos390_css_segments.v1.json: schema ns-cowling.eos390-css-segments, reference Alford-Han-Prakash PRD 88 083013 (2013) arXiv:1302.4732, one source-backed segment (benchmark_conformal_first_order: p_transition=712.78, epsilon_low=1397.11, nb_low=1.0, delta_epsilon=698.55, cs2=1/3, n_css=8, interface_class=first_order) + a blocked_segments list (the 6 EOS-03 source-blocked models)."
+  },
+  "acceptance_criteria_verification": [
+    {
+      "criterion": "per-task source-backed parameter manifest",
+      "status": "PASS",
+      "evidence_test": "test_eos06_css_branch_join.py::test_css_parameter_manifest_is_source_backed_and_well_formed",
+      "evidence_detail": "data/eos390_css_segments.v1.json exists, schema ns-cowling.eos390-css-segments, reference cites Alford-Han-Prakash PRD 88 083013 (2013) arXiv:1302.4732, the benchmark_conformal_first_order segment carries all 5 CSS params (p_transition, epsilon_low, nb_low, delta_epsilon, cs2) + n_css + interface_class=first_order, and the blocked_segments list documents the 6 EOS-03 source-blocked models that are out of scope."
+    },
+    {
+      "criterion": "native CLI action",
+      "status": "PASS",
+      "evidence_test": "test_eos06_css_branch_join.py::test_css_join_cli_action_is_available; test_css_join_python_api_invokes_native_action",
+      "evidence_detail": "The 'css-join' action is in the CLI usage string (compose_eos_fortran.f90 case('css-join')). join_crust_core_css (api.py) calls run_native('css-join', ...) and returns a joined EOSData + report. The 9 new EOS-06 tests all exercise this path."
+    },
+    {
+      "criterion": "joined crust+core+CSS table not sidecar-only",
+      "status": "PASS",
+      "evidence_test": "test_eos06_css_branch_join.py::test_joined_table_is_three_segment_and_not_sidecar",
+      "evidence_detail": "The joined EOSData has n_total = n_matched + n_css (609 + 8 = 617 rows). The CSS tail knots (rows n_matched+1..n_total) have nb strictly greater than the matched core top (1.0 -> 7.56 fm^-3). The joined nb grid is strictly increasing. The CSS tail is INLINE in the main EOSData (not a sidecar file): composition is absent (strict-thermo-only) but the thermo rows (nb, Q1..Q7) include the CSS tail in the single array. The write_compose round-trip writes a full CompOSE dir (eos.nb, eos.t, eos.thermo, eos.yq), not a CSS-only sidecar."
+    },
+    {
+      "criterion": "Delta_epsilon and first-law jump verified",
+      "status": "PASS",
+      "evidence_test": "test_eos06_css_branch_join.py::test_css_transition_jump_identity_verified; test_joined_table_first_law_holds",
+      "evidence_detail": "The kernel's jump identity Delta_epsilon = mu_t * Delta_n_B is verified at machine precision (first_law_jump_residual = 4.88e-16, < 64*eps*scale). interface_class = 1 (first_order, delta_epsilon > 0). epsilon_high = epsilon_low + delta_epsilon. nb_high > nb_low (the jump increases density). On the joined table, the first law mu_B = F + P/nb holds at every row (max residual < 1e-3 relative)."
+    },
+    {
+      "criterion": "sound speed and causal checks",
+      "status": "PASS",
+      "evidence_test": "test_eos06_css_branch_join.py::test_joined_table_is_causal; test_joined_table_passes_native_consistency_gate",
+      "evidence_detail": "The finite-difference joined sound speed is causal: cs2_min = 3.8e-5 (low-density crust), cs2_max = 0.756 (CSS branch), all within (0, 1]. The joined table passes the native C1-C11 consistency gate: overall PASS, C6 (dP/dn_B > 0) PASS, C10 (causal sound speed) PASS, C11 (dmu_B/dn_B > 0) PASS."
+    },
+    {
+      "criterion": "native read-back",
+      "status": "PASS",
+      "evidence_test": "test_eos06_css_branch_join.py::test_joined_table_native_read_back",
+      "evidence_detail": "The joined table is written to a CompOSE directory (eos.nb, eos.t, eos.thermo, eos.yq -- a full CompOSE table) and read back via read_compose: row count matches (617), density grid matches to rtol=1e-12, the CSS high-density tail survives (max nb = 7.56 fm^-3 > 1.3), and the first-law identity holds on the read-back table. This is the native read-back guarantee."
+    }
+  ],
+  "test_run": {
+    "command": "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python -m pytest -q python_frontend/tests pipeline/tests",
+    "new_tests_added": 9,
+    "new_tests": [
+      "test_eos06_css_branch_join.py::test_css_parameter_manifest_is_source_backed_and_well_formed",
+      "test_eos06_css_branch_join.py::test_css_join_cli_action_is_available",
+      "test_eos06_css_branch_join.py::test_css_join_python_api_invokes_native_action",
+      "test_eos06_css_branch_join.py::test_joined_table_is_three_segment_and_not_sidecar",
+      "test_eos06_css_branch_join.py::test_css_transition_jump_identity_verified",
+      "test_eos06_css_branch_join.py::test_joined_table_first_law_holds",
+      "test_eos06_css_branch_join.py::test_joined_table_is_causal",
+      "test_eos06_css_branch_join.py::test_joined_table_passes_native_consistency_gate",
+      "test_eos06_css_branch_join.py::test_joined_table_native_read_back"
+    ],
+    "with_conda_env_and_shim": {
+      "exit_code": 0,
+      "result": "169 passed, 2 skipped",
+      "log": "download/eos06_baseline/pytest_full.log"
+    },
+    "fresh_cache_default_PATH": {
+      "exit_code": 1,
+      "result": "3 failed, 166 passed, 2 skipped",
+      "log": "download/eos06_baseline/pytest_default_fresh.log",
+      "interpretation": "The 3 failures are the unchanged COWLING-track env failures (gfortran not resolvable on default PATH); NOT EOS-06 and NOT a regression. EOS-06 added 9 passing tests (157 -> 166 passed on default PATH). The 9 new tests pass on default PATH (the css-join CLI needs the conda-env gfortran, so the Python tests that invoke run_native('css-join') use the shim-resolved exe -- on default PATH the executable resolves via COMPOSE_EOS_FORTRAN_EXE which points at the prebuilt build/compose_eos_fortran/compose_eos_fortran)."
+    }
+  },
+  "regression_check": {
+    "before_this_node_default_PATH": "3 failed, 157 passed, 2 skipped (EOS-01 state; the 3 Cowling env failures)",
+    "after_this_node_default_PATH": "3 failed, 166 passed, 2 skipped (same 3 Cowling env failures; +9 new EOS-06 tests pass; 0 regressions)",
+    "regression_count": 0
+  },
+  "honesty_note": "G3 produced one failing-first diagnostic during the implementation: the first css-join CLI run failed with 'joined EOS pressure grid is not strictly increasing'. Root cause was a unit-convention bug in the Q1 assignment (I set q1 = p_grid/mn^2 but the code convention is P = q1*nb, so q1 = P/nb). Corrected by reading eos_pressure/eos_mu_b/eos_free_energy/eos_energy in compose_eos_types.f90 and setting q1 = p_grid(k)/nb_css(k). The corrected run produced the joined table with jump_verified=true, causal=true, pressure_strictly_increasing=true. This was a genuine implementation bug (not test-side), found and fixed before the verification tests were run. The Fortran executable SHA changed (f0acd9e1 -> 9f3a9a8a) reflecting the new module + CLI case.",
+  "full_suite_status_at_HEAD": {
+    "with_conda_env_and_sysroot_shim": {
+      "exit_code": 0,
+      "result": "169 passed, 2 skipped"
+    },
+    "fresh_cache_default_PATH": {
+      "exit_code": 1,
+      "result": "3 failed, 166 passed, 2 skipped",
+      "note": "3 COWLING-track env failures unchanged; ENVIRONMENT_OR_COMPILER, not EOS-06"
+    }
+  },
+  "not_claimed": [
+    "No 390 crust-core-CSS EOS combination regenerated (EOS-07 remains BLOCKED_KERNELS_AND_PROVIDER_SEMANTICS; it needs the EOS-06 join which is now available, plus the SPG/GPPVA provider semantics which remain blocked).",
+    "No complete combined crust-core-CSS EOS table for the 6 EOS-03 source-blocked models (GPPVA_FSU2/FSU2H/NL3wrL55/TM1e Walecca-blocked, SPG_M3/M5 posterior-extreme). Their CSS branches are out of scope (documented in the manifest's blocked_segments) until EOS-03's blocks are lifted (Lalazissis 1997 PDF; posterior-fit-J acceptance).",
+    "No Dropbox upload (EOS-09, local-mount).",
+    "No cell-level CLD beta-equilibrium reconstruction (exercised by EOS-04; the CSS join consumes the matched crust+core barotrope, not a cell-level CLD reconstruction).",
+    "No composition-aware CSS join (the CSS branch is strict-thermo-only; the joined table has no composition, consistent with the match_crust_core drop_composition=True path).",
+    "No SPG/GPPVA provider semantics resolution (EOS-02B BLOCKED_PROVIDER_AUTHORITY).",
+    "The Cowling-track env fix is deliberately NOT made in this EOS-06 commit.",
+    "The maxwell method remains disabled in match_crust_core (the legacy smooth pressure plateau is not a first-order transition; fail closed until the sharp composition-aware construction is integrated).",
+    "Historical M7/M8/M9 files preserved unchanged (the EOS-01 raw-output immutability test pins them).",
+    "No unblocking of the run_css_task orchestrator stub (that is an M7-route concern for EOS-07; the EOS-06 join is exercised through the direct CLI + Python API, not the batch orchestrator)."
+  ],
+  "next_nodes": [
+    "EOS-07 (Native manifest-driven historical 390 batch) - BLOCKED_KERNELS_AND_PROVIDER_SEMANTICS; depends on EOS-02A + EOS-04 + EOS-05 + EOS-06. With EOS-02A/EOS-04/EOS-05/EOS-06 all resolved (PASS or PASS_SCOPED) and EOS-03 PASS_OR_BLOCKED_SCOPED, the CSS join is now available for the 390 batch. EOS-07's remaining blockers are the SPG/GPPVA provider semantics (EOS-02B) and the per-model CSS parameters for the 6 EOS-03 source-blocked models (out of EOS-06 scope). The run_css_task orchestrator stub can now be upgraded to call join_crust_core_css for the resolved-model subset.",
+    "EOS-02B (BLOCKED_PROVIDER_AUTHORITY) remains the upstream limiter for the full SPG/GPPVA 390 generation.",
+    "EOS-08 (NOT_RUN_ON_NATIVE_390) and EOS-09 (SUPERSEDE_OLD_M9) remain downstream of EOS-07."
+  ]
+}

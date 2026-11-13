@@ -26,8 +26,6 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "python_frontend"))
 from compose_eos import EOSData, read_compose, select_slice  # noqa: E402
 
-INPUTS = ROOT / "inputs" / "raw_compose"
-
 
 def _write_multi_yq_table(d: Path, *, n: int, nYq: int, nadd: int = 0):
     """Write a minimal CompOSE cold-slice dir with nT==1, T=0 and nYq>1.
@@ -60,8 +58,6 @@ def _write_multi_yq_table(d: Path, *, n: int, nYq: int, nadd: int = 0):
 # --- 1. a synthetic 1T x 3Yq x n table reads into q_full --------------------
 
 def test_multi_yq_reads_into_q_full(tmp_path):
-    if not (INPUTS / "RG_SLY4").exists():
-        pytest.skip("inputs/raw_compose not staged (E390-00)")
     _write_multi_yq_table(tmp_path / "yq3", n=4, nYq=3)
     eos = read_compose(tmp_path / "yq3")
     assert eos.nYq == 3
@@ -78,8 +74,6 @@ def test_multi_yq_reads_into_q_full(tmp_path):
 # --- 2. select_slice materializes each Yq cell -----------------------------
 
 def test_select_slice_materializes_each_yq(tmp_path):
-    if not (INPUTS / "RG_SLY4").exists():
-        pytest.skip("inputs/raw_compose not staged (E390-00)")
     _write_multi_yq_table(tmp_path / "yq3s", n=5, nYq=3)
     eos = read_compose(tmp_path / "yq3s")
     for iyq in (1, 2, 3):
@@ -92,8 +86,6 @@ def test_select_slice_materializes_each_yq(tmp_path):
 # --- 3. 1T x 2Yq x n Nadd=2 round-trips through the internal directory ----
 
 def test_multi_yq_nadd2_internal_directory_round_trip(tmp_path):
-    if not (INPUTS / "RG_SLY4").exists():
-        pytest.skip("inputs/raw_compose not staged (E390-00)")
     _write_multi_yq_table(tmp_path / "yq2n2", n=4, nYq=2, nadd=2)
     eos = read_compose(tmp_path / "yq2n2")
     assert eos.nYq == 2

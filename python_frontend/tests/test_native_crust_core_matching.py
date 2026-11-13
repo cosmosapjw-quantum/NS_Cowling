@@ -124,7 +124,7 @@ def test_native_smooth_matching_differential_against_legacy(method, tmp_path):
     assert "consistency" in info and "overall" in info["consistency"]
 
 
-def test_historical_maxwell_alias_is_rejected_instead_of_emitting_a_fake_plateau():
+def test_sharp_maxwell_method_is_rejected_by_smooth_matcher_until_m5_integration():
     crust = read_compose(CRUST)
     core = read_compose(CORE)
     with pytest.raises(NativeFeatureUnavailable, match="not a first-order transition"):
@@ -133,7 +133,7 @@ def test_historical_maxwell_alias_is_rejected_instead_of_emitting_a_fake_plateau
         )
 
 
-def test_native_cli_also_rejects_the_legacy_maxwell_alias(tmp_path):
+def test_native_cli_keeps_sharp_maxwell_fail_closed_until_m5_integration(tmp_path):
     crust = read_compose(CRUST)
     core = read_compose(CORE)
     cdir, kdir, out = tmp_path / "crust", tmp_path / "core", tmp_path / "out"

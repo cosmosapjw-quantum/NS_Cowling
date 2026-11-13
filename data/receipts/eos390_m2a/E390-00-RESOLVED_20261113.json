@@ -1,0 +1,102 @@
+{
+  "receipt_id": "E390-00-RESOLVED_20261113",
+  "node": "E390-00",
+  "gate": "M0",
+  "title": "Freeze and hash all source/data baselines",
+  "prior_status": "BLOCKED_REPLACEMENT_ZIP_NOT_STAGED",
+  "resolved_status": "IMPLEMENTED_CI_PASS",
+  "resolution_date": "2026-11-13",
+  "branch": "cloud/eos390-fortran-unification-v1",
+  "finding": "The replacement Dropbox archive EoS_complete_core_crust_release_v3_2.zip (provided by the user via upload/) was staged into ${WORKSPACE}/inputs/replacement/, independently re-hashed, and its 18-model/158-file source cohort was extracted, per-file hashed, and archived into a fresh reproducible tar.zst. The lost NS_Cowling_EOS390_raw_inputs_v1.tar.zst was NOT requested (per next_actions[0]). All five E390-00 outputs are produced; the M0 admission gate passes.",
+  "user_provided_inputs": {
+    "zip_source": "/home/z/my-project/upload/EoS_complete_core_crust_release_v3_2.zip",
+    "ssh_key_for_push": "/home/z/my-project/upload/glm_key (ed25519, coosmosapjw@gmail.com) — enabled git push of the prior 4 commits + merge"
+  },
+  "outputs": {
+    "1_replacement_zip_sha256_size_crc_verification": {
+      "staged_path": "inputs/replacement/EoS_complete_core_crust_release_v3_2.zip",
+      "size_bytes": 19398255,
+      "sha256_independent_rehash": "d671310eb630ffd13f1b278425d945741ad7e08ce14c0d9aff42309c707e6a3b",
+      "sha256_from_delivery_manifest": "d671310eb630ffd13f1b278425d945741ad7e08ce14c0d9aff42309c707e6a3b",
+      "sha256_verification": "MATCH (independent rehash == delivery manifest)",
+      "crc32_whole_file": "13191d7e",
+      "zip_members_actual": 2516,
+      "zip_members_inventory_reported": 2516,
+      "crc_test_status": "PASS (zip integrity verified via Python zipfile; no CRC errors on member read)",
+      "verdict": "PASS"
+    },
+    "2_18_model_158_file_exact_source_inventory_comparison": {
+      "inventory_file": "data/eos390_reconstructed_source_inventory.v1.json",
+      "inventory_counts": {"models": 18, "files": 158, "bytes": 3883275},
+      "fresh_extraction_counts": {"models": 18, "files": 158},
+      "models": ["APR_APR","BBB_BHF2","GM_GM1","GPPVA_DD2","GPPVA_DDME2","GPPVA_FSU2","GPPVA_FSU2H","GPPVA_FSU2R","GPPVA_NL3wrL55","GPPVA_TM1e","GPPVA_TW","RG_KDE0v1","RG_SLY4","SPG_M1","SPG_M2","SPG_M3","SPG_M4","SPG_M5"],
+      "per_model_file_counts_match": true,
+      "per_model_counts": {
+        "APR_APR": "inv=8 fresh=8",
+        "BBB_BHF2": "inv=7 fresh=7",
+        "GM_GM1": "inv=8 fresh=8",
+        "GPPVA_DD2": "inv=9 fresh=9",
+        "GPPVA_DDME2": "inv=9 fresh=9",
+        "GPPVA_FSU2": "inv=9 fresh=9",
+        "GPPVA_FSU2H": "inv=9 fresh=9",
+        "GPPVA_FSU2R": "inv=9 fresh=9",
+        "GPPVA_NL3wrL55": "inv=9 fresh=9",
+        "GPPVA_TM1e": "inv=9 fresh=9",
+        "GPPVA_TW": "inv=9 fresh=9",
+        "RG_KDE0v1": "inv=9 fresh=9",
+        "RG_SLY4": "inv=9 fresh=9",
+        "SPG_M1": "inv=9 fresh=9",
+        "SPG_M2": "inv=9 fresh=9",
+        "SPG_M3": "inv=9 fresh=9",
+        "SPG_M4": "inv=9 fresh=9",
+        "SPG_M5": "inv=9 fresh=9"
+      },
+      "files_missing_from_fresh": 0,
+      "files_extra_in_fresh": 0,
+      "verdict": "PASS"
+    },
+    "3_fresh_per_file_sha256sums": {
+      "path": "inputs/raw_compose/SHA256SUMS.txt",
+      "line_count": 158,
+      "reconciliation_vs_inventory": {
+        "records_checked": 158,
+        "hash_mismatches": 0,
+        "size_mismatches": 0,
+        "missing": 0,
+        "extra": 0
+      },
+      "verdict": "PASS — all 158 freshly computed SHA-256 hashes and sizes match the checked-in inventory bit-for-bit"
+    },
+    "4_new_reconstructed_tar_zst": {
+      "path": "inputs/replacement/eos390_reconstructed_source_v1.tar.zst",
+      "size_bytes": 1061584,
+      "sha256": "7d657c7ae42acfca0ffa71b8efc0a55fc3049ee65bbfc5272317d4b46090c3ad",
+      "reproducibility_flags": "tar --zstd --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner, ZSTD_CLEVEL=19",
+      "members": 178,
+      "member_layout": "SHA256SUMS.txt + source_manifest.json + 18 sorted model directories (158 provider files)",
+      "readback_test": "PASS (tar --zstd -tf lists all 178 members)",
+      "toolchain_note": "zstd 1.5.7 (conda-forge) installed at /home/z/my-project/miniconda3/bin/zstd; CI environment uses apt-installed zstd or the conda-forge path. GNU tar 1.35 provides --zstd.",
+      "verdict": "PASS"
+    },
+    "5_source_manifest_and_legacy_output_manifest": {
+      "source_manifest_path": "inputs/raw_compose/source_manifest.json",
+      "source_manifest_records": 158,
+      "legacy_output_manifest_in_zip": "EoS_complete_core_crust_release_v3_2/matched_eos_390/ (393 combination directories from the v3.2 release) + reports/ (ADVERSARIAL_AUDIT_REPORT_v3_2, CHANGE_AND_REPAIR_REPORT_v3_2, COMPOSITION_NORMALIZATION_MANIFEST, INDEPENDENT_READBACK_v3_2, NORMALIZER_REPRODUCIBILITY_v3_2, TECHNICAL_REFERENCE_v3_2)",
+      "legacy_390_summary_status": "the v3.2 release ships matched_eos_390/ (393 combinations) as the legacy output corpus; not re-extracted into the working tree (E390-00 scope is source baseline, not legacy outputs), but its presence is recorded for provenance",
+      "verdict": "PASS"
+    }
+  },
+  "extraction_and_staging_layout": {
+    "staged_zip": "inputs/replacement/EoS_complete_core_crust_release_v3_2.zip",
+    "reconstructed_tar_zst": "inputs/replacement/eos390_reconstructed_source_v1.tar.zst",
+    "extracted_source_root": "inputs/raw_compose/ (18 model directories + SHA256SUMS.txt + source_manifest.json)",
+    "tree_size": {"inputs/raw_compose": "4.3M", "inputs/replacement": "20M"}
+  },
+  "downstream_impact": {
+    "E390_10B_phase_6": "the 2 previously-skipped test_m10 tests (test_real_RG_SLY4_passes_slice_check, test_real_RG_KDE0v1_passes_slice_check) can now run against the staged raw_compose; unblocks E390-10B real-data slice-check validation",
+    "M3_M6_real_data": "the 18-model cohort is now available as a checked-in-validated source for reconstruction, matching, and splicing pipelines",
+    "provenance_chain": "user-uploaded zip -> independent SHA-256 rehash (matches delivery manifest) -> per-file hash (matches inventory) -> reproducible tar.zst -> readback verify; every step attested"
+  },
+  "admission_gate": "M0 BLOCKED_REPLACEMENT_ZIP_NOT_STAGED -> IMPLEMENTED_CI_PASS: binary staged, hash verified, ZIP integrity PASS, 18-model/158-file exact match, fresh per-file hashes PASS, tar.zst generated and readback-verified, legacy manifest recorded.",
+  "next_node_recommendation": "E390-00 resolved. With raw_compose staged, unblock the 2 skipped test_m10 tests (run them against inputs/raw_compose) and validate E390-10A's real-data slice check; then proceed to E390-10B phase 1 (data model extension, lowest risk) or SPG/GPPVA abundance semantics (next_actions[4])."
+}

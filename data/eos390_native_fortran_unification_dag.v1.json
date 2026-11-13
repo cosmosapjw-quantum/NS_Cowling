@@ -406,7 +406,7 @@
    "gate": "M0",
    "title": "Freeze and hash all source/data baselines",
    "depends_on": [],
-   "status": "BLOCKED_REPLACEMENT_ZIP_NOT_STAGED",
+   "status": "IMPLEMENTED_CI_PASS",
    "files": [
     "data/eos390_native_fortran_unification_dag.v1.json"
    ],
@@ -416,7 +416,10 @@
     "fresh per-file SHA256SUMS.txt",
     "new reconstructed tar.zst and source manifest",
     "legacy output manifest"
-   ]
+   ],
+   "status_detail": "Replacement ZIP staged in inputs/replacement/, independent SHA-256 rehash matches delivery manifest, 18-model/158-file exact inventory match, fresh per-file SHA256SUMS.txt (158 lines, 0 mismatches vs inventory), reproducible tar.zst generated + readback-verified, legacy manifest recorded.",
+   "resolved_date": "2026-11-13",
+   "receipt": "data/receipts/eos390_m2a/E390-00-RESOLVED_20261113.json"
   },
   {
    "id": "E390-01",
@@ -1734,7 +1737,7 @@
   }
  ],
  "next_actions": [
-  "Stage the surviving Dropbox archive EoS_complete_core_crust_release_v3_2.zip from /EoS_core_crust_release_v3_2_20261106/ into ${WORKSPACE}/inputs/replacement; verify it and run scripts/prepare_eos390_reconstructed_inputs.py with data/eos390_reconstructed_source_inventory.v1.json. Do not request the lost NS_Cowling_EOS390_raw_inputs_v1.tar.zst.",
+  "[RESOLVED 2026-11-13] Stage the surviving Dropbox archive EoS_complete_core_crust_release_v3_2.zip from /EoS_core_crust_release_v3_2_20261106/ into ${WORKSPACE}/inputs/replacement; verify it and run scripts/prepare_eos390_reconstructed_inputs.py with data/eos390_reconstructed_source_inventory.v1.json. Do not request the lost NS_Cowling_EOS390_raw_inputs_v1.tar.zst.",
   "[RESOLVED 2026-11-13] Finish E390-02C: move find_density_gap selection and any production numerical selector from Python into Fortran; quarantine Python/SciPy prototypes as diagnostic-only.",
   "[RESOLVED 2026-11-13] Implement E390-02A row-level, field-level, per-species and group presence masks; assess C3 and C4 independently per row.",
   "[SPLIT 2026-11-13] Implement E390-10 general CompOSE axes and lossless 1D/2D/3D reader/writer. (E390-10A=RESOLVED cold-slice; E390-10B=PENDING full multidim reader, design drafted)",

@@ -14,14 +14,21 @@ import m7_batch_orchestrator as m7  # noqa: E402
 from m7_manifest_generator import METHODS, METHOD_PHYSICS  # noqa: E402
 
 
-def test_historical_maxwell_token_is_not_a_sharp_first_order_transition():
-    assert "maxwell" in METHODS
-    assert METHOD_PHYSICS["maxwell"]["kind"] == "legacy_smooth_interpolation"
-    assert "NPPHB" in METHOD_PHYSICS["maxwell"]["description"]
-    assert METHOD_PHYSICS["maxwell"]["physical_classification"] == "UNRESOLVED"
+def test_method_ids_distinguish_legacy_smooth_bridge_from_sharp_maxwell():
+    legacy = "first_law_constrained_hermite_pressure_bridge"
+    assert legacy in METHODS
+    assert "maxwell" not in METHODS
+    assert METHOD_PHYSICS[legacy]["kind"] == "legacy_smooth_interpolation"
+    assert METHOD_PHYSICS[legacy]["method_identity"] == "LEGACY_NPPHB_FLCHPB"
+    assert "first-law-constrained Hermite pressure bridge" in METHOD_PHYSICS[legacy]["description"]
+    assert METHOD_PHYSICS["maxwell"]["kind"] == "sharp_maxwell_phase_transition"
+    assert METHOD_PHYSICS["maxwell"]["method_identity"] == "SHARP_MAXWELL_LOCAL_NEUTRALITY"
+    assert METHOD_PHYSICS["maxwell"]["physical_classification"] == "FIRST_ORDER_SHARP"
 
 
 def test_python_oracle_and_placeholder_methods_are_blocked():
+    with pytest.raises(m7.BackendUnavailable, match="native Fortran"):
+        m7.run_first_law_constrained_hermite_pressure_bridge_task("crust", "core", "out")
     with pytest.raises(m7.BackendUnavailable, match="native Fortran"):
         m7.run_maxwell_task("crust", "core", "out")
     with pytest.raises(m7.BackendUnavailable, match="native Fortran"):
@@ -29,7 +36,6 @@ def test_python_oracle_and_placeholder_methods_are_blocked():
     for method in ("cubic_F", "cubic_P", "quintic_F", "quintic_P"):
         with pytest.raises(m7.BackendUnavailable, match="native Fortran"):
             m7.run_smooth_task(method, "crust", "core", "out")
-
 
 def test_run_task_does_not_promote_python_results_to_pass(tmp_path, monkeypatch):
     crust = tmp_path / "crust"
@@ -41,7 +47,7 @@ def test_run_task_does_not_promote_python_results_to_pass(tmp_path, monkeypatch)
         "task_id": "unit-test",
         "crust_model": "C",
         "core_model": "H",
-        "method": "maxwell",
+        "method": "first_law_constrained_hermite_pressure_bridge",
         "method_kind": "legacy_smooth_interpolation",
         "method_reference": "project-defined",
         "acceptance_node": "E390-02C",
@@ -51,7 +57,7 @@ def test_run_task_does_not_promote_python_results_to_pass(tmp_path, monkeypatch)
         "core_eos_path": str(core),
     }
     monkeypatch.setattr(
-        m7, "run_maxwell_task",
+        m7, "run_first_law_constrained_hermite_pressure_bridge_task",
         lambda *_: {
             "output_files": [],
             "execution_backend": "python_oracle",

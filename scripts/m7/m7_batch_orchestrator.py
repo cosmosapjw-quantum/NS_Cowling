@@ -15,6 +15,8 @@ import traceback
 import hashlib
 from pathlib import Path
 
+FIRST_LAW_HERMITE_PRESSURE_BRIDGE = "first_law_constrained_hermite_pressure_bridge"
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PYTHON_FRONTEND = REPO_ROOT / "python_frontend"
 if str(PYTHON_FRONTEND) not in sys.path:
@@ -39,16 +41,26 @@ def sha256_file(path: str) -> str:
     return h.hexdigest()
 
 
-def run_maxwell_task(crust_dir: str, core_dir: str, output_dir: str) -> dict:
-    """Historical 'maxwell' token means the smooth NPPHB bridge, not sharp Maxwell.
+def run_first_law_constrained_hermite_pressure_bridge_task(crust_dir: str, core_dir: str, output_dir: str) -> dict:
+    """Run the historical smooth NPPHB parameterization under its new method ID.
 
-    The old Python M5 sharp-Maxwell oracle has different physical semantics.
-    The native NPPHB Hermite kernel is not ported/validated yet, so block this
-    390-matrix task rather than calling a different algorithm.
+    The native Fortran smooth Hermite kernel is not ported/validated yet, so the
+    390-matrix task remains blocked rather than calling a Python numerical oracle.
     """
     raise BackendUnavailable(
-        "legacy maxwell/NPPHB requires the native Fortran M2/M10 smooth Hermite kernel; "
-        "the Python M5 sharp-Maxwell oracle is not a compatible substitute"
+        "first_law_constrained_hermite_pressure_bridge requires the native Fortran M2/M10 smooth Hermite kernel"
+    )
+
+
+def run_maxwell_task(crust_dir: str, core_dir: str, output_dir: str) -> dict:
+    """The canonical 'maxwell' method is the true sharp local-neutrality transition.
+
+    This separate physical transition path requires common P(mu_B) coexistence,
+    equal P_t and mu_t, a positive density/energy jump, and composition-aware
+    native M5 integration. It must not call the historical NPPHB kernel.
+    """
+    raise BackendUnavailable(
+        "maxwell is reserved for sharp Maxwell coexistence; native Fortran M5 composition-aware transition integration is pending"
     )
 
 
@@ -115,7 +127,9 @@ def run_task(task: dict) -> dict:
         if not Path(core_dir).is_dir():
             raise FileNotFoundError(f"core EOS source missing: {core_dir}")
         method = task["method"]
-        if method == "maxwell":
+        if method == FIRST_LAW_HERMITE_PRESSURE_BRIDGE:
+            result = run_first_law_constrained_hermite_pressure_bridge_task(crust_dir, core_dir, str(out_dir))
+        elif method == "maxwell":
             result = run_maxwell_task(crust_dir, core_dir, str(out_dir))
         elif method == "css":
             result = run_css_task(crust_dir, core_dir, str(out_dir))

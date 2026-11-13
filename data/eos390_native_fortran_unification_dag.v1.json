@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.4.6",
+  "revision": "1.4.7",
   "created_utc": "2026-11-11",
-  "status": "M1A_SPECIFICATION_COMPLETE_M1C_BOUNDARY_ADJUDICATION_NEXT",
+  "status": "M1A_SPECIFICATION_COMPLETE_SOURCE_LABELS_CORRECTED_M1C_BOUNDARY_ADJUDICATION_NEXT",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "cloud/eos390-fortran-unification-v1",
@@ -831,12 +831,13 @@
         "E390-02A",
         "E390-10A"
       ],
-      "status": "SPECIFICATION_COMPLETE_MODEL_BOUNDARY_ADMISSION_PENDING",
+      "status": "SPECIFICATION_COMPLETE_MODEL_BOUNDARY_ADMISSION_PENDING_SOURCE_LABELS_CORRECTED",
       "outputs": [
         "source-authoritative component boundaries and model-specific policies for all five core and thirteen crust inputs",
         "separate raw-source, normalized/reconstructed, core-only, crust-only and matched-composite artifact contracts",
         "cold T=0 thermodynamic and composition acceptance matrix",
-        "matching-ready component interface metadata and provenance schema"
+        "matching-ready component interface metadata and provenance schema",
+        "model-specific outer-crust provider correction: GPPVA_TW=BPS; GPPVA_FSU2R unresolved"
       ],
       "acceptance": [
         "Core-only selection is provider/model-specific and uses documented homogeneous-matter support; the legacy n_B>=0.045 fm^-3 fallback is not accepted as the sole physical boundary criterion.",
@@ -849,14 +850,14 @@
         "Raw source hashes and all intermediate outputs are immutable/versioned; reconstruction changes are recorded as transformations.",
         "The component constructors do not extrapolate outside source support and report source gaps, duplicate rows, unsupported fields and acausal/stability failures explicitly."
       ],
-      "status_detail": "The source-authoritative component schema and model inventory are specified for all five core and thirteen crust inputs. Exact source-grid supports, model-specific prematched crust facts, CompOSE Q1-Q7/rest-mass conventions, sparse composition/missingness, artifact lineage and fail-closed tests are recorded. This is a specification completion only: four core boundaries still require model-specific adjudication; no component builder or output table was implemented, and no CI PASS is claimed.",
+      "status_detail": "The 5-core/13-crust component contract and immutable artifact/thermodynamic interfaces are specified. Source labels were corrected against exact CompOSE pages: TW uses BPS; FSU2R outer crust is left unassigned until its own data sheet is verified; the archived APR input is pinned to older 172-point EOS 68, not newer 1833-point unified EOS 328. Physical core boundaries and per-model phase/neutron-drip dictionaries remain blocked for E390-01C. No builders or 390 matching tasks are part of this design node.",
       "files": [
         "data/eos390_component_source_contract.v1.json",
         "docs/E390_01A_STANDALONE_COMPONENT_CONSTRUCTION_CONTRACT_20261113.md",
         "data/receipts/eos390_m1a/E390-01A_STANDALONE_COMPONENT_CONTRACT_20261113.json"
       ],
       "receipt": "data/receipts/eos390_m1a/E390-01A_STANDALONE_COMPONENT_CONTRACT_20261113.json",
-      "receipt_blob": "dd86859dba86b53977a0115da64507808f923cb4",
+      "receipt_blob": "ed01d82dd9e65f4013c5023700218e62b459b1eb",
       "contract": "data/eos390_component_source_contract.v1.json",
       "contract_blob": "d4f76d4237e72438834d81593f953335f0219dd5",
       "resolved_date": "2026-11-13"
@@ -1375,8 +1376,8 @@
     },
     {
       "area": "row-level composition presence/coverage",
-      "status": "DIAGNOSED_NOT_IMPLEMENTED",
-      "evidence": "Global composition_available conflates missing records with measured zero; GM_GM1 phase-only and partial species coverage requires presence masks."
+      "status": "RESOLVED_CI_PASS",
+      "evidence": "E390-02A receipt: 8 tests pass; row-level species/group masks and independent C3/C4 applicability are implemented and round-trip tested."
     },
     {
       "area": "SPG/GPPVA final eos.compo tuple semantics",
@@ -1387,7 +1388,7 @@
     {
       "area": "standalone core-only and crust-only EOS construction",
       "status": "SPECIFIED_NOT_IMPLEMENTED",
-      "evidence": "E390-01A v1 component source contract enumerates all 5 core and 13 crust tables and the thermodynamic/provenance interface; E390-03A/B builders are pending after source boundary adjudication."
+      "evidence": "E390-01A source contract v1.0.1 specifies all 5 core and 13 crust inputs, source grids, thermodynamics, missingness, provenance, and immutable artifacts; native builders remain E390-03A/B after E390-01C."
     },
     {
       "area": "model-specific component boundary admission",
@@ -2154,12 +2155,13 @@
   },
   "latest_evidence_receipt": {
     "node": "E390-01A",
-    "path": "data/receipts/eos390_m1a/E390-01A_STANDALONE_COMPONENT_CONTRACT_20261113.json",
-    "blob_sha": "dd86859dba86b53977a0115da64507808f923cb4",
-    "status": "SPECIFICATION_COMPLETE_MODEL_BOUNDARY_ADMISSION_PENDING",
+    "blob_sha": "ed01d82dd9e65f4013c5023700218e62b459b1eb",
+    "status": "SPECIFICATION_COMPLETE_MODEL_BOUNDARY_ADMISSION_PENDING_SOURCE_LABELS_CORRECTED",
     "contract": "data/eos390_component_source_contract.v1.json",
-    "contract_blob": "15b86f57aac4620f3aad3f98c4528b77702f5467",
+    "contract_blob": "82d9b1770f4ff19bb75c896fb31a07da2d2765e5",
     "backup_branch": "backup/e390-01a-pre-20261113",
-    "backup_parent_sha": "4dd2a52356c77504d7d6e043238d8a79d24629be"
+    "backup_parent_sha": "4dd2a52356c77504d7d6e043238d8a79d24629be",
+    "correction_backup_branch": "backup/e390-01a-label-corrections-pre-20261113",
+    "correction_parent_sha": "96c0cbbaa6bfac9a82a4784f23a43d2016bc4ae8"
   }
 }

@@ -13,7 +13,7 @@ This node fixes the scientific and data contract for standalone components befor
 
 The current "core" source cohort is not five homogeneous-core-only files. CompOSE identifies APR(APR) and BBB(BHF-BBB2) as non-unified cold EOSs with BPS outer crust and SLy4 inner crust already appended; GM(GM1) contains a Douchin-Haensel crust below \(n_B=10^{-3}\,\mathrm{fm}^{-3}\); RG(KDE0v1) and RG(SLY4) are classified as unified EOSs. Treating each file's minimum density as the start of a homogeneous core would therefore import crust matter into a core-only artifact. This is the central reason for separating raw source coverage from physical component support.
 
-The 13 crust inputs are also not interchangeable density tails. The five SPG models use their model-specific crust construction, with a BSk22 low-density segment and CLD-based inner-crust treatment; the eight GPPVA models use BSk22 at low density and self-consistent Thomas-Fermi inner-crust calculations, including nonspherical pasta where specified. Each crust EOS has its own terminal density. That terminal point is table support, not a universal transition density.
+The 13 crust inputs are not interchangeable density tails. The five SPG models use model-specific CLD inner-crust constructions, with BSk22 outer crust below 2.0e-3 fm^-3 on the verified M1/M3/M4/M5 pages; M2 remains pinned to its exact source archive pending page-level confirmation. Among GPPVA crust pages verified here, DD2, DD-ME2, FSU2, FSU2H, NL3wrL55 and TM1e specify BSk22 below 2.0e-3 fm^-3, TW specifies BPS below the same density, and FSU2R's outer-crust source remains unresolved. The eight use self-consistent Thomas-Fermi inner-crust calculations, with nonspherical pasta explicitly stated on the verified pages. Each crust EOS has its own terminal density. That terminal point is table support, not a universal transition density.
 
 ## 2. Source-authoritative component matrix
 
@@ -29,7 +29,7 @@ The intervals below are the exact native \`eos.nb\` grid support in the current 
 | RG_KDE0v1 | \(10^{-7}\) to 1.791349 | 1240 | Unified crust-core table | **Blocked:** KDE0v1-specific phase legend/core onset must be extracted |
 | RG_SLY4 | \(10^{-7}\) to 1.21 | 197 | Unified SLy4 table with cluster energy functionals | **Blocked:** SLY4-specific phase legend/core onset must be extracted |
 
-CompOSE source pages: [APR(APR)](https://compose.obspm.fr/eos/68), [BBB(BHF-BBB2)](https://compose.obspm.fr/eos/69), [GM(GM1)](https://compose.obspm.fr/eos/54), [RG(SLY4)](https://compose.obspm.fr/eos/134), and the [CompOSE model selection table](https://compose.obspm.fr/table_selection) for the RG(KDE0v1) unified classification.
+CompOSE source pages: [APR(APR), archived 172-point release](https://compose.obspm.fr/eos/68), [BBB(BHF-BBB2)](https://compose.obspm.fr/eos/69), [GM(GM1)](https://compose.obspm.fr/eos/54), [RG(SLY4)](https://compose.obspm.fr/eos/134), and the [CompOSE model selection table](https://compose.obspm.fr/table_selection) for the RG(KDE0v1) unified classification. A newer 1833-point [APR unified-crust release](https://compose.obspm.fr/eos/328) is a different table and is not substituted for the current archived 172-point input.
 
 Consequences:
 
@@ -57,11 +57,11 @@ Every row below is the archived \`eos.nb\` support, \(n_{\min}=4.67962\times10^{
 | GPPVA_FSU2R | 0.082999997 | 296 | BSk22 + FSU2R Thomas-Fermi |
 | GPPVA_NL3wrL55 | 0.082000002 | 298 | BSk22 + NL3-\(\omega\rho\), \(L=55\) MeV Thomas-Fermi |
 | GPPVA_TM1e | 0.089000002 | 303 | BSk22 + TM1e Thomas-Fermi |
-| GPPVA_TW | 0.074000001 | 289 | BSk22 + TW Thomas-Fermi |
+| GPPVA_TW | 0.074000001 | 289 | BPS + TW Thomas-Fermi |
 
-CompOSE identifies 13 neutron-star-crust tables, split into five unified-model crust tables and eight Thomas-Fermi crust tables. The DD2, DD-ME2, FSU2H, NL3\(\omega\rho L55\), TM1e, SPG M3 and SPG M5 pages are individually linked in the component registry. The archived table endpoints above are measured from the actual source grid, not inferred from the model name.
+CompOSE identifies 13 neutron-star-crust tables, split into five unified-model crust tables and eight Thomas-Fermi crust tables. The DD2, DD-ME2, FSU2, FSU2H, NL3\(\omega\rho L55\), TM1e and TW pages are individually linked in the component registry, as are SPG M1, M3, M4 and M5. The exact FSU2R outer-crust provider and the SPG M2 page-level statement remain unresolved. The archived table endpoints above are measured from the actual source grid, not inferred from the model name.
 
-For the SPG/GPPVA records, keep all source-supported outer-crust, neutron-drip and inner-crust rows. The BSk22 low-density source splice below \(2.0\times10^{-3}\,\mathrm{fm}^{-3}\) is **not** the neutron-drip density. Neutron drip is a separate physical transition within the low-density sequence and must be retained with its own source/model evidence. Preserve every source-defined cluster and pasta phase through the source-supported endpoint. Do not append a homogeneous high-density core tail to a crust-only artifact.
+For the SPG/GPPVA records, keep all source-supported outer-crust, neutron-drip and inner-crust rows. Do not impose one outer-crust model across the whole cohort: the GPPVA_TW sheet explicitly specifies BPS, whereas the verified GPPVA DD2/DD-ME2/FSU2/FSU2H/NL3wrL55/TM1e sheets specify BSk22; GPPVA_FSU2R remains unverified in this record. The BSk22 low-density source splice below \(2.0\times10^{-3}\,\mathrm{fm}^{-3}\) is **not** the neutron-drip density. Neutron drip is a separate physical transition within the low-density sequence and must be retained with its own source/model evidence. Preserve every source-defined cluster and pasta phase through the source-supported endpoint. Do not append a homogeneous high-density core tail to a crust-only artifact.
 
 The GPPVA family is based on Grill et al.'s self-consistent Thomas-Fermi construction; its nonspherical pasta phases must remain represented where the model data sheet specifies them. The SPG family uses model-specific CLD reconstruction associated with Scurto, Pais and Gulminelli and its cited functional inputs. Neither family permits an unverified scalar remapping of the final \`eos.compo\` tuple.
 
@@ -175,3 +175,13 @@ After E390-01C:
 - GPPVA crust: Grill et al., PRC 90, 045803 (2014), [DOI](https://doi.org/10.1103/PhysRevC.90.045803); model-specific RMF papers for DD2, DD-ME2, FSU2/H/R, NL3\(\omega\rho L55\), TM1e and TW are listed in the source bibliography JSON.
 
 The exact per-model data-sheet URLs, raw \(n_B\) grid endpoints, point counts and Git blob identities are maintained in \`data/eos390_component_source_contract.v1.json\`.
+
+### 2.3 Source-label correction addendum (2026-11-13)
+
+A final official-page cross-check corrected one family-wide assumption in the first draft: **GPPVA_TW uses a BPS outer crust**, not BSk22. Its current CompOSE page 212 explicitly says that the BPS outer crust is added below \(n_B=0.002\,\mathrm{fm}^{-3}\), with a TW Thomas-Fermi inner crust. The verified GPPVA pages for DD2 (210), DD-ME2 (211), FSU2 (209), FSU2H (208), NL3\(\omega\rho L55\) (204) and TM1e (207) specify BSk22 below the same density. The outer-crust source for FSU2R remains **unresolved** and must not be inferred from family membership.
+
+The SPG crust pages now linked in the registry include M1 (311), M3 (317), M4 (318) and M5 (319); M2's source identity and archived 377-point grid are recorded, but its exact page-level outer-crust statement remains to be admitted. All source-provider splice densities are distinct from neutron drip.
+
+The current CompOSE website also lists a newer APR unified-crust table, page 328, with 1833 density points. The repository's pinned APR source has 172 points and matches the older non-unified APR table, page 68, which explicitly includes BPS outer crust and SLy4 inner crust. These are different releases. The present source lock remains page 68; page 328 is an alternate release, never a silent replacement.
+
+These corrections do not close the remaining exact core-boundary or per-model phase-dictionary gate. E390-01C remains the next node.

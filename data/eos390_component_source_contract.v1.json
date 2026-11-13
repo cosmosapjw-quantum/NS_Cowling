@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-component-source-contract",
   "schema_version": "1.0.0",
   "contract_id": "E390-01A-STANDALONE-COMPONENT-CONSTRUCTION",
-  "revision": "1.0.0",
+  "revision": "1.0.1",
   "date": "2026-11-13",
-  "status": "SPECIFICATION_COMPLETE_MODEL_BOUNDARY_ADMISSION_PENDING",
+  "status": "SPECIFICATION_COMPLETE_MODEL_BOUNDARY_ADMISSION_PENDING_SOURCE_LABELS_CORRECTED",
   "governing_node": "E390-01A",
   "next_node": "E390-01C",
   "authority": {
@@ -152,7 +152,14 @@
         "rule": "remove the BPS+SLy4 pre-matched crust; admit only the APR homogeneous core branch after an exact source/datasheet transition locator is recorded",
         "prohibited": "do not infer n_cc from the table minimum, a generic 0.045 fm^-3 cut, or an unverified convexity heuristic"
       },
-      "source_unit": "CompOSE; nB fm^-3, P/epsilon MeV fm^-3; m_n/m_p from eos.thermo header"
+      "source_unit": "CompOSE; nB fm^-3, P/epsilon MeV fm^-3; m_n/m_p from eos.thermo header",
+      "alternate_compose_release": {
+        "compose_entry": "APR(APR) unified crust",
+        "compose_eos_id": 328,
+        "compose_url": "https://compose.obspm.fr/eos/328",
+        "status": "SEPARATE_NEWER_RELEASE_NOT_THE_ARCHIVED_172_POINT_SOURCE",
+        "reason": "The repository source has 172 eos.nb rows and matches older non-unified APR page 68; do not silently replace it with the newer 1833-point unified-crust release."
+      }
     },
     {
       "id": "BBB_BHF2",
@@ -297,7 +304,7 @@
       "id": "SPG_M1",
       "family": "crust",
       "compose_entry": "SPG(M1) Crust NS EoS",
-      "compose_url": "https://compose.obspm.fr/table_selection",
+      "compose_url": "https://compose.obspm.fr/eos/311",
       "raw_table_support": {
         "nB_min_fm3": 4.67962e-10,
         "nB_max_fm3": 0.07413102413,
@@ -369,7 +376,7 @@
       "id": "SPG_M4",
       "family": "crust",
       "compose_entry": "SPG(M4) Crust NS EoS",
-      "compose_url": "https://compose.obspm.fr/table_selection",
+      "compose_url": "https://compose.obspm.fr/eos/318",
       "raw_table_support": {
         "nB_min_fm3": 4.67962e-10,
         "nB_max_fm3": 0.0977237221,
@@ -465,7 +472,7 @@
       "id": "GPPVA_FSU2",
       "family": "crust",
       "compose_entry": "GPPVA(FSU2) NS crust",
-      "compose_url": "https://compose.obspm.fr/table_selection",
+      "compose_url": "https://compose.obspm.fr/eos/209",
       "raw_table_support": {
         "nB_min_fm3": 4.67962e-10,
         "nB_max_fm3": 0.054000001,
@@ -521,7 +528,7 @@
       },
       "eos_nb_git_blob_sha1": "756b25cc31d84d5c4124e3593fe0e122685e8ac3",
       "source_construction": {
-        "outer_crust": "BSk22-based segment below 2.0e-3 fm^-3",
+        "outer_crust": "NOT_VERIFIED_FROM_THE_MODEL_SPECIFIC_DATASHEET_IN_THIS_ADJUDICATION; preserve raw source and do not assume BSk22 or BPS until the exact source sheet is inspected",
         "inner_crust": "self-consistent Thomas-Fermi calculation; preserve all source-defined nonspherical pasta and cluster regimes",
         "method": "Thomas-Fermi; Grill et al. 2014 with model-specific RMF parameterization"
       },
@@ -531,7 +538,7 @@
         "eos_compo": "PRESENT",
         "status": "PRESERVE_RAW_PROVIDER_RECORDS_AND_ROW_MASKS; production group-composition reconstruction follows the E390-02 dual-track literature route"
       },
-      "note": "FSU2R RMF; CompOSE classifies it as Thomas-Fermi crust; BSk22 outer crust below 0.002 fm^-3."
+      "note": "FSU2R RMF; CompOSE table selection classifies this as a Thomas-Fermi crust. The exact outer-crust provider is not source-verified; no family-wide assumption is admitted."
     },
     {
       "id": "GPPVA_NL3wrL55",
@@ -585,7 +592,7 @@
       "id": "GPPVA_TW",
       "family": "crust",
       "compose_entry": "GPPVA(TW) NS crust",
-      "compose_url": "https://compose.obspm.fr/table_selection",
+      "compose_url": "https://compose.obspm.fr/eos/212",
       "raw_table_support": {
         "nB_min_fm3": 4.67962e-10,
         "nB_max_fm3": 0.074000001,
@@ -593,7 +600,7 @@
       },
       "eos_nb_git_blob_sha1": "1ae3b88523f9fcbe94ab6198cd2e6e99833b7c86",
       "source_construction": {
-        "outer_crust": "BSk22-based segment below 2.0e-3 fm^-3",
+        "outer_crust": "BPS (Baym-Pethick-Sutherland) outer-crust EoS below nB=2.0e-3 fm^-3, as stated on the TW crust CompOSE page",
         "inner_crust": "self-consistent Thomas-Fermi calculation; preserve all source-defined nonspherical pasta and cluster regimes",
         "method": "Thomas-Fermi; Grill et al. 2014 with model-specific RMF parameterization"
       },
@@ -603,7 +610,7 @@
         "eos_compo": "PRESENT",
         "status": "PRESERVE_RAW_PROVIDER_RECORDS_AND_ROW_MASKS; production group-composition reconstruction follows the E390-02 dual-track literature route"
       },
-      "note": "TW RMF; CompOSE classifies it as Thomas-Fermi crust; BSk22 outer crust below 0.002 fm^-3."
+      "note": "TW RMF; CompOSE page /eos/212 explicitly uses BPS, not BSk22, for the outer crust below 0.002 fm^-3; inner crust is self-consistent Thomas-Fermi with nonspherical pasta."
     }
   ],
   "interface_schema": {
@@ -672,25 +679,53 @@
     "all transformations create new immutable versioned artifacts with input and output hashes"
   ],
   "source_refs": [
-    "https://compose.obspm.fr/eos/68",
-    "https://compose.obspm.fr/eos/69",
-    "https://compose.obspm.fr/eos/54",
+    "https://arxiv.org/abs/0908.2344",
+    "https://arxiv.org/abs/1408.4159",
+    "https://arxiv.org/abs/1607.05899",
+    "https://arxiv.org/abs/1804.00334",
+    "https://arxiv.org/abs/2001.10143",
+    "https://arxiv.org/abs/2402.15548",
     "https://compose.obspm.fr/eos/134",
     "https://compose.obspm.fr/eos/204",
     "https://compose.obspm.fr/eos/207",
     "https://compose.obspm.fr/eos/208",
+    "https://compose.obspm.fr/eos/209",
     "https://compose.obspm.fr/eos/210",
     "https://compose.obspm.fr/eos/211",
+    "https://compose.obspm.fr/eos/212",
+    "https://compose.obspm.fr/eos/311",
     "https://compose.obspm.fr/eos/317",
+    "https://compose.obspm.fr/eos/318",
     "https://compose.obspm.fr/eos/319",
+    "https://compose.obspm.fr/eos/328",
+    "https://compose.obspm.fr/eos/54",
+    "https://compose.obspm.fr/eos/68",
+    "https://compose.obspm.fr/eos/69",
     "https://compose.obspm.fr/table_selection",
-    "https://doi.org/10.1140/epja/s10050-022-00847-y",
-    "https://arxiv.org/abs/2402.15548",
     "https://doi.org/10.1103/PhysRevC.90.045803",
-    "https://arxiv.org/abs/0908.2344",
-    "https://arxiv.org/abs/1408.4159",
-    "https://arxiv.org/abs/1804.00334",
-    "https://arxiv.org/abs/1607.05899",
-    "https://arxiv.org/abs/2001.10143"
+    "https://doi.org/10.1140/epja/s10050-022-00847-y"
+  ],
+  "validation_corrections": [
+    {
+      "model": "GPPVA_TW",
+      "field": "outer_crust",
+      "corrected_value": "BPS below 2.0e-3 fm^-3",
+      "authority": "https://compose.obspm.fr/eos/212",
+      "status": "SOURCE_CONFIRMED"
+    },
+    {
+      "model": "GPPVA_FSU2R",
+      "field": "outer_crust",
+      "corrected_value": null,
+      "authority": "https://compose.obspm.fr/table_selection",
+      "status": "UNRESOLVED_NO_PROVIDER_ASSUMPTION"
+    },
+    {
+      "model": "APR_APR",
+      "field": "source_release_identity",
+      "corrected_value": "legacy CompOSE EOS 68; 172 points",
+      "alternate_release": "CompOSE EOS 328; 1833 points",
+      "status": "RELEASE_IDENTITY_PINNED_NO_SUBSTITUTION"
+    }
   ]
 }

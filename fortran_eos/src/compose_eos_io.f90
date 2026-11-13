@@ -204,18 +204,34 @@ contains
         if(.not.ok) then;close(u);status='invalid/nonfinite Q column';return;endif
       enddo
       call token_int(tok,11,nadd,ok)
-      if(.not.ok.or.nadd<0.or.nadd>1) then;close(u);status='only Nadd=0 or Nadd=1 is supported';return;endif
+      if(.not.ok.or.nadd<0) then;close(u);status='Nadd must be a non-negative integer';return;endif
       if(eos%nadd<0) then
         eos%nadd=nadd
+        ! E390-10B phase 2: track the declared max extra count and allocate the
+        ! full q_extra_full(nadd_max,nT,nYq,n) tensor once we know the per-row
+        ! Nadd. The cold slice has nT=nYq=1; q_extra_full holds every extra
+        ! column while the 1D q_extra(n) surface keeps the first one for
+        ! backward compatibility with M3-M6 downstream code.
+        eos%nadd_max=nadd
+        if(nadd>=1.and.eos%nT>=1.and.eos%nYq>=1.and.allocated(eos%nb)) then
+          if(.not.allocated(eos%q_extra_full)) then
+            allocate(eos%q_extra_full(nadd,eos%nT,eos%nYq,eos%n))
+            eos%q_extra_full=0._wp
+          endif
+        endif
       else if(eos%nadd/=nadd) then
         close(u);status='Nadd changes across eos.thermo rows';return
       endif
       if(nt/=11+nadd) then;close(u);status='Nadd does not match thermo row width';return;endif
       eos%q(:,k)=qv
-      if(nadd==1) then
-        call token_real(tok,12,v,ok)
-        if(.not.ok) then;close(u);status='invalid q_extra';return;endif
-        eos%q_extra(k)=v
+      if(nadd>=1) then
+        do i=1,nadd
+          call token_real(tok,11+i,v,ok)
+          if(.not.ok) then;close(u);status='invalid q_extra column';return;endif
+          ! store every column in the tensor; the 1D surface keeps the first
+          if(allocated(eos%q_extra_full)) eos%q_extra_full(i,eos%nT,eos%nYq,k)=v
+          if(i==1) eos%q_extra(k)=v
+        enddo
       endif
       seen(k)=.true.
     enddo
@@ -359,14 +375,37 @@ contains
     character(len=*),intent(in)::path
     type(eos_data_t),intent(in)::eos
     character(len=*),intent(out)::status
-    integer::u,ios,i
+    integer::u,ios,i,j
+    character(len=512)::header
+    character(len=64)::colname
     open(newunit=u,file=trim(path),status='replace',action='write',iostat=ios)
     if(ios/=0) then;status='cannot create internal EOS CSV';return;endif
-    write(u,'(a)')'nb,Q1,Q2,Q3,Q4,Q5,Q6,Q7,q_extra,Iphase,Yn,Yp,Ye,Ymu,Abar,Zbar,Yh,'// &
+    ! E390-10B phase 2: emit one q_extra column per declared extra quantity
+    ! (q_extra for slot 1, q_extra_2..q_extra_{nadd_max} for slots 2+). Legacy
+    ! readers that only consume q_extra (slot 1) keep working; the additional
+    ! columns are optional and default to 0 on read if absent.
+    header='nb,Q1,Q2,Q3,Q4,Q5,Q6,Q7,q_extra'
+    do j=2,max(1,eos%nadd_max)
+      write(colname,'(a,i0)')',q_extra_',j
+      header=trim(header)//trim(colname)
+    enddo
+    header=trim(header)//',Iphase,Yn,Yp,Ye,Ymu,Abar,Zbar,Yh,'// &
       'row_status,yn_present,yp_present,ye_present,ymu_present,abar_present,zbar_present,yh_present,c3_applicable,c4_applicable'
+    write(u,'(a)')trim(header)
     do i=1,eos%n
-      write(u,'(es25.16e3,7(",",es25.16e3),",",es25.16e3,",",i0,7(",",es25.16e3),",",i0,9(",",i0))') &
-        eos%nb(i),eos%q(:,i),eos%q_extra(i),eos%iphase(i),eos%yn(i),eos%yp(i),eos%ye(i), &
+      ! base row: nb, Q1..Q7, q_extra (slot 1)
+      write(u,'(es25.16e3,7(",",es25.16e3),",",es25.16e3)',advance='no') &
+        eos%nb(i),eos%q(:,i),eos%q_extra(i)
+      ! additional extra slots 2..nadd_max (from the tensor; 0 if unallocated)
+      do j=2,max(1,eos%nadd_max)
+        if(allocated(eos%q_extra_full).and.size(eos%q_extra_full,1)>=j) then
+          write(u,'(",",es25.16e3)',advance='no')eos%q_extra_full(j,eos%nT,eos%nYq,i)
+        else
+          write(u,'(",",es25.16e3)',advance='no')0._wp
+        endif
+      enddo
+      write(u,'(",",i0,7(",",es25.16e3),",",i0,9(",",i0))') &
+        eos%iphase(i),eos%yn(i),eos%yp(i),eos%ye(i), &
         eos%ymu(i),eos%abar(i),eos%zbar(i),eos%yh(i),eos%row_status(i), &
         merge(1,0,eos%yn_present(i)),merge(1,0,eos%yp_present(i)), &
         merge(1,0,eos%ye_present(i)),merge(1,0,eos%ymu_present(i)), &
@@ -380,20 +419,24 @@ contains
     character(len=*),intent(in)::path,meta_path
     type(eos_data_t),intent(out)::eos
     character(len=*),intent(out)::status
-    integer::u,ios,n,i,nt,k,ival
+    integer::u,ios,n,i,nt,k,ival,j,nqextra
     character(len=4096)::line
     character(len=96)::tok(64)
-    logical::ok
+    character(len=96)::hcol
+    integer::col_idx(64)  ! maps our known-field code -> token index; 0 if absent
+    character(len=96)::hdr(64)
+    integer::nhdr
+    logical::ok,found
     real(wp)::v
     integer::phase
     logical::composition_file_present,composition_available,beta_equilibrated
-    integer::il,iT,iYq,inb_start,nadd,nadd_max
+    integer::il,iT,iYq,inb_start,nadd,nadd_max,naxis_t,naxis_yq
     real(wp)::mn,mp,temperature_mev,charge_fraction_grid
-    namelist /metadata/ mn,mp,il,iT,iYq,inb_start,nadd,nadd_max,temperature_mev,charge_fraction_grid, &
+    namelist /metadata/ mn,mp,il,iT,iYq,inb_start,nadd,nadd_max,naxis_t,naxis_yq,temperature_mev,charge_fraction_grid, &
        composition_file_present,composition_available,beta_equilibrated
     open(newunit=u,file=trim(meta_path),status='old',action='read',iostat=ios)
     if(ios/=0) then;status='cannot open internal EOS metadata';return;endif
-    mn=939._wp;mp=939._wp;il=1;iT=1;iYq=1;inb_start=1;nadd=0;nadd_max=0
+    mn=939._wp;mp=939._wp;il=1;iT=1;iYq=1;inb_start=1;nadd=0;nadd_max=0;naxis_t=1;naxis_yq=1
     temperature_mev=0._wp;charge_fraction_grid=0._wp
     composition_file_present=.false.;composition_available=.false.;beta_equilibrated=.false.
     read(u,nml=metadata,iostat=ios);close(u)
@@ -402,6 +445,68 @@ contains
     if(ios/=0) then;status='cannot open internal EOS CSV';return;endif
     call next_line(u,line,ios)
     if(ios/=0) then;close(u);status='missing internal EOS CSV header';return;endif
+    ! E390-10B phase 2: header-driven column lookup. Parse the header line into
+    ! names and build col_idx(code) = token position. This supports a variable
+    ! number of q_extra_N columns and is backward compatible with legacy 17/27
+    ! field CSVs (absent optional columns default to 0 / .false.).
+    call split_tokens(line,hdr,nhdr)
+    col_idx=0
+    do k=1,nhdr
+      hcol=adjustl(hdr(k))
+      ! normalize to lowercase so the header matches the case-insensitive
+      ! Fortran namelist convention and the lowercase mask column names the
+      ! Python writer emits (yn_present, ...). Q1..Q7 and Abar/Zbar/Yh are
+      ! also matched in lowercase here for robustness.
+      do j=1,len_trim(hcol)
+        if(hcol(j:j)>='A'.and.hcol(j:j)<='Z') then
+          hcol(j:j)=achar(iachar(hcol(j:j))+32)
+        endif
+      enddo
+      select case(trim(hcol))
+      case('nb');col_idx(1)=k
+      case('q1');col_idx(2)=k
+      case('q2');col_idx(3)=k
+      case('q3');col_idx(4)=k
+      case('q4');col_idx(5)=k
+      case('q5');col_idx(6)=k
+      case('q6');col_idx(7)=k
+      case('q7');col_idx(8)=k
+      case('q_extra');col_idx(9)=k
+      case('iphase');col_idx(10)=k
+      case('yn');col_idx(11)=k
+      case('yp');col_idx(12)=k
+      case('ye');col_idx(13)=k
+      case('ymu');col_idx(14)=k
+      case('abar');col_idx(15)=k
+      case('zbar');col_idx(16)=k
+      case('yh');col_idx(17)=k
+      case('row_status');col_idx(18)=k
+      case('yn_present');col_idx(19)=k
+      case('yp_present');col_idx(20)=k
+      case('ye_present');col_idx(21)=k
+      case('ymu_present');col_idx(22)=k
+      case('abar_present');col_idx(23)=k
+      case('zbar_present');col_idx(24)=k
+      case('yh_present');col_idx(25)=k
+      case('c3_applicable');col_idx(26)=k
+      case('c4_applicable');col_idx(27)=k
+      end select
+    enddo
+    ! required columns: nb + 7 Q + q_extra + Iphase + 7 compo (codes 1..17)
+    do k=1,17
+      if(col_idx(k)==0)then;close(u);status='internal EOS CSV missing required column';return;endif
+    enddo
+    ! count extra q_extra_N columns present in the header (N>=2)
+    nqextra=1
+    do j=2,64
+      write(hcol,'(a,i0)')'q_extra_',j
+      found=.false.
+      do k=1,nhdr
+        if(trim(adjustl(hdr(k)))==trim(hcol))then;found=.true.;exit;endif
+      enddo
+      if(.not.found)exit
+      nqextra=j
+    enddo
     n=0
     do
       call next_line(u,line,ios)
@@ -412,10 +517,20 @@ contains
     close(u)
     call allocate_eos(eos,n)
     eos%mn=mn;eos%mp=mp;eos%il=il;eos%iT=iT;eos%iYq=iYq;eos%inb_start=inb_start;eos%nadd=nadd
-    eos%nadd_max=nadd_max
+    eos%nadd_max=max(nadd_max,nqextra)
+    eos%nT=max(naxis_t,1);eos%nYq=max(naxis_yq,1)
     eos%temperature_mev=temperature_mev;eos%charge_fraction_grid=charge_fraction_grid
     eos%composition_file_present=composition_file_present;eos%composition_available=composition_available
     eos%beta_equilibrated=beta_equilibrated
+    ! E390-10B phase 2: allocate the q_extra_full tensor when the table carries
+    ! more than one extra column. Use the namelist-declared axis lengths so a
+    ! multidim table's tensor is sized correctly; the cold slice defaults to 1.
+    if(eos%nadd_max>=1) then
+      if(.not.allocated(eos%q_extra_full)) then
+        allocate(eos%q_extra_full(eos%nadd_max,eos%nT,eos%nYq,eos%n))
+        eos%q_extra_full=0._wp
+      endif
+    endif
     open(newunit=u,file=trim(path),status='old',action='read',iostat=ios)
     if(ios/=0) then;status='cannot reopen internal EOS CSV';return;endif
     call next_line(u,line,ios)
@@ -423,22 +538,37 @@ contains
       call next_line(u,line,ios)
       if(ios/=0)then;close(u);status='unexpected EOF in internal EOS CSV';return;endif
       call split_tokens(line,tok,nt)
-      ! M2A: accept either the legacy 17-field CSV (no masks; defaults applied)
-      ! or the new 27-field CSV (with masks). 27 is the current writer output.
-      if(nt/=17.and.nt/=27)then;close(u);status='internal EOS CSV must have 17 or 27 fields';return;endif
-      do k=1,9
-        if(k==10)cycle
-        call token_real(tok,k,v,ok);if(.not.ok)then;close(u);status='invalid internal EOS value';return;endif
-        select case(k)
-        case(1);eos%nb(i)=v
-        case(2:8);eos%q(k-1,i)=v
-        case(9);eos%q_extra(i)=v
-        end select
+      ! required thermo+compo columns 1..17 via header lookup
+      do k=1,8
+        if(col_idx(k)==0.or.col_idx(k)>nt)cycle
+        call token_real(tok,col_idx(k),v,ok);if(.not.ok)then;close(u);status='invalid internal EOS value';return;endif
+        if(k==1)then;eos%nb(i)=v;else;eos%q(k-1,i)=v;endif
       enddo
-      call token_int(tok,10,phase,ok);if(.not.ok)then;close(u);status='invalid Iphase';return;endif
-      eos%iphase(i)=phase
+      if(col_idx(9)/=0.and.col_idx(9)<=nt) then
+        call token_real(tok,col_idx(9),v,ok);if(.not.ok)then;close(u);status='invalid q_extra';return;endif
+        eos%q_extra(i)=v
+        if(allocated(eos%q_extra_full)) eos%q_extra_full(1,eos%nT,eos%nYq,i)=v
+      endif
+      ! additional extra slots 2..nqextra (header-named q_extra_2..)
+      do j=2,nqextra
+        write(hcol,'(a,i0)')'q_extra_',j
+        found=.false.
+        do k=1,nhdr
+          if(trim(adjustl(hdr(k)))==trim(hcol))then;found=.true.;exit;endif
+        enddo
+        if(found.and.k<=nt) then
+          call token_real(tok,k,v,ok);if(.not.ok)then;close(u);status='invalid q_extra_N';return;endif
+          if(allocated(eos%q_extra_full).and.size(eos%q_extra_full,1)>=j) &
+            eos%q_extra_full(j,eos%nT,eos%nYq,i)=v
+        endif
+      enddo
+      if(col_idx(10)/=0.and.col_idx(10)<=nt) then
+        call token_int(tok,col_idx(10),phase,ok);if(.not.ok)then;close(u);status='invalid Iphase';return;endif
+        eos%iphase(i)=phase
+      endif
       do k=11,17
-        call token_real(tok,k,v,ok);if(.not.ok)then;close(u);status='invalid internal composition field';return;endif
+        if(col_idx(k)==0.or.col_idx(k)>nt)cycle
+        call token_real(tok,col_idx(k),v,ok);if(.not.ok)then;close(u);status='invalid internal composition field';return;endif
         select case(k)
         case(11);eos%yn(i)=v
         case(12);eos%yp(i)=v
@@ -449,27 +579,27 @@ contains
         case(17);eos%yh(i)=v
         end select
       enddo
-      if(nt==27) then
-        ! M2A per-row mask columns 18..27. Read each as 0/1 integer.
-        call token_int(tok,18,ival,ok);if(.not.ok)then;close(u);status='invalid row_status';return;endif
+      ! optional M2A mask columns 18..27 (absent in legacy 17-field CSV)
+      if(col_idx(18)/=0.and.col_idx(18)<=nt) then
+        call token_int(tok,col_idx(18),ival,ok);if(.not.ok)then;close(u);status='invalid row_status';return;endif
         eos%row_status(i)=ival
-        call token_int(tok,19,ival,ok);if(.not.ok)then;close(u);status='invalid yn_present';return;endif
+        call token_int(tok,col_idx(19),ival,ok);if(.not.ok)then;close(u);status='invalid yn_present';return;endif
         eos%yn_present(i)=ival/=0
-        call token_int(tok,20,ival,ok);if(.not.ok)then;close(u);status='invalid yp_present';return;endif
+        call token_int(tok,col_idx(20),ival,ok);if(.not.ok)then;close(u);status='invalid yp_present';return;endif
         eos%yp_present(i)=ival/=0
-        call token_int(tok,21,ival,ok);if(.not.ok)then;close(u);status='invalid ye_present';return;endif
+        call token_int(tok,col_idx(21),ival,ok);if(.not.ok)then;close(u);status='invalid ye_present';return;endif
         eos%ye_present(i)=ival/=0
-        call token_int(tok,22,ival,ok);if(.not.ok)then;close(u);status='invalid ymu_present';return;endif
+        call token_int(tok,col_idx(22),ival,ok);if(.not.ok)then;close(u);status='invalid ymu_present';return;endif
         eos%ymu_present(i)=ival/=0
-        call token_int(tok,23,ival,ok);if(.not.ok)then;close(u);status='invalid abar_present';return;endif
+        call token_int(tok,col_idx(23),ival,ok);if(.not.ok)then;close(u);status='invalid abar_present';return;endif
         eos%abar_present(i)=ival/=0
-        call token_int(tok,24,ival,ok);if(.not.ok)then;close(u);status='invalid zbar_present';return;endif
+        call token_int(tok,col_idx(24),ival,ok);if(.not.ok)then;close(u);status='invalid zbar_present';return;endif
         eos%zbar_present(i)=ival/=0
-        call token_int(tok,25,ival,ok);if(.not.ok)then;close(u);status='invalid yh_present';return;endif
+        call token_int(tok,col_idx(25),ival,ok);if(.not.ok)then;close(u);status='invalid yh_present';return;endif
         eos%yh_present(i)=ival/=0
-        call token_int(tok,26,ival,ok);if(.not.ok)then;close(u);status='invalid c3_applicable';return;endif
+        call token_int(tok,col_idx(26),ival,ok);if(.not.ok)then;close(u);status='invalid c3_applicable';return;endif
         eos%c3_applicable(i)=ival/=0
-        call token_int(tok,27,ival,ok);if(.not.ok)then;close(u);status='invalid c4_applicable';return;endif
+        call token_int(tok,col_idx(27),ival,ok);if(.not.ok)then;close(u);status='invalid c4_applicable';return;endif
         eos%c4_applicable(i)=ival/=0
       endif
     enddo
@@ -492,6 +622,8 @@ contains
     write(u,'(a,i0)')' inb_start=',eos%inb_start
     write(u,'(a,i0)')' nadd=',eos%nadd
     write(u,'(a,i0)')' nadd_max=',eos%nadd_max
+    write(u,'(a,i0)')' naxis_t=',eos%nT
+    write(u,'(a,i0)')' naxis_yq=',eos%nYq
     write(u,'(a,es25.16e3)')' temperature_mev=',eos%temperature_mev
     write(u,'(a,es25.16e3)')' charge_fraction_grid=',eos%charge_fraction_grid
     write(u,'(a,l1)')' composition_file_present=',eos%composition_file_present
@@ -701,10 +833,30 @@ contains
     if(ios/=0)then;status='cannot write eos.thermo';return;endif
     write(u,'(2(es25.16e3,1x),i0)')eos%mn,eos%mp,eos%il
     do i=1,eos%n
-      if(eos%nadd==1)then
+      ! E390-10B phase 2: write every extra column. The 1D q_extra(n) surface
+      ! holds only the first column for backward compatibility, so for Nadd>=2
+      ! pull the additional columns from q_extra_full (cold slice: nT=nYq=1).
+      if(eos%nadd==0) then
+        write(u,'(3(i0,1x),7(es25.16e3,1x),i0)')eos%iT,eos%inb_start+i-1,eos%iYq,eos%q(:,i),0
+      else if(eos%nadd==1) then
         write(u,'(3(i0,1x),7(es25.16e3,1x),i0,1x,es25.16e3)')eos%iT,eos%inb_start+i-1,eos%iYq,eos%q(:,i),1,eos%q_extra(i)
       else
-        write(u,'(3(i0,1x),7(es25.16e3,1x),i0)')eos%iT,eos%inb_start+i-1,eos%iYq,eos%q(:,i),0
+        ! Nadd>=2: emit the full row from the q_extra_full tensor (cold slice).
+        block
+          integer::j
+          character(len=4096)::row
+          character(len=64)::buf
+          write(row,'(3(i0,1x),7(es25.16e3,1x),i0)')eos%iT,eos%inb_start+i-1,eos%iYq,eos%q(:,i),eos%nadd
+          do j=1,eos%nadd
+            if(allocated(eos%q_extra_full).and.size(eos%q_extra_full,1)>=j) then
+              write(buf,'(1x,es25.16e3)')eos%q_extra_full(j,eos%nT,eos%nYq,i)
+            else
+              write(buf,'(1x,es25.16e3)')0._wp
+            endif
+            row=trim(row)//trim(buf)
+          enddo
+          write(u,'(a)')trim(row)
+        end block
       endif
     enddo
     close(u)

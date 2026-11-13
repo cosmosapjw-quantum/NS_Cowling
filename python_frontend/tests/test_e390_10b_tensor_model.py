@@ -68,6 +68,10 @@ def _multidim_eos(nT: int = 2, nYq: int = 3, n: int = 5, nadd_max: int = 1) -> E
     base.nYq = nYq
     base.nadd_max = nadd_max
     base.q_extra_count = nadd_max
+    # mirror the first extra slot into the 1D q_extra surface so write/read
+    # round-trips the slot-1 values (the writer serializes q_extra then reads
+    # it back into q_extra_full[0]).
+    base.q_extra = q_extra_full[0, 0, 0, :].copy()
     return base
 
 
@@ -81,13 +85,23 @@ def test_cold_slice_eosdata_has_empty_q_full_by_default():
 
 
 def test_cold_slice_read_compose_leaves_q_full_empty():
-    """read_compose on a real cold-slice source must NOT populate q_full."""
+    """read_compose on a real cold-slice source must NOT populate q_full.
+
+    Phase 2 update: a cold-slice Nadd=1 source now materializes q_extra_full
+    (nadd_max=1, shape (1,1,1,n)) mirroring the 1D q_extra surface — this is
+    the Nadd-relaxation contract. q_full stays empty because the cold slice
+    has nT=nYq=1 and the multidim tensor is only materialized by a phase-3/4
+    multidim reader. nadd_max reflects the source's declared Nadd.
+    """
     if not (INPUTS / "RG_SLY4").exists():
         pytest.skip("inputs/raw_compose not staged (E390-00)")
     eos = read_compose(INPUTS / "RG_SLY4")
-    assert eos.q_full.size == 0, "cold-slice reader must leave q_full empty (phase 1 opt-in)"
-    assert eos.q_extra_full.size == 0
-    assert eos.nadd_max == 0
+    assert eos.q_full.size == 0, "cold-slice reader must leave q_full empty (multidim opt-in)"
+    # RG_SLY4 is Nadd=1: q_extra_full is populated with nadd_max=1, mirroring q_extra
+    assert eos.nadd_max == 1
+    assert eos.q_extra_full.ndim == 4
+    assert eos.q_extra_full.shape == (1, 1, 1, eos.n)
+    assert np.allclose(eos.q_extra_full[0, 0, 0, :], eos.q_extra)
 
 
 # --- 2. select_slice materializes the chosen cell into the 1D surface -------
@@ -156,14 +170,16 @@ def test_select_slice_raises_on_inconsistent_tensor_shape():
 
 def test_nadd_max_round_trips_through_internal_directory(tmp_path):
     eos = _multidim_eos(nT=2, nYq=2, n=4, nadd_max=1)
-    # write only the 1D surface (q_full is in-memory only, not serialized)
+    # write the internal directory (1D surface + q_extra_N columns for slots 2+;
+    # the nadd_max=1 case serializes only the q_extra slot which mirrors q_extra_full[0])
     eos.write_internal_directory(tmp_path)
-    # nadd_max should round-trip; q_full/q_extra_full are intentionally not
-    # serialized (they are in-memory only in phase 1)
     back = EOSData.from_internal_directory(tmp_path)
     assert back.nadd_max == 1
-    assert back.q_full.size == 0  # not serialized in phase 1
-    assert back.q_extra_full.size == 0
+    assert back.q_full.size == 0  # q_full is in-memory only (multidim reader opt-in)
+    # phase 2: q_extra_full IS serialized for nadd_max>=1; slot 1 mirrors q_extra
+    assert back.q_extra_full.ndim == 4
+    assert back.q_extra_full.shape[0] == 1
+    assert np.allclose(back.q_extra_full[0, 0, 0, :], eos.q_extra_full[0, 0, 0, :])
 
 
 def test_nadd_max_defaults_to_zero_for_legacy_namelist(tmp_path):

@@ -890,7 +890,7 @@ contains
       endif
     enddo
     if(eos%nadd<0.or.eos%nadd>1)then
-      status='reconstruct_master supports Nadd=0 or 1 only'
+      status='reconstruct_master outputs Nadd=0 or 1 only (the E390-10B phase 2 reader accepts Nadd>1 on input, but reconstruct still emits a single extra column)'
       return
     endif
     if(recompute_extra_cs2.and.eos%nadd/=1)then

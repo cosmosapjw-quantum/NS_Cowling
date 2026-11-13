@@ -193,7 +193,7 @@ class EOSData:
                 return np.asarray([bool(int(row[name])) for row in rows], dtype=bool)
             return np.asarray([dtype(row[name]) for row in rows])
         has_masks = "row_status" in header
-        return cls(
+        eos = cls(
             nb=col("nb"), mn=float(metadata["mn"]), mp=float(metadata["mp"]),
             Q1=col("Q1"), Q2=col("Q2"), Q3=col("Q3"), Q4=col("Q4"),
             Q5=col("Q5"), Q6=col("Q6"), Q7=col("Q7"), q_extra=col("q_extra"),
@@ -225,6 +225,26 @@ class EOSData:
             C4_applicable=col("c4_applicable", bool, default=False),
             source_dir=source_dir,
         )
+        # E390-10B phase 2: collect the additional extra-quantity columns
+        # (q_extra_2, q_extra_3, ...) the Fortran writer now emits when nadd_max
+        # >= 2, and materialize them into the q_extra_full tensor
+        # (nadd_max, nT, nYq, n). Slot 1 mirrors the 1D q_extra surface. Absent
+        # columns default to 0 (backward compatible with Nadd in {0,1}).
+        nadd_max_out = int(metadata.get("nadd_max", 0))
+        if nadd_max_out >= 1:
+            nT = int(metadata.get("naxis_t", 1)) or 1
+            nYq = int(metadata.get("naxis_yq", 1)) or 1
+            import numpy as _np
+            qef = _np.zeros((nadd_max_out, nT, nYq, len(rows)), dtype=float)
+            qef[0, 0, 0, :] = _np.asarray([float(r.get("q_extra", 0.0) or 0.0) for r in rows])
+            for j in range(2, nadd_max_out + 1):
+                cname = f"q_extra_{j}"
+                if cname in header:
+                    qef[j - 1, 0, 0, :] = _np.asarray(
+                        [float(r[cname]) for r in rows], dtype=float
+                    )
+            eos.q_extra_full = qef
+        return eos
 
     def write_internal_directory(self, directory: str | Path) -> Path:
         directory = Path(directory)
@@ -270,10 +290,23 @@ class EOSData:
                   "row_status", "Yn_present", "Yp_present", "Ye_present", "Ymu_present",
                   "Abar_present", "Zbar_present", "Yh_present",
                   "C3_applicable", "C4_applicable"]
+        # E390-10B phase 2: append one column per extra slot beyond the first.
+        # Slot 1 is the existing q_extra; slots 2..nadd_max come from the
+        # q_extra_full tensor (cold slice: indices nT-1, nYq-1). The tensor is
+        # optional; absent slots are written as 0 and read back as 0.
+        nadd_max = int(self.nadd_max)
+        qef = np.asarray(self.q_extra_full)
+        extra_slot_cols = []
+        for j in range(2, max(1, nadd_max) + 1):
+            fields.append(f"q_extra_{j}")
+            if qef.ndim == 4 and qef.shape[0] >= j:
+                extra_slot_cols.append(qef[j - 1, 0, 0, :])
+            else:
+                extra_slot_cols.append(np.zeros(n, dtype=float))
         arrays = [self.nb, self.Q1, self.Q2, self.Q3, self.Q4, self.Q5, self.Q6, self.Q7,
                   self.q_extra, self.Iphase, self.Yn, self.Yp, self.Ye, self.Ymu,
                   self.Aav, self.Zav, self.Yh,
-                  rs, yn_p, yp_p, ye_p, ymu_p, abar_p, zbar_p, yh_p, c3, c4]
+                  rs, yn_p, yp_p, ye_p, ymu_p, abar_p, zbar_p, yh_p, c3, c4] + extra_slot_cols
         # integer columns (Iphase=10, row_status=18); bool columns are 19..26
         int_idx = {9, 17}
         bool_idx = {18, 19, 20, 21, 22, 23, 24, 25, 26}
@@ -294,6 +327,7 @@ class EOSData:
             "&metadata\n"
             f" mn={self.mn:.17e}\n mp={self.mp:.17e}\n il={self.Il}\n iT={self.iT}\n"
             f" iYq={self.iYq}\n inb_start={self.inb_start}\n nadd={self.q_extra_count}\n"
+            f" naxis_t={int(self.nT)}\n naxis_yq={int(self.nYq)}\n"
             f" temperature_mev={self.temperature_mev:.17e}\n"
             f" charge_fraction_grid={self.charge_fraction_grid:.17e}\n"
             f" composition_file_present={'.true.' if self.composition_file_present else '.false.'}\n"

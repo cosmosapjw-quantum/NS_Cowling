@@ -30,6 +30,26 @@
   },
   "method_ontology": {
     "historical_matrix_keys": [
+      "first_law_constrained_hermite_pressure_bridge",
+      "css",
+      "cubic_F",
+      "cubic_P",
+      "quintic_F",
+      "quintic_P"
+    ],
+    "css": {
+      "type": "parameterized_high_density_extension",
+      "classification_rule": "Sharp first order only if supplied Delta_epsilon>0 and P/mu/first-law jump conditions pass."
+    },
+    "smooth_tokens": [
+      "first_law_constrained_hermite_pressure_bridge",
+      "cubic_F",
+      "cubic_P",
+      "quintic_F",
+      "quintic_P"
+    ],
+    "general_rule": "Numerical interpolation method is not physical transition classification; preserve phase boundaries and never interpolate across a true discontinuity.",
+    "historical_matrix_v1_keys": [
       "maxwell",
       "css",
       "cubic_F",
@@ -37,30 +57,33 @@
       "quintic_F",
       "quintic_P"
     ],
-    "historical_maxwell": {
-      "identity": "LEGACY_NPPHB",
+    "legacy_first_law_bridge": {
+      "method_id": "first_law_constrained_hermite_pressure_bridge",
+      "historical_v1_token": "maxwell",
+      "identity": "LEGACY_NPPHB_FLCHPB",
       "type": "smooth_interpolation",
-      "actual_description": "Project-defined near-pressure-plateau Hermite bridge; continuous density, no latent heat, no common-P/common-mu coexistence in the historical algorithm.",
+      "actual_description": "Project-defined first-law-constrained Hermite pressure bridge (historical NPPHB parameterization); continuous density, no latent-heat jump and no Maxwell coexistence.",
       "physical_classification": "UNRESOLVED",
       "literature_attribution": false,
-      "production_status": "BLOCKED_NATIVE_M2_M10_PORT"
+      "production_status": "BLOCKED_NATIVE_M2_M10_PORT",
+      "historical_v1_artifacts_immutable": true
     },
-    "sharp_maxwell": {
-      "token": "sharp_maxwell",
+    "maxwell": {
+      "token": "maxwell",
+      "identity": "SHARP_MAXWELL_LOCAL_NEUTRALITY",
+      "type": "first_order_sharp_phase_transition",
       "part_of_historical_390_matrix": false,
-      "rule": "Separate operation and separately versioned task manifest if ever authorized; never silently repurpose historical maxwell."
+      "pair_scope": "separate existing 65-pair sharp-Maxwell workflow",
+      "conditions": [
+        "P_low(mu_t)=P_high(mu_t)=P_t",
+        "mu_B,low=mu_B,high=mu_t",
+        "n_high>n_low>0",
+        "Delta epsilon=mu_t*Delta n_B>0",
+        "local electric charge neutrality in each phase"
+      ],
+      "production_status": "NATIVE_KERNEL_EXISTS_COMPOSITION_AWARE_COMMON_MATCHER_INTEGRATION_PENDING"
     },
-    "css": {
-      "type": "parameterized_high_density_extension",
-      "classification_rule": "Sharp first order only if supplied Delta_epsilon>0 and P/mu/first-law jump conditions pass."
-    },
-    "smooth_tokens": [
-      "cubic_F",
-      "cubic_P",
-      "quintic_F",
-      "quintic_P"
-    ],
-    "general_rule": "Numerical interpolation method is not physical transition classification; preserve phase boundaries and never interpolate across a true discontinuity."
+    "historical_v1_artifact_policy": "Existing v1 output directories/task IDs containing __maxwell identify the old NPPHB parameterization and remain byte-for-byte immutable. Active code and new manifests use FLCHPB; the method ID maxwell means sharp first-order coexistence only."
   },
   "backend_contract": {
     "numerical_backend": "Fortran",
@@ -298,12 +321,13 @@
       "cloud_action": true,
       "acceptance": [
         "exact 390 unique historical keys",
-        "maxwell token routes to native NPPHB smooth bridge",
+        "first_law_constrained_hermite_pressure_bridge routes to the native NPPHB smooth bridge; historical v1 __maxwell outputs remain immutable",
         "CSS tasks require explicit parameters/native join",
         "every task calls Fortran backend",
         "no placeholder copies",
         "no stale output overwrite",
-        "per-task machine receipt"
+        "per-task machine receipt",
+        "the physical sharp Maxwell operation uses method ID maxwell in its separate 65-pair transition workflow"
       ]
     },
     {

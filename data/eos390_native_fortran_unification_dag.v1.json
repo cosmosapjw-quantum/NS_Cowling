@@ -4,7 +4,7 @@
   "plan_id": "eos390_native_fortran_unification_v1",
   "revision": "1.4.5",
   "created_utc": "2026-11-11",
-  "status": "M1B_METHOD_IDENTITY_MIGRATION_CODE_AND_CONTRACT_COMPLETE_CI_PENDING",
+  "status": "M1B_METHOD_IDENTITY_MIGRATION_CI_PASS_E390_01A_NEXT",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "cloud/eos390-fortran-unification-v1",
@@ -446,7 +446,8 @@
         "old v1 artifacts remain immutable",
         "active code has no smooth maxwell alias"
       ],
-      "status": "CODE_AND_CONTRACT_MIGRATION_COMPLETE_CI_PENDING"
+      "status": "CI_PASS",
+      "resolved_date": "2026-11-13"
     }
   ],
   "nodes": [
@@ -851,13 +852,15 @@
       "depends_on": [
         "E390-01"
       ],
-      "status": "CODE_AND_CONTRACT_MIGRATION_PUBLISHED_SHA256_REFRESHED_CI_PENDING",
+      "status": "CI_PASS",
       "outputs": [
         "smooth matcher method/function ID first_law_constrained_hermite_pressure_bridge",
         "canonical sharp local-neutrality method ID maxwell",
         "M7 six-smooth-method manifest registry with unchanged 390 task cardinality",
         "immutable v1 historical-token to v2 method-ID migration receipt",
-        "native Fortran fail-closed sharp Maxwell dispatch and renamed smooth FLCHPB dispatch"
+        "native Fortran fail-closed sharp Maxwell dispatch and renamed smooth FLCHPB dispatch",
+        "CI run 43419554959 PASS on exact code commit 8e1224344d68ddc50fef4bc79fa24f8ac684dbfe",
+        "M7 v2 manifest and old v1 manifest rejection tests"
       ],
       "acceptance": [
         "No active smooth matching code path dispatches method=maxwell to NPPHB.",
@@ -869,10 +872,25 @@
         "Both Python and Fortran smooth matchers fail closed for method=maxwell until the composition-aware M5 common route is integrated.",
         "Tests verify FLCHPB smooth identity, maxwell sharp identity, and no Python numerical fallback."
       ],
-      "status_detail": "Active Python and native Fortran smooth code use first_law_constrained_hermite_pressure_bridge; canonical sharp transition ID is maxwell. M7 v2.0.0 retains six smooth methods and 390 keys, rejects old v1 manifests and does not admit maxwell into the smooth matrix. Existing v1 outputs remain immutable. Static source audit and SHA manifest refresh are recorded; exact-head GitHub Actions CI is still pending. FLCHPB knot-split quadrature convergence and composition-aware common M5 integration remain open.",
+      "status_detail": "Method-ID migration is implemented and GitHub Actions run #43419554959 passed on code commit 8e1224344d68ddc50fef4bc79fa24f8ac684dbfe: GNU Fortran 15.2.0 build PASS, Python 3.13.18 frontend/pipeline suite 130 passed and 3 skipped, native polynomial-extrema and CSS analytic tests PASS, tracked SHA256SUMS_v4.txt verification PASS, source snapshot artifact upload PASS. This closes the identity migration, not the FLCHPB interior quadrature convergence or composition-aware M5 common-matcher integration.",
       "receipt": "data/receipts/eos390_m1b/E390-01B_METHOD_IDENTITY_MIGRATION_20261113.json",
       "receipt_commit": "996176746030fd4690f24963bf546d958df51c25",
-      "receipt_blob": "6cf498e8f896fb26394ff604066100526e1949e6"
+      "receipt_blob": "6cf498e8f896fb26394ff604066100526e1949e6",
+      "resolved_date": "2026-11-13",
+      "ci_run_id": 43419554959,
+      "ci_commit": "8e1224344d68ddc50fef4bc79fa24f8ac684dbfe",
+      "receipt_blob_sha": "804bf5d3a35eb06021dbe4da690418fcdb9057e6",
+      "verification": {
+        "run_id": 43419554959,
+        "code_commit": "8e1224344d68ddc50fef4bc79fa24f8ac684dbfe",
+        "compiler": "GNU Fortran 15.2.0",
+        "python": "3.13.18",
+        "pytest": "130 passed, 3 skipped",
+        "polynomial_extrema": "PASS",
+        "css_segment_analytic": "PASS",
+        "sha256_manifest": "PASS (96 tracked entries)",
+        "artifact_id": 14033462692
+      }
     }
   ],
   "mutation_policy": {
@@ -1234,7 +1252,7 @@
     ],
     "policy": "Track separately from the 390 matrix; never reinterpret EOS390 method=maxwell."
   },
-  "last_update_utc": "2026-11-13T11:44:41.155Z",
+  "last_update_utc": "2026-11-13T11:48:28.176Z",
   "known_remaining_implementation_gaps": [
     {
       "area": "native literature-derived composition",
@@ -1924,7 +1942,7 @@
     }
   ],
   "next_actions": [
-    "E390-01A (next): specify source-authoritative core-only and crust-only construction contracts for all five core and thirteen crust models; separate raw, reconstructed component and composite EOS artifacts.",
+    "E390-01A (next): specify source-authoritative core-only and crust-only EOS construction contracts for all five core and thirteen crust models, separating raw, reconstructed component, core-only, crust-only and matched-composite artifacts.",
     "Implement native core-only EOS construction from each approved core source interval, with explicit composition provenance and no fixed-density-only boundary inference.",
     "Implement native crust-only EOS construction preserving outer crust, neutron drip, inner crust and cluster/pasta fields; use published CLD/Thomas-Fermi reconstruction for SPG/GPPVA rather than remapping provider values.",
     "Complete M10B phase 4 multi-T parsing and full composition tensor/readback phases without weakening cold-slice fail-closed semantics.",
@@ -2045,8 +2063,9 @@
   "latest_evidence_receipt": {
     "node": "E390-01B",
     "path": "data/receipts/eos390_m1b/E390-01B_METHOD_IDENTITY_MIGRATION_20261113.json",
-    "blob_sha": "6cf498e8f896fb26394ff604066100526e1949e6",
-    "commit_sha": "996176746030fd4690f24963bf546d958df51c25",
+    "blob_sha": "804bf5d3a35eb06021dbe4da690418fcdb9057e6",
+    "ci_run_id": 43419554959,
+    "ci_commit": "8e1224344d68ddc50fef4bc79fa24f8ac684dbfe",
     "backup_branch": "backup/e390-02-pre-20261113",
     "backup_parent_sha": "0c9d66c7092627d70b5df742af5cc7178f28b081"
   }

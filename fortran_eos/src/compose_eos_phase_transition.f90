@@ -4,6 +4,7 @@ module compose_eos_phase_transition
   implicit none
   private
   public :: maxwell_transition_report_t, construct_maxwell_transition
+  character(len=*), parameter, public :: MAXWELL_METHOD_ID = 'maxwell'
 
   real(wp), parameter :: euler_tolerance = 5.e-4_wp
   real(wp), parameter :: algebraic_tolerance = 2.e-6_wp

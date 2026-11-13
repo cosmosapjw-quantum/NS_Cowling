@@ -1,5 +1,6 @@
 """Public Python API backed by the native Fortran EOS reader/writer/verifier."""
 from __future__ import annotations
+import hashlib
 import json
 import tempfile
 from pathlib import Path
@@ -90,6 +91,334 @@ def normalize_compose(directory: str | Path, output_csv: str | Path) -> Path:
     output=Path(output_csv).expanduser().resolve();output.parent.mkdir(parents=True,exist_ok=True)
     run_native("normalize",Path(directory).expanduser().resolve(),output)
     return output
+
+
+# Source-authoritative row selections admitted by E390-01C. Row numbers are
+# 1-based positions in the immutable eos.nb source grid, not density thresholds.
+_CORE_ONLY_SOURCE_SPECS: dict[str, dict[str, Any]] = {
+    "APR_APR": {
+        "first_row": 70, "last_row": 172, "source_n": 172,
+        "first_core_nb_fm3": 0.085,
+        "eos_nb_git_blob_sha1": "bca7ab3da8bf11ef13cde8ba8454c2bc0d616b4f",
+        "expected_iphase": -1,
+        "boundary_note": "Rows 1-69 are the source-attached BPS+SLy4 crust; preserve the 0.075959 to 0.085 fm^-3 source gap.",
+    },
+    "BBB_BHF2": {
+        "first_row": 70, "last_row": 84, "source_n": 84,
+        "first_core_nb_fm3": 0.16,
+        "eos_nb_git_blob_sha1": "60725116001613f77384bf97e7cc4889af59145d",
+        "expected_iphase": -1,
+        "boundary_note": "Rows 1-69 are the source-attached BPS+SLy4 crust; preserve the 0.075959 to 0.16 fm^-3 source gap.",
+    },
+    "GM_GM1": {
+        "first_row": 49, "last_row": 349, "source_n": 349,
+        "first_core_nb_fm3": 0.048,
+        "eos_nb_git_blob_sha1": "ca4454a9018e78dd24224faeac48c18138634503",
+        "expected_iphase": 3,
+        "boundary_note": "Use the source composition-support core rows; the CompOSE 1e-3 fm^-3 cutoff lies in the unsampled source gap.",
+    },
+    "RG_KDE0v1": {
+        "first_row": 967, "last_row": 1240, "source_n": 1240,
+        "first_core_nb_fm3": 0.04582369,
+        "eos_nb_git_blob_sha1": "0af6fbac0213f60d640715674aa33601747d920f",
+        "expected_iphase": 3,
+        "boundary_note": "Model-local Iphase=3 is homogeneous matter; Iphase=4 rows are inhomogeneous and excluded.",
+    },
+    "RG_SLY4": {
+        "first_row": 144, "last_row": 197, "source_n": 197,
+        "first_core_nb_fm3": 0.05248075,
+        "eos_nb_git_blob_sha1": "b3e1aa85c0f8e64930b04e67fd86016b64fdccc4",
+        "expected_iphase": 3,
+        "boundary_note": "Model-local Iphase=3 is homogeneous matter; Iphase=4 rows are inhomogeneous and excluded.",
+    },
+}
+
+
+def _git_blob_sha1(path: Path) -> str:
+    raw = path.read_bytes()
+    header = f"blob {len(raw)}\0".encode("ascii")
+    return hashlib.sha1(header + raw).hexdigest()
+
+
+def _sha256_files(directory: Path, names: tuple[str, ...]) -> dict[str, str]:
+    result: dict[str, str] = {}
+    for name in names:
+        path = directory / name
+        if path.is_file():
+            result[name] = hashlib.sha256(path.read_bytes()).hexdigest()
+    return result
+
+
+def build_core_only(
+    output_root: str | Path,
+    *,
+    source_root: str | Path | None = None,
+    model_ids: list[str] | tuple[str, ...] | None = None,
+) -> list[dict[str, Any]]:
+    """Build source-authoritative standalone core-only CompOSE tables natively.
+
+    The builder only selects rows fixed by E390-01C. All thermodynamic and
+    composition data are read, sliced and written by Fortran. Python performs
+    source identity checks, paths, native invocation, readback comparisons,
+    hashes and receipt serialization. Existing output roots are never
+    overwritten; failed attempts must use a new versioned path.
+    """
+    import math
+    import numpy as np
+
+    repo_root = Path(__file__).resolve().parents[2]
+    inputs = Path(source_root).expanduser().resolve() if source_root is not None else (
+        repo_root / "eos_generator" / "eos_data"
+    )
+    target_root = Path(output_root).expanduser().resolve()
+    if target_root.exists():
+        raise FileExistsError(
+            f"core-only output root already exists; use a fresh attempt path: {target_root}"
+        )
+    if not inputs.is_dir():
+        raise FileNotFoundError(f"core-only source root does not exist: {inputs}")
+
+    selected = list(_CORE_ONLY_SOURCE_SPECS) if model_ids is None else list(model_ids)
+    if not selected or len(selected) != len(set(selected)):
+        raise ValueError("model_ids must be nonempty and contain no duplicates")
+    unknown = [model for model in selected if model not in _CORE_ONLY_SOURCE_SPECS]
+    if unknown:
+        raise ValueError(f"models are not admitted for core-only construction: {unknown}")
+
+    target_root.mkdir(parents=True, exist_ok=False)
+    receipts: list[dict[str, Any]] = []
+    for model_id in selected:
+        spec = _CORE_ONLY_SOURCE_SPECS[model_id]
+        source_dir = inputs / model_id
+        nb_path = source_dir / "eos.nb"
+        if not source_dir.is_dir() or not nb_path.is_file():
+            raise FileNotFoundError(
+                f"missing source CompOSE directory or eos.nb for {model_id}: {source_dir}"
+            )
+
+        observed_git_blob = _git_blob_sha1(nb_path)
+        if observed_git_blob != spec["eos_nb_git_blob_sha1"]:
+            raise ValueError(
+                f"{model_id} eos.nb Git blob identity mismatch: "
+                f"expected {spec['eos_nb_git_blob_sha1']}, observed {observed_git_blob}"
+            )
+
+        input_files = _sha256_files(
+            source_dir, ("eos.nb", "eos.t", "eos.yq", "eos.thermo", "eos.compo")
+        )
+        required = {"eos.nb", "eos.t", "eos.yq", "eos.thermo"}
+        if not required.issubset(input_files):
+            missing = sorted(required - set(input_files))
+            raise FileNotFoundError(
+                f"{model_id} is missing mandatory CompOSE source files: {missing}"
+            )
+
+        source = read_compose(source_dir)
+        if source.n != spec["source_n"]:
+            raise ValueError(
+                f"{model_id} point count differs from E390-01C: "
+                f"{source.n} != {spec['source_n']}"
+            )
+        if source.nT != 1 or source.nYq != 1 or not math.isclose(
+            source.temperature_mev, 0.0, rel_tol=0.0, abs_tol=1e-12
+        ):
+            raise NativeFeatureUnavailable(
+                f"{model_id} is not a single cold T=0/Yq slice; "
+                "E390-10B multidimensional support is required"
+            )
+
+        first = int(spec["first_row"])
+        last = int(spec["last_row"])
+        if not math.isclose(
+            float(source.nb[first - 1]),
+            float(spec["first_core_nb_fm3"]),
+            rel_tol=2e-10,
+            abs_tol=1e-14,
+        ):
+            raise ValueError(
+                f"{model_id} first admitted core density disagrees with E390-01C"
+            )
+        expected_phase = int(spec["expected_iphase"])
+        if expected_phase >= 0:
+            if not source.composition_file_present or not np.all(
+                source.Iphase[first - 1:last] == expected_phase
+            ):
+                raise ValueError(
+                    f"{model_id} admitted rows do not all carry Iphase={expected_phase}"
+                )
+
+        output_dir = target_root / model_id
+        output_dir.mkdir(parents=False, exist_ok=False)
+        native_report = run_native(
+            "extract-core",
+            source_dir,
+            output_dir,
+            str(first),
+            str(last),
+            str(spec["source_n"]),
+            str(expected_phase),
+        )
+        if native_report.get("native_readback") != "PASS":
+            raise NativeExecutionError(
+                f"{model_id} native core-only write/readback was not certified"
+            )
+
+        core = read_compose(output_dir)
+        row_slice = slice(first - 1, last)
+        array_names = (
+            "nb", "Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "q_extra",
+            "Iphase", "Yn", "Yp", "Ye", "Ymu", "Aav", "Zav", "Yh",
+            "row_status", "Yn_present", "Yp_present", "Ye_present",
+            "Ymu_present", "Abar_present", "Zbar_present", "Yh_present",
+            "C3_applicable", "C4_applicable",
+        )
+        for name in array_names:
+            if not np.array_equal(
+                getattr(core, name), getattr(source, name)[row_slice]
+            ):
+                raise NativeExecutionError(
+                    f"{model_id} readback mismatch in {name}"
+                )
+
+        for name in ("q_full", "q_extra_full"):
+            expected_tensor = np.asarray(getattr(source, name))
+            actual_tensor = np.asarray(getattr(core, name))
+            if expected_tensor.size:
+                expected_slice = expected_tensor[..., row_slice]
+                if actual_tensor.shape != expected_slice.shape or not np.array_equal(
+                    actual_tensor, expected_slice
+                ):
+                    raise NativeExecutionError(
+                        f"{model_id} readback mismatch in {name}"
+                    )
+            elif actual_tensor.size:
+                raise NativeExecutionError(
+                    f"{model_id} unexpected {name} tensor after readback"
+                )
+
+        if core.n != last - first + 1:
+            raise NativeExecutionError(f"{model_id} core row count mismatch")
+        if core.inb_start != source.inb_start + first - 1:
+            raise NativeExecutionError(
+                f"{model_id} original CompOSE density-row keys were not preserved"
+            )
+        scalar_names = (
+            "mn", "mp", "Il", "temperature_mev", "charge_fraction_grid",
+            "q_extra_count", "composition_file_present", "composition_available",
+            "beta_equilibrated", "nT", "nYq", "selected_iT", "selected_iYq",
+        )
+        for name in scalar_names:
+            if getattr(core, name) != getattr(source, name):
+                raise NativeExecutionError(
+                    f"{model_id} readback metadata mismatch in {name}"
+                )
+        if not np.array_equal(core.t_axis, source.t_axis) or not np.array_equal(
+            core.yq_axis, source.yq_axis
+        ):
+            raise NativeExecutionError(f"{model_id} T/Yq axis values changed")
+
+        # Diagnostics only: no physical repair, clipping, or source modification.
+        physical_report = check_consistency(core)
+        output_names = (
+            "eos.nb", "eos.t", "eos.yq", "eos.thermo", "eos.compo"
+        )
+        output_hashes = _sha256_files(output_dir, output_names)
+        receipt: dict[str, Any] = {
+            "schema": "ns-cowling.component-construction-receipt",
+            "schema_version": "1.0.0",
+            "node_id": "E390-03A",
+            "model_id": model_id,
+            "component_role": "core_only",
+            "status": "CORE_ONLY_CONSTRUCTED_NATIVE_READBACK_PASS",
+            "source": {
+                "directory": str(source_dir),
+                "eos_nb_git_blob_sha1_expected": spec["eos_nb_git_blob_sha1"],
+                "eos_nb_git_blob_sha1_observed": observed_git_blob,
+                "input_file_sha256": input_files,
+            },
+            "selection": {
+                "row_index_convention": "1-based eos.nb data-row position",
+                "first_row": first,
+                "last_row": last,
+                "source_point_count": spec["source_n"],
+                "output_point_count": core.n,
+                "first_core_nb_fm3": float(core.nb[0]),
+                "last_core_nb_fm3": float(core.nb[-1]),
+                "expected_iphase": None if expected_phase < 0 else expected_phase,
+                "boundary_note": spec["boundary_note"],
+                "source_density_row_labels_preserved": True,
+                "no_interpolation_or_extrapolation": True,
+                "excluded_rows": [1, first - 1] if first > 1 else [],
+            },
+            "transform_chain": [
+                "native_fortran_compose_reader",
+                "native_fortran_exact_row_projection",
+                "native_fortran_compose_writer",
+                "native_fortran_compose_readback",
+            ],
+            "checks": {
+                "source_identity": "PASS",
+                "native_readback": "PASS",
+                "Q1_Q7_and_Qextra_exact_row_preservation": "PASS",
+                "Iphase_and_row_composition_presence_exact_preservation": "PASS",
+                "density_row_key_preservation": "PASS",
+                "T_Yq_axis_value_preservation": "PASS",
+                "physical_validation": physical_report["overall"],
+            },
+            "output": {
+                "directory": str(output_dir),
+                "file_sha256": output_hashes,
+                "n": core.n,
+                "inb_start": core.inb_start,
+                "composition_file_present": core.composition_file_present,
+                "composition_available": core.composition_available,
+                "nadd": core.q_extra_count,
+            },
+            "non_claims": [
+                "No core EOS interpolation, reconstruction, smoothing or extrapolation was performed.",
+                "No missing particle/group abundance was replaced by zero.",
+                "No composition solver, crust construction or crust-core matching method was executed.",
+                "No TOV/Cowling stability or oscillation claim follows from this component extraction.",
+                "eos.micro and eos.mr are not handled by the current EOSData reader/writer path.",
+            ],
+        }
+        receipt_path = output_dir / "E390-03A_RECEIPT.json"
+        receipt_path.write_text(
+            json.dumps(receipt, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        receipts.append(receipt)
+
+    manifest = {
+        "schema": "ns-cowling.core-only-component-manifest",
+        "schema_version": "1.0.0",
+        "node_id": "E390-03A",
+        "status": "ALL_REQUESTED_COMPONENTS_CONSTRUCTED_AND_NATIVE_READBACK_VERIFIED",
+        "source_root": str(inputs),
+        "output_root": str(target_root),
+        "components": [
+            {
+                "model_id": item["model_id"],
+                "directory": item["output"]["directory"],
+                "receipt": str(
+                    Path(item["output"]["directory"]) / "E390-03A_RECEIPT.json"
+                ),
+                "output_file_sha256": item["output"]["file_sha256"],
+                "physical_validation": item["checks"]["physical_validation"],
+            }
+            for item in receipts
+        ],
+        "non_claims": [
+            "This manifest does not certify the 390 matched EOS products.",
+            "Physical validation failures remain failures; extraction never repairs the source EOS.",
+        ],
+    }
+    (target_root / "core_only_manifest.v1.json").write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return receipts
+
 
 def find_density_gap(data: EOSData, min_ratio: float = 5.0) -> int:
     """DEPRECATED (E390-02C): the density-gap selector now lives in the native

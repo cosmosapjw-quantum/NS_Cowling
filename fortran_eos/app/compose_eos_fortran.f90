@@ -1,5 +1,6 @@
 program compose_eos_fortran
   use compose_eos_types
+  use compose_eos_component, only: extract_core_rows, verify_core_roundtrip
   use compose_eos_io
   use compose_eos_verify
   use compose_eos_reconstruct, only: fill_density_gap, reconstruct_master
@@ -7,7 +8,7 @@ program compose_eos_fortran
   use compose_eos_matching, only: match_crust_core, match_report_t
   use compose_eos_phase_transition, only: construct_maxwell_transition, maxwell_transition_report_t
   implicit none
-  type(eos_data_t)::eos,out,crust,core,phase_low,phase_high
+  type(eos_data_t)::eos,out,crust,core,phase_low,phase_high,readback
   type(verify_report_t)::report
   type(causal_completion_report_t)::causal_report
   type(match_report_t)::match_report
@@ -17,6 +18,7 @@ program compose_eos_fortran
   character(len=128)::arg4,arg5,arg6,arg7
   character(len=512)::status
   integer::narg,ios,n_fill,fit_points,gap_phase,n_points,n_bridge
+  integer::core_first,core_last,expected_source_n,expected_phase
   real(wp)::cs2_extension,n_max_requested,smooth_sigma,dissolution_tol
   real(wp)::min_ratio_local,best_sel
   integer::igap_sel
@@ -27,7 +29,7 @@ program compose_eos_fortran
   action='';arg1='';arg2='';arg3='';arg4='';arg5='';arg6='';arg7=''
   narg=command_argument_count()
   if(narg<2)then
-    write(*,'(a)')'usage: compose_eos_fortran {read|verify|verify-csv|normalize|write|fill-gap|reconstruct-master|causal-complete|match-core|maxwell-transition} INPUT OUTPUT [OPTIONS]'
+    write(*,'(a)')'usage: compose_eos_fortran {read|verify|verify-csv|normalize|write|extract-core|fill-gap|reconstruct-master|causal-complete|match-core|maxwell-transition} INPUT OUTPUT [OPTIONS]'
     stop 2
   endif
   call get_command_argument(1,action,status=ios)
@@ -290,6 +292,32 @@ program compose_eos_fortran
       ',"max_cs2_high":'//real_text(phase_report%max_cs2_high)// &
       ',"min_cs2":'//real_text(min(phase_report%min_cs2_low,phase_report%min_cs2_high))// &
       ',"max_cs2":'//real_text(max(phase_report%max_cs2_low,phase_report%max_cs2_high))//'}'
+  case('extract-core')
+    if(narg/=7)then
+      call emit_failure('extract-core requires SOURCE_COMPOSE OUTPUT_COMPOSE FIRST_ROW LAST_ROW EXPECTED_SOURCE_N EXPECTED_Iphase_OR_MINUS1');stop 2
+    endif
+    read(arg3,*,iostat=ios)core_first
+    if(ios/=0)then;call emit_failure('invalid FIRST_ROW');stop 2;endif
+    read(arg4,*,iostat=ios)core_last
+    if(ios/=0)then;call emit_failure('invalid LAST_ROW');stop 2;endif
+    read(arg5,*,iostat=ios)expected_source_n
+    if(ios/=0)then;call emit_failure('invalid EXPECTED_SOURCE_N');stop 2;endif
+    read(arg6,*,iostat=ios)expected_phase
+    if(ios/=0)then;call emit_failure('invalid EXPECTED_Iphase');stop 2;endif
+    call read_compose(trim(arg1),eos,status)
+    if(status/='ok')then;call emit_failure('invalid source CompOSE table: '//trim(status));stop 3;endif
+    call extract_core_rows(eos,core_first,core_last,expected_source_n,expected_phase,out,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    call write_compose(trim(arg2),out,status)
+    if(status/='ok')then;call emit_failure('native core-only CompOSE write failed: '//trim(status));stop 3;endif
+    call read_compose(trim(arg2),readback,status)
+    if(status/='ok')then;call emit_failure('native core-only CompOSE readback failed: '//trim(status));stop 3;endif
+    call verify_core_roundtrip(out,readback,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 4;endif
+    write(*,'(a)')'{"status":"ok","operation":"extract-core","n":'//integer_text(out%n)// &
+      ',"first_source_row":'//integer_text(core_first)//',"last_source_row":'//integer_text(core_last)// &
+      ',"source_inb_start":'//integer_text(eos%inb_start)//',"output_inb_start":'//integer_text(out%inb_start)// &
+      ',"expected_phase":'//integer_text(expected_phase)//',"native_readback":"PASS"}'
   case default
     call emit_failure('unknown operation: '//trim(action));stop 2
   end select

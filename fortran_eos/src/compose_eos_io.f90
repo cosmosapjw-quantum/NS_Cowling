@@ -807,7 +807,7 @@ contains
     character(len=*),intent(in)::directory
     type(eos_data_t),intent(in)::eos
     character(len=*),intent(out)::status
-    integer::u,ios,i,nquad,npairs
+    integer::u,ios,i,nquad,npairs,t0_out,t1_out,yq0_out,yq1_out
     logical::any_composition,group_any,group_complete
     character(len=1024)::path
     real(wp)::yi,baryon_residual,charge_residual,max_baryon_residual,max_charge_residual
@@ -950,6 +950,12 @@ contains
         return
       endif
     endif
+    t0_out=eos%t_first;t1_out=eos%t_last
+    yq0_out=eos%yq_first;yq1_out=eos%yq_last
+    ! Preserve source axis labels when known; internal-only tables fall back
+    ! to their selected cold-slice indices.
+    if(t1_out<t0_out)then;t0_out=eos%iT;t1_out=eos%iT;endif
+    if(yq1_out<yq0_out)then;yq0_out=eos%iYq;yq1_out=eos%iYq;endif
     path=trim(directory)//'/eos.nb'
     open(newunit=u,file=trim(path),status='replace',action='write',iostat=ios)
     if(ios/=0)then;status='cannot write eos.nb';return;endif
@@ -958,10 +964,10 @@ contains
     close(u)
     open(newunit=u,file=trim(directory)//'/eos.t',status='replace',action='write',iostat=ios)
     if(ios/=0)then;status='cannot write eos.t';return;endif
-    write(u,'(i0)')eos%iT;write(u,'(i0)')eos%iT;write(u,'(es25.16e3)')eos%temperature_mev;close(u)
+    write(u,'(i0)')t0_out;write(u,'(i0)')t1_out;write(u,'(es25.16e3)')eos%temperature_mev;close(u)
     open(newunit=u,file=trim(directory)//'/eos.yq',status='replace',action='write',iostat=ios)
     if(ios/=0)then;status='cannot write eos.yq';return;endif
-    write(u,'(i0)')eos%iYq;write(u,'(i0)')eos%iYq;write(u,'(es25.16e3)')eos%charge_fraction_grid;close(u)
+    write(u,'(i0)')yq0_out;write(u,'(i0)')yq1_out;write(u,'(es25.16e3)')eos%charge_fraction_grid;close(u)
     open(newunit=u,file=trim(directory)//'/eos.thermo',status='replace',action='write',iostat=ios)
     if(ios/=0)then;status='cannot write eos.thermo';return;endif
     write(u,'(2(es25.16e3,1x),i0)')eos%mn,eos%mp,eos%il

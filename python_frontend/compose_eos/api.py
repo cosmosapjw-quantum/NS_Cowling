@@ -308,17 +308,26 @@ def build_core_only(
         scalar_names = (
             "mn", "mp", "Il", "temperature_mev", "charge_fraction_grid",
             "q_extra_count", "composition_file_present", "composition_available",
-            "beta_equilibrated", "nT", "nYq", "selected_iT", "selected_iYq",
+            "beta_equilibrated", "nT", "nYq", "t_first", "t_last",
+            "yq_first", "yq_last", "selected_iT", "selected_iYq",
         )
         for name in scalar_names:
             if getattr(core, name) != getattr(source, name):
                 raise NativeExecutionError(
                     f"{model_id} readback metadata mismatch in {name}"
                 )
-        if not np.array_equal(core.t_axis, source.t_axis) or not np.array_equal(
-            core.yq_axis, source.yq_axis
-        ):
-            raise NativeExecutionError(f"{model_id} T/Yq axis values changed")
+        # For a one-point cold slice, CompOSE's mandatory eos.t/eos.yq files
+        # are represented by the exact scalar value plus source index bounds
+        # checked above. The optional NumPy axis views need only compare when
+        # both readers materialize them; multi-point axes are fail-closed here.
+        for name in ("t_axis", "yq_axis"):
+            source_axis = np.asarray(getattr(source, name))
+            core_axis = np.asarray(getattr(core, name))
+            axis_size = source.nT if name == "t_axis" else source.nYq
+            if axis_size > 1 and (source_axis.size == 0 or core_axis.size == 0):
+                raise NativeExecutionError(f"{model_id} multi-point {name} was not materialized")
+            if source_axis.size and core_axis.size and not np.array_equal(core_axis, source_axis):
+                raise NativeExecutionError(f"{model_id} {name} values changed")
 
         # Diagnostics only: no physical repair, clipping, or source modification.
         physical_report = check_consistency(core)

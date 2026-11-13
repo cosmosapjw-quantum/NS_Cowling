@@ -31,7 +31,7 @@ Here n_B is in fm^-3, Q1 and m_n,m_p are in MeV, and epsilon and P are in MeV fm
 
 Iphase remains an EOS-local categorical code. For GM1, KDE0v1 and SLy4, the admitted core rows must carry the source-adjudicated code 3. APR and BBB-BHF2 retain the phase labels actually present in their admitted source rows. No cross-model phase dictionary is inferred.
 
-The following are preserved row by row: particle/group values, Iphase, row_status, all per-species/group presence masks, and independent C3/C4 applicability. A written zero remains present; an absent pair remains absent. The CompOSE eos.t and eos.yq source index bounds are retained when writing the one-point cold slice. The original eos.nb density-row labels are retained by shifting inb_start by first_row-1.
+The following are preserved row by row: particle/group values, Iphase, row_status, all per-species/group presence masks, and independent C3/C4 applicability. A written zero remains present; an absent pair remains absent. The CompOSE eos.t and eos.yq source index bounds and one-point values are retained when writing the cold slice. For this one-point case, the mandatory grid-file value plus exact first/last index metadata is authoritative; optional in-memory t_axis/yq_axis allocation is not itself a serialized field. The original eos.nb density-row labels are retained by shifting inb_start by first_row-1.
 
 ## Implementation
 

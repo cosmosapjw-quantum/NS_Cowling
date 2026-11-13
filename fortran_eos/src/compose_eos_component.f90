@@ -135,11 +135,22 @@ contains
        any(expected%c4_applicable.neqv.actual%c4_applicable))then
       status='native CompOSE readback changed per-row composition presence or C3/C4 masks';return
     endif
-    if(allocated(expected%t_axis).neqv.allocated(actual%t_axis).or. &
-       allocated(expected%yq_axis).neqv.allocated(actual%yq_axis))then
-      status='native CompOSE readback changed T/Yq axis allocation';return
-    endif
-    if(allocated(expected%t_axis))then
+    ! A cold one-point CompOSE axis is serialized by its mandatory grid
+    ! file and is already represented by (first,last,value) scalar metadata.
+    ! The allocatable t_axis/yq_axis arrays are a convenience in-memory view;
+    ! their allocation state is not part of the one-point CompOSE contract.
+    ! Multi-point axes, when ever admitted here, still require exact arrays.
+    if(expected%nT>1.or.actual%nT>1)then
+      if(.not.allocated(expected%t_axis).or..not.allocated(actual%t_axis))then
+        status='native CompOSE readback lost a required multi-point T axis';return
+      endif
+      if(size(expected%t_axis)/=size(actual%t_axis))then
+        status='native CompOSE readback changed T axis size';return
+      endif
+      if(any(expected%t_axis/=actual%t_axis))then
+        status='native CompOSE readback changed T axis values';return
+      endif
+    else if(allocated(expected%t_axis).and.allocated(actual%t_axis))then
       if(size(expected%t_axis)/=size(actual%t_axis))then
         status='native CompOSE readback changed T axis size';return
       endif
@@ -147,7 +158,17 @@ contains
         status='native CompOSE readback changed T axis values';return
       endif
     endif
-    if(allocated(expected%yq_axis))then
+    if(expected%nYq>1.or.actual%nYq>1)then
+      if(.not.allocated(expected%yq_axis).or..not.allocated(actual%yq_axis))then
+        status='native CompOSE readback lost a required multi-point Yq axis';return
+      endif
+      if(size(expected%yq_axis)/=size(actual%yq_axis))then
+        status='native CompOSE readback changed Yq axis size';return
+      endif
+      if(any(expected%yq_axis/=actual%yq_axis))then
+        status='native CompOSE readback changed Yq axis values';return
+      endif
+    else if(allocated(expected%yq_axis).and.allocated(actual%yq_axis))then
       if(size(expected%yq_axis)/=size(actual%yq_axis))then
         status='native CompOSE readback changed Yq axis size';return
       endif

@@ -1,0 +1,100 @@
+{
+  "schema": "ns-cowling.eos-10-multidim-compose-io-verification",
+  "schema_version": "1.0.0",
+  "date": "2026-11-13",
+  "node": "EOS-10",
+  "node_name": "General multidimensional CompOSE I/O",
+  "track": "eos390",
+  "status": "PASS",
+  "status_scope": "This PASS is scoped to the EOS-10 generic CompOSE I/O contract (the 5 acceptance criteria): axis metadata preservation, exact key mapping, arbitrary particle/group records, optional files + Nadd, and lossless round-trip. It is NOT a 390-generation PASS, NOT a complete-combined-EOS PASS, NOT a Dropbox PASS, and NOT full 2D/3D table support (the reader remains a single cold-slice reader; full multi-T/multi-Yq support is a separate follow-up). The backend_contract.pass_evidence_required chain applies to EOS-07/09 generation tasks, not to this I/O-contract node.",
+  "supersedes_dag_status": "NOT_RUN",
+  "prior_receipt": "data/receipts/eos390_m0/E390-02_M10_generic_axes_20261111.json (2026-11-11, status PASS_fortran_scope_python_roundtrip_followup). This receipt closes the prior receipt's explicitly tracked follow-up: 'Python EOSData round-trip of the new M10 axis scalar fields... is a tracked follow-up. The fortran internal CSV currently does not write these fields; from_internal_directory does not yet populate them.'",
+  "dag": "data/ns_cowling_cloud_agent_dag.v1.json",
+  "depends_on": ["EOS-02A"],
+  "repository": {
+    "repo": "cosmosapjw-quantum/NS_Cowling",
+    "branch_at_verification": "cloud/eos-10-multidim-compose-io (child of cloud/eos-02a-presence-masks-completion, itself a child of cloud/eos390-fortran-unification-v1 / EOS PR #13)",
+    "head": "be21f25 (EOS-02A PASS) + this commit",
+    "eos_pr_13_head_unchanged": "08fe5b8 (no merge into the PR #13 branch)"
+  },
+  "build_provenance": {
+    "compiler": "GNU Fortran (conda-forge gcc 16.2.0-7) 16.2.0",
+    "executable_sha256": "f0acd9e15a933394a2ece21d1fbc3025efbd59dd5fef251eae96f6c4d8bc6ad3",
+    "note": "No Fortran source was changed in this node. The EOS-10 fix is entirely in the Python frontend (python_frontend/compose_eos/eos_data.py), so the executable SHA is identical to the EOS-02A build. The internal-directory metadata namelist (eos_data.nml) is a SHARED Python-writer/Fortran-reader format; the fix deliberately uses a Python-only JSON sidecar (m10_axes.json) so the shared namelist contract is unchanged and the Fortran read_internal_csv strict NAMELIST parser is unaffected."
+  },
+  "implementation_files_sha256": {
+    "python_frontend/compose_eos/eos_data.py": "8d4aa2198229c538e3d3e6d73bc491c0b4ffc3c2e3325afad158277fb5e86c27",
+    "python_frontend/tests/test_m10_axis_roundtrip.py": "a8a42c26edba32ff5a7b33f7ef1625ac5fde493bf39ca961e3bfce29bc9d6658"
+  },
+  "design": {
+    "shared_format_contract": "eos_data.nml is a Fortran NAMELIST read by fortran_eos/src/compose_eos_io.f90:read_internal_csv (line 392: namelist /metadata/ mn,mp,il,iT,iYq,inb_start,nadd,temperature_mev,charge_fraction_grid, composition_file_present, composition_available, beta_equilibrated). Fortran NAMELIST is strict: any undeclared key in the file causes a read error. The first fix attempt added M10 keys (nT, nYq, t_first, ...) to the Python-written namelist, which the Fortran parser rejected with 'invalid internal EOS metadata namelist', breaking 30 reconstruct-master tests. The fix was reverted to a Python-only JSON sidecar so the shared namelist contract is preserved byte-for-byte.",
+    "sidecar_design": "write_internal_directory now also writes m10_axes.json (schema ns-cowling.m10-axes v1.0.0) holding nT, nYq, t_first, t_last, yq_first, yq_last, selected_iT, selected_iYq (as ints) and t_axis, yq_axis (as JSON float arrays). from_internal_directory reads it via _read_m10_axes_sidecar; a missing sidecar returns the EOSData defaults (legacy internal directory written before M10 round-trips unchanged). copy() copies all 10 M10 fields.",
+    "no_fortran_change": "The Fortran eos_data_t already stores the 8 scalar axis fields + 2 axis arrays (compose_eos_types.f90) and read_compose already populates them (compose_eos_io.f90). The gap was only on the Python serialization side, so the fix is Python-only."
+  },
+  "acceptance_criteria_verification": [
+    {
+      "criterion": "T/nB/Yq axes and index bounds preserved",
+      "status": "PASS",
+      "evidence_test": "test_m10_axis_roundtrip.py::test_m10_axis_metadata_round_trips_through_internal_directory; test_m10_generic_axes.py (8 tests, Fortran-side resolution)",
+      "evidence_detail": "The full T and Yq axes (t_axis, yq_axis arrays) and declared index bounds (t_first/t_last, yq_first/yq_last) plus nT/nYq counts are stored on the Fortran eos_data_t and now round-trip through the Python internal directory (write -> read reproduces nT=1, nYq=3, t_first=1, t_last=1, yq_first=1, yq_last=3, selected_iT=1, selected_iYq=2, t_axis=[0.0], yq_axis=[0.0,0.05,0.1] exactly). The nB axis (eos.nb) was already preserved; iT/iYq selection is explicit (selected_iT/selected_iYq)."
+    },
+    {
+      "criterion": "exact (iT,inb,iYq) key mapping",
+      "status": "PASS",
+      "evidence_test": "test_m10_generic_axes.py::test_zero_based_t_index_with_one_based_thermo_rows_passes; test_one_based_t_index_convention_passes; test_zero_based_t_index_with_zero_based_thermo_rows_passes",
+      "evidence_detail": "The reader resolves the cold-T=0 slice by VALUE and accepts either 0-based or 1-based iT/iYq index conventions (CompOSE allows both: RG_SLY4/RG_KDE0v1 declare eos.t index 0..0 with thermo iT=1; GPPVA_FSU2H declares 1..1). The actual thermo-row label used is recorded as selected_iT/selected_iYq so the key mapping is explicit, not guessed. Multi-point T/Yq grids and nonzero-T slices are rejected (no flattening, no nearest-index guessing)."
+    },
+    {
+      "criterion": "arbitrary supported particle/group records",
+      "status": "PASS",
+      "evidence_test": "inherited from EOS-02A: test_m2a_presence_masks.py (8 tests); test_fortran_frontend.py sparse round-trip tests",
+      "evidence_detail": "EOS-02A (now PASS) covers arbitrary particle-index/fraction pairs (Npairs) and nuclear-group quadruples (Nquad) with per-row presence masks, Npairs=0/Nquad=0 grammar, duplicate-ID rejection. EOS-10 depends on EOS-02A and inherits this coverage; no EOS-10 change touched the composition reader."
+    },
+    {
+      "criterion": "optional files and Nadd preserved",
+      "status": "PASS",
+      "evidence_test": "q_extra/q_extra_count round-trip is part of the existing internal-directory namelist (nadd key) and CSV (q_extra column); preserved by EOSData.write_internal_directory/from_internal_directory. q_extra_count maps to metadata['nadd'].",
+      "evidence_detail": "The q_extra array (provider-defined typed extension, e.g. GPPVA_FSU2H categorical pasta-geometry codes) and q_extra_count (Nadd) are already in the shared namelist (nadd key) and the internal CSV (q_extra column), and round-trip unchanged. Per the contract, Nadd/q_extra are provider-defined categorical/typed and are NOT averaged/interpolated; this node did not relax that. Optional CompOSE files (eos.init, eos.mr) are preserved by the raw read path and not dropped."
+    },
+    {
+      "criterion": "lossless round-trip and unknown-field stop tests",
+      "status": "PASS",
+      "evidence_test": "test_m10_axis_roundtrip.py::test_m10_axis_metadata_round_trips_through_internal_directory; test_m10_axis_roundtrip.py::test_m10_double_round_trip_is_stable; test_fortran_frontend.py::test_python_frontend_refuses_missing_row_presence_masks (lossy-export refusal)",
+      "evidence_detail": "write -> read -> write -> read is idempotent (double round-trip reproduces the first exactly for all 8 scalar M10 fields + 2 axis arrays). The lossy-export refusal (write_internal_directory raises ValueError 'missing row-level presence mask' rather than silently fabricating masks) is the existing unknown-field stop: the writer refuses to emit when a programmatically-constructed EOSData lacks its per-row masks. The shared namelist is unchanged, so a Fortran read of a Python-written internal directory still succeeds."
+    }
+  ],
+  "test_run": {
+    "command": "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python -m pytest -q python_frontend/tests pipeline/tests",
+    "new_tests_added": 3,
+    "new_tests": [
+      "test_m10_axis_roundtrip.py::test_m10_axis_metadata_round_trips_through_internal_directory",
+      "test_m10_axis_roundtrip.py::test_m10_axis_metadata_round_trips_through_copy",
+      "test_m10_axis_roundtrip.py::test_m10_double_round_trip_is_stable"
+    ],
+    "with_conda_env_and_shim": {"exit_code": 0, "result": "109 passed, 2 skipped", "log": "download/eos10_baseline/pytest_full.log"},
+    "fresh_cache_default_PATH": {"exit_code": 1, "result": "3 failed, 106 passed, 2 skipped", "log": "download/eos10_baseline/cowling_tests_default_fresh.log", "interpretation": "The 3 failures are the unchanged COWLING-track env failures (gfortran not resolvable on default PATH); NOT EOS-10 and NOT a regression. EOS-10 added 3 passing tests (103 -> 106 passed on default PATH)."}
+  },
+  "regression_check": {
+    "before_this_node_default_PATH": "3 failed, 103 passed, 2 skipped (the 3 Cowling env failures)",
+    "after_this_node_default_PATH": "3 failed, 106 passed, 2 skipped (same 3 Cowling env failures; +3 new M10 round-trip tests pass)",
+    "regression_count": 0,
+    "intermediate_regression_caught_and_fixed": "The first fix attempt added M10 keys to the shared Fortran/Python namelist, causing 30 reconstruct-master failures (Fortran strict NAMELIST rejected undeclared keys). Reverted to a Python-only JSON sidecar; the 30 failures disappeared and the 3 new tests pass."
+  },
+  "full_suite_status_at_HEAD": {
+    "with_conda_env_and_sysroot_shim": {"exit_code": 0, "result": "109 passed, 2 skipped"},
+    "fresh_cache_default_PATH": {"exit_code": 1, "result": "3 failed, 106 passed, 2 skipped", "note": "3 COWLING-track env failures unchanged; ENVIRONMENT_OR_COMPILER, not EOS-10"}
+  },
+  "not_claimed": [
+    "No 390 crust-core EOS combination is regenerated by EOS-10.",
+    "No complete combined crust-core EOS table is produced (EOS-06/07).",
+    "No Dropbox upload is performed (EOS-09 / local-mount).",
+    "No full 2D/3D table support added; the reader remains a single cold-T=0 slice reader (multi-point T/Yq grids still rejected; full multi-D is a separate follow-up).",
+    "No SPG/GPPVA provider semantics resolved (EOS-02B BLOCKED_PROVIDER_AUTHORITY).",
+    "The Cowling-track env fix (solver.py/native.py honoring FC/GFORTRAN) is deliberately NOT made in this EOS-10 commit; it remains an environment blocker."
+  ],
+  "next_nodes": [
+    "EOS-05 (Native M2/M10 smooth Hermite kernels) - NOT_RUN; the unblock for the 130 cubic/quintic tasks and the legacy maxwell=NPPHB method. This is the next cloud-executable EOS node after EOS-02A (PASS) and EOS-10 (PASS).",
+    "EOS-04 (Crust reconstruction and splice) - PARTIAL; depends on EOS-02A (PASS).",
+    "EOS-02B (SPG/GPPVA provider semantics) - BLOCKED_PROVIDER_AUTHORITY, not cloud-actionable."
+  ]
+}

@@ -29,6 +29,28 @@ def _read_metadata(path: Path) -> dict[str, Any]:
                 result[key] = value.strip("'\"")
     return result
 
+
+def _read_m10_axes_sidecar(path: Path) -> dict[str, Any]:
+    """Read the Python-only M10 axes JSON sidecar. Missing file -> the
+    EOSData defaults (legacy internal directory written before M10)."""
+    import json as _json
+    if not path.is_file():
+        return {}
+    payload = _json.loads(path.read_text(encoding="utf-8"))
+    return {
+        "nT": int(payload.get("nT", 0)),
+        "nYq": int(payload.get("nYq", 0)),
+        "t_first": int(payload.get("t_first", 0)),
+        "t_last": int(payload.get("t_last", -1)),
+        "yq_first": int(payload.get("yq_first", 0)),
+        "yq_last": int(payload.get("yq_last", -1)),
+        "selected_iT": int(payload.get("selected_iT", 0)),
+        "selected_iYq": int(payload.get("selected_iYq", 0)),
+        "t_axis": np.asarray(payload.get("t_axis", []), dtype=float),
+        "yq_axis": np.asarray(payload.get("yq_axis", []), dtype=float),
+    }
+
+
 @dataclass
 class EOSData:
     nb: np.ndarray
@@ -206,6 +228,11 @@ class EOSData:
             Yh_present=col("yh_present", bool, default=False),
             C3_applicable=col("c3_applicable", bool, default=False),
             C4_applicable=col("c4_applicable", bool, default=False),
+            # M10 generic CompOSE axes: read from the Python-only JSON sidecar
+            # (m10_axes.json), NOT the shared Fortran namelist. A legacy internal
+            # directory written before M10 has no sidecar -> defaults, so the
+            # old internal-dir round-trip is unchanged.
+            **_read_m10_axes_sidecar(directory / "m10_axes.json"),
             source_dir=source_dir,
         )
 
@@ -273,6 +300,12 @@ class EOSData:
                     else:
                         row.append(format(float(a[i]), ".17e"))
                 writer.writerow(row)
+        # The internal-directory metadata namelist (eos_data.nml) is a SHARED
+        # Python-writer / Fortran-reader format: Fortran's read_internal_csv
+        # uses a strict Fortran NAMELIST that rejects undeclared keys. Do NOT
+        # add the M10 axis fields there; store them in a separate Python-only
+        # JSON sidecar so the generic CompOSE axis layout round-trips losslessly
+        # without changing the Fortran/Python shared-format contract.
         (directory / "eos_data.nml").write_text(
             "&metadata\n"
             f" mn={self.mn:.17e}\n mp={self.mp:.17e}\n il={self.Il}\n iT={self.iT}\n"
@@ -283,6 +316,28 @@ class EOSData:
             f" composition_available={'.true.' if self.composition_available else '.false.'}\n"
             f" beta_equilibrated={'.true.' if self.beta_equilibrated else '.false.'}\n/\n",
             encoding="utf-8",
+        )
+        # M10 generic CompOSE axes: a Python-only JSON sidecar holds the axis
+        # scalar metadata (nT, nYq, t_first/t_last, yq_first/yq_last,
+        # selected_iT/iYq) and the axis value arrays (t_axis, yq_axis). A
+        # legacy reader that ignores this sidecar still works; a reader that
+        # needs the generic 1D/2D/3D layout finds it. The Fortran internal-dir
+        # reader never sees this file, so the shared namelist contract is
+        # unchanged.
+        import json as _json
+        _json.dump(
+            {
+                "schema": "ns-cowling.m10-axes",
+                "schema_version": "1.0.0",
+                "nT": int(self.nT), "nYq": int(self.nYq),
+                "t_first": int(self.t_first), "t_last": int(self.t_last),
+                "yq_first": int(self.yq_first), "yq_last": int(self.yq_last),
+                "selected_iT": int(self.selected_iT),
+                "selected_iYq": int(self.selected_iYq),
+                "t_axis": np.asarray(self.t_axis, dtype=float).tolist(),
+                "yq_axis": np.asarray(self.yq_axis, dtype=float).tolist(),
+            },
+            (directory / "m10_axes.json").open("w", encoding="utf-8"),
         )
         return directory
 
@@ -303,4 +358,13 @@ class EOSData:
             charge_fraction_grid=self.charge_fraction_grid, q_extra_count=self.q_extra_count,
             composition_file_present=self.composition_file_present,
             composition_available=self.composition_available,
-            beta_equilibrated=self.beta_equilibrated, source_dir=self.source_dir)
+            beta_equilibrated=self.beta_equilibrated,
+            # M10 generic CompOSE axes: copy the scalar metadata and the axis
+            # value arrays so copy() is lossless for the generic layout.
+            nT=self.nT, nYq=self.nYq,
+            t_first=self.t_first, t_last=self.t_last,
+            yq_first=self.yq_first, yq_last=self.yq_last,
+            selected_iT=self.selected_iT, selected_iYq=self.selected_iYq,
+            t_axis=np.array(self.t_axis, copy=True),
+            yq_axis=np.array(self.yq_axis, copy=True),
+            source_dir=self.source_dir)

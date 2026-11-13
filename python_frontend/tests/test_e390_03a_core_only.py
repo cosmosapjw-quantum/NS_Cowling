@@ -49,6 +49,11 @@ def test_e390_03a_builds_all_five_admitted_core_only_tables(tmp_path: Path) -> N
         assert output.n == n
         assert np.all(np.diff(output.nb) > 0.0)
         assert output.inb_start >= 1
+        expected_composition_available = bool(np.any(
+            output.Yn_present | output.Yp_present | output.Ye_present | output.Ymu_present |
+            output.Abar_present | output.Zbar_present | output.Yh_present
+        ))
+        assert output.composition_available is expected_composition_available
         saved = json.loads(
             (Path(receipt["output"]["directory"]) / "E390-03A_RECEIPT.json").read_text()
         )

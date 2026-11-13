@@ -307,8 +307,8 @@ def build_core_only(
             )
         scalar_names = (
             "mn", "mp", "Il", "temperature_mev", "charge_fraction_grid",
-            "q_extra_count", "composition_file_present", "composition_available",
-            "beta_equilibrated", "nT", "nYq", "t_first", "t_last",
+            "q_extra_count", "composition_file_present", "beta_equilibrated",
+            "nT", "nYq", "t_first", "t_last",
             "yq_first", "yq_last", "selected_iT", "selected_iYq",
         )
         for name in scalar_names:
@@ -316,6 +316,14 @@ def build_core_only(
                 raise NativeExecutionError(
                     f"{model_id} readback metadata mismatch in {name}"
                 )
+        expected_composition_available = bool(np.any(
+            core.Yn_present | core.Yp_present | core.Ye_present | core.Ymu_present |
+            core.Abar_present | core.Zbar_present | core.Yh_present
+        ))
+        if core.composition_available != expected_composition_available:
+            raise NativeExecutionError(
+                f"{model_id} composition_available is inconsistent with the sliced row-presence masks"
+            )
         # For a one-point cold slice, CompOSE's mandatory eos.t/eos.yq files
         # are represented by the exact scalar value plus source index bounds
         # checked above. The optional NumPy axis views need only compare when
@@ -384,6 +392,8 @@ def build_core_only(
                 "inb_start": core.inb_start,
                 "composition_file_present": core.composition_file_present,
                 "composition_available": core.composition_available,
+                "source_parent_composition_available": source.composition_available,
+                "composition_availability_scope": "selected core-only rows; recomputed from row presence masks",
                 "nadd": core.q_extra_count,
             },
             "non_claims": [

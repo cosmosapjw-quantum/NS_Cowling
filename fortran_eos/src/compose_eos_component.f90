@@ -75,6 +75,10 @@ contains
     core%yh_present=source%yh_present(first_row:last_row)
     core%c3_applicable=source%c3_applicable(first_row:last_row)
     core%c4_applicable=source%c4_applicable(first_row:last_row)
+    ! composition_available is a slice-local summary, not the presence of eos.compo.
+    ! The parent unified table may have abundances only in its excluded crust.
+    core%composition_available=any(core%yn_present.or.core%yp_present.or.core%ye_present.or. &
+      core%ymu_present.or.core%abar_present.or.core%zbar_present.or.core%yh_present)
     if(allocated(source%q_full))core%q_full=source%q_full(:,:,:,first_row:last_row)
     if(allocated(source%q_extra_full))core%q_extra_full=source%q_extra_full(:,:,:,first_row:last_row)
 

@@ -5,7 +5,7 @@
   "date": "2026-11-13",
   "node": "E390-01B",
   "gate": "M1B",
-  "status": "CODE_AND_CONTRACT_MIGRATION_PUBLISHED_CI_PENDING",
+  "status": "CODE_AND_CONTRACT_MIGRATION_PUBLISHED_SHA256_MANIFEST_REFRESHED_CI_PENDING",
   "repository": "cosmosapjw-quantum/NS_Cowling",
   "branch": "cloud/eos390-fortran-unification-v1",
   "head_at_receipt": "f6bd31ebef83eaa7cb5455f2113e8b9a4b4d17f9",
@@ -59,12 +59,33 @@
     "historical_v1_outputs_modified": false
   },
   "verification": {
-    "static_source_review": "All changed code paths were fetched again from the feature branch and checked for active smooth maxwell dispatch. The FLCHPB token dispatches the old smooth kernel; the maxwell token is defined as sharp and is rejected by the smooth matcher/M7 390 runner pending M5 integration.",
+    "static_source_review": "Re-fetched active source paths contain no build_maxwell_plateau_bridge symbol, no case('maxwell') smooth native bridge, and no smooth dispatch of method=maxwell. Python matching.py declares MAXWELL_METHOD_ID='maxwell' and rejects it from the smooth matcher; build_maxwell_eos and native construct_maxwell_transition are the sharp transition APIs.",
     "native_fortran_kernel": "compose_eos_phase_transition.f90 exports MAXWELL_METHOD_ID='maxwell' and construct_maxwell_transition. This does not imply that the composition-aware common matcher, CompOSE export or 65-pair production runner is complete.",
     "legacy_quadrature": "The NPPHB/FLCHPB interior integral still has the previously recorded unsplit partial quadrature at Hermite knots u=0.22 and 0.78. FLCHPB remains legacy parity only until knot-split/adaptive or analytic quadrature convergence is validated.",
     "manifest": "M7 v2 generator and tests assert exactly 390 smooth tasks and separate method ID maxwell.",
     "ci": "Not yet executed on this receipt head. Prior CI on an earlier head built Fortran and ran tests successfully but failed the tracked SHA256 manifest because the DAG hash was stale; the hash manifest is being refreshed for this migration.",
-    "sharp_65_pair_manifest": "The authoritative EOS DAG references data/sharp_maxwell_c4_execution_plan.v1.json as a separate 65-pair plan, but that file was not present in this branch checkout (GitHub contents lookup returned 404). Its separate scope is retained in the DAG, but its exact task manifest is not claimed as independently inspected in this turn."
+    "sharp_65_pair_manifest": "The authoritative EOS DAG references data/sharp_maxwell_c4_execution_plan.v1.json as a separate 65-pair plan, but that file was not present in this branch checkout (GitHub contents lookup returned 404). Its separate scope is retained in the DAG, but its exact task manifest is not claimed as independently inspected in this turn.",
+    "sha256_manifest": {
+      "path": "SHA256SUMS_v4.txt",
+      "blob_sha": "8a51ad4c0a510cd50f9b72d191f3c29a1015a6b0",
+      "status": "REFRESHED_FOR_ALL_MODIFIED_RELEASE_MANIFEST_PATHS_AND_ADDED_METHOD_SOURCE/RECEIPT_PATHS",
+      "note": "SHA-256 values were recomputed from the UTF-8 bytes fetched from the exact branch blobs; a built-in SHA-256 self-test against the standard 'abc' vector passed. The exact-head GitHub workflow remains the independent checksum/build/test verification."
+    },
+    "m7": "M7 manifest v2.0.0 contains six smooth methods including FLCHPB and has a 390-task generator invariant. M7 runner rejects v1 manifests and rejects method=maxwell inside the 390 smooth matrix; run_maxwell_task is a separate sharp M5 stub that remains blocked pending composition-aware native integration.",
+    "native_fortran": "The old native smooth case('maxwell') was renamed to case('first_law_constrained_hermite_pressure_bridge'). The common smooth matcher keeps a sharp method=maxwell guard and fails closed until M5 integration. The phase-transition module exports MAXWELL_METHOD_ID='maxwell'.",
+    "tests_added": [
+      "test_method_ids_distinguish_legacy_smooth_bridge_from_sharp_maxwell",
+      "test_v2_smooth_manifest_retains_390_keys_with_renamed_legacy_method",
+      "test_m7_smooth_runner_rejects_sharp_maxwell_method_id",
+      "test_m7_smooth_runner_rejects_a_historical_v1_manifest",
+      "test_sharp_maxwell_method_is_rejected_by_smooth_matcher_until_m5_integration",
+      "test_native_cli_keeps_sharp_maxwell_fail_closed_until_m5_integration"
+    ],
+    "unresolved": [
+      "FLCHPB/NPPHB interior first-law integral quadrature remains a legacy parity kernel with the known unsplit u=0.22 and u=0.78 knot issue; knot-split/adaptive or analytic convergence remains required.",
+      "Composition-aware M5 sharp Maxwell common-matcher integration and complete two-phase composition preservation remain pending.",
+      "The separate sharp-Maxwell 65-pair task manifest is referenced by the DAG but the referenced JSON path was not present in this working branch; do not claim its task list was revalidated."
+    ]
   },
   "immutable_policy": {
     "old_v1_task_ids_and_output_folders": "Do not rename or rewrite existing output directories, task receipts, CSVs, manifests or hashes containing __maxwell. Their token means NPPHB under manifest v1.",
@@ -107,15 +128,15 @@
     },
     {
       "path": "python_frontend/tests/test_native_crust_core_matching.py",
-      "blob_sha": "aa045f440d2139a3a024dbf3bab96a1f11f6c4ad"
+      "blob_sha": "b20fb567ef9aa65b9c19149f08af6bca442e5d99"
     },
     {
       "path": "data/eos390_native_fortran_unification_dag.v1.json",
-      "blob_sha": "ba5e4202c9e6cb85d499fb52bb731b2fb6261bc3"
+      "blob_sha": "ecc5eedcebe0a6498de42d418be6a43d7de2067b"
     },
     {
       "path": "data/ns_cowling_cloud_agent_dag.v1.json",
-      "blob_sha": "70f3bf8e86b0b26cd631d3941951a3ea8e1b32b2"
+      "blob_sha": "88588f160f00d5217965dc5c14ee35dd95b42d61"
     },
     {
       "path": "docs/NS_COWLING_CLOUD_AGENT_DAG_20261112.md",
@@ -124,8 +145,13 @@
     {
       "path": "docs/EOS390_NATIVE_FORTRAN_UNIFICATION_CONTRACT_20261111.md",
       "blob_sha": "2a72d6b07186152284e0581be109ea4317687948"
+    },
+    {
+      "path": "SHA256SUMS_v4.txt",
+      "blob_sha": "8a51ad4c0a510cd50f9b72d191f3c29a1015a6b0"
     }
   ],
   "next_node": "E390-01A",
-  "next_node_title": "Specify standalone core-only and crust-only EOS construction contracts"
+  "next_node_title": "Specify standalone core-only and crust-only EOS construction contracts",
+  "head_before_receipt_refresh": "facb2cfabf280dc8143a52b9af3490f6f7693db0"
 }

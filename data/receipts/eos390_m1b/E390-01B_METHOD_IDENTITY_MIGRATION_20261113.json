@@ -1,0 +1,131 @@
+{
+  "schema": "ns-cowling.eos390-method-identity-migration",
+  "schema_version": "1.0.0",
+  "receipt_id": "E390-01B-METHOD-IDENTITY-MIGRATION-20261113",
+  "date": "2026-11-13",
+  "node": "E390-01B",
+  "gate": "M1B",
+  "status": "CODE_AND_CONTRACT_MIGRATION_PUBLISHED_CI_PENDING",
+  "repository": "cosmosapjw-quantum/NS_Cowling",
+  "branch": "cloud/eos390-fortran-unification-v1",
+  "head_at_receipt": "f6bd31ebef83eaa7cb5455f2113e8b9a4b4d17f9",
+  "backup_branch": "backup/e390-02-pre-20261113",
+  "backup_parent": "0c9d66c7092627d70b5df742af5cc7178f28b081",
+  "method_identity": {
+    "old_v1_smooth_token": "maxwell",
+    "new_smooth_method_id": "first_law_constrained_hermite_pressure_bridge",
+    "new_smooth_long_name": "First-Law-Constrained Hermite Pressure Bridge (FLCHPB)",
+    "algorithm_identity": "Legacy Near-Pressure-Plateau Hermite Bridge (NPPHB) parameterization; project-defined, not claimed as a literature method.",
+    "sharp_transition_method_id": "maxwell",
+    "sharp_transition_identity": "SHARP_MAXWELL_LOCAL_NEUTRALITY",
+    "sharp_transition_definition": {
+      "assumptions": "Cold one-charge baryon barotropes, with local electric neutrality imposed separately in each phase.",
+      "coexistence": [
+        "P_low(mu_t)=P_high(mu_t)=P_t",
+        "mu_B,low=mu_B,high=mu_t",
+        "n_high>n_low>0",
+        "epsilon_i=mu_t*n_i-P_t",
+        "Delta epsilon=mu_t*Delta n_B>0"
+      ],
+      "no_alias": "The smooth matcher never maps method=maxwell to the FLCHPB/NPPHB kernel."
+    }
+  },
+  "matrix_migration": {
+    "historical_v1_matrix": "13 crust x 5 core x 6 methods = 390",
+    "v2_smooth_method_ids": [
+      "first_law_constrained_hermite_pressure_bridge",
+      "css",
+      "cubic_F",
+      "cubic_P",
+      "quintic_F",
+      "quintic_P"
+    ],
+    "v2_schema_version": "2.0.0",
+    "v2_cardinality": "13 x 5 x 6 = 390",
+    "sharp_maxwell_scope": "The sharp method ID maxwell is outside the 390 smooth M7 manifest and remains a separate M5 65-pair transition scope.",
+    "task_identity": "New FLCHPB task IDs and output paths are generated from the new token; v1 IDs and outputs are not rewritten."
+  },
+  "code_changes": {
+    "legacy_smooth_kernel_renamed": true,
+    "package_export_renamed": true,
+    "native_fortran_smooth_case_renamed": true,
+    "canonical_sharp_maxwell_method_id_declared_in_python_and_fortran": true,
+    "python_smooth_matcher_rejects_maxwell": true,
+    "native_fortran_common_matcher_rejects_maxwell_until_m5_integration": true,
+    "m7_v2_manifest_excludes_maxwell_from_smooth_methods": true,
+    "m7_batch_runner_rejects_v1_manifest": true,
+    "m7_batch_runner_rejects_maxwell_in_390_smooth_matrix": true,
+    "python_tests_updated": true,
+    "historical_v1_outputs_modified": false
+  },
+  "verification": {
+    "static_source_review": "All changed code paths were fetched again from the feature branch and checked for active smooth maxwell dispatch. The FLCHPB token dispatches the old smooth kernel; the maxwell token is defined as sharp and is rejected by the smooth matcher/M7 390 runner pending M5 integration.",
+    "native_fortran_kernel": "compose_eos_phase_transition.f90 exports MAXWELL_METHOD_ID='maxwell' and construct_maxwell_transition. This does not imply that the composition-aware common matcher, CompOSE export or 65-pair production runner is complete.",
+    "legacy_quadrature": "The NPPHB/FLCHPB interior integral still has the previously recorded unsplit partial quadrature at Hermite knots u=0.22 and 0.78. FLCHPB remains legacy parity only until knot-split/adaptive or analytic quadrature convergence is validated.",
+    "manifest": "M7 v2 generator and tests assert exactly 390 smooth tasks and separate method ID maxwell.",
+    "ci": "Not yet executed on this receipt head. Prior CI on an earlier head built Fortran and ran tests successfully but failed the tracked SHA256 manifest because the DAG hash was stale; the hash manifest is being refreshed for this migration.",
+    "sharp_65_pair_manifest": "The authoritative EOS DAG references data/sharp_maxwell_c4_execution_plan.v1.json as a separate 65-pair plan, but that file was not present in this branch checkout (GitHub contents lookup returned 404). Its separate scope is retained in the DAG, but its exact task manifest is not claimed as independently inspected in this turn."
+  },
+  "immutable_policy": {
+    "old_v1_task_ids_and_output_folders": "Do not rename or rewrite existing output directories, task receipts, CSVs, manifests or hashes containing __maxwell. Their token means NPPHB under manifest v1.",
+    "new_m7_outputs": "Use manifest schema v2.0.0 and a fresh versioned root; no overwrite or reuse of historical v1 output folders.",
+    "raw_eos_and_v3_2_outputs_modified": false,
+    "default_branch_modified": false
+  },
+  "changed_files": [
+    {
+      "path": "eos_generator/compose_eos_pkg/compose_eos/matching.py",
+      "blob_sha": "948b3e277ad08b74e4d55512bc9a060ecbf80150"
+    },
+    {
+      "path": "eos_generator/compose_eos_pkg/compose_eos/__init__.py",
+      "blob_sha": "7695f45c795acc1b3bbab7074d5848c3fa5d633d"
+    },
+    {
+      "path": "eos_generator/compose_eos_pkg/compose_eos/phase_transitions.py",
+      "blob_sha": "5976e6fe882fd239756603933978490b6a538f14"
+    },
+    {
+      "path": "fortran_eos/src/compose_eos_matching.f90",
+      "blob_sha": "f88db5603673b68165b5caa200c7047ca7d5a7fd"
+    },
+    {
+      "path": "fortran_eos/src/compose_eos_phase_transition.f90",
+      "blob_sha": "12394d73f04ab89c192b910abd2ae7f77ac50ecd"
+    },
+    {
+      "path": "scripts/m7/m7_manifest_generator.py",
+      "blob_sha": "10b2f26a240a5122ebab21eda165f389de764e3b"
+    },
+    {
+      "path": "scripts/m7/m7_batch_orchestrator.py",
+      "blob_sha": "714dfeac3491b4f11e39e1e8079ac3eb9793b69f"
+    },
+    {
+      "path": "python_frontend/tests/test_m7_fail_closed.py",
+      "blob_sha": "1c2859d883884fd74b42647a5b94377884f1c30e"
+    },
+    {
+      "path": "python_frontend/tests/test_native_crust_core_matching.py",
+      "blob_sha": "aa045f440d2139a3a024dbf3bab96a1f11f6c4ad"
+    },
+    {
+      "path": "data/eos390_native_fortran_unification_dag.v1.json",
+      "blob_sha": "ba5e4202c9e6cb85d499fb52bb731b2fb6261bc3"
+    },
+    {
+      "path": "data/ns_cowling_cloud_agent_dag.v1.json",
+      "blob_sha": "70f3bf8e86b0b26cd631d3941951a3ea8e1b32b2"
+    },
+    {
+      "path": "docs/NS_COWLING_CLOUD_AGENT_DAG_20261112.md",
+      "blob_sha": "6d8dbcac108a2b25ca796a3d6de9f786ff7b32cc"
+    },
+    {
+      "path": "docs/EOS390_NATIVE_FORTRAN_UNIFICATION_CONTRACT_20261111.md",
+      "blob_sha": "2a72d6b07186152284e0581be109ea4317687948"
+    }
+  ],
+  "next_node": "E390-01A",
+  "next_node_title": "Specify standalone core-only and crust-only EOS construction contracts"
+}

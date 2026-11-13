@@ -1,0 +1,81 @@
+{
+  "receipt_id": "E390-02A-RESOLVED_20261113",
+  "node": "E390-02A",
+  "gate": "M2A",
+  "title": "Represent per-row composition coverage without converting missing data to zero",
+  "prior_status": "NOT_IMPLEMENTED",
+  "resolved_status": "IMPLEMENTED_CI_PASS",
+  "resolution_date": "2026-11-13",
+  "branch": "cloud/eos390-fortran-unification-v1",
+  "finding": "On inspection, E390-02A is fully implemented and passing CI; the DAG node status was stale (NOT_IMPLEMENTED) because the status update was never committed after the M2A implementation landed. The implementation is complete across the Fortran backend (compute), the EOSData dataclass (storage/round-trip), and the Python API (read/write).",
+  "implementation_inventory": {
+    "fortran_backend": {
+      "files": ["fortran_eos/src/compose_eos_io.f90", "fortran_eos/src/compose_eos_types.f90"],
+      "role": "Computes row_status, per-species *_present flags, and C3/C4_applicable per row while parsing eos.compo (Npairs/Nquad/Iphase aware). Emits the values to the internal CSV with lowercase headers (row_status, yn_present, ..., c3_applicable, c4_applicable)."
+    },
+    "dataclass": {
+      "file": "python_frontend/compose_eos/eos_data.py",
+      "fields": ["row_status (int64: 0=NOT_AVAILABLE, 1=PARTIAL, 2=CHECKED, 3=FAIL)", "Yn_present, Yp_present, Ye_present, Ymu_present, Abar_present, Zbar_present, Yh_present (bool)", "C3_applicable, C4_applicable (bool, per-row, independent)"],
+      "round_trip": "write_internal_directory serializes all 9 mask arrays to eos_data.csv with safe defaults for legacy-constructed objects; from_internal_directory reads them back via the lowercase Fortran headers. copy() propagates all mask fields."
+    },
+    "python_api": {
+      "file": "python_frontend/compose_eos/api.py",
+      "role": "read_compose delegates to run_native('read', ...) -> EOSData.from_internal_directory; write_compose delegates to data.write_internal_directory -> run_native('write', ...). Mask fields flow through both directions."
+    },
+    "tests": {
+      "file": "python_frontend/tests/test_m2a_presence_masks.py",
+      "count": 8,
+      "result": "8 passed in 0.17s",
+      "coverage": "all 6 acceptance criteria"
+    }
+  },
+  "acceptance_criteria_verification": {
+    "1_Npairs0_Nquad0_preserves_Iphase_records_absent": {
+      "test": "test_phase_only_row_records_composition_as_absent",
+      "verdict": "PASS",
+      "evidence": "Npairs=0/Nquad=0 rows keep Iphase, row_status=PARTIAL(1), all *_present=False, C3/C4 not applicable. composition_available=False (not measured zero)."
+    },
+    "2_every_particle_id_and_group_has_explicit_row_level_presence": {
+      "test": "all 8 mask tests assert *_present arrays",
+      "verdict": "PASS",
+      "evidence": "Yn_present, Yp_present, Ye_present, Ymu_present, Abar_present, Zbar_present, Yh_present are per-row bool arrays (a written zero is True; a missing entry is False)."
+    },
+    "3_C3_and_C4_applicability_independent_and_row_aware": {
+      "tests": ["test_gm1_core_c3_unavailable_without_complete_charge_carrier_inventory", "test_gm1_core_c4_applicable_only_with_complete_baryon_inventory"],
+      "verdict": "PASS",
+      "evidence": "C3 requires Yn+Yp+Yh complete (baryon); C4 requires Yp+Abar+Zbar+Yh+Ye+Ymu complete (charge). Computed independently per row: a row with Yn missing has C4_applicable=True but C3_applicable=False."
+    },
+    "4_GM_GM1_missing_outer_core_species_not_checked_as_zero_filled": {
+      "test": "test_gm1_outer_rows_do_not_fail_from_zero_initialized_missing_data",
+      "verdict": "PASS",
+      "evidence": "GM_GM1 outer-crust phase-only rows (Npairs=0) produce row_status=PARTIAL, not FAIL; no NativeExecutionError raised."
+    },
+    "5_masks_survive_transformations_and_compose_read_write": {
+      "test": "test_masks_round_trip_through_internal_csv",
+      "verdict": "PASS",
+      "evidence": "write_compose -> read_compose round trip preserves row_status, all *_present, C3/C4_applicable bit-for-bit (against a fully-CHECKED source). Fail-closed: write_compose raises if composition_available without eos.compo sidecar."
+    },
+    "6_no_SPG_GPPVA_final_tuple_remapping": {
+      "test": "test_no_spg_gppva_ambiguous_field_remapping_is_made_by_coverage_mask_task",
+      "verdict": "PASS",
+      "evidence": "A Yh=1.0 value (C6B-ambiguous) is preserved byte-for-byte (within float64 round-trip tolerance 1e-10); no remap to Y_I/X_h/Ye/aggregate. row_status reflects the per-row range check, not a guess."
+    }
+  },
+  "row_status_ontology": {
+    "0_NOT_AVAILABLE": "eos.compo absent, or row not present in file",
+    "1_PARTIAL": "row present but composition incomplete (some required species/group missing); C3 or C4 not applicable",
+    "2_CHECKED": "row present with complete baryon + charge inventory; both C3 and C4 applicable and closure satisfied",
+    "3_FAIL": "row present but a physical range check failed (e.g. Yn<0)"
+  },
+  "c3_c4_definitions": {
+    "C3_applicable": "per-row: complete baryon inventory present (Yn, Yp, Yh) so Yn+Yp+Yh=1 can be checked",
+    "C4_applicable": "per-row: complete charge inventory present (Yp, Abar>0, Zbar, Yh, Ye, Ymu) so Yp+(Z/A)Yh=Ye+Ymu can be checked",
+    "independence": "C3 and C4 are computed independently per row; a row can have C3_applicable=True and C4_applicable=False (or vice versa) depending on which inventory is complete"
+  },
+  "downstream_impact": {
+    "E390_02": "row-level duplicate-row guard + provider-semantics-B now have per-row masks available",
+    "E390_03_plus": "M3-M6 predecessors can use row_status to decide per-row closure applicability instead of a global composition_available flag",
+    "E390_10": "the generic CompOSE reader (E390-10) inherits the same mask fields via EOSData"
+  },
+  "next_node_recommendation": "E390-02A is resolved. The next action per DAG next_actions[1] is E390-02C (move find_density_gap selection from Python into Fortran; quarantine Python/SciPy prototypes)."
+}

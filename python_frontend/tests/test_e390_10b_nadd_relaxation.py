@@ -24,8 +24,6 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "python_frontend"))
 from compose_eos import EOSData, read_compose, write_compose  # noqa: E402
 
-INPUTS = ROOT / "inputs" / "raw_compose"
-
 
 def _write_nadd_table(d: Path, *, n: int, nadd: int, extra_vals=None):
     """Write a minimal CompOSE cold-slice dir with an arbitrary Nadd>=0.
@@ -57,8 +55,6 @@ def _write_nadd_table(d: Path, *, n: int, nadd: int, extra_vals=None):
 # --- 1. a synthetic Nadd=2 table reads into q_extra_full ---------------------
 
 def test_nadd2_table_reads_into_q_extra_full(tmp_path):
-    if not (INPUTS / "RG_SLY4").exists():
-        pytest.skip("inputs/raw_compose not staged (E390-00)")
     _write_nadd_table(tmp_path / "nadd2", n=6, nadd=2)
     eos = read_compose(tmp_path / "nadd2")
     assert eos.q_extra_count == 2, "nadd must be 2"
@@ -78,8 +74,6 @@ def test_nadd2_table_reads_into_q_extra_full(tmp_path):
 # --- 2. Nadd=3 reads and round-trips through write_compose ------------------
 
 def test_nadd3_round_trips_through_compose_format(tmp_path):
-    if not (INPUTS / "RG_SLY4").exists():
-        pytest.skip("inputs/raw_compose not staged (E390-00)")
     src = tmp_path / "nadd3_src"
     dst = tmp_path / "nadd3_dst"
     n = 5
@@ -105,8 +99,6 @@ def test_nadd3_round_trips_through_compose_format(tmp_path):
 # --- 3. internal CSV round-trips Nadd>=2 via q_extra_N columns ----------------
 
 def test_nadd2_internal_directory_round_trip(tmp_path):
-    if not (INPUTS / "RG_SLY4").exists():
-        pytest.skip("inputs/raw_compose not staged (E390-00)")
     _write_nadd_table(tmp_path / "nadd2int", n=4, nadd=2)
     eos = read_compose(tmp_path / "nadd2int")
     out_dir = tmp_path / "internal"
@@ -121,8 +113,6 @@ def test_nadd2_internal_directory_round_trip(tmp_path):
 # --- 4. Nadd=0 table still works (backward compatible) ----------------------
 
 def test_nadd0_table_still_reads(tmp_path):
-    if not (INPUTS / "RG_SLY4").exists():
-        pytest.skip("inputs/raw_compose not staged (E390-00)")
     _write_nadd_table(tmp_path / "nadd0", n=5, nadd=0)
     eos = read_compose(tmp_path / "nadd0")
     assert eos.q_extra_count == 0

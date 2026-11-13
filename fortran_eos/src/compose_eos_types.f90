@@ -199,6 +199,13 @@ contains
       write(status,'(a,2(a,i0),a)')'iT/iYq out of range',' (iT=',iT,', nT=',eos%nT,')'
       return
     endif
+    ! Composition/Iphase/presence masks currently belong only to the first
+    ! materialized (T,Yq) cell. Do not copy a different thermo tensor cell into
+    ! the legacy 1D view while leaving stale composition attached to it.
+    if((eos%composition_file_present.or.eos%composition_available).and.(iT/=1.or.iYq/=1)) then
+      status='composition is materialized only for slice (iT=1, iYq=1); full multidimensional composition support is required'
+      return
+    endif
     if(size(eos%q_full,1)/=eos%nT.or.size(eos%q_full,2)/=eos%nYq.or.size(eos%q_full,3)/=7 &
        .or.size(eos%q_full,4)/=n) then
       status='q_full cell shape mismatch';return

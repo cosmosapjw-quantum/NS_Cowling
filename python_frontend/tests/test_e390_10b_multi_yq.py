@@ -106,3 +106,24 @@ def test_multi_yq_nadd2_internal_directory_round_trip(tmp_path):
         for slot in (1, 2):
             exp_v = np.array([100 * slot + i + 10 * iy for i in range(4)], dtype=float)
             assert np.allclose(back.q_extra_full[slot - 1, 0, iy, :], exp_v)
+
+
+# --- 5. composition is not silently reused across different Yq cells --------
+
+def test_select_slice_fails_closed_when_composition_is_only_on_first_yq(tmp_path):
+    table = tmp_path / "yq3_composition"
+    _write_multi_yq_table(table, n=4, nYq=3)
+    # Composition/Iphase/presence fields are currently stored only on the
+    # first Yq block. A sparse CompOSE row may contain particle pairs and Nquad=0.
+    compo_rows = ["1 1 1 0 2 10 0.8 11 0.2 0"]
+    for inb in range(2, 5):
+        compo_rows.append(f"1 {inb} 1 0 2 10 0.8 11 0.2 0")
+    (table / "eos.compo").write_text("\n".join(compo_rows) + "\n")
+
+    eos = read_compose(table)
+    assert eos.composition_file_present
+    assert eos.composition_available
+    first = select_slice(eos, iT=1, iYq=1)
+    assert np.allclose(first.Q1, eos.q_full[0, 0, 0, :])
+    with pytest.raises(ValueError, match="composition is materialized only"):
+        select_slice(eos, iT=1, iYq=2)

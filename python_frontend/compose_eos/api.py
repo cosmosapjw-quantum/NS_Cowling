@@ -231,6 +231,16 @@ def select_slice(data: EOSData, iT: int, iYq: int) -> EOSData:
         raise ValueError(
             f"iT/iYq out of range: iT={iT} (1..{nT}), iYq={iYq} (1..{nYq})"
         )
+    # Composition (Iphase, abundances, presence masks and closure applicability)
+    # is currently materialized only for the first selected (T,Yq) cell. Until
+    # matching full composition tensors exist, selecting another thermodynamic
+    # cell would silently pair it with stale composition metadata.
+    if (data.composition_file_present or data.composition_available) and (iT != 1 or iYq != 1):
+        raise ValueError(
+            "composition is materialized only for slice (iT=1, iYq=1); "
+            "selecting another tensor cell requires full multidimensional "
+            "composition support"
+        )
     # copy the chosen cell into the 1D Q surface. q_full[iT-1, iYq-1] has shape
     # (7, n); transpose to (n, 7) so column k -> Q{k+1}.
     cell = q_full[iT - 1, iYq - 1, :, :]  # shape (7, n)

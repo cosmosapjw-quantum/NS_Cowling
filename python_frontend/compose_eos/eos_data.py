@@ -177,6 +177,20 @@ class EOSData:
             header = reader.fieldnames or []
         if not rows:
             raise ValueError("Fortran backend produced an empty EOSData CSV")
+        # E390-10B phase 3: when the CSV carries an iy_local column, the rows
+        # span nYq*n (Yq,density) pairs. The 1D surface (nb,Q*,q_extra,compo,
+        # masks) only materializes the selected (first) Yq (iy_local==1); the
+        # remaining Yq blocks feed the q_full/q_extra_full tensors below.
+        has_iyq_axis = "iy_local" in header
+        if has_iyq_axis:
+            surf_rows = [r for r in rows if int(r["iy_local"]) == 1]
+        else:
+            surf_rows = rows
+        # keep `rows` for tensor materialization; the col() helper below reads
+        # from surf_rows (the 1D surface) so the existing field lookups stay
+        # unchanged.
+        orig_rows = rows
+        rows = surf_rows
         def col(name: str, dtype=float, default=None):
             if name not in header:
                 if default is None:
@@ -205,10 +219,12 @@ class EOSData:
             composition_file_present=bool(metadata["composition_file_present"]),
             composition_available=bool(metadata["composition_available"]),
             beta_equilibrated=bool(metadata["beta_equilibrated"]),
-            # E390-10B phase 1: nadd_max round-trips via the namelist. q_full/
-            # q_extra_full tensors are in-memory only (not serialized to the
-            # 1D cold-slice CSV/namelist); they default empty on read.
+            # E390-10B phase 1/3: nadd_max + the axis lengths round-trip via the
+            # namelist. q_full/q_extra_full tensors are materialized below from
+            # the CSV (iy_local axis + q_extra_N columns).
             nadd_max=int(metadata.get("nadd_max", 0)),
+            nT=int(metadata.get("naxis_t", 1)) or 1,
+            nYq=int(metadata.get("naxis_yq", 1)) or 1,
             # M2A masks: default to 0 / False if the backend wrote a legacy 17-col CSV.
             # NOTE: the Fortran CSV header uses lowercase column names (row_status,
             # yn_present, ...) which differ from the dataclass field names. The col
@@ -231,19 +247,51 @@ class EOSData:
         # (nadd_max, nT, nYq, n). Slot 1 mirrors the 1D q_extra surface. Absent
         # columns default to 0 (backward compatible with Nadd in {0,1}).
         nadd_max_out = int(metadata.get("nadd_max", 0))
+        nT = int(metadata.get("naxis_t", 1)) or 1
+        nYq = int(metadata.get("naxis_yq", 1)) or 1
+        import numpy as _np
         if nadd_max_out >= 1:
-            nT = int(metadata.get("naxis_t", 1)) or 1
-            nYq = int(metadata.get("naxis_yq", 1)) or 1
-            import numpy as _np
+            # E390-10B phase 3: when iy_local is present, the extra columns span
+            # nYq*n rows; collect per-Yq blocks into q_extra_full. Otherwise
+            # (cold slice) the surface rows already carry slot 1.
             qef = _np.zeros((nadd_max_out, nT, nYq, len(rows)), dtype=float)
-            qef[0, 0, 0, :] = _np.asarray([float(r.get("q_extra", 0.0) or 0.0) for r in rows])
-            for j in range(2, nadd_max_out + 1):
-                cname = f"q_extra_{j}"
-                if cname in header:
-                    qef[j - 1, 0, 0, :] = _np.asarray(
-                        [float(r[cname]) for r in rows], dtype=float
+            if has_iyq_axis:
+                # slot 1 (the q_extra column) for every Yq block
+                for iy in range(1, nYq + 1):
+                    qef[0, 0, iy - 1, :] = _np.asarray(
+                        [float(r.get("q_extra", 0.0) or 0.0)
+                         for r in orig_rows if int(r["iy_local"]) == iy]
                     )
+                for j in range(2, nadd_max_out + 1):
+                    cname = f"q_extra_{j}"
+                    if cname in header:
+                        for iy in range(1, nYq + 1):
+                            block = _np.asarray(
+                                [float(r[cname]) for r in orig_rows if int(r["iy_local"]) == iy],
+                                dtype=float,
+                            )
+                            qef[j - 1, 0, iy - 1, :] = block
+            else:
+                qef[0, 0, 0, :] = _np.asarray([float(r.get("q_extra", 0.0) or 0.0) for r in rows])
+                for j in range(2, nadd_max_out + 1):
+                    cname = f"q_extra_{j}"
+                    if cname in header:
+                        qef[j - 1, 0, 0, :] = _np.asarray(
+                            [float(r[cname]) for r in rows], dtype=float
+                        )
             eos.q_extra_full = qef
+        # E390-10B phase 3: materialize q_full(nT,nYq,7,n) when the CSV carries
+        # an iy_local axis. The cold slice (nT=1) stores Q1..Q7 per (Yq,density)
+        # pair. Without iy_local the tensor stays empty (legacy cold slice).
+        if has_iyq_axis and nYq > 1:
+            qf = _np.zeros((nT, nYq, 7, len(rows)), dtype=float)
+            for iy in range(1, nYq + 1):
+                block = [r for r in orig_rows if int(r["iy_local"]) == iy]
+                for qi, qn in enumerate(("Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7")):
+                    qf[0, iy - 1, qi, :] = _np.asarray(
+                        [float(r[qn]) for r in block], dtype=float
+                    )
+            eos.q_full = qf
         return eos
 
     def write_internal_directory(self, directory: str | Path) -> Path:
@@ -294,35 +342,70 @@ class EOSData:
         # Slot 1 is the existing q_extra; slots 2..nadd_max come from the
         # q_extra_full tensor (cold slice: indices nT-1, nYq-1). The tensor is
         # optional; absent slots are written as 0 and read back as 0.
+        # E390-10B phase 3: when nYq>1, prepend an iy_local column and emit one
+        # (Yq,density) row per Yq block (nYq*n rows total). Q1..Q7 for non-first
+        # Yq blocks come from q_full; compo/mask columns are meaningful only for
+        # the selected (first) Yq and zero-filled for the rest.
         nadd_max = int(self.nadd_max)
+        nYq = int(self.nYq) or 1
         qef = np.asarray(self.q_extra_full)
+        qf = np.asarray(self.q_full)
+        has_iyq = nYq > 1 and qf.ndim == 4 and qf.shape[1] == nYq
         extra_slot_cols = []
         for j in range(2, max(1, nadd_max) + 1):
             fields.append(f"q_extra_{j}")
-            if qef.ndim == 4 and qef.shape[0] >= j:
-                extra_slot_cols.append(qef[j - 1, 0, 0, :])
-            else:
-                extra_slot_cols.append(np.zeros(n, dtype=float))
-        arrays = [self.nb, self.Q1, self.Q2, self.Q3, self.Q4, self.Q5, self.Q6, self.Q7,
-                  self.q_extra, self.Iphase, self.Yn, self.Yp, self.Ye, self.Ymu,
-                  self.Aav, self.Zav, self.Yh,
-                  rs, yn_p, yp_p, ye_p, ymu_p, abar_p, zbar_p, yh_p, c3, c4] + extra_slot_cols
-        # integer columns (Iphase=10, row_status=18); bool columns are 19..26
+            extra_slot_cols.append(j)  # resolved per-Yq below
+        if has_iyq:
+            fields = ["iy_local"] + fields
+        arrays_spec = [self.nb, self.Q1, self.Q2, self.Q3, self.Q4, self.Q5, self.Q6, self.Q7,
+                       self.q_extra, self.Iphase, self.Yn, self.Yp, self.Ye, self.Ymu,
+                       self.Aav, self.Zav, self.Yh,
+                       rs, yn_p, yp_p, ye_p, ymu_p, abar_p, zbar_p, yh_p, c3, c4]
+        # integer columns (Iphase=idx 9->10 with iy_local prefix, row_status);
+        # bool columns follow. Indices are computed relative to arrays_spec
+        # (the iy_local prefix is written separately, not via arrays_spec).
         int_idx = {9, 17}
         bool_idx = {18, 19, 20, 21, 22, 23, 24, 25, 26}
+        nrow_blocks = nYq if has_iyq else 1
         with csv_path.open("w", newline="", encoding="utf-8") as stream:
             writer = csv.writer(stream)
             writer.writerow(fields)
-            for i in range(n):
-                row = []
-                for j, a in enumerate(arrays):
-                    if j in int_idx:
-                        row.append(int(a[i]))
-                    elif j in bool_idx:
-                        row.append(1 if bool(a[i]) else 0)
-                    else:
-                        row.append(format(float(a[i]), ".17e"))
-                writer.writerow(row)
+            for iy in range(1, nrow_blocks + 1):
+                for k in range(n):
+                    row = []
+                    if has_iyq:
+                        row.append(iy)
+                    for j, a in enumerate(arrays_spec):
+                        if j in int_idx:
+                            row.append(int(a[k]) if iy == 1 else 0)
+                        elif j in bool_idx:
+                            row.append((1 if bool(a[k]) else 0) if iy == 1 else 0)
+                        else:
+                            # thermo Q1..Q7 (idx 1..7), nb (idx 0), q_extra (idx 8):
+                            # for non-first Yq blocks pull Q1..Q7 from q_full.
+                            if has_iyq and 1 <= j <= 7:
+                                row.append(format(float(qf[0, iy - 1, j - 1, k]), ".17e"))
+                            elif has_iyq and j == 8:
+                                # q_extra slot 1 per-Yq from q_extra_full (if present)
+                                if qef.ndim == 4 and qef.shape[0] >= 1:
+                                    row.append(format(float(qef[0, 0, iy - 1, k]), ".17e"))
+                                else:
+                                    row.append("0.00000000000000000e+00")
+                            elif has_iyq and j == 0:
+                                # nb is the same across Yq blocks
+                                row.append(format(float(a[k]), ".17e"))
+                            else:
+                                row.append(format(float(a[k]), ".17e"))
+                    # extra slots 2..nadd_max per-Yq from q_extra_full
+                    for j in range(2, max(1, nadd_max) + 1):
+                        if qef.ndim == 4 and qef.shape[0] >= j:
+                            if has_iyq:
+                                row.append(format(float(qef[j - 1, 0, iy - 1, k]), ".17e"))
+                            else:
+                                row.append(format(float(qef[j - 1, 0, 0, k]), ".17e"))
+                        else:
+                            row.append("0.00000000000000000e+00")
+                    writer.writerow(row)
         (directory / "eos_data.nml").write_text(
             "&metadata\n"
             f" mn={self.mn:.17e}\n mp={self.mp:.17e}\n il={self.Il}\n iT={self.iT}\n"

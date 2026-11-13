@@ -112,22 +112,30 @@ def test_multi_point_T_axis_is_rejected(tmp_path):
         read_compose(d)
 
 
-def test_multi_point_Yq_axis_is_rejected(tmp_path):
-    """A 2D source with more than one Yq value must be rejected."""
+def test_multi_point_Yq_axis_is_accepted_phase3(tmp_path):
+    """E390-10B phase 3: a 2D source with more than one Yq value (nT==1, T=0)
+    is now ACCEPTED. Every (Yq,density) row is read into q_full(1,nYq,7,n); the
+    1D q(7,n) surface materializes the first Yq. select_slice picks each cell."""
     d = tmp_path / "multi-Yq"
     d.mkdir(parents=True, exist_ok=True)
     n = 3
+    nYq = 2
     nb = np.linspace(0.05, 0.052, n)
     (d / "eos.nb").write_text(f"1\n{n}\n" + "\n".join(f"{x:.10e}" for x in nb) + "\n", encoding="utf-8")
     (d / "eos.t").write_text("1\n1\n0.0\n", encoding="utf-8")
-    (d / "eos.yq").write_text("1\n2\n0.0\n0.1\n", encoding="utf-8")
+    (d / "eos.yq").write_text(f"1\n{nYq}\n" + "\n".join("0.0" if j == 0 else "0.1" for j in range(nYq)) + "\n", encoding="utf-8")
     lines = ["939.0 939.0 1"]
-    for i in range(n):
-        q1 = 1.0e-3 + 1.0e-5 * i
-        lines.append(f"1 {i+1} 1 {q1:.10e} 0 0 0 0 0 0 0")
+    for iy in range(1, nYq + 1):
+        for i in range(n):
+            q1 = 1.0e-3 + 1.0e-5 * (i + 10 * (iy - 1))
+            lines.append(f"1 {i+1} {iy} {q1:.10e} 0 0 0 0 0 0 0")
     (d / "eos.thermo").write_text("\n".join(lines) + "\n", encoding="utf-8")
-    with pytest.raises(NativeExecutionError, match="single cold T=0"):
-        read_compose(d)
+    eos = read_compose(d)
+    assert eos.nYq == nYq
+    assert eos.q_full.shape == (1, nYq, 7, n)
+    # 1D Q1(n) mirrors the first Yq; Q1 of the second Yq differs (from q_full)
+    assert np.allclose(eos.Q1, [1.0e-3 + 1.0e-5 * i for i in range(n)])
+    assert np.allclose(eos.q_full[0, 1, 0, :], [1.0e-3 + 1.0e-5 * (i + 10) for i in range(n)])
 
 
 def test_nonzero_T_slice_is_rejected(tmp_path):

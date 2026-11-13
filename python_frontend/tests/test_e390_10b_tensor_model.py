@@ -169,13 +169,15 @@ def test_select_slice_raises_on_inconsistent_tensor_shape():
 # --- 4. nadd_max round-trips through the internal namelist -------------------
 
 def test_nadd_max_round_trips_through_internal_directory(tmp_path):
-    eos = _multidim_eos(nT=2, nYq=2, n=4, nadd_max=1)
-    # write the internal directory (1D surface + q_extra_N columns for slots 2+;
-    # the nadd_max=1 case serializes only the q_extra slot which mirrors q_extra_full[0])
+    eos = _multidim_eos(nT=1, nYq=2, n=4, nadd_max=1)
+    # write the internal directory. Phase 3: nYq>1 now serializes an iy_local
+    # axis so q_full round-trips too; nadd_max=1 carries only q_extra (slot 1).
     eos.write_internal_directory(tmp_path)
     back = EOSData.from_internal_directory(tmp_path)
     assert back.nadd_max == 1
-    assert back.q_full.size == 0  # q_full is in-memory only (multidim reader opt-in)
+    # phase 3: q_full IS serialized when nYq>1 (iy_local axis)
+    assert back.q_full.ndim == 4
+    assert back.q_full.shape == (1, 2, 7, 4)
     # phase 2: q_extra_full IS serialized for nadd_max>=1; slot 1 mirrors q_extra
     assert back.q_extra_full.ndim == 4
     assert back.q_extra_full.shape[0] == 1

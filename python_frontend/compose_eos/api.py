@@ -256,6 +256,11 @@ def select_slice(data: EOSData, iT: int, iYq: int) -> EOSData:
         out.q_extra_count = 0
     out.selected_iT = iT
     out.selected_iYq = iYq
+    # reflect the selected cell on the legacy iYq/iT fields too, so consumers
+    # that read data.iYq see the materialized cell rather than the source's
+    # first-Yq default.
+    out.iYq = iYq
+    out.iT = iT
     # preserve the tensor on the view so a caller can select another cell
     return out
 

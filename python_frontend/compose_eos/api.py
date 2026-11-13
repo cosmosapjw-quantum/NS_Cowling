@@ -280,20 +280,23 @@ def build_core_only(
                     f"{model_id} readback mismatch in {name}"
                 )
 
+        # The core-only scope is cold 1D. Q-extra slot 1 is represented by
+        # q_extra and compared above; q_extra_full is only an auxiliary view
+        # when Nadd=1. For Nadd>1 all additional slots are required and checked.
         for name in ("q_full", "q_extra_full"):
+            required_tensor = (name == "q_full" and source.nYq > 1) or (
+                name == "q_extra_full" and source.q_extra_count > 1
+            )
+            if not required_tensor:
+                continue
             expected_tensor = np.asarray(getattr(source, name))
             actual_tensor = np.asarray(getattr(core, name))
-            if expected_tensor.size:
-                expected_slice = expected_tensor[..., row_slice]
-                if actual_tensor.shape != expected_slice.shape or not np.array_equal(
-                    actual_tensor, expected_slice
-                ):
-                    raise NativeExecutionError(
-                        f"{model_id} readback mismatch in {name}"
-                    )
-            elif actual_tensor.size:
+            expected_slice = expected_tensor[..., row_slice]
+            if actual_tensor.shape != expected_slice.shape or not np.array_equal(
+                actual_tensor, expected_slice
+            ):
                 raise NativeExecutionError(
-                    f"{model_id} unexpected {name} tensor after readback"
+                    f"{model_id} readback mismatch in {name}"
                 )
 
         if core.n != last - first + 1:

@@ -136,10 +136,8 @@ contains
       status='native CompOSE readback changed per-row composition presence or C3/C4 masks';return
     endif
     if(allocated(expected%t_axis).neqv.allocated(actual%t_axis).or. &
-       allocated(expected%yq_axis).neqv.allocated(actual%yq_axis).or. &
-       allocated(expected%q_full).neqv.allocated(actual%q_full).or. &
-       allocated(expected%q_extra_full).neqv.allocated(actual%q_extra_full))then
-      status='native CompOSE readback changed optional axis or tensor allocation';return
+       allocated(expected%yq_axis).neqv.allocated(actual%yq_axis))then
+      status='native CompOSE readback changed T/Yq axis allocation';return
     endif
     if(allocated(expected%t_axis))then
       if(size(expected%t_axis)/=size(actual%t_axis))then
@@ -157,7 +155,14 @@ contains
         status='native CompOSE readback changed Yq axis values';return
       endif
     endif
-    if(allocated(expected%q_full))then
+    ! In a selected cold 1D slice, q(7,n) and q_extra(n) are the
+    ! serialized authorities. q_extra_full is an auxiliary in-memory tensor
+    ! view allocated whenever Nadd>=1; its allocation state is not itself a
+    ! CompOSE data field. For Nadd>1, however, every extra slot must survive.
+    if(expected%nYq>1.and.allocated(expected%q_full))then
+      if(.not.allocated(actual%q_full))then
+        status='native CompOSE readback lost required Q tensor';return
+      endif
       if(any(shape(expected%q_full)/=shape(actual%q_full)))then
         status='native CompOSE readback changed Q tensor shape';return
       endif
@@ -165,7 +170,10 @@ contains
         status='native CompOSE readback changed Q tensor values';return
       endif
     endif
-    if(allocated(expected%q_extra_full))then
+    if(expected%nadd>1.and.allocated(expected%q_extra_full))then
+      if(.not.allocated(actual%q_extra_full))then
+        status='native CompOSE readback lost required Q-extra tensor';return
+      endif
       if(any(shape(expected%q_extra_full)/=shape(actual%q_extra_full)))then
         status='native CompOSE readback changed Q-extra tensor shape';return
       endif

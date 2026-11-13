@@ -336,8 +336,8 @@ program compose_eos_fortran
     call extract_crust_rows(eos,expected_source_n,crust_outer_last,expected_outer_phase, &
       expected_inner_phase,out,status)
     if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
-    call write_compose(trim(arg2),out,status)
-    if(status/='ok')then;call emit_failure('native crust-only CompOSE write failed: '//trim(status));stop 3;endif
+    call write_compose(trim(arg2),out,status,allow_source_physical_violations=.true.)
+    if(status/='ok')then;call emit_failure('native source-preserving crust-only CompOSE write failed: '//trim(status));stop 3;endif
     call read_compose(trim(arg2),readback,status)
     if(status/='ok')then;call emit_failure('native crust-only CompOSE readback failed: '//trim(status));stop 3;endif
     call verify_core_roundtrip(out,readback,status)

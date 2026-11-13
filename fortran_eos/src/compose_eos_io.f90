@@ -803,14 +803,18 @@ contains
     close(u);status='ok'
   end subroutine write_normalized_csv
 
-  subroutine write_compose(directory,eos,status)
+  subroutine write_compose(directory,eos,status,allow_source_physical_violations)
     character(len=*),intent(in)::directory
     type(eos_data_t),intent(in)::eos
     character(len=*),intent(out)::status
+    logical,intent(in),optional::allow_source_physical_violations
     integer::u,ios,i,nquad,npairs,t0_out,t1_out,yq0_out,yq1_out
-    logical::any_composition,group_any,group_complete
+    logical::any_composition,group_any,group_complete,allow_source_physical_violations_local
     character(len=1024)::path
     real(wp)::yi,baryon_residual,charge_residual,max_baryon_residual,max_charge_residual
+    allow_source_physical_violations_local=.false.
+    if(present(allow_source_physical_violations)) &
+      allow_source_physical_violations_local=allow_source_physical_violations
     ! M10 safety gate: the current writer serializes one selected T/Yq slice.
     ! Refuse a multidimensional EOS rather than silently dropping tensor cells.
     if(eos%nT>1.or.eos%nYq>1)then
@@ -858,7 +862,7 @@ contains
     if(eos%composition_file_present)then
       max_baryon_residual=0._wp;max_charge_residual=0._wp
       do i=1,eos%n
-        if(eos%row_status(i)==3)then
+        if(eos%row_status(i)==3.and..not.allow_source_physical_violations_local)then
           status='row-level composition status is FAIL; refusing CompOSE export'
           return
         endif
@@ -869,28 +873,44 @@ contains
           return
         endif
         if(eos%yn_present(i))then
-          if(.not.ieee_is_finite(eos%yn(i)).or.eos%yn(i)<-1.e-10_wp.or.eos%yn(i)>1._wp+5.e-3_wp)then
+          if(.not.ieee_is_finite(eos%yn(i)))then
+            status='neutron fraction is nonfinite';return
+          endif
+          if(.not.allow_source_physical_violations_local.and. &
+             (eos%yn(i)<-1.e-10_wp.or.eos%yn(i)>1._wp+5.e-3_wp))then
             status='neutron fraction outside physical range';return
           endif
         else if(abs(eos%yn(i))>1.e-14_wp)then
           status='unmarked neutron value would be lost during CompOSE export';return
         endif
         if(eos%yp_present(i))then
-          if(.not.ieee_is_finite(eos%yp(i)).or.eos%yp(i)<-1.e-10_wp.or.eos%yp(i)>1._wp+5.e-3_wp)then
+          if(.not.ieee_is_finite(eos%yp(i)))then
+            status='proton fraction is nonfinite';return
+          endif
+          if(.not.allow_source_physical_violations_local.and. &
+             (eos%yp(i)<-1.e-10_wp.or.eos%yp(i)>1._wp+5.e-3_wp))then
             status='proton fraction outside physical range';return
           endif
         else if(abs(eos%yp(i))>1.e-14_wp)then
           status='unmarked proton value would be lost during CompOSE export';return
         endif
         if(eos%ye_present(i))then
-          if(.not.ieee_is_finite(eos%ye(i)).or.eos%ye(i)<-1.e-10_wp.or.eos%ye(i)>1._wp+5.e-3_wp)then
+          if(.not.ieee_is_finite(eos%ye(i)))then
+            status='electron fraction is nonfinite';return
+          endif
+          if(.not.allow_source_physical_violations_local.and. &
+             (eos%ye(i)<-1.e-10_wp.or.eos%ye(i)>1._wp+5.e-3_wp))then
             status='electron fraction outside physical range';return
           endif
         else if(abs(eos%ye(i))>1.e-14_wp)then
           status='unmarked electron value would be lost during CompOSE export';return
         endif
         if(eos%ymu_present(i))then
-          if(.not.ieee_is_finite(eos%ymu(i)).or.eos%ymu(i)<-1.e-10_wp.or.eos%ymu(i)>1._wp+5.e-3_wp)then
+          if(.not.ieee_is_finite(eos%ymu(i)))then
+            status='muon fraction is nonfinite';return
+          endif
+          if(.not.allow_source_physical_violations_local.and. &
+             (eos%ymu(i)<-1.e-10_wp.or.eos%ymu(i)>1._wp+5.e-3_wp))then
             status='muon fraction outside physical range';return
           endif
         else if(abs(eos%ymu(i))>1.e-14_wp)then
@@ -900,10 +920,12 @@ contains
           if(.not.all(ieee_is_finite([eos%abar(i),eos%zbar(i),eos%yh(i)])))then
             status='nuclear-group composition contains nonfinite values';return
           endif
-          if(eos%yh(i)<-1.e-10_wp.or.eos%yh(i)>1.002_wp.or. &
-             eos%zbar(i)<0._wp.or.eos%zbar(i)>eos%abar(i).or. &
-             (eos%abar(i)>0._wp.and.eos%abar(i)<1._wp))then
-            status='nuclear-group composition outside physical range';return
+          if(.not.allow_source_physical_violations_local)then
+            if(eos%yh(i)<-1.e-10_wp.or.eos%yh(i)>1.002_wp.or. &
+               eos%zbar(i)<0._wp.or.eos%zbar(i)>eos%abar(i).or. &
+               (eos%abar(i)>0._wp.and.eos%abar(i)<1._wp))then
+              status='nuclear-group composition outside physical range';return
+            endif
           endif
           if(eos%abar(i)>0._wp)then
             yi=eos%yh(i)/eos%abar(i)
@@ -925,7 +947,7 @@ contains
           endif
           baryon_residual=eos%yn(i)+eos%yp(i)+eos%yh(i)-1._wp
           max_baryon_residual=max(max_baryon_residual,abs(baryon_residual))
-          if(abs(baryon_residual)>2.e-3_wp)then
+          if(abs(baryon_residual)>2.e-3_wp.and..not.allow_source_physical_violations_local)then
             status='C3 baryon abundance closure failed on an applicable row';return
           endif
         endif
@@ -936,7 +958,7 @@ contains
           endif
           charge_residual=eos%yp(i)+(eos%zbar(i)/eos%abar(i))*eos%yh(i)-eos%ye(i)-eos%ymu(i)
           max_charge_residual=max(max_charge_residual,abs(charge_residual))
-          if(abs(charge_residual)>2.e-3_wp)then
+          if(abs(charge_residual)>2.e-3_wp.and..not.allow_source_physical_violations_local)then
             status='C4 charge abundance closure failed on an applicable row';return
           endif
         endif

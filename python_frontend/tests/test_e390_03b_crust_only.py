@@ -11,7 +11,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "python_frontend"))
 
-from compose_eos import build_crust_only, read_compose
+from compose_eos import build_crust_only, read_compose, write_compose, NativeExecutionError
 
 
 EXPECTED = {
@@ -56,6 +56,7 @@ def test_e390_03b_builds_all_twelve_admitted_crust_only_tables(tmp_path: Path) -
         assert receipt["checks"]["native_readback"] == "PASS"
         assert receipt["checks"]["BSk22_neutron_drip_boundary"] == "PASS"
         assert receipt["checks"]["C3_C4_masks_exact_preservation"] == "PASS"
+        assert receipt["checks"]["source_row_status_lossless_preservation"] == "PASS"
 
         source = read_compose(source_root / model)
         output_dir = Path(receipt["output"]["directory"])
@@ -120,3 +121,14 @@ def test_e390_03b_never_overwrites_an_existing_attempt(tmp_path: Path) -> None:
             source_root=ROOT / "eos_generator" / "eos_data",
             model_ids=["SPG_M1"],
         )
+
+
+def test_e390_03b_preserves_source_fail_status_without_relaxing_default_writer(tmp_path: Path) -> None:
+    source_root = ROOT / "eos_generator" / "eos_data"
+    source = read_compose(source_root / "SPG_M1")
+    assert np.any(source.row_status == 3), "fixture must retain source rows marked FAIL"
+
+    # Normal writes remain fail-closed; only the dedicated crust projection path
+    # opts into preserving finite source values without physical repair.
+    with pytest.raises(NativeExecutionError, match="row-level composition status is FAIL"):
+        write_compose(tmp_path / "strict-output", source)

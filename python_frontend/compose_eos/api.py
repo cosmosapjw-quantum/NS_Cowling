@@ -608,6 +608,13 @@ def build_crust_only(
         iphase_counts_map = {
             str(int(code)): int(count) for code, count in zip(iphase_codes, iphase_counts)
         }
+        row_status_codes, row_status_values = np.unique(source.row_status, return_counts=True)
+        row_status_counts_map = {
+            str(int(code)): int(count) for code, count in zip(row_status_codes, row_status_values)
+        }
+        row_status_fail_rows = [
+            int(index + 1) for index, value in enumerate(source.row_status) if int(value) == 3
+        ]
 
         output_dir = target_root / model_id
         output_dir.mkdir(parents=False, exist_ok=False)
@@ -717,6 +724,11 @@ def build_crust_only(
                 "no_interpolation_or_extrapolation": True,
                 "no_homogeneous_core_tail_imported": True,
             },
+            "source_row_status": {
+                "counts": row_status_counts_map,
+                "fail_rows_1based": row_status_fail_rows,
+                "policy": "preserved from source values and presence masks; FAIL is not repaired or silently cleared",
+            },
             "categorical_fields": {
                 "Iphase_counts": iphase_counts_map,
                 "q_extra_counts": qextra_counts,
@@ -731,6 +743,7 @@ def build_crust_only(
             ],
             "checks": {
                 "source_identity": "PASS",
+                "source_row_status_lossless_preservation": "PASS",
                 "exact_source_support": "PASS",
                 "outer_inner_phase_boundary": "PASS",
                 "BSk22_neutron_drip_boundary": "PASS",
@@ -777,6 +790,8 @@ def build_crust_only(
             "provider_splice_first_source_row_at_or_above_2e-3": int(np.searchsorted(source.nb, 2e-3, side="left") + 1),
             "terminal_nb_fm3": float(source.nb[-1]),
             "Iphase_counts": iphase_counts_map,
+            "row_status_counts": row_status_counts_map,
+            "row_status_fail_rows_1based": row_status_fail_rows,
             "q_extra_count": int(source.q_extra_count),
             "q_extra_counts": qextra_counts,
             "construction_status": receipt["status"],

@@ -42,7 +42,7 @@
         "RG_KDE0v1"
       ],
       "methods": [
-        "maxwell",
+        "first_law_constrained_hermite_pressure_bridge",
         "css",
         "cubic_F",
         "cubic_P",
@@ -50,9 +50,18 @@
         "quintic_P"
       ],
       "expected_pairs": 390,
-      "cardinality_check": "13 * 5 * 6 == 390"
+      "cardinality_check": "13 * 5 * 6 == 390",
+      "historical_v1_methods": [
+        "maxwell",
+        "css",
+        "cubic_F",
+        "cubic_P",
+        "quintic_F",
+        "quintic_P"
+      ],
+      "method_registry_version": "2.0.0"
     },
-    "output_root": "/home/cosmosapjw/Dropbox/ns_eos/matched_eos_all_combinations_native_fortran_v1_20261111",
+    "output_root": "/home/cosmosapjw/Dropbox/ns_eos/matched_eos_all_combinations_native_fortran_v2_20261113",
     "baseline_output_is_immutable": true
   },
   "architecture": {
@@ -364,7 +373,8 @@
         "Fortran consumes one exact pair/method manifest",
         "Exactly 390 unique tasks are scheduled",
         "Each task writes an isolated output folder and machine receipt",
-        "Failures remain failures/diagnostic-only; no silent skipping"
+        "Failures remain failures/diagnostic-only; no silent skipping",
+        "The six smooth M7 methods use the v2 method IDs; FLCHPB replaces the historical v1 NPPHB token maxwell. The physical sharp method maxwell is excluded from this 390-task matrix."
       ],
       "status": "PENDING"
     },
@@ -869,12 +879,13 @@
       "EoS_core_crust_release_v3_2_20261106",
       "/ns_eos/matched_eos_all_combinations",
       "/ns_eos/Crust_Core_Matching_390_Summary.csv",
-      "eos_generator/compose_eos_pkg"
+      "eos_generator/compose_eos_pkg",
+      "/ns_eos/matched_eos_all_combinations_native_fortran_v1_20261111"
     ],
     "allowed": [
       "research/eos390-fortran-unification-v1",
       "new docs/data artifacts in this branch",
-      "new versioned output directory matched_eos_all_combinations_native_fortran_v1_20261111"
+      "new versioned output directory matched_eos_all_combinations_native_fortran_v2_20261113"
     ],
     "never": [
       "rewrite raw EOS source rows",
@@ -905,7 +916,8 @@
       "Do not map SPG/GPPVA final quadruple values until written provider semantics arrive.",
       "Implement E390-10 multidimensional T/Yq parsing as lossless generic I/O, preserving every axis and field.",
       "Download/hash public OA papers into a new versioned archive; do not overwrite the four existing PDFs.",
-      "Proceed to M3-M8 only when all scientific admission gates close."
+      "Proceed to M3-M8 only when all scientific admission gates close.",
+      "Do not execute or rewrite the historical v1 manifest whose method token maxwell meant NPPHB; use the v2 six-smooth-method manifest and the FLCHPB token. Route canonical method=maxwell only through the separate sharp transition workflow."
     ],
     "build_command": "bash fortran_eos/build.sh build/compose_eos_fortran",
     "test_command": "COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran PYTHONPATH=python_frontend python -m pytest -q python_frontend/tests pipeline/tests",
@@ -1129,7 +1141,7 @@
         "write_gibbs_eos",
         "read_gibbs_eos"
       ],
-      "status": "READ_ONLY_REFERENCE; true Maxwell and distinct Gibbs algorithms to port in Fortran; legacy Maxwell output drops composition and cannot be copied verbatim"
+      "status": "READ_ONLY_REFERENCE; true sharp Maxwell uses the canonical method ID maxwell and distinct Gibbs algorithms are separate; sharp output composition must be preserved before production use."
     },
     {
       "source": "eos_generator/compose_eos_pkg/compose_eos/literature_solvers.py",
@@ -1219,7 +1231,7 @@
     ],
     "policy": "Track separately from the 390 matrix; never reinterpret EOS390 method=maxwell."
   },
-  "last_update_utc": "2026-11-13T11:41:15.285Z",
+  "last_update_utc": "2026-11-13T11:41:59.625Z",
   "known_remaining_implementation_gaps": [
     {
       "area": "native literature-derived composition",

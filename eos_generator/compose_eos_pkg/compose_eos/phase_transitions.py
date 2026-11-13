@@ -18,8 +18,7 @@ from scipy.optimize import brentq, root_scalar
 from scipy.integrate import solve_ivp
 from .eos_data import EOSData
 from .io import read_compose, write_compose
-
-MAXWELL_METHOD_ID = 'maxwell'
+from .matching import MAXWELL_METHOD_ID
 
 @dataclass
 class MaxwellEOS:

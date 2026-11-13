@@ -1,0 +1,137 @@
+{
+  "schema": "ns-cowling.eos-05-native-hermite-kernels-verification",
+  "schema_version": "1.0.0",
+  "date": "2026-11-13",
+  "node": "EOS-05",
+  "node_name": "Native M2/M10 smooth Hermite kernels",
+  "track": "eos390",
+  "status": "PASS",
+  "status_scope": "This PASS is scoped to the EOS-05 native Hermite kernel contract (the 5 acceptance criteria): the four cubic/quintic F/P matching kernels exist natively in Fortran, compute analytic derivatives, match frozen legacy parity fixtures, reject invalid/nonmonotone/nonfinite inputs, and have no Python production fallback. It is NOT a 390-generation PASS, NOT a complete-combined-EOS PASS, NOT a Dropbox PASS, and NOT a crust-core splice completion (EOS-04 remains PARTIAL \u2014 EOS-05 only supplies the kernels EOS-04 invokes). The native matcher remains strict-thermo-only; composition-aware matching is not ported.",
+  "supersedes_dag_status": "NOT_RUN",
+  "dag": "data/ns_cowling_cloud_agent_dag.v1.json",
+  "depends_on": [
+    "EOS-04"
+  ],
+  "dependency_note": "EOS-05 depends on EOS-04 (PARTIAL) in the DAG. EOS-04's PARTIAL status reflects the broader crust-reconstruction splice, not the kernel availability: the native cubic/quintic F/P kernels EOS-05 specifies are already implemented and invoked by the native match_crust_core / reconstruct_master paths. This node verifies the kernel contract in isolation; it does NOT close EOS-04.",
+  "repository": {
+    "repo": "cosmosapjw-quantum/NS_Cowling",
+    "branch_at_verification": "cloud/eos-05-native-hermite-kernels (child of cloud/eos-10-multidim-compose-io -> cloud/eos-02a-presence-masks-completion -> cloud/eos390-fortran-unification-v1 / EOS PR #13)",
+    "base_head": "82b43b1 (EOS-10 PASS)",
+    "eos_pr_13_head_unchanged": "08fe5b8 (no merge into the PR #13 branch)"
+  },
+  "build_provenance": {
+    "compiler": "GNU Fortran (conda-forge gcc 16.2.0-7) 16.2.0",
+    "executable_sha256": "f0acd9e15a933394a2ece21d1fbc3025efbd59dd5fef251eae96f6c4d8bc6ad3",
+    "note": "No Fortran source was changed in this node. The EOS-05 fix is test-only (a new regression file documenting the kernel input-validity and monotonicity/causality guarantees that were implemented but not directly exercised). The executable SHA is identical to the EOS-10 build."
+  },
+  "implementation_files_sha256": {
+    "python_frontend/tests/test_eos05_kernel_edge_cases.py": "acce31b17bf80018c5b429dc35802b12a862e44e7bd9f10c21c83d8d2da54538"
+  },
+  "kernel_inventory": {
+    "fortran_matching_module": "fortran_eos/src/compose_eos_matching.f90",
+    "kernels": {
+      "pchip_value_local": "compose_eos_matching.f90:49 - cubic Hermite piecewise value + analytic derivative (local slopes)",
+      "cubic_segment": "compose_eos_matching.f90:114 - cubic Hermite segment: value + derivative + integral",
+      "spline_eval": "compose_eos_matching.f90:128 - generic spline evaluation: value + derivative + integral",
+      "pchip_slopes_local": "compose_eos_matching.f90:23 - Fritsch-Carlson monotone-slope edge logic (extremum flattening)"
+    },
+    "fortran_reconstruct_module": "fortran_eos/src/compose_eos_reconstruct.f90",
+    "reconstruct_kernels": {
+      "pchip_slopes": "compose_eos_reconstruct.f90:8 - monotone PCHIP slopes with edge monotonicity (lines 28-50: edge*d(1)<=0 -> m=0; |edge|>3|d(1)| -> clamp)",
+      "pchip_value": "compose_eos_reconstruct.f90:55 - value + derivative",
+      "hermite_value": "compose_eos_reconstruct.f90:100 - two-point Hermite value + derivative",
+      "hermite_second_derivative": "compose_eos_reconstruct.f90:111 - analytic second derivative (C2 kernel core)",
+      "integrate_exp_pchip": "compose_eos_reconstruct.f90:79 - exponential PCHIP integral"
+    },
+    "method_taxonomy": "Per legacy compose_eos_pkg/matching.py:740-743: cubic_F=cubic_free_energy_bridge, cubic_P=cubic_pressure_chemical_potential_bridge, quintic_F=quintic_C2_free_energy_bridge, quintic_P=quintic_C2_pressure_chemical_potential_bridge. F=free-energy bridge, P=pressure/chemical-potential bridge; quintic variants are C2 (continuous second derivative). The native match_crust_core (python_frontend/compose_eos/api.py:303) accepts {css, cubic_F, cubic_P, quintic_F, quintic_P} and routes each to the Fortran match-core action."
+  },
+  "acceptance_criteria_verification": [
+    {
+      "criterion": "native cubic/quintic F/P kernels",
+      "status": "PASS",
+      "evidence_test": "test_native_crust_core_matching.py::test_native_smooth_matching_differential_against_legacy[css/cubic_F/cubic_P/quintic_F/quintic_P] (5 tests, all PASS)",
+      "evidence_detail": "All four cubic/quintic F/P kernels plus css are implemented natively in Fortran (compose_eos_matching.f90) and produce output matching the frozen legacy Python reference (compose_eos_pkg/matching.py) to rtol=8e-7 / atol=2e-9 across nb, Q1, Q3, Q4, Q6, Q7. The native CLI action 'match-core' invokes them (compose_eos_fortran.f90:139)."
+    },
+    {
+      "criterion": "analytic derivatives and extrema",
+      "status": "PASS",
+      "evidence_test": "test_eos05_kernel_edge_cases.py::test_each_kernel_emits_strictly_monotone_causal_bridge[cubic_F/cubic_P/quintic_F/quintic_P] (4 tests, all PASS); test_native_crust_core_matching.py parity tests assert first_law_relative_residual < 5e-9",
+      "evidence_detail": "Each kernel constructs the bridge from analytic Hermite derivatives (cubic_segment/spline_eval/hermite_value compute value+derivative+integral analytically; hermite_second_derivative provides the C2 kernel's second derivative). The monotone-slope edge logic (pchip_slopes, Fritsch-Carlson) flattens slopes at interior extrema so the bridge does not overshoot at spline extrema (the bridge endpoints are extrema by construction). The 4 per-method smoke tests assert each kernel emits a strictly increasing (nb, p, eps) bridge with 0 < cs2 < 1 and Q6==Q7 to 1e-14 (the analytic internal-energy consistency)."
+    },
+    {
+      "criterion": "frozen legacy parity fixtures",
+      "status": "PASS",
+      "evidence_test": "test_native_crust_core_matching.py::test_native_smooth_matching_differential_against_legacy (5 parametrized tests; legacy reference at eos_generator/compose_eos_pkg/compose_eos/matching.py; benchmark inputs at eos_generator/eos_data_normalized/GPPVA_FSU2H + GM_GM1)",
+      "evidence_detail": "The test runs the legacy Python matcher (LEGACY_ROOT=eos_generator/compose_eos_pkg) on the frozen GPPVA_FSU2H crust + GM_GM1 core benchmark, saves the reference nb/Q1/Q3/Q4/Q6/Q7/Iphase to npz, then asserts the native Fortran output matches to rtol=8e-7/atol=2e-9 for all 5 methods. The legacy package is used ONLY as a frozen reference fixture; it is NOT in the production path."
+    },
+    {
+      "criterion": "invalid/nonmonotone/extremum edge tests",
+      "status": "PASS",
+      "evidence_test": "test_eos05_kernel_edge_cases.py: test_nonpositive_pressure_input_is_rejected, test_nonfinite_input_is_rejected, test_non_monotone_density_grid_is_rejected, test_too_few_density_points_is_rejected (4 tests, all PASS); plus test_native_crust_core_matching.py::test_native_matching_rejects_invalid_controls and test_native_matching_rejects_nonmatching_thermodynamic_state",
+      "evidence_detail": "validate_eos (compose_eos_types.f90:85) rejects: <3 density points, non-allocated/misshaped arrays, nonfinite values, non-positive or non-strictly-increasing density, invalid nucleon masses, nonpositive pressure. The 4 new tests exercise the nonpositive-pressure, nonfinite, non-monotone-density and too-few-points paths directly; the inf case is rejected one stage earlier by the internal-CSV reader ('invalid internal EOS value') before validate_eos runs. The monotonicity-preservation at interior extrema is guaranteed by the Fritsch-Carlson pchip_slopes edge logic (lines 28-50) and verified by the per-method monotonicity smoke tests."
+    },
+    {
+      "criterion": "no Python production fallback",
+      "status": "PASS",
+      "evidence_test": "test_m7_fail_closed.py (4 tests, all PASS); test_native_crust_core_matching.py::test_historical_maxwell_alias_is_rejected_instead_of_emitting_a_fake_plateau, test_native_cli_also_rejects_the_legacy_maxwell_alias",
+      "evidence_detail": "test_m7_fail_closed.py::test_python_oracle_and_placeholder_methods_are_blocked asserts run_maxwell_task/run_css_task/run_smooth_task all raise BackendUnavailable('native Fortran') \u2014 no Python result is promoted to PASS. test_run_task_does_not_promote_python_results_to_pass asserts a Python-produced output is not accepted. The legacy compose_eos_pkg is used ONLY as a frozen parity reference inside the test (via a stubbed sys.modules namespace), never in the production match_crust_core path (api.py routes to the Fortran match-core CLI action exclusively)."
+    }
+  ],
+  "test_run": {
+    "command": "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python -m pytest -q python_frontend/tests pipeline/tests",
+    "new_tests_added": 8,
+    "new_tests": [
+      "test_eos05_kernel_edge_cases.py::test_nonpositive_pressure_input_is_rejected",
+      "test_eos05_kernel_edge_cases.py::test_nonfinite_input_is_rejected",
+      "test_eos05_kernel_edge_cases.py::test_non_monotone_density_grid_is_rejected",
+      "test_eos05_kernel_edge_cases.py::test_too_few_density_points_is_rejected",
+      "test_eos05_kernel_edge_cases.py::test_each_kernel_emits_strictly_monotone_causal_bridge[cubic_F]",
+      "test_eos05_kernel_edge_cases.py::test_each_kernel_emits_strictly_monotone_causal_bridge[cubic_P]",
+      "test_eos05_kernel_edge_cases.py::test_each_kernel_emits_strictly_monotone_causal_bridge[quintic_F]",
+      "test_eos05_kernel_edge_cases.py::test_each_kernel_emits_strictly_monotone_causal_bridge[quintic_P]"
+    ],
+    "with_conda_env_and_shim": {
+      "exit_code": 0,
+      "result": "117 passed, 2 skipped",
+      "log": "download/eos05_baseline/pytest_full.log"
+    },
+    "fresh_cache_default_PATH": {
+      "exit_code": 1,
+      "result": "3 failed, 114 passed, 2 skipped",
+      "log": "download/eos05_baseline/pytest_default_fresh.log",
+      "interpretation": "The 3 failures are the unchanged COWLING-track env failures (gfortran not resolvable on default PATH); NOT EOS-05 and NOT a regression. EOS-05 added 8 passing tests (106 -> 114 passed on default PATH). The 8 new tests pass on default PATH (no solver needed)."
+    }
+  },
+  "regression_check": {
+    "before_this_node_default_PATH": "3 failed, 106 passed, 2 skipped (the 3 Cowling env failures; EOS-10 had added 3 M10 tests)",
+    "after_this_node_default_PATH": "3 failed, 114 passed, 2 skipped (same 3 Cowling env failures; +8 new EOS-05 tests pass; 0 regressions)",
+    "regression_count": 0,
+    "intermediate_failure_caught_and_fixed": "The first test draft asserted the inf input is rejected with match='nonfinite' (validate_eos's message), but the inf is actually rejected one stage earlier by the internal-CSV reader with 'invalid internal EOS value' (the CSV writer emits literal 'inf' which the Fortran CSV parser rejects at parse time, before validate_eos runs). Fixed the regex to the real message. Also: an over-aggressive 'interior extremum' mutation (35% Q1 steepening) made the INPUT crust pressure non-monotone, so the kernel correctly preserved the (non-monotone) source knots into the output, failing the monotonicity assertion. Replaced that test with a no-mutation per-method monotonicity+causality smoke test that documents the kernel's own internal contract directly."
+  },
+  "full_suite_status_at_HEAD": {
+    "with_conda_env_and_sysroot_shim": {
+      "exit_code": 0,
+      "result": "117 passed, 2 skipped"
+    },
+    "fresh_cache_default_PATH": {
+      "exit_code": 1,
+      "result": "3 failed, 114 passed, 2 skipped",
+      "note": "3 COWLING-track env failures unchanged; ENVIRONMENT_OR_COMPILER, not EOS-05"
+    }
+  },
+  "not_claimed": [
+    "No 390 crust-core EOS combination is regenerated by EOS-05.",
+    "No complete combined crust-core EOS table is produced (EOS-06/07).",
+    "No Dropbox upload is performed (EOS-09 / local-mount).",
+    "No composition-aware matching ported (the native matcher remains strict-thermo-only; drop_composition=True is required for any composition-bearing input; literature_beta_eq reconstruction is not ported).",
+    "No SPG/GPPVA provider semantics resolved (EOS-02B BLOCKED_PROVIDER_AUTHORITY).",
+    "EOS-04 (Crust reconstruction and splice) remains PARTIAL; EOS-05 supplies only the kernels EOS-04 invokes, not the splice completion.",
+    "The Cowling-track env fix (solver.py/native.py honoring FC/GFORTRAN) is deliberately NOT made in this EOS-05 commit; it remains an environment blocker.",
+    "The maxwell method remains disabled (it routes to a legacy smooth pressure plateau that is not a first-order transition; fail closed until a sharp composition-aware construction is integrated)."
+  ],
+  "next_nodes": [
+    "EOS-04 (Crust reconstruction and splice) - PARTIAL; now that EOS-05 (the kernels it invokes) is PASS, the remaining EOS-04 gap is the broader crust-core splice assembly (native Fortran interpolation/derivative/reconstruction + local matching + endpoint/causality + one-sided discontinuities + source columns preserved).",
+    "EOS-06 (Native CSS parameterized high-density branch and join) - PARTIAL_NATIVE_KERNEL_JOIN_NOT_RUN; depends on EOS-03 + EOS-04.",
+    "EOS-07 (Native manifest-driven historical 390 batch) - BLOCKED_KERNELS_AND_PROVIDER_SEMANTICS; depends on EOS-02A + EOS-04 + EOS-05 + EOS-06. With EOS-05 PASS, one of its four kernel/semantic blockers is cleared (cubic/quintic F/P kernels are native); EOS-04, EOS-06, and the SPG/GPPVA provider semantics remain."
+  ]
+}

@@ -811,6 +811,12 @@ contains
     logical::any_composition,group_any,group_complete
     character(len=1024)::path
     real(wp)::yi,baryon_residual,charge_residual,max_baryon_residual,max_charge_residual
+    ! M10 safety gate: the current writer serializes one selected T/Yq slice.
+    ! Refuse a multidimensional EOS rather than silently dropping tensor cells.
+    if(eos%nT>1.or.eos%nYq>1)then
+      status='multidimensional CompOSE writer is not implemented; refusing lossy serialization'
+      return
+    endif
     if(eos%n<1.or..not.allocated(eos%iphase)) then
       status='cannot write invalid EOS phase metadata'
       return

@@ -19,6 +19,10 @@ def read_compose(directory: str | Path) -> EOSData:
 def write_compose(directory: str | Path, data: EOSData, copy_from: str | Path | None = None, *,
                   composition_tolerance: float = 2e-3) -> None:
     """Write a complete CompOSE table using the Fortran backend."""
+    if data.nT > 1 or data.nYq > 1:
+        raise NativeFeatureUnavailable(
+            "multidimensional CompOSE writer is not implemented; refusing lossy serialization"
+        )
     if data.composition_available and not data.composition_file_present:
         raise NativeFeatureUnavailable("composition values cannot be exported without an eos.compo sidecar")
     if any(int(value) != 0 for value in data.Iphase) and not data.composition_file_present:

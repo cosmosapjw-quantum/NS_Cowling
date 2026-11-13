@@ -24,7 +24,11 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "python_frontend"))
-from compose_eos import EOSData, read_compose, select_slice  # noqa: E402
+import subprocess
+
+from compose_eos import (  # noqa: E402
+    EOSData, NativeFeatureUnavailable, executable, read_compose, select_slice, write_compose,
+)
 
 
 def _write_multi_yq_table(d: Path, *, n: int, nYq: int, nadd: int = 0):
@@ -127,3 +131,38 @@ def test_select_slice_fails_closed_when_composition_is_only_on_first_yq(tmp_path
     assert np.allclose(first.Q1, eos.q_full[0, 0, 0, :])
     with pytest.raises(ValueError, match="composition is materialized only"):
         select_slice(eos, iT=1, iYq=2)
+
+
+# --- 6. Multidimensional CompOSE export must not discard tensor cells -------
+
+def test_python_write_compose_refuses_multi_yq_until_tensor_writer_support(tmp_path):
+    """The public API rejects multidimensional export before creating outputs."""
+    source = tmp_path / "source"
+    _write_multi_yq_table(source, n=4, nYq=2, nadd=2)
+    eos = read_compose(source)
+    target = tmp_path / "compose-out"
+    with pytest.raises(
+        NativeFeatureUnavailable,
+        match="multidimensional CompOSE writer is not implemented",
+    ):
+        write_compose(target, eos)
+    assert not target.exists()
+
+
+def test_native_write_compose_refuses_multi_yq_until_tensor_writer_support(tmp_path):
+    """The Fortran CLI must also fail closed when bypassing the Python wrapper."""
+    source = tmp_path / "source"
+    _write_multi_yq_table(source, n=4, nYq=2, nadd=2)
+    eos = read_compose(source)
+    internal = tmp_path / "internal"
+    eos.write_internal_directory(internal)
+    target = tmp_path / "native-compose-out"
+    result = subprocess.run(
+        [str(executable()), "write", str(internal), str(target)],
+        capture_output=True, text=True, check=False,
+    )
+    assert result.returncode != 0
+    assert "multidimensional CompOSE writer is not implemented" in result.stdout
+    assert not (target / "eos.t").exists()
+    assert not (target / "eos.yq").exists()
+    assert not (target / "eos.thermo").exists()

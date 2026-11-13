@@ -34,6 +34,7 @@ from scipy.optimize import brentq
 from .eos_data import EOSData
 from .consistency import check_consistency
 
+
 HBARC = 197.3269804
 ME = 0.51099895
 MMU = 105.6583755
@@ -474,6 +475,11 @@ def match_crust_core(
         remains absent in the matched table. ``literature_beta_eq`` is an explicit
         opt-in parabolic-symmetry-energy approximation for APR_APR/BBB_BHF2 only.
     """
+    if method == MAXWELL_METHOD_ID:
+        raise ValueError(
+            "method='maxwell' is the sharp first-order local-neutrality transition; "
+            "use build_maxwell_eos from the phase-transition API, not the smooth core-crust matcher"
+        )
     if method not in METHODS:
         raise ValueError(f"Unknown matching method {method!r}; choose from {METHODS}")
     if core_compo_mode not in ("literature_beta_eq", "strict_thermo_only"):

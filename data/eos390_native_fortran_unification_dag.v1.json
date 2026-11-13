@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.4.7",
+  "revision": "1.4.8",
   "created_utc": "2026-11-11",
-  "status": "M1A_SPECIFICATION_COMPLETE_SOURCE_LABELS_CORRECTED_M1C_BOUNDARY_ADJUDICATION_NEXT",
+  "status": "M1C_SOURCE_BOUNDARIES_ADJUDICATED_TW_BLOCKED_M3A_CORE_CONSTRUCTION_NEXT",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "cloud/eos390-fortran-unification-v1",
@@ -872,7 +872,7 @@
         "E390-02A",
         "E390-10A"
       ],
-      "status": "READY_NEXT_NODE",
+      "status": "SOURCE_ADJUDICATION_COMPLETE_WITH_TW_BLOCKED",
       "outputs": [
         "exact APR/SLy4 and BHF/SLy4 non-unified crust splice locators",
         "GM1 source-row selection at the CompOSE Douchin-Haensel splice density",
@@ -887,7 +887,27 @@
         "All boundaries have cited source evidence, exact source row/value/index and uncertainty/status; unresolved models remain BLOCKED_COMPONENT_ADMISSION.",
         "No source, normalized or historical output artifact is modified."
       ],
-      "status_detail": "Source adjudication node only; does not write component EOS or run matching."
+      "status_detail": "All five core boundaries and all thirteen crust source row ranges, phase fields and support endpoints were adjudicated from the tracked source blobs and CompOSE model documentation. Core-only admission is 5/5. Crust-only admission is 12/13; GPPVA_TW remains BLOCKED_COMPONENT_ADMISSION because live CompOSE page 212 says BPS while its linked official PDF says BSk22. The BSk22 neutron-drip row is separately locked and is not conflated with the 2e-3 fm^-3 provider splice. This node writes evidence only; no component table or matching output is generated.",
+      "completed_outputs": [
+        "APR_APR and BBB_BHF2 exact pre-attached crust/core source-row splice locators (rows 1-69 crust, row 70+ core)",
+        "GM_GM1 core-only source rows 49-349 anchored to CompOSE page 54 and the per-row composition support; documented 1e-3 fm^-3 cutoff lies in the source gap",
+        "RG_KDE0v1 phase dictionary: Iphase=4 inhomogeneous through row966, Iphase=3 homogeneous from row967",
+        "RG_SLY4 phase dictionary: Iphase=4 inhomogeneous through row143, Iphase=3 homogeneous from row144",
+        "13 crust tables exact outer/inner row ranges, first inner row and terminal support; BSk22 physical neutron drip row217/218 separated from 2e-3 fm^-3 source-provider splice",
+        "GPPVA eos.thermo categorical q_extra geometry field documented separately from eos.compo Iphase",
+        "TW provider conflict explicitly blocked; FSU2R and GM1 source metadata discrepancies preserved"
+      ],
+      "blocked_models": [
+        "GPPVA_TW"
+      ],
+      "admission_summary": {
+        "core_only": "5/5 ADMITTED",
+        "crust_only": "12/13 ADMITTED; GPPVA_TW BLOCKED_COMPONENT_ADMISSION"
+      },
+      "receipt": "data/receipts/eos390_m1c/E390-01C_SOURCE_BOUNDARY_PHASE_ADJUDICATION_20261113.json",
+      "receipt_blob_sha": "c3492ac2260d904184dfd2cd1cedbf74cb6c2a84",
+      "document": "docs/E390_01C_SOURCE_BOUNDARY_PHASE_ADJUDICATION_20261113.md",
+      "document_commit": "52aef51ac862593b77aeb3f8032a091a3b6b5b7f"
     },
     {
       "id": "E390-03A",
@@ -1056,11 +1076,11 @@
     "provider_semantics_stop": "Production EOS390 composition matching for SPG/GPPVA is blocked until providers define the raw field. Generic parser and presence-mask work may continue only without assigning that field a meaning."
   },
   "evidence_status": {
-    "code_execution_in_this_turn": "GITHUB_ACTIONS_EXACT_HEAD_BUILD_78_PYTEST_POLYNOMIAL_EXTREMA_CSS_ANALYTIC_TEST_SHA256_MANIFEST_AND_ARCHIVE_PASS_LOCAL_RUNTIME_NOT_RUN",
-    "static_source_patch": "NO_PRODUCTION_CODE_PATCH; DAG/CONTRACT/PROVENANCE UPDATE ONLY",
+    "code_execution_in_this_turn": "GITHUB_SOURCE_BLOB_AUDIT_OF_18_EOS_NB_GRIDS_AND_MODEL_BOUNDARY_PHASE_ADJUDICATION; NO_PRODUCTION_NUMERICAL_EXECUTION",
+    "static_source_patch": "NO_PRODUCTION_CODE_OR_RAW_SOURCE_EOS_PATCH; M1C_RECEIPT_DOCUMENT_AND_DAG_ONLY",
     "github_ci": "PASS_BRANCH_HEAD_6ECF8AD_RUN_212",
     "local_runtime": "CURRENT_REMOTE_DESKTOP_DEVICE_OFFLINE; PRIOR_LOCAL_E390_02_RECEIPT_EXISTS_IN_DROPBOX",
-    "source_cohort_admission": "RESOLVED_20261113_DUAL_TRACK (standard M2A + reconstruction bypass); BLOCKED_SP_GPPVA_PROVIDER_SEMANTICS; GM1_ROW_COVERAGE_MASK_REQUIRED; RG_MULTIDIMENSIONAL_READER_REQUIRED",
+    "source_cohort_admission": "CORE_ONLY_5_OF_5_ADMITTED; CRUST_ONLY_12_OF_13_ADMITTED; GPPVA_TW_BLOCKED_OFFICIAL_PROVIDER_CONFLICT",
     "regenerated_390": "NOT_RUN",
     "github_actions_execution": {
       "previous_head_before_css": {
@@ -2035,13 +2055,12 @@
     }
   ],
   "next_actions": [
-    "E390-01C (next): adjudicate source-exact model-specific core boundaries and phase dictionaries for all five core and thirteen crust models; block any unresolved component admission.",
-    "E390-03A: implement the native Fortran core-only constructor over the source-admitted homogeneous branch only.",
-    "E390-03B: implement the native Fortran crust-only constructor preserving the entire source-supported outer-crust, neutron-drip, inner-crust and cluster/pasta coverage.",
-    "E390-03: port literature-backed core composition solvers and SPG/GPPVA CLD/Thomas-Fermi reconstruction after the component constructors and source boundaries are admitted.",
-    "Complete E390-10B multi-T parsing, full composition tensorization and full-tensor CompOSE writer/readback without weakening the cold-slice path.",
-    "Integrate the five production smooth matching kernels and the distinct FLCHPB legacy parity kernel on validated core-only/crust-only inputs.",
-    "Integrate canonical method=maxwell sharp coexistence with composition/provenance preservation; keep the separate sharp-Maxwell 65-pair scope apart from the 390 smooth matrix.",
+    "E390-03A (next): implement the native Fortran standalone core-only constructor for all five admitted core models using the exact model-specific source row ranges in the E390-01C receipt.",
+    "E390-03B: implement the native Fortran crust-only constructor for the twelve admitted SPG/GPPVA inputs; GPPVA_TW remains fail-closed pending resolution of its BPS-versus-BSk22 official-source conflict.",
+    "E390-03: port literature-backed model-composition solvers and SPG/GPPVA CLD/Thomas-Fermi reconstruction after the source-admitted standalone component artifacts are built.",
+    "E390-10B: complete multi-T parsing, full composition tensorization and full-tensor CompOSE writer/readback without weakening the cold-slice path.",
+    "Integrate the five production smooth matching kernels plus FLCHPB legacy parity on validated core-only/crust-only inputs.",
+    "Integrate canonical method=maxwell sharp coexistence with composition/provenance preservation; keep the separate sharp-Maxwell 65-pair workflow distinct from the 390 smooth matrix.",
     "Complete native TOV/tidal/Cowling, 390 smooth batch orchestration, differential/physical/convergence validation and versioned regeneration only after the component and matching gates close."
   ],
   "provenance": {
@@ -2154,14 +2173,12 @@
     "rule": "Never request or fabricate the lost tar.zst. Reconstruct a new versioned tar.zst from the surviving ZIP using the checked-in inventory and helper."
   },
   "latest_evidence_receipt": {
-    "node": "E390-01A",
-    "blob_sha": "ed01d82dd9e65f4013c5023700218e62b459b1eb",
-    "status": "SPECIFICATION_COMPLETE_MODEL_BOUNDARY_ADMISSION_PENDING_SOURCE_LABELS_CORRECTED",
-    "contract": "data/eos390_component_source_contract.v1.json",
-    "contract_blob": "82d9b1770f4ff19bb75c896fb31a07da2d2765e5",
-    "backup_branch": "backup/e390-01a-pre-20261113",
-    "backup_parent_sha": "4dd2a52356c77504d7d6e043238d8a79d24629be",
-    "correction_backup_branch": "backup/e390-01a-label-corrections-pre-20261113",
-    "correction_parent_sha": "96c0cbbaa6bfac9a82a4784f23a43d2016bc4ae8"
+    "node": "E390-01C",
+    "blob_sha": "c3492ac2260d904184dfd2cd1cedbf74cb6c2a84",
+    "status": "SOURCE_ADJUDICATION_COMPLETE_WITH_TW_BLOCKED",
+    "receipt": "data/receipts/eos390_m1c/E390-01C_SOURCE_BOUNDARY_PHASE_ADJUDICATION_20261113.json",
+    "document": "docs/E390_01C_SOURCE_BOUNDARY_PHASE_ADJUDICATION_20261113.md",
+    "backup_branch": "backup/e390-01c-pre-20261113",
+    "backup_parent_sha": "357d9a51d65c41cee45dd987c84a346ef0cc3370"
   }
 }

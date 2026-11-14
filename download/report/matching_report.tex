@@ -38,10 +38,15 @@ is carried out by a native Fortran backend; the Python frontend performs
 only manifest validation, native invocation, and receipt emission.  Of the
 80 attempted (crust, core, method) combinations, 21 survive the production
 acceptance gate (a complete combined equation of state with successful
-CompOSE read-back); all survivors are CSS matches.  No Maxwell construction
-survives because the crust and core tables use inconsistent neutron and
+CompOSE read-back); all survivors are CSS matches.  All 40 Maxwell
+attempts stopped at the native rest-mass admission gate; the existence of
+a pressure crossing or a physical coexistence point was therefore not
+tested.  The crust and core CompOSE tables use inconsistent neutron and
 proton rest-mass conventions, which the native Maxwell transition rejects
-as a hard acceptance criterion.  For each surviving matched equation of
+as a hard acceptance criterion; this is a mass-convention discrepancy
+between the written CompOSE artifacts (see
+Sec.~\ref{sec:discussion}), not evidence that a Maxwell
+coexistence is physically absent.  For each surviving matched equation of
 state we report the thermodynamic barotrope --- pressure $P$, baryon
 density $n_B$, energy density $\varepsilon$, baryon chemical potential
 $\mu_B$, and squared sound speed $c_s^2$ --- and present five diagnostic
@@ -223,12 +228,20 @@ dominant categories:
     \item \textbf{Maxwell rest-mass convention mismatch (40 failures).}  The
           native \texttt{maxwell-transition} kernel requires the two phase
           tables to use identical neutron and proton rest masses.  The
-          SPG/GPPVA crusts use $m_n = m_p = 939.0\,\mathrm{MeV}$, whereas
-          the core tables use $m_n = 939.565\,\mathrm{MeV}$,
-          $m_p = 938.272\,\mathrm{MeV}$ (APR, GM1, RG) or the analogous
-          published values.  This mismatch is rejected as a hard
-          acceptance criterion; a Maxwell construction across inconsistent
-          rest-mass conventions would produce an artificial transition
+          SPG/GPPVA crust \emph{CompOSE artifacts} are written with a common
+          rest-mass convention: $m_n = m_p = 939.0\,\mathrm{MeV}$ for the
+          GPPVA crusts and $m_n = m_p = 938.9\,\mathrm{MeV}$ for the SPG
+          crusts, whereas the core tables use the physical distinct pair
+          $m_n = 939.565\,\mathrm{MeV}$, $m_p = 938.272\,\mathrm{MeV}$
+          (APR, GM1, RG) or the analogous published values.  This is a
+          discrepancy between the \emph{written CompOSE artifacts}, not
+          necessarily between the underlying physical models: the GPPVA\_DD2
+          model (Typel 2010) used the distinct physical masses
+          $(939.56536, 938.27203)\,\mathrm{MeV}$ but its CompOSE export was
+          normalised to the common $(939.0, 939.0)\,\mathrm{MeV}$.  The
+          mismatch is rejected as a hard acceptance criterion; a Maxwell
+          construction across inconsistent rest-mass conventions would
+          produce an artificial transition
           pressure that reflects the convention difference rather than a
           genuine thermodynamic coexistence point.
     \item \textbf{Non-beta-equilibrated cores (19 failures).}  The native

@@ -2,6 +2,7 @@ program compose_eos_fortran
   use compose_eos_types
   use compose_eos_component, only: extract_core_rows, extract_crust_rows, verify_core_roundtrip
   use compose_eos_rmf, only: ddrmf_diagnostic_t, evaluate_ddrmf
+  use compose_eos_cld, only: cld_reconstruct_model
   use compose_eos_io
   use compose_eos_verify
   use compose_eos_reconstruct, only: fill_density_gap, reconstruct_master
@@ -24,6 +25,8 @@ program compose_eos_fortran
   integer::crust_outer_last,expected_outer_phase,expected_inner_phase
   real(wp)::cs2_extension,n_max_requested,smooth_sigma,dissolution_tol
   real(wp)::min_ratio_local,best_sel
+  real(wp)::cld_sigma_0,cld_b,cld_rho_min,cld_rho_max
+  integer::cld_n_points
   integer::igap_sel
   logical::has_gap_phase,drop_composition,local_neutrality_confirmed
   logical::smooth_master_flag,fix_dissolution,recompute_extra_cs2,outer_crust_corrected
@@ -32,7 +35,7 @@ program compose_eos_fortran
   action='';arg1='';arg2='';arg3='';arg4='';arg5='';arg6='';arg7=''
   narg=command_argument_count()
   if(narg<2)then
-    write(*,'(a)')'usage: compose_eos_fortran {rmf-evaluate|read|verify|verify-csv|normalize|write|extract-core|extract-crust|fill-gap|reconstruct-master|causal-complete|match-core|maxwell-transition} INPUT OUTPUT [OPTIONS]'
+    write(*,'(a)')'usage: compose_eos_fortran {rmf-evaluate|read|verify|verify-csv|normalize|write|extract-core|extract-crust|fill-gap|reconstruct-master|causal-complete|match-core|maxwell-transition|cld-reconstruct} INPUT OUTPUT [OPTIONS]'
     stop 2
   endif
   call get_command_argument(1,action,status=ios)
@@ -406,6 +409,41 @@ program compose_eos_fortran
       ',"inner_first_source_row":'//integer_text(crust_outer_last+1)// &
       ',"outer_neutron_drip_nb":'//real_text(out%nb(crust_outer_last))// &
       ',"native_readback":"PASS"}'
+  case('cld-reconstruct')
+    ! Native CLD inner-crust reconstruction (E390-03 remaining subscope).
+    !   arg1 = model_id (GPPVA_DD2/GPPVA_DDME2/GPPVA_TW)
+    !   arg2 = sigma_0 (MeV/fm^2 surface tension scale, default 1.0)
+    !   arg3 = b       (Lattimer exponent, default 1.0)
+    !   arg4 = rho_min  (fm^-3, default 0.001)
+    !   arg5 = rho_max  (fm^-3, default 0.08)
+    !   arg6 = n_points (default 20)
+    if(narg<2)then
+      call emit_failure('cld-reconstruct requires model_id');stop 2
+    endif
+    cld_sigma_0=1.0_wp; cld_b=1.0_wp
+    cld_rho_min=0.001_wp; cld_rho_max=0.08_wp
+    cld_n_points=20
+    if(narg>=3)then
+      read(arg2,*,iostat=ios)cld_sigma_0
+      if(ios/=0)then;call emit_failure('invalid sigma_0 for cld-reconstruct');stop 2;endif
+    endif
+    if(narg>=4)then
+      read(arg3,*,iostat=ios)cld_b
+      if(ios/=0)then;call emit_failure('invalid b for cld-reconstruct');stop 2;endif
+    endif
+    if(narg>=5)then
+      read(arg4,*,iostat=ios)cld_rho_min
+      if(ios/=0)then;call emit_failure('invalid rho_min for cld-reconstruct');stop 2;endif
+    endif
+    if(narg>=6)then
+      read(arg5,*,iostat=ios)cld_rho_max
+      if(ios/=0)then;call emit_failure('invalid rho_max for cld-reconstruct');stop 2;endif
+    endif
+    if(narg>=7)then
+      read(arg6,*,iostat=ios)cld_n_points
+      if(ios/=0)then;call emit_failure('invalid n_points for cld-reconstruct');stop 2;endif
+    endif
+    call cld_reconstruct_model(trim(arg1),cld_sigma_0,cld_b,cld_rho_min,cld_rho_max,cld_n_points)
   case default
     call emit_failure('unknown operation: '//trim(action));stop 2
   end select

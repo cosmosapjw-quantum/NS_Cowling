@@ -1,0 +1,63 @@
+{
+  "built_date": "2026-11-14",
+  "closure_invariants": {
+    "C3_baryon": "Yn + Yp + Yh == 1 (constructed from baryon conservation)",
+    "C3_tolerance": 1e-09,
+    "C4_charge": "Yp + (Zbar/Abar)*Yh == Ye + Ymu (Zbar/Abar = rho_Ip/rho_I exact)",
+    "C4_tolerance": 1e-09
+  },
+  "mapping": {
+    "Abar": "NaN (CLD continuous-phase model does not fix cluster nucleon count)",
+    "Ye": "rho_e / rho_B  (electron fraction)",
+    "Yh": "f * rho_I / rho_B  (heavy-group baryon fraction = cluster)",
+    "Ymu": "0  (cold inner crust, no muons)",
+    "Yn": "(1-f) * rho_II / rho_B  (free neutron, gas is pure neutron)",
+    "Yp": "(1-f) * rho_IIp / rho_B  (= 0 for pure-neutron gas)",
+    "Zbar": "NaN (ditto; Zbar/Abar = rho_Ip/rho_I is the exact charge ratio)"
+  },
+  "model_receipts": [
+    {
+      "C3_pass": true,
+      "C3_violations": 0,
+      "C4_pass": true,
+      "C4_violations": 0,
+      "model_id": "GPPVA_DD2",
+      "n_points": 20
+    },
+    {
+      "C3_pass": true,
+      "C3_violations": 0,
+      "C4_pass": true,
+      "C4_violations": 0,
+      "model_id": "GPPVA_DDME2",
+      "n_points": 20
+    },
+    {
+      "C3_pass": true,
+      "C3_violations": 0,
+      "C4_pass": true,
+      "C4_violations": 0,
+      "model_id": "GPPVA_TW",
+      "n_points": 20
+    }
+  ],
+  "models": [
+    "GPPVA_DD2",
+    "GPPVA_DDME2",
+    "GPPVA_TW"
+  ],
+  "node": "E390-03",
+  "non_claims": [
+    "Abar/Zbar absolute values are not produced; the CLD continuous-phase model treats the cluster as a liquid-drop phase without a fixed nucleon count. The C3/C4 closures use only the ratio Zbar/Abar = rho_Ip/rho_I, which is exact.",
+    "This is a composition table, not a complete CompOSE eos.thermo/eos.compo pair; the thermodynamic table comes from the native DD-RMF + CLD reconstruction.",
+    "No core-crust matching, TOV, tidal or Cowling output is generated."
+  ],
+  "provenance": {
+    "native_cld_grids": "/home/z/my-project/repos/NS_Cowling_eos390/data/receipts/eos390_m3/cld",
+    "parent_commit": "a5fd06ae468a56ef1c8aea10afc5855ab68b1b71"
+  },
+  "schema_version": "1.0.1",
+  "status": "COMPOSE_CLOSURE_PASS",
+  "subscope": "compose_group_abundances_closure",
+  "total_output_rows": 60
+}

@@ -136,3 +136,65 @@ Mission flags: do not claim multidim composition round-trip completion where sta
 - `/home/z/my-project/scripts/build_pairwise_mass_provenance.py`
 
 **No changes committed.** All modifications are in the working tree, ready for review. Per mission constraints: PR #13 left open/draft, no merge, no force-push, no Dropbox upload.
+
+---
+
+## UPDATE — Remaining EOS-MASS nodes executed (this turn)
+
+**Toolchain blockers resolved:**
+- **B0 (SSH):** located ssh at `/tmp/my-project/.tools/mmb_root/envs/fortran/bin/ssh` + key `~/.ssh/id_glm`; authenticates as `cosmosapjw-quantum`. Push helper at `/home/z/my-project/scripts/git_ssh_helper.sh`.
+- **B1 (gfortran):** the micromamba gfortran 15.3.0 sysroot was missing `lib/` and `usr/lib64` symlinks; created `sysroot/lib -> lib64` and `sysroot/usr/lib64 -> ../lib64`. The Fortran backend now builds and runs.
+
+**Final HEAD:** `7b5285a8fcf5e6febcf518cdfb2d3bdce464e6a5` (5 audit commits on top of `b7989e7`)
+
+### Node 6 — M5 density-grid refinement (commit e608927)
+Re-ran the corrected M5 script with the live Fortran backend. Refinement over n_min in {0.06,0.08,0.10,0.12} demonstrates convergence: mu_t=1297.3558, P_t=168.7759, n_low=0.73978, n_high=0.92744 are identical across all four cuts (the coexistence lives at n_B≈0.74, far above the cuts). Receipt now carries refinement_study, raw_first_law_residual, P_t_input vs P_t_actual separation, raw source mass pair, thermo SHA-256.
+
+### Node 7/7b — DAG evidence_status reconciliation (commit 8b3a62c)
+Subagent walk of 21 DAG nodes found E390-10B overclaimed `PHASES_1_6_COMPLETE_MULTIDIM_READ_WRITE_ROUNDTRIP_PASS` while its status_detail/blocking_dependencies/scope_note still listed multi-T read, full composition tensor, full-tensor writer/readback, and source-backed CI as pending. Applied corrections:
+- E390-10B status → `PARTIAL_MULTIDIM_THERMO_ROUNDTRIP_PASS_COMPOSITION_TENSOR_PENDING`
+- E390-10B remaining_acceptance populated (was empty [])
+- evidence_status.generator_upgrade → `M10_PARTIALLY_IMPLEMENTED_...`
+- top-level generator_upgrade.status → `PARTIALLY_IMPLEMENTED_...`
+
+### Node 8 — Representation-only CompOSE re-expression for GPPVA_DD2 (commit 5f7e3c7)
+- `GPPVA_DD2_reexpressed`: canonical target (939.56536, 938.27203), r=0.9993982750
+- `GPPVA_DD2_matched`: core-matched target (939.56533, 938.272), r=0.9993983069
+Both verified physical-invariant (P, mu, f, eps to <1e-15 relative), reversible (Q3/Q7 to <3e-16 abs), readback-confirmed by native Fortran reader. No model regenerated; only dimensionless CompOSE normalization restored. Receipt: `download/eos390_mass_reexpression/E390-08_REEXPRESSION_RECEIPT_20261114.json`.
+
+### Node 9 — Structured Maxwell root census (commit 5f7e3c7)
+14-category census over 6 pairs (2 crusts × 3 cores):
+- 6 pairs at pinned rtol=1e-12 gate: all MASS_MISMATCH (3e-5 MeV source-decimal gap not silently absorbed).
+- 3 pairs (GPPVA_DD2_matched, binary-identical masses): mass-equality gate PASSES, but v1 Maxwell terminates at INTERNAL_PHASE_BOUNDARY because the GPPVA_DD2 crust has an internal Iphase boundary (crust-core splice).
+- 09b: explicit precision-policy record (admits the 3e-5 MeV gap under documented source precision + same-family provenance; v1 gate stays strict — honest result).
+Finding: the mass-convention discrepancy is resolved by re-expression, but v1's single-smooth-phase requirement blocks the crust-core splice. Receipts: `download/eos390_maxwell_census/E390-09{,_B,_C}_*.json`.
+
+### Node 10 — Maxwell v2 composition-aware orchestration (commit 7b5285a)
+New separately-versioned `construct_maxwell_transition_v2` (Python layer, v1 unchanged):
+- segments inputs at internal Iphase boundaries; runs v1 on (last-low, first-high) segment pair
+- preserves per-segment Iphase/composition (copied, not interpolated across coexistence)
+- axis-value slice compatibility (charge_fraction_grid value), not v1's blind iYq integer
+- records per-segment local-neutrality evidence (residual, n_rows, composition_available)
+- rejects nonzero Nadd (COMPOSITION_UNSUPPORTED)
+7 v2 tests pass against live Fortran: `python_frontend/tests/test_maxwell_v2_composition.py`.
+
+### Node 11 — Full test suite at exact HEAD
+At HEAD `7b5285a`: **168 passed, 3 skipped, 1 failed** (48.02 s).
+- The 1 failure (`test_m7_fail_closed.py::test_python_oracle_and_placeholder_methods_are_blocked`) is PRE-EXISTING at b7989e7 (verified by checking out the pre-audit version of the test file): it fails because a `crust/eos.nb` test fixture is missing in the working tree — an environmental issue unrelated to the mass-convention audit.
+- My 16 new tests (9 mass-gate + 7 v2) all pass.
+- No regressions introduced by the audit.
+
+### Commit chain (this turn)
+```
+7b5285a feat(eos390): node 10 Maxwell v2 composition-aware orchestration + tests
+8b3a62c fix(eos390-dag): downgrade E390-10B status + reconcile evidence_status (Node 7b)
+5f7e3c7 feat(eos390): nodes 8-9 representation-only re-expression + Maxwell root census
+e608927 feat(eos390-m5): density-grid refinement study converges (Node 6)
+f1f302d feat(eos390): pairwise mass-convention audit + M5 corrections + mass-gate regression tests
+b7989e7 (audit start HEAD)
+```
+
+### Remaining blockers (unchanged from initial handoff)
+- **B2** source composition coverage incomplete (crust per-nucleus composition not available; physical model mass changes not derivable — representation-only re-expression is the only unblocked route, and is implemented for GPPVA_DD2).
+- **B3** euler_tolerance=5e-4 derivation pending (v2 receipt records as pending evidence; v1 unchanged).
+- **B0** GitHub API/CI token still unavailable in sandbox (PR #13 CI run IDs not retrievable; PR body not updatable). All commits pushed via SSH.

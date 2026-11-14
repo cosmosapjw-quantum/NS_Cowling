@@ -78,6 +78,19 @@ jobs:
           path: build/e390_03b/crust_only/
           if-no-files-found: error
           retention-days: 30
+      - name: Build native E390-03 DD-RMF beta-equilibrium and symmetry grid
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+        run: python scripts/build_e390_03_ddrmf.py build/e390_03/ddrmf
+      - name: Upload E390-03 DD-RMF native diagnostic grids and receipts
+        uses: actions/upload-artifact@v4
+        with:
+          name: E390-03-DDRMF-native-${{ github.sha }}
+          path: build/e390_03/ddrmf/
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Run native Fortran polynomial-extrema unit tests
         run: |

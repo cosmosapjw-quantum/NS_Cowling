@@ -225,6 +225,10 @@ class RMFModel:
     couplings: dict        # meson -> RMFCouplings
     saturation_targets: dict
     reference: str = ""
+    # Source-specific rest masses. DD2 uses separate physical neutron/proton
+    # masses; DD-ME2 and TW99 use the common M=939 MeV model convention.
+    mn: float = M_N
+    mp: float = M_P
     # which mesons use the rational (isoscalar) vs exponential (isovector) form:
     isoscalar_mesons: tuple = ("omega", "sigma")
     isovector_mesons: tuple = ("rho",)
@@ -321,8 +325,8 @@ def solve_homogeneous(model: RMFModel, rho_B: float, rho_p: float,
     g_r = model.g("rho", rho_B_M)
     g_d = model.g("delta", rho_B_M) if has_delta else 0.0
 
-    Mstar_n = M_N
-    Mstar_p = M_P
+    Mstar_n = model.mn
+    Mstar_p = model.mp
     converged = False
     it = 0
     sigma0_prev = 0.0
@@ -365,8 +369,8 @@ def solve_homogeneous(model: RMFModel, rho_B: float, rho_p: float,
         # m*_n = M + g_sigma*sigma - g_delta*delta (neutron lighter in neutron-rich
         # matter, delta>0 there), we use M*_n = M - g_s*sigma0 + g_d*delta0 and
         # M*_p = M - g_s*sigma0 - g_d*delta0 (delta0<0 in neutron-rich -> M*_n drops).
-        Mstar_n_new = M_N - g_s * sigma0 + (g_d * delta0 if has_delta else 0.0)
-        Mstar_p_new = M_P - g_s * sigma0 - (g_d * delta0 if has_delta else 0.0)
+        Mstar_n_new = model.mn - g_s * sigma0 + (g_d * delta0 if has_delta else 0.0)
+        Mstar_p_new = model.mp - g_s * sigma0 - (g_d * delta0 if has_delta else 0.0)
         if Mstar_n_new <= 10 or Mstar_p_new <= 10:
             break
         dn = abs(Mstar_n_new - Mstar_n)
@@ -374,7 +378,7 @@ def solve_homogeneous(model: RMFModel, rho_B: float, rho_p: float,
         alpha = 0.4
         Mstar_n = alpha * Mstar_n_new + (1 - alpha) * Mstar_n
         Mstar_p = alpha * Mstar_p_new + (1 - alpha) * Mstar_p
-        if max(dn, dp) / M_N < tol:
+        if max(dn, dp) / max(model.mn, model.mp) < tol:
             Mstar_n, Mstar_p = Mstar_n_new, Mstar_p_new
             converged = True
             break
@@ -439,20 +443,25 @@ def solve_homogeneous(model: RMFModel, rho_B: float, rho_p: float,
 
     # binding energy density (Typel eq. 69 / Scurto common-M convention): subtract
     # free rest masses. Use individual m_n, m_p (Typel DD2) for best reproduction.
-    E_bind_MeV4 = E_MeV4 - M_N * rho_n_M - M_P * rho_p_M
+    E_bind_MeV4 = E_MeV4 - model.mn * rho_n_M - model.mp * rho_p_M
     E_bind_MeV_fm3 = E_bind_MeV4 / HBARC ** 3
 
-    # rearrangement term Sigma^R (MeV), Scurto 2024 eq. 14:
-    #   Sigma^R = (dg_w/drho) w0 rho + (1/2)(dg_r/drho) b3 rho_3 - (dg_s/drho) phi0 rho_s
-    # (the sigma term is MINUS because the scalar field lowers M*; the rho term
-    # has a 1/2 from the isospin convention). For SPG delta models add the
-    # analogous delta term with the isovector scalar 1/2.
+    # Rearrangement term Sigma^R (MeV), positive in the nucleon chemical
+    # potentials. The scalar contribution is negative because increasing g_sigma
+    # lowers M*. DD2/DD-ME2/TW99 registry couplings use the original no-1/2 tau_3
+    # convention; SPG_GOGELEIN uses Scurto et al. (2024)'s explicit 1/2 convention.
+    # The rho and delta terms below follow their respective Lagrangian factors.
     rho_n = rho_B - rho_p
     dgs = model.dg_drho_fm("sigma", rho_B_M)
     dgw = model.dg_drho_fm("omega", rho_B_M)
     dgr = model.dg_drho_fm("rho", rho_B_M)
+    # DD2/DD-ME2/TW99 use the original no-1/2 tau_3 convention in their
+    # parameter tables. SPG_GOGELEIN follows Scurto et al. (2024), where the
+    # isovector vertex is written with an explicit 1/2. The rho rearrangement
+    # contribution must use the same convention as the vector self-energy.
+    rho_iso_factor = 1.0 if model.functional_form == "DD2_TYYPEL_RATIONAL" else 0.5
     sigma_R = (dgw * omega0 * rho_B
-               + 0.5 * dgr * rho03 * (rho_p - rho_n)
+               + rho_iso_factor * dgr * rho03 * (rho_p - rho_n)
                - dgs * sigma0 * (rs_n + rs_p) / HBARC ** 3)
     if has_delta:
         dgd = model.dg_drho_fm("delta", rho_B_M)
@@ -460,8 +469,8 @@ def solve_homogeneous(model: RMFModel, rho_B: float, rho_p: float,
 
     En_n = math.sqrt(kF_n ** 2 + Mstar_n ** 2)
     En_p = math.sqrt(kF_p ** 2 + Mstar_p ** 2)
-    mu_n = En_n + g_w * omega0 - 0.5 * g_r * rho03 - sigma_R
-    mu_p = En_p + g_w * omega0 + 0.5 * g_r * rho03 - sigma_R
+    mu_n = En_n + g_w * omega0 - rho_iso_factor * g_r * rho03 + sigma_R
+    mu_p = En_p + g_w * omega0 + rho_iso_factor * g_r * rho03 + sigma_R
 
     # Pressure (Typel eq. 66): the kinetic pressure + rearrangement contribution.
     # In the no-sea mean-field at T=0, the pressure can be computed from the
@@ -499,6 +508,8 @@ def load_models(path: Path | str) -> dict[str, RMFModel]:
             rho_sat=m["rho_sat_fm3"], couplings=couplings,
             saturation_targets=m.get("saturation_targets", {}),
             reference=m.get("reference", ""),
+            mn=m.get("nucleon_masses_MeV", {}).get("neutron", M_N),
+            mp=m.get("nucleon_masses_MeV", {}).get("proton", M_P),
             isoscalar_mesons=tuple(m.get("isoscalar_mesons", ("omega", "sigma"))),
             isovector_mesons=tuple(m.get("isovector_mesons", ("rho",))),
             g2=m.get("g2", 0.0),

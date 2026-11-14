@@ -1,6 +1,7 @@
 program compose_eos_fortran
   use compose_eos_types
   use compose_eos_component, only: extract_core_rows, extract_crust_rows, verify_core_roundtrip
+  use compose_eos_rmf, only: ddrmf_diagnostic_t, evaluate_ddrmf
   use compose_eos_io
   use compose_eos_verify
   use compose_eos_reconstruct, only: fill_density_gap, reconstruct_master
@@ -13,6 +14,7 @@ program compose_eos_fortran
   type(causal_completion_report_t)::causal_report
   type(match_report_t)::match_report
   type(maxwell_transition_report_t)::phase_report
+  type(ddrmf_diagnostic_t)::rmf_diagnostic
   character(len=32)::action
   character(len=2048)::arg1,arg2,arg3
   character(len=128)::arg4,arg5,arg6,arg7
@@ -30,7 +32,7 @@ program compose_eos_fortran
   action='';arg1='';arg2='';arg3='';arg4='';arg5='';arg6='';arg7=''
   narg=command_argument_count()
   if(narg<2)then
-    write(*,'(a)')'usage: compose_eos_fortran {read|verify|verify-csv|normalize|write|extract-core|extract-crust|fill-gap|reconstruct-master|causal-complete|match-core|maxwell-transition} INPUT OUTPUT [OPTIONS]'
+    write(*,'(a)')'usage: compose_eos_fortran {rmf-evaluate|read|verify|verify-csv|normalize|write|extract-core|extract-crust|fill-gap|reconstruct-master|causal-complete|match-core|maxwell-transition} INPUT OUTPUT [OPTIONS]'
     stop 2
   endif
   call get_command_argument(1,action,status=ios)
@@ -42,6 +44,63 @@ program compose_eos_fortran
   if(narg>=7)call get_command_argument(7,arg6,status=ios)
   if(narg>=8)call get_command_argument(8,arg7,status=ios)
   select case(trim(action))
+  case('rmf-evaluate')
+    if(narg/=3)then
+      call emit_failure('rmf-evaluate requires model_id and baryon_density_fm^-3');stop 2
+    endif
+    read(arg2,*,iostat=ios)n_max_requested
+    if(ios/=0)then;call emit_failure('invalid baryon density for rmf-evaluate');stop 2;endif
+    call evaluate_ddrmf(trim(arg1),n_max_requested,rmf_diagnostic,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    if(rmf_diagnostic%beta%muon_active)then
+      write(*,'(a)')'{"status":"ok","operation":"rmf-evaluate","model":"'//trim(arg1)// &
+        '","rho_b_fm3":'//trim(real_text(n_max_requested))// &
+        ',"yp":'//trim(real_text(rmf_diagnostic%beta%yp))// &
+        ',"ye":'//trim(real_text(rmf_diagnostic%beta%ye))// &
+        ',"ymu":'//trim(real_text(rmf_diagnostic%beta%ymu))// &
+        ',"rho_e_fm3":'//trim(real_text(rmf_diagnostic%beta%rho_e))// &
+        ',"rho_mu_fm3":'//trim(real_text(rmf_diagnostic%beta%rho_mu))// &
+        ',"mu_e_mev":'//trim(real_text(rmf_diagnostic%beta%mu_e))// &
+        ',"mu_mu_mev":'//trim(real_text(rmf_diagnostic%beta%mu_mu))// &
+        ',"muon_branch":"ACTIVE","muon_onset_rho_p_fm3":'//trim(real_text(rmf_diagnostic%beta%muon_onset_rho_p))// &
+        ',"muon_onset_gap_mev":0.0'// &
+        ',"mu_n_mev":'//trim(real_text(rmf_diagnostic%beta%baryons%mu_n))// &
+        ',"mu_p_mev":'//trim(real_text(rmf_diagnostic%beta%baryons%mu_p))// &
+        ',"eps_total_mev_fm3":'//trim(real_text(rmf_diagnostic%beta%eps_total))// &
+        ',"pressure_total_mev_fm3":'//trim(real_text(rmf_diagnostic%beta%p_total))// &
+        ',"beta_residual_mev":'//trim(real_text(rmf_diagnostic%beta%beta_residual))// &
+        ',"charge_residual_fm3":'//trim(real_text(rmf_diagnostic%beta%charge_residual))// &
+        ',"pressure_identity_residual_mev_fm3":'//trim(real_text(rmf_diagnostic%beta%baryons%pressure_identity_residual))// &
+        ',"scalar_field_residual_mev":'//trim(real_text(rmf_diagnostic%beta%baryons%scalar_field_residual))// &
+        ',"sigma_rearrangement_mev":'//trim(real_text(rmf_diagnostic%beta%baryons%sigma_r))// &
+        ',"symmetry_step":'//trim(real_text(rmf_diagnostic%symmetry_step))// &
+        ',"symmetry_second_derivative_mev":'//trim(real_text(rmf_diagnostic%symmetry_second_derivative))// &
+        ',"symmetry_pnm_minus_snm_mev":'//trim(real_text(rmf_diagnostic%symmetry_pnm_minus_snm))//'}'
+    else
+      write(*,'(a)')'{"status":"ok","operation":"rmf-evaluate","model":"'//trim(arg1)// &
+        '","rho_b_fm3":'//trim(real_text(n_max_requested))// &
+        ',"yp":'//trim(real_text(rmf_diagnostic%beta%yp))// &
+        ',"ye":'//trim(real_text(rmf_diagnostic%beta%ye))// &
+        ',"ymu":'//trim(real_text(rmf_diagnostic%beta%ymu))// &
+        ',"rho_e_fm3":'//trim(real_text(rmf_diagnostic%beta%rho_e))// &
+        ',"rho_mu_fm3":'//trim(real_text(rmf_diagnostic%beta%rho_mu))// &
+        ',"mu_e_mev":'//trim(real_text(rmf_diagnostic%beta%mu_e))// &
+        ',"mu_mu_mev":null,"muon_branch":"INACTIVE_BELOW_THRESHOLD"'// &
+        ',"muon_onset_rho_p_fm3":'//trim(real_text(rmf_diagnostic%beta%muon_onset_rho_p))// &
+        ',"muon_onset_gap_mev":'//trim(real_text(rmf_diagnostic%beta%muon_onset_gap))// &
+        ',"mu_n_mev":'//trim(real_text(rmf_diagnostic%beta%baryons%mu_n))// &
+        ',"mu_p_mev":'//trim(real_text(rmf_diagnostic%beta%baryons%mu_p))// &
+        ',"eps_total_mev_fm3":'//trim(real_text(rmf_diagnostic%beta%eps_total))// &
+        ',"pressure_total_mev_fm3":'//trim(real_text(rmf_diagnostic%beta%p_total))// &
+        ',"beta_residual_mev":'//trim(real_text(rmf_diagnostic%beta%beta_residual))// &
+        ',"charge_residual_fm3":'//trim(real_text(rmf_diagnostic%beta%charge_residual))// &
+        ',"pressure_identity_residual_mev_fm3":'//trim(real_text(rmf_diagnostic%beta%baryons%pressure_identity_residual))// &
+        ',"scalar_field_residual_mev":'//trim(real_text(rmf_diagnostic%beta%baryons%scalar_field_residual))// &
+        ',"sigma_rearrangement_mev":'//trim(real_text(rmf_diagnostic%beta%baryons%sigma_r))// &
+        ',"symmetry_step":'//trim(real_text(rmf_diagnostic%symmetry_step))// &
+        ',"symmetry_second_derivative_mev":'//trim(real_text(rmf_diagnostic%symmetry_second_derivative))// &
+        ',"symmetry_pnm_minus_snm_mev":'//trim(real_text(rmf_diagnostic%symmetry_pnm_minus_snm))//'}'
+    endif
   case('read')
     if(narg/=3)then;call emit_failure('read requires input CompOSE directory and output directory');stop 2;endif
     call read_compose(trim(arg1),eos,status)

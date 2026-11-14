@@ -2,9 +2,9 @@
   "schema": "ns-cowling.eos390-native-fortran-unification-dag",
   "schema_version": "1.0.0",
   "plan_id": "eos390_native_fortran_unification_v1",
-  "revision": "1.5.2",
+  "revision": "1.5.3",
   "created_utc": "2026-11-11",
-  "status": "E390-03A_CORE_ONLY_CONSTRUCTION_CI_PASS_E390-03B_CRUST_ONLY_CONSTRUCTION_CLOSED_E390-03_COMPOSITION_NEXT",
+  "status": "E390-03_PARTIAL_NATIVE_DDRMF_SOLVER_LOCAL_PASS_CLD_TF_REMAINS_CURRENT",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "cloud/eos390-fortran-unification-v1",
@@ -608,11 +608,62 @@
         "E390-03A",
         "E390-03B"
       ],
-      "status": "PENDING",
+      "status": "PARTIAL_NATIVE_DDRMF_HOMOGENEOUS_SOLVER_LOCAL_PASS_GITHUB_CI_PENDING_CLD_TF_REMAINS",
       "outputs": [
-        "native symmetry-energy functions",
-        "native beta-equilibrium solver",
-        "electron/muon branch report"
+        "native DD-RMF homogeneous symmetry energy, beta-equilibrium and electron/muon branch diagnostics (partial subscope delivered)",
+        "native SPG CLD and GPPVA Thomas-Fermi composition reconstruction (remaining)",
+        "row-level CompOSE-standard group abundances with baryon/charge closure and provenance (remaining)",
+        "per-model reconstructed composition and readback receipts (remaining)"
+      ],
+      "implementation_files": [
+        "fortran_eos/src/compose_eos_rmf.f90",
+        "fortran_eos/app/compose_eos_fortran.f90",
+        "fortran_eos/build.sh",
+        "python_frontend/compose_eos/native.py",
+        "python_frontend/compose_eos/rmf_solver.py",
+        "python_frontend/tests/test_e390_03_ddrmf_native.py",
+        "data/eos390_rmf_parameter_sets.v1.json",
+        "scripts/build_e390_03_ddrmf.py",
+        ".github/workflows/fortran-eos-ci.yml"
+      ],
+      "partial_scope": {
+        "status": "LOCAL_NATIVE_DDRMF_HOMOGENEOUS_SLICE_VERIFIED",
+        "models": [
+          "GPPVA_DD2",
+          "GPPVA_DDME2",
+          "GPPVA_TW"
+        ],
+        "density_support_fm3": [
+          0.0001,
+          1.0
+        ],
+        "points_per_model": 32,
+        "total_diagnostic_rows": 96,
+        "outputs": [
+          "native homogeneous DD-RMF state",
+          "five-point symmetry curvature estimate",
+          "pure-neutron minus symmetric finite-difference symmetry energy",
+          "beta-equilibrium proton fraction",
+          "electron/muon branch and charge-neutral lepton fractions",
+          "field/beta/charge/pressure residual diagnostics"
+        ],
+        "not_compose_eos": true,
+        "local_verification": {
+          "native_ddrmf_tests": "15 passed",
+          "full_frontend_and_pipeline": "153 passed, 3 skipped in 28.12s",
+          "grid_builder": "PASS"
+        },
+        "publication": "GITHUB_CI_PENDING"
+      },
+      "receipt": "data/receipts/eos390_m3/E390-03_DDRMF_NATIVE_SOLVER_20261114.json",
+      "remaining_acceptance": [
+        "Implement and validate the SPG four-meson GDFM homogeneous solver, including the delta channel and source-exact M1-M5 coupling sets.",
+        "Implement the SPG CLD Wigner-Seitz minimization natively; preserve the free-neutron gas, cluster variables, surface/Coulomb terms and model provenance.",
+        "Implement and validate all admitted GPPVA homogeneous model functionals, including model-specific nonlinear-Walecka coupling conventions where applicable.",
+        "Implement the GPPVA Thomas-Fermi Wigner-Seitz reconstruction with self-consistent neutron/proton/electron/muon profiles and cluster geometry.",
+        "Construct CompOSE group abundances to standard YI/Yh semantics and enforce baryon and charge closure by construction; do not consume the non-conformant raw group tuple as a target.",
+        "Preserve Iphase and q_extra as distinct categorical variables; add per-model source-backed receipts, CompOSE native write/readback and hashes.",
+        "Only after these routes are completed and validated may E390-03 close and matching work begin."
       ]
     },
     {
@@ -1007,7 +1058,7 @@
         "E390-02A",
         "E390-10A"
       ],
-      "status": "CONSTRUCTION_CLOSED_CI_PASS_COMPOSITION_SEMANTICS_BLOCKED_FOR_E390_03",
+      "status": "CONSTRUCTION_CLOSED_CI_PASS_PROVIDER_EXPORT_NONCONFORMANT_RECONSTRUCTION_REQUIRED_E390_03",
       "outputs": [
         "one standalone native-Fortran crust-only artifact per admitted model (12 models; GPPVA_TW excluded)",
         "outer-crust/neutron-drip/provider-splice/inner-crust/cluster-pasta coverage report",
@@ -1035,7 +1086,7 @@
         "GPPVA_TW stays blocked by the official BPS-vs-BSk22 provider conflict.",
         "CompOSE standard mapping remains Yh=Abar*YI on read and YI=Yh/Abar on write; YI is combined number fraction and Xh=Abar*YI is group baryon fraction.",
         "EOSData.row_status is computed by the native reader, not serialized as a raw eos.compo source field. Record its derivation and do not call it provider-stored status.",
-        "E390-02 receipt 419c00b3bf75bf13a41a58ce8edd99b91caaafaf adjudicates provider composition semantics BLOCKED: Iphase=0 raw group values are Xh-compatible, Iphase=7 raw values match neither standard YI nor raw-as-Xh; normalized closure is reconstruction.",
+        "M2A dual-track adjudication (data/receipts/eos390_m2a/E390-02-SPG_GPPVA_ABUNDANCE_SEMANTICS_RESOLVED_20261113.json) supersedes the earlier provider-semantics blocker: the raw SPG/GPPVA eos.compo group tuple is non-conformant with the CompOSE YI standard and is excluded from production composition; the decided production route is literature reconstruction. Provider clarification remains open but is not a critical-path gate.",
         "C3/C4 NOT_AVAILABLE is not PASS. E390-03 must reconstruct/adjudicate composition with row-level provenance before any matched product uses provider composition."
       ],
       "acceptance_verification": {
@@ -1046,13 +1097,13 @@
         "artifact_upload_and_per_file_hashes": "PASS",
         "source_CLD_TF_provenance": "PASS_SOURCE_TABLE_PROVENANCE_ONLY_NO_NEW_SOLVE",
         "Iphase_and_q_extra_categorical_preservation": "PASS",
-        "provider_composition_semantics": "BLOCKED_E390_03",
+        "provider_composition_semantics": "RAW_PROVIDER_TUPLE_NONCONFORMANT_RECONSTRUCTION_REQUIRED_M2A_BYPASS_DECIDED",
         "C3_C4_composition_closure": "NOT_AVAILABLE_NOT_A_PASS",
         "GPPVA_TW": "BLOCKED_SOURCE_CONFLICT",
         "physical_C2": "MIXED; five GPPVA models fail"
       },
       "closure": {
-        "status": "CONSTRUCTION_AND_NATIVE_READBACK_CI_PASS_PROVIDER_COMPOSITION_SEMANTICS_BLOCKED_FOR_E390_03",
+        "status": "CONSTRUCTION_AND_NATIVE_READBACK_CI_PASS_LITERATURE_COMPOSITION_RECONSTRUCTION_PENDING_E390_03",
         "receipt_path": "data/receipts/eos390_m3b/E390-03B_CRUST_ONLY_CONSTRUCTION_20261113.json",
         "workflow_run_id": 43448915849,
         "artifact_id": 14048389252,
@@ -1183,10 +1234,10 @@
     "provider_semantics_stop": "Production EOS390 composition matching for SPG/GPPVA is blocked until providers define the raw field. Generic parser and presence-mask work may continue only without assigning that field a meaning."
   },
   "evidence_status": {
-    "code_execution_in_this_turn": "GITHUB_SOURCE_BLOB_AUDIT_OF_18_EOS_NB_GRIDS_AND_MODEL_BOUNDARY_PHASE_ADJUDICATION; NO_PRODUCTION_NUMERICAL_EXECUTION",
-    "static_source_patch": "NO_PRODUCTION_CODE_OR_RAW_SOURCE_EOS_PATCH; M1C_RECEIPT_DOCUMENT_AND_DAG_ONLY",
-    "github_ci": "PASS_EXACT_HEAD_1DBD3C1_PUSH_445_AND_PR_446",
-    "local_runtime": "CURRENT_REMOTE_DESKTOP_DEVICE_OFFLINE; PRIOR_LOCAL_E390_02_RECEIPT_EXISTS_IN_DROPBOX",
+    "code_execution_in_this_turn": "NATIVE_DDRMF_HOMOGENEOUS_SOLVER_BUILD_AND_TEST; 3_MODEL_X_32_POINT_DIAGNOSTIC_GRID; INDEPENDENT_REFERENCE_COMPARISON",
+    "static_source_patch": "E390-03_DDRMF_NATIVE_FORTRAN_SLICE_AND_REGRESSION_TESTS; NO_CLD_TF_OR_MATCHING_IMPLEMENTED",
+    "github_ci": "PENDING_EXACT_HEAD_PUSH_RUN",
+    "local_runtime": "LOCAL_SOURCE_SNAPSHOT_BASE_7A0415E; GNU_FORTRAN_BUILD_PASS; 15_NATIVE_DDRMF_TESTS_PASS; FULL_FRONTEND_PIPELINE_153_PASS_3_SKIP; 96_NATIVE_DIAGNOSTIC_ROWS",
     "source_cohort_admission": "CORE_ONLY_5_OF_5_ADMITTED; CRUST_ONLY_12_OF_13_ADMITTED; GPPVA_TW_BLOCKED_OFFICIAL_PROVIDER_CONFLICT",
     "regenerated_390": "NOT_RUN",
     "github_actions_execution": {
@@ -1358,6 +1409,17 @@
       "physical_validation": "2/5 PASS; 3/5 FAIL retained in per-model receipts",
       "matched_eos_generation": "NOT_RUN",
       "crust_only_construction": "NOT_RUN"
+    },
+    "e390_03_ddrmf_partial": {
+      "status": "LOCAL_VERIFIED_GITHUB_CI_PENDING",
+      "receipt": "data/receipts/eos390_m3/E390-03_DDRMF_NATIVE_SOLVER_20261114.json",
+      "models": [
+        "GPPVA_DD2",
+        "GPPVA_DDME2",
+        "GPPVA_TW"
+      ],
+      "rows": 96,
+      "tests": "153 passed, 3 skipped in 28.12 s"
     }
   },
   "legacy_feature_inventory": [
@@ -1479,12 +1541,13 @@
     ],
     "policy": "Track separately from the 390 matrix; never reinterpret EOS390 method=maxwell."
   },
-  "last_update_utc": "2026-11-13",
+  "last_update_utc": "2026-11-14",
   "known_remaining_implementation_gaps": [
     {
       "area": "native literature-derived composition",
-      "status": "PENDING",
-      "evidence": "Legacy literature_solvers.py inspected; APR/BBB and RMF/Skyrme/SPG solver families remain Python reference only."
+      "status": "PARTIAL_NATIVE_DDRMF_HOMOGENEOUS_SOLVER_LOCAL_PASS_SPG_CLD_GPPVA_TF_REMAINS",
+      "evidence": "Native Fortran DD-RMF homogeneous solver, symmetry-energy (two definitions), beta-equilibrium and e/mu branch implemented for GPPVA_DD2/DDME2/TW; 3x32=96 diagnostic grid. Local tests 15 passed and full frontend/pipeline 153 passed, 3 skipped. SPG GDFM/CLD and GPPVA nonlinear-Walecka/Thomas-Fermi composition reconstruction remain outstanding.",
+      "receipt": "data/receipts/eos390_m3/E390-03_DDRMF_NATIVE_SOLVER_20261114.json"
     },
     {
       "area": "composition-preserving five-method matching",
@@ -1524,8 +1587,8 @@
     },
     {
       "area": "standalone core-only and crust-only EOS construction",
-      "status": "SPECIFIED_NOT_IMPLEMENTED",
-      "evidence": "E390-01A source contract v1.0.1 specifies all 5 core and 13 crust inputs, source grids, thermodynamics, missingness, provenance, and immutable artifacts; native builders remain E390-03A/B after E390-01C."
+      "status": "IMPLEMENTED_NATIVE_CONSTRUCTION_CI_PASS_PHYSICAL_DIAGNOSTICS_MIXED",
+      "evidence": "E390-03A native core-only constructor CI PASS for five admitted models; E390-03B native crust-only constructor CI PASS for 12 admitted models (GPPVA_TW excluded). Physical diagnostics remain mixed; see E390-03A/B receipts. Construction PASS does not imply physical admissibility or reconstructed-composition readiness."
     },
     {
       "area": "model-specific component boundary admission",
@@ -2172,11 +2235,13 @@
     }
   ],
   "next_actions": [
-    "E390-03: after standalone core-only and crust-only construction, implement and validate literature-backed model-composition solvers and SPG/GPPVA CLD/Thomas-Fermi reconstruction with explicit provenance.",
-    "Resolve or explicitly adjudicate E390-03A physical diagnostics: APR_APR C10; RG_KDE0v1 C2/C10; RG_SLY4 C2 before these core products enter matched-EOS/TOV/Cowling production cohorts.",
-    "E390-10B: complete multi-T parsing, full composition tensorization and full-tensor CompOSE writer/readback without weakening the cold-slice path.",
-    "Only after both component cohorts are validated, integrate the five smooth matching methods plus FLCHPB legacy parity, then the separate composition-aware sharp Maxwell workflow.",
-    "Complete native TOV/tidal/Cowling, 390 smooth batch orchestration, differential/physical/convergence validation and versioned regeneration only after the component and matching gates close."
+    "Continue E390-03: implement source-exact SPG GDFM four-meson homogeneous solver and native CLD minimization for M1-M5; preserve gas/cluster fields and provenance.",
+    "Continue E390-03: implement model-specific GPPVA homogeneous functionals and Thomas-Fermi Wigner-Seitz reconstruction; DD2 homogeneous support alone is not the GPPVA crust solver.",
+    "Reconstruct CompOSE-standard group abundances and validate Yn+Yp+Yh=1 and Yp+(Z/A)Yh=Ye+Ymu by construction, with per-row provenance and native readback.",
+    "Retain E390-03A/B physical diagnostics: APR_APR C10; RG_KDE0v1 C2/C10; RG_SLY4 C2; also GPPVA source-component physical failures and C3/C4 availability are not PASS.",
+    "Complete E390-10B full multi-T composition tensor and lossless CompOSE write/readback without weakening the cold-slice path.",
+    "Only after E390-03 closes and component physical gates are adjudicated, proceed to the five smooth matching methods (FLCHPB, CSS, cubic_F, cubic_P, quintic_F, quintic_P) and separate composition-aware sharp Maxwell workflow; do not start the 390 batch before its gates.",
+    "Complete native TOV/tidal/Cowling and 390 source-backed batch validation after component and matching gates close."
   ],
   "provenance": {
     "last_reconciled_utc": "2026-11-11",
@@ -2278,7 +2343,13 @@
     "last_ci_reconciliation_receipt": "data/receipts/eos390_m2a/E390-10B-CI_RECONCILIATION_20261113.json",
     "audit_note": "Current 9f543b7d evidence supersedes the earlier 9b77 checksum-failed CI: synthetic fixture skip guards were removed in f9dd6fef/9f543b7d and CI now reports 124 passed, 3 skipped. The GitHub Actions checkout still lacks inputs/raw_compose, so source-backed tests remain skipped. No multi-T, full-tensor writer or EOS390 regeneration is claimed.",
     "source_composition_audit": "data/receipts/eos390_m0/E390-02_COMPOSITION_CLOSURE_SOURCE_RECONCILIATION_20261113.json",
-    "source_composition_audit_sha256": "5a38907b5282317e0222b5fe3827348433e8f72fe9b1f8e78e046e487f4d64d7"
+    "source_composition_audit_sha256": "5a38907b5282317e0222b5fe3827348433e8f72fe9b1f8e78e046e487f4d64d7",
+    "e390_03_ddrmf_partial": {
+      "receipt": "data/receipts/eos390_m3/E390-03_DDRMF_NATIVE_SOLVER_20261114.json",
+      "backup_branch": "backup/e390-03-rmf-dd-beta-pre-20261114",
+      "parent_commit": "7a0415e2865366cb4c3e6b27ffa3dece39a6fa49",
+      "github_ci": "PENDING"
+    }
   },
   "supersedes": {
     "lost_archive_filename": "NS_Cowling_EOS390_raw_inputs_v1.tar.zst",
@@ -2287,16 +2358,5 @@
     "replacement_archive": "EoS_complete_core_crust_release_v3_2.zip",
     "rule": "Never request or fabricate the lost tar.zst. Reconstruct a new versioned tar.zst from the surviving ZIP using the checked-in inventory and helper."
   },
-  "latest_evidence_receipt": {
-    "node_id": "E390-03B",
-    "status": "CONSTRUCTION_AND_NATIVE_READBACK_CI_PASS_PROVIDER_COMPOSITION_SEMANTICS_BLOCKED_FOR_E390_03",
-    "path": "data/receipts/eos390_m3b/E390-03B_CRUST_ONLY_CONSTRUCTION_20261113.json",
-    "receipt_artifact_id": 14048389252,
-    "receipt_artifact_sha256": "0fe10d7b21176f3f439c85f1737b970fdb2872e30c9523f2c4aa1175d1772a8f",
-    "workflow_run_id": 43448915849,
-    "workflow_run_url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43448915849",
-    "backup_branch": "backup/e390-03b-close-pre-20261113",
-    "parent_commit": "b6150a22d37a66b29387a7cd02c5c51dfdb3b52b",
-    "next_node": "E390-03"
-  }
+  "latest_evidence_receipt": "data/receipts/eos390_m3/E390-03_DDRMF_NATIVE_SOLVER_20261114.json"
 }

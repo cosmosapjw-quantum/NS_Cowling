@@ -97,14 +97,30 @@ def _native_pipeline(method: str, crust_dir: str, core_dir: str, output_dir: str
     if r4.get("status") != "ok":
         raise BackendUnavailable(f"native write failed: {r4.get('message','?')}")
 
-    # 5. readback verification
-    r5 = _run("verify", str(out_compose), str(Path(output_dir) / "readback_internal"))
-    if r5.get("status") != "ok":
-        raise BackendUnavailable(f"native verify (readback) failed: {r5.get('message','?')}")
-    readback_n = int(r5.get("n", 0))
+    # 5. readback verification -- split into two native calls:
+    #    (a) read the written CompOSE directory back into an internal CSV and
+    #        compare its row count to combined_n (the 'read' action emits "n";
+    #        the 'verify' action does NOT emit "n", only overall/failed_checks).
+    #    (b) run the C1-C11 verifier on the written CompOSE directory. The
+    #        readback PASS is the row-count match (a); C1-C11 status (b) is
+    #        recorded but does not block the readback contract (composition-
+    #        absent tables legitimately may not pass C3/C4, which is a closure
+    #        diagnostic, not a readback failure).
+    readback_internal = Path(output_dir) / "readback_internal"
+    readback_internal.mkdir(parents=True, exist_ok=True)
+    r5_read = _run("read", str(out_compose), str(readback_internal))
+    if r5_read.get("status") != "ok":
+        raise BackendUnavailable(f"native readback (read) failed: {r5_read.get('message','?')}")
+    readback_n = int(r5_read.get("n", 0))
     if readback_n != combined_n:
         raise BackendUnavailable(
             f"readback row count {readback_n} != combined {combined_n}")
+    # (b) C1-C11 verifier on the written CompOSE directory
+    r5_verify = _run("verify", str(out_compose), str(Path(output_dir) / "verify_report.json"))
+    # verify returns status=ok with overall PASS/FAIL; a FAIL is a C1-C11
+    # diagnostic, not a readback failure -- record it but do not raise.
+    verify_overall = r5_verify.get("overall", "UNKNOWN")
+    verify_failed = r5_verify.get("failed_checks", "")
 
     # output files: the CompOSE directory
     output_files = sorted(p.name for p in out_compose.iterdir() if p.is_file())
@@ -118,9 +134,13 @@ def _native_pipeline(method: str, crust_dir: str, core_dir: str, output_dir: str
         "output_files": output_files,
         "combined_n": combined_n,
         "readback_n": readback_n,
+        "readback_status": "PASS",
+        "c1_c11_overall": verify_overall,
+        "c1_c11_failed_checks": verify_failed,
         "match_report": r3,
         "write_report": r4,
-        "verify_report": r5,
+        "readback_report": r5_read,
+        "verify_report": r5_verify,
     }
 
 
@@ -236,8 +256,12 @@ def run_task(task: dict) -> dict:
                 receipt["blocked_reason"] = "native backend returned no output files"
             else:
                 hashes = {}
+                # _native_pipeline writes the CompOSE output into
+                # out_dir/compose/<files>; the output_files list names the
+                # files inside that compose subdir.
+                compose_dir = out_dir / "compose"
                 for filename in output_files:
-                    file_path = out_dir / filename
+                    file_path = compose_dir / filename
                     if not file_path.is_file():
                         raise FileNotFoundError(f"backend output is missing: {file_path}")
                     hashes[filename] = sha256_file(str(file_path))

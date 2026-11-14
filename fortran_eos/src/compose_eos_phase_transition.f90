@@ -6,6 +6,31 @@ module compose_eos_phase_transition
   public :: maxwell_transition_report_t, construct_maxwell_transition
   character(len=*), parameter, public :: MAXWELL_METHOD_ID = 'maxwell'
 
+  ! Euler-relation tolerance for the provider Q3 chemical potential check
+  ! (validate_phase, line ~242). max_euler = max over rows of
+  ! |mu_source - mu_Euler| / |mu_Euler|, with mu_Euler = (eps+P)/n_B.
+  !
+  ! Empirical basis (E390 audit B3, 2026-11-14): the largest observed
+  ! source-table Euler residual across the 18-model corpus is 1.15e-4
+  ! (RG_KDE0v1); GPPVA crusts ~9e-5; core tables (BBB/APR/GM) pass at
+  ! machine precision (~1e-16) because their providers print Q3 to 17 sig
+  ! figs and computed it algebraically self-consistent with Q1/Q7. The
+  ! crust providers (GPPVA/RG/SPG) print Q3 to 10 sig figs and carry a
+  ! ~0.02-0.1 MeV systematic offset. 5e-4 = ~4.3x the worst-case observed
+  ! residual, so every source table in the corpus passes with a small
+  ! safety margin while a genuine thermodynamic inconsistency (which
+  ! would be O(1e-1) or larger) is still rejected.
+  !
+  ! NOT derivable from 10-sig-fig source precision: the rounding floor for
+  ! Q3 alone is ~5e-11, and the finite-difference derivative floor is
+  ! ~1e-9. The observed residual (1e-4) is five orders of magnitude above
+  ! the rounding floor, so tightening to the rounding-floor value would
+  ! falsely reject all 13 GPPVA/SPG crust tables and RG_SLY4/RG_KDE0v1.
+  ! Loosening above ~1e-3 would erase the 4x safety margin.
+  !
+  ! Value left unchanged; this comment documents the empirical derivation.
+  ! See docs/MAXWELL_MASS_AUDIT_20261114.md section 6.3 (B3) and the v2
+  ! receipt download/eos390_maxwell_v2/E390_B3_EULER_TOLERANCE_20261114.json.
   real(wp), parameter :: euler_tolerance = 5.e-4_wp
   real(wp), parameter :: algebraic_tolerance = 2.e-6_wp
   real(wp), parameter :: entropy_tolerance = 2.e-8_wp

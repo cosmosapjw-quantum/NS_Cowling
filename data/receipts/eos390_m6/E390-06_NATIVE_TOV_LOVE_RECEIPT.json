@@ -1,0 +1,90 @@
+{
+  "built_date": "2026-11-14",
+  "gate": "M6",
+  "maxwell_result": {
+    "Lambda": 53.83915146677225,
+    "M_msun": 0.8614988997408787,
+    "R_km": 8.945180729476274,
+    "central_eps_MeV_fm3": 789.8871545069653,
+    "central_pressure_MeV_fm3": 84.59628,
+    "compactness": 0.1422118664520612,
+    "converged": true,
+    "delta_eps_MeV_fm3": 100.0,
+    "delta_y": -0.5504072260728778,
+    "has_transition": true,
+    "k2": 0.004697520102515856,
+    "m_transition_msun": 0.6594682820281728,
+    "mode": "maxwell",
+    "n_steps": 52932,
+    "operation": "tov-love",
+    "p_transition_MeV_fm3": 8.549999999999999,
+    "r_transition_km": 6.965637170081637,
+    "status": "ok",
+    "status_msg": "ok",
+    "y_surface": 2.013602169192068
+  },
+  "maxwell_verification": {
+    "P_transition_MeV_fm3": 8.549999999999999,
+    "central_pressure_MeV_fm3": 84.59628,
+    "delta_eps_MeV_fm3": 100.0,
+    "issues": [],
+    "pass": true
+  },
+  "node": "E390-06",
+  "non_claims": [
+    "The native Fortran TOV+Love uses a Dormand-Prince RK45 integrator and log-log linear EOS interpolation; the Python reference (m6_tov_love_solver.py) uses scipy DOP853 and PCHIP interpolation, so the two agree to ~7% on R and ~5% on k2 for the same polytrope. The native module is the production backend.",
+    "The rapid-conversion Cowling interface (Masuda et al. 2013) is documented but not integrated; only the slow (quasi-static, pressure-corrected) y-jump is implemented.",
+    "No M5 Maxwell production output is consumed here; this verification uses synthetic polytropic barotropes. The M5 Maxwell production EOS is consumed by the E390-07 batch orchestrator.",
+    "Cowling f-mode oscillation frequencies are NOT computed by this module; the compose_cowling runtime-compile path is a separate subscope (out of scope for this native module)."
+  ],
+  "outputs": {
+    "native_stellar_interfaces": "DELIVERED: native Fortran TOV integration (RK45 adaptive) for smooth and sharp-Maxwell barotropes",
+    "phase_transition_tidal_jump": "DELIVERED: Delta y = -4 pi r_d^3 Delta eps / (m_d + 4 pi r_d^3 p_d) applied at the transition radius; two-branch integration verified",
+    "slow_rapid_cowling_interface_receipts": "DELIVERED (slow case): Takatsy-Kovacs Eq. 11 pressure-corrected y-jump; rapid case (Masuda 2013) documented as a distinct formula, not integrated here",
+    "tidal_love_solver": "DELIVERED: l=2 tidal Love y(r) ODE (Takatsy-Kovacs 2020 Eq. 2-3) integrated with TOV; k2 and Lambda from Thorne 1971 / Eq. 1"
+  },
+  "physics_contract": {
+    "eos_interpolation": "log-log linear P(eps) per branch (PCHIP in the Python reference; the linear form is the native approximation)",
+    "integrator": "Dormand-Prince RK45 adaptive (tol=1e-6, h in [dr_max/1000, dr_max])",
+    "love_number": "Thorne 1971 / Takatsy-Kovacs Eq. 1 (k2, Lambda=2k2/(3 beta^5))",
+    "love_ode": "Takatsy-Kovacs Eq. 2-3 (l=2, y(r))",
+    "maxwell_y_jump": "Takatsy-Kovacs Eq. 11 (pressure-corrected Postnikov): Delta y = -4 pi r_d^3 Delta eps / (m_d + 4 pi r_d^3 p_d)",
+    "tov_equations": "Takatsy-Kovacs 2020 PRD 102 028501 Eq. 7-8 (G=c=1 geometric units)",
+    "unit_conversion": "MeV/fm^3 -> km^-2 via G*MeV/(1e-45 c^4)*1e6"
+  },
+  "provenance": {
+    "fortran_tov_module": "fortran_eos/src/compose_eos_tov.f90",
+    "native_executable_sha256": "ce9a0869d4a3db5acc572ff1c7e05b3940fa747f63ca6f64f0bd730365fac3d7",
+    "parent_commit": "7ae53487a5d9b6327269d20ce70f3ab533c597fe",
+    "python_reference": "scripts/m6/m6_tov_love_solver.py"
+  },
+  "publication": {
+    "backend": "Fortran compose_eos_tov module (RK45 TOV + l=2 Love + Maxwell y-jump)",
+    "frontend": "Python receipt/verification only; no numerical fallback"
+  },
+  "schema_version": "1.0.1",
+  "smooth_result": {
+    "Lambda": 24.909882385513004,
+    "M_msun": 0.8536775995869146,
+    "R_km": 8.665164482383606,
+    "central_eps_MeV_fm3": 1191.2832846105603,
+    "central_pressure_MeV_fm3": 128.05536897112,
+    "compactness": 0.14547464415705788,
+    "converged": true,
+    "has_transition": false,
+    "k2": 0.0024344421217706324,
+    "mode": "smooth",
+    "n_steps": 52738,
+    "operation": "tov-love",
+    "status": "ok",
+    "status_msg": "ok",
+    "y_surface": 2.1994819231678204
+  },
+  "smooth_verification": {
+    "central_pressure_MeV_fm3": 128.05536897112,
+    "issues": [],
+    "pass": true
+  },
+  "status": "NATIVE_TOV_LOVE_PASS",
+  "title": "Make TOV/tidal/Cowling production path Fortran-only"
+}

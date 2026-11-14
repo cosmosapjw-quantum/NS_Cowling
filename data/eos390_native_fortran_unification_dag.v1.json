@@ -731,12 +731,29 @@
         "E390-05",
         "E390-05A"
       ],
-      "status": "PENDING",
+      "status": "NATIVE_TOV_LOVE_PASS_COWLING_RUNTIME_COMPILE_REMAINS",
       "outputs": [
-        "native stellar interfaces",
-        "tidal Love solver or justified migration mapping",
-        "slow/rapid Cowling interface receipts",
-        "Port phase-transition TOV/Love tidal jump Delta y=-4*pi*r_t^3*Delta epsilon/(m_t+4*pi*r_t^3*P_t), and integrate existing phase-segmented Cowling boundary solvers."
+        "native stellar interfaces (DELIVERED: Fortran TOV RK45 integration, smooth + sharp-Maxwell barotropes)",
+        "tidal Love solver (DELIVERED: l=2 y(r) ODE Takatsy-Kovacs 2020 Eq. 2-3, k2 and Lambda from Thorne 1971)",
+        "slow/rapid Cowling interface receipts (DELIVERED slow: Takatsy-Kovacs Eq. 11 pressure-corrected y-jump; rapid Masuda 2013 documented as distinct formula, not integrated)",
+        "phase-transition TOV/Love tidal jump Delta y = -4 pi r_d^3 Delta eps / (m_d + 4 pi r_d^3 p_d) + phase-segmented integration (DELIVERED: two-branch integration with the y-jump applied at the transition radius)"
+      ],
+      "partial_scope": {
+        "delivered": [
+          "native Fortran TOV + l=2 Love solver (smooth + sharp-Maxwell)",
+          "Takatsy-Kovacs 2020 y-jump at the phase transition",
+          "Love number k2 and tidal deformability Lambda"
+        ],
+        "remaining": [
+          "compose_cowling f-mode oscillation solver (the runtime-compile path in python_frontend/compose_cowling/solver.py is a separate subscope; the 3 pre-existing test failures are this path, not the new native TOV+Love module)",
+          "rapid-conversion Cowling interface (Masuda 2013) integration",
+          "consumption of the M5 Maxwell production EOS (delivered by E390-07 batch orchestrator)"
+        ]
+      },
+      "receipt": "data/receipts/eos390_m6/E390-06_NATIVE_TOV_LOVE_RECEIPT.json",
+      "remaining_acceptance": [
+        "GitHub CI build/test pass for the new compose_eos_tov module",
+        "compose_cowling runtime-compile path resolution (separate subscope)"
       ]
     },
     {

@@ -3,6 +3,7 @@ program compose_eos_fortran
   use compose_eos_component, only: extract_core_rows, extract_crust_rows, verify_core_roundtrip
   use compose_eos_rmf, only: ddrmf_diagnostic_t, evaluate_ddrmf
   use compose_eos_cld, only: cld_reconstruct_model
+  use compose_eos_tov, only: tov_love_result_t, solve_tov_love_smooth, solve_tov_love_maxwell
   use compose_eos_io
   use compose_eos_verify
   use compose_eos_reconstruct, only: fill_density_gap, reconstruct_master
@@ -16,6 +17,7 @@ program compose_eos_fortran
   type(match_report_t)::match_report
   type(maxwell_transition_report_t)::phase_report
   type(ddrmf_diagnostic_t)::rmf_diagnostic
+  type(tov_love_result_t)::tov_result
   character(len=32)::action
   character(len=2048)::arg1,arg2,arg3
   character(len=128)::arg4,arg5,arg6,arg7
@@ -23,9 +25,12 @@ program compose_eos_fortran
   integer::narg,ios,n_fill,fit_points,gap_phase,n_points,n_bridge
   integer::core_first,core_last,expected_source_n,expected_phase
   integer::crust_outer_last,expected_outer_phase,expected_inner_phase
+  integer::tov_n_high,tov_n_low,tov_mode
   real(wp)::cs2_extension,n_max_requested,smooth_sigma,dissolution_tol
   real(wp)::min_ratio_local,best_sel
   real(wp)::cld_sigma_0,cld_b,cld_rho_min,cld_rho_max
+  real(wp),allocatable::tov_p_high(:),tov_e_high(:),tov_p_low(:),tov_e_low(:)
+  real(wp)::tov_pc,tov_ptrans,tov_deps,tov_p,tov_e
   integer::cld_n_points
   integer::igap_sel
   logical::has_gap_phase,drop_composition,local_neutrality_confirmed
@@ -35,7 +40,7 @@ program compose_eos_fortran
   action='';arg1='';arg2='';arg3='';arg4='';arg5='';arg6='';arg7=''
   narg=command_argument_count()
   if(narg<2)then
-    write(*,'(a)')'usage: compose_eos_fortran {rmf-evaluate|read|verify|verify-csv|normalize|write|extract-core|extract-crust|fill-gap|reconstruct-master|causal-complete|match-core|maxwell-transition|cld-reconstruct} INPUT OUTPUT [OPTIONS]'
+    write(*,'(a)')'usage: compose_eos_fortran {rmf-evaluate|read|verify|verify-csv|normalize|write|extract-core|extract-crust|fill-gap|reconstruct-master|causal-complete|match-core|maxwell-transition|cld-reconstruct|tov-love} INPUT OUTPUT [OPTIONS]'
     stop 2
   endif
   call get_command_argument(1,action,status=ios)
@@ -444,6 +449,48 @@ program compose_eos_fortran
       if(ios/=0)then;call emit_failure('invalid n_points for cld-reconstruct');stop 2;endif
     endif
     call cld_reconstruct_model(trim(arg1),cld_sigma_0,cld_b,cld_rho_min,cld_rho_max,cld_n_points)
+  case('tov-love')
+    ! Native TOV + l=2 tidal Love solver (E390-06 / M6).
+    !   tov-love smooth <P_eps.csv> <central_pressure_MeV_fm3>
+    !   tov-love maxwell <high_P_eps.csv> <low_P_eps.csv> <P_trans_MeV_fm3> <delta_eps_MeV_fm3> <central_pressure_MeV_fm3>
+    ! Each CSV is "P,eps" (one pair per line, strictly increasing P), MeV/fm^3.
+    if(narg<4)then
+      call emit_failure('tov-love requires mode smooth|maxwell and inputs');stop 2
+    endif
+    select case(trim(arg1))
+    case('smooth')
+      if(narg/=4)then;call emit_failure('tov-love smooth requires <csv> <central_pressure>');stop 2;endif
+      read(arg3,*,iostat=ios)tov_pc
+      if(ios/=0)then;call emit_failure('invalid central pressure for tov-love');stop 2;endif
+      call read_peps_csv(trim(arg2),tov_p_high,tov_e_high,tov_n_high,status)
+      if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+      call solve_tov_love_smooth(tov_n_high,tov_p_high,tov_e_high,tov_pc,tov_result)
+      if(.not.tov_result%converged)then
+        call emit_failure('tov-love smooth did not converge: '//trim(tov_result%status));stop 3
+      endif
+      call emit_tov_json('smooth',tov_result)
+    case('maxwell')
+      if(narg/=7)then;call emit_failure('tov-love maxwell requires <high.csv> <low.csv> <P_trans> <delta_eps> <central_pressure>');stop 2;endif
+      read(arg4,*,iostat=ios)tov_ptrans
+      if(ios/=0)then;call emit_failure('invalid P_trans for tov-love maxwell');stop 2;endif
+      read(arg5,*,iostat=ios)tov_deps
+      if(ios/=0)then;call emit_failure('invalid delta_eps for tov-love maxwell');stop 2;endif
+      read(arg6,*,iostat=ios)tov_pc
+      if(ios/=0)then;call emit_failure('invalid central pressure for tov-love maxwell');stop 2;endif
+      call read_peps_csv(trim(arg2),tov_p_high,tov_e_high,tov_n_high,status)
+      if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+      call read_peps_csv(trim(arg3),tov_p_low,tov_e_low,tov_n_low,status)
+      if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+      call solve_tov_love_maxwell(tov_n_high,tov_p_high,tov_e_high, &
+                                  tov_n_low,tov_p_low,tov_e_low, &
+                                  tov_ptrans,tov_deps,tov_pc,tov_result)
+      if(.not.tov_result%converged)then
+        call emit_failure('tov-love maxwell did not converge: '//trim(tov_result%status));stop 3
+      endif
+      call emit_tov_json('maxwell',tov_result)
+    case default
+      call emit_failure('tov-love mode must be smooth|maxwell');stop 2
+    end select
   case default
     call emit_failure('unknown operation: '//trim(action));stop 2
   end select
@@ -471,4 +518,113 @@ contains
       s='false'
     endif
   end function
+
+  ! Read a "P,eps" CSV (one pair per line, MeV/fm^3) into allocatable arrays.
+  subroutine read_peps_csv(path, P_arr, eps_arr, n, status)
+    character(len=*), intent(in) :: path
+    real(wp), allocatable, intent(out) :: P_arr(:), eps_arr(:)
+    integer, intent(out) :: n
+    character(len=*), intent(out) :: status
+    integer :: u, ios, i
+    character(len=4096) :: line
+    character(len=96) :: tok(32)
+    integer :: nt
+    real(wp) :: pv, ev
+    logical :: ok
+    status = ''
+    n = 0
+    open(newunit=u, file=trim(path), status='old', action='read', iostat=ios)
+    if(ios/=0) then; status='cannot open P,eps CSV: '//trim(path); return; endif
+    do
+      read(u, '(a)', iostat=ios) line
+      if(ios<0) exit
+      if(ios>0) then; close(u); status='error reading P,eps CSV'; return; endif
+      n = n + 1
+    end do
+    close(u)
+    if(n<2) then; status='P,eps CSV needs at least 2 rows'; return; endif
+    allocate(P_arr(n), eps_arr(n))
+    open(newunit=u, file=trim(path), status='old', action='read', iostat=ios)
+    if(ios/=0) then; status='cannot reopen P,eps CSV'; return; endif
+    do i = 1, n
+      read(u, '(a)', iostat=ios) line
+      if(ios/=0) then; close(u); status='unexpected EOF in P,eps CSV'; return; endif
+      call split_csv_tokens(line, tok, nt)
+      if(nt<2) then; close(u); status='P,eps CSV row needs 2 columns'; return; endif
+      call csv_real(tok(1), pv, ok)
+      if(.not. ok) then; close(u); status='invalid P in P,eps CSV'; return; endif
+      call csv_real(tok(2), ev, ok)
+      if(.not. ok) then; close(u); status='invalid eps in P,eps CSV'; return; endif
+      P_arr(i) = pv; eps_arr(i) = ev
+    end do
+    close(u)
+    do i = 1, n-1
+      if(P_arr(i) >= P_arr(i+1)) then; status='P must be strictly increasing'; return; endif
+    end do
+    status = 'ok'
+  end subroutine read_peps_csv
+
+  ! Emit the TOV+Love result as a JSON object to stdout.
+  subroutine emit_tov_json(mode, r)
+    character(len=*), intent(in) :: mode
+    type(tov_love_result_t), intent(in) :: r
+    write(*, '(a)', advance='no') &
+      '{"status":"ok","operation":"tov-love","mode":"'//trim(mode)// &
+      '","converged":'//merge('true ','false',r%converged)// &
+      ',"R_km":'//trim(real_text(r%r_km))// &
+      ',"M_msun":'//trim(real_text(r%m_msun))// &
+      ',"compactness":'//trim(real_text(r%compactness))// &
+      ',"k2":'//trim(real_text(r%k2))// &
+      ',"Lambda":'//trim(real_text(r%lambda_tidal))// &
+      ',"y_surface":'//trim(real_text(r%y_surface))// &
+      ',"central_pressure_MeV_fm3":'//trim(real_text(r%central_pressure))// &
+      ',"central_eps_MeV_fm3":'//trim(real_text(r%central_eps))// &
+      ',"n_steps":'//trim(integer_text(r%n_steps))// &
+      ',"status_msg":"'//trim(r%status)//'"'
+    if(r%has_transition) then
+      write(*, '(a)', advance='no') &
+        ',"has_transition":true,'// &
+        '"r_transition_km":'//trim(real_text(r%r_transition_km))// &
+        ',"m_transition_msun":'//trim(real_text(r%m_transition_msun))// &
+        ',"p_transition_MeV_fm3":'//trim(real_text(r%p_transition_mevfm3))// &
+        ',"delta_eps_MeV_fm3":'//trim(real_text(r%delta_eps_mevfm3))// &
+        ',"delta_y":'//trim(real_text(r%delta_y))
+    else
+      write(*, '(a)', advance='no') ',"has_transition":false'
+    endif
+    write(*, '(a)') '}'
+  end subroutine emit_tov_json
+
+  ! CSV token splitter (comma delimiter) — minimal, no quoted-field handling.
+  subroutine split_csv_tokens(line, tok, nt)
+    character(len=*), intent(in) :: line
+    character(len=96), intent(out) :: tok(32)
+    integer, intent(out) :: nt
+    integer :: i, j, start
+    nt = 0; start = 1
+    do i = 1, len_trim(line)
+      if(line(i:i)==',') then
+        if(nt>=32) return
+        nt = nt + 1
+        tok(nt) = adjustl(line(start:i-1))
+        start = i + 1
+      endif
+    end do
+    if(start <= len_trim(line)) then
+      if(nt<32) then
+        nt = nt + 1
+        tok(nt) = adjustl(line(start:len_trim(line)))
+      endif
+    endif
+  end subroutine split_csv_tokens
+
+  subroutine csv_real(s, v, ok)
+    character(len=*), intent(in) :: s
+    real(wp), intent(out) :: v
+    logical, intent(out) :: ok
+    integer :: ios
+    read(s, *, iostat=ios) v
+    ok = (ios==0)
+  end subroutine csv_real
+
 end program compose_eos_fortran

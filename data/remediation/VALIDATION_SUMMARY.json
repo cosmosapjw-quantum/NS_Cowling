@@ -1,0 +1,171 @@
+{
+  "mission": "NSC_EOS390_FULL_REMEDIATION_2026-11-14",
+  "phase": "H",
+  "artifact": "VALIDATION_SUMMARY",
+  "generated_utc": "2026-11-14T09:31:44.136770+00:00",
+  "c1_c11_definitions": {
+    "C1": {
+      "definition": "cold-slice algebra: |T|<=1e-12 MeV; max|Q2|<=atol; max|Q6-Q7|<=atol; if beta_equilibrated also max|mu_l|<=atol*mn",
+      "tolerance": "atol=2e-6 (algebraic)",
+      "units": "Q2..Q7 dimensionless, mu_l in MeV",
+      "failure": "nonzero entropy, Q6/Q7 split, or nonzero lepton potential on a beta-equilibrated table",
+      "gate": "HARD"
+    },
+    "C2": {
+      "definition": "baryon-chemical-potential Euler identity: mu_B vs (P+F)/n_B minus the convention term (-Yq*mu_Q for Il=0; -Y_l*mu_l when leptons present with composition; plain (P+F)/n_B for Il=1, |mu_l|<=1e-8*mn). NOT_APPLICABLE when neither branch applies.",
+      "tolerance": "relerr <= atol=2e-6",
+      "units": "relative",
+      "failure": "provider tabulation inconsistent with the first law in its own convention",
+      "gate": "HARD (when applicable)"
+    },
+    "C3": {
+      "definition": "charge closure Y_p + (Zbar/Abar)*Y_h = Y_e + Y_mu (per row, needs composition); NOT_AVAILABLE when composition absent (recorded, never counted as PASS in admission)",
+      "tolerance": "comptol=2e-5 absolute",
+      "gate": "HARD when composition available"
+    },
+    "C4": {
+      "definition": "baryon closure Y_n + Y_p + Y_h = 1 (per row)",
+      "tolerance": "comptol=2e-5 absolute",
+      "gate": "HARD when composition available"
+    },
+    "C5": {
+      "definition": "beta-equilibrium consistency: max|mu_l| <= atol*mn when beta_equilibrated flag is set",
+      "tolerance": "atol=2e-6 * mn",
+      "gate": "HARD"
+    },
+    "C6": {
+      "definition": "mechanical stability: min successive delta P >= -1e-12 * max|P| (P nondecreasing on the grid)",
+      "tolerance": "-1e-12*max|P|",
+      "gate": "HARD"
+    },
+    "C7": {
+      "definition": "dP/dn_B vs n_B * dmu_B/dn_B (finite-difference diagnostic on masked interior points)",
+      "tolerance": "atol*100 = 2e-4 (reported, diagnostic)",
+      "gate": "DIAGNOSTIC"
+    },
+    "C8": {
+      "definition": "P vs n_B^2 * d(F/n)/dn_B (finite-difference diagnostic)",
+      "tolerance": "2e-4 (diagnostic)",
+      "gate": "DIAGNOSTIC"
+    },
+    "C9": {
+      "definition": "d(eps)/dn_B vs mu_B (finite-difference diagnostic)",
+      "tolerance": "2e-4 (diagnostic)",
+      "gate": "DIAGNOSTIC"
+    },
+    "C10": {
+      "definition": "causality: -cstol <= cs2 = (dP/dn)/(deps/dn) < 1+cstol AND first-law variant cs2_fl = (dP/dn)/mu_B in range, on ALL masked interior points (grid log step <= 0.25, Iphase-boundary-adjacent knots always masked so no stencil crosses a phase discontinuity)",
+      "tolerance": "cstol=1e-6",
+      "gate": "HARD (continuous interval, not endpoints)"
+    },
+    "C11": {
+      "definition": "d(mu_B)/dn_B >= -1e-10 on masked interior points (thermodynamic stability of the chemical potential)",
+      "tolerance": "-1e-10",
+      "gate": "HARD"
+    }
+  },
+  "source_of_truth": "fortran_eos/src/compose_eos_verify.f90 lines 46-175",
+  "hard_gate_set": [
+    "C1",
+    "C2",
+    "C3",
+    "C4",
+    "C5",
+    "C6",
+    "C10",
+    "C11"
+  ],
+  "diagnostic_set": [
+    "C7",
+    "C8",
+    "C9"
+  ],
+  "masking_policy": "finite-difference stencils skip knots adjacent to Iphase changes and any interval with log step > 0.25; C10 is evaluated on the full continuous masked set, NOT only endpoints",
+  "method_differential": {
+    "pair": "GPPVA_DD2__BBB_BHF2",
+    "endpoints": {
+      "css": {
+        "P_t_mean": 0.9249934266827768,
+        "mu_t_mean": 958.1710592487406,
+        "first_law_residual": 3.2254246816216683e-14
+      },
+      "cubic_F": {
+        "P_t_mean": 0.9249934266827768,
+        "mu_t_mean": 958.1710592487406,
+        "first_law_residual": 0.0
+      },
+      "cubic_P": {
+        "P_t_mean": 0.9249934266827768,
+        "mu_t_mean": 958.1710592487406,
+        "first_law_residual": 0.0
+      },
+      "quintic_F": {
+        "P_t_mean": 0.9249934266827768,
+        "mu_t_mean": 958.1710592487406,
+        "first_law_residual": 0.0
+      },
+      "quintic_P": {
+        "P_t_mean": 0.9249934266827768,
+        "mu_t_mean": 958.1710592487406,
+        "first_law_residual": 3.2254246816216683e-14
+      }
+    },
+    "endpoint_note": "all 5 methods share source endpoints (P_t, mu_t) by construction; endpoint equality alone is NOT claimed as method equivalence",
+    "bridge_interior_max_dP_P_vs_css": {
+      "css_vs_cubic_F": 0.02195789549264717,
+      "css_vs_cubic_P": 0.07712437063432571,
+      "css_vs_quintic_F": 0.08580817927245085,
+      "css_vs_quintic_P": 0.05137880731306454
+    },
+    "full_range_max_dP_P_vs_css": {
+      "css_vs_cubic_F": {
+        "max_abs_dP_P": 0.02195789549264717
+      },
+      "css_vs_cubic_P": {
+        "max_abs_dP_P": 0.07712437063432571
+      },
+      "css_vs_quintic_F": {
+        "max_abs_dP_P": 0.08580817927245085
+      },
+      "css_vs_quintic_P": {
+        "max_abs_dP_P": 0.05137880731306454
+      }
+    }
+  },
+  "convergence": {
+    "css_sweep": {
+      "n_bridge=8": {
+        "P_t_mean": 0.9249934266827768,
+        "mu_t_mean": 958.1710592487406,
+        "first_law_residual": 3.2254246816216683e-14,
+        "cs2_bridge_max": 0.01655112386769065,
+        "combined_n": 306
+      },
+      "n_bridge=16": {
+        "P_t_mean": 0.9249934266827768,
+        "mu_t_mean": 958.1710592487406,
+        "first_law_residual": 3.2254246816216683e-14,
+        "cs2_bridge_max": 0.01655112386769065,
+        "combined_n": 314
+      },
+      "n_bridge=32": {
+        "P_t_mean": 0.9249934266827768,
+        "mu_t_mean": 958.1710592487406,
+        "first_law_residual": 3.2254246816216683e-14,
+        "cs2_bridge_max": 0.01655112386769065,
+        "combined_n": 330
+      },
+      "n_bridge=64": {
+        "P_t_mean": 0.9249934266827768,
+        "mu_t_mean": 958.1710592487406,
+        "first_law_residual": 3.2254246816216683e-14,
+        "cs2_bridge_max": 0.01655112386769065,
+        "combined_n": 362
+      }
+    },
+    "P_t_spread_across_sweep": 0.0,
+    "mu_t_spread_across_sweep": 0.0,
+    "trend": "endpoint observables are method/bridge-count independent by construction (same source endpoints); the INTERIOR profile converges with n_bridge (max |dP/P| between consecutive refinements recorded per sweep in receipts)",
+    "max_abs_dP_P_bridge_8_vs_64": 0.011136367664011304
+  }
+}

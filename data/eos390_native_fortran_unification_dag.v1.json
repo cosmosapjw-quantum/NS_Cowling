@@ -881,7 +881,7 @@
         "E390-02",
         "E390-10A"
       ],
-      "status": "PHASES_1_6_COMPLETE_MULTIDIM_READ_WRITE_ROUNDTRIP_PASS",
+      "status": "PARTIAL_MULTIDIM_THERMO_ROUNDTRIP_PASS_COMPOSITION_TENSOR_PENDING",
       "outputs": [
         "2D/3D axes and cell-index parser (DELIVERED: read all T x Yq thermo rows, not just cold slice)",
         "arbitrary Nadd (Nadd>=0) species/group/optional file support (DELIVERED phase 2)",
@@ -901,7 +901,12 @@
       "receipt": "data/receipts/eos390_m10b/E390-10B_PHASES_4_6_RECEIPT.json",
       "phase_2_done_date": "2026-11-13",
       "phase_3_done_date": "2026-11-13",
-      "remaining_acceptance": []
+      "remaining_acceptance": [
+        "E390-10B phase 4 multi-T parser and complete index/coverage mapping (THERMO done; COMPOSITION tensor still pending)",
+        "E390-10B phase 5 lossless T x Yq x nb writer/readback (thermo round-trip bit-for-bit PASS for 1T x multi-Yq; full-tensor nT>1 / nYq>1 writer still rejects)",
+        "Full composition tensorization (multidim composition storage out of scope per phase receipt non_claims)",
+        "Source-backed CI acceptance (pending the 18-model raw_compose cohort provisioning)"
+      ]
     },
     {
       "id": "E390-02A",
@@ -1411,7 +1416,7 @@
     "open_source_pdf_download": "PUBLIC_ARXIV_PDF_URLS_CONFIRMED_DIRECT_CONTAINER_DOWNLOAD_TOOL_FAILED; LOCAL_AGENT_DOWNLOAD_REQUIRED",
     "source_bibliography": "18_COMPOSE_DATASHEETS_READ_MODEL_SPECIFIC_REFERENCES_REGISTERED_OPEN_URLS_VERIFIED_BINARY_DOWNLOAD_LOCAL_AGENT_PENDING",
     "css_kernel": "GITHUB_CI_PASS_LOCAL_REPLAY_PENDING",
-    "generator_upgrade": "M10_SPECIFIED_NOT_IMPLEMENTED",
+    "generator_upgrade": "M10_PARTIALLY_IMPLEMENTED_THERMO_ROUNDTRIP_PASS_COMPOSITION_TENSOR_PENDING",
     "native_subagent": "NOT_RUN_NO_NATIVE_DELEGATION_TOOL_EXPOSED",
     "open_source_references": {
       "dd2": "arXiv:0908.2344",
@@ -1780,7 +1785,7 @@
     }
   },
   "generator_upgrade": {
-    "status": "PLANNED_NOT_IMPLEMENTED",
+    "status": "PARTIALLY_IMPLEMENTED_THERMO_ROUNDTRIP_PASS_COMPOSITION_TENSOR_PENDING",
     "target": "Generic CompOSE provider reader/writer/generator, with safe extraction of a requested thermodynamic slice for the cold EOS390 workflow.",
     "dimensions": [
       "1D fixed-T/fixed-Yq slice",

@@ -10,6 +10,15 @@ module compose_eos_matching
     real(wp) :: cs2_source_left=0._wp, cs2_source_right=0._wp
     real(wp) :: cs2_left=0._wp, cs2_right=0._wp, cs2_min=0._wp, cs2_max=0._wp
     real(wp) :: first_law_relative_residual=0._wp, pressure_span=0._wp
+    ! Rest-mass gauge alignment provenance (NSC remediation Phase B).
+    ! dm_mass_gauge_meV = co%mn - cr%mn: additive per-baryon shift applied to
+    ! crust F and mu_B to re-express the crust in the core's neutron rest-mass
+    ! gauge (representation-only; see
+    ! data/remediation/MASS_NORMALIZATION_CONTRACT.json).
+    ! source_euler_residual_meV = max over RETAINED crust rows of
+    ! |mu_B,src - (F_src + P/n_B)|: provider tabulation residual repaired by
+    ! the output Q3 re-derivation.
+    real(wp) :: dm_mass_gauge_meV=0._wp, source_euler_residual_meV=0._wp
     character(len=32) :: method='', construction_kind='', spline_mode=''
     logical :: composition_dropped=.false., is_exact_maxwell=.false., seidov_applicable=.false.
   end type match_report_t
@@ -672,6 +681,17 @@ contains
     report%pressure_span=maxval(pd)-minval(pd);report%spline_mode=trim(msg)
     report%first_law_relative_residual=abs(fd(size(fd))-report%f2)/max(1._wp,abs(report%f2-report%f1))
     report%method=trim(method);report%is_exact_maxwell=.false.;report%seidov_applicable=.false.
+    ! Phase B provenance: record the gauge shift and the provider Euler
+    ! residual over the retained crust rows (rows 1..i1). The residual is
+    ! |mu_B,src - (F_src + P/n_B)| in MeV; the output Q3 re-derivation
+    ! (q(3)=(F+Q1)/mn-1) repairs it, so this value bounds the seam
+    ! discontinuity the shift-free bridge would otherwise inherit.
+    report%dm_mass_gauge_meV=dmcr
+    report%source_euler_residual_meV=0._wp
+    do j=1,i1
+      report%source_euler_residual_meV=max(report%source_euler_residual_meV, &
+        abs((cr%q(3,j)+1._wp)*cr%mn-((cr%q(6,j)+1._wp)*cr%mn+cr%q(1,j))))
+    enddo
     select case(trim(method))
     case('first_law_constrained_hermite_pressure_bridge');report%construction_kind='smooth_near_pressure_plateau'
     case('css');report%construction_kind='two_segment_constant_sound_speed'

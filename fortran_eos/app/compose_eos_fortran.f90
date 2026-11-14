@@ -271,6 +271,8 @@ program compose_eos_fortran
       ',"cs2_min":'//real_text(match_report%cs2_min)//',"cs2_max":'//real_text(match_report%cs2_max)// &
       ',"pressure_span":'//real_text(match_report%pressure_span)// &
       ',"first_law_relative_residual":'//real_text(match_report%first_law_relative_residual)// &
+      ',"dm_mass_gauge_meV":'//real_text(match_report%dm_mass_gauge_meV)// &
+      ',"source_euler_residual_meV":'//real_text(match_report%source_euler_residual_meV)// &
       ',"composition_dropped":'//logical_text(match_report%composition_dropped)// &
       ',"is_exact_maxwell":'//logical_text(match_report%is_exact_maxwell)// &
       ',"seidov_applicable":'//logical_text(match_report%seidov_applicable)//'}'

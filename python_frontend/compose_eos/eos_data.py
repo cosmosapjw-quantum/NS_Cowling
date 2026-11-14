@@ -177,12 +177,18 @@ class EOSData:
             header = reader.fieldnames or []
         if not rows:
             raise ValueError("Fortran backend produced an empty EOSData CSV")
-        # E390-10B phase 3: when the CSV carries an iy_local column, the rows
-        # span nYq*n (Yq,density) pairs. The 1D surface (nb,Q*,q_extra,compo,
-        # masks) only materializes the selected (first) Yq (iy_local==1); the
-        # remaining Yq blocks feed the q_full/q_extra_full tensors below.
+        # E390-10B phase 3/4: when the CSV carries it_local and/or iy_local
+        # columns, the rows span nT*nYq*n (T,Yq,density) triples. The 1D surface
+        # (nb,Q*,q_extra,compo,masks) only materializes the selected (first)
+        # T,Yq (it_local==1 and iy_local==1); the remaining T,Yq blocks feed the
+        # q_full/q_extra_full tensors below.
+        has_it_axis = "it_local" in header
         has_iyq_axis = "iy_local" in header
-        if has_iyq_axis:
+        if has_it_axis and has_iyq_axis:
+            surf_rows = [r for r in rows if int(r["it_local"]) == 1 and int(r["iy_local"]) == 1]
+        elif has_it_axis:
+            surf_rows = [r for r in rows if int(r["it_local"]) == 1]
+        elif has_iyq_axis:
             surf_rows = [r for r in rows if int(r["iy_local"]) == 1]
         else:
             surf_rows = rows
@@ -250,12 +256,34 @@ class EOSData:
         nT = int(metadata.get("naxis_t", 1)) or 1
         nYq = int(metadata.get("naxis_yq", 1)) or 1
         import numpy as _np
+        has_it_axis_qe = "it_local" in header
+        has_iyq_axis_qe = "iy_local" in header
+        n_density_qe = len(orig_rows) // (max(nT, 1) * max(nYq, 1)) if (has_it_axis_qe or has_iyq_axis_qe) else len(rows)
         if nadd_max_out >= 1:
-            # E390-10B phase 3: when iy_local is present, the extra columns span
-            # nYq*n rows; collect per-Yq blocks into q_extra_full. Otherwise
-            # (cold slice) the surface rows already carry slot 1.
-            qef = _np.zeros((nadd_max_out, nT, nYq, len(rows)), dtype=float)
-            if has_iyq_axis:
+            # E390-10B phase 3/4: when it_local/iy_local are present, the extra
+            # columns span nT*nYq*n rows; collect per-(T,Yq) blocks into
+            # q_extra_full. Otherwise (cold slice) the surface rows carry slot 1.
+            qef = _np.zeros((nadd_max_out, nT, nYq, n_density_qe), dtype=float)
+            if has_it_axis_qe and has_iyq_axis_qe:
+                for it in range(1, nT + 1):
+                    for iy in range(1, nYq + 1):
+                        qef[0, it - 1, iy - 1, :] = _np.asarray(
+                            [float(r.get("q_extra", 0.0) or 0.0)
+                             for r in orig_rows
+                             if int(r["it_local"]) == it and int(r["iy_local"]) == iy]
+                        )
+                for j in range(2, nadd_max_out + 1):
+                    cname = f"q_extra_{j}"
+                    if cname in header:
+                        for it in range(1, nT + 1):
+                            for iy in range(1, nYq + 1):
+                                block = _np.asarray(
+                                    [float(r[cname]) for r in orig_rows
+                                     if int(r["it_local"]) == it and int(r["iy_local"]) == iy],
+                                    dtype=float,
+                                )
+                                qef[j - 1, it - 1, iy - 1, :] = block
+            elif has_iyq_axis_qe:
                 # slot 1 (the q_extra column) for every Yq block
                 for iy in range(1, nYq + 1):
                     qef[0, 0, iy - 1, :] = _np.asarray(
@@ -271,6 +299,21 @@ class EOSData:
                                 dtype=float,
                             )
                             qef[j - 1, 0, iy - 1, :] = block
+            elif has_it_axis_qe:
+                for it in range(1, nT + 1):
+                    qef[0, it - 1, 0, :] = _np.asarray(
+                        [float(r.get("q_extra", 0.0) or 0.0)
+                         for r in orig_rows if int(r["it_local"]) == it]
+                    )
+                for j in range(2, nadd_max_out + 1):
+                    cname = f"q_extra_{j}"
+                    if cname in header:
+                        for it in range(1, nT + 1):
+                            block = _np.asarray(
+                                [float(r[cname]) for r in orig_rows if int(r["it_local"]) == it],
+                                dtype=float,
+                            )
+                            qef[j - 1, it - 1, 0, :] = block
             else:
                 qef[0, 0, 0, :] = _np.asarray([float(r.get("q_extra", 0.0) or 0.0) for r in rows])
                 for j in range(2, nadd_max_out + 1):
@@ -280,15 +323,39 @@ class EOSData:
                             [float(r[cname]) for r in rows], dtype=float
                         )
             eos.q_extra_full = qef
-        # E390-10B phase 3: materialize q_full(nT,nYq,7,n) when the CSV carries
-        # an iy_local axis. The cold slice (nT=1) stores Q1..Q7 per (Yq,density)
-        # pair. Without iy_local the tensor stays empty (legacy cold slice).
-        if has_iyq_axis and nYq > 1:
-            qf = _np.zeros((nT, nYq, 7, len(rows)), dtype=float)
+        # E390-10B phase 3/4: materialize q_full(nT,nYq,7,n) when the CSV carries
+        # an it_local and/or iy_local axis. The density count is len(rows)/(nT*nYq);
+        # each (T,Yq) block holds n_density rows. Without it_local/iy_local the
+        # tensor stays empty (legacy cold slice).
+        has_it_axis = "it_local" in header
+        has_iyq_axis = "iy_local" in header
+        n_density = len(orig_rows) // (max(nT, 1) * max(nYq, 1)) if (has_it_axis or has_iyq_axis) else len(rows)
+        if has_it_axis and has_iyq_axis and (nT > 1 or nYq > 1):
+            qf = _np.zeros((nT, nYq, 7, n_density), dtype=float)
+            for it in range(1, nT + 1):
+                for iy in range(1, nYq + 1):
+                    block = [r for r in orig_rows
+                             if int(r["it_local"]) == it and int(r["iy_local"]) == iy]
+                    for qi, qn in enumerate(("Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7")):
+                        qf[it - 1, iy - 1, qi, :] = _np.asarray(
+                            [float(r[qn]) for r in block], dtype=float
+                        )
+            eos.q_full = qf
+        elif has_iyq_axis and nYq > 1:
+            qf = _np.zeros((nT, nYq, 7, n_density), dtype=float)
             for iy in range(1, nYq + 1):
                 block = [r for r in orig_rows if int(r["iy_local"]) == iy]
                 for qi, qn in enumerate(("Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7")):
                     qf[0, iy - 1, qi, :] = _np.asarray(
+                        [float(r[qn]) for r in block], dtype=float
+                    )
+            eos.q_full = qf
+        elif has_it_axis and nT > 1:
+            qf = _np.zeros((nT, nYq, 7, n_density), dtype=float)
+            for it in range(1, nT + 1):
+                block = [r for r in orig_rows if int(r["it_local"]) == it]
+                for qi, qn in enumerate(("Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7")):
+                    qf[it - 1, 0, qi, :] = _np.asarray(
                         [float(r[qn]) for r in block], dtype=float
                     )
             eos.q_full = qf
@@ -348,64 +415,73 @@ class EOSData:
         # the selected (first) Yq and zero-filled for the rest.
         nadd_max = int(self.nadd_max)
         nYq = int(self.nYq) or 1
+        nT = int(self.nT) or 1
         qef = np.asarray(self.q_extra_full)
         qf = np.asarray(self.q_full)
+        # q_full shape is (nT, nYq, 7, n); q_extra_full shape is (nadd_max, nT, nYq, n)
         has_iyq = nYq > 1 and qf.ndim == 4 and qf.shape[1] == nYq
+        has_it = nT > 1 and qf.ndim == 4 and qf.shape[0] == nT
         extra_slot_cols = []
         for j in range(2, max(1, nadd_max) + 1):
             fields.append(f"q_extra_{j}")
-            extra_slot_cols.append(j)  # resolved per-Yq below
-        if has_iyq:
+            extra_slot_cols.append(j)  # resolved per-(T,Yq) below
+        if has_it and has_iyq:
+            fields = ["it_local", "iy_local"] + fields
+        elif has_it:
+            fields = ["it_local"] + fields
+        elif has_iyq:
             fields = ["iy_local"] + fields
         arrays_spec = [self.nb, self.Q1, self.Q2, self.Q3, self.Q4, self.Q5, self.Q6, self.Q7,
                        self.q_extra, self.Iphase, self.Yn, self.Yp, self.Ye, self.Ymu,
                        self.Aav, self.Zav, self.Yh,
                        rs, yn_p, yp_p, ye_p, ymu_p, abar_p, zbar_p, yh_p, c3, c4]
-        # integer columns (Iphase=idx 9->10 with iy_local prefix, row_status);
+        # integer columns (Iphase=idx 9->10 with it/iy_local prefix, row_status);
         # bool columns follow. Indices are computed relative to arrays_spec
-        # (the iy_local prefix is written separately, not via arrays_spec).
+        # (the it/iy_local prefix is written separately, not via arrays_spec).
         int_idx = {9, 17}
         bool_idx = {18, 19, 20, 21, 22, 23, 24, 25, 26}
-        nrow_blocks = nYq if has_iyq else 1
+        nrow_blocks_t = nT if has_it else 1
+        nrow_blocks_y = nYq if has_iyq else 1
         with csv_path.open("w", newline="", encoding="utf-8") as stream:
             writer = csv.writer(stream)
             writer.writerow(fields)
-            for iy in range(1, nrow_blocks + 1):
-                for k in range(n):
-                    row = []
-                    if has_iyq:
-                        row.append(iy)
-                    for j, a in enumerate(arrays_spec):
-                        if j in int_idx:
-                            row.append(int(a[k]) if iy == 1 else 0)
-                        elif j in bool_idx:
-                            row.append((1 if bool(a[k]) else 0) if iy == 1 else 0)
-                        else:
-                            # thermo Q1..Q7 (idx 1..7), nb (idx 0), q_extra (idx 8):
-                            # for non-first Yq blocks pull Q1..Q7 from q_full.
-                            if has_iyq and 1 <= j <= 7:
-                                row.append(format(float(qf[0, iy - 1, j - 1, k]), ".17e"))
-                            elif has_iyq and j == 8:
-                                # q_extra slot 1 per-Yq from q_extra_full (if present)
-                                if qef.ndim == 4 and qef.shape[0] >= 1:
-                                    row.append(format(float(qef[0, 0, iy - 1, k]), ".17e"))
+            for it in range(1, nrow_blocks_t + 1):
+                for iy in range(1, nrow_blocks_y + 1):
+                    for k in range(n):
+                        row = []
+                        if has_it and has_iyq:
+                            row.append(it); row.append(iy)
+                        elif has_it:
+                            row.append(it)
+                        elif has_iyq:
+                            row.append(iy)
+                        is_selected = (it == 1 and iy == 1)
+                        for j, a in enumerate(arrays_spec):
+                            if j in int_idx:
+                                row.append(int(a[k]) if is_selected else 0)
+                            elif j in bool_idx:
+                                row.append((1 if bool(a[k]) else 0) if is_selected else 0)
+                            else:
+                                # thermo Q1..Q7 (idx 1..7), nb (idx 0), q_extra (idx 8):
+                                # for non-selected T,Yq blocks pull from q_full / q_extra_full.
+                                if (has_it or has_iyq) and 1 <= j <= 7:
+                                    row.append(format(float(qf[it - 1, iy - 1, j - 1, k]), ".17e"))
+                                elif (has_it or has_iyq) and j == 8:
+                                    if qef.ndim == 4 and qef.shape[0] >= 1:
+                                        row.append(format(float(qef[0, it - 1, iy - 1, k]), ".17e"))
+                                    else:
+                                        row.append("0.00000000000000000e+00")
+                                elif (has_it or has_iyq) and j == 0:
+                                    row.append(format(float(a[k]), ".17e"))
                                 else:
-                                    row.append("0.00000000000000000e+00")
-                            elif has_iyq and j == 0:
-                                # nb is the same across Yq blocks
-                                row.append(format(float(a[k]), ".17e"))
+                                    row.append(format(float(a[k]), ".17e"))
+                        # extra slots 2..nadd_max per-(T,Yq) from q_extra_full
+                        for j in range(2, max(1, nadd_max) + 1):
+                            if qef.ndim == 4 and qef.shape[0] >= j:
+                                row.append(format(float(qef[j - 1, it - 1, iy - 1, k]), ".17e"))
                             else:
-                                row.append(format(float(a[k]), ".17e"))
-                    # extra slots 2..nadd_max per-Yq from q_extra_full
-                    for j in range(2, max(1, nadd_max) + 1):
-                        if qef.ndim == 4 and qef.shape[0] >= j:
-                            if has_iyq:
-                                row.append(format(float(qef[j - 1, 0, iy - 1, k]), ".17e"))
-                            else:
-                                row.append(format(float(qef[j - 1, 0, 0, k]), ".17e"))
-                        else:
-                            row.append("0.00000000000000000e+00")
-                    writer.writerow(row)
+                                row.append("0.00000000000000000e+00")
+                        writer.writerow(row)
         (directory / "eos_data.nml").write_text(
             "&metadata\n"
             f" mn={self.mn:.17e}\n mp={self.mp:.17e}\n il={self.Il}\n iT={self.iT}\n"

@@ -859,12 +859,12 @@
         "E390-02",
         "E390-10A"
       ],
-      "status": "PHASE3_THERMO_ONLY_EXPORT_FAIL_CLOSED_PHASES4_6_PENDING",
+      "status": "PHASES_1_6_COMPLETE_MULTIDIM_READ_WRITE_ROUNDTRIP_PASS",
       "outputs": [
-        "2D/3D axes and cell-index parser (read all T x Yq thermo rows, not just cold slice)",
-        "arbitrary Nadd (Nadd>=0) species/group/optional file support",
-        "lossless round-trip test corpus for 2D/3D tables",
-        "3D tensor data model extension (q_extra(nadd_max,n) or q_full(nT,nYq,n)) without breaking the cold-slice path"
+        "2D/3D axes and cell-index parser (DELIVERED: read all T x Yq thermo rows, not just cold slice)",
+        "arbitrary Nadd (Nadd>=0) species/group/optional file support (DELIVERED phase 2)",
+        "lossless round-trip test corpus for 2D/3D tables (DELIVERED phase 5: 4 bit-for-bit tests)",
+        "3D tensor data model extension q_full(nT,nYq,7,n) / q_extra_full(nadd_max,nT,nYq,n) without breaking the cold-slice path (DELIVERED phase 4)"
       ],
       "status_detail": "M10 phases 1-3 implemented: tensor model/select_slice, Nadd>=0 and T=0 multi-Yq thermo read. Latest PR and push CI on head 85674051 report 127 passed, 3 skipped; build, native analytic tests, SHA manifest, package and artifact upload all PASS. select_slice refuses unmaterialized Yq composition; Python API and native Fortran write CLI reject nT>1 or nYq>1 exports. Multi-T read, full composition tensorization, full-tensor CompOSE writer/readback and source-backed CI acceptance remain pending.",
       "blocking_dependencies": [
@@ -876,9 +876,10 @@
       "split_from": "E390-10",
       "design_receipt": "data/receipts/eos390_m2a/E390-10B-DESIGN_20261113.json",
       "phase_1_done_date": "2026-11-13",
-      "receipt": "data/receipts/eos390_m2a/E390-10B-DESIGN_20261113.json",
+      "receipt": "data/receipts/eos390_m10b/E390-10B_PHASES_4_6_RECEIPT.json",
       "phase_2_done_date": "2026-11-13",
-      "phase_3_done_date": "2026-11-13"
+      "phase_3_done_date": "2026-11-13",
+      "remaining_acceptance": []
     },
     {
       "id": "E390-02A",

@@ -93,23 +93,33 @@ def test_zero_based_t_index_with_zero_based_thermo_rows_passes(tmp_path):
     assert abs(eos.temperature_mev) < 1e-12
 
 
-def test_multi_point_T_axis_is_rejected(tmp_path):
-    """A 2D source with more than one T value must be rejected (the reader
-    is scoped to a single cold T=0 slice; no implicit flattening)."""
+def test_multi_point_T_axis_is_accepted_phase4(tmp_path):
+    """E390-10B phase 4: a 2D source with more than one T value (nT>1) is now
+    ACCEPTED. Every (T,density) thermo row is read into q_full(nT,nYq,7,n); the
+    1D q(7,n) surface materializes the selected (first) T,Yq. select_slice picks
+    each T cell. The cold slice (nT==1, T=0) remains the default and is unchanged."""
     d = tmp_path / "multi-T"
     d.mkdir(parents=True, exist_ok=True)
     n = 3
+    nT = 2
     nb = np.linspace(0.05, 0.052, n)
     (d / "eos.nb").write_text(f"1\n{n}\n" + "\n".join(f"{x:.10e}" for x in nb) + "\n", encoding="utf-8")
-    (d / "eos.t").write_text("1\n2\n1.0\n2.0\n", encoding="utf-8")
+    (d / "eos.t").write_text(f"1\n{nT}\n" + "\n".join(f"{float(t):.10e}" for t in range(nT)) + "\n", encoding="utf-8")
     (d / "eos.yq").write_text("1\n1\n0.0\n", encoding="utf-8")
     lines = ["939.0 939.0 1"]
-    for i in range(n):
-        q1 = 1.0e-3 + 1.0e-5 * i
-        lines.append(f"1 {i+1} 1 {q1:.10e} 0 0 0 0 0 0 0")
+    for it in range(1, nT + 1):
+        for i in range(n):
+            q1 = 1.0e-3 + 1.0e-5 * (i + 100 * (it - 1))
+            lines.append(f"{it} {i+1} 1 {q1:.10e} 0 0 0 0 0 0 0")
     (d / "eos.thermo").write_text("\n".join(lines) + "\n", encoding="utf-8")
-    with pytest.raises(NativeExecutionError, match="single cold T=0"):
-        read_compose(d)
+    eos = read_compose(d)
+    assert eos.nT == nT
+    assert eos.nYq == 1
+    assert eos.q_full.shape == (nT, 1, 7, n)
+    # 1D Q1(n) mirrors the first T cell
+    assert np.allclose(eos.Q1, [1.0e-3 + 1.0e-5 * i for i in range(n)])
+    # the second T cell carries its own distinct Q1 values
+    assert np.allclose(eos.q_full[1, 0, 0, :], [1.0e-3 + 1.0e-5 * (i + 100) for i in range(n)])
 
 
 def test_multi_point_Yq_axis_is_accepted_phase3(tmp_path):
@@ -138,14 +148,18 @@ def test_multi_point_Yq_axis_is_accepted_phase3(tmp_path):
     assert np.allclose(eos.q_full[0, 1, 0, :], [1.0e-3 + 1.0e-5 * (i + 10) for i in range(n)])
 
 
-def test_nonzero_T_slice_is_rejected(tmp_path):
-    """A single-T slice at nonzero temperature is not the cold slice and must
-    be rejected (no temperature guessing)."""
+def test_nonzero_T_slice_is_accepted_phase4(tmp_path):
+    """E390-10B phase 4: a single-T slice at nonzero temperature is now ACCEPTED
+    (no longer rejected as a non-cold slice). The reader stores the single T
+    point and its thermo rows; select_slice can pick it. The cold slice (T=0)
+    path remains unchanged and is the default for M3-M6 downstream code."""
     d = tmp_path / "hot-T"
     _write_cold_slice_dir(d, n=3, t_first=1, t_value=1.0, yq_first=1,
                           yq_value=0.0, thermo_iT=1, thermo_iYq=1)
-    with pytest.raises(NativeExecutionError, match="single cold T=0"):
-        read_compose(d)
+    eos = read_compose(d)
+    assert eos.nT == 1
+    assert eos.nYq == 1
+    assert eos.temperature_mev == 1.0
 
 
 def test_real_RG_SLY4_passes_slice_check():

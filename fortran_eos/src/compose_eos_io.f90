@@ -102,8 +102,8 @@ contains
     character(len=*),intent(out)::status
     integer::nb0,nb1,t0,t1,y0,y1,u,ios,i,k,nt,it,ib,iy,nadd,extraid,npairs,nquad,pos,pid,qid,phase
     integer::cold_t_idx,cold_yq_idx,declared_t_idx,declared_yq_idx,selected_t,selected_yq
-    integer::iy_local,iy_min,iy_max
-    logical::t_idx_resolved,yq_idx_resolved
+    integer::iy_local,iy_min,iy_max,it_local,it_min,it_max
+    logical::t_idx_resolved,yq_idx_resolved,cold_slice
     character(len=4096)::line
     character(len=96)::tok(256)
     real(wp),allocatable::nb(:),tv(:),yv(:)
@@ -111,6 +111,7 @@ contains
     logical::ok,file_exists
     logical,allocatable::seen(:)
     logical,allocatable::seen_2d(:,:)
+    logical,allocatable::seen_3d(:,:,:)
     character(len=1024)::path
     eos=eos_data_t();status='uninitialized'
     path=trim(directory)//'/eos.nb'
@@ -133,37 +134,48 @@ contains
     ! multi-point Yq axis (nYq>1) while keeping nT==1 and T=0. Every Yq thermo
     ! row is stored into q_full(1,iy_local,7,k); the 1D q(7,n) surface still
     ! materializes the selected (first) Yq for backward compatibility with
-    ! M3-M6 downstream code. The nT==1 + T=0 cold-slice requirement stays.
-    if(size(tv)/=1.or.abs(tv(1))>1.e-12_wp) then
-      status='only a single cold T=0 eos.t slice is supported';return
+    ! M3-M6 downstream code.
+    !
+    ! E390-10B phase 4: relax the nT==1 bound. A multidim table now allows a
+    ! multi-point T axis (nT>1). Every (T,Yq,density) thermo row is stored into
+    ! q_full(it_local,iy_local,7,k); the 1D q(7,n) surface still materializes
+    ! the selected (first) T,Yq for backward compatibility. The cold slice
+    ! (nT==1, T=0) path remains the default and is unchanged.
+    !
+    ! Cold-slice detection: nT==1 AND T=0. The cold slice keeps the existing
+    ! index-resolution logic (0-based or 1-based declaration). A multidim
+    ! table (nT>1) uses the declared first index as the T label origin and
+    ! requires thermo rows to span consecutive T labels.
+    cold_slice = (size(tv)==1 .and. abs(tv(1))<=1.e-12_wp)
+    if(.not.cold_slice .and. size(tv)<1) then
+      status='eos.t must contain at least one temperature point';return
     endif
-    ! M10: resolve the cold-slice T index by VALUE. CompOSE allows 0-based or
-    ! 1-based T indexing: some sources declare eos.t as index 0..0 with value
-    ! T=0 (e.g. RG_SLY4, RG_KDE0v1) and write thermo rows with iT=1, while
-    ! others declare eos.t as index 1..1 (e.g. GPPVA_FSU2H). Both refer to the
-    ! same single cold-T=0 point. Accept either the declared first index or
-    ! the declared first index + 1 if the grid value is T=0; record the actual
-    ! label used in the thermo rows as selected_iT. This is NOT guessing the
-    ! temperature - it is recognizing the index convention for the cold slice.
+    ! M10/phase 3/4: resolve the cold-slice T index by VALUE, OR set up the
+    ! multidim T index origin. CompOSE allows 0-based or 1-based T indexing.
     declared_t_idx=t0
     t_idx_resolved=.false.
-    if(t0>=0.and.t0<=size(tv)) then
-      tval=tv(max(1,t0-t0+1))  ! value at the declared first index
-      if(abs(tval)<=1.e-12_wp) then
-        cold_t_idx=t0; t_idx_resolved=.true.
-      endif
-    endif
-    if(.not.t_idx_resolved) then
-      ! fall back: try t0+1 (1-based convention for a 0-based declaration)
-      if(t0+1>=1.and.t0+1<=size(tv)+t0) then
-        tval=tv(1)
+    if(cold_slice) then
+      if(t0>=0.and.t0<=size(tv)) then
+        tval=tv(max(1,t0-t0+1))  ! value at the declared first index
         if(abs(tval)<=1.e-12_wp) then
-          cold_t_idx=t0+1; t_idx_resolved=.true.
+          cold_t_idx=t0; t_idx_resolved=.true.
         endif
       endif
-    endif
-    if(.not.t_idx_resolved) then
-      status='cold T=0 slice could not be resolved from eos.t grid';return
+      if(.not.t_idx_resolved) then
+        ! fall back: try t0+1 (1-based convention for a 0-based declaration)
+        if(t0+1>=1.and.t0+1<=size(tv)+t0) then
+          tval=tv(1)
+          if(abs(tval)<=1.e-12_wp) then
+            cold_t_idx=t0+1; t_idx_resolved=.true.
+          endif
+        endif
+      endif
+      if(.not.t_idx_resolved) then
+        status='cold T=0 slice could not be resolved from eos.t grid';return
+      endif
+    else
+      ! multidim: the declared first index is the T label origin.
+      cold_t_idx=t0; t_idx_resolved=.true.
     endif
     declared_yq_idx=y0
     yq_idx_resolved=.false.
@@ -176,11 +188,11 @@ contains
     call allocate_eos(eos,size(nb));eos%nb=nb;eos%inb_start=nb0;eos%temperature_mev=tv(1)
     eos%charge_fraction_grid=yv(1)
     eos%selected_iT=cold_t_idx; eos%selected_iYq=cold_yq_idx
-    ! E390-10B phase 3: allocate the multidim q_full(nT,nYq,7,n) tensor when
-    ! the table carries more than one Yq point (cold slice: nT==1). Slot
-    ! (1,selected_iYq_local,:,k) mirrors the 1D q(7,n) surface so M3-M6
-    ! downstream code that reads the 1D fields is unaffected.
-    if(eos%nYq>1) then
+    ! E390-10B phase 3/4: allocate the multidim q_full(nT,nYq,7,n) tensor when
+    ! the table carries more than one Yq point OR more than one T point. Slot
+    ! (selected_iT_local,selected_iYq_local,:,k) mirrors the 1D q(7,n) surface
+    ! so M3-M6 downstream code that reads the 1D fields is unaffected.
+    if(eos%nYq>1 .or. eos%nT>1) then
       if(.not.allocated(eos%q_full)) then
         allocate(eos%q_full(eos%nT,eos%nYq,7,eos%n))
         eos%q_full=0._wp
@@ -195,11 +207,13 @@ contains
     if(ios/=0.or.eos%mn<=0._wp.or.eos%mp<=0._wp.or.(eos%il/=0.and.eos%il/=1)) then
       close(u);status='invalid eos.thermo header';return
     endif
-    ! E390-10B phase 3: track coverage over the full (Yq,density) grid when
-    ! nYq>1, or the 1D density grid when nYq==1 (legacy cold slice). The 1D
-    ! q(7,n) surface always materializes the selected (first) Yq; the other
-    ! Yq rows go into q_full(1,iy_local,7,k).
-    if(eos%nYq>1) then
+    ! E390-10B phase 3/4: track coverage over the full (T,Yq,density) grid.
+    ! phase 3: (Yq,density) when nYq>1 and nT==1 (cold slice). phase 4 adds
+    ! the T axis: (T,Yq,density) when nT>1. The 1D q(7,n) surface always
+    ! materializes the selected (first) T,Yq; the other cells go into q_full.
+    if(eos%nT>1) then
+      allocate(seen_3d(eos%nT,eos%nYq,eos%n));seen_3d=.false.
+    else if(eos%nYq>1) then
       allocate(seen_2d(eos%nYq,eos%n));seen_2d=.false.
     else
       allocate(seen(eos%n));seen=.false.
@@ -211,6 +225,12 @@ contains
     ! cover consecutive Yq labels from y0 to y0+eos%nYq-1 (1-based convention).
     iy_min=eos%selected_iYq
     iy_max=eos%selected_iYq+eos%nYq-1
+    ! E390-10B phase 4: accepted T label range. For a cold slice (nT==1) the
+    ! existing 0-based/1-based resolution is kept (selected_iT or +1). For a
+    ! multidim table (nT>1) the rows span consecutive T labels from t0 to
+    ! t0+eos%nT-1 (1-based convention).
+    it_min=eos%selected_iT
+    it_max=eos%selected_iT+eos%nT-1
     do
       call next_line(u,line,ios)
       if(ios<0) exit
@@ -220,20 +240,30 @@ contains
       call token_int(tok,1,it,ok);if(.not.ok) then;close(u);status='invalid iT';return;endif
       call token_int(tok,2,ib,ok);if(.not.ok) then;close(u);status='invalid inb';return;endif
       call token_int(tok,3,iy,ok);if(.not.ok) then;close(u);status='invalid iYq';return;endif
-      ! M10/phase 3: T must still be the single cold slice (T=0); the T label
-      ! accepts either the declared first index or the 1-based variant. Yq
-      ! may now span nYq consecutive labels (phase 3 relaxation).
-      if((it/=eos%selected_iT .and. it/=eos%selected_iT+1)) then
-        close(u);status='thermo table is not a single selected T slice';return
+      ! M10/phase 3/4: T validation. Cold slice (nT==1): accept selected_iT
+      ! or selected_iT+1 (0-based/1-based declaration). Multidim (nT>1): accept
+      ! the consecutive T label range [it_min,it_max].
+      if(cold_slice) then
+        if((it/=eos%selected_iT .and. it/=eos%selected_iT+1)) then
+          close(u);status='thermo table is not a single selected T slice';return
+        endif
+        it_local=1
+      else
+        if(it<it_min.or.it>it_max) then
+          close(u);status='thermo T label outside the declared eos.t grid';return
+        endif
+        it_local=it-it_min+1
       endif
       if(iy<iy_min.or.iy>iy_max) then
         close(u);status='thermo Yq label outside the declared eos.yq grid';return
       endif
       iy_local=iy-iy_min+1
-      eos%selected_iT=it
+      if(cold_slice) eos%selected_iT=it
       k=ib-nb0+1
       if(k<1.or.k>eos%n) then;close(u);status='thermo density index outside eos.nb';return;endif
-      if(eos%nYq>1) then
+      if(eos%nT>1) then
+        if(seen_3d(it_local,iy_local,k)) then;close(u);status='duplicate eos.thermo row key';return;endif
+      else if(eos%nYq>1) then
         if(seen_2d(iy_local,k)) then;close(u);status='duplicate eos.thermo row key';return;endif
       else
         if(seen(k)) then;close(u);status='duplicate eos.thermo row key';return;endif
@@ -261,28 +291,32 @@ contains
         close(u);status='Nadd changes across eos.thermo rows';return
       endif
       if(nt/=11+nadd) then;close(u);status='Nadd does not match thermo row width';return;endif
-      ! materialize the selected (first) Yq into the 1D q(7,n) surface
-      if(iy_local==1) eos%q(:,k)=qv
-      ! store every Yq row into the multidim tensor (cold slice: nT=1)
-      if(allocated(eos%q_full)) eos%q_full(1,iy_local,:,k)=qv
+      ! materialize the selected (first) T,Yq into the 1D q(7,n) surface
+      if(it_local==1 .and. iy_local==1) eos%q(:,k)=qv
+      ! store every (T,Yq) row into the multidim tensor
+      if(allocated(eos%q_full)) eos%q_full(it_local,iy_local,:,k)=qv
       if(nadd>=1) then
         do i=1,nadd
           call token_real(tok,11+i,v,ok)
           if(.not.ok) then;close(u);status='invalid q_extra column';return;endif
           ! store every column in the tensor (slot 1 mirrors 1D q_extra for
-          ! the selected Yq only)
-          if(allocated(eos%q_extra_full)) eos%q_extra_full(i,1,iy_local,k)=v
-          if(i==1.and.iy_local==1) eos%q_extra(k)=v
+          ! the selected T,Yq only)
+          if(allocated(eos%q_extra_full)) eos%q_extra_full(i,it_local,iy_local,k)=v
+          if(i==1.and.it_local==1.and.iy_local==1) eos%q_extra(k)=v
         enddo
       endif
-      if(eos%nYq>1) then
+      if(eos%nT>1) then
+        seen_3d(it_local,iy_local,k)=.true.
+      else if(eos%nYq>1) then
         seen_2d(iy_local,k)=.true.
       else
         seen(k)=.true.
       endif
     enddo
     close(u)
-    if(eos%nYq>1) then
+    if(eos%nT>1) then
+      if(.not.all(seen_3d)) then;status='eos.thermo does not cover every (T,Yq,density) grid point';return;endif
+    else if(eos%nYq>1) then
       if(.not.all(seen_2d)) then;status='eos.thermo does not cover every (Yq,density) grid point';return;endif
     else
       if(.not.all(seen)) then;status='eos.thermo does not cover every density grid point';return;endif
@@ -291,6 +325,7 @@ contains
     path=trim(directory)//'/eos.compo'
     if(allocated(seen)) deallocate(seen)
     if(allocated(seen_2d)) deallocate(seen_2d)
+    if(allocated(seen_3d)) deallocate(seen_3d)
     open(newunit=u,file=trim(path),status='old',action='read',iostat=ios)
     file_exists=ios==0
     eos%composition_file_present=file_exists
@@ -426,7 +461,7 @@ contains
     character(len=*),intent(in)::path
     type(eos_data_t),intent(in)::eos
     character(len=*),intent(out)::status
-    integer::u,ios,i,j,iy,nyq_out,first_iy,last_iy
+    integer::u,ios,i,j,iy,it,nT_out,nyq_out,first_iy,last_iy,first_it,last_it
     real(wp)::v,qv(7)
     character(len=512)::header
     character(len=64)::colname
@@ -439,9 +474,20 @@ contains
     ! E390-10B phase 3: when nYq>1, prefix every row with an iy_local column so
     ! the multidim Yq blocks can be round-tripped. nYq==1 (the legacy cold
     ! slice) omits iy_local entirely, keeping the CSV shape unchanged.
+    ! E390-10B phase 4/5: when nT>1, also prefix every row with an it_local
+    ! column so the multidim T blocks round-trip. The header ordering is
+    ! it_local,iy_local,nb,... when both axes are multidim; it_local,nb,...
+    ! when only T is multidim; iy_local,nb,... when only Yq is multidim
+    ! (phase 3); nb,... for the legacy cold slice.
     nyq_out=eos%nYq
     if(nyq_out<1) nyq_out=1
-    if(nyq_out>1) then
+    nT_out=eos%nT
+    if(nT_out<1) nT_out=1
+    if(nT_out>1 .and. nyq_out>1) then
+      header='it_local,iy_local,nb,Q1,Q2,Q3,Q4,Q5,Q6,Q7,q_extra'
+    else if(nT_out>1) then
+      header='it_local,nb,Q1,Q2,Q3,Q4,Q5,Q6,Q7,q_extra'
+    else if(nyq_out>1) then
       header='iy_local,nb,Q1,Q2,Q3,Q4,Q5,Q6,Q7,q_extra'
     else
       header='nb,Q1,Q2,Q3,Q4,Q5,Q6,Q7,q_extra'
@@ -455,23 +501,32 @@ contains
     write(u,'(a)')trim(header)
     first_iy=1
     last_iy=nyq_out
+    first_it=1
+    last_it=nT_out
+    do it=first_it,last_it
       do iy=first_iy,last_iy
       do i=1,eos%n
-        ! E390-10B phase 3: for nYq>1 pull Q1..Q7 from q_full(1,iy,:,i); the 1D
-        ! q(7,n) surface only holds the selected (first) Yq. q_extra slot 1 is
-        ! taken from q_extra_full(1,1,iy,i) for the same reason.
-        if(allocated(eos%q_full).and.eos%nYq>1) then
-          qv=eos%q_full(1,iy,:,i)
+        ! E390-10B phase 3/4: for nYq>1 or nT>1 pull Q1..Q7 from the tensor
+        ! q_full(it,iy,:,i); the 1D q(7,n) surface only holds the selected
+        ! (first) T,Yq. q_extra slot 1 is taken from q_extra_full(1,it,iy,i).
+        if(allocated(eos%q_full).and.(eos%nYq>1.or.eos%nT>1)) then
+          qv=eos%q_full(it,iy,:,i)
         else
           qv=eos%q(:,i)
         endif
-        if(allocated(eos%q_extra_full).and.eos%nYq>1.and.eos%nadd_max>=1) then
-          v=eos%q_extra_full(1,1,iy,i)
+        if(allocated(eos%q_extra_full).and.(eos%nYq>1.or.eos%nT>1).and.eos%nadd_max>=1) then
+          v=eos%q_extra_full(1,it,iy,i)
         else
           v=eos%q_extra(i)
         endif
-        ! base row: (iy_local,) nb, Q1..Q7, q_extra (slot 1)
-        if(nyq_out>1) then
+        ! base row: (it_local,)(iy_local,) nb, Q1..Q7, q_extra (slot 1)
+        if(nT_out>1 .and. nyq_out>1) then
+          write(u,'(i0,",",i0,",",es25.16e3,7(",",es25.16e3),",",es25.16e3)',advance='no') &
+            it,iy,eos%nb(i),qv,v
+        else if(nT_out>1) then
+          write(u,'(i0,",",es25.16e3,7(",",es25.16e3),",",es25.16e3)',advance='no') &
+            it,eos%nb(i),qv,v
+        else if(nyq_out>1) then
           write(u,'(i0,",",es25.16e3,7(",",es25.16e3),",",es25.16e3)',advance='no') &
             iy,eos%nb(i),qv,v
         else
@@ -479,18 +534,16 @@ contains
             eos%nb(i),qv,v
         endif
         ! additional extra slots 2..nadd_max (from the tensor; 0 if unallocated).
-        ! For nYq>1 pull from the tensor's iy slot; the 1D q_extra holds slot 1
-        ! of the selected (first) Yq only.
         do j=2,max(1,eos%nadd_max)
           if(allocated(eos%q_extra_full).and.size(eos%q_extra_full,1)>=j) then
-            write(u,'(",",es25.16e3)',advance='no')eos%q_extra_full(j,1,iy,i)
+            write(u,'(",",es25.16e3)',advance='no')eos%q_extra_full(j,it,iy,i)
           else
             write(u,'(",",es25.16e3)',advance='no')0._wp
           endif
         enddo
-        ! composition/masks are only meaningful for the selected (first) Yq;
-        ! the other Yq blocks emit zeros (they carry thermo only).
-        if(iy==1) then
+        ! composition/masks are only meaningful for the selected (first) T,Yq;
+        ! the other T,Yq blocks emit zeros (they carry thermo only).
+        if(it==1 .and. iy==1) then
           write(u,'(",",i0,7(",",es25.16e3),",",i0,9(",",i0))') &
             eos%iphase(i),eos%yn(i),eos%yp(i),eos%ye(i), &
             eos%ymu(i),eos%abar(i),eos%zbar(i),eos%yh(i),eos%row_status(i), &
@@ -504,6 +557,7 @@ contains
         endif
       enddo
     enddo
+    enddo
     close(u);status='ok'
   end subroutine write_internal_csv
 
@@ -512,7 +566,7 @@ contains
     type(eos_data_t),intent(out)::eos
     character(len=*),intent(out)::status
     integer::u,ios,n,i,nt,k,ival,j,nqextra,eos_n
-    integer::iy_local,kk
+    integer::iy_local,it_local,kk
     character(len=4096)::line
     character(len=96)::tok(64)
     character(len=96)::hcol
@@ -584,6 +638,7 @@ contains
       case('c3_applicable');col_idx(26)=k
       case('c4_applicable');col_idx(27)=k
       case('iy_local');col_idx(28)=k
+      case('it_local');col_idx(29)=k
       end select
     enddo
     ! required columns: nb + 7 Q + q_extra + Iphase + 7 compo (codes 1..17)
@@ -609,13 +664,22 @@ contains
       n=n+1
     enddo
     close(u)
-    ! E390-10B phase 3: when iy_local is present the CSV carries nYq*n rows (one
-    ! per (Yq,density) pair); the density grid size is n/nYq. Otherwise (legacy
-    ! cold slice) the row count is already the density count.
-    if(col_idx(28)/=0) then
+    ! E390-10B phase 3/4: when iy_local is present the CSV carries nYq*n rows
+    ! (one per (Yq,density) pair); when it_local is present it carries nT*nYq*n
+    ! rows (one per (T,Yq,density) triple). The density grid size is
+    ! n/(nT*nYq). Without it_local/iy_local, the row count is the density count.
+    if(col_idx(29)/=0.and.col_idx(28)/=0) then
+      if(max(naxis_t,1)<=0.or.max(naxis_yq,1)<=0) then;status='naxis_t and naxis_yq must be positive for it_local+iy_local CSV';return;endif
+      if(mod(n,max(naxis_t,1)*max(naxis_yq,1))/=0) then;status='it_local+iy_local CSV row count is not nT*nYq*n';return;endif
+      eos_n=n/(max(naxis_t,1)*max(naxis_yq,1))
+    else if(col_idx(28)/=0) then
       if(max(naxis_yq,1)<=0) then;status='naxis_yq must be positive for iy_local CSV';return;endif
       if(mod(n,max(naxis_yq,1))/=0) then;status='iy_local CSV row count is not nYq*n';return;endif
       eos_n=n/max(naxis_yq,1)
+    else if(col_idx(29)/=0) then
+      if(max(naxis_t,1)<=0) then;status='naxis_t must be positive for it_local CSV';return;endif
+      if(mod(n,max(naxis_t,1))/=0) then;status='it_local CSV row count is not nT*n';return;endif
+      eos_n=n/max(naxis_t,1)
     else
       eos_n=n
     endif
@@ -626,15 +690,15 @@ contains
     eos%temperature_mev=temperature_mev;eos%charge_fraction_grid=charge_fraction_grid
     eos%composition_file_present=composition_file_present;eos%composition_available=composition_available
     eos%beta_equilibrated=beta_equilibrated
-    ! E390-10B phase 2/3: allocate q_extra_full when the table carries extra
-    ! columns (any nadd_max>=1). E390-10B phase 3: allocate q_full when nYq>1.
+    ! E390-10B phase 2/3/4: allocate q_extra_full when the table carries extra
+    ! columns (any nadd_max>=1). phase 3/4: allocate q_full when nYq>1 or nT>1.
     if(eos%nadd_max>=1) then
       if(.not.allocated(eos%q_extra_full)) then
         allocate(eos%q_extra_full(eos%nadd_max,eos%nT,eos%nYq,eos_n))
         eos%q_extra_full=0._wp
       endif
     endif
-    if(eos%nYq>1) then
+    if(eos%nYq>1 .or. eos%nT>1) then
       if(.not.allocated(eos%q_full)) then
         allocate(eos%q_full(eos%nT,eos%nYq,7,eos_n))
         eos%q_full=0._wp
@@ -647,32 +711,46 @@ contains
       call next_line(u,line,ios)
       if(ios/=0)then;close(u);status='unexpected EOF in internal EOS CSV';return;endif
       call split_tokens(line,tok,nt)
-      ! E390-10B phase 3: when iy_local is present, each row is a (Yq,density)
-      ! pair; compute the density index kk and the Yq index iy_local. The 1D
-      ! surface (q/q_extra/compo/masks) only materializes the selected (first)
-      ! Yq (iy_local==1); the other Yq blocks fill the q_full/q_extra_full
-      ! tensors. Without iy_local, kk==i (legacy cold slice).
+      ! E390-10B phase 3/4: when it_local/iy_local are present, each row is a
+      ! (T,Yq,density) triple; compute the density index kk and the T/Yq
+      ! indices. The 1D surface (q/q_extra/compo/masks) only materializes the
+      ! selected (first) T,Yq (it_local==1 and iy_local==1); the other T,Yq
+      ! blocks fill the q_full/q_extra_full tensors. Without it_local/iy_local,
+      ! kk==i (legacy cold slice).
+      if(col_idx(29)/=0.and.col_idx(29)<=nt) then
+        call token_int(tok,col_idx(29),it_local,ok);if(.not.ok)then;close(u);status='invalid it_local';return;endif
+      else
+        it_local=1
+      endif
       if(col_idx(28)/=0.and.col_idx(28)<=nt) then
         call token_int(tok,col_idx(28),iy_local,ok);if(.not.ok)then;close(u);status='invalid iy_local';return;endif
+      else
+        iy_local=1
+      endif
+      if(col_idx(29)/=0.and.col_idx(28)/=0) then
+        kk=mod(i-1,eos_n)+1
+      else if(col_idx(29)/=0) then
+        kk=mod(i-1,eos_n)+1
+      else if(col_idx(28)/=0) then
         kk=mod(i-1,eos_n)+1
       else
-        iy_local=1;kk=i
+        kk=i
       endif
       ! required thermo+compo columns 1..17 via header lookup
       do k=1,8
         if(col_idx(k)==0.or.col_idx(k)>nt)cycle
         call token_real(tok,col_idx(k),v,ok);if(.not.ok)then;close(u);status='invalid internal EOS value';return;endif
         if(k==1)then
-          if(iy_local==1) eos%nb(kk)=v
+          if(it_local==1.and.iy_local==1) eos%nb(kk)=v
         else
-          if(iy_local==1) eos%q(k-1,kk)=v
-          if(allocated(eos%q_full)) eos%q_full(1,iy_local,k-1,kk)=v
+          if(it_local==1.and.iy_local==1) eos%q(k-1,kk)=v
+          if(allocated(eos%q_full)) eos%q_full(it_local,iy_local,k-1,kk)=v
         endif
       enddo
       if(col_idx(9)/=0.and.col_idx(9)<=nt) then
         call token_real(tok,col_idx(9),v,ok);if(.not.ok)then;close(u);status='invalid q_extra';return;endif
-        if(iy_local==1) eos%q_extra(kk)=v
-        if(allocated(eos%q_extra_full)) eos%q_extra_full(1,1,iy_local,kk)=v
+        if(it_local==1.and.iy_local==1) eos%q_extra(kk)=v
+        if(allocated(eos%q_extra_full)) eos%q_extra_full(1,it_local,iy_local,kk)=v
       endif
       ! additional extra slots 2..nqextra (header-named q_extra_2..)
       do j=2,nqextra
@@ -684,16 +762,16 @@ contains
         if(found.and.k<=nt) then
           call token_real(tok,k,v,ok);if(.not.ok)then;close(u);status='invalid q_extra_N';return;endif
           if(allocated(eos%q_extra_full).and.size(eos%q_extra_full,1)>=j) &
-            eos%q_extra_full(j,1,iy_local,kk)=v
+            eos%q_extra_full(j,it_local,iy_local,kk)=v
         endif
       enddo
-      if(col_idx(10)/=0.and.col_idx(10)<=nt.and.iy_local==1) then
+      if(col_idx(10)/=0.and.col_idx(10)<=nt.and.it_local==1.and.iy_local==1) then
         call token_int(tok,col_idx(10),phase,ok);if(.not.ok)then;close(u);status='invalid Iphase';return;endif
         eos%iphase(kk)=phase
       endif
       do k=11,17
         if(col_idx(k)==0.or.col_idx(k)>nt)cycle
-        if(iy_local/=1) cycle
+        if(it_local/=1.or.iy_local/=1) cycle
         call token_real(tok,col_idx(k),v,ok);if(.not.ok)then;close(u);status='invalid internal composition field';return;endif
         select case(k)
         case(11);eos%yn(kk)=v
@@ -706,8 +784,8 @@ contains
         end select
       enddo
       ! optional M2A mask columns 18..27 (absent in legacy 17-field CSV; only
-      ! meaningful for the selected Yq block)
-      if(col_idx(18)/=0.and.col_idx(18)<=nt.and.iy_local==1) then
+      ! meaningful for the selected T,Yq block)
+      if(col_idx(18)/=0.and.col_idx(18)<=nt.and.it_local==1.and.iy_local==1) then
         call token_int(tok,col_idx(18),ival,ok);if(.not.ok)then;close(u);status='invalid row_status';return;endif
         eos%row_status(kk)=ival
         call token_int(tok,col_idx(19),ival,ok);if(.not.ok)then;close(u);status='invalid yn_present';return;endif

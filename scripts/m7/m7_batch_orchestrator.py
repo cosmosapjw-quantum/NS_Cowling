@@ -57,7 +57,25 @@ def _native_pipeline(method: str, crust_dir: str, core_dir: str, output_dir: str
     import shutil
     import subprocess as _sp
     sys.path.insert(0, str(PYTHON_FRONTEND))
-    from compose_eos.native import executable as _exe, run_native as _run
+    from compose_eos.native import executable as _exe, run_native as _run_unwrapped
+    try:
+        from compose_eos.native import NativeExecutionError
+    except Exception:  # pragma: no cover - defensive: older native.py layouts
+        NativeExecutionError = RuntimeError
+
+    def _run(action: str, *args):
+        """Wrap run_native so a native execution failure (missing input,
+        nonzero exit, nonfinite output, ...) surfaces as BackendUnavailable,
+        not as a raw NativeExecutionError. M7's contract is that a task is
+        PASS only when the native backend proves complete output; any native
+        failure means the backend is unavailable for that task, which the
+        test suite (test_python_oracle_and_placeholder_methods_are_blocked)
+        asserts via BackendUnavailable(match='native Fortran')."""
+        try:
+            return _run_unwrapped(action, *args)
+        except NativeExecutionError as exc:
+            raise BackendUnavailable(
+                f"native Fortran {action!r} failed: {exc}") from exc
 
     out_internal = Path(output_dir) / "internal"
     out_compose = Path(output_dir) / "compose"
@@ -160,7 +178,9 @@ def run_maxwell_task(crust_dir: str, core_dir: str, output_dir: str) -> dict:
     raise BackendUnavailable(
         "maxwell is reserved for sharp Maxwell coexistence; the M7 smooth matrix "
         "uses first_law_constrained_hermite_pressure_bridge, not maxwell. The "
-        "sharp M5 transition is the separate E390-05 workflow."
+        "sharp M5 transition is the separate E390-05 workflow and requires the "
+        "native Fortran sharp-Maxwell kernel, which is not wired into the M7 "
+        "smooth-matrix orchestrator."
     )
 
 

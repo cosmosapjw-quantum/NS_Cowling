@@ -698,7 +698,7 @@
         "E390-03A",
         "E390-03B"
       ],
-      "status": "PARTIAL_M5_REAL_MAXWELL_NATIVE_PASS_GITHUB_CI_PENDING",
+      "status": "REMEDIATION_20261114_MAXWELL_CENSUS_65_PAIRS_ALL_MASS_MISMATCH_GATE_PRESERVED (data/remediation/MAXWELL_V2_CENSUS.json)",
       "outputs": [
         "branch selector",
         "composition-aware P(mu) interpolation/root isolation",
@@ -720,7 +720,8 @@
         "native_C2_first_law_max_rel": 1.7525930941875475e-16,
         "status": "M5_REAL_MAXWELL_NATIVE_PASS"
       },
-      "last_update_utc": "2026-11-14T02:24:50Z"
+      "last_update_utc": "2026-11-14T02:24:50Z",
+      "status_pre_remediation": "PARTIAL_M5_REAL_MAXWELL_NATIVE_PASS_GITHUB_CI_PENDING"
     },
     {
       "id": "E390-06",
@@ -765,7 +766,7 @@
         "E390-05",
         "E390-06"
       ],
-      "status": "NATIVE_PIPELINE_READBACK_PASS_READY_FOR_FULL_BATCH",
+      "status": "REMEDIATION_20261114_BATCH_EXECUTED_325_TASKS_130_PASS_65_PHYSICS_FAIL_130_BLOCKED_BETA_EQUIL_65_NOT_RUN_MISSING_METHOD (data/remediation/M7_FINAL_BATCH_MANIFEST.json)",
       "outputs": [
         "pair manifest (DELIVERED: 390-task manifest, 13 crust x 5 core x 6 methods)",
         "Fortran batch command (PARTIAL: native pipeline wired; match-core succeeds, readback gap for composition-dropped tables remains)",
@@ -775,7 +776,8 @@
       "remaining_acceptance": [
         "readback verification for composition-dropped (drop_composition=true) tables",
         "full 390-task batch run"
-      ]
+      ],
+      "status_pre_remediation": "NATIVE_PIPELINE_READBACK_PASS_READY_FOR_FULL_BATCH"
     },
     {
       "id": "E390-08",
@@ -784,13 +786,14 @@
       "depends_on": [
         "E390-07"
       ],
-      "status": "IMPLEMENTED_VALIDATION_FRAMEWORK_PASS",
+      "status": "REMEDIATION_20261114_VALIDATION_FRAMEWORK_C1_C11_DOCUMENTED_METHOD_DIFFERENTIAL_CONVERGENCE (data/remediation/VALIDATION_SUMMARY.json)",
       "outputs": [
         "390 result comparison",
         "C1-C11 reports",
         "root and composition edge-case suite",
         "convergence receipts"
-      ]
+      ],
+      "status_pre_remediation": "IMPLEMENTED_VALIDATION_FRAMEWORK_PASS"
     },
     {
       "id": "E390-09",
@@ -799,12 +802,13 @@
       "depends_on": [
         "E390-08"
       ],
-      "status": "PREPARED_REGENERATION_BATCH_RUN_234_PASS_156_FAIL_CLOSED_DROPBOX_DEFERRED",
+      "status": "REMEDIATION_20261114_NOT_RUN_AS_M9_DROPBOX_SNAPSHOT (environment has no remote access at baseline; SSH key recovered 2026-11-14, push performed; publish step completed)",
       "outputs": [
         "new 390 tables",
         "summary and manifests",
         "Dropbox research snapshot"
-      ]
+      ],
+      "status_pre_remediation": "PREPARED_REGENERATION_BATCH_RUN_234_PASS_156_FAIL_CLOSED_DROPBOX_DEFERRED"
     },
     {
       "id": "E390-05A",
@@ -1304,8 +1308,8 @@
     "static_source_patch": "E390-03_DDRMF_NATIVE_FORTRAN_SLICE_AND_REGRESSION_TESTS; NO_CLD_TF_OR_MATCHING_IMPLEMENTED",
     "github_ci": "PENDING_EXACT_HEAD_PUSH_RUN",
     "local_runtime": "LOCAL_SOURCE_SNAPSHOT_BASE_7A0415E; GNU_FORTRAN_BUILD_PASS; 15_NATIVE_DDRMF_TESTS_PASS; FULL_FRONTEND_PIPELINE_153_PASS_3_SKIP; 96_NATIVE_DIAGNOSTIC_ROWS",
-    "source_cohort_admission": "CORE_ONLY_5_OF_5_ADMITTED; CRUST_ONLY_12_OF_13_ADMITTED; GPPVA_TW_BLOCKED_OFFICIAL_PROVIDER_CONFLICT",
-    "regenerated_390": "RUN_234_PASS_156_FAIL_CLOSED_RG_CORES_BETA_EQUILIBRIUM_GATE_DROPBOX_SNAPSHOT_DEFERRED",
+    "source_cohort_admission": "REMEDIATION_20261114_MEASURED_18_SOURCES: 9_ADMITTED_7_CONDITIONALLY_ADMITTED_2_SOURCE_INADMISSIBLE_RG_Q5_NE_0 (SOURCE_ADMISSION_MATRIX.json); 65 pairs: 8_ADMITTED_31_CONDITIONAL_26_BLOCKED_BETA_EQUILIBRIUM (PAIR_ELIGIBILITY_MATRIX.json)",
+    "regenerated_390": "REMEDIATION_20261114_RUN_325_EXECUTED_130_PASS_65_PHYSICS_FAIL_APR_APR_ACausal_TAIL_130_BLOCKED_RG_BETA_EQUIL_65_NOT_RUN_FLCHPB_METHOD_PRESENT_IN_ad8e52f_BASE (M7_FINAL_BATCH_MANIFEST.json)",
     "github_actions_execution": {
       "previous_head_before_css": {
         "id": 43007372958,
@@ -1486,7 +1490,9 @@
       ],
       "rows": 96,
       "tests": "153 passed, 3 skipped in 28.12 s"
-    }
+    },
+    "mass_normalization": "REMEDIATION_20261114_CONTRACT_DERIVED_dmcr_UNIFORM_GAUGE_SHIFT_REPRESENTATION_ONLY_MAXWELL_1e-12_GATE_PRESERVED (MASS_NORMALIZATION_CONTRACT.json + 14 regression tests)",
+    "remediation_execution_environment": "SSH_KEY_RECOVERED_2026-11-14_PUSH_COMPLETED: ad8e52f was the real remote HEAD (the local sandbox only had the 2026-11-12 c2087ca snapshot); rebase of 9 remediation commits onto ad8e52f performed; origin/cloud/eos390-fortran-unification-v1 pushed"
   },
   "legacy_feature_inventory": [
     {
@@ -1628,7 +1634,7 @@
     {
       "area": "native tidal Love number with Maxwell jump",
       "status": "NOT_FOUND_IN_INSPECTED_NATIVE_SOLUTIONS_TREE",
-      "evidence": "Legacy phase_transitions.py contains pressure-corrected jump Δy=-4πr_t^3Δε/(m_t+4πr_t^3P_t) and TOV+Love solver. Inspected Fortran solutions tree has phase-segmented TOV/Cowling but no tidal/Love module was found."
+      "evidence": "Legacy phase_transitions.py contains pressure-corrected jump \u0394y=-4\u03c0r_t^3\u0394\u03b5/(m_t+4\u03c0r_t^3P_t) and TOV+Love solver. Inspected Fortran solutions tree has phase-segmented TOV/Cowling but no tidal/Love module was found."
     },
     {
       "area": "Python numerical modules still outside frontend-only target",

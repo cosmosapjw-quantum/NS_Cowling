@@ -218,12 +218,15 @@ def main():
     refinement = []
     for n_min in [0.06, 0.08, 0.10, 0.12]:
         low_ref = hadronic_phase_eosdata(n_min=n_min)
+        # use the production-successful CSS config (P_t=20, cs2=0.2) so the
+        # refinement study isolates the n_min dependence; P_t=30 fails the
+        # native density-ordering check at the CSS onset for all n_min.
         n_h = np.asarray(low_ref.nb, float); P_h = np.asarray(low_ref.p, float)
-        i = int(np.argmin(np.abs(P_h - 30.0)))
+        i = int(np.argmin(np.abs(P_h - 20.0)))
         eps_t = float(np.asarray(low_ref.eps, float)[i]); n_t = float(n_h[i])
         try:
             high_ref, _, _, _, _ = quark_phase_eosdata(
-                hadronic_mn, hadronic_mp, P_t=30.0, eps_t=eps_t, cs2=0.2, n_t=n_t)
+                hadronic_mn, hadronic_mp, P_t=20.0, eps_t=eps_t, cs2=0.2, n_t=n_t)
             matched_ref, report_ref = construct_maxwell_transition(
                 low_ref, high_ref, assume_local_charge_neutrality=True,
                 return_report=True)

@@ -1,0 +1,71 @@
+{
+  "receipt_id": "E390-10B-DESIGN_20261113",
+  "node": "E390-10B",
+  "gate": "M10",
+  "title": "General multidimensional CompOSE reader/writer: read all T x Yq x nb cells, arbitrary Nadd",
+  "split_from": "E390-10",
+  "status": "PENDING_DESIGN_COMPLETE",
+  "design_date": "2026-11-13",
+  "branch": "cloud/eos390-fortran-unification-v1",
+  "document_type": "DESIGN (no implementation; implementation is the next phase)",
+  "objective": "Extend the native CompOSE reader/writer beyond the single cold T=0 slice to support the full CompOSE multidimensional table format: all T x Yq x nb thermo cells, arbitrary Nadd (>=0) extra-quantity columns, and a 3D tensor data model that does not break the existing cold-slice production path.",
+  "current_state": {
+    "data_model": "eos_data_t (compose_eos_types.f90) stores a 1D cold slice: q(7,n) over nb, q_extra(n) for a single extra quantity, nadd as a single integer for the whole table. nT/nYq/t_axis/yq_axis/selected_iT/selected_iYq carry the axes metadata but only the selected cold slice is materialized.",
+    "reader_constraints": [
+      "compose_eos_io.f90 line 130-132: rejects multi-point T or Yq axes or T!=0",
+      "compose_eos_io.f90 line 195-197: thermo rows must match a single selected_iT/selected_iYq",
+      "compose_eos_io.f90 line 207: Nadd restricted to {0,1}",
+      "compose_eos_io.f90 line 213: thermo row width must match Nadd"
+    ],
+    "downstream_consumers_of_the_1D_model": [
+      "M3-M6 reconstruction (GPPVA/SPG coupling extraction, splicing, causal-complete, Maxwell)",
+      "outer-inner crust splicing pipeline (M4)",
+      "fill_density_gap / reconstruct-master / causal-complete / match-core / maxwell-transition (Fortran app commands)",
+      "Python api.py read_compose / write_compose / from_internal_directory / write_internal_directory"
+    ]
+  },
+  "design_decisions": {
+    "D1_data_model_extension": {
+      "decision": "Add a 3D tensor view q_full(nT, nYq, n) and an extra-quantity tensor q_extra_full(nadd_max, nT, nYq, n) to eos_data_t, ALLOCATABLE and unallocated by default. The existing q(7,n) / q_extra(n) / nadd fields remain and continue to hold the selected slice (the cold slice by default). A selector selects_iT/selected_iYq materializes q/q_extra from q_full/q_extra_full for the chosen slice.",
+      "rationale": "Preserves the cold-slice surface API (q, q_extra, nadd) so M3-M6 and the app commands keep working unchanged. The tensor view is opt-in: readers that only need the cold slice (the current EOS390 path) never allocate it.",
+      "risk": "Memory: a full 3D table is nT*nYq*n*7 doubles; for n~1000, nT~50, nYq~20 this is ~5.6 GB. Mitigation: the tensor is allocated only when the table is genuinely multidimensional (nT>1 or nYq>1) AND the caller requests the full view; cold-slice reads never allocate it."
+    },
+    "D2_reader_relaxation_order": {
+      "decision": "Relax the reader in three independent, gated steps, each with its own unit tests, so a regression in one step does not invalidate the others:",
+      "steps": [
+        "Step 1 (Nadd relaxation): remove the nadd<=1 bound (line 207) and the width check (line 213) when nadd>=0; store q_extra as a 1D array of size n*nadd (row-major, nadd varies fastest) for the cold slice. Requires q_extra(n) -> q_extra(n, nadd_max) or a separate q_extra_block. Backward compatible for Nadd in {0,1}.",
+        "Step 2 (multi-point Yq axis): allow nYq>1 while keeping nT==1 (T=0); read all Yq thermo rows into q_full(1, nYq, n). The cold slice (selected_iYq) still materializes q(7,n).",
+        "Step 3 (multi-point T axis): allow nT>1; read all T x Yq rows into q_full(nT, nYq, n). Reject only non-cold T>0 for the slice materialization when a cold-slice consumer is attached (M3-M6), but keep the full tensor for multidim consumers."
+      ]
+    },
+    "D3_slice_materialization_API": {
+      "decision": "Add a Fortran subroutine select_slice(eos, iT, iYq, status) that copies q_full(iT,iYq,:) into q(:,n) and q_extra_full(:,iT,iYq,:) into q_extra(n, :). The Python side exposes this as EOSData.select_slice(iT, iYq) returning a 1D cold-slice EOSData view.",
+      "rationale": "M3-M6 and app commands consume the 1D q/q_extra; select_slice bridges the tensor to the 1D surface without changing their call sites."
+    },
+    "D4_writer_extension": {
+      "decision": "write_internal_csv writes the full q_full/q_extra_full when allocated, plus the axes; write_compose emits the multidim eos.t/eos.yq/eos.thermo with all cells. A legacy flag preserves the 1D cold-slice write for backward compatibility.",
+      "rationale": "Round-trip losslessness requires writing all cells, not just the selected slice."
+    }
+  },
+  "downstream_impact_analysis": {
+    "M3_M6_cold_slice_path": "UNAFFECTED if D1/D3 hold: the 1D q/q_extra/nadd fields are still populated for the selected cold slice; M3-M6 never see q_full unless they opt in.",
+    "splicing_pipeline": "UNAFFECTED: operates on 1D q/q_extra.",
+    "app_commands": "UNAFFECTED for cold-slice inputs; a new command 'read-multidim' or an option to 'read' (--full-tensor) opts into the tensor.",
+    "tests": "test_m10_generic_axes.py rejection tests (test_multi_point_T_axis_is_rejected, test_multi_point_Yq_axis_is_rejected, test_nonzero_T_slice_is_rejected) become acceptance tests for the relaxed reader; they must be rewritten to assert successful read + correct cell counts, not rejection."
+  },
+  "phased_implementation_plan": {
+    "phase_1": "DONE 2026-11-13. D1 data model (allocatable q_full(nT,nYq,7,n), q_extra_full(nadd_max,nT,nYq,n), nadd_max) + D3 select_slice implemented in Fortran (compose_eos_types.f90) and Python (eos_data.py, api.py select_slice). No reader change. 12 unit tests in test_e390_10b_tensor_model.py PASS: cold-slice read leaves q_full empty; select_slice copies chosen cell into Q surface + records selected_iT/iYq; deep-copy no mutation; nadd_max namelist round-trip (legacy default 0); copy() propagates tensor. Full suite 112 passed 0 skipped (was 100; +12 new).",
+    "phase_2": "DONE 2026-11-13. D2 Step 1 (Nadd relaxation) implemented in Fortran (compose_eos_io.f90: read_compose accepts any Nadd>=0, stores every extra column in q_extra_full(nadd_max,nT,nYq,n), 1D q_extra mirrors slot 1; write_internal_csv emits q_extra_2..q_extra_{nadd_max} optional columns; read_internal_csv switched to header-driven lowercase lookup so the variable column count and the Python writer's mixed-case mask names both work; write_metadata/read_metadata carry naxis_t/naxis_yq/nadd_max; write_compose emits the full Nadd>=2 row from the tensor) and Python (eos_data.py: write_internal_directory appends q_extra_N columns, from_internal_directory materializes q_extra_full). reconstruct_master still outputs Nadd in {0,1} (its cs2 recompute needs a single column) - message clarified. 4 unit tests in test_e390_10b_nadd_relaxation.py PASS: Nadd=0 still reads (backward compat), Nadd=2 reads into q_extra_full (both slots), Nadd=3 round-trips through CompOSE format bit-for-bit, Nadd=2 internal-directory round-trip. Full suite 116 passed 0 skipped (was 112; +4 new).",
+    "phase_3": "DONE 2026-11-13. D2 Step 2 (multi-point Yq) implemented in Fortran (compose_eos_io.f90: read_compose relaxes the size(yv)/=1 bound to keep nT==1+T=0 only; thermo parser generalizes seen to a 2D (nYq,n) coverage map; every (Yq,density) row stores into q_full(1,iy_local,7,k); 1D q(7,n) materializes selected (first) Yq; q_extra_full stores per-Yq extra slots; write_internal_csv emits an iy_local prefix column and nYq*n rows when nYq>1, pulling Q1..Q7/q_extra from the tensors per Yq block; read_internal_csv is header-driven and reconstructs q_full + q_extra_full from the iy_local rows) and Python (eos_data.py: from_internal_directory materializes q_full + per-Yq q_extra_full from the iy_local axis; write_internal_directory emits iy_local + per-Yq blocks; cls() now passes nT/nYq from the namelist; api.py select_slice reflects the chosen iYq/iT on the legacy fields). 3 unit tests in test_e390_10b_multi_yq.py PASS: 1T×3Yq×n reads into q_full(1,3,7,n) with distinct per-Yq Q1; select_slice materializes each Yq cell; 1T×2Yq×n Nadd=2 round-trips through the internal directory (q_full + q_extra_full both Yq blocks + both extra slots). M10 test_multi_point_Yq_axis_is_rejected rewritten to acceptance (test_multi_point_Yq_axis_is_accepted_phase3). Full suite 119 passed 0 skipped (was 116; +3 new).",
+    "phase_4": "D2 Step 3 (multi-point T); unit test: a synthetic 3T x 2Yq x n table reads into q_full(3,2,7,n); select_slice materializes each T/Yq.",
+    "phase_5": "D4 writer extension; round-trip test: read multidim -> write -> read back, all cells bit-for-bit.",
+    "phase_6": "Rewrite the 3 rejection tests as acceptance tests; the 2 real-data tests (RG_SLY4, RG_KDE0v1) are NOW PASSING post E390-00 RESOLVED 2026-11-13 (raw_compose staged, inputs/raw_compose/ present). Phase 6's real-data slice-check is already unblocked; only the 3-rejection-test rewrite remains for phase 6.",
+    "blocking": "E390-00 RESOLVED 2026-11-13 — raw_compose is staged (inputs/raw_compose/, 18-model cohort). Phases 1-6 are ALL unblocked; phases 1-5 use synthetic test tables, phase 6 uses the staged real-data cohort. The 2 previously-skipped m10 tests now PASS (8 passed 0 skipped)."
+  },
+  "open_questions_for_user": [
+    "Q1: Is there a real CompOSE 2D/3D table the EOS390 pipeline must ingest (not just the cold slice)? If yes, providing one (even a small synthetic one in the standard format) would let phase 2-5 be validated against real data rather than synthetic tables.",
+    "Q2: The memory bound (D1 risk) assumes the largest table the pipeline will see. What is the expected max (nT, nYq, n)? This decides whether q_full should be memory-mapped or in-core.",
+    "Q3: Should select_slice copy (safe, doubles memory transiently) or reference (zero-copy but lifetime-coupled to q_full)? Default: copy, matching the existing q/q_extra semantics."
+  ],
+  "next_node_recommendation": "E390-10B design is complete. Implementation (phases 1-5) is unblocked and can proceed in the next session; phase 6 (real-data validation) is blocked by E390-00. Recommend starting phase 1 (D1 data model, no reader change) as the lowest-risk first step, with a synthetic Nadd=2 table test."
+}

@@ -1,0 +1,190 @@
+{
+  "test1_analytic_maxwell": {
+    "coexistence_found": true,
+    "acceptance_pass": true,
+    "transition": {
+      "kind": "maxwell",
+      "pressure_MeV_fm3": 23.082859434225497,
+      "muB_MeV": 1242.8609675996668,
+      "n_low_fm3": 0.15193048379983334,
+      "n_high_fm3": 0.2423640798660484,
+      "eps_low_MeV_fm3": 165.74560866912086,
+      "eps_high_MeV_fm3": 278.14199537949435,
+      "delta_eps_MeV_fm3": 112.39638671037349,
+      "delta_n_fm3": 0.09043359606621507,
+      "low_index": 23,
+      "high_index": 24,
+      "seidov_critical_delta_eps_MeV_fm3": 117.49709348589867,
+      "seidov_delta_eps_over_critical": 0.9565886557343877,
+      "seidov_small_core_stable": true,
+      "tidal_jump_formula": "Takatsy-Kovacs-2020: Delta y = -4 pi r_t^3 Delta epsilon / (m_t + 4 pi r_t^3 P_t)",
+      "charge_neutrality": "local in each phase (Maxwell)",
+      "first_law_residual": 1.4210854715202004e-14
+    }
+  },
+  "test2_css_branch": {
+    "AHP2013_typical": {
+      "transition": {
+        "P_t": 100.0,
+        "eps_low": 200.0,
+        "n_low": 0.16,
+        "Delta_eps": 100.0,
+        "cs2": 0.3333333333333333,
+        "mu_t": 1875.0,
+        "eps_high_at_Pt": 300.0,
+        "n_high_at_Pt": 0.21333333333333335,
+        "delta_n": 0.053333333333333344,
+        "first_law_residual": 1.4210854715202004e-14,
+        "classification": "SHARP_FIRST_ORDER"
+      },
+      "checks": {
+        "eps_at_Pt": true,
+        "n_at_Pt": true,
+        "mu_at_Pt": true,
+        "first_law_Delta_eps": true,
+        "dP_deps_equals_cs2": true,
+        "eps_plus_P_over_n_equals_mu": true,
+        "deps_dn_equals_mu_along_branch": true,
+        "classification": true,
+        "cs2_valid": true
+      },
+      "overall_pass": true,
+      "cs2_numerical_mean": 0.3333333333333333
+    },
+    "AHP2013_small_jump": {
+      "transition": {
+        "P_t": 50.0,
+        "eps_low": 150.0,
+        "n_low": 0.12,
+        "Delta_eps": 30.0,
+        "cs2": 0.3,
+        "mu_t": 1666.6666666666667,
+        "eps_high_at_Pt": 180.0,
+        "n_high_at_Pt": 0.13799999999999998,
+        "delta_n": 0.017999999999999988,
+        "first_law_residual": 1.7763568394002505e-14,
+        "classification": "SHARP_FIRST_ORDER"
+      },
+      "checks": {
+        "eps_at_Pt": true,
+        "n_at_Pt": true,
+        "mu_at_Pt": true,
+        "first_law_Delta_eps": true,
+        "dP_deps_equals_cs2": true,
+        "eps_plus_P_over_n_equals_mu": true,
+        "deps_dn_equals_mu_along_branch": true,
+        "classification": true,
+        "cs2_valid": true
+      },
+      "overall_pass": true,
+      "cs2_numerical_mean": 0.29999999999999993
+    },
+    "AHP2013_large_jump": {
+      "transition": {
+        "P_t": 200.0,
+        "eps_low": 400.0,
+        "n_low": 0.25,
+        "Delta_eps": 500.0,
+        "cs2": 0.5,
+        "mu_t": 2400.0,
+        "eps_high_at_Pt": 900.0,
+        "n_high_at_Pt": 0.4583333333333333,
+        "delta_n": 0.20833333333333331,
+        "first_law_residual": 5.684341886080802e-14,
+        "classification": "SHARP_FIRST_ORDER"
+      },
+      "checks": {
+        "eps_at_Pt": true,
+        "n_at_Pt": true,
+        "mu_at_Pt": true,
+        "first_law_Delta_eps": true,
+        "dP_deps_equals_cs2": true,
+        "eps_plus_P_over_n_equals_mu": true,
+        "deps_dn_equals_mu_along_branch": true,
+        "classification": true,
+        "cs2_valid": true
+      },
+      "overall_pass": true,
+      "cs2_numerical_mean": 0.5
+    },
+    "zero_jump_crossover": {
+      "transition": {
+        "P_t": 100.0,
+        "eps_low": 200.0,
+        "n_low": 0.16,
+        "Delta_eps": 0.0,
+        "cs2": 0.3333333333333333,
+        "mu_t": 1875.0,
+        "eps_high_at_Pt": 200.0,
+        "n_high_at_Pt": 0.16,
+        "delta_n": 0.0,
+        "first_law_residual": 0.0,
+        "classification": "CONTINUOUS_UNCLASSIFIED"
+      },
+      "checks": {
+        "eps_at_Pt": true,
+        "n_at_Pt": true,
+        "mu_at_Pt": true,
+        "first_law_Delta_eps": true,
+        "dP_deps_equals_cs2": true,
+        "eps_plus_P_over_n_equals_mu": true,
+        "deps_dn_equals_mu_along_branch": true,
+        "classification": true,
+        "cs2_valid": true
+      },
+      "overall_pass": true,
+      "cs2_numerical_mean": 0.3333333333333333
+    },
+    "causal_limit_cs2=1": {
+      "transition": {
+        "P_t": 100.0,
+        "eps_low": 200.0,
+        "n_low": 0.16,
+        "Delta_eps": 100.0,
+        "cs2": 1.0,
+        "mu_t": 1875.0,
+        "eps_high_at_Pt": 300.0,
+        "n_high_at_Pt": 0.21333333333333335,
+        "delta_n": 0.053333333333333344,
+        "first_law_residual": 1.4210854715202004e-14,
+        "classification": "SHARP_FIRST_ORDER"
+      },
+      "checks": {
+        "eps_at_Pt": true,
+        "n_at_Pt": true,
+        "mu_at_Pt": true,
+        "first_law_Delta_eps": true,
+        "dP_deps_equals_cs2": true,
+        "eps_plus_P_over_n_equals_mu": true,
+        "deps_dn_equals_mu_along_branch": true,
+        "classification": true,
+        "cs2_valid": true
+      },
+      "overall_pass": true,
+      "cs2_numerical_mean": 1.0
+    }
+  },
+  "test3_maxwell_case2_and_css_extension": {
+    "coexistence_found": true,
+    "acceptance_pass": true,
+    "transition": {
+      "kind": "maxwell",
+      "pressure_MeV_fm3": 27.230815083013773,
+      "muB_MeV": 1343.2088994939759,
+      "n_low_fm3": 0.13473629983132532,
+      "n_high_fm3": 0.21140935082732978,
+      "eps_low_MeV_fm3": 153.7481819353111,
+      "eps_high_MeV_fm3": 256.7361063844997,
+      "delta_eps_MeV_fm3": 102.9879244491886,
+      "delta_n_fm3": 0.07667305099600447,
+      "low_index": 21,
+      "high_index": 22,
+      "seidov_critical_delta_eps_MeV_fm3": 117.72031359217621,
+      "seidov_delta_eps_over_critical": 0.8748526172464534,
+      "seidov_small_core_stable": true,
+      "tidal_jump_formula": "Takatsy-Kovacs-2020: Delta y = -4 pi r_t^3 Delta epsilon / (m_t + 4 pi r_t^3 P_t)",
+      "charge_neutrality": "local in each phase (Maxwell)",
+      "first_law_residual": 5.684341886080802e-14
+    }
+  }
+}

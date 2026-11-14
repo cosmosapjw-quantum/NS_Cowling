@@ -1,0 +1,292 @@
+{
+  "mission_id": "NSC_EOS390_FULL_REMEDIATION_2026-11-14",
+  "generated_utc": "2026-11-14T08:59:39.851324+00:00",
+  "phase": "A_baseline",
+  "baseline_discrepancies": {
+    "mission_assumed_audit_head": "ad8e52f94e3123d7967f5e6c3044eed7be19c16b",
+    "mission_assumed_audit_head_exists_in_object_store": false,
+    "actual_head": "c2087ca839d7cc04208fe5cbd9111a4ff1aec558",
+    "actual_branch": "cloud/eos390-fortran-unification-v1",
+    "actual_head_commit_subject": "M5+M5A Python reproduction: sharp Maxwell construction + CSS high-density branch, all acceptance criteria PASS",
+    "actual_head_commit_date": "2026-11-12 09:49:45 +0000",
+    "explanation": "The mission document (dated 2026-11-14, referencing audit HEAD ad8e52f and artifacts such as scripts/m7/, download/m7_batch_*, docs/MAXWELL_MASS_AUDIT_20261114.md, maxwell_v2.py, PAIRWISE_MASS_PROVENANCE_20261114) describes a repository state that does NOT exist in this environment. The actual repository is a 2026-11-12 snapshot at c2087ca (M5+M5A Python reproduction). All Phase-A remediation work is therefore performed against the REAL HEAD c2087ca, and mission items that reference nonexistent artifacts are recorded as NOT_APPLICABLE_TO_THIS_BASELINE.",
+    "prior_turn_commits_absent": [
+      "ad8e52f",
+      "4d04544",
+      "f63615e",
+      "cc60ba5",
+      "7b5285a",
+      "8b3a62c",
+      "5f7e3c7"
+    ],
+    "working_tree": {
+      "uncommitted_entries": 2096,
+      "content_changes_beyond_file_mode": 4,
+      "content_change_files": [
+        "download/reconstruction/SPG_M3/eos.mr",
+        "download/reconstruction/SPG_M3/reconstruction_summary.txt",
+        "download/reconstruction/SPG_M5/eos.mr",
+        "download/reconstruction/SPG_M5/reconstruction_summary.txt"
+      ],
+      "note": "2084 'M' entries are file-mode-only (100644->100755); a small set carries content changes (download/reconstruction/*, docs line endings) plus 12 untracked files. No git history for the mission-referenced remediation chain exists here."
+    }
+  },
+  "remote_access": {
+    "ssh_helper_script": "/home/z/my-project/scripts/git_ssh_helper.sh (ABSENT)",
+    "gh_cli": "ABSENT",
+    "github_ssh_keys": "ABSENT (~/.ssh does not exist)",
+    "github_api_unauthenticated": "HTTP 403 rate-limited from this egress IP",
+    "conclusion": "NO remote read/write access: cannot push, cannot run exact-head GitHub Actions, cannot update PR #13. All work is committed locally on the working branch; push/CI/PR steps are ENVIRONMENT_BLOCKED and recorded."
+  },
+  "baseline_local_tests": {
+    "command": "python3 -m pytest python_frontend/tests/ -q (COMPOSE_EOS_FORTRAN_EXE set, micromamba fortran env on PATH)",
+    "result": "91 passed, 2 skipped (run 2026-11-14, this environment)",
+    "note": "The mission's referenced CI failures (run #494 at ad8e52f) cannot be reproduced here: that commit does not exist in this object store. Current HEAD tests pass locally."
+  },
+  "key_files": {
+    "data/eos390_native_fortran_unification_dag.v1.json": {
+      "exists": true,
+      "sha256": "1c88067d2ce6c3a6154f7d68a565adea997f6bcbaf88cf57c2df19f7471e7d92",
+      "size": 81476
+    },
+    "data/eos_direct_provider_v3/final_cohort/direct_v3_spectrum_234.csv": {
+      "exists": true,
+      "sha256": "d9ab8b2db0f84853a4f10c39fb0c87a6b54726df30cce5b5b87afe41ee39d6c8",
+      "size": 144349
+    },
+    "data/eos_direct_provider_v3/final_cohort/direct_v3_full_cohort_report.json": {
+      "exists": true,
+      "sha256": "d36ca2b27c1efa20583acfcf54dabb4205fe919ea5a44779d2b00d52463dd9c3",
+      "size": 2009
+    },
+    "data/eos_direct_provider_v3/fortran_direct_eos_cohort.json": {
+      "exists": true,
+      "sha256": "775a2c6a1be684869afd0edee844b8204122266a29f4a44898972e5425b7d116",
+      "size": 1071
+    },
+    "docs/DIRECT_EOS_PROVIDER_V3.md": {
+      "exists": true,
+      "sha256": "f648a1d5b1bf02798c72effb951b22653c1a007a79dc655684f2fcf141a762f1",
+      "size": 12667
+    },
+    "docs/EOS_TO_COWLING_PIPELINE.md": {
+      "exists": true,
+      "sha256": "2562b5577d5e4c18cfbd3755a408d2a19a74d10a90f4b2cf9632a3fbf202469f",
+      "size": 8849
+    },
+    "docs/NS_COWLING_PHYSICS_AND_CODE_GUIDE_V4.md": {
+      "exists": true,
+      "sha256": "fec2f4ecefca2fa23dff2ab01821cf291ca8368e3d800cdf3f52b3bff7eddb27",
+      "size": 9596
+    },
+    "docs/EOS390_NATIVE_FORTRAN_UNIFICATION_CONTRACT_20261111.md": {
+      "exists": true,
+      "sha256": "fdbd23b35a2bb0694fc015d8e11189dad047b8bf97669007306f4ba0c65c4d7e",
+      "size": 43082
+    },
+    "docs/FORTRAN_EOS_CRUST_CORE_MATCHING_V1.md": {
+      "exists": true,
+      "sha256": "5b4f1d8f20229d9313ac85d69198cb860c95fe094a0f1afbdf8fd18c5320005f",
+      "size": 20751
+    },
+    "fortran_eos/src/compose_eos_matching.f90": {
+      "exists": true,
+      "sha256": "bef473a924f974a66a31cc6ab2abf257e95fb755e6a975f387fbd59f83f6d877",
+      "size": 31716
+    },
+    "fortran_eos/src/compose_eos_phase_transition.f90": {
+      "exists": true,
+      "sha256": "7f58efff26af9cc71544bcafc2528ddf6b4fc8c5e906dfe1905617aa338ed737",
+      "size": 27675
+    },
+    "fortran_eos/src/compose_eos_io.f90": {
+      "exists": true,
+      "sha256": "a31dddefc2e485866c6e2c8fa65053b8de517c12ef3bf39a16e575ae333c4ca3",
+      "size": 31398
+    },
+    "fortran_eos/src/compose_eos_verify.f90": {
+      "exists": true,
+      "sha256": "1e6cd955656924e997560081895d0d95dcb49f4d8493fad7d94eb56775d0e694",
+      "size": 12180
+    },
+    "scripts/audit_fortran_direct_provider.py": {
+      "exists": true,
+      "sha256": "7bb6e66823de0a1f60592871b13839d9a057168b33711a9ff4eb322aa0cd84df",
+      "size": 5688
+    },
+    "eos_generator/provenance/RELEASE_MANIFEST_v3_2.json": {
+      "exists": true,
+      "sha256": "a354da30fec9b916d6bc92faacaf7d2da4d54c0ea50a07d11787ab596a22ae7e",
+      "size": 4349
+    },
+    "build/compose_eos_fortran/compose_eos_fortran": {
+      "exists": true,
+      "sha256": "930f173c8b4e0f79f15937cb4c96e162b4f25c0c4993c7388d6c0ff23989ddb6",
+      "size": 654264
+    }
+  },
+  "mission_referenced_but_absent": [
+    "data/PAIRWISE_MASS_PROVENANCE_20261114.json",
+    "data/PAIRWISE_MASS_PROVENANCE_20261114.csv",
+    "docs/MAXWELL_MASS_AUDIT_20261114.md",
+    "download/m7_batch_v2_20261114/M7_BATCH_MANIFEST_v2.json",
+    "download/m7_batch_v2_20261114_full/M7_BATCH_MANIFEST_v2.json",
+    "download/eos390_m8_validation_full/E390-08_c1_c11.json",
+    "download/eos390_m9_regeneration/E390-09_REGENERATION_PREPARATION_20261114.json",
+    "download/eos390_mass_reexpression/E390-08_REEXPRESSION_RECEIPT_20261114.json",
+    "download/m5_real_maxwell/E390-05_M5_REAL_MAXWELL_RECEIPT_20261114.json",
+    "download/m5_real_maxwell/E390-05_M5_REAL_MAXWELL_RECEIPT_20261114.json",
+    "scripts/m7/",
+    "download/m5_real_maxwell/",
+    "download/eos390_maxwell_census/",
+    "python_frontend/compose_eos/maxwell_v2.py",
+    "python_frontend/tests/test_b3_euler_tolerance.py"
+  ],
+  "source_eos_inventory": {
+    "APR_APR": {
+      "mn_mp_M_header": "939.56533000000002 938.27200000000005 1",
+      "mn": 939.56533,
+      "mp": 938.272,
+      "has_compo": false,
+      "thermo_rows": 171,
+      "thermo_sha256": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a"
+    },
+    "BBB_BHF2": {
+      "mn_mp_M_header": "939.56533000000002 938.27200000000005 1",
+      "mn": 939.56533,
+      "mp": 938.272,
+      "has_compo": false,
+      "thermo_rows": 83,
+      "thermo_sha256": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+    },
+    "GM_GM1": {
+      "mn_mp_M_header": "9.3956533000E+02 9.3827200000E+02 1",
+      "mn": 939.56533,
+      "mp": 938.272,
+      "has_compo": true,
+      "thermo_rows": 348,
+      "thermo_sha256": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906"
+    },
+    "GPPVA_DD2": {
+      "mn_mp_M_header": "9.3900000000E+02 9.3900000000E+02 1",
+      "mn": 939.0,
+      "mp": 939.0,
+      "has_compo": true,
+      "thermo_rows": 282,
+      "thermo_sha256": "9a2d39421de4835aca4ce67d73c7f915baa3b8907c1e4fcfac14f4043ba5c201"
+    },
+    "GPPVA_DDME2": {
+      "mn_mp_M_header": "9.3900000000E+02 9.3900000000E+02 1",
+      "mn": 939.0,
+      "mp": 939.0,
+      "has_compo": true,
+      "thermo_rows": 287,
+      "thermo_sha256": "11d0250691e3cd9f18bddcc460cd4328a2c8b4f1a57e6ec8f29aa876b9b77714"
+    },
+    "GPPVA_FSU2": {
+      "mn_mp_M_header": "9.3900000000E+02 9.3900000000E+02 1",
+      "mn": 939.0,
+      "mp": 939.0,
+      "has_compo": true,
+      "thermo_rows": 268,
+      "thermo_sha256": "0b5f98c1b8d77858b75bd81212197525dd7c80c8e44272c405a5c6b2631142e9"
+    },
+    "GPPVA_FSU2H": {
+      "mn_mp_M_header": "9.3900000000E+02 9.3900000000E+02 1",
+      "mn": 939.0,
+      "mp": 939.0,
+      "has_compo": true,
+      "thermo_rows": 299,
+      "thermo_sha256": "c28d2faf066145eb95b640ca4bf7dad9bbc03f1bf10a0bfe3c51ba6b896a216c"
+    },
+    "GPPVA_FSU2R": {
+      "mn_mp_M_header": "9.3900000000E+02 9.3900000000E+02 1",
+      "mn": 939.0,
+      "mp": 939.0,
+      "has_compo": true,
+      "thermo_rows": 295,
+      "thermo_sha256": "2344370fd68aa285fcc5dc42d01f7d35dfe730b4b8adc3117bbe7b60d48cbd05"
+    },
+    "GPPVA_NL3wrL55": {
+      "mn_mp_M_header": "9.3900000000E+02 9.3900000000E+02 1",
+      "mn": 939.0,
+      "mp": 939.0,
+      "has_compo": true,
+      "thermo_rows": 297,
+      "thermo_sha256": "e718b8857be096b4f7e00dde8a9da4c72f0cc831a5f994774cc74b125ffb4155"
+    },
+    "GPPVA_TM1e": {
+      "mn_mp_M_header": "9.3800000000E+02 9.3800000000E+02 1",
+      "mn": 938.0,
+      "mp": 938.0,
+      "has_compo": true,
+      "thermo_rows": 302,
+      "thermo_sha256": "9e401855e42ca8fda7c24ec802a8ce9189cd9575c2ee3dfc2b66fb8ec86d4659"
+    },
+    "GPPVA_TW": {
+      "mn_mp_M_header": "9.3900000000E+02 9.3900000000E+02 1",
+      "mn": 939.0,
+      "mp": 939.0,
+      "has_compo": true,
+      "thermo_rows": 288,
+      "thermo_sha256": "440293cd0a1ee55caaa029ef5b5b1db5240ecc3b697c51a288eb7125bc97de41"
+    },
+    "RG_KDE0v1": {
+      "mn_mp_M_header": "9.3956533000E+02 9.3827200000E+02 1",
+      "mn": 939.56533,
+      "mp": 938.272,
+      "has_compo": true,
+      "thermo_rows": 1239,
+      "thermo_sha256": "359c117b5d699fd026429e33555083168d07502179700eec14fa7f165ff4cc60"
+    },
+    "RG_SLY4": {
+      "mn_mp_M_header": "9.3956540000E+02 9.3827200000E+02 1",
+      "mn": 939.5654,
+      "mp": 938.272,
+      "has_compo": true,
+      "thermo_rows": 196,
+      "thermo_sha256": "454aab2370ba7e5ee11ef3fd00801489222cdb2ce9ad416ccfa8821456c65e3f"
+    },
+    "SPG_M1": {
+      "mn_mp_M_header": "9.3890000000E+02 9.3890000000E+02 1",
+      "mn": 938.9,
+      "mp": 938.9,
+      "has_compo": true,
+      "thermo_rows": 364,
+      "thermo_sha256": "20ef365b0fc9ff66b3b268c7f319d2d8dca0b782bd44a32612d3c4a82c8641e5"
+    },
+    "SPG_M2": {
+      "mn_mp_M_header": "9.3890000000E+02 9.3890000000E+02 1",
+      "mn": 938.9,
+      "mp": 938.9,
+      "has_compo": true,
+      "thermo_rows": 376,
+      "thermo_sha256": "0a90ad4fca400d66c8b86842adf45bb214ee335e34922ff47bdf5bafb8041221"
+    },
+    "SPG_M3": {
+      "mn_mp_M_header": "9.3890000000E+02 9.3890000000E+02 1",
+      "mn": 938.9,
+      "mp": 938.9,
+      "has_compo": true,
+      "thermo_rows": 365,
+      "thermo_sha256": "a73d22c35513224673b233a9e0349305868420a9d30f05efbd6d3e0daa81276e"
+    },
+    "SPG_M4": {
+      "mn_mp_M_header": "9.3890000000E+02 9.3890000000E+02 1",
+      "mn": 938.9,
+      "mp": 938.9,
+      "has_compo": true,
+      "thermo_rows": 374,
+      "thermo_sha256": "9da4c2a40b478f64a4c06abb50881be23dd4060ff60bc9f69118be0636114517"
+    },
+    "SPG_M5": {
+      "mn_mp_M_header": "9.3890000000E+02 9.3890000000E+02 1",
+      "mn": 938.9,
+      "mp": 938.9,
+      "has_compo": true,
+      "thermo_rows": 362,
+      "thermo_sha256": "ce749823d0c6f5e48f046e4bd992507f1f384e2068ae93590aa3a953700aaabc"
+    }
+  },
+  "source_eos_count": 18
+}

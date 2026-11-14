@@ -1,5 +1,9 @@
 program compose_eos_fortran
   use compose_eos_types
+  use compose_eos_component, only: extract_core_rows, extract_crust_rows, verify_core_roundtrip
+  use compose_eos_rmf, only: ddrmf_diagnostic_t, evaluate_ddrmf
+  use compose_eos_cld, only: cld_reconstruct_model
+  use compose_eos_tov, only: tov_love_result_t, solve_tov_love_smooth, solve_tov_love_maxwell
   use compose_eos_io
   use compose_eos_verify
   use compose_eos_reconstruct, only: fill_density_gap, reconstruct_master
@@ -7,23 +11,36 @@ program compose_eos_fortran
   use compose_eos_matching, only: match_crust_core, match_report_t
   use compose_eos_phase_transition, only: construct_maxwell_transition, maxwell_transition_report_t
   implicit none
-  type(eos_data_t)::eos,out,crust,core,phase_low,phase_high
+  type(eos_data_t)::eos,out,crust,core,phase_low,phase_high,readback
   type(verify_report_t)::report
   type(causal_completion_report_t)::causal_report
   type(match_report_t)::match_report
   type(maxwell_transition_report_t)::phase_report
+  type(ddrmf_diagnostic_t)::rmf_diagnostic
+  type(tov_love_result_t)::tov_result
   character(len=32)::action
   character(len=2048)::arg1,arg2,arg3
   character(len=128)::arg4,arg5,arg6,arg7
   character(len=512)::status
   integer::narg,ios,n_fill,fit_points,gap_phase,n_points,n_bridge
+  integer::core_first,core_last,expected_source_n,expected_phase
+  integer::crust_outer_last,expected_outer_phase,expected_inner_phase
+  integer::tov_n_high,tov_n_low,tov_mode
   real(wp)::cs2_extension,n_max_requested,smooth_sigma,dissolution_tol
+  real(wp)::min_ratio_local,best_sel
+  real(wp)::cld_sigma_0,cld_b,cld_rho_min,cld_rho_max
+  real(wp),allocatable::tov_p_high(:),tov_e_high(:),tov_p_low(:),tov_e_low(:)
+  real(wp)::tov_pc,tov_ptrans,tov_deps,tov_p,tov_e
+  integer::cld_n_points
+  integer::igap_sel
   logical::has_gap_phase,drop_composition,local_neutrality_confirmed
   logical::smooth_master_flag,fix_dissolution,recompute_extra_cs2,outer_crust_corrected
+  logical::has_min_ratio
+  character(len=256)::why
   action='';arg1='';arg2='';arg3='';arg4='';arg5='';arg6='';arg7=''
   narg=command_argument_count()
   if(narg<2)then
-    write(*,'(a)')'usage: compose_eos_fortran {read|verify|verify-csv|normalize|write|fill-gap|reconstruct-master|causal-complete|match-core|maxwell-transition} INPUT OUTPUT [OPTIONS]'
+    write(*,'(a)')'usage: compose_eos_fortran {rmf-evaluate|read|verify|verify-csv|normalize|write|extract-core|extract-crust|fill-gap|reconstruct-master|causal-complete|match-core|maxwell-transition|cld-reconstruct|tov-love} INPUT OUTPUT [OPTIONS]'
     stop 2
   endif
   call get_command_argument(1,action,status=ios)
@@ -35,6 +52,63 @@ program compose_eos_fortran
   if(narg>=7)call get_command_argument(7,arg6,status=ios)
   if(narg>=8)call get_command_argument(8,arg7,status=ios)
   select case(trim(action))
+  case('rmf-evaluate')
+    if(narg/=3)then
+      call emit_failure('rmf-evaluate requires model_id and baryon_density_fm^-3');stop 2
+    endif
+    read(arg2,*,iostat=ios)n_max_requested
+    if(ios/=0)then;call emit_failure('invalid baryon density for rmf-evaluate');stop 2;endif
+    call evaluate_ddrmf(trim(arg1),n_max_requested,rmf_diagnostic,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    if(rmf_diagnostic%beta%muon_active)then
+      write(*,'(a)')'{"status":"ok","operation":"rmf-evaluate","model":"'//trim(arg1)// &
+        '","rho_b_fm3":'//trim(real_text(n_max_requested))// &
+        ',"yp":'//trim(real_text(rmf_diagnostic%beta%yp))// &
+        ',"ye":'//trim(real_text(rmf_diagnostic%beta%ye))// &
+        ',"ymu":'//trim(real_text(rmf_diagnostic%beta%ymu))// &
+        ',"rho_e_fm3":'//trim(real_text(rmf_diagnostic%beta%rho_e))// &
+        ',"rho_mu_fm3":'//trim(real_text(rmf_diagnostic%beta%rho_mu))// &
+        ',"mu_e_mev":'//trim(real_text(rmf_diagnostic%beta%mu_e))// &
+        ',"mu_mu_mev":'//trim(real_text(rmf_diagnostic%beta%mu_mu))// &
+        ',"muon_branch":"ACTIVE","muon_onset_rho_p_fm3":'//trim(real_text(rmf_diagnostic%beta%muon_onset_rho_p))// &
+        ',"muon_onset_gap_mev":0.0'// &
+        ',"mu_n_mev":'//trim(real_text(rmf_diagnostic%beta%baryons%mu_n))// &
+        ',"mu_p_mev":'//trim(real_text(rmf_diagnostic%beta%baryons%mu_p))// &
+        ',"eps_total_mev_fm3":'//trim(real_text(rmf_diagnostic%beta%eps_total))// &
+        ',"pressure_total_mev_fm3":'//trim(real_text(rmf_diagnostic%beta%p_total))// &
+        ',"beta_residual_mev":'//trim(real_text(rmf_diagnostic%beta%beta_residual))// &
+        ',"charge_residual_fm3":'//trim(real_text(rmf_diagnostic%beta%charge_residual))// &
+        ',"pressure_identity_residual_mev_fm3":'//trim(real_text(rmf_diagnostic%beta%baryons%pressure_identity_residual))// &
+        ',"scalar_field_residual_mev":'//trim(real_text(rmf_diagnostic%beta%baryons%scalar_field_residual))// &
+        ',"sigma_rearrangement_mev":'//trim(real_text(rmf_diagnostic%beta%baryons%sigma_r))// &
+        ',"symmetry_step":'//trim(real_text(rmf_diagnostic%symmetry_step))// &
+        ',"symmetry_second_derivative_mev":'//trim(real_text(rmf_diagnostic%symmetry_second_derivative))// &
+        ',"symmetry_pnm_minus_snm_mev":'//trim(real_text(rmf_diagnostic%symmetry_pnm_minus_snm))//'}'
+    else
+      write(*,'(a)')'{"status":"ok","operation":"rmf-evaluate","model":"'//trim(arg1)// &
+        '","rho_b_fm3":'//trim(real_text(n_max_requested))// &
+        ',"yp":'//trim(real_text(rmf_diagnostic%beta%yp))// &
+        ',"ye":'//trim(real_text(rmf_diagnostic%beta%ye))// &
+        ',"ymu":'//trim(real_text(rmf_diagnostic%beta%ymu))// &
+        ',"rho_e_fm3":'//trim(real_text(rmf_diagnostic%beta%rho_e))// &
+        ',"rho_mu_fm3":'//trim(real_text(rmf_diagnostic%beta%rho_mu))// &
+        ',"mu_e_mev":'//trim(real_text(rmf_diagnostic%beta%mu_e))// &
+        ',"mu_mu_mev":null,"muon_branch":"INACTIVE_BELOW_THRESHOLD"'// &
+        ',"muon_onset_rho_p_fm3":'//trim(real_text(rmf_diagnostic%beta%muon_onset_rho_p))// &
+        ',"muon_onset_gap_mev":'//trim(real_text(rmf_diagnostic%beta%muon_onset_gap))// &
+        ',"mu_n_mev":'//trim(real_text(rmf_diagnostic%beta%baryons%mu_n))// &
+        ',"mu_p_mev":'//trim(real_text(rmf_diagnostic%beta%baryons%mu_p))// &
+        ',"eps_total_mev_fm3":'//trim(real_text(rmf_diagnostic%beta%eps_total))// &
+        ',"pressure_total_mev_fm3":'//trim(real_text(rmf_diagnostic%beta%p_total))// &
+        ',"beta_residual_mev":'//trim(real_text(rmf_diagnostic%beta%beta_residual))// &
+        ',"charge_residual_fm3":'//trim(real_text(rmf_diagnostic%beta%charge_residual))// &
+        ',"pressure_identity_residual_mev_fm3":'//trim(real_text(rmf_diagnostic%beta%baryons%pressure_identity_residual))// &
+        ',"scalar_field_residual_mev":'//trim(real_text(rmf_diagnostic%beta%baryons%scalar_field_residual))// &
+        ',"sigma_rearrangement_mev":'//trim(real_text(rmf_diagnostic%beta%baryons%sigma_r))// &
+        ',"symmetry_step":'//trim(real_text(rmf_diagnostic%symmetry_step))// &
+        ',"symmetry_second_derivative_mev":'//trim(real_text(rmf_diagnostic%symmetry_second_derivative))// &
+        ',"symmetry_pnm_minus_snm_mev":'//trim(real_text(rmf_diagnostic%symmetry_pnm_minus_snm))//'}'
+    endif
   case('read')
     if(narg/=3)then;call emit_failure('read requires input CompOSE directory and output directory');stop 2;endif
     call read_compose(trim(arg1),eos,status)
@@ -83,27 +157,50 @@ program compose_eos_fortran
     if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
     write(*,'(a)')'{"status":"ok","operation":"write","n":'//integer_text(eos%n)//'}'
   case('fill-gap')
-    if(narg/=5.and.narg/=6)then
-      call emit_failure('fill-gap requires input internal EOS directory, output directory, n_fill, fit_points, and optional gap_phase');stop 2
+    if(narg<5.or.narg>7)then
+      call emit_failure('fill-gap requires input internal EOS directory, output directory, n_fill, fit_points, and optional gap_phase and min_ratio');stop 2
     endif
     read(arg3,*,iostat=ios)n_fill
     if(ios/=0)then;call emit_failure('invalid n_fill');stop 2;endif
     read(arg4,*,iostat=ios)fit_points
     if(ios/=0)then;call emit_failure('invalid fit_points');stop 2;endif
-    has_gap_phase=narg==6;gap_phase=0
-    if(has_gap_phase)then
-      read(arg5,*,iostat=ios)gap_phase
-      if(ios/=0)then;call emit_failure('invalid gap_phase');stop 2;endif
+    has_gap_phase=.false.;gap_phase=0
+    min_ratio_local=5._wp
+    has_min_ratio=.false.
+    ! remaining args: gap_phase, then min_ratio (or just min_ratio)
+    if(narg>=6)then
+      ! arg5 could be gap_phase (int) or min_ratio (real); disambiguate by presence of a '.'
+      if(index(arg5,'.')>0.or.index(arg5,'e')>0.or.index(arg5,'E')>0)then
+        read(arg5,*,iostat=ios)min_ratio_local
+        if(ios/=0)then;call emit_failure('invalid min_ratio');stop 2;endif
+        has_min_ratio=.true.
+        if(narg==7)then;call emit_failure('fill-gap: gap_phase and min_ratio both given but gap_phase must come first');stop 2;endif
+      else
+        has_gap_phase=.true.
+        read(arg5,*,iostat=ios)gap_phase
+        if(ios/=0)then;call emit_failure('invalid gap_phase');stop 2;endif
+        if(narg==7)then
+          read(arg6,*,iostat=ios)min_ratio_local
+          if(ios/=0)then;call emit_failure('invalid min_ratio');stop 2;endif
+          has_min_ratio=.true.
+        endif
+      endif
     endif
     call read_internal_csv(trim(arg1)//'/eos_data.csv',trim(arg1)//'/eos_data.nml',eos,status)
     if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
-    call fill_density_gap(eos,n_fill,fit_points,gap_phase,has_gap_phase,out,status)
+    if(has_min_ratio)then
+      call fill_density_gap(eos,n_fill,fit_points,gap_phase,has_gap_phase,out,status,min_ratio_local,igap_sel,best_sel)
+    else
+      call fill_density_gap(eos,n_fill,fit_points,gap_phase,has_gap_phase,out,status,igap_out=igap_sel,best_out=best_sel)
+    endif
     if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
     call write_internal_csv(trim(arg2)//'/eos_data.csv',out,status)
     if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
     call write_metadata(trim(arg2)//'/eos_data.nml',out,status)
     if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
-    write(*,'(a)')'{"status":"ok","operation":"fill-gap","n":'//integer_text(out%n)//'}'
+    write(why,'(a,i0,a,i0,a,g0.6,a)')'{"status":"ok","operation":"fill-gap","n":',out%n,&
+      ',"igap":',igap_sel,',"best_ratio":',best_sel,'}'
+    write(*,'(a)')trim(why)
   case('causal-complete')
     if(narg/=6)then
       call emit_failure('causal-complete requires input internal directory, output directory, cs2_extension, n_max (zero selects source maximum), and n_points');stop 2
@@ -174,6 +271,8 @@ program compose_eos_fortran
       ',"cs2_min":'//real_text(match_report%cs2_min)//',"cs2_max":'//real_text(match_report%cs2_max)// &
       ',"pressure_span":'//real_text(match_report%pressure_span)// &
       ',"first_law_relative_residual":'//real_text(match_report%first_law_relative_residual)// &
+      ',"dm_mass_gauge_meV":'//real_text(match_report%dm_mass_gauge_meV)// &
+      ',"source_euler_residual_meV":'//real_text(match_report%source_euler_residual_meV)// &
       ',"composition_dropped":'//logical_text(match_report%composition_dropped)// &
       ',"is_exact_maxwell":'//logical_text(match_report%is_exact_maxwell)// &
       ',"seidov_applicable":'//logical_text(match_report%seidov_applicable)//'}'
@@ -263,6 +362,137 @@ program compose_eos_fortran
       ',"max_cs2_high":'//real_text(phase_report%max_cs2_high)// &
       ',"min_cs2":'//real_text(min(phase_report%min_cs2_low,phase_report%min_cs2_high))// &
       ',"max_cs2":'//real_text(max(phase_report%max_cs2_low,phase_report%max_cs2_high))//'}'
+  case('extract-core')
+    if(narg/=7)then
+      call emit_failure('extract-core requires SOURCE_COMPOSE OUTPUT_COMPOSE FIRST_ROW LAST_ROW EXPECTED_SOURCE_N EXPECTED_Iphase_OR_MINUS1');stop 2
+    endif
+    read(arg3,*,iostat=ios)core_first
+    if(ios/=0)then;call emit_failure('invalid FIRST_ROW');stop 2;endif
+    read(arg4,*,iostat=ios)core_last
+    if(ios/=0)then;call emit_failure('invalid LAST_ROW');stop 2;endif
+    read(arg5,*,iostat=ios)expected_source_n
+    if(ios/=0)then;call emit_failure('invalid EXPECTED_SOURCE_N');stop 2;endif
+    read(arg6,*,iostat=ios)expected_phase
+    if(ios/=0)then;call emit_failure('invalid EXPECTED_Iphase');stop 2;endif
+    call read_compose(trim(arg1),eos,status)
+    if(status/='ok')then;call emit_failure('invalid source CompOSE table: '//trim(status));stop 3;endif
+    call extract_core_rows(eos,core_first,core_last,expected_source_n,expected_phase,out,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    call write_compose(trim(arg2),out,status)
+    if(status/='ok')then;call emit_failure('native core-only CompOSE write failed: '//trim(status));stop 3;endif
+    call read_compose(trim(arg2),readback,status)
+    if(status/='ok')then;call emit_failure('native core-only CompOSE readback failed: '//trim(status));stop 3;endif
+    call verify_core_roundtrip(out,readback,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 4;endif
+    write(*,'(a)')'{"status":"ok","operation":"extract-core","n":'//integer_text(out%n)// &
+      ',"first_source_row":'//integer_text(core_first)//',"last_source_row":'//integer_text(core_last)// &
+      ',"source_inb_start":'//integer_text(eos%inb_start)//',"output_inb_start":'//integer_text(out%inb_start)// &
+      ',"expected_phase":'//integer_text(expected_phase)//',"native_readback":"PASS"}'
+  case('extract-crust')
+    if(narg/=7)then
+      call emit_failure('extract-crust requires SOURCE_COMPOSE OUTPUT_COMPOSE EXPECTED_SOURCE_N OUTER_LAST EXPECTED_OUTER_Iphase EXPECTED_INNER_Iphase');stop 2
+    endif
+    read(arg3,*,iostat=ios)expected_source_n
+    if(ios/=0)then;call emit_failure('invalid EXPECTED_SOURCE_N');stop 2;endif
+    read(arg4,*,iostat=ios)crust_outer_last
+    if(ios/=0)then;call emit_failure('invalid OUTER_LAST');stop 2;endif
+    read(arg5,*,iostat=ios)expected_outer_phase
+    if(ios/=0)then;call emit_failure('invalid EXPECTED_OUTER_Iphase');stop 2;endif
+    read(arg6,*,iostat=ios)expected_inner_phase
+    if(ios/=0)then;call emit_failure('invalid EXPECTED_INNER_Iphase');stop 2;endif
+    call read_compose(trim(arg1),eos,status)
+    if(status/='ok')then;call emit_failure('invalid source CompOSE table: '//trim(status));stop 3;endif
+    call extract_crust_rows(eos,expected_source_n,crust_outer_last,expected_outer_phase, &
+      expected_inner_phase,out,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    call write_compose(trim(arg2),out,status,allow_source_physical_violations=.true.)
+    if(status/='ok')then;call emit_failure('native source-preserving crust-only CompOSE write failed: '//trim(status));stop 3;endif
+    call read_compose(trim(arg2),readback,status)
+    if(status/='ok')then;call emit_failure('native crust-only CompOSE readback failed: '//trim(status));stop 3;endif
+    call verify_core_roundtrip(out,readback,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 4;endif
+    write(*,'(a)')'{"status":"ok","operation":"extract-crust","n":'//integer_text(out%n)// &
+      ',"outer_last_source_row":'//integer_text(crust_outer_last)// &
+      ',"inner_first_source_row":'//integer_text(crust_outer_last+1)// &
+      ',"outer_neutron_drip_nb":'//real_text(out%nb(crust_outer_last))// &
+      ',"native_readback":"PASS"}'
+  case('cld-reconstruct')
+    ! Native CLD inner-crust reconstruction (E390-03 remaining subscope).
+    !   arg1 = model_id (GPPVA_DD2/GPPVA_DDME2/GPPVA_TW)
+    !   arg2 = sigma_0 (MeV/fm^2 surface tension scale, default 1.0)
+    !   arg3 = b       (Lattimer exponent, default 1.0)
+    !   arg4 = rho_min  (fm^-3, default 0.001)
+    !   arg5 = rho_max  (fm^-3, default 0.08)
+    !   arg6 = n_points (default 20)
+    if(narg<2)then
+      call emit_failure('cld-reconstruct requires model_id');stop 2
+    endif
+    cld_sigma_0=1.0_wp; cld_b=1.0_wp
+    cld_rho_min=0.001_wp; cld_rho_max=0.08_wp
+    cld_n_points=20
+    if(narg>=3)then
+      read(arg2,*,iostat=ios)cld_sigma_0
+      if(ios/=0)then;call emit_failure('invalid sigma_0 for cld-reconstruct');stop 2;endif
+    endif
+    if(narg>=4)then
+      read(arg3,*,iostat=ios)cld_b
+      if(ios/=0)then;call emit_failure('invalid b for cld-reconstruct');stop 2;endif
+    endif
+    if(narg>=5)then
+      read(arg4,*,iostat=ios)cld_rho_min
+      if(ios/=0)then;call emit_failure('invalid rho_min for cld-reconstruct');stop 2;endif
+    endif
+    if(narg>=6)then
+      read(arg5,*,iostat=ios)cld_rho_max
+      if(ios/=0)then;call emit_failure('invalid rho_max for cld-reconstruct');stop 2;endif
+    endif
+    if(narg>=7)then
+      read(arg6,*,iostat=ios)cld_n_points
+      if(ios/=0)then;call emit_failure('invalid n_points for cld-reconstruct');stop 2;endif
+    endif
+    call cld_reconstruct_model(trim(arg1),cld_sigma_0,cld_b,cld_rho_min,cld_rho_max,cld_n_points)
+  case('tov-love')
+    ! Native TOV + l=2 tidal Love solver (E390-06 / M6).
+    !   tov-love smooth <P_eps.csv> <central_pressure_MeV_fm3>
+    !   tov-love maxwell <high_P_eps.csv> <low_P_eps.csv> <P_trans_MeV_fm3> <delta_eps_MeV_fm3> <central_pressure_MeV_fm3>
+    ! Each CSV is "P,eps" (one pair per line, strictly increasing P), MeV/fm^3.
+    if(narg<4)then
+      call emit_failure('tov-love requires mode smooth|maxwell and inputs');stop 2
+    endif
+    select case(trim(arg1))
+    case('smooth')
+      if(narg/=4)then;call emit_failure('tov-love smooth requires <csv> <central_pressure>');stop 2;endif
+      read(arg3,*,iostat=ios)tov_pc
+      if(ios/=0)then;call emit_failure('invalid central pressure for tov-love');stop 2;endif
+      call read_peps_csv(trim(arg2),tov_p_high,tov_e_high,tov_n_high,status)
+      if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+      call solve_tov_love_smooth(tov_n_high,tov_p_high,tov_e_high,tov_pc,tov_result)
+      if(.not.tov_result%converged)then
+        call emit_failure('tov-love smooth did not converge: '//trim(tov_result%status));stop 3
+      endif
+      call emit_tov_json('smooth',tov_result)
+    case('maxwell')
+      if(narg/=7)then;call emit_failure('tov-love maxwell requires <high.csv> <low.csv> <P_trans> <delta_eps> <central_pressure>');stop 2;endif
+      read(arg4,*,iostat=ios)tov_ptrans
+      if(ios/=0)then;call emit_failure('invalid P_trans for tov-love maxwell');stop 2;endif
+      read(arg5,*,iostat=ios)tov_deps
+      if(ios/=0)then;call emit_failure('invalid delta_eps for tov-love maxwell');stop 2;endif
+      read(arg6,*,iostat=ios)tov_pc
+      if(ios/=0)then;call emit_failure('invalid central pressure for tov-love maxwell');stop 2;endif
+      call read_peps_csv(trim(arg2),tov_p_high,tov_e_high,tov_n_high,status)
+      if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+      call read_peps_csv(trim(arg3),tov_p_low,tov_e_low,tov_n_low,status)
+      if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+      call solve_tov_love_maxwell(tov_n_high,tov_p_high,tov_e_high, &
+                                  tov_n_low,tov_p_low,tov_e_low, &
+                                  tov_ptrans,tov_deps,tov_pc,tov_result)
+      if(.not.tov_result%converged)then
+        call emit_failure('tov-love maxwell did not converge: '//trim(tov_result%status));stop 3
+      endif
+      call emit_tov_json('maxwell',tov_result)
+    case default
+      call emit_failure('tov-love mode must be smooth|maxwell');stop 2
+    end select
   case default
     call emit_failure('unknown operation: '//trim(action));stop 2
   end select
@@ -290,4 +520,113 @@ contains
       s='false'
     endif
   end function
+
+  ! Read a "P,eps" CSV (one pair per line, MeV/fm^3) into allocatable arrays.
+  subroutine read_peps_csv(path, P_arr, eps_arr, n, status)
+    character(len=*), intent(in) :: path
+    real(wp), allocatable, intent(out) :: P_arr(:), eps_arr(:)
+    integer, intent(out) :: n
+    character(len=*), intent(out) :: status
+    integer :: u, ios, i
+    character(len=4096) :: line
+    character(len=96) :: tok(32)
+    integer :: nt
+    real(wp) :: pv, ev
+    logical :: ok
+    status = ''
+    n = 0
+    open(newunit=u, file=trim(path), status='old', action='read', iostat=ios)
+    if(ios/=0) then; status='cannot open P,eps CSV: '//trim(path); return; endif
+    do
+      read(u, '(a)', iostat=ios) line
+      if(ios<0) exit
+      if(ios>0) then; close(u); status='error reading P,eps CSV'; return; endif
+      n = n + 1
+    end do
+    close(u)
+    if(n<2) then; status='P,eps CSV needs at least 2 rows'; return; endif
+    allocate(P_arr(n), eps_arr(n))
+    open(newunit=u, file=trim(path), status='old', action='read', iostat=ios)
+    if(ios/=0) then; status='cannot reopen P,eps CSV'; return; endif
+    do i = 1, n
+      read(u, '(a)', iostat=ios) line
+      if(ios/=0) then; close(u); status='unexpected EOF in P,eps CSV'; return; endif
+      call split_csv_tokens(line, tok, nt)
+      if(nt<2) then; close(u); status='P,eps CSV row needs 2 columns'; return; endif
+      call csv_real(tok(1), pv, ok)
+      if(.not. ok) then; close(u); status='invalid P in P,eps CSV'; return; endif
+      call csv_real(tok(2), ev, ok)
+      if(.not. ok) then; close(u); status='invalid eps in P,eps CSV'; return; endif
+      P_arr(i) = pv; eps_arr(i) = ev
+    end do
+    close(u)
+    do i = 1, n-1
+      if(P_arr(i) >= P_arr(i+1)) then; status='P must be strictly increasing'; return; endif
+    end do
+    status = 'ok'
+  end subroutine read_peps_csv
+
+  ! Emit the TOV+Love result as a JSON object to stdout.
+  subroutine emit_tov_json(mode, r)
+    character(len=*), intent(in) :: mode
+    type(tov_love_result_t), intent(in) :: r
+    write(*, '(a)', advance='no') &
+      '{"status":"ok","operation":"tov-love","mode":"'//trim(mode)// &
+      '","converged":'//merge('true ','false',r%converged)// &
+      ',"R_km":'//trim(real_text(r%r_km))// &
+      ',"M_msun":'//trim(real_text(r%m_msun))// &
+      ',"compactness":'//trim(real_text(r%compactness))// &
+      ',"k2":'//trim(real_text(r%k2))// &
+      ',"Lambda":'//trim(real_text(r%lambda_tidal))// &
+      ',"y_surface":'//trim(real_text(r%y_surface))// &
+      ',"central_pressure_MeV_fm3":'//trim(real_text(r%central_pressure))// &
+      ',"central_eps_MeV_fm3":'//trim(real_text(r%central_eps))// &
+      ',"n_steps":'//trim(integer_text(r%n_steps))// &
+      ',"status_msg":"'//trim(r%status)//'"'
+    if(r%has_transition) then
+      write(*, '(a)', advance='no') &
+        ',"has_transition":true,'// &
+        '"r_transition_km":'//trim(real_text(r%r_transition_km))// &
+        ',"m_transition_msun":'//trim(real_text(r%m_transition_msun))// &
+        ',"p_transition_MeV_fm3":'//trim(real_text(r%p_transition_mevfm3))// &
+        ',"delta_eps_MeV_fm3":'//trim(real_text(r%delta_eps_mevfm3))// &
+        ',"delta_y":'//trim(real_text(r%delta_y))
+    else
+      write(*, '(a)', advance='no') ',"has_transition":false'
+    endif
+    write(*, '(a)') '}'
+  end subroutine emit_tov_json
+
+  ! CSV token splitter (comma delimiter) — minimal, no quoted-field handling.
+  subroutine split_csv_tokens(line, tok, nt)
+    character(len=*), intent(in) :: line
+    character(len=96), intent(out) :: tok(32)
+    integer, intent(out) :: nt
+    integer :: i, j, start
+    nt = 0; start = 1
+    do i = 1, len_trim(line)
+      if(line(i:i)==',') then
+        if(nt>=32) return
+        nt = nt + 1
+        tok(nt) = adjustl(line(start:i-1))
+        start = i + 1
+      endif
+    end do
+    if(start <= len_trim(line)) then
+      if(nt<32) then
+        nt = nt + 1
+        tok(nt) = adjustl(line(start:len_trim(line)))
+      endif
+    endif
+  end subroutine split_csv_tokens
+
+  subroutine csv_real(s, v, ok)
+    character(len=*), intent(in) :: s
+    real(wp), intent(out) :: v
+    logical, intent(out) :: ok
+    integer :: ios
+    read(s, *, iostat=ios) v
+    ok = (ios==0)
+  end subroutine csv_real
+
 end program compose_eos_fortran

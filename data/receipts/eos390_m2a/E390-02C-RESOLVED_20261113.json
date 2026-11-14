@@ -1,0 +1,54 @@
+{
+  "receipt_id": "E390-02C-RESOLVED_20261113",
+  "node": "E390-02C",
+  "gate": "FORTRAN_BACKEND_PARITY",
+  "title": "Remove remaining production-path numerical selectors from Python",
+  "prior_status": "STATIC_AUDIT_COMPLETE_MIGRATION_NOT_IMPLEMENTED",
+  "resolved_status": "IMPLEMENTED_CI_PASS",
+  "resolution_date": "2026-11-13",
+  "branch": "cloud/eos390-fortran-unification-v1",
+  "finding": "The static audit flagged find_density_gap (Python NumPy argmax) as a production-path numerical selector running before the native Fortran fill-gap command. Inspection showed the Fortran fill_density_gap subroutine (compose_eos_reconstruct.f90) already performed its own gap selection (lines 155-159: argmax of adjacent nb ratios) and phase-boundary safety check (lines 161-164), so the Python find_density_gap was a redundant pre-pass that violated the E390-02C contract. Resolution: move the selector authority entirely to Fortran, forward the threshold to the native operation, and report the chosen index/ratio back to Python.",
+  "changes": {
+    "fortran_backend": {
+      "file": "fortran_eos/src/compose_eos_reconstruct.f90",
+      "subroutine": "fill_density_gap",
+      "change": "Added optional intent(in) min_ratio (default 5.0 if absent) and optional intent(out) igap_out, best_out. The hardcoded threshold 5._wp (line 160) is now min_ratio_local with a range check (min_ratio>1). The chosen igap and best ratio are exposed to the caller via the optional outputs. Backward compatible: existing callers without min_ratio/igap_out/best_out get the prior behaviour with min_ratio=5.0.",
+      "lines": "137-180 (signature + selector block)"
+    },
+    "fortran_app_cli": {
+      "file": "fortran_eos/app/compose_eos_fortran.f90",
+      "change": "fill-gap command now accepts an optional min_ratio (real) and reports igap/best_ratio in its JSON output. Argument disambiguation: arg5 is gap_phase (integer, no decimal point) or min_ratio (real, has '.'/'e'); arg6 (if present) is min_ratio after gap_phase. New program-scope declarations: min_ratio_local, best_sel (real(wp)); igap_sel (integer); has_min_ratio, why (char). The success JSON is now {status,operation,n,igap,best_ratio} via a corrected write format '(a,i0,a,i0,a,g0.6,a)' (igap=i0, best_ratio=g0.6) — an earlier '(a,i0,a,g0.6,a,i0,a)' had the descriptors swapped and caused a Fortran runtime type-mismatch on the REAL best_sel.",
+      "lines": "85-133 (fill-gap case)"
+    },
+    "python_api": {
+      "file": "python_frontend/compose_eos/api.py",
+      "change": "find_density_gap is DEPRECATED (emits DeprecationWarning); it now delegates to the native selector via a zero-fill probe and decodes the native report, converting the 1-based Fortran igap to a 0-based Python index for caller compatibility. fill_density_gap no longer calls find_density_gap or runs a Python phase-boundary pre-check; it forwards min_ratio (default 5.0, only appended to the command when != 5.0 for legacy-binary compatibility) to the native Fortran selector and accepts return_report=True to return (EOSData, report_dict) where report_dict carries igap (1-based) and best_ratio. The phase-cross rejection now surfaces from Fortran as NativeExecutionError('density gap crosses phase IDs; pass gap_phase explicitly') instead of a Python ValueError."
+    },
+    "tests_updated": {
+      "file": "python_frontend/tests/test_native_density_gap.py",
+      "change": "test_native_density_gap_rejects_implicit_cross_phase_fill now expects NativeExecutionError (was ValueError) since the phase-boundary check is Fortran-owned. test_native_density_gap_matches_gppva_source_cohort_contract now uses fill_density_gap(return_report=True) and converts the 1-based Fortran igap to a 0-based index (report['igap']-1) before indexing source.Iphase."
+    }
+  },
+  "acceptance_verification": {
+    "findings_addressed": [
+      {
+        "finding": "find_density_gap in api.py uses NumPy argmax of adjacent density ratios to select the largest gap; fill_density_gap calls this selector before invoking the native Fortran fill-gap command.",
+        "resolution": "find_density_gap is deprecated; fill_density_gap no longer pre-computes the gap index. The native Fortran fill_density_gap owns the argmax selection (min_ratio parameter) and the phase-boundary safety check. Python forwards the threshold and decodes the native report (igap, best_ratio).",
+        "verdict": "PASS"
+      }
+    ],
+    "remaining_findings_diagnostic_only": "The other audit findings (count_nodes in solver.py; PAV/Hermite/integration in pipeline/compose_cowling/adapter.py; SciPy PCHIP/Gauss-Legendre in direct_barotrope.py; first-law/monotonicity in intake.py) are classified as diagnostic/reference-only per the audit and are not on the EOS390 production path; E390-02C's production-path mandate is satisfied by the find_density_gap migration.",
+    "test_results": {
+      "test_native_density_gap": "16 passed",
+      "python_frontend_full_suite": "91 passed, 2 skipped",
+      "regressions": "none"
+    },
+    "indexing_contract": "The native Fortran selector reports a 1-based igap (it loops j=1,n-1). Python callers indexing into 0-based NumPy arrays must subtract 1. find_density_gap (deprecated) and the test both perform this conversion. fill_density_gap(return_report=True) returns the raw 1-based igap in the report dict and documents this contract in its docstring."
+  },
+  "build_environment": "Built locally with conda-forge gfortran 15.2.0 (x86_64-conda-linux-gnu-gfortran) since the sandbox lacks apt-sudo access; CI uses 'sudo apt-get install -y gfortran' (standard gfortran name) so no symlink is needed in CI. build.sh uses FC=${FC:-gfortran} so CI's default gfortran builds the augmented backend directly.",
+  "downstream_impact": {
+    "E390_02": "the production-path numerical selector is now Fortran-owned, advancing the FORTRAN_BACKEND_PARITY gate",
+    "E390_03_plus": "downstream pipelines calling fill_density_gap with non-default thresholds can now pass min_ratio natively without a Python pre-pass; return_report exposes the selected gap for diagnostic and matching use"
+  },
+  "next_node_recommendation": "E390-02C production-path migration complete. The next DAG action is E390-10 (general CompOSE axes + lossless 1D/2D/3D reader/writer) — test_m10_generic_axes already passes (6 passed, 2 skipped), so it warrants a status audit to determine if it is near-resolved (cold-slice path) or genuinely pending (full multidim reader)."
+}

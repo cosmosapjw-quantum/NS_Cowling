@@ -1,0 +1,143 @@
+{
+  "node": "E390-B3",
+  "subscope": "euler_tolerance_empirical_derivation",
+  "date": "2026-11-14",
+  "fortran_value_unchanged": 0.0005,
+  "definition": "max_euler = max over rows of |mu_source - mu_Euler| / |mu_Euler|, mu_source=mn*(1+Q3), mu_Euler=(eps+P)/n_B",
+  "worst_case_residual": 0.00011513420719356455,
+  "worst_case_model": "RG_KDE0v1",
+  "safety_margin_5e4_over_worst": 4.342758005528244,
+  "derivation": "5e-4 = 4.3x the largest observed source-table Euler residual (1.151e-04, RG_KDE0v1). The residual is a uniform systematic offset from the crust providers' 10-sig-fig Q3 print (~0.02-0.1 MeV), NOT 10-sig-fig rounding noise (floor ~5e-11). Core tables pass at machine precision (~1e-16). 5e-4 admits all 18 source tables with a 4.3x margin while rejecting genuine inconsistencies (O(1e-1)).",
+  "rounding_floor_note": "NOT derivable from 10-sig-fig precision: Q3 rounding floor ~5e-11, FD derivative floor ~1e-9. Observed residual 1e-4 is 5 orders of magnitude above the rounding floor. Tightening to the rounding-floor value would falsely reject all 13 GPPVA/SPG crust tables and RG_SLY4/RG_KDE0v1.",
+  "source_tables_passing_5e4": 18,
+  "source_tables_failing_5e4": 0,
+  "recommendation": "keep 5e-4 unchanged; the Fortran source comment (line 9 block) documents the empirical basis. No behavior change.",
+  "per_model": [
+    {
+      "model": "APR_APR",
+      "max_euler_residual": 3.5440579572034276e-16,
+      "mn": 939.56533,
+      "n_rows": 172,
+      "passes_5e4_gate": true
+    },
+    {
+      "model": "BBB_BHF2",
+      "max_euler_residual": 2.4415900465763727e-16,
+      "mn": 939.56533,
+      "n_rows": 84,
+      "passes_5e4_gate": true
+    },
+    {
+      "model": "GM_GM1",
+      "max_euler_residual": 2.7301219591657268e-11,
+      "mn": 939.56533,
+      "n_rows": 349,
+      "passes_5e4_gate": true
+    },
+    {
+      "model": "GPPVA_DD2",
+      "max_euler_residual": 8.758118038681777e-05,
+      "mn": 939.0,
+      "n_rows": 283,
+      "passes_5e4_gate": true
+    },
+    {
+      "model": "GPPVA_DDME2",
+      "max_euler_residual": 8.97839735230574e-05,
+      "mn": 939.0,
+      "n_rows": 288,
+      "passes_5e4_gate": true
+    },
+    {
+      "model": "GPPVA_FSU2",
+      "max_euler_residual": 1.198855527403862e-06,
+      "mn": 939.0,
+      "n_rows": 269,
+      "passes_5e4_gate": true
+    },
+    {
+      "model": "GPPVA_FSU2H",
+      "max_euler_residual": 1.5379901058898197e-06,
+      "mn": 939.0,
+      "n_rows": 300,
+      "passes_5e4_gate": true
+    },
+    {
+      "model": "GPPVA_FSU2R",
+      "max_euler_residual": 2.5971666261375664e-06,
+      "mn": 939.0,
+      "n_rows": 296,
+      "passes_5e4_gate": true
+    },
+    {
+      "model": "GPPVA_NL3wrL55",
+      "max_euler_residual": 3.2139851048496636e-06,
+      "mn": 939.0,
+      "n_rows": 298,
+      "passes_5e4_gate": true
+    },
+    {
+      "model": "GPPVA_TM1e",
+      "max_euler_residual": 3.3173306110615447e-06,
+      "mn": 938.0,
+      "n_rows": 303,
+      "passes_5e4_gate": true
+    },
+    {
+      "model": "GPPVA_TW",
+      "max_euler_residual": 1.475502610544452e-06,
+      "mn": 939.0,
+      "n_rows": 289,
+      "passes_5e4_gate": true
+    },
+    {
+      "model": "RG_KDE0v1",
+      "max_euler_residual": 0.00011513420719356455,
+      "mn": 939.56533,
+      "n_rows": 1240,
+      "passes_5e4_gate": true
+    },
+    {
+      "model": "RG_SLY4",
+      "max_euler_residual": 0.00011285770347265308,
+      "mn": 939.5654,
+      "n_rows": 197,
+      "passes_5e4_gate": true
+    },
+    {
+      "model": "SPG_M1",
+      "max_euler_residual": 1.4105003690089034e-06,
+      "mn": 938.9,
+      "n_rows": 365,
+      "passes_5e4_gate": true
+    },
+    {
+      "model": "SPG_M2",
+      "max_euler_residual": 1.4105003690089034e-06,
+      "mn": 938.9,
+      "n_rows": 377,
+      "passes_5e4_gate": true
+    },
+    {
+      "model": "SPG_M3",
+      "max_euler_residual": 1.4105003690089034e-06,
+      "mn": 938.9,
+      "n_rows": 366,
+      "passes_5e4_gate": true
+    },
+    {
+      "model": "SPG_M4",
+      "max_euler_residual": 1.4105003690089034e-06,
+      "mn": 938.9,
+      "n_rows": 375,
+      "passes_5e4_gate": true
+    },
+    {
+      "model": "SPG_M5",
+      "max_euler_residual": 1.4105003690089034e-06,
+      "mn": 938.9,
+      "n_rows": 363,
+      "passes_5e4_gate": true
+    }
+  ]
+}

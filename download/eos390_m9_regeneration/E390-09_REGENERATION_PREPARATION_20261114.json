@@ -1,0 +1,80 @@
+{
+  "node": "E390-09",
+  "subscope": "regeneration_preparation",
+  "date": "2026-11-14",
+  "generated_utc": "2026-11-14T07:31:28.822019+00:00",
+  "batch_root": "download/m7_batch_v2_20261114_full",
+  "versioned_folder_layout": {
+    "manifest": "download/m7_batch_v2_20261114_full/M7_BATCH_MANIFEST_v2.json",
+    "manifest_sha256": "658340d7cc881e164be8707dd1a0812637adbdfd0388f2dede16c1b63366c77a",
+    "task_output_pattern": "download/m7_batch_v2_20261114_full/<task_id>_<crust>_<core>_<method>/",
+    "per_task_contents": [
+      "compose/eos.thermo",
+      "compose/eos.nb",
+      "compose/eos.t",
+      "compose/eos.yq",
+      "internal/eos_data.csv",
+      "internal/eos_data.nml",
+      "crust_internal/",
+      "core_internal/",
+      "readback_internal/",
+      "task_receipt.json"
+    ]
+  },
+  "batch_summary": {
+    "total_tasks": 390,
+    "status_counts": {
+      "PASS": 234,
+      "FAIL": 156
+    },
+    "pass_rate": "234/390",
+    "cardinality_check": true,
+    "unique_task_ids": true,
+    "fail_closed": true
+  },
+  "pass_by_method": {
+    "first_law_constrained_hermite_pressure_bridge": 39,
+    "css": 39,
+    "cubic_F": 39,
+    "cubic_P": 39,
+    "quintic_F": 39,
+    "quintic_P": 39
+  },
+  "pass_by_core": {
+    "APR_APR": 78,
+    "BBB_BHF2": 78,
+    "GM_GM1": 78
+  },
+  "fail_by_core": {
+    "RG_SLY4": 78,
+    "RG_KDE0v1": 78
+  },
+  "failure_analysis": {
+    "count": 156,
+    "all_failures_are_RG_cores": true,
+    "failure_reason": "native smooth matching requires beta-equilibrated cold barotropes",
+    "physics_interpretation": "RG_KDE0v1 and RG_SLY4 cores do not carry a valid beta-equilibrium branch for smooth matching against the 13 crust models; the native match-core gate correctly rejects these as FAIL (fail-closed), not as a silent physics violation. These 156 pairs are not regenerable via the smooth-matching path; they would require a sharp Maxwell transition (E390-05) or a source-side beta-equilibrium regeneration."
+  },
+  "validation_evidence": {
+    "c1_c11_report": "download/eos390_m8_validation_full/E390-08_c1_c11.json",
+    "differential": "download/eos390_m8_validation_full/E390-08_differential.json",
+    "edge_cases": "download/eos390_m8_validation_full/E390-08_edge_cases.json",
+    "convergence": "download/eos390_m8_validation_full/E390-08_convergence.json",
+    "note": "234 PASS tasks have readback PASS (combined_n == readback_n); 156 FAIL tasks are fail-closed (RG cores not beta-equilibrated)."
+  },
+  "remaining_publish_step": {
+    "step": "Dropbox research snapshot upload",
+    "blocker": "B0 (GitHub/Dropbox API token unavailable in sandbox)",
+    "status": "DEFERRED_TO_FUTURE_JOB per user instruction (2026-11-14)",
+    "what_is_needed": "upload download/m7_batch_v2_20261114_full/ as a versioned research snapshot to the project Dropbox, with the manifest SHA-256 and this receipt as the index"
+  },
+  "DAG_status_deltas": {
+    "E390-07": "PARTIAL_NATIVE_PIPELINE_MATCH_CORE_PASS_READBACK_REMAINS -> NATIVE_PIPELINE_READBACK_PASS_READY_FOR_FULL_BATCH (readback gap resolved: verify doesn't emit n; use 'read' for rowcount; compose-subdir path fixed; 6/6 sample PASS)",
+    "E390-08": "PENDING -> IMPLEMENTED_VALIDATION_FRAMEWORK_PASS (C1-C11 + differential + edge cases + convergence; 4 receipts produced for the full 390-task batch)",
+    "E390-09": "PENDING -> PREPARED_REGENERATION_BATCH_RUN_234_PASS_156_FAIL_CLOSED (full 390-task batch executed; 234 PASS, 156 FAIL-closed RG cores; Dropbox snapshot deferred to future job per B0)"
+  },
+  "evidence_status_deltas": {
+    "regenerated_390": "NOT_RUN -> RUN_234_PASS_156_FAIL_CLOSED (full native pipeline; 234 verified readback PASS, 156 RG-core beta-equilibrium FAIL-closed)"
+  },
+  "status": "REGENERATION_PREPARED_BATCH_RUN_VALIDATION_PASS_DROPBOX_DEFERRED"
+}

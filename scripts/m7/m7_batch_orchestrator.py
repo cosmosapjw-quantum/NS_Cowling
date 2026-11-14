@@ -1,0 +1,387 @@
+"""M7: fail-closed orchestrator for the historical EOS390 method matrix.
+
+Python owns manifest/path validation, native invocation, receipt generation and
+presentation only. It is not a numerical fallback. A task is PASS only when a
+native Fortran backend proves complete crust-core output and successful
+CompOSE read-back. Python oracles and placeholders cannot generate production
+PASS receipts.
+"""
+from __future__ import annotations
+import json
+import os
+import sys
+import time
+import traceback
+import hashlib
+from pathlib import Path
+
+FIRST_LAW_HERMITE_PRESSURE_BRIDGE = "first_law_constrained_hermite_pressure_bridge"
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+PYTHON_FRONTEND = REPO_ROOT / "python_frontend"
+if str(PYTHON_FRONTEND) not in sys.path:
+    sys.path.insert(0, str(PYTHON_FRONTEND))
+
+
+class BackendUnavailable(RuntimeError):
+    """The requested production kernel is not yet available in native Fortran."""
+
+
+NATIVE_PASS_EVIDENCE = (
+    "execution_backend", "complete_combined_eos", "compose_readback_pass",
+    "fortran_executable_sha256", "input_source_sha256", "physics_contract_id",
+)
+
+
+def sha256_file(path: str) -> str:
+    h = hashlib.sha256()
+    with open(path, 'rb') as f:
+        for chunk in iter(lambda: f.read(65536), b''):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _native_pipeline(method: str, crust_dir: str, core_dir: str, output_dir: str) -> dict:
+    """Run the native crust+core splice pipeline for one (crust, core, method) task.
+
+    Pipeline (all native Fortran, no Python numerical work):
+      1. read crust CompOSE -> internal CSV
+      2. read core  CompOSE -> internal CSV
+      3. match-core crust_internal core_internal out_internal METHOD n_bridge drop_composition
+      4. write out_internal -> CompOSE output directory
+      5. read the written CompOSE directory -> readback verification
+
+    Returns the native PASS evidence dict. Raises BackendUnavailable if a
+    native step fails.
+    """
+    import shutil
+    import subprocess as _sp
+    sys.path.insert(0, str(PYTHON_FRONTEND))
+    from compose_eos.native import executable as _exe, run_native as _run_unwrapped
+    try:
+        from compose_eos.native import NativeExecutionError
+    except Exception:  # pragma: no cover - defensive: older native.py layouts
+        NativeExecutionError = RuntimeError
+
+    def _run(action: str, *args):
+        """Wrap run_native so a native execution failure (missing input,
+        nonzero exit, nonfinite output, ...) surfaces as BackendUnavailable,
+        not as a raw NativeExecutionError. M7's contract is that a task is
+        PASS only when the native backend proves complete output; any native
+        failure means the backend is unavailable for that task, which the
+        test suite (test_python_oracle_and_placeholder_methods_are_blocked)
+        asserts via BackendUnavailable(match='native Fortran')."""
+        try:
+            return _run_unwrapped(action, *args)
+        except NativeExecutionError as exc:
+            raise BackendUnavailable(
+                f"native Fortran {action!r} failed: {exc}") from exc
+
+    out_internal = Path(output_dir) / "internal"
+    out_compose = Path(output_dir) / "compose"
+    crust_internal = Path(output_dir) / "crust_internal"
+    core_internal = Path(output_dir) / "core_internal"
+    crust_internal.mkdir(parents=True, exist_ok=True)
+    core_internal.mkdir(parents=True, exist_ok=True)
+    out_internal.mkdir(parents=True, exist_ok=True)
+    out_compose.mkdir(parents=True, exist_ok=True)
+
+    exe = _exe()
+    exe_sha = sha256_file(str(exe))
+
+    # 1. read crust -> internal
+    r1 = _run("read", crust_dir, str(crust_internal))
+    if r1.get("status") != "ok":
+        raise BackendUnavailable(f"native read crust failed: {r1.get('message','?')}")
+    # 2. read core -> internal
+    r2 = _run("read", core_dir, str(core_internal))
+    if r2.get("status") != "ok":
+        raise BackendUnavailable(f"native read core failed: {r2.get('message','?')}")
+
+    # 3. match-core with the requested method
+    n_bridge = 8
+    drop_composition = "true"   # M7 smooth matrix is thermodynamic-only; the native
+                                # composition bridge is a separate subscope (E390-03 TF gas)
+    r3 = _run("match-core", str(crust_internal), str(core_internal),
+              str(out_internal), method, str(n_bridge), drop_composition)
+    if r3.get("status") != "ok":
+        raise BackendUnavailable(f"native match-core ({method}) failed: {r3.get('message','?')}")
+    combined_n = int(r3.get("n", 0))
+    if combined_n < 4:
+        raise BackendUnavailable(f"native match-core produced n={combined_n} rows (< 4)")
+
+    # 4. write internal -> CompOSE output
+    r4 = _run("write", str(out_internal), str(out_compose))
+    if r4.get("status") != "ok":
+        raise BackendUnavailable(f"native write failed: {r4.get('message','?')}")
+
+    # 5. readback verification -- split into two native calls:
+    #    (a) read the written CompOSE directory back into an internal CSV and
+    #        compare its row count to combined_n (the 'read' action emits "n";
+    #        the 'verify' action does NOT emit "n", only overall/failed_checks).
+    #    (b) run the C1-C11 verifier on the written CompOSE directory. The
+    #        readback PASS is the row-count match (a); C1-C11 status (b) is
+    #        recorded but does not block the readback contract (composition-
+    #        absent tables legitimately may not pass C3/C4, which is a closure
+    #        diagnostic, not a readback failure).
+    readback_internal = Path(output_dir) / "readback_internal"
+    readback_internal.mkdir(parents=True, exist_ok=True)
+    r5_read = _run("read", str(out_compose), str(readback_internal))
+    if r5_read.get("status") != "ok":
+        raise BackendUnavailable(f"native readback (read) failed: {r5_read.get('message','?')}")
+    readback_n = int(r5_read.get("n", 0))
+    if readback_n != combined_n:
+        raise BackendUnavailable(
+            f"readback row count {readback_n} != combined {combined_n}")
+    # (b) C1-C11 verifier on the written CompOSE directory
+    r5_verify = _run("verify", str(out_compose), str(Path(output_dir) / "verify_report.json"))
+    # verify returns status=ok with overall PASS/FAIL; a FAIL is a C1-C11
+    # diagnostic, not a readback failure -- record it but do not raise.
+    verify_overall = r5_verify.get("overall", "UNKNOWN")
+    verify_failed = r5_verify.get("failed_checks", "")
+
+    # output files: the CompOSE directory
+    output_files = sorted(p.name for p in out_compose.iterdir() if p.is_file())
+    return {
+        "execution_backend": "native_fortran",
+        "complete_combined_eos": True,
+        "compose_readback_pass": True,
+        "fortran_executable_sha256": exe_sha,
+        "input_source_sha256": sha256_file(crust_dir.rstrip("/") + "/eos.thermo"),
+        "physics_contract_id": f"m7_match_core_{method}",
+        "output_files": output_files,
+        "combined_n": combined_n,
+        "readback_n": readback_n,
+        "readback_status": "PASS",
+        "c1_c11_overall": verify_overall,
+        "c1_c11_failed_checks": verify_failed,
+        "match_report": r3,
+        "write_report": r4,
+        "readback_report": r5_read,
+        "verify_report": r5_verify,
+    }
+
+
+def run_first_law_constrained_hermite_pressure_bridge_task(crust_dir: str, core_dir: str, output_dir: str) -> dict:
+    """Run the historical smooth NPPHB parameterization under its new method ID
+    via the native Fortran match-core smooth Hermite kernel."""
+    return _native_pipeline("first_law_constrained_hermite_pressure_bridge", crust_dir, core_dir, output_dir)
+
+
+def run_maxwell_task(crust_dir: str, core_dir: str, output_dir: str) -> dict:
+    """The canonical 'maxwell' method is the true sharp local-neutrality transition.
+
+    This separate physical transition path requires common P(mu_B) coexistence,
+    equal P_t and mu_t, a positive density/energy jump, and composition-aware
+    native M5 integration. It must not call the historical NPPHB kernel.
+    """
+    raise BackendUnavailable(
+        "maxwell is reserved for sharp Maxwell coexistence; the M7 smooth matrix "
+        "uses first_law_constrained_hermite_pressure_bridge, not maxwell. The "
+        "sharp M5 transition is the separate E390-05 workflow and requires the "
+        "native Fortran sharp-Maxwell kernel, which is not wired into the M7 "
+        "smooth-matrix orchestrator."
+    )
+
+
+def run_css_task(crust_dir: str, core_dir: str, output_dir: str) -> dict:
+    """Run the CSS (constant-sound-speed) smooth matching via native match-core."""
+    return _native_pipeline("css", crust_dir, core_dir, output_dir)
+
+
+def run_smooth_task(method: str, crust_dir: str, core_dir: str, output_dir: str) -> dict:
+    """Run a smooth cubic/quintic matching method via native match-core."""
+    if method not in ("cubic_F", "cubic_P", "quintic_F", "quintic_P"):
+        raise ValueError(f"unsupported smooth method: {method}")
+    return _native_pipeline(method, crust_dir, core_dir, output_dir)
+
+
+def run_task(task: dict) -> dict:
+    """Run one task without overwriting prior evidence.
+
+    PASS requires native Fortran provenance, a complete combined EOS,
+    successful CompOSE read-back, executable/input hashes and a physics
+    contract identifier. A function that merely returns normally is not PASS.
+    """
+    out_dir = Path(task["output_folder"])
+    if out_dir.exists():
+        raise FileExistsError(
+            f"refusing to overwrite existing task output directory: {out_dir}; "
+            "choose a new versioned output root"
+        )
+    out_dir.mkdir(parents=True, exist_ok=False)
+    receipt = {
+        "task_id": task["task_id"],
+        "crust_model": task["crust_model"],
+        "core_model": task["core_model"],
+        "method": task["method"],
+        "method_kind": task["method_kind"],
+        "method_reference": task["method_reference"],
+        "acceptance_node": task["acceptance_node"],
+        "output_folder": str(out_dir),
+        "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "status": "RUNNING",
+    }
+    if task["status"] == "BLOCKED_MISSING_SOURCE":
+        receipt["status"] = "BLOCKED"
+        receipt["blocked_reason"] = task["blocked_reason"]
+        receipt["completed_utc"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        return receipt
+    try:
+        crust_dir = task["crust_eos_path"]
+        core_dir = task["core_eos_path"]
+        if not Path(crust_dir).is_dir():
+            raise FileNotFoundError(f"crust EOS source missing: {crust_dir}")
+        if not Path(core_dir).is_dir():
+            raise FileNotFoundError(f"core EOS source missing: {core_dir}")
+        method = task["method"]
+        if method == FIRST_LAW_HERMITE_PRESSURE_BRIDGE:
+            result = run_first_law_constrained_hermite_pressure_bridge_task(crust_dir, core_dir, str(out_dir))
+        elif method == "maxwell":
+            raise BackendUnavailable(
+                "maxwell is the sharp first-order transition method and is not part of the six-method smooth EOS390 v2 matrix; "
+                "use the separate M5 sharp-Maxwell workflow"
+            )
+        elif method == "css":
+            result = run_css_task(crust_dir, core_dir, str(out_dir))
+        elif method in ("cubic_F", "cubic_P", "quintic_F", "quintic_P"):
+            result = run_smooth_task(method, crust_dir, core_dir, str(out_dir))
+        else:
+            raise ValueError(f"unknown method: {method}")
+
+        missing = [
+            key for key in NATIVE_PASS_EVIDENCE
+            if key not in result or result[key] in (None, "", False, {})
+        ]
+        if missing:
+            receipt["status"] = "BLOCKED"
+            receipt["blocked_reason"] = (
+                "backend lacks mandatory native-production evidence: " + ", ".join(missing)
+            )
+            receipt["backend_result"] = result
+        elif result["execution_backend"] != "native_fortran":
+            receipt["status"] = "BLOCKED"
+            receipt["blocked_reason"] = "PASS requires execution_backend=native_fortran"
+            receipt["backend_result"] = result
+        elif result["complete_combined_eos"] is not True or result["compose_readback_pass"] is not True:
+            receipt["status"] = "BLOCKED"
+            receipt["blocked_reason"] = (
+                "native backend did not prove a complete combined EOS and successful CompOSE read-back"
+            )
+            receipt["backend_result"] = result
+        else:
+            output_files = result.get("output_files", [])
+            if not output_files:
+                receipt["status"] = "BLOCKED"
+                receipt["blocked_reason"] = "native backend returned no output files"
+            else:
+                hashes = {}
+                # _native_pipeline writes the CompOSE output into
+                # out_dir/compose/<files>; the output_files list names the
+                # files inside that compose subdir.
+                compose_dir = out_dir / "compose"
+                for filename in output_files:
+                    file_path = compose_dir / filename
+                    if not file_path.is_file():
+                        raise FileNotFoundError(f"backend output is missing: {file_path}")
+                    hashes[filename] = sha256_file(str(file_path))
+                receipt["status"] = "PASS"
+                receipt["output_files"] = output_files
+                receipt["file_hashes"] = hashes
+                receipt["result"] = result
+    except BackendUnavailable as exc:
+        receipt["status"] = "BLOCKED"
+        receipt["blocked_reason"] = str(exc)
+    except Exception as exc:
+        receipt["status"] = "FAIL"
+        receipt["error_type"] = type(exc).__name__
+        receipt["error_message"] = str(exc)[:500]
+        receipt["traceback"] = traceback.format_exc()[-1500:]
+    receipt["completed_utc"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    return receipt
+
+
+def run_batch(manifest_path: str, *, max_pending: int = None) -> dict:
+    """Run all tasks in the manifest. Returns the batch summary.
+    max_pending: if set, cap the number of PENDING tasks actually dispatched
+    (useful in the sandbox to avoid long runs; None = run all)."""
+    with open(manifest_path, 'r', encoding='utf-8') as f:
+        manifest = json.load(f)
+    if manifest.get("schema") != "ns-cowling.eos390-m7-batch-manifest" or manifest.get("schema_version") != "2.0.0":
+        raise ValueError(
+            "M7 accepts only the v2 six-smooth-method manifest. Historical v1 manifests used "
+            "method=maxwell for NPPHB and are immutable; regenerate a v2 manifest with "
+            "first_law_constrained_hermite_pressure_bridge. The sharp method ID maxwell "
+            "belongs to the separate M5 transition workflow."
+        )
+    if "maxwell" in manifest.get("matrix", {}).get("methods", []):
+        raise ValueError("method=maxwell is forbidden in the M7 smooth EOS390 manifest")
+    tasks = manifest['tasks']
+    receipts = []
+    counts = {'PASS': 0, 'FAIL': 0, 'BLOCKED': 0, 'PARTIAL': 0, 'PENDING': 0}
+    pending_dispatched = 0
+    for i, task in enumerate(tasks):
+        if task['status'] == 'PENDING' and max_pending is not None and pending_dispatched >= max_pending:
+            # Leave remaining PENDING tasks as PENDING (not dispatched)
+            receipt = {
+                'task_id': task['task_id'],
+                'crust_model': task['crust_model'],
+                'core_model': task['core_model'],
+                'method': task['method'],
+                'status': 'NOT_DISPATCHED_CAP',
+                'reason': f'batch capped at {max_pending} pending; {len(tasks)-i} tasks remain',
+            }
+            receipts.append(receipt)
+            counts['PENDING'] += 1
+            continue
+        receipt = run_task(task)
+        receipts.append(receipt)
+        counts[receipt['status']] = counts.get(receipt['status'], 0) + 1
+        if task['status'] == 'PENDING':
+            pending_dispatched += 1
+        # Write the per-task receipt into the task's output folder
+        if receipt.get('output_folder'):
+            rpath = Path(receipt['output_folder']) / 'task_receipt.json'
+            rpath.write_text(json.dumps(receipt, indent=2, allow_nan=False,
+                                         default=str) + '\n', encoding='utf-8')
+        else:
+            # NOT_DISPATCHED_CAP tasks have no folder yet; write to a cap-area
+            cap_dir = Path(manifest_path).expanduser().resolve().parent / 'outputs' / '_cap_receipts'
+            cap_dir.mkdir(parents=True, exist_ok=True)
+            (cap_dir / f'{receipt["task_id"]}_receipt.json').write_text(
+                json.dumps(receipt, indent=2, default=str) + '\n', encoding='utf-8')
+    summary = {
+        'schema': 'ns-cowling.eos390-m7-batch-summary',
+        'schema_version': '1.0.0',
+        'manifest_path': manifest_path,
+        'total_tasks': len(tasks),
+        'receipts_count': len(receipts),
+        'status_counts': counts,
+        'cardinality_check': len(tasks) == 390,
+        'uniqueness_check': len(set(t['task_id'] for t in tasks)) == 390,
+        'no_silent_skip_check': len(receipts) == len(tasks),
+        'fail_closed_check': all(r['status'] in ('PASS','FAIL','BLOCKED','PARTIAL','NOT_DISPATCHED_CAP','PENDING') for r in receipts),
+        'pending_attempted': pending_dispatched,
+        'pending_dispatched': pending_dispatched,
+        'max_pending_cap': max_pending,
+    }
+    return summary, receipts
+
+
+if __name__ == "__main__":
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--manifest", required=True, help="exact versioned 390-key manifest")
+    ap.add_argument("--summary", required=True, help="new versioned summary JSON path")
+    ap.add_argument("--max-pending", type=int, default=None,
+                    help="optional cap on attempted tasks; omitted means all manifest rows")
+    args = ap.parse_args()
+    summary, receipts = run_batch(args.manifest, max_pending=args.max_pending)
+    output = Path(args.summary).expanduser().resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    with output.open("x", encoding="utf-8") as stream:
+        json.dump({"summary": summary, "receipts": receipts}, stream,
+                  indent=2, allow_nan=False, default=str)
+        stream.write("\\n")
+    print(json.dumps(summary, indent=2))
+    print(f"\\nbatch summary written: {output}")

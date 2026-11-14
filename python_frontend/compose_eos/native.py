@@ -77,3 +77,23 @@ def run_native(action: str, *args: str | os.PathLike[str]) -> dict[str, Any]:
     if payload.get("status") == "error":
         raise NativeExecutionError(str(payload.get("message", "unknown Fortran error")))
     return payload
+
+
+def evaluate_ddrmf(model_id: str, rho_b_fm3: float) -> dict[str, Any]:
+    """Evaluate a literature-parameterized cold DD-RMF beta-equilibrium state natively.
+
+    The Fortran backend solves the scalar field, rearrangement self-energy,
+    charge-neutral npe/mu branch and two explicitly distinct symmetry-energy
+    definitions. Python only validates arguments and decodes the native JSON.
+    """
+    if not isinstance(model_id, str) or not model_id.strip():
+        raise ValueError("model_id must be a non-empty string")
+    try:
+        density = float(rho_b_fm3)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("rho_b_fm3 must be a finite positive number") from exc
+    if not (density > 0.0):
+        raise ValueError("rho_b_fm3 must be finite and positive")
+    if density != density or density in (float("inf"), float("-inf")):
+        raise ValueError("rho_b_fm3 must be finite and positive")
+    return run_native("rmf-evaluate", model_id.strip(), format(density, ".17g"))

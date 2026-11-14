@@ -1,0 +1,731 @@
+{
+  "schema": "ns-cowling.eos390-component-source-contract",
+  "schema_version": "1.0.0",
+  "contract_id": "E390-01A-STANDALONE-COMPONENT-CONSTRUCTION",
+  "revision": "1.0.1",
+  "date": "2026-11-13",
+  "status": "SPECIFICATION_COMPLETE_MODEL_BOUNDARY_ADMISSION_PENDING_SOURCE_LABELS_CORRECTED",
+  "governing_node": "E390-01A",
+  "next_node": "E390-01C",
+  "authority": {
+    "repository": "cosmosapjw-quantum/NS_Cowling",
+    "branch": "cloud/eos390-fortran-unification-v1",
+    "parent_commit": "4dd2a52356c77504d7d6e043238d8a79d24629be",
+    "source_inventory": "data/eos390_reconstructed_source_inventory.v1.json",
+    "source_bibliography": "data/eos390_source_bibliography.v1.json",
+    "source_receipt": "data/receipts/eos390_m2a/E390-00-RESOLVED_20261113.json",
+    "component_contract_document": "docs/E390_01A_STANDALONE_COMPONENT_CONSTRUCTION_CONTRACT_20261113.md",
+    "source_archive": {
+      "filename": "EoS_complete_core_crust_release_v3_2.zip",
+      "sha256": "d671310eb630ffd13f1b278425d945741ad7e08ce14c0d9aff42309c707e6a3b",
+      "verification_authority": "E390-00 receipt; preserve original archive and per-file source manifest; archive is not committed into the GitHub Actions checkout"
+    },
+    "hash_policy": "Git blob SHA-1 values identify current source-file blobs only. They are not SHA-256 replacements for the source archive/per-file SHA-256 manifest."
+  },
+  "scope": {
+    "core_models": [
+      "APR_APR",
+      "BBB_BHF2",
+      "GM_GM1",
+      "RG_KDE0v1",
+      "RG_SLY4"
+    ],
+    "crust_models": [
+      "SPG_M1",
+      "SPG_M2",
+      "SPG_M3",
+      "SPG_M4",
+      "SPG_M5",
+      "GPPVA_DD2",
+      "GPPVA_DDME2",
+      "GPPVA_FSU2",
+      "GPPVA_FSU2H",
+      "GPPVA_FSU2R",
+      "GPPVA_NL3wrL55",
+      "GPPVA_TM1e",
+      "GPPVA_TW"
+    ],
+    "matrix_cardinality": {
+      "core": 5,
+      "crust": 13,
+      "composition": "component construction precedes 13 x 5 x 6 = 390 smooth matching matrix"
+    },
+    "excluded_this_node": [
+      "native core builder",
+      "native crust builder",
+      "any pair matching",
+      "390 batch execution",
+      "sharp-Maxwell 65-pair run"
+    ]
+  },
+  "coordinate_and_unit_contract": {
+    "density": "nB in fm^-3",
+    "pressure": "P in MeV fm^-3",
+    "energy_density": "epsilon in MeV fm^-3",
+    "energy_per_baryon": "MeV, with source rest-mass convention preserved",
+    "chemical_potential": "MeV",
+    "sound_speed": "cs2_over_c2",
+    "source_axes": [
+      "T",
+      "nB",
+      "Yq"
+    ],
+    "slice": "select T=0 by axis value and record exact iT; select the source-authoritative beta-equilibrium table slice and record the exact iYq/index; never infer a physical proton fraction from a stored Yq coordinate such as 0",
+    "source_header": "read mn, mp and Il from the eos.thermo header for each source; never replace them by universal hard-coded constants",
+    "metric_signature": "(-,+,+,+)"
+  },
+  "compose_thermo_contract": {
+    "version": "CompOSE reference manual v3.01",
+    "columns": {
+      "Q1": "P/nB in MeV",
+      "Q2": "entropy per baryon",
+      "Q3": "mu_b/mn - 1",
+      "Q4": "mu_q/mn",
+      "Q5": "mu_l/mn",
+      "Q6": "f/(nB*mn) - 1",
+      "Q7": "e/(nB*mn) - 1",
+      "Nadd": "provider-defined optional typed extension; preserve exact arity and values"
+    },
+    "reconstruction": {
+      "F": "mn * (1 + Q6)",
+      "epsilon_over_nB": "mn * (1 + Q7)",
+      "P": "nB * Q1",
+      "muB_source": "mn * (1 + Q3)",
+      "muB_Euler": "F + P/nB",
+      "cs2_over_c2": "[dP/dln(nB)]/[nB*muB_Euler] = [Q1 + dQ1/dln(nB)]/[F + Q1]"
+    },
+    "first_law": "For the selected T=0 one-parameter beta-equilibrium barotrope: F=epsilon/nB and P=nB*dF/dln(nB). Q6 and Q7 must agree within the declared source tolerance at T=0. Q1 is retained as the source pressure-per-baryon channel and is independently checked against the derivative of F.",
+    "checks": [
+      "T=0 and entropy-per-baryon consistency",
+      "Q6 versus Q7",
+      "source Q1 versus dF/dln(nB)",
+      "source Q3 versus Euler chemical potential",
+      "positive compressibility on smooth stable branches",
+      "0 <= cs2/c2 <= 1 on causal smooth branches",
+      "phase-local derivative stencils; no derivative across an interface"
+    ],
+    "no_repair_policy": "Do not silently overwrite source Q1/Q3/Q6/Q7, shift the energy zero, clip cs2, smooth a physical transition, or fit an empirical gauge. Report a failed/diagnostic residual and preserve source values."
+  },
+  "composition_contract": {
+    "source_format": "eos.compo rows keyed by (iT,inb,iYq); preserve Iphase, Npairs, particle-index/fraction pairs, Nquad and nuclear-group quadruples",
+    "presence": "per-row/per-species/per-group presence masks from E390-02A are authoritative; absent is not zero, and an explicitly written zero is present",
+    "Iphase": "categorical and model/provider-specific; the CompOSE manual states that the numeric-to-physical correspondence is defined on each model's EOS page",
+    "nuclear_group": "preserve source tuple and raw YI; convert Yh=Abar*YI only when model semantics and applicability have been admitted; never map a final tuple by assumption",
+    "Nadd_q_extra": "preserve exact source typing and row association or mark explicitly unsupported; never interpolate categorical/unknown fields as scalar values",
+    "SPG_GPPVA": "dual-track contract: parse/retain original standard CompOSE records and masks; bypass unverified final-field remapping in production and reconstruct inner-crust composition from the cited CLD/Thomas-Fermi/model papers with separate provenance"
+  },
+  "artifact_lineage": {
+    "raw_source": "immutable provider ZIP and exact files; no mutation",
+    "normalized_source": "lossless parse/normalization only: units/axes/indices/header, row sorting prohibited unless identity-preserving and explicitly logged",
+    "reconstructed_source": "separate derived branch for literature-based composition/fields; original rows and hashes remain unchanged",
+    "core_only": "only homogeneous core branch admitted by the model-specific source boundary; no imported crust rows",
+    "crust_only": "all source-supported crust regimes through the crust EOS terminal support; no homogeneous high-density core tail",
+    "matched_composite": "created only by a separately identified matching-method node and carries both component parents plus method ID/version"
+  },
+  "core_models": [
+    {
+      "id": "APR_APR",
+      "family": "core",
+      "compose_entry": "APR(APR)",
+      "compose_eos_id": 68,
+      "compose_url": "https://compose.obspm.fr/eos/68",
+      "table_class": "NON_UNIFIED_CRUST_MODEL_MATCHED",
+      "interaction": "A18 + delta-v + UIX* variational APR",
+      "crust_already_present": {
+        "outer": "BPS",
+        "inner": "SLy4"
+      },
+      "compose_statement": "T=0 beta-equilibrium; CompOSE states BPS outer crust and SLy4 inner crust; no composition table is available.",
+      "raw_table_support": {
+        "nB_min_fm3": 7.92405959867008e-15,
+        "nB_max_fm3": 1.34,
+        "nb_points": 172
+      },
+      "eos_nb_git_blob_sha1": "bca7ab3da8bf11ef13cde8ba8454c2bc0d616b4f",
+      "composition": {
+        "eos_compo": "ABSENT",
+        "status": "NOT_AVAILABLE_SOURCE_CONFIRMED"
+      },
+      "core_boundary": {
+        "state": "UNRESOLVED_ADMISSION_BLOCKED",
+        "nB_fm3": null,
+        "rule": "remove the BPS+SLy4 pre-matched crust; admit only the APR homogeneous core branch after an exact source/datasheet transition locator is recorded",
+        "prohibited": "do not infer n_cc from the table minimum, a generic 0.045 fm^-3 cut, or an unverified convexity heuristic"
+      },
+      "source_unit": "CompOSE; nB fm^-3, P/epsilon MeV fm^-3; m_n/m_p from eos.thermo header",
+      "alternate_compose_release": {
+        "compose_entry": "APR(APR) unified crust",
+        "compose_eos_id": 328,
+        "compose_url": "https://compose.obspm.fr/eos/328",
+        "status": "SEPARATE_NEWER_RELEASE_NOT_THE_ARCHIVED_172_POINT_SOURCE",
+        "reason": "The repository source has 172 eos.nb rows and matches older non-unified APR page 68; do not silently replace it with the newer 1833-point unified-crust release."
+      }
+    },
+    {
+      "id": "BBB_BHF2",
+      "family": "core",
+      "compose_entry": "BBB(BHF-BBB2)",
+      "compose_eos_id": 69,
+      "compose_url": "https://compose.obspm.fr/eos/69",
+      "table_class": "NON_UNIFIED_CRUST_MODEL_MATCHED",
+      "interaction": "BHF with Paris + three-body forces",
+      "crust_already_present": {
+        "outer": "BPS",
+        "inner": "SLy4"
+      },
+      "compose_statement": "T=0 beta-equilibrium; CompOSE states BPS outer crust and SLy4 inner crust; no composition table is available. CompOSE page currently notes eos.init is unavailable on the public calculation service, but the archived source cohort contains eos.init.",
+      "raw_table_support": {
+        "nB_min_fm3": 7.92405959867008e-15,
+        "nB_max_fm3": 1.5,
+        "nb_points": 84
+      },
+      "eos_nb_git_blob_sha1": "60725116001613f77384bf97e7cc4889af59145d",
+      "composition": {
+        "eos_compo": "ABSENT",
+        "status": "NOT_AVAILABLE_SOURCE_CONFIRMED"
+      },
+      "core_boundary": {
+        "state": "UNRESOLVED_ADMISSION_BLOCKED",
+        "nB_fm3": null,
+        "rule": "remove the BPS+SLy4 pre-matched crust; admit only the BHF homogeneous core branch after exact model/source transition locator is recorded",
+        "prohibited": "do not infer n_cc from the table minimum, a generic 0.045 fm^-3 cut, or an unverified convexity heuristic"
+      },
+      "source_unit": "CompOSE; nB fm^-3, P/epsilon MeV fm^-3; m_n/m_p from eos.thermo header"
+    },
+    {
+      "id": "GM_GM1",
+      "family": "core",
+      "compose_entry": "GM(GM1)",
+      "compose_eos_id": 54,
+      "compose_url": "https://compose.obspm.fr/eos/54",
+      "table_class": "NON_UNIFIED_CRUST_MODEL_MATCHED",
+      "interaction": "GM1 relativistic mean-field parameterization",
+      "crust_already_present": {
+        "outer": "not separately identified on current CompOSE abstract",
+        "inner": "Douchin-Haensel crust appended for nB < 1.0e-3 fm^-3"
+      },
+      "compose_statement": "T=0 beta-equilibrium npe. CompOSE explicitly states the Douchin-Haensel crust is added below 1.0e-3 fm^-3 and proton-fraction/composition information is available for core only.",
+      "raw_table_support": {
+        "nB_min_fm3": 7.9240595987e-15,
+        "nB_max_fm3": 1,
+        "nb_points": 349,
+        "compose_page_nB_max_fm3": 0.999
+      },
+      "eos_nb_git_blob_sha1": "ca4454a9018e78dd24224faeac48c18138634503",
+      "composition": {
+        "eos_compo": "PRESENT",
+        "status": "CORE_ONLY_COVERAGE_WITH_ROW_MASKS",
+        "observed_Iphase_codes": [
+          1,
+          3
+        ]
+      },
+      "core_boundary": {
+        "state": "SOURCE_EXPLICIT",
+        "nB_fm3": 0.001,
+        "rule": "core admission begins at the CompOSE-reported crust splice density; exact source row/index at the threshold must be selected without extrapolation",
+        "provenance": "CompOSE GM(GM1) model abstract"
+      },
+      "source_unit": "CompOSE; nB fm^-3, P/epsilon MeV fm^-3; m_n/m_p from eos.thermo header"
+    },
+    {
+      "id": "RG_KDE0v1",
+      "family": "core",
+      "compose_entry": "RG(KDE0v1)",
+      "compose_eos_id": null,
+      "compose_url": "https://compose.obspm.fr/table_selection",
+      "table_class": "UNIFIED_MODEL",
+      "interaction": "KDE0v1 Skyrme energy-density functional",
+      "crust_already_present": {
+        "outer": "unified-model low-density branch; exact phase breakdown must be read from this model's data sheet",
+        "inner": "unified-model cluster branch; exact phase breakdown must be read from this model's data sheet"
+      },
+      "compose_statement": "CompOSE selection table classifies RG(KDE0v1) as a unified cold neutron-star EOS. Exact model-specific Iphase legend and core-transition density were not independently verified in this pass.",
+      "raw_table_support": {
+        "nB_min_fm3": 1e-7,
+        "nB_max_fm3": 1.791349,
+        "nb_points": 1240
+      },
+      "eos_nb_git_blob_sha1": "0af6fbac0213f60d640715674aa33601747d920f",
+      "composition": {
+        "eos_compo": "PRESENT",
+        "status": "PRESERVE_PROVIDER_ROWS_AND_PHASE_MASKS",
+        "observed_Iphase_codes": [
+          3,
+          4
+        ]
+      },
+      "core_boundary": {
+        "state": "UNRESOLVED_ADMISSION_BLOCKED",
+        "nB_fm3": null,
+        "rule": "identify the first homogeneous branch from the KDE0v1-specific eos.pdf/Iphase dictionary and the published crust-core criterion; preserve the cluster branch separately",
+        "prohibited": "do not map Iphase codes by analogy with another EOS or use 0.045 fm^-3"
+      },
+      "source_unit": "CompOSE; nB fm^-3, P/epsilon MeV fm^-3; m_n/m_p from eos.thermo header"
+    },
+    {
+      "id": "RG_SLY4",
+      "family": "core",
+      "compose_entry": "RG(SLY4)",
+      "compose_eos_id": 134,
+      "compose_url": "https://compose.obspm.fr/eos/134",
+      "table_class": "UNIFIED_MODEL",
+      "interaction": "SLy4 Skyrme effective interaction; cluster EDF references Danielewicz-Lee",
+      "crust_already_present": {
+        "outer": "unified model low-density/cluster branch",
+        "inner": "unified model cluster branch"
+      },
+      "compose_statement": "T=0 beta-equilibrium unified EOS. CompOSE identifies SLy4 and the cluster energy functionals; exact n_cc is not stated in the retrieved abstract.",
+      "raw_table_support": {
+        "nB_min_fm3": 1e-7,
+        "nB_max_fm3": 1.21,
+        "nb_points": 197
+      },
+      "eos_nb_git_blob_sha1": "b3e1aa85c0f8e64930b04e67fd86016b64fdccc4",
+      "composition": {
+        "eos_compo": "PRESENT",
+        "status": "PRESERVE_PROVIDER_ROWS_AND_PHASE_MASKS",
+        "observed_Iphase_codes": [
+          3,
+          4
+        ]
+      },
+      "core_boundary": {
+        "state": "UNRESOLVED_ADMISSION_BLOCKED",
+        "nB_fm3": null,
+        "rule": "use the SLY4-specific data-sheet phase legend and unified crust-core transition criterion; homogeneous core begins only after the model's inhomogeneous cluster branch ends",
+        "prohibited": "do not map Iphase codes by analogy with another EOS or use 0.045 fm^-3"
+      },
+      "source_unit": "CompOSE; nB fm^-3, P/epsilon MeV fm^-3; m_n/m_p from eos.thermo header"
+    }
+  ],
+  "crust_models": [
+    {
+      "id": "SPG_M1",
+      "family": "crust",
+      "compose_entry": "SPG(M1) Crust NS EoS",
+      "compose_url": "https://compose.obspm.fr/eos/311",
+      "raw_table_support": {
+        "nB_min_fm3": 4.67962e-10,
+        "nB_max_fm3": 0.07413102413,
+        "nb_points": 365
+      },
+      "eos_nb_git_blob_sha1": "671e4c2b8fe5e77539cb4854586c153f81be3f31",
+      "source_construction": {
+        "outer_crust": "BSk22-based low-density segment; CompOSE describes this below 2.0e-3 fm^-3",
+        "inner_crust": "SPG model-specific CLD construction; preserve all source-defined cluster/phase regimes",
+        "method": "CLD; model parameters/couplings from Scurto-Pais-Gulminelli 2024 and related GDFM references"
+      },
+      "crust_drip_policy": "Keep the source-defined neutron-drip transition and all rows on either side. The 2.0e-3 fm^-3 outer-source splice is not identified as the neutron-drip density.",
+      "upper_endpoint_policy": "The listed nB_max is the exact upper support endpoint of this archived eos.nb grid, not a universal physical crust-core transition and not permission to append or extrapolate a core tail.",
+      "composition": {
+        "eos_compo": "PRESENT",
+        "status": "PRESERVE_RAW_PROVIDER_RECORDS_AND_ROW_MASKS; production group-composition reconstruction follows the E390-02 dual-track literature route"
+      },
+      "note": "SPG M1 crust; BSk22 outer segment below 0.002 fm^-3 plus model-specific CLD inner-crust reconstruction; exact M1 phase legend remains model-specific."
+    },
+    {
+      "id": "SPG_M2",
+      "family": "crust",
+      "compose_entry": "SPG(M2) Crust NS EoS",
+      "compose_url": "https://compose.obspm.fr/table_selection",
+      "raw_table_support": {
+        "nB_min_fm3": 4.67962e-10,
+        "nB_max_fm3": 0.08912509381,
+        "nb_points": 377
+      },
+      "eos_nb_git_blob_sha1": "f9c032b24a2735547e7bf359906b678be5a63455",
+      "source_construction": {
+        "outer_crust": "BSk22-based low-density segment; CompOSE describes this below 2.0e-3 fm^-3",
+        "inner_crust": "SPG model-specific CLD construction; preserve all source-defined cluster/phase regimes",
+        "method": "CLD; model parameters/couplings from Scurto-Pais-Gulminelli 2024 and related GDFM references"
+      },
+      "crust_drip_policy": "Keep the source-defined neutron-drip transition and all rows on either side. The 2.0e-3 fm^-3 outer-source splice is not identified as the neutron-drip density.",
+      "upper_endpoint_policy": "The listed nB_max is the exact upper support endpoint of this archived eos.nb grid, not a universal physical crust-core transition and not permission to append or extrapolate a core tail.",
+      "composition": {
+        "eos_compo": "PRESENT",
+        "status": "PRESERVE_RAW_PROVIDER_RECORDS_AND_ROW_MASKS; production group-composition reconstruction follows the E390-02 dual-track literature route"
+      },
+      "note": "SPG M2 crust; BSk22 outer segment below 0.002 fm^-3 plus model-specific CLD inner-crust reconstruction; exact M2 phase legend remains model-specific."
+    },
+    {
+      "id": "SPG_M3",
+      "family": "crust",
+      "compose_entry": "SPG(M3) Crust NS EoS",
+      "compose_url": "https://compose.obspm.fr/eos/317",
+      "raw_table_support": {
+        "nB_min_fm3": 4.67962e-10,
+        "nB_max_fm3": 0.07943282347,
+        "nb_points": 366
+      },
+      "eos_nb_git_blob_sha1": "5afee15e44ca5aa84145d0cf9c04889c99547b39",
+      "source_construction": {
+        "outer_crust": "BSk22-based low-density segment; CompOSE describes this below 2.0e-3 fm^-3",
+        "inner_crust": "SPG model-specific CLD construction; preserve all source-defined cluster/phase regimes",
+        "method": "CLD; model parameters/couplings from Scurto-Pais-Gulminelli 2024 and related GDFM references"
+      },
+      "crust_drip_policy": "Keep the source-defined neutron-drip transition and all rows on either side. The 2.0e-3 fm^-3 outer-source splice is not identified as the neutron-drip density.",
+      "upper_endpoint_policy": "The listed nB_max is the exact upper support endpoint of this archived eos.nb grid, not a universal physical crust-core transition and not permission to append or extrapolate a core tail.",
+      "composition": {
+        "eos_compo": "PRESENT",
+        "status": "PRESERVE_RAW_PROVIDER_RECORDS_AND_ROW_MASKS; production group-composition reconstruction follows the E390-02 dual-track literature route"
+      },
+      "note": "SPG M3 crust; CompOSE page /eos/317; BSk22 outer segment below 0.002 fm^-3 and model-specific CLD inner crust."
+    },
+    {
+      "id": "SPG_M4",
+      "family": "crust",
+      "compose_entry": "SPG(M4) Crust NS EoS",
+      "compose_url": "https://compose.obspm.fr/eos/318",
+      "raw_table_support": {
+        "nB_min_fm3": 4.67962e-10,
+        "nB_max_fm3": 0.0977237221,
+        "nb_points": 375
+      },
+      "eos_nb_git_blob_sha1": "47d96bf925e646e50a5c71da71ef372c7e4b941f",
+      "source_construction": {
+        "outer_crust": "BSk22-based low-density segment; CompOSE describes this below 2.0e-3 fm^-3",
+        "inner_crust": "SPG model-specific CLD construction; preserve all source-defined cluster/phase regimes",
+        "method": "CLD; model parameters/couplings from Scurto-Pais-Gulminelli 2024 and related GDFM references"
+      },
+      "crust_drip_policy": "Keep the source-defined neutron-drip transition and all rows on either side. The 2.0e-3 fm^-3 outer-source splice is not identified as the neutron-drip density.",
+      "upper_endpoint_policy": "The listed nB_max is the exact upper support endpoint of this archived eos.nb grid, not a universal physical crust-core transition and not permission to append or extrapolate a core tail.",
+      "composition": {
+        "eos_compo": "PRESENT",
+        "status": "PRESERVE_RAW_PROVIDER_RECORDS_AND_ROW_MASKS; production group-composition reconstruction follows the E390-02 dual-track literature route"
+      },
+      "note": "SPG M4 crust; BSk22 outer segment below 0.002 fm^-3 plus model-specific CLD inner-crust reconstruction; exact M4 phase legend remains model-specific."
+    },
+    {
+      "id": "SPG_M5",
+      "family": "crust",
+      "compose_entry": "SPG(M5) Crust NS EoS",
+      "compose_url": "https://compose.obspm.fr/eos/319",
+      "raw_table_support": {
+        "nB_min_fm3": 4.67962e-10,
+        "nB_max_fm3": 0.07079457844,
+        "nb_points": 363
+      },
+      "eos_nb_git_blob_sha1": "c979d1ba6c4642496b0c9177c427899b2412c9ad",
+      "source_construction": {
+        "outer_crust": "BSk22-based low-density segment; CompOSE describes this below 2.0e-3 fm^-3",
+        "inner_crust": "SPG model-specific CLD construction; preserve all source-defined cluster/phase regimes",
+        "method": "CLD; model parameters/couplings from Scurto-Pais-Gulminelli 2024 and related GDFM references"
+      },
+      "crust_drip_policy": "Keep the source-defined neutron-drip transition and all rows on either side. The 2.0e-3 fm^-3 outer-source splice is not identified as the neutron-drip density.",
+      "upper_endpoint_policy": "The listed nB_max is the exact upper support endpoint of this archived eos.nb grid, not a universal physical crust-core transition and not permission to append or extrapolate a core tail.",
+      "composition": {
+        "eos_compo": "PRESENT",
+        "status": "PRESERVE_RAW_PROVIDER_RECORDS_AND_ROW_MASKS; production group-composition reconstruction follows the E390-02 dual-track literature route"
+      },
+      "note": "SPG M5 crust; CompOSE page /eos/319; BSk22 outer segment below 0.002 fm^-3 and model-specific CLD inner crust."
+    },
+    {
+      "id": "GPPVA_DD2",
+      "family": "crust",
+      "compose_entry": "GPPVA(DD2) NS crust",
+      "compose_url": "https://compose.obspm.fr/eos/210",
+      "raw_table_support": {
+        "nB_min_fm3": 4.67962e-10,
+        "nB_max_fm3": 0.067000002,
+        "nb_points": 283
+      },
+      "eos_nb_git_blob_sha1": "d9238f1fdd0e3a580b689253d709cf4493c95358",
+      "source_construction": {
+        "outer_crust": "BSk22-based segment below 2.0e-3 fm^-3",
+        "inner_crust": "self-consistent Thomas-Fermi calculation; preserve all source-defined nonspherical pasta and cluster regimes",
+        "method": "Thomas-Fermi; Grill et al. 2014 with model-specific RMF parameterization"
+      },
+      "crust_drip_policy": "Keep the source-defined neutron-drip transition and all rows on either side. The 2.0e-3 fm^-3 outer-source splice is not identified as the neutron-drip density.",
+      "upper_endpoint_policy": "The listed nB_max is the exact upper support endpoint of this archived eos.nb grid, not a universal physical crust-core transition and not permission to append or extrapolate a core tail.",
+      "composition": {
+        "eos_compo": "PRESENT",
+        "status": "PRESERVE_RAW_PROVIDER_RECORDS_AND_ROW_MASKS; production group-composition reconstruction follows the E390-02 dual-track literature route"
+      },
+      "note": "DD2 RMF; CompOSE page /eos/210; BSk22 outer crust below 0.002 fm^-3, self-consistent Thomas-Fermi inner crust with nonspherical pasta; crust table terminates at nB=0.067 fm^-3."
+    },
+    {
+      "id": "GPPVA_DDME2",
+      "family": "crust",
+      "compose_entry": "GPPVA(DDME2) NS crust",
+      "compose_url": "https://compose.obspm.fr/eos/211",
+      "raw_table_support": {
+        "nB_min_fm3": 4.67962e-10,
+        "nB_max_fm3": 0.071999997,
+        "nb_points": 288
+      },
+      "eos_nb_git_blob_sha1": "8a068e43a31f5fd4e94b8091a0cd672ae40dc3a7",
+      "source_construction": {
+        "outer_crust": "BSk22-based segment below 2.0e-3 fm^-3",
+        "inner_crust": "self-consistent Thomas-Fermi calculation; preserve all source-defined nonspherical pasta and cluster regimes",
+        "method": "Thomas-Fermi; Grill et al. 2014 with model-specific RMF parameterization"
+      },
+      "crust_drip_policy": "Keep the source-defined neutron-drip transition and all rows on either side. The 2.0e-3 fm^-3 outer-source splice is not identified as the neutron-drip density.",
+      "upper_endpoint_policy": "The listed nB_max is the exact upper support endpoint of this archived eos.nb grid, not a universal physical crust-core transition and not permission to append or extrapolate a core tail.",
+      "composition": {
+        "eos_compo": "PRESENT",
+        "status": "PRESERVE_RAW_PROVIDER_RECORDS_AND_ROW_MASKS; production group-composition reconstruction follows the E390-02 dual-track literature route"
+      },
+      "note": "DD-ME2 RMF; CompOSE page /eos/211; BSk22 outer crust below 0.002 fm^-3 and Thomas-Fermi inner crust."
+    },
+    {
+      "id": "GPPVA_FSU2",
+      "family": "crust",
+      "compose_entry": "GPPVA(FSU2) NS crust",
+      "compose_url": "https://compose.obspm.fr/eos/209",
+      "raw_table_support": {
+        "nB_min_fm3": 4.67962e-10,
+        "nB_max_fm3": 0.054000001,
+        "nb_points": 269
+      },
+      "eos_nb_git_blob_sha1": "abf5acef150c448297fd0b02314c1dff168cfb42",
+      "source_construction": {
+        "outer_crust": "BSk22-based segment below 2.0e-3 fm^-3",
+        "inner_crust": "self-consistent Thomas-Fermi calculation; preserve all source-defined nonspherical pasta and cluster regimes",
+        "method": "Thomas-Fermi; Grill et al. 2014 with model-specific RMF parameterization"
+      },
+      "crust_drip_policy": "Keep the source-defined neutron-drip transition and all rows on either side. The 2.0e-3 fm^-3 outer-source splice is not identified as the neutron-drip density.",
+      "upper_endpoint_policy": "The listed nB_max is the exact upper support endpoint of this archived eos.nb grid, not a universal physical crust-core transition and not permission to append or extrapolate a core tail.",
+      "composition": {
+        "eos_compo": "PRESENT",
+        "status": "PRESERVE_RAW_PROVIDER_RECORDS_AND_ROW_MASKS; production group-composition reconstruction follows the E390-02 dual-track literature route"
+      },
+      "note": "FSU2 RMF variant; CompOSE classifies it as Thomas-Fermi crust; BSk22 outer crust below 0.002 fm^-3."
+    },
+    {
+      "id": "GPPVA_FSU2H",
+      "family": "crust",
+      "compose_entry": "GPPVA(FSU2H) NS crust",
+      "compose_url": "https://compose.obspm.fr/eos/208",
+      "raw_table_support": {
+        "nB_min_fm3": 4.67962e-10,
+        "nB_max_fm3": 0.086999997,
+        "nb_points": 300
+      },
+      "eos_nb_git_blob_sha1": "b5936f64781c2381585683ba69472b8e0d7cb24c",
+      "source_construction": {
+        "outer_crust": "BSk22-based segment below 2.0e-3 fm^-3",
+        "inner_crust": "self-consistent Thomas-Fermi calculation; preserve all source-defined nonspherical pasta and cluster regimes",
+        "method": "Thomas-Fermi; Grill et al. 2014 with model-specific RMF parameterization"
+      },
+      "crust_drip_policy": "Keep the source-defined neutron-drip transition and all rows on either side. The 2.0e-3 fm^-3 outer-source splice is not identified as the neutron-drip density.",
+      "upper_endpoint_policy": "The listed nB_max is the exact upper support endpoint of this archived eos.nb grid, not a universal physical crust-core transition and not permission to append or extrapolate a core tail.",
+      "composition": {
+        "eos_compo": "PRESENT",
+        "status": "PRESERVE_RAW_PROVIDER_RECORDS_AND_ROW_MASKS; production group-composition reconstruction follows the E390-02 dual-track literature route"
+      },
+      "note": "FSU2H RMF; CompOSE page /eos/208; BSk22 outer crust below 0.002 fm^-3 and Thomas-Fermi inner crust with nonspherical pasta."
+    },
+    {
+      "id": "GPPVA_FSU2R",
+      "family": "crust",
+      "compose_entry": "GPPVA(FSU2R) NS crust",
+      "compose_url": "https://compose.obspm.fr/table_selection",
+      "raw_table_support": {
+        "nB_min_fm3": 4.67962e-10,
+        "nB_max_fm3": 0.082999997,
+        "nb_points": 296
+      },
+      "eos_nb_git_blob_sha1": "756b25cc31d84d5c4124e3593fe0e122685e8ac3",
+      "source_construction": {
+        "outer_crust": "NOT_VERIFIED_FROM_THE_MODEL_SPECIFIC_DATASHEET_IN_THIS_ADJUDICATION; preserve raw source and do not assume BSk22 or BPS until the exact source sheet is inspected",
+        "inner_crust": "self-consistent Thomas-Fermi calculation; preserve all source-defined nonspherical pasta and cluster regimes",
+        "method": "Thomas-Fermi; Grill et al. 2014 with model-specific RMF parameterization"
+      },
+      "crust_drip_policy": "Keep the source-defined neutron-drip transition and all rows on either side. The 2.0e-3 fm^-3 outer-source splice is not identified as the neutron-drip density.",
+      "upper_endpoint_policy": "The listed nB_max is the exact upper support endpoint of this archived eos.nb grid, not a universal physical crust-core transition and not permission to append or extrapolate a core tail.",
+      "composition": {
+        "eos_compo": "PRESENT",
+        "status": "PRESERVE_RAW_PROVIDER_RECORDS_AND_ROW_MASKS; production group-composition reconstruction follows the E390-02 dual-track literature route"
+      },
+      "note": "FSU2R RMF; CompOSE table selection classifies this as a Thomas-Fermi crust. The exact outer-crust provider is not source-verified; no family-wide assumption is admitted."
+    },
+    {
+      "id": "GPPVA_NL3wrL55",
+      "family": "crust",
+      "compose_entry": "GPPVA(NL3wrL55) NS crust",
+      "compose_url": "https://compose.obspm.fr/eos/204",
+      "raw_table_support": {
+        "nB_min_fm3": 4.67962e-10,
+        "nB_max_fm3": 0.082000002,
+        "nb_points": 298
+      },
+      "eos_nb_git_blob_sha1": "f829b08138181ea68c9e99adae5193a7d7308d75",
+      "source_construction": {
+        "outer_crust": "BSk22-based segment below 2.0e-3 fm^-3",
+        "inner_crust": "self-consistent Thomas-Fermi calculation; preserve all source-defined nonspherical pasta and cluster regimes",
+        "method": "Thomas-Fermi; Grill et al. 2014 with model-specific RMF parameterization"
+      },
+      "crust_drip_policy": "Keep the source-defined neutron-drip transition and all rows on either side. The 2.0e-3 fm^-3 outer-source splice is not identified as the neutron-drip density.",
+      "upper_endpoint_policy": "The listed nB_max is the exact upper support endpoint of this archived eos.nb grid, not a universal physical crust-core transition and not permission to append or extrapolate a core tail.",
+      "composition": {
+        "eos_compo": "PRESENT",
+        "status": "PRESERVE_RAW_PROVIDER_RECORDS_AND_ROW_MASKS; production group-composition reconstruction follows the E390-02 dual-track literature route"
+      },
+      "note": "NL3-omega-rho, L=55 MeV; CompOSE page /eos/204; BSk22 outer crust below 0.002 fm^-3 and Thomas-Fermi inner crust with pasta."
+    },
+    {
+      "id": "GPPVA_TM1e",
+      "family": "crust",
+      "compose_entry": "GPPVA(TM1e) NS crust",
+      "compose_url": "https://compose.obspm.fr/eos/207",
+      "raw_table_support": {
+        "nB_min_fm3": 4.67962e-10,
+        "nB_max_fm3": 0.089000002,
+        "nb_points": 303
+      },
+      "eos_nb_git_blob_sha1": "e39714a8993e7aea62c1f880644cc46e60e6307d",
+      "source_construction": {
+        "outer_crust": "BSk22-based segment below 2.0e-3 fm^-3",
+        "inner_crust": "self-consistent Thomas-Fermi calculation; preserve all source-defined nonspherical pasta and cluster regimes",
+        "method": "Thomas-Fermi; Grill et al. 2014 with model-specific RMF parameterization"
+      },
+      "crust_drip_policy": "Keep the source-defined neutron-drip transition and all rows on either side. The 2.0e-3 fm^-3 outer-source splice is not identified as the neutron-drip density.",
+      "upper_endpoint_policy": "The listed nB_max is the exact upper support endpoint of this archived eos.nb grid, not a universal physical crust-core transition and not permission to append or extrapolate a core tail.",
+      "composition": {
+        "eos_compo": "PRESENT",
+        "status": "PRESERVE_RAW_PROVIDER_RECORDS_AND_ROW_MASKS; production group-composition reconstruction follows the E390-02 dual-track literature route"
+      },
+      "note": "TM1e RMF; CompOSE page /eos/207; BSk22 outer crust below 0.002 fm^-3 and Thomas-Fermi inner crust."
+    },
+    {
+      "id": "GPPVA_TW",
+      "family": "crust",
+      "compose_entry": "GPPVA(TW) NS crust",
+      "compose_url": "https://compose.obspm.fr/eos/212",
+      "raw_table_support": {
+        "nB_min_fm3": 4.67962e-10,
+        "nB_max_fm3": 0.074000001,
+        "nb_points": 289
+      },
+      "eos_nb_git_blob_sha1": "1ae3b88523f9fcbe94ab6198cd2e6e99833b7c86",
+      "source_construction": {
+        "outer_crust": "BPS (Baym-Pethick-Sutherland) outer-crust EoS below nB=2.0e-3 fm^-3, as stated on the TW crust CompOSE page",
+        "inner_crust": "self-consistent Thomas-Fermi calculation; preserve all source-defined nonspherical pasta and cluster regimes",
+        "method": "Thomas-Fermi; Grill et al. 2014 with model-specific RMF parameterization"
+      },
+      "crust_drip_policy": "Keep the source-defined neutron-drip transition and all rows on either side. The 2.0e-3 fm^-3 outer-source splice is not identified as the neutron-drip density.",
+      "upper_endpoint_policy": "The listed nB_max is the exact upper support endpoint of this archived eos.nb grid, not a universal physical crust-core transition and not permission to append or extrapolate a core tail.",
+      "composition": {
+        "eos_compo": "PRESENT",
+        "status": "PRESERVE_RAW_PROVIDER_RECORDS_AND_ROW_MASKS; production group-composition reconstruction follows the E390-02 dual-track literature route"
+      },
+      "note": "TW RMF; CompOSE page /eos/212 explicitly uses BPS, not BSk22, for the outer crust below 0.002 fm^-3; inner crust is self-consistent Thomas-Fermi with nonspherical pasta."
+    }
+  ],
+  "interface_schema": {
+    "required": [
+      "model_id",
+      "component_role",
+      "source_archive_sha256",
+      "source_file_sha256_manifest_ref",
+      "source_file_git_blob_sha1",
+      "compose_entry_id_or_name",
+      "compose_datasheet_url",
+      "primary_paper_refs",
+      "source_file_support_nB",
+      "selected_T_value_and_index",
+      "selected_Yq_value_and_index",
+      "mn",
+      "mp",
+      "Il",
+      "thermo_column_map",
+      "phase_dictionary_ref",
+      "composition_presence_masks",
+      "Nadd_schema",
+      "component_lower_and_upper_support",
+      "boundary_method_id",
+      "boundary_value_and_unit",
+      "interpolation_id_and_version",
+      "endpoint_P",
+      "endpoint_epsilon",
+      "endpoint_muB",
+      "endpoint_slope",
+      "unsupported_fields",
+      "source_gaps",
+      "transform_chain",
+      "output_sha256"
+    ],
+    "optional": [
+      "proton_fraction",
+      "particle_abundances",
+      "nuclear_group_Abar_Zbar_YI",
+      "phase_label",
+      "pasta_geometry",
+      "source_mr_data"
+    ],
+    "missing_policy": "null plus explicit status; never numeric zero unless source contains an explicit zero"
+  },
+  "hard_stops": [
+    "No core-only product for a model with an unresolved homogeneous-core boundary.",
+    "No crust-only product that omits a source-supported outer-crust, neutron-drip, inner-crust or source-labelled cluster/pasta interval.",
+    "No extrapolation below/above source support.",
+    "No universal nB=0.045 fm^-3 fallback as a physical core boundary.",
+    "No cross-model Iphase numeric remapping.",
+    "No fabricated composition or replacement of absent species by zero.",
+    "No use of archived source nB_max as a universal crust-core matching density.",
+    "No source mutation, in-place overwrite, or hash identity loss."
+  ],
+  "required_tests": [
+    "exact eos.nb point count and bounds match the admitted source manifest; nB strictly increasing and finite",
+    "eos.t/eos.yq axes and (iT,inb,iYq) keys preserved exactly for the selected T=0 beta-equilibrium slice",
+    "mn/mp/Il parse from each eos.thermo header and all Q columns retain their CompOSE definitions",
+    "Q6/Q7 T=0 consistency and independent pressure/chemical-potential first-law residuals",
+    "C1-C11 applicability matrix reports CHECKED/PARTIAL/NOT_AVAILABLE/FAIL per source row without treating missing as zero",
+    "model-specific core boundary is cited, numerically represented or explicitly blocks construction",
+    "crust phase coverage includes all source-supported regimes and keeps neutron drip distinct from the BSk22 splice at 0.002 fm^-3",
+    "phase-local derivatives, mechanical stability and causality; failure retained without clipping or extrapolation",
+    "unknown Nadd/q_extra and phase fields are byte-preserved or explicitly unsupported",
+    "all transformations create new immutable versioned artifacts with input and output hashes"
+  ],
+  "source_refs": [
+    "https://arxiv.org/abs/0908.2344",
+    "https://arxiv.org/abs/1408.4159",
+    "https://arxiv.org/abs/1607.05899",
+    "https://arxiv.org/abs/1804.00334",
+    "https://arxiv.org/abs/2001.10143",
+    "https://arxiv.org/abs/2402.15548",
+    "https://compose.obspm.fr/eos/134",
+    "https://compose.obspm.fr/eos/204",
+    "https://compose.obspm.fr/eos/207",
+    "https://compose.obspm.fr/eos/208",
+    "https://compose.obspm.fr/eos/209",
+    "https://compose.obspm.fr/eos/210",
+    "https://compose.obspm.fr/eos/211",
+    "https://compose.obspm.fr/eos/212",
+    "https://compose.obspm.fr/eos/311",
+    "https://compose.obspm.fr/eos/317",
+    "https://compose.obspm.fr/eos/318",
+    "https://compose.obspm.fr/eos/319",
+    "https://compose.obspm.fr/eos/328",
+    "https://compose.obspm.fr/eos/54",
+    "https://compose.obspm.fr/eos/68",
+    "https://compose.obspm.fr/eos/69",
+    "https://compose.obspm.fr/table_selection",
+    "https://doi.org/10.1103/PhysRevC.90.045803",
+    "https://doi.org/10.1140/epja/s10050-022-00847-y"
+  ],
+  "validation_corrections": [
+    {
+      "model": "GPPVA_TW",
+      "field": "outer_crust",
+      "corrected_value": "BPS below 2.0e-3 fm^-3",
+      "authority": "https://compose.obspm.fr/eos/212",
+      "status": "SOURCE_CONFIRMED"
+    },
+    {
+      "model": "GPPVA_FSU2R",
+      "field": "outer_crust",
+      "corrected_value": null,
+      "authority": "https://compose.obspm.fr/table_selection",
+      "status": "UNRESOLVED_NO_PROVIDER_ASSUMPTION"
+    },
+    {
+      "model": "APR_APR",
+      "field": "source_release_identity",
+      "corrected_value": "legacy CompOSE EOS 68; 172 points",
+      "alternate_release": "CompOSE EOS 328; 1833 points",
+      "status": "RELEASE_IDENTITY_PINNED_NO_SUBSTITUTION"
+    }
+  ]
+}

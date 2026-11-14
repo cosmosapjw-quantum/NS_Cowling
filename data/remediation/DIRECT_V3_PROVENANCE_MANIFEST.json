@@ -1,0 +1,98 @@
+{
+  "mission": "NSC_EOS390_FULL_REMEDIATION_2026-11-14",
+  "phase": "G",
+  "artifact": "DIRECT_V3_PROVENANCE_MANIFEST",
+  "generated_utc": "2026-11-14T09:30:53.665033+00:00",
+  "cohort_identity": {
+    "n_rows": 234,
+    "n_unique_crust_core_pairs": 39,
+    "n_unique_triples": 234,
+    "composition": "13 crusts x 3 cores (BBB_BHF2, GM_GM1, RG_SLY4) x 6 methods = 234",
+    "methods": {
+      "css": 39,
+      "cubic_F": 39,
+      "cubic_P": 39,
+      "maxwell": 39,
+      "quintic_F": 39,
+      "quintic_P": 39
+    },
+    "rows_by_core": {
+      "BBB_BHF2": 78,
+      "GM_GM1": 78,
+      "RG_SLY4": 78
+    },
+    "clarification": "The 234 rows are NOT 234 unique physical EOS pairs; they are 39 pairs x 6 methods. Mission section 9.1 requirement satisfied."
+  },
+  "method_labels": {
+    "maxwell": "39 rows carry the HISTORICAL v1 smooth-plateau label 'maxwell' from the pre-remediation generator. It is NOT a sharp first-order Maxwell construction (the current kernel rejects that alias). These rows are LEGACY_V1_REFERENCE spectra computed on legacy-matched input tables; the input CSVs are immutable historical inputs.",
+    "smooth_five": "css/cubic_F/cubic_P/quintic_F/quintic_P are the five smooth methods (identical ids to the native matcher)."
+  },
+  "v3_verification": {
+    "approach": "independent recomputation with the native Cowling solver (cell_solve, matched shooting) on the immutable normalized CSV inputs",
+    "n_recomputed": 6,
+    "all_reproduced_within_3e-12": true,
+    "recomputed_rows": [
+      {
+        "name": "GPPVA_FSU2H__BBB_BHF2__quintic_P",
+        "f_csv": 2517.378705850092,
+        "f_recomputed": 2517.3787058520247,
+        "f_rel_diff": 7.7e-13,
+        "p1_rel_diff": 2.3e-13,
+        "node_identity_f_0_0_p1_1_1": true
+      },
+      {
+        "name": "GPPVA_DD2__RG_SLY4__quintic_F",
+        "f_csv": 2371.0285,
+        "f_recomputed": 2371.0285,
+        "f_rel_diff": 1.54e-12,
+        "p1_rel_diff": 7.07e-14,
+        "node_identity_f_0_0_p1_1_1": true
+      },
+      {
+        "name": "GPPVA_TW__RG_SLY4__quintic_F",
+        "f_csv": 2371.3692,
+        "f_recomputed": 2371.3692,
+        "f_rel_diff": 9.42e-13,
+        "p1_rel_diff": 3.88e-13,
+        "node_identity_f_0_0_p1_1_1": true
+      },
+      {
+        "name": "GPPVA_TM1e__RG_SLY4__quintic_F",
+        "f_csv": 2381.8655,
+        "f_recomputed": 2381.8655,
+        "f_rel_diff": 1.88e-12,
+        "p1_rel_diff": 1.41e-13,
+        "node_identity_f_0_0_p1_1_1": true
+      },
+      {
+        "name": "GPPVA_TW__BBB_BHF2__quintic_F",
+        "f_csv": 2513.1821,
+        "f_recomputed": 2513.1821,
+        "f_rel_diff": 1.18e-12,
+        "p1_rel_diff": 1.12e-12,
+        "node_identity_f_0_0_p1_1_1": true
+      },
+      {
+        "name": "SPG_M1__GM_GM1__cubic_F",
+        "f_csv": 1924.2237936971626,
+        "f_recomputed": 1924.2238,
+        "f_rel_diff": 2.91e-12,
+        "p1_rel_diff": 1.46e-12,
+        "node_identity_f_0_0_p1_1_1": true
+      }
+    ],
+    "doc_representative_claim_verified": "DIRECT_EOS_PROVIDER_V3.md sec. 96 (GPPVA_FSU2H__BBB_BHF2__quintic_P: f=2.517378706 kHz, p1=7.205657666 kHz, mass residual 1.54e-13) reproduced exactly.",
+    "doc_stale_statement": "DIRECT_EOS_PROVIDER_V3.md sec. 97 states 'the other 233 spectra require a separate v3 production run'. This is STALE: the artifact CSV carries fully populated f_v3/p1_v3 columns, and every sampled recomputation (6/6) reproduces the stored values to <= 3e-12 relative. The doc is updated in Phase K; the artifact was NOT relabelled."
+  },
+  "cohort_numerics_reproduction": {
+    "f_v3_populated_rows": 234,
+    "max_abs_mass_relative_residual": 9.9342756243459e-13,
+    "max_abs_f_residual": 5.68939267919788e-08,
+    "max_abs_p1_residual": 3.59120330695184e-10,
+    "note": "matches the stored cohort report's per-core maxima (max mass rel 9.93e-13, max f residual 5.7e-08 within solver tolerances)"
+  },
+  "source_admission_overlay": {
+    "RG_SLY4_rows": 78,
+    "admission_note": "Phase C measured RG_SLY4 as SOURCE_INADMISSIBLE for SMOOTH MATCHING (Q5 != 0). These 78 legacy spectra remain VALID AS COMPUTED (numerical verification above) but their INPUT tables come from the legacy v1 generator, not the current admission-gated pipeline. They are LEGACY_REFERENCE, not production-admitted v3 outputs. No claim is changed post hoc."
+  }
+}

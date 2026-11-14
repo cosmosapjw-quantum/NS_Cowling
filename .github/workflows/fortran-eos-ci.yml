@@ -6,10 +6,12 @@ on:
       - main
       - research/fortran-eos-gap-fill-v1
       - research/eos390-fortran-unification-v1
+      - cloud/eos390-fortran-unification-v1
   pull_request:
     branches:
       - main
       - research/fortran-eos-gap-fill-v1
+      - research/eos390-fortran-unification-v1
 
 permissions:
   contents: read
@@ -50,6 +52,46 @@ jobs:
           COMPOSE_EOS_FORTRAN_ROOT: .
           COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
         run: python -m pytest -q python_frontend/tests pipeline/tests
+      - name: Build admitted E390-03A standalone core-only cohort
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+        run: python scripts/build_e390_03a_core_only.py build/e390_03a/core_only
+      - name: Upload E390-03A core-only tables and construction receipts
+        uses: actions/upload-artifact@v4
+        with:
+          name: E390-03A-core-only-${{ github.sha }}
+          path: build/e390_03a/core_only/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Build admitted E390-03B standalone crust-only cohort
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+        run: python scripts/build_e390_03b_crust_only.py build/e390_03b/crust_only
+      - name: Upload E390-03B crust-only tables and construction receipts
+        uses: actions/upload-artifact@v4
+        with:
+          name: E390-03B-crust-only-${{ github.sha }}
+          path: build/e390_03b/crust_only/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Build native E390-03 DD-RMF beta-equilibrium and symmetry grid
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+        run: python scripts/build_e390_03_ddrmf.py build/e390_03/ddrmf
+      - name: Upload E390-03 DD-RMF native diagnostic grids and receipts
+        uses: actions/upload-artifact@v4
+        with:
+          name: E390-03-DDRMF-native-${{ github.sha }}
+          path: build/e390_03/ddrmf/
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Run native Fortran polynomial-extrema unit tests
         run: |
           gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
@@ -89,6 +131,26 @@ jobs:
               print(f"{label}: bytes={len(data)} sha256={sha256(data).hexdigest()} "
                     f"CRLF={data.count(bytes([13, 10]))} CR={data.count(bytes([13]))} "
                     f"LF={data.count(bytes([10]))}")
+          PY
+
+      - name: Diagnose exact SHA-256 manifest mismatches
+        if: always()
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from hashlib import sha256
+          for line in Path("SHA256SUMS_v4.txt").read_text(encoding="utf-8").splitlines():
+              if not line.strip():
+                  continue
+              expected, name = line.split(maxsplit=1)
+              name = name.lstrip("* ")
+              path = Path(name)
+              if not path.is_file():
+                  print(f"MISSING {name} expected={expected}")
+                  continue
+              actual = sha256(path.read_bytes()).hexdigest()
+              if actual != expected:
+                  print(f"MISMATCH {name} expected={expected} actual={actual}")
           PY
 
       - name: Verify tracked SHA-256 manifest

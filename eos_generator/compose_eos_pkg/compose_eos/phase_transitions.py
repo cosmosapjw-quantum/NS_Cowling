@@ -18,6 +18,7 @@ from scipy.optimize import brentq, root_scalar
 from scipy.integrate import solve_ivp
 from .eos_data import EOSData
 from .io import read_compose, write_compose
+from .matching import MAXWELL_METHOD_ID
 
 @dataclass
 class MaxwellEOS:
@@ -110,7 +111,7 @@ def build_maxwell_eos(low_phase: EOSData, high_phase: EOSData, *, low_name='low'
         q_extra_count=0,composition_available=False,beta_equilibrated=True)
     il=int(ml.sum()); ih=il+1
     critical=0.5*elo+1.5*pt
-    transition={'kind':'maxwell','pressure_MeV_fm3':pt,'muB_MeV':mut,
+    transition={'kind':'maxwell','method_id':MAXWELL_METHOD_ID,'pressure_MeV_fm3':pt,'muB_MeV':mut,
        'n_low_fm3':nlo,'n_high_fm3':nhi_t,'eps_low_MeV_fm3':elo,'eps_high_MeV_fm3':epshi_t,
        'delta_eps_MeV_fm3':de,'low_index':il,'high_index':ih,
        'seidov_critical_delta_eps_MeV_fm3':critical,
@@ -120,7 +121,7 @@ def build_maxwell_eos(low_phase: EOSData, high_phase: EOSData, *, low_name='low'
        'charge_neutrality':'local in each phase (Maxwell)'}
     # Store provenance and interpolation consistency at the coexistence point.
     source_e_low=float(eli(mut)); source_e_high=float(ehi_sp(mut))
-    meta={'schema':'compose-eos-maxwell-v1','low_phase':low_name,'high_phase':high_name,
+    meta={'schema':'compose-eos-maxwell-v1','method_id':MAXWELL_METHOD_ID,'low_phase':low_name,'high_phase':high_name,
           'coexistence_root_count':len(brackets),'selected_root_index':int(crossing_index),
           'low_energy_identity_residual':elo-source_e_low,'high_energy_identity_residual':epshi_t-source_e_high,
           'low_source_hard_gates':{k:bool(repl[k].get('pass_',False)) for k in ('C1','C2','C6','C10','C11')},
@@ -142,7 +143,7 @@ def read_maxwell_eos(directory: str) -> MaxwellEOS:
     data=read_compose(directory); path=Path(directory)/'eos.phase_transitions.json'
     if not path.is_file(): raise FileNotFoundError('EOS directory has no eos.phase_transitions.json sharp-interface metadata')
     meta=json.loads(path.read_text(encoding='utf-8'))
-    if meta.get('schema')!='compose-eos-maxwell-v1' or meta.get('transition',{}).get('kind')!='maxwell':
+    if meta.get('schema')!='compose-eos-maxwell-v1' or meta.get('transition',{}).get('kind')!='maxwell' or meta.get('method_id', MAXWELL_METHOD_ID)!=MAXWELL_METHOD_ID:
         raise ValueError('unsupported or malformed Maxwell sidecar schema')
     ids=np.asarray(meta.get('phase_ids',[]),dtype=int)
     if ids.shape!=(data.n,): raise ValueError('phase_ids length does not match CompOSE table')

@@ -1,0 +1,62 @@
+{
+ "node": "E390-05",
+ "subscope": "m5_real_maxwell_hadron_quark_native",
+ "date": "2026-11-14",
+ "method": "native Fortran construct_maxwell_transition (commit 6ffdd62; single-conserved-charge local-neutrality sharp coexistence in Euler mu_E)",
+ "phase_low": {
+  "source": "single real CompOSE core table BBB_BHF2 (n_B>=0.08, trimmed; the M4 splice was rejected by the native Hermite P(mu) stability gate at the GPPVA_DD2/BBB_BHF2 model join)",
+  "n_points": 15,
+  "mu_B_range": [
+   963.9481323536147,
+   2172.4300127697456
+  ]
+ },
+ "phase_high": {
+  "model": "CSS constant-sound-speed quark (Alford-Han-Prakash 2013): eps=eps_t+(P-P_t)/cs2, n=n_t*f^(1/(1+cs2)), mu=(eps+P)/n",
+  "P_t_input": 20.0,
+  "eps_t_input": 290.5615199146374,
+  "n_t_input": 0.3,
+  "cs2_input": 0.2,
+  "n_points": 500
+ },
+ "maxwell_transition": {
+  "mu_t_mev": 1297.3557649936765,
+  "P_t_mev_fm3": 20.0,
+  "n_low_fm3": 0.7397772124276645,
+  "n_high_fm3": 0.9274376924688952,
+  "delta_n_fm3": 0.1876604800412307,
+  "eps_low_mev_fm3": 790.978379201623,
+  "eps_high_mev_fm3": 1034.4407848445944,
+  "delta_eps_mev_fm3": 243.46240564297136,
+  "first_law_resid_native": 2.3347924584367573e-16,
+  "seidov_critical_mev_fm3": 648.6529678293502,
+  "seidov_stable": true,
+  "native_status": "ok"
+ },
+ "native_c1_c11_overall_pass": true,
+ "native_failed_checks": [],
+ "native_C2_first_law_max_rel": 1.7525930941875475e-16,
+ "native_C6_min_dPdnb": 0.0,
+ "native_C10_cs2_range": [
+  0.03129766810564141,
+  0.4743558186845136
+ ],
+ "is_exact_maxwell": true,
+ "construction": "single_conserved_charge_local_neutrality_maxwell",
+ "status": "M5_REAL_MAXWELL_NATIVE_PASS",
+ "attempts_summary": [
+  {
+   "P_t_in": 20.0,
+   "cs2_in": 0.2,
+   "eps_t_in": 290.5615199146374,
+   "n_t_in": 0.3,
+   "mu_t": 1297.3557649936765,
+   "P_t": 168.77585215235916,
+   "n_low": 0.7397772124276645,
+   "n_high": 0.9274376924688952,
+   "jump": 0.1876604800412307,
+   "maxwell_identity_residual": 2.3347924584367573e-16,
+   "status": "ok"
+  }
+ ]
+}

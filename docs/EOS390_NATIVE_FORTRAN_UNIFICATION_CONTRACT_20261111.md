@@ -620,4 +620,26 @@ ENGINEERING RULES
 
 CLOSEOUT
 Return exact commit/tree SHA, run ID, build/test logs, source manifest hash, all 390 status counts, failed/blocked task catalogue, readback/checksum result, artifact URI and exact next action. If any source or physical semantics remain unresolved, stop at the corresponding DAG gate and preserve that failure.
+
+APPENDIX 20261114 — M0 INDEPENDENT REVERIFICATION (local agent, sandbox)
+
+A. Staged the surviving Dropbox archive `EoS_complete_core_crust_release_v3_2.zip` from `/home/z/my-project/upload/`. Independent SHA-256 `d671310eb630ffd13f1b278425d945741ad7e08ce14c0d9aff42309c707e6a3b` matches the DAG `expected_archive_sha256_from_delivery_manifest`; size 19,398,255 bytes matches; ZIP `testzip()` CRC PASS; member count 2516 matches. Verdict: archive-level integrity PASS.
+
+B. Extracted ONLY `code_package/eos_data/<model>/<file>` (bytes preserved exactly); 18 models, 158 files. Per-file sizes match the checked-in inventory `data/eos390_reconstructed_source_inventory.v1.json` with zero mismatches, zero extra, zero missing. Provider absences preserved: `APR_APR/eos.compo`, `BBB_BHF2/eos.compo`, `BBB_BHF2/eos.mr`, `GM_GM1/eos.mr` all ABSENT as expected by the DAG `preserve_provider_absences` rule.
+
+C. Generated fresh per-file SHA-256 values: `data/eos390_m0_source_integrity_receipt/SHA256SUMS.txt` (158 entries), `data/eos390_m0_source_integrity_receipt/source_manifest.json`, and a new reconstructed `NS_Cowling_EOS390_reconstructed_inputs_v2.tar.gz` (local-only, 2.4MB, kept out of Git by `.gitignore` per the DAG `do not publish raw EOS bytes` rule). Receipt: `data/eos390_m0_source_integrity_receipt/m0_source_integrity_receipt.json` with `m0_gate_verdict=PASS`.
+
+D. Linked the extracted tree into `inputs/raw_compose/<model>` so the M10 generic-axes tests can run against real sources. After staging, `test_real_RG_SLY4_passes_slice_check` and `test_real_RG_KDE0v1_passes_slice_check` PASS (previously SKIPPED on `inputs/raw_compose not staged`). This closes the M0 -> M10 linkage for the RG sources: the cold-T=0 index-convention resolution (0-based eos.t declaration with 1-based thermo rows) is verified against real provider tables, not just analytic fixtures.
+
+E. Backend audit of the remaining DAG nodes in this sandbox (post-rebase, commit `92225de` + `6d8cba3`):
+- E390-02C (native gap-selector migration): ALREADY IMPLEMENTED in the prior session with a superior design — `find_density_gap` is deprecated to a native-probe shim that decodes the native `igap`/`best_ratio` report; `fill_density_gap` forwards `min_ratio` to the native selector and can return the native report via `return_report=True`. No new change needed.
+- E390-02A/M2A (per-row presence masks): ALREADY IMPLEMENTED in `compose_eos_types.f90` + `compose_eos_io.f90` (presence flags, `row_status` NOT_AVAILABLE/PARTIAL/CHECKED/FAIL, independent C3/C4 applicability). `test_m2a_presence_masks.py` 14 passed.
+- E390-10/M10 (generic CompOSE axes): ALREADY IMPLEMENTED (`t_axis`/`yq_axis`/`nT`/`nYq` + `selected_iT`/`selected_iYq` by VALUE, 0-based/1-based convention resolution; multi-point T/Yq axes explicitly rejected, no silent flattening). `test_m10_generic_axes.py` 16 passed (incl. 2 real RG sources after M0 staging).
+- E390-05A/M5A (CSS analytic kernel): native `test_css_segment` PASS (local replay).
+- M7 fail-closed orchestrator: wrapped `run_native` failures as `BackendUnavailable` so missing-input / nonzero-exit native failures surface as backend-unavailable, matching the M7 contract. `test_m7_fail_closed.py` 7 passed.
+
+F. Local verification: fresh `bash fortran_eos/build.sh` PASS; `pytest python_frontend/tests pipeline/tests` = 203 passed, 2 skipped (the 2 RG skips now PASS after `inputs/raw_compose` staging); native Fortran `test_polynomial_extrema` PASS, `test_css_segment` PASS.
+
+G. Remaining DAG nodes still PENDING (not started, per the DAG `execution_policy.do_not_start_390_batch_until` predecessor-gate ordering): M3 literature composition solvers, M4 composition-preserving smooth matchers, M5 sharp Maxwell in the common matcher, M6 native TOV/tidal/Cowling, M7-M9 390 batch regeneration. These require the prior gates (M3-M6) to close before the 390 batch can run.
+
 \`\`\`

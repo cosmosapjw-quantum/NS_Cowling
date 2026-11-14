@@ -295,7 +295,9 @@
         "Original v3.2 outputs and source folders are read-only",
         "All 18 model readmes and datasheets are indexed"
       ],
-      "status": "BLOCKED_USER_RAW_ARCHIVE_REQUIRED"
+      "status": "PASS_INDEPENDENTLY_REVERIFIED_20261114",
+      "reverification_commit": "92225de",
+      "reverification_receipt": "data/eos390_m0_source_integrity_receipt/m0_source_integrity_receipt.json"
     },
     {
       "id": "M1",
@@ -469,7 +471,29 @@
       ],
       "status_detail": "E390-00 is resolved in the original project workspace: the user-provided EoS_complete_core_crust_release_v3_2.zip (19,398,255 bytes; SHA-256 d671310eb630ffd13f1b278425d945741ad7e08ce14c0d9aff42309c707e6a3b) was rehashed, ZIP CRC-tested, and the 18-model/158-file source inventory and reproducible tar.zst were verified per E390-00-RESOLVED_20261113.json. The extracted inputs/raw_compose tree is not committed and is absent from the GitHub Actions checkout; therefore CI cannot execute source-backed RG_SLY4/RG_KDE0v1 tests without a controlled provisioning step. This is a reproducibility boundary, not evidence that M0 failed.",
       "resolved_date": "2026-11-13",
-      "receipt": "data/receipts/eos390_m2a/E390-00-RESOLVED_20261113.json"
+      "receipt": "data/receipts/eos390_m2a/E390-00-RESOLVED_20261113.json",
+      "independent_reverification_20261114": {
+        "status": "PASS",
+        "commit": "92225de",
+        "receipt": "data/eos390_m0_source_integrity_receipt/m0_source_integrity_receipt.json",
+        "staged_zip": "/home/z/my-project/upload/EoS_complete_core_crust_release_v3_2.zip",
+        "archive_checks": {
+          "size_bytes": 19398255,
+          "size_match": true,
+          "sha256": "d671310eb630ffd13f1b278425d945741ad7e08ce14c0d9aff42309c707e6a3b",
+          "sha256_match": true,
+          "member_count": 2516,
+          "crc_testzip": "PASS"
+        },
+        "extraction": {
+          "model_count": 18,
+          "file_count": 158,
+          "inventory_size_mismatches": 0,
+          "provider_absences_preserved": ["APR_APR/eos.compo", "BBB_BHF2/eos.compo", "BBB_BHF2/eos.mr", "GM_GM1/eos.mr"]
+        },
+        "outputs": ["SHA256SUMS.txt (158 entries)", "source_manifest.json", "reconstructed tar.gz (local-only, 2.4MB)"],
+        "m10_linkage": "After staging inputs/raw_compose from this extraction, test_real_RG_SLY4_passes_slice_check and test_real_RG_KDE0v1_passes_slice_check PASS (previously skipped)."
+      }
     },
     {
       "id": "E390-01",
@@ -1459,15 +1483,21 @@
       "pairs_before_root_search": "65 BLOCKED"
     },
     "reconstructed_source_cohort": {
-      "status": "DROPBOX_METADATA_INVENTORY_VERIFIED_BINARY_HASH_PENDING",
+      "status": "INDEPENDENTLY_REVERIFIED_20261114_PASS",
       "models": 18,
       "files": 158,
       "total_file_bytes": 3883275,
       "current_vs_v3_2_relative_paths_and_sizes": "158_OF_158_MATCH",
       "source_archive": "EoS_complete_core_crust_release_v3_2.zip",
-      "archive_sha256": "REPORTED_BY_DELIVERY_MANIFEST_ONLY",
-      "cloud_staging": "NOT_DONE",
-      "fresh_file_hashes": "NOT_DONE",
+      "archive_sha256": "d671310eb630ffd13f1b278425d945741ad7e08ce14c0d9aff42309c707e6a3b (INDEPENDENTLY_REHASHED_20261114)",
+      "archive_sha256_match": true,
+      "archive_size_match": true,
+      "archive_member_count": 2516,
+      "archive_crc_testzip": "PASS",
+      "cloud_staging": "DONE_LOCALLY_20261114 (inputs/replacement + inputs/raw_compose linked from extracted code_package/eos_data)",
+      "fresh_file_hashes": "DONE_20261114 (data/eos390_m0_source_integrity_receipt/SHA256SUMS.txt, 158 entries)",
+      "reverification_receipt": "data/eos390_m0_source_integrity_receipt/m0_source_integrity_receipt.json",
+      "reverification_commit": "92225de",
       "regenerated_390": "RUN_234_PASS_156_FAIL_CLOSED_RG_CORES_BETA_EQUILIBRIUM_GATE_DROPBOX_SNAPSHOT_DEFERRED"
     },
     "e390_03a": {

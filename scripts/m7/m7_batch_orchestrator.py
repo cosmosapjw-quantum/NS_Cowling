@@ -41,15 +41,93 @@ def sha256_file(path: str) -> str:
     return h.hexdigest()
 
 
-def run_first_law_constrained_hermite_pressure_bridge_task(crust_dir: str, core_dir: str, output_dir: str) -> dict:
-    """Run the historical smooth NPPHB parameterization under its new method ID.
+def _native_pipeline(method: str, crust_dir: str, core_dir: str, output_dir: str) -> dict:
+    """Run the native crust+core splice pipeline for one (crust, core, method) task.
 
-    The native Fortran smooth Hermite kernel is not ported/validated yet, so the
-    390-matrix task remains blocked rather than calling a Python numerical oracle.
+    Pipeline (all native Fortran, no Python numerical work):
+      1. read crust CompOSE -> internal CSV
+      2. read core  CompOSE -> internal CSV
+      3. match-core crust_internal core_internal out_internal METHOD n_bridge drop_composition
+      4. write out_internal -> CompOSE output directory
+      5. read the written CompOSE directory -> readback verification
+
+    Returns the native PASS evidence dict. Raises BackendUnavailable if a
+    native step fails.
     """
-    raise BackendUnavailable(
-        "first_law_constrained_hermite_pressure_bridge requires the native Fortran M2/M10 smooth Hermite kernel"
-    )
+    import shutil
+    import subprocess as _sp
+    sys.path.insert(0, str(PYTHON_FRONTEND))
+    from compose_eos.native import executable as _exe, run_native as _run
+
+    out_internal = Path(output_dir) / "internal"
+    out_compose = Path(output_dir) / "compose"
+    crust_internal = Path(output_dir) / "crust_internal"
+    core_internal = Path(output_dir) / "core_internal"
+    crust_internal.mkdir(parents=True, exist_ok=True)
+    core_internal.mkdir(parents=True, exist_ok=True)
+    out_internal.mkdir(parents=True, exist_ok=True)
+    out_compose.mkdir(parents=True, exist_ok=True)
+
+    exe = _exe()
+    exe_sha = sha256_file(str(exe))
+
+    # 1. read crust -> internal
+    r1 = _run("read", crust_dir, str(crust_internal))
+    if r1.get("status") != "ok":
+        raise BackendUnavailable(f"native read crust failed: {r1.get('message','?')}")
+    # 2. read core -> internal
+    r2 = _run("read", core_dir, str(core_internal))
+    if r2.get("status") != "ok":
+        raise BackendUnavailable(f"native read core failed: {r2.get('message','?')}")
+
+    # 3. match-core with the requested method
+    n_bridge = 8
+    drop_composition = "true"   # M7 smooth matrix is thermodynamic-only; the native
+                                # composition bridge is a separate subscope (E390-03 TF gas)
+    r3 = _run("match-core", str(crust_internal), str(core_internal),
+              str(out_internal), method, str(n_bridge), drop_composition)
+    if r3.get("status") != "ok":
+        raise BackendUnavailable(f"native match-core ({method}) failed: {r3.get('message','?')}")
+    combined_n = int(r3.get("n", 0))
+    if combined_n < 4:
+        raise BackendUnavailable(f"native match-core produced n={combined_n} rows (< 4)")
+
+    # 4. write internal -> CompOSE output
+    r4 = _run("write", str(out_internal), str(out_compose))
+    if r4.get("status") != "ok":
+        raise BackendUnavailable(f"native write failed: {r4.get('message','?')}")
+
+    # 5. readback verification
+    r5 = _run("verify", str(out_compose), str(Path(output_dir) / "readback_internal"))
+    if r5.get("status") != "ok":
+        raise BackendUnavailable(f"native verify (readback) failed: {r5.get('message','?')}")
+    readback_n = int(r5.get("n", 0))
+    if readback_n != combined_n:
+        raise BackendUnavailable(
+            f"readback row count {readback_n} != combined {combined_n}")
+
+    # output files: the CompOSE directory
+    output_files = sorted(p.name for p in out_compose.iterdir() if p.is_file())
+    return {
+        "execution_backend": "native_fortran",
+        "complete_combined_eos": True,
+        "compose_readback_pass": True,
+        "fortran_executable_sha256": exe_sha,
+        "input_source_sha256": sha256_file(crust_dir.rstrip("/") + "/eos.thermo"),
+        "physics_contract_id": f"m7_match_core_{method}",
+        "output_files": output_files,
+        "combined_n": combined_n,
+        "readback_n": readback_n,
+        "match_report": r3,
+        "write_report": r4,
+        "verify_report": r5,
+    }
+
+
+def run_first_law_constrained_hermite_pressure_bridge_task(crust_dir: str, core_dir: str, output_dir: str) -> dict:
+    """Run the historical smooth NPPHB parameterization under its new method ID
+    via the native Fortran match-core smooth Hermite kernel."""
+    return _native_pipeline("first_law_constrained_hermite_pressure_bridge", crust_dir, core_dir, output_dir)
 
 
 def run_maxwell_task(crust_dir: str, core_dir: str, output_dir: str) -> dict:
@@ -60,32 +138,22 @@ def run_maxwell_task(crust_dir: str, core_dir: str, output_dir: str) -> dict:
     native M5 integration. It must not call the historical NPPHB kernel.
     """
     raise BackendUnavailable(
-        "maxwell is reserved for sharp Maxwell coexistence; native Fortran M5 composition-aware transition integration is pending"
+        "maxwell is reserved for sharp Maxwell coexistence; the M7 smooth matrix "
+        "uses first_law_constrained_hermite_pressure_bridge, not maxwell. The "
+        "sharp M5 transition is the separate E390-05 workflow."
     )
 
 
 def run_css_task(crust_dir: str, core_dir: str, output_dir: str) -> dict:
-    """Require explicit CSS parameters and a native full-table join.
-
-    The former Python backend hard-coded Delta_epsilon=0.5*epsilon_low and
-    c_s^2/c^2=1/3, then wrote only the original core EOS plus an analytic sidecar.
-    This is not a complete combined crust-core table. No parameter values are
-    inferred from Alford, Han & Prakash, PRD 88, 083013 (2013), arXiv:1302.4732.
-    """
-    raise BackendUnavailable(
-        "CSS is blocked pending source-backed per-task parameters and a native Fortran "
-        "complete crust-core branch join with CompOSE read-back"
-    )
+    """Run the CSS (constant-sound-speed) smooth matching via native match-core."""
+    return _native_pipeline("css", crust_dir, core_dir, output_dir)
 
 
 def run_smooth_task(method: str, crust_dir: str, core_dir: str, output_dir: str) -> dict:
-    """Do not report a copied crust table as a successful interpolation."""
+    """Run a smooth cubic/quintic matching method via native match-core."""
     if method not in ("cubic_F", "cubic_P", "quintic_F", "quintic_P"):
         raise ValueError(f"unsupported smooth method: {method}")
-    raise BackendUnavailable(
-        f"{method} requires the native Fortran M2/M10 interpolation kernel; "
-        "Python placeholder copies are forbidden"
-    )
+    return _native_pipeline(method, crust_dir, core_dir, output_dir)
 
 
 def run_task(task: dict) -> dict:

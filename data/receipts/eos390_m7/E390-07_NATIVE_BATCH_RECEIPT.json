@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0.1",
+  "node": "E390-07",
+  "gate": "M7",
+  "title": "Implement native manifest-driven 390 batch orchestration",
+  "status": "PARTIAL_NATIVE_PIPELINE_MATCH_CORE_PASS_READBACK_REMAINS",
+  "built_date": "2026-11-14",
+  "outputs": {
+    "pair_manifest": "DELIVERED: m7_manifest_generator.py produces the 390-task manifest (13 crust x 5 core x 6 methods) with task_id, provenance, output_folder, status slots",
+    "fortran_batch_command": "PARTIAL: the native pipeline (read -> match-core -> write -> verify) is wired into m7_batch_orchestrator.py via _native_pipeline; match-core succeeds (combined EOS, e.g. 92 rows) but the write->verify readback returns 0 rows for drop_composition=true tables",
+    "per_pair_receipts": "DELIVERED: the orchestrator emits per-task receipts with PASS/FAIL/BLOCKED status, hashes, and native evidence; the remaining gap is the readback row count for composition-dropped tables"
+  },
+  "delivered": [
+    "m7_manifest_generator.py: 390-task manifest (13 crust x 5 core x 6 smooth methods)",
+    "m7_batch_orchestrator.py: native Fortran pipeline wired into all 4 method stubs (FLCHPB, css, cubic_F/P, quintic_F/P)",
+    "per-task fail-closed receipts with native evidence (execution_backend, combined_n, match_report)"
+  ],
+  "remaining": [
+    "readback verification: write -> read returns 0 rows when drop_composition=true (the compo file is omitted, so the verify step needs to accept composition-absent tables)",
+    "full 390-task batch run once the readback gap is closed",
+    "maxwell method remains a separate M5 workflow (not in the M7 smooth matrix)"
+  ],
+  "physics_contract": {
+    "pipeline": "read crust CompOSE -> internal; read core CompOSE -> internal; match-core METHOD n_bridge drop_composition; write internal -> CompOSE; verify readback",
+    "methods": "first_law_constrained_hermite_pressure_bridge, css, cubic_F, cubic_P, quintic_F, quintic_P (all native match-core smooth methods)",
+    "drop_composition": "true (the M7 smooth matrix is thermodynamic-only; the native composition bridge is the E390-03 TF-gas subscope)",
+    "maxwell_excluded": "maxwell is the sharp first-order transition (E390-05), not a smooth EOS390 v2 method"
+  },
+  "non_claims": [
+    "The readback gap is a verify-step acceptance for composition-dropped tables, not a physics gap; match-core produces a complete combined thermodynamic EOS.",
+    "No Python numerical fallback; the pipeline is native Fortran end-to-end."
+  ],
+  "provenance": {
+    "parent_commit": "81ddceca5e8ca39c94188dedce5f7ca42c6d2e7e",
+    "orchestrator": "scripts/m7/m7_batch_orchestrator.py",
+    "manifest_generator": "scripts/m7/m7_manifest_generator.py"
+  }
+}

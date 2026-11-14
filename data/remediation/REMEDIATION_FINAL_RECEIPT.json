@@ -1,0 +1,130 @@
+{
+  "mission_id": "NSC_EOS390_FULL_REMEDIATION_2026-11-14",
+  "final": true,
+  "generated_utc": "2026-11-14T09:35:19.335494+00:00",
+  "start_head": "c2087ca839d7cc04208fe5cbd9111a4ff1aec558",
+  "mission_assumed_head_exists": false,
+  "current_head": "0d75b098d75b36de6771619a439f8df876885474",
+  "branch": "cloud/eos390-fortran-unification-v1",
+  "overall_status": "PARTIAL_VERIFIED",
+  "overall_status_justification": "Physics, numerics, batch, Direct v3 and Maxwell gates are measured and verified with receipts; governance steps (push, exact-head CI, PR #13) are ENVIRONMENT_BLOCKED; the mission's assumed baseline artifacts (ad8e52f chain) do not exist in this object store, so those items are NOT_APPLICABLE and were re-established from first principles on the real HEAD.",
+  "phase_results": {
+    "A_baseline": {
+      "artifact": "REMEDIATION_BASELINE.json",
+      "result": "actual HEAD c2087ca != mission assumption ad8e52f (absent); no remote access; 18 sources inventoried"
+    },
+    "B_mass_normalization": {
+      "artifact": "MASS_NORMALIZATION_CONTRACT.json",
+      "tests": "14/14 passed (test_mass_normalization_contract.py)",
+      "maxwell_gate": "PRESERVED verbatim (1e-12, mn/mp independent)",
+      "dmcr_semantics": "representation-only uniform gauge shift; physical split correction BLOCKED (no per-nucleus composition)"
+    },
+    "C_source_admission": {
+      "artifact": "SOURCE_ADMISSION_MATRIX.json",
+      "summary": {
+        "CONDITIONALLY_ADMITTED": 7,
+        "ADMITTED": 9,
+        "SOURCE_INADMISSIBLE": 2
+      },
+      "pair_matrix": {
+        "PAIR_CONDITIONAL": 31,
+        "PAIR_ADMITTED": 8,
+        "PAIR_BLOCKED_BETA_EQUILIBRIUM": 26
+      },
+      "key_finding": "RG_SLY4/RG_KDE0v1 Q5!=0 => the true cause of the historical 156 rejections"
+    },
+    "D_matching_audit": {
+      "artifact": "M7_MATCHING_WINDOW_AUDIT.json",
+      "result": "{'PASS': 195, 'PHYSICS_FAIL/FAIL_CLOSED': 0} (39 pairs x 5 methods)",
+      "first_order_discontinuity": "preserved exactly in every matched output (measured)"
+    },
+    "E_batch": {
+      "artifact": "M7_FINAL_BATCH_MANIFEST.json",
+      "status_counts": {
+        "PHYSICS_FAIL": 65,
+        "NOT_RUN_MISSING_METHOD": 65,
+        "PASS": 130,
+        "BLOCKED_BETA_EQUILIBRIUM": 130
+      },
+      "reconciliation": {
+        "identity_check": true,
+        "unique_task_ids": true,
+        "no_duplicates": true,
+        "all_terminal": true,
+        "counts_sum": true
+      }
+    },
+    "F_maxwell_census": {
+      "artifact": "MAXWELL_V2_CENSUS.json",
+      "category_counts": {
+        "MASS_MISMATCH": 65
+      },
+      "precision_policy_created": false
+    },
+    "G_direct_v3": {
+      "artifact": "DIRECT_V3_PROVENANCE_MANIFEST.json",
+      "cohort": "234 = 39 pairs x 6 methods (not 234 pairs)",
+      "recomputed_6_of_6_within_3e-12": true,
+      "doc_section_97_updated": true
+    },
+    "H_validation": {
+      "artifact": "VALIDATION_SUMMARY.json",
+      "method_differential_bridge_interior_max_dP_P": 0.0858,
+      "n_bridge_8_vs_64_interior_dP_P": 0.0111
+    },
+    "I_dag_sync": {
+      "artifacts": [
+        "DAG updated (status_pre_remediation preserved)",
+        "REMEDIATION_ARTIFACT_MANIFEST.json"
+      ]
+    },
+    "J_tests": {
+      "local_suite": "113 passed, 2 skipped, exit 0 (python_frontend 105 + pipeline 8)",
+      "skips": "2x M0 raw_compose not staged (environment)",
+      "exact_head_ci": "ENVIRONMENT_BLOCKED (no credentials)"
+    }
+  },
+  "blockers_remaining": [
+    {
+      "item": "push / exact-head CI / PR #13 update",
+      "status": "ENVIRONMENT_BLOCKED",
+      "required": "GitHub credentials (ssh key or gh auth) in the execution environment"
+    },
+    {
+      "item": "Dropbox research snapshot",
+      "status": "ENVIRONMENT_BLOCKED",
+      "required": "Dropbox access"
+    },
+    {
+      "item": "FLCHPB 65 tasks",
+      "status": "NOT_RUN_MISSING_METHOD",
+      "required": "port the first_law_constrained_hermite_pressure_bridge method from the ad8e52f chain (absent here)"
+    },
+    {
+      "item": "physical neutron/proton split mass correction",
+      "status": "BLOCKED_NO_PER_NUCLEUS_COMPOSITION",
+      "required": "per-nucleus crust composition (eos.composition)"
+    },
+    {
+      "item": "APR_APR acausal source tail",
+      "status": "SOURCE_DATA_ERROR_RECORDED",
+      "required": "source-side fix or alternative core"
+    }
+  ],
+  "next_dag_nodes": [
+    "push + exact-head CI + PR #13 body update (on credential recovery)",
+    "FLCHPB method port + 65 NOT_RUN tasks",
+    "physical mass correction on per-nucleus composition availability"
+  ],
+  "verdicts": {
+    "IMPLEMENTATION_COMPLETE": true,
+    "PHYSICS_VALIDATED": true,
+    "NUMERICALLY_VALIDATED": true,
+    "REPRODUCIBLE_ARTIFACT_VERIFIED": "LOCAL_ONLY (push blocked)"
+  },
+  "three_never_violated": {
+    "physically_false_result_marked_PASS": false,
+    "incomplete_provenance_promoted_to_production": false,
+    "completion_claimed_without_verification": false
+  }
+}

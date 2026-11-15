@@ -1363,7 +1363,14 @@ def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
         "cs2_2": float(payload["cs2_source_right"]),
         "cs2_left_br": float(payload["cs2_left"]),
         "cs2_right_br": float(payload["cs2_right"]),
-        "dcs2_left": abs(float(payload["cs2_left"]) - float(payload["cs2_source_left"])),
+        "dcs2_left": (
+            None if bool(payload["is_exact_maxwell"])
+            else abs(float(payload["cs2_left"]) - float(payload["cs2_source_left"]))
+        ),
+        "dcs2_left_semantics": (
+            "not_applicable_across_first_order_density_jump"
+            if bool(payload["is_exact_maxwell"]) else "smooth_left_endpoint_derivative_difference"
+        ),
         "dcs2_right": abs(float(payload["cs2_right"]) - float(payload["cs2_source_right"])),
         "cs2_min_bridge": float(payload["cs2_min"]),
         "cs2_max_bridge": float(payload["cs2_max"]),

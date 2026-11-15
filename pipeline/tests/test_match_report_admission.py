@@ -86,6 +86,7 @@ def _css_case():
         "css_transition_low_index": i_low, "css_transition_high_index": i_low + 1,
         "css_core_bridge_index": i_low + 1 + 8 + 1,
         "first_law_relative_residual": 1.0e-14,
+        "source_euler_relative_residual": 1.0e-12,
         "composition_dropped": True, "is_exact_maxwell": True,
     }
     return report, rows
@@ -454,3 +455,12 @@ def test_admission_rejects_malformed_csv_schema_without_crashing(tmp_path, corru
         writer.writerows(rows)
     nml_path.write_text(f"&metadata\nmn={MN}\nil=1\ncharge_fraction_grid=0\n/\n")
     _failed(adm.admit_match_report("css", report, csv_path, nml_path), "serialized_rows_readable")
+
+
+@pytest.mark.parametrize("value", [6.0e-4, 3.7e-2, float("nan")])
+def test_css_rejects_source_euler_residual_above_native_provider_gate(value):
+    report, rows = _css_case()
+    report["source_euler_relative_residual"] = value
+    result = adm.admit_css(report, adm.rows_from_table(rows, META), META)
+    assert result["status"] == "REJECTED"
+    assert {"source_euler_relative_residual", "report_fields_present"} & set(result["failed_checks"])

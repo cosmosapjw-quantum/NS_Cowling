@@ -56,7 +56,7 @@ _CSS_REQUIRED = (
     "css_transition_delta_eps", "css_transition_epsilon_low",
     "css_transition_epsilon_high", "css_transition_pressure", "css_transition_mu",
     "css_transition_low_index", "css_transition_high_index", "css_core_bridge_index",
-    "first_law_relative_residual",
+    "first_law_relative_residual", "source_euler_relative_residual",
 )
 
 _MAXWELL_REQUIRED = (
@@ -288,6 +288,11 @@ def admit_css(report: Mapping[str, Any], rows: list[dict[str, float]],
     flr = float(report["first_law_relative_residual"])
     c.add("first_law_relative_residual", 0.0 <= flr <= FIRST_LAW_GATE,
           value=flr, gate=FIRST_LAW_GATE)
+    # Output mu_B is re-derived from F + P/n_B, so the serialized rows cannot
+    # reveal an inconsistent source chemical potential; the native report can.
+    ser = float(report["source_euler_relative_residual"])
+    c.add("source_euler_relative_residual", 0.0 <= ser <= EULER_GATE,
+          value=ser, gate=EULER_GATE)
 
     lo = _int_index(report, "css_transition_low_index")
     hi = _int_index(report, "css_transition_high_index")

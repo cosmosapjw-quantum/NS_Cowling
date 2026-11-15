@@ -29,6 +29,10 @@ module compose_eos_matching
     ! |mu_B,src - (F_src + P/n_B)|: provider tabulation residual repaired by
     ! the output Q3 re-derivation.
     real(wp) :: dm_mass_gauge_meV=0._wp, source_euler_residual_meV=0._wp
+    ! source_euler_relative_residual = max over all crust AND core source rows of
+    ! |mu_B,src - mu_E|/|mu_E| (mu_E = F + P/n_B, Il=0 charge shift undone).
+    ! Gated at the provider Euler tolerance 5e-4 declared by the Maxwell kernel.
+    real(wp) :: source_euler_relative_residual=0._wp
     character(len=32) :: method='', spline_mode=''
     character(len=64) :: construction_kind=''
     logical :: composition_dropped=.false., is_exact_maxwell=.false., seidov_applicable=.false.
@@ -720,6 +724,18 @@ contains
       status='unknown matching method';return
     endif
 
+    ! Output mu_B is re-derived from F + P/n_B, so an inconsistent
+    ! provider chemical potential (or a misplaced pressure column) would vanish
+    ! silently. Gate every source row, before the window search so that
+    ! a defective table is not misreported as a physical no-window case, with the provider Euler
+    ! tolerance already declared by the sharp-Maxwell kernel (5e-4).
+    report%source_euler_relative_residual=max( &
+      max_source_euler_relative(cr,1,cr%n),max_source_euler_relative(co,1,co%n))
+    if(.not.ieee_is_finite(report%source_euler_relative_residual).or. &
+       report%source_euler_relative_residual>5.e-4_wp)then
+      status='source rows violate the provider Q3 Euler relation mu_B = F + P/n_B '// &
+        '(relative tolerance 5e-4)';return
+    endif
     call find_window(cr,co,i1,i2,nbar,qbar,ok1,msg,require_single_css=css_mode)
     if(.not.ok1)then;status=trim(msg);return;endif
     call endpoint_cs2(cr,i1,'left',cs1,ok1,msg)
@@ -897,4 +913,23 @@ contains
     endif
     status='ok'
   end subroutine match_crust_core
+
+  real(wp) function max_source_euler_relative(eos,first,last) result(worst)
+    !! max |mu_B,src - mu_E|/|mu_E| over rows first..last, with
+    !! mu_B,src=(Q3+1)m_n (+Yq*mu_q for Il=0) and mu_E=(Q6+1)m_n+Q1.
+    type(eos_data_t),intent(in)::eos
+    integer,intent(in)::first,last
+    integer::j
+    real(wp)::mub,mue
+    worst=0._wp
+    do j=first,last
+      mub=(eos%q(3,j)+1._wp)*eos%mn
+      if(eos%il==0)mub=mub+eos%charge_fraction_grid*eos%q(4,j)*eos%mn
+      mue=(eos%q(6,j)+1._wp)*eos%mn+eos%q(1,j)
+      if(.not.ieee_is_finite(mub).or..not.ieee_is_finite(mue).or.mue==0._wp)then
+        worst=huge(1._wp);return
+      endif
+      worst=max(worst,abs(mub-mue)/abs(mue))
+    enddo
+  end function max_source_euler_relative
 end module compose_eos_matching

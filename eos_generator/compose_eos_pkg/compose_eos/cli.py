@@ -1,4 +1,4 @@
-r"""Command-line interface for the ``compose_eos`` package (v3.1.0).
+r"""Command-line interface for the ``compose_eos`` package (v3.3.1).
 
 Supports:
   - ``compose-eos check <dir>`` (or ``compose-eos audit <dir>``)

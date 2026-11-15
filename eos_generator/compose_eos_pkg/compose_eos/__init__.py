@@ -1,4 +1,4 @@
-"""compose_eos v3.3.0 — CompOSE EoS Parser, Thermodynamic Auditor, Gap Reconstructor,
+"""compose_eos v3.3.1 — CompOSE EoS Parser, Thermodynamic Auditor, Gap Reconstructor,
 First-Principles Literature Solver, Causal TOV Runner, and Universal Crust–Core Matcher.
 """
 from .eos_data import EOSData
@@ -42,7 +42,7 @@ from .matching import (
     solve_star_at_target_mass,
 )
 
-__version__ = "3.3.0"
+__version__ = "3.3.1"
 
 __all__ = ["build_maxwell_css_eos",
     "MaxwellEOS", "GibbsResult", "ChargeResolvedPhase", "LeptonSector",

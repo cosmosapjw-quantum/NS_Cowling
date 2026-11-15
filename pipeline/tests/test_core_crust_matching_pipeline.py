@@ -517,3 +517,33 @@ def test_census_flags_byte_identical_source_models(tmp_path, monkeypatch):
     assert manifest["source_duplicate_groups"]["core"] == []
     assert manifest["total_survivors"] == 3
     assert manifest["distinct_source_survivors"] == 2
+
+
+def test_census_classifies_rejected_and_placeholder_reconstruction_markers(tmp_path, monkeypatch):
+    import json
+    crust_root, core_root, out_root = tmp_path / "crust", tmp_path / "core", tmp_path / "run"
+    (crust_root / "REJ").mkdir(parents=True)
+    (crust_root / "REJ" / "REJECTED.json").write_text(json.dumps(
+        {"status": "REJECTED", "reason": "mechanical stability violated at rows [4]"}))
+    (crust_root / "PH").mkdir()
+    (crust_root / "PH" / "NOT_GENERATED.json").write_text(json.dumps(
+        {"status": "NOT_GENERATED", "reason": "placeholder identical to M1"}))
+    (core_root / "K").mkdir(parents=True)
+    for name in ("eos.nb", "eos.t", "eos.yq", "eos.thermo"):
+        (core_root / "K" / name).write_text(name, encoding="utf-8")
+    monkeypatch.setattr(pipeline, "CRUST_MODELS", ["REJ", "PH"])
+    monkeypatch.setattr(pipeline, "CORE_MODELS", ["K"])
+    monkeypatch.setattr(pipeline, "CRUST_ROOT", crust_root)
+    monkeypatch.setattr(pipeline, "CORE_ROOT", core_root)
+    monkeypatch.setattr(pipeline, "OUT_ROOT", out_root)
+    monkeypatch.setattr(pipeline, "executable", lambda: tmp_path / "exe")
+    monkeypatch.setattr(pipeline, "run_pipeline", lambda *a: pytest.fail("must not run"))
+    assert pipeline.main() == 0
+    manifest = json.loads((out_root / "matching_manifest.json").read_text(encoding="utf-8"))
+    assert manifest["crust_root"] == str(crust_root)
+    assert manifest["evaluated_attempts"] == 0
+    by = {r["crust_model"]: r for r in manifest["all_results"] if r["method"] == "css"}
+    assert by["REJ"]["failure_category"] == "source_reconstruction_rejected"
+    assert "mechanical stability" in by["REJ"]["error"]
+    assert by["PH"]["failure_category"] == "data_provenance"
+    assert "placeholder" in by["PH"]["error"]

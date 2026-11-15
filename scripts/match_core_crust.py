@@ -51,7 +51,11 @@ CRUST_MODELS = [
     "GPPVA_DD2", "GPPVA_DDME2", "GPPVA_TW",
 ]
 CORE_MODELS = ["APR_APR", "BBB_BHF2", "GM_GM1", "RG_SLY4", "RG_KDE0v1"]
-CRUST_ROOT = ROOT / "download" / "reconstruction"
+# v2 tables come from the corrected CLD writer (docs/CORE_CRUST_REAUDIT_
+# CONTINUATION_20261115.md); download/reconstruction holds the historical
+# tables whose Q1 slot carries n_B and is kept only as evidence.
+CRUST_ROOT = Path(os.environ.get("NS_COWLING_CRUST_ROOT",
+                                 str(ROOT / "download" / "reconstruction_v2"))).expanduser()
 CORE_ROOT = ROOT / "eos_generator" / "eos_data"
 DEFAULT_RUN_STAMP = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 DEFAULT_OUT_ROOT = ROOT / "download" / "matched_runs" / DEFAULT_RUN_STAMP
@@ -387,6 +391,20 @@ def _duplicate_groups(identities: dict[str, str | None]) -> list[list[str]]:
         if ident is not None:
             groups.setdefault(ident, []).append(model)
     return sorted(sorted(g) for g in groups.values() if len(g) > 1)
+
+
+def _source_marker(directory: Path) -> tuple[str, str] | None:
+    """(failure_category, reason) recorded by a reconstruction that wrote no table."""
+    for name, category in (("REJECTED.json", "source_reconstruction_rejected"),
+                           ("NOT_GENERATED.json", "data_provenance")):
+        path = directory / name
+        if path.is_file():
+            try:
+                reason = str(json.loads(path.read_text(encoding="utf-8")).get("reason", ""))
+            except (OSError, UnicodeError, json.JSONDecodeError):
+                reason = f"unreadable {name}"
+            return category, f"{name[:-5]}: {reason}"
+    return None
 
 
 def _missing_sources(directory: Path) -> list[str]:
@@ -728,6 +746,10 @@ def main() -> int:
                         "missing_source_detail": missing,
                         "failure_category": "data_provenance",
                     }
+                    marker = _source_marker(crust_dir) or _source_marker(core_dir)
+                    if marker is not None:
+                        res["failure_category"], res["error"] = marker[0], marker[1]
+                        res["source_marker"] = marker[1]
                 else:
                     res = run_pipeline(method, crust_dir, core_dir, out_dir)
                     res["outcome"] = "SURVIVED" if res["survived"] else "FAILED"
@@ -810,6 +832,8 @@ def main() -> int:
         "built_at_utc": built_at.isoformat(),
         "built_date_utc": built_at.date().isoformat(),
         "output_root": str(OUT_ROOT),
+        "crust_root": str(CRUST_ROOT),
+        "core_root": str(CORE_ROOT),
         "crust_models": CRUST_MODELS,
         "core_models": CORE_MODELS,
         "methods": ["maxwell", "css"],

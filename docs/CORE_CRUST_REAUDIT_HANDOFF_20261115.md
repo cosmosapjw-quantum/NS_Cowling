@@ -11,6 +11,7 @@ Current authority:
 - data/receipts/core_crust_audit_20261115/AUDIT_RECEIPT.json
 - docs/MASS_NORMALIZATION_CORRECTION_20261115.md
 - data/remediation/MASS_NORMALIZATION_CONTRACT.json
+- data/receipts/core_crust_audit_20261115/CENSUS_b11a530.json
 - latest PR CI and core-crust-census artifact matching current head/merge SHA.
 
 The user's existing /home/cosmosapjw/Dropbox/NS_Cowling checkout was dirty at

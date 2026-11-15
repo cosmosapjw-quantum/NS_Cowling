@@ -102,3 +102,17 @@ stability. Exa/Parallel/SciSpace assisted primary-source discovery.
 
 Verdict: **PARTIALLY-COMPLETE** for the scientific project; bounded corrections
 are implemented and executed. Keep PR15 draft/open/unmerged.
+
+## Committed-code census receipt
+
+`data/receipts/core_crust_audit_20261115/CENSUS_b11a530.json` records a clean
+run of code commit `b11a5305c461872f43a0a17611fd8cea796ff1d9`, all80 pair
+report hashes, source identities and10 survivor output hashes. Counts remain
+80/60/20/10/6 as above. Numerical physics changes are material: for
+SPG_M1+BBB_BHF2, the CSS latent energy falls from4.853739572 to
+1.775592014 MeV fm^-3 and s=(c_s/c)^2 changes from0.0873574303 to
+0.0855269965. For SPG_M1+GM_GM1 latent energy changes from0.434594362 to
+0.807502668 MeV fm^-3. Equal survivor counts do not mean equivalent EOS.
+
+This receipt uses native Python3.12.3, not the GitHub Actions Python3.13
+environment. Final CI repeats the full census and uploads its complete evidence.

@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[2]
 CRUST = ROOT / "eos_generator" / "eos_data_normalized" / "GPPVA_FSU2H"
 CORE = ROOT / "eos_generator" / "eos_data_normalized" / "GM_GM1"
 LEGACY_ROOT = ROOT / "eos_generator" / "compose_eos_pkg"
-METHODS = ("css", "cubic_F", "cubic_P", "quintic_F", "quintic_P")
+METHODS = ("cubic_F", "cubic_P", "quintic_F", "quintic_P")
 
 
 def _require_reference_inputs():
@@ -122,6 +122,56 @@ def test_native_smooth_matching_differential_against_legacy(method, tmp_path):
     assert info["is_exact_maxwell"] is False
     assert info["density_jump_fm3"] == 0.0
     assert "consistency" in info and "overall" in info["consistency"]
+
+
+def test_native_css_is_single_speed_with_crust_side_first_order_jump():
+    """CSS is one constant-c_s^2 bridge: continuous at core, Maxwell-jump at crust."""
+    _require_reference_inputs()
+    crust = read_compose(CRUST)
+    core = read_compose(CORE)
+    matched, info = match_crust_core(
+        crust, core, cr_name="GPPVA_FSU2H", co_name="GM_GM1",
+        method="css", n_bridge=40, core_compo_mode="strict_thermo_only",
+        drop_composition=True,
+    )
+
+    report = info["native_report"]
+    assert report["construction_kind"] == "css_single_speed_with_crust_density_jump"
+    assert report["is_exact_maxwell"] is True
+    assert report["seidov_applicable"] is True
+    assert info["is_exact_maxwell"] is True
+    assert info["phase_transition_order"] == "first_order"
+    assert info["density_jump_fm3"] > 0.0
+
+    # The CSS bridge has one and only one sound-speed value.
+    cs2 = report["css_single_sound_speed"]
+    assert 0.0 < cs2 <= 1.0
+    assert report["cs2_left"] == pytest.approx(cs2, rel=1e-11, abs=1e-13)
+    assert report["cs2_right"] == pytest.approx(cs2, rel=1e-11, abs=1e-13)
+    assert report["cs2_min"] == pytest.approx(cs2, rel=1e-11, abs=1e-13)
+    assert report["cs2_max"] == pytest.approx(cs2, rel=1e-11, abs=1e-13)
+
+    # The only sharp interface is crust -> bridge: P and mu are continuous,
+    # while n and epsilon jump according to Delta epsilon = mu_t Delta n.
+    i_low = report["css_transition_low_index"]
+    i_high = report["css_transition_high_index"]
+    assert i_high == i_low + 1
+    assert matched.nb[i_high] > matched.nb[i_low]
+    assert matched.p[i_high] == pytest.approx(matched.p[i_low], rel=1e-11, abs=1e-12)
+    assert matched.mub[i_high] == pytest.approx(matched.mub[i_low], rel=1e-11, abs=1e-10)
+    delta_n = matched.nb[i_high] - matched.nb[i_low]
+    delta_eps = matched.eps[i_high] - matched.eps[i_low]
+    assert delta_eps == pytest.approx(matched.mub[i_low] * delta_n, rel=2e-10, abs=1e-10)
+    assert info["density_jump_fm3"] == pytest.approx(delta_n, rel=1e-12)
+
+    # The bridge joins continuously onto the selected core endpoint.
+    i_core = report["css_core_bridge_index"]
+    source_core_index = report["i2"]
+    assert matched.nb[i_core] == pytest.approx(core.nb[source_core_index], rel=1e-12)
+    assert matched.p[i_core] == pytest.approx(core.p[source_core_index], rel=2e-10)
+    assert matched.eps[i_core] == pytest.approx(core.eps[source_core_index], rel=2e-8)
+    assert matched.mub[i_core] == pytest.approx(core.mub[source_core_index], rel=2e-10)
+    assert info["first_law_relative_residual"] < 5e-9
 
 
 def test_sharp_maxwell_method_is_rejected_by_smooth_matcher_until_m5_integration():

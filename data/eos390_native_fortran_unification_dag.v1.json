@@ -489,9 +489,18 @@
           "model_count": 18,
           "file_count": 158,
           "inventory_size_mismatches": 0,
-          "provider_absences_preserved": ["APR_APR/eos.compo", "BBB_BHF2/eos.compo", "BBB_BHF2/eos.mr", "GM_GM1/eos.mr"]
+          "provider_absences_preserved": [
+            "APR_APR/eos.compo",
+            "BBB_BHF2/eos.compo",
+            "BBB_BHF2/eos.mr",
+            "GM_GM1/eos.mr"
+          ]
         },
-        "outputs": ["SHA256SUMS.txt (158 entries)", "source_manifest.json", "reconstructed tar.gz (local-only, 2.4MB)"],
+        "outputs": [
+          "SHA256SUMS.txt (158 entries)",
+          "source_manifest.json",
+          "reconstructed tar.gz (local-only, 2.4MB)"
+        ],
         "m10_linkage": "After staging inputs/raw_compose from this extraction, test_real_RG_SLY4_passes_slice_check and test_real_RG_KDE0v1_passes_slice_check PASS (previously skipped)."
       }
     },
@@ -668,9 +677,18 @@
         "compose_closure": "data/receipts/eos390_m3/compose_closure/E390-03_COMPOSE_CLOSURE_receipt.json"
       },
       "remaining_acceptance": [
-        "GitHub CI build/test pass for the new compose_eos_cld module",
-        "full Thomas-Fermi Wigner-Seitz gas composition (separate subscope)"
-      ]
+        "RESOLVED_20261114: GitHub CI build/test pass for compose_eos_cld + compose_eos_rmf -- native unit tests test_ddrmf_homogeneous.f90 and test_cld_cell.f90 added to fortran_eos/tests/ and wired into .github/workflows/fortran-eos-ci.yml (commit 669ec9d). Local: 5 native tests PASS.",
+        "full Thomas-Fermi Wigner-Seitz gas composition (separate subscope, REMAINS)"
+      ],
+      "resolved_acceptance_20261114": {
+        "commit": "669ec9d",
+        "native_tests": [
+          "test_ddrmf_homogeneous.f90",
+          "test_cld_cell.f90"
+        ],
+        "ci_step": "Run native Fortran DD-RMF / CLD tests (E390-03/M3)",
+        "verdict": "CI acceptance for compose_eos_cld + compose_eos_rmf satisfied by native unit tests + CI step"
+      }
     },
     {
       "id": "E390-04",
@@ -777,9 +795,17 @@
       },
       "receipt": "data/receipts/eos390_m6/E390-06_NATIVE_TOV_LOVE_RECEIPT.json",
       "remaining_acceptance": [
-        "GitHub CI build/test pass for the new compose_eos_tov module",
-        "compose_cowling runtime-compile path resolution (separate subscope)"
-      ]
+        "RESOLVED_20261114: GitHub CI build/test pass for compose_eos_tov -- native unit test test_tov_love.f90 added to fortran_eos/tests/ and wired into .github/workflows/fortran-eos-ci.yml (commit 669ec9d). Local: native TOV test PASS (causal barotrope, stable-branch monotone, k2 in [0,1], fail-closed).",
+        "compose_cowling runtime-compile path resolution (separate subscope, REMAINS)"
+      ],
+      "resolved_acceptance_20261114": {
+        "commit": "669ec9d",
+        "native_tests": [
+          "test_tov_love.f90"
+        ],
+        "ci_step": "Run native Fortran TOV-Love tests (E390-06/M6)",
+        "verdict": "CI acceptance for compose_eos_tov satisfied by native unit test + CI step"
+      }
     },
     {
       "id": "E390-07",
@@ -798,10 +824,15 @@
       ],
       "receipt": "data/receipts/eos390_m7/E390-07_NATIVE_BATCH_RECEIPT.json",
       "remaining_acceptance": [
-        "readback verification for composition-dropped (drop_composition=true) tables",
-        "full 390-task batch run"
+        "RESOLVED_20261114: readback verification for composition-dropped (drop_composition=true) tables -- pinned by test_m7_native_pipeline_readback_passes_for_composition_dropped_table (commit 669ec9d). End-to-end on real staged SPG_M1+APR_APR: combined_n==readback_n, compose_readback_pass=True, verify overall FAIL allowed (C3/C4 closure diagnostic on composition-absent table, not a readback failure).",
+        "full 390-task batch run (REMAINS, requires M3-M6 predecessor gates fully closed incl. TF gas + Cowling subscopes)"
       ],
-      "status_pre_remediation": "NATIVE_PIPELINE_READBACK_PASS_READY_FOR_FULL_BATCH"
+      "status_pre_remediation": "NATIVE_PIPELINE_READBACK_PASS_READY_FOR_FULL_BATCH",
+      "resolved_acceptance_20261114": {
+        "commit": "669ec9d",
+        "test": "test_m7_native_pipeline_readback_passes_for_composition_dropped_table",
+        "verdict": "readback contract for composition-dropped tables pinned by end-to-end test"
+      }
     },
     {
       "id": "E390-08",
@@ -1664,7 +1695,7 @@
     {
       "area": "native tidal Love number with Maxwell jump",
       "status": "NOT_FOUND_IN_INSPECTED_NATIVE_SOLUTIONS_TREE",
-      "evidence": "Legacy phase_transitions.py contains pressure-corrected jump \u0394y=-4\u03c0r_t^3\u0394\u03b5/(m_t+4\u03c0r_t^3P_t) and TOV+Love solver. Inspected Fortran solutions tree has phase-segmented TOV/Cowling but no tidal/Love module was found."
+      "evidence": "Legacy phase_transitions.py contains pressure-corrected jump Δy=-4πr_t^3Δε/(m_t+4πr_t^3P_t) and TOV+Love solver. Inspected Fortran solutions tree has phase-segmented TOV/Cowling but no tidal/Love module was found."
     },
     {
       "area": "Python numerical modules still outside frontend-only target",

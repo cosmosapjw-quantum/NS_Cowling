@@ -52,6 +52,19 @@ jobs:
           COMPOSE_EOS_FORTRAN_ROOT: .
           COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
         run: python -m pytest -q python_frontend/tests pipeline/tests
+      - name: Install EOS generator package and test dependencies
+        run: python -m pip install -e 'eos_generator/compose_eos_pkg[test]'
+
+      - name: Run EOS generator adversarial and phase-transition suite
+        env:
+          PYTHONPATH: eos_generator/compose_eos_pkg
+        run: python -m pytest -q eos_generator/tests
+
+      - name: Verify EOS generator v3.3 release manifest
+        run: |
+          cd eos_generator
+          sha256sum -c SHA256SUMS_v3_3.txt
+
       - name: Build admitted E390-03A standalone core-only cohort
         env:
           PYTHONPATH: python_frontend

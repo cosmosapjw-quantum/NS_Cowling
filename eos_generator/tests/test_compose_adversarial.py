@@ -202,3 +202,11 @@ def test_unknown_nuclear_group_id_is_rejected(tmp_path):
     (tmp_path/'eos.compo').write_text('\n'.join(compo)+'\n')
     with pytest.raises(NotImplementedError, match='nuclear group id 9'):
         read_compose(str(tmp_path))
+
+
+def test_phase_boundary_mask_is_independent_of_composition_presence():
+    # A sharp Maxwell EOS may legitimately omit eos.compo while retaining Iphase.
+    d = make_data(composition=False)
+    report = check_consistency(d, verbose=False)
+    assert report["grid"]["phase_boundary_indices"] == [1]
+    assert np.array_equal(report["derivative_mask"][1:3], np.array([False, False]))

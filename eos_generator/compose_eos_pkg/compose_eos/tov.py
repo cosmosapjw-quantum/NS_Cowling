@@ -53,6 +53,7 @@ class CausalDomain:
     cs2_at_limit: float
     reason: str
     crossing_index: int | None = None
+    cs2_certified_max: float | None = None
 
     def to_dict(self):
         return asdict(self)
@@ -135,64 +136,159 @@ class BarotropicEOS:
         dlnp_dlneps = self._lnp_of_lneps.derivative()(logeps)
         return (p / np.asarray(eps, dtype=float)) * dlnp_dlneps
 
+    def cs2_of_pressure(self, pressure):
+        """dP/d epsilon of the interpolant the TOV RHS integrates, ln eps(ln P)."""
+        self._check_range(pressure, self.pressure[0], self.pressure[-1], "pressure")
+        x = np.log(np.asarray(pressure, dtype=float))
+        z = self._lneps_of_lnp(x)
+        return np.exp(x - z) / self._lneps_of_lnp.derivative()(x)
+
     def cs2_on_grid(self):
         return np.asarray(self.cs2(self.energy_density), dtype=float)
 
 
+def _rhs_interval_polys(eos: BarotropicEOS, j: int):
+    """Interval j of the RHS interpolant z(x)=ln eps(x), x=ln P, s in [0, 1].
+
+    Returns (x0, h, z_s, dz_s) as numpy Polynomials in s, with dz/dx = dz_s/h.
+    """
+    from numpy.polynomial import Polynomial
+    spline = eos._lneps_of_lnp
+    x0 = float(spline.x[j]); h = float(spline.x[j + 1] - spline.x[j])
+    c3, c2, c1, c0 = (float(v) for v in spline.c[:, j])
+    z_s = Polynomial([c0, c1 * h, c2 * h * h, c3 * h ** 3])
+    return x0, h, z_s, z_s.deriv()
+
+
+def _poly_range(poly, a, b):
+    """Exact (min, max) of a polynomial of degree <= 3 on [a, b]."""
+    cand = [a, b]
+    d = poly.deriv().trim(tol=0.0)
+    if d.degree() >= 1:
+        for r in d.roots():
+            if abs(r.imag) <= 1e-12 * max(1.0, abs(r.real)) and a < r.real < b:
+                cand.append(float(r.real))
+    vals = [float(poly(t)) for t in cand]
+    return min(vals), max(vals)
+
+
+def _certify_rhs_causality(eos: BarotropicEOS, tolerance: float, min_width: float = 1e-12):
+    """Ordered branch-and-bound certificate of 0 < c_s^2 <= 1 + tolerance.
+
+    On the RHS interpolant c_s^2 = exp(x - z(x)) / z'(x).  On any sub-interval
+    w = x - z is a cubic and z' a quadratic, so their exact ranges give rigorous
+    bounds  exp(min w)/max z' <= c_s^2 <= exp(max w)/min z'.  Sub-intervals are
+    processed left to right and bisected until certified or a violating point is
+    found.  A leaf of width ``min_width`` (in the unit interval coordinate) that
+    is neither certified nor violating at its endpoints is recorded as
+    unresolved and the scan continues; if no genuine violation follows, the
+    domain is cut fail-closed at the first unresolved leaf.
+
+    Returns (violation_x, certified_max, x_safe, undecided) with x = ln P.
+    """
+    bound = 1.0 + tolerance
+    certified_max = -np.inf
+    unresolved = None
+    nint = len(eos._lneps_of_lnp.x) - 1
+    for j in range(nint):
+        x0, h, z_s, dz_s = _rhs_interval_polys(eos, j)
+        w = Polynomial_from_shift(x0, h) - z_s
+
+        def cs2_at(s):
+            dz = float(dz_s(s)) / h
+            return np.exp(float(w(s))) / dz if dz > 0.0 else np.inf
+
+        stack = [(0.0, 1.0)]
+        while stack:
+            a, b = stack.pop()
+            wmin, wmax = _poly_range(w, a, b)
+            dmin, dmax = _poly_range(dz_s, a, b)
+            dmin /= h; dmax /= h
+            upper = np.exp(wmax) / dmin if dmin > 0.0 else np.inf
+            if upper <= bound:
+                certified_max = max(certified_max, upper)
+                continue
+            if cs2_at(a) > bound:
+                return x0 + h * a, certified_max, x0 + h * a, False
+            if b - a <= min_width:
+                if cs2_at(b) > bound:
+                    return x0 + h * b, certified_max, x0 + h * a, False
+                certified_max = max(certified_max, cs2_at(a), cs2_at(b))
+                if unresolved is None:
+                    unresolved = x0 + h * a
+                continue
+            mid = 0.5 * (a + b)
+            stack.append((mid, b))   # right half processed after left half
+            stack.append((a, mid))
+    if unresolved is not None:
+        return unresolved, certified_max, unresolved, True
+    return None, certified_max, float(eos._lneps_of_lnp.x[-1]), False
+
+
+def Polynomial_from_shift(x0, h):
+    from numpy.polynomial import Polynomial
+    return Polynomial([x0, h])
+
+
 def find_causal_domain(eos: BarotropicEOS, tolerance: float = 1e-8,
                        samples_per_interval: int = 16) -> CausalDomain:
-    r"""Return the connected low-density domain with 0 <= c_s^2 <= 1.
+    r"""Return the connected low-density domain with 0 < c_s^2 <= 1 + tolerance.
 
-    The same PCHIP derivative used by the TOV RHS is sampled densely within
-    every source interval. This avoids the false-safe result that can occur
-    when all tabulated knot values are causal but the derivative between knots
-    briefly exceeds a physical bound. The first crossing is then root-solved.
+    Certification is performed on the interpolant the TOV right-hand side
+    actually integrates, ln eps(ln P), with exact interval bounds (no sampling):
+    see :func:`_certify_rhs_causality`.  The first violation is bracketed by a
+    certified point and root-solved for c_s^2 = 1 (or 1 + tolerance when the
+    certified side already lies in (1, 1 + tolerance]).  ``samples_per_interval``
+    is accepted for configuration compatibility and is not used for any gate.
     """
     if tolerance < 0:
         raise ValueError("tolerance must be non-negative")
     if samples_per_interval < 2:
         raise ValueError("samples_per_interval must be at least 2")
-    x = eos.energy_density
-    # Uniform sampling in log epsilon, with knots included exactly.
-    segments = [np.linspace(np.log(x[i]), np.log(x[i + 1]),
-                            samples_per_interval + 1)[:-1]
-                for i in range(len(x) - 1)]
-    logeps_dense = np.concatenate(segments + [np.asarray([np.log(x[-1])])])
-    eps_dense = np.exp(logeps_dense)
-    eps_dense[0], eps_dense[-1] = x[0], x[-1]
-    cs_dense = np.asarray(eos.cs2(eps_dense), dtype=float)
-    invalid = np.flatnonzero((cs_dense < -tolerance) | (cs_dense > 1.0 + tolerance))
-    if invalid.size == 0:
+    violation, cert_max, x_safe, undecided = _certify_rhs_causality(eos, tolerance)
+    if violation is None:
         return CausalDomain(
             status="FULL_TABLE_CAUSAL", nb_max=float(eos.nb[-1]),
             eps_max=float(eos.energy_density[-1]), pressure_max=float(eos.pressure[-1]),
-            cs2_at_limit=float(cs_dense[-1]),
-            reason=(f"No sampled instability/acausal point; {samples_per_interval} interior samples per source interval."))
-
-    i = int(invalid[0])
-    if i == 0:
+            cs2_at_limit=float(eos.cs2_of_pressure(eos.pressure[-1])),
+            reason=("Certified 0 < c_s^2 <= 1 + tol on the TOV RHS interpolant "
+                    "ln eps(ln P) by exact interval bounds; no sampling."),
+            cs2_certified_max=float(cert_max))
+    x_first = float(eos._lneps_of_lnp.x[0])
+    if violation <= x_first:
         raise ValueError("EOS is mechanically unstable or acausal at the first tabulated point")
-    boundary = 0.0 if cs_dense[i] < 0.0 else 1.0
-    xa, xb = float(eps_dense[i - 1]), float(eps_dense[i])
-    fa = float(eos.cs2(xa) - boundary)
-    fb = float(eos.cs2(xb) - boundary)
-    if fa == 0.0:
-        eps_cross = xa
-    elif fa * fb < 0.0:
-        eps_cross = float(brentq(lambda q: float(eos.cs2(q) - boundary), xa, xb,
-                                 xtol=max(1e-13 * xa, 1e-300), rtol=1e-12))
+    cs2 = lambda x: float(eos.cs2_of_pressure(np.exp(x)))
+    target = 1.0
+    if undecided:
+        x_cross = x_safe
     else:
-        raise ValueError(f"could not bracket first c_s^2={boundary:g} crossing in dense interval")
-    p_cross = float(eos.pressure_of_energy(eps_cross))
-    nb_cross = float(eos.nb_of_energy(eps_cross))
-    source_interval = max(0, min(len(x) - 2, int(np.searchsorted(x, eps_cross, side="right") - 1)))
-    status = "ACASUAL_CUTOFF" if boundary == 1.0 else "MECHANICAL_INSTABILITY_CUTOFF"
+        # Cut at the c_s^2 = 1 crossing connected to the violation: step back
+        # from the last certified point until c_s^2 <= 1, then root-solve.
+        x_hi, x_lo, step = violation, x_safe, 1e-12 * max(1.0, abs(x_safe))
+        while cs2(x_lo) > 1.0 and x_lo > x_first:
+            x_hi = x_lo
+            x_lo = max(x_first, x_lo - step)
+            step *= 2.0
+        if cs2(x_lo) > 1.0:
+            target = 1.0 + tolerance
+            x_lo = x_first
+        x_cross = float(brentq(lambda x: cs2(x) - target, x_lo, x_hi,
+                               xtol=1e-15 * max(1.0, abs(x_hi)), rtol=1e-15))
+    p_cross = float(np.exp(x_cross))
+    eps_cross = float(eos.energy_of_pressure(p_cross))
+    nb_cross = float(eos.nb_of_energy(min(max(eps_cross, eos.energy_density[0]), eos.energy_density[-1])))
+    source_interval = max(0, min(len(eos.pressure) - 2,
+                                 int(np.searchsorted(eos.pressure, p_cross, side="right") - 1)))
+    reason = ("First c_s^2 crossing of the TOV RHS interpolant ln eps(ln P), located by "
+              "exact interval bounds; higher-density branch excluded.")
+    if undecided:
+        reason += " Bound undecided at minimum width; cut fail-closed at the last certified point."
+    elif target != 1.0:
+        reason += " No c_s^2 <= 1 point precedes the violation; root solved at c_s^2 = 1 + tol."
     return CausalDomain(
-        status=status, nb_max=nb_cross, eps_max=eps_cross,
-        pressure_max=p_cross, cs2_at_limit=float(eos.cs2(eps_cross)),
-        reason=(f"First c_s^2=1 crossing; {samples_per_interval} interior samples per source interval; higher-density branch excluded."
-                if boundary == 1.0 else f"First c_s^2=0 crossing; {samples_per_interval} interior samples per source interval; unstable branch excluded."),
-        crossing_index=source_interval)
+        status="ACASUAL_CUTOFF", nb_max=nb_cross, eps_max=eps_cross,
+        pressure_max=p_cross, cs2_at_limit=cs2(x_cross), reason=reason,
+        crossing_index=source_interval, cs2_certified_max=float(cert_max))
 
 
 def solve_tov_star(eos: BarotropicEOS, central_nb: float,

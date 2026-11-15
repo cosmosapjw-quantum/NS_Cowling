@@ -1,29 +1,30 @@
-"""Core-crust matching pipeline: maxwell + css for all (crust, core) pairs.
+"""Run native core--crust matching and verify the serialized CompOSE readback.
 
-Runs the native Fortran maxwell-transition and css (match-core) for every
-(crust, core) combination (8 crusts x 5 cores = 40 pairs x 2 methods = 80
-attempts). A pair "survives" if the native backend produces a complete
-combined EOS with successful CompOSE read-back.
-
-Surviving matched EOS are written as CompOSE tables under download/matched/
-and a JSON manifest of survivors is produced.
+Runs the native Fortran Maxwell and CSS methods for each configured crust/core
+pair. A pair survives only if the native match, CompOSE write, CompOSE readback,
+reported point counts, and every numerical/metadata column in the internal
+readback CSV all agree.
 
 Physics:
-  - maxwell: sharp first-order phase transition between the crust (low-density
-    phase) and core (high-density phase) at the common P(mu_B) coexistence
-    point. Requires a pressure crossing between the two phases.
-  - css: smooth constant-sound-speed matching via the native match-core kernel
-    with METHOD='css'. Produces a continuous thermodynamic bridge.
+  - maxwell: sharp first-order local-neutrality coexistence, with common
+    pressure and baryon chemical potential and a finite density/energy jump.
+  - css: one constant-sound-speed CSS bridge. At crust--CSS, P and mu_B are
+    continuous while n_B and epsilon jump; at CSS--core, n_B, P, epsilon and
+    mu_B are continuous. This is not a smooth density-continuous join over
+    the complete crust-plus-bridge domain.
 
-Both methods use drop_composition=true (the matched table is thermodynamic-only;
-composition bridging is a separate subscope).
+Both methods are thermodynamic-only in this pipeline. Composition is explicitly
+dropped; no composition-preservation claim is made.
 """
 from __future__ import annotations
+import csv
 import json
+import math
 import shutil
 import subprocess
 import sys
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -50,6 +51,189 @@ def sha256_file(path: Path | str) -> str:
         for chunk in iter(lambda: f.read(65536), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+# Integer-valued metadata columns in the native Fortran internal CSV.
+_INTEGER_COLUMNS = {
+    "Iphase", "row_status", "yn_present", "yp_present", "ye_present",
+    "ymu_present", "abar_present", "zbar_present", "yh_present",
+    "c3_applicable", "c4_applicable",
+}
+
+
+def verify_internal_readback(
+    expected_csv: Path | str,
+    actual_csv: Path | str,
+    *,
+    expected_n: int,
+    actual_n: int,
+    rtol: float = 5e-13,
+    atol: float = 1e-14,
+) -> dict:
+    """Compare the full native internal EOS table before/after CompOSE I/O.
+
+    This is intentionally stricter than checking a successful process exit or
+    an unchanged row count. Every numeric column emitted by write_internal_csv
+    is compared row-by-row, including Q1..Q7, q_extra slots, phase labels,
+    composition values, row status, presence masks and C3/C4 applicability.
+    Integer metadata is exact; floating-point columns use the declared
+    mixed absolute/relative tolerance.
+    """
+    expected_path = Path(expected_csv)
+    actual_path = Path(actual_csv)
+    errors: list[str] = []
+    report = {
+        "schema": "native-compose-internal-readback-v1",
+        "status": "FAIL",
+        "expected_n_reported": int(expected_n),
+        "actual_n_reported": int(actual_n),
+        "expected_path": str(expected_path),
+        "actual_path": str(actual_path),
+        "rtol": float(rtol),
+        "atol": float(atol),
+        "columns": [],
+        "expected_rows": None,
+        "actual_rows": None,
+        "max_abs_residuals": {},
+        "max_rel_residuals": {},
+        "errors": errors,
+    }
+
+    if expected_n < 0 or actual_n < 0:
+        errors.append("native readback row counts must be nonnegative")
+    if int(expected_n) != int(actual_n):
+        errors.append(
+            f"native readback row count mismatch: expected {expected_n}, got {actual_n}"
+        )
+    if not expected_path.is_file():
+        errors.append(f"expected internal CSV is missing: {expected_path}")
+    if not actual_path.is_file():
+        errors.append(f"readback internal CSV is missing: {actual_path}")
+    if errors:
+        return report
+
+    def load_table(path: Path):
+        with path.open("r", encoding="utf-8", newline="") as handle:
+            reader = csv.DictReader(handle)
+            header = reader.fieldnames
+            if not header:
+                raise ValueError(f"{path}: missing CSV header")
+            if len(set(header)) != len(header):
+                raise ValueError(f"{path}: duplicate CSV column names")
+            rows = list(reader)
+            for line_number, row in enumerate(rows, start=2):
+                if None in row:
+                    raise ValueError(
+                        f"{path}:{line_number}: row has more values than the header"
+                    )
+                if any(value is None for value in row.values()):
+                    raise ValueError(
+                        f"{path}:{line_number}: row has fewer values than the header"
+                    )
+            return list(header), rows
+
+    try:
+        expected_header, expected_rows = load_table(expected_path)
+        actual_header, actual_rows = load_table(actual_path)
+    except (OSError, UnicodeError, csv.Error, ValueError) as exc:
+        errors.append(f"internal CSV parse failure: {type(exc).__name__}: {exc}")
+        return report
+
+    report["expected_rows"] = len(expected_rows)
+    report["actual_rows"] = len(actual_rows)
+    report["columns"] = expected_header
+
+    if len(expected_rows) != int(expected_n):
+        errors.append(
+            f"expected internal CSV row count mismatch: native match reported "
+            f"{expected_n}, file contains {len(expected_rows)}"
+        )
+    if len(actual_rows) != int(actual_n):
+        errors.append(
+            f"readback internal CSV row count mismatch: native read reported "
+            f"{actual_n}, file contains {len(actual_rows)}"
+        )
+    expected_columns = set(expected_header)
+    actual_columns = set(actual_header)
+    if expected_columns != actual_columns:
+        missing = sorted(expected_columns - actual_columns)
+        extra = sorted(actual_columns - expected_columns)
+        errors.append(
+            f"internal CSV column mismatch: missing={missing}, extra={extra}"
+        )
+    if len(expected_rows) != len(actual_rows):
+        errors.append(
+            f"internal CSV row count mismatch: expected {len(expected_rows)}, "
+            f"got {len(actual_rows)}"
+        )
+        return report
+    if expected_columns != actual_columns:
+        return report
+
+    # Validate the serialized schema needed to preserve the EOS contract.
+    required = {"nb", *(f"Q{i}" for i in range(1, 8)), "Iphase"}
+    missing_required = sorted(required - expected_columns)
+    if missing_required:
+        errors.append(f"internal CSV lacks required EOS columns: {missing_required}")
+        return report
+
+    max_abs = {name: 0.0 for name in expected_header}
+    max_rel = {name: 0.0 for name in expected_header}
+    for row_index, (expected_row, actual_row) in enumerate(
+        zip(expected_rows, actual_rows), start=1
+    ):
+        for name in expected_header:
+            try:
+                expected_value = float(expected_row[name])
+                actual_value = float(actual_row[name])
+            except (TypeError, ValueError):
+                errors.append(
+                    f"row {row_index} column {name}: non-numeric value "
+                    f"(expected={expected_row.get(name)!r}, actual={actual_row.get(name)!r})"
+                )
+                continue
+            if not (math.isfinite(expected_value) and math.isfinite(actual_value)):
+                errors.append(
+                    f"row {row_index} column {name}: non-finite value "
+                    f"(expected={expected_value!r}, actual={actual_value!r})"
+                )
+                continue
+            difference = abs(actual_value - expected_value)
+            scale = max(abs(expected_value), abs(actual_value), 1e-30)
+            max_abs[name] = max(max_abs[name], difference)
+            max_rel[name] = max(max_rel[name], difference / scale)
+
+            if name in _INTEGER_COLUMNS:
+                if not expected_value.is_integer() or not actual_value.is_integer():
+                    errors.append(
+                        f"row {row_index} column {name}: integer metadata is not integral"
+                    )
+                elif int(expected_value) != int(actual_value):
+                    errors.append(
+                        f"row {row_index} column {name}: exact metadata mismatch "
+                        f"(expected={int(expected_value)}, actual={int(actual_value)})"
+                    )
+            elif difference > atol + rtol * abs(expected_value):
+                errors.append(
+                    f"row {row_index} column {name}: numerical mismatch "
+                    f"(expected={expected_value:.17g}, actual={actual_value:.17g}, "
+                    f"abs={difference:.3e}, rel={difference/scale:.3e})"
+                )
+
+    report["max_abs_residuals"] = max_abs
+    report["max_rel_residuals"] = max_rel
+    report["status"] = "PASS" if not errors else "FAIL"
+    return report
+
+
+def _source_compose_hashes(directory: Path) -> dict[str, str]:
+    """Return hashes of the CompOSE source files actually present."""
+    hashes = {}
+    for name in ("eos.nb", "eos.t", "eos.yq", "eos.thermo", "eos.compo"):
+        path = directory / name
+        if path.is_file():
+            hashes[name] = sha256_file(path)
+    return hashes
 
 
 def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) -> dict:
@@ -111,10 +295,57 @@ def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) ->
         # 5. readback verification
         readback_internal = work / "readback_internal"
         readback_internal.mkdir(exist_ok=True)
-        r5 = run_native("read", str(out_dir / "compose"), str(readback_internal))
+        try:
+            r5 = run_native("read", str(out_dir / "compose"), str(readback_internal))
+        except Exception as exc:
+            return {
+                "survived": False, "method": method, "stage": "readback",
+                "error": f"native CompOSE readback failed: {type(exc).__name__}: {exc}",
+                "combined_n": combined_n,
+                "readback_n": 0,
+                "readback_status": "ERROR",
+                "readback_validation": {
+                    "schema": "native-compose-internal-readback-v1",
+                    "status": "FAIL",
+                    "errors": [f"native CompOSE readback failed: {type(exc).__name__}: {exc}"],
+                },
+                "match_report": r3,
+                "write_report": r4,
+            }
+
         readback_n = int(r5.get("n", 0)) if r5.get("status") == "ok" else 0
+        expected_csv = matched_internal / "eos_data.csv"
+        actual_csv = readback_internal / "eos_data.csv"
+        readback_validation = verify_internal_readback(
+            expected_csv, actual_csv,
+            expected_n=combined_n, actual_n=readback_n,
+        )
+        if r5.get("status") != "ok":
+            readback_validation["status"] = "FAIL"
+            readback_validation["errors"].append(
+                f"native readback returned status={r5.get('status')!r}"
+            )
+        if readback_validation["status"] != "PASS":
+            return {
+                "survived": False,
+                "method": method,
+                "stage": "readback",
+                "error": "; ".join(readback_validation["errors"][:8]),
+                "combined_n": combined_n,
+                "readback_n": readback_n,
+                "readback_status": r5.get("status", "?"),
+                "readback_validation": readback_validation,
+                "fortran_executable_sha256": exe_sha,
+                "match_report": r3,
+                "write_report": r4,
+            }
 
         output_files = sorted(p.name for p in (out_dir / "compose").iterdir() if p.is_file())
+        output_hashes = _source_compose_hashes(out_dir / "compose")
+        source_hashes = {
+            "crust": _source_compose_hashes(crust_dir),
+            "core": _source_compose_hashes(core_dir),
+        }
 
         return {
             "survived": True,
@@ -123,6 +354,9 @@ def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) ->
             "combined_n": combined_n,
             "readback_n": readback_n,
             "readback_status": r5.get("status", "?"),
+            "readback_validation": readback_validation,
+            "source_sha256": source_hashes,
+            "output_sha256": output_hashes,
             "output_files": output_files,
             "fortran_executable_sha256": exe_sha,
             "match_report": r3,
@@ -175,6 +409,10 @@ def main() -> int:
                         "combined_n": res["combined_n"],
                         "readback_n": res["readback_n"],
                         "readback_status": res["readback_status"],
+                        "readback_validation": res["readback_validation"],
+                        "source_sha256": res["source_sha256"],
+                        "output_sha256": res["output_sha256"],
+                        "fortran_executable_sha256": res["fortran_executable_sha256"],
                         "output_dir": str(out_dir / "compose"),
                         "match_report": res["match_report"],
                     })
@@ -186,11 +424,31 @@ def main() -> int:
     n_maxwell = sum(1 for s in survivors if s["method"] == "maxwell")
     n_css = sum(1 for s in survivors if s["method"] == "css")
     manifest = {
-        "schema": "ns-cowling.core-crust-matching.v1",
-        "built_date": "2026-11-14",
+        "schema": "ns-cowling.core-crust-matching.v2",
+        "built_at_utc": datetime.now(timezone.utc).isoformat(),
+        "built_date_utc": datetime.now(timezone.utc).date().isoformat(),
         "crust_models": CRUST_MODELS,
         "core_models": CORE_MODELS,
         "methods": ["maxwell", "css"],
+        "method_contracts": {
+            "maxwell": {
+                "construction_kind": "sharp_first_order_local_neutrality_coexistence",
+                "interfaces": {
+                    "crust_core": "common pressure and baryon chemical potential; finite density and energy-density jump"
+                },
+                "composition": "dropped",
+            },
+            "css": {
+                "construction_kind": "css_single_speed_with_crust_density_jump",
+                "interfaces": {
+                    "crust_css": "common pressure and baryon chemical potential; finite positive density and energy-density jump with Delta_epsilon=mu_t Delta_n",
+                    "css_core": "continuous n_B, pressure, energy density, and baryon chemical potential",
+                },
+                "sound_speed": "one constant cs2 across the CSS bridge",
+                "composition": "dropped",
+                "smooth_over_entire_crust_plus_bridge": False,
+            },
+        },
         "total_attempts": len(results),
         "total_survivors": len(survivors),
         "survivors_maxwell": n_maxwell,

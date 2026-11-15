@@ -136,6 +136,19 @@ def test_internal_metadata_readback_checks_discrete_flags_and_indices(tmp_path):
     assert any("beta_equilibrated" in error for error in report["errors"])
 
 
+def test_census_main_refuses_nonempty_output_root_without_deleting_existing_files(tmp_path, monkeypatch):
+    occupied = tmp_path / "previous_census"
+    occupied.mkdir()
+    sentinel = occupied / "previous_manifest.json"
+    sentinel.write_text('{"preserve": true}', encoding="utf-8")
+    monkeypatch.setattr(pipeline, "OUT_ROOT", occupied)
+
+    with pytest.raises(FileExistsError, match="not empty"):
+        pipeline.main()
+
+    assert sentinel.read_text(encoding="utf-8") == '{"preserve": true}'
+
+
 def test_pipeline_does_not_mark_css_survived_when_readback_count_differs(tmp_path, monkeypatch):
     exe = tmp_path / "compose_eos_fortran"
     exe.write_bytes(b"test executable identity")

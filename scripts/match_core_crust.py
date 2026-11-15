@@ -40,8 +40,9 @@ CRUST_MODELS = [
 CORE_MODELS = ["APR_APR", "BBB_BHF2", "GM_GM1", "RG_SLY4", "RG_KDE0v1"]
 CRUST_ROOT = ROOT / "download" / "reconstruction"
 CORE_ROOT = ROOT / "eos_generator" / "eos_data"
-OUT_ROOT = ROOT / "download" / "matched"
-WORK_ROOT = ROOT / "download" / "matched_work"
+DEFAULT_RUN_STAMP = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+DEFAULT_OUT_ROOT = ROOT / "download" / "matched_runs" / DEFAULT_RUN_STAMP
+OUT_ROOT = Path(os.environ.get("NS_COWLING_MATCH_OUT_ROOT", str(DEFAULT_OUT_ROOT))).expanduser()
 N_BRIDGE = 8
 
 
@@ -554,12 +555,18 @@ def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) ->
 
 
 def main() -> int:
+    # Never delete a previous match census. A fresh timestamped run root is
+    # the default; an explicit override is allowed only when its directory is
+    # absent or empty. This makes reruns and interrupted jobs fail closed.
     if OUT_ROOT.exists():
-        shutil.rmtree(OUT_ROOT)
-    OUT_ROOT.mkdir(parents=True)
-    if WORK_ROOT.exists():
-        shutil.rmtree(WORK_ROOT)
-    WORK_ROOT.mkdir(parents=True)
+        if not OUT_ROOT.is_dir():
+            raise NotADirectoryError(f"matching output root is not a directory: {OUT_ROOT}")
+        if any(OUT_ROOT.iterdir()):
+            raise FileExistsError(
+                f"matching output root is not empty: {OUT_ROOT}; "
+                "choose a new NS_COWLING_MATCH_OUT_ROOT"
+            )
+    OUT_ROOT.mkdir(parents=True, exist_ok=True)
 
     results = []
     survivors = []
@@ -616,6 +623,7 @@ def main() -> int:
         "schema": "ns-cowling.core-crust-matching.v2",
         "built_at_utc": built_at.isoformat(),
         "built_date_utc": built_at.date().isoformat(),
+        "output_root": str(OUT_ROOT),
         "crust_models": CRUST_MODELS,
         "core_models": CORE_MODELS,
         "methods": ["maxwell", "css"],

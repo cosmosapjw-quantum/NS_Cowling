@@ -82,3 +82,8 @@ The core--crust runner now invokes the native `verify` operation on the actual s
 The consistency checker now detects a composition-free thermodynamic Maxwell interface independently of `Iphase`: equal pressure and baryon chemical potential, positive density and energy-density jumps, and `Delta epsilon = mu_t Delta n_B`. Both one-sided knots are excluded from derivative stencils only after these conditions pass. A same-pressure density discontinuity that fails chemical-potential or latent-energy closure is recorded as `THERMODYNAMIC_JUMP` and fails the overall audit. This is needed because the thermo-only CSS matcher intentionally sets all composition Iphase values to zero.
 
 A native analytic regression verifies one valid single-speed Maxwell jump with a thermo-only EOS, verifies derivative-stencil masking, and rejects a corrupted high-side energy row. The real GPPVA_FSU2H + GM_GM1 CSS runner regression additionally checks C1/C2/C6/C10/C11 on the serialized CompOSE output.
+
+
+## Safe full-census execution
+
+The full batch runner no longer deletes `download/matched` or `download/matched_work`. By default it writes each census into a UTC timestamped directory under `download/matched_runs/<timestamp>`. An explicit `NS_COWLING_MATCH_OUT_ROOT` is supported only when the selected directory is absent or empty; non-empty roots are rejected without modifying their contents. Each survivor manifest records the resolved output root. The per-pair `work` directory remains scratch space owned by that individual attempt.

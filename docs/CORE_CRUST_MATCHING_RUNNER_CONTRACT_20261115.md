@@ -59,3 +59,12 @@ The tests added in `pipeline/tests/test_core_crust_matching_pipeline.py` are int
 - the runner cannot classify a mismatch as a survivor.
 
 The CI run on test-only commit `69e9752023e3f6c93552e99f0c5e455560b5a568` reproduced these three expected failures (269 passed, 9 skipped, 3 failed). The implementation commit must rerun the exact PR head and record its exact SHA and CI result before claiming verification.
+
+
+## Downstream TOV-Love sharp-interface gate (2026-11-15)
+
+The native `solve_tov_love_maxwell` consumer now validates the supplied two P(epsilon) branches before integration. It requires positive finite and strictly increasing P and epsilon, causal log-log interpolation slopes, Pt inside both branch domains, Pc inside the high-density branch, positive `delta_eps`, and agreement between `delta_eps` and the one-sided table difference at Pt. This prevents the interpolation routine's endpoint clamping from silently substituting an endpoint state outside a branch's declared range.
+
+This consumer receives only P(epsilon) arrays. It can validate the energy-density jump but cannot independently validate `mu_B` continuity or `Delta epsilon = mu_t Delta n_B`; those checks must be performed by the EOS generator/adapter before converting the matched EOS to the two TOV branches.
+
+Native tests now include one valid two-branch Maxwell TOV-Love fixture and negative cases for out-of-range Pt on either branch, a mismatched delta-epsilon, and central pressure above the high branch.

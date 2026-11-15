@@ -99,6 +99,47 @@ contains
   end subroutine branch_interp
 
   !------------------------------------------------------------------
+  ! Validate one continuous P(epsilon) branch before any interpolation.
+  ! branch_interp uses log-log interpolation and clamps out-of-range queries;
+  ! callers that model a phase interface must prove the complete query range
+  ! is covered before entering the integrator.
+  subroutine validate_maxwell_branch(P_arr,eps_arr,n,label,ok,status)
+    integer,intent(in)::n
+    real(wp),intent(in)::P_arr(n),eps_arr(n)
+    character(len=*),intent(in)::label
+    logical,intent(out)::ok
+    character(len=*),intent(out)::status
+    real(wp)::alpha,cs2_left,cs2_right,log_dp,log_de
+    integer::i
+    ok=.false.;status=trim(label)//' branch requires at least two rows'
+    if(n<2)return
+    status=trim(label)//' branch contains nonfinite P or epsilon'
+    if(.not.all(ieee_is_finite(P_arr)).or..not.all(ieee_is_finite(eps_arr)))return
+    status=trim(label)//' branch requires positive pressure and energy density'
+    if(any(P_arr<=0._wp).or.any(eps_arr<=0._wp))return
+    do i=1,n-1
+      status=trim(label)//' branch pressure must be strictly increasing'
+      if(P_arr(i+1)<=P_arr(i))return
+      status=trim(label)//' branch energy density must be strictly increasing'
+      if(eps_arr(i+1)<=eps_arr(i))return
+      log_dp=log(P_arr(i+1)/P_arr(i))
+      log_de=log(eps_arr(i+1)/eps_arr(i))
+      if(log_dp<=0._wp.or.log_de<=0._wp)return
+      alpha=log_de/log_dp
+      if(.not.ieee_is_finite(alpha).or.alpha<=0._wp)return
+      ! For the log-log linear segment, c_s^2=P/(epsilon*alpha).
+      ! P/epsilon is monotone within each segment, so endpoint checks bound
+      ! the full segment without an arbitrary sampling grid.
+      cs2_left=P_arr(i)/(eps_arr(i)*alpha)
+      cs2_right=P_arr(i+1)/(eps_arr(i+1)*alpha)
+      status=trim(label)//' branch is mechanically unstable or acausal'
+      if(.not.all(ieee_is_finite([cs2_left,cs2_right])))return
+      if(min(cs2_left,cs2_right)<=0._wp.or.max(cs2_left,cs2_right)>1._wp+1.e-5_wp)return
+    enddo
+    ok=.true.;status='ok'
+  end subroutine validate_maxwell_branch
+
+  !------------------------------------------------------------------
   ! TOV + y RHS at radius r given (p_geom, m, y) and a branch interpolator.
   ! Returns (dpdr, dmdr, dydr) in geometric units. Sets ok=.false. on the
   ! trapped-surface or surface-cutoff condition.
@@ -342,8 +383,10 @@ contains
     real(wp) :: pc, ec, dedp_c, cs2c, r0, p0, m0, y0
     real(wp) :: p_surface, r_t, m_t, y_t, r_out, m_out, y_out, beta
     real(wp) :: p_trans_geom, y_after_jump, m_t_msun
+    real(wp) :: eps_high_t,eps_low_t,dedp_high_t,dedp_low_t,jump_from_tables,jump_scale
     integer :: n_steps1, n_steps2
-    logical :: ok
+    logical :: ok,high_ok,low_ok
+    character(len=128) :: branch_status
     character(len=64) :: status
 
     result = tov_love_result_t()
@@ -352,12 +395,51 @@ contains
     result%p_transition_mevfm3 = P_transition
     result%delta_eps_mevfm3 = delta_eps
     pc = central_pressure
-    if (pc <= P_transition) then
-      result%status = 'central pressure below transition'; return
+
+    ! Validate every input branch before branch_interp is allowed to clamp an
+    ! out-of-range query to an endpoint. The high branch must span Pt..Pc and
+    ! the low branch must span P_surface..Pt.
+    if(nh<2.or.nl<2)then
+      result%status='Maxwell TOV requires at least two rows in each phase branch';return
     endif
-    if (P_transition < low_P(1) .or. P_transition > high_P(nh)) then
-      result%status = 'transition pressure outside branches'; return
+    if(.not.all(ieee_is_finite([P_transition,delta_eps,central_pressure])))then
+      result%status='Maxwell TOV transition inputs must be finite';return
     endif
+    if(P_transition<=0._wp.or.delta_eps<=0._wp.or.central_pressure<=P_transition)then
+      result%status='Maxwell TOV requires Pt>0, delta_eps>0 and Pc>Pt';return
+    endif
+    call validate_maxwell_branch(high_P,high_eps,nh,'high',high_ok,branch_status)
+    if(.not.high_ok)then
+      result%status=trim(branch_status);return
+    endif
+    call validate_maxwell_branch(low_P,low_eps,nl,'low',low_ok,branch_status)
+    if(.not.low_ok)then
+      result%status=trim(branch_status);return
+    endif
+    if(P_transition<high_P(1).or.P_transition>high_P(nh).or. &
+       central_pressure<high_P(1).or.central_pressure>high_P(nh))then
+      result%status='Maxwell Pt and Pc must lie inside the high-density branch range';return
+    endif
+    if(P_transition<low_P(1).or.P_transition>low_P(nl))then
+      result%status='Maxwell Pt must lie inside the low-density branch range';return
+    endif
+    call branch_interp(high_P,high_eps,nh,P_transition,eps_high_t,dedp_high_t,ok)
+    if(.not.ok.or.dedp_high_t<=0._wp)then
+      result%status='high-density branch interpolation failed at Pt';return
+    endif
+    call branch_interp(low_P,low_eps,nl,P_transition,eps_low_t,dedp_low_t,ok)
+    if(.not.ok.or.dedp_low_t<=0._wp)then
+      result%status='low-density branch interpolation failed at Pt';return
+    endif
+    jump_from_tables=eps_high_t-eps_low_t
+    jump_scale=max(abs(jump_from_tables),abs(delta_eps),tiny(1._wp))
+    if(jump_from_tables<=0._wp)then
+      result%status='Maxwell energy-density ordering must have a positive jump';return
+    endif
+    if(abs(delta_eps-jump_from_tables)>1.e-8_wp*jump_scale)then
+      result%status='supplied delta_eps does not match the one-sided EOS jump at Pt';return
+    endif
+
     call branch_interp(high_P, high_eps, nh, pc, ec, dedp_c, ok)
     if (.not. ok .or. dedp_c <= 0._wp) then
       result%status = 'high-branch interp failed at center'; return

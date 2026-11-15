@@ -195,7 +195,7 @@ jobs:
         run: |
           python -m pytest -q python_frontend/tests/test_wigner_seitz_reconstruction.py
 
-      - name: Run native Fortran TOV-Love smooth barotrope tests (E390-06/M6)
+      - name: Run native Fortran TOV-Love smooth + sharp-Maxwell branch tests (E390-06/M6)
         run: |
           gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
             -Ibuild/compose_eos_fortran/mod \

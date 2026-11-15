@@ -96,10 +96,71 @@ program test_tov_love
     write(*,'(2x,a,a)') 'PASS TOV out-of-range central pressure fail-closed: ', trim(rbad%status)
   end if
 
+  ! --- 4. sharp-Maxwell TOV-Love branch-domain and jump-contract tests ---
+  block
+    real(wp) :: high_P(4),high_eps(4),low_P(4),low_eps(4),high_bad(4),low_bad(4)
+    type(tov_love_result_t) :: rmaxwell
+
+    ! Two causal log-log branches with a positive one-sided energy-density
+    ! jump at Pt=1 MeV/fm^3. Both branches include Pt in their interpolation
+    ! domains; epsilon_high(Pt)-epsilon_low(Pt)=50 MeV/fm^3.
+    high_P=[1.0_wp,1.2_wp,1.5_wp,2.0_wp]
+    high_eps=[153.0_wp,153.6_wp,154.5_wp,156.0_wp]
+    low_P=[0.01_wp,0.1_wp,0.5_wp,1.0_wp]
+    low_eps=[100.03_wp,100.3_wp,101.5_wp,103.0_wp]
+    call solve_tov_love_maxwell(4,high_P,high_eps,4,low_P,low_eps,1.0_wp,50.0_wp,1.8_wp,rmaxwell)
+    if(.not.rmaxwell%converged)then
+      write(*,'(2x,a,a)')'FAIL valid Maxwell TOV-Love fixture: ',trim(rmaxwell%status)
+      fails=fails+1
+    else if(rmaxwell%delta_y>=0._wp.or.rmaxwell%r_transition_km<=0._wp)then
+      write(*,'(2x,a)')'FAIL Maxwell TOV-Love transition diagnostics'
+      fails=fails+1
+    else
+      write(*,'(2x,a,es12.4,a,es12.4)')'PASS Maxwell TOV-Love jump: R_t=', &
+        rmaxwell%r_transition_km,' km Delta-y=',rmaxwell%delta_y
+    end if
+
+    ! Old code accepted these out-of-domain Pt values because it checked the
+    ! wrong branch endpoints and branch_interp silently clamped them.
+    high_bad=[1.1_wp,1.3_wp,1.6_wp,2.0_wp]
+    call solve_tov_love_maxwell(4,high_bad,high_eps,4,low_P,low_eps,1.0_wp,50.0_wp,1.8_wp,rbad)
+    if(rbad%converged)then
+      write(*,'(2x,a)')'FAIL Maxwell Pt below high branch minimum was not rejected'
+      fails=fails+1
+    else
+      write(*,'(2x,a)')'PASS Maxwell Pt outside high branch rejected'
+    end if
+
+    low_bad=[0.01_wp,0.1_wp,0.5_wp,0.8_wp]
+    call solve_tov_love_maxwell(4,high_P,high_eps,4,low_bad,low_eps,1.0_wp,50.0_wp,1.8_wp,rbad)
+    if(rbad%converged)then
+      write(*,'(2x,a)')'FAIL Maxwell Pt above low branch maximum was not rejected'
+      fails=fails+1
+    else
+      write(*,'(2x,a)')'PASS Maxwell Pt outside low branch rejected'
+    end if
+
+    call solve_tov_love_maxwell(4,high_P,high_eps,4,low_P,low_eps,1.0_wp,49.0_wp,1.8_wp,rbad)
+    if(rbad%converged)then
+      write(*,'(2x,a)')'FAIL inconsistent supplied delta-epsilon was not rejected'
+      fails=fails+1
+    else
+      write(*,'(2x,a)')'PASS inconsistent delta-epsilon rejected'
+    end if
+
+    call solve_tov_love_maxwell(4,high_P,high_eps,4,low_P,low_eps,1.0_wp,50.0_wp,2.1_wp,rbad)
+    if(rbad%converged)then
+      write(*,'(2x,a)')'FAIL Maxwell central pressure above high branch was not rejected'
+      fails=fails+1
+    else
+      write(*,'(2x,a)')'PASS Maxwell central pressure outside high branch rejected'
+    end if
+  end block
+
   if (fails == 0) then
-    write(*,'(a)') 'TOV-Love smooth barotrope: PASS'
+    write(*,'(a)') 'TOV-Love smooth + Maxwell branches: PASS'
   else
-    write(*,'(a,i0,a)') 'TOV-Love smooth barotrope: FAIL (', fails, ' checks)'
+    write(*,'(a,i0,a)') 'TOV-Love smooth + Maxwell branches: FAIL (', fails, ' checks)'
     stop 1
   end if
 end program test_tov_love

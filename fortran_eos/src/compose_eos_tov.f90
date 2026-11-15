@@ -420,7 +420,7 @@ contains
        central_pressure<high_P(1).or.central_pressure>high_P(nh))then
       result%status='Maxwell Pt and Pc must lie inside the high-density branch range';return
     endif
-    if(P_transition<low_P(1).or.P_transition>low_P(nl))then
+    if(P_transition<=low_P(1).or.P_transition>low_P(nl))then
       result%status='Maxwell Pt must lie inside the low-density branch range';return
     endif
     call branch_interp(high_P,high_eps,nh,P_transition,eps_high_t,dedp_high_t,ok)

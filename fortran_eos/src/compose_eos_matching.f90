@@ -779,6 +779,16 @@ contains
     call allocate_eos(out,nout)
     out%mn=co%mn;out%mp=co%mp;out%il=co%il;out%iT=co%iT;out%iYq=co%iYq
     out%inb_start=1;out%nadd=0;out%temperature_mev=0._wp;out%charge_fraction_grid=0._wp
+    ! This matcher exports one cold, selected thermodynamic slice. Record that
+    ! as an explicit 1x1 (T,Yq) grid rather than leaving nT/nYq at their
+    ! allocate_eos defaults of zero. The CompOSE writer serializes one value
+    ! on each axis; the readback therefore must recover lengths 1 and 1.
+    out%nT=1;out%nYq=1
+    out%t_first=out%iT;out%t_last=out%iT
+    out%yq_first=out%iYq;out%yq_last=out%iYq
+    out%selected_iT=out%iT;out%selected_iYq=out%iYq
+    allocate(out%t_axis(1),out%yq_axis(1))
+    out%t_axis(1)=out%temperature_mev;out%yq_axis(1)=out%charge_fraction_grid
     out%composition_file_present=.false.;out%composition_available=.false.;out%beta_equilibrated=.true.
     out%q=0._wp;out%q_extra=0._wp;out%iphase=0
     out%yn=0._wp;out%yp=0._wp;out%ye=0._wp;out%ymu=0._wp;out%abar=0._wp;out%zbar=0._wp;out%yh=0._wp

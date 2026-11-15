@@ -68,3 +68,8 @@ The native `solve_tov_love_maxwell` consumer now validates the supplied two P(ep
 This consumer receives only P(epsilon) arrays. It can validate the energy-density jump but cannot independently validate `mu_B` continuity or `Delta epsilon = mu_t Delta n_B`; those checks must be performed by the EOS generator/adapter before converting the matched EOS to the two TOV branches.
 
 Native tests now include one valid two-branch Maxwell TOV-Love fixture and negative cases for out-of-range Pt on either branch, a mismatched delta-epsilon, and central pressure above the high branch.
+
+
+## Canonical T/Yq metadata for matched thermodynamic slices
+
+The core--crust matcher produces one selected cold thermodynamic slice, not an empty T/Yq grid. Its native output object now records `nT=nYq=1`, the selected T/Yq labels as one-point bounds, and one-element axis arrays before CompOSE serialization. The native readback must reproduce `naxis_t=naxis_yq=1` exactly. The readback comparator remains strict; the prior 0-to-1 mismatch is repaired at the producer, not ignored at validation time.

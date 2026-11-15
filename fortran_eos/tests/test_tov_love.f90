@@ -16,7 +16,7 @@ program test_tov_love
   !! log grid from eps_low to eps_high.
   use, intrinsic :: iso_fortran_env, only: real64
   use compose_eos_types, only: wp
-  use compose_eos_tov, only: tov_love_result_t, solve_tov_love_smooth
+  use compose_eos_tov, only: tov_love_result_t, solve_tov_love_smooth, solve_tov_love_maxwell
   use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
   implicit none
   integer :: fails, n, i
@@ -138,6 +138,14 @@ program test_tov_love
       fails=fails+1
     else
       write(*,'(2x,a)')'PASS Maxwell Pt outside low branch rejected'
+    end if
+
+    call solve_tov_love_maxwell(4,high_P,high_eps,4,low_P,low_eps,low_P(1),50.0_wp,1.8_wp,rbad)
+    if(rbad%converged)then
+      write(*,'(2x,a)')'FAIL Maxwell Pt at low-branch surface cutoff was not rejected'
+      fails=fails+1
+    else
+      write(*,'(2x,a)')'PASS Maxwell Pt at low-branch surface cutoff rejected'
     end if
 
     call solve_tov_love_maxwell(4,high_P,high_eps,4,low_P,low_eps,1.0_wp,49.0_wp,1.8_wp,rbad)

@@ -190,6 +190,11 @@ def test_css_runner_roundtrips_real_native_benchmark_pair(tmp_path):
     assert result["readback_validation"]["expected_rows"] == result["combined_n"]
     assert result["readback_validation"]["actual_rows"] == result["readback_n"]
     assert result["readback_validation"]["metadata_status"] == "PASS"
+    metadata = result["readback_validation"]["metadata"]
+    assert metadata["expected_values"]["naxis_t"] == 1
+    assert metadata["expected_values"]["naxis_yq"] == 1
+    assert metadata["actual_values"]["naxis_t"] == 1
+    assert metadata["actual_values"]["naxis_yq"] == 1
     assert result["output_sha256"]
     assert result["source_sha256"]["crust"]
     assert result["source_sha256"]["core"]

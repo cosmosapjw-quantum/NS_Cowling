@@ -81,8 +81,6 @@ def verify_internal_readback(
     *,
     expected_n: int,
     actual_n: int,
-    expected_metadata: Path | str | None = None,
-    actual_metadata: Path | str | None = None,
     rtol: float = 5e-13,
     atol: float = 1e-14,
 ) -> dict:
@@ -118,8 +116,6 @@ def verify_internal_readback(
         "metadata_max_rel_residuals": {},
     }
 
-    if (expected_metadata is None) != (actual_metadata is None):
-        errors.append("both expected_metadata and actual_metadata must be supplied together")
     if expected_n < 0 or actual_n < 0:
         errors.append("native readback row counts must be nonnegative")
     if int(expected_n) != int(actual_n):
@@ -301,6 +297,8 @@ def verify_internal_metadata_readback(
         "atol": float(atol),
         "max_abs_residuals": {},
         "max_rel_residuals": {},
+        "expected_values": {},
+        "actual_values": {},
         "errors": [],
     }
     if not expected_path.is_file():
@@ -315,6 +313,8 @@ def verify_internal_metadata_readback(
     except (OSError, UnicodeError, ValueError) as exc:
         report["errors"].append(f"internal metadata parse failure: {type(exc).__name__}: {exc}")
         return report
+    report["expected_values"] = expected
+    report["actual_values"] = actual
     if set(expected) != set(actual):
         report["errors"].append(
             f"internal metadata key mismatch: missing={sorted(set(expected)-set(actual))}, "
@@ -441,13 +441,12 @@ def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) ->
         readback_validation = verify_internal_readback(
             expected_csv, actual_csv,
             expected_n=combined_n, actual_n=readback_n,
-            expected_metadata=expected_nml,
-            actual_metadata=actual_nml,
         )
         metadata_validation = verify_internal_metadata_readback(
             expected_nml, actual_nml,
         )
         readback_validation["metadata_status"] = metadata_validation["status"]
+        readback_validation["metadata"] = metadata_validation
         readback_validation["metadata_max_abs_residuals"] = metadata_validation["max_abs_residuals"]
         readback_validation["metadata_max_rel_residuals"] = metadata_validation["max_rel_residuals"]
         readback_validation["errors"].extend(metadata_validation["errors"])

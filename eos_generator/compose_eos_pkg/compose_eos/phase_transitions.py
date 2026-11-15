@@ -133,57 +133,136 @@ def _maxwell_pressure_equality_roots(n_low, n_high, pressure_low, pressure_high,
     return unique
 
 
-def _branchwise_first_law_report(mu, p, n, eps, *, samples_per_interval=8):
-    """Audit thermodynamic-potential reconstruction on the input grid.
+MAXWELL_CS2_TOLERANCE = 1e-6   # fixed causal gate c_s^2 <= 1 + 1e-6 (unchanged)
 
-    The representation uses n_B(mu_B) as the primary PCHIP and integrates it.
-    Therefore n_B=dP/dmu_B is exact up to floating-point evaluation. The
-    independent admission residual is the mismatch between reconstructed and
-    supplied pressure knots; this catches source-table inconsistency without
-    comparing two unrelated interpolants.
+
+def _real_roots_in_unit_interval(poly):
+    """Real roots of a numpy Polynomial strictly inside (0, 1)."""
+    poly = poly.trim(tol=0.0)
+    if poly.degree() <= 0:
+        return []
+    out = []
+    for r in poly.roots():
+        if abs(r.imag) <= 1e-9 * max(1.0, abs(r.real)) and 0.0 < r.real < 1.0:
+            out.append(float(r.real))
+    return out
+
+
+def _branchwise_first_law_report(mu, p, n, eps, *, samples_per_interval=8,
+                                 cs2_tolerance=MAXWELL_CS2_TOLERANCE):
+    """Exact interval-extrema audit of the declared branch interpolant.
+
+    Representation: n_B(mu_B) is one monotone PCHIP (cubic per interval) and
+    P(mu_B) = P(mu_0) + integral n_B dmu_B.  Hence n_B = dP/dmu_B holds *by
+    construction* on the whole branch; it is not reported as a residual.  The
+    independent source-table checks are the pressure and energy reconstruction
+    residuals at the knots.
+
+    Stability and causality are decided on the continuous interpolant, per
+    interval s in [0, 1] (mu = mu_j + h s), without sampling:
+      * dn/dmu is quadratic: extrema at s=0, s=1 and its vertex;
+      * c_s^2 <= 1 + tol  <=>  g(s) = (1+tol) mu dn/dmu - n >= 0 when
+        dn/dmu > 0; g is cubic, so its minimum is at the endpoints or at the
+        real roots of the quadratic g'(s) (closed form);
+      * the reported c_s^2 extrema use the roots of the quintic stationarity
+        polynomial of n/(mu dn/dmu) plus every candidate above.
+    ``samples_per_interval`` is accepted for configuration compatibility only
+    and is not used for any gate.
     """
+    from numpy.polynomial import Polynomial
+    mu = np.asarray(mu, dtype=float); p = np.asarray(p, dtype=float)
+    n = np.asarray(n, dtype=float); eps = np.asarray(eps, dtype=float)
+    if (mu.ndim != 1 or mu.size < 2 or n.shape != mu.shape or p.shape != mu.shape
+            or eps.shape != mu.shape):
+        raise ValueError("branch audit requires matching 1-D arrays with >= 2 rows")
+    if not np.all(np.isfinite(mu)) or np.any(np.diff(mu) <= 0.0):
+        raise ValueError("branch audit requires strictly increasing finite mu_B; "
+                         "a phase jump must be split into one-sided branches")
+    if not (np.isfinite(cs2_tolerance) and cs2_tolerance >= 0.0):
+        raise ValueError("invalid causal tolerance")
     ns, primitive, offset = _thermodynamic_pressure_from_density(mu, n, p)
-    qparts = [np.linspace(mu[i], mu[i + 1], samples_per_interval + 2)
-              for i in range(len(mu) - 1)]
-    q = np.unique(np.concatenate(qparts))
-    dp_dmu = np.asarray(ns(q), dtype=float)
-    n_interp = np.asarray(ns(q), dtype=float)
-    rel_derivative = np.abs(dp_dmu - n_interp) / np.maximum(np.abs(n_interp), 1e-30)
-    dn_dmu = np.asarray(ns.derivative()(q), dtype=float)
-    with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
-        cs2_thermo = n_interp / (q * dn_dmu)
     p_reconstructed = np.asarray(primitive(mu), dtype=float) + offset
     p_scale = np.maximum(np.maximum(np.abs(p), abs(float(p[0]))), 1e-8)
     p_rel = np.abs(p_reconstructed - p) / p_scale
     eps_reconstructed = mu * n - p_reconstructed
     eps_scale = np.maximum(np.abs(eps), 1.0)
     eps_rel = np.abs(eps_reconstructed - eps) / eps_scale
-    finite_derivative = (np.isfinite(rel_derivative) & np.isfinite(dp_dmu)
-                         & np.isfinite(n_interp) & np.isfinite(dn_dmu)
-                         & np.isfinite(cs2_thermo))
-    finite_source = np.isfinite(p_rel) & np.isfinite(eps_rel)
-    if not np.all(finite_derivative) or not np.all(finite_source):
-        return {"max_relative_residual": float("inf"),
-                "rms_relative_residual": float("inf"),
+
+    epsmach = np.finfo(float).eps
+    min_dn = np.inf; arg_dn = float(mu[0])
+    min_n = np.inf
+    max_cs2 = -np.inf; arg_max = float(mu[0])
+    min_cs2 = np.inf
+    min_margin_rel = np.inf; arg_margin = float(mu[0])
+    causal = True
+    finite = bool(np.all(np.isfinite(ns.c)))
+    one_plus = 1.0 + float(cs2_tolerance)
+    for j in range(len(mu) - 1):
+        h = float(mu[j + 1] - mu[j]); m0 = float(mu[j])
+        c3, c2, c1, c0 = (float(v) for v in ns.c[:, j])
+        # n(s) on s in [0, 1]
+        n_s = Polynomial([c0, c1 * h, c2 * h * h, c3 * h ** 3])
+        dn_ds = n_s.deriv()                               # = h dn/dmu
+        mu_s = Polynomial([m0, h])
+        cand = {0.0, 1.0}
+        cand.update(_real_roots_in_unit_interval(dn_ds.deriv()))   # dn/dmu extrema
+        cand.update(_real_roots_in_unit_interval(dn_ds))           # n extrema
+        g = one_plus * mu_s * dn_ds - h * n_s                      # h*g
+        g_cand = {0.0, 1.0, *_real_roots_in_unit_interval(g.deriv())}
+        num, den = h * n_s, mu_s * dn_ds                           # cs2 = num/den
+        stat = num.deriv() * den - num * den.deriv()
+        cand.update(_real_roots_in_unit_interval(stat))
+        cand.update(g_cand)
+        for s in sorted(cand):
+            nv = float(n_s(s)); dnv = float(dn_ds(s)) / h; muv = m0 + h * s
+            if not (np.isfinite(nv) and np.isfinite(dnv)):
+                finite = False; continue
+            if dnv < min_dn:
+                min_dn, arg_dn = dnv, muv
+            min_n = min(min_n, nv)
+            cs2 = nv / (muv * dnv) if dnv > 0.0 else np.inf
+            if cs2 > max_cs2:
+                max_cs2, arg_max = cs2, muv
+            min_cs2 = min(min_cs2, cs2)
+        for s in g_cand:
+            gv = float(g(s)) / h
+            scale = max(abs(one_plus * (m0 + h * s) * float(dn_ds(s)) / h), abs(float(n_s(s))))
+            rel = gv / scale if scale > 0.0 else -np.inf
+            if rel < min_margin_rel:
+                min_margin_rel, arg_margin = rel, m0 + h * s
+            if gv < -64.0 * epsmach * scale:
+                causal = False
+    stable = finite and min_dn > 0.0 and min_n > 0.0
+    causal = causal and stable and max_cs2 <= one_plus
+    if not finite or not (np.all(np.isfinite(p_rel)) and np.all(np.isfinite(eps_rel))):
+        return {"method": "exact_interval_extrema", "stability_pass": False,
+                "causality_pass": False,
                 "pressure_reconstruction_max_relative_residual": float("inf"),
                 "energy_reconstruction_max_relative_residual": float("inf"),
                 "min_dP_dmu_fm3": float("nan"), "min_dn_dmu_fm3_per_MeV": float("nan"),
                 "min_cs2_thermodynamic": float("nan"), "max_cs2_thermodynamic": float("inf"),
-                "n_samples": int(q.size)}
+                "interval_count": int(len(mu) - 1),
+                "identity": "n_B = dP/dmu_B by construction (P is the antiderivative of n_B)"}
     return {
-        "max_relative_residual": float(np.max(rel_derivative)),
-        "rms_relative_residual": float(np.sqrt(np.mean(rel_derivative ** 2))),
+        "method": "exact_interval_extrema",
+        "stability_pass": bool(stable),
+        "causality_pass": bool(causal),
+        "causal_tolerance": float(cs2_tolerance),
         "pressure_reconstruction_max_relative_residual": float(np.max(p_rel)),
         "pressure_reconstruction_rms_relative_residual": float(np.sqrt(np.mean(p_rel ** 2))),
         "energy_reconstruction_max_relative_residual": float(np.max(eps_rel)),
         "energy_reconstruction_rms_relative_residual": float(np.sqrt(np.mean(eps_rel ** 2))),
-        "min_dP_dmu_fm3": float(np.min(dp_dmu)),
-        "min_dn_dmu_fm3_per_MeV": float(np.min(dn_dmu)),
-        "min_cs2_thermodynamic": float(np.min(cs2_thermo)),
-        "max_cs2_thermodynamic": float(np.max(cs2_thermo)),
-        "n_samples": int(q.size),
-        "samples_per_interval": int(samples_per_interval),
-        "identity": "n_B = dP/dmu_B (enforced by integrating interpolated n_B)",
+        "min_dP_dmu_fm3": float(min_n),
+        "min_dn_dmu_fm3_per_MeV": float(min_dn),
+        "argmin_dn_dmu_mu_MeV": float(arg_dn),
+        "min_cs2_thermodynamic": float(min_cs2),
+        "max_cs2_thermodynamic": float(max_cs2),
+        "argmax_cs2_mu_MeV": float(arg_max),
+        "min_causal_margin_relative": float(min_margin_rel),
+        "argmin_causal_margin_mu_MeV": float(arg_margin),
+        "interval_count": int(len(mu) - 1),
+        "samples_per_interval_ignored": int(samples_per_interval),
+        "identity": "n_B = dP/dmu_B by construction (P is the antiderivative of n_B)",
         "interpolant": "P(mu_B)=P(mu_0)+integral PchipInterpolator(mu_B,n_B) dmu_B",
     }
 
@@ -222,9 +301,10 @@ def _phase_arrays(data: EOSData, *, differential_tolerance=5e-3, differential_sa
     # The actual Maxwell interpolant is n_B(mu_B) with P obtained by
     # integration. Check mechanical stability and causality on that same
     # interpolant between knots, not only on a finite-difference knot stencil.
-    if (differential['min_dn_dmu_fm3_per_MeV'] <= 0
+    if (not differential['stability_pass'] or not differential['causality_pass']
+            or differential['min_dn_dmu_fm3_per_MeV'] <= 0
             or differential['min_cs2_thermodynamic'] <= 0
-            or differential['max_cs2_thermodynamic'] > 1.0 + 1e-6):
+            or differential['max_cs2_thermodynamic'] > 1.0 + MAXWELL_CS2_TOLERANCE):
         raise ValueError(
             'thermodynamic n_B(mu_B) interpolant is unstable or acausal '
             f"(min dn/dmu={differential['min_dn_dmu_fm3_per_MeV']:.3e}, "
@@ -248,7 +328,8 @@ def _phase_arrays(data: EOSData, *, differential_tolerance=5e-3, differential_sa
         'max_cs2': differential['max_cs2_thermodynamic'],
         'min_cs2': differential['min_cs2_thermodynamic'],
         'min_dn_dmu': differential['min_dn_dmu_fm3_per_MeV'],
-        'sampling': 'same monotone PCHIP n_B(mu_B), between every table interval',
+        'method': 'exact interval extrema of the declared PCHIP n_B(mu_B) on every interval',
+        'causality_pass': differential['causality_pass'],
     }
     for key in ('C1','C2','C6','C10','C11'):
         if not bool(rep[key].get('pass_',False)):
@@ -616,12 +697,13 @@ def read_maxwell_eos(directory: str) -> MaxwellEOS:
                 f"(P residual={pressure_residual:.3e}, epsilon residual={energy_residual:.3e}, "
                 f"tolerance={differential_tolerance:.3e})"
             )
-        if (not np.isfinite(report["min_dn_dmu_fm3_per_MeV"])
+        if (not report["stability_pass"] or not report["causality_pass"]
+                or not np.isfinite(report["min_dn_dmu_fm3_per_MeV"])
                 or report["min_dn_dmu_fm3_per_MeV"] <= 0.0
                 or not np.isfinite(report["min_cs2_thermodynamic"])
                 or report["min_cs2_thermodynamic"] <= 0.0
                 or not np.isfinite(report["max_cs2_thermodynamic"])
-                or report["max_cs2_thermodynamic"] > 1.0 + 1e-6):
+                or report["max_cs2_thermodynamic"] > 1.0 + MAXWELL_CS2_TOLERANCE):
             raise ValueError(
                 f"Maxwell readback {label} branch fails mechanical-stability/causality checks "
                 f"(dn/dmu min={report['min_dn_dmu_fm3_per_MeV']:.3e}, "
@@ -634,13 +716,14 @@ def read_maxwell_eos(directory: str) -> MaxwellEOS:
             "min_dn_dmu_fm3_per_MeV": float(report["min_dn_dmu_fm3_per_MeV"]),
             "min_cs2": float(report["min_cs2_thermodynamic"]),
             "max_cs2": float(report["max_cs2_thermodynamic"]),
-            "samples": int(report["n_samples"]),
+            "intervals": int(report["interval_count"]),
+            "argmax_cs2_mu_MeV": float(report["argmax_cs2_mu_MeV"]),
         }
 
     meta = dict(meta)
     meta["readback_validation"] = {
         "status": "PASS",
-        "method": "branchwise n_B(mu_B) PCHIP pressure primitive",
+        "method": "branchwise n_B(mu_B) PCHIP pressure primitive; exact interval extrema",
         "differential_tolerance": differential_tolerance,
         "branches": branch_reports,
         "transition_identity_relative_residual": float(

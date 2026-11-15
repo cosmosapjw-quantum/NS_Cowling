@@ -52,14 +52,15 @@ def differential_first_law_residual(mu, P, n):
     consistent table; independent PCHIPs do NOT guarantee it."""
     Pp = PchipInterpolator(mu, P, extrapolate=False)
     np_ = PchipInterpolator(mu, n, extrapolate=False)
-    # dP/dmu via finite difference of the P PCHIP on a dense grid (interior)
+    # Evaluate the analytic derivative of the actual piecewise-cubic PCHIP.
+    # A finite-difference gradient of sampled P adds an avoidable stencil error
+    # and can hide or exaggerate the thermodynamic defect being audited.
     lo, hi = mu[1], mu[-2]
     grid = np.linspace(lo, hi, 2000)
-    dP_dmu = np.gradient(Pp(grid), grid)
+    dP_dmu = Pp.derivative()(grid)
     n_at_grid = np_(grid)
     resid = np.abs(n_at_grid - dP_dmu) / np.maximum(np.abs(n_at_grid), 1e-30)
-    # ignore the finite-difference endpoints (grid edge)
-    return float(np.max(resid[1:-1]))
+    return float(np.max(resid))
 
 
 def audit_apr_css() -> dict:
@@ -116,11 +117,14 @@ def audit_apr_css() -> dict:
         "artifact": str(VALIDATION),
         "source": v["source"],
         "1_differential_first_law_n_equals_dPdmu": {
+            "derivative_operator": "PchipInterpolator.derivative",
+            "sampling": "2000-point interior grid; analytic derivative of the PCHIP polynomial",
+            "acceptance_tolerance_relative": 1e-3,
             "apr_source_residual_relative": apr_dfl_resid,
             "css_high_branch_residual_relative": css_dfl_resid,
             "apr_source_differential_first_law_holds": bool(apr_dfl_resid < 1e-3),
             "css_high_branch_differential_first_law_holds": bool(css_dfl_resid < 1e-3),
-            "note": "Independent PCHIP interpolants of P(mu) and n(mu) do NOT guarantee n=dP/dmu. The residual measures the violation. The APR source is a thermodynamic table so it should hold to finite-difference precision; the CSS high branch holds by construction (analytic formula).",
+            "note": "P(mu) and n(mu) are independently interpolated, so n=dP/dmu is not guaranteed. This audit uses the exact derivative of the PCHIP polynomial rather than a finite-difference approximation. Passing endpoint jump identities does not override a failed branch-interior differential check.",
         },
         "2_phenomenological_declaration": {
             "present": "Phenomenological" in mm.get("interpretation", "") or "phenomenological" in mm.get("interpretation", "").lower(),
@@ -148,6 +152,7 @@ def audit_apr_css() -> dict:
         "verdict": "ADMITTED_WITH_PHENOMENOLOGICAL_DECLARATION" if (
             common_Pt and positive_density_jump and positive_energy_jump
             and fl_jump_identity and cs2_causal and tov_converged
+            and apr_dfl_resid < 1e-3 and css_dfl_resid < 1e-3
             and "phenomenological" in mm.get("interpretation", "").lower()
         ) else "REVIEW_REQUIRED",
     }

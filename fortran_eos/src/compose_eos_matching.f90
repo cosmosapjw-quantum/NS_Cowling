@@ -14,6 +14,7 @@ module compose_eos_matching
     real(wp) :: css_single_sound_speed=0._wp
     real(wp) :: css_transition_nb_low=0._wp, css_transition_nb_high=0._wp
     real(wp) :: css_transition_delta_nb=0._wp, css_transition_delta_eps=0._wp
+    real(wp) :: css_transition_epsilon_low=0._wp, css_transition_epsilon_high=0._wp
     real(wp) :: css_transition_pressure=0._wp, css_transition_mu=0._wp
     real(wp) :: seidov_critical_delta_eps=0._wp, seidov_ratio=0._wp
     integer :: css_transition_low_index=-1, css_transition_high_index=-1
@@ -834,6 +835,7 @@ contains
       report%css_transition_nb_low=cr%nb(i1);report%css_transition_nb_high=css_nb_high
       report%css_transition_delta_nb=css_nb_high-cr%nb(i1)
       report%css_transition_delta_eps=css_delta_eps
+      report%css_transition_epsilon_low=css_eps_low;report%css_transition_epsilon_high=css_eps_high
       report%css_transition_pressure=css_p_t;report%css_transition_mu=css_mu_t
       report%seidov_critical_delta_eps=css_critical
       report%seidov_ratio=css_delta_eps/css_critical

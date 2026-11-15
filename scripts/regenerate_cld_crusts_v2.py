@@ -1,6 +1,7 @@
 """Regenerate CLD inner-crust tables with the corrected CompOSE writer.
 
-Output: download/reconstruction_v2/<MODEL>/ (the historical
+Output: download/reconstruction_v3/<MODEL>/ (v2 kept rows on the optimizer
+box bound; v3 trims them at the table ends and refuses interior ones; the historical
 download/reconstruction/ tree is left untouched as evidence of the former
 column-layout defect).  For each model the original density grid is reused,
 the CLD minimization is rerun with the parameters that reproduce the stored
@@ -91,13 +92,13 @@ def main(out_root: Path) -> int:
             continue
         hashes = {f: sha256(out / f) for f in ("eos.nb", "eos.t", "eos.yq", "eos.thermo")}
         index["models"][name] = {"status": "EMITTED", "sha256": hashes,
-                                 "box_bound_rows": receipt["box_bound_rows"],
+                                 "dropped_box_bound_rows": receipt["dropped_box_bound_rows"],
                                  "max_euler_relative_residual": receipt["max_euler_relative_residual"]}
-        print(f"{name:12s} EMITTED   rows={receipt['rows']} box_bound_rows={receipt['box_bound_rows']}")
+        print(f"{name:12s} EMITTED   rows={receipt['rows']} dropped_box_bound_rows={receipt['dropped_box_bound_rows']}")
     (out_root / "regeneration_index.json").write_text(json.dumps(index, indent=2) + "\n")
     return 0
 
 
 if __name__ == "__main__":
-    target = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "download" / "reconstruction_v2"
+    target = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "download" / "reconstruction_v3"
     raise SystemExit(main(target))

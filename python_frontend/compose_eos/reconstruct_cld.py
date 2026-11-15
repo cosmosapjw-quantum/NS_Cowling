@@ -114,7 +114,26 @@ def _box_bound_rows(results: list[CLDCellResult]) -> list[int]:
 
 def emit_compose_set(results: list[CLDCellResult], outdir: Path, model_key: str, *,
                      mn: float, mp: float, provenance: dict | None = None) -> dict:
-    """Write the CompOSE thermodynamic file set; raises before writing if inadmissible."""
+    """Write the CompOSE thermodynamic file set; raises before writing if inadmissible.
+
+    Rows whose minimum lies on the optimizer box (f or R_d on a bound) are not
+    stationary points, so the envelope-theorem derivative mu_B = d eps/d n_B is
+    not thermodynamic there.  Such rows are trimmed when they form contiguous
+    runs at the table ends (recorded in the receipt); a bound row inside the
+    table is refused.
+    """
+    bound = _box_bound_rows(results)
+    lo, hi = 0, len(results)
+    while lo < hi and lo in bound:
+        lo += 1
+    while hi > lo and (hi - 1) in bound:
+        hi -= 1
+    interior = [i for i in bound if lo <= i < hi]
+    if interior:
+        raise CLDThermodynamicsError(
+            f"optimizer box-bound minimum inside the table at rows {interior}")
+    dropped = [i for i in bound if i < lo or i >= hi]
+    results = list(results[lo:hi])
     table = thermodynamic_table(results, mn=mn, mp=mp)
     outdir = Path(outdir)
     outdir.mkdir(parents=True, exist_ok=True)
@@ -153,7 +172,8 @@ def emit_compose_set(results: list[CLDCellResult], outdir: Path, model_key: str,
         "max_euler_relative_residual": float(euler.max()),
         "solver_cluster_mu_n_minus_derived_mu_B_max_abs_MeV":
             table["solver_cluster_mu_n_minus_derived_mu_B_max_abs_MeV"],
-        "box_bound_rows": _box_bound_rows(results),
+        "dropped_box_bound_rows": dropped,
+        "source_row_offset": lo,
         "box_bounds": {"R_d_fm": list(R_D_BOUNDS), "f": list(F_BOUNDS)},
         "omitted_files": ["eos.compo", "eos.init", "eos.mr"],
         "provenance": provenance or {},

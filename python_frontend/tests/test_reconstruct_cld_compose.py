@@ -101,7 +101,9 @@ def test_nonconvex_energy_is_refused_and_nothing_is_written(tmp_path):
     assert not (out / "eos.thermo").exists()
 
 
-def test_receipt_flags_cells_on_optimizer_box_bounds(tmp_path):
+def test_box_bound_end_rows_are_trimmed_and_recorded(tmp_path):
+    # A minimum constrained by the optimizer box (f or R_d on a bound) is not
+    # stationary, so mu_B = d eps/d n_B there is not thermodynamic.
     cells = [_cell(n) for n in _grid()]
     cells[-1] = replace(cells[-1], R_d=40.0, f=0.95)
     cells[0] = replace(cells[0], R_d=2.0, f=1e-4)
@@ -109,10 +111,22 @@ def test_receipt_flags_cells_on_optimizer_box_bounds(tmp_path):
     emit_compose_set(cells, out, "SYN", mn=MN, mp=MP, provenance={"sigma_0": 1.0, "b": 1.0})
     receipt = json.loads((out / "reconstruction_receipt.json").read_text())
     assert receipt["reference_masses_MeV"] == {"neutron": MN, "proton": MP}
-    assert receipt["box_bound_rows"] == [0, len(cells) - 1]
+    assert receipt["dropped_box_bound_rows"] == [0, len(cells) - 1]
+    assert receipt["rows"] == len(cells) - 2
+    assert receipt["n_B_range_fm3"] == [cells[1].rho_B, cells[-2].rho_B]
     assert receipt["provenance"] == {"sigma_0": 1.0, "b": 1.0}
     assert receipt["columns"].startswith("iT inb iYq Q1 Q2 Q3")
     assert math.isfinite(receipt["max_euler_relative_residual"])
+    nb = (out / "eos.nb").read_text().split()
+    assert int(nb[1]) == len(cells) - 2
+
+
+def test_interior_box_bound_row_is_refused(tmp_path):
+    cells = [_cell(n) for n in _grid()]
+    cells[7] = replace(cells[7], R_d=40.0)
+    with pytest.raises(CLDThermodynamicsError, match="box"):
+        emit_compose_set(cells, tmp_path / "X", "X", mn=MN, mp=MP)
+    assert not (tmp_path / "X" / "eos.thermo").exists()
 
 
 def test_unconverged_cell_is_refused():

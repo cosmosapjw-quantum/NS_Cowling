@@ -17,8 +17,10 @@ from pathlib import Path
 from typing import Any
 import numpy as np
 
-REPO = Path("/home/z/my-project/repos/NS_Cowling_eos390")
-sys.path.insert(0, str(REPO / "python_frontend"))
+REPO = Path(__file__).resolve().parents[2]
+PYTHON_FRONTEND = REPO / "python_frontend"
+if str(PYTHON_FRONTEND) not in sys.path:
+    sys.path.insert(0, str(PYTHON_FRONTEND))
 from compose_eos.api import construct_maxwell_transition, read_compose
 from compose_eos.eos_data import EOSData
 from compose_eos.native import NativeExecutionError

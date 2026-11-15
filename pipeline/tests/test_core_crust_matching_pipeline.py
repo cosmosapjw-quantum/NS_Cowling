@@ -163,6 +163,51 @@ def test_pipeline_does_not_mark_css_survived_when_readback_count_differs(tmp_pat
     assert result["readback_validation"]["status"] == "FAIL"
 
 
+def test_pipeline_rejects_native_consistency_failure_after_verified_readback(tmp_path, monkeypatch):
+    exe = tmp_path / "compose_eos_fortran"
+    exe.write_bytes(b"test executable identity")
+    monkeypatch.setattr(pipeline, "executable", lambda: exe)
+    monkeypatch.setattr(
+        pipeline, "verify_internal_readback",
+        lambda *args, **kwargs: {"status": "PASS", "errors": []},
+    )
+    monkeypatch.setattr(
+        pipeline, "verify_internal_metadata_readback",
+        lambda *args, **kwargs: {"status": "PASS", "errors": []},
+    )
+
+    crust_dir = tmp_path / "crust"
+    core_dir = tmp_path / "core"
+    out_dir = tmp_path / "out"
+    crust_dir.mkdir()
+    core_dir.mkdir()
+
+    def fake_run_native(action, *args):
+        if action == "match-core":
+            return {"status": "ok", "n": 6,
+                    "construction_kind": "css_single_speed_with_crust_density_jump"}
+        if action == "read":
+            return {"status": "ok", "n": 6}
+        if action == "verify":
+            Path(args[1]).write_text(
+                '{"schema":"compose-eos-fortran-verification-v1",'
+                '"C1":{"pass":true},"C2":{"pass":true},'
+                '"C6":{"pass":true},"C10":{"pass":false},'
+                '"C11":{"pass":true},"failed_checks":"C10"}',
+                encoding="utf-8",
+            )
+            return {"status": "ok", "overall": "FAIL", "failed_checks": "C10"}
+        return {"status": "ok"}
+
+    monkeypatch.setattr(pipeline, "run_native", fake_run_native)
+    result = pipeline.run_pipeline("css", crust_dir, core_dir, out_dir)
+
+    assert result["survived"] is False
+    assert result["stage"] == "consistency"
+    assert result["consistency_status"] == "FAIL"
+    assert "C10" in result["error"]
+
+
 def test_css_runner_roundtrips_real_native_benchmark_pair(tmp_path):
     """Exercise actual Fortran match -> CompOSE write -> native readback."""
     root = Path(__file__).resolve().parents[2]
@@ -190,6 +235,13 @@ def test_css_runner_roundtrips_real_native_benchmark_pair(tmp_path):
     assert result["readback_validation"]["expected_rows"] == result["combined_n"]
     assert result["readback_validation"]["actual_rows"] == result["readback_n"]
     assert result["readback_validation"]["metadata_status"] == "PASS"
+    assert result["consistency_status"] == "PASS"
+    consistency = result["consistency_report"]
+    assert consistency["C1"]["pass"] is True
+    assert consistency["C2"]["pass"] is True
+    assert consistency["C6"]["pass"] is True
+    assert consistency["C10"]["pass"] is True
+    assert consistency["C11"]["pass"] is True
     metadata = result["readback_validation"]["metadata"]
     assert metadata["expected_values"]["naxis_t"] == 1
     assert metadata["expected_values"]["naxis_yq"] == 1

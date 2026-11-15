@@ -472,6 +472,58 @@ def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) ->
                 "write_report": r4,
             }
 
+        # 6. Verify the actual serialized CompOSE artefact with the native
+        # C1/C2/C3/C4/C5/C6/C10/C11 checker. C7-C9 remain diagnostics only.
+        consistency_path = work / "consistency_verification.json"
+        try:
+            r6 = run_native("verify", str(out_dir / "compose"), str(consistency_path))
+        except Exception as exc:
+            return {
+                "survived": False, "method": method, "stage": "consistency",
+                "error": f"native consistency verification failed: {type(exc).__name__}: {exc}",
+                "combined_n": combined_n,
+                "readback_n": readback_n,
+                "readback_status": r5.get("status", "?"),
+                "readback_validation": readback_validation,
+                "match_report": r3,
+                "write_report": r4,
+            }
+        if r6.get("status") != "ok" or r6.get("overall") != "PASS":
+            consistency_report = None
+            try:
+                consistency_report = json.loads(consistency_path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, json.JSONDecodeError):
+                pass
+            return {
+                "survived": False,
+                "method": method,
+                "stage": "consistency",
+                "error": f"native consistency overall={r6.get('overall', 'UNKNOWN')}; "
+                         f"failed_checks={r6.get('failed_checks', 'unavailable')}",
+                "combined_n": combined_n,
+                "readback_n": readback_n,
+                "readback_status": r5.get("status", "?"),
+                "readback_validation": readback_validation,
+                "consistency_status": r6.get("overall", "UNKNOWN"),
+                "consistency_report": consistency_report,
+                "match_report": r3,
+                "write_report": r4,
+            }
+        try:
+            consistency_report = json.loads(consistency_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            return {
+                "survived": False, "method": method, "stage": "consistency",
+                "error": f"native verifier did not produce valid JSON: {type(exc).__name__}: {exc}",
+                "combined_n": combined_n,
+                "readback_n": readback_n,
+                "readback_status": r5.get("status", "?"),
+                "readback_validation": readback_validation,
+                "consistency_status": "INVALID_REPORT",
+                "match_report": r3,
+                "write_report": r4,
+            }
+
         output_files = sorted(p.name for p in (out_dir / "compose").iterdir() if p.is_file())
         output_hashes = _source_compose_hashes(out_dir / "compose")
         source_hashes = {
@@ -487,6 +539,8 @@ def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) ->
             "readback_n": readback_n,
             "readback_status": r5.get("status", "?"),
             "readback_validation": readback_validation,
+            "consistency_status": "PASS",
+            "consistency_report": consistency_report,
             "source_sha256": source_hashes,
             "output_sha256": output_hashes,
             "output_files": output_files,
@@ -542,6 +596,8 @@ def main() -> int:
                         "readback_n": res["readback_n"],
                         "readback_status": res["readback_status"],
                         "readback_validation": res["readback_validation"],
+                        "consistency_status": res["consistency_status"],
+                        "consistency_report": res["consistency_report"],
                         "source_sha256": res["source_sha256"],
                         "output_sha256": res["output_sha256"],
                         "fortran_executable_sha256": res["fortran_executable_sha256"],

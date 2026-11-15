@@ -134,6 +134,7 @@ Run the exact CI workflow commands from `.github/workflows/fortran-eos-ci.yml`. 
 - [ ] Focused M5A, Maxwell v2 and APR+CSS tests pass.
 - [ ] Fortran executable builds with the workflow's gfortran flags.
 - [ ] Full `python -m pytest -q python_frontend/tests pipeline/tests` passes.
+- [ ] M7 CSS uses one constant bridge cs2, a crust-side first-order density jump and a continuous state-variable core join; native read-back retains both transition rows.
 - [ ] The M5A native read-back values are independently compared, not just counted.
 - [ ] No case-level native verification is claimed without a case-specific run.
 - [ ] Composition-bearing Maxwell v2 remains fail-closed unless native composition support is actually complete.

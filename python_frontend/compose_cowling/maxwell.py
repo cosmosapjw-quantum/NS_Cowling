@@ -67,16 +67,24 @@ class MaxwellEOS:
         if tags[cut] != 1 or tags[cut + 1] != 2:
             raise ValueError("phase labels must be ordered low-density then high-density")
 
-        def subtable(mask: np.ndarray) -> DirectBarotrope:
+        def subtable(mask: np.ndarray, anchor: str) -> DirectBarotrope:
             return DirectBarotrope(
                 np.asarray(transition_table.p[mask], dtype=float),
                 np.asarray(transition_table.eps[mask], dtype=float),
                 np.asarray(transition_table.nb[mask], dtype=float),
                 np.asarray(transition_table.mub[mask], dtype=float),
+                anchor=anchor,
             )
 
-        self.low = subtable(tags == 1)
-        self.high = subtable(tags == 2)
+        # Each phase is anchored at the coexistence point, where the Maxwell
+        # identities are imposed; first-law drift of a table shows up away
+        # from the interface and is reported, not hidden.
+        self.low = subtable(tags == 1, "last")
+        self.high = subtable(tags == 2, "first")
+        self.low_branch_surface_density_drift_relative = float(
+            self.low.number_density_knots[0] / self.low.number_density_source[0] - 1.0)
+        self.high_branch_end_density_drift_relative = float(
+            self.high.number_density_knots[-1] / self.high.number_density_source[-1] - 1.0)
         p_lo = float(self.low.pressure[-1])
         p_hi = float(self.high.pressure[0])
         scale = max(abs(p_lo), abs(p_hi), 1.0)
@@ -131,7 +139,16 @@ class MaxwellEOS:
             provider = self.high
         else:
             raise ValueError("side must be 'low' or 'high'")
-        s: EOSState = provider.evaluate(p / MEV_FM3_TO_J_M3)
+        p_mev = p / MEV_FM3_TO_J_M3
+        # Exact q-coordinate endpoints (Pt, the surface cutoff) are reached as
+        # P_ref*exp(-q), which can land an ulp outside the provider domain.
+        ulps = 64.0 * np.finfo(float).eps
+        lo_p, hi_p = float(provider.pressure[0]), float(provider.pressure[-1])
+        if lo_p * (1.0 - ulps) <= p_mev < lo_p:
+            p_mev = lo_p
+        elif hi_p < p_mev <= hi_p * (1.0 + ulps):
+            p_mev = hi_p
+        s: EOSState = provider.evaluate(p_mev)
         return {
             "pressure_pa": p,
             "energy_j_m3": s.energy * MEV_FM3_TO_J_M3,

@@ -33,7 +33,8 @@ A generated EOS is a survivor only if all of the following are true:
 5. The pre-write and post-read internal CSV files both exist and parse without malformed rows or duplicate columns.
 6. Their column sets agree and include `nb`, `Q1`--`Q7`, and `Iphase`.
 7. Every numerical column is compared row-by-row. This includes optional q_extra columns, composition payload values, row status, presence masks, and C3/C4 applicability flags.
-8. Integer metadata columns match exactly; finite floating-point values match within the declared `rtol=5e-13`, `atol=1e-14` criterion.
+8. Integer CSV metadata columns match exactly; finite floating-point values match within the declared `rtol=5e-13`, `atol=1e-14` criterion.
+9. The complete scalar `eos_data.nml` metadata set is compared as well: rest-mass conventions, grid/index metadata, temperature/charge-grid values, composition-presence flags, and beta-equilibrium flag. Integers and logicals match exactly; floating-point metadata obeys the same tolerance.
 
 A status-only or row-count-only readback is insufficient. The report contains per-column maximum absolute and relative residuals. Any discrepancy rejects that pair and prevents it from entering the survivor list.
 

@@ -20,6 +20,7 @@ from __future__ import annotations
 import csv
 import json
 import math
+import re
 import shutil
 import subprocess
 import sys
@@ -57,8 +58,21 @@ def sha256_file(path: Path | str) -> str:
 _INTEGER_COLUMNS = {
     "Iphase", "row_status", "yn_present", "yp_present", "ye_present",
     "ymu_present", "abar_present", "zbar_present", "yh_present",
-    "c3_applicable", "c4_applicable",
+    "c3_applicable", "c4_applicable", "iy_local", "it_local",
 }
+
+_METADATA_INTEGER_KEYS = {
+    "il", "iT", "iYq", "inb_start", "nadd", "nadd_max", "naxis_t", "naxis_yq",
+}
+_METADATA_BOOLEAN_KEYS = {
+    "composition_file_present", "composition_available", "beta_equilibrated",
+}
+_METADATA_FLOAT_KEYS = {
+    "mn", "mp", "temperature_mev", "charge_fraction_grid",
+}
+_METADATA_REQUIRED_KEYS = (
+    _METADATA_INTEGER_KEYS | _METADATA_BOOLEAN_KEYS | _METADATA_FLOAT_KEYS
+)
 
 
 def verify_internal_readback(
@@ -67,6 +81,8 @@ def verify_internal_readback(
     *,
     expected_n: int,
     actual_n: int,
+    expected_metadata: Path | str | None = None,
+    actual_metadata: Path | str | None = None,
     rtol: float = 5e-13,
     atol: float = 1e-14,
 ) -> dict:
@@ -97,8 +113,13 @@ def verify_internal_readback(
         "max_abs_residuals": {},
         "max_rel_residuals": {},
         "errors": errors,
+        "metadata_status": "NOT_CHECKED",
+        "metadata_max_abs_residuals": {},
+        "metadata_max_rel_residuals": {},
     }
 
+    if (expected_metadata is None) != (actual_metadata is None):
+        errors.append("both expected_metadata and actual_metadata must be supplied together")
     if expected_n < 0 or actual_n < 0:
         errors.append("native readback row counts must be nonnegative")
     if int(expected_n) != int(actual_n):
@@ -226,6 +247,105 @@ def verify_internal_readback(
     return report
 
 
+def _parse_fortran_metadata(path: Path) -> dict[str, bool | int | float]:
+    """Parse the scalar fields emitted by the native write_metadata routine."""
+    text = path.read_text(encoding="utf-8")
+    values = {}
+    for match in re.finditer(
+        r"^\\s*([A-Za-z][A-Za-z0-9_]*)\\s*=\\s*([^,\\s/]+)",
+        text,
+        flags=re.MULTILINE,
+    ):
+        key, raw = match.group(1), match.group(2).strip()
+        if key in _METADATA_BOOLEAN_KEYS:
+            normalized = raw.strip(".").upper()
+            if normalized in {"T", "TRUE"}:
+                value = True
+            elif normalized in {"F", "FALSE"}:
+                value = False
+            else:
+                raise ValueError(f"{path}: invalid Fortran logical {key}={raw!r}")
+        elif key in _METADATA_INTEGER_KEYS:
+            value_float = float(raw.replace("D", "E").replace("d", "e"))
+            if not value_float.is_integer():
+                raise ValueError(f"{path}: non-integral metadata {key}={raw!r}")
+            value = int(value_float)
+        else:
+            value = float(raw.replace("D", "E").replace("d", "e"))
+            if not math.isfinite(value):
+                raise ValueError(f"{path}: non-finite metadata {key}={raw!r}")
+        if key in values:
+            raise ValueError(f"{path}: duplicate metadata key {key}")
+        values[key] = value
+    missing = sorted(_METADATA_REQUIRED_KEYS - set(values))
+    if missing:
+        raise ValueError(f"{path}: missing required metadata keys {missing}")
+    return values
+
+
+def verify_internal_metadata_readback(
+    expected_metadata: Path | str,
+    actual_metadata: Path | str,
+    *,
+    rtol: float = 5e-13,
+    atol: float = 1e-14,
+) -> dict:
+    """Compare all scalar EOS metadata written before and after CompOSE I/O."""
+    expected_path = Path(expected_metadata)
+    actual_path = Path(actual_metadata)
+    report = {
+        "status": "FAIL",
+        "expected_path": str(expected_path),
+        "actual_path": str(actual_path),
+        "rtol": float(rtol),
+        "atol": float(atol),
+        "max_abs_residuals": {},
+        "max_rel_residuals": {},
+        "errors": [],
+    }
+    if not expected_path.is_file():
+        report["errors"].append(f"expected internal metadata is missing: {expected_path}")
+    if not actual_path.is_file():
+        report["errors"].append(f"readback internal metadata is missing: {actual_path}")
+    if report["errors"]:
+        return report
+    try:
+        expected = _parse_fortran_metadata(expected_path)
+        actual = _parse_fortran_metadata(actual_path)
+    except (OSError, UnicodeError, ValueError) as exc:
+        report["errors"].append(f"internal metadata parse failure: {type(exc).__name__}: {exc}")
+        return report
+    if set(expected) != set(actual):
+        report["errors"].append(
+            f"internal metadata key mismatch: missing={sorted(set(expected)-set(actual))}, "
+            f"extra={sorted(set(actual)-set(expected))}"
+        )
+        return report
+    max_abs = {}
+    max_rel = {}
+    for key in sorted(expected):
+        ev, av = expected[key], actual[key]
+        if key in _METADATA_BOOLEAN_KEYS or key in _METADATA_INTEGER_KEYS:
+            if type(ev) is not type(av) or ev != av:
+                report["errors"].append(
+                    f"metadata {key}: exact mismatch (expected={ev!r}, actual={av!r})"
+                )
+        else:
+            difference = abs(float(av) - float(ev))
+            scale = max(abs(float(ev)), abs(float(av)), 1e-30)
+            max_abs[key] = difference
+            max_rel[key] = difference / scale
+            if difference > atol + rtol * abs(float(ev)):
+                report["errors"].append(
+                    f"metadata {key}: numerical mismatch (expected={ev:.17g}, actual={av:.17g}, "
+                    f"abs={difference:.3e}, rel={difference/scale:.3e})"
+                )
+    report["max_abs_residuals"] = max_abs
+    report["max_rel_residuals"] = max_rel
+    report["status"] = "PASS" if not report["errors"] else "FAIL"
+    return report
+
+
 def _source_compose_hashes(directory: Path) -> dict[str, str]:
     """Return hashes of the CompOSE source files actually present."""
     hashes = {}
@@ -316,10 +436,23 @@ def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) ->
         readback_n = int(r5.get("n", 0)) if r5.get("status") == "ok" else 0
         expected_csv = matched_internal / "eos_data.csv"
         actual_csv = readback_internal / "eos_data.csv"
+        expected_nml = matched_internal / "eos_data.nml"
+        actual_nml = readback_internal / "eos_data.nml"
         readback_validation = verify_internal_readback(
             expected_csv, actual_csv,
             expected_n=combined_n, actual_n=readback_n,
+            expected_metadata=expected_nml,
+            actual_metadata=actual_nml,
         )
+        metadata_validation = verify_internal_metadata_readback(
+            expected_nml, actual_nml,
+        )
+        readback_validation["metadata_status"] = metadata_validation["status"]
+        readback_validation["metadata_max_abs_residuals"] = metadata_validation["max_abs_residuals"]
+        readback_validation["metadata_max_rel_residuals"] = metadata_validation["max_rel_residuals"]
+        readback_validation["errors"].extend(metadata_validation["errors"])
+        if metadata_validation["status"] != "PASS":
+            readback_validation["status"] = "FAIL"
         if r5.get("status") != "ok":
             readback_validation["status"] = "FAIL"
             readback_validation["errors"].append(

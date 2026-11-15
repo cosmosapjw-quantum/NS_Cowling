@@ -93,6 +93,49 @@ def test_internal_readback_comparison_rejects_nonfinite_payload(tmp_path):
     assert any("non-finite" in error for error in report["errors"])
 
 
+def _write_internal_metadata(
+    path: Path, *, mn: float = 939.0, beta_equilibrated: bool = True
+) -> None:
+    path.write_text(
+        "&metadata\\n"
+        f" mn={mn:.16E}\\n"
+        " mp=939.0000000000000E+00\\n"
+        " il=1\\n iT=1\\n iYq=1\\n inb_start=1\\n"
+        " nadd=0\\n nadd_max=0\\n naxis_t=1\\n naxis_yq=1\\n"
+        " temperature_mev=0.0000000000000E+00\\n"
+        " charge_fraction_grid=0.0000000000000E+00\\n"
+        " composition_file_present=F\\n"
+        " composition_available=F\\n"
+        f" beta_equilibrated={'T' if beta_equilibrated else 'F'}\\n"
+        "/\\n",
+        encoding="utf-8",
+    )
+
+
+def test_internal_metadata_readback_detects_rest_mass_change(tmp_path):
+    expected = tmp_path / "expected.nml"
+    actual = tmp_path / "actual.nml"
+    _write_internal_metadata(expected, mn=939.0)
+    _write_internal_metadata(actual, mn=939.1)
+
+    report = pipeline.verify_internal_metadata_readback(expected, actual)
+
+    assert report["status"] == "FAIL"
+    assert any("metadata mn" in error for error in report["errors"])
+
+
+def test_internal_metadata_readback_checks_discrete_flags_and_indices(tmp_path):
+    expected = tmp_path / "expected.nml"
+    actual = tmp_path / "actual.nml"
+    _write_internal_metadata(expected, beta_equilibrated=True)
+    _write_internal_metadata(actual, beta_equilibrated=False)
+
+    report = pipeline.verify_internal_metadata_readback(expected, actual)
+
+    assert report["status"] == "FAIL"
+    assert any("beta_equilibrated" in error for error in report["errors"])
+
+
 def test_pipeline_does_not_mark_css_survived_when_readback_count_differs(tmp_path, monkeypatch):
     exe = tmp_path / "compose_eos_fortran"
     exe.write_bytes(b"test executable identity")
@@ -146,6 +189,7 @@ def test_css_runner_roundtrips_real_native_benchmark_pair(tmp_path):
     assert result["readback_validation"]["status"] == "PASS"
     assert result["readback_validation"]["expected_rows"] == result["combined_n"]
     assert result["readback_validation"]["actual_rows"] == result["readback_n"]
+    assert result["readback_validation"]["metadata_status"] == "PASS"
     assert result["output_sha256"]
     assert result["source_sha256"]["crust"]
     assert result["source_sha256"]["core"]

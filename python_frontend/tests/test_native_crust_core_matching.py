@@ -10,6 +10,7 @@ import numpy as np
 import pytest
 
 from compose_eos import (
+    EOSData,
     NativeExecutionError,
     NativeFeatureUnavailable,
     executable,
@@ -259,3 +260,118 @@ def test_native_matching_rejects_nonmatching_thermodynamic_state(mutation, match
         match_crust_core(
             crust, core, method="quintic_P", drop_composition=True
         )
+
+
+# ---------------------------------------------------------------------------
+# §3.5 acceptance tests #9 and #10: root-solver failure / no-root case and
+# a deliberately invalid case with nonpositive density jump. The native
+# Fortran solve_single_css_match rejects both; these tests prove the rejection
+# surfaces to the caller instead of returning a nominal success or a clipped
+# solution.  (Tests #1-#8 and #11-#12 are already covered by
+# test_native_css_is_single_speed_with_crust_side_first_order_jump above and
+# test_apr_css_maxwell_audit.py; these two close the remaining gap.)
+# ---------------------------------------------------------------------------
+
+
+def _css_barotrope(*, rest_mass: float, stiffness: float, n_min: float,
+                   n_max: float, count: int = 81) -> EOSData:
+    """Exact cold barotrope P = K n^2, eps = m n + K n^2, mu = m + 2 K n.
+
+    This is the canonical cold polytrope of index 2 used by the CSS tests; its
+    thermodynamic identities hold to machine precision and cs^2 = dP/deps is
+    monotone, so it is a well-behaved crust or core input for the single-speed
+    CSS matcher.
+    """
+    nb = np.linspace(n_min, n_max, count)
+    pressure = stiffness * nb ** 2
+    epsilon = rest_mass * nb + pressure
+    mu = (epsilon + pressure) / nb
+    zeros = np.zeros_like(nb)
+    q7 = epsilon / (nb * 939.0) - 1.0
+    return EOSData(
+        nb=nb, mn=939.0, mp=939.0,
+        Q1=pressure / nb, Q2=zeros.copy(), Q3=mu / 939.0 - 1.0,
+        Q4=zeros.copy(), Q5=zeros.copy(), Q6=q7.copy(), Q7=q7.copy(),
+        q_extra=zeros.copy(), Iphase=np.zeros(nb.size, dtype=int),
+        Yn=zeros.copy(), Yp=zeros.copy(), Ye=zeros.copy(), Ymu=zeros.copy(),
+        Aav=zeros.copy(), Zav=zeros.copy(), Yh=zeros.copy(),
+        Il=1, iT=1, iYq=1, inb_start=1, temperature_mev=0.0,
+        charge_fraction_grid=0.0, q_extra_count=0,
+        composition_file_present=False, composition_available=False,
+        beta_equilibrated=True,
+    )
+
+
+def test_css_single_speed_rejects_endpoints_with_no_causal_solution():
+    """§3.5 #9: when the crust/core endpoints admit no causal single-speed CSS
+    solution, the native matcher must fail closed rather than clip a noncausal
+    solution into the allowed interval or return a nominal success. The exact
+    rejection point depends on where in the pipeline the causality violation is
+    detected (endpoint sound-speed check, no-sign-change bracket, or noncausal
+    solved root), so this test asserts failure with a causality-related message,
+    not a specific substring. The key contract is that the matcher must NOT
+    silently succeed on an acausal endpoint pair."""
+    # A causal polytropic crust joined to an explicitly acausal cubic core
+    # (P = K n^3 with stiffness so high that c_s^2 = dP/deps exceeds 1 at the
+    # high-density end). The CSS matcher requires 0 < cs^2 <= 1 at the selected
+    # core endpoint, so an acausal core endpoint is rejected.
+    crust = _css_barotrope(rest_mass=939.0, stiffness=1.0, n_min=0.05, n_max=0.60)
+    # acausal cubic core: cs^2 = 3 K n^2 / (m + 3 K n^2) -> 1 as n grows; with
+    # stiffness large, cs^2 exceeds 1 well inside the grid.
+    nb = np.linspace(0.30, 1.50, 81)
+    stiffness = 4000.0
+    rest_mass = 939.0
+    pressure = stiffness * nb ** 3
+    epsilon = rest_mass * nb + 0.5 * stiffness * nb ** 3
+    mu = (epsilon + pressure) / nb
+    zeros = np.zeros_like(nb)
+    q7 = epsilon / (nb * 939.0) - 1.0
+    core = EOSData(
+        nb=nb, mn=939.0, mp=939.0,
+        Q1=pressure / nb, Q2=zeros.copy(), Q3=mu / 939.0 - 1.0,
+        Q4=zeros.copy(), Q5=zeros.copy(), Q6=q7.copy(), Q7=q7.copy(),
+        q_extra=zeros.copy(), Iphase=np.zeros(nb.size, dtype=int),
+        Yn=zeros.copy(), Yp=zeros.copy(), Ye=zeros.copy(), Ymu=zeros.copy(),
+        Aav=zeros.copy(), Zav=zeros.copy(), Yh=zeros.copy(),
+        Il=1, iT=1, iYq=1, inb_start=1, temperature_mev=0.0,
+        charge_fraction_grid=0.0, q_extra_count=0,
+        composition_file_present=False, composition_available=False,
+        beta_equilibrated=True,
+    )
+    with pytest.raises((NativeExecutionError, ValueError)) as excinfo:
+        match_crust_core(
+            crust, core, cr_name="synth_crust", co_name="synth_core",
+            method="css", n_bridge=40, core_compo_mode="strict_thermo_only",
+            drop_composition=True,
+        )
+    # The rejection must cite a causality / sound-speed / no-causal-solution
+    # failure; it must not be a silent success or an unrelated validation error.
+    msg = str(excinfo.value).lower()
+    assert ("causal" in msg or "sound speed" in msg or "no.*solution" in msg
+            or "endpoint" in msg or "outside (0,1)" in msg or "outside (0, 1)" in msg), (
+        f"rejection must cite causality/endpoint failure; got: {excinfo.value!r}")
+
+
+def test_css_single_speed_rejects_nonpositive_density_jump():
+    """§3.5 #10: a deliberately invalid case where the solved bridge density is
+    not larger than the crust-side density (nonpositive density jump). The
+    native matcher must reject it rather than return a continuous match or a
+    clipped jump.  The CSS contract requires Delta n_B = n_b - n_c > 0 at the
+    crust-bridge interface."""
+    # If the crust and core overlap in density (core starts below the crust's
+    # high end) the matcher cannot construct a positive crust-to-bridge jump.
+    crust = _css_barotrope(rest_mass=939.0, stiffness=1.0, n_min=0.05, n_max=0.50)
+    core = _css_barotrope(rest_mass=939.0, stiffness=1.2, n_min=0.45, n_max=1.20)
+    with pytest.raises((NativeExecutionError, ValueError)) as excinfo:
+        match_crust_core(
+            crust, core, cr_name="synth_crust", co_name="synth_core",
+            method="css", n_bridge=40, core_compo_mode="strict_thermo_only",
+            drop_composition=True,
+        )
+    # The rejection must mention density ordering or a nonpositive jump; it
+    # must not be a silent success or an unrelated validation error.
+    msg = str(excinfo.value).lower()
+    assert ("density" in msg or "ordered" in msg or "jump" in msg
+            or "endpoint" in msg or "increase" in msg), (
+        f"rejection must cite density/jump/endpoints; got: {excinfo.value!r}")
+

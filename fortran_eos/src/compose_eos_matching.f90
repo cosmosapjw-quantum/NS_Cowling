@@ -10,6 +10,15 @@ module compose_eos_matching
     real(wp) :: cs2_source_left=0._wp, cs2_source_right=0._wp
     real(wp) :: cs2_left=0._wp, cs2_right=0._wp, cs2_min=0._wp, cs2_max=0._wp
     real(wp) :: first_law_relative_residual=0._wp, pressure_span=0._wp
+    ! Single-speed CSS: a sharp crust->bridge jump and continuous bridge->core join.
+    real(wp) :: css_single_sound_speed=0._wp
+    real(wp) :: css_transition_nb_low=0._wp, css_transition_nb_high=0._wp
+    real(wp) :: css_transition_delta_nb=0._wp, css_transition_delta_eps=0._wp
+    real(wp) :: css_transition_pressure=0._wp, css_transition_mu=0._wp
+    real(wp) :: seidov_critical_delta_eps=0._wp, seidov_ratio=0._wp
+    integer :: css_transition_low_index=-1, css_transition_high_index=-1
+    integer :: css_core_bridge_index=-1
+    logical :: seidov_small_core_stable=.false.
     ! Rest-mass gauge alignment provenance (NSC remediation Phase B).
     ! dm_mass_gauge_meV = co%mn - cr%mn: additive per-baryon shift applied to
     ! crust F and mu_B to re-express the crust in the core's neutron rest-mass
@@ -403,6 +412,66 @@ contains
     enddo
   end function pressure_work_integral
 
+  pure function single_css_pressure_span(cs2,n_high,mu_t,mu_core) result(delta_p)
+    real(wp),intent(in)::cs2,n_high,mu_t,mu_core
+    real(wp)::delta_p,log_ratio,ratio
+    delta_p=0._wp
+    if(cs2<=0._wp.or.n_high<=0._wp.or.mu_t<=0._wp.or.mu_core<=mu_t)return
+    log_ratio=log(mu_core/mu_t)
+    ratio=exp(log_ratio)
+    delta_p=n_high*mu_t*cs2/(1._wp+cs2)*(ratio-exp(-log_ratio/cs2))
+  end function single_css_pressure_span
+
+  subroutine solve_single_css_match(n_crust,n_core,p_transition,p_core,mu_transition,mu_core, &
+                                    cs2,nb_bridge,delta_eps,ok,message)
+    real(wp),intent(in)::n_crust,n_core,p_transition,p_core,mu_transition,mu_core
+    real(wp),intent(out)::cs2,nb_bridge,delta_eps
+    logical,intent(out)::ok
+    character(len=*),intent(out)::message
+    real(wp)::lo,hi,mid,target,flo,fhi,fmid,log_ratio,delta_nb,epsilon_bridge
+    integer::iter
+    ok=.false.;cs2=0._wp;nb_bridge=0._wp;delta_eps=0._wp
+    message='invalid single-speed CSS matching endpoints'
+    if(.not.all(ieee_is_finite([n_crust,n_core,p_transition,p_core,mu_transition,mu_core])))return
+    if(n_crust<=0._wp.or.n_core<=n_crust.or.p_transition<0._wp.or.p_core<=p_transition.or. &
+       mu_transition<=0._wp.or.mu_core<=mu_transition)then
+      message='single-speed CSS endpoints must increase in n_B, P and mu_B';return
+    endif
+    target=p_core-p_transition
+    log_ratio=log(mu_core/mu_transition)
+    lo=1.e-10_wp;hi=1._wp
+    flo=single_css_pressure_span(lo,n_core,mu_transition,mu_core)-target
+    fhi=single_css_pressure_span(hi,n_core,mu_transition,mu_core)-target
+    if(.not.ieee_is_finite(flo+fhi).or.flo>0._wp.or.fhi<0._wp)then
+      message='no causal single-speed CSS solution (0<cs2<=1) matches the endpoints';return
+    endif
+    do iter=1,140
+      mid=0.5_wp*(lo+hi)
+      fmid=single_css_pressure_span(mid,n_core,mu_transition,mu_core)-target
+      if(abs(fmid)<=8._wp*epsilon(1._wp)*max(1._wp,abs(target)))exit
+      if(fmid<0._wp)then;lo=mid
+      else;hi=mid;endif
+    enddo
+    cs2=0.5_wp*(lo+hi)
+    nb_bridge=n_core*exp(-log_ratio/cs2)
+    delta_nb=nb_bridge-n_crust
+    delta_eps=mu_transition*delta_nb
+    epsilon_bridge=mu_transition*nb_bridge-p_transition
+    if(.not.all(ieee_is_finite([cs2,nb_bridge,delta_eps,epsilon_bridge])))then
+      message='single-speed CSS solution is nonfinite';return
+    endif
+    if(cs2<=0._wp.or.cs2>1._wp)then
+      message='single-speed CSS solution violates 0<cs2<=1';return
+    endif
+    if(delta_nb<=64._wp*epsilon(1._wp)*max(1._wp,n_crust))then
+      message='single-speed CSS solution has no positive crust-to-bridge density jump';return
+    endif
+    if(epsilon_bridge<=0._wp.or.delta_eps<=0._wp)then
+      message='single-speed CSS transition has nonpositive energy density or jump';return
+    endif
+    ok=.true.;message='single_speed_css_with_crust_density_jump'
+  end subroutine solve_single_css_match
+
   subroutine css_residual(s,n1,n2,mu1,mu2,p1,p2,res,mu_m,n_m,csa,csb)
     real(wp),intent(in)::s,n1,n2,mu1,mu2,p1,p2
     real(wp),intent(out)::res,mu_m,n_m,csa,csb
@@ -458,35 +527,28 @@ contains
       enddo
       ok=.true.;message=trim(b_msg)
     case('css')
-      lo=1.e-6_wp;hi=1._wp-1.e-6_wp
-      call css_residual(lo,n1,n2,mu1,mu2,p1,p2,fa,um,nm,csa,csb)
-      call css_residual(hi,n1,n2,mu1,mu2,p1,p2,fb,um,nm,csa,csb)
-      if(fa*fb>0._wp)then;message='CSS bridge scalar equation has no bracketed root';return;endif
-      do iter=1,120
-        mid=0.5_wp*(lo+hi)
-        call css_residual(mid,n1,n2,mu1,mu2,p1,p2,fm,um,nm,csa,csb)
-        if(abs(fm)<2.e-13_wp*max(1._wp,abs(p2-p1)))exit
-        if(fa*fm<=0._wp)then;hi=mid;fb=fm
-        else;lo=mid;fa=fm;endif
-      enddo
-      call css_residual(mid,n1,n2,mu1,mu2,p1,p2,fm,um,nm,csa,csb)
-      if(csa<=0._wp.or.csb<=0._wp.or.csa>=1._wp.or.csb>=1._wp)then;message='CSS segment sound speed outside (0,1)';return;endif
-      ga=1._wp/csa;gb=1._wp/csb
-      pm=p1+(n1*mu1/(ga+1._wp))*((um/mu1)**(ga+1._wp)-1._wp)
+      ! One constant sound speed over the entire bridge. The low-density
+      ! endpoint passed here is the bridge-side state of the crust->bridge
+      ! Maxwell jump; u=1 joins continuously to the high-density core.
+      if(cs1<=0._wp.or.cs1>1._wp)then
+        message='single-speed CSS requires 0<cs2<=1';return
+      endif
+      if(mu2<=mu1.or.n2<=n1.or.p2<=p1)then
+        message='single-speed CSS bridge endpoints are not ordered';return
+      endif
+      ga=1._wp/cs1
       do j=1,size(u)
         muv=mu1*(mu2/mu1)**u(j)
-        if(muv<=um)then
-          nbv=n1*(muv/mu1)**ga
-          pp=p1+(n1*mu1/(ga+1._wp))*((muv/mu1)**(ga+1._wp)-1._wp)
-          cs(j)=csa
-        else
-          nbv=nm*(muv/um)**gb
-          pp=pm+(nm*um/(gb+1._wp))*((muv/um)**(gb+1._wp)-1._wp)
-          cs(j)=csb
-        endif
-        nb(j)=nbv;p(j)=pp;q(j)=pp/nbv;mu(j)=muv;f(j)=muv-q(j)
+        nbv=n1*(muv/mu1)**ga
+        pp=p1+n1*mu1*cs1/(1._wp+cs1)*((muv/mu1)**(1._wp+ga)-1._wp)
+        nb(j)=nbv;p(j)=pp;q(j)=pp/nbv;mu(j)=muv;f(j)=muv-q(j);cs(j)=cs1
       enddo
-      ok=.true.;message='two_segment_css'
+      if(abs(nb(size(u))-n2)>2.e-10_wp*max(1._wp,n2).or. &
+         abs(p(size(u))-p2)>2.e-10_wp*max(1._wp,p2).or. &
+         abs(mu(size(u))-mu2)>2.e-12_wp*max(1._wp,mu2))then
+        message='single-speed CSS failed continuous core endpoint matching';return
+      endif
+      ok=.true.;message='single_speed_css_analytic'
     case('first_law_constrained_hermite_pressure_bridge')
       dpdu1=n1*mu1*cs1*dx;dpdu2=n2*mu2*cs2*dx
       lo=p1+1.05_wp*0.015_wp*(p2-p1);hi=p2-1.05_wp*0.015_wp*(p2-p1)

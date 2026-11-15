@@ -2,7 +2,7 @@
 First-Principles Literature Solver, Causal TOV Runner, and Universal Crust–Core Matcher.
 """
 from .eos_data import EOSData
-from .io import read_compose, write_compose
+from .io import read_compose, write_compose, write_compose_verified, verify_compose_readback
 from .consistency import check_consistency
 from .reconstruct import fill_density_gap, find_density_gap, reconstruct_master
 from .plotting import (
@@ -44,7 +44,7 @@ from .matching import (
 
 __version__ = "3.3.1"
 
-__all__ = ["build_maxwell_css_eos",
+__all__ = ["build_maxwell_css_eos", "validate_gibbs_barotrope",
     "MaxwellEOS", "GibbsResult", "ChargeResolvedPhase", "LeptonSector",
     "build_maxwell_eos", "write_maxwell_eos", "read_maxwell_eos",
     "tidal_y_jump", "solve_tov_with_phase_transition", "gibbs_mixed_phase",
@@ -52,6 +52,8 @@ __all__ = ["build_maxwell_css_eos",
     "EOSData",
     "read_compose",
     "write_compose",
+    "write_compose_verified",
+    "verify_compose_readback",
     "check_consistency",
     "fill_density_gap",
     "find_density_gap",
@@ -88,7 +90,7 @@ __all__ = ["build_maxwell_css_eos",
     "solve_star_at_target_mass",
 ]
 
-from .phase_transitions import (MaxwellEOS, GibbsResult, ChargeResolvedPhase, LeptonSector, build_maxwell_eos, write_maxwell_eos, read_maxwell_eos, tidal_y_jump, solve_tov_with_phase_transition, gibbs_mixed_phase, write_gibbs_eos, read_gibbs_eos)
+from .phase_transitions import (MaxwellEOS, GibbsResult, ChargeResolvedPhase, LeptonSector, build_maxwell_eos, write_maxwell_eos, read_maxwell_eos, tidal_y_jump, solve_tov_with_phase_transition, validate_gibbs_barotrope, gibbs_mixed_phase, write_gibbs_eos, read_gibbs_eos)
 from .causality import causality_profile, causal_completion
 
 from .phase_transitions import build_maxwell_css_eos

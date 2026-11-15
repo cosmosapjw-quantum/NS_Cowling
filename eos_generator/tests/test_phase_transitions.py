@@ -337,3 +337,145 @@ def test_maxwell_rejects_non_neutral_fixed_yq_slice():
     data=_cold_local_neutral_maxwell_fixture(); data.charge_fraction_grid=0.05
     with pytest.raises(ValueError,match="Yq=0"):
         _phase_arrays(data)
+
+
+def _narrow_pocket_eos(scale: float) -> EOSData:
+    n = np.array([0.10, 0.125, 0.155, 0.195, 0.245, 0.305], dtype=float)
+    eps = np.array([95.0, 120.0, 151.0, 193.0, 249.0, 322.0], dtype=float)
+    p = np.array([2.0, 4.0, 6.0, 20.0, 21.5, 24.0], dtype=float) * float(scale)
+    mu = (eps + p) / n
+    F = eps / n
+    z = np.zeros_like(n)
+    return EOSData(
+        nb=n, mn=939.0, mp=939.0,
+        Q1=p / n, Q2=z, Q3=mu / 939.0 - 1.0, Q4=z, Q5=z,
+        Q6=F / 939.0 - 1.0, Q7=F / 939.0 - 1.0, q_extra=z,
+        Iphase=np.zeros(len(n), dtype=int),
+        Yn=z, Yp=z, Ye=z, Ymu=z, Aav=z, Zav=z, Yh=z,
+        composition_available=False, beta_equilibrated=True,
+    )
+
+
+def test_causality_exact_extrema_catches_narrow_pocket_missed_by_uniform_grids():
+    s_tangent = 2.0641739540456010
+    d = _narrow_pocket_eos(s_tangent * 1.0002)
+    prof16 = causality_profile(d, n_min=0.0, max_log_step=0.5, samples_per_interval=16)
+    prof32 = causality_profile(d, n_min=0.0, max_log_step=0.5, samples_per_interval=32)
+    # Fixed 16- and 32-point grids both step over the narrow peak (< 1.0)
+    assert prof16["pchip"]["grid_diagnostic_max_cs2"] < 1.0
+    assert prof32["pchip"]["grid_diagnostic_max_cs2"] < 1.0
+    # Exact degree<=6 polynomial interval analysis catches the pocket and isolates both crossings
+    assert prof16["pchip"]["acausal"] is True
+    assert prof16["pchip"]["max_cs2"] > 1.0 + 1e-4
+    assert prof16["pchip"]["crossing_kind"] == "true_crossing"
+    directions = [ev["direction"] for ev in prof16["pchip"]["crossing_events"]]
+    assert "upward" in directions and "downward" in directions
+
+
+def test_causality_distinguishes_tangential_contact_and_no_crossing():
+    s_tangent = 2.0641739540456010
+    d_tan = _narrow_pocket_eos(s_tangent)
+    prof_tan = causality_profile(d_tan, n_min=0.0, max_log_step=0.5, samples_per_interval=16)
+    assert prof_tan["pchip"]["crossing_kind"] == "tangential_contact"
+    assert prof_tan["pchip"]["acausal"] is False
+    assert len(prof_tan["pchip"]["tangential_contacts"]) == 1
+    with pytest.raises(ValueError, match="tangential c_s\\^2=1 contact"):
+        causal_completion(d_tan, max_log_step=0.5)
+
+    d_none = _narrow_pocket_eos(0.5 * s_tangent)
+    prof_none = causality_profile(d_none, n_min=0.0, max_log_step=0.5, samples_per_interval=16)
+    assert prof_none["pchip"]["crossing_kind"] == "none"
+    assert prof_none["pchip"]["acausal"] is False
+    with pytest.raises(ValueError, match="no resolved first c_s"):
+        causal_completion(d_none, max_log_step=0.5)
+
+
+def test_gibbs_thermo_validation_provenance_and_readback_roundtrip(tmp_path):
+    mu_b = np.linspace(1100.0, 1450.0, 28)
+    mu_q = np.linspace(-180.0, 20.0, 25)
+    MB, MQ = np.meshgrid(mu_b, mu_q, indexing="ij")
+    P_h = 0.00018 * (MB - 900.0) ** 2 + 0.04 * MQ + 12.0
+    P_q = 0.00018 * (MB - 900.0) ** 2 - 0.06 * MQ + 2.0
+    h_npz = tmp_path / "hadronic_surface.npz"
+    q_npz = tmp_path / "quark_surface.npz"
+    np.savez(h_npz, mu_b=mu_b, mu_q=mu_q, pressure=P_h, source_id="hadronic_toy", model_id="TOY_H1")
+    np.savez(q_npz, mu_b=mu_b, mu_q=mu_q, pressure=P_q, source_id="quark_toy", model_id="TOY_Q1")
+
+    had = ChargeResolvedPhase.from_npz(h_npz, label="hadronic")
+    qk = ChargeResolvedPhase.from_npz(q_npz, label="quark")
+    res = gibbs_mixed_phase(had, qk, np.linspace(1140.0, 1400.0, 16), lepton_sector=LeptonSector(lambda q: 0.0, lambda q: 0.0, "zero"))
+
+    assert res.metadata["schema"] == "compose-eos-gibbs-v2"
+    assert res.metadata["composition_status"] == "thermo_only"
+    assert "CompOSE normalization reference" in res.metadata["normalization_masses_mev"]["role"]
+    for role in ("hadronic", "high_density"):
+        prov = res.metadata["provenance"][role]
+        for key in (
+            "source_identifier", "source_file_path", "source_sha256",
+            "model_parameter_set_identifier", "phase_identity",
+            "mu_b_units", "mu_q_units", "pressure_units",
+            "normalization_convention", "interpolation_method",
+            "interpolation_order", "lepton_contributions",
+        ):
+            assert key in prov and prov[key] is not None
+    pc = res.metadata["validation"]["post_construction"]
+    assert pc["pass_"] is True
+    assert pc["min_dnb_dmu_b_fm3_per_MeV"] > 0.0
+    assert pc["min_causality_margin_fm3"] >= -1e-11
+    assert 0.0 < pc["min_cs2"] <= pc["max_cs2"] <= 1.0 + 1e-10
+
+    out_dir = tmp_path / "gibbs_out"
+    receipt = write_gibbs_eos(str(out_dir), res)
+    assert receipt["status"] == "PASS"
+    assert (out_dir / "eos.readback_receipt.json").is_file()
+    rr = read_gibbs_eos(str(out_dir))
+    assert rr.metadata["validation"]["post_readback"]["pass_"] is True
+    assert rr.metadata["provenance"]["hadronic"]["source_sha256"] == had.source_sha256
+
+
+def test_gibbs_rejects_acausal_barotrope_corrupted_readback_lepton_double_count_and_out_of_domain(tmp_path):
+    from compose_eos.phase_transitions import validate_gibbs_barotrope
+
+    mu_b = np.linspace(1100.0, 1450.0, 28)
+    mu_q = np.linspace(-180.0, 20.0, 25)
+    MB, MQ = np.meshgrid(mu_b, mu_q, indexing="ij")
+    P_h = 0.00018 * (MB - 900.0) ** 2 + 0.04 * MQ + 12.0
+    P_q = 0.00018 * (MB - 900.0) ** 2 - 0.06 * MQ + 2.0
+
+    # Lepton double-counting guard
+    had_with_lep = ChargeResolvedPhase(mu_b, mu_q, P_h, label="had", lepton_contributions="included_electrons")
+    qk = ChargeResolvedPhase(mu_b, mu_q, P_q, label="qk")
+    with pytest.raises(ValueError, match="already declares lepton_contributions"):
+        gibbs_mixed_phase(had_with_lep, qk, np.linspace(1140.0, 1400.0, 16))
+
+    # Out-of-domain chemical potential evaluation
+    with pytest.raises(ValueError, match="outside tabulated phase surface"):
+        qk.evaluate(900.0, -50.0)
+
+    # Acausal Gibbs barotrope (c_s^2 = 2.0 > 1, g = -0.5 n < 0): P = 1e-4 * mu^1.5
+    m = np.linspace(1000.0, 1100.0, 12)
+    nb_acausal = 1.5e-4 * (m ** 0.5)
+    p_acausal = 1.0e-4 * (m ** 1.5)
+    eps_acausal = m * nb_acausal - p_acausal
+    with pytest.raises(ValueError, match="causality margin|causal sound speed"):
+        validate_gibbs_barotrope(m, nb_acausal, p_acausal, eps_acausal)
+
+    # Corrupted dP/dmu_B != n_B while keeping monotonicity & Euler identity on post-readback
+    had = ChargeResolvedPhase(mu_b, mu_q, P_h, label="had")
+    res = gibbs_mixed_phase(had, qk, np.linspace(1140.0, 1400.0, 16), lepton_sector=LeptonSector(lambda q: 0.0, lambda q: 0.0, "zero"))
+    out_dir = tmp_path / "gibbs_corrupt"
+    write_gibbs_eos(str(out_dir), res)
+    # Perturb all rows of Q1 by +2% and adjust Q6/Q7 so eps+P=mu_B*n_B still holds while dP/dmu_B != n_B!
+    lines = (out_dir / "eos.thermo").read_text(encoding="utf-8").splitlines()
+    for idx in range(1, len(lines)):
+        toks = lines[idx].split()
+        q1_old = float(toks[3])
+        q1_new = q1_old * 1.02
+        dq = (q1_new - q1_old) / float(res.eos.mn)
+        toks[3] = f"{q1_new:.16E}"
+        toks[8] = f"{float(toks[8]) - dq:.16E}"
+        toks[9] = f"{float(toks[9]) - dq:.16E}"
+        lines[idx] = " " + " ".join(toks)
+    (out_dir / "eos.thermo").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="integral reconstruction"):
+        read_gibbs_eos(str(out_dir))

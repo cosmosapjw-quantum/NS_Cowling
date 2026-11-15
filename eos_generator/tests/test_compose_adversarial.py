@@ -245,3 +245,40 @@ def test_reader_does_not_infer_beta_equilibrium_when_leptons_are_absent(tmp_path
     loaded=read_compose(str(tmp_path))
     assert loaded.Il==0
     assert loaded.beta_equilibrated is False
+
+
+def test_staged_write_readback_mismatch_refuses_publish_and_preserves_failure_receipt(tmp_path):
+    from compose_eos.io import verify_compose_readback
+    import json
+
+    initial = make_data(composition=True)
+    write_compose(str(tmp_path), initial)
+    original_thermo = (tmp_path / "eos.thermo").read_bytes()
+
+    updated = make_data(composition=True)
+    updated.Q1 = updated.Q1 * 1.1
+
+    def _corrupt_staged_thermo(stage_dir: str) -> None:
+        p = __import__("pathlib").Path(stage_dir) / "eos.thermo"
+        lines = p.read_text(encoding="utf-8").splitlines()
+        cols = lines[2].split()
+        cols[3] = f"{float(cols[3]) * 1.25:.16E}"
+        lines[2] = " " + " ".join(cols)
+        p.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="readback verification failed"):
+        write_compose(str(tmp_path), updated, _post_stage_hook=_corrupt_staged_thermo)
+
+    # Atomic promotion did NOT overwrite existing published output
+    assert (tmp_path / "eos.thermo").read_bytes() == original_thermo
+    # Failure receipt preserved with FAIL status and non-empty errors
+    receipt_path = tmp_path / "eos.readback_failure_receipt.json"
+    assert receipt_path.is_file()
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    assert receipt["status"] == "FAIL"
+    assert any("Q1" in err or "p" in err for err in receipt["errors"])
+
+    # Direct verify_compose_readback also catches Nadd and composition presence mismatches
+    mismatch_data = make_data(composition=False)
+    with pytest.raises(ValueError, match="composition_available mismatch"):
+        verify_compose_readback(str(tmp_path), mismatch_data)

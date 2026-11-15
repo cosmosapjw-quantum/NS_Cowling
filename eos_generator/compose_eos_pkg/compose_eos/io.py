@@ -16,11 +16,13 @@ and CompOSE Quick Guide for Providers (2023).
 """
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 import shutil
 import tempfile
 import warnings
-from typing import Dict, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -211,7 +213,10 @@ def _one_dimensional_slice(nb_grid, t_grid, yq_grid, thermo_rows):
             "The selected table has a multi-point eos.t or eos.yq grid; refusing to flatten it"
         )
     if abs(float(T[iT - t_i0])) > 1e-12:
-        raise ValueError(f"selected temperature is {T[iT-t_i0]} MeV, not a cold T=0 slice")
+        raise NotImplementedError(
+            f"selected temperature is {T[iT-t_i0]:g} MeV, not a cold T=0 slice; "
+            "compose_eos v3.3.1 supports only cold T=0 tables"
+        )
     expected = {(iT, ib, iYq) for ib in range(nb_i0, nb_i1 + 1)}
     if set(keys) != expected:
         missing = sorted(expected - set(keys))[:8]
@@ -284,6 +289,16 @@ def read_compose(directory: str) -> EOSData:
         raise NotImplementedError(
             f'{directory}: compose_eos v3.3.1 supports only cold T=0 tables; got T={T:g} MeV'
         )
+    comp_charge_neutral = True
+    if composition_available:
+        comp_charge_neutral = float(np.max(np.abs(Yp + Zav * YI - Ye - Ymu))) <= 2e-4
+    is_cold = np.isfinite(T) and abs(float(T)) <= 1e-12
+    is_beta_eq = bool(
+        is_cold
+        and Il == 1
+        and float(np.max(np.abs(Q[:, 4]))) < 1e-8
+        and comp_charge_neutral
+    )
     return EOSData(
         nb=nb, mn=mn, mp=mp,
         Q1=Q[:, 0], Q2=Q[:, 1], Q3=Q[:, 2], Q4=Q[:, 3],
@@ -294,7 +309,7 @@ def read_compose(directory: str) -> EOSData:
         Il=Il, iT=iT, iYq=iYq, inb_start=int(nb_grid[0]), temperature_mev=T,
         charge_fraction_grid=Yq, q_extra_count=nadd,
         composition_available=composition_available,
-        beta_equilibrated=(Il == 1 and abs(float(np.max(np.abs(Q[:, 4])))) < 1e-8),
+        beta_equilibrated=is_beta_eq,
     )
 
 
@@ -312,6 +327,236 @@ def _extra_count(data: EOSData, copy_from: Optional[str]) -> int:
     return nadd
 
 
+def _sha256_file(path: str) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(65536), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _compose_dir_hashes(directory: str) -> Dict[str, str]:
+    hashes: Dict[str, str] = {}
+    for fn in ("eos.nb", "eos.t", "eos.yq", "eos.thermo", "eos.compo"):
+        p = os.path.join(directory, fn)
+        if os.path.isfile(p):
+            hashes[fn] = _sha256_file(p)
+    return hashes
+
+
+def _array_diff_stats(actual: np.ndarray, expected: np.ndarray) -> Dict[str, float]:
+    a = np.asarray(actual, dtype=float)
+    b = np.asarray(expected, dtype=float)
+    abs_diff = np.abs(a - b)
+    scale = np.maximum(np.maximum(np.abs(a), np.abs(b)), 1e-30)
+    rel_diff = abs_diff / scale
+    return {
+        "max_abs": float(np.max(abs_diff)) if abs_diff.size else 0.0,
+        "max_rel": float(np.max(rel_diff)) if rel_diff.size else 0.0,
+    }
+
+
+def verify_compose_readback(
+    directory: str,
+    expected: EOSData,
+    *,
+    expected_nadd: Optional[int] = None,
+    source_dir: Optional[str] = None,
+    rtol: float = 1e-10,
+    atol: float = 1e-12,
+    compo_rtol: float = 1e-9,
+    compo_atol: float = 1e-12,
+    failure_receipt_path: Optional[str] = None,
+) -> Dict[str, object]:
+    """Read back a written CompOSE directory natively and verify full fidelity.
+
+    Verifies numerical arrays, Q1..Q7, units and mass headers, Iphase/Nadd,
+    composition arrays and presence masks, C3/C4 applicability and status, and
+    source/output SHA256 checksums. Preserves a failure receipt before raising
+    if any check fails.
+    """
+    from .consistency import check_consistency
+
+    errors: List[str] = []
+    source_hashes = _compose_dir_hashes(source_dir) if source_dir and os.path.isdir(source_dir) else {}
+    output_hashes = _compose_dir_hashes(directory)
+    receipt: Dict[str, object] = {
+        "schema": "compose-eos-readback-receipt-v1",
+        "directory": os.path.abspath(directory),
+        "source_directory": os.path.abspath(source_dir) if source_dir else None,
+        "source_sha256": source_hashes,
+        "output_sha256": output_hashes,
+        "units": {
+            "nb": "fm^-3",
+            "temperature_mev": "MeV",
+            "mn": "MeV",
+            "mp": "MeV",
+            "Q1_to_Q7": "dimensionless (CompOSE Manual v3.01 Sec. 4.2)",
+        },
+        "status": "FAIL",
+        "errors": errors,
+    }
+    try:
+        actual = read_compose(directory)
+    except Exception as exc:
+        errors.append(f"native read_compose failed: {exc}")
+        if failure_receipt_path:
+            os.makedirs(os.path.dirname(os.path.abspath(failure_receipt_path)), exist_ok=True)
+            with open(failure_receipt_path, "w", encoding="utf-8") as fh:
+                json.dump(receipt, fh, indent=2, sort_keys=True)
+        raise ValueError(f"CompOSE readback failed: {exc}") from exc
+
+    n_exp = expected.n
+    n_act = actual.n
+    receipt["point_count"] = {"expected": int(n_exp), "actual": int(n_act)}
+    if n_act != n_exp:
+        errors.append(f"point count mismatch: expected {n_exp}, got {n_act}")
+
+    # Mass & grid headers
+    exp_nadd = int(expected_nadd) if expected_nadd is not None else (
+        int(expected.q_extra_count)
+        if expected.q_extra_count is not None
+        else int(expected.q_extra.size == expected.n and np.any(expected.q_extra != 0.0))
+    )
+    act_nadd = int(actual.q_extra_count if actual.q_extra_count is not None else 0)
+    receipt["headers"] = {
+        "mn": {"expected": float(expected.mn), "actual": float(actual.mn)},
+        "mp": {"expected": float(expected.mp), "actual": float(actual.mp)},
+        "Il": {"expected": int(expected.Il), "actual": int(actual.Il)},
+        "iT": {"expected": int(expected.iT), "actual": int(actual.iT)},
+        "iYq": {"expected": int(expected.iYq), "actual": int(actual.iYq)},
+        "inb_start": {"expected": int(expected.inb_start), "actual": int(actual.inb_start)},
+        "temperature_mev": {"expected": float(expected.temperature_mev), "actual": float(actual.temperature_mev)},
+        "charge_fraction_grid": {
+            "expected": float(expected.charge_fraction_grid),
+            "actual": float(actual.charge_fraction_grid),
+        },
+        "Nadd": {"expected": exp_nadd, "actual": act_nadd},
+        "beta_equilibrated": {
+            "expected_flag": bool(expected.beta_equilibrated),
+            "actual": bool(actual.beta_equilibrated),
+        },
+    }
+    for name in ("mn", "mp", "temperature_mev", "charge_fraction_grid"):
+        ev = float(getattr(expected, name))
+        av = float(getattr(actual, name))
+        if not np.isclose(av, ev, rtol=rtol, atol=atol):
+            errors.append(f"header {name} mismatch: expected {ev!r}, got {av!r}")
+    for name in ("Il", "iT", "iYq", "inb_start"):
+        if int(getattr(actual, name)) != int(getattr(expected, name)):
+            errors.append(
+                f"header {name} mismatch: expected {int(getattr(expected, name))}, "
+                f"got {int(getattr(actual, name))}"
+            )
+    if act_nadd != exp_nadd:
+        errors.append(f"Nadd mismatch: expected {exp_nadd}, got {act_nadd}")
+
+    # Q1..Q7 & derived numerical arrays
+    q_stats: Dict[str, Dict[str, float]] = {}
+    num_stats: Dict[str, Dict[str, float]] = {}
+    if n_act == n_exp:
+        for name in ("Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7"):
+            ea = np.asarray(getattr(expected, name), dtype=float)
+            aa = np.asarray(getattr(actual, name), dtype=float)
+            q_stats[name] = _array_diff_stats(aa, ea)
+            if not np.allclose(aa, ea, rtol=rtol, atol=atol):
+                errors.append(
+                    f"{name} readback mismatch (max_abs={q_stats[name]['max_abs']:.3e}, "
+                    f"max_rel={q_stats[name]['max_rel']:.3e})"
+                )
+        num_fields = ["nb", "p", "eps", "mub", "muq", "mul", "F"]
+        if exp_nadd == 1:
+            num_fields.append("q_extra")
+        for name in num_fields:
+            ea = np.asarray(getattr(expected, name), dtype=float)
+            aa = np.asarray(getattr(actual, name), dtype=float)
+            num_stats[name] = _array_diff_stats(aa, ea)
+            if not np.allclose(aa, ea, rtol=rtol, atol=atol):
+                errors.append(
+                    f"array {name} readback mismatch (max_abs={num_stats[name]['max_abs']:.3e}, "
+                    f"max_rel={num_stats[name]['max_rel']:.3e})"
+                )
+    receipt["Q1_Q7_residuals"] = q_stats
+    receipt["numerical_array_residuals"] = num_stats
+
+    # Composition arrays, presence mask, and Iphase
+    compo_file_exists = os.path.isfile(os.path.join(directory, "eos.compo"))
+    exp_comp = bool(expected.composition_available)
+    act_comp = bool(actual.composition_available)
+    compo_stats: Dict[str, Dict[str, float]] = {}
+    receipt["composition"] = {
+        "expected_available": exp_comp,
+        "actual_available": act_comp,
+        "eos_compo_present": compo_file_exists,
+        "residuals": compo_stats,
+    }
+    if act_comp != exp_comp:
+        errors.append(f"composition_available mismatch: expected {exp_comp}, got {act_comp}")
+    if exp_comp != compo_file_exists:
+        errors.append(
+            f"eos.compo presence mismatch: composition_available={exp_comp}, file_exists={compo_file_exists}"
+        )
+    if n_act == n_exp:
+        if exp_comp:
+            if not np.array_equal(np.asarray(actual.Iphase, dtype=int), np.asarray(expected.Iphase, dtype=int)):
+                errors.append("Iphase mismatch on eos.compo readback")
+            for name in ("Yn", "Yp", "Ye", "Ymu", "Aav", "Zav", "Yh"):
+                ea = np.asarray(getattr(expected, name), dtype=float)
+                aa = np.asarray(getattr(actual, name), dtype=float)
+                compo_stats[name] = _array_diff_stats(aa, ea)
+                if not np.allclose(aa, ea, rtol=compo_rtol, atol=compo_atol):
+                    errors.append(
+                        f"composition array {name} mismatch (max_abs={compo_stats[name]['max_abs']:.3e}, "
+                        f"max_rel={compo_stats[name]['max_rel']:.3e})"
+                    )
+        else:
+            if not np.all(np.asarray(actual.Iphase, dtype=int) == 0):
+                errors.append("expected zero Iphase on composition-absent readback")
+    receipt["Iphase"] = {
+        "expected_unique": [int(x) for x in np.unique(expected.Iphase)] if np.asarray(expected.Iphase).size else [],
+        "actual_unique": [int(x) for x in np.unique(actual.Iphase)] if np.asarray(actual.Iphase).size else [],
+    }
+
+    # C3/C4 applicability and agreement
+    if n_act == n_exp and n_act >= 3:
+        exp_rep = check_consistency(expected, verbose=False)
+        act_rep = check_consistency(actual, verbose=False)
+        c34 = {}
+        for key in ("C3", "C4"):
+            ec, ac = exp_rep[key], act_rep[key]
+            exp_app = bool(ec["status"] == "CHECKED")
+            act_app = bool(ac["status"] == "CHECKED")
+            c34[key] = {
+                "expected_status": ec["status"],
+                "actual_status": ac["status"],
+                "expected_applicable": exp_app,
+                "actual_applicable": act_app,
+                "expected_pass": bool(ec.get("pass_", False)) if exp_app else None,
+                "actual_pass": bool(ac.get("pass_", False)) if act_app else None,
+            }
+            if ec["status"] != ac["status"] or exp_app != act_app:
+                errors.append(
+                    f"{key} applicability mismatch: expected ({ec['status']}, {exp_app}), "
+                    f"got ({ac['status']}, {act_app})"
+                )
+            elif exp_app and bool(ec["pass_"]) != bool(ac["pass_"]):
+                errors.append(
+                    f"{key} pass status mismatch: expected {ec['pass_']}, got {ac['pass_']}"
+                )
+        receipt["C3_C4_applicability"] = c34
+
+    if errors:
+        receipt["status"] = "FAIL"
+        if failure_receipt_path:
+            os.makedirs(os.path.dirname(os.path.abspath(failure_receipt_path)), exist_ok=True)
+            with open(failure_receipt_path, "w", encoding="utf-8") as fh:
+                json.dump(receipt, fh, indent=2, sort_keys=True)
+        raise ValueError("CompOSE staged readback verification failed: " + "; ".join(errors))
+
+    receipt["status"] = "PASS"
+    return receipt
+
+
 def _replace_file(src: str, dst: str) -> None:
     """Replace dst with src atomically; separated so unit tests can inject mid-commit I/O faults."""
     os.replace(src, dst)
@@ -319,7 +564,9 @@ def _replace_file(src: str, dst: str) -> None:
 
 def write_compose(directory: str, data: EOSData,
                   copy_from: Optional[str] = None,
-                  *, composition_tolerance: float = 2e-3) -> None:
+                  *, composition_tolerance: float = 2e-3,
+                  receipt_path: Optional[str] = None,
+                  _post_stage_hook: Optional[Callable[[str], None]] = None) -> Dict[str, object]:
     """Write a standards-compliant 1D CompOSE table with transactional staging and rollback.
 
     Internal `Yh` is converted to the CompOSE group number abundance `Y_I=Yh/A`.
@@ -426,6 +673,18 @@ def write_compose(directory: str, data: EOSData,
         # Never copy source-model sidecars to a modified EOS. In particular,
         # eos.mr and eos.pdf would falsely describe the original crust/core.
 
+        if _post_stage_hook is not None:
+            _post_stage_hook(stage_dir)
+
+        failure_receipt = os.path.join(directory, "eos.readback_failure_receipt.json")
+        receipt = verify_compose_readback(
+            stage_dir,
+            data,
+            expected_nadd=nadd,
+            source_dir=copy_from,
+            failure_receipt_path=failure_receipt,
+        )
+
         # Backup existing files before committing staged replacements
         for fn in target_names + (["eos.compo"] if not data.composition_available else []):
             dst = os.path.join(directory, fn)
@@ -442,6 +701,14 @@ def write_compose(directory: str, data: EOSData,
             if os.path.exists(cp_dst):
                 os.remove(cp_dst)
                 committed.append("eos.compo")
+
+        receipt["directory"] = os.path.abspath(directory)
+        receipt["output_sha256"] = _compose_dir_hashes(directory)
+        if receipt_path is not None:
+            os.makedirs(os.path.dirname(os.path.abspath(receipt_path)), exist_ok=True)
+            with open(receipt_path, "w", encoding="utf-8") as fh:
+                json.dump(receipt, fh, indent=2, sort_keys=True)
+        return receipt
     except Exception:
         # Roll back any files modified before the failure
         for fn in committed:
@@ -456,4 +723,29 @@ def write_compose(directory: str, data: EOSData,
         shutil.rmtree(backup_dir, ignore_errors=True)
 
 
-__all__ = ["read_compose", "write_compose", "_replace_file"]
+def write_compose_verified(
+    directory: str,
+    data: EOSData,
+    copy_from: Optional[str] = None,
+    *,
+    composition_tolerance: float = 2e-3,
+    receipt_path: Optional[str] = None,
+) -> Dict[str, object]:
+    """Write a CompOSE directory with staged native readback and write a JSON receipt."""
+    rpath = receipt_path or os.path.join(directory, "eos.readback_receipt.json")
+    return write_compose(
+        directory,
+        data,
+        copy_from=copy_from,
+        composition_tolerance=composition_tolerance,
+        receipt_path=rpath,
+    )
+
+
+__all__ = [
+    "read_compose",
+    "write_compose",
+    "write_compose_verified",
+    "verify_compose_readback",
+    "_replace_file",
+]

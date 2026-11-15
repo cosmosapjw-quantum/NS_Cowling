@@ -259,3 +259,16 @@ def test_v1_unchanged_after_v2_addition():
     high = _smooth_phase(n_min=2.0, n_max=3.0, iphase=2)
     with pytest.raises(Exception):
         construct_maxwell_transition(low, high, assume_local_charge_neutrality=True)
+
+
+@pytest.mark.parametrize("composition_flag", ["composition_available", "composition_file_present"])
+def test_v2_fails_closed_for_composition_bearing_inputs(composition_flag):
+    """The v1 native Maxwell kernel is thermo-only. Until v2 has a genuinely
+    composition-aware native construction/output path, composition-bearing
+    inputs must be rejected explicitly rather than silently stripped."""
+    low = _smooth_phase()
+    high = _smooth_phase(n_min=2.0, n_max=3.0, iphase=2)
+    setattr(low, composition_flag, True)
+    with pytest.raises(RuntimeError, match="COMPOSITION_UNSUPPORTED"):
+        construct_maxwell_transition_v2(
+            low, high, assume_local_charge_neutrality=True)

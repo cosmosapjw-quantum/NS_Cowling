@@ -745,7 +745,16 @@ def match_crust_core(
         muq_cr = d_cr.muq[:i1 + 1]
         muq_co = d_co.muq[i2:]
         muq_br = (1.0 - s_u) * float(muq_cr[-1]) + s_u * float(muq_co[0])
-        muq_full = np.concatenate([muq_cr, muq_br, muq_co])
+        if method == "css":
+            # Thermo-only CSS carries no charge-composition solution. Hold the
+            # charge chemical potential at the crust-side value across the
+            # jump and bridge; it is metadata only, not a reconstructed species
+            # profile or a claim of beta-equilibrated microscopic composition.
+            muq_jump = np.asarray([float(muq_cr[-1])])
+            muq_br = np.full(n_bridge, float(muq_cr[-1]))
+            muq_full = np.concatenate([muq_cr, muq_jump, muq_br, muq_co])
+        else:
+            muq_full = np.concatenate([muq_cr, muq_br, muq_co])
         cr_ids = (np.asarray(d_cr.Iphase[:i1 + 1], dtype=int)
                   if np.asarray(d_cr.Iphase).shape == d_cr.nb.shape else np.zeros(len(nb_cr), dtype=int))
         co_ids_raw = (np.asarray(d_co.Iphase[i2:], dtype=int)

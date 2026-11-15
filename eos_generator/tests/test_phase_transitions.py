@@ -139,7 +139,7 @@ def test_maxwell_admission_rejects_differential_first_law_violation():
         composition_available=False, beta_equilibrated=True,
     )
     assert np.max(np.abs(mu*n-pressure-eps)) < 1e-10
-    with pytest.raises(ValueError, match=r"dP/dmu_B"):
+    with pytest.raises(ValueError, match=r"thermodynamic-potential consistency.*pressure reconstruction residual"):
         _phase_arrays(bad)
 
 

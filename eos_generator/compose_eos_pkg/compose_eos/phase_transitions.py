@@ -70,9 +70,10 @@ def _branchwise_first_law_report(mu, p, n, *, samples_per_interval=8):
     p_reconstructed = np.asarray(primitive(mu), dtype=float) + offset
     p_scale = np.maximum(np.maximum(np.abs(p), abs(float(p[0]))), 1e-8)
     p_rel = np.abs(p_reconstructed - p) / p_scale
-    finite = (np.isfinite(rel_derivative) & np.isfinite(dp_dmu)
-              & np.isfinite(n_interp) & np.isfinite(p_rel))
-    if not np.all(finite):
+    finite_derivative = (np.isfinite(rel_derivative) & np.isfinite(dp_dmu)
+                         & np.isfinite(n_interp))
+    finite_pressure = np.isfinite(p_rel)
+    if not np.all(finite_derivative) or not np.all(finite_pressure):
         return {"max_relative_residual": float("inf"),
                 "rms_relative_residual": float("inf"),
                 "pressure_reconstruction_max_relative_residual": float("inf"),
@@ -107,8 +108,9 @@ def _phase_arrays(data: EOSData, *, differential_tolerance=5e-3, differential_sa
             or differential['pressure_reconstruction_max_relative_residual'] > differential_tolerance
             or differential['min_dP_dmu_fm3'] <= 0):
         raise ValueError(
-            'phase branchwise dP/dmu_B = n_B consistency failed '
-            f"(pressure reconstruction residual {differential['pressure_reconstruction_max_relative_residual']:.3e}; "
+            'phase thermodynamic-potential consistency failed (dP/dmu_B = n_B by construction; '
+            'pressure reconstruction residual '
+            f"{differential['pressure_reconstruction_max_relative_residual']:.3e}; "
             f"tolerance {differential_tolerance:.3e})"
         )
     # A sharp coexistence construction is only meaningful when each input is

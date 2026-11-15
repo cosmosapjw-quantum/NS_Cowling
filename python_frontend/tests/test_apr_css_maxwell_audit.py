@@ -105,3 +105,13 @@ def test_apr_css_verdict_admitted_with_phenomenological_declaration(rep):
     """The overall verdict is ADMITTED_WITH_PHENOMENOLOGICAL_DECLARATION: all
     physical gates pass AND the phenomenological declaration is present."""
     assert rep["verdict"] == "ADMITTED_WITH_PHENOMENOLOGICAL_DECLARATION"
+
+
+def test_apr_css_exact_pchip_derivative_is_an_admission_gate(rep):
+    """A representative TOV/Love solution and a correct jump identity do not
+    override a failed differential first-law check inside the interpolated
+    phase. Use the exact PCHIP derivative, not finite differences of samples."""
+    dfl = rep["1_differential_first_law_n_equals_dPdmu"]
+    assert dfl["derivative_operator"] == "PchipInterpolator.derivative"
+    assert dfl["apr_source_differential_first_law_holds"] is False
+    assert rep["verdict"] == "REVIEW_REQUIRED"

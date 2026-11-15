@@ -36,18 +36,34 @@ def test_m5a_receipt_exists(rep):
 
 
 def test_m5a_finding1_python_check_not_native(rep):
-    """Finding 1: the consistency check is Python-side, NOT native Fortran.
-    The field is renamed; native_c1_c11_verification is False (BLOCKED)."""
+    """Finding 1: the consistency check field is renamed to
+    python_consistency_check_pass (NOT the misleading native_c1_c11_overall_pass).
+    The native_c1_c11_verification and native_fortran_compose_readback fields
+    are TRUE only because the native Fortran read/write/verify pathway was
+    actually executed (scripts/maxwell_audit/m5a_native_readback_verify.py);
+    they carry concrete evidence in native_readback_evidence. The §6 spec
+    allows these to be TRUE when actual native calls succeed."""
     sample = rep["results"]["nB0.4_cs20.3333_dEps0.0"]
+    # the misleading field name is gone
     assert "python_consistency_check_pass" in sample
     assert "native_c1_c11_overall_pass" not in sample
-    assert sample["native_c1_c11_verification"] is False
-    assert sample["native_fortran_compose_readback"] is False
+    # the native verification fields are TRUE with evidence (not BLOCKED)
+    assert sample["native_c1_c11_verification"] is True
+    assert sample["native_fortran_compose_readback"] is True
     # the truthful verification-backend summary
     vbt = rep["verification_backend_truthful"]
     assert vbt["python_consistency_check"] is True
-    assert vbt["native_c1_c11_verification"] is False
-    assert vbt["native_fortran_compose_readback"] is False
+    assert vbt["native_c1_c11_verification"] is True
+    assert vbt["native_fortran_compose_readback"] is True
+    # concrete evidence must be present
+    ev = rep["native_readback_evidence"]
+    assert ev["native_write_executed"] is True
+    assert ev["native_read_executed"] is True
+    assert ev["native_verify_executed"] is True
+    assert ev["readback_n_match"] is True
+    assert ev["c1_c11_overall_pass"] is True
+    # failed_checks is empty (either "" or []) -- no checks failed
+    assert ev["c1_c11_failed_checks"] in ("", [], None)
 
 
 def test_m5a_finding2_filename_corrected(rep):
@@ -100,8 +116,16 @@ def test_m5a_finding6_delta_eps_classification_explicit(rep):
 
 def test_m5a_finding7_barotrope_not_compose(rep):
     """Finding 7: the saved JSON is declared a barotrope (n_B, mu_B, P, eps),
-    NOT a CompOSE-generated EOS."""
+    NOT a CompOSE-generated EOS. The native Fortran read-back may be run as a
+    verification step (and recorded in native_readback_evidence), but that
+    does NOT promote the barotrope to a CompOSE-generated multi-phase EOS --
+    the headline artifact is still the (n_B, mu_B, P, eps) barotrope."""
     assert rep["output_is_compose_generated_eos"] is False
     assert rep["output_is_barotrope_only"] is True
-    # a CompOSE artifact would require the native I/O path, which was not run
-    assert rep["verification_backend_truthful"]["native_fortran_compose_readback"] is False
+    # the native read-back is a verification backend, not a CompOSE-EOS claim:
+    # it is TRUE only because the native I/O pathway was actually executed
+    # (with evidence), and output_is_compose_generated_eos stays False.
+    assert rep["verification_backend_truthful"]["native_fortran_compose_readback"] is True
+    assert rep["verification_backend_truthful"]["native_c1_c11_verification"] is True
+    # but the artifact is still declared a barotrope, not a CompOSE EOS
+    assert rep["output_is_compose_generated_eos"] is False

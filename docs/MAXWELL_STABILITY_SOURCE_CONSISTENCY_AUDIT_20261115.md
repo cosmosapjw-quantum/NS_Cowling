@@ -95,7 +95,7 @@ Across the 147 intervals of the SPG_M1 Iphase-7 segment: **99 `SOURCE_TABLE_CONV
 
 | # | finding | correction | evidence |
 | --- | --- | --- | --- |
-| 1 | `native_c1_c11_overall_pass` recorded a Python `check_consistency()` as native | renamed to `python_consistency_check_pass`; `native_c1_c11_verification=False` (BLOCKED) | verification_backend_truthful records the distinction |
+| 1 | `native_c1_c11_overall_pass` recorded a Python `check_consistency()` as native | renamed to `python_consistency_check_pass`; `native_c1_c11_verification` and `native_fortran_compose_readback` are TRUE because the native Fortran read/write/verify pathway was actually executed | verification_backend_truthful records the distinction; native_readback_evidence carries row-count match + C1-C11 PASS |
 | 2 | `GPPVA_DD2_m5a_real_css.json` generated from BBB_BHF2 (misnamed) | renamed to `BBB_BHF2_m5a_real_css.json`; misnamed file removed | old file gone, new file exists |
 | 3 | `mp=M_N*0.9938=933.74 MeV` (invented) | real BBB_BHF2 `mp=938.272 MeV` | diff 4.53 MeV recorded |
 | 4 | first-law reset `ε:=μn−P` unrecorded | quantified: max relative change 1.77e-8 | recorded |
@@ -105,7 +105,9 @@ Across the 147 intervals of the SPG_M1 Iphase-7 segment: **99 `SOURCE_TABLE_CONV
 
 The analytic CSS high-density branch formula is retained (no mathematical defect found).
 
-**Conclusion 4.** The M5A receipt now truthfully reports the verification backend (analytic + Python, NOT native Fortran), uses the real BBB_BHF2 proton mass, quantifies the first-law reset, records the μ_t mismatch, explicitly classifies Δε=0, and declares the output as a barotrope. The two native-Fortran verification fields (`native_fortran_compose_readback`, `native_c1_c11_verification`) are False/BLOCKED unless actual native calls are executed.
+**Native read-back follow-up (post-§6).** The §6 spec allows `native_fortran_compose_readback` and `native_c1_c11_verification` to be TRUE when actual native calls are executed successfully. `scripts/maxwell_audit/m5a_native_readback_verify.py` runs the native Fortran `write_compose` → `read_compose` → `check_consistency` pathway on the headline barotrope (after dropping one duplicate seam row so the native reader's strictly-increasing `n_B` requirement is met; the original barotrope file is NOT modified). Result: write produced `eos.nb/eos.t/eos.thermo/eos.yq`; read-back 274→274 rows match; C1-C11 overall PASS, no failed checks; C2 first-law `4.17e-16`; C10 cs² ∈ [5.9e-4, 0.333]. The receipt's two native-verification fields are now TRUE with this evidence. The headline artifact remains a barotrope (`output_is_compose_generated_eos=False`); the native read-back is a verification backend, not a CompOSE-EOS promotion.
+
+**Conclusion 4.** The M5A receipt now truthfully reports the verification backend: analytic CSS acceptance + Python consistency check are TRUE; the two native-Fortran fields (`native_fortran_compose_readback`, `native_c1_c11_verification`) are TRUE with concrete evidence because the native I/O pathway was actually executed. The receipt uses the real BBB_BHF2 proton mass, quantifies the first-law reset, records the μ_t mismatch, explicitly classifies Δε=0, and declares the output as a barotrope.
 
 **Deliverables:** `data/m5a_css_provenance_correction_20261115.json`, `download/m5a_real_css/BBB_BHF2_m5a_real_css.json`, `python_frontend/tests/test_m5a_provenance_correction.py` (8 tests).
 

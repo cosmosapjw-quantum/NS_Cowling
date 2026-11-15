@@ -7,16 +7,20 @@
     {
       "id": 1,
       "finding": "script used check_consistency() from Python but recorded the result as native_c1_c11_overall_pass",
-      "correction": "renamed to python_consistency_check_pass; added native_c1_c11_verification=False (BLOCKED, not executed); verification_backend_truthful records the distinction",
+      "correction": "renamed to python_consistency_check_pass; native_c1_c11_verification and native_fortran_compose_readback are now TRUE because the native Fortran read/write/verify pathway was actually executed (scripts/maxwell_audit/m5a_native_readback_verify.py), with evidence in native_readback_evidence",
       "evidence": {
         "python_consistency_check_pass": true,
-        "native_c1_c11_verification": false,
+        "native_c1_c11_verification": true,
         "verification_backend_truthful": {
           "analytic_css_acceptance": true,
           "python_consistency_check": true,
           "native_fortran_compose_readback": false,
           "native_c1_c11_verification": false
-        }
+        },
+        "native_fortran_compose_readback": true,
+        "native_readback_n_match": true,
+        "native_c1_c11_failed_checks": [],
+        "native_dedup_note": "the barotrope has a duplicate n_B at the hadronic->CSS seam; the native CompOSE reader requires strictly increasing n_B, so the duplicate seam row is dropped for the native read-back ONLY. The original BBB_BHF2_m5a_real_css.json is NOT modified."
       }
     },
     {
@@ -79,5 +83,15 @@
       }
     }
   ],
-  "summary": "All 7 M5A audit findings corrected. The receipt now truthfully reports the verification backend (analytic + Python, NOT native Fortran), uses the real BBB_BHF2 proton mass, quantifies the first-law reset, records the mu_t mismatch, explicitly classifies Delta_eps=0, and declares the output as a barotrope (not CompOSE)."
+  "summary": "All 7 M5A audit findings corrected. The receipt now truthfully reports the verification backend (analytic + Python, NOT native Fortran), uses the real BBB_BHF2 proton mass, quantifies the first-law reset, records the mu_t mismatch, explicitly classifies Delta_eps=0, and declares the output as a barotrope (not CompOSE).",
+  "native_readback_followup": {
+    "executed": true,
+    "readback_n_match": true,
+    "c1_c11_overall_pass": true,
+    "c1_c11_failed_checks": [],
+    "original_barotrope_n_points": 275,
+    "dedup_dropped_seam_rows": 1,
+    "dedup_note": "the barotrope has a duplicate n_B at the hadronic->CSS seam; the native CompOSE reader requires strictly increasing n_B, so the duplicate seam row is dropped for the native read-back ONLY. The original BBB_BHF2_m5a_real_css.json is NOT modified.",
+    "fortran_executable_sha256": "cfa4ce518760973e47514932188af0051a835dfb3649930cd008cb1c2cc5636d"
+  }
 }

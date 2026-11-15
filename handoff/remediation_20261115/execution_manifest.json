@@ -52,7 +52,7 @@
       "historical_artifact": "2026-11-14 two-segment smooth CSS output remains immutable historical evidence"
     }
   },
-  "patch_state": "CSS_SINGLE_SPEED_CRUST_JUMP_PATCHED_FINAL_CI_PENDING",
+  "patch_state": "CSS_SINGLE_SPEED_CRUST_JUMP_CODE_AND_TESTS_PASS_HASH_SYNC_PENDING",
   "red_green_evidence": {
     "tests_committed_before_implementation": true,
     "red_failure_observed_in_host_session": false,
@@ -468,7 +468,7 @@
     },
     "important_interpretation": "Workflow success means build, tests and artifact-construction steps succeeded. It does not mean every generated component EOS passed physical validation; preserve the per-model C2/C10 results above.",
     "css_change": {
-      "status": "PATCHED_CI_RUNNING",
+      "status": "HASH_SYNC_PENDING_FINAL_EXACT_HEAD_CI",
       "failed_attempt": {
         "run_id": 43677499924,
         "head_sha": "4d95ee6a3f7a52b3a3c75d5d58c87e1d128136b5",
@@ -500,6 +500,32 @@
       "final_head_gate": {
         "status": "PENDING",
         "note": "All source, test, handoff and report edits are now staged in the branch; run CI after the final metadata update and do not update tracked files after that run unless a new run is performed."
+      },
+      "latest_completed_attempt": {
+        "run_id": 43678512196,
+        "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43678512196",
+        "head_sha": "ce66b88a83d9934b63e9c3fe8e7c6ad8c06983ad",
+        "conclusion": "failure_at_checksum_only",
+        "fortran_build": "PASS",
+        "pytest": {
+          "passed": 263,
+          "skipped": 9,
+          "failed": 0
+        },
+        "native_fortran_unit_tests": "PASS",
+        "tov_love_tests": "PASS",
+        "cowling_runtime_compile": "PASS",
+        "e390_03a_03b_ddrmf_builds": "PASS",
+        "skipped_e2e_tests": [
+          "2 Wigner-Seitz raw-source tests",
+          "3 Cowling end-to-end spectrum tests"
+        ],
+        "checksum_mismatch": {
+          "path": "fortran_eos/src/compose_eos_matching.f90",
+          "expected": "c27cb44b3f81e37719f0d6532a4c40f8e0c9d57975e15dcbcf9f344fc8729e9e",
+          "actual": "b6c677a23b886896a5439bd5de6436bd4764d7354f7b3ebb3e5dcdd6a19cf9d4"
+        },
+        "interpretation": "The new CSS integration test passed; the sole workflow failure was the stale SHA256SUMS entry."
       }
     }
   }

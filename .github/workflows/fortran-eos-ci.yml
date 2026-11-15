@@ -112,6 +112,39 @@ jobs:
             -o build/compose_eos_fortran/test_css_segment
           build/compose_eos_fortran/test_css_segment
 
+      - name: Run native Fortran DD-RMF homogeneous + beta-equilibrium tests (E390-03/M3)
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/test_ddrmf_homogeneous.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_rmf.o \
+            -o build/compose_eos_fortran/test_ddrmf_homogeneous
+          build/compose_eos_fortran/test_ddrmf_homogeneous
+
+      - name: Run native Fortran CLD cell reconstruction tests (E390-03/M3)
+        env:
+          GFORTRAN_WARN_ARRAY_TEMPORARY: "0"
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/test_cld_cell.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_rmf.o \
+            build/compose_eos_fortran/obj/compose_eos_cld.o \
+            -o build/compose_eos_fortran/test_cld_cell
+          build/compose_eos_fortran/test_cld_cell
+
+      - name: Run native Fortran TOV-Love smooth barotrope tests (E390-06/M6)
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/test_tov_love.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_tov.o \
+            -o build/compose_eos_fortran/test_tov_love
+          build/compose_eos_fortran/test_tov_love
+
       - name: Diagnose local-agent handoff document checkout bytes
         run: |
           git check-attr -a -- docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md

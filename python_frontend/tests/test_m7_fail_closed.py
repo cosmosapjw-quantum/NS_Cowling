@@ -137,3 +137,39 @@ def test_run_task_refuses_to_delete_or_overwrite_an_existing_output_folder(tmp_p
     with pytest.raises(FileExistsError):
         m7.run_task(task)
     assert sentinel.read_text(encoding="utf-8") == "immutable"
+
+
+def test_m7_native_pipeline_readback_passes_for_composition_dropped_table(tmp_path):
+    """E390-07/M7 remaining acceptance: readback verification for
+    composition-dropped (drop_composition=true) tables.
+
+    The M7 smooth matrix is thermodynamic-only (drop_composition=true). The
+    combined output therefore has no eos.compo. C3/C4 cannot be checked on a
+    composition-absent table -- this is a closure diagnostic, NOT a readback
+    failure. The readback contract is: (1) native read of the written CompOSE
+    directory succeeds, (2) readback row count == combined_n from match-core.
+    This test pins that contract against real staged sources so the gap
+    cannot silently regress.
+    """
+    crust = ROOT / "inputs" / "raw_compose" / "SPG_M1"
+    core = ROOT / "inputs" / "raw_compose" / "APR_APR"
+    if not (crust.is_dir() and core.is_dir()):
+        pytest.skip("inputs/raw_compose not staged (M0 not run in this environment)")
+    out = tmp_path / "m7-readback"
+    receipt = m7.run_first_law_constrained_hermite_pressure_bridge_task(
+        str(crust), str(core), str(out))
+    # native provenance required (no Python oracle promoted to PASS)
+    assert receipt["execution_backend"] == "native_fortran"
+    assert receipt["complete_combined_eos"] is True
+    assert receipt["compose_readback_pass"] is True
+    # row-count match: readback_n == combined_n (the core readback contract)
+    combined_n = int(receipt["combined_n"])
+    readback_n = int(receipt["readback_report"]["n"])
+    assert combined_n >= 4, f"combined_n too small: {combined_n}"
+    assert readback_n == combined_n, (
+        f"readback row count {readback_n} != combined {combined_n}")
+    # verify may report overall FAIL (composition-absent C3/C4 diagnostic);
+    # that is explicitly allowed and does not block the readback contract
+    verify_report = receipt.get("verify_report", {})
+    assert verify_report.get("status") == "ok", (
+        f"verify action failed: {verify_report.get('message','?')}")

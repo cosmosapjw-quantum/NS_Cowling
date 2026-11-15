@@ -251,6 +251,8 @@ def build_maxwell_eos(low_phase: EOSData, high_phase: EOSData, *, low_name='low'
     source_e_low=float(eli(mut)); source_e_high=float(ehi_sp(mut))
     meta={'schema':'compose-eos-maxwell-v1','method_id':MAXWELL_METHOD_ID,'low_phase':low_name,'high_phase':high_name,
           'coexistence_root_count':len(brackets),'selected_root_index':int(crossing_index),
+          'differential_tolerance':float(differential_tolerance),
+          'differential_samples_per_interval':int(differential_samples_per_interval),
           'low_energy_identity_residual':elo-source_e_low,'high_energy_identity_residual':epshi_t-source_e_high,
           'low_source_hard_gates':{k:bool(repl[k].get('pass_',False)) for k in ('C1','C2','C6','C10','C11','C12','C13')},
           'high_source_hard_gates':{k:bool(reph[k].get('pass_',False)) for k in ('C1','C2','C6','C10','C11','C12','C13')},
@@ -278,37 +280,175 @@ def write_maxwell_eos(directory: str, eos: MaxwellEOS) -> None:
 
 
 def read_maxwell_eos(directory: str) -> MaxwellEOS:
-    data=read_compose(directory); path=Path(directory)/'eos.phase_transitions.json'
-    if not path.is_file(): raise FileNotFoundError('EOS directory has no eos.phase_transitions.json sharp-interface metadata')
-    meta=json.loads(path.read_text(encoding='utf-8'))
-    if meta.get('schema')!='compose-eos-maxwell-v1' or meta.get('transition',{}).get('kind')!='maxwell' or meta.get('method_id', MAXWELL_METHOD_ID)!=MAXWELL_METHOD_ID:
-        raise ValueError('unsupported or malformed Maxwell sidecar schema')
-    ids=np.asarray(meta.get('phase_ids',[]),dtype=int)
-    if ids.shape!=(data.n,): raise ValueError('phase_ids length does not match CompOSE table')
-    data.Iphase=ids
-    t=meta['transition']; il=int(t['low_index']); ih=int(t['high_index'])
-    if ih!=il+1 or not (0<=il<data.n-1) or abs(data.p[il]-data.p[ih])>1e-8*max(1.0,abs(data.p[il])):
-        raise ValueError('Maxwell sidecar indices do not identify a pressure-continuous adjacent density jump')
-    comparisons=(('P_low',data.p[il],t['pressure_MeV_fm3']),('P_high',data.p[ih],t['pressure_MeV_fm3']),
-      ('mu_low',data.mub[il],t['muB_MeV']),('mu_high',data.mub[ih],t['muB_MeV']),
-      ('n_low',data.nb[il],t['n_low_fm3']),('n_high',data.nb[ih],t['n_high_fm3']),
-      ('eps_low',data.eps[il],t['eps_low_MeV_fm3']),('eps_high',data.eps[ih],t['eps_high_MeV_fm3']))
-    for label,actual,expected in comparisons:
-        if abs(float(actual)-float(expected))>2e-8*max(abs(float(expected)),1.0):
-            raise ValueError(f'Maxwell sidecar {label} mismatch: table={actual}, metadata={expected}')
-    if not (data.nb[ih]>data.nb[il] and data.eps[ih]>data.eps[il]): raise ValueError('Maxwell jump is not upward in n and epsilon')
-    delta_n = float(data.nb[ih] - data.nb[il])
-    delta_eps = float(data.eps[ih] - data.eps[il])
-    mu_t = float(t['muB_MeV'])
-    declared_delta_eps = float(t.get('delta_eps_MeV_fm3', float('nan')))
-    identity_value = mu_t * delta_n
+    """Read and revalidate a sharp Maxwell EOS and its phase-event sidecar.
+
+    The sidecar is not trusted as a validation receipt: each smooth phase is
+    checked again against the pressure primitive generated from n_B(mu_B).
+    This catches post-write corruption away from the transition rows.
+    """
+    data = read_compose(directory)
+    path = Path(directory) / "eos.phase_transitions.json"
+    if not path.is_file():
+        raise FileNotFoundError(
+            "EOS directory has no eos.phase_transitions.json sharp-interface metadata"
+        )
+    meta = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(meta, dict):
+        raise ValueError("Maxwell sidecar must contain a JSON object")
+    transition = meta.get("transition")
+    if (meta.get("schema") != "compose-eos-maxwell-v1"
+            or not isinstance(transition, dict)
+            or transition.get("kind") != "maxwell"
+            or meta.get("method_id", MAXWELL_METHOD_ID) != MAXWELL_METHOD_ID):
+        raise ValueError("unsupported or malformed Maxwell sidecar schema")
+
+    # The current Maxwell exporter is deliberately thermo-only. An eos.compo
+    # file appearing beside this output is not silently accepted as validated.
+    if data.composition_available:
+        raise ValueError("Maxwell readback is thermo-only; unexpected eos.compo is present")
+
+    numeric_keys = (
+        "pressure_MeV_fm3", "muB_MeV", "n_low_fm3", "n_high_fm3",
+        "eps_low_MeV_fm3", "eps_high_MeV_fm3", "delta_eps_MeV_fm3",
+    )
+    try:
+        numeric = {key: float(transition[key]) for key in numeric_keys}
+    except (KeyError, TypeError, ValueError) as exc:
+        raise ValueError("Maxwell sidecar is missing a numeric transition field") from exc
+    if not all(np.isfinite(value) for value in numeric.values()):
+        raise ValueError("Maxwell sidecar transition fields must all be finite")
+
+    def _exact_index(key):
+        try:
+            value = float(transition[key])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise ValueError(f"Maxwell sidecar {key} must be an integer index") from exc
+        if not np.isfinite(value) or value != np.rint(value):
+            raise ValueError(f"Maxwell sidecar {key} must be an integer index")
+        return int(value)
+
+    il = _exact_index("low_index")
+    ih = _exact_index("high_index")
+    nrows = data.n
+    if ih != il + 1 or not (0 <= il < ih < nrows):
+        raise ValueError("Maxwell sidecar indices do not identify adjacent in-range transition rows")
+
+    try:
+        raw_ids = np.asarray(meta.get("phase_ids", []), dtype=float)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Maxwell sidecar phase_ids must be an integer array") from exc
+    if (raw_ids.shape != (nrows,) or np.any(~np.isfinite(raw_ids))
+            or np.any(raw_ids != np.rint(raw_ids))):
+        raise ValueError("Maxwell sidecar phase_ids must be finite integers with one ID per EOS row")
+    ids = raw_ids.astype(int)
+    expected_ids = np.r_[np.ones(ih, dtype=int), np.full(nrows - ih, 2, dtype=int)]
+    if not np.array_equal(ids, expected_ids):
+        raise ValueError("Maxwell sidecar phase_ids must be contiguous low-phase 1 then high-phase 2")
+    data.Iphase = ids
+
+    n = np.asarray(data.nb, dtype=float)
+    mu = np.asarray(data.mub, dtype=float)
+    pressure = np.asarray(data.p, dtype=float)
+    eps = np.asarray(data.eps, dtype=float)
+    if (any(array.shape != (nrows,) for array in (n, mu, pressure, eps))
+            or any(np.any(~np.isfinite(array)) for array in (n, mu, pressure, eps))
+            or any(np.any(array <= 0.0) for array in (n, mu, pressure, eps))):
+        raise ValueError("Maxwell readback requires finite, positive n_B, mu_B, P and epsilon arrays")
+    if np.any(np.diff(n) <= 0.0) or np.any(np.diff(eps) <= 0.0):
+        raise ValueError("Maxwell readback density and energy density must increase across the full table")
+
+    pt = numeric["pressure_MeV_fm3"]
+    mut = numeric["muB_MeV"]
+    comparisons = (
+        ("P_low", pressure[il], pt),
+        ("P_high", pressure[ih], pt),
+        ("mu_low", mu[il], mut),
+        ("mu_high", mu[ih], mut),
+        ("n_low", n[il], numeric["n_low_fm3"]),
+        ("n_high", n[ih], numeric["n_high_fm3"]),
+        ("eps_low", eps[il], numeric["eps_low_MeV_fm3"]),
+        ("eps_high", eps[ih], numeric["eps_high_MeV_fm3"]),
+    )
+    for label, actual, expected in comparisons:
+        if abs(float(actual) - float(expected)) > 2e-8 * max(abs(float(expected)), 1.0):
+            raise ValueError(f"Maxwell sidecar {label} mismatch: table={actual}, metadata={expected}")
+
+    if not (pressure[il] > 0 and mut > 0 and n[ih] > n[il] and eps[ih] > eps[il]):
+        raise ValueError("Maxwell transition must have positive P, mu_B and upward density/energy jumps")
+
+    delta_n = float(n[ih] - n[il])
+    delta_eps = float(eps[ih] - eps[il])
+    identity_value = mut * delta_n
     identity_scale = max(abs(delta_eps), abs(identity_value), 1.0)
-    if (not np.isfinite(declared_delta_eps)
+    declared_delta_eps = numeric["delta_eps_MeV_fm3"]
+    if (declared_delta_eps <= 0.0
             or abs(declared_delta_eps - delta_eps) > 2e-8 * identity_scale
             or abs(delta_eps - identity_value) > 2e-8 * identity_scale):
-        raise ValueError('Maxwell readback violates Delta epsilon = mu_B Delta n_B')
-    if int(ids[il])!=1 or int(ids[ih])!=2: raise ValueError('Maxwell sidecar phase IDs do not bracket the density jump')
-    return MaxwellEOS(data,t,meta)
+        raise ValueError("Maxwell readback violates Delta epsilon = mu_B Delta n_B")
+
+    try:
+        differential_tolerance = float(meta.get("differential_tolerance", 5e-3))
+        samples_per_interval = int(meta.get("differential_samples_per_interval", 8))
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Maxwell readback has invalid branchwise validation settings") from exc
+    if (not np.isfinite(differential_tolerance) or differential_tolerance <= 0.0
+            or samples_per_interval < 2):
+        raise ValueError("Maxwell readback has invalid branchwise validation settings")
+
+    branch_reports = {}
+    for label, lo, hi in (("low", 0, ih), ("high", ih, nrows)):
+        if hi - lo < 4:
+            raise ValueError(f"Maxwell readback {label} branch needs at least four rows")
+        if (np.any(np.diff(mu[lo:hi]) <= 0.0)
+                or np.any(np.diff(pressure[lo:hi]) <= 0.0)
+                or np.any(np.diff(eps[lo:hi]) <= 0.0)):
+            raise ValueError(f"Maxwell readback {label} branch is not strictly monotone in mu_B, P and epsilon")
+        report = _branchwise_first_law_report(
+            mu[lo:hi], pressure[lo:hi], n[lo:hi], eps[lo:hi],
+            samples_per_interval=samples_per_interval,
+        )
+        pressure_residual = report["pressure_reconstruction_max_relative_residual"]
+        energy_residual = report["energy_reconstruction_max_relative_residual"]
+        if (not np.isfinite(pressure_residual) or not np.isfinite(energy_residual)
+                or pressure_residual > differential_tolerance
+                or energy_residual > differential_tolerance):
+            raise ValueError(
+                f"Maxwell readback {label} branch pressure reconstruction failed "
+                f"(P residual={pressure_residual:.3e}, epsilon residual={energy_residual:.3e}, "
+                f"tolerance={differential_tolerance:.3e})"
+            )
+        if (not np.isfinite(report["min_dn_dmu_fm3_per_MeV"])
+                or report["min_dn_dmu_fm3_per_MeV"] <= 0.0
+                or not np.isfinite(report["min_cs2_thermodynamic"])
+                or report["min_cs2_thermodynamic"] <= 0.0
+                or not np.isfinite(report["max_cs2_thermodynamic"])
+                or report["max_cs2_thermodynamic"] > 1.0 + 1e-6):
+            raise ValueError(
+                f"Maxwell readback {label} branch fails mechanical-stability/causality checks "
+                f"(dn/dmu min={report['min_dn_dmu_fm3_per_MeV']:.3e}, "
+                f"cs2=[{report['min_cs2_thermodynamic']:.6g},"
+                f"{report['max_cs2_thermodynamic']:.6g}])"
+            )
+        branch_reports[label] = {
+            "pressure_reconstruction_max_relative_residual": float(pressure_residual),
+            "energy_reconstruction_max_relative_residual": float(energy_residual),
+            "min_dn_dmu_fm3_per_MeV": float(report["min_dn_dmu_fm3_per_MeV"]),
+            "min_cs2": float(report["min_cs2_thermodynamic"]),
+            "max_cs2": float(report["max_cs2_thermodynamic"]),
+            "samples": int(report["n_samples"]),
+        }
+
+    meta = dict(meta)
+    meta["readback_validation"] = {
+        "status": "PASS",
+        "method": "branchwise n_B(mu_B) PCHIP pressure primitive",
+        "differential_tolerance": differential_tolerance,
+        "branches": branch_reports,
+        "transition_identity_relative_residual": float(
+            abs(delta_eps - identity_value) / identity_scale
+        ),
+    }
+    return MaxwellEOS(data, transition, meta)
 
 
 def tidal_y_jump(y_inner: float, radius_km: float, mass_geometric_km: float,

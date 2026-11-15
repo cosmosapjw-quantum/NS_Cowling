@@ -210,3 +210,22 @@ def test_phase_boundary_mask_is_independent_of_composition_presence():
     report = check_consistency(d, verbose=False)
     assert report["grid"]["phase_boundary_indices"] == [1]
     assert np.array_equal(report["derivative_mask"][1:3], np.array([False, False]))
+
+
+def test_gap_crossing_phase_requires_explicit_label_without_composition():
+    nb = np.array([1e-3, 2e-3, 1e-2, 2e-2])
+    F = np.full(4, 930.0); Q1 = np.full(4, 5.0)
+    mu = F + Q1; Q6 = F/MN-1
+    d = EOSData(nb=nb, mn=MN, mp=938., Q1=Q1, Q2=np.zeros(4),
+        Q3=mu/MN-1, Q4=np.zeros(4), Q5=np.zeros(4), Q6=Q6, Q7=Q6.copy(),
+        q_extra=np.zeros(4), Iphase=np.array([0,0,7,7]), Yn=np.zeros(4),
+        Yp=np.zeros(4), Ye=np.zeros(4), Ymu=np.zeros(4), Aav=np.zeros(4),
+        Zav=np.zeros(4), Yh=np.zeros(4), composition_available=False)
+    with pytest.raises(ValueError, match='pass gap_phase explicitly'):
+        fill_density_gap(d, n_fill=4)
+
+
+def test_summary_reports_phase_ids_even_without_composition():
+    d = make_data(composition=False)
+    summary = d.summary()
+    assert "phase ID 1:" in summary and "phase ID 2:" in summary

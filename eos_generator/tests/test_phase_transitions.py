@@ -58,7 +58,7 @@ def test_gibbs_requires_charge_resolved_two_dimensional_surfaces():
     assert np.all(np.diff(g.eos.nb)>0) and np.all(np.diff(g.eos.p)>0) and np.all(np.diff(g.eos.eps)>0)
     tmp=__import__('pathlib').Path(__import__('tempfile').mkdtemp())
     write_gibbs_eos(str(tmp),g); rr=read_gibbs_eos(str(tmp))
-    assert rr.eos.n==g.eos.n and rr.metadata['schema']=='compose-eos-gibbs-v1'
+    assert rr.eos.n==g.eos.n and rr.metadata['schema']=='compose-eos-gibbs-v2'
 
 def test_causality_profile_detects_source_core_acausality():
     root=__import__('pathlib').Path(__file__).resolve().parents[1]
@@ -265,6 +265,8 @@ def _gibbs_pressure_surfaces_with_narrow_contact(contact_mode):
         delta = (Q-q0)**2 - 1.0e-6
     elif contact_mode == "tangential":
         delta = (Q-q0)**2
+    elif contact_mode == "near_miss":
+        delta = (Q-q0)**2 + 1.0e-6
     else:
         raise AssertionError(contact_mode)
     hadronic = ChargeResolvedPhase(mb, mq, base+delta, "hadronic")
@@ -288,3 +290,50 @@ def test_gibbs_detects_tangential_pressure_equality_contact():
         gibbs_mixed_phase(
             hadronic, high, np.linspace(204.0, 206.0, 4), lepton_sector=leptons
         )
+
+
+def _cold_local_neutral_maxwell_fixture():
+    from compose_eos.eos_data import EOSData
+    nb=np.linspace(0.05,0.20,16); free=930.0+100.0*nb; q1=100.0*nb
+    mu=free+q1; q6=free/939.0-1.0; z=np.zeros_like(nb)
+    return EOSData(nb=nb,mn=939.0,mp=938.272,Q1=q1,Q2=z,Q3=mu/939.0-1.0,
+        Q4=z,Q5=z,Q6=q6,Q7=q6.copy(),q_extra=z,Iphase=np.zeros(len(nb),int),
+        Yn=z,Yp=z,Ye=z,Ymu=z,Aav=z,Zav=z,Yh=z,Il=1,iT=0,iYq=1,inb_start=1,
+        temperature_mev=0.0,charge_fraction_grid=0.0,q_extra_count=0,
+        composition_available=False,beta_equilibrated=True)
+
+
+def test_gibbs_detects_pressure_equality_near_miss_without_false_root():
+    hadronic,high=_gibbs_pressure_surfaces_with_narrow_contact("near_miss")
+    leptons=LeptonSector(lambda mu_q:0.0,lambda mu_q:0.0,"zero lepton sector")
+    with pytest.raises(ValueError,match="pressure equality has 0 roots"):
+        gibbs_mixed_phase(hadronic,high,np.linspace(204.0,206.0,4),lepton_sector=leptons)
+
+
+def test_gibbs_rejects_nonisolated_pressure_equality_interval():
+    hadronic,_=_gibbs_pressure_surfaces_with_narrow_contact("tangential")
+    identical=ChargeResolvedPhase(hadronic.mu_b,hadronic.mu_q,hadronic.pressure.copy(),"identical")
+    leptons=LeptonSector(lambda mu_q:0.0,lambda mu_q:0.0,"zero lepton sector")
+    with pytest.raises(ValueError,match="non-isolated root interval"):
+        gibbs_mixed_phase(hadronic,identical,np.linspace(204.0,206.0,4),lepton_sector=leptons)
+
+
+def test_maxwell_rejects_nonzero_temperature_phase():
+    from compose_eos.phase_transitions import _phase_arrays
+    data=_cold_local_neutral_maxwell_fixture(); data.temperature_mev=0.5
+    with pytest.raises(ValueError,match="cold T=0"):
+        _phase_arrays(data)
+
+
+def test_maxwell_rejects_phase_without_leptons_even_if_flagged_beta_equilibrated():
+    from compose_eos.phase_transitions import _phase_arrays
+    data=_cold_local_neutral_maxwell_fixture(); data.Il=0; data.beta_equilibrated=True
+    with pytest.raises(ValueError,match="include leptons"):
+        _phase_arrays(data)
+
+
+def test_maxwell_rejects_non_neutral_fixed_yq_slice():
+    from compose_eos.phase_transitions import _phase_arrays
+    data=_cold_local_neutral_maxwell_fixture(); data.charge_fraction_grid=0.05
+    with pytest.raises(ValueError,match="Yq=0"):
+        _phase_arrays(data)

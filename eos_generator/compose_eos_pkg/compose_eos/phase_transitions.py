@@ -109,6 +109,12 @@ def _phase_arrays(data: EOSData, *, differential_tolerance=5e-3, differential_sa
     n=np.asarray(data.nb,float); mu=np.asarray(data.mub,float); p=np.asarray(data.p,float); eps=np.asarray(data.eps,float)
     if n.ndim!=1 or len(n)<5 or eps.shape!=n.shape or np.any(~np.isfinite(n+mu+p+eps)) or np.any(n<=0) or np.any(p<=0) or np.any(eps<=0):
         raise ValueError('phase EOS needs finite positive 1-D n, P, epsilon and mu arrays')
+    if not np.isfinite(data.temperature_mev) or abs(float(data.temperature_mev))>1e-12:
+        raise ValueError('Maxwell phase input must be a cold T=0 slice')
+    if int(data.Il)!=1:
+        raise ValueError('Maxwell beta-equilibrated phase input must include leptons (CompOSE Il=1)')
+    if not np.isfinite(data.charge_fraction_grid) or abs(float(data.charge_fraction_grid))>1e-10:
+        raise ValueError('Maxwell requires a locally charge-neutral Yq=0 source slice')
     if np.any(np.diff(n)<=0) or np.any(np.diff(mu)<=0) or np.any(np.diff(p)<=0) or np.any(np.diff(eps)<=0):
         raise ValueError('each phase must have strictly increasing n_b, mu_B, P and epsilon')
     if np.asarray(data.Iphase).shape == n.shape and np.any(np.diff(data.Iphase) != 0):
@@ -623,6 +629,74 @@ class LeptonSector:
         return LeptonSector(p_of_mu_q,q_of_mu_q,'zero-temperature electron+muon Fermi gases')
 
 
+
+def _gibbs_pressure_equality_roots(hadronic, high_density, mu_b, q_lo, q_hi):
+    """Isolate all roots of Delta P(mu_Q) for the declared bicubic surfaces.
+
+    At fixed mu_B, Delta P is piecewise cubic in mu_Q and its derivative
+    q_H-q_Q is piecewise quadratic. The union of spline knots partitions the
+    domain, allowing all stationary points and hence all roots to be isolated.
+    """
+    if not q_lo < q_hi:
+        return []
+
+    def dp(q):
+        return float(hadronic.evaluate(mu_b, q)[0] - high_density.evaluate(mu_b, q)[0])
+
+    def dq(q):
+        return float(hadronic.evaluate(mu_b, q)[2] - high_density.evaluate(mu_b, q)[2])
+
+    parts=[np.asarray([q_lo,q_hi],float)]
+    for phase in (hadronic,high_density):
+        _,knots=phase._spline.get_knots()
+        knots=np.asarray(knots,float)
+        parts.append(knots[(knots>=q_lo)&(knots<=q_hi)])
+    breaks=np.unique(np.concatenate(parts))
+    stationary=[]; eps=np.finfo(float).eps
+    for left,right in zip(breaks[:-1],breaks[1:]):
+        width=float(right-left)
+        if width<=0: continue
+        mid=0.5*(left+right)
+        d0,dm,d1=dq(left),dq(mid),dq(right)
+        a=2.0*(d1+d0-2.0*dm); b=d1-d0-a; c=d0
+        scale=max(abs(d0),abs(dm),abs(d1),1e-300); tol=128.0*eps*scale
+        if max(abs(a),abs(b),abs(c))<=tol:
+            vals=[dp(left),dp(mid),dp(right)]
+            pscale=max(1.0,abs(hadronic.evaluate(mu_b,mid)[0]),abs(high_density.evaluate(mu_b,mid)[0]))
+            if max(abs(v) for v in vals)<=128.0*eps*pscale:
+                raise ValueError(
+                    "Gibbs pressure equality contains a non-isolated root interval "
+                    f"at mu_B={mu_b:g}, mu_Q=[{left:g},{right:g}]"
+                )
+            continue
+        if abs(a)<=tol:
+            tr=[] if abs(b)<=tol else [-c/b]
+        else:
+            tr=[float(r.real) for r in np.roots([a,b,c])
+                if abs(float(r.imag))<=1e-10*max(1.0,abs(float(r.real)))]
+        candidates=sorted(left+width*t for t in tr if np.isfinite(t) and 0.0<t<1.0)
+        for i,guess in enumerate(candidates):
+            lo=left if i==0 else 0.5*(candidates[i-1]+guess)
+            hi=right if i+1==len(candidates) else 0.5*(guess+candidates[i+1])
+            if np.signbit(dq(lo))!=np.signbit(dq(hi)):
+                guess=float(brentq(dq,lo,hi,xtol=1e-12,rtol=4.0*eps))
+            stationary.append(guess)
+
+    points=np.unique(np.asarray([q_lo,q_hi,*stationary],float)); roots=[]
+    for q in points:
+        ph=hadronic.evaluate(mu_b,float(q))[0]; pq=high_density.evaluate(mu_b,float(q))[0]
+        if abs(float(ph-pq))<=128.0*eps*max(1.0,abs(float(ph)),abs(float(pq))):
+            roots.append(float(q))
+    for lo,hi in zip(points[:-1],points[1:]):
+        flo,fhi=dp(float(lo)),dp(float(hi))
+        if np.signbit(flo)!=np.signbit(fhi):
+            roots.append(float(brentq(dp,float(lo),float(hi),xtol=1e-12,rtol=4.0*eps)))
+    roots.sort(); qtol=128.0*eps*max(1.0,abs(q_lo),abs(q_hi)); unique=[]
+    for root in roots:
+        if not unique or abs(root-unique[-1])>qtol: unique.append(root)
+    return unique
+
+
 def gibbs_mixed_phase(hadronic: ChargeResolvedPhase, high_density: ChargeResolvedPhase,
                       mu_b_values, *, lepton_sector: Optional[LeptonSector]=None,
                       mu_q_bounds=None) -> GibbsResult:
@@ -642,10 +716,13 @@ def gibbs_mixed_phase(hadronic: ChargeResolvedPhase, high_density: ChargeResolve
     leptons=lepton_sector or LeptonSector.electron_muon()
     out=[]; pressure_equal_residuals=[]
     for mub in mus:
-        qscan=np.linspace(qlo,qhi,160); vals=np.array([hadronic.evaluate(mub,q)[0]-high_density.evaluate(mub,q)[0] for q in qscan])
-        br=[(qscan[i],qscan[i+1]) for i in range(len(qscan)-1) if vals[i]==0 or vals[i]*vals[i+1]<0]
-        if len(br)!=1:raise ValueError(f'Gibbs pressure equality has {len(br)} roots at mu_B={mub:g}; a unique coexistence branch is required')
-        qmu=float(brentq(lambda q:hadronic.evaluate(mub,q)[0]-high_density.evaluate(mub,q)[0],*br[0]))
+        roots = _gibbs_pressure_equality_roots(hadronic, high_density, float(mub), qlo, qhi)
+        if len(roots) != 1:
+            raise ValueError(
+                f'Gibbs pressure equality has {len(roots)} roots at mu_B={mub:g}; '
+                'a unique coexistence branch is required'
+            )
+        qmu = float(roots[0])
         ph,nh,qh=hadronic.evaluate(mub,qmu); pq,nq,qq=high_density.evaluate(mub,qmu)
         pressure_equal_residuals.append(abs(ph-pq))
         ql=float(leptons.charge_density(qmu)); pl=float(leptons.pressure(qmu))
@@ -683,7 +760,7 @@ def read_gibbs_eos(directory: str) -> GibbsResult:
     data=read_compose(directory); path=Path(directory)/'eos.gibbs_construction.json'
     if not path.is_file(): raise FileNotFoundError('EOS directory has no eos.gibbs_construction.json provenance sidecar')
     meta=json.loads(path.read_text(encoding='utf-8'))
-    if meta.get('schema')!='compose-eos-gibbs-v1': raise ValueError('unsupported Gibbs sidecar schema')
+    if meta.get('schema') not in ('compose-eos-gibbs-v1','compose-eos-gibbs-v2'): raise ValueError('unsupported Gibbs sidecar schema')
     fields=('mu_b_MeV','mu_q_MeV','mixed_fraction_chi','global_charge_residual')
     if any(len(meta.get(k,[]))!=data.n for k in fields): raise ValueError('Gibbs chemical-potential/mixture arrays do not match EOS row count')
     arrays = {k: np.asarray(meta[k], dtype=float) for k in fields}
@@ -723,6 +800,7 @@ def build_maxwell_css_eos(hadronic: EOSData, pressure_transition_MeV_fm3: float,
     """
     from scipy.interpolate import PchipInterpolator
     n=np.asarray(hadronic.nb,float); p=np.asarray(hadronic.p,float); eps=np.asarray(hadronic.eps,float)
+    _phase_arrays(hadronic)
     pt=float(pressure_transition_MeV_fm3); de=float(delta_epsilon_MeV_fm3); cs=float(cs2_high); nmax=float(n_max_fm3)
     if not hadronic.beta_equilibrated: raise ValueError('CSS Maxwell builder requires a beta-equilibrated one-dimensional hadronic EOS')
     if not np.all(np.isfinite([pt,de,cs,nmax,overlap_fraction])) or not p[0]<pt<p[-1] or de<=0 or not 0<cs<=1:

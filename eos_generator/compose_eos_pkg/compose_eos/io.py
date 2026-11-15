@@ -280,6 +280,10 @@ def read_compose(directory: str) -> EOSData:
         Iphase = np.zeros(len(nb), dtype=int)
         Yn = Yp = Ye = Ymu = Aav = Zav = Yh = np.zeros(len(nb), dtype=float)
 
+    if not np.isfinite(T) or abs(float(T))>1e-12:
+        raise NotImplementedError(
+            f'{directory}: compose_eos v3.3.1 supports only cold T=0 tables; got T={T:g} MeV'
+        )
     return EOSData(
         nb=nb, mn=mn, mp=mp,
         Q1=Q[:, 0], Q2=Q[:, 1], Q3=Q[:, 2], Q4=Q[:, 3],
@@ -290,7 +294,7 @@ def read_compose(directory: str) -> EOSData:
         Il=Il, iT=iT, iYq=iYq, inb_start=int(nb_grid[0]), temperature_mev=T,
         charge_fraction_grid=Yq, q_extra_count=nadd,
         composition_available=composition_available,
-        beta_equilibrated=(abs(float(np.max(np.abs(Q[:, 4])))) < 1e-8),
+        beta_equilibrated=(Il == 1 and abs(float(np.max(np.abs(Q[:, 4])))) < 1e-8),
     )
 
 

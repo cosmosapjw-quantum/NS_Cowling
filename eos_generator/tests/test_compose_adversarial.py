@@ -229,3 +229,19 @@ def test_summary_reports_phase_ids_even_without_composition():
     d = make_data(composition=False)
     summary = d.summary()
     assert "phase ID 1:" in summary and "phase ID 2:" in summary
+
+
+def test_reader_rejects_single_nonzero_temperature_slice(tmp_path):
+    data=make_data()
+    write_compose(str(tmp_path),data)
+    (tmp_path/"eos.t").write_text("0\n0\n0.5\n",encoding="utf-8")
+    with pytest.raises(NotImplementedError,match="cold T=0"):
+        read_compose(str(tmp_path))
+
+
+def test_reader_does_not_infer_beta_equilibrium_when_leptons_are_absent(tmp_path):
+    data=make_data(composition=False); data.Il=0
+    write_compose(str(tmp_path),data)
+    loaded=read_compose(str(tmp_path))
+    assert loaded.Il==0
+    assert loaded.beta_equilibrated is False

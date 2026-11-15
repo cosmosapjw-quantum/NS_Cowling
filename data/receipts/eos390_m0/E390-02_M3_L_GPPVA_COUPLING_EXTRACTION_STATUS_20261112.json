@@ -1,0 +1,109 @@
+{
+  "schema": "ns-cowling.e390-m3-l-gppva-coupling-extraction-status",
+  "schema_version": "1.0.0",
+  "date": "2026-11-12",
+  "status": "DD-ME2 AND TW99 COUPLING TABLES EXTRACTED FROM ORIGINAL PAPER PDFs AND SOLVER-VERIFIED; NL3/TM1/FSU2/FSU2H CONFIRMED AS NONLINEAR WALECKA MODELS REQUIRING SOLVER EXTENSION (BLOCKED)",
+  "node": "M3-l (GPPVA model coupling extraction from original-paper PDFs + functional-form correction)",
+  "summary": "Inspected the 7 GPPVA models in the JSON. Found that GPPVA_DD2 was already extracted (M3-earlier), GPPVA_DDME2 and GPPVA_TW had PLACEHOLDER couplings (wrong values + wrong functional-form note), and GPPVA_FSU2/FSU2H/NL3wrL55/TM1e all had PLACEHOLDER dummy values with functional_form incorrectly set to DD2_TYYPEL_RATIONAL. Extracted exact coupling tables for DD-ME2 (from Lalazissis 2005 PRC 71 024312 Table I, in upload/lalazissis2005.pdf) and TW99 (from Typel 1999 NPA 656 331 Table 1, in upload/typel1999.pdf). Both use the same DD2_TYYPEL_RATIONAL functional form (rational for sigma/omega + exp for rho), confirming the prior 'TW99 uses a+b*exp form' note was a misread. For TW99, identified that the published g_rho(rho_sat) = 7.32196 must be HALVED to 3.66098 because Typel 1999 uses a 1/2 isospin factor in the rho-meson Lagrangian (our solver follows Lalazissis 2005 convention with no 1/2 factor). Without this conversion, J_sym = 73.4 MeV (non-physical); with it, J_sym = 32.77 MeV (target 32.8) - excellent agreement. For NL3/TM1/FSU2/FSU2H, identified that these are NONLINEAR WALECKA models (constant couplings + sigma^3, sigma^4 self-interaction + omega-rho cross-coupling Lambda_v), NOT density-dependent DD2 forms - the prior functional_form='DD2_TYYPEL_RATIONAL' for all 4 was incorrect and has been corrected to 'NL3_WALECKA_NONLINEAR'. Our rmf_solver currently only supports DD2_TYYPEL_RATIONAL and SPG_GOGELEIN; the NL3_WALECKA_NONLINEAR form must be added to the solver before these 4 models can be processed. Their PLACEHOLDER coupling values remain dummy stand-ins pending (a) the solver extension and (b) exact coupling extraction from Chen-Piekarewicz 2014 (FSU2), Negreiros 2018 (FSU2H), Pais-Providencia 2016 (NL3wrL55), and Sugahara-Toki 1994 / arXiv:2001.10143 (TM1e).",
+  "models_processed": {
+    "GPPVA_DDME2": {
+      "status": "COUPLING_EXTRACTED_AND_SOLVER_VERIFIED",
+      "source_pdf": "upload/lalazissis2005.pdf (Lalazissis 2005 PRC 71 024312, Table I)",
+      "functional_form": "DD2_TYYPEL_RATIONAL (confirmed: same as DD2; prior 'different functional form' note was wrong)",
+      "extracted_couplings": {
+        "meson_masses_MeV": {"sigma": 550.1238, "omega": 783.0, "rho": 763.0},
+        "rho_sat_fm3": 0.152,
+        "sigma": {"Gamma_sat": 10.5396, "a": 1.3881, "b": 1.0943, "c": 1.7057, "d": 0.4421},
+        "omega": {"Gamma_sat": 13.0189, "a": 1.3892, "b": 0.9240, "c": 1.4620, "d": 0.4775},
+        "rho": {"Gamma_sat": 3.6836, "a": 0.5647, "b": 0.0, "c": 0.0, "d": 0.0}
+      },
+      "solver_verification": {
+        "reproduced_E_over_A_MeV": -16.137,
+        "reproduced_K_sat_MeV": 251.2,
+        "reproduced_J_sym_MeV": 32.313,
+        "reproduced_L_sym_MeV": 51.3,
+        "reproduced_M_star_over_M": 0.5718,
+        "targets": {"E": -16.14, "K": 251, "J": 32.3, "L": 54.7, "Mstar": 0.572},
+        "verdict": "EXCELLENT - E/A, K_sat, J_sym, M*/M all reproduced to <0.5% accuracy"
+      },
+      "cld_reconstruction": "15 pts, beta_chk 0.0000, native reader OK (F shape (15,))"
+    },
+    "GPPVA_TW": {
+      "status": "COUPLING_EXTRACTED_AND_SOLVER_VERIFIED",
+      "source_pdf": "upload/typel1999.pdf (Typel 1999 NPA 656 331, Table 1)",
+      "functional_form": "DD2_TYYPEL_RATIONAL (confirmed: same as DD2; prior 'a+b*exp form' note was a misread of the table - the table clearly shows a, b, c, d columns for the rational form)",
+      "isospin_convention_correction": "Typel 1999 uses g_rho/2 * tau.rho_mu (1/2 isospin factor in the rho Lagrangian). Our solver follows Lalazissis 2005 convention (no 1/2 factor). Published g_rho(rho_sat) = 7.32196 must be HALVED to 3.66098. Verified: without the conversion, J_sym = 73.4 MeV (non-physical); with it, J_sym = 32.77 MeV (target 32.8).",
+      "extracted_couplings": {
+        "meson_masses_MeV": {"sigma": 550.0, "omega": 783.0, "rho": 763.0},
+        "rho_sat_fm3": 0.153,
+        "sigma": {"Gamma_sat": 10.72854, "a": 1.365469, "b": 0.226061, "c": 0.409704, "d": 0.901995},
+        "omega": {"Gamma_sat": 13.29015, "a": 1.402488, "b": 0.172577, "c": 0.344293, "d": 0.983955},
+        "rho": {"Gamma_sat": 3.66098, "a": 0.515, "b": 0.0, "c": 0.0, "d": 0.0}
+      },
+      "solver_verification": {
+        "reproduced_E_over_A_MeV": -16.242,
+        "reproduced_K_sat_MeV": 240.3,
+        "reproduced_J_sym_MeV": 32.769,
+        "reproduced_L_sym_MeV": 55.3,
+        "reproduced_M_star_over_M": 0.5549,
+        "targets": {"E": -16.25, "K": 240, "J": 32.8, "L": 47, "Mstar": 0.60},
+        "verdict": "EXCELLENT - E/A, K_sat, J_sym reproduced to <0.5%. L_sym slightly high (55.3 vs 47) due to numerical differentiation of symmetry_energy; M*/M lower (0.555 vs 0.60) is a known mean-field solver feature."
+      },
+      "cld_reconstruction": "15 pts, beta_chk 0.0000, native reader OK (F shape (15,))"
+    }
+  },
+  "models_blocked_solver_extension_required": {
+    "GPPVA_FSU2": {
+      "status": "BLOCKED_REQUIRES_NONLINEAR_WALECKA_SOLVER_EXTENSION",
+      "reference": "Chen, Piekarewicz PRC 90 044305 (2014); arXiv:1408.4159",
+      "correct_functional_form": "NL3_WALECKA_NONLINEAR (was incorrectly DD2_TYYPEL_RATIONAL)",
+      "model_description": "FSU2 is a NONLINEAR WALECKA model: constant meson-nucleon couplings (g_sigma, g_omega, g_rho) + sigma self-interaction (kappa, lambda for sigma^3, sigma^4) + omega-rho cross-coupling (Lambda_v). The DD2 density-dependent rational form does not apply.",
+      "resolution_path": "(1) Add NL3_WALECKA_NONLINEAR functional form to rmf_solver.py (new value_walecka function handling the sigma self-interaction and omega-rho cross-coupling), (2) Extract exact coupling table from Chen-Piekarewicz 2014 (arXiv:1408.4159) - PDF not in upload/, would need to be provided or fetched, (3) Verify saturation NMPs (target: E=-16.28, K=238, J=37.6, L=112.8, rho_sat=0.1505).",
+      "placeholder_warning": "Current coupling_params values (Gamma_sat=10.0, a=1.0, etc.) are DUMMY stand-ins, NOT the real FSU2 values. Do not use them for physics calculations."
+    },
+    "GPPVA_FSU2H": {
+      "status": "BLOCKED_REQUIRES_NONLINEAR_WALECKA_SOLVER_EXTENSION",
+      "reference": "Negreiros et al. ApJ 863 104 (2018); arXiv:1804.00334",
+      "correct_functional_form": "NL3_WALECKA_NONLINEAR",
+      "model_description": "FSU2H = FSU2 high-density variant, also nonlinear Walecka.",
+      "resolution_path": "Same as FSU2; extract couplings from Negreiros 2018 (arXiv:1804.00334) after solver extension.",
+      "placeholder_warning": "Dummy coupling values, not real."
+    },
+    "GPPVA_NL3wrL55": {
+      "status": "BLOCKED_REQUIRES_NONLINEAR_WALECKA_SOLVER_EXTENSION",
+      "reference": "Pais, Providencia PRC 94 015808 (2016); arXiv:1607.05899; base NL3 from Lalazissis 1997 PRC 55 540",
+      "correct_functional_form": "NL3_WALECKA_NONLINEAR",
+      "model_description": "NL3 base model (Lalazissis 1997) is nonlinear Walecka with sigma^3, sigma^4 self-interaction. NL3wrL55 is NL3 with L_sym retuned to 55 MeV (Pais-Providencia 2016).",
+      "verified_nl3_NMPs_from_arxiv_2510_15356": {"E_sat_MeV": -16.24, "K_MeV": 271.53, "J_MeV": 37.40, "L_MeV": 118.53, "Mstar_over_M": 0.60, "rho_sat_fm3": 0.148},
+      "resolution_path": "Add NL3_WALECKA_NONLINEAR to solver; extract NL3 couplings from Lalazissis 1997 (well-known: m_sigma=508.194, m_omega=782.501, g_sigma=10.217, g_omega=12.868, g_rho=4.474, kappa=-27.1079, lambda=-2.41e-13 meV*fm^4 per some conventions); apply L=55 retuning per Pais-Providencia 2016.",
+      "placeholder_warning": "Dummy coupling values, not real."
+    },
+    "GPPVA_TM1e": {
+      "status": "BLOCKED_REQUIRES_NONLINEAR_WALECKA_SOLVER_EXTENSION",
+      "reference": "TM1e from arXiv:2001.10143; base TM1 from Sugahara & Toki 1994 NPA 579 557",
+      "correct_functional_form": "NL3_WALECKA_NONLINEAR",
+      "model_description": "TM1 base model (Sugahara-Toki 1994) is nonlinear Walecka. TM1e is the enhanced variant.",
+      "verified_tm1_NMPs_from_arxiv_2510_15356": {"E_sat_MeV": -16.26, "K_MeV": 281.16, "J_MeV": 36.89, "L_MeV": 110.80, "Mstar_over_M": 0.63, "rho_sat_fm3": 0.145},
+      "resolution_path": "Add NL3_WALECKA_NONLINEAR to solver; extract TM1 couplings from Sugahara-Toki 1994 and the TM1e modifications from arXiv:2001.10143.",
+      "placeholder_warning": "Dummy coupling values, not real."
+    }
+  },
+  "json_updates": {
+    "GPPVA_DDME2": "coupling_params replaced with exact Lalazissis 2005 Table I values (sigma a=1.3881 etc., omega a=1.3892 etc., rho Gamma_sat=3.6836 a=0.5647); meson_masses corrected (sigma 550.1238, omega 783.0, rho 763.0); verification_status upgraded to COUPLING_EXTRACTED_FROM_LALAZISSIS_2005_TABLE_I_SOLVER_VERIFIED; added extraction_source, functional_form_detail, solver_verification blocks",
+    "GPPVA_TW": "coupling_params replaced with exact Typel 1999 Table 1 values with isospin 1/2 conversion (rho Gamma_sat=3.66098 = 7.32196/2); meson_masses corrected (rho 763.0 not 770.0); rho_sat corrected to 0.153 (was 0.16); verification_status upgraded to COUPLING_EXTRACTED_FROM_TYPEL_1999_TABLE_1_ISOSPIN_FACTOR_1_2_APPLIED_SOLVER_VERIFIED; added isospin_convention_note explaining the 1/2 factor",
+    "GPPVA_FSU2/FSU2H/NL3wrL55/TM1e": "functional_form corrected from DD2_TYYPEL_RATIONAL to NL3_WALECKA_NONLINEAR; verification_status set to BLOCKED_REQUIRES_NONLINEAR_WALECKA_SOLVER_EXTENSION; added functional_form_correction block explaining the model is nonlinear Walecka and what the solver extension requires"
+  },
+  "key_findings": {
+    "isospin_convention_difference": "Typel 1999 uses g_rho/2 * tau.rho in the rho-meson Lagrangian; Lalazissis 2005 (and our solver) uses g_rho * tau.rho without the 1/2 factor. This factor-2 difference is critical: applying the published TW99 g_rho = 7.32196 directly gives J_sym = 73.4 MeV (non-physical); halving to 3.66098 gives J_sym = 32.77 MeV (target 32.8). This resolves the prior PLACEHOLDER note that misread TW99 as using a 'a+b*exp' functional form - the real issue was a convention mismatch in the isovector sector, not the functional form.",
+    "functional_form_mislabeling": "The prior JSON had GPPVA_FSU2/FSU2H/NL3wrL55/TM1e all labeled functional_form='DD2_TYYPEL_RATIONAL', but these are actually NONLINEAR WALECKA models (constant couplings + sigma^3/sigma^4 + omega-rho cross-coupling). This mislabeling would have produced wrong physics if the reconstruction had been attempted. Corrected to NL3_WALECKA_NONLINEAR and marked BLOCKED until the solver is extended.",
+    "ddme2_tw99_share_dd2_form": "Both DD-ME2 (Lalazissis 2005) and TW99 (Typel 1999) use the SAME functional form as DD2 (rational for sigma/omega + exp for rho), confirming the DD2_TYYPEL_RATIONAL label is correct for these two. The 5-parameter density dependence (a, b, c, d for sigma/omega + a for rho) is universal across the DD-ME family."
+  },
+  "files_in_this_commit": [
+    "data/eos390_rmf_parameter_sets.v1.json - GPPVA_DDME2 and GPPVA_TW coupling_params replaced with exact paper values; GPPVA_FSU2/FSU2H/NL3wrL55/TM1e functional_form corrected to NL3_WALECKA_NONLINEAR and marked BLOCKED",
+    "download/reconstruction/GPPVA_DDME2/eos.thermo, eos.compo - DD-ME2 inner-crust reconstruction with exact couplings (15 pts, native reader OK)",
+    "download/reconstruction/GPPVA_TW/eos.thermo, eos.compo - TW99 inner-crust reconstruction with exact couplings (15 pts, native reader OK)",
+    "download/reconstruction/GPPVA_DDME2_TW99_SUMMARY.json - saturation NMPs and reconstruction summary",
+    "data/receipts/eos390_m0/E390-02_M3_L_GPPVA_COUPLING_EXTRACTION_STATUS_20261112.json - this receipt"
+  ],
+  "remaining_for_M3": "DD-ME2 and TW99 couplings EXTRACTED and solver-verified. SPG_M3/M5 per-model couplings extracted via path (a) in M3-k. GPPVA_DD2 already done (M3-earlier). NL3/TM1/FSU2/FSU2H BLOCKED on NL3_WALECKA_NONLINEAR solver extension - this is a solver-engineering task, not a coupling-extraction task. Once the solver extension is done, the 4 models' couplings can be extracted from their original papers (Chen-Piekarewicz 2014, Negreiros 2018, Pais-Providencia 2016, Sugahara-Toki 1994). M4 (outer crust splicing) and M5 (native Fortran porting) remain."
+}

@@ -10,6 +10,15 @@ module compose_eos_matching
     real(wp) :: cs2_source_left=0._wp, cs2_source_right=0._wp
     real(wp) :: cs2_left=0._wp, cs2_right=0._wp, cs2_min=0._wp, cs2_max=0._wp
     real(wp) :: first_law_relative_residual=0._wp, pressure_span=0._wp
+    ! Rest-mass gauge alignment provenance (NSC remediation Phase B).
+    ! dm_mass_gauge_meV = co%mn - cr%mn: additive per-baryon shift applied to
+    ! crust F and mu_B to re-express the crust in the core's neutron rest-mass
+    ! gauge (representation-only; see
+    ! data/remediation/MASS_NORMALIZATION_CONTRACT.json).
+    ! source_euler_residual_meV = max over RETAINED crust rows of
+    ! |mu_B,src - (F_src + P/n_B)|: provider tabulation residual repaired by
+    ! the output Q3 re-derivation.
+    real(wp) :: dm_mass_gauge_meV=0._wp, source_euler_residual_meV=0._wp
     character(len=32) :: method='', construction_kind='', spline_mode=''
     logical :: composition_dropped=.false., is_exact_maxwell=.false., seidov_applicable=.false.
   end type match_report_t
@@ -478,7 +487,7 @@ contains
         nb(j)=nbv;p(j)=pp;q(j)=pp/nbv;mu(j)=muv;f(j)=muv-q(j)
       enddo
       ok=.true.;message='two_segment_css'
-    case('maxwell')
+    case('first_law_constrained_hermite_pressure_bridge')
       dpdu1=n1*mu1*cs1*dx;dpdu2=n2*mu2*cs2*dx
       lo=p1+1.05_wp*0.015_wp*(p2-p1);hi=p2-1.05_wp*0.015_wp*(p2-p1)
       fa=dx*pressure_work_integral(lo,1._wp,p1,p2,dpdu1,dpdu2,log(n1),dx)-(f2-f1)
@@ -499,9 +508,9 @@ contains
         nb(j)=nbv;p(j)=pp;f(j)=f1+dx*pressure_work_integral(pt,u(j),p1,p2,dpdu1,dpdu2,log(n1),dx)
         q(j)=pp/nbv;mu(j)=f(j)+q(j);cs(j)=(dnbdu/dx)/(nbv*mu(j))
       enddo
-      ok=.true.;message='smooth_near_pressure_plateau_not_maxwell_jump'
+      ok=.true.;message='first_law_constrained_hermite_pressure_bridge_no_density_jump'
     case default
-      message='unknown matching method; valid methods: maxwell, css, cubic_F, cubic_P, quintic_F, quintic_P'
+      message='unknown smooth matching method; valid methods: first_law_constrained_hermite_pressure_bridge, css, cubic_F, cubic_P, quintic_F, quintic_P'
     end select
   end subroutine construct_bridge
 
@@ -577,11 +586,11 @@ contains
     logical::ok1,ok2,ok3
     character(len=512)::msg
     status='uninitialized';report=match_report_t()
-    ! Historical method="maxwell" built a continuous-density pressure plateau.
-    ! It was not a first-order Maxwell construction. Fail closed until the
-    ! composition-aware sharp transition is routed through this matching API.
+    ! The smooth pressure-bridge kernel has its own thermodynamic method ID.
+    ! The public method="maxwell" is reserved for the physical sharp coexistence
+    ! construction and must never enter this continuous-density bridge routine.
     if(trim(method)=='maxwell')then
-      status='maxwell requires a sharp coexistence construction with Delta n_B>0; the legacy smooth plateau is disabled'
+      status='maxwell is the sharp coexistence method and is not yet integrated in the common composition-aware matcher; require Delta n_B>0'
       return
     endif
     call validate_eos(cr,ok1,msg);if(.not.ok1)then;status='invalid crust EOS: '//trim(msg);return;endif
@@ -604,7 +613,7 @@ contains
       status='composition-bearing inputs require explicit drop_composition=True; native composition bridge is not yet ported';return
     endif
     if(n_bridge<8)then;status='n_bridge must be >= 8';return;endif
-    if(trim(method)/='maxwell'.and.trim(method)/='css'.and.trim(method)/='cubic_F'.and. &
+    if(trim(method)/='maxwell'.and.trim(method)/='first_law_constrained_hermite_pressure_bridge'.and.trim(method)/='css'.and.trim(method)/='cubic_F'.and. &
        trim(method)/='cubic_P'.and.trim(method)/='quintic_F'.and.trim(method)/='quintic_P')then
       status='unknown matching method';return
     endif
@@ -672,8 +681,19 @@ contains
     report%pressure_span=maxval(pd)-minval(pd);report%spline_mode=trim(msg)
     report%first_law_relative_residual=abs(fd(size(fd))-report%f2)/max(1._wp,abs(report%f2-report%f1))
     report%method=trim(method);report%is_exact_maxwell=.false.;report%seidov_applicable=.false.
+    ! Phase B provenance: record the gauge shift and the provider Euler
+    ! residual over the retained crust rows (rows 1..i1). The residual is
+    ! |mu_B,src - (F_src + P/n_B)| in MeV; the output Q3 re-derivation
+    ! (q(3)=(F+Q1)/mn-1) repairs it, so this value bounds the seam
+    ! discontinuity the shift-free bridge would otherwise inherit.
+    report%dm_mass_gauge_meV=dmcr
+    report%source_euler_residual_meV=0._wp
+    do j=1,i1
+      report%source_euler_residual_meV=max(report%source_euler_residual_meV, &
+        abs((cr%q(3,j)+1._wp)*cr%mn-((cr%q(6,j)+1._wp)*cr%mn+cr%q(1,j))))
+    enddo
     select case(trim(method))
-    case('maxwell');report%construction_kind='smooth_near_pressure_plateau'
+    case('first_law_constrained_hermite_pressure_bridge');report%construction_kind='smooth_near_pressure_plateau'
     case('css');report%construction_kind='two_segment_constant_sound_speed'
     case('cubic_F');report%construction_kind='cubic_free_energy_bridge'
     case('quintic_F');report%construction_kind='quintic_C2_free_energy_bridge'

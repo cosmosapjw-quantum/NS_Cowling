@@ -1,0 +1,42 @@
+{
+  "schema": "ns-cowling.e390-02-m2a-presence-masks",
+  "schema_version": "1.0.0",
+  "gate": "M2A",
+  "status": "PASS",
+  "generated_utc": "2026-11-11",
+  "design": {
+    "row_status": "0=NOT_AVAILABLE (no compo row), 1=PARTIAL (some required field missing), 2=CHECKED (all required fields present and in physical range, both C3 and C4 applicable), 3=FAIL (present but out of physical range)",
+    "presence_flags": "yn_present, yp_present, ye_present, ymu_present, abar_present, zbar_present, yh_present - per-row logical; a written zero is True, a missing entry is False (the zero-vs-missing distinction)",
+    "c3_applicable": "per-row logical; True iff the complete baryon inventory needed for Yn+Yp+Yh=1 is present (Yn, Yp, Yh all present)",
+    "c4_applicable": "per-row logical; True iff the complete charge inventory needed for Yp+(Z/A)Yh=Ye+Ymu is present (Yp, Abar>0, Zbar, Yh, Ye, Ymu all present)",
+    "independent_per_row": "C3 and C4 are assessed independently per row; a row may be C3-applicable without C4 (e.g. missing Ymu) or vice versa (e.g. missing Yn)",
+    "global_composition_available_preserved": "the legacy global composition_available boolean is preserved for backward compatibility (set True iff any nonzero fraction is read); it is NOT used as the per-row authority"
+  },
+  "implementation": {
+    "fortran_types": "fortran_eos/src/compose_eos_types.f90 - added 10 allocatable arrays to eos_data_t (row_status, *_present, c3_applicable, c4_applicable); allocate_eos initializes them to NOT_AVAILABLE/False",
+    "fortran_parser": "fortran_eos/src/compose_eos_io.f90 read_compose - per-row presence flags set as each field is read; per-row range check sets FAIL only on offending rows (the read succeeds so partial-coverage sources do not abort the whole read); C3/C4 applicability computed per row after all rows are read",
+    "fortran_csv_round_trip": "write_internal_csv writes 10 new columns (row_status + 7 presence + 2 applicability); read_internal_csv accepts both the legacy 17-column and the new 27-column CSV (legacy -> defaults)",
+    "python_eos_data": "python_frontend/compose_eos/eos_data.py - EOSData dataclass gained 10 mask fields; from_internal_directory reads them with backward-compat defaults; write_internal_directory derives safe defaults if a caller constructed EOSData directly (reconstruct_master path); copy() round-trips them; bool columns converted via int to avoid bool('0') being True"
+  },
+  "regression_tests": [
+    "test_phase_only_row_records_composition_as_absent",
+    "test_gm1_outer_rows_do_not_fail_from_zero_initialized_missing_data",
+    "test_gm1_core_c3_unavailable_without_complete_charge_carrier_inventory",
+    "test_gm1_core_c4_applicable_only_with_complete_baryon_inventory",
+    "test_mixed_coverage_yields_checked_partial_not_available_and_fail",
+    "test_no_composition_file_all_rows_not_available",
+    "test_masks_round_trip_through_internal_csv",
+    "test_no_spg_gppva_ambiguous_field_remapping_is_made_by_coverage_mask_task"
+  ],
+  "test_count": "8 new M2A tests + 85 original = 93 total, all pass",
+  "required_scenarios_covered": {
+    "phase_only_retains_Iphase_and_records_composition_absent": "test_phase_only_row_records_composition_as_absent",
+    "gm1_outer_no_fail_from_zero_initialized_missing_data": "test_gm1_outer_rows_do_not_fail_from_zero_initialized_missing_data",
+    "gm1_core_c3_unavailable_without_complete_charge_carrier_inventory": "test_gm1_core_c3_unavailable_without_complete_charge_carrier_inventory",
+    "gm1_core_c4_applicable_only_with_complete_baryon_inventory": "test_gm1_core_c4_applicable_only_with_complete_baryon_inventory",
+    "mixed_coverage_row_level_CHECKED_PARTIAL_NOT_AVAILABLE_FAIL": "test_mixed_coverage_yields_checked_partial_not_available_and_fail",
+    "no_spg_gppva_ambiguous_field_remapping": "test_no_spg_gppva_ambiguous_field_remapping_is_made_by_coverage_mask_task"
+  },
+  "c6b_unchanged": "M2A does NOT consume any disputed SPG/GPPVA composition field. The disputed final group field is preserved byte-for-byte (test_no_spg_gppva_ambiguous_field_remapping_is_made_by_coverage_mask_task verifies Yh=1.0 is preserved, not remapped to Y_I/X_h/Ye or another aggregate). C6B remains BLOCKED.",
+  "scope_note": "M2A is the per-row/per-species/per-group presence-mask task required by the C6B adjudication. It does NOT resolve the SPG/GPPVA abundance semantics dispute (that is C6B, still BLOCKED on provider documentation). It does NOT add multidimensional thermo support (that is M10). It does NOT touch source tables or historical output. The duplicate (iT,inb,iYq) row-key guard (M2) is preserved unchanged."
+}

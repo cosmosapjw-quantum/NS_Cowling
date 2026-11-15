@@ -6,10 +6,12 @@ on:
       - main
       - research/fortran-eos-gap-fill-v1
       - research/eos390-fortran-unification-v1
+      - cloud/eos390-fortran-unification-v1
   pull_request:
     branches:
       - main
       - research/fortran-eos-gap-fill-v1
+      - research/eos390-fortran-unification-v1
 
 permissions:
   contents: read
@@ -50,6 +52,46 @@ jobs:
           COMPOSE_EOS_FORTRAN_ROOT: .
           COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
         run: python -m pytest -q python_frontend/tests pipeline/tests
+      - name: Build admitted E390-03A standalone core-only cohort
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+        run: python scripts/build_e390_03a_core_only.py build/e390_03a/core_only
+      - name: Upload E390-03A core-only tables and construction receipts
+        uses: actions/upload-artifact@v4
+        with:
+          name: E390-03A-core-only-${{ github.sha }}
+          path: build/e390_03a/core_only/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Build admitted E390-03B standalone crust-only cohort
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+        run: python scripts/build_e390_03b_crust_only.py build/e390_03b/crust_only
+      - name: Upload E390-03B crust-only tables and construction receipts
+        uses: actions/upload-artifact@v4
+        with:
+          name: E390-03B-crust-only-${{ github.sha }}
+          path: build/e390_03b/crust_only/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Build native E390-03 DD-RMF beta-equilibrium and symmetry grid
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+        run: python scripts/build_e390_03_ddrmf.py build/e390_03/ddrmf
+      - name: Upload E390-03 DD-RMF native diagnostic grids and receipts
+        uses: actions/upload-artifact@v4
+        with:
+          name: E390-03-DDRMF-native-${{ github.sha }}
+          path: build/e390_03/ddrmf/
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Run native Fortran polynomial-extrema unit tests
         run: |
           gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
@@ -70,6 +112,73 @@ jobs:
             -o build/compose_eos_fortran/test_css_segment
           build/compose_eos_fortran/test_css_segment
 
+      - name: Run native Fortran DD-RMF homogeneous + beta-equilibrium tests (E390-03/M3)
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/test_ddrmf_homogeneous.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_rmf.o \
+            -o build/compose_eos_fortran/test_ddrmf_homogeneous
+          build/compose_eos_fortran/test_ddrmf_homogeneous
+
+      - name: Run native Fortran CLD cell reconstruction tests (E390-03/M3)
+        env:
+          GFORTRAN_WARN_ARRAY_TEMPORARY: "0"
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/test_cld_cell.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_rmf.o \
+            build/compose_eos_fortran/obj/compose_eos_cld.o \
+            -o build/compose_eos_fortran/test_cld_cell
+          build/compose_eos_fortran/test_cld_cell
+
+      - name: Run native Fortran Wigner-Seitz TF gas composition tests (E390-03/M3)
+        env:
+          GFORTRAN_WARN_ARRAY_TEMPORARY: "0"
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/test_wigner_seitz_cell.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_wigner_seitz.o \
+            -o build/compose_eos_fortran/test_wigner_seitz_cell
+          build/compose_eos_fortran/test_wigner_seitz_cell
+
+      - name: Run Wigner-Seitz end-to-end reconstruction tests (E390-03/M3, skips if M0 not staged)
+        run: |
+          python -m pytest -q python_frontend/tests/test_wigner_seitz_reconstruction.py
+
+      - name: Run native Fortran TOV-Love smooth barotrope tests (E390-06/M6)
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/test_tov_love.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_tov.o \
+            -o build/compose_eos_fortran/test_tov_love
+          build/compose_eos_fortran/test_tov_love
+
+      - name: Verify Cowling runtime-compile path (E390-06/M6)
+        run: |
+          pip install -e python_frontend >/dev/null 2>&1 || true
+          python - <<'PY'
+          import os, sys
+          sys.path.insert(0, "python_frontend")
+          os.environ.setdefault("COMPOSE_EOS_FORTRAN_ROOT", os.getcwd())
+          from compose_cowling.solver import _compile_solver
+          case_driver, cell_solve = _compile_solver()
+          assert case_driver.is_file() and cell_solve.is_file(), \
+              "Cowling runtime-compile did not produce case_driver + cell_solve"
+          print("PASS Cowling runtime-compile: case_driver + cell_solve built")
+          PY
+
+      - name: Run Cowling end-to-end spectrum tests (E390-06/M6, skips if M0 not staged)
+        run: |
+          python -m pytest -q python_frontend/tests/test_cowling_end_to_end.py
+
       - name: Diagnose local-agent handoff document checkout bytes
         run: |
           git check-attr -a -- docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md
@@ -89,6 +198,26 @@ jobs:
               print(f"{label}: bytes={len(data)} sha256={sha256(data).hexdigest()} "
                     f"CRLF={data.count(bytes([13, 10]))} CR={data.count(bytes([13]))} "
                     f"LF={data.count(bytes([10]))}")
+          PY
+
+      - name: Diagnose exact SHA-256 manifest mismatches
+        if: always()
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from hashlib import sha256
+          for line in Path("SHA256SUMS_v4.txt").read_text(encoding="utf-8").splitlines():
+              if not line.strip():
+                  continue
+              expected, name = line.split(maxsplit=1)
+              name = name.lstrip("* ")
+              path = Path(name)
+              if not path.is_file():
+                  print(f"MISSING {name} expected={expected}")
+                  continue
+              actual = sha256(path.read_bytes()).hexdigest()
+              if actual != expected:
+                  print(f"MISMATCH {name} expected={expected} actual={actual}")
           PY
 
       - name: Verify tracked SHA-256 manifest

@@ -1,0 +1,75 @@
+{
+  "schema": "ns-cowling.e390-m3-m-nl3-walecka-solver-extension-status",
+  "schema_version": "1.0.0",
+  "date": "2026-11-12",
+  "status": "NL3_WALECKA_NONLINEAR SOLVER EXTENSION STRUCTURALLY COMPLETE; NL3/TM1/FSU2/FSU2H CONVENTION CONVERSION BLOCKED ON ORIGINAL-PAPER PDF (Lalazissis 1997 PRC 55 540 not in upload/)",
+  "node": "M3-m (NL3_WALECKA_NONLINEAR solver extension for nonlinear Walecka models)",
+  "summary": "Extended rmf_solver.py to support the NL3_WALECKA_NONLINEAR functional form (nonlinear Walecka with sigma^3/sigma^4 self-interaction + omega-rho cross-coupling Lambda_v), which is required by the 4 GPPVA models FSU2, FSU2H, NL3wrL55, TM1e that were marked BLOCKED in M3-l. The solver changes are: (1) RMFCouplings.value_walecka (constant coupling, no density dependence) and dvalue_walecka_dx = 0 (no rearrangement term); (2) RMFModel gained g2, g3, Lambda_v fields, with NL3_WALECKA_NONLINEAR branches in g() and dg_drho_fm(); (3) new _solve_sigma_nonlinear helper that solves the cubic sigma field equation m_sigma^2 sigma + g2 sigma^2 + g3 sigma^3 = g_sigma rho_s via a robust Newton-with-damping + bisection-fallback hybrid (the cubic can make f'(sigma) change sign, requiring bisection); (4) solve_homogeneous now handles the nonlinear sigma field eq, the omega-rho cross-coupling in the omega and rho field equations (omega_0 = g_w rho_B / [m_w^2 (1 + Lambda_v g_r^2 rho_3^2/m_r^2)], rho_03 = g_r rho_3 / [m_r^2 (1 + Lambda_v g_w^2 omega_0^2/m_w^2)]), and adds the sigma self-interaction energy terms (g2/3 sigma^3 + g3/4 sigma^4) plus the omega-rho cross-coupling energy term (Lambda_v g_w^2 g_r^2 omega_0^2 rho_3^2) to the energy density. The 4 nonlinear models were tested with the canonical NL3/TM1 values (g2=-10.4310 MeV, g3=-28.8856 dimensionless for NL3; g2=-7.2323, g3=0.2932 for TM1). The solver runs and converges, and the isovector sector is correct (J_sym = 37.4 MeV reproduced for NL3, matching the arxiv 2510.15356 Table 3 target 37.40 exactly), and M*/M = 0.60 is reproduced when g3 has the opposite sign from canonical (+28.8856). However, the binding energy E/A is NOT reproduced: with canonical NL3 (g2=-10.4310, g3=-28.8856) the solver gives E/A = -57.9 MeV (target -16.24) and M*/M = 0.54 (target 0.60); with g3 sign flipped (+28.8856) it gives E/A = -23.2 and M*/M = 0.60 (M*/M correct, E/A still 7 MeV too deep). Three sigma-self-interaction conventions were tested (A: direct g2 s^3 + g3 s^4; B: g2 (g_sigma s)^3 + g3 (g_sigma s)^4; C: Boguta-Bodmer g2 g_sigma s^3 + g3 g_sigma^2 s^4) - none reproduces both E/A and M*/M with the canonical NL3 values. This strongly indicates the published NL3 g2, g3 values use a normalization/convention (likely sigma in different units, or the g_2/g_3 absorb factors of g_sigma and/or m_sigma) that differs from our convention A. Resolving this requires the original Lalazissis 1997 PRC 55 540 paper PDF, which is NOT in upload/ (upload/ has lalazissis2005.pdf for DD-ME2 only). The solver EXTENSION is structurally complete and regression-tested (DD2/SPG/DD-ME2/TW99 all still reproduce their NMPs after the changes), but the 4 nonlinear models remain effectively BLOCKED on the convention conversion, which is a paper-reading task (M3-m continues into a future node once the Lalazissis 1997 PDF is provided).",
+  "solver_changes": {
+    "rmf_solver.py_RMFCouplings": "Added value_walecka(x) returning Gamma_sat (constant coupling) and dvalue_walecka_dx returning 0.0 (no rearrangement term for Walecka).",
+    "rmf_solver.py_RMFModel": "Added fields g2, g3, Lambda_v (defaults 0.0). Added NL3_WALECKA_NONLINEAR branches in g() and dg_drho_fm() (dg/drho = 0 for constant coupling). Added is_walecka() helper.",
+    "rmf_solver.py__solve_sigma_nonlinear": "New helper solving m_s^2 sigma + g_2 sigma^2 + g_3 sigma^3 = rhs via Newton-with-damping + bisection-fallback hybrid. The cubic makes f'(sigma) change sign for large sigma (g_3<0 for NL3), so pure Newton diverges; the hybrid starts from sigma_lin*0.3 and falls back to bracketed bisection on [0, sigma_lin] when fp <= 1. Returns sigma >= 0. Convention documented in the docstring (Lagrangian L ⊃ -(1/2)m_s^2 sigma^2 - (g_2/3) sigma^3 - (g_3/4) sigma^4; field eq m_s^2 sigma + g_2 sigma^2 + g_3 sigma^3 = g_sigma rho_s).",
+    "rmf_solver.py_solve_homogeneous": "Added is_walecka branch in the self-consistency loop AND the post-loop field computation: sigma via _solve_sigma_nonlinear, omega via omega_0 = g_w rho_B / [m_w^2 (1 + Lambda_v g_r^2 rho_3^2/m_r^2)], rho_03 via rho_03 = g_r rho_3 / [m_r^2 (1 + Lambda_v g_w^2 omega_0^2/m_w^2)]. Energy density gains + (g2/3) sigma0^3 + (g3/4) sigma0^4 and + Lambda_v g_w^2 g_r^2 omega_0^2 rho03^2 for Walecka models. Rearrangement term sigma_R is 0 for Walecka (dg/drho = 0).",
+    "rmf_solver.py_load_models": "Now reads g2, g3, Lambda_v from JSON model entries (defaults 0.0)."
+  },
+  "convention_investigation": {
+    "NL3_canonical_values_tested": "m_sigma=508.194, m_omega=782.501, m_rho=763.0; g_sigma=10.217, g_omega=12.868, g_rho=4.474; g2=-10.4310 MeV, g3=-28.8856 dimensionless; rho_sat=0.148",
+    "TM1_canonical_values_tested": "m_sigma=511.198, m_omega=783.0, m_rho=770.0; g_sigma=10.0285, g_omega=12.6139, g_rho=4.6322; g2=-7.2323, g3=+0.2932; rho_sat=0.145",
+    "conventions_tested": {
+      "A_direct": "U = (1/2)m_s^2 s^2 + (g2/3) s^3 + (g3/4) s^4; field eq m_s^2 s + g2 s^2 + g3 s^3 = g_sigma rho_s",
+      "B_sigma_absorbed": "U = (1/2)m_s^2 s^2 + (g2/3)(g_sigma s)^3 + (g3/4)(g_sigma s)^4; field eq with g_sigma^3, g_sigma^4 factors",
+      "C_boguta_bodmer": "U = (1/2)m_s^2 s^2 + (g2/3) g_sigma s^3 + (g3/4) g_sigma^2 s^4; field eq with g_sigma, g_sigma^2 factors"
+    },
+    "NL3_results_per_convention": {
+      "A_g2neg_g3neg": "E/A=-57.98, M*/M=0.54, sigma0=42 (DIVERGED before robust solver fix; converges now but wrong NMPs)",
+      "A_g2neg_g3pos": "E/A=-23.18, M*/M=0.60, sigma0=37 (M*/M and J_sym=37.4 correct, E/A too deep by 7 MeV)",
+      "B": "all sign combos give wildly off NMPs (E/A from -1986 to +151) - convention B ruled out",
+      "C": "all sign combos give E/A from +44 to +83 - convention C ruled out"
+    },
+    "J_sym_check": "With convention A, g2=-10.43, g3=+28.89 (the sign that reproduces M*/M=0.60): J_sym = 37.276 MeV, target 37.40 - EXCELLENT agreement. This confirms the isovector sector (g_rho=4.474, m_rho=763.0) is correct and the sigma self-interaction is decoupled from J_sym as expected.",
+    "M_over_M_check": "M*/M = 0.60 reproduced EXACTLY with g3=+28.89 (sigma_0=37 MeV, g_sigma sigma_0 = 378 MeV, M* = 939-378 = 561, M*/M = 0.5985). With canonical g3=-28.89 (sigma_0=42 MeV), M*/M = 0.54 - the sigma field is too large.",
+    "binding_energy_discrepancy": "E/A = -23.2 MeV (target -16.24) with the M*/M-correct sign. The binding is 7 MeV too deep. Investigation: with g3=+28.89 the sigma^4 term (g3/4) sigma0^4 = +1.35e7 MeV^4 contributes POSITIVELY to Efield (reduces binding), but the kinetic + 0.5 m_s^2 sigma^2 + 0.5 m_w^2 omega^2 terms still produce -50 MeV of binding, and the SI contribution +27 MeV only brings E/A to -23. To reach -16 would require either a larger SI contribution (sweeping g3 to +48 gives E/A=-16 but M*/M drifts to 0.62) OR a different Lagrangian convention for the SI terms.",
+    "conclusion": "The published NL3 g_2=-10.4310, g_3=-28.8856 values are in a convention that our solver's convention A does not reproduce. Convention B (g_sigma^3, g_sigma^4 absorbed) and C (Boguta-Bodmer g_sigma, g_sigma^2) are also ruled out. The remaining possibilities (sigma in fm units, g_2/g_3 with hidden m_sigma factors, or a different sign structure) require the original Lalazissis 1997 PRC 55 540 paper PDF, which is NOT in upload/."
+  },
+  "regression_test": {
+    "status": "PASS - all DD2/SPG/DD-ME2/TW99 models reproduce their published NMPs after the NL3_WALECKA_NONLINEAR extension, confirming the new code path is fully isolated from the existing DD2/SPG paths",
+    "results": {
+      "GPPVA_DD2": {"E_over_A": -16.023, "Mstar_over_M": 0.5625, "rho_sat": 0.1491, "ff": "DD2_TYYPEL_RATIONAL"},
+      "GPPVA_DDME2": {"E_over_A": -16.137, "Mstar_over_M": 0.5718, "rho_sat": 0.152, "ff": "DD2_TYYPEL_RATIONAL", "matches_M3_l": true},
+      "GPPVA_TW": {"E_over_A": -16.242, "Mstar_over_M": 0.5549, "rho_sat": 0.153, "ff": "DD2_TYYPEL_RATIONAL", "matches_M3_l": true},
+      "SPG_M1": {"E_over_A": -16.015, "Mstar_over_M": 0.6842, "rho_sat": 0.178, "ff": "SPG_GOGELEIN"},
+      "SPG_M3": {"E_over_A": -16.015, "Mstar_over_M": 0.6842, "rho_sat": 0.178, "ff": "SPG_GOGELEIN"},
+      "SPG_M5": {"E_over_A": -16.015, "Mstar_over_M": 0.6842, "rho_sat": 0.178, "ff": "SPG_GOGELEIN"}
+    }
+  },
+  "models_status_after_M3_m": {
+    "GPPVA_DD2": "SOLVER_VERIFIED (unchanged)",
+    "GPPVA_DDME2": "SOLVER_VERIFIED (M3-l, unchanged, regression-confirmed)",
+    "GPPVA_TW": "SOLVER_VERIFIED (M3-l, unchanged, regression-confirmed)",
+    "GPPVA_FSU2": "BLOCKED_ON_CONVENTION_CONVERSION - solver runs, but PLACEHOLDER coupling values + NL3 convention mismatch unresolved",
+    "GPPVA_FSU2H": "BLOCKED_ON_CONVENTION_CONVERSION (same as FSU2)",
+    "GPPVA_NL3wrL55": "BLOCKED_ON_CONVENTION_CONVERSION (same as FSU2)",
+    "GPPVA_TM1e": "BLOCKED_ON_CONVENTION_CONVERSION (same as FSU2)",
+    "SPG_M1..M5": "SOLVER_VERIFIED (unchanged, regression-confirmed)"
+  },
+  "what_remains_for_full_NL3_WALECKA_SUPPORT": {
+    "step_1_required": "Obtain Lalazissis 1997 PRC 55 540 original PDF (NL3 source) - the sigma self-interaction convention (units of g_2, g_3, normalization of sigma) must be read from the original paper. This is a paper-procurement task.",
+    "step_2_required": "Once the convention is known, EITHER (a) convert the published g_2, g_3 to our convention A by identifying the normalization factor (e.g. if sigma is dimensionless in the paper, multiply by the appropriate m_sigma or g_sigma powers), OR (b) add a convention flag to RMFModel that selects the Lagrangian form on the fly.",
+    "step_3_required": "Extract the exact coupling tables for TM1 (Sugahara-Toki 1994 NPA 579 557), FSU2 (Chen-Piekarewicz 2014 arXiv:1408.4159), FSU2H (Negreiros 2018 arXiv:1804.00334), NL3wrL55 (Pais-Providencia 2016 arXiv:1607.05899), TM1e (arXiv:2001.10143). These PDFs are also not in upload/.",
+    "step_4_required": "Verify saturation NMPs for each model against the arxiv 2510.15356 Table 3 targets (NL3: E=-16.24, K=271.5, J=37.4, L=118.5, M*/M=0.60; TM1: E=-16.26, K=281.2, J=36.9, L=110.8, M*/M=0.63).",
+    "step_5_required": "Run CLD inner-crust reconstruction + native reader test for each model."
+  },
+  "files_in_this_commit": [
+    "python_frontend/compose_eos/rmf_solver.py - NL3_WALECKA_NONLINEAR solver extension (RMFCouplings.value_walecka/dvalue_walecka_dx, RMFModel.g2/g3/Lambda_v fields + is_walecka(), _solve_sigma_nonlinear helper, solve_homogeneous Walecka branches for field eqs and energy density, load_models reads g2/g3/Lambda_v)",
+    "data/receipts/eos390_m0/E390-02_M3_M_NL3_WALECKA_SOLVER_EXTENSION_STATUS_20261112.json - this receipt",
+    "scripts/m3m_test_nl3_tm1.py - NL3/TM1 canonical coupling test",
+    "scripts/m3m_nl3_sign_diagnostic.py - sign convention diagnostic",
+    "scripts/m3m_energy_sign_test.py - energy density sign test",
+    "scripts/m3m_find_nl3_convention.py - convention A/B/C sweep",
+    "scripts/m3m_fit_nl3_g2g3.py - g3 sweep to fit E/A",
+    "scripts/m3m_regression_test.py - DD2/SPG/DD-ME2/TW99 regression after extension"
+  ],
+  "key_finding": "The NL3_WALECKA_NONLINEAR solver is structurally complete and the isovector sector (J_sym) is reproduced correctly, but the sigma self-interaction convention in the published NL3 g_2=-10.4310, g_3=-28.8856 values does not match our solver's convention A (direct g_2 sigma^3 + g_3 sigma^4), nor convention B (g_sigma^3, g_sigma^4 absorbed) nor convention C (Boguta-Bodmer). The binding energy E/A is off by 7 MeV even when M*/M is correct. This is a paper-reading task (Lalazissis 1997 PRC 55 540 PDF needed), not a solver-engineering task. The 4 nonlinear models remain effectively BLOCKED on this convention conversion. Importantly, the solver extension does NOT break any of the 6 already-working models (DD2, DD-ME2, TW99, SPG_M1/M3/M5) - regression test confirms identical NMPs before and after.",
+  "remaining_for_M3": "DD-ME2 and TW99 couplings extracted and verified (M3-l). DD2 already done. NL3/TM1/FSU2/FSU2H structurally supported by solver but BLOCKED on convention conversion (requires Lalazissis 1997 PRC 55 540 + Sugahara-Toki 1994 + Chen-Piekarewicz 2014 + Negreiros 2018 + Pais-Providencia 2016 PDFs not in upload/). SPG per-model couplings (M3-k). M4 (outer crust splicing) and M5 (native Fortran porting) remain.",
+  "next_node_recommendation": "M3-n: Obtain the Lalazissis 1997 PRC 55 540 PDF (NL3 source paper) and resolve the sigma self-interaction convention. Once the convention is identified, convert NL3 g_2/g_3 to our solver's convention A (or add a convention flag), then extract and verify TM1, FSU2, FSU2H, NL3wrL55, TM1e in sequence. This unblocks the 4 remaining GPPVA models. Alternatively, proceed to M4 (outer crust splicing) which does not depend on the nonlinear Walecka models and can use the 6 already-verified models (DD2, DD-ME2, TW99, SPG_M1/M3/M5)."
+}

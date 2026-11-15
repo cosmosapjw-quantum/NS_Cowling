@@ -1,0 +1,743 @@
+{
+  "schema": "nscowling.cloud-agent-dag",
+  "schema_version": "1.0.0",
+  "contract_id": "NSCOWLING-CLOUD-AGENT-DAG-v1.0",
+  "created_utc": "2026-11-12",
+  "repository": "cosmosapjw-quantum/NS_Cowling",
+  "scope": {
+    "execution_domain": "cloud_coding_and_ci",
+    "excluded_execution": "Dropbox-mounted raw data intake, full 390 numerical batch, and Dropbox output upload. These require the local/cloud environment holding the user's Dropbox mount and must be separately receipted.",
+    "goal": "Fortran numerical backend + Python thin frontend; preserve the historical 390-key EOS matrix and separately validate sharp-Maxwell Cowling physics."
+  },
+  "pins": {
+    "eos_branch": "cloud/eos390-fortran-unification-v1",
+    "eos_pr": 13,
+    "eos_head_at_authoring": "4d43dc6786ac2d3c3139ead3a65aae32d3609f70",
+    "cowling_branch": "research/maxwell-native-fortran-v1",
+    "cowling_pr": 3,
+    "cowling_head": "99a0f9c314cab996c3a0bac28299e7b604b6cd01",
+    "historical_eos_dag": "data/eos390_native_fortran_unification_dag.v1.json",
+    "historical_eos_dag_blob": "820d2c103b7f3876a4a0af7f6db01f0a57fda252",
+    "supersedes": "No historical raw/source/output artifact; this is the top-level cloud execution DAG.",
+    "method_identity_migration_receipt": "data/receipts/eos390_m1b/E390-01B_METHOD_IDENTITY_MIGRATION_20261113.json",
+    "method_identity_migration_receipt_blob": "804bf5d3a35eb06021dbe4da690418fcdb9057e6",
+    "method_identity_migration_ci_run": 43419554959,
+    "component_source_contract": "data/eos390_component_source_contract.v1.json",
+    "component_source_contract_blob": "82d9b1770f4ff19bb75c896fb31a07da2d2765e5",
+    "component_contract_receipt": "data/receipts/eos390_m1a/E390-01A_STANDALONE_COMPONENT_CONTRACT_20261113.json",
+    "component_contract_receipt_blob": "ed01d82dd9e65f4013c5023700218e62b459b1eb",
+    "eos01a_backup_branch": "backup/e390-01a-pre-20261113",
+    "component_contract_revision": "1.0.1",
+    "eos01a_status": "SPECIFICATION_COMPLETE_MODEL_BOUNDARY_ADMISSION_PENDING_SOURCE_LABELS_CORRECTED"
+  },
+  "authority": {
+    "top_level": "data/ns_cowling_cloud_agent_dag.v1.json",
+    "detailed_contract": "docs/NS_COWLING_CLOUD_AGENT_DAG_20261112.md",
+    "audit_report": "docs/NS_COWLING_AUDIT_REPORT_20261112.md",
+    "handoff_prompt": "docs/NS_COWLING_CLOUD_AGENT_HANDOFF_PROMPT_20261112.md",
+    "subsystem_physics_authority": "data/eos390_native_fortran_unification_dag.v1.json",
+    "rule": "This graph controls task sequencing/status. The subsystem EOS DAG remains authoritative for detailed physics/source constraints where not superseded."
+  },
+  "method_ontology": {
+    "historical_matrix_keys": [
+      "first_law_constrained_hermite_pressure_bridge",
+      "css",
+      "cubic_F",
+      "cubic_P",
+      "quintic_F",
+      "quintic_P"
+    ],
+    "css": {
+      "type": "parameterized_high_density_extension",
+      "classification_rule": "Sharp first order only if supplied Delta_epsilon>0 and P/mu/first-law jump conditions pass."
+    },
+    "smooth_tokens": [
+      "first_law_constrained_hermite_pressure_bridge",
+      "cubic_F",
+      "cubic_P",
+      "quintic_F",
+      "quintic_P"
+    ],
+    "general_rule": "Numerical interpolation method is not physical transition classification; preserve phase boundaries and never interpolate across a true discontinuity.",
+    "historical_matrix_v1_keys": [
+      "maxwell",
+      "css",
+      "cubic_F",
+      "cubic_P",
+      "quintic_F",
+      "quintic_P"
+    ],
+    "legacy_first_law_bridge": {
+      "method_id": "first_law_constrained_hermite_pressure_bridge",
+      "historical_v1_token": "maxwell",
+      "identity": "LEGACY_NPPHB_FLCHPB",
+      "type": "smooth_interpolation",
+      "actual_description": "Project-defined first-law-constrained Hermite pressure bridge (historical NPPHB parameterization); continuous density, no latent-heat jump and no Maxwell coexistence.",
+      "physical_classification": "UNRESOLVED",
+      "literature_attribution": false,
+      "production_status": "BLOCKED_NATIVE_M2_M10_PORT",
+      "historical_v1_artifacts_immutable": true
+    },
+    "maxwell": {
+      "token": "maxwell",
+      "identity": "SHARP_MAXWELL_LOCAL_NEUTRALITY",
+      "type": "first_order_sharp_phase_transition",
+      "part_of_historical_390_matrix": false,
+      "pair_scope": "separate existing 65-pair sharp-Maxwell workflow",
+      "conditions": [
+        "P_low(mu_t)=P_high(mu_t)=P_t",
+        "mu_B,low=mu_B,high=mu_t",
+        "n_high>n_low>0",
+        "Delta epsilon=mu_t*Delta n_B>0",
+        "local electric charge neutrality in each phase"
+      ],
+      "production_status": "NATIVE_KERNEL_EXISTS_COMPOSITION_AWARE_COMMON_MATCHER_INTEGRATION_PENDING"
+    },
+    "historical_v1_artifact_policy": "Existing v1 output directories/task IDs containing __maxwell identify the old NPPHB parameterization and remain byte-for-byte immutable. Active code and new manifests use FLCHPB; the method ID maxwell means sharp first-order coexistence only."
+  },
+  "backend_contract": {
+    "numerical_backend": "Fortran",
+    "python_allowed": [
+      "path validation",
+      "argument validation",
+      "manifest validation",
+      "strict serialization",
+      "native process invocation",
+      "exit/status decoding",
+      "hash/provenance handling",
+      "presentation"
+    ],
+    "python_forbidden_in_production": [
+      "PCHIP/Brent EOS matching",
+      "CSS branch evaluation",
+      "Hermite/quintic matching",
+      "TOV/Cowling ODEs",
+      "interface transfer",
+      "frequency determinants/root finding",
+      "any fallback numerical transform"
+    ],
+    "pass_evidence_required": [
+      "execution_backend=native_fortran",
+      "complete_combined_eos=true",
+      "compose_readback_pass=true",
+      "fortran_executable_sha256",
+      "input_source_sha256",
+      "physics_contract_id",
+      "output_file_sha256",
+      "C1_C11_validation_receipt"
+    ],
+    "missing_evidence": "BLOCKED_OR_PARTIAL_NEVER_PASS"
+  },
+  "data_contract": {
+    "compose_manual": "Typel et al. 2022, CompOSE Reference Manual v3.01, arXiv:2203.03209",
+    "row_key": [
+      "iT",
+      "inb",
+      "iYq"
+    ],
+    "eos_compo_fields": [
+      "Iphase",
+      "Npairs",
+      "particle_index_fraction_pairs",
+      "Nquad",
+      "nuclear_group_quadruples"
+    ],
+    "sparse_records_allowed": true,
+    "explicit_zero_is_present": true,
+    "absent_is_not_zero": true,
+    "C3_and_C4": "independent row-level applicability and closure",
+    "statuses": [
+      "CHECKED",
+      "PARTIAL",
+      "NOT_AVAILABLE",
+      "FAIL"
+    ],
+    "Iphase": "provider-defined categorical",
+    "Nadd_q_extra": "provider-defined typed extension; categorical fields must never be averaged/interpolated",
+    "SPG_GPPVA_semantics": "RESOLVED_DUAL_TRACK: preserve raw provider CompOSE fields under standard parser/masks; production inner-crust composition is separately reconstructed from Grill 2014 / Scurto 2024 / model-specific RMF or GDFM sources. No provider-field remapping.",
+    "axes": [
+      "T",
+      "nB",
+      "Yq"
+    ],
+    "multidimensional_policy": "preserve all exact indices and axes; no flattening/averaging/nearest-grid guessing/field drops"
+  },
+  "nodes": [
+    {
+      "id": "CLOUD-00",
+      "name": "Live repository snapshot and branch isolation",
+      "track": "shared",
+      "depends_on": [],
+      "status": "IN_PROGRESS",
+      "cloud_action": true,
+      "acceptance": [
+        "fetch exact PR #3/#13 heads and bases",
+        "record tree/parent/branch and clean-state",
+        "create isolated child branch/worktree per independent patch",
+        "no force push or implicit merge"
+      ]
+    },
+    {
+      "id": "EOS-01",
+      "name": "Source authority and provenance registry",
+      "track": "eos390",
+      "depends_on": [
+        "CLOUD-00"
+      ],
+      "status": "PARTIAL",
+      "cloud_action": "code_and_registry_only",
+      "acceptance": [
+        "hash exact source files and paper registry metadata",
+        "retain model-to-paper provenance",
+        "record that Dropbox byte hashes require mounted environment",
+        "do not modify raw EOS/historical output"
+      ]
+    },
+    {
+      "id": "EOS-02A",
+      "name": "Per-row composition presence and sparse CompOSE I/O",
+      "track": "eos390",
+      "depends_on": [
+        "CLOUD-00"
+      ],
+      "status": "IN_PROGRESS",
+      "cloud_action": true,
+      "acceptance": [
+        "preserve each particle/group presence mask",
+        "explicit zero remains present",
+        "Npairs=0/Nquad=0 grammar round-trips exactly",
+        "reject duplicate IDs and trailing tokens",
+        "C3/C4 applicability independent",
+        "GM1 mixed-coverage and phase-only tests",
+        "C4 inapplicable where Abar=0/Z-A undefined"
+      ]
+    },
+    {
+      "id": "EOS-02B",
+      "name": "SPG/GPPVA composition semantics",
+      "track": "eos390",
+      "depends_on": [
+        "EOS-02A",
+        "EOS-01"
+      ],
+      "status": "RESOLVED_DUAL_TRACK_STANDARD_AND_RECONSTRUCTION",
+      "cloud_action": "research_and_contract_only",
+      "acceptance": [
+        "obtain provider-written mappings",
+        "resolve Iphase=0/7 semantics separately",
+        "resolve Abar/Zbar/group fraction and neutron gas",
+        "independent baryon/charge closure on every applicable row",
+        "do not guess, drop, or tolerance-relax"
+      ],
+      "resolution_receipt": "data/receipts/eos390_m2a/E390-02-SPG_GPPVA_ABUNDANCE_SEMANTICS_RESOLVED_20261113.json"
+    },
+    {
+      "id": "EOS-10",
+      "name": "General multidimensional CompOSE I/O",
+      "track": "eos390",
+      "depends_on": [
+        "EOS-02A"
+      ],
+      "status": "NOT_RUN",
+      "cloud_action": true,
+      "acceptance": [
+        "T/nB/Yq axes and index bounds preserved",
+        "exact (iT,inb,iYq) key mapping",
+        "arbitrary supported particle/group records",
+        "optional files and Nadd preserved",
+        "lossless round-trip and unknown-field stop tests"
+      ]
+    },
+    {
+      "id": "EOS-03",
+      "name": "Core model couplings and thermodynamic reconstruction",
+      "track": "eos390",
+      "depends_on": [
+        "EOS-01"
+      ],
+      "status": "PARTIAL_OR_SOURCE_BLOCKED",
+      "cloud_action": true,
+      "acceptance": [
+        "each parameter is linked to correct original paper/data sheet",
+        "unit and convention reconciliation",
+        "independent Euler/first-law checks",
+        "ambiguous coupling source remains blocked"
+      ]
+    },
+    {
+      "id": "EOS-04",
+      "name": "Crust reconstruction and splice",
+      "track": "eos390",
+      "depends_on": [
+        "EOS-02A",
+        "EOS-03",
+        "EOS-03A",
+        "EOS-03B"
+      ],
+      "status": "PARTIAL",
+      "cloud_action": true,
+      "acceptance": [
+        "native Fortran interpolation/derivative/reconstruction",
+        "local matching with endpoint/causality checks",
+        "no interpolation of categorical Nadd/q_extra",
+        "one-sided discontinuities retained",
+        "source columns and optional files preserved"
+      ]
+    },
+    {
+      "id": "EOS-05",
+      "name": "Native M2/M10 smooth Hermite kernels",
+      "track": "eos390",
+      "depends_on": [
+        "EOS-04",
+        "EOS-03A",
+        "EOS-03B"
+      ],
+      "status": "NOT_RUN",
+      "cloud_action": true,
+      "acceptance": [
+        "native cubic/quintic F/P kernels",
+        "analytic derivatives and extrema",
+        "frozen legacy parity fixtures",
+        "invalid/nonmonotone/extremum edge tests",
+        "no Python production fallback"
+      ]
+    },
+    {
+      "id": "EOS-06",
+      "name": "Native CSS parameterized high-density branch and join",
+      "track": "eos390",
+      "depends_on": [
+        "EOS-03",
+        "EOS-04",
+        "EOS-03A",
+        "EOS-03B"
+      ],
+      "status": "PARTIAL_NATIVE_KERNEL_JOIN_NOT_RUN",
+      "cloud_action": true,
+      "acceptance": [
+        "per-task source-backed parameter manifest",
+        "native CLI action",
+        "joined crust+core+CSS table not sidecar-only",
+        "Delta_epsilon and first-law jump verified",
+        "sound speed and causal checks",
+        "native read-back"
+      ]
+    },
+    {
+      "id": "EOS-07",
+      "name": "Native manifest-driven historical 390 batch",
+      "track": "eos390",
+      "depends_on": [
+        "EOS-02A",
+        "EOS-04",
+        "EOS-05",
+        "EOS-06",
+        "EOS-03A",
+        "EOS-03B"
+      ],
+      "status": "BLOCKED_KERNELS_AND_PROVIDER_SEMANTICS",
+      "cloud_action": true,
+      "acceptance": [
+        "exact 390 unique historical keys",
+        "first_law_constrained_hermite_pressure_bridge routes to the native NPPHB smooth bridge; historical v1 __maxwell outputs remain immutable",
+        "CSS tasks require explicit parameters/native join",
+        "every task calls Fortran backend",
+        "no placeholder copies",
+        "no stale output overwrite",
+        "per-task machine receipt",
+        "the physical sharp Maxwell operation uses method ID maxwell in its separate 65-pair transition workflow"
+      ]
+    },
+    {
+      "id": "EOS-08",
+      "name": "Independent M8 differential/physical/numerical validation",
+      "track": "eos390",
+      "depends_on": [
+        "EOS-07"
+      ],
+      "status": "NOT_RUN_ON_NATIVE_390",
+      "cloud_action": true,
+      "acceptance": [
+        "C1-C11 with C7-C9 diagnostic distinction",
+        "differential parity against frozen reference",
+        "causal/stability gates",
+        "convergence and edge controls",
+        "all failures retained"
+      ]
+    },
+    {
+      "id": "EOS-09",
+      "name": "Corrected M9 read-back, hash, immutability and delivery receipt",
+      "track": "eos390",
+      "depends_on": [
+        "EOS-08"
+      ],
+      "status": "SUPERSEDE_OLD_M9",
+      "cloud_action": "code_and_ci_plus_local_ack",
+      "acceptance": [
+        "390 key manifest",
+        "only genuine native complete outputs read back",
+        "every output hashed",
+        "historical immutability compared with trusted baseline",
+        "Dropbox upload has real acknowledgement/revision",
+        "no vacuous success flags"
+      ]
+    },
+    {
+      "id": "COW-01",
+      "name": "Sharp-Maxwell Cowling branch source reconciliation",
+      "track": "cowling",
+      "depends_on": [
+        "CLOUD-00",
+        "EOS-01"
+      ],
+      "status": "PARTIAL_SYNTHETIC_REFERENCE",
+      "cloud_action": true,
+      "acceptance": [
+        "inspect exact PR #3 HEAD and solver source",
+        "do not infer q-to-r equations",
+        "no merge with PR #13 without separate reviewed integration branch",
+        "preserve analytic fixture evidence"
+      ]
+    },
+    {
+      "id": "COW-02",
+      "name": "Phase-resolved profile export and one-sided interface states",
+      "track": "cowling",
+      "depends_on": [
+        "COW-01"
+      ],
+      "status": "NOT_RUN_ON_LIVE_NATIVE_PROFILE",
+      "cloud_action": true,
+      "acceptance": [
+        "W/V/r/q/P/epsilon/h/chi/nu/lambda/nu_prime on each side",
+        "explicit inner and outer state",
+        "finite equal-length arrays",
+        "no interpolation/averaging/zero filling across jump",
+        "profile schema and SHA receipt"
+      ]
+    },
+    {
+      "id": "COW-03",
+      "name": "Trace-first Abel-Liouville invariant from actual native RHS",
+      "track": "cowling",
+      "depends_on": [
+        "COW-01",
+        "COW-02"
+      ],
+      "status": "CONDITIONAL_DERIVATION_SYNTHETIC_ONLY",
+      "cloud_action": true,
+      "acceptance": [
+        "derive full native matrix and q-to-r chain rule",
+        "verify exact trace and cold first law/TOV assumptions",
+        "derive interface determinant cocycle and orientation",
+        "retain lapse factor",
+        "no canonical symplectic-current claim"
+      ]
+    },
+    {
+      "id": "COW-04",
+      "name": "Physical slow/rapid endpoints and LA10 algebraic family",
+      "track": "cowling",
+      "depends_on": [
+        "COW-02",
+        "COW-03"
+      ],
+      "status": "ENDPOINTS_SYNTHETIC_LA10_RESEARCH_ONLY",
+      "cloud_action": true,
+      "acceptance": [
+        "slow and rapid endpoint maps tested separately",
+        "theta family labelled algebraic boundary interpolation only",
+        "no finite-rate kinetic claims",
+        "A=0 uses implicit full-rank relation",
+        "no production-root integration until approved"
+      ]
+    },
+    {
+      "id": "COW-05",
+      "name": "LA11 finite-interval matching and analytic cocycles",
+      "track": "cowling",
+      "depends_on": [
+        "COW-03",
+        "COW-04"
+      ],
+      "status": "CONDITIONAL_SYNTHETIC_ONLY",
+      "cloud_action": true,
+      "acceptance": [
+        "finite-interval determinant bilinear without conjugation",
+        "endpoint/gauge/basis/scale cocycles retained",
+        "chart-pole and implicit matching tests",
+        "complex JSON finite serialization",
+        "Fredholm/holomorphy gate before argument principle"
+      ]
+    },
+    {
+      "id": "COW-06",
+      "name": "Mode identity, profiles and continuation",
+      "track": "cowling",
+      "depends_on": [
+        "COW-02",
+        "COW-04",
+        "COW-05"
+      ],
+      "status": "UNRESOLVED",
+      "cloud_action": true,
+      "acceptance": [
+        "phase-local node counts",
+        "normalized profile overlaps",
+        "interface tangential polarization",
+        "frequency/parameter continuation and avoided-crossing handling",
+        "no frequency-order-only f/p1/g labels"
+      ]
+    },
+    {
+      "id": "COW-07",
+      "name": "Source-backed EOS-to-Cowling integration",
+      "track": "cowling",
+      "depends_on": [
+        "EOS-09",
+        "COW-06"
+      ],
+      "status": "BLOCKED_SOURCE_ADMISSION",
+      "cloud_action": "local_input_then_cloud_review",
+      "acceptance": [
+        "source EOS admitted with provenance/composition closure",
+        "TOV sharp transition preserves separate phases",
+        "native Cowling RHS and interface transfers integrated",
+        "root convergence and mode labels validated"
+      ]
+    },
+    {
+      "id": "RELEASE-00",
+      "name": "Final release and handoff",
+      "track": "shared",
+      "depends_on": [
+        "EOS-09",
+        "COW-07"
+      ],
+      "status": "BLOCKED",
+      "cloud_action": true,
+      "acceptance": [
+        "all 390 original keys complete if matrix release requested",
+        "source/output hashes complete",
+        "tests and CI exact-head pass",
+        "Dropbox upload acknowledgement",
+        "sharp Cowling physics/mode claims appropriately scoped",
+        "handoff prompt and DAG consistent"
+      ]
+    },
+    {
+      "id": "EOS-01A",
+      "name": "Specify standalone core-only and crust-only EOS source contracts",
+      "track": "eos390",
+      "depends_on": [
+        "CLOUD-00",
+        "EOS-01",
+        "EOS-02A",
+        "EOS-10A"
+      ],
+      "status": "SPECIFICATION_COMPLETE_MODEL_BOUNDARY_ADMISSION_PENDING",
+      "cloud_action": "specification_and_source_registry",
+      "outputs": [
+        "5 core + 13 crust source matrix",
+        "CompOSE Q1-Q7 / rest-mass / cold-slice contract",
+        "composition masks and artifact lineage",
+        "source-backed component construction acceptance matrix"
+      ],
+      "receipt": "data/receipts/eos390_m1a/E390-01A_STANDALONE_COMPONENT_CONTRACT_20261113.json",
+      "contract": "data/eos390_component_source_contract.v1.json"
+    },
+    {
+      "id": "EOS-01C",
+      "name": "Adjudicate model-specific component boundaries and phase dictionaries",
+      "track": "eos390",
+      "depends_on": [
+        "EOS-01A",
+        "EOS-02A",
+        "EOS-10A"
+      ],
+      "status": "READY_NEXT_NODE",
+      "acceptance": [
+        "exact core boundaries",
+        "per-model Iphase dictionaries",
+        "crust phase / neutron-drip / terminal support lock",
+        "source row/value/index and citation for all admitted boundaries"
+      ]
+    },
+    {
+      "id": "EOS-03A",
+      "name": "Native standalone core-only EOS constructor",
+      "track": "eos390",
+      "depends_on": [
+        "EOS-01C",
+        "EOS-02A",
+        "EOS-10A"
+      ],
+      "status": "PENDING"
+    },
+    {
+      "id": "EOS-03B",
+      "name": "Native standalone crust-only EOS constructor",
+      "track": "eos390",
+      "depends_on": [
+        "EOS-01C",
+        "EOS-02A",
+        "EOS-10A"
+      ],
+      "status": "PENDING"
+    }
+  ],
+  "mutation_gates": [
+    {
+      "id": "G0",
+      "name": "Live source lock",
+      "rule": "Fetch exact heads/tree/status before any mutation; stop on drift."
+    },
+    {
+      "id": "G1",
+      "name": "Branch isolation",
+      "rule": "Use child branches/worktrees; never delete dirty work, reset, force push or auto-merge."
+    },
+    {
+      "id": "G2",
+      "name": "Source provenance",
+      "rule": "Hash original EOS, CompOSE sheets, papers, optional files and historical outputs; raw and old outputs are read-only."
+    },
+    {
+      "id": "G3",
+      "name": "TDD",
+      "rule": "Failing test first, observe intended failure, then smallest production fix; run complete suite."
+    },
+    {
+      "id": "G4",
+      "name": "Physical semantics",
+      "rule": "Do not map ambiguous provider fields or infer phase order from method/Iphase labels."
+    },
+    {
+      "id": "G5",
+      "name": "Numerics",
+      "rule": "Fortran unit/analytic tests, independent formulas, edge cases and convergence; failures retained."
+    },
+    {
+      "id": "G6",
+      "name": "Native-only",
+      "rule": "No Python numerical fallback in production; PASS requires native executable identity/evidence."
+    },
+    {
+      "id": "G7",
+      "name": "Batch cardinality",
+      "rule": "Exactly 390 historical task keys, no duplicates/omissions, unique versioned output root."
+    },
+    {
+      "id": "G8",
+      "name": "Read-back",
+      "rule": "Each PASS output is read by native Fortran and independently validated."
+    },
+    {
+      "id": "G9",
+      "name": "Immutability",
+      "rule": "Compare old outputs to trusted baseline hashes, never 'unchanged by construction'."
+    },
+    {
+      "id": "G10",
+      "name": "Cloud/local boundary",
+      "rule": "Cloud CI and Dropbox-mount run are separate receipts and may not substitute for one another."
+    },
+    {
+      "id": "G11",
+      "name": "Publication",
+      "rule": "No unapproved merge/release or unacknowledged Dropbox upload."
+    }
+  ],
+  "acceptance_statuses": [
+    "PASS",
+    "FAIL",
+    "BLOCKED",
+    "PARTIAL",
+    "NOT_RUN",
+    "SUPERSEDED"
+  ],
+  "failure_taxonomy": [
+    "THEORY_OR_CONVENTION",
+    "SOURCE_SEMANTICS",
+    "DATA_PROVENANCE",
+    "PHYSICAL_STABILITY_OR_CAUSALITY",
+    "NUMERICAL_CONVERGENCE_OR_CONDITIONING",
+    "FORTRAN_IMPLEMENTATION",
+    "PYTHON_FRONTEND_OR_SERIALIZATION",
+    "COMPATIBILITY_OR_PARITY",
+    "ENVIRONMENT_OR_COMPILER",
+    "CLOUD_PERMISSION_OR_TOOLING",
+    "RESOURCE_LIMIT",
+    "SCOPE_OR_POLICY"
+  ],
+  "anti_drift_questions": [
+    "What exact repository, branch, HEAD, tree, PR base/head and clean-state were observed?",
+    "Which complete source files and input data were inspected and hashed?",
+    "Does each method token preserve its historical physical meaning?",
+    "Is a smooth interpolant being mislabelled a phase transition?",
+    "Are left/right interface values explicit and all stencils phase-local?",
+    "Are absent, explicit-zero and model-generated-zero fields distinguished?",
+    "Are C3 and C4 independently applicable and validated row by row?",
+    "Are Iphase and Nadd/q_extra categorical and provider-defined?",
+    "Did any Python numerical routine enter a production path?",
+    "Does every PASS prove native Fortran generation, complete combined output and read-back?",
+    "Are all 390 exact task keys present exactly once?",
+    "Are old outputs compared against trusted baseline hashes?",
+    "Are equations, units, metric signature, state orientation and approximation regime explicit?",
+    "Are slow/rapid physical endpoints separate from LA10 algebraic interpolation?",
+    "Was actual native RHS and q-to-r chain rule derived from source?",
+    "Are basis/gauge/scale determinant phases retained for complex matching?",
+    "Are mode labels based on node/profile/overlap/continuation evidence?",
+    "Do logs, manifests, stdout, test collection and report agree on counts?",
+    "Were all failures/negative controls preserved?",
+    "Were no unapproved raw-data, output-folder, Dropbox or remote branch mutations performed?"
+  ],
+  "required_receipts": [
+    "run_identity.json",
+    "environment.json",
+    "source_manifest.sha256",
+    "paper_source_registry.json",
+    "build.log",
+    "pytest.log",
+    "native_unit_tests.log",
+    "composition_coverage_matrix.json",
+    "provider_semantics_answers.json",
+    "390_pair_manifest.json",
+    "per_pair/<task_id>/task_receipt.json",
+    "readback_report.json",
+    "C1_C11_report.json",
+    "failure_catalog.json",
+    "historical_immutability_report.json",
+    "output_manifest.sha256",
+    "dropbox_upload_receipt.json",
+    "handoff_result.json"
+  ],
+  "sources": [
+    {
+      "id": "compose-v301",
+      "citation": "Typel et al., CompOSE Reference Manual v3.01 (2022)",
+      "url": "https://arxiv.org/abs/2203.03209",
+      "role": "eos.compo grammar, species/group semantics, axes and table format"
+    },
+    {
+      "id": "tonetto-lugones-2020",
+      "citation": "Tonetto & Lugones, Phys. Rev. D 101, 123029 (2020)",
+      "url": "https://arxiv.org/abs/2003.01259",
+      "role": "nonradial slow/rapid sharp-interface endpoints"
+    },
+    {
+      "id": "alford-han-prakash-2013",
+      "citation": "Alford, Han & Prakash, Phys. Rev. D 88, 083013 (2013)",
+      "url": "https://arxiv.org/abs/1302.4732",
+      "role": "CSS parameterized high-density branch"
+    },
+    {
+      "id": "dong-kuan-yunes-2026",
+      "citation": "Dong, Kuan & Yunes (2026)",
+      "url": "https://arxiv.org/abs/2609.33002",
+      "role": "full-GR context only; not a drop-in Cowling derivation"
+    }
+  ]
+}

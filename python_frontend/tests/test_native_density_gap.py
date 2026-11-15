@@ -64,7 +64,11 @@ def test_native_density_gap_fill_preserves_knots_and_first_law():
 def test_native_density_gap_rejects_implicit_cross_phase_fill():
     phases = np.array([0, 0, 0, 1, 1, 1])
     source = analytic_gap_eos(composition_available=True, phases=phases)
-    with pytest.raises(ValueError, match="crosses phase IDs"):
+    # E390-02C: the phase-boundary safety check is now owned by the native
+    # Fortran fill-gap operation (not a Python pre-pass), so the rejection
+    # surfaces as a NativeExecutionError carrying the "crosses phase IDs" message.
+    from compose_eos import NativeExecutionError
+    with pytest.raises(NativeExecutionError, match="crosses phase IDs"):
         fill_density_gap(source, n_fill=2, fit_points=2)
 
 
@@ -105,14 +109,19 @@ def test_native_density_gap_reproduces_linear_in_density_master_function():
 
 
 def test_native_density_gap_matches_gppva_source_cohort_contract():
-    from compose_eos import read_compose, find_density_gap
+    from compose_eos import read_compose, fill_density_gap
 
     source = read_compose(ROOT / "eos_generator" / "eos_data_normalized" / "GPPVA_FSU2H")
-    gap = find_density_gap(source)
+    # E390-02C: the gap index is selected by the native Fortran fill-gap
+    # operation, not by a Python NumPy argmax pre-pass. fill_density_gap
+    # returns the native report carrying the chosen igap and best_ratio.
+    out, report = fill_density_gap(source, n_fill=12, gap_phase=7, return_report=True)
+    # The Fortran selector reports a 1-based index (Fortran do j=1,n-1), while
+    # NumPy/Python arrays are 0-based; convert for indexing into source.Iphase.
+    gap = int(report["igap"]) - 1
     assert source.composition_available
     assert source.Iphase[gap] != source.Iphase[gap + 1]
 
-    out = fill_density_gap(source, n_fill=12, gap_phase=7)
     inserted = slice(gap + 1, gap + 13)
     assert out.n == source.n + 12
     assert np.array_equal(out.Iphase[inserted], np.full(12, 7))

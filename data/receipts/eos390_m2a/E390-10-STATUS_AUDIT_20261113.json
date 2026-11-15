@@ -1,0 +1,43 @@
+{
+  "receipt_id": "E390-10-STATUS_AUDIT_20261113",
+  "node": "E390-10",
+  "gate": "M10",
+  "title": "Upgrade native CompOSE support from cold one-dimensional slices to the standard multidimensional provider format",
+  "audited_status": "EOS390_COLD_SLICE_PATH_PASS_FULL_MULTIDIMENSIONAL_READER_PENDING",
+  "prior_status": "PENDING_GENERAL_MULTIDIMENSIONAL_COMPOSE_READER",
+  "audit_date": "2026-11-13",
+  "branch": "cloud/eos390-fortran-unification-v1",
+  "finding": "E390-10 is partially implemented. The native reader (compose_eos_io.f90) stores the full 1D/2D/3D axes metadata (nT, nYq, t_axis, yq_axis, t_first/last, yq_first/last, selected_iT, selected_iYq) on every EOSData, and resolves the cold T=0 slice by VALUE with 0-based/1-based index convention tolerance. This satisfies the EOS390 production path: every reconstructed EoS in eos_generator/eos_data_normalized/ (APR, BBB, GM, GPPVA x8, RG x2, SPG) reads successfully with Nadd in {0,1} — the reader's Nadd<=1 constraint does not block any current cohort member. However, the reader explicitly rejects multi-point T or Yq axes (compose_eos_io.f90 line 131: 'only a single cold T=0 eos.t/eos.yq slice is supported') and only Nadd in {0,1} (line 207). The full general multidimensional reader (reading all T x Yq x nb cells, arbitrary Nadd) is NOT implemented.",
+  "outputs_audit": {
+    "1_generic_compose_table_data_model": {
+      "verdict": "PASS",
+      "evidence": "EOSData (python_frontend/compose_eos/eos_data.py lines 77-86) carries nT, nYq, t_first, t_last, yq_first, yq_last, selected_iT, selected_iYq, t_axis, yq_axis. The Fortran eos_data_t mirrors these (compose_eos_types.f90). read_compose populates them via read_grid (compose_eos_io.f90 lines 69-97, 116-129)."
+    },
+    "2_1D_2D_3D_axes_and_cell_index_parser": {
+      "verdict": "PARTIAL",
+      "evidence": "Axes metadata is parsed and stored for 1D/2D/3D layouts. The cold-slice cell-index parser (selected_iT, selected_iYq) resolves the cold T=0 slice with 0-based/1-based convention tolerance (compose_eos_io.f90 lines 137-171). HOWEVER the reader explicitly rejects multi-point T or Yq axes: compose_eos_io.f90 line 131 'only a single cold T=0 eos.t/eos.yq slice is supported' — it does NOT read all cells of a 2D or 3D table, only the single cold slice. test_m10_generic_axes.py test_multi_point_T_axis_is_rejected and test_multi_point_Yq_axis_is_rejected confirm this is a rejection, not a parse."
+    },
+    "3_arbitrary_species_group_optional_file_support": {
+      "verdict": "PARTIAL_FOR_CURRENT_COHORT",
+      "evidence": "compose_eos_io.f90 line 207 restricts Nadd to {0,1}: 'only Nadd=0 or Nadd=1 is supported'; line 213 rejects Nadd changing across rows. Survey of all 13 reconstructed EoS directories in eos_generator/eos_data_normalized/ shows q_extra_count in {0,1} for every member (APR/BBB/GM/SPG=0; GPPVAx8/RGx2=1), so the constraint does NOT block the current EOS390 cohort. Arbitrary Nadd>1 (multi extra-quantity columns) remains unsupported."
+    },
+    "4_lossless_round_trip_test_corpus": {
+      "verdict": "PARTIAL",
+      "evidence": "test_m10_generic_axes.py has 8 tests; 6 pass, 2 skipped. The 2 skips are test_real_RG_SLY4_passes_slice_check and test_real_RG_KDE0v1_passes_slice_check, both skipped because 'inputs/raw_compose not staged (M0 not run in this environment)' — i.e. blocked by E390-00 (BLOCKED_REPLACEMENT_ZIP_NOT_STAGED). The Fortran test_roundtrip/ directory has fortran_verify_roundtrip.json but it is a single-source round-trip, not a multi-axis corpus."
+    },
+    "5_explicit_slice_selector_for_eos390": {
+      "verdict": "PASS",
+      "evidence": "selected_iT and selected_iYq record the actual thermo-row label used for the cold slice; the reader resolves the cold slice by value with index-convention tolerance. test_one_based_t_index_convention_passes, test_zero_based_t_index_with_one_based_thermo_rows_passes, test_zero_based_t_index_with_zero_based_thermo_rows_passes all verify this."
+    }
+  },
+  "blocking_dependencies": {
+    "E390_00": "2 test_m10 tests skip on inputs/raw_compose not staged (M0 zip not staged). Resolving E390-00 would unblock these real-data slice-check tests.",
+    "none_internal": "No internal code gap blocks the EOS390 cold-slice production path; the cohort reads end-to-end."
+  },
+  "test_results": {
+    "test_m10_generic_axes": "6 passed, 2 skipped (skips blocked by E390-00)",
+    "full_python_frontend_suite": "91 passed, 2 skipped, no regression (same run as E390-02C verification)"
+  },
+  "resolution_recommendation": "E390-10 should NOT be marked fully RESOLVED — the full general multidimensional reader (read all T x Yq cells, arbitrary Nadd) remains PENDING. Two options: (a) split E390-10 into E390-10A (EOS390 cold-slice path — PASS, mark RESOLVED) and E390-10B (full 2D/3D reader + arbitrary Nadd — PENDING); or (b) keep E390-10 as PENDING with a status_detail noting the cold-slice path passes. Recommendation: (a) is more honest and unblocks downstream M3-M6 while preserving the multidim-reader mandate. This audit receipt documents the partial state without falsely claiming completion.",
+  "no_dag_status_change_made": "This is a status-audit receipt only. The DAG node status is NOT changed to IMPLEMENTED because the full multidimensional reader output is not satisfied. The status PENDING_GENERAL_MULTIDIMENSIONAL_COMPOSE_READER is accurate; this receipt adds the finding that the EOS390 cold-slice subset is already passing."
+}

@@ -4,10 +4,11 @@ module compose_eos_verify
   implicit none
   private
   type,public :: verify_report_t
-    logical :: c1=.false.,c2=.false.,c2_applicable=.true.,c3=.false.,c4=.false.,c3_available=.false.
+    logical :: c1=.false.,c2=.false.,c2_applicable=.true.,c3=.false.,c4=.false.,c3_available=.false.,c4_available=.false.
     logical :: c5=.false.,c5_applicable=.true.,c6=.false.,c7=.false.,c8=.false.,c9=.false.
     logical :: c10=.false.,c11=.false.,overall=.false.
     integer :: derivative_points=0,derivative_masked=0,acausal_count=0,acausal_firstlaw_count=0
+    integer :: c3_points=0,c3_masked=0,c4_points=0,c4_masked=0
     real(wp) :: c1_max_q2=0._wp,c1_max_q6q7=0._wp,c1_max_mul=0._wp
     real(wp) :: c2_max_rel=0._wp,c3_max_abs=0._wp,c4_max_abs=0._wp
     real(wp) :: min_dpdnb=0._wp,min_delta_p=0._wp
@@ -52,7 +53,7 @@ contains
     real(wp),allocatable::p(:),f(:),fb(:),eps(:),mub(:),muq(:),mul(:),x(:)
     real(wp),allocatable::dp(:),dmub(:),df(:),deps(:),r(:),cs2(:),csfl(:)
     logical,allocatable::mask(:)
-    logical::c2app,finite_primary
+    logical::c2app,finite_primary,c3_ready,c4_ready
     integer::n,i,nbad
     character(len=8)::names(11)
     atol=2.e-6_wp;dxmax=0.25_wp;cstol=1.e-6_wp;comptol=2.e-5_wp
@@ -98,22 +99,55 @@ contains
     if(c2app)report%c2_max_rel=maxval(r)
     report%c2=c2app.and.report%c2_max_rel<=atol
 
-    report%c3_available=eos%composition_available
-    if(eos%composition_available)then
-      do i=1,n
-        if(eos%abar(i)>0._wp)then
-          muqv=eos%zbar(i)/eos%abar(i)
-        else
-          muqv=0._wp
-        endif
-        report%c3_max_abs=max(report%c3_max_abs,abs(eos%yp(i)+muqv*eos%yh(i)-eos%ye(i)-eos%ymu(i)))
-        report%c4_max_abs=max(report%c4_max_abs,abs(eos%yn(i)+eos%yp(i)+eos%yh(i)-1._wp))
-      enddo
-      report%c3=report%c3_max_abs<=comptol
-      report%c4=report%c4_max_abs<=comptol
-    else
-      report%c3=.true.;report%c4=.true.
+    report%c3=.true.;report%c4=.true.
+    c3_ready=allocated(eos%c3_applicable).and.allocated(eos%yn_present).and. &
+             allocated(eos%yp_present).and.allocated(eos%yh_present)
+    c4_ready=allocated(eos%c4_applicable).and.allocated(eos%yp_present).and. &
+             allocated(eos%abar_present).and.allocated(eos%zbar_present).and. &
+             allocated(eos%yh_present).and.allocated(eos%ye_present).and.allocated(eos%ymu_present)
+    if(c3_ready)then
+      c3_ready=size(eos%c3_applicable)==n.and.size(eos%yn_present)==n.and. &
+               size(eos%yp_present)==n.and.size(eos%yh_present)==n
     endif
+    if(c4_ready)then
+      c4_ready=size(eos%c4_applicable)==n.and.size(eos%yp_present)==n.and. &
+               size(eos%abar_present)==n.and.size(eos%zbar_present)==n.and. &
+               size(eos%yh_present)==n.and.size(eos%ye_present)==n.and.size(eos%ymu_present)==n
+    endif
+    if(c3_ready)then
+      do i=1,n
+        if(.not.eos%c3_applicable(i))cycle
+        report%c3_points=report%c3_points+1
+        if(.not.(eos%yn_present(i).and.eos%yp_present(i).and.eos%yh_present(i)))then
+          report%c3=.false.
+          cycle
+        endif
+        report%c3_max_abs=max(report%c3_max_abs,abs(eos%yn(i)+eos%yp(i)+eos%yh(i)-1._wp))
+      enddo
+    else
+      report%c3=.false.
+    endif
+    if(c4_ready)then
+      do i=1,n
+        if(.not.eos%c4_applicable(i))cycle
+        report%c4_points=report%c4_points+1
+        if(.not.(eos%yp_present(i).and.eos%abar_present(i).and.eos%zbar_present(i).and. &
+           eos%yh_present(i).and.eos%ye_present(i).and.eos%ymu_present(i)).or.eos%abar(i)<=0._wp)then
+          report%c4=.false.
+          cycle
+        endif
+        report%c4_max_abs=max(report%c4_max_abs, &
+          abs(eos%yp(i)+(eos%zbar(i)/eos%abar(i))*eos%yh(i)-eos%ye(i)-eos%ymu(i)))
+      enddo
+    else
+      report%c4=.false.
+    endif
+    report%c3_available=report%c3_points>0
+    report%c4_available=report%c4_points>0
+    report%c3_masked=n-report%c3_points
+    report%c4_masked=n-report%c4_points
+    if(report%c3_available)report%c3=report%c3.and.report%c3_max_abs<=comptol
+    if(report%c4_available)report%c4=report%c4.and.report%c4_max_abs<=comptol
     report%c5_applicable=eos%beta_equilibrated
     report%c5=(.not.eos%beta_equilibrated).or.report%c1_max_mul<=atol*eos%mn
 
@@ -206,10 +240,21 @@ contains
     write(u,'(a)')'"C1":{"pass":'//trim(logical_text(report%c1))//'},'
     write(u,'(a)')'"C2":{"applicable":'//trim(logical_text(report%c2_applicable))//',"pass":'//trim(logical_text(report%c2))//'},'
     if(report%c3_available)then
-      write(u,'(a)')'"C3":{"status":"CHECKED","pass":'//trim(logical_text(report%c3))//'},'
-      write(u,'(a)')'"C4":{"status":"CHECKED","pass":'//trim(logical_text(report%c4))//'},'
+      if(report%c3_masked==0)then
+        write(u,'(a)')'"C3":{"status":"CHECKED","pass":'//trim(logical_text(report%c3))//'},'
+      else
+        write(u,'(a)')'"C3":{"status":"PARTIAL","pass":'//trim(logical_text(report%c3))//'},'
+      endif
     else
       write(u,'(a)')'"C3":{"status":"NOT_AVAILABLE","pass":null},'
+    endif
+    if(report%c4_available)then
+      if(report%c4_masked==0)then
+        write(u,'(a)')'"C4":{"status":"CHECKED","pass":'//trim(logical_text(report%c4))//'},'
+      else
+        write(u,'(a)')'"C4":{"status":"PARTIAL","pass":'//trim(logical_text(report%c4))//'},'
+      endif
+    else
       write(u,'(a)')'"C4":{"status":"NOT_AVAILABLE","pass":null},'
     endif
     if(report%c5_applicable)then
@@ -223,6 +268,10 @@ contains
     write(u,'(a,es25.16e3,a,i0,a)')'"C9":{"status":"FINITE_DIFFERENCE_DIAGNOSTIC","max_rel":',report%c9_max_rel,',"n_points":',report%derivative_points,'},'
     write(u,'(a)')'"C10":{"pass":'//trim(logical_text(report%c10))//'},'
     write(u,'(a)')'"C11":{"pass":'//trim(logical_text(report%c11))//'},'
+    write(u,'(a,i0,a)')'"C3_applicable_points":',report%c3_points,','
+    write(u,'(a,i0,a)')'"C3_masked_points":',report%c3_masked,','
+    write(u,'(a,i0,a)')'"C4_applicable_points":',report%c4_points,','
+    write(u,'(a,i0,a)')'"C4_masked_points":',report%c4_masked,','
     write(u,'(a,i0,a)')'"derivative_points":',report%derivative_points,','
     write(u,'(a,i0,a)')'"derivative_masked_points":',report%derivative_masked,','
     write(u,'(a,es25.16e3,a)')'"C1_max_Q2":',report%c1_max_q2,','

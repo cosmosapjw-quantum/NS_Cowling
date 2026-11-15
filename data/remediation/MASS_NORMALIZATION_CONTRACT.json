@@ -1,0 +1,133 @@
+{
+  "node": "NSC_EOS390_FULL_REMEDIATION_2026-11-14",
+  "phase": "B",
+  "artifact": "MASS_NORMALIZATION_CONTRACT",
+  "generated_utc": "2026-11-14T09:16:23.586374+00:00",
+  "status": "DERIVED_AND_ENFORCED_BY_REGRESSION_TESTS",
+  "compose_variable_semantics": {
+    "source": "Typel et al., CompOSE Reference Manual v3.01 (2022), arXiv:2203.03209; cross-checked against repo implementation python_frontend/compose_eos/eos_data.py:94-118 and fortran_eos/src/compose_eos_types.f90:118-143 and docs/NS_COWLING_PHYSICS_AND_CODE_GUIDE_V4.md:25",
+    "units": "n_B [fm^-3], P, eps, F per volume [MeV fm^-3], m_n c^2, m_p c^2, mu [MeV], Q1 [MeV], Q2..Q7 dimensionless",
+    "Q1": "P / n_B  (pressure per baryon, MeV)",
+    "Q2": "entropy per baryon (must be 0 for cold T=0)",
+    "Q3": "mu_B / m_n - 1 for Il=1 (barotropic enthalpy derivative gauge); for Il=0 Q3 stores mu_B/m_n - 1 - Yq*Q4 (charge-shifted)",
+    "Q4": "mu_Q / m_n  (charge chemical potential, mu_Q = mu_p - mu_n)",
+    "Q5": "mu_lepton / m_n  (per-CompOSE the included lepton potential)",
+    "Q6": "F / m_n - 1  (free energy per baryon, includes rest mass)",
+    "Q7": "eps / (n_B m_n) - 1  (energy density per baryon, includes rest mass)",
+    "Il": "lepton-content flag; all 18 sources in this cohort are Il=1, Yq=0",
+    "cold_identity": "T=0, beta-equilibrium, no trapped leptons => Q2=0, Q5=0 (for Il=1), Q6=Q7, mu_B = F + P/n_B",
+    "observed_in_cohort": {
+      "Il": "18/18 models Il=1",
+      "Q6_minus_Q7": "0 for all 18 models (exact in stored precision)",
+      "Q5": "APR/BBB/GM/GPPVA/SPG = 0; RG_SLY4=1.383e-3, RG_KDE0v1=6.035e-4 constant => beta_equilibrated=False (this is the true cause of the 156 M7 rejections, NOT a mass issue)"
+    }
+  },
+  "mass_conventions_observed": {
+    "physical_split_cores": {
+      "models": [
+        "APR_APR",
+        "BBB_BHF2",
+        "GM_GM1"
+      ],
+      "mn_mp_MeV": [
+        939.56533,
+        938.272
+      ],
+      "note": "physical neutron/proton split; mn-mp = 1.29333 MeV"
+    },
+    "physical_split_RG": {
+      "models": [
+        "RG_SLY4"
+      ],
+      "mn_mp_MeV": [
+        939.5654,
+        938.272
+      ]
+    },
+    "uniform_convention_crusts": {
+      "GPPVA_family": {
+        "models": [
+          "GPPVA_DD2",
+          "GPPVA_DDME2",
+          "GPPVA_FSU2",
+          "GPPVA_FSU2H",
+          "GPPVA_FSU2R",
+          "GPPVA_NL3wrL55",
+          "GPPVA_TW"
+        ],
+        "mn_mp_MeV": [
+          939.0,
+          939.0
+        ]
+      },
+      "GPPVA_TM1e": {
+        "mn_mp_MeV": [
+          938.0,
+          938.0
+        ]
+      },
+      "SPG_family": {
+        "models": [
+          "SPG_M1",
+          "SPG_M2",
+          "SPG_M3",
+          "SPG_M4",
+          "SPG_M5"
+        ],
+        "mn_mp_MeV": [
+          938.9,
+          938.9
+        ]
+      }
+    },
+    "consequence": "Every crust-core pair in the 65-pair matrix carries a different rest-mass convention between crust and core; dmcr ranges from +0.56533 (GPPVA 939 family) to +1.56533 MeV (TM1e)."
+  },
+  "gauge_alignment_derivation": {
+    "name": "crust->core uniform rest-mass gauge alignment (representation-only)",
+    "code_location": "fortran_eos/src/compose_eos_matching.f90: dmcr = co%mn - cr%mn (find_window ~530, match_crust_core ~617)",
+    "definition": [
+      "F_tgt(n) = F_src(n) + dmcr          [per baryon, MeV]",
+      "mu_B,tgt(n) = mu_B,src(n) + dmcr    [follows from mu_B = F + P/n_B]",
+      "eps_tgt(n) = eps_src(n) + n * dmcr  [Q7 derived from shifted Q6]",
+      "P_tgt(n) = P_src(n)                 [Q1 unchanged]",
+      "n_B grid unchanged",
+      "mu_Q,tgt = mu_Q,src                  [gauge INVARIANT: a uniform shift of both m_n and m_p cancels in mu_n - mu_p; the code rescales Q4_tgt = Q4_src * m_src/m_tgt which exactly preserves mu_Q]"
+    ],
+    "what_it_is": "A change of the rest-mass GAUGE in which the crust barotrope is tabulated. It re-expresses the SAME physical crust model in the core's neutron-mass gauge.",
+    "what_it_is_NOT": "It is NOT a physical rest-energy correction. It does not convert a uniform-mass RMF convention into the physical (m_n, m_p) split convention. That conversion requires species-resolved composition (delta eps = delta m_n n_n + delta m_p n_p + binding convention terms) and is BLOCKED for all 13 crusts (no per-nucleus eos.composition; see B2).",
+    "invariants_preserved": [
+      "P(n_B) exactly (Q1 copied)",
+      "dF/dln(n_B) = P/n_B exactly (shift is additive in F)",
+      "mu_B = F + P/n_B identity exactly on retained crust rows (output Q3 is RE-DERIVED as (F+Q1)/m_n, which also repairs the provider's Euler residual: max 8.2e-2 MeV for GPPVA_DD2, 8.5e-2 DDME2, 3.1e-3 TM1e, 1.3e-3 SPG)",
+      "mu_Q exactly (invariant under uniform shift)",
+      "thermodynamic stability and cs2 source values (shift cancels in dP/deps to machine precision: dP unchanged, d(eps+n dmcr)/dn = deps/dn + dmcr, and mu = F+P/n shifts consistently)"
+    ],
+    "inverse_transformation": [
+      "F_src = F_tgt - dmcr",
+      "mu_B,src = mu_B,tgt - dmcr",
+      "eps_src = eps_tgt - n * dmcr",
+      "exact (floating-point) round trip; verified by regression test"
+    ],
+    "residual_cost": "The matched output is a THERMO-ONLY barotrope. Its crust-side mu_Q is in the crust provider's uniform convention (missing the physical 1.29333 MeV n-p splitting) while the header records the core's physical (m_n, m_p). This is a documented representation limitation, NOT a thermodynamic inconsistency; the output must not be used for charge-composition physics.",
+    "forbidden_cases": [
+      "composition-bearing inputs WITHOUT drop_composition=true: rejected (existing gate at compose_eos_matching.f90:602-604)",
+      "physical split-mass correction without per-nucleus composition: NOT IMPLEMENTED, must remain BLOCKED (B2)",
+      "Maxwell pairwise construction across differing (m_n,m_p): rejected by the 1e-12 exact gate at compose_eos_phase_transition.f90:663-665; this gate is PRESERVED unchanged"
+    ]
+  },
+  "implementation_changes_this_phase": {
+    "fortran": [
+      "compose_eos_matching.f90: expose dmcr and the max source Euler residual in the match report (new report fields dm_mass_gauge_meV and source_euler_residual_meV; additive, no behavior change to the six bridge methods)",
+      "compose_eos_phase_transition.f90: NO change to the 1e-12 pairwise mass gate (preserved verbatim)"
+    ],
+    "python": [
+      "api.py match_core: surface dm_mass_gauge_meV and source_euler_residual_meV from the native payload into info dict"
+    ],
+    "tests": "python_frontend/tests/test_mass_normalization_contract.py (14 cases per mission section 4.6)"
+  },
+  "acceptance": {
+    "maxwell_mass_gate": "PRESERVED verbatim (1e-12 relative, neutron and proton checked independently)",
+    "gate_weakening": "NONE (no tolerance was widened to make any pair pass)",
+    "tests_file": "python_frontend/tests/test_mass_normalization_contract.py"
+  }
+}

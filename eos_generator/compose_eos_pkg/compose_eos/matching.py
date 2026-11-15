@@ -1,10 +1,12 @@
 """Core--crust matching for cold, one-dimensional CompOSE barotropes.
 
-The module constructs smooth single-valued bridges in either the canonical
-F_b(n_b) or grand-canonical P(mu_b) representation. The historical method token
-``maxwell`` is retained for API compatibility, but currently denotes a smooth
-near-pressure-plateau bridge: it does NOT construct an exact Maxwell coexistence
-point, latent-heat density jump, or a Seidov-applicable first-order transition.
+The module constructs only smooth, single-valued core--crust bridges. The former
+historical ``maxwell`` NPPHB kernel is now identified by the thermodynamic method
+token ``first_law_constrained_hermite_pressure_bridge``: a Hermite pressure
+profile whose integral enforces the cold first-law endpoint constraint. It has
+continuous density and is NOT a Maxwell coexistence construction. The physical
+sharp one-charge Maxwell method is separately identified by the token ``maxwell``
+and implemented through the phase-transition API, not this smooth matcher.
 The other methods are interpolation regularity choices, not phase-transition
 orders. ``find_convex_transition_window`` is a candidate-screening heuristic;
 all completed EOS tables must pass independent consistency and causality gates.
@@ -32,6 +34,7 @@ from scipy.optimize import brentq
 from .eos_data import EOSData
 from .consistency import check_consistency
 
+
 HBARC = 197.3269804
 ME = 0.51099895
 MMU = 105.6583755
@@ -39,7 +42,10 @@ R_SCHW_SUN = 1.4766250385079258
 CONV_MEV_FM3 = 8.96526390e-7
 FOUR_PI = 4.0 * np.pi
 
-METHODS = ("maxwell", "css", "cubic_F", "cubic_P", "quintic_F", "quintic_P")
+FIRST_LAW_HERMITE_PRESSURE_BRIDGE = "first_law_constrained_hermite_pressure_bridge"
+MAXWELL_METHOD_ID = "maxwell"
+SMOOTH_METHODS = (FIRST_LAW_HERMITE_PRESSURE_BRIDGE, "css", "cubic_F", "cubic_P", "quintic_F", "quintic_P")
+METHODS = SMOOTH_METHODS
 
 CRUST_NAMES = (
     "SPG_M1", "SPG_M2", "SPG_M3", "SPG_M4", "SPG_M5",
@@ -273,7 +279,7 @@ def build_monotone_hermite_bridge(
     )
 
 
-def build_maxwell_plateau_bridge(
+def build_first_law_constrained_hermite_pressure_bridge(
     x1: float,
     x2: float,
     P1: float,
@@ -292,7 +298,8 @@ def build_maxwell_plateau_bridge(
     3 percent of the endpoint pressure difference. There is no density jump,
     latent-heat discontinuity, or exact equal-pressure coexistence construction.
     The integrated first-law condition is enforced for the smooth barotrope.
-    The public ``maxwell`` method token is retained only for compatibility.
+    This project-defined smooth kernel is not a Maxwell transition. Its public
+    method identity is first_law_constrained_hermite_pressure_bridge.
     """
     Dx = x2 - x1
     x_br = x1 + u_grid * Dx
@@ -468,6 +475,11 @@ def match_crust_core(
         remains absent in the matched table. ``literature_beta_eq`` is an explicit
         opt-in parabolic-symmetry-energy approximation for APR_APR/BBB_BHF2 only.
     """
+    if method == MAXWELL_METHOD_ID:
+        raise ValueError(
+            "method='maxwell' is the sharp first-order local-neutrality transition; "
+            "use build_maxwell_eos from the phase-transition API, not the smooth core-crust matcher"
+        )
     if method not in METHODS:
         raise ValueError(f"Unknown matching method {method!r}; choose from {METHODS}")
     if core_compo_mode not in ("literature_beta_eq", "strict_thermo_only"):
@@ -505,8 +517,8 @@ def match_crust_core(
     u_grid = np.linspace(0.0, 1.0, n_bridge + 2)[1:-1]
     extra_meta: Dict[str, object] = {}
 
-    if method == "maxwell":
-        nb_br, P_br, F_br, mu_br, Q1_br, cs2_br, Pt_sol, cs2_left_br, cs2_right_br = build_maxwell_plateau_bridge(
+    if method == FIRST_LAW_HERMITE_PRESSURE_BRIDGE:
+        nb_br, P_br, F_br, mu_br, Q1_br, cs2_br, Pt_sol, cs2_left_br, cs2_right_br = build_first_law_constrained_hermite_pressure_bridge(
             x1, x2, P1, P2, F1, F2, mu1, mu2, cs2_1, cs2_2, u_grid
         )
         extra_meta["P_plateau_reference"] = Pt_sol
@@ -735,7 +747,7 @@ def match_crust_core(
     # Seidov's criterion is therefore not applicable to these constructions.
     seidov_ratio = None
     regularity_class = {
-        "maxwell": "smooth_near_pressure_plateau_no_phase_jump",
+        FIRST_LAW_HERMITE_PRESSURE_BRIDGE: "smooth_near_pressure_plateau_no_phase_jump",
         "css": "piecewise_constant_sound_speed_continuous_barotrope",
         "cubic_F": "cubic_free_energy_bridge",
         "cubic_P": "cubic_pressure_chemical_potential_bridge",
@@ -962,13 +974,16 @@ def solve_star_at_target_mass(
 
 __all__ = [
     "METHODS",
+    "SMOOTH_METHODS",
+    "FIRST_LAW_HERMITE_PRESSURE_BRIDGE",
+    "MAXWELL_METHOD_ID",
     "CRUST_NAMES",
     "CORE_NAMES",
     "get_core_start_index",
     "get_gauge_shifts",
     "find_convex_transition_window",
     "build_monotone_hermite_bridge",
-    "build_maxwell_plateau_bridge",
+    "build_first_law_constrained_hermite_pressure_bridge",
     "match_crust_core",
     "solve_star_3stage",
     "solve_star_at_target_mass",

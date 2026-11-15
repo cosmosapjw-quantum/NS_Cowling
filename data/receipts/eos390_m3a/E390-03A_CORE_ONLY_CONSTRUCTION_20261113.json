@@ -1,0 +1,247 @@
+{
+  "schema": "ns-cowling.dag-node-receipt",
+  "schema_version": "1.0.0",
+  "receipt_id": "E390-03A-CORE-ONLY-CONSTRUCTION-20261113",
+  "node_id": "E390-03A",
+  "gate": "M3A",
+  "title": "Native Fortran standalone core-only EOS construction",
+  "status": "CORE_ONLY_CONSTRUCTION_CI_PASS_PHYSICAL_DIAGNOSTICS_PARTIAL_FAIL",
+  "date": "2026-11-13",
+  "repository": "cosmosapjw-quantum/NS_Cowling",
+  "branch": "cloud/eos390-fortran-unification-v1",
+  "implementation_head_commit": "1dbd3c16ce81577f4eda60d073300d1731d837e7",
+  "backup_branch": "backup/e390-03a-close-pre-20261113",
+  "source_adjudication_receipt": "data/receipts/eos390_m1c/E390-01C_SOURCE_BOUNDARY_PHASE_ADJUDICATION_20261113.json",
+  "source_adjudication_receipt_blob": "c3492ac2260d904184dfd2cd1cedbf74cb6c2a84",
+  "dependency_nodes": {
+    "E390-01C": "SOURCE_ADJUDICATION_COMPLETE_WITH_TW_BLOCKED",
+    "E390-02A": "IMPLEMENTED_CI_PASS",
+    "E390-10A": "IMPLEMENTED_CI_PASS"
+  },
+  "production_artifact": {
+    "workflow": "Fortran EOS frontend CI",
+    "push_run_id": 43442487415,
+    "push_run_number": 445,
+    "push_run_url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43442487415",
+    "pull_request_run_id": 43442506878,
+    "pull_request_run_number": 446,
+    "pull_request_run_url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43442506878",
+    "artifact_id": 14045374660,
+    "artifact_name": "E390-03A-core-only-1dbd3c16ce81577f4eda60d073300d1731d837e7",
+    "artifact_url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43442487415/artifacts/14045374660",
+    "artifact_bytes": 57270,
+    "artifact_sha256": "e999734e36a255bb03cb4ddb02ea93855d2c086e37d9245348f9e0e2cd0b3e1c",
+    "independently_downloaded_sha256": "e999734e36a255bb03cb4ddb02ea93855d2c086e37d9245348f9e0e2cd0b3e1c",
+    "zip_member_count": 29,
+    "uncompressed_bytes": 285336,
+    "root_manifest": "core_only_manifest.v1.json",
+    "root_manifest_status": "ALL_REQUESTED_COMPONENTS_CONSTRUCTED_AND_NATIVE_READBACK_VERIFIED",
+    "artifact_retention_days": 30
+  },
+  "ci_verification": {
+    "exact_head_commit": "1dbd3c16ce81577f4eda60d073300d1731d837e7",
+    "push_ci": "PASS",
+    "pull_request_ci": "PASS",
+    "fortran_native_build": "PASS",
+    "python_frontend_and_pipeline_tests": "133 passed, 3 skipped",
+    "admitted_core_only_builder": "PASS",
+    "native_readback_all_five_models": "PASS",
+    "native_polynomial_extrema_tests": "PASS",
+    "native_css_segment_analytic_tests": "PASS",
+    "sha256_manifest": "PASS (103 entries)",
+    "source_snapshot_packaging": "PASS",
+    "source_snapshot_upload": "PASS",
+    "component_artifact_upload": "PASS"
+  },
+  "construction_contract": {
+    "source_row_index_convention": "1-based eos.nb data-row position",
+    "source_selection": "E390-01C exact model-adjudicated source row ranges; no density-threshold-only fallback",
+    "projection": "strict exact row projection; no interpolation, extrapolation, smoothing, re-normalization, composition repair or phase remapping",
+    "preserved": "nB, Q1-Q7, Q-extra, Iphase, all row composition values/presence masks, C3/C4 masks, source density row labels, T/Yq grid values and source index bounds",
+    "composition": "composition_file_present is independent of slice-local composition_available; composition_available and beta_equilibrated are recomputed on the selected core slice",
+    "unsupported": "absent source composition remains absent; APR_APR and BBB_BHF2 retain composition unavailable",
+    "implementation": "native Fortran row selection, CompOSE serialization and CompOSE readback; Python performs source identity admission, orchestration, parity checks and receipts"
+  },
+  "models": [
+    {
+      "model": "APR_APR",
+      "source_rows": [
+        70,
+        172
+      ],
+      "source_n": 172,
+      "output_n": 103,
+      "inb_start": 70,
+      "nb_fm3": [
+        0.085,
+        1.34
+      ],
+      "expected_iphase": null,
+      "source_eos_nb_git_blob_sha1": "bca7ab3da8bf11ef13cde8ba8454c2bc0d616b4f",
+      "composition_file_present": false,
+      "composition_available": false,
+      "nadd": 0,
+      "physical_validation": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C10"
+        ]
+      },
+      "output_file_sha256": {
+        "eos.nb": "23b5c255de67bd36317068749216e8eb771bc6f5519be2bdf0c7195783690c60",
+        "eos.t": "de64c2d60122ff59fba321386dac7c6d1a1c61b3eca81044899d0218ce6b286b",
+        "eos.thermo": "f526ec41a7cb8038c7320638ca092e21e7432f0c041d9500015609d2734f6c78",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+      }
+    },
+    {
+      "model": "BBB_BHF2",
+      "source_rows": [
+        70,
+        84
+      ],
+      "source_n": 84,
+      "output_n": 15,
+      "inb_start": 70,
+      "nb_fm3": [
+        0.16,
+        1.5
+      ],
+      "expected_iphase": null,
+      "source_eos_nb_git_blob_sha1": "60725116001613f77384bf97e7cc4889af59145d",
+      "composition_file_present": false,
+      "composition_available": false,
+      "nadd": 0,
+      "physical_validation": {
+        "status": "PASS",
+        "failed_checks": []
+      },
+      "output_file_sha256": {
+        "eos.nb": "5035cdf8c4fa4d0efe96fc904e253f9970fd1174ba1165e76964ba6221cbe54f",
+        "eos.t": "de64c2d60122ff59fba321386dac7c6d1a1c61b3eca81044899d0218ce6b286b",
+        "eos.thermo": "08d7b203822c317840f463828e75d5103984973f57863360dfaeac805675ebd7",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+      }
+    },
+    {
+      "model": "GM_GM1",
+      "source_rows": [
+        49,
+        349
+      ],
+      "source_n": 349,
+      "output_n": 301,
+      "inb_start": 49,
+      "nb_fm3": [
+        0.048,
+        1
+      ],
+      "expected_iphase": 3,
+      "source_eos_nb_git_blob_sha1": "ca4454a9018e78dd24224faeac48c18138634503",
+      "source_eos_compo_git_blob_sha1": null,
+      "composition_file_present": true,
+      "composition_available": true,
+      "nadd": 0,
+      "physical_validation": {
+        "status": "PASS",
+        "failed_checks": []
+      },
+      "output_file_sha256": {
+        "eos.compo": "77cfba9f168d8560b61ea4996b119c317b0a352c221e8558f32b36bfc6682ae2",
+        "eos.nb": "04009b0c0706926c04602b74c5e20f7ebba3501b7c8b8dfd069a4ab3c69f9eed",
+        "eos.t": "de64c2d60122ff59fba321386dac7c6d1a1c61b3eca81044899d0218ce6b286b",
+        "eos.thermo": "b8ac17d4af0f6bf29cf182044d866a147c36299d920682d870c1d4192150c8df",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+      }
+    },
+    {
+      "model": "RG_KDE0v1",
+      "source_rows": [
+        967,
+        1240
+      ],
+      "source_n": 1240,
+      "output_n": 274,
+      "inb_start": 967,
+      "nb_fm3": [
+        0.04582369,
+        1.791349
+      ],
+      "expected_iphase": 3,
+      "source_eos_nb_git_blob_sha1": "0af6fbac0213f60d640715674aa33601747d920f",
+      "source_eos_compo_git_blob_sha1": "72521dbd1d47e9cba4e1201003c3a0a2f93199e7",
+      "composition_file_present": true,
+      "composition_available": true,
+      "nadd": 1,
+      "physical_validation": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C2",
+          "C10"
+        ]
+      },
+      "output_file_sha256": {
+        "eos.compo": "2ca441b811a1342f7214aacaf531e1b3401e6279bd9c7af487edcd7e147d242d",
+        "eos.nb": "b6758bc548cf63f45414840faa20b77f029db814f0ac0c4e2d5a4b3949edebba",
+        "eos.t": "de64c2d60122ff59fba321386dac7c6d1a1c61b3eca81044899d0218ce6b286b",
+        "eos.thermo": "0445af7ec391c30557b3772d55819c4f24ebcbb72988b4914706f5dc387bd56e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+      }
+    },
+    {
+      "model": "RG_SLY4",
+      "source_rows": [
+        144,
+        197
+      ],
+      "source_n": 197,
+      "output_n": 54,
+      "inb_start": 144,
+      "nb_fm3": [
+        0.05248075,
+        1.21
+      ],
+      "expected_iphase": 3,
+      "source_eos_nb_git_blob_sha1": "b3e1aa85c0f8e64930b04e67fd86016b64fdccc4",
+      "source_eos_compo_git_blob_sha1": "1b6695d79c29e29d359fbd02d1b870c11cfd1e19",
+      "composition_file_present": true,
+      "composition_available": true,
+      "nadd": 1,
+      "physical_validation": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C2"
+        ]
+      },
+      "output_file_sha256": {
+        "eos.compo": "1048e03de720c15c41f524f336027df2d96e7c4bf88d9a7738427f092377633b",
+        "eos.nb": "56f9e2c4d3a4b9ef49fd64c0259937caa35cf1c62421370b51025d1954361e87",
+        "eos.t": "de64c2d60122ff59fba321386dac7c6d1a1c61b3eca81044899d0218ce6b286b",
+        "eos.thermo": "1d199b2299a6323f0c59ca50b2b2ef1b454c145910d618d84d27a3456bd2504b",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+      }
+    }
+  ],
+  "acceptance_verification": {
+    "source_identity_all_five": "PASS",
+    "only_source_admitted_homogeneous_core_rows": "PASS",
+    "no_preattached_crust_or_cluster_rows": "PASS",
+    "no_interpolation_or_extrapolation": "PASS",
+    "thermo_Q1_Q7_and_Qextra_row_projection": "PASS",
+    "composition_presence_masks_Iphase_C3_C4": "PASS",
+    "original_density_row_keys": "PASS",
+    "T_Yq_values_and_index_bounds": "PASS",
+    "native_fortran_compose_write_readback": "PASS (5/5)",
+    "output_sha256_per_file_and_archive_sha256": "PASS",
+    "physical_validation": "PARTIAL: BBB_BHF2 and GM_GM1 PASS; APR_APR C10 FAIL; RG_KDE0v1 C2/C10 FAIL; RG_SLY4 C2 FAIL"
+  },
+  "downstream_blockers": [
+    "Do not admit APR_APR, RG_KDE0v1 or RG_SLY4 into any matched-EOS/TOV/Cowling production cohort until their recorded C10/C2 physical diagnostics are investigated and resolved or explicitly adjudicated.",
+    "The core-only construction node does not certify EOS physical admissibility; it certifies source-faithful component extraction and native CompOSE round-trip only.",
+    "No crust-only EOS was constructed and no core-crust matching method was executed in this node.",
+    "GPPVA_TW remains blocked for crust-only admission by the E390-01C official BPS-versus-BSk22 provider conflict."
+  ],
+  "next_node": "E390-03B",
+  "next_node_title": "Implement native Fortran standalone crust-only EOS constructor",
+  "next_node_scope": "Construct the 12 admitted crust inputs with exact source-supported outer-crust, neutron-drip and inner-crust/cluster/pasta coverage. Keep GPPVA_TW fail-closed. Do not execute matching methods until both component cohorts are admitted and their validation gates are explicit."
+}

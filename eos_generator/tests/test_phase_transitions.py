@@ -253,3 +253,38 @@ def test_maxwell_readback_rejects_off_transition_pressure_corruption(tmp_path):
 
     with pytest.raises(ValueError, match="pressure reconstruction"):
         read_maxwell_eos(str(tmp_path))
+
+
+def _gibbs_pressure_surfaces_with_narrow_contact(contact_mode):
+    mb = np.linspace(200.0, 210.0, 9)
+    mq = np.linspace(-120.0, -80.0, 81)
+    M, Q = np.meshgrid(mb, mq, indexing="ij")
+    base = 2.0*(M-200.0) + 0.01*(M-205.0)**2 + 0.01*(Q+100.0)**2 + 100.0
+    q0 = -100.123
+    if contact_mode == "two_close_roots":
+        delta = (Q-q0)**2 - 1.0e-6
+    elif contact_mode == "tangential":
+        delta = (Q-q0)**2
+    else:
+        raise AssertionError(contact_mode)
+    hadronic = ChargeResolvedPhase(mb, mq, base+delta, "hadronic")
+    high = ChargeResolvedPhase(mb, mq, base, "high-density")
+    return hadronic, high
+
+
+def test_gibbs_detects_two_pressure_roots_narrower_than_fixed_scan_spacing():
+    hadronic, high = _gibbs_pressure_surfaces_with_narrow_contact("two_close_roots")
+    leptons = LeptonSector(lambda mu_q: 0.0, lambda mu_q: 0.0, "zero lepton sector")
+    with pytest.raises(ValueError, match="pressure equality has 2 roots"):
+        gibbs_mixed_phase(
+            hadronic, high, np.linspace(204.0, 206.0, 4), lepton_sector=leptons
+        )
+
+
+def test_gibbs_detects_tangential_pressure_equality_contact():
+    hadronic, high = _gibbs_pressure_surfaces_with_narrow_contact("tangential")
+    leptons = LeptonSector(lambda mu_q: 0.0, lambda mu_q: 0.0, "zero lepton sector")
+    with pytest.raises(ValueError, match="phase charge densities are indistinguishable"):
+        gibbs_mixed_phase(
+            hadronic, high, np.linspace(204.0, 206.0, 4), lepton_sector=leptons
+        )

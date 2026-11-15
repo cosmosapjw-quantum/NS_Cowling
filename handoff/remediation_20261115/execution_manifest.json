@@ -52,7 +52,7 @@
       "historical_artifact": "2026-11-14 two-segment smooth CSS output remains immutable historical evidence"
     }
   },
-  "patch_state": "CSS_SINGLE_SPEED_CRUST_JUMP_PATCHED_CI_PENDING",
+  "patch_state": "CSS_SINGLE_SPEED_CRUST_JUMP_PATCHED_EXACT_HEAD_CI_RUNNING",
   "red_green_evidence": {
     "tests_committed_before_implementation": true,
     "red_failure_observed_in_host_session": false,
@@ -244,7 +244,7 @@
     {
       "id": "M7-CSS-01",
       "priority": "P2",
-      "status": "PATCHED_SINGLE_SPEED_JUMP_CI_PENDING",
+      "status": "PATCHED_EXACT_HEAD_CI_RUNNING",
       "title": "Use one constant CSS sound speed with a crust-side first-order jump and continuous core join",
       "acceptance": [
         "exactly one constant cs2 across all CSS bridge samples",
@@ -468,9 +468,34 @@
     },
     "important_interpretation": "Workflow success means build, tests and artifact-construction steps succeeded. It does not mean every generated component EOS passed physical validation; preserve the per-model C2/C10 results above.",
     "css_change": {
-      "status": "PENDING",
-      "reason": "All single-speed CSS implementation and handoff changes were added after the last successful CI run 43676024772.",
-      "required": "A fresh workflow run must complete with head_sha equal to the final branch HEAD."
+      "status": "PATCHED_CI_RUNNING",
+      "failed_attempt": {
+        "run_id": 43677499924,
+        "head_sha": "4d95ee6a3f7a52b3a3c75d5d58c87e1d128136b5",
+        "fortran_build": "PASS",
+        "pytest": {
+          "passed": 248,
+          "skipped": 9,
+          "failed": 15
+        },
+        "root_causes": [
+          "CSS constructor incorrectly applied the endpoint consistency check to the production interior-only sample grid; this rejected a correct single-speed solution because its last sample is u=n_bridge/(n_bridge+1), not u=1.",
+          "The rewritten common matcher omitted report%composition_dropped, causing four existing smooth-method metadata assertions to fail.",
+          "SHA256SUMS_v4.txt entries for six modified code/docs files were stale; the workflow reported their exact mismatches."
+        ],
+        "correction_commits": [
+          "b07cf7e85606c2af924ac48f77d74bcb10e75f0a",
+          "5a97f5a722739f8a23a1fe38ab2e8cf1b6a55417",
+          "654bdc513b6f3c77f80d828898f81f213b12d02e"
+        ]
+      },
+      "current_attempt": {
+        "run_id": 43678164119,
+        "head_sha": "654bdc513b6f3c77f80d828898f81f213b12d02e",
+        "status": "in_progress",
+        "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43678164119"
+      },
+      "required_final_gate": "The workflow must complete with run head_sha equal to the final branch HEAD; any subsequent code/docs/hash update requires another run."
     }
   }
 }

@@ -215,7 +215,9 @@ def run_maxwell_task(crust_dir: str, core_dir: str, output_dir: str) -> dict:
 
 
 def run_css_task(crust_dir: str, core_dir: str, output_dir: str) -> dict:
-    """Run the CSS (constant-sound-speed) smooth matching via native match-core."""
+    """Run one-speed CSS with a sharp crust-side density jump and a continuous
+    high-density core join. The jump is reported with Maxwell/Seidov metadata;
+    the CSS sound speed is constant throughout the bridge."""
     return _native_pipeline("css", crust_dir, core_dir, output_dir)
 
 

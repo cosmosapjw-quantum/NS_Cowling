@@ -29,9 +29,13 @@
 
 ## Verification state
 
-**Not yet CI-verified.** The latest pre-remediation CI on the frozen source HEAD failed (259 passed, 9 skipped, 1 failed). This branch has not yet produced a GitHub Actions run at the time the package was assembled. The local execution container could not resolve `github.com`, so local clone/pytest execution was blocked. Do not infer PASS from the commits being present.
+**Verified CI run:** [run 43676024772](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43676024772), on code-patch HEAD `5d31b41eacf267cfae64e9d60a86a1715a774f14` (see authoritative SHA in `execution_manifest.json`). Fortran build passed; full frontend/direct-provider test command returned **263 passed, 9 skipped, 0 failed**; all workflow steps, including native Fortran unit tests and SHA-256 manifest check, completed successfully.
 
-The test additions were committed before the corresponding implementation changes, but the host could not observe a test-only RED run. The red-observation field is therefore `NOT_OBSERVED`, not PASS.
+The two Wigner-Seitz source-data tests and three Cowling E2E tests were skipped because their raw inputs were not staged. Also, some generated core/crust-only component EOS receipts explicitly report C2/C10 physical-validation failures, and GPPVA_TW remains blocked due a provider-source discrepancy. Thus workflow success is not a claim that every generated EOS is physically admissible.
+
+The local execution container could not resolve `github.com`, so local clone/pytest execution was blocked. Focused test-first additions were committed before implementation, but the host could not observe a test-only RED run; the red-observation status remains `NOT_OBSERVED`.
+
+A docs-only manifest/README update has now changed the PR head; a fresh CI run on that exact final HEAD is still required before declaring the final handoff snapshot CI-verified.
 
 ## Continue here
 

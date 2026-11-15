@@ -99,11 +99,132 @@
         "python_frontend/tests/test_apr_css_maxwell_audit.py"
       ],
       "purpose": "Bind test expectation to the measured derivative threshold instead of hard-coding a physical verdict."
+    },
+    {
+      "id": "CSS-TEST-FIRST",
+      "commit": "5ec4052cd9c93bf2df1d176e4ca739b568a75cf0",
+      "files": [
+        "python_frontend/tests/test_native_crust_core_matching.py"
+      ],
+      "purpose": "Pin one-speed CSS, crust-side density jump, exact jump identity and continuous core endpoint."
+    },
+    {
+      "id": "CSS-SINGLE-SPEED-PRIMITIVE",
+      "commit": "c1d0db43a877351f54bf61f129fd03607dc1fe13",
+      "files": [
+        "fortran_eos/src/compose_eos_matching.f90"
+      ],
+      "purpose": "Add analytic one-speed CSS pressure integral/root solver and replace two-speed CSS bridge equation."
+    },
+    {
+      "id": "CSS-WINDOW-GATE",
+      "commit": "eecf6f1e9ac94c816e5eb65e782ec36673e145c2",
+      "files": [
+        "fortran_eos/src/compose_eos_matching.f90"
+      ],
+      "purpose": "Only select CSS endpoints admitting a causal single-speed solution and positive crust-side jump."
+    },
+    {
+      "id": "CSS-JUMP-ASSEMBLY",
+      "commit": "991cf40a4747039703090111f5b141ef589db154",
+      "files": [
+        "fortran_eos/src/compose_eos_matching.f90"
+      ],
+      "purpose": "Assemble adjacent equal-P/equal-mu transition rows, CSS interior and continuous core rows; report indices and Seidov diagnostics."
+    },
+    {
+      "id": "CSS-NONCSS-ENDPOINT-RESTORE",
+      "commit": "6e0e4ff3b323610ef3b7c92c9ae25c84e638c3b0",
+      "files": [
+        "fortran_eos/src/compose_eos_matching.f90"
+      ],
+      "purpose": "Preserve non-CSS construction metadata and separate source endpoint speeds."
+    },
+    {
+      "id": "CSS-EULER-ENDPOINT",
+      "commit": "2bbb391cf2c35003074bf6cc7631ee9c46410c17",
+      "files": [
+        "fortran_eos/src/compose_eos_matching.f90"
+      ],
+      "purpose": "Use Euler-consistent F+P/n chemical potential at the core endpoint."
+    },
+    {
+      "id": "CSS-API-REPORT",
+      "commit": "bd7fb5b7a92dddfb310a9d2d20ac22f00c688b5b",
+      "files": [
+        "python_frontend/compose_eos/api.py"
+      ],
+      "purpose": "Expose first-order CSS transition and Seidov fields to Python."
+    },
+    {
+      "id": "CSS-CLI-REPORT",
+      "commit": "5061ce3e5f33dc1ac382701a1a3ce0e96059e906",
+      "files": [
+        "fortran_eos/app/compose_eos_fortran.f90"
+      ],
+      "purpose": "Emit CSS transition fields and row indices in native JSON."
+    },
+    {
+      "id": "CSS-TRANSITION-EPS",
+      "commit": "9596eaa6a718854cebd84a1374835625e0b8d4d5",
+      "files": [
+        "fortran_eos/src/compose_eos_matching.f90"
+      ],
+      "purpose": "Report the low/high energy densities on the two sides of the crust-side jump."
+    },
+    {
+      "id": "CSS-CLI-TRANSITION-EPS",
+      "commit": "ef4ed2f028aae252a2cc9983c8cee26ff91213ba",
+      "files": [
+        "fortran_eos/app/compose_eos_fortran.f90"
+      ],
+      "purpose": "Serialize low/high transition energy densities."
+    },
+    {
+      "id": "CSS-API-TRANSITION-EPS",
+      "commit": "48826c6b081581ded38d68b54fc08004a4413fce",
+      "files": [
+        "python_frontend/compose_eos/api.py"
+      ],
+      "purpose": "Expose explicit low/high transition energy densities without deriving from possibly absent fields."
+    },
+    {
+      "id": "CSS-M7-DOC-TEST",
+      "commit": "8601bbb59554ee06a2f5956677ed00d096a56860",
+      "files": [
+        "scripts/m7/m7_batch_orchestrator.py"
+      ],
+      "purpose": "Describe M7 CSS as a one-speed crust-jump bridge."
+    },
+    {
+      "id": "CSS-REGRESSION-DETAIL",
+      "commit": "cdf0f1c94d75eb21bb4ea522f2a8441ac9b7766b",
+      "files": [
+        "python_frontend/tests/test_native_crust_core_matching.py"
+      ],
+      "purpose": "Assert transition-side epsilon and Seidov report values."
+    },
+    {
+      "id": "CSS-SCIENCE-GUIDE",
+      "commit": "bffb5e271a5acd965515f727d7497ad68887e4a3",
+      "files": [
+        "docs/NS_COWLING_PHYSICS_AND_CODE_GUIDE_V4.md"
+      ],
+      "purpose": "Document the one-speed CSS plus crust-side first-order jump architecture and literature alternatives."
+    },
+    {
+      "id": "CSS-CONTRACT-DOC",
+      "commit": "577ab265d4b346434ff95cc7b5242259806e1d7c",
+      "files": [
+        "docs/CSS_SINGLE_SPEED_CRUST_JUMP_CONTRACT_20261115.md"
+      ],
+      "purpose": "Derivation, evidence scope, numerical example and explicit verification plan."
     }
   ],
   "verification": {
     "tests_executed_on_this_branch": false,
     "ci_executed_on_this_branch": false,
-    "reason": "Local container cannot resolve github.com and branch workflow has not yet been triggered by a PR."
+    "reason": "Latest previous successful workflow predates the new CSS branch behavior; exact final HEAD must be rebuilt and tested.",
+    "ci_executed_on_css_head": false
   }
 }

@@ -38,15 +38,72 @@ def test_v2_smooth_manifest_retains_390_keys_with_renamed_legacy_method():
 
 
 def test_python_oracle_and_placeholder_methods_are_blocked():
-    with pytest.raises(m7.BackendUnavailable, match="native Fortran"):
-        m7.run_first_law_constrained_hermite_pressure_bridge_task("crust", "core", "out")
+    """§8: a placeholder/missing input directory rejects BEFORE native file
+    I/O (FileNotFoundError with a useful path message), and an unavailable
+    METHOD rejects with BackendUnavailable('native Fortran'). The two paths
+    are distinct: a missing path is a path error, not a backend-unavailability
+    error, so production callers get useful path errors without turning
+    placeholder methods into false native attempts."""
+    import tempfile
+    from pathlib import Path
+    # (a) placeholder/missing input dir -> FileNotFoundError BEFORE native I/O
+    #     (the old behavior invoked Fortran read on 'crust/eos.nb' before
+    #     raising; now it rejects at the pre-flight)
+    with pytest.raises(FileNotFoundError, match="crust input directory"):
+        m7.run_css_task("crust", "core", "out")
+    # crust exists (with required files) but core is missing -> core error
+    import tempfile
+    from pathlib import Path
+    with tempfile.TemporaryDirectory() as td:
+        crust = Path(td) / "crust"; crust.mkdir()
+        (crust / "eos.nb").write_text("x"); (crust / "eos.thermo").write_text("x")
+        with pytest.raises(FileNotFoundError, match="core input directory"):
+            m7.run_smooth_task("cubic_F", str(crust), "core", "out")
+    # (b) unavailable METHOD -> BackendUnavailable('native Fortran')
     with pytest.raises(m7.BackendUnavailable, match="native Fortran"):
         m7.run_maxwell_task("crust", "core", "out")
-    with pytest.raises(m7.BackendUnavailable, match="native Fortran"):
-        m7.run_css_task("crust", "core", "out")
-    for method in ("cubic_F", "cubic_P", "quintic_F", "quintic_P"):
+    # (c) valid input dir + unavailable METHOD -> BackendUnavailable BEFORE native I/O
+    #     (run_maxwell_task raises immediately, regardless of dir validity)
+    with tempfile.TemporaryDirectory() as td:
+        crust = Path(td) / "crust"; crust.mkdir()
+        (crust / "eos.nb").write_text("dummy")
+        (crust / "eos.thermo").write_text("dummy")
+        core = Path(td) / "core"; core.mkdir()
+        (core / "eos.nb").write_text("dummy")
+        (core / "eos.thermo").write_text("dummy")
         with pytest.raises(m7.BackendUnavailable, match="native Fortran"):
-            m7.run_smooth_task(method, "crust", "core", "out")
+            m7.run_maxwell_task(str(crust), str(core), "out")
+
+
+def test_m7_preflight_rejects_missing_dir_before_native_io():
+    """§8: a missing input directory is rejected at the pre-flight, before the
+    native Fortran read is invoked. This is verified by checking that no
+    'internal' subdirectory is created in the output dir (the native pipeline
+    creates it only after the pre-flight passes)."""
+    import tempfile
+    from pathlib import Path
+    with tempfile.TemporaryDirectory() as td:
+        out = Path(td) / "out"
+        # crust dir is missing entirely
+        with pytest.raises(FileNotFoundError, match="crust input directory does not exist"):
+            m7.run_css_task(str(Path(td) / "nonexistent"), str(Path(td) / "core"), str(out))
+        # the pre-flight must have raised before _native_pipeline created any
+        # internal subdirectories (the native pipeline only runs after pre-flight)
+        assert not out.exists() or not (out / "internal").exists()
+
+
+def test_m7_preflight_rejects_dir_missing_compose_files():
+    """§8: an existing directory that lacks eos.nb/eos.thermo is rejected with
+    a clear message naming the missing file."""
+    import tempfile
+    from pathlib import Path
+    with tempfile.TemporaryDirectory() as td:
+        crust = Path(td) / "crust"; crust.mkdir()  # exists but no eos.nb
+        core = Path(td) / "core"; core.mkdir()
+        (core / "eos.nb").write_text("dummy")
+        (core / "eos.thermo").write_text("dummy")
+        with pytest.raises(FileNotFoundError, match="eos.nb"):
+            m7.run_css_task(str(crust), str(core), str(Path(td) / "out"))
 
 def test_run_task_does_not_promote_python_results_to_pass(tmp_path, monkeypatch):
     crust = tmp_path / "crust"

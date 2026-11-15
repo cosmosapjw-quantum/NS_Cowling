@@ -1,0 +1,50 @@
+{
+  "git_head": "44c3b4656a53a585581501352f0b5a9b5e4a3244",
+  "artifact": "/home/z/my-project/repos/NS_Cowling_eos390/eos_generator/docs/APR_CSS_MAXWELL_VALIDATION_v3_3.json",
+  "source": "APR_APR",
+  "1_differential_first_law_n_equals_dPdmu": {
+    "apr_source_residual_relative": 0.8101725078551861,
+    "css_high_branch_residual_relative": 6.695243357822717e-08,
+    "apr_source_differential_first_law_holds": false,
+    "css_high_branch_differential_first_law_holds": true,
+    "note": "Independent PCHIP interpolants of P(mu) and n(mu) do NOT guarantee n=dP/dmu. The residual measures the violation. The APR source is a thermodynamic table so it should hold to finite-difference precision; the CSS high branch holds by construction (analytic formula)."
+  },
+  "2_phenomenological_declaration": {
+    "present": true,
+    "interpretation_text": "Phenomenological CSS high-density phase. Its transition pressure, energy jump and sound speed are model parameters, not a microscopic quark-matter calculation.",
+    "high_phase_model": "constant_sound_speed",
+    "is_microscopic_quark_matter_eos": false
+  },
+  "3_seidov_scope": {
+    "critical_delta_eps_MeV_fm3": 495.89979303307126,
+    "delta_eps_over_critical": 0.2419843720160716,
+    "small_core_stable": true,
+    "scope": "Seidov small-core onset criterion only; not a full radial-mode stability calculation"
+  },
+  "4_representative_example": {
+    "common_Pt_mu_t": true,
+    "positive_density_jump": true,
+    "positive_energy_jump": true,
+    "first_law_jump_identity": true,
+    "first_law_jump_residual": 8.526512829121202e-14,
+    "high_side_cs2": 0.75,
+    "high_side_cs2_causal": true,
+    "phase_ids": {
+      "phase1_rows": 136,
+      "phase2_rows": 201,
+      "transition_row_index": 135
+    },
+    "tov_converged": true,
+    "tov_mass_Msun": 1.9692546803561561,
+    "tov_radius_km": 9.755065234742817,
+    "tov_Lambda": 5.227171557412265
+  },
+  "5_roundtrip_gate": {
+    "status": "PASS",
+    "pass_": true,
+    "failed_checks": [],
+    "finite_primary_arrays": true,
+    "note": "C7-C9/C11 are reported as finite-difference diagnostics, not standalone proofs"
+  },
+  "verdict": "ADMITTED_WITH_PHENOMENOLOGICAL_DECLARATION"
+}

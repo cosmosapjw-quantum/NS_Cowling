@@ -41,6 +41,26 @@ def sha256_file(path: str) -> str:
     return h.hexdigest()
 
 
+def _preflight_input_dir(path: str, label: str) -> None:
+    """§8 fail-closed pre-flight: validate an input CompOSE directory BEFORE
+    any native file I/O. Raises FileNotFoundError with a useful path message
+    if the directory or its eos.nb/eos.thermo files are missing, so production
+    callers get a clear error and a placeholder method never becomes a false
+    native attempt. Does NOT raise BackendUnavailable -- a missing input is a
+    path error, not a backend-unavailability error. An unavailable METHOD is
+    the separate BackendUnavailable path (see run_maxwell_task)."""
+    p = Path(path)
+    if not p.is_dir():
+        raise FileNotFoundError(
+            f"{label} input directory does not exist: {path!r} (expected a CompOSE "
+            f"directory containing eos.nb and eos.thermo)")
+    for required in ("eos.nb", "eos.thermo"):
+        if not (p / required).is_file():
+            raise FileNotFoundError(
+                f"{label} input directory {path!r} is missing the required "
+                f"CompOSE file {required!r}")
+
+
 def _native_pipeline(method: str, crust_dir: str, core_dir: str, output_dir: str) -> dict:
     """Run the native crust+core splice pipeline for one (crust, core, method) task.
 
@@ -76,6 +96,16 @@ def _native_pipeline(method: str, crust_dir: str, core_dir: str, output_dir: str
         except NativeExecutionError as exc:
             raise BackendUnavailable(
                 f"native Fortran {action!r} failed: {exc}") from exc
+
+    # §8 fail-closed pre-flight: validate the input directories BEFORE any
+    # directory creation or native file I/O. A placeholder/missing path raises
+    # FileNotFoundError with a useful path message so production callers get a
+    # clear error and no output directories are created; the native Fortran
+    # read is not invoked on a placeholder, so a placeholder method cannot
+    # become a false native attempt. An unavailable METHOD raises
+    # BackendUnavailable (see run_maxwell_task).
+    _preflight_input_dir(crust_dir, "crust")
+    _preflight_input_dir(core_dir, "core")
 
     out_internal = Path(output_dir) / "internal"
     out_compose = Path(output_dir) / "compose"

@@ -9,7 +9,18 @@ from pathlib import Path
 from typing import Any
 
 class NativeExecutionError(RuntimeError):
-    pass
+    """A Fortran backend operation failed.
+
+    Carries the structured `category` field emitted by the Fortran layer when
+    available (e.g. the maxwell-transition command emits a stable §3/§4
+    terminal-outcome identifier alongside the free-form message). This lets
+    callers branch on a stable status without parsing exception text.
+    """
+    def __init__(self, message: str, *, category: str | None = None,
+                 operation: str | None = None) -> None:
+        super().__init__(message)
+        self.category = category
+        self.operation = operation
 
 class NativeFeatureUnavailable(NotImplementedError):
     pass
@@ -69,13 +80,21 @@ def run_native(action: str, *args: str | os.PathLike[str]) -> dict[str, Any]:
                 break
         except json.JSONDecodeError:
             continue
+    # the structured category the Fortran layer attaches to structured failures
+    # (e.g. maxwell-transition). None when the Fortran layer did not emit one.
+    category = payload.get("category")
+    op = payload.get("operation", action)
     if completed.returncode:
         raise NativeExecutionError(
             f"Fortran operation {action!r} failed with exit code {completed.returncode}: "
-            f"{payload.get('message', completed.stderr.strip() or completed.stdout.strip())}"
+            f"{payload.get('message', completed.stderr.strip() or completed.stdout.strip())}",
+            category=category, operation=op,
         )
     if payload.get("status") == "error":
-        raise NativeExecutionError(str(payload.get("message", "unknown Fortran error")))
+        raise NativeExecutionError(
+            str(payload.get("message", "unknown Fortran error")),
+            category=category, operation=op,
+        )
     return payload
 
 

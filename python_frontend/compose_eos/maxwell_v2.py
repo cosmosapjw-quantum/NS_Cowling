@@ -38,6 +38,7 @@ REPO = Path("/home/z/my-project/repos/NS_Cowling_eos390")
 sys.path.insert(0, str(REPO / "python_frontend"))
 from compose_eos.api import construct_maxwell_transition, read_compose
 from compose_eos.eos_data import EOSData
+from compose_eos.native import NativeExecutionError
 
 
 @dataclass
@@ -205,20 +206,22 @@ def construct_maxwell_transition_v2(low: EOSData, high: EOSData,
             low_seg, high_seg,
             assume_local_charge_neutrality=assume_local_charge_neutrality,
             return_report=True)
+    except NativeExecutionError as e:
+        # Structured-status taxonomy (§3/§4). The Fortran layer emits a stable
+        # `category` field alongside the free-form message; the v2 layer
+        # consumes it directly instead of inferring a category from the
+        # exception text. This guarantees that the same underlying failure
+        # receives the same status in every transformation and every run, and
+        # removes the text-based category inference that previously produced
+        # inconsistent labels for identical Q5 beta-equilibrium failures.
+        cat = e.category or "INTERPOLATION_UNSTABLE"
+        # Map the §3/§4 Fortran category to the v2 report status. The category
+        # names are identical to the §3 terminal-outcome set.
+        report.status = cat
+        report.rejection_category = cat
+        raise RuntimeError(f"v2: v1 kernel rejected segment pair: {e}") from e
     except Exception as e:
-        msg = str(e).lower()
-        if "rest-mass" in msg:
-            report.status = "MASS_MISMATCH"; report.rejection_category = "MASS_MISMATCH"
-        elif "iphase" in msg or "smooth phase" in msg:
-            report.status = "INTERNAL_PHASE_BOUNDARY"; report.rejection_category = "INTERNAL_PHASE_BOUNDARY"
-        elif "not beta" in msg:
-            report.status = "NON_BETA_EQUILIBRATED"; report.rejection_category = "NON_BETA_EQUILIBRATED"
-        elif "no root" in msg or "no coexistence" in msg:
-            report.status = "NO_ROOT"; report.rejection_category = "NO_ROOT"
-        elif "not ordered" in msg or "density" in msg:
-            report.status = "NONPOSITIVE_DENSITY_JUMP"; report.rejection_category = "NONPOSITIVE_DENSITY_JUMP"
-        else:
-            report.status = "INTERPOLATION_UNSTABLE"; report.rejection_category = "INTERPOLATION_UNSTABLE"
+        report.status = "INTERPOLATION_UNSTABLE"; report.rejection_category = "INTERPOLATION_UNSTABLE"
         raise RuntimeError(f"v2: v1 kernel rejected segment pair: {e}") from e
 
     # success -- record coexistence with per-segment composition provenance

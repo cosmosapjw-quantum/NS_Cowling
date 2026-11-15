@@ -1,0 +1,83 @@
+{
+  "git_head": "44c3b4656a53a585581501352f0b5a9b5e4a3244",
+  "node": "E390-05A",
+  "subscope": "m5a_real_css_branch",
+  "audit_date": "2026-11-15",
+  "findings": [
+    {
+      "id": 1,
+      "finding": "script used check_consistency() from Python but recorded the result as native_c1_c11_overall_pass",
+      "correction": "renamed to python_consistency_check_pass; added native_c1_c11_verification=False (BLOCKED, not executed); verification_backend_truthful records the distinction",
+      "evidence": {
+        "python_consistency_check_pass": true,
+        "native_c1_c11_verification": false,
+        "verification_backend_truthful": {
+          "analytic_css_acceptance": true,
+          "python_consistency_check": true,
+          "native_fortran_compose_readback": false,
+          "native_c1_c11_verification": false
+        }
+      }
+    },
+    {
+      "id": 2,
+      "finding": "file GPPVA_DD2_m5a_real_css.json was generated from a BBB_BHF2 hadronic core (filename misidentified the source)",
+      "correction": "renamed to BBB_BHF2_m5a_real_css.json; misnamed file removed",
+      "evidence": {
+        "old_misnamed_file_removed": true,
+        "new_correctly_named_file_exists": true,
+        "output_barotrope_file": "BBB_BHF2_m5a_real_css.json"
+      }
+    },
+    {
+      "id": 3,
+      "finding": "temporary EOSData set mp = M_N*0.9938 = 933.74 MeV (not the source BBB_BHF2 proton mass)",
+      "correction": "replaced with the real BBB_BHF2 mp = 938.272 MeV",
+      "evidence": {
+        "real_mp_mev": 938.272,
+        "invented_mp_was_M_N_times_0_9938_mev": 933.740054768,
+        "diff_mev": -4.531945231999998
+      }
+    },
+    {
+      "id": 4,
+      "finding": "hadronic_core() first-law reset eps := mu*n - P changed the source energy density by an unrecorded amount",
+      "correction": "quantified: max relative change = 1.77e-8 over the BBB_BHF2 table",
+      "evidence": {
+        "first_law_reset_max_relative_change": 1.7729587202310605e-08
+      }
+    },
+    {
+      "id": 5,
+      "finding": "mu_t mismatch between interpolated source mu_B and mu_t=(eps_l+P_t)/n_l was not recorded",
+      "correction": "recorded per transition density (mu_t_mismatch_relative, P_interp_residual_relative, eps_interp_residual_relative)",
+      "evidence": {
+        "sample_nB0.4": {
+          "mu_t_mismatch_relative": 0.0,
+          "P_interp_residual_relative": 0.0,
+          "eps_interp_residual_relative": 0.0
+        }
+      }
+    },
+    {
+      "id": 6,
+      "finding": "Delta_eps=0 case was not explicitly classified; a zero jump alone could be misread as a crossover/2nd-order transition",
+      "correction": "explicit delta_eps_classification_explicit field: SHARP_FIRST_ORDER if Delta_eps>0 else CONTINUOUS_UNCLASSIFIED (zero jump alone is NOT a crossover/2nd-order inference)",
+      "evidence": {
+        "delta_eps_0_classification": "CONTINUOUS_UNCLASSIFIED",
+        "delta_eps_100_classification": "SHARP_FIRST_ORDER"
+      }
+    },
+    {
+      "id": 7,
+      "finding": "saved JSON contains only (n_B, mu_B, P, eps) but was implicitly treated as a CompOSE-generated EOS",
+      "correction": "explicitly declared: output_is_compose_generated_eos=False, output_is_barotrope_only=True; a CompOSE artifact requires the native I/O path",
+      "evidence": {
+        "output_is_compose_generated_eos": false,
+        "output_is_barotrope_only": true,
+        "native_fortran_compose_readback": false
+      }
+    }
+  ],
+  "summary": "All 7 M5A audit findings corrected. The receipt now truthfully reports the verification backend (analytic + Python, NOT native Fortran), uses the real BBB_BHF2 proton mass, quantifies the first-law reset, records the mu_t mismatch, explicitly classifies Delta_eps=0, and declares the output as a barotrope (not CompOSE)."
+}

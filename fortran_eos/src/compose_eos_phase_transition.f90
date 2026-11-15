@@ -4,7 +4,24 @@ module compose_eos_phase_transition
   implicit none
   private
   public :: maxwell_transition_report_t, construct_maxwell_transition
+  public :: maxwell_status_category
   character(len=*), parameter, public :: MAXWELL_METHOD_ID = 'maxwell'
+
+  ! Structured terminal-outcome identifiers for the Maxwell construction. The
+  ! v2 Python layer consumes this stable category directly instead of inferring
+  ! a category from free-form exception text. Each identifier is a fixed
+  ! constant; the mapping from a v1 kernel status string to a category is
+  ! implemented in maxwell_status_category and is independent of the model
+  ! name. The §3/§4 audit requires this so that the same underlying failure
+  ! receives the same status in every transformation and every run.
+  !
+  ! The category set (§3):
+  !   PASS, MASS_CONVENTION_FAIL, BETA_EQUILIBRIUM_FAIL,
+  !   SOURCE_TABLE_CONVEXITY_FAIL, INTERPOLANT_SHAPE_FAIL, CAUSALITY_FAIL,
+  !   NO_COMMON_MU_SUPPORT, NO_COEXISTENCE_CROSSING,
+  !   MULTIPLE_COEXISTENCE_CROSSINGS, NONPOSITIVE_DENSITY_JUMP,
+  !   FIRST_LAW_IDENTITY_FAIL, COMPOSITION_UNSUPPORTED, NO_COMMON_MU_SUPPORT
+  character(len=*), parameter, public :: MAXWELL_STATUS_UNKNOWN = 'UNKNOWN'
 
   ! Euler-relation tolerance for the provider Q3 chemical potential check
   ! (validate_phase, line ~242). max_euler = max over rows of
@@ -825,5 +842,119 @@ contains
     endif
     status='ok'
   end subroutine construct_maxwell_transition
+
+  pure function maxwell_status_category(status) result(category)
+    !! Map a v1 kernel status string to a stable structured terminal-outcome
+    !! identifier. The mapping is data-driven from the status string only; it
+    !! does NOT branch on the model name or on any caller-provided label. This
+    !! is the single source of truth for the §3/§4 structured-status taxonomy.
+    !!
+    !! Ordering rule: the FIRST matching clause wins. Clauses are ordered so
+    !! that the most specific physical category is matched before more generic
+    !! ones (e.g. a "low-density phase: ..." prefix must not hide the underlying
+    !! beta-equilibrium or convexity category).
+    !!
+    !! Returns MAXWELL_STATUS_UNKNOWN if no clause matches (the caller must
+    !! treat UNKNOWN as a rejection -- it never means PASS).
+    character(len=*), intent(in) :: status
+    character(len=40) :: category
+    character(len=len_trim(status)) :: s
+    s = trim(status)
+    ! strip the "low-density phase: " / "high-density phase: " prefixes so the
+    ! category reflects the underlying cause, not which phase failed.
+    if(index(s,'low-density phase: ')==1)  s = s(len('low-density phase: ')+1:)
+    if(index(s,'high-density phase: ')==1) s = s(len('high-density phase: ')+1:)
+
+    if(len_trim(s)==0 .or. trim(s)=='uninitialized') then
+      category = MAXWELL_STATUS_UNKNOWN; return
+    endif
+
+    ! composition / layout
+    if(index(s,'composition-bearing')==1 .or. index(s,'Nadd')>0 .or. &
+       index(s,'composition')>0) then
+      category = 'COMPOSITION_UNSUPPORTED'; return
+    endif
+
+    ! mass convention (neutron/proton rest-mass mismatch)
+    if(index(s,'rest-mass')>0 .or. index(s,'mass conventions')>0 .or. &
+       index(s,'nucleon masses')>0) then
+      category = 'MASS_CONVENTION_FAIL'; return
+    endif
+
+    ! beta-equilibrium / lepton-potential / entropy / T=0
+    if(index(s,'beta-equilibrated')>0 .or. index(s,'beta-equilibrium')>0 .or. &
+       index(s,'Q5')>0 .or. index(s,'Q2')>0 .or. index(s,'Q6=Q7')>0 .or. &
+       index(s,'T=0')>0 .or. index(s,'lepton')>0) then
+      category = 'BETA_EQUILIBRIUM_FAIL'; return
+    endif
+
+    ! thermodynamic identity (Q3/Euler, first-law at the coexistence identity)
+    if(index(s,'Q3 chemical potential')>0 .or. index(s,'Euler')>0 .or. &
+       index(s,'latent-energy identity')>0 .or. index(s,'first-law')>0 .or. &
+       index(s,'Maxwell latent-energy')>0) then
+      category = 'FIRST_LAW_IDENTITY_FAIL'; return
+    endif
+
+    ! phase layout: Iphase boundary inside one input
+    if(index(s,'Iphase')>0 .or. index(s,'smooth phase')>0) then
+      category = 'COMPOSITION_UNSUPPORTED'; return
+    endif
+
+    ! causality
+    if(index(s,'causal')>0 .or. index(s,'c_s^2')>0) then
+      category = 'CAUSALITY_FAIL'; return
+    endif
+
+    ! NO_COMMON_MU_SUPPORT: no overlapping mu_B interval
+    if(index(s,'no overlapping')>0 .or. index(s,'common chemical-potential')>0 .or. &
+       index(s,'insufficient common')>0) then
+      category = 'NO_COMMON_MU_SUPPORT'; return
+    endif
+
+    ! coexistence root count: 0 or >1
+    if(index(s,'no pressure equality')>0 .or. index(s,'no root')>0 .or. &
+       index(s,'no coexistence')>0) then
+      category = 'NO_COEXISTENCE_CROSSING'; return
+    endif
+    if(index(s,'multiple')>0 .or. index(s,'exactly one')>0) then
+      category = 'MULTIPLE_COEXISTENCE_CROSSINGS'; return
+    endif
+
+    ! mechanical-stability / interpolation-shape. This is the §1 distinction:
+    ! the v1 kernel currently emits "P(mu_B) interpolation violates positive
+    ! density or mechanical stability" for both source-level and interpolant-
+    ! level failures. We cannot distinguish them from the status string alone,
+    ! so this is the catch-all INTERPOLANT_SHAPE_FAIL. The §1 source-convexity
+    ! pre-check is the authoritative classifier and lives in the Python audit,
+    ! not in this function. NOTE: this must be matched BEFORE the
+    ! NONPOSITIVE_DENSITY_JUMP clause because the interpolation message
+    ! contains the word "density" ("positive density"), which would otherwise
+    ! mis-bucket 61 of 65 pairs.
+    if(index(s,'interpolation')>0 .or. index(s,'mechanical stability')>0 .or. &
+       index(s,'positive density')>0 .or. index(s,'strictly increasing')>0 .or. &
+       index(s,'nonfinite')>0) then
+      category = 'INTERPOLANT_SHAPE_FAIL'; return
+    endif
+
+    ! density jump / energy ordering at the coexistence point
+    if(index(s,'denser high-density')>0 .or. index(s,'nonpositive')>0 .or. &
+       index(s,'not ordered')>0 .or. index(s,'nondecreasing pressure')>0) then
+      category = 'NONPOSITIVE_DENSITY_JUMP'; return
+    endif
+
+    ! lepton-content / charge-fraction axis mismatch
+    if(index(s,'lepton-content')>0 .or. index(s,'charge_fraction_grid')>0 .or. &
+       index(s,'charge-fraction')>0) then
+      category = 'NO_COMMON_MU_SUPPORT'; return
+    endif
+
+    ! caller did not confirm local charge neutrality
+    if(index(s,'locally charge neutral')>0) then
+      category = 'COMPOSITION_UNSUPPORTED'; return
+    endif
+
+    ! everything else: unknown (treated as rejection, never PASS)
+    category = MAXWELL_STATUS_UNKNOWN
+  end function maxwell_status_category
 
 end module compose_eos_phase_transition

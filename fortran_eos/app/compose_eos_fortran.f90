@@ -338,7 +338,12 @@ program compose_eos_fortran
     call read_internal_csv(trim(arg2)//'/eos_data.csv',trim(arg2)//'/eos_data.nml',phase_high,status)
     if(status/='ok')then;call emit_failure('invalid high-density phase: '//trim(status));stop 3;endif
     call construct_maxwell_transition(phase_low,phase_high,local_neutrality_confirmed,out,phase_report,status)
-    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    if(status/='ok')then
+      ! Emit a STRUCTURED failure JSON so the v2 Python layer can consume the
+      ! stable category directly instead of inferring it from free-form text
+      ! (§4 fix: replace text-based category inference with structured status).
+      call emit_maxwell_failure(trim(status));stop 3
+    endif
     call write_internal_csv(trim(arg3)//'/eos_data.csv',out,status)
     if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
     call write_metadata(trim(arg3)//'/eos_data.nml',out,status)
@@ -501,6 +506,20 @@ contains
     character(len=*),intent(in)::message
     write(*,'(a)')'{"status":"error","message":"'//trim(message)//'"}'
   end subroutine
+  subroutine emit_maxwell_failure(message)
+    !! Structured failure JSON for the maxwell-transition command. Emits a
+    !! stable `category` field (one of the §3/§4 terminal-outcome identifiers)
+    !! alongside the free-form `message`, so the v2 Python layer can consume
+    !! the category directly without text-matching. The category is computed
+    !! by maxwell_status_category from the status string only (data-driven,
+    !! not model-name-based).
+    use compose_eos_phase_transition, only: maxwell_status_category
+    character(len=*),intent(in)::message
+    character(len=40)::cat
+    cat=maxwell_status_category(message)
+    write(*,'(a)')'{"status":"error","operation":"maxwell-transition",'// &
+      '"category":"'//trim(cat)//'","message":"'//trim(message)//'"}'
+  end subroutine emit_maxwell_failure
   function integer_text(i) result(s)
     integer,intent(in)::i
     character(len=32)::s

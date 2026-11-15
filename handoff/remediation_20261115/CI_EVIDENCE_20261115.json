@@ -174,8 +174,26 @@
     },
     "note": "No PASS claim is made until the current attempt completes against the exact final HEAD.",
     "final_verification": {
-      "status": "PENDING",
-      "note": "This file now reflects the cancelled run and awaits one exact-head CI run after the final handoff metadata commit."
+      "status": "PENDING_AFTER_HASH_SYNC"
+    },
+    "latest_completed_attempt": {
+      "run_id": 43678512196,
+      "head_sha": "ce66b88a83d9934b63e9c3fe8e7c6ad8c06983ad",
+      "status": "BUILD_AND_TEST_PASS_CHECKSUM_ONLY_FAILURE",
+      "fortran_build": "PASS",
+      "pytest_passed": 263,
+      "pytest_skipped": 9,
+      "pytest_failed": 0,
+      "native_fortran_unit_tests": "PASS",
+      "tov_love": "PASS",
+      "cowling_runtime_compile": "PASS",
+      "e390_component_builds": "PASS",
+      "checksum_mismatch": {
+        "path": "fortran_eos/src/compose_eos_matching.f90",
+        "expected": "c27cb44b3f81e37719f0d6532a4c40f8e0c9d57975e15dcbcf9f344fc8729e9e",
+        "actual": "b6c677a23b886896a5439bd5de6436bd4764d7354f7b3ebb3e5dcdd6a19cf9d4"
+      },
+      "interpretation": "The only pytest regression is fixed, and the single-speed CSS integration test passes. The remaining failure is the one stale checksum entry."
     }
   }
 }

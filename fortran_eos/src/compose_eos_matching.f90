@@ -663,13 +663,16 @@ contains
     real(wp),allocatable::u(:),nb(:),p(:),f(:),mu(:),q(:),cs(:),museq(:)
     real(wp),allocatable::ud(:),nbd(:),pd(:),fd(:),mud(:),qd(:),csd(:)
     real(wp)::nbar,qbar,cs1,cs2,dmcr,muq1,muq2,su,ff,qq
+    real(wp)::css_cs2,css_nb_high,css_delta_eps,css_p_t,css_mu_t,css_f_high
+    real(wp)::css_eps_low,css_eps_high,css_critical,css_mu_core,css_f_core
     integer::i1,i2,nleft,nright,nout,j,k
-    logical::ok1,ok2,ok3
+    logical::ok1,ok2,ok3,css_mode
     character(len=512)::msg
     status='uninitialized';report=match_report_t()
-    ! The smooth pressure-bridge kernel has its own thermodynamic method ID.
-    ! The public method="maxwell" is reserved for the physical sharp coexistence
-    ! construction and must never enter this continuous-density bridge routine.
+    css_mode=trim(method)=='css'
+    ! The public method="maxwell" remains reserved for the separate sharp
+    ! coexistence kernel. The CSS method below is a distinct high-density
+    ! constant-sound-speed phase attached by one crust-side Maxwell jump.
     if(trim(method)=='maxwell')then
       status='maxwell is the sharp coexistence method and is not yet integrated in the common composition-aware matcher; require Delta n_B>0'
       return
@@ -677,10 +680,10 @@ contains
     call validate_eos(cr,ok1,msg);if(.not.ok1)then;status='invalid crust EOS: '//trim(msg);return;endif
     call validate_eos(co,ok1,msg);if(.not.ok1)then;status='invalid core EOS: '//trim(msg);return;endif
     if(abs(cr%temperature_mev)>1.e-12_wp.or.abs(co%temperature_mev)>1.e-12_wp)then
-      status='native smooth matching currently requires cold T=0 barotropes';return
+      status='native matching currently requires cold T=0 barotropes';return
     endif
     if(.not.cr%beta_equilibrated.or..not.co%beta_equilibrated)then
-      status='native smooth matching requires beta-equilibrated cold barotropes';return
+      status='native matching requires beta-equilibrated cold barotropes';return
     endif
     if(maxval(abs(cr%q(2,:)))>1.e-10_wp.or.maxval(abs(co%q(2,:)))>1.e-10_wp)then
       status='cold T=0 matching requires zero entropy per baryon Q2';return
@@ -694,41 +697,83 @@ contains
       status='composition-bearing inputs require explicit drop_composition=True; native composition bridge is not yet ported';return
     endif
     if(n_bridge<8)then;status='n_bridge must be >= 8';return;endif
-    if(trim(method)/='maxwell'.and.trim(method)/='first_law_constrained_hermite_pressure_bridge'.and.trim(method)/='css'.and.trim(method)/='cubic_F'.and. &
-       trim(method)/='cubic_P'.and.trim(method)/='quintic_F'.and.trim(method)/='quintic_P')then
+    if(trim(method)/='maxwell'.and.trim(method)/='first_law_constrained_hermite_pressure_bridge'.and. &
+       trim(method)/='css'.and.trim(method)/='cubic_F'.and.trim(method)/='cubic_P'.and. &
+       trim(method)/='quintic_F'.and.trim(method)/='quintic_P')then
       status='unknown matching method';return
     endif
-    call find_window(cr,co,i1,i2,nbar,qbar,ok1,msg)
+
+    call find_window(cr,co,i1,i2,nbar,qbar,ok1,msg,require_single_css=css_mode)
     if(.not.ok1)then;status=trim(msg);return;endif
     call endpoint_cs2(cr,i1,'left',cs1,ok1,msg)
     if(.not.ok1)then;status='invalid crust endpoint sound speed: '//trim(msg);return;endif
     call endpoint_cs2(co,i2,'right',cs2,ok2,msg)
     if(.not.ok2)then;status='invalid core endpoint sound speed: '//trim(msg);return;endif
+
     dmcr=co%mn-cr%mn
-    nleft=i1;nright=co%n-i2+1;nout=nleft+n_bridge+nright
+    css_cs2=0._wp;css_nb_high=0._wp;css_delta_eps=0._wp
+    css_p_t=cr%nb(i1)*cr%q(1,i1)
+    css_f_high=0._wp;css_mu_t=0._wp;css_eps_low=0._wp
+    css_eps_high=0._wp;css_critical=0._wp
+    if(css_mode)then
+      ! The crust low-side endpoint is re-expressed in the core neutron-mass
+      ! gauge using the established representation-only mass alignment.
+      css_mu_t=(cr%q(6,i1)+1._wp)*cr%mn+dmcr+cr%q(1,i1)
+      css_f_core=(co%q(6,i2)+1._wp)*co%mn
+      css_mu_core=css_f_core+co%q(1,i2)
+      call solve_single_css_match(cr%nb(i1),co%nb(i2),css_p_t,co%nb(i2)*co%q(1,i2), &
+          css_mu_t,css_mu_core,css_cs2,css_nb_high,css_delta_eps,ok1,msg)
+      if(.not.ok1)then;status='single-speed CSS candidate rejected: '//trim(msg);return;endif
+      css_f_high=css_mu_t-css_p_t/css_nb_high
+      css_eps_low=cr%nb(i1)*((cr%q(6,i1)+1._wp)*cr%mn+dmcr)
+      css_eps_high=css_nb_high*css_f_high
+      css_critical=0.5_wp*css_eps_low+1.5_wp*css_p_t
+      if(css_critical<=0._wp)then;status='single-speed CSS has nonpositive Seidov critical jump';return;endif
+      cs1=css_cs2;cs2=css_cs2
+      nleft=i1;nright=co%n-i2+1;nout=nleft+1+n_bridge+nright
+    else
+      nleft=i1;nright=co%n-i2+1;nout=nleft+n_bridge+nright
+    endif
+
     allocate(ud(401),nbd(401),pd(401),fd(401),mud(401),qd(401),csd(401))
     do j=1,401;ud(j)=real(j-1,wp)/400._wp;enddo
-    call construct_bridge(trim(method),ud,cr%nb(i1),co%nb(i2),cr%nb(i1)*cr%q(1,i1), &
-      co%nb(i2)*co%q(1,i2),(cr%q(6,i1)+1._wp)*cr%mn+dmcr,(co%q(6,i2)+1._wp)*co%mn, &
-      ((cr%q(6,i1)+1._wp)*cr%mn+dmcr)+cr%q(1,i1),((co%q(6,i2)+1._wp)*co%mn)+co%q(1,i2), &
-      cr%q(1,i1),co%q(1,i2),cs1,cs2,nbd,pd,fd,mud,qd,csd,ok2,msg)
+    if(css_mode)then
+      ! u=0 is the bridge-side transition row; u=1 is the continuous core join.
+      call construct_bridge(trim(method),ud,css_nb_high,co%nb(i2),css_p_t, &
+        co%nb(i2)*co%q(1,i2),css_f_high,css_f_core,css_mu_t,css_mu_core, &
+        css_p_t/css_nb_high,co%q(1,i2),cs1,cs2,nbd,pd,fd,mud,qd,csd,ok2,msg)
+    else
+      call construct_bridge(trim(method),ud,cr%nb(i1),co%nb(i2),cr%nb(i1)*cr%q(1,i1), &
+        co%nb(i2)*co%q(1,i2),(cr%q(6,i1)+1._wp)*cr%mn+dmcr,css_f_core, &
+        ((cr%q(6,i1)+1._wp)*cr%mn+dmcr)+cr%q(1,i1),css_mu_core, &
+        cr%q(1,i1),co%q(1,i2),cs1,cs2,nbd,pd,fd,mud,qd,csd,ok2,msg)
+    endif
     if(.not.ok2)then;status='matching construction failed: '//trim(msg);return;endif
     call validate_bridge(nbd,pd,fd,mud,csd,ok2,msg)
     if(.not.ok2)then;status='matching candidate rejected: '//trim(msg);return;endif
+
     allocate(u(n_bridge),nb(n_bridge),p(n_bridge),f(n_bridge),mu(n_bridge),q(n_bridge),cs(n_bridge),museq(n_bridge))
     do j=1,n_bridge;u(j)=real(j,wp)/real(n_bridge+1,wp);enddo
-    call construct_bridge(trim(method),u,cr%nb(i1),co%nb(i2),cr%nb(i1)*cr%q(1,i1), &
-      co%nb(i2)*co%q(1,i2),(cr%q(6,i1)+1._wp)*cr%mn+dmcr,(co%q(6,i2)+1._wp)*co%mn, &
-      ((cr%q(6,i1)+1._wp)*cr%mn+dmcr)+cr%q(1,i1),((co%q(6,i2)+1._wp)*co%mn)+co%q(1,i2), &
-      cr%q(1,i1),co%q(1,i2),cs1,cs2,nb,p,f,mu,q,cs,ok3,msg)
+    if(css_mode)then
+      call construct_bridge(trim(method),u,css_nb_high,co%nb(i2),css_p_t,co%nb(i2)*co%q(1,i2), &
+        css_f_high,css_f_core,css_mu_t,css_mu_core,css_p_t/css_nb_high,co%q(1,i2), &
+        cs1,cs2,nb,p,f,mu,q,cs,ok3,msg)
+    else
+      call construct_bridge(trim(method),u,cr%nb(i1),co%nb(i2),cr%nb(i1)*cr%q(1,i1), &
+        co%nb(i2)*co%q(1,i2),(cr%q(6,i1)+1._wp)*cr%mn+dmcr,css_f_core, &
+        ((cr%q(6,i1)+1._wp)*cr%mn+dmcr)+cr%q(1,i1),css_mu_core, &
+        cr%q(1,i1),co%q(1,i2),cs1,cs2,nb,p,f,mu,q,cs,ok3,msg)
+    endif
     if(.not.ok3)then;status='matching construction failed on output grid: '//trim(msg);return;endif
+
     call allocate_eos(out,nout)
     out%mn=co%mn;out%mp=co%mp;out%il=co%il;out%iT=co%iT;out%iYq=co%iYq
     out%inb_start=1;out%nadd=0;out%temperature_mev=0._wp;out%charge_fraction_grid=0._wp
     out%composition_file_present=.false.;out%composition_available=.false.;out%beta_equilibrated=.true.
     out%q=0._wp;out%q_extra=0._wp;out%iphase=0
     out%yn=0._wp;out%yp=0._wp;out%ye=0._wp;out%ymu=0._wp;out%abar=0._wp;out%zbar=0._wp;out%yh=0._wp
-    ! Retain the selected crust and core source rows, applying only the documented rest-mass gauge alignment.
+    ! Retain crust source rows, then (for CSS) an explicit high-density
+    ! transition row, the bridge interior, and finally the continuous core.
     out%nb(1:nleft)=cr%nb(1:i1)
     out%q(1,1:nleft)=cr%q(1,1:i1)
     do j=1,nleft
@@ -736,53 +781,77 @@ contains
       out%q(3,j)=(ff+qq)/out%mn-1._wp;out%q(6,j)=ff/out%mn-1._wp
       out%q(4,j)=cr%q(4,j)*cr%mn/out%mn
     enddo
-    do j=1,n_bridge
-      k=nleft+j;out%nb(k)=nb(j);out%q(1,k)=q(j)
-      out%q(3,k)=mu(j)/out%mn-1._wp;out%q(6,k)=f(j)/out%mn-1._wp
-      su=u(j)**3*(10._wp-15._wp*u(j)+6._wp*u(j)**2)
-      muq1=cr%q(4,i1)*cr%mn;muq2=co%q(4,i2)*co%mn
-      museq(j)=muq1+(muq2-muq1)*su;out%q(4,k)=museq(j)/out%mn
-    enddo
+    muq1=cr%q(4,i1)*cr%mn;muq2=co%q(4,i2)*co%mn
+    if(css_mode)then
+      ! Two adjacent rows share P_t and mu_t, but differ in n_B and epsilon.
+      k=nleft+1;out%nb(k)=css_nb_high;out%q(1,k)=css_p_t/css_nb_high
+      out%q(3,k)=css_mu_t/out%mn-1._wp;out%q(6,k)=css_f_high/out%mn-1._wp
+      out%q(4,k)=muq1/out%mn
+      do j=1,n_bridge
+        k=nleft+1+j;out%nb(k)=nb(j);out%q(1,k)=q(j)
+        out%q(3,k)=mu(j)/out%mn-1._wp;out%q(6,k)=f(j)/out%mn-1._wp
+        su=u(j)**3*(10._wp-15._wp*u(j)+6._wp*u(j)**2)
+        museq(j)=muq1+(muq2-muq1)*su;out%q(4,k)=museq(j)/out%mn
+      enddo
+      report%css_transition_low_index=i1-1
+      report%css_transition_high_index=i1
+      report%css_core_bridge_index=i1+n_bridge+1
+    else
+      do j=1,n_bridge
+        k=nleft+j;out%nb(k)=nb(j);out%q(1,k)=q(j)
+        out%q(3,k)=mu(j)/out%mn-1._wp;out%q(6,k)=f(j)/out%mn-1._wp
+        su=u(j)**3*(10._wp-15._wp*u(j)+6._wp*u(j)**2)
+        museq(j)=muq1+(muq2-muq1)*su;out%q(4,k)=museq(j)/out%mn
+      enddo
+    endif
     do j=1,nright
-      k=nleft+n_bridge+j;out%nb(k)=co%nb(i2+j-1);out%q(1,k)=co%q(1,i2+j-1)
+      if(css_mode)then
+        k=nleft+n_bridge+1+j
+      else
+        k=nleft+n_bridge+j
+      endif
+      out%nb(k)=co%nb(i2+j-1);out%q(1,k)=co%q(1,i2+j-1)
       ff=(co%q(6,i2+j-1)+1._wp)*co%mn;qq=co%q(1,i2+j-1)
       out%q(3,k)=(ff+qq)/out%mn-1._wp;out%q(6,k)=ff/out%mn-1._wp
       out%q(4,k)=co%q(4,i2+j-1)*co%mn/out%mn
     enddo
     out%q(7,:)=out%q(6,:);out%q(2,:)=0._wp;out%q(5,:)=0._wp
     if(any(out%nb(2:)<=out%nb(:nout-1)))then;status='assembled EOS density grid is not strictly increasing';return;endif
+
     report%i1=i1-1;report%i2=i2-1;report%n_bridge=n_bridge
     report%n1=cr%nb(i1);report%n2=co%nb(i2)
-    report%p1=cr%nb(i1)*cr%q(1,i1);report%p2=co%nb(i2)*co%q(1,i2)
-    report%f1=(cr%q(6,i1)+1._wp)*cr%mn+dmcr;report%f2=(co%q(6,i2)+1._wp)*co%mn
-    report%mu1=report%f1+cr%q(1,i1);report%mu2=report%f2+co%q(1,i2)
-    report%cs2_source_left=cs1;report%cs2_source_right=cs2
+    report%p1=css_p_t;report%p2=co%nb(i2)*co%q(1,i2)
+    report%f1=(cr%q(6,i1)+1._wp)*cr%mn+dmcr;report%f2=css_f_core
+    report%mu1=report%f1+cr%q(1,i1);report%mu2=css_mu_core
+    if(css_mode)then
+      report%cs2_source_left=0._wp;report%cs2_source_right=cs2
+      report%is_exact_maxwell=.true.;report%seidov_applicable=.true.
+      report%construction_kind='css_single_speed_with_crust_density_jump'
+      report%css_single_sound_speed=css_cs2
+      report%css_transition_nb_low=cr%nb(i1);report%css_transition_nb_high=css_nb_high
+      report%css_transition_delta_nb=css_nb_high-cr%nb(i1)
+      report%css_transition_delta_eps=css_delta_eps
+      report%css_transition_pressure=css_p_t;report%css_transition_mu=css_mu_t
+      report%seidov_critical_delta_eps=css_critical
+      report%seidov_ratio=css_delta_eps/css_critical
+      report%seidov_small_core_stable=css_delta_eps<css_critical
+    else
+      report%cs2_source_left=cs1;report%cs2_source_right=cs2
+      report%is_exact_maxwell=.false.;report%seidov_applicable=.false.
+    endif
     report%cs2_left=csd(1);report%cs2_right=csd(size(csd))
     report%cs2_min=minval(csd);report%cs2_max=maxval(csd)
     report%pressure_span=maxval(pd)-minval(pd);report%spline_mode=trim(msg)
     report%first_law_relative_residual=abs(fd(size(fd))-report%f2)/max(1._wp,abs(report%f2-report%f1))
-    report%method=trim(method);report%is_exact_maxwell=.false.;report%seidov_applicable=.false.
-    ! Phase B provenance: record the gauge shift and the provider Euler
-    ! residual over the retained crust rows (rows 1..i1). The residual is
-    ! |mu_B,src - (F_src + P/n_B)| in MeV; the output Q3 re-derivation
-    ! (q(3)=(F+Q1)/mn-1) repairs it, so this value bounds the seam
-    ! discontinuity the shift-free bridge would otherwise inherit.
+    report%method=trim(method)
+    ! Phase B provenance: record the gauge shift and the provider Euler residual
+    ! over the retained crust rows (rows 1..i1); it is not a physical mass correction.
     report%dm_mass_gauge_meV=dmcr
     report%source_euler_residual_meV=0._wp
     do j=1,i1
       report%source_euler_residual_meV=max(report%source_euler_residual_meV, &
         abs((cr%q(3,j)+1._wp)*cr%mn-((cr%q(6,j)+1._wp)*cr%mn+cr%q(1,j))))
     enddo
-    select case(trim(method))
-    case('first_law_constrained_hermite_pressure_bridge');report%construction_kind='smooth_near_pressure_plateau'
-    case('css');report%construction_kind='two_segment_constant_sound_speed'
-    case('cubic_F');report%construction_kind='cubic_free_energy_bridge'
-    case('quintic_F');report%construction_kind='quintic_C2_free_energy_bridge'
-    case('cubic_P');report%construction_kind='cubic_pressure_chemical_potential_bridge'
-    case('quintic_P');report%construction_kind='quintic_C2_pressure_chemical_potential_bridge'
-    end select
-    report%composition_dropped=cr%composition_file_present.or.cr%composition_available.or. &
-      co%composition_file_present.or.co%composition_available
     if(report%first_law_relative_residual>5.e-9_wp)then
       status='matching candidate violates the endpoint first-law integral tolerance';return
     endif

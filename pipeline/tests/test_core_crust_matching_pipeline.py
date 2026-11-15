@@ -269,3 +269,174 @@ def test_css_runner_roundtrips_real_native_benchmark_pair(tmp_path):
     assert result["output_sha256"]
     assert result["source_sha256"]["crust"]
     assert result["source_sha256"]["core"]
+    admission = result["admission"]
+    assert admission["status"] == "ADMITTED", admission["failed_checks"]
+    for name in ("construction_kind", "css_sound_speed_range", "css_single_sound_speed",
+                 "crust_transition_pressure", "crust_transition_euler_mu",
+                 "crust_transition_positive_jump", "crust_transition_latent_identity",
+                 "css_segment_single_speed", "css_core_continuity",
+                 "first_law_relative_residual", "report_matches_rows"):
+        assert admission["checks"][name]["pass"] is True, name
+
+
+def _passing_readback(monkeypatch):
+    ok = {"status": "PASS", "errors": [], "max_abs_residuals": {}, "max_rel_residuals": {}}
+    monkeypatch.setattr(pipeline, "verify_internal_readback", lambda *a, **k: dict(ok, errors=[]))
+    monkeypatch.setattr(pipeline, "verify_internal_metadata_readback", lambda *a, **k: dict(ok, errors=[]))
+
+
+def _fake_native_all_ok(action, *args):
+    if action == "verify":
+        Path(args[1]).write_text('{"overall":"PASS"}', encoding="utf-8")
+        return {"status": "ok", "overall": "PASS"}
+    if action in ("match-core", "maxwell-transition"):
+        return {"status": "ok", "n": 6,
+                "construction_kind": "css_single_speed_with_crust_density_jump"}
+    return {"status": "ok", "n": 6}
+
+
+def test_pipeline_requires_independent_admission_after_native_pass(tmp_path, monkeypatch):
+    exe = tmp_path / "exe"
+    exe.write_bytes(b"x")
+    monkeypatch.setattr(pipeline, "executable", lambda: exe)
+    _passing_readback(monkeypatch)
+    monkeypatch.setattr(pipeline, "run_native", _fake_native_all_ok)
+    for d in ("crust", "core"):
+        (tmp_path / d).mkdir()
+
+    result = pipeline.run_pipeline("css", tmp_path / "crust", tmp_path / "core", tmp_path / "out")
+
+    # Native status ok + verifier PASS alone must not create a survivor.
+    assert result["survived"] is False
+    assert result["stage"] == "admission"
+    assert result["admission"]["status"] == "REJECTED"
+    assert result["failure_category"] == "admission"
+
+
+def test_pipeline_admits_only_when_admission_layer_admits(tmp_path, monkeypatch):
+    exe = tmp_path / "exe"
+    exe.write_bytes(b"x")
+    monkeypatch.setattr(pipeline, "executable", lambda: exe)
+    _passing_readback(monkeypatch)
+    monkeypatch.setattr(pipeline, "run_native", _fake_native_all_ok)
+    monkeypatch.setattr(pipeline, "admit_match_report",
+                        lambda *a, **k: {"status": "ADMITTED", "failed_checks": []})
+    for d in ("crust", "core"):
+        (tmp_path / d).mkdir()
+    result = pipeline.run_pipeline("css", tmp_path / "crust", tmp_path / "core", tmp_path / "out")
+    assert result["survived"] is True
+    assert result["admission"]["status"] == "ADMITTED"
+
+
+def test_native_failure_keeps_stage_and_category(tmp_path, monkeypatch):
+    from compose_eos.native import NativeExecutionError
+
+    exe = tmp_path / "exe"
+    exe.write_bytes(b"x")
+    monkeypatch.setattr(pipeline, "executable", lambda: exe)
+
+    def fake(action, *args):
+        if action == "maxwell-transition":
+            raise NativeExecutionError(
+                "phase tables must use the same neutron and proton rest-mass conventions",
+                category="MASS_CONVENTION_FAIL", operation=action)
+        return {"status": "ok", "n": 5}
+
+    monkeypatch.setattr(pipeline, "run_native", fake)
+    for d in ("crust", "core"):
+        (tmp_path / d).mkdir()
+    result = pipeline.run_pipeline("maxwell", tmp_path / "crust", tmp_path / "core", tmp_path / "out")
+    assert result["survived"] is False
+    assert result["stage"] == "maxwell"
+    assert result["native_category"] == "MASS_CONVENTION_FAIL"
+    assert result["failure_category"] == "implementation_convention"
+
+
+def test_census_counts_missing_sources_as_provenance_and_preserves_failed_reports(
+        tmp_path, monkeypatch):
+    crust_root, core_root, out_root = tmp_path / "crust", tmp_path / "core", tmp_path / "runs" / "r1"
+    for name in ("eos.nb", "eos.t", "eos.yq", "eos.thermo"):
+        (crust_root / "COMPLETE").mkdir(parents=True, exist_ok=True)
+        (crust_root / "COMPLETE" / name).write_text("x", encoding="utf-8")
+        (core_root / "CORE").mkdir(parents=True, exist_ok=True)
+        (core_root / "CORE" / name).write_text("x", encoding="utf-8")
+    (crust_root / "PARTIAL").mkdir()
+    (crust_root / "PARTIAL" / "eos.thermo").write_text("x", encoding="utf-8")
+    monkeypatch.setattr(pipeline, "CRUST_MODELS", ["COMPLETE", "PARTIAL", "ABSENT"])
+    monkeypatch.setattr(pipeline, "CORE_MODELS", ["CORE"])
+    monkeypatch.setattr(pipeline, "CRUST_ROOT", crust_root)
+    monkeypatch.setattr(pipeline, "CORE_ROOT", core_root)
+    monkeypatch.setattr(pipeline, "OUT_ROOT", out_root)
+    monkeypatch.setattr(pipeline, "executable", lambda: tmp_path / "exe")
+
+    calls = []
+
+    def fake_pipeline(method, crust_dir, core_dir, out_dir):
+        calls.append((crust_dir.name, method))
+        (out_dir / "work").mkdir(parents=True, exist_ok=True)
+        (out_dir / "work" / "trace.txt").write_text("kept", encoding="utf-8")
+        return {"survived": False, "method": method, "stage": method,
+                "error": "no pressure equality was found in the common mu_B interval",
+                "failure_category": "physical"}
+
+    monkeypatch.setattr(pipeline, "run_pipeline", fake_pipeline)
+    assert pipeline.main() == 0
+
+    import json
+    manifest = json.loads((out_root / "matching_manifest.json").read_text(encoding="utf-8"))
+    assert manifest["configured_attempts"] == 6
+    assert manifest["evaluated_attempts"] == 2
+    assert manifest["not_evaluated_source_incomplete"] == 4
+    assert sorted(calls) == [("COMPLETE", "css"), ("COMPLETE", "maxwell")]
+    cats = manifest["failures_by_category"]
+    assert cats["data_provenance"] == 4
+    assert cats["physical"] == 2
+    partial = [r for r in manifest["all_results"] if r["crust_model"] == "PARTIAL"]
+    assert all(r["stage"] == "source" and r["outcome"] == "NOT_EVALUATED_SOURCE_INCOMPLETE"
+               for r in partial)
+    assert "eos.nb" in partial[0]["missing_source_files"]
+    # Failed attempts are preserved with a per-pair JSON report and hash.
+    for r in manifest["all_results"]:
+        report = out_root / r["pair_id"] / "pair_report.json"
+        assert report.is_file()
+        assert r["pair_report_sha256"] == pipeline.sha256_file(report)
+    assert (out_root / "COMPLETE__CORE__css" / "work" / "trace.txt").read_text() == "kept"
+    assert manifest["by_method"]["css"]["evaluated"] == 1
+    assert manifest["by_method"]["maxwell"]["survivors"] == 0
+
+
+def test_census_flags_byte_identical_source_models(tmp_path, monkeypatch):
+    crust_root, core_root, out_root = tmp_path / "crust", tmp_path / "core", tmp_path / "run"
+    for model, payload in (("A", "same"), ("B", "same"), ("C", "different")):
+        (crust_root / model).mkdir(parents=True)
+        for name in ("eos.nb", "eos.t", "eos.yq", "eos.thermo"):
+            (crust_root / model / name).write_text(payload + name, encoding="utf-8")
+    (core_root / "K").mkdir(parents=True)
+    for name in ("eos.nb", "eos.t", "eos.yq", "eos.thermo"):
+        (core_root / "K" / name).write_text(name, encoding="utf-8")
+    monkeypatch.setattr(pipeline, "CRUST_MODELS", ["A", "B", "C"])
+    monkeypatch.setattr(pipeline, "CORE_MODELS", ["K"])
+    monkeypatch.setattr(pipeline, "CRUST_ROOT", crust_root)
+    monkeypatch.setattr(pipeline, "CORE_ROOT", core_root)
+    monkeypatch.setattr(pipeline, "OUT_ROOT", out_root)
+    monkeypatch.setattr(pipeline, "executable", lambda: tmp_path / "exe")
+
+    def fake_pipeline(method, crust_dir, core_dir, out_dir):
+        if method == "css":
+            return {"survived": True, "method": method, "stage": "complete",
+                    "combined_n": 1, "readback_n": 1, "readback_status": "ok",
+                    "readback_validation": {}, "consistency_status": "PASS",
+                    "consistency_report": {}, "admission": {"status": "ADMITTED"},
+                    "source_sha256": {}, "output_sha256": {},
+                    "fortran_executable_sha256": None, "match_report": {}}
+        return {"survived": False, "method": method, "stage": method, "error": "x",
+                "failure_category": "unclassified"}
+
+    monkeypatch.setattr(pipeline, "run_pipeline", fake_pipeline)
+    assert pipeline.main() == 0
+    import json
+    manifest = json.loads((out_root / "matching_manifest.json").read_text(encoding="utf-8"))
+    assert manifest["source_duplicate_groups"]["crust"] == [["A", "B"]]
+    assert manifest["source_duplicate_groups"]["core"] == []
+    assert manifest["total_survivors"] == 3
+    assert manifest["distinct_source_survivors"] == 2

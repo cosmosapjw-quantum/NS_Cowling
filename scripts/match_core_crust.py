@@ -3,7 +3,13 @@
 Runs the native Fortran Maxwell and CSS methods for each configured crust/core
 pair. A pair survives only if the native match, CompOSE write, CompOSE readback,
 reported point counts, and every numerical/metadata column in the internal
-readback CSV all agree.
+readback CSV all agree, the native consistency verifier passes, AND the
+independent method-specific admission layer (scripts/match_report_admission.py)
+re-derives the interface conditions from the serialized rows and admits them.
+
+Every configured (crust, core, method) triple is recorded with a per-pair JSON
+report; nothing is deleted. Incomplete source directories are recorded as
+NOT_EVALUATED data-provenance gaps, never as failed physics.
 
 Physics:
   - maxwell: sharp first-order local-neutrality coexistence, with common
@@ -31,8 +37,15 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python_frontend"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from compose_eos.native import executable, run_native  # noqa: E402
+from match_report_admission import admit_match_report, classify_failure  # noqa: E402
+
+# CompOSE files the native reader needs for a thermodynamic table. A model
+# directory missing any of them is a data-provenance gap, not a physics case.
+REQUIRED_SOURCE_FILES = ("eos.nb", "eos.t", "eos.yq", "eos.thermo")
+METHODS = ("maxwell", "css")
 
 CRUST_MODELS = [
     "SPG_M1", "SPG_M2", "SPG_M3", "SPG_M4", "SPG_M5",
@@ -358,11 +371,46 @@ def _source_compose_hashes(directory: Path) -> dict[str, str]:
     return hashes
 
 
+def _source_identity(directory: Path) -> str | None:
+    """SHA-256 over the required CompOSE files, or None if any is missing."""
+    if _missing_sources(directory):
+        return None
+    import hashlib
+    h = hashlib.sha256()
+    for name in REQUIRED_SOURCE_FILES:
+        h.update(name.encode() + b"\0" + sha256_file(directory / name).encode() + b"\n")
+    return h.hexdigest()
+
+
+def _duplicate_groups(identities: dict[str, str | None]) -> list[list[str]]:
+    groups: dict[str, list[str]] = {}
+    for model, ident in identities.items():
+        if ident is not None:
+            groups.setdefault(ident, []).append(model)
+    return sorted(sorted(g) for g in groups.values() if len(g) > 1)
+
+
+def _missing_sources(directory: Path) -> list[str]:
+    if not directory.is_dir():
+        return list(REQUIRED_SOURCE_FILES)
+    return [name for name in REQUIRED_SOURCE_FILES if not (directory / name).is_file()]
+
+
 def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) -> dict:
     """Run one (crust, core, method) match. Returns a result dict.
 
-    method in {"maxwell", "css"}.
+    method in {"maxwell", "css"}. Every non-surviving result carries a
+    ``failure_category`` separating data-provenance, input-contract,
+    implementation, numerical, physical and admission failures.
     """
+    res = _run_pipeline(method, crust_dir, core_dir, out_dir)
+    if not res.get("survived"):
+        res.setdefault("failure_category", classify_failure(
+            res.get("stage"), res.get("error"), res.get("native_category")))
+    return res
+
+
+def _run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) -> dict:
     work = out_dir / "work"
     if work.exists():
         shutil.rmtree(work)
@@ -379,6 +427,7 @@ def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) ->
     exe = executable()
     exe_sha = sha256_file(exe)
 
+    stage = "read_crust"
     try:
         # 1. read crust -> internal
         r1 = run_native("read", str(crust_dir), str(crust_internal))
@@ -386,11 +435,13 @@ def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) ->
             return {"survived": False, "method": method, "stage": "read_crust",
                     "error": r1.get("message", "?")}
         # 2. read core -> internal
+        stage = "read_core"
         r2 = run_native("read", str(core_dir), str(core_internal))
         if r2.get("status") != "ok":
             return {"survived": False, "method": method, "stage": "read_core",
                     "error": r2.get("message", "?")}
 
+        stage = method
         if method == "maxwell":
             # maxwell-transition: low=crust, high=core, local_neutrality=true
             r3 = run_native("maxwell-transition", str(crust_internal), str(core_internal),
@@ -409,6 +460,7 @@ def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) ->
                     "error": f"combined n={combined_n} too small", "report": r3}
 
         # 4. write internal -> CompOSE output
+        stage = "write"
         r4 = run_native("write", str(matched_internal), str(out_dir / "compose"))
         if r4.get("status") != "ok":
             return {"survived": False, "method": method, "stage": "write",
@@ -533,16 +585,25 @@ def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) ->
             "core": _source_compose_hashes(core_dir),
         }
 
-        return {
-            "survived": True,
+        # 7. Independent method-specific admission. Native status/verifier
+        # PASS is necessary but never sufficient: interface conditions are
+        # re-derived from the serialized readback rows.
+        stage = "admission"
+        admission = admit_match_report(
+            method, r3,
+            readback_internal / "eos_data.csv", readback_internal / "eos_data.nml",
+        )
+        (work / "admission.json").write_text(
+            json.dumps(admission, indent=2) + "\n", encoding="utf-8")
+        common = {
             "method": method,
-            "stage": "complete",
             "combined_n": combined_n,
             "readback_n": readback_n,
             "readback_status": r5.get("status", "?"),
             "readback_validation": readback_validation,
             "consistency_status": "PASS",
             "consistency_report": consistency_report,
+            "admission": admission,
             "source_sha256": source_hashes,
             "output_sha256": output_hashes,
             "output_files": output_files,
@@ -550,9 +611,20 @@ def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) ->
             "match_report": r3,
             "write_report": r4,
         }
+        if admission.get("status") != "ADMITTED":
+            return {
+                "survived": False,
+                "stage": "admission",
+                "error": "independent admission rejected: "
+                         + ",".join(admission.get("failed_checks", []) or ["unknown"]),
+                **common,
+            }
+        return {"survived": True, "stage": "complete", **common}
     except Exception as exc:
-        return {"survived": False, "method": method, "stage": "exception",
-                "error": f"{type(exc).__name__}: {exc}"}
+        return {"survived": False, "method": method, "stage": stage,
+                "error": f"{type(exc).__name__}: {exc}",
+                "native_category": getattr(exc, "category", None),
+                "exception_type": type(exc).__name__}
 
 
 def main() -> int:
@@ -571,29 +643,59 @@ def main() -> int:
 
     results = []
     survivors = []
+    source_presence = {
+        "crust": {c: _missing_sources(CRUST_ROOT / c) for c in CRUST_MODELS},
+        "core": {c: _missing_sources(CORE_ROOT / c) for c in CORE_MODELS},
+    }
+    # Byte-identical source tables under different model names are reported
+    # so that survivor counts are not mistaken for independent evidence.
+    source_identity = {
+        "crust": {c: _source_identity(CRUST_ROOT / c) for c in CRUST_MODELS},
+        "core": {c: _source_identity(CORE_ROOT / c) for c in CORE_MODELS},
+    }
+    # Every configured (crust, core, method) triple is recorded. Incomplete
+    # source directories are NOT_EVALUATED data-provenance gaps -- never
+    # counted as failed physics -- and no attempt directory is ever deleted.
     for crust in CRUST_MODELS:
         crust_dir = CRUST_ROOT / crust
-        if not crust_dir.is_dir():
-            continue
         for core in CORE_MODELS:
             core_dir = CORE_ROOT / core
-            if not core_dir.is_dir():
-                continue
-            for method in ("maxwell", "css"):
+            missing = {"crust": source_presence["crust"][crust],
+                       "core": source_presence["core"][core]}
+            for method in METHODS:
                 pair_id = f"{crust}__{core}__{method}"
                 out_dir = OUT_ROOT / pair_id
-                out_dir.mkdir(parents=True, exist_ok=True)
+                out_dir.mkdir(parents=True, exist_ok=False)
                 t0 = time.time()
-                res = run_pipeline(method, crust_dir, core_dir, out_dir)
+                if missing["crust"] or missing["core"]:
+                    names = sorted(set(missing["crust"]) | set(missing["core"]))
+                    res = {
+                        "survived": False, "method": method, "stage": "source",
+                        "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+                        "error": "missing CompOSE source files: "
+                                 + "; ".join(f"{side}={','.join(v)}"
+                                             for side, v in missing.items() if v),
+                        "missing_source_files": names,
+                        "missing_source_detail": missing,
+                        "failure_category": "data_provenance",
+                    }
+                else:
+                    res = run_pipeline(method, crust_dir, core_dir, out_dir)
+                    res["outcome"] = "SURVIVED" if res["survived"] else "FAILED"
                 res["crust_model"] = crust
                 res["core_model"] = core
                 res["pair_id"] = pair_id
                 res["elapsed_s"] = round(time.time() - t0, 2)
+                report_path = out_dir / "pair_report.json"
+                report_path.write_text(
+                    json.dumps(res, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+                res["pair_report_sha256"] = sha256_file(report_path)
                 results.append(res)
                 status = "SURVIVED" if res["survived"] else f"FAILED@{res.get('stage')}"
                 print(f"  [{status:20s}] {crust:14s} + {core:12s} / {method:7s}  "
+                      f"[{res.get('failure_category', '-')}] "
                       f"(n={res.get('combined_n','-')})  {res.get('elapsed_s','-')}s  "
-                      f"{res.get('error','')[:60]}")
+                      f"{str(res.get('error',''))[:60]}")
                 if res["survived"]:
                     survivors.append({
                         "pair_id": pair_id,
@@ -606,22 +708,56 @@ def main() -> int:
                         "readback_validation": res["readback_validation"],
                         "consistency_status": res["consistency_status"],
                         "consistency_report": res["consistency_report"],
+                        "admission": res["admission"],
                         "source_sha256": res["source_sha256"],
                         "output_sha256": res["output_sha256"],
                         "fortran_executable_sha256": res["fortran_executable_sha256"],
                         "output_dir": str(out_dir / "compose"),
                         "match_report": res["match_report"],
+                        "pair_report_sha256": res["pair_report_sha256"],
                     })
-                else:
-                    # clean up failed attempt dir
-                    shutil.rmtree(out_dir, ignore_errors=True)
 
     # write manifest
     n_maxwell = sum(1 for s in survivors if s["method"] == "maxwell")
     n_css = sum(1 for s in survivors if s["method"] == "css")
+    failures_by_category: dict[str, int] = {}
+    by_method: dict[str, dict] = {}
+    by_pair: dict[str, dict] = {}
+    for r in results:
+        m = by_method.setdefault(r["method"], {
+            "configured": 0, "evaluated": 0, "survivors": 0, "failures_by_category": {}})
+        m["configured"] += 1
+        if r["outcome"] != "NOT_EVALUATED_SOURCE_INCOMPLETE":
+            m["evaluated"] += 1
+        if r["survived"]:
+            m["survivors"] += 1
+        else:
+            cat = r.get("failure_category", "unclassified")
+            failures_by_category[cat] = failures_by_category.get(cat, 0) + 1
+            m["failures_by_category"][cat] = m["failures_by_category"].get(cat, 0) + 1
+        by_pair.setdefault(f"{r['crust_model']}__{r['core_model']}", {})[r["method"]] = {
+            "outcome": r["outcome"], "stage": r.get("stage"),
+            "failure_category": r.get("failure_category"),
+            "error": str(r.get("error", ""))[:240] or None,
+        }
+    try:
+        exe_sha_top = sha256_file(executable())
+    except (OSError, RuntimeError):
+        exe_sha_top = None
+    try:
+        git_head = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"],
+                                  capture_output=True, text=True, check=True).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        git_head = None
+    try:
+        git_dirty = bool(subprocess.run(
+            ["git", "-C", str(ROOT), "status", "--porcelain", "--untracked-files=no"],
+            capture_output=True, text=True, check=True).stdout.strip())
+    except (OSError, subprocess.CalledProcessError):
+        git_dirty = None
     built_at = datetime.now(timezone.utc)
     manifest = {
-        "schema": "ns-cowling.core-crust-matching.v2",
+        "schema": "ns-cowling.core-crust-matching.v3",
         "built_at_utc": built_at.isoformat(),
         "built_date_utc": built_at.date().isoformat(),
         "output_root": str(OUT_ROOT),
@@ -647,6 +783,26 @@ def main() -> int:
                 "smooth_over_entire_crust_plus_bridge": False,
             },
         },
+        "git_head": git_head,
+        "git_tracked_tree_dirty": git_dirty,
+        "fortran_executable_sha256": exe_sha_top,
+        "required_source_files": list(REQUIRED_SOURCE_FILES),
+        "source_missing_files": source_presence,
+        "admission_schema": "ns-cowling.match-report-admission.v1",
+        "configured_attempts": len(CRUST_MODELS) * len(CORE_MODELS) * len(METHODS),
+        "evaluated_attempts": sum(
+            1 for r in results if r["outcome"] != "NOT_EVALUATED_SOURCE_INCOMPLETE"),
+        "not_evaluated_source_incomplete": sum(
+            1 for r in results if r["outcome"] == "NOT_EVALUATED_SOURCE_INCOMPLETE"),
+        "source_identity_sha256": source_identity,
+        "source_duplicate_groups": {
+            side: _duplicate_groups(ids) for side, ids in source_identity.items()},
+        "distinct_source_survivors": len({
+            (source_identity["crust"][s["crust_model"]],
+             source_identity["core"][s["core_model"]], s["method"]) for s in survivors}),
+        "failures_by_category": failures_by_category,
+        "by_method": by_method,
+        "by_pair": by_pair,
         "total_attempts": len(results),
         "total_survivors": len(survivors),
         "survivors_maxwell": n_maxwell,

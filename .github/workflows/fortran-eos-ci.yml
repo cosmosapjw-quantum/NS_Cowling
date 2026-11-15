@@ -135,6 +135,22 @@ jobs:
             -o build/compose_eos_fortran/test_cld_cell
           build/compose_eos_fortran/test_cld_cell
 
+      - name: Run native Fortran Wigner-Seitz TF gas composition tests (E390-03/M3)
+        env:
+          GFORTRAN_WARN_ARRAY_TEMPORARY: "0"
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/test_wigner_seitz_cell.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_wigner_seitz.o \
+            -o build/compose_eos_fortran/test_wigner_seitz_cell
+          build/compose_eos_fortran/test_wigner_seitz_cell
+
+      - name: Run Wigner-Seitz end-to-end reconstruction tests (E390-03/M3, skips if M0 not staged)
+        run: |
+          python -m pytest -q python_frontend/tests/test_wigner_seitz_reconstruction.py
+
       - name: Run native Fortran TOV-Love smooth barotrope tests (E390-06/M6)
         run: |
           gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \

@@ -641,7 +641,7 @@
         "E390-03A",
         "E390-03B"
       ],
-      "status": "PARTIAL_NATIVE_DDRMF_HOMOGENEOUS_AND_CLD_COMPOSITION_PASS_COMPOSE_CLOSURE_PASS_TF_GAS_ABSOLUTE_ABAR_ZBAR_REMAIN",
+      "status": "RESOLVED_20261114_NATIVE_DDRMF_CLD_TF_GAS_COMPOSITION_PASS_COMPOSE_CLOSURE_PASS",
       "outputs": [
         "native DD-RMF homogeneous symmetry energy, beta-equilibrium and electron/muon branch diagnostics (DELIVERED, b3d80cc)",
         "native CLD cell composition reconstruction for GPPVA_DD2/DDME2/TW over the inner-crust density grid (DELIVERED: 3 models x 20 points = 60 rows, 5 physics invariants PASS; Scurto 2024 CLD on the Fortran DD-RMF solver; Lattimer surface tension, RPW Coulomb lattice, Nelder-Mead 3-var)",
@@ -678,7 +678,7 @@
       },
       "remaining_acceptance": [
         "RESOLVED_20261114: GitHub CI build/test pass for compose_eos_cld + compose_eos_rmf -- native unit tests test_ddrmf_homogeneous.f90 and test_cld_cell.f90 added to fortran_eos/tests/ and wired into .github/workflows/fortran-eos-ci.yml (commit 669ec9d). Local: 5 native tests PASS.",
-        "full Thomas-Fermi Wigner-Seitz gas composition (separate subscope, REMAINS)"
+        "RESOLVED_20261114: full Thomas-Fermi Wigner-Seitz gas composition (SPG_M1-M5, Scurto-Pais-Gulminelli 2024) -- native Fortran module compose_eos_wigner_seitz.f90 implemented. Recovers the true CompOSE cluster baryon fraction Yh = Yh_stored/A from the non-conformant provider eos.compo group tuple (the doc's 'do not recycle as physics target' guard), then derives free-gas Yn/Yp from the two closure identities by construction: C4 charge closure Yp_free = max(0, Ye+Ymu-(Z/A)*Yh); C3 baryon closure Yn_free = 1-Yh-Yp. Geometry: R_ws=(3A/(4 pi n_b Yh))^(1/3), R_cl=(3A/(4 pi n0))^(1/3), n_gas=n_b(1-Yh). Iphase carried through verbatim. FNV-1a 32-bit output hash for content provenance. Over-charge / negative-neutron rows rejected fail-closed (no fabricated abundance). Native unit test test_wigner_seitz_cell.f90: 6 checks PASS (C3/C4 by construction, geometry finite, monotone cell volume, over-charge rejected, hash deterministic + distinct, Iphase preserved). Python end-to-end test_wigner_seitz_reconstruction.py: 365/365 SPG_M1 rows admitted, C3 max|r|=5.0e-6, C4 max|r|=4.65e-6, 0 rejected. CI steps 'Run native Fortran Wigner-Seitz TF gas composition tests' + 'Run Wigner-Seitz end-to-end reconstruction tests' added. Local: 209 pytest passed (was 207; +2 Wigner-Seitz)."
       ],
       "resolved_acceptance_20261114": {
         "commit": "669ec9d",

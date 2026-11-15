@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from compose_eos import EOSData,read_compose,check_consistency
+from compose_eos import EOSData,read_compose,write_compose,check_consistency
 from compose_eos.phase_transitions import (build_maxwell_eos,build_maxwell_css_eos,write_maxwell_eos,read_maxwell_eos,
     tidal_y_jump,solve_tov_with_phase_transition,ChargeResolvedPhase,LeptonSector,gibbs_mixed_phase,write_gibbs_eos,read_gibbs_eos)
 from compose_eos.causality import causality_profile,causal_completion
@@ -229,3 +229,27 @@ def test_maxwell_preflight_rejects_acausal_n_of_mu_interpolant_between_knots():
     )
     with pytest.raises(ValueError, match="thermodynamic n_B"):
         _phase_arrays(phase)
+
+
+
+def test_maxwell_readback_rejects_off_transition_pressure_corruption(tmp_path):
+    low = polytrope(939, 100, np.linspace(0.01, 0.5, 180))
+    high = polytrope(950, 50, np.linspace(0.01, 0.8, 180))
+    result = build_maxwell_eos(low, high)
+    write_maxwell_eos(str(tmp_path), result)
+
+    damaged = read_compose(str(tmp_path))
+    transition_index = int(result.transition["low_index"])
+    row = max(1, transition_index // 2)
+    original_pressure = float(damaged.p[row])
+    damaged.Q1[row] *= 1.01
+    # Keep the pointwise Euler identity exact so this test isolates the
+    # branchwise pressure-potential readback contract.
+    new_pressure = float(damaged.p[row])
+    new_energy = float(damaged.mub[row] * damaged.nb[row] - new_pressure)
+    damaged.Q7[row] = new_energy / (damaged.nb[row] * damaged.mn) - 1.0
+    assert damaged.p[row] > original_pressure
+    write_compose(str(tmp_path), damaged)
+
+    with pytest.raises(ValueError, match="pressure reconstruction"):
+        read_maxwell_eos(str(tmp_path))

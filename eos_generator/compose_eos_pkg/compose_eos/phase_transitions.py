@@ -70,19 +70,25 @@ def _branchwise_first_law_report(mu, p, n, *, samples_per_interval=8):
     p_reconstructed = np.asarray(primitive(mu), dtype=float) + offset
     p_scale = np.maximum(np.maximum(np.abs(p), abs(float(p[0]))), 1e-8)
     p_rel = np.abs(p_reconstructed - p) / p_scale
+    eps_reconstructed = mu * n - p_reconstructed
+    eps_scale = np.maximum(np.abs(eps), 1.0)
+    eps_rel = np.abs(eps_reconstructed - eps) / eps_scale
     finite_derivative = (np.isfinite(rel_derivative) & np.isfinite(dp_dmu)
                          & np.isfinite(n_interp))
-    finite_pressure = np.isfinite(p_rel)
-    if not np.all(finite_derivative) or not np.all(finite_pressure):
+    finite_source = np.isfinite(p_rel) & np.isfinite(eps_rel)
+    if not np.all(finite_derivative) or not np.all(finite_source):
         return {"max_relative_residual": float("inf"),
                 "rms_relative_residual": float("inf"),
                 "pressure_reconstruction_max_relative_residual": float("inf"),
+                "energy_reconstruction_max_relative_residual": float("inf"),
                 "min_dP_dmu_fm3": float("nan"), "n_samples": int(q.size)}
     return {
         "max_relative_residual": float(np.max(rel_derivative)),
         "rms_relative_residual": float(np.sqrt(np.mean(rel_derivative ** 2))),
         "pressure_reconstruction_max_relative_residual": float(np.max(p_rel)),
         "pressure_reconstruction_rms_relative_residual": float(np.sqrt(np.mean(p_rel ** 2))),
+        "energy_reconstruction_max_relative_residual": float(np.max(eps_rel)),
+        "energy_reconstruction_rms_relative_residual": float(np.sqrt(np.mean(eps_rel ** 2))),
         "min_dP_dmu_fm3": float(np.min(dp_dmu)),
         "n_samples": int(q.size),
         "samples_per_interval": int(samples_per_interval),
@@ -105,12 +111,15 @@ def _phase_arrays(data: EOSData, *, differential_tolerance=5e-3, differential_sa
         mu, p, n, samples_per_interval=int(differential_samples_per_interval)
     )
     if (not np.isfinite(differential['pressure_reconstruction_max_relative_residual'])
+            or not np.isfinite(differential['energy_reconstruction_max_relative_residual'])
             or differential['pressure_reconstruction_max_relative_residual'] > differential_tolerance
+            or differential['energy_reconstruction_max_relative_residual'] > differential_tolerance
             or differential['min_dP_dmu_fm3'] <= 0):
         raise ValueError(
             'phase thermodynamic-potential consistency failed (dP/dmu_B = n_B by construction; '
             'pressure reconstruction residual '
-            f"{differential['pressure_reconstruction_max_relative_residual']:.3e}; "
+            f"P residual {differential['pressure_reconstruction_max_relative_residual']:.3e}, "
+            f"epsilon residual {differential['energy_reconstruction_max_relative_residual']:.3e}; "
             f"tolerance {differential_tolerance:.3e})"
         )
     # A sharp coexistence construction is only meaningful when each input is
@@ -172,9 +181,20 @@ def build_maxwell_eos(low_phase: EOSData, high_phase: EOSData, *, low_name='low'
     # Keep the untouched tabulated branches and add exact interpolated endpoints.
     ml=mul<mut; mh=muh>mut
     if ml.sum()<3 or mh.sum()<3: raise ValueError('not enough tabulated points on both sides of the coexistence point')
+    # Export the same thermodynamic pressure primitive used to locate the
+    # coexistence root. Keep the original input immutable; quantify how much
+    # P and epsilon were reconstructed from n_B(mu_B).
+    p_low_consistent = np.asarray(Pl(mul), dtype=float)
+    p_high_consistent = np.asarray(Ph(muh), dtype=float)
+    eps_low_consistent = mul * nl - p_low_consistent
+    eps_high_consistent = muh * nh - p_high_consistent
+    if (np.any(~np.isfinite(p_low_consistent + eps_low_consistent))
+            or np.any(~np.isfinite(p_high_consistent + eps_high_consistent))
+            or np.any(eps_low_consistent <= 0) or np.any(eps_high_consistent <= 0)):
+        raise ValueError('thermodynamic-potential reconstruction produced non-finite/non-positive branch energy')
     n_out=np.r_[nl[ml],nlo,nhi_t,nh[mh]]
     mu_out=np.r_[mul[ml],mut,mut,muh[mh]]
-    p_out=np.r_[pl[ml],pt,pt,ph[mh]]
+    p_out=np.r_[p_low_consistent[ml],pt,pt,p_high_consistent[mh]]
     phase_ids=np.r_[np.ones(ml.sum()+1,dtype=int),np.full(1+mh.sum(),2,dtype=int)]
     eps_out=mu_out*n_out-p_out
     if np.any(np.diff(n_out)<=0) or np.any(np.diff(p_out)<-1e-10) or np.any(np.diff(eps_out)<=0):
@@ -208,7 +228,13 @@ def build_maxwell_eos(low_phase: EOSData, high_phase: EOSData, *, low_name='low'
           'low_source_differential_first_law':repl['C12'],
           'high_source_differential_first_law':reph['C12'],
           'transition':transition,'phase_ids':phase_ids.tolist(),
-          'interpretation':'Exact sharp Maxwell interface between the supplied locally-neutral 1-D barotropes; not the legacy smooth maxwell bridge.'}
+          'output_pressure_interpolation':'P(mu_B)=P(mu_0)+integral PchipInterpolator(mu_B,n_B) dmu_B',
+          'output_energy_identity':'epsilon=mu_B*n_B-P, enforced at every exported row',
+          'low_branch_source_pressure_reconstruction_max_relative_residual':repl['C12']['pressure_reconstruction_max_relative_residual'],
+          'high_branch_source_pressure_reconstruction_max_relative_residual':reph['C12']['pressure_reconstruction_max_relative_residual'],
+          'low_branch_source_energy_reconstruction_max_relative_residual':repl['C12']['energy_reconstruction_max_relative_residual'],
+          'high_branch_source_energy_reconstruction_max_relative_residual':reph['C12']['energy_reconstruction_max_relative_residual'],
+          'interpretation':'Sharp Maxwell interface between locally-neutral 1-D barotropes using an n_B(mu_B) thermodynamic pressure primitive; source P/epsilon reconstruction residuals are explicitly recorded.'}
     return MaxwellEOS(data=data,transition=transition,metadata=meta)
 
 

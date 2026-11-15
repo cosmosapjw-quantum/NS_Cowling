@@ -43,7 +43,7 @@
     "do_not_merge_any_pull_request": true,
     "do_not_force_push": true
   },
-  "patch_state": "PATCHED_PUSHED_CI_PENDING",
+  "patch_state": "PATCHED_CI_PASS_WITH_SCIENTIFIC_BLOCKERS_RETAINED",
   "red_green_evidence": {
     "tests_committed_before_implementation": true,
     "red_failure_observed_in_host_session": false,
@@ -291,5 +291,128 @@
       "remaining_blockers",
       "scientific_claims_with_scope"
     ]
+  },
+  "verification": {
+    "last_completed_ci": {
+      "run_id": 43676024772,
+      "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43676024772",
+      "head_sha": "5d31b41eacf267b5face4c1097287b3b705887",
+      "conclusion": "success",
+      "job_id": 132696243405,
+      "job": "native",
+      "fortran_build_exit": 0,
+      "pytest_command": "python -m pytest -q python_frontend/tests pipeline/tests",
+      "pytest_passed": 263,
+      "pytest_skipped": 9,
+      "pytest_failed": 0,
+      "wigner_seitz_raw_source_tests_skipped": 2,
+      "cowling_end_to_end_tests_skipped": 3,
+      "tracked_sha256_manifest": "PASS",
+      "warning_notes": [
+        "GitHub Actions emitted Node.js 20 deprecation warning for checkout/setup-python/upload-artifact actions.",
+        "Fortran CLD routine emitted array-temporary runtime warnings; not test failures."
+      ]
+    },
+    "verification_after_docs_update": {
+      "required": true,
+      "reason": "Updating the manifest and README changes the PR head. The exact final docs-updated head must receive its own CI run before the final completion claim.",
+      "status": "PENDING"
+    },
+    "cohort_physical_validation_observations": {
+      "core_only": {
+        "APR_APR": {
+          "status": "FAIL",
+          "failed_checks": [
+            "C10"
+          ]
+        },
+        "BBB_BHF2": {
+          "status": "PASS",
+          "failed_checks": []
+        },
+        "GM_GM1": {
+          "status": "PASS",
+          "failed_checks": []
+        },
+        "RG_KDE0v1": {
+          "status": "FAIL",
+          "failed_checks": [
+            "C2",
+            "C10"
+          ]
+        },
+        "RG_SLY4": {
+          "status": "FAIL",
+          "failed_checks": [
+            "C2"
+          ]
+        }
+      },
+      "crust_only": {
+        "GPPVA_DD2": {
+          "status": "FAIL",
+          "failed_checks": [
+            "C2"
+          ]
+        },
+        "GPPVA_DDME2": {
+          "status": "FAIL",
+          "failed_checks": [
+            "C2"
+          ]
+        },
+        "GPPVA_FSU2": {
+          "status": "PASS",
+          "failed_checks": []
+        },
+        "GPPVA_FSU2H": {
+          "status": "PASS",
+          "failed_checks": []
+        },
+        "GPPVA_FSU2R": {
+          "status": "FAIL",
+          "failed_checks": [
+            "C2"
+          ]
+        },
+        "GPPVA_NL3wrL55": {
+          "status": "FAIL",
+          "failed_checks": [
+            "C2"
+          ]
+        },
+        "GPPVA_TM1e": {
+          "status": "FAIL",
+          "failed_checks": [
+            "C2"
+          ]
+        },
+        "SPG_M1": {
+          "status": "PASS",
+          "failed_checks": []
+        },
+        "SPG_M2": {
+          "status": "PASS",
+          "failed_checks": []
+        },
+        "SPG_M3": {
+          "status": "PASS",
+          "failed_checks": []
+        },
+        "SPG_M4": {
+          "status": "PASS",
+          "failed_checks": []
+        },
+        "SPG_M5": {
+          "status": "PASS",
+          "failed_checks": []
+        },
+        "GPPVA_TW": {
+          "status": "BLOCKED",
+          "reason": "provider source discrepancy: live CompOSE page and linked model PDF disagree about the crust prescription; no provider choice inferred"
+        }
+      }
+    },
+    "important_interpretation": "Workflow success means build, tests and artifact-construction steps succeeded. It does not mean every generated component EOS passed physical validation; preserve the per-model C2/C10 results above."
   }
 }

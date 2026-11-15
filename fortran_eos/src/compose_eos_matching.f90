@@ -665,6 +665,7 @@ contains
     real(wp)::nbar,qbar,cs1,cs2,dmcr,muq1,muq2,su,ff,qq
     real(wp)::css_cs2,css_nb_high,css_delta_eps,css_p_t,css_mu_t,css_f_high
     real(wp)::css_eps_low,css_eps_high,css_critical,css_mu_core,css_f_core
+    real(wp)::css_source_cs1,css_source_cs2
     integer::i1,i2,nleft,nright,nout,j,k
     logical::ok1,ok2,ok3,css_mode
     character(len=512)::msg
@@ -709,6 +710,9 @@ contains
     if(.not.ok1)then;status='invalid crust endpoint sound speed: '//trim(msg);return;endif
     call endpoint_cs2(co,i2,'right',cs2,ok2,msg)
     if(.not.ok2)then;status='invalid core endpoint sound speed: '//trim(msg);return;endif
+    css_source_cs1=cs1;css_source_cs2=cs2
+    css_f_core=(co%q(6,i2)+1._wp)*co%mn
+    css_mu_core=(co%q(3,i2)+1._wp)*co%mn
 
     dmcr=co%mn-cr%mn
     css_cs2=0._wp;css_nb_high=0._wp;css_delta_eps=0._wp
@@ -719,7 +723,6 @@ contains
       ! The crust low-side endpoint is re-expressed in the core neutron-mass
       ! gauge using the established representation-only mass alignment.
       css_mu_t=(cr%q(6,i1)+1._wp)*cr%mn+dmcr+cr%q(1,i1)
-      css_f_core=(co%q(6,i2)+1._wp)*co%mn
       css_mu_core=css_f_core+co%q(1,i2)
       call solve_single_css_match(cr%nb(i1),co%nb(i2),css_p_t,co%nb(i2)*co%q(1,i2), &
           css_mu_t,css_mu_core,css_cs2,css_nb_high,css_delta_eps,ok1,msg)
@@ -824,7 +827,7 @@ contains
     report%f1=(cr%q(6,i1)+1._wp)*cr%mn+dmcr;report%f2=css_f_core
     report%mu1=report%f1+cr%q(1,i1);report%mu2=css_mu_core
     if(css_mode)then
-      report%cs2_source_left=0._wp;report%cs2_source_right=cs2
+      report%cs2_source_left=css_source_cs1;report%cs2_source_right=css_source_cs2
       report%is_exact_maxwell=.true.;report%seidov_applicable=.true.
       report%construction_kind='css_single_speed_with_crust_density_jump'
       report%css_single_sound_speed=css_cs2
@@ -844,6 +847,15 @@ contains
     report%pressure_span=maxval(pd)-minval(pd);report%spline_mode=trim(msg)
     report%first_law_relative_residual=abs(fd(size(fd))-report%f2)/max(1._wp,abs(report%f2-report%f1))
     report%method=trim(method)
+    if(.not.css_mode)then
+      select case(trim(method))
+      case('first_law_constrained_hermite_pressure_bridge');report%construction_kind='smooth_near_pressure_plateau'
+      case('cubic_F');report%construction_kind='cubic_free_energy_bridge'
+      case('quintic_F');report%construction_kind='quintic_C2_free_energy_bridge'
+      case('cubic_P');report%construction_kind='cubic_pressure_chemical_potential_bridge'
+      case('quintic_P');report%construction_kind='quintic_C2_pressure_chemical_potential_bridge'
+      end select
+    endif
     ! Phase B provenance: record the gauge shift and the provider Euler residual
     ! over the retained crust rows (rows 1..i1); it is not a physical mass correction.
     report%dm_mass_gauge_meV=dmcr

@@ -102,7 +102,7 @@ PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=bu
 
 ---
 
-## Task 4: Native Wigner–Seitz production route
+## Task 5: Native Wigner–Seitz production route
 
 **Files to inspect:** `fortran_eos/src/compose_eos_wigner_seitz.f90`, `fortran_eos/app/compose_eos_fortran.f90`, `fortran_eos/src/compose_eos_io.f90`, `python_frontend/compose_eos/native.py`, `python_frontend/tests/test_wigner_seitz_reconstruction.py`.
 
@@ -115,15 +115,15 @@ PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=bu
 
 **Stop:** do not label the current module as a full microscopic Thomas–Fermi variational solver; do not claim end-to-end native acceptance without running the native command on the raw source input.
 
-## Task 5: Composition-aware Maxwell v2 (future native implementation)
+## Task 6: Composition-aware Maxwell v2 (future native implementation)
 
 The current branch deliberately rejects composition-bearing input. A genuine implementation requires an explicit native kernel contract for composition, row-level masks, `Iphase`, phase metadata and round-trip serialization. Do not remove the fail-closed guard until the native path exists and the tests exercise real composition-bearing inputs.
 
-## Task 6: SPG_M1 source convexity
+## Task 7: SPG_M1 source convexity
 
 Reconfirm source blob identities and the 147 interval diagnostics. Do not change source data. Seek higher-resolution pressure/chemical-potential/density output or use an independently validated crust model. If a thermodynamic-potential reconstruction is explored, report all source residuals and reject if it exceeds the predeclared source error budget.
 
-## Task 7: Full verification and handoff
+## Task 8: Full verification and handoff
 
 Run the exact CI workflow commands from `.github/workflows/fortran-eos-ci.yml`. Create or update a **draft** PR targeting `research/eos390-fortran-unification-v1`. Confirm the workflow run's `head_sha` equals the final branch HEAD. Report pass/skip/fail counts and all remaining blockers. Never merge.
 

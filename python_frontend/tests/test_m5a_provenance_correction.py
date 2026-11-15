@@ -47,14 +47,20 @@ def test_m5a_finding1_python_check_not_native(rep):
     # the misleading field name is gone
     assert "python_consistency_check_pass" in sample
     assert "native_c1_c11_overall_pass" not in sample
-    # the native verification fields are TRUE with evidence (not BLOCKED)
-    assert sample["native_c1_c11_verification"] is True
-    assert sample["native_fortran_compose_readback"] is True
-    # the truthful verification-backend summary
+    # The native Fortran run covers the one headline barotrope only.
+    # It must never be broadcast to all 27 parameter combinations.
+    assert all(
+        case["native_c1_c11_verification"] is False
+        and case["native_fortran_compose_readback"] is False
+        for case in rep["results"].values()
+    )
+    # The receipt-level evidence is retained with an explicit single-artifact scope.
     vbt = rep["verification_backend_truthful"]
     assert vbt["python_consistency_check"] is True
     assert vbt["native_c1_c11_verification"] is True
     assert vbt["native_fortran_compose_readback"] is True
+    assert vbt["native_readback_scope"] == "HEADLINE_BAROTROPE_ONLY"
+    assert vbt["native_verified_case_keys"] == []
     # concrete evidence must be present
     ev = rep["native_readback_evidence"]
     assert ev["native_write_executed"] is True

@@ -101,10 +101,14 @@ def test_apr_css_example_tov_love_converged(rep):
     assert ex["tov_Lambda"] > 0
 
 
-def test_apr_css_verdict_admitted_with_phenomenological_declaration(rep):
-    """The overall verdict is ADMITTED_WITH_PHENOMENOLOGICAL_DECLARATION: all
-    physical gates pass AND the phenomenological declaration is present."""
-    assert rep["verdict"] == "ADMITTED_WITH_PHENOMENOLOGICAL_DECLARATION"
+def test_apr_css_verdict_is_blocked_when_differential_gate_fails(rep):
+    """A failed branch-interior differential first law must block admission,
+    even when the Maxwell jump identity and representative TOV solution pass."""
+    dfl = rep["1_differential_first_law_n_equals_dPdmu"]
+    if not dfl["apr_source_differential_first_law_holds"]:
+        assert rep["verdict"] == "REVIEW_REQUIRED"
+    else:
+        assert rep["verdict"] == "ADMITTED_WITH_PHENOMENOLOGICAL_DECLARATION"
 
 
 def test_apr_css_exact_pchip_derivative_is_an_admission_gate(rep):

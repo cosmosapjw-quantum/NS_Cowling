@@ -148,3 +148,115 @@ def test_spg_m1_wigner_seitz_preserves_provider_cluster_abundance():
     assert np.allclose(gas_sum[valid_mask] + yh_recovered[valid_mask], 1.0, atol=1e-4)
     # The recovered cluster baryon fraction is Yh_stored / A, in [0, 1]
     assert np.all(yh_recovered[valid_mask] >= 0) and np.all(yh_recovered[valid_mask] <= 1 + 1e-9)
+
+
+def test_native_wigner_seitz_cli_matches_python_oracle_on_spg_m1(tmp_path):
+    """§8: the production Fortran CLI `wigner-seitz` operation, invoked on the
+    real SPG_M1 source table, must reproduce the independent Python oracle
+    (`reconstruct_row` above) row-by-row. This is a native end-to-end
+    integration test, not a Python mirror of the Fortran logic: it shells out
+    to the compiled binary and compares the JSON report against the oracle."""
+    import json
+    import subprocess
+    from compose_eos import executable
+    # Prefer the staged M0 input; fall back to the committed eos_generator source
+    # table so the integration test runs even when M0 staging was not performed.
+    spg_m1_inputs = [ROOT / "inputs" / "raw_compose" / "SPG_M1",
+                     ROOT / "eos_generator" / "eos_data" / "SPG_M1"]
+    spg_m1_path = next((p for p in spg_m1_inputs if p.is_dir()), None)
+    if spg_m1_path is None:
+        pytest.skip("SPG_M1 source table not found in inputs/raw_compose or eos_generator/eos_data")
+    d = read_compose(str(spg_m1_path))
+    # write the source to an internal directory the CLI can read
+    internal = tmp_path / "internal"
+    internal.mkdir()
+    d.write_internal_directory(internal)
+    report_path = tmp_path / "ws_report.json"
+    exe = executable()
+    completed = subprocess.run(
+        [str(exe), "wigner-seitz", str(internal), str(report_path)],
+        capture_output=True, text=True, check=False,
+    )
+    assert completed.returncode == 0, (
+        f"native wigner-seitz CLI failed: rc={completed.returncode}\n"
+        f"stdout={completed.stdout}\nstderr={completed.stderr}")
+    assert report_path.is_file(), "native wigner-seitz did not write a report"
+    rep = json.loads(report_path.read_text())
+    assert rep["operation"] == "wigner-seitz"
+    assert rep["n_rows"] == d.n
+    # the native report must admit rows and close C3/C4 within the provider
+    # rounding tolerance, matching the Python oracle's acceptance contract
+    assert rep["n_valid_rows"] > 0, "native wigner-seitz admitted no rows"
+    assert rep["closures"]["max_abs_c3_residual"] < 1e-4
+    assert rep["closures"]["max_abs_c4_residual"] < 1e-4
+    # row-by-row comparison with the independent Python oracle
+    nb = np.asarray(d.nb, float); A = np.asarray(d.Aav, float)
+    Z = np.asarray(d.Zav, float); Yh = np.asarray(d.Yh, float)
+    Ye = np.asarray(d.Ye, float); Ymu = np.asarray(d.Ymu, float)
+    n_match = 0
+    n_oracle_valid = 0
+    for i in range(d.n):
+        r = reconstruct_row(nb[i], A[i], Z[i], Yh[i], Ye[i], Ymu[i])
+        native_row = rep["rows"][i]
+        # validity must agree between native and oracle
+        assert native_row["valid"] == r["valid"], (
+            f"row {i}: native valid={native_row['valid']} oracle valid={r['valid']}")
+        if r["valid"]:
+            n_oracle_valid += 1
+            # free-gas fractions must agree to the provider rounding tolerance
+            assert abs(native_row["yp_free"] - r["yp_free"]) < 1e-4, (
+                f"row {i}: Yp_free native={native_row['yp_free']} oracle={r['yp_free']}")
+            assert abs(native_row["yn_free"] - r["yn_free"]) < 1e-4, (
+                f"row {i}: Yn_free native={native_row['yn_free']} oracle={r['yn_free']}")
+            # C3/C4 residuals must agree (both close the same identities)
+            assert abs(native_row["c3_residual"] - r["c3"]) < 1e-4
+            assert abs(native_row["c4_residual"] - r["c4"]) < 1e-4
+            n_match += 1
+    assert n_match == n_oracle_valid, (
+        f"native/oracle mismatch: matched {n_match}/{n_oracle_valid} valid rows")
+    # the report must document the formula as algebraic closure, NOT a
+    # Thomas-Fermi spatial profile or variational minimization
+    note = rep["formula"]["note"].lower()
+    assert "thomas-fermi" in note or "not a" in note or "algebraic" in note, (
+        f"formula note must disclaim spatial-profile semantics; got: {rep['formula']['note']!r}")
+
+
+def test_native_wigner_seitz_cli_rejects_composition_missing_input(tmp_path):
+    """§8: the native wigner-seitz CLI must fail closed (nonzero exit) when the
+    input EOS has no composition, rather than silently producing an empty or
+    zero-filled report. This is the production-path guard that the module is
+    not applied outside its declared scope."""
+    import subprocess
+    from compose_eos import executable, EOSData
+    # a synthetic thermo-only EOSData with no composition
+    nb = np.linspace(0.05, 0.5, 20)
+    pressure = nb ** 2
+    epsilon = 939.0 * nb + pressure
+    mu = (epsilon + pressure) / nb
+    zeros = np.zeros_like(nb)
+    q7 = epsilon / (nb * 939.0) - 1.0
+    d = EOSData(
+        nb=nb, mn=939.0, mp=939.0,
+        Q1=pressure / nb, Q2=zeros.copy(), Q3=mu / 939.0 - 1.0,
+        Q4=zeros.copy(), Q5=zeros.copy(), Q6=q7.copy(), Q7=q7.copy(),
+        q_extra=zeros.copy(), Iphase=np.zeros(nb.size, dtype=int),
+        Yn=zeros.copy(), Yp=zeros.copy(), Ye=zeros.copy(), Ymu=zeros.copy(),
+        Aav=zeros.copy(), Zav=zeros.copy(), Yh=zeros.copy(),
+        Il=1, iT=1, iYq=1, inb_start=1, temperature_mev=0.0,
+        charge_fraction_grid=0.0, q_extra_count=0,
+        composition_file_present=False, composition_available=False,
+        beta_equilibrated=True,
+    )
+    internal = tmp_path / "internal"
+    internal.mkdir()
+    d.write_internal_directory(internal)
+    report_path = tmp_path / "ws_report.json"
+    exe = executable()
+    completed = subprocess.run(
+        [str(exe), "wigner-seitz", str(internal), str(report_path)],
+        capture_output=True, text=True, check=False,
+    )
+    assert completed.returncode != 0, (
+        "native wigner-seitz must reject composition-missing input")
+    assert "composition" in completed.stdout.lower() or "composition" in completed.stderr.lower(), (
+        f"rejection must cite composition; got stdout={completed.stdout!r}")

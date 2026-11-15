@@ -10,6 +10,8 @@ program compose_eos_fortran
   use compose_eos_causality, only: causal_complete, causal_completion_report_t
   use compose_eos_matching, only: match_crust_core, match_report_t
   use compose_eos_phase_transition, only: construct_maxwell_transition, maxwell_transition_report_t
+  use compose_eos_wigner_seitz, only: wigner_seitz_state_t, reconstruct_wigner_seitz_table, &
+                                       wigner_seitz_output_hash
   implicit none
   type(eos_data_t)::eos,out,crust,core,phase_low,phase_high,readback
   type(verify_report_t)::report
@@ -18,6 +20,7 @@ program compose_eos_fortran
   type(maxwell_transition_report_t)::phase_report
   type(ddrmf_diagnostic_t)::rmf_diagnostic
   type(tov_love_result_t)::tov_result
+  type(wigner_seitz_state_t), allocatable :: ws_states(:)
   character(len=32)::action
   character(len=2048)::arg1,arg2,arg3
   character(len=128)::arg4,arg5,arg6,arg7
@@ -26,6 +29,7 @@ program compose_eos_fortran
   integer::core_first,core_last,expected_source_n,expected_phase
   integer::crust_outer_last,expected_outer_phase,expected_inner_phase
   integer::tov_n_high,tov_n_low,tov_mode
+  integer::ws_n_valid
   real(wp)::cs2_extension,n_max_requested,smooth_sigma,dissolution_tol
   real(wp)::min_ratio_local,best_sel
   real(wp)::cld_sigma_0,cld_b,cld_rho_min,cld_rho_max
@@ -40,7 +44,7 @@ program compose_eos_fortran
   action='';arg1='';arg2='';arg3='';arg4='';arg5='';arg6='';arg7=''
   narg=command_argument_count()
   if(narg<2)then
-    write(*,'(a)')'usage: compose_eos_fortran {rmf-evaluate|read|verify|verify-csv|normalize|write|extract-core|extract-crust|fill-gap|reconstruct-master|causal-complete|match-core|maxwell-transition|cld-reconstruct|tov-love} INPUT OUTPUT [OPTIONS]'
+    write(*,'(a)')'usage: compose_eos_fortran {rmf-evaluate|read|verify|verify-csv|normalize|write|extract-core|extract-crust|fill-gap|reconstruct-master|causal-complete|match-core|maxwell-transition|cld-reconstruct|tov-love|wigner-seitz} INPUT OUTPUT [OPTIONS]'
     stop 2
   endif
   call get_command_argument(1,action,status=ios)
@@ -513,6 +517,32 @@ program compose_eos_fortran
     case default
       call emit_failure('tov-love mode must be smooth|maxwell');stop 2
     end select
+  case('wigner-seitz')
+    ! §8: production Fortran CLI path for the Wigner-Seitz cell composition
+    ! reconstruction. Reads an internal EOS directory with composition, invokes
+    ! the native reconstruct_wigner_seitz_table routine, and writes a JSON
+    ! provenance report (row count, valid rows, C3/C4 residuals, output hash).
+    ! Returns nonzero on invalid inputs (no composition, failed checks).
+    ! arg1=INPUT_INTERNAL, arg2=OUTPUT_REPORT -> narg must be 3 (action + 2 args)
+    if(narg/=3)then
+      call emit_failure('wigner-seitz requires INPUT_INTERNAL OUTPUT_REPORT');stop 2
+    endif
+    call read_internal_csv(trim(arg1)//'/eos_data.csv',trim(arg1)//'/eos_data.nml',eos,status)
+    if(status/='ok')then;call emit_failure('invalid EOS input: '//trim(status));stop 3;endif
+    if(.not. eos%composition_available)then
+      call emit_failure('wigner-seitz requires composition-bearing EOS input; input has no composition');stop 3
+    endif
+    call reconstruct_wigner_seitz_table(eos,ws_states,ws_n_valid,status)
+    ! The module returns an empty status on success and a message on failure.
+    if(len_trim(status)/=0)then;call emit_failure(trim(status));stop 3;endif
+    call write_wigner_seitz_report(trim(arg2),eos,ws_states,ws_n_valid,status)
+    if(len_trim(status)==0)then
+      write(*,'(a)')'{"status":"ok","operation":"wigner-seitz","n":'//integer_text(eos%n)// &
+        ',"n_valid":'//integer_text(ws_n_valid)// &
+        ',"n_invalid":'//integer_text(eos%n-ws_n_valid)//'}'
+    else
+      call emit_failure('wigner-seitz report write failed: '//trim(status));stop 3
+    endif
   case default
     call emit_failure('unknown operation: '//trim(action));stop 2
   end select
@@ -662,5 +692,78 @@ contains
     read(s, *, iostat=ios) v
     ok = (ios==0)
   end subroutine csv_real
+
+  ! §8: write a JSON provenance report for the native Wigner-Seitz cell
+  ! reconstruction. Records the row count, the number of valid (closure-
+  ! satisfying) rows, the max |C3| and |C4| residuals, the per-row phase
+  ! labels, and an output hash over the reconstructed abundance fields. This
+  ! is the production-path provenance report (not a unit test).
+  subroutine write_wigner_seitz_report(path, eos, states, n_valid, status)
+    character(len=*), intent(in) :: path
+    type(eos_data_t), intent(in) :: eos
+    type(wigner_seitz_state_t), intent(in) :: states(:)
+    integer, intent(in) :: n_valid
+    character(len=*), intent(out) :: status
+    integer :: u, i, ios
+    real(wp) :: max_c3, max_c4, hash_hex
+    character(len=64) :: hash_str
+    max_c3 = 0._wp; max_c4 = 0._wp
+    do i = 1, size(states, 1)
+      if (abs(states(i)%c3_residual) > max_c3) max_c3 = abs(states(i)%c3_residual)
+      if (abs(states(i)%c4_residual) > max_c4) max_c4 = abs(states(i)%c4_residual)
+    end do
+    call wigner_seitz_output_hash(states, n_valid, hash_str, status)
+    if (len_trim(status) /= 0) return
+    open(newunit=u, file=trim(path), status='replace', action='write', iostat=ios)
+    if (ios /= 0) then
+      status = 'cannot open output report file'; return
+    endif
+    write(u, '(a)') '{'
+    write(u, '(a)') '  "operation": "wigner-seitz",'
+    write(u, '(a,i0,a)') '  "n_rows": ', eos%n, ','
+    write(u, '(a,i0,a)') '  "n_valid_rows": ', n_valid, ','
+    write(u, '(a,i0,a)') '  "n_invalid_rows": ', eos%n - n_valid, ','
+    write(u, '(a)') '  "closures": {'
+    write(u, '(a)') '    "c3_baryon_closure": "Yn + Yp + Yh = 1",'
+    write(u, '(a)') '    "c4_charge_closure": "Yp + (Z/A) Yh = Ye + Ymu",'
+    write(u, '(a)') '    "max_abs_c3_residual": '//real_text(max_c3)//','
+    write(u, '(a)') '    "max_abs_c4_residual": '//real_text(max_c4)
+    write(u, '(a)') '  },'
+    write(u, '(a)') '  "formula": {'
+    write(u, '(a)') '    "yp_free": "max(0, Ye + Ymu - (Z/A)*Yh)",'
+    write(u, '(a)') '    "yn_free": "1 - Yh - Yp_free",'
+    write(u, '(a)') '    "note": "algebraic closure from cell geometry; not a Thomas-Fermi spatial profile or variational minimization"'
+    write(u, '(a)') '  },'
+    write(u, '(a)') '  "rows": ['
+    do i = 1, size(states, 1)
+      ! Build the row JSON as a string to avoid fragile format-string item
+      ! counting; the per-row fields are 8 (i, n_b, yp_free, yn_free, c3, c4,
+      ! iphase, valid). Merge with a trailing comma except for the last row.
+      if (i < size(states, 1)) then
+        write(u, '(a)') '    {"i":'//integer_text(i)// &
+          ',"n_b_fm3":'//real_text(states(i)%n_b_fm3)// &
+          ',"yp_free":'//real_text(states(i)%yp_free)// &
+          ',"yn_free":'//real_text(states(i)%yn_free)// &
+          ',"c3_residual":'//real_text(states(i)%c3_residual)// &
+          ',"c4_residual":'//real_text(states(i)%c4_residual)// &
+          ',"iphase":'//integer_text(states(i)%iphase)// &
+          ',"valid":'//logical_text(states(i)%valid)//'},'
+      else
+        write(u, '(a)') '    {"i":'//integer_text(i)// &
+          ',"n_b_fm3":'//real_text(states(i)%n_b_fm3)// &
+          ',"yp_free":'//real_text(states(i)%yp_free)// &
+          ',"yn_free":'//real_text(states(i)%yn_free)// &
+          ',"c3_residual":'//real_text(states(i)%c3_residual)// &
+          ',"c4_residual":'//real_text(states(i)%c4_residual)// &
+          ',"iphase":'//integer_text(states(i)%iphase)// &
+          ',"valid":'//logical_text(states(i)%valid)//'}'
+      endif
+    end do
+    write(u, '(a)') '  ],'
+    write(u, '(a)') '  "output_hash": "'//trim(hash_str)//'"'
+    write(u, '(a)') '}'
+    close(u)
+    status = ''
+  end subroutine write_wigner_seitz_report
 
 end program compose_eos_fortran

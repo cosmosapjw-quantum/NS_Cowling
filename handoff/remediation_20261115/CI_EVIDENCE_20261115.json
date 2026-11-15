@@ -1,0 +1,138 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": 43676024772,
+  "run_url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43676024772",
+  "verified_code_head": "5d31b41eacf267bface4c1097287b3b705887",
+  "conclusion": "success",
+  "job": {
+    "id": 132696243405,
+    "name": "native",
+    "conclusion": "success"
+  },
+  "build": {
+    "command": "bash fortran_eos/build.sh build/compose_eos_fortran",
+    "exit_code": 0
+  },
+  "pytest": {
+    "command": "python -m pytest -q python_frontend/tests pipeline/tests",
+    "passed": 263,
+    "skipped": 9,
+    "failed": 0
+  },
+  "additional": {
+    "wigner_seitz_raw_source_tests": {
+      "status": "SKIPPED",
+      "count": 2,
+      "reason": "M0 raw source inputs were not staged in CI."
+    },
+    "cowling_end_to_end_tests": {
+      "status": "SKIPPED",
+      "count": 3,
+      "reason": "M0 raw source inputs were not staged in CI."
+    },
+    "sha256_manifest": {
+      "status": "PASS"
+    }
+  },
+  "warnings": [
+    "Node.js 20 deprecation warning for GitHub Actions checkout/setup-python/upload-artifact actions.",
+    "Fortran array-temporary runtime warnings were emitted by CLD objective calls."
+  ],
+  "scientific_validation": {
+    "meaning": "Construction/readback artifacts generated successfully; physical validation is tracked per EOS and is not implied by workflow success.",
+    "core_only": {
+      "APR_APR": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C10"
+        ]
+      },
+      "BBB_BHF2": {
+        "status": "PASS",
+        "failed_checks": []
+      },
+      "GM_GM1": {
+        "status": "PASS",
+        "failed_checks": []
+      },
+      "RG_KDE0v1": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C2",
+          "C10"
+        ]
+      },
+      "RG_SLY4": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C2"
+        ]
+      }
+    },
+    "crust_only": {
+      "GPPVA_DD2": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C2"
+        ]
+      },
+      "GPPVA_DDME2": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C2"
+        ]
+      },
+      "GPPVA_FSU2": {
+        "status": "PASS",
+        "failed_checks": []
+      },
+      "GPPVA_FSU2H": {
+        "status": "PASS",
+        "failed_checks": []
+      },
+      "GPPVA_FSU2R": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C2"
+        ]
+      },
+      "GPPVA_NL3wrL55": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C2"
+        ]
+      },
+      "GPPVA_TM1e": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C2"
+        ]
+      },
+      "SPG_M1": {
+        "status": "PASS",
+        "failed_checks": []
+      },
+      "SPG_M2": {
+        "status": "PASS",
+        "failed_checks": []
+      },
+      "SPG_M3": {
+        "status": "PASS",
+        "failed_checks": []
+      },
+      "SPG_M4": {
+        "status": "PASS",
+        "failed_checks": []
+      },
+      "SPG_M5": {
+        "status": "PASS",
+        "failed_checks": []
+      },
+      "GPPVA_TW": {
+        "status": "BLOCKED",
+        "reason": "CompOSE live page and linked PDF conflict on crust prescription; no provider choice inferred."
+      }
+    }
+  },
+  "note": "This run verified the code-patch HEAD before the subsequent docs-only commit. A new CI run is required for the exact final handoff HEAD."
+}

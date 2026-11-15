@@ -712,7 +712,7 @@ contains
     if(.not.ok2)then;status='invalid core endpoint sound speed: '//trim(msg);return;endif
     css_source_cs1=cs1;css_source_cs2=cs2
     css_f_core=(co%q(6,i2)+1._wp)*co%mn
-    css_mu_core=(co%q(3,i2)+1._wp)*co%mn
+    css_mu_core=css_f_core+co%q(1,i2)
 
     dmcr=co%mn-cr%mn
     css_cs2=0._wp;css_nb_high=0._wp;css_delta_eps=0._wp

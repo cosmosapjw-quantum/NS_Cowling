@@ -6,7 +6,7 @@ This chapter uses zero-temperature barotropic thermodynamics in SI units.  For e
 \mu=\frac{\epsilon+P}{n},\qquad dP=n\,d\mu,\qquad \epsilon=\mu n-P.
 \]
 
-The  exercises are **equilibrium-EOS exercises only**.  They do not yet specify how a Cowling perturbation crosses a material density jump; that is .
+The  exercises are **equilibrium-EOS exercises only**.  They do not yet specify how a Cowling perturbation crosses a material density jump; that is documented separately in `cowling_phase_interface_scope.md`.
 
 ## Continuous two-polytrope example knot
 

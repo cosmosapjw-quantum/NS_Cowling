@@ -162,7 +162,12 @@ def test_native_css_is_single_speed_with_crust_side_first_order_jump():
     delta_n = matched.nb[i_high] - matched.nb[i_low]
     delta_eps = matched.eps[i_high] - matched.eps[i_low]
     assert delta_eps == pytest.approx(matched.mub[i_low] * delta_n, rel=2e-10, abs=1e-10)
+    assert report["css_transition_epsilon_low"] == pytest.approx(matched.eps[i_low], rel=2e-10)
+    assert report["css_transition_epsilon_high"] == pytest.approx(matched.eps[i_high], rel=2e-10)
+    assert report["css_transition_delta_eps"] == pytest.approx(delta_eps, rel=2e-10)
     assert info["density_jump_fm3"] == pytest.approx(delta_n, rel=1e-12)
+    assert info["seidov_applicable"] is True
+    assert info["seidov_ratio"] == pytest.approx(report["seidov_ratio"], rel=1e-12)
 
     # The bridge joins continuously onto the selected core endpoint.
     i_core = report["css_core_bridge_index"]

@@ -95,10 +95,28 @@ def test_all_6_matching_schemes_pass_and_quintic_has_zero_cs2_jump(tmp_path):
         rep = check_consistency(reloaded, verbose=False)
         assert rep["overall"]["pass_"], f"{m} failed check_consistency: {rep['overall']}"
         assert rep["C2"]["max_rel"] < 1e-10
-        assert rep["C3"]["max_abs"] < 2e-5
-        assert rep["C4"]["max_abs"] < 2e-5
         i1 = info["i1"]
-        assert int(reloaded.Iphase[i1 + 1]) == int(d_cr.Iphase[i1])
+        if m == "css":
+            assert rep["C3"]["status"] == "NOT_AVAILABLE"
+            assert rep["C4"]["status"] == "NOT_AVAILABLE"
+            assert info["construction_kind"] == "css_single_speed_with_crust_density_jump"
+            assert info["density_jump_fm3"] > 0.0
+            assert info["cs2_min_bridge"] == pytest.approx(info["cs2_max_bridge"], abs=1e-14)
+            assert 0.0 < info["cs2_min_bridge"] <= 1.0
+            assert info["cs2_bridge"] == pytest.approx(info["cs2_min_bridge"], abs=1e-14)
+            assert "csA2" not in info and "csB2" not in info
+            j = i1 + 1
+            assert reloaded.p[j] == pytest.approx(reloaded.p[i1], rel=1e-12)
+            assert reloaded.mub[j] == pytest.approx(reloaded.mub[i1], rel=1e-12)
+            assert reloaded.nb[j] > reloaded.nb[i1]
+            assert reloaded.eps[j] - reloaded.eps[i1] == pytest.approx(
+                reloaded.mub[j] * (reloaded.nb[j] - reloaded.nb[i1]), rel=1e-10
+            )
+            assert reloaded.nb[j + info["n_bridge"] + 1] == pytest.approx(info["n2"], rel=1e-12)
+        else:
+            assert rep["C3"]["max_abs"] < 2e-5
+            assert rep["C4"]["max_abs"] < 2e-5
+            assert int(reloaded.Iphase[i1 + 1]) == int(d_cr.Iphase[i1])
         if m in ("quintic_F", "quintic_P"):
             assert info["dcs2_left"] < 1e-14
             assert info["dcs2_right"] < 1e-14
@@ -222,3 +240,24 @@ def test_empty_compose_composition_rows_are_not_claimed_as_available(tmp_path):
     loaded = read_compose(str(tmp_path))
     assert not loaded.composition_available
     assert np.array_equal(loaded.Iphase, np.ones(d.n, dtype=int))
+
+
+
+def test_css_single_speed_root_matches_both_interfaces():
+    d_cr, d_co, _ = _load_sample_crust_and_core()
+    eos, info = match_crust_core(d_cr, d_co, "SPG_M1", "RG_SLY4", method="css", n_bridge=64)
+    i1 = info["i1"]
+    j = i1 + 1
+    # crust -> CSS: pressure and mu continuous, n and epsilon jump.
+    assert eos.p[i1] == pytest.approx(eos.p[j], rel=1e-12)
+    assert eos.mub[i1] == pytest.approx(eos.mub[j], rel=1e-12)
+    assert eos.nb[j] > eos.nb[i1]
+    assert eos.eps[j] - eos.eps[i1] == pytest.approx(eos.mub[j]*(eos.nb[j]-eos.nb[i1]), rel=1e-10)
+    # CSS -> core: all thermodynamic state variables are continuous.
+    k = j + info["n_bridge"] + 1
+    assert eos.nb[k] == pytest.approx(info["n2"], rel=1e-12)
+    assert eos.p[k] == pytest.approx(info["P2"], rel=1e-12)
+    assert eos.mub[k] == pytest.approx(info["mu2"], rel=1e-12)
+    assert eos.eps[k] == pytest.approx(info["eps2"], rel=1e-10)
+    assert info["cs2_min_bridge"] == pytest.approx(info["cs2_bridge"], abs=1e-14)
+    assert info["cs2_max_bridge"] == pytest.approx(info["cs2_bridge"], abs=1e-14)

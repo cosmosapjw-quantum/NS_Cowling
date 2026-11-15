@@ -37,37 +37,57 @@ class CausalCompletion:
     metadata: dict
 
 
-def _branchwise_first_law_report(mu, p, n, *, samples_per_interval=8):
-    """Check n_B = dP/dmu_B on the actual PCHIP pressure interpolant.
+def _thermodynamic_pressure_from_density(mu, n, p):
+    """Return the pressure primitive P(mu)=P(mu0)+integral n_B dmu_B.
 
-    The check is deliberately separate from the pointwise Euler identity. The
-    same P(mu_B) interpolant used to locate coexistence is differentiated, and
-    compared with an independently PCHIP-interpolated n_B on a dense set within
-    every tabulated interval.
+    Interpolating n_B as the derivative of the thermodynamic potential and
+    integrating it enforces dP/dmu_B=n_B identically. The deviation from the
+    supplied tabulated pressure is retained as an independent source-table
+    consistency diagnostic.
     """
-    ps = PchipInterpolator(mu, p, extrapolate=False)
     ns = PchipInterpolator(mu, n, extrapolate=False)
+    primitive = ns.antiderivative()
+    offset = float(p[0]) - float(primitive(mu[0]))
+    return ns, primitive, offset
+
+
+def _branchwise_first_law_report(mu, p, n, *, samples_per_interval=8):
+    """Audit thermodynamic-potential reconstruction on the input grid.
+
+    The representation uses n_B(mu_B) as the primary PCHIP and integrates it.
+    Therefore n_B=dP/dmu_B is exact up to floating-point evaluation. The
+    independent admission residual is the mismatch between reconstructed and
+    supplied pressure knots; this catches source-table inconsistency without
+    comparing two unrelated interpolants.
+    """
+    ns, primitive, offset = _thermodynamic_pressure_from_density(mu, n, p)
     qparts = [np.linspace(mu[i], mu[i + 1], samples_per_interval + 2)
               for i in range(len(mu) - 1)]
     q = np.unique(np.concatenate(qparts))
-    dp_dmu = np.asarray(ps.derivative()(q), dtype=float)
+    dp_dmu = np.asarray(ns(q), dtype=float)
     n_interp = np.asarray(ns(q), dtype=float)
-    scale = np.maximum(np.maximum(np.abs(dp_dmu), np.abs(n_interp)), 1e-30)
-    rel = np.abs(dp_dmu - n_interp) / scale
-    finite = np.isfinite(rel) & np.isfinite(dp_dmu) & np.isfinite(n_interp)
+    rel_derivative = np.abs(dp_dmu - n_interp) / np.maximum(np.abs(n_interp), 1e-30)
+    p_reconstructed = np.asarray(primitive(mu), dtype=float) + offset
+    p_scale = np.maximum(np.maximum(np.abs(p), abs(float(p[0]))), 1e-8)
+    p_rel = np.abs(p_reconstructed - p) / p_scale
+    finite = (np.isfinite(rel_derivative) & np.isfinite(dp_dmu)
+              & np.isfinite(n_interp) & np.isfinite(p_rel))
     if not np.all(finite):
-        return {"max_relative_residual": float("inf"), "rms_relative_residual": float("inf"),
-                "min_dP_dmu_MeV2_fm3": float("nan"), "n_samples": int(q.size)}
+        return {"max_relative_residual": float("inf"),
+                "rms_relative_residual": float("inf"),
+                "pressure_reconstruction_max_relative_residual": float("inf"),
+                "min_dP_dmu_fm3": float("nan"), "n_samples": int(q.size)}
     return {
-        "max_relative_residual": float(np.max(rel)),
-        "rms_relative_residual": float(np.sqrt(np.mean(rel ** 2))),
-        "min_dP_dmu_MeV2_fm3": float(np.min(dp_dmu)),
+        "max_relative_residual": float(np.max(rel_derivative)),
+        "rms_relative_residual": float(np.sqrt(np.mean(rel_derivative ** 2))),
+        "pressure_reconstruction_max_relative_residual": float(np.max(p_rel)),
+        "pressure_reconstruction_rms_relative_residual": float(np.sqrt(np.mean(p_rel ** 2))),
+        "min_dP_dmu_fm3": float(np.min(dp_dmu)),
         "n_samples": int(q.size),
         "samples_per_interval": int(samples_per_interval),
-        "identity": "n_B = dP/dmu_B",
-        "interpolant": "PchipInterpolator(mu_B, P).derivative() vs PchipInterpolator(mu_B, n_B)",
+        "identity": "n_B = dP/dmu_B (enforced by integrating interpolated n_B)",
+        "interpolant": "P(mu_B)=P(mu_0)+integral PchipInterpolator(mu_B,n_B) dmu_B",
     }
-
 
 def _phase_arrays(data: EOSData, *, differential_tolerance=5e-3, differential_samples_per_interval=8):
     n=np.asarray(data.nb,float); mu=np.asarray(data.mub,float); p=np.asarray(data.p,float); eps=np.asarray(data.eps,float)
@@ -83,12 +103,12 @@ def _phase_arrays(data: EOSData, *, differential_tolerance=5e-3, differential_sa
     differential = _branchwise_first_law_report(
         mu, p, n, samples_per_interval=int(differential_samples_per_interval)
     )
-    if (not np.isfinite(differential['max_relative_residual'])
-            or differential['max_relative_residual'] > differential_tolerance
-            or differential['min_dP_dmu_MeV2_fm3'] <= 0):
+    if (not np.isfinite(differential['pressure_reconstruction_max_relative_residual'])
+            or differential['pressure_reconstruction_max_relative_residual'] > differential_tolerance
+            or differential['min_dP_dmu_fm3'] <= 0):
         raise ValueError(
             'phase branchwise dP/dmu_B = n_B consistency failed '
-            f"(max relative residual {differential['max_relative_residual']:.3e}; "
+            f"(pressure reconstruction residual {differential['pressure_reconstruction_max_relative_residual']:.3e}; "
             f"tolerance {differential_tolerance:.3e})"
         )
     # A sharp coexistence construction is only meaningful when each input is
@@ -127,8 +147,10 @@ def build_maxwell_eos(low_phase: EOSData, high_phase: EOSData, *, low_name='low'
         differential_samples_per_interval=differential_samples_per_interval)
     lo=max(mul[0],muh[0]); hi=min(mul[-1],muh[-1])
     if not lo<hi: raise ValueError('the two phases have no common baryon-chemical-potential interval')
-    Pl=PchipInterpolator(mul,pl,extrapolate=False); Ph=PchipInterpolator(muh,ph,extrapolate=False)
-    nli=PchipInterpolator(mul,nl,extrapolate=False); nhi=PchipInterpolator(muh,nh,extrapolate=False)
+    nli, pli_primitive, pli_offset = _thermodynamic_pressure_from_density(mul, nl, pl)
+    nhi, phi_primitive, phi_offset = _thermodynamic_pressure_from_density(muh, nh, ph)
+    Pl=lambda x: pli_primitive(x)+pli_offset
+    Ph=lambda x: phi_primitive(x)+phi_offset
     eli=PchipInterpolator(mul,el,extrapolate=False); ehi_sp=PchipInterpolator(muh,eh,extrapolate=False)
     grid=np.linspace(lo,hi,int(mu_samples)); delta=np.asarray(Pl(grid)-Ph(grid),float)
     brackets=[(grid[i],grid[i+1]) for i in range(len(grid)-1) if delta[i]==0 or delta[i]*delta[i+1]<0]

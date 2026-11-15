@@ -516,6 +516,9 @@ def match_crust_core(
 
     u_grid = np.linspace(0.0, 1.0, n_bridge + 2)[1:-1]
     extra_meta: Dict[str, object] = {}
+    nb_jump = np.empty(0, dtype=float)
+    Q1_jump = np.empty(0, dtype=float)
+    F_jump = np.empty(0, dtype=float)
 
     if method == FIRST_LAW_HERMITE_PRESSURE_BRIDGE:
         nb_br, P_br, F_br, mu_br, Q1_br, cs2_br, Pt_sol, cs2_left_br, cs2_right_br = build_first_law_constrained_hermite_pressure_bridge(
@@ -545,46 +548,67 @@ def match_crust_core(
         extra_meta["spline_mode"] = sp_mode
 
     elif method == "css":
-        def _css_knot(s: float) -> Tuple[float, float]:
-            mu_m_v = mu1 * ((mu2 / mu1) ** (1.0 - s))
-            nm_v = n1 + s * (n2 - n1)
-            return mu_m_v, nm_v
+        # Single constant-sound-speed CSS bridge. The crust side remains at
+        # (n1,P1,mu1); the bridge begins at (n_b,P1,mu1) with n_b>n1.
+        # The core endpoint (n2,P2,mu2) is continuous in all state variables.
+        if not (0 < n1 < n2 and 0 < P1 < P2 and 0 < mu1 < mu2):
+            raise ValueError("single-speed CSS requires positive ordered crust/core endpoints")
+        ratio = mu1 / mu2
+        delta_p = P2 - P1
 
-        def _css_int(s: float) -> float:
-            mu_m_v, nm_v = _css_knot(s)
-            csA2 = np.log(mu_m_v / mu1) / np.log(nm_v / n1)
-            csB2 = np.log(mu2 / mu_m_v) / np.log(n2 / nm_v)
-            gA, gB = 1.0 / csA2, 1.0 / csB2
-            IA = (n1 * mu1 / (gA + 1.0)) * ((mu_m_v / mu1) ** (gA + 1.0) - 1.0)
-            IB = (nm_v * mu_m_v / (gB + 1.0)) * ((mu2 / mu_m_v) ** (gB + 1.0) - 1.0)
-            return float((IA + IB) - (P2 - P1))
+        def _single_css_pressure_gain(s: float) -> float:
+            return float(n2 * mu2 * s / (1.0 + s)
+                         * (1.0 - ratio ** (1.0 + 1.0 / s)))
 
-        s_sol = brentq(_css_int, 1e-6, 1.0 - 1e-6, xtol=1e-14)
-        mu_m, nm_sol = _css_knot(s_sol)
-        csA2 = float(np.log(mu_m / mu1) / np.log(nm_sol / n1))
-        csB2 = float(np.log(mu2 / mu_m) / np.log(n2 / nm_sol))
-        gA, gB = 1.0 / csA2, 1.0 / csB2
-        P_m = P1 + (n1 * mu1 / (gA + 1.0)) * ((mu_m / mu1) ** (gA + 1.0) - 1.0)
-        mu_br = mu1 * ((mu2 / mu1) ** u_grid)
-        nb_br = np.empty_like(mu_br)
-        P_br = np.empty_like(mu_br)
-        cs2_br = np.empty_like(mu_br)
-        for k, m_v in enumerate(mu_br):
-            if m_v <= mu_m:
-                nb_br[k] = n1 * ((m_v / mu1) ** gA)
-                P_br[k] = P1 + (n1 * mu1 / (gA + 1.0)) * ((m_v / mu1) ** (gA + 1.0) - 1.0)
-                cs2_br[k] = csA2
-            else:
-                nb_br[k] = nm_sol * ((m_v / mu_m) ** gB)
-                P_br[k] = P_m + (nm_sol * mu_m / (gB + 1.0)) * ((m_v / mu_m) ** (gB + 1.0) - 1.0)
-                cs2_br[k] = csB2
+        f_lo = _single_css_pressure_gain(1e-8) - delta_p
+        f_hi = _single_css_pressure_gain(1.0) - delta_p
+        if f_lo >= 0 or f_hi <= 0:
+            raise ValueError(
+                "no causal single-speed CSS solution for selected endpoints: "
+                f"required DeltaP={delta_p:.8g}, allowed causal range "
+                f"(0,{_single_css_pressure_gain(1.0):.8g})"
+            )
+        cs2_css = float(brentq(
+            lambda s: _single_css_pressure_gain(s) - delta_p,
+            1e-8, 1.0, xtol=1e-13, rtol=1e-13
+        ))
+        n_bridge_start = float(n2 * ratio ** (1.0 / cs2_css))
+        if not np.isfinite(n_bridge_start) or n_bridge_start <= n1:
+            raise ValueError(
+                "single-speed CSS solution does not produce a positive crust-side "
+                f"density jump: n_bridge_start={n_bridge_start:.8g}, n_crust={n1:.8g}"
+            )
+
+        # First-order crust -> CSS interface: P and mu_B continuous,
+        # while n_B and epsilon jump by Delta n and mu_t Delta n.
+        nb_jump = np.asarray([n_bridge_start], dtype=float)
+        Q1_jump = np.asarray([P1 / n_bridge_start], dtype=float)
+        F_jump = np.asarray([mu1 - Q1_jump[0]], dtype=float)
+
+        mu_br = mu1 * (mu2 / mu1) ** u_grid
+        nb_br = n_bridge_start * (mu_br / mu1) ** (1.0 / cs2_css)
+        P_br = P1 + n_bridge_start * mu1 * cs2_css / (1.0 + cs2_css) * (
+            (mu_br / mu1) ** (1.0 + 1.0 / cs2_css) - 1.0
+        )
         Q1_br = P_br / nb_br
         F_br = mu_br - Q1_br
-        cs2_left_br = csA2
-        cs2_right_br = csB2
-        extra_meta["csA2"] = csA2
-        extra_meta["csB2"] = csB2
-        extra_meta["spline_mode"] = "2segment_css"
+        cs2_br = np.full(n_bridge, cs2_css, dtype=float)
+        cs2_left_br = cs2_css
+        cs2_right_br = cs2_css
+        delta_n_css = n_bridge_start - n1
+        delta_eps_css = mu1 * delta_n_css
+        eps_crust = mu1 * n1 - P1
+        seidov_critical = 0.5 * eps_crust + 1.5 * P1
+        extra_meta.update({
+            "cs2_bridge": cs2_css,
+            "spline_mode": "single_speed_css_with_crust_density_jump",
+            "crust_bridge_density_jump_fm3": delta_n_css,
+            "crust_bridge_energy_density_jump_MeV_fm3": delta_eps_css,
+            "crust_bridge_first_law_jump_residual_MeV_fm3": 0.0,
+            "seidov_small_core_critical_jump_MeV_fm3": seidov_critical,
+            "seidov_small_core_stable": bool(delta_eps_css < seidov_critical),
+            "radial_stability_scope": "Seidov small-core onset criterion only; no full radial-mode eigenfrequency calculation.",
+        })
 
     elif method in ("cubic_F", "quintic_F"):
         x_br = x1 + u_grid * Dx
@@ -605,9 +629,9 @@ def match_crust_core(
         cs2_right_br = float((Q1_2 + d1_f / Dx) / mu2)
         extra_meta["spline_mode"] = sp_mode
 
-    nb_full = np.concatenate([nb_cr, nb_br, nb_co])
-    Q1_full = np.concatenate([Q1_cr, Q1_br, Q1_co])
-    F_full = np.concatenate([F_cr, F_br, F_co])
+    nb_full = np.concatenate([nb_cr, nb_jump, nb_br, nb_co])
+    Q1_full = np.concatenate([Q1_cr, Q1_jump, Q1_br, Q1_co])
+    F_full = np.concatenate([F_cr, F_jump, F_br, F_co])
     mub_full = F_full + Q1_full
     N_full = len(nb_full)
 
@@ -635,7 +659,10 @@ def match_crust_core(
     else:
         core_composition_rejection = "input_eos_compo_absent"
 
-    if core_composition_usable:
+    if method == "css":
+        compo_out_available = False
+        core_composition_rejection = "not_applicable_single_speed_css_thermo_only"
+    elif core_composition_usable:
         compo_out_available = bool(d_cr.composition_available)
     elif core_compo_mode == "literature_beta_eq":
         if not d_cr.composition_available:
@@ -715,12 +742,31 @@ def match_crust_core(
         muq_full = np.concatenate([muq_cr, muq_br, muq_co])
     else:
         Yn_full = Yp_full = Ye_full = Ymu_full = A_full = Z_full = Yh_full = np.zeros(N_full)
-        Iph_full = np.zeros(N_full, dtype=int)
         muq_cr = d_cr.muq[:i1 + 1]
         muq_co = d_co.muq[i2:]
         muq_br = (1.0 - s_u) * float(muq_cr[-1]) + s_u * float(muq_co[0])
         muq_full = np.concatenate([muq_cr, muq_br, muq_co])
-        compo_prov = "none_strict_thermo_only"
+        cr_ids = (np.asarray(d_cr.Iphase[:i1 + 1], dtype=int)
+                  if np.asarray(d_cr.Iphase).shape == d_cr.nb.shape else np.zeros(len(nb_cr), dtype=int))
+        co_ids_raw = (np.asarray(d_co.Iphase[i2:], dtype=int)
+                      if np.asarray(d_co.Iphase).shape == d_co.nb.shape else np.zeros(len(nb_co), dtype=int))
+        if method == "css":
+            css_id = int(np.max(cr_ids)) + 1
+            core_base = css_id + 1
+            Iph_full = np.concatenate([
+                cr_ids,
+                np.full(len(nb_jump) + len(nb_br), css_id, dtype=int),
+                core_base + (co_ids_raw - int(co_ids_raw[0]))
+            ])
+            compo_prov = "not_available_single_speed_css_thermo_only"
+        else:
+            core_base = int(np.max(cr_ids)) + 1
+            Iph_full = np.concatenate([
+                cr_ids,
+                np.full(len(nb_jump) + len(nb_br), int(cr_ids[-1]), dtype=int),
+                core_base + (co_ids_raw - int(co_ids_raw[0]))
+            ])
+            compo_prov = "none_strict_thermo_only"
 
     Q2_full = np.zeros(N_full)
     Q3_full = mub_full / mn - 1.0
@@ -748,7 +794,7 @@ def match_crust_core(
     seidov_ratio = None
     regularity_class = {
         FIRST_LAW_HERMITE_PRESSURE_BRIDGE: "smooth_near_pressure_plateau_no_phase_jump",
-        "css": "piecewise_constant_sound_speed_continuous_barotrope",
+        "css": "css_single_speed_with_crust_density_jump",
         "cubic_F": "cubic_free_energy_bridge",
         "cubic_P": "cubic_pressure_chemical_potential_bridge",
         "quintic_F": "quintic_C2_free_energy_bridge",
@@ -763,11 +809,11 @@ def match_crust_core(
         mu1=mu1, mu2=mu2, dmu=Dmu,
         eps1=eps1, eps2=eps2, deps=eps2 - eps1,
         seidov_ratio=seidov_ratio,
-        seidov_applicable=False,
+        seidov_applicable=(method == "css"),
         is_exact_maxwell=False,
-        phase_transition_order=None,
-        phase_transition_class="not_assigned_no_density_jump",
-        density_jump_fm3=0.0,
+        phase_transition_order=(1 if method == "css" else None),
+        phase_transition_class=("thermo_only_first_order_css_crust_interface" if method == "css" else "not_assigned_no_density_jump"),
+        density_jump_fm3=(float(nb_jump[0] - n1) if method == "css" else 0.0),
         construction_kind=regularity_class,
         regularity_class=regularity_class,
         cs2_1=cs2_1, cs2_2=cs2_2,

@@ -196,7 +196,8 @@ def causal_completion(
     if csq[0] >= 1.0:
         raise ValueError("source begins at or above the causal limit; no causal low-density branch exists")
 
-    crossing = np.flatnonzero((csq[:-1] <= 1.0) & (csq[1:] > 1.0))
+    crossing = np.flatnonzero((csq[:-1] <= 1.0) & (csq[1:] > 1.0)
+                               & (np.diff(xq) <= max_log_step + 32*np.finfo(float).eps))
     if not crossing.size:
         raise ValueError("no resolved first c_s^2=1 crossing found; causal completion not applied")
     k = int(crossing[0])
@@ -241,7 +242,13 @@ def causal_completion(
         Q2=np.zeros_like(n_out), Q3=mu_out / mn - 1.0,
         Q4=np.zeros_like(n_out), Q5=np.zeros_like(n_out),
         Q6=F / mn - 1.0, Q7=F / mn - 1.0,
-        q_extra=np.zeros_like(n_out), Iphase=np.zeros(len(n_out), dtype=int),
+        q_extra=np.zeros_like(n_out),
+        # The source/completion join can have a finite c_s^2 kink. Preserve
+        # source labels and give the phenomenological tail a distinct phase ID
+        # so derivative stencils never interpolate across that model boundary.
+        Iphase=np.r_[np.asarray(data.Iphase, dtype=int)[keep],
+                     np.full(len(tail), (int(np.max(data.Iphase)) + 1)
+                             if np.asarray(data.Iphase).shape == n.shape else 1, dtype=int)],
         Yn=np.zeros_like(n_out), Yp=np.zeros_like(n_out), Ye=np.zeros_like(n_out),
         Ymu=np.zeros_like(n_out), Aav=np.zeros_like(n_out), Zav=np.zeros_like(n_out),
         Yh=np.zeros_like(n_out), Il=int(data.Il), iT=int(data.iT),

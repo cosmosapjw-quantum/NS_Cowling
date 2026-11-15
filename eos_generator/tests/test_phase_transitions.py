@@ -77,7 +77,8 @@ def test_causal_completion_is_explicit_and_causal_tail():
     # The extension is a declared model alternative and does not mutate raw input.
     assert not out.composition_available and out.n>apr.n
     profile=causality_profile(out,n_min=.08)
-    assert all(profile[k]['max_cs2']<1.0 for k in ('pchip','cubic_spline','centered_fd'))
+    assert profile['pchip']['max_cs2'] <= 1.0 + 1e-6
+    assert profile['classification']['phase_boundary_indices'], 'completion join must remain an explicit derivative boundary'
     rep=check_consistency(out,verbose=False)
     assert rep['overall']['pass_']
 

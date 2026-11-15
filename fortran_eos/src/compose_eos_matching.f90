@@ -29,7 +29,8 @@ module compose_eos_matching
     ! |mu_B,src - (F_src + P/n_B)|: provider tabulation residual repaired by
     ! the output Q3 re-derivation.
     real(wp) :: dm_mass_gauge_meV=0._wp, source_euler_residual_meV=0._wp
-    character(len=32) :: method='', construction_kind='', spline_mode=''
+    character(len=32) :: method='', spline_mode=''
+    character(len=64) :: construction_kind=''
     logical :: composition_dropped=.false., is_exact_maxwell=.false., seidov_applicable=.false.
   end type match_report_t
   public :: match_crust_core

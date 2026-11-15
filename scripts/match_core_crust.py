@@ -252,7 +252,7 @@ def _parse_fortran_metadata(path: Path) -> dict[str, bool | int | float]:
     text = path.read_text(encoding="utf-8")
     values = {}
     for match in re.finditer(
-        r"^\\s*([A-Za-z][A-Za-z0-9_]*)\\s*=\\s*([^,\\s/]+)",
+        r"^\s*([A-Za-z][A-Za-z0-9_]*)\s*=\s*([^,\s/]+)",
         text,
         flags=re.MULTILINE,
     ):

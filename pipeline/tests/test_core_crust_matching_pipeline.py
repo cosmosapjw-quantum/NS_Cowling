@@ -97,17 +97,17 @@ def _write_internal_metadata(
     path: Path, *, mn: float = 939.0, beta_equilibrated: bool = True
 ) -> None:
     path.write_text(
-        "&metadata\\n"
-        f" mn={mn:.16E}\\n"
-        " mp=939.0000000000000E+00\\n"
-        " il=1\\n iT=1\\n iYq=1\\n inb_start=1\\n"
-        " nadd=0\\n nadd_max=0\\n naxis_t=1\\n naxis_yq=1\\n"
-        " temperature_mev=0.0000000000000E+00\\n"
-        " charge_fraction_grid=0.0000000000000E+00\\n"
-        " composition_file_present=F\\n"
-        " composition_available=F\\n"
-        f" beta_equilibrated={'T' if beta_equilibrated else 'F'}\\n"
-        "/\\n",
+        "&metadata\n"
+        f" mn={mn:.16E}\n"
+        " mp=939.0000000000000E+00\n"
+        " il=1\n iT=1\n iYq=1\n inb_start=1\n"
+        " nadd=0\n nadd_max=0\n naxis_t=1\n naxis_yq=1\n"
+        " temperature_mev=0.0000000000000E+00\n"
+        " charge_fraction_grid=0.0000000000000E+00\n"
+        " composition_file_present=F\n"
+        " composition_available=F\n"
+        f" beta_equilibrated={'T' if beta_equilibrated else 'F'}\n"
+        "/\n",
         encoding="utf-8",
     )
 

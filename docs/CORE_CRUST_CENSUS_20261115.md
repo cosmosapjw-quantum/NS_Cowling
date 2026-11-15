@@ -1,3 +1,9 @@
+> **Superseded (2026-11-15).** The CSS survivors below were built on reconstructed
+> crusts whose Q1 slot holds n_B (P = n_B²) and on a crust energy shift later
+> shown not to be representation-only. See
+> `docs/MASS_NORMALIZATION_CORRECTION_20261115.md` and
+> `docs/CORE_CRUST_REAUDIT_CONTINUATION_20261115.md`. Kept as a historical record.
+
 # Core–crust matching census — 2026-11-15 (code HEAD 843a399)
 
 Receipt for the full configured census after the independent admission layer

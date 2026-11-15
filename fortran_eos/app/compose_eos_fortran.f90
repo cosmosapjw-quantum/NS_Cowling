@@ -269,6 +269,19 @@ program compose_eos_fortran
       ',"cs2_source_right":'//real_text(match_report%cs2_source_right)// &
       ',"cs2_left":'//real_text(match_report%cs2_left)//',"cs2_right":'//real_text(match_report%cs2_right)// &
       ',"cs2_min":'//real_text(match_report%cs2_min)//',"cs2_max":'//real_text(match_report%cs2_max)// &
+      ',"css_single_sound_speed":'//real_text(match_report%css_single_sound_speed)// &
+      ',"css_transition_nb_low":'//real_text(match_report%css_transition_nb_low)// &
+      ',"css_transition_nb_high":'//real_text(match_report%css_transition_nb_high)// &
+      ',"css_transition_delta_nb":'//real_text(match_report%css_transition_delta_nb)// &
+      ',"css_transition_delta_eps":'//real_text(match_report%css_transition_delta_eps)// &
+      ',"css_transition_pressure":'//real_text(match_report%css_transition_pressure)// &
+      ',"css_transition_mu":'//real_text(match_report%css_transition_mu)// &
+      ',"css_transition_low_index":'//integer_text(match_report%css_transition_low_index)// &
+      ',"css_transition_high_index":'//integer_text(match_report%css_transition_high_index)// &
+      ',"css_core_bridge_index":'//integer_text(match_report%css_core_bridge_index)// &
+      ',"seidov_critical_delta_eps":'//real_text(match_report%seidov_critical_delta_eps)// &
+      ',"seidov_ratio":'//real_text(match_report%seidov_ratio)// &
+      ',"seidov_small_core_stable":'//logical_text(match_report%seidov_small_core_stable)// &
       ',"pressure_span":'//real_text(match_report%pressure_span)// &
       ',"first_law_relative_residual":'//real_text(match_report%first_law_relative_residual)// &
       ',"dm_mass_gauge_meV":'//real_text(match_report%dm_mass_gauge_meV)// &

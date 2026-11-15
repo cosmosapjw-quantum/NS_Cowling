@@ -18,7 +18,7 @@
 - Never mark individual M5A parameter cases as native verified from one headline artifact.
 - Do not describe thermo-only Maxwell v2 as composition-preserving.
 - Do not promote a Python mirror test to native Fortran end-to-end evidence.
-- Do not call M7 CSS a sharp Maxwell transition or its C⁰ seam C¹.
+- The current M7 CSS has one constant bridge sound speed, a first-order crust-side jump, and continuous state variables at the core join; do not claim C1 or full phase-interface mode stability.
 - Do not merge PR #13 or the remediation PR; do not force-push.
 
 ## Review focus
@@ -80,6 +80,27 @@ PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=bu
 ```
 
 **Not yet implemented:** the production `build_maxwell_eos` still builds independent PCHIP interpolants for pressure, density and energy. Do not assume the audit patch changes that generator. A thermodynamically consistent production interpolant remains an open task.
+
+## Task 4: M7 single-speed CSS with a crust-side first-order jump
+
+**Files:** `fortran_eos/src/compose_eos_matching.f90`, `fortran_eos/app/compose_eos_fortran.f90`, `python_frontend/compose_eos/api.py`, `python_frontend/tests/test_native_crust_core_matching.py`, `scripts/m7/m7_batch_orchestrator.py`.
+
+**Implemented changes:**
+- Replace the former two-segment/two-speed CSS construction with one constant (c_s^2\in(0,1]).
+- Solve (c_s^2) from the pressure integral between the bridge-side transition state and the selected core endpoint.
+- Require a positive crust-side density jump and the exact jump identity (Deltaepsilon=mu_tDelta n).
+- Insert two adjacent output rows with equal (P_t,mu_t) and different (n_B,epsilon); then match the bridge continuously to the core state.
+- Expose the transition indices, jump values, one bridge speed, and Seidov small-core onset diagnostics through the native JSON and Python report.
+- Preserve thermo-only scope and explicit composition dropping. Do not claim C1 at the core-side join if the source derivative differs.
+
+**Verify:**
+```bash
+PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python -m pytest -q python_frontend/tests/test_native_crust_core_matching.py
+```
+
+**Acceptance:** one (c_s^2) over all bridge samples; adjacent crust/bridge rows with common (P_t,\mu_t), positive (Delta n,Deltaepsilon), and the jump identity; continuous (n_B,P,\epsilon,\mu_B) at the core join; exact report indices; no composition-preservation claim. The prior two-speed CSS artifact remains immutable historical evidence.
+
+---
 
 ## Task 4: Native Wigner–Seitz production route
 

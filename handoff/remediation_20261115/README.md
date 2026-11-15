@@ -16,6 +16,7 @@
 | `IMPLEMENTATION_PLAN.md` | Ordered task plan with concrete files, interfaces, tests and stop conditions |
 | `LOW_PERFORMANCE_AGENT_PROMPT.md` | Copy-ready prompt for a constrained coding agent |
 | `SCIENTIFIC_CONTRACTS.md` | Derivations, units, CompOSE composition semantics and physics gates |
+| `../..//docs/CSS_SINGLE_SPEED_CRUST_JUMP_CONTRACT_20261115.md` | Single-speed CSS matching equations, jump contract, and verification scope |
 | `PATCH_REGISTER.json` | Patch list, file paths, commit IDs and verification state |
 
 ## Already patched in this branch
@@ -26,6 +27,7 @@
 4. Maxwell v2 now explicitly rejects composition-bearing inputs because the Fortran v1 kernel is thermo-only. It no longer claims that composition is preserved in successful thermo-only output.
 5. Maxwell v2 resolves the repository path from its module location rather than a developer-specific absolute path.
 6. APR+CSS audit now evaluates the exact derivative of the PCHIP pressure interpolant and makes the differential first-law check part of the admission verdict.
+7. The native M7 `css` matcher is changed to one constant-sound-speed branch with a first-order crust-to-bridge density jump and a continuous bridge-to-core state match. The full contract is in `docs/CSS_SINGLE_SPEED_CRUST_JUMP_CONTRACT_20261115.md`.
 
 ## Verification state
 
@@ -35,7 +37,7 @@ The two Wigner-Seitz source-data tests and three Cowling E2E tests were skipped 
 
 The local execution container could not resolve `github.com`, so local clone/pytest execution was blocked. Focused test-first additions were committed before implementation, but the host could not observe a test-only RED run; the red-observation status remains `NOT_OBSERVED`.
 
-A docs-only manifest/README update has now changed the PR head; a fresh CI run on that exact final HEAD is still required before declaring the final handoff snapshot CI-verified.
+The single-speed CSS Fortran implementation, CLI fields, Python API and native integration regression test were added after the previous successful run. A fresh CI run on the exact post-CSS HEAD is required before claiming the current branch is verified.
 
 ## Continue here
 
@@ -45,4 +47,4 @@ A docs-only manifest/README update has now changed the PR head; a fresh CI run o
 4. Run the GitHub Actions CI on this branch through the draft PR, then fix only evidenced regressions.
 5. Keep unresolved physical/source blockers open. Never weaken a gate to turn the status green.
 
-No raw CompOSE source EOS data are to be edited by this package.
+The old 2026-11-14 two-segment smooth CSS artifact is historical evidence for the previous implementation and must not be overwritten or treated as validation of the new contract. No raw CompOSE source EOS data are to be edited by this package.

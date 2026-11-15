@@ -39,7 +39,7 @@ The local execution container could not resolve `github.com`, so local clone/pyt
 
 The single-speed CSS implementation initially reached CI run [43677499924](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43677499924). The Fortran build passed; pytest returned **248 passed, 9 skipped, 15 failed**. Root causes were an endpoint equality check incorrectly applied to the interior-only production grid, an omitted `composition_dropped` report assignment, and stale SHA256 manifest entries. The endpoint check and metadata assignment have since been corrected, and a sharp-seam derivative diagnostic was made not-applicable rather than comparing derivatives across a first-order jump.
 
-The corrected code was tested in workflow [43678164119](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43678164119), on code head `654bdc513b6f3c77f80d828898f81f213b12d02e`; that run was in progress when this handoff snapshot was updated. Subsequent handoff/evidence commits changed the branch head again, so **a fresh workflow run on the exact final branch head is still required**. No CI PASS is claimed for the single-speed CSS implementation yet.
+A follow-up workflow [43678164119](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43678164119) was queued for code head `654bdc513b6f3c77f80d828898f81f213b12d02e`, but was **cancelled by the workflow concurrency group** after subsequent handoff/evidence commits changed the PR head. The current final branch snapshot therefore still requires one fresh exact-head workflow run. No CI PASS is claimed for the single-speed CSS implementation yet.
 
 ## Continue here
 

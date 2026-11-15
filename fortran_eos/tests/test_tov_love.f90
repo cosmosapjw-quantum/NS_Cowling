@@ -15,8 +15,9 @@ program test_tov_love
   !! (a causal, monotone, simple polytrope-like branch) sampled on a uniform
   !! log grid from eps_low to eps_high.
   use, intrinsic :: iso_fortran_env, only: real64
-  use compose_eos_types, only: wp
+  use compose_eos_types, only: wp,eos_data_t,allocate_eos
   use compose_eos_tov, only: tov_love_result_t, solve_tov_love_smooth, solve_tov_love_maxwell
+  use compose_eos_verify, only: verify_report_t,check_consistency
   use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
   implicit none
   integer :: fails, n, i
@@ -165,10 +166,74 @@ program test_tov_love
     end if
   end block
 
+  call check_thermodynamic_jump_consistency(fails)
+
   if (fails == 0) then
     write(*,'(a)') 'TOV-Love smooth + Maxwell branches: PASS'
   else
     write(*,'(a,i0,a)') 'TOV-Love smooth + Maxwell branches: FAIL (', fails, ' checks)'
     stop 1
   end if
+contains
+
+  subroutine check_thermodynamic_jump_consistency(failures)
+    integer,intent(inout)::failures
+    type(eos_data_t)::eos
+    type(verify_report_t)::report
+    real(wp)::nvals(11),k,m,p,eps,mu,delta_n,delta_eps
+    integer::i
+    nvals=[0.10_wp,0.12_wp,0.15_wp,0.18_wp,0.21_wp,0.25_wp, &
+           0.30_wp,0.40_wp,0.48_wp,0.55_wp,0.62_wp]
+    call allocate_eos(eos,size(nvals))
+    eos%mn=939._wp;eos%mp=939._wp;eos%il=1
+    eos%temperature_mev=0._wp;eos%beta_equilibrated=.true.
+    eos%composition_available=.false.;eos%composition_file_present=.false.
+    do i=1,size(nvals)
+      if(i<=7)then
+        k=1._wp/(0.30_wp**2)
+        m=950._wp-2._wp*k*0.30_wp
+      else
+        k=1._wp/(0.40_wp**2)
+        m=950._wp-2._wp*k*0.40_wp
+      endif
+      p=k*nvals(i)**2
+      eps=m*nvals(i)+p
+      mu=m+2._wp*k*nvals(i)
+      eos%nb(i)=nvals(i)
+      eos%q(1,i)=p/nvals(i)
+      eos%q(2,i)=0._wp
+      eos%q(3,i)=mu/eos%mn-1._wp
+      eos%q(4,i)=0._wp;eos%q(5,i)=0._wp
+      eos%q(6,i)=eps/(nvals(i)*eos%mn)-1._wp
+      eos%q(7,i)=eos%q(6,i)
+    enddo
+
+    call check_consistency(eos,report)
+    delta_n=eos%nb(8)-eos%nb(7)
+    delta_eps=eos%nb(8)*(eos%q(7,8)+1._wp)*eos%mn- &
+              eos%nb(7)*(eos%q(7,7)+1._wp)*eos%mn
+    if(.not.report%overall.or.report%thermodynamic_jump_boundaries/=1.or. &
+       report%thermodynamic_jump_failures/=0.or.report%derivative_masked<2.or. &
+       abs(delta_eps-950._wp*delta_n)>1.e-9_wp*max(abs(delta_eps),1._wp))then
+      write(*,'(a,l1,a,i0,a,i0,a,i0)')'FAIL valid thermo-only Maxwell consistency overall=', &
+        report%overall,' jump_boundaries=',report%thermodynamic_jump_boundaries, &
+        ' jump_failures=',report%thermodynamic_jump_failures,' derivative_masked=',report%derivative_masked
+      failures=failures+1
+    else
+      write(*,'(a)')'PASS thermo-only Maxwell jump detected and derivative stencil masked'
+    endif
+
+    ! Corrupt only the high-side energy row. The transition is still at common
+    ! pressure, but the Euler and latent-energy identities must reject it.
+    eos%q(7,8)=eos%q(7,8)+1.e-3_wp
+    call check_consistency(eos,report)
+    if(report%thermodynamic_jump_failures/=1.or.report%overall)then
+      write(*,'(a,i0,a,l1)')'FAIL corrupted Maxwell jump gate failures=', &
+        report%thermodynamic_jump_failures,' overall=',report%overall
+      failures=failures+1
+    else
+      write(*,'(a)')'PASS corrupted Maxwell latent-energy jump rejected'
+    endif
+  end subroutine check_thermodynamic_jump_consistency
+
 end program test_tov_love

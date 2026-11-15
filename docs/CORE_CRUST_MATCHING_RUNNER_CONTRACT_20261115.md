@@ -73,3 +73,12 @@ Native tests now include one valid two-branch Maxwell TOV-Love fixture and negat
 ## Canonical T/Yq metadata for matched thermodynamic slices
 
 The core--crust matcher produces one selected cold thermodynamic slice, not an empty T/Yq grid. Its native output object now records `nT=nYq=1`, the selected T/Yq labels as one-point bounds, and one-element axis arrays before CompOSE serialization. The native readback must reproduce `naxis_t=naxis_yq=1` exactly. The readback comparator remains strict; the prior 0-to-1 mismatch is repaired at the producer, not ignored at validation time.
+
+
+## Native consistency admission after CompOSE serialization (2026-11-15)
+
+The core--crust runner now invokes the native `verify` operation on the actual serialized CompOSE output after write/readback. A pair is not admitted as a survivor unless the native C1, C2, C3/C4 applicability, C5, C6, C10 and C11 hard-gate report is `overall=PASS`. C7-C9 remain finite-difference diagnostics and are retained in the report, not used as additional hard gates. The full report is copied into the matching manifest.
+
+The consistency checker now detects a composition-free thermodynamic Maxwell interface independently of `Iphase`: equal pressure and baryon chemical potential, positive density and energy-density jumps, and `Delta epsilon = mu_t Delta n_B`. Both one-sided knots are excluded from derivative stencils only after these conditions pass. A same-pressure density discontinuity that fails chemical-potential or latent-energy closure is recorded as `THERMODYNAMIC_JUMP` and fails the overall audit. This is needed because the thermo-only CSS matcher intentionally sets all composition Iphase values to zero.
+
+A native analytic regression verifies one valid single-speed Maxwell jump with a thermo-only EOS, verifies derivative-stencil masking, and rejects a corrupted high-side energy row. The real GPPVA_FSU2H + GM_GM1 CSS runner regression additionally checks C1/C2/C6/C10/C11 on the serialized CompOSE output.

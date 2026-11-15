@@ -9,6 +9,8 @@ module compose_eos_verify
     logical :: c10=.false.,c11=.false.,overall=.false.
     integer :: derivative_points=0,derivative_masked=0,acausal_count=0,acausal_firstlaw_count=0
     integer :: c3_points=0,c3_masked=0,c4_points=0,c4_masked=0
+    integer :: thermodynamic_jump_boundaries=0,thermodynamic_jump_failures=0
+    real(wp) :: max_thermodynamic_jump_relative_residual=0._wp
     real(wp) :: c1_max_q2=0._wp,c1_max_q6q7=0._wp,c1_max_mul=0._wp
     real(wp) :: c2_max_rel=0._wp,c3_max_abs=0._wp,c4_max_abs=0._wp
     real(wp) :: min_dpdnb=0._wp,min_delta_p=0._wp
@@ -49,6 +51,7 @@ contains
     type(verify_report_t),intent(out)::report
     real(wp),intent(in),optional::algebraic_tolerance,max_log_step,cs2_tolerance,composition_tolerance
     real(wp)::atol,dxmax,cstol,comptol,muqv,mulmax
+    real(wp)::jump_dn,jump_deps,jump_mu,jump_pressure_rel,jump_mu_rel,jump_identity_rel,jump_scale
     real(wp),allocatable::yl(:),dp_m(:),dmub_m(:),p_m(:),nb_m(:),df_m(:),deps_m(:),mub_m(:),cs2_m(:),csfl_m(:)
     real(wp),allocatable::p(:),f(:),fb(:),eps(:),mub(:),muq(:),mul(:),x(:)
     real(wp),allocatable::dp(:),dmub(:),df(:),deps(:),r(:),cs2(:),csfl(:)
@@ -162,10 +165,35 @@ contains
     allocate(mask(n),cs2(n),csfl(n));mask=.true.;cs2=0._wp;csfl=0._wp
     do i=1,n-1
       if(log(eos%nb(i+1)/eos%nb(i))>dxmax)mask(i:i+1)=.false.
-      ! A phase boundary is nonsmooth even when eos.compo is absent.
-      ! Always mask both adjacent knots so finite-difference stencils never
-      ! manufacture derivatives across a Maxwell density discontinuity.
+      ! A provider phase-label change is a discontinuity marker when present.
       if(eos%iphase(i+1)/=eos%iphase(i))mask(i:i+1)=.false.
+
+      ! Thermodynamic-only matched tables intentionally carry Iphase=0 after
+      ! composition is dropped. Detect a genuine one-charge Maxwell interface
+      ! independently from composition metadata: common P and mu_B, positive
+      ! jumps in n_B and epsilon, and Delta epsilon = mu_t Delta n_B. Mask both
+      ! one-sided knots only after all coexistence conditions pass.
+      jump_dn=eos%nb(i+1)-eos%nb(i)
+      jump_deps=eps(i+1)-eps(i)
+      if(p(i)>0._wp.and.p(i+1)>0._wp.and. &
+         jump_dn>1.e-10_wp*max(abs(eos%nb(i)),abs(eos%nb(i+1)),tiny(1._wp)))then
+        jump_pressure_rel=abs(p(i+1)-p(i))/max(abs(p(i)),abs(p(i+1)),tiny(1._wp))
+        if(jump_pressure_rel<=1.e-10_wp)then
+          jump_mu=0.5_wp*(mub(i)+mub(i+1))
+          jump_mu_rel=abs(mub(i+1)-mub(i))/max(abs(mub(i)),abs(mub(i+1)),tiny(1._wp))
+          jump_scale=max(abs(jump_deps),abs(jump_mu*jump_dn),tiny(1._wp))
+          jump_identity_rel=abs(jump_deps-jump_mu*jump_dn)/jump_scale
+          report%max_thermodynamic_jump_relative_residual= &
+            max(report%max_thermodynamic_jump_relative_residual,jump_identity_rel)
+          if(jump_deps>0._wp.and.jump_mu>0._wp.and.jump_mu_rel<=1.e-10_wp.and. &
+             jump_identity_rel<=1.e-8_wp)then
+            report%thermodynamic_jump_boundaries=report%thermodynamic_jump_boundaries+1
+            mask(i:i+1)=.false.
+          else
+            report%thermodynamic_jump_failures=report%thermodynamic_jump_failures+1
+          endif
+        endif
+      endif
     enddo
     do i=1,n
       if(deps(i)<=0._wp.or.mub(i)<=0._wp)mask(i)=.false.
@@ -195,7 +223,7 @@ contains
       report%c11=report%min_dmubdnb>=-1.e-10_wp
     endif
     report%overall=finite_primary.and.report%c1.and.report%c2.and.report%c3.and.report%c4.and. &
-      report%c5.and.report%c6.and.report%c10.and.report%c11
+      report%c5.and.report%c6.and.report%c10.and.report%c11.and.report%thermodynamic_jump_failures==0
     report%failed_checks=''
     if(.not.finite_primary)call add_failure(report,'FINITE')
     if(.not.report%c1)call add_failure(report,'C1')
@@ -206,6 +234,7 @@ contains
     if(.not.report%c6)call add_failure(report,'C6')
     if(.not.report%c10)call add_failure(report,'C10')
     if(.not.report%c11)call add_failure(report,'C11')
+    if(report%thermodynamic_jump_failures>0)call add_failure(report,'THERMODYNAMIC_JUMP')
   end subroutine check_consistency
 
   subroutine add_failure(report,name)

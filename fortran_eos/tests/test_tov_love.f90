@@ -182,8 +182,11 @@ contains
     type(verify_report_t)::report
     real(wp)::nvals(11),k,m,p,eps,mu,delta_n,delta_eps
     integer::i
+    ! The 0.30 -> 0.33 transition density ratio is below exp(0.25), so
+    ! the derivative mask must come from the thermodynamic jump detector,
+    ! not the generic maximum-log-step guard.
     nvals=[0.10_wp,0.12_wp,0.15_wp,0.18_wp,0.21_wp,0.25_wp, &
-           0.30_wp,0.40_wp,0.48_wp,0.55_wp,0.62_wp]
+           0.30_wp,0.33_wp,0.38_wp,0.44_wp,0.50_wp]
     call allocate_eos(eos,size(nvals))
     eos%mn=939._wp;eos%mp=939._wp;eos%il=1
     eos%temperature_mev=0._wp;eos%beta_equilibrated=.true.
@@ -193,8 +196,8 @@ contains
         k=1._wp/(0.30_wp**2)
         m=950._wp-2._wp*k*0.30_wp
       else
-        k=1._wp/(0.40_wp**2)
-        m=950._wp-2._wp*k*0.40_wp
+        k=1._wp/(0.33_wp**2)
+        m=950._wp-2._wp*k*0.33_wp
       endif
       p=k*nvals(i)**2
       eps=m*nvals(i)+p

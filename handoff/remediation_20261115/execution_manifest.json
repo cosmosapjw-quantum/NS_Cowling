@@ -1,0 +1,295 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "schema_name": "ns-cowling-eos-remediation-execution-package",
+  "schema_version": "1.0.0",
+  "created_date": "2026-11-15",
+  "repository": "cosmosapjw-quantum/NS_Cowling",
+  "scope": "Continue the adversarial audit remediation for the current EOS390/Fortran PR without merging it or weakening scientific gates.",
+  "source_snapshot": {
+    "branch": "cloud/eos390-fortran-unification-v1",
+    "head": "772e85910afb40aea37c292680be24b363586a54",
+    "pull_request": 13,
+    "pull_request_state": "OPEN_DRAFT_UNMERGED",
+    "latest_baseline_ci_run": 43672847915,
+    "latest_baseline_ci_conclusion": "failure",
+    "latest_baseline_pytest_summary": {
+      "passed": 259,
+      "skipped": 9,
+      "failed": 1
+    },
+    "baseline_failure": "python_frontend/tests/test_m5a_provenance_correction.py::test_m5a_finding2_filename_corrected"
+  },
+  "execution_target": {
+    "branch": "remediation/2026-11-15-m5a-maxwell-eos-contracts",
+    "created_from": "772e85910afb40aea37c292680be24b363586a54",
+    "head_at_package_creation": "82cc20e75d444caaeeade9d60a86a1715a774f14",
+    "push_authorized": true,
+    "merge_authorized": false,
+    "force_push_authorized": false,
+    "draft_pr_base": "research/eos390-fortran-unification-v1"
+  },
+  "global_invariants": {
+    "preserve_raw_compose_source_bytes": true,
+    "do_not_weaken_mass_gate_relative_tolerance": 1e-12,
+    "do_not_weaken_stability_gate": true,
+    "do_not_weaken_causality_gate": true,
+    "do_not_weaken_beta_equilibrium_gate": true,
+    "do_not_weaken_first_law_gate": true,
+    "do_not_modify_source_eos_knots_to_force_admission": true,
+    "do_not_claim_composition_preservation_without_native_roundtrip_evidence": true,
+    "do_not_claim_native_verification_for_unverified_parameter_cases": true,
+    "do_not_call_m7_css_bridge_a_sharp_maxwell_transition": true,
+    "do_not_call_c0_seam_c1": true,
+    "do_not_merge_any_pull_request": true,
+    "do_not_force_push": true
+  },
+  "patch_state": "PATCHED_PUSHED_CI_PENDING",
+  "red_green_evidence": {
+    "tests_committed_before_implementation": true,
+    "red_failure_observed_in_host_session": false,
+    "status": "NOT_OBSERVED",
+    "instruction": "CI or a local runner must execute the focused tests. Do not claim TDD red was observed."
+  },
+  "patches": [
+    {
+      "id": "PATCH-M5A-ARRAY-READBACK",
+      "status": "PATCHED_NOT_CI_VERIFIED",
+      "files": [
+        "scripts/maxwell_audit/m5a_native_readback_verify.py",
+        "python_frontend/tests/test_m5a_provenance_correction.py"
+      ],
+      "behavior": "Native write/read/verify now records row-count equality and per-array relative residuals for n_B, mu_B, P and epsilon. Read-back acceptance requires all four values to match within 5e-13 relative tolerance."
+    },
+    {
+      "id": "PATCH-M5A-SCOPE",
+      "status": "PATCHED_NOT_CI_VERIFIED",
+      "files": [
+        "scripts/maxwell_audit/m5a_native_readback_verify.py",
+        "download/m5a_real_css/E390-05A_M5A_REAL_CSS_RECEIPT_20261114.json"
+      ],
+      "behavior": "Receipt-level evidence is scoped to HEADLINE_BAROTROPE_ONLY. All 27 per-case native flags are false and each case is NOT_VERIFIED_INDIVIDUALLY until an exact case artifact is independently run through native read/write/verify."
+    },
+    {
+      "id": "PATCH-M5A-DUPLICATE-ARTIFACT",
+      "status": "PATCHED_NOT_CI_VERIFIED",
+      "files": [
+        "download/m5a_real_css/GPPVA_DD2_m5a_real_css.json"
+      ],
+      "behavior": "Removed a wrong-name duplicate whose Git blob SHA equalled the correctly named BBB_BHF2 artifact."
+    },
+    {
+      "id": "PATCH-MAXWELL-V2-THERMO-ONLY",
+      "status": "PATCHED_NOT_CI_VERIFIED",
+      "files": [
+        "python_frontend/compose_eos/maxwell_v2.py",
+        "python_frontend/tests/test_maxwell_v2_composition.py"
+      ],
+      "behavior": "Composition-bearing inputs now fail closed with COMPOSITION_UNSUPPORTED. Successful thermo-only v2 reports explicitly say composition is not preserved or available."
+    },
+    {
+      "id": "PATCH-MAXWELL-V2-PORTABLE-ROOT",
+      "status": "PATCHED_NOT_CI_VERIFIED",
+      "files": [
+        "python_frontend/compose_eos/maxwell_v2.py"
+      ],
+      "behavior": "Removed developer-specific /home/... project root and derive repository path from __file__."
+    },
+    {
+      "id": "PATCH-APR-CSS-EXACT-DERIVATIVE-GATE",
+      "status": "PATCHED_NOT_CI_VERIFIED",
+      "files": [
+        "scripts/maxwell_audit/audit_apr_css_maxwell.py",
+        "python_frontend/tests/test_apr_css_maxwell_audit.py"
+      ],
+      "behavior": "Use PchipInterpolator.derivative() to evaluate n_B=dP/dmu_B and require both APR and analytic CSS branch residuals below the declared 1e-3 relative audit threshold before ADMITTED verdict."
+    }
+  ],
+  "tasks": [
+    {
+      "id": "CI-01",
+      "priority": "P0",
+      "status": "PENDING",
+      "title": "Run branch CI and repair only reproduced failures",
+      "commands": [
+        "python -m pip install -e '.[test]'",
+        "bash fortran_eos/build.sh build/compose_eos_fortran",
+        "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python -m pytest -q python_frontend/tests pipeline/tests"
+      ],
+      "acceptance": [
+        "Fortran executable build exits 0",
+        "All non-skipped tests pass",
+        "No test assertion is removed or loosened to hide a regression",
+        "CI run SHA equals the final branch HEAD"
+      ]
+    },
+    {
+      "id": "M5A-02",
+      "priority": "P1",
+      "status": "PATCHED_PENDING_CI",
+      "title": "Verify M5A single-artifact scope and native numerical readback",
+      "commands": [
+        "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python scripts/maxwell_audit/m5a_native_readback_verify.py",
+        "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python -m pytest -q python_frontend/tests/test_m5a_provenance_correction.py"
+      ],
+      "acceptance": [
+        "readback_n_match is true",
+        "readback_value_match is true",
+        "Each of n_B, mu_B, P, epsilon has maximum relative residual <=5e-13",
+        "top-level native scope is HEADLINE_BAROTROPE_ONLY",
+        "native_verified_case_keys remains empty unless exact case-specific input/output provenance is present",
+        "all 27 per-case native flags remain false until individually verified"
+      ]
+    },
+    {
+      "id": "MAXWELL-V2-02",
+      "priority": "P1",
+      "status": "PATCHED_PENDING_CI",
+      "title": "Verify thermo-only Maxwell v2 fails closed for composition-bearing inputs",
+      "commands": [
+        "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python -m pytest -q python_frontend/tests/test_maxwell_v2_composition.py"
+      ],
+      "acceptance": [
+        "composition_available=true input rejects with COMPOSITION_UNSUPPORTED",
+        "composition_file_present=true input rejects with COMPOSITION_UNSUPPORTED",
+        "thermo-only segmented test retains all v1 physical gates",
+        "no successful report claims composition preservation"
+      ]
+    },
+    {
+      "id": "APR-CSS-02",
+      "priority": "P1",
+      "status": "AUDIT_GATE_PATCHED_GENERATOR_REMAINS_UNRESOLVED",
+      "title": "Validate exact PCHIP derivative audit and stop APR+CSS admission on branch mismatch",
+      "commands": [
+        "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python -m pytest -q python_frontend/tests/test_apr_css_maxwell_audit.py"
+      ],
+      "acceptance": [
+        "Audit uses PchipInterpolator.derivative, not finite difference of sampled P",
+        "APR and CSS branch residuals are reported separately",
+        "ADMITTED verdict requires both branch residuals below 1e-3",
+        "If APR branch fails, verdict is REVIEW_REQUIRED even if jump identity, TOV and Love solve pass"
+      ],
+      "unresolved": [
+        "eos_generator/compose_eos_pkg/compose_eos/phase_transitions.py still creates independent P, n and epsilon PCHIP interpolants; the construction path itself has not yet been redesigned or gated by this patch"
+      ]
+    },
+    {
+      "id": "APR-CSS-03",
+      "priority": "P1",
+      "status": "BLOCKED_PHYSICAL_NUMERICAL_DESIGN",
+      "title": "Make the production APR+CSS Maxwell interpolant thermodynamically consistent",
+      "required_work": [
+        "Compare a single-potential representation, P(mu) with n=P'(mu), thermodynamic-potential reconstruction, and Hermite P(mu) with endpoint n constraints",
+        "Report source-knot residuals and source precision budget before choosing a method",
+        "Reject the branch if no method satisfies stability, causality and differential first law within a declared source error budget",
+        "Keep analytic CSS branch identities explicit and tested"
+      ],
+      "stop_condition": "Do not choose an arbitrary interpolation tolerance or modify source knots to obtain a PASS."
+    },
+    {
+      "id": "WS-01",
+      "priority": "P2",
+      "status": "BLOCKED_NATIVE_PRODUCTION_INTEGRATION",
+      "title": "Expose Wigner-Seitz reconstruction through a native production command",
+      "required_work": [
+        "Trace compose_eos_wigner_seitz.f90 public routines and their exact eos_data_t contracts",
+        "Add a CLI/API path that consumes actual CompOSE source input, runs the native Fortran routine and emits a provenance-bound output",
+        "Test SPG_M1 source rows through the native command, not a Python reimplementation only",
+        "Compare all output states, source row identity, Iphase and CompOSE abundance semantics"
+      ],
+      "stop_condition": "Synthetic unit tests and Python mirror tests alone do not close native end-to-end acceptance. Do not call the current module a full microscopic Thomas-Fermi functional solver."
+    },
+    {
+      "id": "MAXWELL-V2-03",
+      "priority": "P2",
+      "status": "BLOCKED_NATIVE_COMPOSITION_KERNEL",
+      "title": "Implement genuine composition-aware Maxwell v2 or retain explicit rejection",
+      "required_work": [
+        "Do not remove the current fail-closed guard",
+        "If implementing composition-aware v2, add a native kernel with explicit composition and mask contracts",
+        "Preserve per-row presence masks, C3/C4 applicability, Iphase and composition sidecars across transition construction and native write/read-back",
+        "Add tests using actual composition-bearing source phases and assert complete native round-trip"
+      ],
+      "stop_condition": "Do not claim composition preservation by copying source arrays into report flags; reject until output values and sidecars are actually verified."
+    },
+    {
+      "id": "MAXWELL-SPG-01",
+      "priority": "P1",
+      "status": "BLOCKED_SOURCE_RECONSTRUCTION_REQUIRED",
+      "title": "Resolve SPG_M1 Iphase-7 source convexity inconsistency",
+      "current_evidence": {
+        "rows": 148,
+        "intervals": 147,
+        "source_convexity_fail_intervals": 99,
+        "source_identity": "see frozen raw CompOSE blob identities and source consistency audit",
+        "representative_secant_fm3": 0.003005954998982141,
+        "representative_endpoint_density_max_fm3": 0.002570395783
+      },
+      "required_work": [
+        "Reconfirm raw source hashes before analysis",
+        "Request or locate higher-resolution thermodynamic source data, or select a separately validated crust model",
+        "Preserve exact source values and quantify any thermodynamic-potential reconstruction residual"
+      ],
+      "stop_condition": "No PCHIP/Hermite method may silently alter source knots or weaken dn/dmu>=0, causality, Euler or first-law gates."
+    },
+    {
+      "id": "M7-CSS-01",
+      "priority": "P2",
+      "status": "SCOPED_PASS_C0_THERMO_ONLY",
+      "title": "Preserve the declared M7 CSS scope",
+      "acceptance": [
+        "Not a sharp Maxwell transition",
+        "Composition dropped and C3/C4 NOT_AVAILABLE",
+        "C0 seam only; do not describe as C1"
+      ]
+    },
+    {
+      "id": "RECEIPT-01",
+      "priority": "P1",
+      "status": "PENDING",
+      "title": "Regenerate stale audit receipts only after final CI and exact verification",
+      "required_work": [
+        "Use the final git HEAD in every new receipt",
+        "Record exact commands, executable hashes and source hashes",
+        "Keep old receipts immutable or version them; do not backdate or silently overwrite historical evidence"
+      ]
+    }
+  ],
+  "stop_conditions": [
+    "Any proposal to relax 1e-12 mass gate or stability/causality/beta-equilibrium/first-law gates",
+    "Any source EOS knot modification without an explicitly approved source reconstruction budget",
+    "Any composition-aware claim without real input -> native output -> readback value identity and mask/sidecar preservation",
+    "Any APR+CSS ADMITTED verdict while its exact branch derivative residual exceeds 1e-3",
+    "Any Wigner-Seitz end-to-end PASS based only on Python mirror or synthetic Fortran unit tests",
+    "Any claim of CI PASS without a fresh workflow run whose head SHA equals the current branch HEAD"
+  ],
+  "completion_contract": {
+    "minimum_done": [
+      "focused tests pass",
+      "full frontend/direct-provider CI passes",
+      "Fortran build passes",
+      "all remaining blockers preserve explicit status"
+    ],
+    "must_not_do": [
+      "merge PR #13 or any remediation PR",
+      "force push",
+      "delete raw EOS source data",
+      "weaken scientific gates",
+      "claim unresolved physical design is fixed"
+    ],
+    "final_report_fields": [
+      "branch",
+      "head_sha",
+      "changed_files",
+      "commit_shas",
+      "ci_run_id",
+      "ci_head_sha",
+      "pytest_passed",
+      "pytest_skipped",
+      "pytest_failed",
+      "fortran_build_exit",
+      "remaining_blockers",
+      "scientific_claims_with_scope"
+    ]
+  }
+}

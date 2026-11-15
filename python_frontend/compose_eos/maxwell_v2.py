@@ -1,31 +1,14 @@
-"""Node 10: Composition-aware Maxwell v2 orchestration (Python layer).
+"""Node 10: Iphase-segmented thermo-only Maxwell v2 orchestration.
 
-The v1 native Fortran kernel (construct_maxwell_transition) requires each
-input phase to be a single smooth Iphase segment and rejects nonzero Nadd.
-These are correct safety gates for the v1 thermodynamic-only contract. This
-module implements a SEPARATELY VERSIONED v2 path that addresses the
-composition-aware requirements of mission section 6 WITHOUT weakening v1:
+The v1 native Fortran kernel is explicitly thermo-only and rejects
+composition-bearing input. This v2 wrapper only segments thermo-only inputs at
+contiguous Iphase boundaries before calling v1. It does NOT preserve or
+transform composition. Until a dedicated native composition-aware kernel and
+round-trip representation exist, both composition_available and
+composition_file_present inputs fail closed with COMPOSITION_UNSUPPORTED.
 
-  - v2 segments each input at its internal Iphase boundaries into smooth
-    sub-phases, then runs the v1 native Maxwell kernel on each (low-segment,
-    high-segment) pair. No interpolation, spline, or derivative stencil
-    crosses a true phase discontinuity.
-  - v2 preserves the Iphase label and composition of each segment
-    independently at the two Maxwell transition rows (composition is copied
-    from the source segment, NOT interpolated across the coexistence).
-  - v2 records local-neutrality evidence per phase (not only the caller's
-    boolean), and rejects source layouts whose phase/composition semantics
-    cannot be preserved (COMPOSITION_UNSUPPORTED_LAYOUT).
-  - v2 uses axis-value-based slice compatibility (charge_fraction_grid
-    value), NOT the blind iYq integer equality of v1; original iYq labels
-    are preserved as provenance.
-  - v1 is UNCHANGED. v2 is opt-in via construct_maxwell_transition_v2.
-
-The Euler tolerance (euler_tolerance=5e-4 in v1) is NOT changed in this
-implementation; the v2 receipt records it as pending a source-accuracy
-derivation (mission B3).
-
-This module does NOT modify Fortran source. It orchestrates v1 calls.
+The wrapper preserves the v1 mass, stability, causality, beta-equilibrium and
+first-law gates. It is opt-in via construct_maxwell_transition_v2.
 """
 from __future__ import annotations
 import sys
@@ -128,6 +111,22 @@ def construct_maxwell_transition_v2(low: EOSData, high: EOSData,
     Returns (matched, report) on success or raises with a v2 status category.
     """
     report = MaxwellV2Report()
+
+    # v1 is a thermo-only kernel. Do not silently drop a CompOSE composition
+    # sidecar or its row-level semantics while extracting an Iphase segment.
+    has_composition = any(
+        bool(getattr(phase, flag, False))
+        for phase in (low, high)
+        for flag in ("composition_available", "composition_file_present")
+    )
+    if has_composition:
+        report.status = "COMPOSITION_UNSUPPORTED"
+        report.rejection_category = "COMPOSITION_UNSUPPORTED"
+        raise RuntimeError(
+            "v2: COMPOSITION_UNSUPPORTED: current native v1 kernel is "
+            "thermo-only; composition-bearing inputs require a dedicated "
+            "composition-aware native transition and output path."
+        )
 
     # axis-value slice compatibility (charge_fraction_grid value, not iYq int)
     cf_low = float(getattr(low, 'charge_fraction_grid', 0.0))
@@ -236,8 +235,10 @@ def construct_maxwell_transition_v2(low: EOSData, high: EOSData,
         "high_segment_iphase": first_high[0],
         "low_segment_n_rows": last_low[2]-last_low[1],
         "high_segment_n_rows": first_high[2]-first_high[1],
-        "low_composition_preserved_from_segment": True,
-        "high_composition_preserved_from_segment": True,
+        "low_composition_preserved_from_segment": False,
+        "high_composition_preserved_from_segment": False,
+        "composition_status": "NOT_AVAILABLE_THERMO_ONLY",
+        "output_composition_available": False,
     }
     report.coexistence_results.append(coex)
     report.status = "PASS"

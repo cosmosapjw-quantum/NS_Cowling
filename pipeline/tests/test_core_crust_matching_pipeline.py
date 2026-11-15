@@ -169,11 +169,17 @@ def test_pipeline_rejects_native_consistency_failure_after_verified_readback(tmp
     monkeypatch.setattr(pipeline, "executable", lambda: exe)
     monkeypatch.setattr(
         pipeline, "verify_internal_readback",
-        lambda *args, **kwargs: {"status": "PASS", "errors": []},
+        lambda *args, **kwargs: {
+            "status": "PASS", "errors": [],
+            "max_abs_residuals": {}, "max_rel_residuals": {},
+        },
     )
     monkeypatch.setattr(
         pipeline, "verify_internal_metadata_readback",
-        lambda *args, **kwargs: {"status": "PASS", "errors": []},
+        lambda *args, **kwargs: {
+            "status": "PASS", "errors": [],
+            "max_abs_residuals": {}, "max_rel_residuals": {},
+        },
     )
 
     crust_dir = tmp_path / "crust"

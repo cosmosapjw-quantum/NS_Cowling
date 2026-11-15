@@ -1,0 +1,171 @@
+{
+  "schema": "compose-eos-gibbs-validation-report-v3.3.1",
+  "package_version": "3.3.1",
+  "gibbs_schema": "compose-eos-gibbs-v2",
+  "composition_status": "thermo_only",
+  "normalization_masses_mev": {
+    "mn": 939.0,
+    "mp": 939.0,
+    "role": "CompOSE normalization reference only; does not represent constituent masses of either underlying phase"
+  },
+  "provenance": {
+    "hadronic": {
+      "source_identifier": "synthetic_hadronic_surface_v331",
+      "source_file_path": "/home/cosmosapjw/Dropbox/NS_Cowling/in_memory:/synthetic_hadronic_surface_v331",
+      "source_sha256": "ad182bbbcb741b079c699f05fd182014a6c129185b71f34c97fdd54160d78b41",
+      "model_parameter_set_identifier": "H_cubic_convex_ref",
+      "phase_identity": "hadronic_nuclear",
+      "mu_b_units": "MeV",
+      "mu_q_units": "MeV",
+      "pressure_units": "MeV fm^-3",
+      "normalization_convention": "grand-potential pressure P(mu_B, mu_Q) relative to zero-pressure vacuum",
+      "interpolation_method": "RectBivariateSpline",
+      "interpolation_order": [
+        3,
+        3
+      ],
+      "lepton_contributions": "excluded_baryonic_only",
+      "mu_b_range": [
+        980.0,
+        1450.0
+      ],
+      "mu_q_range": [
+        -250.0,
+        100.0
+      ],
+      "grid_shape": [
+        29,
+        29
+      ]
+    },
+    "high_density": {
+      "source_identifier": "synthetic_quark_surface_v331",
+      "source_file_path": "/home/cosmosapjw/Dropbox/NS_Cowling/in_memory:/synthetic_quark_surface_v331",
+      "source_sha256": "4478847f664914cdf2f977e34e773c31f2549bf1946865a1749a44f7fd00a97a",
+      "model_parameter_set_identifier": "Q_quartic_convex_ref",
+      "phase_identity": "quark_deconfined",
+      "mu_b_units": "MeV",
+      "mu_q_units": "MeV",
+      "pressure_units": "MeV fm^-3",
+      "normalization_convention": "grand-potential pressure P(mu_B, mu_Q) relative to zero-pressure vacuum",
+      "interpolation_method": "RectBivariateSpline",
+      "interpolation_order": [
+        3,
+        3
+      ],
+      "lepton_contributions": "excluded_baryonic_only",
+      "mu_b_range": [
+        980.0,
+        1450.0
+      ],
+      "mu_q_range": [
+        -250.0,
+        100.0
+      ],
+      "grid_shape": [
+        29,
+        29
+      ]
+    },
+    "lepton_sector": {
+      "label": "zero-temperature electron+muon Fermi gases"
+    }
+  },
+  "pressure_equality_residual_max_MeV_fm3": 5.684341886080802e-14,
+  "global_charge_residual_max_abs": 1.984089975648473e-16,
+  "post_construction_validation": {
+    "stage": "post_construction",
+    "representation": "PchipInterpolator(mu_b_MeV, nb_fm3)",
+    "interval_count": 24,
+    "euler_residual_max_abs_MeV_fm3": 5.684341886080802e-14,
+    "euler_residual_max_rel": 1.5544461101287958e-16,
+    "euler_residual_rms_rel": 3.1088922202575915e-17,
+    "pressure_reconstruction_max_abs_MeV_fm3": 2.0742424453601416e-06,
+    "pressure_reconstruction_rms_abs_MeV_fm3": 1.1512193420668126e-06,
+    "pressure_reconstruction_max_rel": 1.5726442698027547e-08,
+    "pressure_reconstruction_rms_rel": 1.0227719862053433e-08,
+    "min_dnb_dmu_b_fm3_per_MeV": 0.0009246520117557153,
+    "max_dnb_dmu_b_fm3_per_MeV": 0.0017192267707703006,
+    "worst_dnb_dmu_b_mu_b_MeV": 1100.0,
+    "min_causality_margin_fm3": 0.7559065390615181,
+    "max_causality_margin_fm3": 1.7236712590610592,
+    "worst_causality_margin_mu_b_MeV": 1100.0,
+    "min_cs2": 0.2404657825856958,
+    "max_cs2": 0.2568147215963155,
+    "worst_cs2_mu_b_MeV": 1100.0,
+    "tolerances": {
+      "euler_rtol": 1e-06,
+      "euler_atol": 1e-10,
+      "pressure_rtol": 0.0005,
+      "pressure_atol": 0.0005,
+      "causality_margin_tol_scaled": 1e-11,
+      "cs2_tol": 1e-10
+    },
+    "pass_": true
+  },
+  "post_readback_validation": {
+    "stage": "post_readback",
+    "representation": "PchipInterpolator(mu_b_MeV, nb_fm3)",
+    "interval_count": 24,
+    "euler_residual_max_abs_MeV_fm3": 1.1368683772161603e-13,
+    "euler_residual_max_rel": 2.1968095352572598e-16,
+    "euler_residual_rms_rel": 9.250829128730532e-17,
+    "pressure_reconstruction_max_abs_MeV_fm3": 2.074242473781851e-06,
+    "pressure_reconstruction_rms_abs_MeV_fm3": 1.1512193407978012e-06,
+    "pressure_reconstruction_max_rel": 1.5726442698027547e-08,
+    "pressure_reconstruction_rms_rel": 1.022771984847875e-08,
+    "min_dnb_dmu_b_fm3_per_MeV": 0.0009246520117557153,
+    "max_dnb_dmu_b_fm3_per_MeV": 0.0017192267707703006,
+    "worst_dnb_dmu_b_mu_b_MeV": 1100.0,
+    "min_causality_margin_fm3": 0.7559065390615181,
+    "max_causality_margin_fm3": 1.7236712590610592,
+    "worst_causality_margin_mu_b_MeV": 1100.0,
+    "min_cs2": 0.2404657825856958,
+    "max_cs2": 0.2568147215963155,
+    "worst_cs2_mu_b_MeV": 1100.0,
+    "tolerances": {
+      "euler_rtol": 1e-06,
+      "euler_atol": 1e-10,
+      "pressure_rtol": 0.0005,
+      "pressure_atol": 0.0005,
+      "causality_margin_tol_scaled": 1e-11,
+      "cs2_tol": 1e-10
+    },
+    "pass_": true
+  },
+  "write_readback_status": "PASS",
+  "output_hashes_sample_roundtrip": {
+    "eos.gibbs_construction.json": "c8c836a98fc737d87c0713354455107b01598cdf6696bdcbc158b8850f68e0a9",
+    "eos.nb": "dc95fbdcfbf7ec609bd0822f92914eb44dc1493156a4d545ad21b0dd360d6d24",
+    "eos.readback_receipt.json": "06e342e4c5a68278e6d9f68c66434bf72300aca355048d76569c6e5638574792",
+    "eos.t": "73ff4ff1446f1526fb13fba0e0100079258a41bfd2b157f97c0ccaf9476c3454",
+    "eos.thermo": "b7689f7e9acfc1904555c98e17063cd5c8894f75358662dfb3a318575f2517d1",
+    "eos.yq": "a41fa9402091b99e237373b42f2025e77c12ce18aff93807302b3375b4701f2a"
+  },
+  "negative_controls": {
+    "zero_root_rejected": {
+      "passed": true,
+      "error": "mu_b_values must be an increasing grid inside both phase surfaces"
+    },
+    "tangential_contact_rejected": {
+      "passed": true,
+      "error": "phase charge densities are indistinguishable; mixed fraction is undefined"
+    },
+    "non_isolated_interval_rejected": {
+      "passed": true,
+      "error": "Gibbs pressure equality contains a non-isolated root interval at mu_B=1050, mu_Q=[-100,-80]"
+    },
+    "lepton_double_count_rejected": {
+      "passed": true,
+      "error": "had_lep already declares lepton_contributions='included'; refusing to add an external LeptonSector on top"
+    },
+    "out_of_domain_rejected": {
+      "passed": true,
+      "error": "mu_b_values must be an increasing grid inside both phase surfaces"
+    },
+    "acausal_barotrope_rejected": {
+      "passed": true,
+      "error": "Gibbs synthetic_acausal_check fails dP/dmu_B = n_B integral reconstruction (max_abs=7.625e+00, max_rel=7.943e-02)"
+    }
+  }
+}

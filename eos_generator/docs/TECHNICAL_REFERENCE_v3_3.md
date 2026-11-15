@@ -2,25 +2,29 @@
 
 ## Zero-temperature barotrope
 
-The cold EOS uses `n_B` in fm^-3 and `P,epsilon` in MeV fm^-3. Define `F=epsilon/n_B`. The package uses
+The cold EOS uses `n_B` in $\text{fm}^{-3}$ and $P, \varepsilon$ in $\text{MeV fm}^{-3}$. Define $F = \varepsilon / n_B$. The package uses
 
-$$P=n_B^2\\frac{dF}{dn_B},\\qquad \\mu_B=F+\\frac{P}{n_B},\\qquad \\epsilon=n_BF.$$
+$$P = n_B^2 \frac{dF}{dn_B}, \qquad \mu_B = F + \frac{P}{n_B}, \qquad \varepsilon = n_B F.$$
 
-Hence `d epsilon/d n_B = mu_B` and `c_s^2=dP/d epsilon`. Thermodynamic stability requires positive compressibility; relativistic causality requires `0 <= c_s^2 <= 1`.
+Hence $d\varepsilon/dn_B = \mu_B$ and $c_s^2 = dP/d\varepsilon$. Thermodynamic stability requires positive compressibility; relativistic causality requires $0 \le c_s^2 \le 1$.
+
+## CompOSE Manual v3.01 Definitions ($Q_1 \dots Q_7$, $I_l$, $Y_q$)
+
+In CompOSE Reference Manual v3.01 (Sec. 4.2): $Q_1 = P/n_B$, $Q_2 = s/n_B$, $Q_3 = \mu_B/m_n - 1$, $Q_4 = \mu_Q/m_n$, $Q_5 = \mu_L/m_n$, $Q_6 = F/(n_B m_n) - 1$, $Q_7 = \varepsilon/(n_B m_n) - 1$, with lepton flag $I_l \in \{0, 1\}$ and hadronic charge fraction $Y_q$. Cold $\beta$-equilibrium requires $T=0$, $I_l=1$, $\max|Q_5| < 10^{-8}$, and (when `eos.compo` is available) local charge neutrality $\max|Y_p + (Z_{\text{av}}/A_{\text{av}}) Y_h - Y_e - Y_\mu| \le 2\times 10^{-4}$.
 
 ## Single-speed CSS core-crust bridge
 
-The core-crust matcher `method="css"` uses one constant (s=c_s^2\in(0,1]) over the entire bridge. Let the crust-side endpoint be ((n_c,P_t,\mu_t)) and the continuous high-density core endpoint be ((n_2,P_2,\mu_2)). The bridge-side start density is
+The core-crust matcher `method="css"` uses one constant $s = c_s^2 \in (0, 1]$ over the entire bridge. Let the crust-side endpoint be $(n_c, P_t, \mu_t)$ and the continuous high-density core endpoint be $(n_2, P_2, \mu_2)$. The bridge-side start density is
 
-$n_b=n_2(\mu_t/\mu_2)^{1/s}.$
+$$n_b = n_2 (\mu_t / \mu_2)^{1/s}.$$
 
 The pressure integral gives
 
-$P_2-P_t=n_2\mu_2\frac{s}{1+s}\left[1-(\mu_t/\mu_2)^{1+1/s}\right].$
+$$P_2 - P_t = n_2 \mu_2 \frac{s}{1+s} \left[1 - (\mu_t / \mu_2)^{1+1/s}\right].$$
 
-The scalar equation is solved only on (0<s\le1), and a physical solution additionally requires (n_b>n_c). At the crust--bridge interface (P,\mu_B) are continuous while (n_B,\epsilon) jump, with
+The scalar equation is solved only on $0 < s \le 1$, and a physical solution additionally requires $n_b > n_c$. At the crust–bridge interface $(P, \mu_B)$ are continuous while $(n_B, \varepsilon)$ jump, with
 
-$\Delta\epsilon=\mu_t(n_b-n_c).$
+$$\Delta\varepsilon = \mu_t (n_b - n_c).$$
 
 At the bridge--core endpoint (n_B,P,\epsilon,\mu_B) are continuous. This path is thermo-only and does not infer composition. It is not yet exported through the phase-aware TOV sidecar path; the smooth `match --tov` CLI therefore rejects it. Any Seidov result refers only to the small-core onset criterion.
 
@@ -42,19 +46,19 @@ The final CompOSE table contains two adjacent rows at equal `P_t,mu_t` and diffe
 
 In geometric units `G=c=1`, for `y=r H'/H`, the pressure-corrected jump is
 
-$$y^+-y^-=-\\frac{4\\pi r_t^3\\Delta\\epsilon}{m_t+4\\pi r_t^3P_t}.$$
+$$y^+ - y^- = -\frac{4\pi r_t^3 \Delta\varepsilon}{m_t + 4\pi r_t^3 P_t}.$$
 
 This is the finite-pressure correction by Takátsy and Kovács (2020). The interface metadata includes all quantities required to independently recompute `Delta y`.
 
 ## Gibbs construction
 
-For each phase supply a grid `P(mu_B,mu_Q)` with pressure shape `(len(mu_B),len(mu_Q))`. The code computes `n_B=partial P/partial mu_B` and charge density `q=partial P/partial mu_Q`, checks pressure convexity, solves phase-pressure equality, and imposes
+For each phase supply a `ChargeResolvedPhase` surface $P(\mu_B, \mu_Q)$ with pressure shape `(len(mu_b), len(mu_q))` and provenance metadata (`source_id`, `source_file_path`, `source_sha256`, `model_id`, `phase_identity`, units, `normalization_convention`, interpolation method/order, `lepton_contributions`). The code computes $n_B = \partial P / \partial \mu_B$ and charge density $q = \partial P / \partial \mu_Q$, checks convexity and lepton double-counting, solves phase-pressure equality, and imposes
 
-$$ (1-\\chi)q_H+\\chi q_Q+q_l=0. $$
+$$(1 - \chi) q_H + \chi q_Q + q_l = 0.$$
 
-The mixed baryon density is `(1-chi)n_H+chi n_Q`; total energy density follows `epsilon=mu_B*n_B+mu_Q*q_total-P_total`, with `q_total=0`. A zero-temperature electron+muon lepton sector is included. The 1-D CompOSE tables in this release do not supply the required charge-resolved surfaces. Do not pass a `read_compose()` EOS as a substitute.
+The mixed baryon density is $(1-\chi)n_H + \chi n_Q$; total energy density follows $\varepsilon = \mu_B n_B + \mu_Q q_{\text{total}} - P_{\text{total}}$ with $q_{\text{total}} = 0$. A zero-temperature electron+muon lepton sector is included when not already present on the phase surfaces. The 1-D CompOSE tables in this release do not supply charge-resolved surfaces; do not pass a `read_compose()` EOS as a substitute. Output headers use `(939.0, 939.0) MeV` explicitly as CompOSE normalization reference masses and record `composition_status = "thermo_only"`.
 
-NPZ input format: `mu_b`, `mu_q`, and `pressure` arrays, with pressure shape `(len(mu_b),len(mu_q))`.
+NPZ input format: `mu_b`, `mu_q`, and `pressure` arrays, with pressure shape `(len(mu_b), len(mu_q))`.
 
 ## TOV and numerical units
 
@@ -64,11 +68,11 @@ NPZ input format: `mu_b`, `mu_q`, and `pressure` arrays, with pressure shape `(l
 
 For constant `s=c_s^2` the continuation is
 
-$$\\mu(n)=\\mu_t(n/n_t)^s,$$
+$$\mu(n) = \mu_t (n / n_t)^s,$$
 
-$$P(n)=P_t+\\frac{s}{1+s}(\\epsilon_t+P_t)[(n/n_t)^{1+s}-1],\\qquad \\epsilon=\\mu n-P.$$
+$$P(n) = P_t + \frac{s}{1+s} (\varepsilon_t + P_t) \left[(n / n_t)^{1+s} - 1\right], \qquad \varepsilon = \mu n - P.$$
 
-This preserves the first law and has `c_s^2=s` on the tail. It changes the input model, is not uniquely implied by the source table, and must be audited with all three derivative schemes. An output is diagnostic-only unless its package gate and PCHIP, cubic-spline and centered-FD checks all pass.
+This preserves the first law and has `c_s^2=s` on the tail. It changes the input model, is not uniquely implied by the source table, and must be audited with all three derivative schemes and exact spline interval extrema. An output is diagnostic-only unless its package gate, exact interval causality checks, and PCHIP, cubic-spline and centered-FD checks all pass.
 
 ## Failure-cause report
 
@@ -129,4 +133,10 @@ For a fixed baryon chemical potential, each input `RectBivariateSpline` pressure
 
 The Gibbs root solver now partitions the charge domain at that union of knots, isolates every stationary point from the quadratic derivative on each span, and searches each resulting monotone subinterval. This detects narrow root pairs and tangential contacts of the declared interpolant that a fixed sign-scan can miss. A non-isolated pressure-equality interval is rejected explicitly. The guarantee is for the declared spline interpolant, not for arbitrary unsampled physics outside the source table.
 
-Gibbs construction also records its output as a thermodynamic barotrope, not species-resolved mixed-phase composition. Sharp Maxwell input admission is restricted to cold, lepton-bearing, locally neutral (Y_q=0) slices. These restrictions are deliberate fail-closed contracts.
+Gibbs construction also records its output as a `thermo_only` barotrope (not species-resolved mixed-phase composition), enforces post-construction and post-readback barotropic consistency (`validate_gibbs_barotrope` over `PchipInterpolator(mu_b, n_B)` verifying $P_{\text{rec}}$, Euler identity, interval minima of $dn_B/d\mu_B > 0$, causality margin $g = \mu_B dn_B/d\mu_B - n_B \ge 0$, and $0 < c_s^2 \le 1$), and preserves all 12 `ChargeResolvedPhase` provenance fields in `eos.phase_transitions.json`.
+
+## v3.3.1 implementation note: exact causality interval extrema, staged readback & native Fortran closure
+
+- **Exact causality extrema (`causality.py`):** Uses log-spline derivatives $p(x)=\ln P$, $e(x)=\ln \varepsilon$ ($x=\ln n_B$) and isolates all real roots of $(p'-e')p'e' + p''e' - e''p' = 0$ (degree $\le 6$) on every spline interval to evaluate exact $[c_{s,\min}^2, c_{s,\max}^2]$, enforce $p' > 0, e' > 0$, and distinguish `true_crossing`, `tangential_contact`, and `none`.
+- **Staged writer readback (`io.py`, `phase_transitions.py`, `cli.py`):** All CompOSE writers stage output, invoke `verify_compose_readback` (and domain readback where applicable), preserve failure receipts on nonzero exit, and promote atomically only after verification passes.
+- **Native Fortran composition closure (`compose_eos_wigner_seitz.f90`):** `compose_eos_fortran reconstruct-compo-native` executes `reconstruct_compo_closure_ws` on cold SPG/GPPVA CompOSE tables with native `read_compose` readback and FNV-1a output hashes (algebraic closure only; not a spatial Thomas-Fermi solver).

@@ -60,25 +60,35 @@ jobs:
           PYTHONPATH: eos_generator:eos_generator/compose_eos_pkg
         run: python -m pytest -q eos_generator/tests
 
-      - name: Diagnose EOS generator package manifest refresh
+      - name: Verify EOS generator SHA-256 package manifest
         run: |
           cd eos_generator
           python - <<'PY'
+          import sys
           from pathlib import Path
           from hashlib import sha256
           manifest = Path("SHA256SUMS_v3_3.txt")
+          failures = []
+          count = 0
           for line in manifest.read_text(encoding="utf-8").splitlines():
               if not line.strip():
                   continue
               expected, name = line.split(maxsplit=1)
               name = name.lstrip("* ")
               path = Path(name)
+              count += 1
               if not path.is_file():
-                  print(f"PACKAGE_MISSING {name} expected={expected}")
+                  failures.append(f"PACKAGE_MISSING {name} expected={expected}")
                   continue
               actual = sha256(path.read_bytes()).hexdigest()
               if actual != expected:
-                  print(f"PACKAGE_UPDATE {name} {actual}")
+                  failures.append(f"PACKAGE_MISMATCH {name} expected={expected} actual={actual}")
+          if failures or count == 0:
+              for f in failures:
+                  print(f)
+              print(f"FAIL: {len(failures)} SHA256SUMS_v3_3.txt errors out of {count} entries")
+              sys.exit(1)
+          print(f"PASS: all {count} entries in eos_generator/SHA256SUMS_v3_3.txt verified")
           PY
 
       - name: Build admitted E390-03A standalone core-only cohort
@@ -172,11 +182,16 @@ jobs:
             -Ibuild/compose_eos_fortran/mod \
             fortran_eos/tests/test_wigner_seitz_cell.f90 \
             build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_io.o \
             build/compose_eos_fortran/obj/compose_eos_wigner_seitz.o \
             -o build/compose_eos_fortran/test_wigner_seitz_cell
           build/compose_eos_fortran/test_wigner_seitz_cell
 
       - name: Run Wigner-Seitz end-to-end reconstruction tests (E390-03/M3, skips if M0 not staged)
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
         run: |
           python -m pytest -q python_frontend/tests/test_wigner_seitz_reconstruction.py
 

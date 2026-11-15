@@ -69,11 +69,13 @@ PYTHONPATH=compose_eos_pkg python scripts/construct_gibbs_eos.py \
   --mu-b-min 900 --mu-b-max 1500 --out ./gibbs_eos
 ```
 
-Each NPZ must contain `mu_b`, `mu_q`, and `pressure` arrays shaped `(len(mu_b),len(mu_q))`. The supplied 1-D beta-equilibrium CompOSE barotropes do not contain these charge-resolved surfaces and cannot be promoted to Gibbs inputs.
+Each NPZ must contain `mu_b`, `mu_q`, and `pressure` arrays shaped `(len(mu_b),len(mu_q))`, together with `ChargeResolvedPhase` provenance fields. Gibbs root isolation partitions the union of both charge knot vectors; post-construction and post-readback `validate_gibbs_barotrope` verifies thermodynamic identities and interval causality margins. The supplied 1-D beta-equilibrium CompOSE barotropes do not contain these charge-resolved surfaces and cannot be promoted to Gibbs inputs. Output tables carry `composition_status = "thermo_only"` and `(939.0, 939.0) MeV` explicitly as CompOSE normalization reference masses.
 
-## Causality and reconstruction
+## Causality, readback verification and native Fortran closure
 
-Causality is sampled between knots within each smooth phase; derivatives are not taken across phase IDs or large density gaps. An optional constant-(c_s^2) completion produces a separate model alternative and never overwrites the source. The source/completion join is kept as an explicit derivative boundary because the sound-speed derivative may kink there.
+Causality is evaluated via exact piecewise-cubic interval extrema (solving the degree-$\le 6$ stationary polynomial on log-spline intervals and distinguishing `true_crossing`, `tangential_contact`, and `none`); uniform 16/32-point sampling is retained strictly as non-gating diagnostic telemetry. An optional constant-$c_s^2$ completion produces a separate model alternative and never overwrites the source.
+
+CompOSE writers stage outputs and run `verify_compose_readback` (checking arrays, `Q1..Q7`, headers, `Iphase`/`Nadd`, composition masks, `C3`/`C4`, and SHA-256 digests; CLI subcommand `compose-eos verify-readback`) before atomic publication. Native Fortran algebraic crust closure is exposed via `compose_eos_fortran reconstruct-compo-native` (not a spatial Thomas-Fermi solver).
 
 ## Install and test
 

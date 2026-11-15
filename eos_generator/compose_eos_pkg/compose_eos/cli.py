@@ -91,6 +91,14 @@ def _cmd_match(args) -> int:
         if not rep["overall"]["pass_"] and not args.allow_failed:
             print(f"[{m}] hard consistency gate failed; refusing to write. Use --allow-failed only for an explicitly diagnostic export.", file=sys.stderr)
             return 2
+        if args.tov and info.get("phase_transition_order") is not None:
+            print(
+                f"[{m}] TOV not run: this construction contains a finite density jump, "
+                "while match --tov currently supports only smooth barotropes. "
+                "Use a phase-interface-aware TOV export/solver path.",
+                file=sys.stderr,
+            )
+            return 2
         out_sub = os.path.join(args.out, f"{cr_name}__{co_name}__{m}") if len(methods) > 1 else args.out
         write_compose(out_sub, eos_m, copy_from=args.crust)
         msg = (

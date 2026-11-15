@@ -1,4 +1,4 @@
-# Technical reference - compose_eos v3.3.0
+# Technical reference - compose_eos v3.3.1
 
 ## Zero-temperature barotrope
 
@@ -121,3 +121,12 @@ PYTHONPATH=compose_eos_pkg python scripts/construct_gibbs_eos.py \\
 ```
 
 The NPZ files must contain charge-resolved data; do not synthesize them from a 1-D beta-equilibrium barotrope.
+
+
+## v3.3.1 implementation note: Gibbs pressure-root isolation
+
+For a fixed baryon chemical potential, each input `RectBivariateSpline` pressure surface restricts to a piecewise-cubic function of charge chemical potential. The pressure difference is therefore piecewise cubic on the union of both charge-axis knot vectors, and its derivative is the charge-density difference, piecewise quadratic.
+
+The Gibbs root solver now partitions the charge domain at that union of knots, isolates every stationary point from the quadratic derivative on each span, and searches each resulting monotone subinterval. This detects narrow root pairs and tangential contacts of the declared interpolant that a fixed sign-scan can miss. A non-isolated pressure-equality interval is rejected explicitly. The guarantee is for the declared spline interpolant, not for arbitrary unsampled physics outside the source table.
+
+Gibbs construction also records its output as a thermodynamic barotrope, not species-resolved mixed-phase composition. Sharp Maxwell input admission is restricted to cold, lepton-bearing, locally neutral (Y_q=0) slices. These restrictions are deliberate fail-closed contracts.

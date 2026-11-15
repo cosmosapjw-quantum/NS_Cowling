@@ -105,3 +105,67 @@ Composition-aware Maxwell v2 and the generated CSS → phase-segmented
 TOV/Cowling adapter. Phase-only output is not abundance preservation or
 elastic-crust validation. With the crusts withdrawn, no generated matched EOS
 currently exists to feed such an adapter.
+
+## Regenerated crusts and census on corrected inputs
+
+**Writer/solver fix (`489d87f`, `6a2417e`).** `emit_compose_set` now builds
+eps = E_cell + m_n n_n + m_p n_p with the model's own masses (E_cell is
+measured from them), derives mu_B = m_n + R'(n_B) from one not-a-knot cubic
+spline of R = eps − m_n n_B and P = n_B mu_B − eps, writes the CompOSE layout
+with the model masses in the header, and refuses (writing nothing) unconverged
+cells or tables whose eps, mu_B (convexity) or P are not strictly increasing,
+P ≤ 0, or row secants exceed 1. Rows whose CLD minimum lies on the optimizer
+box (f ∈ {1e-4, 0.95}, R_d ∈ {2, 40} fm) are not stationary, so the envelope
+derivative is not thermodynamic there: contiguous end runs are trimmed and
+recorded, interior ones refused. The v2 census exposed this — all 6 v2
+survivors attached at a box-bound last row — so v2 is kept only as evidence.
+
+**Regeneration** (`scripts/regenerate_cld_crusts_v2.py`, σ₀ = 1, b = 1, which
+reproduces the stored SPG_M1 row exactly; deterministic, byte-identical reruns):
+
+| Model | v3 result |
+|---|---|
+| SPG_M1 | 13 rows, n_B 0.0048–0.1116 (dropped 0–5 on R_d = 2 fm, 19 on f = 0.95) |
+| SPG_M3 | REJECTED: box-bound minima inside the table (rows 1–2) |
+| SPG_M5 | 15 rows, n_B 0.001–0.039 (dropped 15–19) |
+| SPG_M2, SPG_M4 | NOT_GENERATED: placeholders of SPG_M1 |
+| GPPVA_DD2 | 19 rows (last row dropped) |
+| GPPVA_DDME2, GPPVA_TW | 14 rows each (last row dropped); eos.nb/eos.t/eos.yq now exist |
+
+Diagnostic, not a gate: the solver's cluster μ_n differs from the derived μ_B
+by up to 3.1 MeV (DD2) because the CLD prototype does not impose gas–cluster
+neutron equilibrium. SPG reconstructions use the solver's physical nucleon
+masses although Gögelein 2008 specifies M = 938.9 MeV; the SPG crusts are
+therefore not the published Hamiltonian (source-provenance defect, open).
+
+**Census at `e434bee`** (`CENSUS_e434bee.json`, manifest `dac5e45a…04c6`,
+crust root `download/reconstruction_v3`): 80 configured, 50 evaluated,
+30 not evaluated (20 SPG_M2/M4 placeholders = data_provenance, 10 SPG_M3 =
+source_reconstruction_rejected). **10 CSS survivors, 10 distinct**, all
+independently ADMITTED: {SPG_M1, SPG_M5, GPPVA_DD2, GPPVA_DDME2, GPPVA_TW} ×
+{BBB_BHF2, GM_GM1}. Rejections: 25 Maxwell mass convention, 10 CSS RG beta
+contract, 5 CSS APR C10 (max c_s² 1.4709, APR core). Seidov ratios exceed 1
+for SPG_M5 (1.52, 3.79), DD2+GM1 (1.57), DDME2+GM1 (1.80), TW+GM1 (1.73):
+small-core onset instability per Seidov is reported, not gated.
+
+Scope of these survivors: thermodynamically admissible composite cold
+barotropes built from a CLD prototype crust (no gas–cluster μ_n equality,
+optimizer box, SPG mass deviation) plus one CSS segment. They are not
+certified microscopic crust models and carry no composition.
+
+## B re-adjudicated on v3 crusts
+
+Headers now equal the Hamiltonian masses used to compute each crust, so the
+sharp-Maxwell gate (1e-12 relative) compares constituent masses:
+
+| Crust (Hamiltonian m_n / m_p, MeV) | vs APR/BBB/GM1 (939.56533 / 938.272) | vs RG_SLY4 (939.5654 / 938.272) |
+|---|---|---|
+| GPPVA_DD2, SPG_M1, SPG_M5 (939.56536 / 938.27203) | Δ = 3e-5 MeV each; mass-constant version difference | Δm_n = 4e-5 |
+| GPPVA_DDME2, GPPVA_TW (939 / 939) | Δm_n = −0.565, Δm_p = +0.728 | same order |
+
+All 25 Maxwell attempts remain blocked by the gate, now for a source-backed
+reason: different constituent masses in the two Hamiltonians. For DDME2/TW
+this is a sub-MeV Hamiltonian difference that normalization cannot remove.
+For DD2/SPG it is a 3e-5 MeV difference of tabulated constants; admitting it
+would require an explicit, labelled decision on mass-constant equivalence,
+not a tolerance change. No coexistence result is claimed or excluded.

@@ -37,12 +37,60 @@ class CausalCompletion:
     metadata: dict
 
 
-def _phase_arrays(data: EOSData):
+def _branchwise_first_law_report(mu, p, n, *, samples_per_interval=8):
+    """Check n_B = dP/dmu_B on the actual PCHIP pressure interpolant.
+
+    The check is deliberately separate from the pointwise Euler identity. The
+    same P(mu_B) interpolant used to locate coexistence is differentiated, and
+    compared with an independently PCHIP-interpolated n_B on a dense set within
+    every tabulated interval.
+    """
+    ps = PchipInterpolator(mu, p, extrapolate=False)
+    ns = PchipInterpolator(mu, n, extrapolate=False)
+    qparts = [np.linspace(mu[i], mu[i + 1], samples_per_interval + 2)
+              for i in range(len(mu) - 1)]
+    q = np.unique(np.concatenate(qparts))
+    dp_dmu = np.asarray(ps.derivative()(q), dtype=float)
+    n_interp = np.asarray(ns(q), dtype=float)
+    scale = np.maximum(np.maximum(np.abs(dp_dmu), np.abs(n_interp)), 1e-30)
+    rel = np.abs(dp_dmu - n_interp) / scale
+    finite = np.isfinite(rel) & np.isfinite(dp_dmu) & np.isfinite(n_interp)
+    if not np.all(finite):
+        return {"max_relative_residual": float("inf"), "rms_relative_residual": float("inf"),
+                "min_dP_dmu_MeV2_fm3": float("nan"), "n_samples": int(q.size)}
+    return {
+        "max_relative_residual": float(np.max(rel)),
+        "rms_relative_residual": float(np.sqrt(np.mean(rel ** 2))),
+        "min_dP_dmu_MeV2_fm3": float(np.min(dp_dmu)),
+        "n_samples": int(q.size),
+        "samples_per_interval": int(samples_per_interval),
+        "identity": "n_B = dP/dmu_B",
+        "interpolant": "PchipInterpolator(mu_B, P).derivative() vs PchipInterpolator(mu_B, n_B)",
+    }
+
+
+def _phase_arrays(data: EOSData, *, differential_tolerance=5e-3, differential_samples_per_interval=8):
     n=np.asarray(data.nb,float); mu=np.asarray(data.mub,float); p=np.asarray(data.p,float); eps=np.asarray(data.eps,float)
     if n.ndim!=1 or len(n)<5 or eps.shape!=n.shape or np.any(~np.isfinite(n+mu+p+eps)) or np.any(n<=0) or np.any(p<=0) or np.any(eps<=0):
         raise ValueError('phase EOS needs finite positive 1-D n, P, epsilon and mu arrays')
     if np.any(np.diff(n)<=0) or np.any(np.diff(mu)<=0) or np.any(np.diff(p)<=0) or np.any(np.diff(eps)<=0):
         raise ValueError('each phase must have strictly increasing n_b, mu_B, P and epsilon')
+    if np.asarray(data.Iphase).shape == n.shape and np.any(np.diff(data.Iphase) != 0):
+        raise ValueError('Maxwell input phase contains an internal Iphase phase boundary; split it into smooth branches first')
+    if (not np.isfinite(differential_tolerance) or differential_tolerance <= 0
+            or int(differential_samples_per_interval) < 2):
+        raise ValueError('invalid branchwise first-law validation configuration')
+    differential = _branchwise_first_law_report(
+        mu, p, n, samples_per_interval=int(differential_samples_per_interval)
+    )
+    if (not np.isfinite(differential['max_relative_residual'])
+            or differential['max_relative_residual'] > differential_tolerance
+            or differential['min_dP_dmu_MeV2_fm3'] <= 0):
+        raise ValueError(
+            'phase branchwise dP/dmu_B = n_B consistency failed '
+            f"(max relative residual {differential['max_relative_residual']:.3e}; "
+            f"tolerance {differential_tolerance:.3e})"
+        )
     # A sharp coexistence construction is only meaningful when each input is
     # already a stable, causal, cold barotrope with its first-law identity.
     euler=mu*n-p
@@ -53,6 +101,7 @@ def _phase_arrays(data: EOSData):
         raise ValueError('1-D Maxwell input must be a beta-equilibrated, locally neutral phase barotrope')
     from .consistency import check_consistency
     rep=check_consistency(data,verbose=False)
+    rep['C12'] = {'pass_': True, **differential}
     for key in ('C1','C2','C6','C10','C11'):
         if not bool(rep[key].get('pass_',False)):
             raise ValueError(f'phase {key} hard gate failed; Maxwell construction requires stable causal source phases')
@@ -62,14 +111,20 @@ def _phase_arrays(data: EOSData):
 
 
 def build_maxwell_eos(low_phase: EOSData, high_phase: EOSData, *, low_name='low', high_name='high',
-                      mu_samples=800, crossing_index=0) -> MaxwellEOS:
+                      mu_samples=800, crossing_index=0, differential_tolerance=5e-3,
+                      differential_samples_per_interval=8) -> MaxwellEOS:
     """Construct one exact local-neutrality Maxwell transition from two 1-D phases.
 
     Coexistence solves P_low(mu_B)=P_high(mu_B). The returned table contains
     two adjacent rows at the same P_t and mu_t but n_high>n_low and eps_high>eps_low.
     The two input EOS are understood as locally charge-neutral phase barotropes.
     """
-    nl,mul,pl,el,repl=_phase_arrays(low_phase); nh,muh,ph,eh,reph=_phase_arrays(high_phase)
+    if int(mu_samples) < 2:
+        raise ValueError('mu_samples must be at least 2')
+    nl,mul,pl,el,repl=_phase_arrays(low_phase, differential_tolerance=differential_tolerance,
+        differential_samples_per_interval=differential_samples_per_interval)
+    nh,muh,ph,eh,reph=_phase_arrays(high_phase, differential_tolerance=differential_tolerance,
+        differential_samples_per_interval=differential_samples_per_interval)
     lo=max(mul[0],muh[0]); hi=min(mul[-1],muh[-1])
     if not lo<hi: raise ValueError('the two phases have no common baryon-chemical-potential interval')
     Pl=PchipInterpolator(mul,pl,extrapolate=False); Ph=PchipInterpolator(muh,ph,extrapolate=False)
@@ -124,8 +179,10 @@ def build_maxwell_eos(low_phase: EOSData, high_phase: EOSData, *, low_name='low'
     meta={'schema':'compose-eos-maxwell-v1','method_id':MAXWELL_METHOD_ID,'low_phase':low_name,'high_phase':high_name,
           'coexistence_root_count':len(brackets),'selected_root_index':int(crossing_index),
           'low_energy_identity_residual':elo-source_e_low,'high_energy_identity_residual':epshi_t-source_e_high,
-          'low_source_hard_gates':{k:bool(repl[k].get('pass_',False)) for k in ('C1','C2','C6','C10','C11')},
-          'high_source_hard_gates':{k:bool(reph[k].get('pass_',False)) for k in ('C1','C2','C6','C10','C11')},
+          'low_source_hard_gates':{k:bool(repl[k].get('pass_',False)) for k in ('C1','C2','C6','C10','C11','C12')},
+          'high_source_hard_gates':{k:bool(reph[k].get('pass_',False)) for k in ('C1','C2','C6','C10','C11','C12')},
+          'low_source_differential_first_law':repl['C12'],
+          'high_source_differential_first_law':reph['C12'],
           'transition':transition,'phase_ids':phase_ids.tolist(),
           'interpretation':'Exact sharp Maxwell interface between the supplied locally-neutral 1-D barotropes; not the legacy smooth maxwell bridge.'}
     return MaxwellEOS(data=data,transition=transition,metadata=meta)
@@ -159,6 +216,16 @@ def read_maxwell_eos(directory: str) -> MaxwellEOS:
         if abs(float(actual)-float(expected))>2e-8*max(abs(float(expected)),1.0):
             raise ValueError(f'Maxwell sidecar {label} mismatch: table={actual}, metadata={expected}')
     if not (data.nb[ih]>data.nb[il] and data.eps[ih]>data.eps[il]): raise ValueError('Maxwell jump is not upward in n and epsilon')
+    delta_n = float(data.nb[ih] - data.nb[il])
+    delta_eps = float(data.eps[ih] - data.eps[il])
+    mu_t = float(t['muB_MeV'])
+    declared_delta_eps = float(t.get('delta_eps_MeV_fm3', float('nan')))
+    identity_value = mu_t * delta_n
+    identity_scale = max(abs(delta_eps), abs(identity_value), 1.0)
+    if (not np.isfinite(declared_delta_eps)
+            or abs(declared_delta_eps - delta_eps) > 2e-8 * identity_scale
+            or abs(delta_eps - identity_value) > 2e-8 * identity_scale):
+        raise ValueError('Maxwell readback violates Delta epsilon = mu_B Delta n_B')
     if int(ids[il])!=1 or int(ids[ih])!=2: raise ValueError('Maxwell sidecar phase IDs do not bracket the density jump')
     return MaxwellEOS(data,t,meta)
 
@@ -201,7 +268,17 @@ def solve_tov_with_phase_transition(eos: MaxwellEOS, central_pressure_MeV_fm3: f
         if len(pp)<4 or np.any(np.diff(pp)<=0) or np.any(np.diff(ee)<=0): raise ValueError('each smooth phase branch needs >=4 strictly increasing P/epsilon points')
         sp=PchipInterpolator(np.log(pp),np.log(ee),extrapolate=False)
         def state(P):
-            lp=np.log(np.asarray(P,float)); ev=np.exp(sp(lp)); dedp=ev/np.asarray(P,float)*sp.derivative()(lp)
+            values = np.asarray(P, dtype=float)
+            if np.any(~np.isfinite(values)):
+                raise FloatingPointError('non-finite pressure query in phase branch')
+            # solve_ivp can return P_t +/- a few ulps at the phase interface.
+            # Permit only roundoff-scale endpoint excursions; never extrapolate
+            # the EOS interpolant across a physically finite pressure interval.
+            endpoint_tol = 64.0 * np.finfo(float).eps * max(1.0, abs(float(pp[0])), abs(float(pp[-1])))
+            if np.any(values < pp[0] - endpoint_tol) or np.any(values > pp[-1] + endpoint_tol):
+                raise FloatingPointError('pressure query lies outside selected phase branch')
+            clipped = np.clip(values, pp[0], pp[-1])
+            lp=np.log(clipped); ev=np.exp(sp(lp)); dedp=ev/clipped*sp.derivative()(lp)
             if np.any(~np.isfinite(ev+dedp)) or np.any(dedp<=0): raise FloatingPointError('invalid d epsilon/dP in phase branch')
             return ev,dedp
         return (pp,ee,state)
@@ -282,8 +359,11 @@ class ChargeResolvedPhase:
         self.mu_b=np.asarray(self.mu_b,float); self.mu_q=np.asarray(self.mu_q,float); self.pressure=np.asarray(self.pressure,float)
         if self.mu_b.ndim!=1 or self.mu_q.ndim!=1 or len(self.mu_b)<4 or len(self.mu_q)<4 or self.pressure.shape!=(len(self.mu_b),len(self.mu_q)):
             raise ValueError('two-charge surface needs >=4x4 pressure grid with shape (mu_b,mu_q)')
-        if np.any(np.diff(self.mu_b)<=0) or np.any(np.diff(self.mu_q)<=0) or np.any(~np.isfinite(self.pressure)):
-            raise ValueError('phase surface grids must be finite and strictly increasing')
+        if (np.any(~np.isfinite(self.mu_b)) or np.any(~np.isfinite(self.mu_q))
+                or np.any(~np.isfinite(self.pressure))):
+            raise ValueError('phase surface grids and pressure values must be finite')
+        if np.any(np.diff(self.mu_b)<=0) or np.any(np.diff(self.mu_q)<=0):
+            raise ValueError('phase surface grids must be strictly increasing')
         self._spline=RectBivariateSpline(self.mu_b,self.mu_q,self.pressure,kx=3,ky=3,s=0)
     @classmethod
     def from_npz(cls,path,label='phase'):
@@ -385,8 +465,19 @@ def read_gibbs_eos(directory: str) -> GibbsResult:
     if meta.get('schema')!='compose-eos-gibbs-v1': raise ValueError('unsupported Gibbs sidecar schema')
     fields=('mu_b_MeV','mu_q_MeV','mixed_fraction_chi','global_charge_residual')
     if any(len(meta.get(k,[]))!=data.n for k in fields): raise ValueError('Gibbs chemical-potential/mixture arrays do not match EOS row count')
-    if np.max(np.abs(np.asarray(meta['global_charge_residual'],float)))>2e-7: raise ValueError('Gibbs sidecar violates global charge neutrality')
-    if np.any(np.asarray(meta['mixed_fraction_chi'],float)<-1e-8) or np.any(np.asarray(meta['mixed_fraction_chi'],float)>1+1e-8): raise ValueError('Gibbs mixed fraction lies outside [0,1]')
+    arrays = {k: np.asarray(meta[k], dtype=float) for k in fields}
+    if any(v.shape != (data.n,) or np.any(~np.isfinite(v)) for v in arrays.values()):
+        raise ValueError('Gibbs sidecar arrays must be finite and match EOS row count')
+    if np.max(np.abs(arrays['global_charge_residual']))>2e-7: raise ValueError('Gibbs sidecar violates global charge neutrality')
+    if np.any(arrays['mixed_fraction_chi']<-1e-8) or np.any(arrays['mixed_fraction_chi']>1+1e-8): raise ValueError('Gibbs mixed fraction lies outside [0,1]')
+    for label, actual, expected in (
+        ('mu_B', arrays['mu_b_MeV'], data.mub),
+        ('mu_Q', arrays['mu_q_MeV'], data.muq),
+    ):
+        residual = np.abs(actual - np.asarray(expected, dtype=float))
+        scale = np.maximum(np.maximum(np.abs(actual), np.abs(expected)), 1.0)
+        if np.any(residual > 2e-8 * scale):
+            raise ValueError(f'Gibbs sidecar {label} does not match CompOSE table chemical potential')
     return GibbsResult(data,meta)
 
 

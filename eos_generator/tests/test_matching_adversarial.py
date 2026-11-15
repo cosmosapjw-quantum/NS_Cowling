@@ -190,16 +190,12 @@ def test_unvalidated_core_composition_is_omitted_in_strict_mode():
     assert report["overall"]["pass_"]
 
 
-def test_maxwell_compatibility_token_is_not_reported_as_phase_transition():
+def test_sharp_maxwell_token_is_rejected_by_smooth_core_crust_matcher():
     d_cr, d_co, _ = _load_sample_crust_and_core()
-    eos, info = match_crust_core(
-        d_cr, d_co, "SPG_M1", "RG_SLY4", method="maxwell"
-    )
-    assert info["is_exact_maxwell"] is False
-    assert info["density_jump_fm3"] == 0.0
-    assert info["seidov_applicable"] is False
-    assert info["phase_transition_order"] is None
-    assert "smooth_near_pressure_plateau" in info["construction_kind"]
+    with pytest.raises(ValueError, match="sharp first-order local-neutrality transition"):
+        match_crust_core(
+            d_cr, d_co, "SPG_M1", "RG_SLY4", method="maxwell"
+        )
 
 
 def test_writer_does_not_copy_stale_source_model_sidecars(tmp_path):

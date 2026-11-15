@@ -148,12 +148,14 @@ def test_causality_profile_samples_between_knots():
     assert profile["pchip"]["max_cs2"] > 1.0
 
 
-def test_causal_completion_finds_between_knot_acausal_crossing():
+def test_causal_completion_detects_between_knot_crossing_before_first_law_rejection():
     d = _between_knot_acausal_eos()
-    out, meta = causal_completion(d, cs2=0.95, n_points=80, max_log_step=1.0)
-    assert meta["source_max_cs2"] > 1.0
-    assert 0.0 < meta["n_match_fm3"] < d.nb[-1]
-    assert out.nb[-1] == pytest.approx(d.nb[-1])
+    # This deliberately sparse fixture has an interpolant-level acausal pocket
+    # but its interpolated chemical potential is not accurate enough at the
+    # crossing. The correct behavior is to find the crossing and then fail the
+    # independent first-law match, not to miss the pocket.
+    with pytest.raises(ValueError, match="chemical potential mismatch"):
+        causal_completion(d, cs2=0.95, n_points=80, max_log_step=1.0)
 
 
 def test_causal_completion_rejects_phase_discontinuous_input():

@@ -1,103 +1,75 @@
-# Cowling phase-interface scope — density-jump background EOS
+# Cowling phase-interface scope — sharp Maxwell backgrounds
 
-**Repository:** `cosmosapjw-quantum/NS_Cowling`
-**Date:** 2026-11-15
-**Scope:** §12 of the EOS390 remediation handoff — document whether the Cowling
-perturbation solver supports the phase-interface matching conditions required
-by a background EOS that carries a finite first-order density jump (sharp
-Maxwell or single-speed CSS with a crust-side density jump).
+**Repository:** `cosmosapjw-quantum/NS_Cowling`  
+**Date:** 2026-11-15  
+**Scope:** distinguish the general smooth-barotrope Cowling path from the separate phase-segmented Maxwell TOV/Cowling path, and determine what is still missing for EOS-generator core--crust CSS output.
 
 ## Background
 
-A finite density jump in the background EOS changes the physical problem for
-radial and non-radial perturbations. At a first-order phase transition the
-background state variables are discontinuous in \(n_B\) and \(\epsilon\) (with
-\(\Delta\epsilon = \mu_t \Delta n_B\), pressure and chemical potential
-continuous), so the perturbation equations acquire interface matching
-conditions that do not arise for a smooth barotrope. This document records what
-the current Cowling implementation actually does, and what it does NOT claim.
+At a cold first-order interface, pressure and baryon chemical potential are continuous while (n_B) and (epsilon) may jump, with
+[
+Deltaepsilon=mu_tDelta n_B.
+]
+Perturbation equations then require interface conditions. The physically correct conditions depend on the interface model and, for a fluid phase boundary, on whether phase conversion is rapid or slow.
 
-## What the current Cowling solver implements
+## Implemented paths: do not conflate them
 
-The oscillation solver (`oscillation_source/methods/`) is a Cowling-approximation
-radial-mode solver on a smooth one-dimensional barotropic background. The
-implementation contracts are:
+### General smooth-barotrope path
 
-1. **Continuous background barotrope.** The solver integrates the radial
-   perturbation equation on a background EOS that is at least \(C^0\) in
-   \(P(\epsilon)\) and \(C^0\) in \(n_B(r)\). It does not detect, locate, or
-   special-case a material interface where \(n_B\) jumps.
+The general smooth-star solver under `oscillation_source/methods/` consumes a single smooth barotropic background. It does not automatically inspect a CompOSE table, discover an internal density jump, split the star into phases, or insert a phase-interface transfer.
 
-2. **No phase-interface matching code path.** There is no code that, at a
-   discontinuity of the background, applies a junction condition on the
-   perturbation variables \((\delta P, \delta\epsilon, \xi)\) across the
-   interface. The integration proceeds as if the background were smooth.
+A result obtained by passing a discontinuous table to this path is not thereby interface-validated.
 
-3. **No rapid- or slow-conversion switch.** The interface conversion rate
-   \(\lambda\) (rapid conversion \(\lambda\to\infty\), slow conversion
-   \(\lambda\to 0\)) does not appear as a solver parameter. No matching
-   condition is selected by a conversion-rate flag.
+### Separate sharp-Maxwell path
 
-4. **No interface motion.** The Lagrangian displacement \(\xi\) of the
-   interface is not a solved degree of freedom. The background phase boundary
-   is treated as a fixed point of the star, not as a moving surface whose
-   motion couples to the perturbation.
+The repository also contains a dedicated phase-segmented implementation:
 
-5. **Boundary conditions actually implemented.** The solver applies a regular
-   center condition and a surface matching condition to the exterior
-   Schwarzschild vacuum. These are the standard smooth-star boundary
-   conditions. No additional interface condition is imposed at a phase
-   boundary.
+- `oscillation_source/solutions/src/structure/ns_maxwell_tov.f90` constructs a `maxwell_star_t` from separate high- and low-density EOS callbacks and validates coexistence at (P_t), (mu_B), and the cold first-law jump identity.
+- `oscillation_source/solutions/src/modes/ns_maxwell_cowling.f90` integrates the core and envelope on separate pressure coordinates and applies an interface-transfer routine.
+- `oscillation_source/solutions/src/modes/ns_interface_transfer.f90` provides distinct `material_interface_transfer` (slow conversion) and `rapid_interface_transfer` conditions.
+- `oscillation_source/solutions/src/modes/ns_maxwell_mode_spectrum.f90` performs a phase-aware frequency scan and counts nodes separately on each side of the interface.
+- `oscillation_source/solutions/tests_fortran/maxwell_checks.f90` and `maxwell_table_checks.f90` exercise analytic and table-backed Maxwell backgrounds, including slow/rapid Cowling shots and phase-aware mode-spectrum paths.
 
-6. **Test coverage of the interface.** No current test exercises a Cowling
-   mode on a background EOS that carries a genuine sharp density jump. The
-   provided default fixtures (`fixtures/modes/smooth_l2/`) are smooth
-   barotropes; `ch07.md` records that "the provided default precision
-   comparison is a continuous barotrope and does not automatically solve the
-   spectrum of a whole star with a material density jump."
+Therefore, the blanket statement that “the repository has no phase-interface Cowling code” is incorrect. The separate fluid-fluid Maxwell implementation exists and has native tests.
 
-## What this means for the density-jump EOS
+## What is still not established for core--crust CSS output
 
-The single-speed CSS bridge with a crust-side density jump (§3 contract) and
-the sharp Maxwell construction (§5) produce background EOS tables that contain
-a genuine first-order density discontinuity. The current Cowling solver does
-NOT support the interface matching conditions required by such a background.
-Consequently:
+The EOS-generator route `scripts/match_core_crust.py` writes a thermo-only CompOSE table. It does not currently build the separate high/low EOS callbacks and `maxwell_star_t` required by `integrate_maxwell_tov`, nor does it run the resulting CSS crust-side jump through `shoot_maxwell_cowling`.
 
-- A radial mode computed on a density-jump background by the current solver is
-  the result of integrating through the jump as if it were smooth. It is not a
-  solution of the perturbation eigenvalue problem with correct junction
-  conditions, and it must not be reported as such.
-- The Seidov small-core onset criterion (§3.6) is a necessary stability
-  condition, not a substitute for the interface-eigenvalue calculation. It is
-  reported for completeness only.
+Consequently, there is no demonstrated end-to-end path:
 
-## Status classification
+[
+	ext{matched CSS CompOSE output}
+longrightarrow
+	ext{phase-segmented TOV background}
+longrightarrow
+	ext{phase-interface Cowling spectrum}.
+]
 
-`UNRESOLVED` — the Cowling phase-interface treatment is not implemented. The
-density-jump EOS is therefore **not yet validated** for the perturbation
-problem. This is an implementation limitation, not a numerical or physical
-limitation of the EOS itself.
+The existing Maxwell tests use analytic and normalized-table fluid-phase fixtures. They do not prove that a generated crust--CSS--core result is converted correctly into the separate Maxwell callbacks and passed through the full structure/mode path.
 
-## Recommended next bounded task
+There is a second physical distinction: the current phase-segmented Maxwell solver treats both sides as barotropic fluids. It does not by itself implement an elastic solid crust with shear stresses or the solid-fluid crust-core boundary conditions. Thus it can support a fluid-fluid sharp interface under its stated conversion assumptions, but must not be advertised as a complete elastic crust-core oscillation treatment.
 
-Derive the junction conditions for a Cowling radial perturbation at a
-first-order phase boundary under a stated conversion-rate assumption (rapid
-or slow), implement the matching in the solver, and add a test that exercises
-a mode on a sharp-Maxwell or single-speed-CSS background. The derivation must
-cite the appropriate literature (e.g. the conversion-rate-dependent junction
-conditions used in the hybrid-star g-mode literature) rather than inventing a
-matching prescription. Until that task is complete, any Cowling mode reported
-on a density-jump background must be labeled as **not interface-validated**.
+The single-speed CSS construction has a finite crust--CSS density jump and a continuous CSS--core join. Whether the crust can be represented by the fluid envelope callback is a model assumption that must be stated and tested, not silently inferred from the existence of the Maxwell solver.
 
-## Literature pointers (not an endorsement of a single convention)
+## Status
 
-- Alford, Han & Prakash, "Generic conditions for hybrid star cores", arXiv:1302.4732 —
-  the single-speed-plus-first-order-jump CSS parameterization used in §3.
-- The hybrid-star g-mode literature (e.g. the conversion-rate-dependent
-  matching used for discontinuity g-modes) derives junction conditions that
-  depend on the interface conversion rate; those conditions are not yet
-  implemented here.
+- **IMPLEMENTATION_VERIFIED:** a separate sharp-Maxwell phase-segmented TOV/Cowling path exists; its native analytic/table fixtures test slow and rapid conversion.
+- **UNRESOLVED:** automatic adapter from EOS-generator CSS output to the phase-segmented TOV/Cowling callbacks.
+- **UNRESOLVED:** validation of the core--crust CSS interface under a realistic crust model, particularly if elastic crust physics is required.
+- **NOT_CLAIMED:** full elastic crust perturbations or a universal crust-core interface prescription.
 
-This document records an unresolved limitation. It does not claim full
-phase-interface Cowling support.
+A smooth single-barotrope solver and the dedicated sharp-Maxwell solver are distinct numerical models. Do not flatten a density jump into the smooth solver's interpolation domain.
+
+## Next bounded tasks
+
+1. Build a tested adapter that splits a matched EOS at its exact one-sided interface rows and constructs separate low/high callbacks without interpolating across the jump.
+2. Verify (P_t,mu_t,Delta n_B,Deltaepsilon), branch monotonicity, and first-law closure at the adapter boundary.
+3. Run the generated background through the phase-segmented TOV routine and compare against independently assembled phase callbacks.
+4. Run both slow- and rapid-conversion Cowling shots on that generated background.
+5. Determine whether elastic crust physics is required; if so, derive and implement the solid-fluid boundary conditions rather than reusing fluid-fluid transfer formulas.
+6. Add a real-data end-to-end fixture with source hashes, numerical residuals, and exact code revision.
+
+## Literature scope
+
+A sharp CSS density jump is a first-order transition parameterization, not a universal crust-core matching prescription. Crust-core matching methods differ in their physical assumptions and can affect neutron-star observables. A smooth unified crust-core EOS and a fluid-fluid Maxwell interface should be treated as distinct models.

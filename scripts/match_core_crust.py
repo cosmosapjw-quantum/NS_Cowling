@@ -423,10 +423,11 @@ def main() -> int:
     # write manifest
     n_maxwell = sum(1 for s in survivors if s["method"] == "maxwell")
     n_css = sum(1 for s in survivors if s["method"] == "css")
+    built_at = datetime.now(timezone.utc)
     manifest = {
         "schema": "ns-cowling.core-crust-matching.v2",
-        "built_at_utc": datetime.now(timezone.utc).isoformat(),
-        "built_date_utc": datetime.now(timezone.utc).date().isoformat(),
+        "built_at_utc": built_at.isoformat(),
+        "built_date_utc": built_at.date().isoformat(),
         "crust_models": CRUST_MODELS,
         "core_models": CORE_MODELS,
         "methods": ["maxwell", "css"],

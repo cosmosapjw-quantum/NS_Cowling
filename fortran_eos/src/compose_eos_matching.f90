@@ -544,10 +544,15 @@ contains
         pp=p1+n1*mu1*cs1/(1._wp+cs1)*((muv/mu1)**(1._wp+ga)-1._wp)
         nb(j)=nbv;p(j)=pp;q(j)=pp/nbv;mu(j)=muv;f(j)=muv-q(j);cs(j)=cs1
       enddo
-      if(abs(nb(size(u))-n2)>2.e-10_wp*max(1._wp,n2).or. &
-         abs(p(size(u))-p2)>2.e-10_wp*max(1._wp,p2).or. &
-         abs(mu(size(u))-mu2)>2.e-12_wp*max(1._wp,mu2))then
-        message='single-speed CSS failed continuous core endpoint matching';return
+      ! The diagnostic grid includes u=1 and must hit the selected core
+      ! endpoint. The production bridge grid contains interior samples only,
+      ! so its last u is n_bridge/(n_bridge+1) and is not an endpoint.
+      if(u(size(u))>=1._wp-8._wp*epsilon(1._wp))then
+        if(abs(nb(size(u))-n2)>2.e-10_wp*max(1._wp,n2).or. &
+           abs(p(size(u))-p2)>2.e-10_wp*max(1._wp,p2).or. &
+           abs(mu(size(u))-mu2)>2.e-12_wp*max(1._wp,mu2))then
+          message='single-speed CSS failed continuous core endpoint matching';return
+        endif
       endif
       ok=.true.;message='single_speed_css_analytic'
     case('first_law_constrained_hermite_pressure_bridge')
@@ -649,7 +654,7 @@ contains
     if(any(p(2:)<=p(:size(p)-1)))then;message='matching bridge pressure is not strictly increasing';return;endif
     allocate(eps(size(nb)));eps=nb*f
     if(any(eps(2:)<=eps(:size(eps)-1)))then;message='matching bridge is not strictly increasing in energy density';return;endif
-    if(any(cs<=0._wp).or.any(cs>=1._wp))then;message='matching bridge violates 0 < c_s^2 < 1';return;endif
+    if(any(cs<=0._wp).or.any(cs>1._wp))then;message='matching bridge violates 0 < c_s^2 <= 1';return;endif
     ok=.true.;message='ok'
   end subroutine validate_bridge
 
@@ -713,7 +718,7 @@ contains
     if(.not.ok2)then;status='invalid core endpoint sound speed: '//trim(msg);return;endif
     css_source_cs1=cs1;css_source_cs2=cs2
     css_f_core=(co%q(6,i2)+1._wp)*co%mn
-    css_mu_core=css_f_core+co%q(1,i2)
+    css_mu_core=(co%q(3,i2)+1._wp)*co%mn
 
     dmcr=co%mn-cr%mn
     css_cs2=0._wp;css_nb_high=0._wp;css_delta_eps=0._wp
@@ -866,6 +871,8 @@ contains
       report%source_euler_residual_meV=max(report%source_euler_residual_meV, &
         abs((cr%q(3,j)+1._wp)*cr%mn-((cr%q(6,j)+1._wp)*cr%mn+cr%q(1,j))))
     enddo
+    report%composition_dropped=cr%composition_file_present.or.cr%composition_available.or. &
+      co%composition_file_present.or.co%composition_available
     if(report%first_law_relative_residual>5.e-9_wp)then
       status='matching candidate violates the endpoint first-law integral tolerance';return
     endif

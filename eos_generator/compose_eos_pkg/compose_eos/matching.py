@@ -1,14 +1,16 @@
 """Core--crust matching for cold, one-dimensional CompOSE barotropes.
 
-The module constructs only smooth, single-valued core--crust bridges. The former
-historical ``maxwell`` NPPHB kernel is now identified by the thermodynamic method
-token ``first_law_constrained_hermite_pressure_bridge``: a Hermite pressure
-profile whose integral enforces the cold first-law endpoint constraint. It has
-continuous density and is NOT a Maxwell coexistence construction. The physical
-sharp one-charge Maxwell method is separately identified by the token ``maxwell``
-and implemented through the phase-transition API, not this smooth matcher.
-The other methods are interpolation regularity choices, not phase-transition
-orders. ``find_convex_transition_window`` is a candidate-screening heuristic;
+The module provides smooth core--crust bridges and one explicit thermo-only
+single-speed CSS bridge with a finite crust-side density jump. The
+``first_law_constrained_hermite_pressure_bridge`` and cubic/quintic methods
+remain continuous-density interpolation choices. The ``css`` method solves
+one constant c_s^2 over the entire bridge, permits a density/energy jump at the
+crust--CSS boundary, and matches n_B, P, epsilon and mu_B continuously at the
+CSS--core endpoint. It does not reconstruct a composition profile or provide
+phase-interface Cowling/TOV support by itself. The sharp local-neutrality
+Maxwell construction from two tabulated phases is separately implemented in
+the phase-transition API under the token ``maxwell``; that token is not a
+smooth-matcher method. ``find_convex_transition_window`` is a candidate-screening heuristic;
 all completed EOS tables must pass independent consistency and causality gates.
 
 Composition is propagated only when the core input passes the CompOSE baryon and

@@ -67,6 +67,9 @@ def test_m5a_finding1_python_check_not_native(rep):
     assert ev["native_read_executed"] is True
     assert ev["native_verify_executed"] is True
     assert ev["readback_n_match"] is True
+    assert ev["readback_value_match"] is True
+    assert ev["readback_comparison_relative_tolerance"] == pytest.approx(5.0e-13)
+    assert max(ev["readback_relative_residuals"].values()) <= 5.0e-13
     assert ev["c1_c11_overall_pass"] is True
     # failed_checks is empty (either "" or []) -- no checks failed
     assert ev["c1_c11_failed_checks"] in ("", [], None)

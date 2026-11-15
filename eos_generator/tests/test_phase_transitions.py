@@ -207,3 +207,25 @@ def test_gibbs_readback_rejects_sidecar_chemical_potential_mismatch(tmp_path):
     sidecar.write_text(json.dumps(payload))
     with pytest.raises(ValueError, match="mu_B.*does not match"):
         read_gibbs_eos(str(tmp_path))
+
+
+def test_maxwell_preflight_rejects_acausal_n_of_mu_interpolant_between_knots():
+    from compose_eos.phase_transitions import _phase_arrays
+    mu = np.linspace(940.0, 960.0, 31)
+    n0, slope, p0 = 0.1, 5e-5, 1.0
+    x = mu - mu[0]
+    n = n0 + slope*x
+    pressure = p0 + n0*x + 0.5*slope*x*x
+    eps = mu*n - pressure
+    fbar = eps/n
+    mn = 939.0
+    z = np.zeros_like(n)
+    phase = EOSData(
+        nb=n, mn=mn, mp=mn, Q1=pressure/n, Q2=z,
+        Q3=mu/mn-1.0, Q4=z, Q5=z, Q6=fbar/mn-1.0,
+        Q7=fbar/mn-1.0, q_extra=z, Iphase=np.zeros(n.size, dtype=int),
+        Yn=z, Yp=z, Ye=z, Ymu=z, Aav=z, Zav=z, Yh=z,
+        composition_available=False, beta_equilibrated=True,
+    )
+    with pytest.raises(ValueError, match="thermodynamic n_B"):
+        _phase_arrays(phase)

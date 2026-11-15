@@ -52,7 +52,7 @@
       "historical_artifact": "2026-11-14 two-segment smooth CSS output remains immutable historical evidence"
     }
   },
-  "patch_state": "CSS_SINGLE_SPEED_CRUST_JUMP_PATCHED_EXACT_HEAD_CI_RUNNING",
+  "patch_state": "CSS_SINGLE_SPEED_CRUST_JUMP_PATCHED_FINAL_CI_PENDING",
   "red_green_evidence": {
     "tests_committed_before_implementation": true,
     "red_failure_observed_in_host_session": false,
@@ -244,7 +244,7 @@
     {
       "id": "M7-CSS-01",
       "priority": "P2",
-      "status": "PATCHED_EXACT_HEAD_CI_RUNNING",
+      "status": "PATCHED_FINAL_CI_PENDING",
       "title": "Use one constant CSS sound speed with a crust-side first-order jump and continuous core join",
       "acceptance": [
         "exactly one constant cs2 across all CSS bridge samples",
@@ -492,10 +492,15 @@
       "current_attempt": {
         "run_id": 43678164119,
         "head_sha": "654bdc513b6f3c77f80d828898f81f213b12d02e",
-        "status": "in_progress",
-        "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43678164119"
+        "status": "cancelled",
+        "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43678164119",
+        "cancelled_reason": "The PR concurrency group cancelled this run after subsequent handoff commits changed the PR head."
       },
-      "required_final_gate": "The workflow must complete with run head_sha equal to the final branch HEAD; any subsequent code/docs/hash update requires another run."
+      "required_final_gate": "The workflow must complete with run head_sha equal to the final branch HEAD; any subsequent code/docs/hash update requires another run.",
+      "final_head_gate": {
+        "status": "PENDING",
+        "note": "All source, test, handoff and report edits are now staged in the branch; run CI after the final metadata update and do not update tracked files after that run unless a new run is performed."
+      }
     }
   }
 }

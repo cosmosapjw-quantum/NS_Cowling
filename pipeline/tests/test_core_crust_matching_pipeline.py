@@ -149,6 +149,40 @@ def test_census_main_refuses_nonempty_output_root_without_deleting_existing_file
     assert sentinel.read_text(encoding="utf-8") == '{"preserve": true}'
 
 
+def test_pair_runner_preserves_previous_work_and_output(tmp_path, monkeypatch):
+    out = tmp_path / "pair"
+    (out / "work").mkdir(parents=True)
+    (out / "compose").mkdir()
+    trace = out / "work" / "previous_trace.txt"
+    trace.write_text("preserve this evidence")
+    output = out / "compose" / "eos.thermo"
+    output.write_text("previous eos")
+    with pytest.raises(FileExistsError, match="not empty"):
+        pipeline.run_pipeline("css", tmp_path / "crust", tmp_path / "core", out)
+    assert trace.read_text() == "preserve this evidence"
+    assert output.read_text() == "previous eos"
+
+
+def test_pair_runner_rejects_unknown_method_before_writing(tmp_path):
+    out = tmp_path / "pair"
+    with pytest.raises(ValueError, match="unsupported matching method"):
+        pipeline.run_pipeline("typo", tmp_path / "crust", tmp_path / "core", out)
+    assert not out.exists()
+
+
+def test_pair_runner_classifies_missing_backend_as_environment(tmp_path, monkeypatch):
+    from compose_eos.native import NativeExecutionError
+
+    def unavailable():
+        raise NativeExecutionError("compiler unavailable")
+
+    monkeypatch.setattr(pipeline, "executable", unavailable)
+    result = pipeline.run_pipeline("css", tmp_path / "crust", tmp_path / "core", tmp_path / "pair")
+    assert result["survived"] is False
+    assert result["stage"] == "executable"
+    assert result["failure_category"] == "environment"
+
+
 def test_pipeline_does_not_mark_css_survived_when_readback_count_differs(tmp_path, monkeypatch):
     exe = tmp_path / "compose_eos_fortran"
     exe.write_bytes(b"test executable identity")
@@ -287,12 +321,55 @@ def _passing_readback(monkeypatch):
 
 def _fake_native_all_ok(action, *args):
     if action == "verify":
-        Path(args[1]).write_text('{"overall":"PASS"}', encoding="utf-8")
+        import json
+        Path(args[1]).write_text(json.dumps(_valid_consistency_report()), encoding="utf-8")
         return {"status": "ok", "overall": "PASS"}
     if action in ("match-core", "maxwell-transition"):
         return {"status": "ok", "n": 6,
                 "construction_kind": "css_single_speed_with_crust_density_jump"}
     return {"status": "ok", "n": 6}
+
+
+def _valid_consistency_report():
+    return {
+        "schema": "compose-eos-fortran-verification-v1", "n": 6,
+        "overall": {"status": "PASS", "pass": True}, "failed_checks": "",
+        **{name: {"pass": True} for name in ("C1", "C2", "C6", "C10", "C11")},
+        **{name: {"status": "NOT_AVAILABLE", "pass": None} for name in ("C3", "C4")},
+        "C3_applicable_points": 0, "C4_applicable_points": 0,
+        "C5": {"applicable": False, "pass": None},
+    }
+
+
+@pytest.mark.parametrize("corruption", ["failed_gate", "missing_gate", "wrong_count", "false_unavailable"])
+def test_pipeline_checks_consistency_file_despite_pass_stdout(tmp_path, monkeypatch, corruption):
+    import json
+    exe = tmp_path / "exe"
+    exe.write_bytes(b"x")
+    monkeypatch.setattr(pipeline, "executable", lambda: exe)
+    _passing_readback(monkeypatch)
+    monkeypatch.setattr(pipeline, "admit_match_report", lambda *a, **k: {"status": "ADMITTED"})
+
+    def native(action, *args):
+        if action != "verify":
+            return _fake_native_all_ok(action, *args)
+        report = _valid_consistency_report()
+        if corruption == "failed_gate":
+            report["C10"]["pass"] = False
+        elif corruption == "missing_gate":
+            del report["C11"]
+        elif corruption == "wrong_count":
+            report["n"] = 5
+        else:
+            report["C3_applicable_points"] = 1
+        Path(args[1]).write_text(json.dumps(report))
+        return {"status": "ok", "overall": "PASS"}
+
+    monkeypatch.setattr(pipeline, "run_native", native)
+    result = pipeline.run_pipeline("css", tmp_path / "crust", tmp_path / "core", tmp_path / "out")
+    assert result["survived"] is False
+    assert result["stage"] == "consistency"
+    assert result["consistency_status"] == "INVALID_REPORT"
 
 
 def test_pipeline_requires_independent_admission_after_native_pass(tmp_path, monkeypatch):

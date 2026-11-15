@@ -73,16 +73,17 @@ def get_core_start_index(co_name: str, d_co: EOSData) -> int:
 def get_gauge_shifts(
     cr_name: str, co_name: str, d_cr: EOSData, d_co: EOSData
 ) -> Tuple[float, float]:
-    """Return ``(dm_crust, dm_core)`` (in MeV) to align both tables to the
-    common nucleon rest-mass zero point ``d_co.mn``.
+    """Return zero physical-energy shifts for CompOSE normalization.
+
+    ``mn`` normalizes Q3--Q7; changing that reference does not add rest
+    energy to a supplied EOS. Physical F, epsilon and chemical potentials
+    are recovered with each source's own mn, then encoded using the output
+    reference. A constituent-mass model change requires separate source
+    physics and is not implemented by this matcher.
+
+    The historical helper name is retained for API compatibility.
     """
-    # A gauge shift may align different rest-mass conventions; it must not be
-    # used as an empirical fit parameter. Historical +4.96005 MeV (GM1 core)
-    # and +2.45 MeV (FSU2 crust) offsets are deliberately no longer applied:
-    # their provenance is not established by the source data sheets.
-    dm_cr = float(d_co.mn - d_cr.mn)
-    dm_co = 0.0
-    return dm_cr, dm_co
+    return 0.0, 0.0
 
 
 def find_convex_transition_window(

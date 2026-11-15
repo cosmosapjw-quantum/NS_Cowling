@@ -1174,7 +1174,8 @@ def construct_maxwell_transition(phase_low: EOSData, phase_high: EOSData, *,
     report["construction"] = "single_conserved_charge_local_neutrality_maxwell"
     report["local_charge_neutrality"] = "caller_confirmed"
     report["composition_preserved"] = False
-    report["compose_export_allowed"] = False
+    report["compose_export_allowed"] = True
+    report["composition_scope"] = "thermo_only_phase_labels_no_abundances"
     report["consistency"] = consistency
     report["is_exact_maxwell"] = True
     report["seidov_criterion_evaluated"] = False
@@ -1319,7 +1320,7 @@ def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
     # Preserve the legacy tuple return while adding the complete native report
     # and an independently generated C1-C11 consistency record.
     consistency = check_consistency(matched)
-    dm_crust = float(d_co.mn - d_cr.mn)
+    dm_crust = float(payload["dm_mass_gauge_meV"])
     f1, f2 = float(payload["F1"]), float(payload["F2"])
     p1, p2 = float(payload["P1"]), float(payload["P2"])
     mu1, mu2 = float(payload["mu1"]), float(payload["mu2"])
@@ -1378,6 +1379,8 @@ def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
         "pressure_span_bridge": float(payload["pressure_span"]),
         "spline_mode": payload["spline_mode"],
         "dm_crust": dm_crust, "dm_core": 0.0,
+        "normalization_reference_delta_mev": float(d_co.mn - d_cr.mn),
+        "mass_normalization_semantics": "physical_energy_preserving_Q_rescaling",
         "core_compo_mode": core_compo_mode,
         "composition_provenance": "none_strict_thermo_only",
         "core_composition_input_status": "explicitly_dropped" if core_has_composition else "input_eos_compo_absent",

@@ -60,6 +60,21 @@ jobs:
           PYTHONPATH: eos_generator:eos_generator/compose_eos_pkg
         run: python -m pytest -q eos_generator/tests
 
+      - name: Run full configured core-crust census
+        env:
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+          NS_COWLING_MATCH_OUT_ROOT: build/core_crust_census
+        run: python scripts/match_core_crust.py
+
+      - name: Preserve core-crust census evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-crust-census-${{ github.sha }}
+          path: build/core_crust_census/
+          if-no-files-found: warn
+          retention-days: 30
+
       - name: Verify EOS generator SHA-256 package manifest
         run: |
           cd eos_generator

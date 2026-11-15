@@ -2,9 +2,12 @@
 
 The native kernels (``match-core css`` and ``maxwell-transition``) already
 enforce their own gates.  This module is a *second, independent* layer: it
-never infers success from ``status == "ok"`` and never trusts a report scalar
-without re-deriving it from the serialized rows (the internal CSV produced by
-reading the written CompOSE artefact back).
+never infers success from ``status == "ok"`` and re-derives interface conditions
+from serialized rows (the internal CSV produced by reading the written CompOSE
+artefact back). Reported root counts and native interpolation diagnostics are
+checked against their declared contracts; this module does not repeat the
+native root search. Branch secants are necessary checks, not a certification of
+the native higher-order interpolant or its differential first law between rows.
 
 Every tolerance below is a gate that the native kernel already declares; none
 is looser than its native counterpart.  ``SERIAL_FLOOR`` only absorbs the
@@ -70,15 +73,25 @@ _MAXWELL_REQUIRED = (
 def rows_from_table(table: Iterable[Sequence[Any] | Mapping[str, Any]],
                     meta: Mapping[str, Any]) -> list[dict[str, float]]:
     """Convert internal-CSV rows (sequence in column order, or mapping) to physics rows."""
-    mn = float(meta["mn"])
-    il = int(meta.get("il", 1))
-    yq = float(meta.get("charge_fraction_grid", 0.0))
+    try:
+        mn = float(meta["mn"])
+        il = float(meta["il"])
+        yq = float(meta["charge_fraction_grid"])
+    except (KeyError, TypeError, ValueError, OverflowError) as exc:
+        raise ValueError("invalid thermodynamic normalization metadata") from exc
+    if not _finite(mn, il, yq) or mn <= 0.0 or il not in (0.0, 1.0):
+        raise ValueError("require finite mn>0, Il in {0,1}, and finite Yq")
     out = []
-    for raw in table:
-        if isinstance(raw, Mapping):
-            vals = {c: float(raw[c]) for c in _COLUMNS}
-        else:
-            vals = {c: float(raw[i]) for i, c in enumerate(_COLUMNS)}
+    for row_number, raw in enumerate(table, 1):
+        try:
+            if isinstance(raw, Mapping):
+                vals = {c: float(raw[c]) for c in _COLUMNS}
+            else:
+                vals = {c: float(raw[i]) for i, c in enumerate(_COLUMNS)}
+        except (KeyError, IndexError, TypeError, ValueError, OverflowError) as exc:
+            raise ValueError(f"invalid thermodynamic columns at row {row_number}") from exc
+        if not _finite(*vals.values()):
+            raise ValueError(f"nonfinite thermodynamic columns at row {row_number}")
         n = vals["nb"]
         p = n * vals["Q1"]
         eps = n * mn * (vals["Q7"] + 1.0)
@@ -105,7 +118,16 @@ def _parse_metadata(path: Path) -> dict[str, Any]:
 def load_rows(csv_path: Path, nml_path: Path) -> tuple[list[dict[str, float]], dict[str, Any]]:
     meta = _parse_metadata(Path(nml_path))
     with Path(csv_path).open(newline="", encoding="utf-8") as fh:
-        table = [{k.strip(): v for k, v in row.items()} for row in csv.DictReader(fh)]
+        reader = csv.reader(fh)
+        header = [c.strip() for c in next(reader, [])]
+        if (not header or len(set(header)) != len(header) or "" in header
+                or not set(_COLUMNS).issubset(header)):
+            raise ValueError("missing or duplicate internal CSV columns")
+        table = []
+        for line, row in enumerate(reader, 2):
+            if len(row) != len(header):
+                raise ValueError(f"internal CSV row width mismatch at line {line}")
+            table.append(dict(zip(header, row)))
     return rows_from_table(table, meta), meta
 
 
@@ -114,7 +136,7 @@ def load_rows(csv_path: Path, nml_path: Path) -> tuple[list[dict[str, float]], d
 def _finite(*xs: Any) -> bool:
     try:
         return all(math.isfinite(float(x)) for x in xs)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         return False
 
 
@@ -184,7 +206,7 @@ def _missing(report: Mapping[str, Any], keys: Sequence[str]) -> list[str]:
 def _int_index(report: Mapping[str, Any], key: str) -> int | None:
     try:
         f = float(report.get(key))
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         return None
     if not math.isfinite(f) or f != int(f):
         return None
@@ -192,7 +214,7 @@ def _int_index(report: Mapping[str, Any], key: str) -> int | None:
 
 
 def _branch_checks(c: _Checks, rows: list[dict[str, float]], name: str) -> None:
-    """Mechanical stability (dn, dP, deps > 0) and causality (dP/deps <= 1) on secants."""
+    """Necessary row/secant checks, not certification of a higher-order interpolant."""
     worst_cs2 = -math.inf
     stable = causal = len(rows) >= 2
     first_bad = None
@@ -208,6 +230,29 @@ def _branch_checks(c: _Checks, rows: list[dict[str, float]], name: str) -> None:
             causal = False
     c.add(f"{name}_stable", stable, rows=len(rows), first_violation_nb=first_bad)
     c.add(f"{name}_causal", causal, max_secant_cs2=worst_cs2, gate=CAUSAL_GATE)
+
+
+def _physical_rows(c: _Checks, rows: list[dict[str, float]]) -> bool:
+    """Check all retained rows before divisions, logs or fractional powers."""
+    invalid = []
+    for i, row in enumerate(rows):
+        if (not _finite(*(row.get(k) for k in ("n", "P", "eps", "mu_e", "mu_q3")))
+                or any(row[k] <= 0.0 for k in ("n", "P", "eps", "mu_e"))):
+            invalid.append(i)
+    valid = bool(rows) and not invalid
+    c.add("serialized_physical_rows", valid, invalid_rows=invalid)
+    if not valid:
+        return False
+    worst = max(_close(row["mu_q3"], row["mu_e"], EULER_GATE)[1] for row in rows)
+    c.add("serialized_euler_mu", worst <= EULER_GATE, max_rel_residual=worst, gate=EULER_GATE)
+    return True
+
+
+def _float_or_nan(value: Any) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError, OverflowError):
+        return math.nan
 
 
 def _report_vs_rows(c: _Checks, pairs: Mapping[str, tuple[float, float, float | None]]) -> None:
@@ -233,10 +278,10 @@ def admit_css(report: Mapping[str, Any], rows: list[dict[str, float]],
     c.add("construction_kind", report["construction_kind"] == CSS_CONSTRUCTION_KIND,
           value=report["construction_kind"])
 
-    cs2 = float(report["css_single_sound_speed"])
+    cs2 = _float_or_nan(report["css_single_sound_speed"])
     cs2_ok = _finite(cs2) and 0.0 < cs2 <= 1.0
     c.add("css_sound_speed_range", cs2_ok, value=cs2)
-    speeds = [float(report[k]) for k in _SPEED_KEYS[1:]]
+    speeds = [_float_or_nan(report[k]) for k in _SPEED_KEYS[1:]]
     single = _finite(cs2, *speeds) and all(_close(s, cs2, SERIAL_FLOOR)[0] for s in speeds)
     c.add("css_single_sound_speed", single, reported=speeds)
 
@@ -251,13 +296,18 @@ def admit_css(report: Mapping[str, Any], rows: list[dict[str, float]],
     n_rows = _int_index(report, "n")
     idx_ok = (
         None not in (lo, hi, core, n_bridge, n_rows)
-        and n_rows == len(rows) and 0 <= lo and hi == lo + 1
+        and n_rows == len(rows) and 0 <= lo and hi == lo + 1 and n_bridge >= 8
         and core == hi + n_bridge + 1 and core < len(rows)
     )
     c.add("row_indices_consistent", idx_ok, low=lo, high=hi, core=core,
           n_bridge=n_bridge, report_n=n_rows, rows=len(rows))
     if not idx_ok or not cs2_ok:
         return c.result("css")
+    if not _physical_rows(c, rows):
+        return c.result("css")
+    _branch_checks(c, rows[:lo + 1], "crust_branch")
+    _branch_checks(c, rows[hi:core + 1], "css_branch")
+    _branch_checks(c, rows[core:], "core_branch")
 
     rl, rh, rc = rows[lo], rows[hi], rows[core]
     p_t, mu_t = rl["P"], rl["mu_e"]
@@ -296,9 +346,12 @@ def admit_css(report: Mapping[str, Any], rows: list[dict[str, float]],
     # CSS -> core continuity in n_B, P, epsilon and mu_B (native u=1 gate).
     mu_c = rc["mu_e"]
     if _finite(mu_c) and mu_c > 0.0:
-        n_pred = n_h * (mu_c / mu_t) ** (1.0 / cs2)
-        p_pred = p_t + cs2 / (1.0 + cs2) * (n_pred * mu_c - n_h * mu_t)
-        e_pred = n_pred * mu_c - p_pred
+        try:
+            n_pred = n_h * (mu_c / mu_t) ** (1.0 / cs2)
+            p_pred = p_t + cs2 / (1.0 + cs2) * (n_pred * mu_c - n_h * mu_t)
+            e_pred = n_pred * mu_c - p_pred
+        except OverflowError:
+            n_pred = p_pred = e_pred = math.nan
     else:
         n_pred = p_pred = e_pred = math.nan
 
@@ -357,6 +410,8 @@ def admit_maxwell(report: Mapping[str, Any], rows: list[dict[str, float]],
           high_phase_rows=n_high, report_n=n_rows, rows=len(rows))
     if not idx_ok:
         return c.result("maxwell")
+    if not _physical_rows(c, rows):
+        return c.result("maxwell")
 
     rl, rh = rows[n_low - 1], rows[n_low]
     p_t, mu_t = rl["P"], rl["mu_e"]
@@ -378,15 +433,10 @@ def admit_maxwell(report: Mapping[str, Any], rows: list[dict[str, float]],
     eul = [float(report["max_euler_residual_low"]), float(report["max_euler_residual_high"])]
     c.add("report_euler_residuals", all(0.0 <= e <= EULER_GATE for e in eul),
           values=eul, gate=EULER_GATE)
-    worst = 0.0
-    for row in rows:
-        worst = max(worst, _close(row["mu_q3"], row["mu_e"], EULER_GATE)[1])
-    c.add("serialized_euler_mu", worst <= EULER_GATE, max_rel_residual=worst, gate=EULER_GATE)
-
     cs = [float(report[k]) for k in ("min_cs2_low", "max_cs2_low", "min_cs2_high", "max_cs2_high")]
     c.add("report_branch_sound_speeds",
-          cs[0] > 0.0 and cs[2] > 0.0 and cs[1] <= 1.0 + CAUSAL_GATE
-          and cs[3] <= 1.0 + CAUSAL_GATE, values=cs)
+          0.0 < cs[0] <= cs[1] <= 1.0 + CAUSAL_GATE
+          and 0.0 < cs[2] <= cs[3] <= 1.0 + CAUSAL_GATE, values=cs)
     _branch_checks(c, rows[:n_low], "low_branch")
     _branch_checks(c, rows[n_low:], "high_branch")
 
@@ -414,7 +464,7 @@ def admit_match_report(method: str, report: Mapping[str, Any],
         return c.result(method)
     try:
         rows, meta = load_rows(Path(csv_path), Path(nml_path))
-    except (OSError, ValueError, KeyError, UnicodeError) as exc:
+    except (OSError, ValueError, KeyError, UnicodeError, csv.Error) as exc:
         c = _Checks()
         c.add("serialized_rows_readable", False, error=f"{type(exc).__name__}: {exc}")
         return c.result(method)

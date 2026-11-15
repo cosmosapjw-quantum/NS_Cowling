@@ -51,6 +51,88 @@ def _thermodynamic_pressure_from_density(mu, n, p):
     return ns, primitive, offset
 
 
+def _polynomial_roots_on_unit_interval(poly):
+    """Isolate real polynomial roots by recursively partitioning at extrema.
+
+    Used only for degree <= 3 density differences.  The normalized coordinate
+    avoids scaling the root test by a chemical potential of order 1 GeV.
+    This is floating-point isolation of the declared interpolant, not a claim
+    to recover unrepresented structure in the microscopic EOS.
+    """
+    poly = poly.trim(tol=0.0)
+    if poly.degree() <= 0:
+        return []
+    if poly.degree() == 1:
+        root = -float(poly.coef[0]) / float(poly.coef[1])
+        return [root] if 0.0 < root < 1.0 else []
+    stationary = _polynomial_roots_on_unit_interval(poly.deriv())
+    partition = [0.0, *stationary, 1.0]
+    tol = 64.0*np.finfo(float).eps*float(np.sum(np.abs(poly.coef)))
+    roots = [t for t in stationary if abs(float(poly(t))) <= tol]
+    for a, b in zip(partition[:-1], partition[1:]):
+        fa, fb = float(poly(a)), float(poly(b))
+        if abs(fa) > tol and abs(fb) > tol and np.signbit(fa) != np.signbit(fb):
+            roots.append(float(brentq(poly, a, b, xtol=4*np.finfo(float).eps,
+                                     rtol=4*np.finfo(float).eps)))
+    return sorted(roots)
+
+
+def _maxwell_pressure_equality_roots(n_low, n_high, pressure_low, pressure_high, lo, hi):
+    """Return all isolated (mu, tangential) pressure contacts on the common domain.
+
+    P is the quartic primitive of each cubic PCHIP density.  On the union of
+    their knot intervals, Delta n = d(Delta P)/dmu is cubic.  Its roots split
+    Delta P into monotone pieces, so close root pairs cannot hide between
+    samples. A non-isolated pressure-equality interval is explicitly rejected.
+    """
+    from numpy.polynomial import Polynomial
+    knots = np.unique(np.r_[lo, n_low.x, n_high.x, hi])
+    knots = knots[(knots >= lo) & (knots <= hi)]
+    contacts = []
+    epsmach = np.finfo(float).eps
+    for left, right in zip(knots[:-1], knots[1:]):
+        width = float(right-left)
+        def density_poly(spline):
+            index = min(max(int(np.searchsorted(spline.x, left, side='right'))-1, 0),
+                        spline.c.shape[1]-1)
+            return Polynomial(spline.c[:, index][::-1])(
+                Polynomial([float(left-spline.x[index]), width]))
+        delta_n = density_poly(n_low)-density_poly(n_high)
+        delta_p = (width*delta_n).integ()
+        pl, ph = float(pressure_low(left)), float(pressure_high(left))
+        delta_p.coef[0] = pl-ph
+        pressure_scale = max(abs(pl), abs(ph), abs(float(pressure_low(right))),
+                             abs(float(pressure_high(right))), np.finfo(float).tiny)
+        ptol = 64.0*epsmach*pressure_scale
+        if np.all(delta_n.coef == 0.0):
+            if abs(float(delta_p.coef[0])) <= ptol:
+                raise ValueError('Maxwell pressure equality contains a non-isolated root interval')
+            continue
+        stationary = _polynomial_roots_on_unit_interval(delta_n)
+        partition = [0.0, *stationary, 1.0]
+        values = [float(delta_p(t)) for t in partition]
+        for i, (t, value) in enumerate(zip(partition, values)):
+            if abs(value) <= ptol:
+                density_scale = max(abs(float(n_low(left+width*t))),
+                                    abs(float(n_high(left+width*t))))
+                tangential = (0 < i < len(partition)-1 or
+                              abs(float(delta_n(t))) <= 64.0*epsmach*density_scale)
+                contacts.append((float(left+width*t), bool(tangential)))
+        for a, b, fa, fb in zip(partition[:-1], partition[1:], values[:-1], values[1:]):
+            if abs(fa) > ptol and abs(fb) > ptol and np.signbit(fa) != np.signbit(fb):
+                root = float(brentq(delta_p, a, b, xtol=4*epsmach, rtol=4*epsmach))
+                contacts.append((float(left+width*root), False))
+    contacts.sort()
+    unique = []
+    mutol = 8.0*epsmach*max(abs(lo), abs(hi), 1.0)
+    for mu, tangential in contacts:
+        if unique and abs(mu-unique[-1][0]) <= mutol:
+            unique[-1] = (unique[-1][0], unique[-1][1] or tangential)
+        else:
+            unique.append((mu, tangential))
+    return unique
+
+
 def _branchwise_first_law_report(mu, p, n, eps, *, samples_per_interval=8):
     """Audit thermodynamic-potential reconstruction on the input grid.
 
@@ -177,13 +259,16 @@ def _phase_arrays(data: EOSData, *, differential_tolerance=5e-3, differential_sa
 
 
 def build_maxwell_eos(low_phase: EOSData, high_phase: EOSData, *, low_name='low', high_name='high',
-                      mu_samples=800, crossing_index=0, differential_tolerance=5e-3,
+                      mu_samples=800, crossing_index=None, differential_tolerance=5e-3,
                       differential_samples_per_interval=8) -> MaxwellEOS:
     """Construct one exact local-neutrality Maxwell transition from two 1-D phases.
 
     Coexistence solves P_low(mu_B)=P_high(mu_B). The returned table contains
     two adjacent rows at the same P_t and mu_t but n_high>n_low and eps_high>eps_low.
     The two input EOS are understood as locally charge-neutral phase barotropes.
+    Multiple roots require explicit ``crossing_index`` selection. Such output
+    represents that interface only; it does not certify global pressure
+    dominance or include the other phase transitions on the retained domain.
     """
     if int(mu_samples) < 2:
         raise ValueError('mu_samples must be at least 2')
@@ -198,12 +283,21 @@ def build_maxwell_eos(low_phase: EOSData, high_phase: EOSData, *, low_name='low'
     Pl=lambda x: pli_primitive(x)+pli_offset
     Ph=lambda x: phi_primitive(x)+phi_offset
     eli=PchipInterpolator(mul,el,extrapolate=False); ehi_sp=PchipInterpolator(muh,eh,extrapolate=False)
-    grid=np.linspace(lo,hi,int(mu_samples)); delta=np.asarray(Pl(grid)-Ph(grid),float)
-    brackets=[(grid[i],grid[i+1]) for i in range(len(grid)-1) if delta[i]==0 or delta[i]*delta[i+1]<0]
-    if not brackets: raise ValueError('no P_low(mu_B)=P_high(mu_B) coexistence root in common interval')
-    if crossing_index<0 or crossing_index>=len(brackets): raise ValueError(f'{len(brackets)} coexistence roots found; choose crossing_index explicitly')
-    a,b=brackets[crossing_index]
-    mut=float(a if delta[np.searchsorted(grid,a)]==0 else brentq(lambda x: float(Pl(x)-Ph(x)),a,b,xtol=1e-12))
+    # mu_samples is retained for API compatibility; acceptance no longer
+    # depends on a uniform scan resolution.
+    roots = _maxwell_pressure_equality_roots(nli, nhi, Pl, Ph, lo, hi)
+    if not roots: raise ValueError('no P_low(mu_B)=P_high(mu_B) coexistence root in common interval')
+    if crossing_index is None:
+        if len(roots) != 1:
+            raise ValueError(f'{len(roots)} coexistence roots found; choose crossing_index explicitly; '
+                             'a single selected interface does not certify global pressure dominance')
+        crossing_index = 0
+    if isinstance(crossing_index, (bool, np.bool_)) or not isinstance(crossing_index, (int, np.integer)):
+        raise ValueError('crossing_index must be an integer or None')
+    if crossing_index<0 or crossing_index>=len(roots): raise ValueError(f'{len(roots)} coexistence roots found; choose crossing_index explicitly')
+    mut, tangential = roots[crossing_index]
+    if tangential:
+        raise ValueError('tangential pressure equality has no resolved positive density jump')
     pt=float(0.5*(Pl(mut)+Ph(mut))); nlo=float(nli(mut)); nhi_t=float(nhi(mut))
     if not (pt>0 and mut>0 and nlo>0 and nhi_t>nlo):
         raise ValueError(f'coexistence root is not a physical density jump: P={pt}, mu={mut}, n_low={nlo}, n_high={nhi_t}')
@@ -256,7 +350,11 @@ def build_maxwell_eos(low_phase: EOSData, high_phase: EOSData, *, low_name='low'
     # Store provenance and interpolation consistency at the coexistence point.
     source_e_low=float(eli(mut)); source_e_high=float(ehi_sp(mut))
     meta={'schema':'compose-eos-maxwell-v1','method_id':MAXWELL_METHOD_ID,'low_phase':low_name,'high_phase':high_name,
-          'coexistence_root_count':len(brackets),'selected_root_index':int(crossing_index),
+          'coexistence_root_count':len(roots),'selected_root_index':int(crossing_index),
+          'coexistence_root_method':'union-knot quartic pressure primitives; cubic density stationary partition',
+          'coexistence_roots_MeV':[float(root[0]) for root in roots],
+          'coexistence_scope':'single_isolated_interface' if len(roots)==1 else 'explicitly_selected_interface',
+          'global_pressure_dominance_validated':False,
           'differential_tolerance':float(differential_tolerance),
           'differential_samples_per_interval':int(differential_samples_per_interval),
           'low_energy_identity_residual':elo-source_e_low,'high_energy_identity_residual':epshi_t-source_e_high,

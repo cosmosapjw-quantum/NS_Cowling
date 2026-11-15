@@ -85,10 +85,19 @@ def test_writer_rollback_on_injected_mid_commit_io_error(tmp_path, monkeypatch):
     assert leftover == []
 
 
+def _load_css_admitted_crust_and_core():
+    # This benchmark has a positive CSS density jump without changing source
+    # energy normalization. SPG_M1+RG_SLY4 relied on the removed energy shift.
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    return (read_compose(_resolve_eos_dir(base_dir, "GPPVA_FSU2H")),
+            read_compose(_resolve_eos_dir(base_dir, "GM_GM1")))
+
+
 def test_all_6_matching_schemes_pass_and_quintic_has_zero_cs2_jump(tmp_path):
     d_cr, d_co, _ = _load_sample_crust_and_core()
     for m in METHODS:
-        eos_m, info = match_crust_core(d_cr, d_co, "SPG_M1", "RG_SLY4", method=m, n_bridge=40)
+        pair = _load_css_admitted_crust_and_core() if m == "css" else (d_cr, d_co)
+        eos_m, info = match_crust_core(*pair, method=m, n_bridge=40)
         out_dir = tmp_path / m
         write_compose(str(out_dir), eos_m)
         reloaded = read_compose(str(out_dir))
@@ -244,8 +253,8 @@ def test_empty_compose_composition_rows_are_not_claimed_as_available(tmp_path):
 
 
 def test_css_single_speed_root_matches_both_interfaces():
-    d_cr, d_co, _ = _load_sample_crust_and_core()
-    eos, info = match_crust_core(d_cr, d_co, "SPG_M1", "RG_SLY4", method="css", n_bridge=64)
+    d_cr, d_co = _load_css_admitted_crust_and_core()
+    eos, info = match_crust_core(d_cr, d_co, "GPPVA_FSU2H", "GM_GM1", method="css", n_bridge=64)
     i1 = info["i1"]
     j = i1 + 1
     # crust -> CSS: pressure and mu continuous, n and epsilon jump.
@@ -261,3 +270,14 @@ def test_css_single_speed_root_matches_both_interfaces():
     assert eos.eps[k] == pytest.approx(info["eps2"], rel=1e-10)
     assert info["cs2_min_bridge"] == pytest.approx(info["cs2_bridge"], abs=1e-14)
     assert info["cs2_max_bridge"] == pytest.approx(info["cs2_bridge"], abs=1e-14)
+
+
+def test_css_spg_sly4_candidate_rejected_without_artificial_energy_shift():
+    """Historical positive fixture depended on adding n*Delta m to the crust.
+
+    Preserve the failure as a physical rejection of this selected window,
+    not as a general no-go result for every possible SPG/SLy4 matching.
+    """
+    d_cr, d_co, _ = _load_sample_crust_and_core()
+    with pytest.raises(ValueError, match="positive crust-side.*density jump"):
+        match_crust_core(d_cr, d_co, "SPG_M1", "RG_SLY4", method="css", n_bridge=64)

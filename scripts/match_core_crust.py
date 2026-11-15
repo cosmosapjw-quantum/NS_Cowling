@@ -28,7 +28,6 @@ import json
 import math
 import os
 import re
-import shutil
 import subprocess
 import sys
 import time
@@ -396,6 +395,42 @@ def _missing_sources(directory: Path) -> list[str]:
     return [name for name in REQUIRED_SOURCE_FILES if not (directory / name).is_file()]
 
 
+def _consistency_report_errors(report: object, expected_n: int) -> list[str]:
+    """Check the persisted verifier receipt, including applicability, against stdout."""
+    if not isinstance(report, dict):
+        return ["consistency report must be an object"]
+    errors = []
+    if report.get("schema") != "compose-eos-fortran-verification-v1":
+        errors.append("unexpected consistency schema")
+    if type(report.get("n")) is not int or report["n"] != expected_n:
+        errors.append("consistency row count mismatch")
+    if report.get("overall") != {"status": "PASS", "pass": True}:
+        errors.append("consistency overall is not PASS")
+    if report.get("failed_checks") != "":
+        errors.append("consistency failed_checks is not empty")
+    for name in ("C1", "C2", "C6", "C10", "C11"):
+        entry = report.get(name)
+        if not isinstance(entry, dict) or entry.get("pass") is not True:
+            errors.append(f"consistency {name} missing or failed")
+    for name in ("C3", "C4"):
+        entry = report.get(name)
+        count = report.get(f"{name}_applicable_points")
+        valid = isinstance(entry, dict) and type(count) is int and 0 <= count <= expected_n
+        if valid and count == 0:
+            valid = entry.get("status") == "NOT_AVAILABLE" and entry.get("pass") is None
+        elif valid:
+            valid = entry.get("status") in ("CHECKED", "PARTIAL") and entry.get("pass") is True
+        if not valid:
+            errors.append(f"consistency {name} applicability missing or inconsistent")
+    entry = report.get("C5")
+    if not isinstance(entry, dict) or not (
+        (entry.get("applicable") is True and entry.get("pass") is True)
+        or (entry.get("applicable") is False and entry.get("pass") is None)
+    ):
+        errors.append("consistency C5 missing or failed")
+    return errors
+
+
 def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) -> dict:
     """Run one (crust, core, method) match. Returns a result dict.
 
@@ -403,6 +438,14 @@ def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) ->
     ``failure_category`` separating data-provenance, input-contract,
     implementation, numerical, physical and admission failures.
     """
+    if method not in METHODS:
+        raise ValueError(f"unsupported matching method: {method!r}")
+    out_dir = Path(out_dir)
+    if out_dir.exists():
+        if not out_dir.is_dir():
+            raise NotADirectoryError(f"matching output is not a directory: {out_dir}")
+        if any(out_dir.iterdir()):
+            raise FileExistsError(f"matching output directory is not empty: {out_dir}")
     res = _run_pipeline(method, crust_dir, core_dir, out_dir)
     if not res.get("survived"):
         res.setdefault("failure_category", classify_failure(
@@ -412,9 +455,7 @@ def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) ->
 
 def _run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) -> dict:
     work = out_dir / "work"
-    if work.exists():
-        shutil.rmtree(work)
-    work.mkdir(parents=True, exist_ok=True)
+    work.mkdir(parents=True, exist_ok=False)
     (out_dir / "compose").mkdir(parents=True, exist_ok=True)
 
     crust_internal = work / "crust_internal"
@@ -424,8 +465,13 @@ def _run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) -
     core_internal.mkdir(exist_ok=True)
     matched_internal.mkdir(exist_ok=True)
 
-    exe = executable()
-    exe_sha = sha256_file(exe)
+    try:
+        exe = executable()
+        exe_sha = sha256_file(exe)
+    except (OSError, RuntimeError) as exc:
+        return {"survived": False, "method": method, "stage": "executable",
+                "failure_category": "environment",
+                "error": f"{type(exc).__name__}: {exc}"}
 
     stage = "read_crust"
     try:
@@ -565,7 +611,10 @@ def _run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) -
             }
         try:
             consistency_report = json.loads(consistency_path.read_text(encoding="utf-8"))
-        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            receipt_errors = _consistency_report_errors(consistency_report, combined_n)
+            if receipt_errors:
+                raise ValueError("; ".join(receipt_errors))
+        except (OSError, UnicodeError, ValueError) as exc:
             return {
                 "survived": False, "method": method, "stage": "consistency",
                 "error": f"native verifier did not produce valid JSON: {type(exc).__name__}: {exc}",

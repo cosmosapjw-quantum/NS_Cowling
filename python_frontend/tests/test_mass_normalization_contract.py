@@ -1,6 +1,6 @@
 """NSC remediation Phase B regression tests (mission section 4.6).
 
-14 cases pinning the rest-mass normalization contract:
+Regression cases pinning physical-energy-preserving normalization:
   1. identical neutron/proton mass pair -> Maxwell gate PASS
   2. neutron-only mismatch -> FAIL
   3. proton-only mismatch -> FAIL
@@ -22,6 +22,7 @@ from __future__ import annotations
 import hashlib
 import os
 import sys
+import subprocess
 import tempfile
 from pathlib import Path
 
@@ -128,7 +129,7 @@ def test_6_physical_split_masses_supported():
 def test_7_composition_missing_blocks_physical_correction():
     """Without per-nucleus composition the physical split-mass correction is
     not derivable: the API must NOT silently apply it. The smooth matcher
-    applies only the documented uniform gauge shift (representation-only)."""
+    re-encodes dimensionless columns while preserving physical energy."""
     d_cr = read_compose(EOS / "GPPVA_DD2")
     d_co = read_compose(EOS / "BBB_BHF2")
     # GPPVA_DD2 carries aggregate composition -> requires drop_composition
@@ -143,13 +144,16 @@ def test_7_composition_missing_blocks_physical_correction():
 
 @pytest.mark.skipif(_needs_backend(), reason="requires native backend")
 def test_8_composition_present_transformation_pass():
-    """With composition present and drop_composition=True the gauge-aligned
-    transformation runs and the native report exposes the provenance fields."""
+    """With composition present and drop_composition=True the normalization
+    runs without a physical energy shift and exposes provenance fields."""
     d_cr = read_compose(EOS / "GPPVA_DD2")
     d_co = read_compose(EOS / "BBB_BHF2")
     matched, info = match_crust_core(d_cr, d_co, method="css", n_bridge=8,
                                drop_composition=True)
-    assert abs(info["native_report"]["dm_mass_gauge_meV"] - 0.56533) < 1e-6
+    assert info["native_report"]["dm_mass_gauge_meV"] == 0.0
+    assert info["dm_crust"] == 0.0
+    assert info["normalization_reference_delta_mev"] == pytest.approx(d_co.mn - d_cr.mn)
+    assert info["mass_normalization_semantics"] == "physical_energy_preserving_Q_rescaling"
     assert info["native_report"]["source_euler_residual_meV"] > 0
     # P invariance: matched P at retained crust rows equals source P
     assert np.allclose(matched.p[:info["i1"] + 1],
@@ -159,22 +163,21 @@ def test_8_composition_present_transformation_pass():
 # ---------------------------------------------------------------- 9-10: round trips
 @pytest.mark.skipif(_needs_backend(), reason="requires native backend")
 def test_9_gppva_dd2_gauge_round_trip():
-    """F_tgt = F_src + dmcr, inverse F_src = F_tgt - dmcr, exact round trip."""
+    """Changing the output normalization preserves physical F and epsilon."""
     d_cr = read_compose(EOS / "GPPVA_DD2")
     d_co = read_compose(EOS / "BBB_BHF2")
-    dmcr = d_co.mn - d_cr.mn
     matched, info = match_crust_core(d_cr, d_co, method="css", n_bridge=8,
                                drop_composition=True)
     i1 = info["i1"]
-    # forward: matched F on retained crust rows = source F + dmcr
-    assert np.allclose(matched.F[:i1 + 1], d_cr.F[:i1 + 1] + dmcr,
+    # Physical free energy per baryon is unchanged.
+    assert np.allclose(matched.F[:i1 + 1], d_cr.F[:i1 + 1],
                        rtol=0, atol=1e-9)
-    # inverse: subtracting recovers source exactly
-    assert np.allclose(matched.F[:i1 + 1] - dmcr, d_cr.F[:i1 + 1],
-                       rtol=0, atol=1e-9)
-    # eps: eps_tgt = eps_src + n*dmcr
+    # Re-encoding Q6 back to the source reference recovers source Q6.
+    source_q6 = (matched.Q6[:i1 + 1] + 1.0) * matched.mn / d_cr.mn - 1.0
+    assert np.allclose(source_q6, d_cr.Q6[:i1 + 1], rtol=0, atol=1e-12)
+    # epsilon is an absolute gravitating source and must stay unchanged.
     assert np.allclose(matched.eps[:i1 + 1],
-                       d_cr.eps[:i1 + 1] + d_cr.nb[:i1 + 1] * dmcr,
+                       d_cr.eps[:i1 + 1],
                        rtol=0, atol=1e-7)
 
 
@@ -183,13 +186,12 @@ def test_10_q3_q7_normalization_round_trip():
     """Output Q3/Q6/Q7 are normalized to out%mn; inverse recovers source."""
     d_cr = read_compose(EOS / "GPPVA_DD2")
     d_co = read_compose(EOS / "BBB_BHF2")
-    dmcr = d_co.mn - d_cr.mn
     matched, info = match_crust_core(d_cr, d_co, method="css", n_bridge=8,
                                drop_composition=True)
     i1 = info["i1"]
-    # Q6: (Q6_out+1)*mn_out = (Q6_src+1)*mn_src + dmcr
+    # Q6: (Q6_out+1)*mn_out = (Q6_src+1)*mn_src
     lhs = (matched.Q6[:i1 + 1] + 1.0) * matched.mn
-    rhs = (d_cr.Q6[:i1 + 1] + 1.0) * d_cr.mn + dmcr
+    rhs = (d_cr.Q6[:i1 + 1] + 1.0) * d_cr.mn
     assert np.allclose(lhs, rhs, rtol=0, atol=1e-9)
     # Q7 == Q6 on the cold output
     assert np.allclose(matched.Q7, matched.Q6, rtol=0, atol=1e-15)
@@ -243,21 +245,67 @@ def test_13_source_file_immutability():
 
 @pytest.mark.skipif(_needs_backend(), reason="requires native backend")
 def test_14_header_rewrite_is_detectable_and_forbidden():
-    """The matcher records the core gauge in the output header (mn, mp) and
-    the gauge shift separately. A naive 'header-only rewrite' (claiming the
-    physical split without transforming Q columns) is detectable: Q3 would
-    fail the mu = F + P/n identity. Pin that the real output satisfies it."""
+    """A header-only rewrite changes physical energy; complete Q rescaling does not."""
     d_cr = read_compose(EOS / "GPPVA_DD2")
     d_co = read_compose(EOS / "BBB_BHF2")
     matched, info = match_crust_core(d_cr, d_co, method="css", n_bridge=8,
-                               drop_composition=True)
-    # output header carries the core convention
+                                   drop_composition=True)
     assert matched.mn == d_co.mn and matched.mp == d_co.mp
-    # a header-only rewrite would leave crust Q3 inconsistent with shifted F:
-    # naive Q3 would be (Q3_src+1)*mn_src/mn_out - 1; check it FAILS identity
-    naive = (d_cr.Q3[: info["i1"] + 1] + 1.0) * d_cr.mn / matched.mn - 1.0
-    mu_naive = (naive + 1.0) * matched.mn
-    lhs = matched.F[: info["i1"] + 1] + matched.Q1[: info["i1"] + 1]
-    # the naive mapping must NOT satisfy the identity (that's why the code
-    # re-derives Q3); at least one retained row differs beyond 1e-6
-    assert np.max(np.abs(mu_naive - lhs)) > 1e-6
+    stop = info["i1"] + 1
+    header_only_f = (d_cr.Q6[:stop] + 1.0) * matched.mn
+    assert np.max(np.abs(header_only_f - d_cr.F[:stop])) > 1e-6
+    np.testing.assert_allclose(matched.F[:stop], d_cr.F[:stop], rtol=0, atol=1e-9)
+    # Source Q3 tabulation residual is a separate disclosed Euler correction.
+    np.testing.assert_allclose(matched.mub[:stop], d_cr.F[:stop] + d_cr.Q1[:stop],
+                               rtol=0, atol=1e-9)
+
+
+@pytest.mark.skipif(_needs_backend(), reason="requires native backend")
+@pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+def test_matching_invariant_under_compose_mass_normalization(method):
+    """Re-encoding an identical physical crust must not alter its matched EOS."""
+    crust = read_compose(ROOT / "eos_generator/eos_data_normalized/GPPVA_FSU2H")
+    core = read_compose(ROOT / "eos_generator/eos_data_normalized/GM_GM1")
+    encoded = crust.copy()
+    encoded.mn = crust.mn + 0.01
+    ratio = crust.mn / encoded.mn
+    for field in ("Q3", "Q6", "Q7"):
+        setattr(encoded, field, (getattr(crust, field) + 1.0) * ratio - 1.0)
+    for field in ("Q4", "Q5"):
+        setattr(encoded, field, getattr(crust, field) * ratio)
+    # This modifies representation, not a model's constituent masses/energy.
+    np.testing.assert_allclose(encoded.eps, crust.eps, rtol=2e-14, atol=1e-12)
+    original, oi = match_crust_core(crust, core, method=method, n_bridge=40, drop_composition=True)
+    recoded, ri = match_crust_core(encoded, core, method=method, n_bridge=40, drop_composition=True)
+    assert (oi["i1"], oi["i2"]) == (ri["i1"], ri["i2"])
+    for field in ("nb", "p", "eps", "mub", "F"):
+        np.testing.assert_allclose(getattr(recoded, field), getattr(original, field),
+                                   rtol=2e-10, atol=2e-9, err_msg=field)
+    stop = oi["i1"] + 1
+    np.testing.assert_allclose(original.F[:stop], crust.F[:stop], rtol=2e-14, atol=1e-10)
+    np.testing.assert_allclose(original.eps[:stop], crust.eps[:stop], rtol=2e-14, atol=1e-10)
+
+
+def test_python_matching_preserves_physical_energy_under_normalization():
+    """Independent Python implementation obeys the same physical invariance."""
+    code = r'''
+import sys, types
+from pathlib import Path
+import numpy as np
+root = Path(sys.argv[1])
+pkg = types.ModuleType("compose_eos")
+pkg.__path__ = [str(root / "eos_generator/compose_eos_pkg/compose_eos")]
+sys.modules["compose_eos"] = pkg
+from compose_eos.io import read_compose
+from compose_eos.matching import match_crust_core
+cr = read_compose(root / "eos_generator/eos_data_normalized/GPPVA_FSU2H")
+co = read_compose(root / "eos_generator/eos_data_normalized/GM_GM1")
+for method in ("css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"):
+    matched, info = match_crust_core(cr, co, method=method, n_bridge=40,
+                                    core_compo_mode="strict_thermo_only")
+    stop = info["i1"] + 1
+    np.testing.assert_allclose(matched.F[:stop], cr.F[:stop], rtol=2e-14, atol=1e-10)
+    np.testing.assert_allclose(matched.eps[:stop], cr.eps[:stop], rtol=2e-14, atol=1e-10)
+'''
+    result = subprocess.run([sys.executable, "-c", code, str(ROOT)], capture_output=True, text=True)
+    assert result.returncode == 0, result.stdout + result.stderr

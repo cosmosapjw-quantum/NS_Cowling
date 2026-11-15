@@ -1,0 +1,131 @@
+{
+  "schema": "ns-cowling.adversarial-reaudit.v1",
+  "date_kst": "2026-11-15",
+  "baseline_head": "d90d3dca033f759c79ed034b3b8ff939acb43145",
+  "branch": "remediation/2026-11-15-m5a-maxwell-eos-contracts",
+  "pr": 15,
+  "scope": [
+    "C5 bounded corrections",
+    "C6 executed regressions",
+    "C7 thermodynamic invariants",
+    "C9 independent specialist audit and parent integration",
+    "C10 handoff"
+  ],
+  "findings": [
+    {
+      "id": "A01",
+      "kind": "physical_semantics",
+      "status": "FIXED",
+      "object": "mass normalization",
+      "counterexample": "same physical input re-encoded with mn+0.01 MeV changes all 5 native matching outputs; Python retained F was shifted +0.56533 MeV",
+      "correction": "preserve F,epsilon,n,P,mu_Q; only encode dimensionless Q columns using target reference",
+      "historical_result_policy": "pre-correction matching receipts are historical; recompute before current use"
+    },
+    {
+      "id": "A02",
+      "kind": "numerical_implementation",
+      "status": "FIXED",
+      "object": "native Maxwell bisection",
+      "counterexample": "exact midpoint zero at mu=1026 MeV lost, old bisection drifted to1026.25",
+      "correction": "return exact zero immediately; no tolerance changes"
+    },
+    {
+      "id": "A03",
+      "kind": "numerical_implementation",
+      "status": "FIXED",
+      "object": "Python Maxwell root topology",
+      "counterexample": "DeltaP=1e-4*((mu-1050)^2-0.01^2);800-point scan misses both admissible source roots",
+      "correction": "union-knot quartic primitive isolation via cubic stationary partitions; multi-root default rejects unless explicitly selected"
+    },
+    {
+      "id": "A04",
+      "kind": "implementation",
+      "status": "FIXED",
+      "object": "native Maxwell phase-only export",
+      "correction": "write Iphase via supported Npairs=Nquad=0 sidecar, all abundance masks false; exact one-point axes and row status readback"
+    },
+    {
+      "id": "A05",
+      "kind": "false_admission",
+      "status": "FIXED",
+      "object": "independent row/report admission",
+      "counterexample": "21 regression failures including corrupt/reordered rows, invalid normalization, speed types and min/max",
+      "correction": "finite physical row/Euler and branch secant checks; strict schema and index contract; structured rejection"
+    },
+    {
+      "id": "A06",
+      "kind": "false_admission",
+      "status": "FIXED",
+      "object": "native CLI cold source guard",
+      "counterexample": "6 direct CLI tests accepted NaN T/Yq or Il1 Q5!=0 despite beta flag",
+      "correction": "finite metadata and existing Q5 bound enforced"
+    },
+    {
+      "id": "A07",
+      "kind": "data_preservation",
+      "status": "FIXED",
+      "object": "pair runner",
+      "counterexample": "direct helper recursively deleted previous work; unknown method dispatched CSS; absent backend escaped census",
+      "correction": "nonempty pair dirs refused, explicit method guard, environment failures retained"
+    },
+    {
+      "id": "A08",
+      "kind": "false_admission",
+      "status": "FIXED",
+      "object": "persisted native verifier report",
+      "counterexample": "stdout PASS with missing/failed C10/C11 or incorrect n/C3 applicability admitted",
+      "correction": "cross-check full persisted gates and applicability"
+    }
+  ],
+  "verification": {
+    "python_generator": "91 passed (7.35s)",
+    "native_focused": "29 passed (2.14s)",
+    "native_full": "357 passed,9 skipped (28.69s)",
+    "exact_head_ci": "pending publication; final run URL belongs in PR metadata"
+  },
+  "scope_limits": [
+    "no tolerance relaxation",
+    "no raw EOS mutation",
+    "phase labels are not abundance composition",
+    "branch secants do not certify continuous interpolants",
+    "Yq=0 is an implementation scope, not general neutrality",
+    "sampled branchwise first-law/causality remains unresolved",
+    "Maxwell unequal mass-pair source admission remains blocked",
+    "SPG source convexity / repeated reconstructions unresolved",
+    "CSS to Cowling adapter and elastic crust unresolved",
+    "9 frontend/pipeline source-dependent skips remain"
+  ],
+  "environment": {
+    "local": "Python3.12;scipy1.17.0;numpy2.3.5;gfortran unavailable",
+    "native": "isolated /tmp/NS_Cowling_audit_20261115_d90d3dc on authorized cosmosapjw device;gfortran build;Python3.13 scipy1.17.0 numpy2.4.2",
+    "user_worktree": "/home/cosmosapjw/Dropbox/NS_Cowling observed dirty at9179edda; not changed"
+  },
+  "references": [
+    {
+      "url": "https://compose.obspm.fr/download/pdf/manual_v3.00.pdf",
+      "actual_version": "3.01",
+      "date": "2022-04-01",
+      "sections": [
+        "4.1.2 equations4.5-4.9",
+        "4.2.2"
+      ]
+    },
+    {
+      "url": "https://arxiv.org/html/1302.4732v3",
+      "scope": "CSS exact first law; Seidov small-core onset only"
+    }
+  ],
+  "symbolic_checks": {
+    "tool": "Wolfram",
+    "CSS_residuals": {
+      "dP_dmu_minus_n": 0,
+      "epsilon_plus_P_minus_mu_n": 0,
+      "dP_depsilon_minus_s": 0
+    },
+    "source_discovery": [
+      "Exa",
+      "Parallel",
+      "SciSpace"
+    ]
+  }
+}

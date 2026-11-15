@@ -362,3 +362,95 @@ def test_failure_taxonomy_separates_provenance_contract_physics_and_implementati
     assert adm.classify_failure("readback", "row 3 Q1 mismatch", None) == "implementation"
     assert adm.classify_failure("admission", "css_core_continuity", None) == "admission"
     assert adm.classify_failure("css", "something entirely new", None) == "unclassified"
+
+
+@pytest.mark.parametrize("row_index", [0, -1])
+def test_css_rejects_nonfinite_retained_source_row(row_index):
+    report, raw = _css_case()
+    rows = adm.rows_from_table(raw, META)
+    rows[row_index]["P"] = math.nan
+    _failed(adm.admit_css(report, rows, META), "serialized_physical_rows")
+
+
+def test_css_rejects_retained_core_instability():
+    report, raw = _css_case()
+    raw[-1], raw[-2] = raw[-2], raw[-1]
+    _failed(adm.admit_css(report, adm.rows_from_table(raw, META), META), "core_branch_stable")
+
+
+def test_css_rejects_out_of_order_analytic_bridge_rows():
+    report, raw = _css_case()
+    hi = report["css_transition_high_index"]
+    raw[hi + 2], raw[hi + 3] = raw[hi + 3], raw[hi + 2]
+    _failed(adm.admit_css(report, adm.rows_from_table(raw, META), META), "css_branch_stable")
+
+
+def test_css_rejects_serialized_q3_euler_violation():
+    report, raw = _css_case()
+    raw[1][3] += 0.01
+    _failed(adm.admit_css(report, adm.rows_from_table(raw, META), META), "serialized_euler_mu")
+
+
+def test_css_requires_native_minimum_bridge_row_count():
+    report, raw = _css_case()
+    hi, core = report["css_transition_high_index"], report["css_core_bridge_index"]
+    del raw[hi + 1:core]
+    report.update(n_bridge=0, css_core_bridge_index=hi + 1, n=len(raw))
+    _failed(adm.admit_css(report, adm.rows_from_table(raw, META), META), "row_indices_consistent")
+
+
+@pytest.mark.parametrize("bad_value", [None, "invalid", [], {}])
+def test_css_malformed_report_speed_is_rejected_without_crashing(bad_value):
+    report, raw = _css_case()
+    report["cs2_left"] = bad_value
+    result = adm.admit_css(report, adm.rows_from_table(raw, META), META)
+    assert result["status"] == "REJECTED"
+
+
+def test_css_tiny_report_speed_rejects_overflowing_extrapolation():
+    report, raw = _css_case()
+    for key in adm._SPEED_KEYS:
+        report[key] = 1.0e-300
+    result = adm.admit_css(report, adm.rows_from_table(raw, META), META)
+    assert result["status"] == "REJECTED"
+
+
+@pytest.mark.parametrize("changes", [{"mn": math.nan}, {"mn": 0}, {"il": 0.5}, {"il": 2}, {"charge_fraction_grid": math.nan}])
+def test_rows_reject_invalid_normalization_metadata(changes):
+    meta = dict(META, **changes)
+    with pytest.raises(ValueError):
+        adm.rows_from_table([_row(0.1, 1.0, 94.0)], meta)
+
+
+def test_rows_reject_nonfinite_unused_thermodynamic_column():
+    raw = _row(0.1, 1.0, 94.0)
+    raw[2] = math.nan  # entropy must not disappear during projection to (n,P,eps)
+    with pytest.raises(ValueError):
+        adm.rows_from_table([raw], META)
+
+
+def test_maxwell_rejects_inverted_report_sound_speed_bounds():
+    report, raw = _maxwell_case()
+    report["min_cs2_high"] = 0.9
+    report["max_cs2_high"] = -0.2
+    _failed(adm.admit_maxwell(report, adm.rows_from_table(raw, META), META), "report_branch_sound_speeds")
+
+
+@pytest.mark.parametrize("corruption", ["duplicate_header", "extra_cell", "missing_cell"])
+def test_admission_rejects_malformed_csv_schema_without_crashing(tmp_path, corruption):
+    report, rows = _css_case()
+    csv_path, nml_path = tmp_path / "eos_data.csv", tmp_path / "eos_data.nml"
+    header = list(HEADER)
+    if corruption == "duplicate_header":
+        header.append("Q1")
+        rows = [r + [r[1]] for r in rows]
+    elif corruption == "extra_cell":
+        rows[0].append(123)
+    else:
+        rows[0].pop()
+    with csv_path.open("w", newline="", encoding="utf-8") as fh:
+        writer = csv.writer(fh)
+        writer.writerow(header)
+        writer.writerows(rows)
+    nml_path.write_text(f"&metadata\nmn={MN}\nil=1\ncharge_fraction_grid=0\n/\n")
+    _failed(adm.admit_match_report("css", report, csv_path, nml_path), "serialized_rows_readable")

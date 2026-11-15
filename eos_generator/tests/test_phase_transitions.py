@@ -26,6 +26,82 @@ def test_maxwell_exact_coexistence_and_roundtrip(tmp_path):
     rep=check_consistency(rr.data,verbose=False)
     assert rep['C1']['pass_'] and rep['C2']['pass_'] and rep['C6']['pass_']
 
+
+def _narrow_maxwell_pair(*, separation=.01, offset=0.0):
+    """Two analytic causal phases; Delta P=1e-4*((mu-1050)^2-separation^2)+offset."""
+    mu = np.linspace(1000.0, 1100.0, 101)
+    x = mu - 1000.0
+    n_low = .1 + .002*x
+    p_low = 10.0 + .1*x + .001*x*x
+    n_high = n_low - .0002*(x-50.0)
+    p_high = p_low - (.0001*((x-50.0)**2-separation**2) + offset)
+    def phase(n, p):
+        z = np.zeros_like(n)
+        q7 = (mu*n-p)/n/939.0 - 1.0
+        return EOSData(nb=n, mn=939.0, mp=939.0, Q1=p/n, Q2=z,
+            Q3=mu/939.0-1.0, Q4=z, Q5=z, Q6=q7, Q7=q7, q_extra=z,
+            Iphase=np.zeros(len(n), int), Yn=z, Yp=z, Ye=z, Ymu=z,
+            Aav=z, Zav=z, Yh=z, composition_available=False, beta_equilibrated=True)
+    return phase(n_low, p_low), phase(n_high, p_high)
+
+
+@pytest.mark.parametrize('mu_samples', [2, 800, 10001])
+def test_maxwell_narrow_coexistence_pair_is_not_lost_by_scan_resolution(mu_samples):
+    low, high = _narrow_maxwell_pair()
+    with pytest.raises(ValueError, match='2 coexistence roots.*explicit'):
+        build_maxwell_eos(low, high, mu_samples=mu_samples)
+    result = build_maxwell_eos(low, high, mu_samples=mu_samples, crossing_index=0)
+    assert result.metadata['coexistence_root_count'] == 2
+    assert result.transition['muB_MeV'] == pytest.approx(1049.99, abs=3e-7)
+    assert result.transition['delta_eps_MeV_fm3'] > 0.0
+    assert result.metadata['global_pressure_dominance_validated'] is False
+    assert result.metadata['coexistence_scope'] == 'explicitly_selected_interface'
+
+
+def test_maxwell_tangential_contact_is_not_reported_as_absent():
+    low, high = _narrow_maxwell_pair(separation=0.0)
+    with pytest.raises(ValueError, match='tangential|resolved positive density jump'):
+        build_maxwell_eos(low, high)
+
+
+def test_maxwell_identical_pressure_interval_is_not_an_isolated_root():
+    low, _ = _narrow_maxwell_pair()
+    with pytest.raises(ValueError, match='non-isolated'):
+        build_maxwell_eos(low, low)
+
+
+def test_maxwell_near_miss_has_no_coexistence_root():
+    low, high = _narrow_maxwell_pair(separation=0.0, offset=1e-7)
+    with pytest.raises(ValueError, match='no P_low'):
+        build_maxwell_eos(low, high)
+
+
+@pytest.mark.parametrize('center,separation', [(1050.123, .01), (1050.123, 0.0), (1100.0, 0.0)])
+def test_maxwell_isolator_union_knots_interior_and_final_endpoint(center, separation):
+    from compose_eos.phase_transitions import (
+        _thermodynamic_pressure_from_density, _maxwell_pressure_equality_roots)
+    mu_low = np.linspace(1000.0, 1100.0, 37)
+    mu_high = np.linspace(1000.0, 1100.0, 43)
+    def source(mu, high):
+        x = mu-1000.0
+        n = .1+.002*x
+        p = 10.0+.1*x+.001*x*x
+        if high:
+            n = n-.0002*(mu-center)
+            p = p-.0001*((mu-center)**2-separation**2)
+        ns, ps, offset = _thermodynamic_pressure_from_density(mu, n, p)
+        return ns, lambda value: ps(value)+offset
+    nl, pl = source(mu_low, False)
+    nh, ph = source(mu_high, True)
+    roots = _maxwell_pressure_equality_roots(nl, nh, pl, ph, 1000.0, 1100.0)
+    if separation:
+        assert [r[0] for r in roots] == pytest.approx([center-separation, center+separation], abs=3e-7)
+        assert not any(r[1] for r in roots)
+    else:
+        assert len(roots) == 1
+        assert roots[0][0] == pytest.approx(center, abs=3e-7)
+        assert roots[0][1]
+
 def test_pressure_corrected_tidal_jump():
     y=tidal_y_jump(2.0,10.0,1.5,1e-3,2e-3)
     expect=2.0-4*np.pi*10**3*2e-3/(1.5+4*np.pi*10**3*1e-3)

@@ -20,11 +20,11 @@ module compose_eos_matching
     integer :: css_transition_low_index=-1, css_transition_high_index=-1
     integer :: css_core_bridge_index=-1
     logical :: seidov_small_core_stable=.false.
-    ! Rest-mass gauge alignment provenance (NSC remediation Phase B).
-    ! dm_mass_gauge_meV = co%mn - cr%mn: additive per-baryon shift applied to
-    ! crust F and mu_B to re-express the crust in the core's neutron rest-mass
-    ! gauge (representation-only; see
-    ! data/remediation/MASS_NORMALIZATION_CONTRACT.json).
+    ! CompOSE normalization preserves physical energy and chemical potentials.
+    ! dm_mass_gauge_meV is retained as a legacy report field: the applied
+    ! physical energy-per-baryon shift is zero. Changing a normalization
+    ! reference only re-encodes Q3--Q7; it cannot add n_B*Delta m to epsilon.
+    ! See data/remediation/MASS_NORMALIZATION_CONTRACT.json.
     ! source_euler_residual_meV = max over RETAINED crust rows of
     ! |mu_B,src - (F_src + P/n_B)|: provider tabulation residual repaired by
     ! the output Q3 re-derivation.
@@ -590,7 +590,7 @@ contains
     logical,intent(out)::ok
     character(len=*),intent(out)::message
     logical,intent(in),optional::require_single_css
-    real(wp)::n1,n2,p1,p2,f1,f2,mu1,mu2,thp,thf,dmcr
+    real(wp)::n1,n2,p1,p2,f1,f2,mu1,mu2,thp,thf
     real(wp)::css_candidate,nb_candidate,de_candidate
     integer::j,k,kcore,imin
     logical::need_css,css_ok
@@ -612,10 +612,9 @@ contains
     endif
     if(kcore==0)then;message='core table has no point at or above n_B=0.045 fm^-3';return;endif
     imin=max(12,cr%n-148);if(imin>cr%n)imin=cr%n
-    dmcr=co%mn-cr%mn
     do j=cr%n,imin,-1
-      n1=cr%nb(j);p1=n1*cr%q(1,j);f1=(cr%q(6,j)+1._wp)*cr%mn+dmcr
-      mu1=(cr%q(3,j)+1._wp)*cr%mn+dmcr
+      n1=cr%nb(j);p1=n1*cr%q(1,j);f1=(cr%q(6,j)+1._wp)*cr%mn
+      mu1=(cr%q(3,j)+1._wp)*cr%mn
       do k=kcore,co%n
         n2=co%nb(k);p2=n2*co%q(1,k);f2=(co%q(6,k)+1._wp)*co%mn
         mu2=(co%q(3,k)+1._wp)*co%mn
@@ -669,7 +668,7 @@ contains
     character(len=*),intent(out)::status
     real(wp),allocatable::u(:),nb(:),p(:),f(:),mu(:),q(:),cs(:),museq(:)
     real(wp),allocatable::ud(:),nbd(:),pd(:),fd(:),mud(:),qd(:),csd(:)
-    real(wp)::nbar,qbar,cs1,cs2,dmcr,muq1,muq2,su,ff,qq
+    real(wp)::nbar,qbar,cs1,cs2,muq1,muq2,su,ff,qq
     real(wp)::css_cs2,css_nb_high,css_delta_eps,css_p_t,css_mu_t,css_f_high
     real(wp)::css_eps_low,css_eps_high,css_critical,css_mu_core,css_f_core
     real(wp)::css_source_cs1,css_source_cs2
@@ -687,11 +686,21 @@ contains
     endif
     call validate_eos(cr,ok1,msg);if(.not.ok1)then;status='invalid crust EOS: '//trim(msg);return;endif
     call validate_eos(co,ok1,msg);if(.not.ok1)then;status='invalid core EOS: '//trim(msg);return;endif
+    if(.not.ieee_is_finite(cr%temperature_mev).or..not.ieee_is_finite(co%temperature_mev).or. &
+       .not.ieee_is_finite(cr%charge_fraction_grid).or..not.ieee_is_finite(co%charge_fraction_grid))then
+      status='native matching requires finite thermodynamic metadata';return
+    endif
     if(abs(cr%temperature_mev)>1.e-12_wp.or.abs(co%temperature_mev)>1.e-12_wp)then
       status='native matching currently requires cold T=0 barotropes';return
     endif
     if(.not.cr%beta_equilibrated.or..not.co%beta_equilibrated)then
       status='native matching requires beta-equilibrated cold barotropes';return
+    endif
+    ! A caller-supplied beta flag cannot override the lepton chemical potential.
+    ! For Il=1 the established cold beta-equilibrium gate is |Q5| <= 1e-8.
+    if((cr%il==1.and.maxval(abs(cr%q(5,:)))>1.e-8_wp).or. &
+       (co%il==1.and.maxval(abs(co%q(5,:)))>1.e-8_wp))then
+      status='native matching beta-equilibrium requires vanishing lepton potential Q5';return
     endif
     if(maxval(abs(cr%q(2,:)))>1.e-10_wp.or.maxval(abs(co%q(2,:)))>1.e-10_wp)then
       status='cold T=0 matching requires zero entropy per baryon Q2';return
@@ -721,21 +730,20 @@ contains
     css_f_core=(co%q(6,i2)+1._wp)*co%mn
     css_mu_core=(co%q(3,i2)+1._wp)*co%mn
 
-    dmcr=co%mn-cr%mn
     css_cs2=0._wp;css_nb_high=0._wp;css_delta_eps=0._wp
     css_p_t=cr%nb(i1)*cr%q(1,i1)
     css_f_high=0._wp;css_mu_t=0._wp;css_eps_low=0._wp
     css_eps_high=0._wp;css_critical=0._wp
     if(css_mode)then
-      ! The crust low-side endpoint is re-expressed in the core neutron-mass
-      ! gauge using the established representation-only mass alignment.
-      css_mu_t=(cr%q(6,i1)+1._wp)*cr%mn+dmcr+cr%q(1,i1)
+      ! Decode each source with its own reference mass. The physical crust
+      ! energy and Euler chemical potential are unchanged by normalization.
+      css_mu_t=(cr%q(6,i1)+1._wp)*cr%mn+cr%q(1,i1)
       css_mu_core=css_f_core+co%q(1,i2)
       call solve_single_css_match(cr%nb(i1),co%nb(i2),css_p_t,co%nb(i2)*co%q(1,i2), &
           css_mu_t,css_mu_core,css_cs2,css_nb_high,css_delta_eps,ok1,msg)
       if(.not.ok1)then;status='single-speed CSS candidate rejected: '//trim(msg);return;endif
       css_f_high=css_mu_t-css_p_t/css_nb_high
-      css_eps_low=cr%nb(i1)*((cr%q(6,i1)+1._wp)*cr%mn+dmcr)
+      css_eps_low=cr%nb(i1)*((cr%q(6,i1)+1._wp)*cr%mn)
       css_eps_high=css_nb_high*css_f_high
       css_critical=0.5_wp*css_eps_low+1.5_wp*css_p_t
       if(css_critical<=0._wp)then;status='single-speed CSS has nonpositive Seidov critical jump';return;endif
@@ -754,8 +762,8 @@ contains
         css_p_t/css_nb_high,co%q(1,i2),cs1,cs2,nbd,pd,fd,mud,qd,csd,ok2,msg)
     else
       call construct_bridge(trim(method),ud,cr%nb(i1),co%nb(i2),cr%nb(i1)*cr%q(1,i1), &
-        co%nb(i2)*co%q(1,i2),(cr%q(6,i1)+1._wp)*cr%mn+dmcr,css_f_core, &
-        ((cr%q(6,i1)+1._wp)*cr%mn+dmcr)+cr%q(1,i1),css_mu_core, &
+        co%nb(i2)*co%q(1,i2),(cr%q(6,i1)+1._wp)*cr%mn,css_f_core, &
+        ((cr%q(6,i1)+1._wp)*cr%mn)+cr%q(1,i1),css_mu_core, &
         cr%q(1,i1),co%q(1,i2),cs1,cs2,nbd,pd,fd,mud,qd,csd,ok2,msg)
     endif
     if(.not.ok2)then;status='matching construction failed: '//trim(msg);return;endif
@@ -770,8 +778,8 @@ contains
         cs1,cs2,nb,p,f,mu,q,cs,ok3,msg)
     else
       call construct_bridge(trim(method),u,cr%nb(i1),co%nb(i2),cr%nb(i1)*cr%q(1,i1), &
-        co%nb(i2)*co%q(1,i2),(cr%q(6,i1)+1._wp)*cr%mn+dmcr,css_f_core, &
-        ((cr%q(6,i1)+1._wp)*cr%mn+dmcr)+cr%q(1,i1),css_mu_core, &
+        co%nb(i2)*co%q(1,i2),(cr%q(6,i1)+1._wp)*cr%mn,css_f_core, &
+        ((cr%q(6,i1)+1._wp)*cr%mn)+cr%q(1,i1),css_mu_core, &
         cr%q(1,i1),co%q(1,i2),cs1,cs2,nb,p,f,mu,q,cs,ok3,msg)
     endif
     if(.not.ok3)then;status='matching construction failed on output grid: '//trim(msg);return;endif
@@ -797,7 +805,7 @@ contains
     out%nb(1:nleft)=cr%nb(1:i1)
     out%q(1,1:nleft)=cr%q(1,1:i1)
     do j=1,nleft
-      ff=(cr%q(6,j)+1._wp)*cr%mn+dmcr;qq=cr%q(1,j)
+      ff=(cr%q(6,j)+1._wp)*cr%mn;qq=cr%q(1,j)
       out%q(3,j)=(ff+qq)/out%mn-1._wp;out%q(6,j)=ff/out%mn-1._wp
       out%q(4,j)=cr%q(4,j)*cr%mn/out%mn
     enddo
@@ -841,7 +849,7 @@ contains
     report%i1=i1-1;report%i2=i2-1;report%n_bridge=n_bridge
     report%n1=cr%nb(i1);report%n2=co%nb(i2)
     report%p1=css_p_t;report%p2=co%nb(i2)*co%q(1,i2)
-    report%f1=(cr%q(6,i1)+1._wp)*cr%mn+dmcr;report%f2=css_f_core
+    report%f1=(cr%q(6,i1)+1._wp)*cr%mn;report%f2=css_f_core
     report%mu1=report%f1+cr%q(1,i1);report%mu2=css_mu_core
     if(css_mode)then
       report%cs2_source_left=css_source_cs1;report%cs2_source_right=css_source_cs2
@@ -874,9 +882,9 @@ contains
       case('quintic_P');report%construction_kind='quintic_C2_pressure_chemical_potential_bridge'
       end select
     endif
-    ! Phase B provenance: record the gauge shift and the provider Euler residual
-    ! over the retained crust rows (rows 1..i1); it is not a physical mass correction.
-    report%dm_mass_gauge_meV=dmcr
+    ! No physical energy shift is allowed by a normalization-only operation.
+    ! The provider Euler residual is disclosed separately from that operation.
+    report%dm_mass_gauge_meV=0._wp
     report%source_euler_residual_meV=0._wp
     do j=1,i1
       report%source_euler_residual_meV=max(report%source_euler_residual_meV, &

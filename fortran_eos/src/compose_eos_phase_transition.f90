@@ -457,6 +457,13 @@ contains
       mid=0.5_wp*(a+b)
       call evaluate_difference(low,high,mu_low,p_low,mu_high,p_high,mid,fmid,dn,scale,valid)
       if(.not.valid) return
+      ! Keep an exactly represented root.  Assigning fa=0 below would destroy
+      ! the strict sign bracket and make later iterations drift toward b.
+      if(fmid==0._wp) then
+        root=mid
+        ok=.true.
+        return
+      endif
       if((b-a)<=1.e-13_wp*max(1._wp,abs(mid))) then
         root=mid
         ok=abs(fmid)<=10._wp*pressure_relative_tolerance*scale
@@ -767,9 +774,22 @@ contains
     out%nadd=0
     out%temperature_mev=0._wp
     out%charge_fraction_grid=low%charge_fraction_grid
-    out%composition_file_present=.false.
+    ! The output is one cold thermodynamic slice.  Preserve its actual axis
+    ! values and labels in the native metadata before CompOSE serialization.
+    out%nT=1;out%nYq=1
+    out%t_first=out%iT;out%t_last=out%iT
+    out%yq_first=out%iYq;out%yq_last=out%iYq
+    out%selected_iT=out%iT;out%selected_iYq=out%iYq
+    allocate(out%t_axis(1),out%yq_axis(1))
+    out%t_axis(1)=out%temperature_mev
+    out%yq_axis(1)=out%charge_fraction_grid
+    ! CompOSE stores Iphase in eos.compo.  Emit phase-only rows with
+    ! Npairs=Nquad=0, as supported by the existing native writer/reader.
+    ! No abundance is invented: all allocate_eos presence masks stay false.
+    out%composition_file_present=.true.
     out%composition_available=.false.
     out%beta_equilibrated=.true.
+    out%row_status=1  ! PARTIAL: a phase-only row, with no abundance inventory
 
     k=0
     do i=1,low%n

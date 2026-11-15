@@ -105,6 +105,39 @@ def run_native_readback_verify() -> dict:
     n_readback = readback.n
     readback_n_match = (n_readback == n_input)
 
+    # A matching row count is necessary but not sufficient. Compare the
+    # physical barotrope arrays after the native CompOSE round-trip.
+    comparison_tolerance = 5.0e-13
+    reference_arrays = {
+        "n_B": np.asarray(data.nb, float),
+        "mu_B": np.asarray(data.mub, float),
+        "P": np.asarray(data.p, float),
+        "eps": np.asarray(data.eps, float),
+    }
+    observed_arrays = {
+        "n_B": np.asarray(readback.nb, float),
+        "mu_B": np.asarray(readback.mub, float),
+        "P": np.asarray(readback.p, float),
+        "eps": np.asarray(readback.eps, float),
+    }
+    readback_relative_residuals = {}
+    for name, expected in reference_arrays.items():
+        observed = observed_arrays[name]
+        if observed.shape != expected.shape:
+            readback_relative_residuals[name] = float("inf")
+            continue
+        scale = np.maximum(np.abs(expected), np.finfo(float).tiny)
+        readback_relative_residuals[name] = float(
+            np.max(np.abs(observed - expected) / scale)
+        )
+    readback_value_match = bool(
+        readback_n_match
+        and all(
+            np.isfinite(value) and value <= comparison_tolerance
+            for value in readback_relative_residuals.values()
+        )
+    )
+
     # 3. native C1-C11 verify
     consistency = check_consistency(readback, verbose=False)
     c1_c11_pass = bool(consistency["overall"]["pass_"])
@@ -117,6 +150,9 @@ def run_native_readback_verify() -> dict:
         "input_n_points": int(n_input),
         "readback_n_points": int(n_readback),
         "readback_n_match": bool(readback_n_match),
+        "readback_value_match": bool(readback_value_match),
+        "readback_comparison_relative_tolerance": comparison_tolerance,
+        "readback_relative_residuals": readback_relative_residuals,
         "original_barotrope_n_points": int(len(n_raw)),
         "dedup_dropped_seam_rows": dedup_dropped,
         "dedup_note": "the barotrope has a duplicate n_B at the hadronic->CSS seam; the native CompOSE reader requires strictly increasing n_B, so the duplicate seam row is dropped for the native read-back ONLY. The original BBB_BHF2_m5a_real_css.json is NOT modified.",
@@ -139,18 +175,32 @@ def update_receipt(evidence: dict) -> None:
     proves read-back + C1-C11, not that the barotrope is a CompOSE-generated
     multi-phase EOS)."""
     r = json.loads(RECEIPT.read_text())
-    readback_ok = evidence["native_read_executed"] and evidence["readback_n_match"]
-    verify_ok = evidence["native_verify_executed"] and evidence["c1_c11_overall_pass"]
-    r["verification_backend_truthful"]["native_fortran_compose_readback"] = bool(readback_ok)
-    r["verification_backend_truthful"]["native_c1_c11_verification"] = bool(verify_ok)
+    readback_ok = (
+        evidence["native_write_executed"]
+        and evidence["native_read_executed"]
+        and evidence["readback_n_match"]
+        and evidence["readback_value_match"]
+    )
+    verify_ok = (
+        readback_ok
+        and evidence["native_verify_executed"]
+        and evidence["c1_c11_overall_pass"]
+    )
+    vbt = r["verification_backend_truthful"]
+    vbt["native_fortran_compose_readback"] = bool(readback_ok)
+    vbt["native_c1_c11_verification"] = bool(verify_ok)
+    vbt["native_readback_scope"] = "HEADLINE_BAROTROPE_ONLY"
+    # The file contains a single barotrope and the receipt contains 27 distinct
+    # parameter combinations. No verified case key is derivable from this
+    # artifact alone, so per-case verification remains false until each output
+    # is independently generated, read back, and verified.
+    vbt["native_verified_case_keys"] = []
     r["native_readback_evidence"] = evidence
-    # update the per-result fields too (all 27 cases share the same barotrope
-    # shape, so the native read-back applies to the headline case; record it
-    # at the receipt top level and mark the per-case fields consistently)
-    for key, case in r["results"].items():
+    for case in r["results"].values():
         if "native_fortran_compose_readback" in case:
-            case["native_fortran_compose_readback"] = bool(readback_ok)
-            case["native_c1_c11_verification"] = bool(verify_ok)
+            case["native_fortran_compose_readback"] = False
+            case["native_c1_c11_verification"] = False
+            case["native_verification_status"] = "NOT_VERIFIED_INDIVIDUALLY"
     RECEIPT.write_text(json.dumps(r, indent=1))
 
 

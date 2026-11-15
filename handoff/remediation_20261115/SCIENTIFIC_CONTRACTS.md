@@ -105,9 +105,13 @@ Keep the following claims distinct:
 
 A status is PASS only at the evidence level actually exercised.
 
-## 5. M7 CSS scope
+## 5. M7 CSS: one speed with a crust-side Maxwell jump
 
-The audited M7 CSS method is a smooth constant-sound-speed bridge, not a sharp Maxwell density jump. The representative output is thermo-only, has composition dropped, and is C⁰ at the seam but not C¹. C3/C4 are NOT_AVAILABLE. These are scope declarations, not failures to be hidden.
+The current native M7 `css` method uses one constant (c_s^2\in(0,1]) over the bridge. It has a sharp first-order crust-to-bridge transition with common (P_t,\mu_t), positive (\Delta n) and (\Delta\epsilon=\mu_t\Delta n), then a continuous state-variable match (n_B,P,\epsilon,\mu_B) to the selected core endpoint. The exact scalar matching equations and representative source-row calculation are in `docs/CSS_SINGLE_SPEED_CRUST_JUMP_CONTRACT_20261115.md`.
+
+The core-side state is continuous, but the core source derivative (c_s^2) need not equal the constant bridge value; therefore do not claim C1. Seidov is reported only as a small-core onset criterion, not a complete radial-mode or Cowling phase-interface stability result. Composition is explicitly dropped; C3/C4 are NOT_AVAILABLE, not PASS.
+
+The 2026-11-14 two-segment smooth CSS artifact and its C⁰/C¹ validation are historical evidence for the previous method. Preserve that artifact unchanged and do not treat it as validation of the current single-speed/jump contract.
 
 ## 6. References
 

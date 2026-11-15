@@ -31,7 +31,7 @@ Finish the audit-driven remediation in the manifest. Some safe patches are alrea
 - Never claim native verification for all 27 M5A cases from the single headline barotrope.
 - Never claim composition is preserved by Maxwell v2 while the native v1 kernel returns thermo-only output.
 - Never call the Python Wigner–Seitz mirror a native Fortran end-to-end run.
-- Never call the M7 smooth CSS bridge a sharp Maxwell transition. Its audited scope is thermo-only, C⁰, composition dropped, C3/C4 NOT_AVAILABLE.
+- The current M7 CSS method is a single constant-sound-speed bridge with one sharp first-order crust-side density jump and a continuous state-variable core join. Preserve both transition rows and the jump identity. Do not claim C1 at the core join unless derivative matching is separately verified. Seidov is only a small-core onset criterion, not full radial-mode/Cowling interface stability. Composition remains dropped and C3/C4 are NOT_AVAILABLE.
 - Never claim CI PASS without a fresh workflow run whose `head_sha` equals the final branch HEAD.
 - Do not merge any PR. Do not force-push.
 
@@ -43,6 +43,7 @@ Finish the audit-driven remediation in the manifest. Some safe patches are alrea
 4. Maxwell v2 rejects `composition_available` and `composition_file_present` input with COMPOSITION_UNSUPPORTED, and no longer reports composition as preserved.
 5. Maxwell v2 project root is derived from `__file__`.
 6. APR+CSS audit uses `PchipInterpolator.derivative()` and its ADMITTED verdict now requires branch-interior differential first-law residuals below (10^{-3}).
+7. Native M7 CSS now uses one constant cs2 with a sharp crust-side Maxwell jump and a continuous bridge-core state match. Follow `docs/CSS_SINGLE_SPEED_CRUST_JUMP_CONTRACT_20261115.md`; keep the old two-speed smooth artifact historical.
 
 ## Execution order
 
@@ -59,6 +60,7 @@ export COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran
 python -m pytest -q python_frontend/tests/test_m5a_provenance_correction.py
 python -m pytest -q python_frontend/tests/test_maxwell_v2_composition.py
 python -m pytest -q python_frontend/tests/test_apr_css_maxwell_audit.py
+python -m pytest -q python_frontend/tests/test_native_crust_core_matching.py
 ```
 
 Then run the full workflow test command:
@@ -103,9 +105,9 @@ Otherwise leave the explicit COMPOSITION_UNSUPPORTED behavior in place.
 
 Revalidate raw source hashes and rerun the interval audit. The known Iphase-7 segment has 147 intervals and 99 source secants outside the endpoint density bounds. This is not repaired by changing an interpolator while keeping all source knots fixed. Seek higher-resolution source output or another independently admitted crust model. Do not edit raw EOS tables.
 
-### F. Wigner/Maxwell/CSS scope and receipts
+### F. CSS jump and Wigner/Maxwell receipts
 
-Keep the M7 CSS bridge declared as a thermo-only C⁰ bridge; composition dropped and C3/C4 NOT_AVAILABLE. It is not a sharp Maxwell transition and its seam is not C¹. Keep Seidov limited to the small-core onset criterion. Regenerate any audit receipts only after the final code/CI run and stamp them with the exact final Git HEAD, native executable SHA and source data identities.
+The current M7 CSS output must contain one constant bridge cs2, a crust-side density jump with Delta epsilon = mu_t Delta n, and a state-continuous core join. Do not call the old 2026-11-14 two-speed smooth artifact evidence for the new algorithm. Keep composition dropped and C3/C4 NOT_AVAILABLE. Keep Seidov limited to the small-core onset criterion; do not infer full radial/Cowling interface stability. Verify native CompOSE write/read-back preserves both adjacent transition rows and all physical arrays. Regenerate new versioned receipts only after final code/CI verification and stamp them with exact final Git HEAD, executable SHA and source data identities.
 
 ## TDD and verification rules
 

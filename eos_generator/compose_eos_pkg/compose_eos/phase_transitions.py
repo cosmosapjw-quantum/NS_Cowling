@@ -67,6 +67,9 @@ def _branchwise_first_law_report(mu, p, n, *, samples_per_interval=8):
     dp_dmu = np.asarray(ns(q), dtype=float)
     n_interp = np.asarray(ns(q), dtype=float)
     rel_derivative = np.abs(dp_dmu - n_interp) / np.maximum(np.abs(n_interp), 1e-30)
+    dn_dmu = np.asarray(ns.derivative()(q), dtype=float)
+    with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
+        cs2_thermo = n_interp / (q * dn_dmu)
     p_reconstructed = np.asarray(primitive(mu), dtype=float) + offset
     p_scale = np.maximum(np.maximum(np.abs(p), abs(float(p[0]))), 1e-8)
     p_rel = np.abs(p_reconstructed - p) / p_scale
@@ -74,14 +77,17 @@ def _branchwise_first_law_report(mu, p, n, *, samples_per_interval=8):
     eps_scale = np.maximum(np.abs(eps), 1.0)
     eps_rel = np.abs(eps_reconstructed - eps) / eps_scale
     finite_derivative = (np.isfinite(rel_derivative) & np.isfinite(dp_dmu)
-                         & np.isfinite(n_interp))
+                         & np.isfinite(n_interp) & np.isfinite(dn_dmu)
+                         & np.isfinite(cs2_thermo))
     finite_source = np.isfinite(p_rel) & np.isfinite(eps_rel)
     if not np.all(finite_derivative) or not np.all(finite_source):
         return {"max_relative_residual": float("inf"),
                 "rms_relative_residual": float("inf"),
                 "pressure_reconstruction_max_relative_residual": float("inf"),
                 "energy_reconstruction_max_relative_residual": float("inf"),
-                "min_dP_dmu_fm3": float("nan"), "n_samples": int(q.size)}
+                "min_dP_dmu_fm3": float("nan"), "min_dn_dmu_fm3_per_MeV": float("nan"),
+                "min_cs2_thermodynamic": float("nan"), "max_cs2_thermodynamic": float("inf"),
+                "n_samples": int(q.size)}
     return {
         "max_relative_residual": float(np.max(rel_derivative)),
         "rms_relative_residual": float(np.sqrt(np.mean(rel_derivative ** 2))),
@@ -90,6 +96,9 @@ def _branchwise_first_law_report(mu, p, n, *, samples_per_interval=8):
         "energy_reconstruction_max_relative_residual": float(np.max(eps_rel)),
         "energy_reconstruction_rms_relative_residual": float(np.sqrt(np.mean(eps_rel ** 2))),
         "min_dP_dmu_fm3": float(np.min(dp_dmu)),
+        "min_dn_dmu_fm3_per_MeV": float(np.min(dn_dmu)),
+        "min_cs2_thermodynamic": float(np.min(cs2_thermo)),
+        "max_cs2_thermodynamic": float(np.max(cs2_thermo)),
         "n_samples": int(q.size),
         "samples_per_interval": int(samples_per_interval),
         "identity": "n_B = dP/dmu_B (enforced by integrating interpolated n_B)",
@@ -122,6 +131,18 @@ def _phase_arrays(data: EOSData, *, differential_tolerance=5e-3, differential_sa
             f"epsilon residual {differential['energy_reconstruction_max_relative_residual']:.3e}; "
             f"tolerance {differential_tolerance:.3e})"
         )
+    # The actual Maxwell interpolant is n_B(mu_B) with P obtained by
+    # integration. Check mechanical stability and causality on that same
+    # interpolant between knots, not only on a finite-difference knot stencil.
+    if (differential['min_dn_dmu_fm3_per_MeV'] <= 0
+            or differential['min_cs2_thermodynamic'] <= 0
+            or differential['max_cs2_thermodynamic'] > 1.0 + 1e-6):
+        raise ValueError(
+            'thermodynamic n_B(mu_B) interpolant is unstable or acausal '
+            f"(min dn/dmu={differential['min_dn_dmu_fm3_per_MeV']:.3e}, "
+            f"c_s^2 range=[{differential['min_cs2_thermodynamic']:.6g},"
+            f"{differential['max_cs2_thermodynamic']:.6g}])"
+        )
     # A sharp coexistence construction is only meaningful when each input is
     # already a stable, causal, cold barotrope with its first-law identity.
     euler=mu*n-p
@@ -133,6 +154,14 @@ def _phase_arrays(data: EOSData, *, differential_tolerance=5e-3, differential_sa
     from .consistency import check_consistency
     rep=check_consistency(data,verbose=False)
     rep['C12'] = {'pass_': True, **differential}
+    rep['C13'] = {
+        'pass_': True,
+        'identity': 'c_s^2 = n_B/(mu_B dn_B/dmu_B)',
+        'max_cs2': differential['max_cs2_thermodynamic'],
+        'min_cs2': differential['min_cs2_thermodynamic'],
+        'min_dn_dmu': differential['min_dn_dmu_fm3_per_MeV'],
+        'sampling': 'same monotone PCHIP n_B(mu_B), between every table interval',
+    }
     for key in ('C1','C2','C6','C10','C11'):
         if not bool(rep[key].get('pass_',False)):
             raise ValueError(f'phase {key} hard gate failed; Maxwell construction requires stable causal source phases')
@@ -223,10 +252,12 @@ def build_maxwell_eos(low_phase: EOSData, high_phase: EOSData, *, low_name='low'
     meta={'schema':'compose-eos-maxwell-v1','method_id':MAXWELL_METHOD_ID,'low_phase':low_name,'high_phase':high_name,
           'coexistence_root_count':len(brackets),'selected_root_index':int(crossing_index),
           'low_energy_identity_residual':elo-source_e_low,'high_energy_identity_residual':epshi_t-source_e_high,
-          'low_source_hard_gates':{k:bool(repl[k].get('pass_',False)) for k in ('C1','C2','C6','C10','C11','C12')},
-          'high_source_hard_gates':{k:bool(reph[k].get('pass_',False)) for k in ('C1','C2','C6','C10','C11','C12')},
+          'low_source_hard_gates':{k:bool(repl[k].get('pass_',False)) for k in ('C1','C2','C6','C10','C11','C12','C13')},
+          'high_source_hard_gates':{k:bool(reph[k].get('pass_',False)) for k in ('C1','C2','C6','C10','C11','C12','C13')},
           'low_source_differential_first_law':repl['C12'],
           'high_source_differential_first_law':reph['C12'],
+          'low_source_thermodynamic_causality':repl['C13'],
+          'high_source_thermodynamic_causality':reph['C13'],
           'transition':transition,'phase_ids':phase_ids.tolist(),
           'output_pressure_interpolation':'P(mu_B)=P(mu_0)+integral PchipInterpolator(mu_B,n_B) dmu_B',
           'output_energy_identity':'epsilon=mu_B*n_B-P, enforced at every exported row',

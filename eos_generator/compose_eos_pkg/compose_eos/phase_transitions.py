@@ -51,7 +51,7 @@ def _thermodynamic_pressure_from_density(mu, n, p):
     return ns, primitive, offset
 
 
-def _branchwise_first_law_report(mu, p, n, *, samples_per_interval=8):
+def _branchwise_first_law_report(mu, p, n, eps, *, samples_per_interval=8):
     """Audit thermodynamic-potential reconstruction on the input grid.
 
     The representation uses n_B(mu_B) as the primary PCHIP and integrates it.
@@ -117,7 +117,7 @@ def _phase_arrays(data: EOSData, *, differential_tolerance=5e-3, differential_sa
             or int(differential_samples_per_interval) < 2):
         raise ValueError('invalid branchwise first-law validation configuration')
     differential = _branchwise_first_law_report(
-        mu, p, n, samples_per_interval=int(differential_samples_per_interval)
+        mu, p, n, eps, samples_per_interval=int(differential_samples_per_interval)
     )
     if (not np.isfinite(differential['pressure_reconstruction_max_relative_residual'])
             or not np.isfinite(differential['energy_reconstruction_max_relative_residual'])

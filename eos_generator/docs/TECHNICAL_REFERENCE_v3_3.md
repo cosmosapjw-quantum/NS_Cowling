@@ -8,6 +8,24 @@ $$P=n_B^2\\frac{dF}{dn_B},\\qquad \\mu_B=F+\\frac{P}{n_B},\\qquad \\epsilon=n_BF
 
 Hence `d epsilon/d n_B = mu_B` and `c_s^2=dP/d epsilon`. Thermodynamic stability requires positive compressibility; relativistic causality requires `0 <= c_s^2 <= 1`.
 
+## Single-speed CSS core-crust bridge
+
+The core-crust matcher `method="css"` uses one constant (s=c_s^2\in(0,1]) over the entire bridge. Let the crust-side endpoint be ((n_c,P_t,\mu_t)) and the continuous high-density core endpoint be ((n_2,P_2,\mu_2)). The bridge-side start density is
+
+$n_b=n_2(\mu_t/\mu_2)^{1/s}.$
+
+The pressure integral gives
+
+$P_2-P_t=n_2\mu_2\frac{s}{1+s}\left[1-(\mu_t/\mu_2)^{1+1/s}\right].$
+
+The scalar equation is solved only on (0<s\le1), and a physical solution additionally requires (n_b>n_c). At the crust--bridge interface (P,\mu_B) are continuous while (n_B,\epsilon) jump, with
+
+$\Delta\epsilon=\mu_t(n_b-n_c).$
+
+At the bridge--core endpoint (n_B,P,\epsilon,\mu_B) are continuous. This path is thermo-only and does not infer composition. It is not yet exported through the phase-aware TOV sidecar path; the smooth `match --tov` CLI therefore rejects it. Any Seidov result refers only to the small-core onset criterion.
+
+This is distinct from `build_maxwell_css_eos`, which constructs a sharp transition into a phenomenological CSS high-density phase.
+
 ## Sharp Maxwell transition
 
 For locally neutral phases H and Q, coexistence is `P_H(mu_t)=P_Q(mu_t)=P_t`. The energy density and baryon density jump while `P` and `mu_B` are continuous. At coexistence, `Delta epsilon=mu_t Delta n_B`.

@@ -796,7 +796,7 @@
       "receipt": "data/receipts/eos390_m6/E390-06_NATIVE_TOV_LOVE_RECEIPT.json",
       "remaining_acceptance": [
         "RESOLVED_20261114: GitHub CI build/test pass for compose_eos_tov -- native unit test test_tov_love.f90 added to fortran_eos/tests/ and wired into .github/workflows/fortran-eos-ci.yml (commit 669ec9d). Local: native TOV test PASS (causal barotrope, stable-branch monotone, k2 in [0,1], fail-closed).",
-        "compose_cowling runtime-compile path resolution (separate subscope, REMAINS)"
+        "RESOLVED_20261114: compose_cowling runtime-compile path resolution + end-to-end spectrum -- solve_cowling_spectrum defaults fixed (target_mass_kg=0 skips mass-closure bisection; frequency brackets default to Fortran f=[2000,3000]/p1=[6500,8000] Hz). 3 end-to-end tests added (test_cowling_end_to_end.py): causal BBB_BHF2 yields f~2.7kHz + p1~7.5kHz; f-mode monotone in central pressure; superluminal APR_APR rejected with causality error. CI step 'Verify Cowling runtime-compile path' + 'Run Cowling end-to-end spectrum tests' added. Runtime-compile of 67-file oscillation_source tree produces case_driver + cell_solve. Local: 207 pytest passed (was 204; +3 Cowling)."
       ],
       "resolved_acceptance_20261114": {
         "commit": "669ec9d",
@@ -805,6 +805,18 @@
         ],
         "ci_step": "Run native Fortran TOV-Love tests (E390-06/M6)",
         "verdict": "CI acceptance for compose_eos_tov satisfied by native unit test + CI step"
+      },
+      "resolved_acceptance_20261114_cowling": {
+        "commit": "pending",
+        "tests": [
+          "python_frontend/tests/test_cowling_end_to_end.py"
+        ],
+        "ci_steps": [
+          "Verify Cowling runtime-compile path (E390-06/M6)",
+          "Run Cowling end-to-end spectrum tests (E390-06/M6)"
+        ],
+        "solver_fix": "solve_cowling_spectrum target_mass_kg default 0, frequency brackets default to Fortran f/p1 bands",
+        "verdict": "compose_cowling runtime-compile path resolved + end-to-end spectrum physics verified on causal EOS"
       }
     },
     {

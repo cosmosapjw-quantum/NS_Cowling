@@ -131,11 +131,24 @@ def _node_count(path:Path,column:str)->int|None:
     return int(np.count_nonzero(values[1:]*values[:-1]<0))
 
 
-def solve_cowling_spectrum(eos:EOSData | str | Path,pc_pa:float,frequency_lo_hz,frequency_hi_hz,*,
-                           target_mass_kg:float=2.644606257493485e30,p_cut_pa:float|None=None,
+def solve_cowling_spectrum(eos:EOSData | str | Path,pc_pa:float,frequency_lo_hz=(2000.0,6500.0),
+                           frequency_hi_hz=(3000.0,8000.0),*,
+                           target_mass_kg:float=0.0,p_cut_pa:float|None=None,
                            match_index:int=72,rtol:float=1e-9,mode_rtol:float=1e-9,
                            step_cap:float=0.05,mass_rtol:float=1e-10,
                            residual_tol:float=1e-6)->dict:
+    """Solve the Cowling f- and p1-mode spectrum on the given cold beta-equilibrated EOS.
+
+    By default the spectrum is computed directly at ``pc_pa`` (``target_mass_kg=0``
+    skips the mass-closure bisection). Pass an explicit ``target_mass_kg>0`` to
+    instead bisect the central pressure until the TOV mass closes on that target.
+
+    Default frequency brackets follow the Fortran cell_solve defaults so that a
+    causal beta-equilibrated EOS yields both the f-mode (~2-3 kHz) and the p1-mode
+    (~7-8 kHz) without caller tuning. ``frequency_lo_hz``/``frequency_hi_hz`` are
+    ``(f_low, p1_low)``/``(f_high, p1_high)`` Hz; the f-mode is bracketed in
+    ``[f_low, f_high]`` and the p1-mode in ``[p1_low, p1_high]``.
+    """
     _,cell_solve=_compile_solver()
     with tempfile.TemporaryDirectory(prefix='compose-cowling-') as td0:
         td=Path(td0);table=_normalised_file(eos,td)

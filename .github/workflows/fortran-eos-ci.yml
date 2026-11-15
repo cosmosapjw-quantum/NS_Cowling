@@ -145,6 +145,24 @@ jobs:
             -o build/compose_eos_fortran/test_tov_love
           build/compose_eos_fortran/test_tov_love
 
+      - name: Verify Cowling runtime-compile path (E390-06/M6)
+        run: |
+          pip install -e python_frontend >/dev/null 2>&1 || true
+          python - <<'PY'
+          import os, sys
+          sys.path.insert(0, "python_frontend")
+          os.environ.setdefault("COMPOSE_EOS_FORTRAN_ROOT", os.getcwd())
+          from compose_cowling.solver import _compile_solver
+          case_driver, cell_solve = _compile_solver()
+          assert case_driver.is_file() and cell_solve.is_file(), \
+              "Cowling runtime-compile did not produce case_driver + cell_solve"
+          print("PASS Cowling runtime-compile: case_driver + cell_solve built")
+          PY
+
+      - name: Run Cowling end-to-end spectrum tests (E390-06/M6, skips if M0 not staged)
+        run: |
+          python -m pytest -q python_frontend/tests/test_cowling_end_to_end.py
+
       - name: Diagnose local-agent handoff document checkout bytes
         run: |
           git check-attr -a -- docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md

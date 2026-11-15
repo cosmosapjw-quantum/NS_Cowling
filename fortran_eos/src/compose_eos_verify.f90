@@ -51,7 +51,8 @@ contains
     type(verify_report_t),intent(out)::report
     real(wp),intent(in),optional::algebraic_tolerance,max_log_step,cs2_tolerance,composition_tolerance
     real(wp)::atol,dxmax,cstol,comptol,muqv,mulmax
-    real(wp)::jump_dn,jump_deps,jump_mu,jump_pressure_rel,jump_mu_rel,jump_identity_rel,jump_scale
+    real(wp)::jump_dn,jump_deps,jump_mu,jump_mu_low,jump_mu_high
+    real(wp)::jump_pressure_rel,jump_mu_rel,jump_identity_rel,jump_scale
     real(wp),allocatable::yl(:),dp_m(:),dmub_m(:),p_m(:),nb_m(:),df_m(:),deps_m(:),mub_m(:),cs2_m(:),csfl_m(:)
     real(wp),allocatable::p(:),f(:),fb(:),eps(:),mub(:),muq(:),mul(:),x(:)
     real(wp),allocatable::dp(:),dmub(:),df(:),deps(:),r(:),cs2(:),csfl(:)
@@ -179,8 +180,15 @@ contains
          jump_dn>1.e-10_wp*max(abs(eos%nb(i)),abs(eos%nb(i+1)),tiny(1._wp)))then
         jump_pressure_rel=abs(p(i+1)-p(i))/max(abs(p(i)),abs(p(i+1)),tiny(1._wp))
         if(jump_pressure_rel<=1.e-10_wp)then
-          jump_mu=0.5_wp*(mub(i)+mub(i+1))
-          jump_mu_rel=abs(mub(i+1)-mub(i))/max(abs(mub(i)),abs(mub(i+1)),tiny(1._wp))
+          ! Use the physical Euler chemical potential, matching the Maxwell
+          ! constructor's mu_grid=(epsilon+P)/n_B. For CompOSE Il=0, Q3 stores
+          ! mu_Euler - Yq*mu_q, so the raw Q3-derived array is not the correct
+          ! chemical potential for Delta epsilon = mu_t Delta n_B.
+          jump_mu_low=(eps(i)+p(i))/eos%nb(i)
+          jump_mu_high=(eps(i+1)+p(i+1))/eos%nb(i+1)
+          jump_mu=0.5_wp*(jump_mu_low+jump_mu_high)
+          jump_mu_rel=abs(jump_mu_high-jump_mu_low)/ &
+            max(abs(jump_mu_low),abs(jump_mu_high),tiny(1._wp))
           jump_scale=max(abs(jump_deps),abs(jump_mu*jump_dn),tiny(1._wp))
           jump_identity_rel=abs(jump_deps-jump_mu*jump_dn)/jump_scale
           report%max_thermodynamic_jump_relative_residual= &

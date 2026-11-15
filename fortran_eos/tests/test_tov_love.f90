@@ -226,6 +226,23 @@ contains
       write(*,'(a)')'PASS thermo-only Maxwell jump detected and derivative stencil masked'
     endif
 
+    ! CompOSE Il=0 stores Q3=mu_Euler-Yq*mu_q. The jump detector must
+    ! recover mu_Euler=(epsilon+P)/n_B, not compare the raw Q3 field.
+    eos%il=0
+    eos%charge_fraction_grid=0.1_wp
+    eos%q(4,:)=0.2_wp
+    eos%q(3,:)=eos%q(3,:)-eos%charge_fraction_grid*eos%q(4,:)
+    call check_consistency(eos,report)
+    if(.not.report%overall.or.report%thermodynamic_jump_boundaries/=1.or. &
+       report%thermodynamic_jump_failures/=0)then
+      write(*,'(a,l1,a,i0,a,i0)')'FAIL Il=0 thermo-only Maxwell jump overall=', &
+        report%overall,' jump_boundaries=',report%thermodynamic_jump_boundaries, &
+        ' jump_failures=',report%thermodynamic_jump_failures
+      failures=failures+1
+    else
+      write(*,'(a)')'PASS Il=0 charge-shifted Q3 uses Euler mu for jump closure'
+    endif
+
     ! Corrupt only the high-side energy row. The transition is still at common
     ! pressure, but the Euler and latent-energy identities must reject it.
     eos%q(7,8)=eos%q(7,8)+1.e-3_wp

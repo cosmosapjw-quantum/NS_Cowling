@@ -41,9 +41,18 @@
     "do_not_call_m7_css_bridge_a_sharp_maxwell_transition": true,
     "do_not_call_c0_seam_c1": true,
     "do_not_merge_any_pull_request": true,
-    "do_not_force_push": true
+    "do_not_force_push": true,
+    "css_method_contract": {
+      "bridge_sound_speed": "single_constant_cs2",
+      "crust_bridge_interface": "first_order_density_and_energy_jump",
+      "core_bridge_interface": "continuous_n_B_P_epsilon_mu_B",
+      "composition": "thermo_only_composition_dropped",
+      "seidov_scope": "small_core_onset_criterion_only",
+      "c1_claim": "not_claimed_without_source_derivative_match",
+      "historical_artifact": "2026-11-14 two-segment smooth CSS output remains immutable historical evidence"
+    }
   },
-  "patch_state": "PATCHED_CI_PASS_WITH_SCIENTIFIC_BLOCKERS_RETAINED",
+  "patch_state": "CSS_SINGLE_SPEED_CRUST_JUMP_PATCHED_CI_PENDING",
   "red_green_evidence": {
     "tests_committed_before_implementation": true,
     "red_failure_observed_in_host_session": false,
@@ -235,12 +244,21 @@
     {
       "id": "M7-CSS-01",
       "priority": "P2",
-      "status": "SCOPED_PASS_C0_THERMO_ONLY",
-      "title": "Preserve the declared M7 CSS scope",
+      "status": "PATCHED_SINGLE_SPEED_JUMP_CI_PENDING",
+      "title": "Use one constant CSS sound speed with a crust-side first-order jump and continuous core join",
       "acceptance": [
-        "Not a sharp Maxwell transition",
-        "Composition dropped and C3/C4 NOT_AVAILABLE",
-        "C0 seam only; do not describe as C1"
+        "exactly one constant cs2 across all CSS bridge samples",
+        "crust-side adjacent rows share P_t and mu_t but have positive Delta n and Delta epsilon",
+        "Delta epsilon = mu_t Delta n within the declared roundoff tolerance",
+        "CSS bridge joins continuously in n_B, P, epsilon and mu_B to the selected core endpoint",
+        "Seidov is reported only as small-core onset criterion",
+        "thermo-only scope and composition dropping are explicit",
+        "do not claim C1 at core join unless the source endpoint derivative matches"
+      ],
+      "non_claims": [
+        "not a composition-preserving EOS",
+        "not a full radial-mode or Cowling phase-interface stability calculation",
+        "not C1 at the core join unless separately demonstrated"
       ]
     },
     {
@@ -252,6 +270,41 @@
         "Use the final git HEAD in every new receipt",
         "Record exact commands, executable hashes and source hashes",
         "Keep old receipts immutable or version them; do not backdate or silently overwrite historical evidence"
+      ]
+    },
+    {
+      "id": "CSS-SINGLE-SPEED-02",
+      "priority": "P1",
+      "status": "PATCHED_PENDING_CI",
+      "title": "Verify one-speed CSS with first-order crust jump and continuous core endpoint",
+      "files": [
+        "fortran_eos/src/compose_eos_matching.f90",
+        "fortran_eos/app/compose_eos_fortran.f90",
+        "python_frontend/compose_eos/api.py",
+        "python_frontend/tests/test_native_crust_core_matching.py",
+        "scripts/m7/m7_batch_orchestrator.py",
+        "docs/CSS_SINGLE_SPEED_CRUST_JUMP_CONTRACT_20261115.md"
+      ],
+      "required_commands": [
+        "bash fortran_eos/build.sh build/compose_eos_fortran",
+        "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python -m pytest -q python_frontend/tests/test_native_crust_core_matching.py",
+        "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python -m pytest -q python_frontend/tests pipeline/tests"
+      ],
+      "acceptance": [
+        "Fortran build succeeds",
+        "the native test executes match-core css on real staged GPPVA_FSU2H and GM_GM1 tables",
+        "report construction_kind is css_single_speed_with_crust_density_jump",
+        "all bridge c_s^2 values are identical within 1e-11 relative tolerance",
+        "P and mu match across the two crust/bridge transition rows",
+        "n and epsilon have positive jumps",
+        "Delta epsilon = mu_t Delta n holds",
+        "bridge/core selected endpoint agrees in n_B,P,epsilon,mu_B",
+        "native CompOSE read-back retains both adjacent transition rows and numerical arrays",
+        "no C1 or full mode-stability claim is introduced"
+      ],
+      "unresolved": [
+        "Cowling/TOV solver phase-interface jump treatment must be assessed before using this output for oscillation spectra",
+        "M7 batch receipts and CSS cohorts must be regenerated with a new versioned output directory after exact-HEAD CI"
       ]
     }
   ],
@@ -413,6 +466,11 @@
         }
       }
     },
-    "important_interpretation": "Workflow success means build, tests and artifact-construction steps succeeded. It does not mean every generated component EOS passed physical validation; preserve the per-model C2/C10 results above."
+    "important_interpretation": "Workflow success means build, tests and artifact-construction steps succeeded. It does not mean every generated component EOS passed physical validation; preserve the per-model C2/C10 results above.",
+    "css_change": {
+      "status": "PENDING",
+      "reason": "All single-speed CSS implementation and handoff changes were added after the last successful CI run 43676024772.",
+      "required": "A fresh workflow run must complete with head_sha equal to the final branch HEAD."
+    }
   }
 }

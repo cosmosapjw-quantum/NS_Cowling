@@ -150,6 +150,8 @@ def test_native_css_is_single_speed_with_crust_side_first_order_jump():
     assert report["cs2_right"] == pytest.approx(cs2, rel=1e-11, abs=1e-13)
     assert report["cs2_min"] == pytest.approx(cs2, rel=1e-11, abs=1e-13)
     assert report["cs2_max"] == pytest.approx(cs2, rel=1e-11, abs=1e-13)
+    assert info["dcs2_left"] is None
+    assert info["dcs2_left_semantics"] == "not_applicable_across_first_order_density_jump"
 
     # The only sharp interface is crust -> bridge: P and mu are continuous,
     # while n and epsilon jump according to Delta epsilon = mu_t Delta n.
@@ -175,7 +177,11 @@ def test_native_css_is_single_speed_with_crust_side_first_order_jump():
     assert matched.nb[i_core] == pytest.approx(core.nb[source_core_index], rel=1e-12)
     assert matched.p[i_core] == pytest.approx(core.p[source_core_index], rel=2e-10)
     assert matched.eps[i_core] == pytest.approx(core.eps[source_core_index], rel=2e-8)
-    assert matched.mub[i_core] == pytest.approx(core.mub[source_core_index], rel=2e-10)
+    mu_core_euler = (
+        (core.Q6[source_core_index] + 1.0) * core.mn
+        + core.Q1[source_core_index]
+    )
+    assert matched.mub[i_core] == pytest.approx(mu_core_euler, rel=2e-10)
     assert info["first_law_relative_residual"] < 5e-9
 
 

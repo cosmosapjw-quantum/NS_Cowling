@@ -134,5 +134,22 @@
       }
     }
   },
-  "note": "This run verified the code-patch HEAD before the subsequent docs-only commit. A new CI run is required for the exact final handoff HEAD."
+  "note": "This run verified the code-patch HEAD before the subsequent docs-only commit. A new CI run is required for the exact final handoff HEAD.",
+  "css_single_speed_change": {
+    "status": "PENDING_CI",
+    "commit_range_after_previous_ci": "CSS_SINGLE_SPEED-IMPLEMENTATION",
+    "description": "The current M7 CSS matcher was changed from a two-segment/two-speed continuous-density bridge to one constant cs2 with a first-order crust-side density jump and a continuous state-variable core join.",
+    "tests_added": [
+      "python_frontend/tests/test_native_crust_core_matching.py::test_native_css_is_single_speed_with_crust_side_first_order_jump"
+    ],
+    "required_verification": [
+      "Fortran build and native match-core CSS integration test",
+      "one cs2 across all bridge samples",
+      "equal Pt and mu_t across adjacent transition rows with positive Delta n and Delta epsilon",
+      "Delta epsilon=mu_t Delta n",
+      "continuous n_B,P,epsilon,mu_B at core endpoint",
+      "CompOSE write/read-back preserves transition rows"
+    ],
+    "note": "Run 43676024772 predates this CSS patch and is not evidence for the new CSS behavior."
+  }
 }

@@ -11,7 +11,7 @@ program compose_eos_fortran
   use compose_eos_matching, only: match_crust_core, match_report_t
   use compose_eos_phase_transition, only: construct_maxwell_transition, maxwell_transition_report_t
   use compose_eos_wigner_seitz, only: wigner_seitz_state_t, reconstruct_wigner_seitz_table, &
-                                       wigner_seitz_output_hash
+                                       wigner_seitz_output_hash, reconstruct_compo_closure_ws
   implicit none
   type(eos_data_t)::eos,out,crust,core,phase_low,phase_high,readback
   type(verify_report_t)::report
@@ -29,7 +29,10 @@ program compose_eos_fortran
   integer::core_first,core_last,expected_source_n,expected_phase
   integer::crust_outer_last,expected_outer_phase,expected_inner_phase
   integer::tov_n_high,tov_n_low,tov_mode
-  integer::ws_n_valid
+  integer::ws_n_valid,ws_reconstructed_rows,ws_receipt_u,ws_receipt_ios
+  real(wp)::ws_max_baryon_res,ws_max_charge_res
+  character(len=16)::ws_hash_hex
+  character(len=16)::ws_beta_str
   real(wp)::cs2_extension,n_max_requested,smooth_sigma,dissolution_tol
   real(wp)::min_ratio_local,best_sel
   real(wp)::cld_sigma_0,cld_b,cld_rho_min,cld_rho_max
@@ -44,7 +47,7 @@ program compose_eos_fortran
   action='';arg1='';arg2='';arg3='';arg4='';arg5='';arg6='';arg7=''
   narg=command_argument_count()
   if(narg<2)then
-    write(*,'(a)')'usage: compose_eos_fortran {rmf-evaluate|read|verify|verify-csv|normalize|write|extract-core|extract-crust|fill-gap|reconstruct-master|causal-complete|match-core|maxwell-transition|cld-reconstruct|tov-love|wigner-seitz} INPUT OUTPUT [OPTIONS]'
+    write(*,'(a)')'usage: compose_eos_fortran {rmf-evaluate|read|verify|verify-csv|normalize|write|extract-core|extract-crust|fill-gap|reconstruct-master|causal-complete|match-core|maxwell-transition|cld-reconstruct|tov-love|wigner-seitz|reconstruct-compo-native} INPUT OUTPUT [OPTIONS]'
     stop 2
   endif
   call get_command_argument(1,action,status=ios)
@@ -543,6 +546,49 @@ program compose_eos_fortran
     else
       call emit_failure('wigner-seitz report write failed: '//trim(status));stop 3
     endif
+  case('reconstruct-compo-native')
+    ! Phase 7 production raw-source-to-native-CompOSE algebraic closure CLI.
+    ! arg1=RAW_DIR, arg2=OUT_DIR, [arg3=RECEIPT_JSON]
+    if(narg/=3 .and. narg/=4)then
+      call emit_failure('reconstruct-compo-native requires RAW_DIR OUT_DIR [RECEIPT_JSON]');stop 2
+    endif
+    call reconstruct_compo_closure_ws(trim(arg1),trim(arg2),out,ws_max_baryon_res,ws_max_charge_res, &
+                                      ws_reconstructed_rows,ws_hash_hex,status)
+    if(len_trim(status)/=0)then
+      call emit_failure(trim(status));stop 3
+    endif
+    if(out%beta_equilibrated)then
+      ws_beta_str='true'
+    else
+      ws_beta_str='false'
+    endif
+    if(narg==4 .and. len_trim(arg3)>0)then
+      open(newunit=ws_receipt_u,file=trim(arg3),status='replace',action='write',iostat=ws_receipt_ios)
+      if(ws_receipt_ios/=0)then
+        call emit_failure('reconstruct-compo-native receipt write failed: '//trim(arg3));stop 3
+      endif
+      write(ws_receipt_u,'(a)')'{'
+      write(ws_receipt_u,'(a)')'  "status": "ok",'
+      write(ws_receipt_u,'(a)')'  "operation": "reconstruct-compo-native",'
+      write(ws_receipt_u,'(a)')'  "raw_dir": "'//trim(arg1)//'",'
+      write(ws_receipt_u,'(a)')'  "out_dir": "'//trim(arg2)//'",'
+      write(ws_receipt_u,'(a)')'  "n": '//integer_text(out%n)//','
+      write(ws_receipt_u,'(a)')'  "reconstructed_rows": '//integer_text(ws_reconstructed_rows)//','
+      write(ws_receipt_u,'(a)')'  "max_baryon_residual": '//real_text(ws_max_baryon_res)//','
+      write(ws_receipt_u,'(a)')'  "max_charge_residual": '//real_text(ws_max_charge_res)//','
+      write(ws_receipt_u,'(a)')'  "beta_equilibrated": '//trim(ws_beta_str)//','
+      write(ws_receipt_u,'(a)')'  "readback_verified": true,'
+      write(ws_receipt_u,'(a)')'  "output_hash": "'//trim(ws_hash_hex)//'",'
+      write(ws_receipt_u,'(a)')'  "scope_note": "Algebraic free-gas C3/C4 closure preserving cluster (A,Z,Ye,Ymu) and Iphase; not a spatial Thomas-Fermi profile or variational pasta minimization."'
+      write(ws_receipt_u,'(a)')'}'
+      close(ws_receipt_u)
+    endif
+    write(*,'(a)')'{"status":"ok","operation":"reconstruct-compo-native","n":'//integer_text(out%n)// &
+      ',"reconstructed_rows":'//integer_text(ws_reconstructed_rows)// &
+      ',"max_baryon_residual":'//real_text(ws_max_baryon_res)// &
+      ',"max_charge_residual":'//real_text(ws_max_charge_res)// &
+      ',"beta_equilibrated":'//trim(ws_beta_str)// &
+      ',"readback_verified":true,"output_hash":"'//trim(ws_hash_hex)//'"}'
   case default
     call emit_failure('unknown operation: '//trim(action));stop 2
   end select

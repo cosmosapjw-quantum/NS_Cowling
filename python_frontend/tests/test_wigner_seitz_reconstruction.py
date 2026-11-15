@@ -260,3 +260,110 @@ def test_native_wigner_seitz_cli_rejects_composition_missing_input(tmp_path):
         "native wigner-seitz must reject composition-missing input")
     assert "composition" in completed.stdout.lower() or "composition" in completed.stderr.lower(), (
         f"rejection must cite composition; got stdout={completed.stdout!r}")
+
+
+def test_native_reconstruct_compo_cli_matches_python_normalizer_on_spg_and_gppva(tmp_path):
+    """Phase 7: production Fortran CLI `reconstruct-compo-native` ingests real
+    admitted raw CompOSE SPG_M1..M5 and GPPVA_DD2 tables, runs native
+    reconstruct_compo_closure_ws, writes deterministic CompOSE output, verifies
+    native readback, emits receipt JSON, and matches the independent Python
+    normalizer (`normalize_compose_composition.py`) within 1e-12."""
+    import json
+    import shutil
+    import subprocess
+    from compose_eos import executable
+
+    models = ["SPG_M1", "SPG_M2", "SPG_M3", "SPG_M4", "SPG_M5", "GPPVA_DD2"]
+    available = [m for m in models if (ROOT / "eos_generator" / "eos_data" / m).is_dir()]
+    if not available:
+        pytest.skip("eos_generator/eos_data SPG/GPPVA tables not present")
+
+    norm_script = ROOT / "eos_generator" / "scripts" / "normalize_compose_composition.py"
+    assert norm_script.is_file()
+
+    py_in_root = tmp_path / "py_in"
+    py_out_root = tmp_path / "py_out"
+    py_in_root.mkdir()
+    py_out_root.mkdir()
+    for m in available:
+        shutil.copytree(ROOT / "eos_generator" / "eos_data" / m, py_in_root / m)
+
+    py_res = subprocess.run(
+        [sys.executable, str(norm_script), "--input-root", str(py_in_root), "--output-root", str(py_out_root)],
+        capture_output=True, text=True, check=False,
+    )
+    assert py_res.returncode == 0, f"Python normalizer failed: {py_res.stdout}\n{py_res.stderr}"
+
+    exe = executable()
+    for m in available:
+        raw_dir = ROOT / "eos_generator" / "eos_data" / m
+        ft_out = tmp_path / "ft_out" / m
+        ft_out.mkdir(parents=True)
+        receipt = tmp_path / f"{m}_receipt.json"
+        ft_res = subprocess.run(
+            [str(exe), "reconstruct-compo-native", str(raw_dir), str(ft_out), str(receipt)],
+            capture_output=True, text=True, check=False,
+        )
+        assert ft_res.returncode == 0, f"{m} failed: {ft_res.stdout}\n{ft_res.stderr}"
+        assert receipt.is_file()
+        rep = json.loads(receipt.read_text(encoding="utf-8"))
+        assert rep["status"] == "ok"
+        assert rep["operation"] == "reconstruct-compo-native"
+        assert rep["readback_verified"] is True
+        assert rep["max_baryon_residual"] <= 2e-3
+        assert rep["max_charge_residual"] <= 2e-3
+        assert "not a spatial thomas-fermi" in rep["scope_note"].lower()
+
+        ft_eos = read_compose(str(ft_out))
+        py_eos = read_compose(str(py_out_root / m))
+        assert ft_eos.n == py_eos.n
+        for attr in ("nb", "Yn", "Yp", "Ye", "Ymu", "Aav", "Zav", "Yh", "p", "eps"):
+            diff = float(np.max(np.abs(np.asarray(getattr(ft_eos, attr)) - np.asarray(getattr(py_eos, attr)))))
+            assert diff < 1e-12, f"{m} {attr} native vs python diff={diff}"
+
+        # Deterministic output hash on repeated run
+        ft_out2 = tmp_path / "ft_out2" / m
+        ft_out2.mkdir(parents=True)
+        receipt2 = tmp_path / f"{m}_receipt2.json"
+        ft_res2 = subprocess.run(
+            [str(exe), "reconstruct-compo-native", str(raw_dir), str(ft_out2), str(receipt2)],
+            capture_output=True, text=True, check=False,
+        )
+        assert ft_res2.returncode == 0
+        rep2 = json.loads(receipt2.read_text(encoding="utf-8"))
+        assert rep2["output_hash"] == rep["output_hash"]
+
+
+def test_native_reconstruct_compo_cli_rejects_nonzero_temperature_and_missing_compo(tmp_path):
+    """Phase 7 fail-closed gates: reconstruct-compo-native rejects T>0 and missing-composition inputs."""
+    import shutil
+    import subprocess
+    from compose_eos import executable
+
+    exe = executable()
+    # Missing composition (APR_APR)
+    apr_dir = ROOT / "eos_generator" / "eos_data" / "APR_APR"
+    if apr_dir.is_dir():
+        out_apr = tmp_path / "out_apr"
+        out_apr.mkdir()
+        res = subprocess.run(
+            [str(exe), "reconstruct-compo-native", str(apr_dir), str(out_apr)],
+            capture_output=True, text=True, check=False,
+        )
+        assert res.returncode != 0
+        assert "composition" in res.stdout.lower()
+
+    # Nonzero temperature SPG_M1
+    spg_dir = ROOT / "eos_generator" / "eos_data" / "SPG_M1"
+    if spg_dir.is_dir():
+        hot_dir = tmp_path / "hot_spg"
+        shutil.copytree(spg_dir, hot_dir)
+        (hot_dir / "eos.t").write_text("0\n0\n  1.0000000000000000E+001\n", encoding="utf-8")
+        out_hot = tmp_path / "out_hot"
+        out_hot.mkdir()
+        res_hot = subprocess.run(
+            [str(exe), "reconstruct-compo-native", str(hot_dir), str(out_hot)],
+            capture_output=True, text=True, check=False,
+        )
+        assert res_hot.returncode != 0
+        assert "temperature" in res_hot.stdout.lower()

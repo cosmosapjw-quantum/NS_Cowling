@@ -576,15 +576,22 @@ contains
     end select
   end subroutine construct_bridge
 
-  subroutine find_window(cr,co,i1,i2,nbar,qbar,ok,message)
+  subroutine find_window(cr,co,i1,i2,nbar,qbar,ok,message,require_single_css)
     type(eos_data_t),intent(in)::cr,co
     integer,intent(out)::i1,i2
     real(wp),intent(out)::nbar,qbar
     logical,intent(out)::ok
     character(len=*),intent(out)::message
+    logical,intent(in),optional::require_single_css
     real(wp)::n1,n2,p1,p2,f1,f2,mu1,mu2,thp,thf,dmcr
+    real(wp)::css_candidate,nb_candidate,de_candidate
     integer::j,k,kcore,imin
-    ok=.false.;i1=0;i2=0;nbar=0._wp;qbar=0._wp;message='no convex matching window found'
+    logical::need_css,css_ok
+    ok=.false.;i1=0;i2=0;nbar=0._wp;qbar=0._wp
+    message='no convex matching window found'
+    need_css=.false.
+    if(present(require_single_css))need_css=require_single_css
+    if(need_css)message='no causal single-speed CSS window with a positive crust density jump'
     kcore=0
     if(co%composition_available)then
       do k=1,co%n
@@ -600,14 +607,26 @@ contains
     imin=max(12,cr%n-148);if(imin>cr%n)imin=cr%n
     dmcr=co%mn-cr%mn
     do j=cr%n,imin,-1
-      n1=cr%nb(j);p1=n1*cr%q(1,j);f1=(cr%q(6,j)+1._wp)*cr%mn+dmcr;mu1=(cr%q(3,j)+1._wp)*cr%mn+dmcr
+      n1=cr%nb(j);p1=n1*cr%q(1,j);f1=(cr%q(6,j)+1._wp)*cr%mn+dmcr
+      mu1=(cr%q(3,j)+1._wp)*cr%mn+dmcr
       do k=kcore,co%n
-        n2=co%nb(k);p2=n2*co%q(1,k);f2=(co%q(6,k)+1._wp)*co%mn;mu2=(co%q(3,k)+1._wp)*co%mn
+        n2=co%nb(k);p2=n2*co%q(1,k);f2=(co%q(6,k)+1._wp)*co%mn
+        mu2=(co%q(3,k)+1._wp)*co%mn
+        if(need_css)then
+          ! The single-potential CSS construction uses Euler-consistent
+          ! endpoint chemical potentials; the other matchers retain source Q3.
+          mu1=f1+cr%q(1,j);mu2=f2+co%q(1,k)
+        endif
         if(n2<=1.10_wp*n1.or.p2<=1.10_wp*p1.or.mu2<=mu1+0.2_wp.or.f2<=f1+0.2_wp)cycle
         if(mu2<=mu1.or.n2<=n1)cycle
         nbar=(p2-p1)/(mu2-mu1);qbar=(f2-f1)/log(n2/n1)
-          thp=(nbar-n1)/(n2-n1);thf=(qbar-cr%q(1,j))/(co%q(1,k)-cr%q(1,j))
+        thp=(nbar-n1)/(n2-n1);thf=(qbar-cr%q(1,j))/(co%q(1,k)-cr%q(1,j))
         if(ieee_is_finite(thp+thf).and.thp>0.12_wp.and.thp<0.88_wp.and.thf>0.12_wp.and.thf<0.88_wp)then
+          if(need_css)then
+            call solve_single_css_match(n1,n2,p1,p2,mu1,mu2,css_candidate,nb_candidate,de_candidate, &
+                                        css_ok,message)
+            if(.not.css_ok)cycle
+          endif
           i1=j;i2=k;ok=.true.;message='ok';return
         endif
       enddo

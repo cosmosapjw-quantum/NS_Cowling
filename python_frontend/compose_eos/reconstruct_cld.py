@@ -1,174 +1,162 @@
-"""Emit the CLD reconstruction results in CompOSE format.
+"""Emit CLD inner-crust reconstructions in CompOSE format.
 
-Writes the full set of CompOSE files:
-  eos.nb   - baryon density grid (fm^-3)
-  eos.t    - temperature grid (MeV), single T=0
-  eos.yq   - charge fraction grid (Yq)
-  eos.init - metadata
-  eos.thermo - thermodynamic table
-  eos.compo  - composition table
+Writes eos.nb, eos.t, eos.yq, eos.thermo (CompOSE manual v3.01 section 4.2),
+a human-readable summary and a machine-readable ``reconstruction_receipt.json``.
 
-The format matches the existing CompOSE eos_data files in eos_generator/eos_data/
-so the compose_eos native Fortran reader can parse them.
+Thermodynamics.  The CLD minimizer returns, per baryon density n_B, the cell
+energy density E_cell measured from the rest mass of the *model's own*
+nucleons (solve_homogeneous subtracts model.mn*n_n + model.mp*n_p; electrons
+include m_e).  The total energy density is therefore
+
+    eps(n_B) = E_cell + m_n n_n + m_p n_p ,   n_p = y_p,cell n_B .
+
+Pressure and baryon chemical potential follow from one declared interpolant:
+R(n) = eps - m_n n_B is represented by a not-a-knot cubic spline, mu_B =
+m_n + R'(n_B) and P = n_B mu_B - eps (Euler exact by construction).  The
+table is refused (CLDThermodynamicsError, nothing written) unless every cell
+converged and n_B, eps, mu_B (convexity / mechanical stability) and P are
+strictly increasing with P > 0 and row secants dP/deps <= 1.
+
+Every Q column is encoded against the model's reference masses, which are
+also written in the header; normalization never changes eps, P or mu_B.
+eos.compo, eos.init and eos.mr are intentionally not written: the former
+cluster encoding was not a CompOSE composition record.
 """
 from __future__ import annotations
 
+import json
 import math
 from pathlib import Path
 
-from .rmf_solver import HBARC, M_N, M_P, RMFModel
+import numpy as np
+from scipy.interpolate import CubicSpline
+
+from .rmf_solver import RMFModel
 from .cld_cell import minimize_cld_cell, CLDCellResult
+
+COMPOSE_COLUMNS = "iT inb iYq Q1 Q2 Q3 Q4 Q5 Q6 Q7 Nadd"
+# Optimizer box used by cld_cell.minimize_cld_cell (rows on it are flagged).
+R_D_BOUNDS = (2.0, 40.0)
+F_BOUNDS = (1e-4, 0.95)
+
+
+class CLDThermodynamicsError(ValueError):
+    """A CLD table cannot be emitted as an admissible cold barotrope."""
 
 
 def reconstruct_inner_crust(model: RMFModel, sigma_0: float, b: float,
                             rho_min: float = 0.001, rho_max: float = 0.08,
-                            n_points: int = 20, verbose: bool = False
-                            ) -> list[CLDCellResult]:
-    """Run the CLD reconstruction over the inner-crust density grid for one model.
-    Returns a list of CLDCellResult, one per density point (log-spaced grid)."""
-    results = []
-    log_min = math.log(rho_min)
-    log_max = math.log(rho_max)
-    for i in range(n_points):
+                            n_points: int = 20, verbose: bool = False,
+                            densities=None) -> list[CLDCellResult]:
+    """Run the CLD minimization on a log-spaced grid (or explicit ``densities``)."""
+    if densities is None:
         if n_points == 1:
-            rho_B = rho_min
+            densities = [rho_min]
         else:
-            rho_B = math.exp(log_min + (log_max - log_min) * i / (n_points - 1))
-        r = minimize_cld_cell(model, rho_B, sigma_0, b, verbose=verbose)
-        results.append(r)
-    return results
+            lo, hi = math.log(rho_min), math.log(rho_max)
+            densities = [math.exp(lo + (hi - lo) * i / (n_points - 1)) for i in range(n_points)]
+    return [minimize_cld_cell(model, float(rho), sigma_0, b, verbose=verbose)
+            for rho in densities]
 
 
-def emit_compose_set(results: list[CLDCellResult], outdir: Path,
-                     model_key: str, M_nucleon: float = 939.0) -> None:
-    """Write the full CompOSE file set for a CLD reconstruction."""
+def thermodynamic_table(results: list[CLDCellResult], *, mn: float, mp: float) -> dict:
+    """Derive (n, eps, mu_B, P) from minimized cells; raise if inadmissible."""
+    if len(results) < 4:
+        raise CLDThermodynamicsError("at least four CLD cells are required")
+    bad = [i for i, r in enumerate(results) if not r.converged]
+    if bad:
+        raise CLDThermodynamicsError(f"CLD cells did not converge at rows {bad}")
+    n = np.array([r.rho_B for r in results], dtype=float)
+    yp = np.array([r.y_p_cell for r in results], dtype=float)
+    e_cell = np.array([r.E_cell for r in results], dtype=float)
+    if not (np.all(np.isfinite(n)) and np.all(np.isfinite(yp)) and np.all(np.isfinite(e_cell))):
+        raise CLDThermodynamicsError("nonfinite CLD cell values")
+    if np.any(n <= 0.0) or np.any(np.diff(n) <= 0.0):
+        raise CLDThermodynamicsError("baryon densities must be positive and strictly increasing")
+    eps = e_cell + mn * n * (1.0 - yp) + mp * n * yp
+    spline = CubicSpline(n, eps - mn * n, bc_type="not-a-knot")
+    mu = mn + spline(n, 1)
+    p = n * mu - eps
+    problems = []
+    if np.any(np.diff(eps) <= 0.0):
+        problems.append(f"energy density not monotone at rows {np.flatnonzero(np.diff(eps) <= 0).tolist()}")
+    if np.any(np.diff(mu) <= 0.0):
+        problems.append("mechanical stability violated (d mu_B/d n_B <= 0, energy not convex) at rows "
+                        f"{np.flatnonzero(np.diff(mu) <= 0).tolist()}")
+    if np.any(p <= 0.0):
+        problems.append(f"nonpositive pressure at rows {np.flatnonzero(p <= 0).tolist()}")
+    if np.any(np.diff(p) <= 0.0):
+        problems.append(f"pressure not monotone at rows {np.flatnonzero(np.diff(p) <= 0).tolist()}")
+    with np.errstate(divide="ignore", invalid="ignore"):
+        secant = np.diff(p) / np.diff(eps)
+    if np.any(~np.isfinite(secant)) or np.any(secant > 1.0):
+        problems.append("row secant dP/deps exceeds 1 or is undefined")
+    if problems:
+        raise CLDThermodynamicsError("; ".join(problems))
+    mu_solver = np.array([r.mu_n for r in results], dtype=float)
+    return {
+        "n": n, "eps": eps, "mu": mu, "P": p, "yp": yp,
+        "mu_e": np.array([r.mu_e for r in results], dtype=float),
+        "solver_cluster_mu_n_minus_derived_mu_B_max_abs_MeV": float(np.max(np.abs(mu_solver - mu))),
+        "interpolant": "not-a-knot cubic spline of eps - m_n n_B; mu_B = m_n + derivative; P = n_B mu_B - eps",
+    }
+
+
+def _box_bound_rows(results: list[CLDCellResult]) -> list[int]:
+    rows = []
+    for i, r in enumerate(results):
+        on = any(abs(r.R_d - v) <= 1e-9 * v for v in R_D_BOUNDS) or \
+             any(abs(r.f - v) <= 1e-9 * v for v in F_BOUNDS)
+        if on:
+            rows.append(i)
+    return rows
+
+
+def emit_compose_set(results: list[CLDCellResult], outdir: Path, model_key: str, *,
+                     mn: float, mp: float, provenance: dict | None = None) -> dict:
+    """Write the CompOSE thermodynamic file set; raises before writing if inadmissible."""
+    table = thermodynamic_table(results, mn=mn, mp=mp)
     outdir = Path(outdir)
     outdir.mkdir(parents=True, exist_ok=True)
-    nB_list = [r.rho_B for r in results]
-    # The compose_eos native reader supports only a single T=0, single-Yq slice,
-    # so we use a single Yq value (the cell-averaged proton fraction is encoded
-    # in eos.compo per-point; the Yq grid is just one representative value).
-    Yq_list = [0.0]   # single Yq slice (cold beta-equil, Yq varies per nB in compo)
-    n_nb = len(nB_list)
-    n_t = 1   # single T=0
-    n_yq = len(Yq_list)
-
-    # --- eos.t: temperature grid (single T=0) ---
-    (outdir / "eos.t").write_text(
-        f" 1 \n"
-        f" {n_t} \n"
-        f"   0.00000000E+00\n"
-    )
-
-    # --- eos.yq: charge fraction grid ---
-    yq_lines = [f" 1 ", f" {n_yq} "]
-    for yq in Yq_list:
-        yq_lines.append(f"   {yq:14.8E}")
-    (outdir / "eos.yq").write_text("\n".join(yq_lines) + "\n")
-
-    # --- eos.nb: baryon density grid ---
-    nb_lines = [f" 1 ", f" {n_nb} "]
-    for nb in nB_list:
-        nb_lines.append(f"   {nb:18.10E}")
-    (outdir / "eos.nb").write_text("\n".join(nb_lines) + "\n")
-
-    # --- eos.init: metadata (CompOSE standard 12-line format) ---
-    (outdir / "eos.init").write_text(
-        f"           0           1           0           0           0\n"
-        f"   0.0000000000000000        0.0000000000000000     \n"
-        f"   {nB_list[0]:18.10E}   {nB_list[-1]:18.10E}\n"
-        f"   0.0000000000000000        0.0000000000000000     \n"
-        f"   0.0000000000000000        0.0000000000000000     \n"
-        f"           {n_t}           {n_yq}           {n_nb}           0\n"
-        f"           4           1\n"
-        f"          10          11           0           1\n"
-        f"           1\n"
-        f"           0\n"
-    )
-
-    # --- eos.thermo: thermodynamic table ---
-    # CompOSE format (per the existing files):
-    #   line 1: m_n m_p 1
-    #   each entry: iT inb iYq  F_dens  T  mu_n  mu_p  ...  flag
-    # The columns (from GPPVA_FSU2): iT=1, inb, iYq=1, nb_value, T, mu_n, mu_p(?),
-    # then the free energy density and pressure. We follow the column layout
-    # observed: "iT inb iYq nb T mu_n1 mu_n2 ... pressure, 2 flags"
-    thermo_lines = [f"   {M_nucleon:14.7E}   {M_nucleon:14.7E} 1"]
+    n, eps, mu, p = table["n"], table["eps"], table["mu"], table["P"]
+    q1 = p / n
+    q3 = mu / mn - 1.0
+    q4 = -table["mu_e"] / mn          # mu_q = mu_p - mu_n = -mu_e (beta equilibrium)
+    q7 = eps / (n * mn) - 1.0
+    (outdir / "eos.t").write_text(" 1\n 1\n   0.0000000000000000E+00\n")
+    (outdir / "eos.yq").write_text(" 1\n 1\n   0.0000000000000000E+00\n")
+    (outdir / "eos.nb").write_text(" 1\n " + str(len(n)) + "\n"
+                                   + "".join(f"   {x:.16E}\n" for x in n))
+    lines = [f"   {mn:.10E}   {mp:.10E} 1"]
+    for i in range(len(n)):
+        lines.append(f" 1 {i + 1:5d} 1 {q1[i]:.16E} {0.0:.16E} {q3[i]:.16E} {q4[i]:.16E} "
+                     f"{0.0:.16E} {q7[i]:.16E} {q7[i]:.16E} 0")
+    (outdir / "eos.thermo").write_text("\n".join(lines) + "\n")
+    mu_back = (q3 + 1.0) * mn
+    euler = np.abs(mu_back - ((q7 + 1.0) * mn + q1)) / np.abs(mu_back)
+    summary = [f"# CLD inner-crust reconstruction: {model_key}",
+               f"# reference masses m_n={mn} m_p={mp} MeV; columns {COMPOSE_COLUMNS}",
+               f"{'n_B':>12} {'P':>14} {'eps':>14} {'mu_B':>12} {'E_cell/n':>10} "
+               f"{'f':>7} {'R_d':>6} {'y_p':>8}"]
     for i, r in enumerate(results):
-        inb = i + 1
-        iyq = 1  # single Yq slice
-        # CompOSE eos.thermo column convention (manual v3.01, sec 3.4):
-        #   col0=iT, col1=inb, col2=iYq, col3=nb (fm^-3), col4=T,
-        #   col5=Q3 = mu_n/mn - 1 (dimensionless; mub = (Q3+1)*mn),
-        #   col6=Q4 = mu_q/mn  (dimensionless; muq = Q4*mn, mu_q = -mu_e),
-        #   col7=Q5 = mu_l/mn (dimensionless, often 0),
-        #   col8=Q6 = F/mn - 1 (dimensionless; F = (Q6+1)*mn),
-        #   col9=Q7 = eps/mn - 1 (dimensionless; eps = nb*(Q7+1)*mn),
-        #   flags...
-        # The native reader (eos_data.py) reconstructs mub=(Q3+1)*mn, F=(Q6+1)*mn.
-        # Previous code wrote mu_n - M_N (MeV) and E_bind (MeV) directly into the
-        # dimensionless Q slots, which inflated F by a factor of mn. We now divide
-        # by the nucleon mass to make the columns dimensionless.
-        Q3 = (r.mu_n - M_N) / M_N     # mu_n/mn - 1 (dimensionless, ~-0.01 near sat)
-        Q4 = (r.mu_p - M_P) / M_N     # use mu_p in Q4 slot for crust (mu_q ~ mu_p for
-                                      # the cluster phase; mu_q = -mu_e in beta-equil,
-                                      # but the provider 317/319 writes mu_p-like
-                                      # small values here for crust rows)
-        Q5 = 0.0                      # mu_l (leptons folded in mu_e; set 0)
-        Q6 = r.E_binding_per_baryon / M_N  # F/mn - 1 (dimensionless; binding ~0.001)
-        Q7 = r.E_binding_per_baryon / M_N  # eps/nb/mn - 1 ~ same for cold matter
-        thermo_lines.append(
-            f" 1  {inb:4d}  {iyq:4d}  {r.rho_B:14.7E}  0.0000000000E+00  "
-            f"{Q3:14.7E}  {Q4:14.7E}  {Q5:14.7E}  "
-            f"{Q6:14.7E}  {Q7:14.7E}  1  0"
-        )
-    (outdir / "eos.thermo").write_text("\n".join(thermo_lines) + "\n")
-
-    # --- eos.compo: composition table ---
-    # CompOSE format (matching eos_generator/eos_data/GPPVA_FSU2/eos.compo):
-    #   iT inb iYq  0  4  10  X1  11  X2  0  Yq  1  X3  1  1  A  Z  1.00000
-    # where the leading numbers 4/10/11/0/1 are nuclear-group/meson flags that
-    # the native reader validates. For the CLD inner crust, we encode the
-    # cluster as a "nucleus" with A_eff = rho_I * (4/3 pi R_d^3) and
-    # Z_eff = rho_Ip * (4/3 pi R_d^3), and use the volume fraction f as X1.
-    compo_lines = []
-    for i, r in enumerate(results):
-        inb = i + 1
-        iyq = 1
-        # effective cluster A and Z (nucleons in one droplet)
-        cell_vol = (4.0 / 3.0) * math.pi * r.R_d ** 3   # fm^3 (cluster volume)
-        A_eff = r.rho_I * cell_vol
-        Z_eff = r.rho_Ip * cell_vol
-        if A_eff < 1:
-            A_eff = 1.0
-        if Z_eff < 1:
-            Z_eff = 1.0
-        # the format: iT=1 inb iyq 0 4 10 X1 11 X2 0 Yq 1 X3 1 1 A Z 1
-        # X1 = volume fraction f, X2 = rho_I, X3 = rho_Ip (as meson-fraction-like)
-        compo_lines.append(
-            f" 1  {inb:3d}  {iyq:3d}  0  4  10  {r.f:8.5f}  "
-            f"11  {r.rho_I:8.5f}  0  {r.y_p_cell:8.5f}  1  {r.rho_Ip:8.5f}  "
-            f"1  1  {A_eff:8.3f}  {Z_eff:8.3f}  1.00000"
-        )
-    (outdir / "eos.compo").write_text("\n".join(compo_lines) + "\n")
-
-    # --- eos.mr: matching radii / misc (zeros for simplicity) ---
-    mr_lines = []
-    for r in results:
-        mr_lines.append(f"   {r.R_d:18.10f}   0.0000000000   {r.f:18.10f}")
-    (outdir / "eos.mr").write_text("\n".join(mr_lines) + "\n")
-
-    # --- human-readable summary ---
-    summary_lines = [
-        f"# CLD inner-crust reconstruction: {model_key}",
-        f"# n_points: {n_nb}, T=0, n_Yq: {n_yq}",
-        "",
-        f"{'rho_B':>10}  {'E/A':>8}  {'f':>6}  {'R_d':>6}  {'rho_I':>8}  "
-        f"{'rho_II':>8}  {'y_p,cell':>8}  {'mu_e':>7}",
-    ]
-    for r in results:
-        summary_lines.append(
-            f"{r.rho_B:10.5f}  {r.E_binding_per_baryon:8.3f}  {r.f:6.3f}  "
-            f"{r.R_d:6.1f}  {r.rho_I:8.4f}  {r.rho_II:8.4f}  {r.y_p_cell:8.4f}  "
-            f"{r.mu_e:7.2f}")
-    (outdir / "reconstruction_summary.txt").write_text("\n".join(summary_lines) + "\n")
+        summary.append(f"{n[i]:12.6e} {p[i]:14.7e} {eps[i]:14.7e} {mu[i]:12.5f} "
+                       f"{r.E_binding_per_baryon:10.4f} {r.f:7.4f} {r.R_d:6.2f} {r.y_p_cell:8.5f}")
+    (outdir / "reconstruction_summary.txt").write_text("\n".join(summary) + "\n")
+    receipt = {
+        "schema": "ns-cowling.cld-reconstruction-receipt.v2",
+        "model": model_key,
+        "columns": COMPOSE_COLUMNS,
+        "reference_masses_MeV": {"neutron": mn, "proton": mp},
+        "rows": int(len(n)),
+        "n_B_range_fm3": [float(n[0]), float(n[-1])],
+        "thermodynamics": table["interpolant"],
+        "max_euler_relative_residual": float(euler.max()),
+        "solver_cluster_mu_n_minus_derived_mu_B_max_abs_MeV":
+            table["solver_cluster_mu_n_minus_derived_mu_B_max_abs_MeV"],
+        "box_bound_rows": _box_bound_rows(results),
+        "box_bounds": {"R_d_fm": list(R_D_BOUNDS), "f": list(F_BOUNDS)},
+        "omitted_files": ["eos.compo", "eos.init", "eos.mr"],
+        "provenance": provenance or {},
+    }
+    (outdir / "reconstruction_receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
+    return receipt

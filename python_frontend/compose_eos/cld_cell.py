@@ -355,7 +355,9 @@ def minimize_cld_cell(model: RMFModel, rho_B: float, sigma_0: float, b: float,
     # cell mu_n/mu_p from the cluster phase (equilibrating)
     rI = solve_homogeneous(model, rho_I, rho_Ip)
     mu_n_cell = rI.mu_n; mu_p_cell = rI.mu_p
-    P_cell = 0.0  # filled by emitter via finite difference
+    # Pressure is a property of the minimized energy curve, not of one cell:
+    # reconstruct_cld.thermodynamic_table derives it from eps(n_B).
+    P_cell = float("nan")
     yp_cell = (f * rho_Ip + (1 - f) * rho_IIp) / rho_B if rho_B > 0 else 0
     return CLDCellResult(
         rho_B=rho_B, f=f, R_d=R_d, rho_I=rho_I, rho_Ip=rho_Ip,

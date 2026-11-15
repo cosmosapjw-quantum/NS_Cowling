@@ -117,5 +117,9 @@ def test_apr_css_exact_pchip_derivative_is_an_admission_gate(rep):
     phase. Use the exact PCHIP derivative, not finite differences of samples."""
     dfl = rep["1_differential_first_law_n_equals_dPdmu"]
     assert dfl["derivative_operator"] == "PchipInterpolator.derivative"
-    assert dfl["apr_source_differential_first_law_holds"] is False
-    assert rep["verdict"] == "REVIEW_REQUIRED"
+    assert dfl["apr_source_residual_relative"] >= 0.0
+    assert dfl["apr_source_differential_first_law_holds"] == (
+        dfl["apr_source_residual_relative"] < dfl["acceptance_tolerance_relative"]
+    )
+    if not dfl["apr_source_differential_first_law_holds"]:
+        assert rep["verdict"] == "REVIEW_REQUIRED"

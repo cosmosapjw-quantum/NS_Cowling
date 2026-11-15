@@ -274,6 +274,8 @@ program compose_eos_fortran
       ',"css_transition_nb_high":'//real_text(match_report%css_transition_nb_high)// &
       ',"css_transition_delta_nb":'//real_text(match_report%css_transition_delta_nb)// &
       ',"css_transition_delta_eps":'//real_text(match_report%css_transition_delta_eps)// &
+      ',"css_transition_epsilon_low":'//real_text(match_report%css_transition_epsilon_low)// &
+      ',"css_transition_epsilon_high":'//real_text(match_report%css_transition_epsilon_high)// &
       ',"css_transition_pressure":'//real_text(match_report%css_transition_pressure)// &
       ',"css_transition_mu":'//real_text(match_report%css_transition_mu)// &
       ',"css_transition_low_index":'//integer_text(match_report%css_transition_low_index)// &

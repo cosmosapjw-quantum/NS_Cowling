@@ -134,3 +134,18 @@ def test_unconverged_cell_is_refused():
     cells[3] = replace(cells[3], converged=False)
     with pytest.raises(CLDThermodynamicsError, match="converge"):
         thermodynamic_table(cells, mn=MN, mp=MP)
+
+
+def test_receipt_reports_gas_equilibrium_against_derived_mu(tmp_path):
+    cells = []
+    for n in _grid():
+        eps, mu, _ = _analytic(n)
+        cells.append(replace(_cell(n), mu_n_gas=float(mu) + 0.01))
+    out = tmp_path / "SYN"
+    receipt = emit_compose_set(cells, out, "SYN", mn=MN, mp=MP)
+    assert receipt["gas_mu_n_rows"] == len(cells)
+    table = thermodynamic_table(cells, mn=MN, mp=MP)
+    spline_err = float(np.max(np.abs(table["mu"] - _analytic(table["n"])[1])))
+    value = receipt["gas_mu_n_minus_derived_mu_B_max_abs_MeV"]
+    assert 0.01 - spline_err - 1e-12 <= value <= 0.01 + spline_err + 1e-12
+    assert "cluster bulk" in receipt["mu_note"]

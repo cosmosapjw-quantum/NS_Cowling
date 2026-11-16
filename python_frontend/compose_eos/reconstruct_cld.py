@@ -94,7 +94,12 @@ def thermodynamic_table(results: list[CLDCellResult], *, mn: float, mp: float) -
     if problems:
         raise CLDThermodynamicsError("; ".join(problems))
     mu_solver = np.array([r.mu_n for r in results], dtype=float)
+    mu_gas = np.array([getattr(r, "mu_n_gas", float("nan")) for r in results], dtype=float)
+    gas_ok = np.isfinite(mu_gas)
     return {
+        "gas_mu_n_minus_derived_mu_B_max_abs_MeV":
+            float(np.max(np.abs(mu_gas[gas_ok] - mu[gas_ok]))) if gas_ok.any() else None,
+        "gas_mu_n_rows": int(gas_ok.sum()),
         "n": n, "eps": eps, "mu": mu, "P": p, "yp": yp,
         "mu_e": np.array([r.mu_e for r in results], dtype=float),
         "solver_cluster_mu_n_minus_derived_mu_B_max_abs_MeV": float(np.max(np.abs(mu_solver - mu))),
@@ -170,8 +175,12 @@ def emit_compose_set(results: list[CLDCellResult], outdir: Path, model_key: str,
         "n_B_range_fm3": [float(n[0]), float(n[-1])],
         "thermodynamics": table["interpolant"],
         "max_euler_relative_residual": float(euler.max()),
-        "solver_cluster_mu_n_minus_derived_mu_B_max_abs_MeV":
+        "gas_mu_n_minus_derived_mu_B_max_abs_MeV": table["gas_mu_n_minus_derived_mu_B_max_abs_MeV"],
+        "gas_mu_n_rows": table["gas_mu_n_rows"],
+        "cluster_bulk_mu_n_minus_derived_mu_B_max_abs_MeV":
             table["solver_cluster_mu_n_minus_derived_mu_B_max_abs_MeV"],
+        "mu_note": ("equilibrium check is gas mu_n vs derived mu_B; the cluster bulk mu_n omits "
+                    "surface and Coulomb derivative terms"),
         "dropped_box_bound_rows": dropped,
         "source_row_offset": lo,
         "box_bounds": {"R_d_fm": list(R_D_BOUNDS), "f": list(F_BOUNDS)},

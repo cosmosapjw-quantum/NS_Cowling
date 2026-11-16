@@ -118,6 +118,10 @@ class CLDCellResult:
     converged: bool
     n_iter: int
     message: str = ""
+    # Neutron chemical potential of the uniform gas phase.  At the variational
+    # optimum the cell mu_B equals this value; the cluster *bulk* mu_n differs
+    # by the surface and Coulomb derivative terms.
+    mu_n_gas: float = float("nan")
 
 
 def cld_cell_energy(model: RMFModel, rho_B: float, f: float, R_d: float,
@@ -365,6 +369,7 @@ def minimize_cld_cell(model: RMFModel, rho_B: float, sigma_0: float, b: float,
         E_cell=E_cell, E_binding_per_baryon=E_cell / rho_B if rho_B > 0 else 0,
         E_coul=info["E_coul"], E_surf=info["E_surf"], E_L=info["E_L"],
         P_cell=P_cell, mu_n=mu_n_cell, mu_p=mu_p_cell, mu_e=mu_e,
+        mu_n_gas=solve_homogeneous(model, rho_II, rho_IIp).mu_n if rho_II > 0 else float("nan"),
         converged=True, n_iter=n_iter_nm,
         message=f"Nelder-Mead + beta-equil (resid={beta_resid:.3e})",
     )

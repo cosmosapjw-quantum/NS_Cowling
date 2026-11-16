@@ -27,3 +27,34 @@ Build succeeded; frontend/pipeline 460 passed, 9 skipped; generator 142 passed w
 HOLD source-calibrated CLD pending exact model bulk inputs, selected mass dataset and fit protocol/coefficients; wire and validate the complete energy and all variational derivatives only once identified. Multistart and density convergence, source-backed outer crust and physical surface, separately established mode identity and radial stability, DD2/RG conventions, composition-aware Maxwell and EOS390 DAG campaign remain open. Do not promote proxy outputs or infer spectral completeness or global minimum from this node.
 
 Independent read-only review returned `PASS_SCOPED` for the equation-only helpers after these repairs, reporting a 630-case Decimal comparison with maximum relative error 1.02e-15; the detailed sweep output was not retained, so the reproducible committed evidence is the targeted test log rather than that sweep. The review does not admit a calibrated CLD or stellar result.
+
+## Post-change verification and test repair
+
+The interface was published as 594552d7a597dd150be14b9a860a8f5eaa571d7f.
+On that clean commit, a fresh native build and full local suites completed:
+**477 frontend/pipeline passed, 9 skipped (38.71 s); 142 generator passed (14.53 s)**,
+with the same pre-existing Matplotlib warning. Thus the earlier paragraph describes
+the original baseline runs, not the latest available verification.
+
+[CI #614](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43786808560)
+also succeeded on merge 3bf8b045271e752eb4cb705a0111a0ca97665a16
+(head 594552d, base b12ba451), with 477/9 and 142 test results.
+That workflow ran the existing proxy census; no source-calibrated census or new stellar result follows.
+
+Independent review found a test weakness: the near-f=1 pytest.approx assertion's
+default absolute tolerance admitted a value 100 times its expected value. The assertion
+now sets abs=0.0; all 17 targeted tests pass after this repair. No helper formula changed.
+
+A new 400-digit Decimal check retained its script and all **1,722 scalar outputs**:
+zero failures, maximum relative error for normal outputs **1.0180684467550535e-15**,
+maximum subnormal/zero-reference error **1 ULP**. It includes the support boundaries
+and extremely small sigma_0. These finite samples do not prove all floating-point cases.
+Tiny exact outputs may round to zero. This is separate evidence from the earlier
+unretained 630-case sweep.
+
+See data/receipts/core_crust_followup_20261116/verification/RECEIPT.json,
+the adjacent raw logs, compressed Decimal results, replay script and checksum manifest.
+The nine original follow-up logs verified against their hashes. The v6 proxy and prior
+audit receipts remain byte-identical to base 4df4d36. AME2016 and source-HTML
+identities remain the supplied intake provenance; they were not reacquired in this check.
+Equation-only verdict **PASS_SCOPED**; scientific project **PARTIALLY_COMPLETE**.

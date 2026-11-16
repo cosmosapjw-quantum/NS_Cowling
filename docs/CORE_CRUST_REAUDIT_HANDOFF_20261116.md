@@ -5,10 +5,13 @@ NS_Cowling의 적대적 재감사 후속 작업을 이어가라.
 Repo: https://github.com/cosmosapjw-quantum/NS_Cowling
 Branch: remediation/2026-11-15-m5a-maxwell-eos-contracts
 PR: #15, DRAFT / OPEN / UNMERGED 유지.
-실행 코드 기준: 42950053088fa80752826f4aae56d0a0b013c0e4
+v6 별 계산 코드 기준: 42950053088fa80752826f4aae56d0a0b013c0e4
+추가된 equation-only interface 기준: 594552d7a597dd150be14b9a860a8f5eaa571d7f
 (본 문서와 receipt가 추가된 후속 커밋도 읽고, 시작할 때 실제 원격 HEAD를 확인하라.)
 
 먼저 읽을 SSOT:
+- docs/CORE_CRUST_FOLLOWUP_INTERFACE_20261116.md
+- data/receipts/core_crust_followup_20261116/verification/RECEIPT.json
 - docs/CORE_CRUST_ADVERSARIAL_REAUDIT_20261116.md
 - data/receipts/core_crust_audit_20261116/AUDIT_RECEIPT.json
 - data/receipts/core_crust_audit_20261116/CENSUS_v6.json
@@ -24,7 +27,9 @@ PR: #15, DRAFT / OPEN / UNMERGED 유지.
 3. CLD beta 평형은 bulk식이 아니라 전체 cell energy의 조성 변분이다.
    표면/Coulomb 미분과 neutron/proton rest-mass 차이를 포함한다.
 4. v6는 exploratory_proxy_CLD, source_calibrated=false이다.
-   현재 Phi와 sigma는 Scurto2024 Eq24–25와 다르다. b의 의미도 다르다.
+   v6 solver의 Phi와 sigma는 Scurto2024 Eq24–25와 다르다. b의 의미도 다르다.
+   scurto_interface.py에는 원전 식과 sigma 미분이 별도 구현되어 있지만
+   solver/emitter에 연결되지 않았고 source-calibrated 모델이 아니다.
    함수/모델별 fitted parameters 확보 없이 원전 모델 재현을 선언하지 말라.
 5. CSS 구간의 epsilon(P),n(P),mu(P),cs2는 해석식으로 평가한다.
    CSS와 core를 하나의 보간으로 다시 섞지 말라. 접합 양쪽 미분을 보존하라.
@@ -46,8 +51,11 @@ PR: #15, DRAFT / OPEN / UNMERGED 유지.
 - 과거 raw/v2–v5 데이터와 실패 receipt는 역사적 근거로 보존한다.
 
 다음 작업 우선순위:
-A. 원전 spherical Phi 및 surface sigma, 모델별 nuclear-mass fit의 입력/provenance를
-   확보해 source-calibrated CLD 경로를 별도 구현하라. 현재 proxy 재현을 보존하라.
+A. equation-only helper를 재구현하지 말라. 다음 최소 작업은 source bulk-model
+   입력/identity, 정확한 2408개 질량행, fit 구현/가중치/계수를 식별하는 것이다.
+   AME2016 파일 hash만으로 선택행/fit을 식별했다고 보지 말고 SPG surrogate와
+   원전 GDFM의 동등성을 가정하지 말라. 입력을 식별하기 전 calibrated CLD는 HOLD.
+   식별 후에 전체 energy와 모든 변분 미분을 구현·검증하라. 기존 proxy를 보존하라.
 B. 밀도별 전체 변분 잔차, 여러 초기값/전역 최소 후보, 격자 정련을 점검하라.
    현재 finite root scan과 simplex 수렴은 전역 최소 인증이 아니다.
 C. source-backed outer crust와 splice를 구성하고 P→0 경계를 갖는 TOV/Cowling

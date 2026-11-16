@@ -29,7 +29,7 @@ def test_invalid_inputs_refused(y, sigma, b):
 def test_geometry_resolves_near_full_volume():
     f = math.nextafter(1.0, 0.0)
     assert spherical_phi(f) > 0.0
-    assert spherical_phi(f) == pytest.approx((1.0-f)**2/15.0, rel=1e-14)
+    assert spherical_phi(f) == pytest.approx((1.0-f)**2/15.0, rel=1e-14, abs=0.0)
 
 
 def test_surface_ill_conditioned_parameters_against_decimal():

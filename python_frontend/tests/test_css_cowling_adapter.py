@@ -44,7 +44,7 @@ def test_phase_table_splits_exactly_at_the_crust_css_jump(matched):
     table = phase_table_from_css_match(compose, report)
     lo, hi = report["css_transition_low_index"], report["css_transition_high_index"]
     assert np.all(table.Iphase[: lo + 1] == 1) and np.all(table.Iphase[hi:] == 2)
-    assert table.p[lo] == table.p[hi] and table.nb[hi] > table.nb[lo]
+    assert abs(table.p[lo] - table.p[hi]) <= 1e-10 * table.p[lo] and table.nb[hi] > table.nb[lo]
 
 
 def test_adapter_rejects_report_that_is_not_a_css_match(matched):
@@ -94,3 +94,25 @@ def test_interface_anchor_reproduces_last_knot_exactly():
     assert first.evaluate(p[0]).number_density == pytest.approx(n[0], rel=1e-14)
     with pytest.raises(ValueError, match="anchor"):
         DirectBarotrope(p, e, n, mu, anchor="middle")
+
+
+@pytest.mark.parametrize("rel, ok", [(2.2e-16, True), (5e-11, True), (1e-6, False)])
+def test_adapter_uses_declared_pressure_gate_not_bit_equality(matched, monkeypatch, rel, ok):
+    """CompOSE round trip re-forms P = n_B*Q1, so the two jump rows may differ by an ulp."""
+    import compose_cowling.css_adapter as adapter
+    compose, report = matched
+    real = adapter.read_compose(str(compose))
+    hi = report["css_transition_high_index"]
+
+    def fake_read(_path):
+        data = __import__("copy").deepcopy(real)
+        data.Q1[hi] *= 1.0 + rel
+        return data
+
+    monkeypatch.setattr(adapter, "read_compose", fake_read)
+    if ok:
+        table = adapter.phase_table_from_css_match(compose, report)
+        assert table.Iphase[hi] == 2
+    else:
+        with pytest.raises(ValueError, match="first-order jump"):
+            adapter.phase_table_from_css_match(compose, report)

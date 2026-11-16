@@ -27,6 +27,7 @@ from compose_eos import EOSData, read_compose
 from .maxwell import MaxwellEOS
 
 CSS_KIND = "css_single_speed_with_crust_density_jump"
+PRESSURE_REL_GATE = 1.0e-10   # scripts/match_report_admission.PRESSURE_REL_GATE
 
 
 def phase_table_from_css_match(compose_dir: str | Path, match_report: Mapping[str, Any]) -> EOSData:
@@ -42,7 +43,11 @@ def phase_table_from_css_match(compose_dir: str | Path, match_report: Mapping[st
         raise ValueError("match report lacks css transition index fields") from exc
     if hi != lo + 1 or lo < 1 or hi >= data.n - 1 or n_rows != data.n:
         raise ValueError("css transition index fields are inconsistent with the table")
-    if data.p[lo] != data.p[hi] or not (data.nb[hi] > data.nb[lo] and data.eps[hi] > data.eps[lo]):
+    # P is re-formed as n_B*Q1 on read-back, so the two jump rows can differ by
+    # an ulp; use the declared admission pressure gate (1e-10 relative).
+    p_scale = max(abs(float(data.p[lo])), abs(float(data.p[hi])))
+    if (abs(float(data.p[hi]) - float(data.p[lo])) > PRESSURE_REL_GATE * p_scale
+            or not (data.nb[hi] > data.nb[lo] and data.eps[hi] > data.eps[lo])):
         raise ValueError("rows at the css transition index are not a positive first-order jump")
     table = copy.deepcopy(data)
     table.Iphase = np.where(np.arange(table.n) <= lo, 1, 2).astype(int)

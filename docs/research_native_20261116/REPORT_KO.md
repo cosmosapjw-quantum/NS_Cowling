@@ -32,6 +32,8 @@ Native SLSQP는 SciPy v1.15.3의 허가된 Fortran 원본을 exact commit과 SHA
 
 추가로 TF 8종의 원 배포 inner 밀도 590점 전체를 N16에서 계산했다. 3,641개 시도 중 87개 내부 field 평가 실패를 보존했으며, 최종 590점은 모두 후보 선택·native readback이 가능했다(HOLD 0). 일부 geometry는 N192/N384 결과와 다르므로 mesh 수렴 주장으로 사용하지 않는다. 별도 lower/outer를 포함한 이 캠페인은 공개 readback 테이블 24개, 1,902행이다.
 
+추가로 native sequence 진단을 개별 판독했다. N16 원본 밀도표에서 **FSU2R·FSU2H·TM1e는 C6 압력 단조성 검사에 실패**했고 일부 유한차분 음속제곱도 음수다. 이들은 연속 물리 EOS로 승인하지 않으며 mesh/branch 정련 대상이다. Core APR·KDE0v1·SLy4에는 고밀도 비인과적 진단점이 존재하여 생성 범위와 물리 사용 가능 범위를 구분해야 한다. SPG 공개 17점 격자는 same-phase derivative 지원점이 부족하다. 모든 native 원진단과 판정은 PHYSICAL_DIAGNOSTICS.json 및 MODEL_STATUS.json에 포함했다.
+
 ## 판단
 
 구현 검증은 원저자 입력 회복을 대신하지 않으며, 같은 표면·functional 구현의 재생성 성공도 모든 보간 구간의 물리적 유효성을 뜻하지 않는다. 공개 생성기는 모델별 선언된 representation을 재생성할 수 있다. 원전과 동등한 완전 EOS라는 더 강한 최종 목표는 아래 독립 항목이 남아 있어 부분 완료다.

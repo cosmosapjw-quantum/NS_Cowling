@@ -19,6 +19,7 @@ CompOSE와100%일치를 PASS gate로 두지 말라. 원전 충실도·독립 물
 SPG 후보 sigma0,b를 원저자 fit으로 승격하지 말라. 원전의 fixed-density crossing과 별도 common tangent를 구별하라.
 BSk source-fit, outer-anchored 처방, ETFSI를 구별하라. lower/inner common tangent를 원전 attachment의 필수조건으로 재도입하지 말라.
 미해결/phase변경/서로 다른 segment 사이를 자동 보간하지 말라. 모든 실패·재시도·비정형 profile을 보존하라.
+N16 source-grid의 FSU2R/FSU2H/TM1e C6 압력 단조성 실패와 core APR/KDE0v1/SLy4 고밀도 비인과적 진단점을 보존하고, native 생성 성공을 물리 사용 가능 범위와 혼동하지 말라.
 다음 실제 과제는 MODEL_STATUS와 GOAL_DAG의 남은 source/numerical 항목 중 하나를 선택해 실제 계산으로 진전시키는 것이다. 코드 최적화나 형식적인 재심사만 반복하지 말라.
 PR15는 draft/open 상태를 유지하며 이번 인계만으로 merge하지 말라.
 ```

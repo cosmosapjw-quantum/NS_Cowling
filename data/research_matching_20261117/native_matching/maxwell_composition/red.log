@@ -1,0 +1,99 @@
+.FFFFFFF                                                                 [100%]
+=================================== FAILURES ===================================
+____ test_thermo_only_copy_preserves_all_thermo_and_source_without_aliases _____
+
+    def test_thermo_only_copy_preserves_all_thermo_and_source_without_aliases():
+        low,_=composed_pair();low.source_dir="/source/immutable-phase"
+        low.q_extra_count=1;low.q_extra[:]=.3
+>       view=api._thermo_only_view(low)
+             ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'compose_eos.api' has no attribute '_thermo_only_view'
+
+python_frontend/tests/test_maxwell_explicit_drop_20261117.py:38: AttributeError
+____ test_explicit_drop_matches_native_thermo_only_output_and_keeps_inputs _____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-356/test_explicit_drop_matches_nat0')
+
+    def test_explicit_drop_matches_native_thermo_only_output_and_keeps_inputs(tmp_path):
+        low,high=composed_pair()
+        before=[{name:getattr(d,name).copy()for name in THERMO+ABUNDANCES+MASKS} for d in (low,high)]
+        rawlow,rawhigh=physical_pair()
+        ref,_=construct_maxwell_transition(rawlow,rawhigh,assume_local_charge_neutrality=True,return_report=True)
+>       out,report=construct_maxwell_transition(low,high,assume_local_charge_neutrality=True,
+                                              drop_composition=True,return_report=True)
+E       TypeError: construct_maxwell_transition() got an unexpected keyword argument 'drop_composition'
+
+python_frontend/tests/test_maxwell_explicit_drop_20261117.py:60: TypeError
+______________ test_drop_composition_requires_explicit_boolean[1] ______________
+
+bad = 1
+
+    @pytest.mark.parametrize("bad", [1,"true",None])
+    def test_drop_composition_requires_explicit_boolean(bad):
+        low,high=physical_pair()
+>       with pytest.raises(TypeError,match="drop_composition must be bool"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'drop_composition must be bool'
+E         Actual message: "construct_maxwell_transition() got an unexpected keyword argument 'drop_composition'"
+
+python_frontend/tests/test_maxwell_explicit_drop_20261117.py:80: AssertionError
+____________ test_drop_composition_requires_explicit_boolean[true] _____________
+
+bad = 'true'
+
+    @pytest.mark.parametrize("bad", [1,"true",None])
+    def test_drop_composition_requires_explicit_boolean(bad):
+        low,high=physical_pair()
+>       with pytest.raises(TypeError,match="drop_composition must be bool"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'drop_composition must be bool'
+E         Actual message: "construct_maxwell_transition() got an unexpected keyword argument 'drop_composition'"
+
+python_frontend/tests/test_maxwell_explicit_drop_20261117.py:80: AssertionError
+____________ test_drop_composition_requires_explicit_boolean[None] _____________
+
+bad = None
+
+    @pytest.mark.parametrize("bad", [1,"true",None])
+    def test_drop_composition_requires_explicit_boolean(bad):
+        low,high=physical_pair()
+>       with pytest.raises(TypeError,match="drop_composition must be bool"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'drop_composition must be bool'
+E         Actual message: "construct_maxwell_transition() got an unexpected keyword argument 'drop_composition'"
+
+python_frontend/tests/test_maxwell_explicit_drop_20261117.py:80: AssertionError
+___________ test_optin_does_not_remove_unsupported_extra_quantities ____________
+
+    def test_optin_does_not_remove_unsupported_extra_quantities():
+        low,high=composed_pair();low.q_extra_count=1;low.q_extra[:]=.3
+        with pytest.raises(NativeExecutionError,match="Nadd"):
+>           construct_maxwell_transition(low,high,assume_local_charge_neutrality=True,drop_composition=True)
+E           TypeError: construct_maxwell_transition() got an unexpected keyword argument 'drop_composition'
+
+python_frontend/tests/test_maxwell_explicit_drop_20261117.py:86: TypeError
+____ test_pipeline_declared_thermo_only_maxwell_actually_drops_composition _____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-356/test_pipeline_declared_thermo_0')
+
+    def test_pipeline_declared_thermo_only_maxwell_actually_drops_composition(tmp_path):
+        low,high=composed_pair()
+        lo,hi=tmp_path/"low",tmp_path/"high"
+        write_compose(lo,low);write_compose(hi,high)
+        original={str(p):hashlib.sha256(p.read_bytes()).hexdigest()
+                  for d in (lo,hi) for p in d.iterdir()if p.is_file()}
+        result=run_pipeline("maxwell",lo,hi,tmp_path/"matched")
+>       assert result["survived"],result
+E       AssertionError: {'survived': False, 'method': 'maxwell', 'stage': 'maxwell', 'error': "NativeExecutionError: Fortran operation 'maxwel...ow-density phase: v1 Maxwell construction is thermo-only; composition-bearing inputs are rejected, not discarded", ...}
+E       assert False
+
+python_frontend/tests/test_maxwell_explicit_drop_20261117.py:95: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_maxwell_explicit_drop_20261117.py::test_thermo_only_copy_preserves_all_thermo_and_source_without_aliases
+FAILED python_frontend/tests/test_maxwell_explicit_drop_20261117.py::test_explicit_drop_matches_native_thermo_only_output_and_keeps_inputs
+FAILED python_frontend/tests/test_maxwell_explicit_drop_20261117.py::test_drop_composition_requires_explicit_boolean[1]
+FAILED python_frontend/tests/test_maxwell_explicit_drop_20261117.py::test_drop_composition_requires_explicit_boolean[true]
+FAILED python_frontend/tests/test_maxwell_explicit_drop_20261117.py::test_drop_composition_requires_explicit_boolean[None]
+FAILED python_frontend/tests/test_maxwell_explicit_drop_20261117.py::test_optin_does_not_remove_unsupported_extra_quantities
+FAILED python_frontend/tests/test_maxwell_explicit_drop_20261117.py::test_pipeline_declared_thermo_only_maxwell_actually_drops_composition
+7 failed, 1 passed in 0.22s

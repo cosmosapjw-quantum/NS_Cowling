@@ -91,8 +91,17 @@ def _survivor_files(tmp_path):
     for name in ("eos.nb", "eos.t", "eos.yq", "eos.thermo"):
         (pair / name).write_text(name + "\n")
         hashes[name] = hashlib.sha256((pair / name).read_bytes()).hexdigest()
-    return {"pair_id": "example", "method": "css",
-            "admission": {"status": "ADMITTED"}, "output_sha256": hashes}
+    survivor = {"pair_id": "example", "method": "css",
+        "admission": {"status": "ADMITTED", "schema": "ns-cowling.match-report-admission.v1",
+                      "method": "css", "failed_checks": [], "checks": {"example": {"pass": True}}},
+        "output_sha256": hashes, "match_report": {"status": "ok"}, "source_sha256": {},
+        "fortran_executable_sha256": "test-double", "readback_validation": {},
+        "consistency_report": {}, "combined_n": 4, "readback_n": 4,
+        "readback_status": "ok", "consistency_status": "PASS"}
+    receipt = pair.parent / "pair_report.json"
+    receipt.write_text(json.dumps(dict(survivor, survived=True, stage="complete")))
+    survivor["pair_report_sha256"] = hashlib.sha256(receipt.read_bytes()).hexdigest()
+    return survivor
 
 
 def test_survivor_input_hashes_are_verified_before_stellar_solves(tmp_path):

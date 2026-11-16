@@ -67,3 +67,13 @@ MODEL_CONTRACTS = {'APR_APR': {'default_interval_fm3': [0.085, 1.34],
                         'electron_mass_mev': 0.51099895,
                         'muon_mass_mev': 105.6583755,
                         'hbar_c_mev_fm': 197.3269804}}}
+
+# Versioned conditional input, deliberately never the generator default.
+SPG_INFERRED_VARIANT = "public_composition_inferred_20261116"
+SPG_INFERRED_SURFACE = {
+    "path": "data/research_blockers_20261116/spg_inverse/inferred_surface_parameters.json",
+    "sha256": "7d6974d11c5986eb0b10c04aa6c085b3f1508711735edd9f895abca0b7e0cfcd",
+    "classification": "INFERRED_PUBLIC_COMPOSITION_PARAMETERS",
+    "source_equilibrium_equivalence": "UNRESOLVED_SOURCE_BETA_SURFACE_DERIVATIVE_PATTERN",
+    "original_mass_calibration": "UNRESOLVED",
+}

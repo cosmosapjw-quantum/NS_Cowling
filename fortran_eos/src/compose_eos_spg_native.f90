@@ -22,8 +22,17 @@ module compose_eos_spg_native
   logical::stationary=.false.,evaluated=.false.,optimizer_success=.false.
   character(160)::status='not evaluated'
  end type
+ public::spg_native_dilute_uniform_limit
  public::spg_native_cell,spg_native_solve,spg_native_drip,spg_native_endpoint,spg_native_crossing,spg_native_transition
 contains
+ pure logical function spg_native_dilute_uniform_limit(trial,uniform_energy_per_baryon)result(is_limit)
+  type(spg_native_result_t),intent(in)::trial
+  real(wp),intent(in)::uniform_energy_per_baryon
+  ! Both a geometrically negligible phase and independent bulk agreement are
+  ! required. A finite lower cell or a dilute state with distinct energy stays held.
+  is_limit=trial%evaluated.and.trial%volume_fraction<1e-7_wp.and. &
+   abs(trial%energy_per_baryon-uniform_energy_per_baryon)<=1e-9_wp
+ end function
  pure subroutine surface(y,sigma0,b,sigma,derivative)
   real(wp),intent(in)::y,sigma0,b
   real(wp),intent(out)::sigma,derivative
@@ -421,6 +430,8 @@ contains
   real(wp),intent(in),optional::start(4)
   type(spg_native_result_t),allocatable::attempts(:)
   type(spg_native_result_t)::initial
+  type(gdfm_native_beta_t)::uniform_check
+  character(160)::uniform_status
   integer::i,best,nlimit,nlower
   real(wp)::energy
   logical::uniform_limit
@@ -437,6 +448,14 @@ contains
    if(attempts(i)%stationary.or..not.attempts(i)%evaluated)cycle
    uniform_limit=(attempts(i)%z(2)<=nb*(1+2e-6_wp).and.attempts(i)%volume_fraction>1-1e-4_wp).or. &
     (attempts(i)%z(1)<=1.0001e-8_wp.and.attempts(i)%volume_fraction<1e-7_wp)
+   if(.not.uniform_limit.and.attempts(i)%volume_fraction<1e-7_wp)then
+    ! A dilute trial can stop slightly above the artificial t floor. Identify
+    ! its uniform limit by the independent beta-equilibrated bulk energy, not
+    ! by an optimizer-coordinate equality. This does not admit a finite cell.
+    call gdfm_native_beta(model,nb,uniform_check,uniform_status)
+    if(uniform_status=='ok')uniform_limit= &
+     spg_native_dilute_uniform_limit(attempts(i),uniform_check%epsilon/nb-gdfm_mass)
+   endif
    if(uniform_limit)then
     nlimit=nlimit+1
    elseif(attempts(i)%energy_per_baryon<energy-1e-9_wp)then

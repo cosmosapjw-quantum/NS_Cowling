@@ -52,6 +52,45 @@ jobs:
           COMPOSE_EOS_FORTRAN_ROOT: .
           COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
         run: python -m pytest -q python_frontend/tests pipeline/tests
+      - name: Run matching thermodynamic and interval counterexamples
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+          OMP_NUM_THREADS: 1
+          OPENBLAS_NUM_THREADS: 1
+          MKL_NUM_THREADS: 1
+        run: |
+          python fortran_eos/tests/run_matching_native_adversarial.py --build-dir build/matching_controls --log-dir build/matching_controls/logs
+          python -m pytest -q fortran_eos/tests/matching_theory_soft_barotrope.py fortran_eos/tests/matching_theory_maxwell_topology.py
+
+      - name: Verify Maxwell physical invariance under reference reencoding
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/test_maxwell_reference_normalization.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_phase_transition.o \
+            -o build/compose_eos_fortran/test_maxwell_reference_normalization
+          build/compose_eos_fortran/test_maxwell_reference_normalization
+
+      - name: Verify SPG dilute uniform-limit classification
+        env:
+          OMP_NUM_THREADS: 1
+          OPENBLAS_NUM_THREADS: 1
+          MKL_NUM_THREADS: 1
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/spg_finish_regression.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_gdfm_native.o \
+            build/compose_eos_fortran/obj/compose_eos_spg_native.o \
+            build/compose_eos_fortran/obj/compose_eos_optimize_native.o \
+            build/compose_eos_fortran/obj/slsqp_optmz.o \
+            -o build/compose_eos_fortran/spg_finish_regression
+          build/compose_eos_fortran/spg_finish_regression
+
       - name: Regenerate all five composition-aware core models
         env:
           PYTHONPATH: python_frontend

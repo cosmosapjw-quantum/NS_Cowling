@@ -1,0 +1,25 @@
+{
+  "recorded_at_utc": "2026-11-16T18:33:32.027415+00:00",
+  "checkout_base": "478c7b5de1514ac512f91156f36551478f36f688",
+  "identity_scope": "readback identity; concurrent production repairs mean base commit does not certify every working-tree file at execution",
+  "files": {
+    "fortran_eos/tests/matching_theory_soft_barotrope.py": "4810fce128cedc9e3666469be694c9dcaff749482e374955a067bee03b4f4acf",
+    "fortran_eos/tests/matching_theory_maxwell_topology.py": "c69f60499a944e9740b059d6e7fc1ceb3be20795ddae54ef7554d646915d88b2",
+    "build/compose_eos_fortran/compose_eos_fortran": "da4508317cc94a09b5db131895fc86ca769c6ce5aad2bc1a0417a9e769772772"
+  },
+  "red_command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -m pytest -q fortran_eos/tests/matching_theory_soft_barotrope.py",
+  "red_observation": "2 failed, 1 passed in 0.26 s; F endpoint gate still present in executed binary",
+  "topology_command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -m pytest -q fortran_eos/tests/matching_theory_maxwell_topology.py",
+  "topology_observation": "3 passed in 0.17 s",
+  "cas": "Wolfram Language returned d(epsilon)/dn-mu=0, n^2 dF/dn-P=0, dq/dn=-b/n; and H_u=mu*n_uu",
+  "native_changes_review": "New certify_profile/certify_spline polynomial coefficients and scale factors inspected; no algebraic defect found; fullbuild executable regression pending",
+  "green": {
+    "recorded_at_utc": "2026-11-16T18:38:29.451229+00:00",
+    "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 COMPOSE_EOS_FORTRAN_EXE=/tmp/ns_match_478c7b5_20261117/build/matching_native/api/compose_eos_fortran python3 -m pytest -q fortran_eos/tests/matching_theory_soft_barotrope.py fortran_eos/tests/matching_theory_maxwell_topology.py",
+    "result": "6 passed in 0.26s",
+    "log": "data/research_matching_20261117/theory/theory_six_green.log",
+    "executable_sha256": "920a4512e56d028f3f7e3e03680d5e32b915d297b3936963c94467b9ebde716f",
+    "matching_source_sha256": "72ff79e1709f51fa479996fd051a3735ca539fea64e213c28fd3fabc884391f2",
+    "native_owner_frozen_source_sha256": "72ff79e1709f51fa479996fd051a3735ca539fea64e213c28fd3fabc884391f2"
+  }
+}

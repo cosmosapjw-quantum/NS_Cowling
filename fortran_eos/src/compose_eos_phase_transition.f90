@@ -663,7 +663,7 @@ contains
     out%q(1,k)=pressure/n_transition
     out%q(2,k)=0._wp
     out%q(3,k)=mu_t/out%mn-1._wp
-    out%q(4,k)=q4
+    out%q(4,k)=q4*eos%mn/out%mn
     if(eos%il==0)out%q(3,k)=out%q(3,k)-eos%charge_fraction_grid*out%q(4,k)
     out%q(5,k)=0._wp
     eps=mu_t*n_transition-pressure
@@ -680,12 +680,16 @@ contains
     real(wp),intent(in) :: mu_euler
     out%nb(k)=eos%nb(i)
     out%q(:,k)=eos%q(:,i)
+    ! CompOSE Q4 and Q6/Q7 depend on the source normalization mass.
+    ! Decode with that source's mass and re-encode with the output reference;
+    ! no additive rest-energy-per-baryon shift is applied.
+    out%q(4,k)=eos%q(4,i)*eos%mn/out%mn
     out%q(2,k)=0._wp
     out%q(5,k)=0._wp
     out%q(3,k)=mu_euler/out%mn-1._wp
     if(eos%il==0)out%q(3,k)=out%q(3,k)-eos%charge_fraction_grid*out%q(4,k)
-    out%q(6,k)=eos%q(7,i)
-    out%q(7,k)=eos%q(7,i)
+    out%q(6,k)=(1._wp+eos%q(7,i))*eos%mn/out%mn-1._wp
+    out%q(7,k)=out%q(6,k)
     out%q_extra(k)=0._wp
     out%iphase(k)=phase_id
   end subroutine copy_source_row
@@ -710,11 +714,12 @@ contains
       status='caller must explicitly confirm that both input branches are locally charge neutral'
       return
     endif
-    if(abs(low%mn-high%mn)>1.e-12_wp*max(low%mn,high%mn).or. &
-       abs(low%mp-high%mp)>1.e-12_wp*max(low%mp,high%mp)) then
-      status='phase tables must use the same neutron and proton rest-mass conventions'
-      return
-    endif
+    ! Header masses are encoding references, not permission to alter a
+    ! source EOS's absolute gravitating energy. validate_phase decodes each
+    ! input with its own mass; coexistence is solved in physical P and mu.
+    ! Output rows below are re-encoded at low%mn with epsilon and mu_q fixed.
+    ! A physical epsilon -> epsilon+n*Delta m change remains in the input
+    ! curve and cannot be erased or fitted by this normalization operation.
     if(low%il/=high%il.or.low%iyq/=high%iyq.or. &
        abs(low%charge_fraction_grid-high%charge_fraction_grid)>1.e-12_wp) then
       status='phase tables must use the same CompOSE lepton-content and charge-fraction conventions'

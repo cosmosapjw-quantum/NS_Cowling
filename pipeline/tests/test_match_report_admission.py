@@ -102,6 +102,8 @@ def _maxwell_case():
         _css_state(n_b, mu_t, p_t, 0.4, mu_t * (1.0 + 0.02 * j)) for j in range(1, 7)
     ]
     rows = [_row(*s) for s in crust + high]
+    for i, row in enumerate(rows):
+        row[9] = 1 if i < len(crust) else 2
     report = {
         "status": "ok", "operation": "maxwell-transition", "n": len(rows),
         "pressure_crossings": 1, "low_phase_rows": len(crust),
@@ -116,7 +118,8 @@ def _maxwell_case():
     return report, rows
 
 
-META = {"mn": MN, "il": 1, "charge_fraction_grid": 0.0}
+META = {"mn": MN, "il": 1, "charge_fraction_grid": 0.0,
+        "temperature_mev": 0.0, "beta_equilibrated": True}
 
 
 def _failed(result, name):
@@ -323,7 +326,7 @@ def test_admit_from_files_dispatches_by_method(tmp_path):
             w.writerow([repr(v) if isinstance(v, float) else v for v in r])
     nml_path.write_text(
         "&metadata\n"
-        f" mn={MN:.16E}\n il=1\n charge_fraction_grid=0.0000000000000000E+000\n/\n",
+        f" mn={MN:.16E}\n il=1\n charge_fraction_grid=0.0000000000000000E+000\n temperature_mev=0\n beta_equilibrated=T\n/\n",
         encoding="utf-8",
     )
     result = adm.admit_match_report("css", report, csv_path, nml_path)
@@ -453,7 +456,7 @@ def test_admission_rejects_malformed_csv_schema_without_crashing(tmp_path, corru
         writer = csv.writer(fh)
         writer.writerow(header)
         writer.writerows(rows)
-    nml_path.write_text(f"&metadata\nmn={MN}\nil=1\ncharge_fraction_grid=0\n/\n")
+    nml_path.write_text(f"&metadata\nmn={MN}\nil=1\ncharge_fraction_grid=0\ntemperature_mev=0\nbeta_equilibrated=T\n/\n")
     _failed(adm.admit_match_report("css", report, csv_path, nml_path), "serialized_rows_readable")
 
 

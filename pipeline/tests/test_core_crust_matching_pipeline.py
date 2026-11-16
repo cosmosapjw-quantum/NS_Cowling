@@ -8,6 +8,17 @@ import pytest
 from scripts import match_core_crust as pipeline
 
 
+def _complete_mock_sources(tmp_path):
+    """Mocked native stages still require complete source-file inventories."""
+    for side in ("crust", "core"):
+        directory = tmp_path / side
+        directory.mkdir(exist_ok=True)
+        for name in pipeline.REQUIRED_SOURCE_FILES:
+            path = directory / name
+            if not path.exists():
+                path.write_text("mocked native input\n")
+
+
 def _write_internal_csv(
     path: Path, *, q1_second: float = 2.0, yn_present_second: int = 0
 ) -> None:
@@ -177,6 +188,7 @@ def test_pair_runner_classifies_missing_backend_as_environment(tmp_path, monkeyp
         raise NativeExecutionError("compiler unavailable")
 
     monkeypatch.setattr(pipeline, "executable", unavailable)
+    _complete_mock_sources(tmp_path)
     result = pipeline.run_pipeline("css", tmp_path / "crust", tmp_path / "core", tmp_path / "pair")
     assert result["survived"] is False
     assert result["stage"] == "executable"
@@ -203,6 +215,7 @@ def test_pipeline_does_not_mark_css_survived_when_readback_count_differs(tmp_pat
     ])
     monkeypatch.setattr(pipeline, "run_native", lambda action, *args: next(actions))
 
+    _complete_mock_sources(tmp_path)
     result = pipeline.run_pipeline("css", crust_dir, core_dir, out_dir)
 
     assert result["survived"] is False
@@ -253,6 +266,7 @@ def test_pipeline_rejects_native_consistency_failure_after_verified_readback(tmp
         return {"status": "ok"}
 
     monkeypatch.setattr(pipeline, "run_native", fake_run_native)
+    _complete_mock_sources(tmp_path)
     result = pipeline.run_pipeline("css", crust_dir, core_dir, out_dir)
 
     assert result["survived"] is False
@@ -278,6 +292,7 @@ def test_css_runner_roundtrips_real_native_benchmark_pair(tmp_path):
     if not Path(exe).is_file():
         pytest.skip(f"native Fortran executable does not exist: {exe}")
 
+    _complete_mock_sources(tmp_path)
     result = pipeline.run_pipeline("css", crust, core, tmp_path / "css_roundtrip")
 
     assert result["survived"] is True, result
@@ -366,6 +381,7 @@ def test_pipeline_checks_consistency_file_despite_pass_stdout(tmp_path, monkeypa
         return {"status": "ok", "overall": "PASS"}
 
     monkeypatch.setattr(pipeline, "run_native", native)
+    _complete_mock_sources(tmp_path)
     result = pipeline.run_pipeline("css", tmp_path / "crust", tmp_path / "core", tmp_path / "out")
     assert result["survived"] is False
     assert result["stage"] == "consistency"
@@ -381,6 +397,7 @@ def test_pipeline_requires_independent_admission_after_native_pass(tmp_path, mon
     for d in ("crust", "core"):
         (tmp_path / d).mkdir()
 
+    _complete_mock_sources(tmp_path)
     result = pipeline.run_pipeline("css", tmp_path / "crust", tmp_path / "core", tmp_path / "out")
 
     # Native status ok + verifier PASS alone must not create a survivor.
@@ -400,6 +417,7 @@ def test_pipeline_admits_only_when_admission_layer_admits(tmp_path, monkeypatch)
                         lambda *a, **k: {"status": "ADMITTED", "failed_checks": []})
     for d in ("crust", "core"):
         (tmp_path / d).mkdir()
+    _complete_mock_sources(tmp_path)
     result = pipeline.run_pipeline("css", tmp_path / "crust", tmp_path / "core", tmp_path / "out")
     assert result["survived"] is True
     assert result["admission"]["status"] == "ADMITTED"
@@ -413,6 +431,10 @@ def test_native_failure_keeps_stage_and_category(tmp_path, monkeypatch):
     monkeypatch.setattr(pipeline, "executable", lambda: exe)
 
     def fake(action, *args):
+        if action == "read":
+            target = Path(args[1])
+            _write_internal_csv(target / "eos_data.csv")
+            _write_internal_metadata(target / "eos_data.nml")
         if action == "maxwell-transition":
             raise NativeExecutionError(
                 "phase tables must use the same neutron and proton rest-mass conventions",
@@ -422,6 +444,7 @@ def test_native_failure_keeps_stage_and_category(tmp_path, monkeypatch):
     monkeypatch.setattr(pipeline, "run_native", fake)
     for d in ("crust", "core"):
         (tmp_path / d).mkdir()
+    _complete_mock_sources(tmp_path)
     result = pipeline.run_pipeline("maxwell", tmp_path / "crust", tmp_path / "core", tmp_path / "out")
     assert result["survived"] is False
     assert result["stage"] == "maxwell"

@@ -1,0 +1,54 @@
+{
+  "baseline_head": "478c7b5de1514ac512f91156f36551478f36f688",
+  "scope": "Explicit frontend thermo-only transport; no change to physical input columns or native physics",
+  "red": {
+    "failed": 7,
+    "passed": 1,
+    "returncode": 1
+  },
+  "green": {
+    "passed": 8,
+    "returncode": 0
+  },
+  "affected_suite": {
+    "passed": 165,
+    "returncode": 0,
+    "command": [
+      "python3",
+      "-m",
+      "pytest",
+      "-q",
+      "python_frontend/tests/test_maxwell_explicit_drop_20261117.py",
+      "python_frontend/tests/test_native_maxwell_transition.py",
+      "python_frontend/tests/test_maxwell_mass_gate.py",
+      "python_frontend/tests/test_mass_normalization_contract.py",
+      "python_frontend/tests/test_matching_support_20261117.py",
+      "python_frontend/tests/test_maxwell_v2_composition.py",
+      "pipeline/tests/test_core_crust_matching_pipeline.py",
+      "pipeline/tests/test_matching_pipeline_audit_20261117.py",
+      "pipeline/tests/test_match_report_admission.py"
+    ]
+  },
+  "source_sha256": {
+    "python_frontend/compose_eos/api.py": "6c6fdfdf58e16078dacc6358dfe2e4ccb01591e83e05e4e571c06933bbf1b206",
+    "scripts/match_core_crust.py": "feb97734c1de551aa555fff30b93b008903c7e8eac473988a5335841fb8966c7",
+    "python_frontend/tests/test_maxwell_explicit_drop_20261117.py": "605548fd2bcc19e0a7aabd7801f5128e539f3a469a6c420e3ccafc9e50d3c5eb",
+    "pipeline/tests/test_core_crust_matching_pipeline.py": "d196361ccd86b552dfa6b43d995d9e447c547659af1eb87e1fbbd6b2a2589314",
+    "docs/research_matching_20261117/native_matching/MAXWELL_COMPOSITION.md": "9ca789aba7a66a3d6397f194271f3c1bc3cca90c74ed0b61c266f844b13b45d9"
+  },
+  "native_binary_sha256": "821adc0f1380f36025fc788faad88305d4d21247b7687b828a034aec552eaee8",
+  "threads": 1,
+  "logs_sha256": {
+    "affected.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "affected.log": "340e95baec30e8381bc67878b8f1411c099cc9df0078a5fcd1f2b413e01bcf78",
+    "green.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "green.log": "82469cff4e1df5f2929bd2a6f5a9056a2e1a28f7c4cf9d7c208922ea0c54d799",
+    "red.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "red.log": "50cd23a1263194d5e3849021383b0af610d11de2f0d9aa765260006f9a6298b2"
+  },
+  "unchanged_native_kernel_contract": "Composition-bearing input rejected; no Nadd or source-support broadening",
+  "default_api": "drop_composition=False",
+  "explicit_api": "drop_composition=True",
+  "pipeline_policy": "explicit_thermo_only_pipeline",
+  "remaining": "Parent actual-source Maxwell rerun and final full regression"
+}

@@ -71,6 +71,33 @@ def _validated_survivor_dir(census_dir: Path, survivor: dict) -> Path:
     directory = (census_dir / pair / "compose").resolve()
     if not directory.is_relative_to(census_dir.resolve()):
         raise ValueError("survivor input leaves census directory")
+    # The manifest is a summary. Bind it to the preserved pair receipt so a
+    # copied ADMITTED flag or a changed match report cannot promote another run.
+    receipt_path = directory.parent / "pair_report.json"
+    try:
+        receipt_bytes = receipt_path.read_bytes()
+        receipt = json.loads(receipt_bytes)
+    except (OSError, UnicodeError, ValueError) as exc:
+        raise ValueError("survivor pair receipt is missing or unreadable") from exc
+    if (not receipt_path.resolve().is_relative_to(census_dir.resolve())
+            or hashlib.sha256(receipt_bytes).hexdigest() != survivor.get("pair_report_sha256")):
+        raise ValueError("survivor pair receipt sha256 mismatch")
+    if (not isinstance(receipt, dict) or receipt.get("survived") is not True
+            or receipt.get("stage") != "complete" or receipt.get("pair_id") != pair):
+        raise ValueError("survivor pair receipt is not a completed admission")
+    for key in ("method", "admission", "output_sha256", "match_report", "source_sha256",
+                "fortran_executable_sha256", "readback_validation", "consistency_report",
+                "combined_n", "readback_n", "readback_status", "consistency_status"):
+        if key not in survivor or key not in receipt or survivor[key] != receipt[key]:
+            raise ValueError(f"survivor disagrees with pair receipt: {key}")
+    admission = survivor["admission"]
+    checks = admission.get("checks")
+    if (admission.get("schema") != "ns-cowling.match-report-admission.v1"
+            or admission.get("method") != "css" or admission.get("failed_checks") != []
+            or not isinstance(checks, dict) or not checks
+            or any(not isinstance(item, dict) or item.get("pass") is not True
+                   for item in checks.values())):
+        raise ValueError("survivor admission receipt is incomplete or inconsistent")
     hashes = survivor.get("output_sha256", {})
     required = {"eos.nb", "eos.t", "eos.yq", "eos.thermo"}
     actual = {p.name for p in directory.glob("eos.*") if p.is_file()}

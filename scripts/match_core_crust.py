@@ -39,6 +39,8 @@ sys.path.insert(0, str(ROOT / "python_frontend"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from compose_eos.native import executable, run_native  # noqa: E402
+from compose_eos.eos_data import EOSData  # noqa: E402
+from compose_eos.api import _matching_source_support, _matching_support_record, _thermo_only_view  # noqa: E402
 from match_report_admission import admit_match_report, classify_failure  # noqa: E402
 
 # CompOSE files the native reader needs for a thermodynamic table. A model
@@ -376,19 +378,23 @@ def _source_compose_hashes(directory: Path) -> dict[str, str]:
 
 def _source_scope(directory: Path) -> dict:
     """Carry reconstruction scope forward without inferring physical calibration."""
+    try:
+        support = _matching_support_record(directory)
+    except (OSError, UnicodeError, ValueError) as exc:
+        support = {"support_error": str(exc)}
     receipt = directory / "reconstruction_receipt.json"
     if not receipt.is_file():
-        return {"scientific_scope": "not_recorded", "source_calibrated": None}
+        return {"scientific_scope": "not_recorded", "source_calibrated": None, **support}
     try:
         record = json.loads(receipt.read_text(encoding="utf-8"))
         if not isinstance(record, dict):
             raise ValueError("receipt must be an object")
         return {"scientific_scope": record.get("scientific_scope", "not_recorded"),
                 "source_calibrated": record.get("source_calibrated"),
-                "reconstruction_receipt_sha256": sha256_file(receipt)}
+                "reconstruction_receipt_sha256": sha256_file(receipt), **support}
     except (OSError, UnicodeError, ValueError) as exc:
         return {"scientific_scope": "unreadable_receipt", "source_calibrated": None,
-                "error": str(exc)}
+                "error": str(exc), **support}
 
 
 def _source_identity(directory: Path) -> str | None:
@@ -491,7 +497,18 @@ def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) ->
                "failure_category": marker[0], "error": marker[1],
                "source_marker": marker[1]}
     else:
-        res = _run_pipeline(method, crust_dir, core_dir, out_dir)
+        missing = {"crust": _missing_sources(Path(crust_dir)),
+                   "core": _missing_sources(Path(core_dir))}
+        if any(missing.values()):
+            res = {"survived": False, "method": method, "stage": "source",
+                   "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+                   "failure_category": "data_provenance",
+                   "error": "missing CompOSE source files: " + "; ".join(
+                       f"{side}={','.join(names)}" for side, names in missing.items() if names),
+                   "missing_source_files": sorted(set(missing["crust"]) | set(missing["core"])),
+                   "missing_source_detail": missing}
+        else:
+            res = _run_pipeline(method, crust_dir, core_dir, out_dir)
     # Preserve input identity on failures too, before the per-pair receipt is saved.
     res.setdefault("source_sha256", {"crust": _source_compose_hashes(Path(crust_dir)),
                                      "core": _source_compose_hashes(Path(core_dir))})
@@ -524,6 +541,7 @@ def _run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) -
                 "error": f"{type(exc).__name__}: {exc}"}
 
     stage = "read_crust"
+    composition_transport = {}
     try:
         # 1. read crust -> internal
         r1 = run_native("read", str(crust_dir), str(crust_internal))
@@ -537,11 +555,41 @@ def _run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) -
             return {"survived": False, "method": method, "stage": "read_core",
                     "error": r2.get("message", "?")}
 
+        stage = "source_support"
+        source_support = {
+            "crust": _matching_source_support(EOSData.from_internal_directory(
+                crust_internal, source_dir=str(crust_dir))),
+            "core": _matching_source_support(EOSData.from_internal_directory(
+                core_internal, source_dir=str(core_dir))),
+        } if (_matching_support_record(crust_dir) or _matching_support_record(core_dir)) else {
+            "crust": {"status": "NOT_DECLARED"}, "core": {"status": "NOT_DECLARED"}}
         stage = method
         if method == "maxwell":
-            # maxwell-transition: low=crust, high=core, local_neutrality=true
-            r3 = run_native("maxwell-transition", str(crust_internal), str(core_internal),
+            # This pipeline explicitly promises thermo-only matching. Preserve
+            # the original native readback and serialize distinct views with
+            # abundance values/masks removed, retaining every physical column
+            # and phase label. The strict native kernel itself is unchanged.
+            views = {}
+            composition_transport = {"policy": "explicit_thermo_only_pipeline",
+                                     "composition_dropped": False, "sources": {}}
+            for side, original, source in (("crust", crust_internal, crust_dir),
+                                           ("core", core_internal, core_dir)):
+                data = EOSData.from_internal_directory(original, source_dir=str(source))
+                present = bool(data.composition_file_present or data.composition_available)
+                view = _thermo_only_view(data)
+                target = work / (side + "_thermo_internal")
+                view.write_internal_directory(target)
+                views[side] = target
+                composition_transport["composition_dropped"] |= present
+                composition_transport["sources"][side] = {
+                    "composition_input_present": present,
+                    "thermo_internal_sha256": {name: sha256_file(target/name)
+                                               for name in ("eos_data.csv", "eos_data.nml")}}
+            (work / "composition_transport.json").write_text(
+                json.dumps(composition_transport, indent=2) + "\n", encoding="utf-8")
+            r3 = run_native("maxwell-transition", str(views["crust"]), str(views["core"]),
                             str(matched_internal), "true")
+            r3 = dict(r3, composition_dropped=composition_transport["composition_dropped"])
         else:  # css
             r3 = run_native("match-core", str(crust_internal), str(core_internal),
                             str(matched_internal), "css", str(N_BRIDGE), "true")
@@ -704,6 +752,9 @@ def _run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) -
             "consistency_report": consistency_report,
             "admission": admission,
             "source_sha256": source_hashes,
+            "source_support": source_support,
+            "composition_dropped": bool(r3.get("composition_dropped", False)),
+            "composition_transport": composition_transport,
             "output_sha256": output_hashes,
             "output_files": output_files,
             "fortran_executable_sha256": exe_sha,
@@ -723,6 +774,8 @@ def _run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) -
         return {"survived": False, "method": method, "stage": stage,
                 "error": f"{type(exc).__name__}: {exc}",
                 "native_category": getattr(exc, "category", None),
+                "composition_transport": composition_transport,
+                "composition_dropped": bool(composition_transport.get("composition_dropped", False)),
                 "exception_type": type(exc).__name__}
 
 

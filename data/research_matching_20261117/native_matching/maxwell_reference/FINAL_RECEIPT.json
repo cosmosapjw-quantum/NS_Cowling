@@ -1,0 +1,76 @@
+{
+  "baseline_head": "478c7b5de1514ac512f91156f36551478f36f688",
+  "classification": "implementation-verified reference normalization; no physical energy shift",
+  "source_sha256": {
+    "fortran_eos/src/compose_eos_phase_transition.f90": "dd4cfe31b231293810627629bb737293786f259c964e834f0a39cee08f38b6de",
+    "fortran_eos/app/compose_eos_fortran.f90": "9aee3120f40c1e0d339229933fc0a26b34102488732733da53d93ed999df254f",
+    "fortran_eos/tests/test_maxwell_reference_normalization.f90": "44f606bcf89fc4fc53ada9c4ae4f6eb93909819723e869f76c5829ac749661a2",
+    "python_frontend/tests/test_maxwell_mass_gate.py": "315249544051dfda07aa67bfd8988acc584ab3de7b3be133c16dd728dd99bea3",
+    "python_frontend/tests/test_mass_normalization_contract.py": "2332e0ccf6da26ea5c2141e9b8fe9cfc268de005269242403dd8a370d07c0acf",
+    "docs/research_matching_20261117/native_matching/MAXWELL_REFERENCE.md": "4480a2e812a03efe9659796b9f7c9e57e2703c4d01e130c49054b785ea081932"
+  },
+  "baseline_phase_transition_sha256": "aa15b92d4c4dfe27af7a95e6f5b293b65a7427068a38f13843f14b3b9119daad",
+  "executable": "/tmp/ns_match_478c7b5_20261117/build/matching_native/maxwell_api/compose_eos_fortran",
+  "executable_sha256": "821adc0f1380f36025fc788faad88305d4d21247b7687b828a034aec552eaee8",
+  "build_source_signature": "205dff44f059f01febbf6f1a9b1d99d11ac3d93a4be6b7df3f96b7307b1d95da",
+  "threads": 1,
+  "build_command": [
+    "bash",
+    "fortran_eos/build.sh",
+    "--ensure",
+    "build/matching_native/maxwell_api"
+  ],
+  "api_tests_command": [
+    "python3",
+    "-m",
+    "pytest",
+    "-q",
+    "python_frontend/tests/test_maxwell_mass_gate.py",
+    "python_frontend/tests/test_mass_normalization_contract.py",
+    "python_frontend/tests/test_native_maxwell_transition.py",
+    "python_frontend/tests/test_native_maxwell_root_isolation.py",
+    "python_frontend/tests/test_maxwell_source_convexity.py",
+    "python_frontend/tests/test_maxwell_status_taxonomy.py",
+    "python_frontend/tests/test_maxwell_v2_composition.py"
+  ],
+  "api_result": {
+    "passed": 84,
+    "returncode": 0
+  },
+  "native_result": {
+    "equivalent_encodings": 6,
+    "physical_offsets_rejected": 2,
+    "max_epsilon_difference_mev_fm3": 2.842170943040401e-14,
+    "returncode": 0
+  },
+  "native_compile_command": [
+    "gfortran",
+    "-std=f2018",
+    "-O2",
+    "-ffree-line-length-none",
+    "-fcheck=all",
+    "-ffpe-trap=zero,invalid,overflow",
+    "-I/tmp/ns_match_478c7b5_20261117/build/matching_native/maxwell_api/mod",
+    "fortran_eos/tests/test_maxwell_reference_normalization.f90",
+    "/tmp/ns_match_478c7b5_20261117/build/matching_native/maxwell_api/obj/compose_eos_types.o",
+    "/tmp/ns_match_478c7b5_20261117/build/matching_native/maxwell_api/obj/compose_eos_phase_transition.o",
+    "-o",
+    "/tmp/ns_match_478c7b5_20261117/build/matching_native/maxwell_api/test_maxwell_reference_normalization"
+  ],
+  "native_run_command": [
+    "/tmp/ns_match_478c7b5_20261117/build/matching_native/maxwell_api/test_maxwell_reference_normalization"
+  ],
+  "logs_sha256": {
+    "api_build.log": "de22cbf97137b5004ff6e805c7016b95453d63557ea85d6ea05c1fea54d954f8",
+    "api_tests.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "api_tests.log": "e3b11d4db8d9b78924a94a548e40b1dfd700eca19eb737956c372ccd9a2958f8",
+    "api_tests_final.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "api_tests_final.log": "d667f40bcef1bd9dcd0f56139db3afdb86dd1b3f13865bba61ac470163d3e5ab",
+    "compose_eos_phase_transition.before.f90": "aa15b92d4c4dfe27af7a95e6f5b293b65a7427068a38f13843f14b3b9119daad",
+    "final_native.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "final_native.log": "de3f5c879ca17e05e88427750f9d7d30f10fc0ba95088b6d5c3466569d85eadd",
+    "green.log": "de3f5c879ca17e05e88427750f9d7d30f10fc0ba95088b6d5c3466569d85eadd",
+    "red.log": "59ac904959e08e7352ae4dfc7cb106bcb0b11a541659662ac737ebda266a279c"
+  },
+  "remaining": "Parent real-pair rerun and full regression; source phase support constraints unchanged."
+}

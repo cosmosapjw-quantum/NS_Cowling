@@ -1,0 +1,109 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_source_support_is_distinct_from_physical_impossibility[the two phases have no overlapping baryon-chemical-potential interval-NO_COMMON_MU_SUPPORT-input_contract] _
+
+message = 'the two phases have no overlapping baryon-chemical-potential interval'
+native_category = 'NO_COMMON_MU_SUPPORT', expected = 'input_contract'
+
+    @pytest.mark.parametrize("message,native_category,expected", [
+        ("the two phases have no overlapping baryon-chemical-potential interval", "NO_COMMON_MU_SUPPORT", "input_contract"),
+        ("", "NO_COMMON_MU_SUPPORT", "input_contract"),
+        ("matching source support forbids cross-phase interpolation", None, "input_contract"),
+        ("no convex matching window", None, "implementation_scope"),
+        ("unsupported canonical profile: exact polynomial failed interval construction", None, "implementation_scope"),
+    ])
+    def test_source_support_is_distinct_from_physical_impossibility(message, native_category, expected):
+>       assert classify_failure("matching", message, native_category) == expected
+E       AssertionError: assert 'physical' == 'input_contract'
+E         
+E         - input_contract
+E         + physical
+
+pipeline/tests/test_matching_support_taxonomy_20261117.py:13: AssertionError
+_ test_source_support_is_distinct_from_physical_impossibility[-NO_COMMON_MU_SUPPORT-input_contract] _
+
+message = '', native_category = 'NO_COMMON_MU_SUPPORT'
+expected = 'input_contract'
+
+    @pytest.mark.parametrize("message,native_category,expected", [
+        ("the two phases have no overlapping baryon-chemical-potential interval", "NO_COMMON_MU_SUPPORT", "input_contract"),
+        ("", "NO_COMMON_MU_SUPPORT", "input_contract"),
+        ("matching source support forbids cross-phase interpolation", None, "input_contract"),
+        ("no convex matching window", None, "implementation_scope"),
+        ("unsupported canonical profile: exact polynomial failed interval construction", None, "implementation_scope"),
+    ])
+    def test_source_support_is_distinct_from_physical_impossibility(message, native_category, expected):
+>       assert classify_failure("matching", message, native_category) == expected
+E       AssertionError: assert 'physical' == 'input_contract'
+E         
+E         - input_contract
+E         + physical
+
+pipeline/tests/test_matching_support_taxonomy_20261117.py:13: AssertionError
+_ test_source_support_is_distinct_from_physical_impossibility[matching source support forbids cross-phase interpolation-None-input_contract] _
+
+message = 'matching source support forbids cross-phase interpolation'
+native_category = None, expected = 'input_contract'
+
+    @pytest.mark.parametrize("message,native_category,expected", [
+        ("the two phases have no overlapping baryon-chemical-potential interval", "NO_COMMON_MU_SUPPORT", "input_contract"),
+        ("", "NO_COMMON_MU_SUPPORT", "input_contract"),
+        ("matching source support forbids cross-phase interpolation", None, "input_contract"),
+        ("no convex matching window", None, "implementation_scope"),
+        ("unsupported canonical profile: exact polynomial failed interval construction", None, "implementation_scope"),
+    ])
+    def test_source_support_is_distinct_from_physical_impossibility(message, native_category, expected):
+>       assert classify_failure("matching", message, native_category) == expected
+E       AssertionError: assert 'unclassified' == 'input_contract'
+E         
+E         - input_contract
+E         + unclassified
+
+pipeline/tests/test_matching_support_taxonomy_20261117.py:13: AssertionError
+_ test_source_support_is_distinct_from_physical_impossibility[no convex matching window-None-implementation_scope] _
+
+message = 'no convex matching window', native_category = None
+expected = 'implementation_scope'
+
+    @pytest.mark.parametrize("message,native_category,expected", [
+        ("the two phases have no overlapping baryon-chemical-potential interval", "NO_COMMON_MU_SUPPORT", "input_contract"),
+        ("", "NO_COMMON_MU_SUPPORT", "input_contract"),
+        ("matching source support forbids cross-phase interpolation", None, "input_contract"),
+        ("no convex matching window", None, "implementation_scope"),
+        ("unsupported canonical profile: exact polynomial failed interval construction", None, "implementation_scope"),
+    ])
+    def test_source_support_is_distinct_from_physical_impossibility(message, native_category, expected):
+>       assert classify_failure("matching", message, native_category) == expected
+E       AssertionError: assert 'physical' == 'implementation_scope'
+E         
+E         - implementation_scope
+E         + physical
+
+pipeline/tests/test_matching_support_taxonomy_20261117.py:13: AssertionError
+_ test_source_support_is_distinct_from_physical_impossibility[unsupported canonical profile: exact polynomial failed interval construction-None-implementation_scope] _
+
+message = 'unsupported canonical profile: exact polynomial failed interval construction'
+native_category = None, expected = 'implementation_scope'
+
+    @pytest.mark.parametrize("message,native_category,expected", [
+        ("the two phases have no overlapping baryon-chemical-potential interval", "NO_COMMON_MU_SUPPORT", "input_contract"),
+        ("", "NO_COMMON_MU_SUPPORT", "input_contract"),
+        ("matching source support forbids cross-phase interpolation", None, "input_contract"),
+        ("no convex matching window", None, "implementation_scope"),
+        ("unsupported canonical profile: exact polynomial failed interval construction", None, "implementation_scope"),
+    ])
+    def test_source_support_is_distinct_from_physical_impossibility(message, native_category, expected):
+>       assert classify_failure("matching", message, native_category) == expected
+E       AssertionError: assert 'unclassified' == 'implementation_scope'
+E         
+E         - implementation_scope
+E         + unclassified
+
+pipeline/tests/test_matching_support_taxonomy_20261117.py:13: AssertionError
+=========================== short test summary info ============================
+FAILED pipeline/tests/test_matching_support_taxonomy_20261117.py::test_source_support_is_distinct_from_physical_impossibility[the two phases have no overlapping baryon-chemical-potential interval-NO_COMMON_MU_SUPPORT-input_contract]
+FAILED pipeline/tests/test_matching_support_taxonomy_20261117.py::test_source_support_is_distinct_from_physical_impossibility[-NO_COMMON_MU_SUPPORT-input_contract]
+FAILED pipeline/tests/test_matching_support_taxonomy_20261117.py::test_source_support_is_distinct_from_physical_impossibility[matching source support forbids cross-phase interpolation-None-input_contract]
+FAILED pipeline/tests/test_matching_support_taxonomy_20261117.py::test_source_support_is_distinct_from_physical_impossibility[no convex matching window-None-implementation_scope]
+FAILED pipeline/tests/test_matching_support_taxonomy_20261117.py::test_source_support_is_distinct_from_physical_impossibility[unsupported canonical profile: exact polynomial failed interval construction-None-implementation_scope]
+5 failed in 0.14s

@@ -29,6 +29,7 @@ import csv
 import math
 import re
 from pathlib import Path
+from numbers import Integral
 from typing import Any, Iterable, Mapping, Sequence
 
 SCHEMA = "ns-cowling.match-report-admission.v1"
@@ -99,19 +100,27 @@ def rows_from_table(table: Iterable[Sequence[Any] | Mapping[str, Any]],
         mu_q3 = (vals["Q3"] + 1.0) * mn
         if il == 0:
             mu_q3 += yq * vals["Q4"] * mn
-        out.append({"n": n, "P": p, "eps": eps, "mu_e": mu_e, "mu_q3": mu_q3})
+        phase = raw.get("Iphase", math.nan) if isinstance(raw, Mapping) else (raw[9] if len(raw) > 9 else math.nan)
+        out.append({"n": n, "P": p, "eps": eps, "mu_e": mu_e, "mu_q3": mu_q3,
+                    "Q2": vals["Q2"], "Q5": vals["Q5"], "Q6": vals["Q6"],
+                    "Q7": vals["Q7"], "Iphase": _float_or_nan(phase)})
     return out
 
 
 def _parse_metadata(path: Path) -> dict[str, Any]:
     meta: dict[str, Any] = {}
     text = path.read_text(encoding="utf-8")
-    for key in ("mn", "il", "charge_fraction_grid"):
+    for key in ("mn", "il", "charge_fraction_grid", "temperature_mev", "beta_equilibrated"):
         m = re.search(rf"^\s*{key}\s*=\s*([^\s,/]+)", text, flags=re.MULTILINE | re.IGNORECASE)
         if m is None:
             raise ValueError(f"metadata key {key!r} missing in {path}")
         token = m.group(1).replace("D", "E").replace("d", "e")
-        meta[key] = int(token) if key == "il" else float(token)
+        if key == "beta_equilibrated":
+            if token.lower() not in ("t", ".true.", "f", ".false."):
+                raise ValueError("invalid beta_equilibrated metadata")
+            meta[key] = token.lower() in ("t", ".true.")
+        else:
+            meta[key] = int(token) if key == "il" else float(token)
     return meta
 
 
@@ -204,6 +213,8 @@ def _missing(report: Mapping[str, Any], keys: Sequence[str]) -> list[str]:
 
 
 def _int_index(report: Mapping[str, Any], key: str) -> int | None:
+    if isinstance(report.get(key), bool) or not isinstance(report.get(key), Integral):
+        return None
     try:
         f = float(report.get(key))
     except (TypeError, ValueError, OverflowError):
@@ -248,6 +259,31 @@ def _physical_rows(c: _Checks, rows: list[dict[str, float]]) -> bool:
     return True
 
 
+def _cold_checks(c: _Checks, rows: list[dict[str, float]], meta: Mapping[str, Any],
+                 method: str) -> None:
+    """Retain the native cold-state contract through the row projection."""
+    temperature = _float_or_nan(meta.get("temperature_mev"))
+    entropy_gate = 1.0e-10 if method == "css" else 2.0e-8
+    invalid = []
+    for i, row in enumerate(rows):
+        q2, q5, q6, q7 = (_float_or_nan(row.get(k)) for k in ("Q2", "Q5", "Q6", "Q7"))
+        if (not _finite(q2, q5, q6, q7) or abs(q2) > entropy_gate
+                or abs(q6 - q7) > 2.0e-6
+                or ((method == "maxwell" or meta.get("il") == 1) and abs(q5) > 1.0e-8)):
+            invalid.append(i)
+    c.add("serialized_cold_contract", bool(rows) and not invalid
+          and _finite(temperature) and abs(temperature) <= 1.0e-12
+          and meta.get("beta_equilibrated") is True,
+          temperature_mev=temperature, invalid_rows=invalid, entropy_gate=entropy_gate)
+
+
+def _report_identity(c: _Checks, report: Mapping[str, Any], method: str) -> None:
+    operation = "match-core" if method == "css" else "maxwell-transition"
+    c.add("native_report_identity", report.get("status") == "ok"
+          and report.get("operation") == operation,
+          status=report.get("status"), operation=report.get("operation"))
+
+
 def _float_or_nan(value: Any) -> float:
     try:
         return float(value)
@@ -269,6 +305,7 @@ def _report_vs_rows(c: _Checks, pairs: Mapping[str, tuple[float, float, float | 
 def admit_css(report: Mapping[str, Any], rows: list[dict[str, float]],
               meta: Mapping[str, Any]) -> dict[str, Any]:
     c = _Checks()
+    _report_identity(c, report, "css")
     missing = _missing(report, _CSS_REQUIRED)
     c.add("report_fields_present", not missing, missing=missing)
     if missing:
@@ -310,6 +347,9 @@ def admit_css(report: Mapping[str, Any], rows: list[dict[str, float]],
         return c.result("css")
     if not _physical_rows(c, rows):
         return c.result("css")
+    _cold_checks(c, rows, meta, "css")
+    c.add("serialized_phase_layout", all(row.get("Iphase") == 0 for row in rows),
+          expected="native thermo-only CSS output uses Iphase=0")
     _branch_checks(c, rows[:lo + 1], "crust_branch")
     _branch_checks(c, rows[hi:core + 1], "css_branch")
     _branch_checks(c, rows[core:], "core_branch")
@@ -398,6 +438,7 @@ def admit_css(report: Mapping[str, Any], rows: list[dict[str, float]],
 def admit_maxwell(report: Mapping[str, Any], rows: list[dict[str, float]],
                   meta: Mapping[str, Any]) -> dict[str, Any]:
     c = _Checks()
+    _report_identity(c, report, "maxwell")
     missing = _missing(report, _MAXWELL_REQUIRED)
     c.add("report_fields_present", not missing, missing=missing)
     if missing:
@@ -418,6 +459,11 @@ def admit_maxwell(report: Mapping[str, Any], rows: list[dict[str, float]],
     if not _physical_rows(c, rows):
         return c.result("maxwell")
 
+    _cold_checks(c, rows, meta, "maxwell")
+    c.add("serialized_phase_layout",
+          all(row.get("Iphase") == 1 for row in rows[:n_low])
+          and all(row.get("Iphase") == 2 for row in rows[n_low:]),
+          expected="native Maxwell output uses contiguous low=1/high=2 blocks")
     rl, rh = rows[n_low - 1], rows[n_low]
     p_t, mu_t = rl["P"], rl["mu_e"]
     ok, r = _close(rh["P"], rl["P"], PRESSURE_REL_GATE)
@@ -463,6 +509,10 @@ def admit_maxwell(report: Mapping[str, Any], rows: list[dict[str, float]],
 def admit_match_report(method: str, report: Mapping[str, Any],
                        csv_path: Path, nml_path: Path) -> dict[str, Any]:
     """Admit a native match report against serialized readback rows."""
+    if not isinstance(report, Mapping):
+        c = _Checks()
+        c.add("report_fields_present", False, error="match report must be an object")
+        return c.result(method)
     if method not in ("css", "maxwell"):
         c = _Checks()
         c.add("method_supported", False, value=method)
@@ -487,20 +537,23 @@ _RULES: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("implementation_scope", (
         "composition", "nadd", "not yet integrated", "not yet ported",
         "multiple pressure-equality roots", "exactly one isolated",
-        "locally charge neutral", "native matching currently requires cold")),
+        "locally charge neutral", "native matching currently requires cold",
+        "no convex matching window", "unsupported canonical profile")),
     ("input_contract", (
         "beta-equilibrat", "beta-equilibrium", "requires t=0", "zero entropy",
         "q6 and q7", "q6=q7", "lepton potential", "iphase", "single smooth phase",
         "provider q3", "each phase must have strictly increasing",
         "at least three source points", "core table has no point", "phase eos",
-        "not enough points", "invalid crust eos", "invalid core eos")),
+        "not enough points", "invalid crust eos", "invalid core eos",
+        "no overlapping", "insufficient common", "matching source support",
+        "fewer than two retained source knots")),
     ("physical", (
-        "no causal single-speed css", "no pressure equality", "no overlapping",
-        "insufficient common", "does not connect a distinct denser",
+        "no causal single-speed css", "no pressure equality",
+        "does not connect a distinct denser",
         "no positive crust-to-bridge density jump", "nonpositive energy density or jump",
-        "endpoints must increase", "no convex matching window",
+        "endpoints must increase",
         "endpoint sound speed is outside", "violates 0", "causal bound",
-        "fewer than two retained source knots", "coexistence energy densities are nonpositive")),
+        "coexistence energy densities are nonpositive")),
     ("unresolved_source_or_interpolant_shape", ("interpolation violates",)),
     ("numerical", (
         "first-law integral tolerance", "did not converge", "residual check", "nonfinite",
@@ -512,7 +565,7 @@ _NATIVE_CATEGORY = {
     "MASS_CONVENTION_FAIL": "implementation_convention",
     "BETA_EQUILIBRIUM_FAIL": "input_contract",
     "CAUSALITY_FAIL": "physical",
-    "NO_COMMON_MU_SUPPORT": "physical",
+    "NO_COMMON_MU_SUPPORT": "input_contract",
     "NO_COEXISTENCE_CROSSING": "physical",
     "MULTIPLE_COEXISTENCE_CROSSINGS": "implementation_scope",
     "NONPOSITIVE_DENSITY_JUMP": "physical",
@@ -528,6 +581,8 @@ def classify_failure(stage: str | None, message: str | None, native_category: st
     s = (message or "").lower()
     if stage == "source" or "missing compose source" in s:
         return "data_provenance"
+    if stage == "source_support":
+        return "input_contract"
     if stage == "admission":
         return "admission"
     if stage in ("readback", "write"):

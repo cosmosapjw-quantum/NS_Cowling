@@ -223,13 +223,161 @@ contains
     enddo
   end subroutine make_c2_knots
 
+  pure real(wp) function polynomial_value(c,degree,x) result(value)
+    real(wp),intent(in)::c(0:5),x
+    integer,intent(in)::degree
+    integer::j
+    value=c(degree)
+    do j=degree-1,0,-1
+      value=value*x+c(j)
+    enddo
+  end function polynomial_value
+
+  recursive subroutine polynomial_roots_unit(c,degree,roots,nroots)
+    ! Isolate all real roots using derivative roots to partition [0,1]
+    ! into monotone intervals. Stationary zeros retain tangencies.
+    real(wp),intent(in)::c(0:5)
+    integer,intent(in)::degree
+    real(wp),intent(out)::roots(32)
+    integer,intent(out)::nroots
+    real(wp)::dc(0:5),critical(32),bounds(34),lo,hi,mid,flo,fhi,fmid,tol,normalization
+    integer::d,ncritical,j,k,iter
+    roots=0._wp;nroots=0;d=degree
+    do while(d>0)
+      if(c(d)/=0._wp)exit
+      d=d-1
+    enddo
+    if(d==0)return
+    if(d==1)then
+      mid=-c(0)/c(1)
+      if(mid>=0._wp.and.mid<=1._wp)then;nroots=1;roots(1)=mid;endif
+      return
+    endif
+    dc=0._wp
+    do j=1,d;dc(j-1)=real(j,wp)*c(j);enddo
+    normalization=maxval(abs(dc))
+    if(normalization>0._wp)dc=dc/normalization
+    call polynomial_roots_unit(dc,d-1,critical,ncritical)
+    bounds(1)=0._wp;bounds(2:ncritical+1)=critical(:ncritical);bounds(ncritical+2)=1._wp
+    tol=32._wp*epsilon(1._wp)*sum(abs(c(:d)))
+    do j=1,ncritical+2
+      mid=bounds(j);fmid=polynomial_value(c,d,mid)
+      if(abs(fmid)<=tol)call append_root(mid)
+      if(j==ncritical+2)exit
+      lo=mid;hi=bounds(j+1);flo=fmid;fhi=polynomial_value(c,d,hi)
+      if(flo==0._wp.or.fhi==0._wp.or.hi<=lo)cycle
+      if(sign(1._wp,flo)==sign(1._wp,fhi))cycle
+      do iter=1,80
+        mid=0.5_wp*(lo+hi);fmid=polynomial_value(c,d,mid)
+        if(fmid==0._wp.or.hi-lo<=8._wp*epsilon(1._wp))exit
+        if(sign(1._wp,flo)==sign(1._wp,fmid))then
+          lo=mid;flo=fmid
+        else
+          hi=mid
+        endif
+      enddo
+      call append_root(mid)
+    enddo
+    ! Approximate stationary zeros can be inserted before a nearby root.
+    do j=2,nroots
+      mid=roots(j);k=j-1
+      do while(k>=1)
+        if(roots(k)<=mid)exit
+        roots(k+1)=roots(k);k=k-1
+      enddo
+      roots(k+1)=mid
+    enddo
+  contains
+    subroutine append_root(x)
+      real(wp),intent(in)::x
+      if(nroots>0)then
+        if(any(abs(roots(:nroots)-x)<=64._wp*epsilon(1._wp)))return
+      endif
+      if(nroots<32)then;nroots=nroots+1;roots(nroots)=x;endif
+    end subroutine append_root
+  end subroutine polynomial_roots_unit
+
+  real(wp) function polynomial_minimum(c) result(value)
+    real(wp),intent(in)::c(0:5)
+    real(wp)::dc(0:5),roots(32),normalization
+    integer::j,nroots
+    dc=0._wp
+    do j=1,5;dc(j-1)=real(j,wp)*c(j);enddo
+    normalization=maxval(abs(dc))
+    if(normalization>0._wp)dc=dc/normalization
+    call polynomial_roots_unit(dc,4,roots,nroots)
+    value=min(polynomial_value(c,5,0._wp),polynomial_value(c,5,1._wp))
+    do j=1,nroots;value=min(value,polynomial_value(c,5,roots(j)));enddo
+  end function polynomial_minimum
+
+  subroutine certify_profile(coefficients,knots,canonical,axis0,span,potential0,ok,message)
+    ! Certify physical inequalities on every polynomial piece, independently
+    ! of the diagnostic/output nodes. In x=log n: q=P/n, F_x=q,
+    ! D=dP/dn=q+q_x, 0<D<=mu=F+q. In mu: n=P_mu,
+    ! n_mu>0 and mu*n_mu-n>=0; epsilon=mu*n-P>0.
+    real(wp),intent(in)::coefficients(0:,:),knots(:),axis0,span,potential0
+    logical,intent(in)::canonical
+    logical,intent(out)::ok
+    character(len=*),intent(out)::message
+    real(wp)::y(0:5),dy(0:5),pot(0:5),mu(0:5),stable(0:5),causal(0:5),energy(0:5)
+    real(wp)::h,scale,base,axis
+    integer::k,j
+    ok=.false.;message='matching interval violates positivity, stability or causality'
+    base=potential0
+    if(.not.all(ieee_is_finite([span,axis0,potential0])).or.span<=0._wp)return
+    if(.not.all(ieee_is_finite(coefficients)).or..not.all(ieee_is_finite(knots)))return
+    do k=1,size(coefficients,2)
+      h=knots(k+1)-knots(k);scale=span*h
+      if(scale<=0._wp)return
+      y=0._wp;y(:4)=coefficients(:,k);dy=0._wp;pot=0._wp;pot(0)=base
+      do j=1,4;dy(j-1)=real(j,wp)*y(j);enddo
+      do j=0,4;pot(j+1)=scale*y(j)/real(j+1,wp);enddo
+      if(canonical)then
+        mu=pot+y;stable=y+dy/scale;causal=mu-stable;energy=pot
+      else
+        axis=axis0+span*knots(k)
+        mu=0._wp;mu(0)=axis;mu(1)=scale
+        stable=dy;causal=axis*dy-scale*y
+        causal(1:5)=causal(1:5)+scale*dy(:4)
+        energy=axis*y-pot;energy(1:5)=energy(1:5)+scale*y(:4)
+      endif
+      if(.not.all(ieee_is_finite(y)).or..not.all(ieee_is_finite(pot)).or. &
+         .not.all(ieee_is_finite(stable)).or..not.all(ieee_is_finite(causal)).or. &
+         .not.all(ieee_is_finite(mu)).or..not.all(ieee_is_finite(energy)))return
+      if(polynomial_minimum(y)<=0._wp.or.polynomial_minimum(pot)<=0._wp.or. &
+         polynomial_minimum(mu)<=0._wp.or.polynomial_minimum(energy)<=0._wp.or. &
+         polynomial_minimum(stable)<=0._wp.or.polynomial_minimum(causal)<0._wp)return
+      base=polynomial_value(pot,5,1._wp)
+    enddo
+    ok=.true.;message='ok'
+  end subroutine certify_profile
+
+  subroutine certify_spline(knots,values,slopes,canonical,axis0,span,potential0,ok,message)
+    real(wp),intent(in)::knots(:),values(:),slopes(:),axis0,span,potential0
+    logical,intent(in)::canonical
+    logical,intent(out)::ok
+    character(len=*),intent(out)::message
+    real(wp)::coefficients(0:4,size(knots)-1),h,change
+    integer::k
+    coefficients=0._wp
+    do k=1,size(knots)-1
+      h=knots(k+1)-knots(k);change=values(k+1)-values(k)
+      coefficients(0,k)=values(k);coefficients(1,k)=h*slopes(k)
+      coefficients(2,k)=3._wp*change-h*(2._wp*slopes(k)+slopes(k+1))
+      coefficients(3,k)=-2._wp*change+h*(slopes(k)+slopes(k+1))
+    enddo
+    call certify_profile(coefficients,knots,canonical,axis0,span,potential0,ok,message)
+  end subroutine certify_spline
+
   subroutine bridge_profile(y0,y1,dy0,dy1,target_avg,match_slopes,u_grid,canonical_dx,has_canonical, &
-                            y_grid,dy_grid,int_grid,d0,d1,ok,message)
+                            y_grid,dy_grid,int_grid,d0,d1,ok,message,axis0,span,potential0)
+    real(wp),intent(in)::axis0,span,potential0
     real(wp),intent(in)::y0,y1,dy0,dy1,target_avg,u_grid(:),canonical_dx
     logical,intent(in)::match_slopes,has_canonical
     real(wp),intent(out)::y_grid(:),dy_grid(:),int_grid(:),d0,d1
     logical,intent(out)::ok
     character(len=*),intent(out)::message
+    real(wp)::coefficients(0:4,1)
     real(wp)::theta,dy_tot,u,yy,ddy,aa,minimum,maximum,dp0,dp1
     real(wp)::c1,c2,a0,a1,a2,c3,c4,c5,yt,dyt,um,ua,ubw,ub,ya,yb
     real(wp)::knots3(3),vals3(3),slopes3(3),knots5(5),vals5(5),slopes5(5)
@@ -238,11 +386,15 @@ contains
     logical::candidate
     ok=.false.;message='uninitialized bridge';y_grid=0._wp;dy_grid=0._wp;int_grid=0._wp;d0=0._wp;d1=0._wp
     dy_tot=y1-y0
-    if(.not.all(ieee_is_finite([y0,y1,dy0,dy1,target_avg])).or.dy_tot<=0._wp)then
+    if(.not.all(ieee_is_finite([y0,y1,dy0,dy1,target_avg])).or. &
+       (.not.has_canonical.and.dy_tot<=0._wp))then
       message='bridge endpoints must be finite and strictly increasing';return
     endif
-    if(abs(dy_tot)<1.e-14_wp)then;message='degenerate bridge endpoint difference';return;endif
-    theta=(target_avg-y0)/dy_tot
+    if(.not.has_canonical.and.abs(dy_tot)<1.e-14_wp)then
+      message='degenerate bridge endpoint difference';return
+    endif
+    theta=0.5_wp
+    if(dy_tot/=0._wp)theta=(target_avg-y0)/dy_tot
     if(.not.match_slopes)then
       if(has_canonical)then
         candidate=theta>=0.28_wp.and.theta<=0.72_wp
@@ -273,7 +425,13 @@ contains
           int_grid(j)=y0*u*(1._wp-u)**2+y1*u*u*(u-1._wp)+target_avg*u*u*(3._wp-2._wp*u)
         enddo
         d0=-4._wp*y0-2._wp*y1+6._wp*target_avg;d1=2._wp*y0+4._wp*y1-6._wp*target_avg
-        ok=.true.;message='exact_single_cubic';return
+        coefficients(:,1)=[y0,d0,3._wp*y0+3._wp*y1-6._wp*target_avg,0._wp,0._wp]
+        call certify_profile(coefficients,[0._wp,1._wp],has_canonical,axis0,span,potential0,ok,message)
+        if(.not.ok)return
+        message='exact_single_cubic';return
+      endif
+      if(dy_tot<=0._wp)then
+        message='unsupported canonical profile: exact polynomial failed interval construction';return
       endif
       um=max(0.18_wp,min(0.82_wp,1._wp-theta))
       lo=y0+1.e-5_wp*dy_tot;hi=y1-1.e-5_wp*dy_tot
@@ -295,7 +453,9 @@ contains
       do j=1,size(u_grid)
         call spline_eval(knots3,vals3,slopes3,u_grid(j),y_grid(j),dy_grid(j),int_grid(j))
       enddo
-      ok=.true.;message='monotone_1knot_cubic';return
+      call certify_spline(knots3,vals3,slopes3,has_canonical,axis0,span,potential0,ok,message)
+      if(.not.ok)return
+      message='monotone_1knot_cubic';return
     endif
 
     ! Quartic potential derivative (the interpolated EOS variable) with exact endpoint slopes.
@@ -304,17 +464,22 @@ contains
     c4=-15._wp*a0+7._wp*a1-a2
     c5=6._wp*a0-3._wp*a1+0.5_wp*a2
     minimum=huge(1._wp);maximum=-huge(1._wp);secmin=huge(1._wp);secmax=-huge(1._wp)
-    dp0=y0+dy0/canonical_dx;dp1=y1+dy1/canonical_dx
+    dp0=0._wp;dp1=0._wp
+    if(has_canonical)then
+      dp0=y0+dy0/canonical_dx;dp1=y1+dy1/canonical_dx
+    endif
     do i=0,400
       u=real(i,wp)/400._wp
       yt=c1+2*c2*u+3*c3*u*u+4*c4*u**3+5*c5*u**4
       dyt=2*c2+6*c3*u+12*c4*u*u+20*c5*u**3
       minimum=min(minimum,dyt);maximum=max(maximum,dyt)
-      secmin=min(secmin,yt+dyt/canonical_dx);secmax=max(secmax,yt+dyt/canonical_dx)
+      if(has_canonical)then
+        secmin=min(secmin,yt+dyt/canonical_dx);secmax=max(secmax,yt+dyt/canonical_dx)
+      endif
     enddo
     if(has_canonical)then
       candidate=secmin>=0.35_wp*min(dp0,dp1).and.secmax<=1.8_wp*max(dp0,dp1) &
-        .and.minimum>=-0.1_wp*dy_tot
+        .and.(minimum>=-0.1_wp*dy_tot.or.dy_tot<=0._wp)
     else
       candidate=minimum>=0.75_wp*min(dy0,dy1,dy_tot).and.maximum<=2.2_wp*max(dy0,dy1,dy_tot)
     endif
@@ -325,9 +490,16 @@ contains
         dy_grid(j)=2*c2+6*c3*u+12*c4*u*u+20*c5*u**3
         int_grid(j)=c1*u+c2*u*u+c3*u**3+c4*u**4+c5*u**5
       enddo
-      d0=dy0;d1=dy1;ok=.true.;message='exact_single_quintic';return
+      d0=dy0;d1=dy1
+      coefficients(:,1)=[c1,2._wp*c2,3._wp*c3,4._wp*c4,5._wp*c5]
+      call certify_profile(coefficients,[0._wp,1._wp],has_canonical,axis0,span,potential0,ok,message)
+      if(.not.ok)return
+      message='exact_single_quintic';return
     endif
 
+    if(dy_tot<=0._wp)then
+      message='unsupported canonical profile: exact polynomial failed interval construction';return
+    endif
     ua=max(1.e-4_wp,min(0.02_wp,0.025_wp*dy_tot/max(abs(dy0),1.e-12_wp)))
     ubw=max(1.e-4_wp,min(0.02_wp,0.025_wp*dy_tot/max(abs(dy1),1.e-12_wp)));ub=1._wp-ubw
     ya=y0+max(0.002_wp*dy_tot,min(0.025_wp*dy_tot,0.85_wp*max(dy0,0._wp)*ua))
@@ -351,7 +523,9 @@ contains
     do j=1,size(u_grid)
       call spline_eval(knots5,vals5,slopes5,u_grid(j),y_grid(j),dy_grid(j),int_grid(j))
     enddo
-    ok=.true.;message='adaptive_2knot_c2_hermite'
+    call certify_spline(knots5,vals5,slopes5,has_canonical,axis0,span,potential0,ok,message)
+    if(.not.ok)return
+    message='adaptive_2knot_c2_hermite'
   end subroutine bridge_profile
 
   subroutine make_pressure_spline(pt,p1,p2,dpdu1,dpdu2,knots,values,slopes)
@@ -400,21 +574,23 @@ contains
   function pressure_work_integral(pt,uend,p1,p2,dpdu1,dpdu2,x1,dx) result(val)
     real(wp),intent(in)::pt,uend,p1,p2,dpdu1,dpdu2,x1,dx
     real(wp)::val,kn(4),vv(4),ss(4),u,p,dp,aa,weight
-    real(wp)::xg(64),wg(64)
-    integer::j,nquad
+    real(wp)::xg(16),wg(16),lower,upper
+    integer::j,k
     val=0._wp
     if(uend<=0._wp)return
-    ! Match the historical Python implementation: 64-point Gauss-Legendre
-    ! for the full-interval plateau root and 16-point for each partial F(u).
-    nquad=16
-    if(uend>=1._wp-8._wp*epsilon(1._wp))nquad=64
-    call gauss_legendre_rule(nquad,xg(:nquad),wg(:nquad))
+    ! Integrate each smooth cubic segment separately. A global quadrature
+    ! crosses the C1 knots, and changing its order at u=1 breaks dF/du=dx*P/n.
+    call gauss_legendre_rule(16,xg,wg)
     call make_pressure_spline(pt,p1,p2,dpdu1,dpdu2,kn,vv,ss)
-    do j=1,nquad
-      u=0.5_wp*uend*(xg(j)+1._wp)
-      weight=0.5_wp*uend*wg(j)
-      call spline_eval(kn,vv,ss,u,p,dp,aa)
-      val=val+weight*p/exp(x1+u*dx)
+    do k=1,size(kn)-1
+      lower=kn(k);upper=min(uend,kn(k+1))
+      if(upper<=lower)exit
+      do j=1,size(xg)
+        u=lower+0.5_wp*(upper-lower)*(xg(j)+1._wp)
+        weight=0.5_wp*(upper-lower)*wg(j)
+        call spline_eval(kn,vv,ss,u,p,dp,aa)
+        val=val+weight*p/exp(x1+u*dx)
+      enddo
     enddo
   end function pressure_work_integral
 
@@ -513,7 +689,7 @@ contains
     case('cubic_F','quintic_F')
       dqdu=(mu1*cs1-q1_1)*dx;dpdu2=(mu2*cs2-q1_2)*dx
       call bridge_profile(q1_1,q1_2,dqdu,dpdu2,qbar,trim(method)=='quintic_F',u,dx,.true., &
-        yy,ddy,anti,d0,d1,b_ok,b_msg)
+        yy,ddy,anti,d0,d1,b_ok,b_msg,0._wp,dx,f1)
       if(.not.b_ok)then;message=trim(b_msg);return;endif
       do j=1,size(u)
         nb(j)=exp(log(n1)+u(j)*dx);q(j)=yy(j);p(j)=nb(j)*q(j)
@@ -524,7 +700,7 @@ contains
     case('cubic_P','quintic_P')
       dpdu1=(n1/(mu1*cs1))*dmu;dpdu2=(n2/(mu2*cs2))*dmu
       call bridge_profile(n1,n2,dpdu1,dpdu2,nbar,trim(method)=='quintic_P',u,0._wp,.false., &
-        yy,ddy,anti,d0,d1,b_ok,b_msg)
+        yy,ddy,anti,d0,d1,b_ok,b_msg,mu1,dmu,p1)
       if(.not.b_ok)then;message=trim(b_msg);return;endif
       do j=1,size(u)
         nb(j)=yy(j);mu(j)=mu1+u(j)*dmu;p(j)=p1+dmu*anti(j)
@@ -618,19 +794,25 @@ contains
     imin=max(12,cr%n-148);if(imin>cr%n)imin=cr%n
     do j=cr%n,imin,-1
       n1=cr%nb(j);p1=n1*cr%q(1,j);f1=(cr%q(6,j)+1._wp)*cr%mn
-      mu1=(cr%q(3,j)+1._wp)*cr%mn
+      mu1=f1+cr%q(1,j)
       do k=kcore,co%n
         n2=co%nb(k);p2=n2*co%q(1,k);f2=(co%q(6,k)+1._wp)*co%mn
-        mu2=(co%q(3,k)+1._wp)*co%mn
-        if(need_css)then
-          ! The single-potential CSS construction uses Euler-consistent
-          ! endpoint chemical potentials; the other matchers retain source Q3.
-          mu1=f1+cr%q(1,j);mu2=f2+co%q(1,k)
-        endif
+        mu2=f2+co%q(1,k)
+        ! All constructions use the same Euler-consistent endpoint potential.
+        ! Source Q3 is independently gated below; its tabulation residual is
+        ! not a physical endpoint offset and must not alter the bridge.
         if(n2<=1.10_wp*n1.or.p2<=1.10_wp*p1.or.mu2<=mu1+0.2_wp.or.f2<=f1+0.2_wp)cycle
         if(mu2<=mu1.or.n2<=n1)cycle
         nbar=(p2-p1)/(mu2-mu1);qbar=(f2-f1)/log(n2/n1)
-        thp=(nbar-n1)/(n2-n1);thf=(qbar-cr%q(1,j))/(co%q(1,k)-cr%q(1,j))
+        thp=(nbar-n1)/(n2-n1)
+        if(co%q(1,k)==cr%q(1,j))then
+          ! A constant P/n has F=F1+(P/n)*log(n/n1), a valid stable
+          ! barotrope. Account only for endpoint subtraction roundoff.
+          if(abs(qbar-cr%q(1,j))>64._wp*epsilon(1._wp)*max(1._wp,abs(f1),abs(f2))/log(n2/n1))cycle
+          thf=0.5_wp
+        else
+          thf=(qbar-cr%q(1,j))/(co%q(1,k)-cr%q(1,j))
+        endif
         if(ieee_is_finite(thp+thf).and.thp>0.12_wp.and.thp<0.88_wp.and.thf>0.12_wp.and.thf<0.88_wp)then
           if(need_css)then
             call solve_single_css_match(n1,n2,p1,p2,mu1,mu2,css_candidate,nb_candidate,de_candidate, &
@@ -744,7 +926,7 @@ contains
     if(.not.ok2)then;status='invalid core endpoint sound speed: '//trim(msg);return;endif
     css_source_cs1=cs1;css_source_cs2=cs2
     css_f_core=(co%q(6,i2)+1._wp)*co%mn
-    css_mu_core=(co%q(3,i2)+1._wp)*co%mn
+    css_mu_core=css_f_core+co%q(1,i2)
 
     css_cs2=0._wp;css_nb_high=0._wp;css_delta_eps=0._wp
     css_p_t=cr%nb(i1)*cr%q(1,i1)

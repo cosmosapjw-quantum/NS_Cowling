@@ -1166,13 +1166,37 @@ def causal_completion(data: EOSData, *, cs2: float = 1.0,
     return completed
 
 
+def _thermo_only_view(data: EOSData) -> EOSData:
+    """Copy a table and explicitly discard abundance data only.
+
+    Zero abundance placeholders have false presence masks: they are not
+    physical zero fractions. All thermodynamic columns, phase labels, extra
+    quantities, axes and source-support identity remain unchanged.
+    """
+    if not isinstance(data, EOSData):
+        raise TypeError("data must be an EOSData instance")
+    result = data.copy()
+    for name in ("Yn", "Yp", "Ye", "Ymu", "Aav", "Zav", "Yh"):
+        getattr(result, name).fill(0.0)
+    for name in ("Yn_present", "Yp_present", "Ye_present", "Ymu_present",
+                 "Abar_present", "Zbar_present", "Yh_present", "C3_applicable", "C4_applicable"):
+        getattr(result, name).fill(False)
+    result.row_status.fill(0)
+    result.composition_file_present = False
+    result.composition_available = False
+    return result
+
+
 def construct_maxwell_transition(phase_low: EOSData, phase_high: EOSData, *,
                                   assume_local_charge_neutrality: bool = False,
+                                  drop_composition: bool = False,
                                   return_report: bool = False):
     """Construct a genuine single-conserved-charge Maxwell transition natively.
 
-    Inputs are two cold, beta-equilibrated, composition-free single-phase
-    barotropes. All thermodynamic interpolation, stability and causality checks
+    Inputs are two cold, beta-equilibrated single-phase barotropes. Composition
+    is rejected by default; drop_composition=True explicitly copies thermo-only
+    views while retaining physical columns, phase labels and support provenance.
+    All thermodynamic interpolation, stability and causality checks
     are performed by the Fortran backend. The Python layer only serializes the
     input/output tables and exposes the native report.
     """
@@ -1180,19 +1204,29 @@ def construct_maxwell_transition(phase_low: EOSData, phase_high: EOSData, *,
         raise TypeError("phase_low and phase_high must both be EOSData instances")
     if not isinstance(assume_local_charge_neutrality, bool):
         raise TypeError("assume_local_charge_neutrality must be bool")
+    if not isinstance(drop_composition, bool):
+        raise TypeError("drop_composition must be bool")
     if not assume_local_charge_neutrality:
         raise ValueError(
             "confirm that both input phases are locally charge neutral by passing "
             "assume_local_charge_neutrality=True; the thermo-only data cannot prove this from composition"
         )
+    source_support = {"low": _matching_source_support(phase_low),
+                      "high": _matching_source_support(phase_high)}
+    composition_inputs = {
+        "low": bool(phase_low.composition_file_present or phase_low.composition_available),
+        "high": bool(phase_high.composition_file_present or phase_high.composition_available),
+    }
+    low_input = _thermo_only_view(phase_low) if drop_composition else phase_low
+    high_input = _thermo_only_view(phase_high) if drop_composition else phase_high
     with tempfile.TemporaryDirectory(prefix="compose-eos-maxwell-") as td:
         root = Path(td)
         low_dir, high_dir, target_dir = root / "low", root / "high", root / "maxwell"
         low_dir.mkdir()
         high_dir.mkdir()
         target_dir.mkdir()
-        phase_low.write_internal_directory(low_dir)
-        phase_high.write_internal_directory(high_dir)
+        low_input.write_internal_directory(low_dir)
+        high_input.write_internal_directory(high_dir)
         payload = run_native("maxwell-transition", low_dir, high_dir, target_dir, "true")
         matched = EOSData.from_internal_directory(target_dir, source_dir=phase_low.source_dir)
     consistency = check_consistency(matched)
@@ -1202,9 +1236,13 @@ def construct_maxwell_transition(phase_low: EOSData, phase_high: EOSData, *,
             "Fortran Maxwell output failed the independent C1-C6/C10-C11 verifier: " + failed
         )
     report = dict(payload)
+    report["source_support"] = source_support
     report["construction"] = "single_conserved_charge_local_neutrality_maxwell"
     report["local_charge_neutrality"] = "caller_confirmed"
     report["composition_preserved"] = False
+    report["drop_composition_requested"] = drop_composition
+    report["composition_dropped"] = drop_composition and any(composition_inputs.values())
+    report["composition_input_present"] = composition_inputs
     report["compose_export_allowed"] = True
     report["composition_scope"] = "thermo_only_phase_labels_no_abundances"
     report["consistency"] = consistency
@@ -1277,6 +1315,81 @@ def reconstruct_master(data: EOSData, smooth: bool = True,
     return (rebuilt, report) if return_report else rebuilt
 
 
+def _matching_support_record(source_dir: str | Path | None) -> dict[str, Any]:
+    """Read an explicit generator support declaration without inferring physics."""
+    if source_dir is None:
+        return {}
+    directory = Path(source_dir)
+    path = directory / "SUPPORT.json"
+    if (not path.is_file() and directory.name in ("outer", "lower_source_fit")
+            and (directory.parent / "crust_segments.json").is_file()):
+        path = directory.parent / "SUPPORT.json"
+    expected = None
+    seal_path = path.parent / "RESULT.json"
+    if seal_path.is_file():
+        seal = json.loads(seal_path.read_bytes())
+        if not isinstance(seal, dict):
+            raise ValueError("matching source support seal must be an object")
+        hashes = seal.get("output_sha256", {})
+        if not isinstance(hashes, dict):
+            raise ValueError("matching source support sha256 inventory is invalid")
+        if "SUPPORT.json" in hashes:
+            expected = hashes["SUPPORT.json"]
+            if not isinstance(expected, str) or len(expected) != 64:
+                raise ValueError("matching source support sha256 is invalid")
+            if not path.is_file():
+                raise ValueError("matching source support is missing despite its sha256 seal")
+    if not path.is_file():
+        return {}
+    raw = path.read_bytes()
+    if expected is not None and hashlib.sha256(raw).hexdigest() != expected:
+        raise ValueError("matching source support sha256 mismatch")
+    record = json.loads(raw)
+    if not isinstance(record, dict):
+        raise ValueError("matching source support must be a JSON object")
+    return {"support_path": str(path.resolve()),
+            "support_sha256": hashlib.sha256(raw).hexdigest(), "declaration": record}
+
+
+def _matching_source_support(data: EOSData) -> dict[str, Any]:
+    """Confine declared UNAPPROVED boundaries to a contiguous single branch.
+
+    This is an input-support check, not a continuous interpolation certificate.
+    The native endpoint stencils and window search may use all supplied rows;
+    callers must select a contiguous branch before passing that table here.
+    Phase IDs are compared only for equality; their numeric values are opaque.
+    Historical inputs without an explicit declaration keep their prior scope.
+    """
+    import math
+    support = _matching_support_record(data.source_dir)
+    if not support:
+        return {"status": "NOT_DECLARED"}
+    record = support["declaration"]
+    if record.get("cross_phase_interpolation") == "UNAPPROVED":
+        if len(data.Iphase) != data.n or any(value != data.Iphase[0] for value in data.Iphase):
+            raise ValueError("matching source support forbids cross-phase interpolation; select one contiguous phase branch")
+    if record.get("cross_segment_interpolation") == "UNAPPROVED":
+        try:
+            tokens = (Path(data.source_dir) / "eos.nb").read_text().split()
+            first, last = int(tokens[0]), int(tokens[1])
+            grid = [float(value.replace("D", "E").replace("d", "e")) for value in tokens[2:]]
+            if len(grid) != last - first + 1 or not grid or any(not math.isfinite(v) for v in grid):
+                raise ValueError("invalid density axis")
+            indices = []
+            for value in data.nb:
+                hits = [i for i, original in enumerate(grid)
+                        if math.isclose(float(value), original, rel_tol=5e-13, abs_tol=0.0)]
+                if len(hits) != 1:
+                    raise ValueError("density is not one source row")
+                indices.append(hits[0])
+            if not indices or any(b != a + 1 for a, b in zip(indices, indices[1:])):
+                raise ValueError("rows are not one contiguous source slice")
+        except (OSError, IndexError, TypeError, ValueError, OverflowError) as exc:
+            raise ValueError("matching source support requires one contiguous original source segment") from exc
+        support["selected_source_rows_zero_based"] = [indices[0], indices[-1]]
+    return {"status": "DECLARED_BOUNDARIES_RESPECTED", **support}
+
+
 def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
                     cr_name: str = "", co_name: str = "",
                     method: str = "quintic_P", n_bridge: int = 40, *,
@@ -1327,12 +1440,14 @@ def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
         raise ValueError("native matching requires T=0 inputs")
     if not d_cr.beta_equilibrated or not d_co.beta_equilibrated:
         raise ValueError("native matching requires beta-equilibrated inputs")
+    source_support = {}
     for label, data in (("crust", d_cr), ("core", d_co)):
         if not all(len(getattr(data, name)) == data.n for name in
                    ("Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Iphase")):
             raise ValueError(f"{label} EOS arrays have inconsistent lengths")
         if not all(math.isfinite(float(v)) for v in data.nb):
             raise ValueError(f"{label} density grid contains nonfinite values")
+        source_support[label] = _matching_source_support(data)
 
     with tempfile.TemporaryDirectory(prefix="compose-eos-match-core-") as td:
         root = Path(td)
@@ -1417,6 +1532,7 @@ def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
         "core_composition_input_status": "explicitly_dropped" if core_has_composition else "input_eos_compo_absent",
         "core_composition_input_usable": False,
         "composition_dropped": bool(payload["composition_dropped"]),
+        "source_support": source_support,
         "diagnostic_only": not bool(consistency["overall"]["pass_"]),
         "consistency": consistency,
         "native_report": payload,

@@ -372,6 +372,11 @@ program compose_eos_fortran
     call write_metadata(trim(arg3)//'/eos_data.nml',out,status)
     if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
     write(*,'(a)')'{"status":"ok","operation":"maxwell-transition","n":'//integer_text(out%n)// &
+      ',"mass_normalization_semantics":"physical_energy_preserving_Q_reencoding"'// &
+      ',"physical_energy_shift_mev":0.0'// &
+      ',"rest_energy_reference_mev":{"low":['//real_text(phase_low%mn)//','//real_text(phase_low%mp)// &
+      '],"high":['//real_text(phase_high%mn)//','//real_text(phase_high%mp)// &
+      '],"output":['//real_text(out%mn)//','//real_text(out%mp)//']}'// &
       ',"pressure_crossings":'//integer_text(phase_report%pressure_crossings)// &
       ',"low_phase_rows":'//integer_text(phase_report%low_phase_rows)// &
       ',"high_phase_rows":'//integer_text(phase_report%high_phase_rows)// &

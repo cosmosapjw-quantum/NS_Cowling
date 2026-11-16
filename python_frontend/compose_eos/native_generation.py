@@ -26,6 +26,20 @@ def _real(value):
 
 def surface_input(root, model, variant):
     root=Path(root)
+    from .native_model_contracts import SPG_INFERRED_VARIANT, SPG_INFERRED_SURFACE
+    if variant==SPG_INFERRED_VARIANT:
+        path=root/SPG_INFERRED_SURFACE["path"]
+        if file_sha(path)!=SPG_INFERRED_SURFACE["sha256"]:
+            raise ValueError("immutable inferred SPG surface input checksum mismatch")
+        source=json.loads(path.read_text())
+        fit=source["parameters"][model]
+        sigma,b=float(fit["sigma0"]),float(fit["b"])
+        if not math.isfinite(sigma+b) or sigma<=0 or b<=-16:
+            raise ValueError("invalid immutable surface input")
+        return {"sigma0":sigma,"surface_b":b,"label":variant,
+                **SPG_INFERRED_SURFACE,
+                "A_convention":source["A_convention"],
+                "source_equivalence":"CONDITIONAL_RECONSTRUCTION_NOT_ORIGINAL_AUTHOR_CALIBRATION"}
     if variant=="AME2408_candidate":
         path=root/"data/research_generator_20261116/candidate_surface/candidate_surface_fit.json"
         fit=json.loads(path.read_text())["models"][model]["all_mass"]
@@ -186,13 +200,13 @@ def verify_native_generation(output,request):
                 hashes[segment+"/"+name]=value
     # Optional native diagnostics are evidence, never a physical acceptance gate.
     # Hash them when present while keeping historical receipts readable.
-    for name in ("sound_speed.csv", "attachment_diagnostics.json"):
+    for name in ("sound_speed.csv", "attachment_diagnostics.json", "SUPPORT.json"):
         path=output/name
         if path.is_file():
             hashes[name]=file_sha(path)
     expected_hashes=receipt.get("output_sha256")
     if expected_hashes is not None:
-        for name in ("sound_speed.csv", "attachment_diagnostics.json"):
+        for name in ("sound_speed.csv", "attachment_diagnostics.json", "SUPPORT.json"):
             if name in expected_hashes and name not in hashes:
                 raise ValueError("sealed native diagnostic missing: "+name)
     if expected_hashes is not None and any(expected_hashes.get(k)!=v for k,v in hashes.items()):

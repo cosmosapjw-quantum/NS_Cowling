@@ -1,10 +1,8 @@
 """NSC remediation Phase B regression tests (mission section 4.6).
 
 Regression cases pinning physical-energy-preserving normalization:
-  1. identical neutron/proton mass pair -> Maxwell gate PASS
-  2. neutron-only mismatch -> FAIL
-  3. proton-only mismatch -> FAIL
-  4. both mismatch -> FAIL
+  1-4. identical, neutron-only, proton-only and both reference changes preserve
+       native Maxwell physical output after complete CompOSE re-encoding
   5. common neutron/proton mass within one EOS -> allowed
   6. different neutron/proton physical masses -> correctly supported
   7. composition missing -> physical correction BLOCKED
@@ -52,60 +50,39 @@ def _sha256(p: Path) -> str:
     return hashlib.sha256(p.read_bytes()).hexdigest()
 
 
-# ---------------------------------------------------------------- 1-4: Maxwell pairwise mass gate
-def _maxwell_attempt(low: EOSData, high: EOSData):
-    """Invoke the native maxwell-transition with local_neutrality_confirmed.
+# ---------------------------------------------------------------- 1-4: reference normalization
+@pytest.mark.skipif(_needs_backend(), reason="requires native backend")
+@pytest.mark.parametrize("mn,mp", [(939.,939.), (950.,939.), (939.,938.), (950.,938.)])
+def test_1_to_4_native_maxwell_reference_reencoding(mn, mp):
+    """Raw native route preserves physical EOS under independent header references.
 
-    Returns (ok, message). Uses internal-directory round trip.
+    The former header-equality tests conflated an encoding change with an
+    additive physical rest-energy change. Physical-offset controls remain in
+    test_maxwell_mass_gate.py; source normalization must not fit those offsets.
     """
+    from test_maxwell_mass_gate import physical_pair, reencode
+    low, original = physical_pair()
+    high = reencode(original, mn, mp)
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
-        lo, hi, out = root / "lo", root / "hi", root / "out"
-        lo.mkdir(); hi.mkdir(); out.mkdir()
-        low.write_internal_directory(lo)
-        high.write_internal_directory(hi)
-        try:
-            run_native("maxwell-transition", lo, hi, out, "true")
-            return True, ""
-        except Exception as exc:  # NativeExecutionError
-            return False, str(exc)
-
-
-@pytest.mark.skipif(_needs_backend(), reason="requires native backend")
-def test_1_identical_mass_pair_passes_gate():
-    """Same EOS split into two phases with identical (mn, mp) passes the gate."""
-    d = read_compose(EOS / "BBB_BHF2")
-    low, high = d.copy(), d.copy()
-    ok, msg = _maxwell_attempt(low, high)
-    # gate-specific rejection must NOT appear; other physics failures are fine
-    assert "rest-mass conventions" not in msg, msg
-
-
-@pytest.mark.skipif(_needs_backend(), reason="requires native backend")
-def test_2_neutron_only_mismatch_fails_gate():
-    d = read_compose(EOS / "BBB_BHF2")
-    low, high = d.copy(), d.copy()
-    high.mn = high.mn + 0.01  # neutron-only mismatch
-    ok, msg = _maxwell_attempt(low, high)
-    assert not ok and "rest-mass conventions" in msg, msg
-
-
-@pytest.mark.skipif(_needs_backend(), reason="requires native backend")
-def test_3_proton_only_mismatch_fails_gate():
-    d = read_compose(EOS / "BBB_BHF2")
-    low, high = d.copy(), d.copy()
-    high.mp = high.mp + 0.01  # proton-only mismatch, neutron identical
-    ok, msg = _maxwell_attempt(low, high)
-    assert not ok and "rest-mass conventions" in msg, msg
-
-
-@pytest.mark.skipif(_needs_backend(), reason="requires native backend")
-def test_4_both_masses_mismatch_fail_gate():
-    d = read_compose(EOS / "GPPVA_DD2")
-    low, high = d.copy(), d.copy()
-    high.mn += 0.5; high.mp += 0.5
-    ok, msg = _maxwell_attempt(low, high)
-    assert not ok and "rest-mass conventions" in msg, msg
+        lo, hi, target = root/"lo", root/"hi", root/"out"
+        lo.mkdir(); hi.mkdir(); target.mkdir()
+        low.write_internal_directory(lo); high.write_internal_directory(hi)
+        report = run_native("maxwell-transition", lo, hi, target, "true")
+        out = EOSData.from_internal_directory(target)
+    assert report["status"] == "ok"
+    assert report["mu_transition"] == pytest.approx(990., abs=2e-10)
+    assert report["pressure_transition"] == pytest.approx(8., abs=2e-11)
+    assert report["n_low"] == pytest.approx(.12, abs=2e-12)
+    assert report["n_high"] == pytest.approx(.13, abs=2e-12)
+    assert report["physical_energy_shift_mev"] == 0.
+    for source in (low, original):
+        for index, n in enumerate(source.nb):
+            rows = np.flatnonzero(np.isclose(out.nb, n, rtol=0., atol=1e-13))
+            for row in rows:
+                np.testing.assert_allclose([out.eps[row],out.p[row],out.mub[row],out.muq[row]],
+                    [source.eps[index],source.p[index],source.mub[index],source.muq[index]],
+                    rtol=0.,atol=2e-10)
 
 
 # ---------------------------------------------------------------- 5-6: single-EOS conventions

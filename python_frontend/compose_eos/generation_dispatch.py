@@ -18,7 +18,9 @@ SPG_IDS = tuple(f"SPG_M{i}" for i in range(1, 6))
 TF_IDS = ("GPPVA_DD2", "GPPVA_DDME2", "GPPVA_TW", "GPPVA_FSU2",
           "GPPVA_FSU2R", "GPPVA_FSU2H", "GPPVA_NL3wrL55", "GPPVA_TM1e")
 MODEL_IDS = CORE_IDS + SPG_IDS + TF_IDS
-SPG_VARIANTS = ("AME2408_candidate", "geometric_area__nine",
+from .native_model_contracts import SPG_INFERRED_VARIANT, SPG_INFERRED_SURFACE
+
+SPG_VARIANTS = (SPG_INFERRED_VARIANT, "AME2408_candidate", "geometric_area__nine",
                 "geometric_area__eight_measured", "fixed_symmetric_area__nine",
                 "fixed_symmetric_area__eight_measured")
 SCRIPTS = dict(core="generate_core_eos.py", spg="reoptimize_spg_surfaces.py",
@@ -40,6 +42,7 @@ def generator_catalog():
             "calibration": "candidate; original M1-M5 surface coefficients unresolved",
             "composition": "free nucleons, leptons and sharp-interface cluster",
             "variants": list(SPG_VARIANTS),
+            "conditional_inferred_input": {"variant": SPG_INFERRED_VARIANT, **SPG_INFERRED_SURFACE},
         }
     for model in TF_IDS:
         result[model] = {
@@ -255,6 +258,8 @@ def run_generation(model, output, *, root=None, **options):
     command = _command(root, child_output, request)
     from .native_generation import source_files, surface_input, verify_native_generation
     tracked = [Path(__file__).resolve(), Path(__file__).with_name("native_generation.py"), *source_files(root)]
+    if request["family"] == "spg":
+        tracked.append(root / surface_input(root, model, request["variant"])["path"])
     initial = {str(p): _sha(p) for p in tracked}
     receipt = {"status": "RUNNING", "request": request, "command": command,
                "repository_root": str(root), "source_sha256": initial,

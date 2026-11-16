@@ -1,0 +1,22 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_direct_pipeline_missing_source_is_not_a_physics_attempt _________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-337/test_direct_pipeline_missing_s0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74a3379a11f0>
+
+    def test_direct_pipeline_missing_source_is_not_a_physics_attempt(tmp_path, monkeypatch):
+        from scripts import match_core_crust as pipeline
+        monkeypatch.setattr(pipeline, "executable", lambda: (_ for _ in ()).throw(RuntimeError("must not execute")))
+        result = pipeline.run_pipeline("css", tmp_path / "absent_crust", tmp_path / "absent_core", tmp_path / "attempt")
+>       assert result["failure_category"] == "data_provenance", result
+E       AssertionError: {'survived': False, 'method': 'css', 'stage': 'executable', 'failure_category': 'environment', ...}
+E       assert 'environment' == 'data_provenance'
+E         
+E         - data_provenance
+E         + environment
+
+pipeline/tests/test_matching_pipeline_audit_20261117.py:107: AssertionError
+=========================== short test summary info ============================
+FAILED pipeline/tests/test_matching_pipeline_audit_20261117.py::test_direct_pipeline_missing_source_is_not_a_physics_attempt
+1 failed, 15 deselected in 0.81s

@@ -7,18 +7,20 @@ from __future__ import annotations
 import math
 import numpy as np
 from scipy.optimize import brentq, least_squares
-from .candidate_gdfm_cld import MASS, reduced_cell, solve_two_phase
+from .candidate_gdfm_cld import MASS, reduced_cell, solve_two_phase, _resolve_surface
+from dataclasses import asdict
 from .gdfm_uniform import beta_state
 from .eos_data import EOSData
 
 
-def neutron_drip(model):
+def neutron_drip(model, *, surface=None):
     """Locate the constrained t=1 endpoint where the neutron insertion cost vanishes."""
+    surface=_resolve_surface(model,surface)
     def vacuum(n):
-        fit=least_squares(lambda q:reduced_cell(model,n,[1.,q[0],q[1]])[1][1:], [.16,.33],
+        fit=least_squares(lambda q:reduced_cell(model,n,[1.,q[0],q[1]],surface=surface)[1][1:], [.16,.33],
             bounds=([.05,.01],[.25,.499]),jac='3-point',diff_step=1e-5,
             xtol=1e-12,ftol=1e-12,gtol=1e-12)
-        e,g,detail=reduced_cell(model,n,[1.,*fit.x])
+        e,g,detail=reduced_cell(model,n,[1.,*fit.x],surface=surface)
         if not fit.success or max(abs(g[1:]))>1e-5:raise RuntimeError('vacuum endpoint stationarity failed')
         return fit.x,g,detail
     n=brentq(lambda x:vacuum(x)[1][0],1e-6,.002,xtol=2e-14)
@@ -26,16 +28,17 @@ def neutron_drip(model):
     return {'n_B':float(n),'mu_B_MeV':float(MASS+g[0]),
         'pressure_MeV_fm3':float(n*(MASS+g[0])-detail['energy']),
         'stationarity_gradient':g.tolist(),'coordinates':detail['coordinates'],
-        'energy':detail['energy'],'definition':'neutron KKT boundary in the declared common938.9MeV rest-energy convention'}
+        'energy':detail['energy'],'surface_parameters':asdict(surface),'definition':'neutron KKT boundary in the declared common938.9MeV rest-energy convention'}
 
 
-def homogeneous_endpoint(model, bracket):
+def homogeneous_endpoint(model, bracket, *, surface=None):
     """Two locally neutral phases of the same bulk: identify the CLD support end.
 
     Only the cluster-side endpoint is exported as crust. The uniform phase is
     used to determine a thermodynamic endpoint, not to construct a matched EOS.
     """
-    def state(n):return solve_two_phase(model,float(n))[0]
+    surface=_resolve_surface(model,surface)
+    def state(n):return solve_two_phase(model,float(n),surface=surface)[0]
     def delta(n):return state(n)['energy']-beta_state(model,n)['epsilon']
     cross=brentq(delta,*bracket,xtol=2e-10)
     def residual(v):
@@ -55,11 +58,12 @@ def homogeneous_endpoint(model, bracket):
         'pressure_MeV_fm3':float(pressure),'mu_B_MeV':float(chemical),
         'fixed_density_energy_crossing':float(cross),'residuals':errors,
         'cluster_state':low,'uniform_state':high,
-        'construction':'local-neutral same-functional common tangent; no core model splicing'}
+        'surface_parameters':asdict(surface),'construction':'local-neutral same-functional common tangent; no core model splicing'}
 
 
-def sequence(model,densities):
+def sequence(model,densities, *, surface=None):
     """Use continuation plus three fixed seeds; preserve every computed attempt."""
+    surface=_resolve_surface(model,surface)
     densities=np.asarray(densities,float)
     if densities.ndim!=1 or len(densities)<3 or np.any(np.diff(densities)<=0):
         raise ValueError('strictly increasing density sequence of at least3points required')
@@ -67,7 +71,7 @@ def sequence(model,densities):
     for n in densities:
         starts=[[.9,.16,.3],[.5,.15,.14],[.2,.14,.08]]
         if previous is not None:starts.insert(0,previous)
-        best,attempts=solve_two_phase(model,float(n),starts)
+        best,attempts=solve_two_phase(model,float(n),starts,surface=surface)
         previous=best['search_coordinates'][:3]
         rows.append({'n_B':float(n),'best':best,'attempts':attempts})
     return rows

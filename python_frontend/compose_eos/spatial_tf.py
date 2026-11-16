@@ -72,6 +72,23 @@ def _band_solve(matrix,rhs):
     return solve_banded((1,1),band,rhs,check_finite=False)
 
 
+def _coupled_band_solve(jw,jr,cross,rw,rr):
+    """Solve coupled nearest-neighbor fields in interleaved (w_i,r_i) order.
+
+    Local cross derivatives occupy bands +/-1; same-field spatial neighbors
+    occupy bands +/-2. No symmetry or positive definiteness is assumed.
+    """
+    n=len(rw)
+    band=np.zeros((5,2*n))
+    band[2,0::2]=np.diag(jw);band[2,1::2]=np.diag(jr)
+    band[1,1::2]=cross;band[3,0::2]=cross
+    band[0,2::2]=np.diag(jw,1);band[0,3::2]=np.diag(jr,1)
+    band[4,:-2:2]=np.diag(jw,-1);band[4,1:-2:2]=np.diag(jr,-1)
+    rhs=np.empty(2*n);rhs[0::2]=rw;rhs[1::2]=rr
+    delta=solve_banded((2,2),band,rhs,check_finite=False)
+    return delta[0::2],delta[1::2]
+
+
 class CellFunctional:
     """Eliminate mean fields, retaining the analytic density/radius gradient."""
     def __init__(self,model_id:str,grid:RadialGrid,mean_density:float):
@@ -123,8 +140,7 @@ class CellFunctional:
             cross=np.diag(np.broadcast_to(p['dwr'],n.shape))
             if not np.any(cross):dw=_band_solve(jw,-rw);dr=_band_solve(jr,-rr)
             else:
-                delta=np.linalg.solve(np.block([[jw,cross],[cross,jr]]),-np.r_[rw,rr])
-                dw,dr=np.split(delta,2)
+                dw,dr=_coupled_band_solve(jw,jr,np.diag(cross),-rw,-rr)
             before=np.linalg.norm(np.r_[rw,rr])
             for scale in (1.,.5,.25,.125,.0625,.03125):
                 tw,tr=w+scale*dw,r+scale*dr

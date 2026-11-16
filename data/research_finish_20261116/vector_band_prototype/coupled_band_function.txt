@@ -1,0 +1,17 @@
+def _coupled_band_solve(jw,jr,cross,rw,rr):
+    """Solve coupled nearest-neighbor fields in interleaved (w_i,r_i) order.
+
+    Local cross derivatives occupy bands +/-1; same-field spatial neighbors
+    occupy bands +/-2. No symmetry or positive definiteness is assumed.
+    """
+    n=len(rw)
+    band=np.zeros((5,2*n))
+    band[2,0::2]=np.diag(jw);band[2,1::2]=np.diag(jr)
+    band[1,1::2]=cross;band[3,0::2]=cross
+    band[0,2::2]=np.diag(jw,1);band[0,3::2]=np.diag(jr,1)
+    band[4,:-2:2]=np.diag(jw,-1);band[4,1:-2:2]=np.diag(jr,-1)
+    rhs=np.empty(2*n);rhs[0::2]=rw;rhs[1::2]=rr
+    delta=solve_banded((2,2),band,rhs,check_finite=False)
+    return delta[0::2],delta[1::2]
+
+

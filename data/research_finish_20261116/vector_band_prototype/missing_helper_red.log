@@ -1,0 +1,201 @@
+FFFFFFFFFF                                                               [100%]
+=================================== FAILURES ===================================
+______________ test_radial_coupled_band_matches_dense_oracle[8-1] ______________
+
+dimension = 1, points = 8
+
+    @pytest.mark.parametrize('dimension',[1,2,3])
+    @pytest.mark.parametrize('points',[8,17])
+    def test_radial_coupled_band_matches_dense_oracle(dimension,points):
+        grid=tf.RadialGrid(points,dimension)
+        lap=grid.minus_laplacian/13.**2
+        rng=np.random.default_rng(749+points+dimension)
+        jw=lap+np.diag(2+rng.random(points))
+        jr=lap+np.diag(3+rng.random(points))
+        cross=rng.uniform(-.7,.7,points)
+        rhs=rng.normal(size=2*points)
+        matrix=np.block([[jw,np.diag(cross)],[np.diag(cross),jr]])
+>       result=np.concatenate(tf._coupled_band_solve(jw,jr,cross,rhs[:points],rhs[points:]))
+                              ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'compose_eos.spatial_tf' has no attribute '_coupled_band_solve'
+
+python_frontend/tests/test_spatial_tf_vector_band.py:17: AttributeError
+______________ test_radial_coupled_band_matches_dense_oracle[8-2] ______________
+
+dimension = 2, points = 8
+
+    @pytest.mark.parametrize('dimension',[1,2,3])
+    @pytest.mark.parametrize('points',[8,17])
+    def test_radial_coupled_band_matches_dense_oracle(dimension,points):
+        grid=tf.RadialGrid(points,dimension)
+        lap=grid.minus_laplacian/13.**2
+        rng=np.random.default_rng(749+points+dimension)
+        jw=lap+np.diag(2+rng.random(points))
+        jr=lap+np.diag(3+rng.random(points))
+        cross=rng.uniform(-.7,.7,points)
+        rhs=rng.normal(size=2*points)
+        matrix=np.block([[jw,np.diag(cross)],[np.diag(cross),jr]])
+>       result=np.concatenate(tf._coupled_band_solve(jw,jr,cross,rhs[:points],rhs[points:]))
+                              ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'compose_eos.spatial_tf' has no attribute '_coupled_band_solve'
+
+python_frontend/tests/test_spatial_tf_vector_band.py:17: AttributeError
+______________ test_radial_coupled_band_matches_dense_oracle[8-3] ______________
+
+dimension = 3, points = 8
+
+    @pytest.mark.parametrize('dimension',[1,2,3])
+    @pytest.mark.parametrize('points',[8,17])
+    def test_radial_coupled_band_matches_dense_oracle(dimension,points):
+        grid=tf.RadialGrid(points,dimension)
+        lap=grid.minus_laplacian/13.**2
+        rng=np.random.default_rng(749+points+dimension)
+        jw=lap+np.diag(2+rng.random(points))
+        jr=lap+np.diag(3+rng.random(points))
+        cross=rng.uniform(-.7,.7,points)
+        rhs=rng.normal(size=2*points)
+        matrix=np.block([[jw,np.diag(cross)],[np.diag(cross),jr]])
+>       result=np.concatenate(tf._coupled_band_solve(jw,jr,cross,rhs[:points],rhs[points:]))
+                              ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'compose_eos.spatial_tf' has no attribute '_coupled_band_solve'
+
+python_frontend/tests/test_spatial_tf_vector_band.py:17: AttributeError
+_____________ test_radial_coupled_band_matches_dense_oracle[17-1] ______________
+
+dimension = 1, points = 17
+
+    @pytest.mark.parametrize('dimension',[1,2,3])
+    @pytest.mark.parametrize('points',[8,17])
+    def test_radial_coupled_band_matches_dense_oracle(dimension,points):
+        grid=tf.RadialGrid(points,dimension)
+        lap=grid.minus_laplacian/13.**2
+        rng=np.random.default_rng(749+points+dimension)
+        jw=lap+np.diag(2+rng.random(points))
+        jr=lap+np.diag(3+rng.random(points))
+        cross=rng.uniform(-.7,.7,points)
+        rhs=rng.normal(size=2*points)
+        matrix=np.block([[jw,np.diag(cross)],[np.diag(cross),jr]])
+>       result=np.concatenate(tf._coupled_band_solve(jw,jr,cross,rhs[:points],rhs[points:]))
+                              ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'compose_eos.spatial_tf' has no attribute '_coupled_band_solve'
+
+python_frontend/tests/test_spatial_tf_vector_band.py:17: AttributeError
+_____________ test_radial_coupled_band_matches_dense_oracle[17-2] ______________
+
+dimension = 2, points = 17
+
+    @pytest.mark.parametrize('dimension',[1,2,3])
+    @pytest.mark.parametrize('points',[8,17])
+    def test_radial_coupled_band_matches_dense_oracle(dimension,points):
+        grid=tf.RadialGrid(points,dimension)
+        lap=grid.minus_laplacian/13.**2
+        rng=np.random.default_rng(749+points+dimension)
+        jw=lap+np.diag(2+rng.random(points))
+        jr=lap+np.diag(3+rng.random(points))
+        cross=rng.uniform(-.7,.7,points)
+        rhs=rng.normal(size=2*points)
+        matrix=np.block([[jw,np.diag(cross)],[np.diag(cross),jr]])
+>       result=np.concatenate(tf._coupled_band_solve(jw,jr,cross,rhs[:points],rhs[points:]))
+                              ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'compose_eos.spatial_tf' has no attribute '_coupled_band_solve'
+
+python_frontend/tests/test_spatial_tf_vector_band.py:17: AttributeError
+_____________ test_radial_coupled_band_matches_dense_oracle[17-3] ______________
+
+dimension = 3, points = 17
+
+    @pytest.mark.parametrize('dimension',[1,2,3])
+    @pytest.mark.parametrize('points',[8,17])
+    def test_radial_coupled_band_matches_dense_oracle(dimension,points):
+        grid=tf.RadialGrid(points,dimension)
+        lap=grid.minus_laplacian/13.**2
+        rng=np.random.default_rng(749+points+dimension)
+        jw=lap+np.diag(2+rng.random(points))
+        jr=lap+np.diag(3+rng.random(points))
+        cross=rng.uniform(-.7,.7,points)
+        rhs=rng.normal(size=2*points)
+        matrix=np.block([[jw,np.diag(cross)],[np.diag(cross),jr]])
+>       result=np.concatenate(tf._coupled_band_solve(jw,jr,cross,rhs[:points],rhs[points:]))
+                              ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'compose_eos.spatial_tf' has no attribute '_coupled_band_solve'
+
+python_frontend/tests/test_spatial_tf_vector_band.py:17: AttributeError
+_____ test_band_solver_does_not_require_positive_definiteness[indefinite] ______
+
+kind = 'indefinite'
+
+    @pytest.mark.parametrize('kind',['indefinite','zero_leading_pivot','zero_cross'])
+    def test_band_solver_does_not_require_positive_definiteness(kind):
+        n=8
+        jw=np.diag(np.linspace(2.,3.,n))+np.diag(np.full(n-1,-.3),1)+np.diag(np.full(n-1,-.7),-1)
+        jr=.8*jw;cross=np.full(n,.2)
+        if kind=='indefinite':jw-=5*np.eye(n)
+        if kind=='zero_leading_pivot':jw[0,0]=0.;cross[0]=1.
+        if kind=='zero_cross':cross*=0
+        rhs=np.linspace(-1,1,2*n)
+        matrix=np.block([[jw,np.diag(cross)],[np.diag(cross),jr]])
+>       result=np.concatenate(tf._coupled_band_solve(jw,jr,cross,rhs[:n],rhs[n:]))
+                              ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'compose_eos.spatial_tf' has no attribute '_coupled_band_solve'
+
+python_frontend/tests/test_spatial_tf_vector_band.py:32: AttributeError
+_ test_band_solver_does_not_require_positive_definiteness[zero_leading_pivot] __
+
+kind = 'zero_leading_pivot'
+
+    @pytest.mark.parametrize('kind',['indefinite','zero_leading_pivot','zero_cross'])
+    def test_band_solver_does_not_require_positive_definiteness(kind):
+        n=8
+        jw=np.diag(np.linspace(2.,3.,n))+np.diag(np.full(n-1,-.3),1)+np.diag(np.full(n-1,-.7),-1)
+        jr=.8*jw;cross=np.full(n,.2)
+        if kind=='indefinite':jw-=5*np.eye(n)
+        if kind=='zero_leading_pivot':jw[0,0]=0.;cross[0]=1.
+        if kind=='zero_cross':cross*=0
+        rhs=np.linspace(-1,1,2*n)
+        matrix=np.block([[jw,np.diag(cross)],[np.diag(cross),jr]])
+>       result=np.concatenate(tf._coupled_band_solve(jw,jr,cross,rhs[:n],rhs[n:]))
+                              ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'compose_eos.spatial_tf' has no attribute '_coupled_band_solve'
+
+python_frontend/tests/test_spatial_tf_vector_band.py:32: AttributeError
+_____ test_band_solver_does_not_require_positive_definiteness[zero_cross] ______
+
+kind = 'zero_cross'
+
+    @pytest.mark.parametrize('kind',['indefinite','zero_leading_pivot','zero_cross'])
+    def test_band_solver_does_not_require_positive_definiteness(kind):
+        n=8
+        jw=np.diag(np.linspace(2.,3.,n))+np.diag(np.full(n-1,-.3),1)+np.diag(np.full(n-1,-.7),-1)
+        jr=.8*jw;cross=np.full(n,.2)
+        if kind=='indefinite':jw-=5*np.eye(n)
+        if kind=='zero_leading_pivot':jw[0,0]=0.;cross[0]=1.
+        if kind=='zero_cross':cross*=0
+        rhs=np.linspace(-1,1,2*n)
+        matrix=np.block([[jw,np.diag(cross)],[np.diag(cross),jr]])
+>       result=np.concatenate(tf._coupled_band_solve(jw,jr,cross,rhs[:n],rhs[n:]))
+                              ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'compose_eos.spatial_tf' has no attribute '_coupled_band_solve'
+
+python_frontend/tests/test_spatial_tf_vector_band.py:32: AttributeError
+______________ test_singular_band_solver_preserves_linalg_failure ______________
+
+    def test_singular_band_solver_preserves_linalg_failure():
+        zero=np.zeros((8,8));cross=np.zeros(8);rhs=np.ones(8)
+        with pytest.raises(np.linalg.LinAlgError):
+>           tf._coupled_band_solve(zero,zero,cross,rhs,rhs)
+            ^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'compose_eos.spatial_tf' has no attribute '_coupled_band_solve'
+
+python_frontend/tests/test_spatial_tf_vector_band.py:39: AttributeError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_spatial_tf_vector_band.py::test_radial_coupled_band_matches_dense_oracle[8-1]
+FAILED python_frontend/tests/test_spatial_tf_vector_band.py::test_radial_coupled_band_matches_dense_oracle[8-2]
+FAILED python_frontend/tests/test_spatial_tf_vector_band.py::test_radial_coupled_band_matches_dense_oracle[8-3]
+FAILED python_frontend/tests/test_spatial_tf_vector_band.py::test_radial_coupled_band_matches_dense_oracle[17-1]
+FAILED python_frontend/tests/test_spatial_tf_vector_band.py::test_radial_coupled_band_matches_dense_oracle[17-2]
+FAILED python_frontend/tests/test_spatial_tf_vector_band.py::test_radial_coupled_band_matches_dense_oracle[17-3]
+FAILED python_frontend/tests/test_spatial_tf_vector_band.py::test_band_solver_does_not_require_positive_definiteness[indefinite]
+FAILED python_frontend/tests/test_spatial_tf_vector_band.py::test_band_solver_does_not_require_positive_definiteness[zero_leading_pivot]
+FAILED python_frontend/tests/test_spatial_tf_vector_band.py::test_band_solver_does_not_require_positive_definiteness[zero_cross]
+FAILED python_frontend/tests/test_spatial_tf_vector_band.py::test_singular_band_solver_preserves_linalg_failure
+10 failed in 1.44s

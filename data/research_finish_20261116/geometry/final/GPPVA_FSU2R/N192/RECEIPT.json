@@ -1,0 +1,872 @@
+{
+  "export": {
+    "status": "EXPORTED_NATIVE_READBACK_VERIFIED",
+    "row_count": 15,
+    "native_checks": {
+      "C1": {
+        "temperature_mev": 0.0,
+        "maxQ2": 0.0,
+        "maxQ6mQ7": 0.0,
+        "maxmul": 0.0,
+        "pass_": true
+      },
+      "C2": {
+        "applicable": true,
+        "max_rel": 3.582451774490106e-16,
+        "pass_": true,
+        "basis": "Fortran CompOSE thermodynamic closure"
+      },
+      "C3": {
+        "status": "PARTIAL",
+        "max_abs": 0.0,
+        "pass_": true
+      },
+      "C4": {
+        "status": "PARTIAL",
+        "max_abs": 1.3877787807814457e-17,
+        "pass_": true
+      },
+      "C5": {
+        "maxmul": 0.0,
+        "applicable": true,
+        "pass_": true
+      },
+      "C6": {
+        "min_dPdnb": 0.7973256701859591,
+        "min_delta_p": 0.0019933141754648886,
+        "pass_": true
+      },
+      "C7": {
+        "max_rel": 0.01027541363024505,
+        "n_points": 5,
+        "status": "FINITE_DIFFERENCE_DIAGNOSTIC"
+      },
+      "C8": {
+        "max_rel": 0.010500293926459132,
+        "n_points": 5,
+        "status": "FINITE_DIFFERENCE_DIAGNOSTIC"
+      },
+      "C9": {
+        "max_rel": 3.704182004188667e-05,
+        "n_points": 5,
+        "status": "FINITE_DIFFERENCE_DIAGNOSTIC"
+      },
+      "C10": {
+        "min_cs2": 0.0015047930552806938,
+        "max_cs2": 0.016142154100170034,
+        "min_cs2_first_law": 0.0015047859984980239,
+        "max_cs2_first_law": 0.016141556165402766,
+        "acausal_point_count": 0,
+        "acausal_point_count_first_law": 0,
+        "n_points": 5,
+        "pass_": true
+      },
+      "C11": {
+        "min_dmubdnb": 16.981284999477793,
+        "n_points": 5,
+        "pass_": true
+      },
+      "overall": {
+        "status": "PASS",
+        "pass_": true,
+        "failed_checks": [],
+        "finite_primary_arrays": true,
+        "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11."
+      },
+      "native_report": {
+        "schema": "compose-eos-fortran-verification-v1",
+        "n": 15,
+        "temperature_mev": 0.0,
+        "C1": {
+          "pass": true
+        },
+        "C2": {
+          "applicable": true,
+          "pass": true
+        },
+        "C3": {
+          "status": "PARTIAL",
+          "pass": true
+        },
+        "C4": {
+          "status": "PARTIAL",
+          "pass": true
+        },
+        "C5": {
+          "applicable": true,
+          "pass": true
+        },
+        "C6": {
+          "pass": true
+        },
+        "C7": {
+          "status": "FINITE_DIFFERENCE_DIAGNOSTIC",
+          "max_rel": 0.01027541363024505,
+          "n_points": 5
+        },
+        "C8": {
+          "status": "FINITE_DIFFERENCE_DIAGNOSTIC",
+          "max_rel": 0.010500293926459132,
+          "n_points": 5
+        },
+        "C9": {
+          "status": "FINITE_DIFFERENCE_DIAGNOSTIC",
+          "max_rel": 3.704182004188667e-05,
+          "n_points": 5
+        },
+        "C10": {
+          "pass": true
+        },
+        "C11": {
+          "pass": true
+        },
+        "C3_applicable_points": 2,
+        "C3_masked_points": 13,
+        "C4_applicable_points": 2,
+        "C4_masked_points": 13,
+        "derivative_points": 5,
+        "derivative_masked_points": 10,
+        "C1_max_Q2": 0.0,
+        "C1_max_Q6_minus_Q7": 0.0,
+        "C1_max_mu_l": 0.0,
+        "C2_max_relative_residual": 3.582451774490106e-16,
+        "C3_max_absolute_residual": 0.0,
+        "C4_max_absolute_residual": 1.3877787807814457e-17,
+        "C7_max_relative_residual": 0.01027541363024505,
+        "C8_max_relative_residual": 0.010500293926459132,
+        "C9_max_relative_residual": 3.704182004188667e-05,
+        "min_cs2": 0.0015047930552806938,
+        "max_cs2": 0.016142154100170034,
+        "min_cs2_first_law": 0.0015047859984980239,
+        "max_cs2_first_law": 0.016141556165402766,
+        "min_dmu_b_dnb": 16.981284999477793,
+        "acausal_point_count": 0,
+        "acausal_point_count_first_law": 0,
+        "min_dP_dnb": 0.7973256701859591,
+        "min_delta_P": 0.0019933141754648886,
+        "failed_checks": "",
+        "overall": {
+          "status": "PASS",
+          "pass": true
+        }
+      }
+    },
+    "physical_domain": {
+      "schema": "ns-cowling.sampled-physical-domain.v1",
+      "assessment": "DENSITY_RESOLVED_DIAGNOSTICS",
+      "units": {
+        "density": "fm^-3",
+        "pressure_energy": "MeV fm^-3",
+        "chemical_potential": "MeV"
+      },
+      "source_support_fm3": [
+        0.04,
+        0.095
+      ],
+      "tolerances": {
+        "max_log_step": 0.25,
+        "cs2": 1e-06,
+        "euler": 2e-06,
+        "cold_Q6_Q7": 2e-06
+      },
+      "mechanically_causal_segments": [
+        {
+          "first_row": 2,
+          "last_row": 4,
+          "n_min_fm3": 0.042499999999999996,
+          "n_max_fm3": 0.055
+        },
+        {
+          "first_row": 5,
+          "last_row": 8,
+          "n_min_fm3": 0.057499999999999996,
+          "n_max_fm3": 0.07250000000000001
+        },
+        {
+          "first_row": 9,
+          "last_row": 10,
+          "n_min_fm3": 0.075,
+          "n_max_fm3": 0.08
+        },
+        {
+          "first_row": 11,
+          "last_row": 13,
+          "n_min_fm3": 0.0825,
+          "n_max_fm3": 0.09
+        },
+        {
+          "first_row": 14,
+          "last_row": 15,
+          "n_min_fm3": 0.0925,
+          "n_max_fm3": 0.095
+        }
+      ],
+      "thermodynamically_supported_segments": [
+        {
+          "first_row": 2,
+          "last_row": 4,
+          "n_min_fm3": 0.042499999999999996,
+          "n_max_fm3": 0.055
+        },
+        {
+          "first_row": 5,
+          "last_row": 8,
+          "n_min_fm3": 0.057499999999999996,
+          "n_max_fm3": 0.07250000000000001
+        },
+        {
+          "first_row": 9,
+          "last_row": 10,
+          "n_min_fm3": 0.075,
+          "n_max_fm3": 0.08
+        },
+        {
+          "first_row": 11,
+          "last_row": 13,
+          "n_min_fm3": 0.0825,
+          "n_max_fm3": 0.09
+        },
+        {
+          "first_row": 14,
+          "last_row": 15,
+          "n_min_fm3": 0.0925,
+          "n_max_fm3": 0.095
+        }
+      ],
+      "first_interval_findings": {
+        "PHASE_BOUNDARY": {
+          "left_row": 1,
+          "right_row": 2,
+          "n_left_fm3": 0.04,
+          "n_right_fm3": 0.042499999999999996,
+          "cs2_over_c2_secant": 0.003332649096795664,
+          "cs2_over_c2_first_law_secant": 0.0033326846145107334
+        }
+      },
+      "pressure_roundoff_policy": "Monotonic pressure permits 64*float64 epsilon*max(abs(P_left),abs(P_right),float64 tiny); physical sound-speed tolerance is unchanged.",
+      "coarse_sampling_policy": "Split connected interpolation ranges; retain endpoint values and secant diagnostics. Coarse spacing alone supplies no physical exclusion.",
+      "sampled_secant_pass_count": 14,
+      "euler_failed_rows": [],
+      "euler_unavailable_rows": [],
+      "composition": {
+        "file_present": true,
+        "available": true,
+        "status_counts": {
+          "NOT_AVAILABLE": 0,
+          "PARTIAL": 13,
+          "CHECKED": 2,
+          "FAIL": 0,
+          "UNKNOWN": 0
+        }
+      },
+      "chemical_monotonicity_scope": "Baryon chemical-potential decrease is recorded independently. On charged or composition-changing paths its relation to compressibility requires the appropriate constrained chemical potential.",
+      "attribution": "SOURCE_TABLE_DIAGNOSTIC; intrinsic model versus numerical or convention error requires independent reproduction",
+      "continuous_domain_status": "UNRESOLVED; secants describe adjacent sampled rows and do not certify an interpolant",
+      "decision": "Retain every source row and investigate supported segments before model-level exclusion",
+      "rows": [
+        {
+          "row": 1,
+          "source_density_row_label": 1,
+          "n_fm3": 0.04,
+          "P_MeV_fm3": 0.14460424389317694,
+          "epsilon_MeV_fm3": 37.868931493802414,
+          "mu_B_MeV": 950.3383934423896,
+          "finite_positive_energy_mu": true,
+          "cold_free_energy_status": "PASS",
+          "cold_Q6_minus_Q7_absolute_residual": 0.0,
+          "euler_status": "PASS",
+          "euler_relative_residual": 1.1962774366066672e-16,
+          "composition_status": "PARTIAL",
+          "baryon_closure_applicable": false,
+          "charge_closure_applicable": false
+        },
+        {
+          "row": 2,
+          "source_density_row_label": 2,
+          "n_fm3": 0.042499999999999996,
+          "P_MeV_fm3": 0.15252299152441395,
+          "epsilon_MeV_fm3": 40.24504352997534,
+          "mu_B_MeV": 950.530976976465,
+          "finite_positive_energy_mu": true,
+          "cold_free_energy_status": "PASS",
+          "cold_Q6_minus_Q7_absolute_residual": 0.0,
+          "euler_status": "PASS",
+          "euler_relative_residual": 1.1960350632994772e-16,
+          "composition_status": "PARTIAL",
+          "baryon_closure_applicable": false,
+          "charge_closure_applicable": false
+        },
+        {
+          "row": 3,
+          "source_density_row_label": 3,
+          "n_fm3": 0.045,
+          "P_MeV_fm3": 0.1611267293293679,
+          "epsilon_MeV_fm3": 42.62162101424127,
+          "mu_B_MeV": 950.727727634903,
+          "finite_positive_energy_mu": true,
+          "cold_free_energy_status": "PASS",
+          "cold_Q6_minus_Q7_absolute_residual": 0.0,
+          "euler_status": "PASS",
+          "euler_relative_residual": 1.1957875469187311e-16,
+          "composition_status": "PARTIAL",
+          "baryon_closure_applicable": false,
+          "charge_closure_applicable": false
+        },
+        {
+          "row": 4,
+          "source_density_row_label": 4,
+          "n_fm3": 0.055,
+          "P_MeV_fm3": 0.19196245351245267,
+          "epsilon_MeV_fm3": 52.132202003117406,
+          "mu_B_MeV": 951.3484446659974,
+          "finite_positive_energy_mu": true,
+          "cold_free_energy_status": "PASS",
+          "cold_Q6_minus_Q7_absolute_residual": 0.0,
+          "euler_status": "PASS",
+          "euler_relative_residual": 1.1950073430931985e-16,
+          "composition_status": "PARTIAL",
+          "baryon_closure_applicable": false,
+          "charge_closure_applicable": false
+        },
+        {
+          "row": 5,
+          "source_density_row_label": 5,
+          "n_fm3": 0.057499999999999996,
+          "P_MeV_fm3": 0.19574184975488151,
+          "epsilon_MeV_fm3": 54.510577914761704,
+          "mu_B_MeV": 951.4142567742015,
+          "finite_positive_energy_mu": true,
+          "cold_free_energy_status": "PASS",
+          "cold_Q6_minus_Q7_absolute_residual": 1.3160026591843317e-16,
+          "euler_status": "PASS",
+          "euler_relative_residual": 0.0,
+          "composition_status": "PARTIAL",
+          "baryon_closure_applicable": false,
+          "charge_closure_applicable": false
+        },
+        {
+          "row": 6,
+          "source_density_row_label": 6,
+          "n_fm3": 0.06,
+          "P_MeV_fm3": 0.20283264434920767,
+          "epsilon_MeV_fm3": 56.88926652196271,
+          "mu_B_MeV": 951.5349861051988,
+          "finite_positive_energy_mu": true,
+          "cold_free_energy_status": "PASS",
+          "cold_Q6_minus_Q7_absolute_residual": 1.261169215051651e-16,
+          "euler_status": "PASS",
+          "euler_relative_residual": 2.389546141376396e-16,
+          "composition_status": "PARTIAL",
+          "baryon_closure_applicable": false,
+          "charge_closure_applicable": false
+        },
+        {
+          "row": 7,
+          "source_density_row_label": 7,
+          "n_fm3": 0.07,
+          "P_MeV_fm3": 0.22815880685243428,
+          "epsilon_MeV_fm3": 66.40668611500158,
+          "mu_B_MeV": 951.9263560264858,
+          "finite_positive_energy_mu": true,
+          "cold_free_energy_status": "PASS",
+          "cold_Q6_minus_Q7_absolute_residual": 0.0,
+          "euler_status": "PASS",
+          "euler_relative_residual": 0.0,
+          "composition_status": "PARTIAL",
+          "baryon_closure_applicable": false,
+          "charge_closure_applicable": false
+        },
+        {
+          "row": 8,
+          "source_density_row_label": 8,
+          "n_fm3": 0.07250000000000001,
+          "P_MeV_fm3": 0.23369566024423705,
+          "epsilon_MeV_fm3": 68.78660071565798,
+          "mu_B_MeV": 952.0040879434788,
+          "finite_positive_energy_mu": true,
+          "cold_free_energy_status": "PASS",
+          "cold_Q6_minus_Q7_absolute_residual": 2.0874524938785943e-16,
+          "euler_status": "PASS",
+          "euler_relative_residual": 2.3883686879370987e-16,
+          "composition_status": "PARTIAL",
+          "baryon_closure_applicable": false,
+          "charge_closure_applicable": false
+        },
+        {
+          "row": 9,
+          "source_density_row_label": 9,
+          "n_fm3": 0.075,
+          "P_MeV_fm3": 0.23568897441970194,
+          "epsilon_MeV_fm3": 71.16663573937036,
+          "mu_B_MeV": 952.030996183868,
+          "finite_positive_energy_mu": true,
+          "cold_free_energy_status": "PASS",
+          "cold_Q6_minus_Q7_absolute_residual": 2.0178707440826417e-16,
+          "euler_status": "PASS",
+          "euler_relative_residual": 2.388301182993404e-16,
+          "composition_status": "PARTIAL",
+          "baryon_closure_applicable": false,
+          "charge_closure_applicable": false
+        },
+        {
+          "row": 10,
+          "source_density_row_label": 10,
+          "n_fm3": 0.08,
+          "P_MeV_fm3": 0.24561493208008756,
+          "epsilon_MeV_fm3": 75.92712143055931,
+          "mu_B_MeV": 952.1592045329925,
+          "finite_positive_energy_mu": true,
+          "cold_free_energy_status": "PASS",
+          "cold_Q6_minus_Q7_absolute_residual": 0.0,
+          "euler_status": "PASS",
+          "euler_relative_residual": 0.0,
+          "composition_status": "PARTIAL",
+          "baryon_closure_applicable": false,
+          "charge_closure_applicable": false
+        },
+        {
+          "row": 11,
+          "source_density_row_label": 11,
+          "n_fm3": 0.0825,
+          "P_MeV_fm3": 0.24903277554371073,
+          "epsilon_MeV_fm3": 78.3075602884455,
+          "mu_B_MeV": 952.2011280483539,
+          "finite_positive_energy_mu": true,
+          "cold_free_energy_status": "PASS",
+          "cold_Q6_minus_Q7_absolute_residual": 0.0,
+          "euler_status": "PASS",
+          "euler_relative_residual": 1.193937229990793e-16,
+          "composition_status": "PARTIAL",
+          "baryon_closure_applicable": false,
+          "charge_closure_applicable": false
+        },
+        {
+          "row": 12,
+          "source_density_row_label": 12,
+          "n_fm3": 0.085,
+          "P_MeV_fm3": 0.25321203020122596,
+          "epsilon_MeV_fm3": 80.68812736062608,
+          "mu_B_MeV": 952.2510516567919,
+          "finite_positive_energy_mu": true,
+          "cold_free_energy_status": "PASS",
+          "cold_Q6_minus_Q7_absolute_residual": 0.0,
+          "euler_status": "PASS",
+          "euler_relative_residual": 1.1938746355156642e-16,
+          "composition_status": "PARTIAL",
+          "baryon_closure_applicable": false,
+          "charge_closure_applicable": false
+        },
+        {
+          "row": 13,
+          "source_density_row_label": 13,
+          "n_fm3": 0.09,
+          "P_MeV_fm3": 0.25798902231498744,
+          "epsilon_MeV_fm3": 85.44955786250789,
+          "mu_B_MeV": 952.3060764980321,
+          "finite_positive_energy_mu": true,
+          "cold_free_energy_status": "PASS",
+          "cold_Q6_minus_Q7_absolute_residual": 0.0,
+          "euler_status": "PASS",
+          "euler_relative_residual": 1.1938056526918629e-16,
+          "composition_status": "PARTIAL",
+          "baryon_closure_applicable": false,
+          "charge_closure_applicable": false
+        },
+        {
+          "row": 14,
+          "source_density_row_label": 14,
+          "n_fm3": 0.0925,
+          "P_MeV_fm3": 0.26870381799237464,
+          "epsilon_MeV_fm3": 87.83038192978452,
+          "mu_B_MeV": 952.4225486246154,
+          "finite_positive_energy_mu": true,
+          "cold_free_energy_status": "PASS",
+          "cold_Q6_minus_Q7_absolute_residual": 1.6361114141210609e-16,
+          "euler_status": "PASS",
+          "euler_relative_residual": 1.1936596617309212e-16,
+          "composition_status": "CHECKED",
+          "baryon_closure_applicable": true,
+          "charge_closure_applicable": true
+        },
+        {
+          "row": 15,
+          "source_density_row_label": 15,
+          "n_fm3": 0.095,
+          "P_MeV_fm3": 0.29790643146921525,
+          "epsilon_MeV_fm3": 90.2118210904001,
+          "mu_B_MeV": 952.7339739144137,
+          "finite_positive_energy_mu": true,
+          "cold_free_energy_status": "PASS",
+          "cold_Q6_minus_Q7_absolute_residual": 0.0,
+          "euler_status": "PASS",
+          "euler_relative_residual": 1.193269483762828e-16,
+          "composition_status": "CHECKED",
+          "baryon_closure_applicable": true,
+          "charge_closure_applicable": true
+        }
+      ],
+      "intervals": [
+        {
+          "left_row": 1,
+          "right_row": 2,
+          "n_left_fm3": 0.04,
+          "n_right_fm3": 0.042499999999999996,
+          "pressure_monotonic_roundoff_MeV_fm3": 2.1674820732814333e-15,
+          "dP_dnb_MeV": 3.16749905249481,
+          "cs2_over_c2_secant": 0.003332649096795664,
+          "cs2_over_c2_first_law_secant": 0.0033326846145107334,
+          "mechanically_causal_sampled": false,
+          "thermodynamically_supported_sampled": false,
+          "reasons": [
+            "PHASE_BOUNDARY"
+          ],
+          "physical_findings": [],
+          "continuity_findings": [
+            "PHASE_BOUNDARY"
+          ],
+          "secant_diagnostic_pass": true,
+          "continuity_status": "UNRESOLVED",
+          "endpoint_euler_pass": true,
+          "endpoint_cold_free_energy_pass": true,
+          "baryon_chemical_potential_decreases": false
+        },
+        {
+          "left_row": 2,
+          "right_row": 3,
+          "n_left_fm3": 0.042499999999999996,
+          "n_right_fm3": 0.045,
+          "pressure_monotonic_roundoff_MeV_fm3": 2.2897485412353247e-15,
+          "dP_dnb_MeV": 3.4414951219815717,
+          "cs2_over_c2_secant": 0.003620221878695209,
+          "cs2_over_c2_first_law_secant": 0.003620228129538047,
+          "mechanically_causal_sampled": true,
+          "thermodynamically_supported_sampled": true,
+          "reasons": [],
+          "physical_findings": [],
+          "continuity_findings": [],
+          "secant_diagnostic_pass": true,
+          "continuity_status": "ADJACENT_SAMPLED_ROWS",
+          "endpoint_euler_pass": true,
+          "endpoint_cold_free_energy_pass": true,
+          "baryon_chemical_potential_decreases": false
+        },
+        {
+          "left_row": 3,
+          "right_row": 4,
+          "n_left_fm3": 0.045,
+          "n_right_fm3": 0.055,
+          "pressure_monotonic_roundoff_MeV_fm3": 2.7279505376391834e-15,
+          "dP_dnb_MeV": 3.0835724183084774,
+          "cs2_over_c2_secant": 0.003242254518325555,
+          "cs2_over_c2_first_law_secant": 0.0032423227452330118,
+          "mechanically_causal_sampled": true,
+          "thermodynamically_supported_sampled": true,
+          "reasons": [],
+          "physical_findings": [],
+          "continuity_findings": [],
+          "secant_diagnostic_pass": true,
+          "continuity_status": "ADJACENT_SAMPLED_ROWS",
+          "endpoint_euler_pass": true,
+          "endpoint_cold_free_energy_pass": true,
+          "baryon_chemical_potential_decreases": false
+        },
+        {
+          "left_row": 4,
+          "right_row": 5,
+          "n_left_fm3": 0.055,
+          "n_right_fm3": 0.057499999999999996,
+          "pressure_monotonic_roundoff_MeV_fm3": 2.78165898855152e-15,
+          "dP_dnb_MeV": 1.511758496971541,
+          "cs2_over_c2_secant": 0.001589065977302111,
+          "cs2_over_c2_first_law_secant": 0.0015890142221384647,
+          "mechanically_causal_sampled": false,
+          "thermodynamically_supported_sampled": false,
+          "reasons": [
+            "PHASE_BOUNDARY"
+          ],
+          "physical_findings": [],
+          "continuity_findings": [
+            "PHASE_BOUNDARY"
+          ],
+          "secant_diagnostic_pass": true,
+          "continuity_status": "UNRESOLVED",
+          "endpoint_euler_pass": true,
+          "endpoint_cold_free_energy_pass": true,
+          "baryon_chemical_potential_decreases": false
+        },
+        {
+          "left_row": 5,
+          "right_row": 6,
+          "n_left_fm3": 0.057499999999999996,
+          "n_right_fm3": 0.06,
+          "pressure_monotonic_roundoff_MeV_fm3": 2.882425240346829e-15,
+          "dP_dnb_MeV": 2.8363178377304594,
+          "cs2_over_c2_secant": 0.002980967989193788,
+          "cs2_over_c2_first_law_secant": 0.002980970562765779,
+          "mechanically_causal_sampled": true,
+          "thermodynamically_supported_sampled": true,
+          "reasons": [],
+          "physical_findings": [],
+          "continuity_findings": [],
+          "secant_diagnostic_pass": true,
+          "continuity_status": "ADJACENT_SAMPLED_ROWS",
+          "endpoint_euler_pass": true,
+          "endpoint_cold_free_energy_pass": true,
+          "baryon_chemical_potential_decreases": false
+        },
+        {
+          "left_row": 6,
+          "right_row": 7,
+          "n_left_fm3": 0.06,
+          "n_right_fm3": 0.07,
+          "pressure_monotonic_roundoff_MeV_fm3": 3.242331656173779e-15,
+          "dP_dnb_MeV": 2.532616250322659,
+          "cs2_over_c2_secant": 0.002661032463226736,
+          "cs2_over_c2_first_law_secant": 0.002661064025063293,
+          "mechanically_causal_sampled": true,
+          "thermodynamically_supported_sampled": true,
+          "reasons": [],
+          "physical_findings": [],
+          "continuity_findings": [],
+          "secant_diagnostic_pass": true,
+          "continuity_status": "ADJACENT_SAMPLED_ROWS",
+          "endpoint_euler_pass": true,
+          "endpoint_cold_free_energy_pass": true,
+          "baryon_chemical_potential_decreases": false
+        },
+        {
+          "left_row": 7,
+          "right_row": 8,
+          "n_left_fm3": 0.07,
+          "n_right_fm3": 0.07250000000000001,
+          "pressure_monotonic_roundoff_MeV_fm3": 3.3210150753040615e-15,
+          "dP_dnb_MeV": 2.2147413567211043,
+          "cs2_over_c2_secant": 0.002326492467534609,
+          "cs2_over_c2_first_law_secant": 0.002326493978533223,
+          "mechanically_causal_sampled": true,
+          "thermodynamically_supported_sampled": true,
+          "reasons": [],
+          "physical_findings": [],
+          "continuity_findings": [],
+          "secant_diagnostic_pass": true,
+          "continuity_status": "ADJACENT_SAMPLED_ROWS",
+          "endpoint_euler_pass": true,
+          "endpoint_cold_free_energy_pass": true,
+          "baryon_chemical_potential_decreases": false
+        },
+        {
+          "left_row": 8,
+          "right_row": 9,
+          "n_left_fm3": 0.07250000000000001,
+          "n_right_fm3": 0.075,
+          "pressure_monotonic_roundoff_MeV_fm3": 3.3493417734533457e-15,
+          "dP_dnb_MeV": 0.7973256701859591,
+          "cs2_over_c2_secant": 0.0008375146397449712,
+          "cs2_over_c2_first_law_secant": 0.0008375115320434212,
+          "mechanically_causal_sampled": false,
+          "thermodynamically_supported_sampled": false,
+          "reasons": [
+            "PHASE_BOUNDARY"
+          ],
+          "physical_findings": [],
+          "continuity_findings": [
+            "PHASE_BOUNDARY"
+          ],
+          "secant_diagnostic_pass": true,
+          "continuity_status": "UNRESOLVED",
+          "endpoint_euler_pass": true,
+          "endpoint_cold_free_energy_pass": true,
+          "baryon_chemical_potential_decreases": false
+        },
+        {
+          "left_row": 9,
+          "right_row": 10,
+          "n_left_fm3": 0.075,
+          "n_right_fm3": 0.08,
+          "pressure_monotonic_roundoff_MeV_fm3": 3.490398115674332e-15,
+          "dP_dnb_MeV": 1.9851915320771223,
+          "cs2_over_c2_secant": 0.0020850724703904274,
+          "cs2_over_c2_first_law_secant": 0.0020850769333124056,
+          "mechanically_causal_sampled": true,
+          "thermodynamically_supported_sampled": true,
+          "reasons": [],
+          "physical_findings": [],
+          "continuity_findings": [],
+          "secant_diagnostic_pass": true,
+          "continuity_status": "ADJACENT_SAMPLED_ROWS",
+          "endpoint_euler_pass": true,
+          "endpoint_cold_free_energy_pass": true,
+          "baryon_chemical_potential_decreases": false
+        },
+        {
+          "left_row": 10,
+          "right_row": 11,
+          "n_left_fm3": 0.08,
+          "n_right_fm3": 0.0825,
+          "pressure_monotonic_roundoff_MeV_fm3": 3.538968592575184e-15,
+          "dP_dnb_MeV": 1.3671373854492674,
+          "cs2_over_c2_secant": 0.0014358039284647654,
+          "cs2_over_c2_first_law_secant": 0.0014357969571820715,
+          "mechanically_causal_sampled": false,
+          "thermodynamically_supported_sampled": false,
+          "reasons": [
+            "PHASE_BOUNDARY"
+          ],
+          "physical_findings": [],
+          "continuity_findings": [
+            "PHASE_BOUNDARY"
+          ],
+          "secant_diagnostic_pass": true,
+          "continuity_status": "UNRESOLVED",
+          "endpoint_euler_pass": true,
+          "endpoint_cold_free_energy_pass": true,
+          "baryon_chemical_potential_decreases": false
+        },
+        {
+          "left_row": 11,
+          "right_row": 12,
+          "n_left_fm3": 0.0825,
+          "n_right_fm3": 0.085,
+          "pressure_monotonic_roundoff_MeV_fm3": 3.598359373330964e-15,
+          "dP_dnb_MeV": 1.6717018630060905,
+          "cs2_over_c2_secant": 0.0017555710596664947,
+          "cs2_over_c2_first_law_secant": 0.0017555724221596464,
+          "mechanically_causal_sampled": true,
+          "thermodynamically_supported_sampled": true,
+          "reasons": [],
+          "physical_findings": [],
+          "continuity_findings": [],
+          "secant_diagnostic_pass": true,
+          "continuity_status": "ADJACENT_SAMPLED_ROWS",
+          "endpoint_euler_pass": true,
+          "endpoint_cold_free_energy_pass": true,
+          "baryon_chemical_potential_decreases": false
+        },
+        {
+          "left_row": 12,
+          "right_row": 13,
+          "n_left_fm3": 0.085,
+          "n_right_fm3": 0.09,
+          "pressure_monotonic_roundoff_MeV_fm3": 3.666244514235294e-15,
+          "dP_dnb_MeV": 0.9553984227522978,
+          "cs2_over_c2_secant": 0.001003268263996193,
+          "cs2_over_c2_first_law_secant": 0.0010032762038258297,
+          "mechanically_causal_sampled": true,
+          "thermodynamically_supported_sampled": true,
+          "reasons": [],
+          "physical_findings": [],
+          "continuity_findings": [],
+          "secant_diagnostic_pass": true,
+          "continuity_status": "ADJACENT_SAMPLED_ROWS",
+          "endpoint_euler_pass": true,
+          "endpoint_cold_free_energy_pass": true,
+          "baryon_chemical_potential_decreases": false
+        },
+        {
+          "left_row": 13,
+          "right_row": 14,
+          "n_left_fm3": 0.09,
+          "n_right_fm3": 0.0925,
+          "pressure_monotonic_roundoff_MeV_fm3": 3.818510918909718e-15,
+          "dP_dnb_MeV": 4.285918270954877,
+          "cs2_over_c2_secant": 0.004500456721963328,
+          "cs2_over_c2_first_law_secant": 0.004500292812766336,
+          "mechanically_causal_sampled": false,
+          "thermodynamically_supported_sampled": false,
+          "reasons": [
+            "PHASE_BOUNDARY"
+          ],
+          "physical_findings": [],
+          "continuity_findings": [
+            "PHASE_BOUNDARY"
+          ],
+          "secant_diagnostic_pass": true,
+          "continuity_status": "UNRESOLVED",
+          "endpoint_euler_pass": true,
+          "endpoint_cold_free_energy_pass": true,
+          "baryon_chemical_potential_decreases": false
+        },
+        {
+          "left_row": 14,
+          "right_row": 15,
+          "n_left_fm3": 0.0925,
+          "n_right_fm3": 0.095,
+          "pressure_monotonic_roundoff_MeV_fm3": 4.2335050163333e-15,
+          "dP_dnb_MeV": 11.681045390736234,
+          "cs2_over_c2_secant": 0.012262590604788794,
+          "cs2_over_c2_first_law_secant": 0.012262557173169939,
+          "mechanically_causal_sampled": true,
+          "thermodynamically_supported_sampled": true,
+          "reasons": [],
+          "physical_findings": [],
+          "continuity_findings": [],
+          "secant_diagnostic_pass": true,
+          "continuity_status": "ADJACENT_SAMPLED_ROWS",
+          "endpoint_euler_pass": true,
+          "endpoint_cold_free_energy_pass": true,
+          "baryon_chemical_potential_decreases": false
+        }
+      ]
+    },
+    "composition_representation": "spatial_TF_species_densities",
+    "free_cluster_decomposition": "NOT_AVAILABLE in nonuniform TF; physically computed total composition is in companion composition.json and profiles",
+    "interval_support": {
+      "unresolved_requested_densities_fm3": [],
+      "phase_change_brackets": [
+        {
+          "density_bracket_fm3": [
+            0.04,
+            0.042499999999999996
+          ],
+          "phases": [
+            "droplet",
+            "rod"
+          ]
+        },
+        {
+          "density_bracket_fm3": [
+            0.055,
+            0.057499999999999996
+          ],
+          "phases": [
+            "rod",
+            "slab"
+          ]
+        },
+        {
+          "density_bracket_fm3": [
+            0.07250000000000001,
+            0.075
+          ],
+          "phases": [
+            "slab",
+            "tube"
+          ]
+        },
+        {
+          "density_bracket_fm3": [
+            0.08,
+            0.0825
+          ],
+          "phases": [
+            "tube",
+            "bubble"
+          ]
+        },
+        {
+          "density_bracket_fm3": [
+            0.09,
+            0.0925
+          ],
+          "phases": [
+            "bubble",
+            "uniform"
+          ]
+        }
+      ],
+      "interpolation_policy": "No interpolation across unresolved density gaps or phase-change brackets. Same-phase interpolation still needs a density-refinement error estimate."
+    }
+  },
+  "status": "FINITE_FAMILY_SEARCH",
+  "held_densities": []
+}

@@ -1,0 +1,64 @@
+..FF........................................                             [100%]
+=================================== FAILURES ===================================
+_________ test_dilute_positive_electrons_from_large_stale_potential[1] _________
+
+dimension = 1
+
+    @pytest.mark.parametrize('dimension',[1,2,3])
+    def test_dilute_positive_electrons_from_large_stale_potential(dimension):
+        grid=RadialGrid(64,dimension)
+        p=1e-18*(1+.8*np.cos(np.pi*grid.x))
+        cold=screened_electrons(grid,p,40.)
+        warm=screened_electrons(grid,p,40.,
+            initial=(50*np.cos(np.pi*grid.x)+1e3,-1e3))
+        for ne,v,mu,res in (cold,warm):
+            assert abs(grid.mean(ne-p))/grid.mean(p)<2e-6
+            assert res<2e-10
+            assert abs(grid.mean(v))<2e-11
+        assert warm[2]==pytest.approx(cold[2],rel=0,abs=2e-12)
+>       assert warm[0]==pytest.approx(cold[0],rel=2e-6,abs=1e-25)
+E       AssertionError: assert array([1.0000...99992271e-19]) == approx([1.000...19 ± 2.0e-24])
+E         
+E         comparison failed. Mismatched elements: 47 / 64:
+E         Max absolute difference: 7.726449840412357e-24
+E         Max relative difference: 7.726509556631355e-06
+E         Index | Obtained               | Expected                        
+E         (0,)  | 1.0000048396483096e-18 | 1.0000000168866657e-18 ± 2.0e-24
+E         (1,)  | 1.0000048396483096e-18 | 1.0000000168866657e-18 ± 2.0e-24...
+E         
+E         ...Full output truncated (45 lines hidden), use '-vv' to show
+
+python_frontend/tests/test_screened_electron_vacuum_trials.py:38: AssertionError
+_________ test_dilute_positive_electrons_from_large_stale_potential[2] _________
+
+dimension = 2
+
+    @pytest.mark.parametrize('dimension',[1,2,3])
+    def test_dilute_positive_electrons_from_large_stale_potential(dimension):
+        grid=RadialGrid(64,dimension)
+        p=1e-18*(1+.8*np.cos(np.pi*grid.x))
+        cold=screened_electrons(grid,p,40.)
+        warm=screened_electrons(grid,p,40.,
+            initial=(50*np.cos(np.pi*grid.x)+1e3,-1e3))
+        for ne,v,mu,res in (cold,warm):
+            assert abs(grid.mean(ne-p))/grid.mean(p)<2e-6
+            assert res<2e-10
+            assert abs(grid.mean(v))<2e-11
+        assert warm[2]==pytest.approx(cold[2],rel=0,abs=2e-12)
+>       assert warm[0]==pytest.approx(cold[0],rel=2e-6,abs=1e-25)
+E       AssertionError: assert array([6.7580...75806203e-19]) == approx([6.758...19 ± 1.4e-24])
+E         
+E         comparison failed. Mismatched elements: 27 / 64:
+E         Max absolute difference: 3.1449122094509516e-24
+E         Max relative difference: 4.653602531255386e-06
+E         Index | Obtained               | Expected                        
+E         (0,)  | 6.7580163718936255e-19 | 6.75804782101572e-19 ± 1.4e-24  
+E         (1,)  | 6.7580163718936255e-19 | 6.75804782101572e-19 ± 1.4e-24  ...
+E         
+E         ...Full output truncated (25 lines hidden), use '-vv' to show
+
+python_frontend/tests/test_screened_electron_vacuum_trials.py:38: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_screened_electron_vacuum_trials.py::test_dilute_positive_electrons_from_large_stale_potential[1]
+FAILED python_frontend/tests/test_screened_electron_vacuum_trials.py::test_dilute_positive_electrons_from_large_stale_potential[2]
+2 failed, 42 passed in 3.50s

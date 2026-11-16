@@ -1,0 +1,165 @@
+{
+  "scope": "18-entry inventory and actual retained GM1/APR/SPG native smoke; no TF CLI solve or whole-model calibration certificate",
+  "catalog": {
+    "APR_APR": {
+      "family": "core",
+      "region": "core_only"
+    },
+    "BBB_BHF2": {
+      "family": "core",
+      "region": "core_only"
+    },
+    "GM_GM1": {
+      "family": "core",
+      "region": "core_only"
+    },
+    "RG_KDE0v1": {
+      "family": "core",
+      "region": "core_only"
+    },
+    "RG_SLY4": {
+      "family": "core",
+      "region": "core_only"
+    },
+    "SPG_M1": {
+      "family": "spg",
+      "region": "inner_crust_only"
+    },
+    "SPG_M2": {
+      "family": "spg",
+      "region": "inner_crust_only"
+    },
+    "SPG_M3": {
+      "family": "spg",
+      "region": "inner_crust_only"
+    },
+    "SPG_M4": {
+      "family": "spg",
+      "region": "inner_crust_only"
+    },
+    "SPG_M5": {
+      "family": "spg",
+      "region": "inner_crust_only"
+    },
+    "GPPVA_DD2": {
+      "family": "tf",
+      "region": "sampled_inner_crust_cells_only"
+    },
+    "GPPVA_DDME2": {
+      "family": "tf",
+      "region": "sampled_inner_crust_cells_only"
+    },
+    "GPPVA_TW": {
+      "family": "tf",
+      "region": "sampled_inner_crust_cells_only"
+    },
+    "GPPVA_FSU2": {
+      "family": "tf",
+      "region": "sampled_inner_crust_cells_only"
+    },
+    "GPPVA_FSU2R": {
+      "family": "tf",
+      "region": "sampled_inner_crust_cells_only"
+    },
+    "GPPVA_FSU2H": {
+      "family": "tf",
+      "region": "sampled_inner_crust_cells_only"
+    },
+    "GPPVA_NL3wrL55": {
+      "family": "tf",
+      "region": "sampled_inner_crust_cells_only"
+    },
+    "GPPVA_TM1e": {
+      "family": "tf",
+      "region": "sampled_inner_crust_cells_only"
+    }
+  },
+  "cases": [
+    {
+      "case": "core3",
+      "model": "GM_GM1",
+      "requested_rows": 3,
+      "native_rows": 3,
+      "source_matches": {
+        "python_frontend/compose_eos/core_regeneration.py": true,
+        "python_frontend/compose_eos/apr_uniform.py": true,
+        "python_frontend/compose_eos/apr_gibbs.py": true,
+        "python_frontend/compose_eos/bbb_uniform.py": true,
+        "python_frontend/compose_eos/gm1_uniform.py": true,
+        "python_frontend/compose_eos/skyrme_uniform.py": true,
+        "python_frontend/compose_eos/cold_leptons.py": true,
+        "python_frontend/compose_eos/physical_domain.py": true,
+        "python_frontend/compose_eos/eos_data.py": true,
+        "python_frontend/compose_eos/api.py": true,
+        "scripts/generate_core_eos.py": true
+      },
+      "errors": {
+        "eps": 2.842170943040401e-14,
+        "p": 0.0,
+        "mub": 1.1368683772161603e-13,
+        "Yn": 0.0,
+        "Yp": 0.0,
+        "Ye": 0.0,
+        "Ymu": 0.0
+      }
+    },
+    {
+      "case": "apr3",
+      "model": "APR_APR",
+      "requested_rows": 3,
+      "native_rows": 5,
+      "source_matches": {
+        "python_frontend/compose_eos/core_regeneration.py": true,
+        "python_frontend/compose_eos/apr_uniform.py": true,
+        "python_frontend/compose_eos/apr_gibbs.py": true,
+        "python_frontend/compose_eos/bbb_uniform.py": true,
+        "python_frontend/compose_eos/gm1_uniform.py": true,
+        "python_frontend/compose_eos/skyrme_uniform.py": true,
+        "python_frontend/compose_eos/cold_leptons.py": true,
+        "python_frontend/compose_eos/physical_domain.py": true,
+        "python_frontend/compose_eos/eos_data.py": true,
+        "python_frontend/compose_eos/api.py": true,
+        "scripts/generate_core_eos.py": true
+      },
+      "errors": {
+        "eps": 2.842170943040401e-14,
+        "p": 0.0,
+        "mub": 1.1368683772161603e-13,
+        "Yn": 0.0,
+        "Yp": 0.0,
+        "Ye": 0.0,
+        "Ymu": 0.0
+      }
+    },
+    {
+      "case": "spg17",
+      "model": "SPG_M1",
+      "requested_rows": 17,
+      "native_rows": 17,
+      "source_matches": {
+        "scripts/reoptimize_spg_surfaces.py": true,
+        "scripts/generate_spg_crust.py": true,
+        "python_frontend/compose_eos/candidate_gdfm_cld.py": true,
+        "python_frontend/compose_eos/spg_crust_generator.py": true,
+        "python_frontend/compose_eos/gdfm_uniform.py": true,
+        "python_frontend/compose_eos/scurto_interface.py": true,
+        "python_frontend/compose_eos/cold_leptons.py": true,
+        "python_frontend/compose_eos/eos_data.py": true,
+        "python_frontend/compose_eos/api.py": true,
+        "python_frontend/compose_eos/physical_domain.py": true
+      },
+      "errors": {
+        "eps": 1.7763568394002505e-15,
+        "p": 5.551115123125783e-17,
+        "mub": 1.1368683772161603e-13,
+        "Yn": 0.0,
+        "Yp": 0.0,
+        "Ye": 0.0,
+        "Ymu": 0.0
+      }
+    }
+  ],
+  "native_executable_sha256": "cb34dc1161cca4364582434048979a6904c206aba78d6f109f589e3de0aadcbe",
+  "dispatcher_sha256": "29dda811859f113785c94d0f2bafc693fc0ad6580e83a6bbe6e7c157e28ed3b1",
+  "runner_sha256": "2db88d90f8206621f99fdb5b974572f7488a91901972b7a665cbc011e81be50f"
+}

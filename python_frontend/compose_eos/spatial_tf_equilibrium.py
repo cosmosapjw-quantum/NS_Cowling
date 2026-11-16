@@ -12,52 +12,93 @@ from .spatial_tf import CellFunctional,RadialGrid,initial_profile,_band_solve,fe
 
 
 def screened_electrons(grid,protons,radius,initial=None):
-    """Solve local zero-T electron equilibrium, global neutrality and Poisson."""
-    np_=np.asarray(protons,float);average=grid.mean(np_)
-    if np.any(np_<0):raise ValueError('nonnegative proton profile required')
+    """Solve local zero-T electron equilibrium, global neutrality and Poisson.
+
+    Pin one potential component during Newton, then restore the mean-zero gauge.
+    The pinned Laplacian block remains nonsingular as the electron susceptibility
+    tends to zero. Scalar neutrality is enforced at every trial potential, so an
+    almost-empty outer optimizer trial cannot enter a zero-susceptibility branch.
+    """
+    np_=np.asarray(protons,float)
+    if np_.shape!=grid.weights.shape or not np.all(np.isfinite(np_)) or np.any(np_<0):
+        raise ValueError('finite nonnegative proton profile matching the grid required')
+    if not math.isfinite(radius) or radius<=0:
+        raise ValueError('finite positive cell radius required')
+    average=grid.mean(np_)
     if average==0:return np.zeros_like(np_),np.zeros_like(np_),ELECTRON_MASS,0.
     lap=grid.minus_laplacian/radius**2
-    if initial is None:
-        mu=math.hypot(HBARC*(3*np.pi**2*average)**(1/3),ELECTRON_MASS)
-        v=grid.poisson(np_-average,radius)
-    else:v,mu=initial[0].copy(),float(initial[1])
-    v-=grid.mean(v)
-    # An outer line search can change the proton number by many orders of
-    # magnitude. Re-establish neutrality before Newton instead of reusing a
-    # nearly empty-electron chemical potential in a dense trial profile.
-    def average_electrons(q):
-        local=q+v
-        k=np.sqrt(np.maximum(local**2-ELECTRON_MASS**2,0.))
-        return grid.mean(np.where(local>ELECTRON_MASS,(k/HBARC)**3/(3*np.pi**2),0.))
-    upper=math.hypot(HBARC*(3*np.pi**2*average)**(1/3),ELECTRON_MASS)-min(v)
-    upper+=max(1e-10,1e-12*abs(upper)) # strict outward margin at a rounded endpoint
-    mu=brentq(lambda q:average_electrons(q)-average,
-              ELECTRON_MASS-max(v),upper,xtol=1e-12)
-    def terms(v,mu):
-        chemical=mu+v;k=np.sqrt(np.maximum(chemical**2-ELECTRON_MASS**2,0.))
-        k=np.where(chemical>ELECTRON_MASS,k,0.)
+    if initial is None:v=grid.poisson(np_-average,radius)
+    else:
+        v=np.asarray(initial[0],float).copy()
+        if v.shape!=np_.shape or not np.all(np.isfinite(v)) or not math.isfinite(float(initial[1])):
+            raise ValueError('finite electron initial guess matching the grid required')
+    # Retain small potential updates on fine meshes; linear solves and public
+    # outputs stay float64. Extended precision prevents false line-search stalls.
+    v=np.asarray(v,np.longdouble)
+    v-=v[-1]
+    coupling=4*np.pi*E2
+    weights=grid.weights
+    def densities(v,mu):
+        chemical=mu+v
+        # Product form avoids cancellation of two nearly equal rest-energy squares.
+        kinetic=np.maximum(chemical-ELECTRON_MASS,0.)
+        k=np.sqrt(kinetic*np.maximum(chemical+ELECTRON_MASS,0.))
         ne=(k/HBARC)**3/(3*np.pi**2)
         derivative=np.where(chemical>ELECTRON_MASS,chemical*k/(np.pi**2*HBARC**3),0.)
-        residual=lap@v-4*np.pi*E2*(np_-ne)
-        return ne,derivative,residual
-    error=math.inf
-    for _ in range(45):
-        ne,d,res=terms(v,mu);error=float(np.max(abs(res)))
-        if error<2e-12 and abs(grid.mean(v))<1e-11:break
-        jac=lap+np.diag(4*np.pi*E2*d)
-        z=_band_solve(jac,-res)
-        # jac*1 = 4*pi*e²*d, so Schur elimination of the gauge is exact.
-        dmu=grid.mean(z)+grid.mean(v);dv=z-dmu
-        before=np.linalg.norm(res)
-        for scale in (1.,.5,.25,.125,.0625,.03125):
-            tv,tm=v+scale*dv,mu+scale*dmu
-            if np.linalg.norm(terms(tv,tm)[2])<before:
-                v,mu=tv,tm;break
+        return ne,derivative
+    def neutral_mu(potential):
+        lower=ELECTRON_MASS-float(max(potential))
+        upper=math.hypot(HBARC*(3*np.pi**2*average)**(1/3),ELECTRON_MASS)-float(min(potential))
+        upper+=max(1e-10,1e-12*abs(upper))
+        return brentq(lambda q:grid.mean(densities(potential,q)[0])-average,
+                      lower,upper,xtol=1e-15,rtol=4*np.finfo(float).eps)
+    def terms(v,mu):
+        ne,d=densities(v,mu)
+        # Conservative face fluxes preserve the constant-potential null mode and
+        # avoid cancellation between large diagonal/off-diagonal products.
+        flux=-np.diag(lap,1)*weights[:-1]*(v[:-1]-v[1:])
+        action=np.r_[flux,0.]-np.r_[0.,flux]
+        return ne,d,action/weights-coupling*(np_-ne)
+    mu=neutral_mu(v)
+    # Resolve tiny positive charge instead of accepting an absolute-residual
+    # floor inherited from a dense cached potential. This only tightens Newton.
+    target=min(2e-12,coupling*average*1e-6)
+    for _ in range(60):
+        ne,d,res=terms(v,mu)
+        error=float(np.max(abs(res)))
+        if error<target:break
+        # Newton for first N-1 Poisson equations plus global neutrality, V[-1]=0.
+        # Its Schur complement has positive susceptibility without inverting
+        # the singular constant-potential mode of the Neumann Laplacian.
+        jac=lap[:-1,:-1]+np.diag(coupling*d[:-1])
+        solved=_band_solve(jac,np.column_stack((-res[:-1],coupling*d[:-1])))
+        z,u=solved[:,0],solved[:,1]
+        weighted=weights[:-1]*d[:-1]
+        denominator=float(weighted@(1-u)+weights[-1]*d[-1])
+        if not math.isfinite(denominator) or denominator<=0:
+            raise RuntimeError('screened electron susceptibility outside numerical support')
+        dmu=(-grid.mean(ne-np_)-weighted@z)/denominator
+        dv=np.r_[z-u*dmu,0.]
+        before=float(np.linalg.norm(res))
+        for power in range(32):
+            scale=2.**(-power)
+            trial=v+scale*dv
+            trial_mu=neutral_mu(trial)
+            trial_res=terms(trial,trial_mu)[2]
+            if float(np.linalg.norm(trial_res))<before:
+                v,mu=trial,trial_mu
+                break
         else:raise RuntimeError('screened-electron Newton line search failed')
-    if error>2e-10:raise RuntimeError(f'screened electron PDE residual {error}')
+    gauge=grid.mean(v)
+    v-=gauge
+    mu+=gauge
+    # Recheck the physical residual after rounding the public float64 result.
+    v=np.asarray(v,float);mu=float(mu)
     ne,_,res=terms(v,mu)
+    error=float(np.max(abs(res)))
+    if error>2e-10:raise RuntimeError(f'screened electron PDE residual {error}')
     if abs(grid.mean(np_-ne))>2e-11:raise RuntimeError('screened electron neutrality failure')
-    return ne,v,mu,float(np.max(abs(res)))
+    return ne,v,mu,error
 
 
 class ReducedCellFunctional(CellFunctional):

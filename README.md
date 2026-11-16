@@ -2,7 +2,7 @@
 
 The default numerical path is Fortran. The Python frontend exposes CompOSE reading/writing, EOS thermodynamic verification, normalized EOS export, TOV solves and relativistic Cowling f/p1 calculations. See docs/FORTRAN_PYTHON_FRONTEND_V4.md and docs/FORTRAN_EOS_FEATURE_PARITY.md.
 
-Current independent EOS regeneration work is documented in [the 2026-11-16 completion-loop report](docs/research_completion_20261116/REPORT_KO.md), [per-model coverage](data/research_completion_20261116/MODEL_COVERAGE.json), and [replay commands](docs/research_completion_20261116/REPRODUCE.md). These research generators evaluate declared physical models in Python and export through native Fortran I/O. Their implementation, numerical support and original-table agreement are assessed separately; exact CompOSE matching is not an unconditional pass criterion. The production Fortran-port objective remains a distinct engineering task.
+Current independent EOS regeneration work is documented in [the latest research report](docs/research_finish_20261116/REPORT_KO.md), [per-model coverage](data/research_finish_20261116/MODEL_COVERAGE.json), and [the public generation CLI](docs/research_finish_20261116/PUBLIC_GENERATION_CLI.md). The earlier [completion-loop evidence](docs/research_completion_20261116/REPORT_KO.md) remains available. These research generators evaluate declared physical models in Python and export through native Fortran I/O. Their implementation, numerical support and original-table agreement are assessed separately; exact CompOSE matching is not an unconditional pass criterion. The production Fortran-port objective remains a distinct engineering task.
 
 Install and test:
 
@@ -12,8 +12,16 @@ Install and test:
 Native EOS executable:
 
     bash fortran_eos/build.sh build/compose_eos_fortran
-    build/compose_eos_fortran read path/to/compose path/to/internal
-    build/compose_eos_fortran verify path/to/compose report.json
+    build/compose_eos_fortran/compose_eos_fortran read path/to/compose path/to/internal
+    build/compose_eos_fortran/compose_eos_fortran verify path/to/compose report.json
+
+Source-checkout EOS generation (fresh output directories):
+
+    PYTHONPATH=python_frontend python3 -m compose_eos.cli generators
+    PYTHONPATH=python_frontend python3 -m compose_eos.cli generate GM_GM1 build/gm1_run --points 161
+    PYTHONPATH=python_frontend python3 -m compose_eos.cli generate SPG_M1 build/spg_m1_run --points 257 --variant AME2408_candidate
+
+The catalog exposes five core models, five SPG candidate inner-crust models and eight GPPVA spatial-TF models. TF generation requires explicit density and radial-resolution grids. Generation success is limited to requested rows and their native output verification; it does not certify original SPG calibration, a global minimum, a complete joined crust, or arbitrary interpolation across phase boundaries. Density-dependent physical support and composition availability accompany the outputs. The overall original-model completion goal remains **PARTIALLY_COMPLETE**.
 
 Python API:
 

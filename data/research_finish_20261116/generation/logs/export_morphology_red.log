@@ -1,0 +1,32 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+________________ test_interior_dense_shell_has_no_bubble_label _________________
+
+    def test_interior_dense_shell_has_no_bubble_label():
+        row={'dimension':3,'baryon_density_contrast':1.,
+             'profile':{'nn':[.02,.05,.06,.05,.024],
+                        'np':[.01,.03,.06,.03,.011]}}
+>       assert builder().physical_geometry(row)=='noncanonical_spherical_profile'
+E       AssertionError: assert 'bubble' == 'noncanonical...rical_profile'
+E         
+E         - noncanonical_spherical_profile
+E         + bubble
+
+python_frontend/tests/test_tf_export_morphology.py:17: AssertionError
+_________ test_species_modulation_cannot_receive_uniform_export_label __________
+
+    def test_species_modulation_cannot_receive_uniform_export_label():
+        row={'dimension':3,'baryon_density_contrast':0.,
+             'profile':{'nn':[.055,.045,.035,.045,.055],
+                        'np':[.005,.015,.025,.015,.005]}}
+>       assert builder().physical_geometry(row)=='near_uniform_profile'
+E       AssertionError: assert 'uniform' == 'near_uniform_profile'
+E         
+E         - near_uniform_profile
+E         + uniform
+
+python_frontend/tests/test_tf_export_morphology.py:24: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_tf_export_morphology.py::test_interior_dense_shell_has_no_bubble_label
+FAILED python_frontend/tests/test_tf_export_morphology.py::test_species_modulation_cannot_receive_uniform_export_label
+2 failed in 0.44s

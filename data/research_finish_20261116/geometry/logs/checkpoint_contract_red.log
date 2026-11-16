@@ -1,0 +1,32 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_________ test_complete_node_checkpoint_has_all_families_and_identity __________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7947102adaf0>
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-228/test_complete_node_checkpoint_0')
+
+    def test_complete_node_checkpoint_has_all_families_and_identity(monkeypatch,tmp_path):
+        monkeypatch.setattr(runner,'solve_attempt',fake)
+>       runner.solve_node('TEST',.05,8,{g:[] for g in runner.FAMILIES},None,[],tmp_path,{'synthetic':'unit_contract'})
+E       TypeError: solve_node() takes 6 positional arguments but 8 were given
+
+python_frontend/tests/test_gppva_completion_checkpoints.py:17: TypeError
+______________ test_completed_family_survives_next_attempt_crash _______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x79468f66d0a0>
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-228/test_completed_family_survives0')
+
+    def test_completed_family_survives_next_attempt_crash(monkeypatch,tmp_path):
+        def crash_later(model,n,points,family,*args):
+            if family=='rod':raise RuntimeError('simulated process-side interruption')
+            return fake(model,n,points,family,*args)
+        monkeypatch.setattr(runner,'solve_attempt',crash_later)
+        with pytest.raises(RuntimeError,match='interruption'):
+>           runner.solve_node('TEST',.05,8,{g:[] for g in runner.FAMILIES},None,[],tmp_path,{'synthetic':'unit_contract'})
+E           TypeError: solve_node() takes 6 positional arguments but 8 were given
+
+python_frontend/tests/test_gppva_completion_checkpoints.py:30: TypeError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_gppva_completion_checkpoints.py::test_complete_node_checkpoint_has_all_families_and_identity
+FAILED python_frontend/tests/test_gppva_completion_checkpoints.py::test_completed_family_survives_next_attempt_crash
+2 failed in 1.71s

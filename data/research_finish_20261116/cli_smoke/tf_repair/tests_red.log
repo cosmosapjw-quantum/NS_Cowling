@@ -1,0 +1,456 @@
+............................FFFFFFFFFFFFFFFF                             [100%]
+=================================== FAILURES ===================================
+____________________ test_tf_native_corruption_is_rejected _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-221/test_tf_native_corruption_is_r0')
+
+    def test_tf_native_corruption_is_rejected(tmp_path):
+        request = dispatch.generation_request("GPPVA_DD2", densities=[.001,.002,.003],resolutions=[16])
+        directory = tf_evidence(tmp_path)
+        (directory / "compose/eos.thermo").write_text("corrupt table")
+>       with pytest.raises(ValueError,match="checksum"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_dispatch.py:213: Failed
+______________ test_tf_required_hash_coverage[compose/eos.thermo] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-221/test_tf_required_hash_coverage0')
+omit = 'compose/eos.thermo'
+
+    @pytest.mark.parametrize("omit", ["compose/eos.thermo", "composition.json", "selected_states.json.gz", "INTERVAL_SUPPORT.json"])
+    def test_tf_required_hash_coverage(tmp_path, omit):
+        request = dispatch.generation_request("GPPVA_DD2", densities=[.001,.002,.003],resolutions=[16])
+        directory = tf_evidence(tmp_path)
+        dump(directory / "INTERVAL_SUPPORT.json", {"interpolation":"NOT_ADMITTED"})
+        seal_tf_export(directory)
+        record = json.loads((directory/"RECEIPT.json").read_text())
+        del record["export"]["output_sha256"][omit]
+        dump(directory/"RECEIPT.json",record)
+>       with pytest.raises(ValueError,match="checksums"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_dispatch.py:226: Failed
+_______________ test_tf_required_hash_coverage[composition.json] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-221/test_tf_required_hash_coverage1')
+omit = 'composition.json'
+
+    @pytest.mark.parametrize("omit", ["compose/eos.thermo", "composition.json", "selected_states.json.gz", "INTERVAL_SUPPORT.json"])
+    def test_tf_required_hash_coverage(tmp_path, omit):
+        request = dispatch.generation_request("GPPVA_DD2", densities=[.001,.002,.003],resolutions=[16])
+        directory = tf_evidence(tmp_path)
+        dump(directory / "INTERVAL_SUPPORT.json", {"interpolation":"NOT_ADMITTED"})
+        seal_tf_export(directory)
+        record = json.loads((directory/"RECEIPT.json").read_text())
+        del record["export"]["output_sha256"][omit]
+        dump(directory/"RECEIPT.json",record)
+>       with pytest.raises(ValueError,match="checksums"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_dispatch.py:226: Failed
+___________ test_tf_required_hash_coverage[selected_states.json.gz] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-221/test_tf_required_hash_coverage2')
+omit = 'selected_states.json.gz'
+
+    @pytest.mark.parametrize("omit", ["compose/eos.thermo", "composition.json", "selected_states.json.gz", "INTERVAL_SUPPORT.json"])
+    def test_tf_required_hash_coverage(tmp_path, omit):
+        request = dispatch.generation_request("GPPVA_DD2", densities=[.001,.002,.003],resolutions=[16])
+        directory = tf_evidence(tmp_path)
+        dump(directory / "INTERVAL_SUPPORT.json", {"interpolation":"NOT_ADMITTED"})
+        seal_tf_export(directory)
+        record = json.loads((directory/"RECEIPT.json").read_text())
+        del record["export"]["output_sha256"][omit]
+        dump(directory/"RECEIPT.json",record)
+>       with pytest.raises(ValueError,match="checksums"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_dispatch.py:226: Failed
+____________ test_tf_required_hash_coverage[INTERVAL_SUPPORT.json] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-221/test_tf_required_hash_coverage3')
+omit = 'INTERVAL_SUPPORT.json'
+
+    @pytest.mark.parametrize("omit", ["compose/eos.thermo", "composition.json", "selected_states.json.gz", "INTERVAL_SUPPORT.json"])
+    def test_tf_required_hash_coverage(tmp_path, omit):
+        request = dispatch.generation_request("GPPVA_DD2", densities=[.001,.002,.003],resolutions=[16])
+        directory = tf_evidence(tmp_path)
+        dump(directory / "INTERVAL_SUPPORT.json", {"interpolation":"NOT_ADMITTED"})
+        seal_tf_export(directory)
+        record = json.loads((directory/"RECEIPT.json").read_text())
+        del record["export"]["output_sha256"][omit]
+        dump(directory/"RECEIPT.json",record)
+>       with pytest.raises(ValueError,match="checksums"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_dispatch.py:226: Failed
+_ test_tf_selected_row_requires_physical_evidence_even_after_rehash[numerical_status-REQUIRES_REFINEMENT] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-221/test_tf_selected_row_requires_0')
+key = 'numerical_status', value = 'REQUIRES_REFINEMENT'
+
+    @pytest.mark.parametrize("key,value", [
+        ("numerical_status","REQUIRES_REFINEMENT"),
+        ("muon_threshold_crossed",True),
+        ("baryon_constraint_error",1e-3),
+        ("charge_constraint_error",1e-3),
+        ("scalar_pde_residual",1e-3),
+        ("electron_pde_residual",1e-3),
+        ("epsilon",float("nan")),
+        ("energy_per_baryon",float("inf")),
+        ("pressure",float("nan")),
+        ("mu_B",float("inf")),
+        ("mu_Q_lepton",float("nan")),
+    ])
+    def test_tf_selected_row_requires_physical_evidence_even_after_rehash(tmp_path,key,value):
+        request = dispatch.generation_request("GPPVA_DD2", densities=[.001,.002,.003],resolutions=[16])
+        directory = tf_evidence(tmp_path)
+        path = directory / "selected_states.json.gz"
+        with gzip.open(path,"rt") as stream:
+            rows=json.load(stream)
+        rows[0][key]=value
+        with gzip.open(path,"wt") as stream:
+            json.dump(rows,stream)
+        seal_tf_export(directory)
+>       with pytest.raises(ValueError,match="selected TF row"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_dispatch.py:253: Failed
+_ test_tf_selected_row_requires_physical_evidence_even_after_rehash[muon_threshold_crossed-True] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-221/test_tf_selected_row_requires_1')
+key = 'muon_threshold_crossed', value = True
+
+    @pytest.mark.parametrize("key,value", [
+        ("numerical_status","REQUIRES_REFINEMENT"),
+        ("muon_threshold_crossed",True),
+        ("baryon_constraint_error",1e-3),
+        ("charge_constraint_error",1e-3),
+        ("scalar_pde_residual",1e-3),
+        ("electron_pde_residual",1e-3),
+        ("epsilon",float("nan")),
+        ("energy_per_baryon",float("inf")),
+        ("pressure",float("nan")),
+        ("mu_B",float("inf")),
+        ("mu_Q_lepton",float("nan")),
+    ])
+    def test_tf_selected_row_requires_physical_evidence_even_after_rehash(tmp_path,key,value):
+        request = dispatch.generation_request("GPPVA_DD2", densities=[.001,.002,.003],resolutions=[16])
+        directory = tf_evidence(tmp_path)
+        path = directory / "selected_states.json.gz"
+        with gzip.open(path,"rt") as stream:
+            rows=json.load(stream)
+        rows[0][key]=value
+        with gzip.open(path,"wt") as stream:
+            json.dump(rows,stream)
+        seal_tf_export(directory)
+>       with pytest.raises(ValueError,match="selected TF row"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_dispatch.py:253: Failed
+_ test_tf_selected_row_requires_physical_evidence_even_after_rehash[baryon_constraint_error-0.001] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-221/test_tf_selected_row_requires_2')
+key = 'baryon_constraint_error', value = 0.001
+
+    @pytest.mark.parametrize("key,value", [
+        ("numerical_status","REQUIRES_REFINEMENT"),
+        ("muon_threshold_crossed",True),
+        ("baryon_constraint_error",1e-3),
+        ("charge_constraint_error",1e-3),
+        ("scalar_pde_residual",1e-3),
+        ("electron_pde_residual",1e-3),
+        ("epsilon",float("nan")),
+        ("energy_per_baryon",float("inf")),
+        ("pressure",float("nan")),
+        ("mu_B",float("inf")),
+        ("mu_Q_lepton",float("nan")),
+    ])
+    def test_tf_selected_row_requires_physical_evidence_even_after_rehash(tmp_path,key,value):
+        request = dispatch.generation_request("GPPVA_DD2", densities=[.001,.002,.003],resolutions=[16])
+        directory = tf_evidence(tmp_path)
+        path = directory / "selected_states.json.gz"
+        with gzip.open(path,"rt") as stream:
+            rows=json.load(stream)
+        rows[0][key]=value
+        with gzip.open(path,"wt") as stream:
+            json.dump(rows,stream)
+        seal_tf_export(directory)
+>       with pytest.raises(ValueError,match="selected TF row"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_dispatch.py:253: Failed
+_ test_tf_selected_row_requires_physical_evidence_even_after_rehash[charge_constraint_error-0.001] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-221/test_tf_selected_row_requires_3')
+key = 'charge_constraint_error', value = 0.001
+
+    @pytest.mark.parametrize("key,value", [
+        ("numerical_status","REQUIRES_REFINEMENT"),
+        ("muon_threshold_crossed",True),
+        ("baryon_constraint_error",1e-3),
+        ("charge_constraint_error",1e-3),
+        ("scalar_pde_residual",1e-3),
+        ("electron_pde_residual",1e-3),
+        ("epsilon",float("nan")),
+        ("energy_per_baryon",float("inf")),
+        ("pressure",float("nan")),
+        ("mu_B",float("inf")),
+        ("mu_Q_lepton",float("nan")),
+    ])
+    def test_tf_selected_row_requires_physical_evidence_even_after_rehash(tmp_path,key,value):
+        request = dispatch.generation_request("GPPVA_DD2", densities=[.001,.002,.003],resolutions=[16])
+        directory = tf_evidence(tmp_path)
+        path = directory / "selected_states.json.gz"
+        with gzip.open(path,"rt") as stream:
+            rows=json.load(stream)
+        rows[0][key]=value
+        with gzip.open(path,"wt") as stream:
+            json.dump(rows,stream)
+        seal_tf_export(directory)
+>       with pytest.raises(ValueError,match="selected TF row"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_dispatch.py:253: Failed
+_ test_tf_selected_row_requires_physical_evidence_even_after_rehash[scalar_pde_residual-0.001] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-221/test_tf_selected_row_requires_4')
+key = 'scalar_pde_residual', value = 0.001
+
+    @pytest.mark.parametrize("key,value", [
+        ("numerical_status","REQUIRES_REFINEMENT"),
+        ("muon_threshold_crossed",True),
+        ("baryon_constraint_error",1e-3),
+        ("charge_constraint_error",1e-3),
+        ("scalar_pde_residual",1e-3),
+        ("electron_pde_residual",1e-3),
+        ("epsilon",float("nan")),
+        ("energy_per_baryon",float("inf")),
+        ("pressure",float("nan")),
+        ("mu_B",float("inf")),
+        ("mu_Q_lepton",float("nan")),
+    ])
+    def test_tf_selected_row_requires_physical_evidence_even_after_rehash(tmp_path,key,value):
+        request = dispatch.generation_request("GPPVA_DD2", densities=[.001,.002,.003],resolutions=[16])
+        directory = tf_evidence(tmp_path)
+        path = directory / "selected_states.json.gz"
+        with gzip.open(path,"rt") as stream:
+            rows=json.load(stream)
+        rows[0][key]=value
+        with gzip.open(path,"wt") as stream:
+            json.dump(rows,stream)
+        seal_tf_export(directory)
+>       with pytest.raises(ValueError,match="selected TF row"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_dispatch.py:253: Failed
+_ test_tf_selected_row_requires_physical_evidence_even_after_rehash[electron_pde_residual-0.001] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-221/test_tf_selected_row_requires_5')
+key = 'electron_pde_residual', value = 0.001
+
+    @pytest.mark.parametrize("key,value", [
+        ("numerical_status","REQUIRES_REFINEMENT"),
+        ("muon_threshold_crossed",True),
+        ("baryon_constraint_error",1e-3),
+        ("charge_constraint_error",1e-3),
+        ("scalar_pde_residual",1e-3),
+        ("electron_pde_residual",1e-3),
+        ("epsilon",float("nan")),
+        ("energy_per_baryon",float("inf")),
+        ("pressure",float("nan")),
+        ("mu_B",float("inf")),
+        ("mu_Q_lepton",float("nan")),
+    ])
+    def test_tf_selected_row_requires_physical_evidence_even_after_rehash(tmp_path,key,value):
+        request = dispatch.generation_request("GPPVA_DD2", densities=[.001,.002,.003],resolutions=[16])
+        directory = tf_evidence(tmp_path)
+        path = directory / "selected_states.json.gz"
+        with gzip.open(path,"rt") as stream:
+            rows=json.load(stream)
+        rows[0][key]=value
+        with gzip.open(path,"wt") as stream:
+            json.dump(rows,stream)
+        seal_tf_export(directory)
+>       with pytest.raises(ValueError,match="selected TF row"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_dispatch.py:253: Failed
+_ test_tf_selected_row_requires_physical_evidence_even_after_rehash[epsilon-nan] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-221/test_tf_selected_row_requires_6')
+key = 'epsilon', value = nan
+
+    @pytest.mark.parametrize("key,value", [
+        ("numerical_status","REQUIRES_REFINEMENT"),
+        ("muon_threshold_crossed",True),
+        ("baryon_constraint_error",1e-3),
+        ("charge_constraint_error",1e-3),
+        ("scalar_pde_residual",1e-3),
+        ("electron_pde_residual",1e-3),
+        ("epsilon",float("nan")),
+        ("energy_per_baryon",float("inf")),
+        ("pressure",float("nan")),
+        ("mu_B",float("inf")),
+        ("mu_Q_lepton",float("nan")),
+    ])
+    def test_tf_selected_row_requires_physical_evidence_even_after_rehash(tmp_path,key,value):
+        request = dispatch.generation_request("GPPVA_DD2", densities=[.001,.002,.003],resolutions=[16])
+        directory = tf_evidence(tmp_path)
+        path = directory / "selected_states.json.gz"
+        with gzip.open(path,"rt") as stream:
+            rows=json.load(stream)
+        rows[0][key]=value
+        with gzip.open(path,"wt") as stream:
+            json.dump(rows,stream)
+        seal_tf_export(directory)
+>       with pytest.raises(ValueError,match="selected TF row"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_dispatch.py:253: Failed
+_ test_tf_selected_row_requires_physical_evidence_even_after_rehash[energy_per_baryon-inf] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-221/test_tf_selected_row_requires_7')
+key = 'energy_per_baryon', value = inf
+
+    @pytest.mark.parametrize("key,value", [
+        ("numerical_status","REQUIRES_REFINEMENT"),
+        ("muon_threshold_crossed",True),
+        ("baryon_constraint_error",1e-3),
+        ("charge_constraint_error",1e-3),
+        ("scalar_pde_residual",1e-3),
+        ("electron_pde_residual",1e-3),
+        ("epsilon",float("nan")),
+        ("energy_per_baryon",float("inf")),
+        ("pressure",float("nan")),
+        ("mu_B",float("inf")),
+        ("mu_Q_lepton",float("nan")),
+    ])
+    def test_tf_selected_row_requires_physical_evidence_even_after_rehash(tmp_path,key,value):
+        request = dispatch.generation_request("GPPVA_DD2", densities=[.001,.002,.003],resolutions=[16])
+        directory = tf_evidence(tmp_path)
+        path = directory / "selected_states.json.gz"
+        with gzip.open(path,"rt") as stream:
+            rows=json.load(stream)
+        rows[0][key]=value
+        with gzip.open(path,"wt") as stream:
+            json.dump(rows,stream)
+        seal_tf_export(directory)
+>       with pytest.raises(ValueError,match="selected TF row"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_dispatch.py:253: Failed
+_ test_tf_selected_row_requires_physical_evidence_even_after_rehash[pressure-nan] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-221/test_tf_selected_row_requires_8')
+key = 'pressure', value = nan
+
+    @pytest.mark.parametrize("key,value", [
+        ("numerical_status","REQUIRES_REFINEMENT"),
+        ("muon_threshold_crossed",True),
+        ("baryon_constraint_error",1e-3),
+        ("charge_constraint_error",1e-3),
+        ("scalar_pde_residual",1e-3),
+        ("electron_pde_residual",1e-3),
+        ("epsilon",float("nan")),
+        ("energy_per_baryon",float("inf")),
+        ("pressure",float("nan")),
+        ("mu_B",float("inf")),
+        ("mu_Q_lepton",float("nan")),
+    ])
+    def test_tf_selected_row_requires_physical_evidence_even_after_rehash(tmp_path,key,value):
+        request = dispatch.generation_request("GPPVA_DD2", densities=[.001,.002,.003],resolutions=[16])
+        directory = tf_evidence(tmp_path)
+        path = directory / "selected_states.json.gz"
+        with gzip.open(path,"rt") as stream:
+            rows=json.load(stream)
+        rows[0][key]=value
+        with gzip.open(path,"wt") as stream:
+            json.dump(rows,stream)
+        seal_tf_export(directory)
+>       with pytest.raises(ValueError,match="selected TF row"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_dispatch.py:253: Failed
+_ test_tf_selected_row_requires_physical_evidence_even_after_rehash[mu_B-inf] __
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-221/test_tf_selected_row_requires_9')
+key = 'mu_B', value = inf
+
+    @pytest.mark.parametrize("key,value", [
+        ("numerical_status","REQUIRES_REFINEMENT"),
+        ("muon_threshold_crossed",True),
+        ("baryon_constraint_error",1e-3),
+        ("charge_constraint_error",1e-3),
+        ("scalar_pde_residual",1e-3),
+        ("electron_pde_residual",1e-3),
+        ("epsilon",float("nan")),
+        ("energy_per_baryon",float("inf")),
+        ("pressure",float("nan")),
+        ("mu_B",float("inf")),
+        ("mu_Q_lepton",float("nan")),
+    ])
+    def test_tf_selected_row_requires_physical_evidence_even_after_rehash(tmp_path,key,value):
+        request = dispatch.generation_request("GPPVA_DD2", densities=[.001,.002,.003],resolutions=[16])
+        directory = tf_evidence(tmp_path)
+        path = directory / "selected_states.json.gz"
+        with gzip.open(path,"rt") as stream:
+            rows=json.load(stream)
+        rows[0][key]=value
+        with gzip.open(path,"wt") as stream:
+            json.dump(rows,stream)
+        seal_tf_export(directory)
+>       with pytest.raises(ValueError,match="selected TF row"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_dispatch.py:253: Failed
+_ test_tf_selected_row_requires_physical_evidence_even_after_rehash[mu_Q_lepton-nan] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-221/test_tf_selected_row_requires_10')
+key = 'mu_Q_lepton', value = nan
+
+    @pytest.mark.parametrize("key,value", [
+        ("numerical_status","REQUIRES_REFINEMENT"),
+        ("muon_threshold_crossed",True),
+        ("baryon_constraint_error",1e-3),
+        ("charge_constraint_error",1e-3),
+        ("scalar_pde_residual",1e-3),
+        ("electron_pde_residual",1e-3),
+        ("epsilon",float("nan")),
+        ("energy_per_baryon",float("inf")),
+        ("pressure",float("nan")),
+        ("mu_B",float("inf")),
+        ("mu_Q_lepton",float("nan")),
+    ])
+    def test_tf_selected_row_requires_physical_evidence_even_after_rehash(tmp_path,key,value):
+        request = dispatch.generation_request("GPPVA_DD2", densities=[.001,.002,.003],resolutions=[16])
+        directory = tf_evidence(tmp_path)
+        path = directory / "selected_states.json.gz"
+        with gzip.open(path,"rt") as stream:
+            rows=json.load(stream)
+        rows[0][key]=value
+        with gzip.open(path,"wt") as stream:
+            json.dump(rows,stream)
+        seal_tf_export(directory)
+>       with pytest.raises(ValueError,match="selected TF row"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_dispatch.py:253: Failed
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_generation_dispatch.py::test_tf_native_corruption_is_rejected
+FAILED python_frontend/tests/test_generation_dispatch.py::test_tf_required_hash_coverage[compose/eos.thermo]
+FAILED python_frontend/tests/test_generation_dispatch.py::test_tf_required_hash_coverage[composition.json]
+FAILED python_frontend/tests/test_generation_dispatch.py::test_tf_required_hash_coverage[selected_states.json.gz]
+FAILED python_frontend/tests/test_generation_dispatch.py::test_tf_required_hash_coverage[INTERVAL_SUPPORT.json]
+FAILED python_frontend/tests/test_generation_dispatch.py::test_tf_selected_row_requires_physical_evidence_even_after_rehash[numerical_status-REQUIRES_REFINEMENT]
+FAILED python_frontend/tests/test_generation_dispatch.py::test_tf_selected_row_requires_physical_evidence_even_after_rehash[muon_threshold_crossed-True]
+FAILED python_frontend/tests/test_generation_dispatch.py::test_tf_selected_row_requires_physical_evidence_even_after_rehash[baryon_constraint_error-0.001]
+FAILED python_frontend/tests/test_generation_dispatch.py::test_tf_selected_row_requires_physical_evidence_even_after_rehash[charge_constraint_error-0.001]
+FAILED python_frontend/tests/test_generation_dispatch.py::test_tf_selected_row_requires_physical_evidence_even_after_rehash[scalar_pde_residual-0.001]
+FAILED python_frontend/tests/test_generation_dispatch.py::test_tf_selected_row_requires_physical_evidence_even_after_rehash[electron_pde_residual-0.001]
+FAILED python_frontend/tests/test_generation_dispatch.py::test_tf_selected_row_requires_physical_evidence_even_after_rehash[epsilon-nan]
+FAILED python_frontend/tests/test_generation_dispatch.py::test_tf_selected_row_requires_physical_evidence_even_after_rehash[energy_per_baryon-inf]
+FAILED python_frontend/tests/test_generation_dispatch.py::test_tf_selected_row_requires_physical_evidence_even_after_rehash[pressure-nan]
+FAILED python_frontend/tests/test_generation_dispatch.py::test_tf_selected_row_requires_physical_evidence_even_after_rehash[mu_B-inf]
+FAILED python_frontend/tests/test_generation_dispatch.py::test_tf_selected_row_requires_physical_evidence_even_after_rehash[mu_Q_lepton-nan]
+16 failed, 28 passed in 1.19s

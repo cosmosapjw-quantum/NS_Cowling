@@ -1,0 +1,50 @@
+{
+  "status": "PARTIALLY_COMPLETE",
+  "base_head": "ad1ff42fa596a2db4c78b90d764d876de722ee68",
+  "python": "3.12.3",
+  "source_sha256": {
+    "scripts/refine_dd2_geometry_quarters.py": "b80ec4540d8806ddc5d21932c37ee3bd9aa38e62ae6348b7c1a3c565b2d290a7",
+    "scripts/export_dd2_geometry_segment.py": "fe7f0c9dae9c0620144bd26a22e49a7d99416b5a3f3aebf51d890ec09d5288ac",
+    "scripts/audit_spg_surface_on_cells.py": "8d01d193854cd33d642e0a3b3a119cca25d30732c0a77d0e572310d4e4ad9577",
+    "python_frontend/tests/test_dd2_geometry_quarters.py": "9cb2ff73360acd57ff0874e50638bdb10ad5796764073db34a1d9f9b59ac16f6",
+    "scripts/build_gppva_tf.py": "94d91effb07f5a49dda4c9448ced7a942474bd50f0d5d1959ca9d71d00e8e2d2",
+    "scripts/refine_gppva_tf.py": "cd22769f6de4bc23a99b9a60c7940cbd1dcabb62e1c90a278ec042d939007b6b",
+    "scripts/tf_polish.py": "bfaeb9dea7273d995b3efa905496dc74ee6856248e93cc5b8dbbeac5c06ed023",
+    "python_frontend/compose_eos/spatial_tf.py": "d0c027c4c388a9b37cbfae6ecae753354fce0ae83bbfa1867aad88227a47a826",
+    "python_frontend/compose_eos/spatial_tf_equilibrium.py": "559f62e1fec635e38d1a098d0d1d7831b6e57c83ed4672c0b18a141609c34a79",
+    "python_frontend/compose_eos/gppva_rmf.py": "b08bc009f6cfed81680603dc20b3e426be4548eee3e44c9f4b16f3ffa64540a9",
+    "python_frontend/compose_eos/scurto_interface.py": "66b2d8be5396cbddee20a91f43dee1169ae65e38e9fee5ebdae61b2c143ad8f3"
+  },
+  "native_executable_sha256": "340fe833103614d8c69e0b63193e835bd9a602127f3ee0d82803e06d1ec4e1d9",
+  "input_seed_sha256": "5b607c6e0d5945ac01a0534291b0e42f4c56ab2f035b2808005ac38609992aef",
+  "geometry": {
+    "first_run": "HISTORICAL_INVALID_SELECTION_EXCEPTION_HIDDEN",
+    "first_script_snapshot": "geometry/first_runner_snapshot.py",
+    "retry": "HOLD_UNRESOLVED_SEED at 0.0625; rod candidate at 0.0675",
+    "native_readback": "three rows .065,.0675,.070 only; phase boundary is not a continuous interpolation authorization",
+    "new_radial_mesh_convergence": false
+  },
+  "spg": "2565 existing fixed cells and prior four p=3 alternatives; no EOS reoptimization or author-fit identity",
+  "commands": [
+    "bash fortran_eos/build.sh build/compose_eos_fortran",
+    "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python3 scripts/refine_dd2_geometry_quarters.py build/dd2_geometry_quarters_retry",
+    "PYTHONPATH=python_frontend:scripts COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python3 scripts/export_dd2_geometry_segment.py build/dd2_geometry_quarters_retry build/dd2_geometry_segment_replay",
+    "PYTHONPATH=python_frontend python3 scripts/audit_spg_surface_on_cells.py build/spg_surface_on_cells.json",
+    "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -m pytest -q python_frontend/tests pipeline/tests",
+    "PYTHONPATH=eos_generator:eos_generator/compose_eos_pkg python3 -m pytest -q eos_generator/tests",
+    "sha256sum -c SHA256SUMS_v4.txt"
+  ],
+  "tests": {
+    "frontend_pipeline_passed": 775,
+    "frontend_pipeline_skipped": 9,
+    "generator_passed": 142,
+    "generator_warning": "existing Matplotlib Axes3D warning",
+    "root_checksum_manifest_entries": 1181
+  },
+  "no_new_core_crust_or_stellar_calculation": true,
+  "independent_review": {
+    "status": "PASS_SCOPED",
+    "path": "INDEPENDENT_REVIEW.json",
+    "sha256": "7685cc78efcae63ca9376c22158bc25156783faed81f141a5e861335b89d1a05"
+  }
+}

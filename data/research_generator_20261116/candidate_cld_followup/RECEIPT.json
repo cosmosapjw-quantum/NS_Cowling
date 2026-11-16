@@ -1,0 +1,68 @@
+{
+  "status": "PARTIALLY_COMPLETE_DIAGNOSTIC",
+  "base_head": "674aa04bd3dc90b8d3437ffa8401950ccc43861c",
+  "source_calibrated": false,
+  "executed_source_sha256": {
+    "python_frontend/compose_eos/candidate_gdfm_cld.py": "dc37cd9046045ed349af9759da9633541d788d86b75864adc16634af43b06e54",
+    "python_frontend/compose_eos/gdfm_uniform.py": "c5e8b49ffd914307a8cafb2d78f6b83c844db0a628d868e8108bf123d9b37656",
+    "python_frontend/compose_eos/cold_leptons.py": "ac995eb2504560da1569190a2f95bbbe266961dab0498dc0665951afca4c2ded",
+    "python_frontend/compose_eos/scurto_interface.py": "66b2d8be5396cbddee20a91f43dee1169ae65e38e9fee5ebdae61b2c143ad8f3",
+    "python_frontend/tests/test_candidate_gdfm_cld.py": "2dc92f2f94491b1361d365c227001270c9c4a202d1f6977812be60f8a1c0b8e4",
+    "scripts/run_candidate_gdfm_cld.py": "afd23d41243fb082909be2977738190141903476feaa38652589faeddabc64b6",
+    "data/research_generator_20261116/spg_author_candidates.json": "56cbcfbb8baf50f73124eba690ff98cdfb3647eecc01e446b4000afe260e94ab",
+    "data/research_generator_20261116/candidate_surface/candidate_surface_fit.json": "ab888186c3ee385d2932d8d0adade1bf0b514b535e5ae920fa481ca290b76506"
+  },
+  "output_sha256": "b12e81397493673ad5c6a1fea82cc750fe997252a3a279b3cd8e006d996928b4",
+  "independent_review_sha256": "9b766f35431aa4c853940dca16be137b87c35c10839a8309b8733012d580f92a",
+  "executable_sha256": "658f75008aeabbfc2cbbe6c2dee18a9636038fd10f9a9e56cb9bf75009449d77",
+  "python": "3.12.3",
+  "commands": [
+    "bash fortran_eos/build.sh build/compose_eos_fortran",
+    "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python3 scripts/run_candidate_gdfm_cld.py build/candidate_cld_20261116",
+    "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python3 -m pytest -q python_frontend/tests pipeline/tests",
+    "PYTHONPATH=eos_generator:eos_generator/compose_eos_pkg python3 -m pytest -q eos_generator/tests"
+  ],
+  "results": {
+    "attempted_rows": 25,
+    "stationary_candidates": 24,
+    "hold_optimizer_failed": 1,
+    "starts_per_row": 3,
+    "frontend_pipeline_passed": 641,
+    "frontend_pipeline_skipped": 9,
+    "generator_passed": 142,
+    "generator_warning": "existing Matplotlib Axes3D warning"
+  },
+  "search": {
+    "variables": "t=f*n_i/n_B, R_fm, n_i_fm-3, y_p_i",
+    "bounds": "t=[1e-5,.99999], R=[2,40], ni=[max(.06,1.001*nB),.25], y=[.005,.45]",
+    "starts": [
+      [
+        0.5,
+        7,
+        0.15,
+        0.12
+      ],
+      [
+        0.8,
+        10,
+        0.16,
+        0.2
+      ],
+      [
+        0.25,
+        6,
+        0.14,
+        0.3
+      ]
+    ],
+    "note": "diagnostic threshold for mixed-unit transformed coordinate derivatives; no tolerance change to existing validation",
+    "transformed_gradient_coordinatewise_numeric_threshold": 0.0001
+  },
+  "omissions": [
+    "no composition-aware CompOSE output/readback",
+    "no density-grid convergence or interval causality",
+    "no GPPVA finite-range TF implementation",
+    "no original-fit equivalence or low-Yp extrapolation validation",
+    "no radial stability or mode calculation"
+  ]
+}

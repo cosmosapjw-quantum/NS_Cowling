@@ -1,0 +1,58 @@
+..FFFF...                                                                [100%]
+=================================== FAILURES ===================================
+_____________ test_density_grid_refuses_invalid_nuclides[0.0-1.0] ______________
+
+a = 0.0, z = 1.0
+
+    @pytest.mark.parametrize("a,z",[(0.,1.),(10.,-1.),(10.,10.),(float("nan"),1.)])
+    def test_density_grid_refuses_invalid_nuclides(a,z):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_candidate_surface_fit.py:31: Failed
+____________ test_density_grid_refuses_invalid_nuclides[10.0--1.0] _____________
+
+a = 10.0, z = -1.0
+
+    @pytest.mark.parametrize("a,z",[(0.,1.),(10.,-1.),(10.,10.),(float("nan"),1.)])
+    def test_density_grid_refuses_invalid_nuclides(a,z):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_candidate_surface_fit.py:31: Failed
+____________ test_density_grid_refuses_invalid_nuclides[10.0-10.0] _____________
+
+a = 10.0, z = 10.0
+
+    @pytest.mark.parametrize("a,z",[(0.,1.),(10.,-1.),(10.,10.),(float("nan"),1.)])
+    def test_density_grid_refuses_invalid_nuclides(a,z):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_candidate_surface_fit.py:31: Failed
+_____________ test_density_grid_refuses_invalid_nuclides[nan-1.0] ______________
+
+a = nan, z = 1.0
+
+    @pytest.mark.parametrize("a,z",[(0.,1.),(10.,-1.),(10.,10.),(float("nan"),1.)])
+    def test_density_grid_refuses_invalid_nuclides(a,z):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_candidate_surface_fit.py:31: Failed
+=============================== warnings summary ===============================
+python_frontend/tests/test_candidate_surface_fit.py::test_density_grid_refuses_invalid_nuclides[0.0-1.0]
+  /tmp/NS_Cowling_generator_research_20261116/python_frontend/compose_eos/candidate_surface_fit.py:69: RuntimeWarning: invalid value encountered in divide
+    self.surface_area_per_baryon=4*math.pi*self.radius**2/self.a[:,None]
+
+python_frontend/tests/test_candidate_surface_fit.py::test_density_grid_refuses_invalid_nuclides[0.0-1.0]
+  /tmp/NS_Cowling_generator_research_20261116/python_frontend/compose_eos/candidate_surface_fit.py:70: RuntimeWarning: divide by zero encountered in divide
+    self.coulomb_per_baryon=3*E2*self.z[:,None]**2/(5*self.radius*self.a[:,None])
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_candidate_surface_fit.py::test_density_grid_refuses_invalid_nuclides[0.0-1.0]
+FAILED python_frontend/tests/test_candidate_surface_fit.py::test_density_grid_refuses_invalid_nuclides[10.0--1.0]
+FAILED python_frontend/tests/test_candidate_surface_fit.py::test_density_grid_refuses_invalid_nuclides[10.0-10.0]
+FAILED python_frontend/tests/test_candidate_surface_fit.py::test_density_grid_refuses_invalid_nuclides[nan-1.0]
+4 failed, 5 passed, 2 warnings in 0.36s

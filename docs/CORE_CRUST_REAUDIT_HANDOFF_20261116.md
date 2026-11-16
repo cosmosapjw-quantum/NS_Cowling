@@ -1,3 +1,5 @@
+Current generator research and continuation: docs/research_generator_20261116/HANDOFF_KO.md (density-domain and composition follow-up based on 6775859).
+
 # Coding-agent handoff — NS_Cowling, 2026-11-16
 
 ```text

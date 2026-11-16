@@ -1,0 +1,244 @@
+{
+  "representation": "high_branch",
+  "species": "npemu",
+  "points": 103,
+  "native_composition_readback": "passed",
+  "native_phase_counts": {
+    "7": 103
+  },
+  "phase_code_meaning": {
+    "6": "homogeneous low branch",
+    "7": "homogeneous high branch",
+    "8": "two-charge Gibbs mixture"
+  },
+  "native_phase_presence_and_applicability_readback": "passed",
+  "closure_applicable_counts": {
+    "C3": 103,
+    "C4": 103
+  },
+  "native_checks": {
+    "C1": {
+      "temperature_mev": 0.0,
+      "maxQ2": 0.0,
+      "maxQ6mQ7": 0.0,
+      "maxmul": 0.0,
+      "pass_": true
+    },
+    "C2": {
+      "applicable": true,
+      "max_rel": 9.506275258819221e-16,
+      "pass_": true,
+      "basis": "Fortran CompOSE thermodynamic closure"
+    },
+    "C3": {
+      "status": "CHECKED",
+      "max_abs": 0.0,
+      "pass_": true
+    },
+    "C4": {
+      "status": "CHECKED",
+      "max_abs": 7.466249840604178e-15,
+      "pass_": true
+    },
+    "C5": {
+      "maxmul": 0.0,
+      "applicable": true,
+      "pass_": true
+    },
+    "C6": {
+      "min_dPdnb": 11.269724266107593,
+      "min_delta_p": 0.05634862133053786,
+      "pass_": true
+    },
+    "C7": {
+      "max_rel": 0.0009679554531409128,
+      "n_points": 103,
+      "status": "FINITE_DIFFERENCE_DIAGNOSTIC"
+    },
+    "C8": {
+      "max_rel": 0.0015448905840813494,
+      "n_points": 103,
+      "status": "FINITE_DIFFERENCE_DIAGNOSTIC"
+    },
+    "C9": {
+      "max_rel": 0.00014949425255315367,
+      "n_points": 103,
+      "status": "FINITE_DIFFERENCE_DIAGNOSTIC"
+    },
+    "C10": {
+      "min_cs2": 0.011274324319784298,
+      "max_cs2": 1.4715239767010873,
+      "min_cs2_first_law": 0.011274267542827851,
+      "max_cs2_first_law": 1.4713521155035223,
+      "acausal_point_count": 24,
+      "acausal_point_count_first_law": 24,
+      "n_points": 103,
+      "pass_": false
+    },
+    "C11": {
+      "min_dmubdnb": 127.25416838035744,
+      "n_points": 103,
+      "pass_": true
+    },
+    "overall": {
+      "status": "FAIL",
+      "pass_": false,
+      "failed_checks": [
+        "C10"
+      ],
+      "finite_primary_arrays": true,
+      "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11."
+    },
+    "native_report": {
+      "schema": "compose-eos-fortran-verification-v1",
+      "n": 103,
+      "temperature_mev": 0.0,
+      "C1": {
+        "pass": true
+      },
+      "C2": {
+        "applicable": true,
+        "pass": true
+      },
+      "C3": {
+        "status": "CHECKED",
+        "pass": true
+      },
+      "C4": {
+        "status": "CHECKED",
+        "pass": true
+      },
+      "C5": {
+        "applicable": true,
+        "pass": true
+      },
+      "C6": {
+        "pass": true
+      },
+      "C7": {
+        "status": "FINITE_DIFFERENCE_DIAGNOSTIC",
+        "max_rel": 0.0009679554531409128,
+        "n_points": 103
+      },
+      "C8": {
+        "status": "FINITE_DIFFERENCE_DIAGNOSTIC",
+        "max_rel": 0.0015448905840813494,
+        "n_points": 103
+      },
+      "C9": {
+        "status": "FINITE_DIFFERENCE_DIAGNOSTIC",
+        "max_rel": 0.00014949425255315367,
+        "n_points": 103
+      },
+      "C10": {
+        "pass": false
+      },
+      "C11": {
+        "pass": true
+      },
+      "C3_applicable_points": 103,
+      "C3_masked_points": 0,
+      "C4_applicable_points": 103,
+      "C4_masked_points": 0,
+      "derivative_points": 103,
+      "derivative_masked_points": 0,
+      "C1_max_Q2": 0.0,
+      "C1_max_Q6_minus_Q7": 0.0,
+      "C1_max_mu_l": 0.0,
+      "C2_max_relative_residual": 9.506275258819221e-16,
+      "C3_max_absolute_residual": 0.0,
+      "C4_max_absolute_residual": 7.466249840604178e-15,
+      "C7_max_relative_residual": 0.0009679554531409128,
+      "C8_max_relative_residual": 0.0015448905840813494,
+      "C9_max_relative_residual": 0.00014949425255315367,
+      "min_cs2": 0.011274324319784298,
+      "max_cs2": 1.4715239767010873,
+      "min_cs2_first_law": 0.011274267542827851,
+      "max_cs2_first_law": 1.4713521155035223,
+      "min_dmu_b_dnb": 127.25416838035744,
+      "acausal_point_count": 24,
+      "acausal_point_count_first_law": 24,
+      "min_dP_dnb": 11.269724266107593,
+      "min_delta_P": 0.05634862133053786,
+      "failed_checks": "C10",
+      "overall": {
+        "status": "FAIL",
+        "pass": false
+      }
+    }
+  },
+  "physical_domain": {
+    "schema": "ns-cowling.sampled-physical-domain.v1",
+    "assessment": "DENSITY_RESOLVED_DIAGNOSTICS",
+    "units": {
+      "density": "fm^-3",
+      "pressure_energy": "MeV fm^-3",
+      "chemical_potential": "MeV"
+    },
+    "source_support_fm3": [
+      0.085,
+      1.3399999999999999
+    ],
+    "tolerances": {
+      "max_log_step": 0.25,
+      "cs2": 1e-06,
+      "euler": 2e-06,
+      "cold_Q6_Q7": 2e-06
+    },
+    "mechanically_causal_segments": [
+      {
+        "first_row": 1,
+        "last_row": 79,
+        "n_min_fm3": 0.085,
+        "n_max_fm3": 0.86
+      }
+    ],
+    "thermodynamically_supported_segments": [
+      {
+        "first_row": 1,
+        "last_row": 79,
+        "n_min_fm3": 0.085,
+        "n_max_fm3": 0.86
+      }
+    ],
+    "first_interval_findings": {
+      "ACAUSAL_SECANT": {
+        "left_row": 79,
+        "right_row": 80,
+        "n_left_fm3": 0.86,
+        "n_right_fm3": 0.88,
+        "cs2_over_c2_secant": 1.0014941328576696,
+        "cs2_over_c2_first_law_secant": 1.0014402197902512
+      }
+    },
+    "pressure_roundoff_policy": "Monotonic pressure permits 64*float64 epsilon*max(abs(P_left),abs(P_right),float64 tiny); physical sound-speed tolerance is unchanged.",
+    "coarse_sampling_policy": "Split connected interpolation ranges; retain endpoint values and secant diagnostics. Coarse spacing alone supplies no physical exclusion.",
+    "sampled_secant_pass_count": 78,
+    "euler_failed_rows": [],
+    "euler_unavailable_rows": [],
+    "composition": {
+      "file_present": true,
+      "available": true,
+      "status_counts": {
+        "NOT_AVAILABLE": 0,
+        "PARTIAL": 0,
+        "CHECKED": 103,
+        "FAIL": 0,
+        "UNKNOWN": 0
+      }
+    },
+    "chemical_monotonicity_scope": "Baryon chemical-potential decrease is recorded independently. On charged or composition-changing paths its relation to compressibility requires the appropriate constrained chemical potential.",
+    "attribution": "SOURCE_TABLE_DIAGNOSTIC; intrinsic model versus numerical or convention error requires independent reproduction",
+    "continuous_domain_status": "UNRESOLVED; secants describe adjacent sampled rows and do not certify an interpolant",
+    "decision": "Retain every source row and investigate supported segments before model-level exclusion"
+  },
+  "max_charge_residual_fm3": 8.826273045769994e-15,
+  "max_euler_residual_mev_fm3": 2.7284841053187847e-12,
+  "regenerated_native_sha256": {
+    "eos.compo": "12b3663346a11a189b159479e9887dd5a32d8dd625c187f7afece090a221b60f",
+    "eos.nb": "63aa20c049bb6f564485c48f6b1142c582865f29fa3a253f01c8fe4db705ebf6",
+    "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "eos.thermo": "6d83fc889a30cefd0ab484b1f24050c6d7709987db3dec1dce4d098fa388bb5a"
+  }
+}

@@ -17,22 +17,23 @@ from compose_eos import build_crust_only, read_compose, write_compose, NativeExe
 EXPECTED = {
     "SPG_M1": 365, "SPG_M2": 377, "SPG_M3": 366, "SPG_M4": 375, "SPG_M5": 363,
     "GPPVA_DD2": 283, "GPPVA_DDME2": 288, "GPPVA_FSU2": 269, "GPPVA_FSU2H": 300,
-    "GPPVA_FSU2R": 296, "GPPVA_NL3wrL55": 298, "GPPVA_TM1e": 303,
+    "GPPVA_FSU2R": 296, "GPPVA_NL3wrL55": 298, "GPPVA_TM1e": 303, "GPPVA_TW": 289,
 }
 
 
-def test_e390_03b_builds_all_twelve_admitted_crust_only_tables(tmp_path: Path) -> None:
+def test_e390_03b_builds_all_thirteen_admitted_crust_only_tables(tmp_path: Path) -> None:
     source_root = ROOT / "eos_generator" / "eos_data"
     output_root = tmp_path / "crust-only-attempt"
     receipts = build_crust_only(output_root, source_root=source_root)
 
-    assert len(receipts) == 12
+    assert len(receipts) == 13
     manifest = json.loads((output_root / "crust_only_manifest.v1.json").read_text())
     coverage = json.loads((output_root / "crust_coverage_report.v1.json").read_text())
     assert manifest["status"] == "ALL_ADMITTED_CRUST_COMPONENTS_CONSTRUCTED_NATIVE_READBACK_VERIFIED"
-    assert manifest["total_output_rows"] == 3883
-    assert coverage["admitted_model_count"] == 12
-    assert coverage["blocked"]["GPPVA_TW"].startswith("BLOCKED")
+    assert manifest["total_output_rows"] == 4172
+    assert coverage["admitted_model_count"] == 13
+    assert coverage["blocked"] == {}
+    assert "BPS" in coverage["bibliography_conflicts"]["GPPVA_TW"]
 
     source_fields = (
         "nb", "Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "q_extra",
@@ -100,13 +101,16 @@ def test_e390_03b_builds_all_twelve_admitted_crust_only_tables(tmp_path: Path) -
         }
 
 
-def test_e390_03b_rejects_gppva_tw_provider_conflict(tmp_path: Path) -> None:
-    with pytest.raises(ValueError, match="GPPVA_TW remains blocked"):
-        build_crust_only(
-            tmp_path / "tw-attempt",
-            source_root=ROOT / "eos_generator" / "eos_data",
-            model_ids=["GPPVA_TW"],
-        )
+def test_e390_03b_tw_preserves_provider_conflict(tmp_path: Path) -> None:
+    receipt = build_crust_only(
+        tmp_path / "tw-attempt", source_root=ROOT / "eos_generator" / "eos_data",
+        model_ids=["GPPVA_TW"],
+    )[0]
+    assert receipt["output"]["n"] == 289
+    provenance = receipt["construction_provenance"]
+    assert provenance["outer_crust_provider"] == "UNRESOLVED_BPS_BSk22"
+    assert "first 217" in provenance["bibliography_conflict"]
+    assert receipt["physical_domain"]["rows"]
 
 
 def test_e390_03b_rejects_modified_source_grid_before_native_extraction(tmp_path: Path) -> None:
@@ -142,3 +146,11 @@ def test_e390_03b_reader_derived_fail_status_does_not_relax_default_writer(tmp_p
     # may serialize raw source values without changing the derived diagnostic.
     with pytest.raises(NativeExecutionError, match="row-level composition status is FAIL"):
         write_compose(tmp_path / "strict-output", source)
+
+def test_tw_requires_pinned_thermodynamic_source_bytes(tmp_path: Path) -> None:
+    sources = tmp_path / "sources"
+    shutil.copytree(ROOT / "eos_generator/eos_data/GPPVA_TW", sources / "GPPVA_TW")
+    thermo = sources / "GPPVA_TW/eos.thermo"
+    thermo.write_bytes(thermo.read_bytes() + b"\n")
+    with pytest.raises(ValueError, match="pinned source file identity mismatch"):
+        build_crust_only(tmp_path / "out", source_root=sources, model_ids=["GPPVA_TW"])

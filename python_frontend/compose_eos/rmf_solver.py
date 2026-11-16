@@ -2,7 +2,7 @@
 
 Implements the density-dependent relativistic mean-field (DD-RMF) energy
 density for homogeneous asymmetric nuclear matter. Multiple coupling
-functional forms are supported, each with its EXACT published form:
+functional forms and a legacy SPG proxy branch are supported:
 
   1. DD2_TYYPEL_RATIONAL (Typel 2010, arXiv:0908.2344, eq. 75-77):
        isoscalar (omega, sigma): rational function
@@ -10,12 +10,15 @@ functional forms are supported, each with its EXACT published form:
          g_i(n) = Gamma_i(n_sat) * f_i(x)
        isovector (rho): exponential
          f_rho(x) = exp[-a_rho * (x - 1)]
-       This is the DD2 functional form. The DD-ME2, TW99, FSU2, FSU2H,
-       NL3wrL55, TM1e models use related (but check-per-model) forms.
+       DD-ME2 and TW99 use this form with their own parameters.
+       FSU2/R/H, NL3wrL55 and TM1e require nonlinear RMF interactions.
 
   2. SPG_GOGELEIN (Gögelein 2008, eq. 40 + Table I):
-       g_kappa(rho_B) = a_kappa + (b_kappa + d_kappa*x^3)*exp(-c_kappa*x), x = rho_B
-       4 mesons: sigma, omega, delta, rho. SPG_M1..M5 use this form.
+       g_kappa = a_kappa + (b_kappa + d_kappa*x^3)*exp(-c_kappa*x),
+       x = rho_B/0.16, with sigma, omega, delta, rho.
+       Registry SPG_M1..M5 entries are legacy surrogates. Source Scurto2024
+       models have three mesons, no delta, and x=rho_B/model_rho_sat.
+       See data/research_generator_20261116/spg_author_candidates.json.
 
 UNIT CONVENTION: natural units (hbar=c=1), MeV internally, MeV/fm^3 output.
 Densities input in fm^-3, converted to MeV^3 by * HBARC^3 internally.
@@ -33,7 +36,8 @@ M_P = 938.27203
 M_E = 0.511
 M_MU = 105.658
 PI = math.pi
-# Gögelein 2008 PRC 77 025802 eq. 40: SPG functional form uses x = rho_B / rho_0
+# Legacy Goegelein2008 proxy branch uses x = rho_B / rho_0; this is not
+# the source Scurto2024 model-specific normalization.
 # with the FIXED reference saturation density rho_0 = 0.16 fm^-3 (NOT the model's
 # actual rho_sat, which is 0.178 fm^-3 after the omega correction). This is the
 # density at which the DBHF fit was anchored.

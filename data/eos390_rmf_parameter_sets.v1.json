@@ -2,7 +2,7 @@
   "schema": "ns-cowling.e390-rmf-parameter-sets",
   "schema_version": "1.2.0",
   "revision": "1.2.0",
-  "description": "RMF parameter sets for the GPPVA and SPG crust-model families.",
+  "description": "RMF parameter registry containing source parameter sets and explicitly legacy SPG surrogates. SPG_GOGELEIN numerical entries are not the source Scurto2024 M1-M5 models; author candidate vectors are separately retained in data/research_generator_20261116/spg_author_candidates.json.",
   "units": {
     "masses": "MeV",
     "densities": "fm^-3",
@@ -31,8 +31,8 @@
         "delta",
         "rho"
       ],
-      "reference": "Gögelein et al. PRC 77 025802 (2008), eq. 40 + Table I",
-      "notes": "SPG includes delta. x = rho_B directly (fm^-3). All 4 mesons use the same functional form."
+      "reference": "G\u00f6gelein et al. PRC 77 025802 (2008), eq. 40 + Table I",
+      "notes": "LEGACY PROXY ONLY. This four-meson Goegelein2008 branch uses x=n_B/0.16 in rmf_solver.py; the historical form string is retained for compatibility. Scurto2024 Eq20 instead uses only sigma,omega,rho and x=n_B/n_sat of each model. Do not interpret legacy numerical entries or their failures as source M1-M5 validation."
     }
   },
   "models": {
@@ -420,15 +420,26 @@
         "Lsym_MeV": 73,
         "Ksym_MeV": -160
       },
-      "reference": "Gögelein et al. PRC 77 025802 (2008) Table I (couplings) + Table II (DDRMF saturation after omega correction); DOI 10.1103/PhysRevC.77.025802",
+      "reference": "G\u00f6gelein et al. PRC 77 025802 (2008) Table I (couplings) + Table II (DDRMF saturation after omega correction); DOI 10.1103/PhysRevC.77.025802",
       "companion_pdf": "gogelein2008_spg_gdfm.pdf",
-      "verification_status": "PARAMS_AND_RHO_REF_CORRECTED_TABLE_II_PENDING_SOLVER_REPRODUCTION",
-      "note": "rho_sat corrected to 0.178 fm^-3 (DDRMF after omega correction, Table II). x = rho_B/0.16 (rho_0 fixed reference, NOT rho_sat). saturation_targets from Table II DDRMF column.",
+      "verification_status": "LEGACY_SURROGATE_NOT_SOURCE_CALIBRATED",
+      "note": "Legacy four-meson proxy numerical parameters retained unchanged for existing receipts. These are not Scurto2024 M1-M5 source couplings. Author-origin candidate three-meson vectors are now acquired separately; see source_model_relation and docs/research_generator_20261116/crust_literature.md.",
       "nucleon_masses_MeV": {
         "neutron": 938.9,
         "proton": 938.9
       },
-      "nucleon_masses_source": "Goegelein et al. PRC 77 025802 (2008), Sec. II: nucleon rest mass M = 938.9 MeV"
+      "nucleon_masses_source": "Goegelein et al. PRC 77 025802 (2008), Sec. II: nucleon rest mass M = 938.9 MeV",
+      "source_model_relation": {
+        "status": "LEGACY_SURROGATE_NOT_SOURCE_MODEL",
+        "source": "https://arxiv.org/html/2402.15548v1",
+        "author_data": "https://zenodo.org/records/11084025",
+        "candidate_vectors": "data/research_generator_20261116/spg_author_candidates.json",
+        "source_selection_role": "maximum full-posterior likelihood",
+        "author_candidate_index": "134057",
+        "source_definition": "Three mesons sigma,omega,rho; model-specific n_sat; common nucleon mass938.9MeV. No delta meson.",
+        "historical_fit_scope": "Existing coupling values, saturation targets and fit receipts are preserved as legacy-proxy evidence. A beta-equilibrium-trajectory inverse fit does not recover the source functional uniquely.",
+        "precedence": "This relation supersedes earlier assertions of canonical Scurto physics or verified source coupling extraction in legacy note and fit metadata."
+      }
     },
     "SPG_M2": {
       "family": "SPG",
@@ -482,16 +493,27 @@
         "Lsym_MeV": 73,
         "Ksym_MeV": -160
       },
-      "reference": "Scurto, Pais, Gulminelli PRD 109 103015 (2024); arXiv:2402.15548. M2 = highest-weight posterior realization around the LOW extreme of the 68% CI for the maximum NS mass (Scurto text line 3542-3544).",
+      "reference": "Scurto, Pais, Gulminelli PRD109,103015(2024), arXiv:2402.15548 identifies the target model; the numerical coupling values in this legacy entry are not extracted author parameters.",
       "companion_pdf": "scurto2024_spg_variant.pdf",
-      "verification_status": "CANONICAL_BASIS_GOGEGEIN_2008_COUPLINGS_NMP_VARIANT_PENDING_EXTRACTION",
-      "scuurto_role": "M2: low-max-mass extreme of 68% CI",
-      "note": "Scurto 2024 does not publish M1..M5 coupling tables as numbers; Fig. 19 shows them as curves only, and Table IX lists NMPs as figures. The Gögelein 2008 Table I couplings (the Scurto prior center) are used here as the canonical SPG basis until per-model couplings are extracted from CompOSE pages 317 (M3) and 319 (M5) or supplied by the researcher. Reconstruction under this basis reproduces the canonical SPG inner-crust physics; per-model NMP variations are NOT yet captured and must be applied when the exact coupling tables become available.",
+      "verification_status": "LEGACY_SURROGATE_NOT_SOURCE_CALIBRATED",
+      "scuurto_role": "M2: low maximum-mass extreme of the 68% CI",
+      "note": "Legacy four-meson proxy numerical parameters retained unchanged for existing receipts. These are not Scurto2024 M1-M5 source couplings. Author-origin candidate three-meson vectors are now acquired separately; see source_model_relation and docs/research_generator_20261116/crust_literature.md.",
       "nucleon_masses_MeV": {
         "neutron": 938.9,
         "proton": 938.9
       },
-      "nucleon_masses_source": "placeholder of SPG_M1 couplings; mass follows SPG_M1 (Goegelein 2008, M = 938.9 MeV)"
+      "nucleon_masses_source": "placeholder of SPG_M1 couplings; mass follows SPG_M1 (Goegelein 2008, M = 938.9 MeV)",
+      "source_model_relation": {
+        "status": "LEGACY_SURROGATE_NOT_SOURCE_MODEL",
+        "source": "https://arxiv.org/html/2402.15548v1",
+        "author_data": "https://zenodo.org/records/11084025",
+        "candidate_vectors": "data/research_generator_20261116/spg_author_candidates.json",
+        "source_selection_role": "low maximum-mass extreme of the 68% CI",
+        "author_candidate_index": "41210",
+        "source_definition": "Three mesons sigma,omega,rho; model-specific n_sat; common nucleon mass938.9MeV. No delta meson.",
+        "historical_fit_scope": "Existing coupling values, saturation targets and fit receipts are preserved as legacy-proxy evidence. A beta-equilibrium-trajectory inverse fit does not recover the source functional uniquely.",
+        "precedence": "This relation supersedes earlier assertions of canonical Scurto physics or verified source coupling extraction in legacy note and fit metadata."
+      }
     },
     "SPG_M3": {
       "family": "SPG",
@@ -547,7 +569,7 @@
       },
       "per_model_coupling_extraction": {
         "method": "PATH_A_ISOSCALAR_FIXED_ISOVECTOR_FIT (winner of paths a vs c comparison)",
-        "isoscalar_source": "canonical Gögelein 2008 Table I (sigma, omega fixed; reproduce E_sat=-16, K_sat=263 at rho_sat=0.178)",
+        "isoscalar_source": "canonical G\u00f6gelein 2008 Table I (sigma, omega fixed; reproduce E_sat=-16, K_sat=263 at rho_sat=0.178)",
         "isovector_fitted_to": "unified SPG(M3) CompOSE export beta-equil F(rho) and Yp(rho) trajectory, fit range rho in [0.09, 0.30] fm^-3, 7 points",
         "free_parameters": "delta(a,b,c,d) and rho(a,b,c) = 7 params",
         "fit_RMS_F_MeV": 1.6969,
@@ -558,12 +580,13 @@
         "E_sym_residual_MeV": 2.282,
         "E_sat_MeV_preserved": -16.0,
         "competing_path_c_verdict": "REJECTED: full 12-coupling fit gives fit_RMS_F=0.04 MeV (apparent win) but E_sym=90.6 MeV and E_sat=-51.1 MeV (both non-physical, classic underdetermination overfit); eval_RMS_F=14.3 only marginally lower than path (a)'s 16.3",
-        "interpretation": "Path (a) wins on physicality: by keeping isoscalar couplings at the canonical Gögelein values (which reproduce E_sat=-16, K_sat=263), the symmetric matter is correctly constrained and the isovector fit produces a physical E_sym=41.8 MeV (target 39.5, residual 2.3 MeV within fitting noise). Path (c)'s lower F RMS is misleading because it overfits F by inflating E_sym and E_SN in opposite directions, which the symmetric-matter cut would reveal as non-physical. The 2.3 MeV E_sym residual in path (a) reflects the parabolic-approximation noise in the Yp extraction, not a coupling deficiency."
+        "interpretation": "Path (a) wins on physicality: by keeping isoscalar couplings at the canonical G\u00f6gelein values (which reproduce E_sat=-16, K_sat=263), the symmetric matter is correctly constrained and the isovector fit produces a physical E_sym=41.8 MeV (target 39.5, residual 2.3 MeV within fitting noise). Path (c)'s lower F RMS is misleading because it overfits F by inflating E_sym and E_SN in opposite directions, which the symmetric-matter cut would reveal as non-physical. The 2.3 MeV E_sym residual in path (a) reflects the parabolic-approximation noise in the Yp extraction, not a coupling deficiency.",
+        "evidence_scope": "HISTORICAL_PROXY_FIT_ONLY: no claim of unique source coupling extraction or model physicality follows."
       },
-      "reference": "Scurto, Pais, Gulminelli PRD 109 103015 (2024); arXiv:2402.15548. M3 = highest-weight posterior realization around the HIGH extreme of the 68% CI for the maximum NS mass (Scurto text line 3542-3544). CompOSE page 317.",
+      "reference": "Scurto, Pais, Gulminelli PRD109,103015(2024), arXiv:2402.15548 identifies the target model; the numerical coupling values in this legacy entry are not extracted author parameters.",
       "companion_pdf": "scurto2024_spg_variant.pdf",
-      "verification_status": "PER_MODEL_COUPLING_EXTRACTED_PATH_A_ISOSCALAR_FIXED_ISOVECTOR_FIT_VERIFIED_PHYSICAL_ESYM_41_8MEV_ESAT_MINUS16_PATH_C_REJECTED_NONPHYSICAL",
-      "scuurto_role": "M3: high-max-mass extreme of 68% CI; CompOSE page 317",
+      "verification_status": "LEGACY_SURROGATE_NOT_SOURCE_CALIBRATED",
+      "scuurto_role": "M3: high maximum-mass extreme of the 68% CI",
       "compose_reference_export": {
         "crust_only": {
           "page": 317,
@@ -588,7 +611,7 @@
           "Yp_at_rho_0.178": 0.0643,
           "consistency_check": "inner crust F(rho) matches crust-only 317 exactly (max |dF| = 0.0000 MeV at 12 matched densities), confirming the crust-only export is a subset of the unified export"
         },
-        "canonical_basis_inner_crust_agreement": "our canonical Gögelein-basis reconstruction E_bind(rho) matches unified M3 inner-crust within 1.5 MeV (rho<=0.03: within 0.7 MeV; rho=0.08: -1.1 MeV). M3 shows slightly higher E_bind (0.3-0.5 MeV more bound) than canonical at rho>0.04 fm^-3.",
+        "canonical_basis_inner_crust_agreement": "our canonical G\u00f6gelein-basis reconstruction E_bind(rho) matches unified M3 inner-crust within 1.5 MeV (rho<=0.03: within 0.7 MeV; rho=0.08: -1.1 MeV). M3 shows slightly higher E_bind (0.3-0.5 MeV more bound) than canonical at rho>0.04 fm^-3.",
         "esym_trajectory_extracted": {
           "method": "parabolic beta-equil: E_sym(rho) = mu_e(rho, Yp) / (4*(1 - 2*Yp)), mu_e = hbar*(3*pi^2*rho*Yp)^(1/3)",
           "rho_0.10": 26.645,
@@ -604,14 +627,26 @@
           "vs_canonical_L_target_MeV": 73,
           "interpretation": "M3 has +8.09 MeV higher E_sym at rho_sat than canonical (stiffer symmetry energy), and a lower L_sym (62.5 vs 73), consistent with the high-max-mass extreme: stiffer symmetry energy and lower slope give a more massive NS."
         },
-        "coupling_extraction_status": "UNDERDETERMINED: the unified export provides the beta-equilibrated F(rho, Yp) trajectory only (one Yp per rho), so the 12 coupling parameters (a,b,c,d per meson) cannot be uniquely determined - the system has 6 NMPs (E_sat, K_sat, J, L, K_sym, M*/M) constraining 12 parameters. Symmetric-matter E_SN(rho) cannot be reliably extracted from beta-equil via the parabolic approximation because delta ~ 0.88 (very neutron-rich) amplifies E_sym*delta^2 errors. Per-model coupling requires either (a) a Yp=0.5 symmetric cut from the researcher, (b) the numeric coupling tables behind Scurto 2024 Fig. 19, or (c) a 12-parameter fit to the full F(rho, Yp) surface at multiple Yp values. The extracted E_sym trajectory is recorded for consistency checking and future isovector-coupling retuning."
+        "coupling_extraction_status": "UNDERDETERMINED: the unified export provides the beta-equilibrated F(rho, Yp) trajectory only (one Yp per rho), so the 12 coupling parameters (a,b,c,d per meson) cannot be uniquely determined - the system has 6 NMPs (E_sat, K_sat, J, L, K_sym, M*/M) constraining 12 parameters. Symmetric-matter E_SN(rho) cannot be reliably extracted from beta-equil via the parabolic approximation because delta ~ 0.88 (very neutron-rich) amplifies E_sym*delta^2 errors. Per-model coupling requires either (a) a Yp=0.5 symmetric cut from the researcher, (b) the numeric coupling tables behind Scurto 2024 Fig. 19, or (c) a 12-parameter fit to the full F(rho, Yp) surface at multiple Yp values. The extracted E_sym trajectory is recorded for consistency checking and future isovector-coupling retuning.",
+        "evidence_scope": "Historical table observations retained; accompanying parabolic-approximation and source-model inference text is superseded by source_model_relation."
       },
-      "note": "See SPG_M2 note. Per-model NMP variations documented via E_sym trajectory (M3 stiffer than canonical by +8 MeV at rho_sat); 12-coupling extraction remains underdetermined from beta-equil-only unified export.",
+      "note": "Legacy four-meson proxy numerical parameters retained unchanged for existing receipts. These are not Scurto2024 M1-M5 source couplings. Author-origin candidate three-meson vectors are now acquired separately; see source_model_relation and docs/research_generator_20261116/crust_literature.md.",
       "nucleon_masses_MeV": {
         "neutron": 938.9,
         "proton": 938.9
       },
-      "nucleon_masses_source": "CompOSE export page 317 (317.zip, sha256 prefix dd70e8806d8da52b) eos.thermo header 938.9 938.9"
+      "nucleon_masses_source": "CompOSE export page 317 (317.zip, sha256 prefix dd70e8806d8da52b) eos.thermo header 938.9 938.9",
+      "source_model_relation": {
+        "status": "LEGACY_SURROGATE_NOT_SOURCE_MODEL",
+        "source": "https://arxiv.org/html/2402.15548v1",
+        "author_data": "https://zenodo.org/records/11084025",
+        "candidate_vectors": "data/research_generator_20261116/spg_author_candidates.json",
+        "source_selection_role": "high maximum-mass extreme of the 68% CI",
+        "author_candidate_index": "125583",
+        "source_definition": "Three mesons sigma,omega,rho; model-specific n_sat; common nucleon mass938.9MeV. No delta meson.",
+        "historical_fit_scope": "Existing coupling values, saturation targets and fit receipts are preserved as legacy-proxy evidence. A beta-equilibrium-trajectory inverse fit does not recover the source functional uniquely.",
+        "precedence": "This relation supersedes earlier assertions of canonical Scurto physics or verified source coupling extraction in legacy note and fit metadata."
+      }
     },
     "SPG_M4": {
       "family": "SPG",
@@ -665,16 +700,27 @@
         "Lsym_MeV": 73,
         "Ksym_MeV": -160
       },
-      "reference": "Scurto, Pais, Gulminelli PRD 109 103015 (2024); arXiv:2402.15548. M4 = realization from the high-density / direct-Urca-onset tail of the posterior (Scurto text line 3837).",
+      "reference": "Scurto, Pais, Gulminelli PRD109,103015(2024), arXiv:2402.15548 identifies the target model; the numerical coupling values in this legacy entry are not extracted author parameters.",
       "companion_pdf": "scurto2024_spg_variant.pdf",
-      "verification_status": "CANONICAL_BASIS_GOGEGEIN_2008_COUPLINGS_NMP_VARIANT_PENDING_EXTRACTION",
-      "scuurto_role": "M4: direct-Urca-onset tail",
-      "note": "See SPG_M2 note. Per-model NMP variations not yet captured.",
+      "verification_status": "LEGACY_SURROGATE_NOT_SOURCE_CALIBRATED",
+      "scuurto_role": "M4: low R1.4 extreme of the 90% CI",
+      "note": "Legacy four-meson proxy numerical parameters retained unchanged for existing receipts. These are not Scurto2024 M1-M5 source couplings. Author-origin candidate three-meson vectors are now acquired separately; see source_model_relation and docs/research_generator_20261116/crust_literature.md.",
       "nucleon_masses_MeV": {
         "neutron": 938.9,
         "proton": 938.9
       },
-      "nucleon_masses_source": "placeholder of SPG_M1 couplings; mass follows SPG_M1 (Goegelein 2008, M = 938.9 MeV)"
+      "nucleon_masses_source": "placeholder of SPG_M1 couplings; mass follows SPG_M1 (Goegelein 2008, M = 938.9 MeV)",
+      "source_model_relation": {
+        "status": "LEGACY_SURROGATE_NOT_SOURCE_MODEL",
+        "source": "https://arxiv.org/html/2402.15548v1",
+        "author_data": "https://zenodo.org/records/11084025",
+        "candidate_vectors": "data/research_generator_20261116/spg_author_candidates.json",
+        "source_selection_role": "low R1.4 extreme of the 90% CI",
+        "author_candidate_index": "191537",
+        "source_definition": "Three mesons sigma,omega,rho; model-specific n_sat; common nucleon mass938.9MeV. No delta meson.",
+        "historical_fit_scope": "Existing coupling values, saturation targets and fit receipts are preserved as legacy-proxy evidence. A beta-equilibrium-trajectory inverse fit does not recover the source functional uniquely.",
+        "precedence": "This relation supersedes earlier assertions of canonical Scurto physics or verified source coupling extraction in legacy note and fit metadata."
+      }
     },
     "SPG_M5": {
       "family": "SPG",
@@ -730,7 +776,7 @@
       },
       "per_model_coupling_extraction": {
         "method": "PATH_A_ISOSCALAR_FIXED_ISOVECTOR_FIT (winner of paths a vs c comparison)",
-        "isoscalar_source": "canonical Gögelein 2008 Table I (sigma, omega fixed; reproduce E_sat=-16, K_sat=263 at rho_sat=0.178)",
+        "isoscalar_source": "canonical G\u00f6gelein 2008 Table I (sigma, omega fixed; reproduce E_sat=-16, K_sat=263 at rho_sat=0.178)",
         "isovector_fitted_to": "unified SPG(M5) CompOSE export beta-equil F(rho) and Yp(rho) trajectory, fit range rho in [0.09, 0.30] fm^-3, 7 points",
         "free_parameters": "delta(a,b,c,d) and rho(a,b,c) = 7 params",
         "fit_RMS_F_MeV": 2.0711,
@@ -741,12 +787,13 @@
         "E_sym_residual_MeV": 4.321,
         "E_sat_MeV_preserved": -16.0,
         "competing_path_c_verdict": "REJECTED: full 12-coupling fit gives fit_RMS_F=0.03 MeV (apparent win) but E_sym=77.0 MeV and E_sat=-41.3 MeV (both non-physical, classic underdetermination overfit); eval_RMS_F=81.7 MUCH WORSE than path (a)'s 22.3 - path (c) does not even extrapolate well for M5",
-        "interpretation": "Path (a) wins decisively for M5: physical E_sym=43.1 MeV (target 38.8, residual 4.3 MeV) and physical E_sat=-16.0 MeV, while path (c) gives non-physical E_sym=77 MeV, E_sat=-41 MeV, AND worse extrapolation (eval RMS 81.7 vs 22.3). The 4.3 MeV E_sym residual is larger than M3's 2.3 MeV because M5's E_sym rises more steeply at high density (extreme proton-fraction tail), so the parabolic approximation in the Yp extraction has larger noise for M5. The delta coupling for M5 has a~1e-12 (effectively 0), meaning the delta meson contributes only through the (b + d*x^3)*exp(-c*x) term - a different functional shape than M3's delta (a~0, b=0.82, large c=19, large d=19), reflecting M5's distinct isovector physics."
+        "interpretation": "Path (a) wins decisively for M5: physical E_sym=43.1 MeV (target 38.8, residual 4.3 MeV) and physical E_sat=-16.0 MeV, while path (c) gives non-physical E_sym=77 MeV, E_sat=-41 MeV, AND worse extrapolation (eval RMS 81.7 vs 22.3). The 4.3 MeV E_sym residual is larger than M3's 2.3 MeV because M5's E_sym rises more steeply at high density (extreme proton-fraction tail), so the parabolic approximation in the Yp extraction has larger noise for M5. The delta coupling for M5 has a~1e-12 (effectively 0), meaning the delta meson contributes only through the (b + d*x^3)*exp(-c*x) term - a different functional shape than M3's delta (a~0, b=0.82, large c=19, large d=19), reflecting M5's distinct isovector physics.",
+        "evidence_scope": "HISTORICAL_PROXY_FIT_ONLY: no claim of unique source coupling extraction or model physicality follows."
       },
-      "reference": "Scurto, Pais, Gulminelli PRD 109 103015 (2024); arXiv:2402.15548. M5 = realization showing extreme proton-fraction behavior (Scurto text line 3740). CompOSE page 319.",
+      "reference": "Scurto, Pais, Gulminelli PRD109,103015(2024), arXiv:2402.15548 identifies the target model; the numerical coupling values in this legacy entry are not extracted author parameters.",
       "companion_pdf": "scurto2024_spg_variant.pdf",
-      "verification_status": "PER_MODEL_COUPLING_EXTRACTED_PATH_A_ISOSCALAR_FIXED_ISOVECTOR_FIT_VERIFIED_PHYSICAL_ESYM_43_1MEV_ESAT_MINUS16_PATH_C_REJECTED_NONPHYSICAL",
-      "scuurto_role": "M5: extreme proton-fraction tail; CompOSE page 319",
+      "verification_status": "LEGACY_SURROGATE_NOT_SOURCE_CALIBRATED",
+      "scuurto_role": "M5: high R1.4 extreme of the 90% CI",
       "compose_reference_export": {
         "crust_only": {
           "page": 319,
@@ -771,7 +818,7 @@
           "Yp_at_rho_0.178": 0.062,
           "consistency_check": "inner crust F(rho) matches crust-only 319 exactly, confirming the crust-only export is a subset of the unified export"
         },
-        "canonical_basis_inner_crust_agreement": "our canonical Gögelein-basis reconstruction E_bind(rho) matches unified M5 inner-crust within 1.5 MeV (rho<=0.03: within 0.7 MeV; rho=0.08: -0.4 MeV). M5 shows near-perfect agreement with canonical at the transition region (dE = -0.0006 MeV at rho=6.6e-2 fm^-3), indicating M5's posterior is very close to the Scurto prior center (canonical Gögelein couplings).",
+        "canonical_basis_inner_crust_agreement": "our canonical G\u00f6gelein-basis reconstruction E_bind(rho) matches unified M5 inner-crust within 1.5 MeV (rho<=0.03: within 0.7 MeV; rho=0.08: -0.4 MeV). M5 shows near-perfect agreement with canonical at the transition region (dE = -0.0006 MeV at rho=6.6e-2 fm^-3), indicating M5's posterior is very close to the Scurto prior center (canonical G\u00f6gelein couplings).",
         "esym_trajectory_extracted": {
           "method": "parabolic beta-equil: E_sym(rho) = mu_e(rho, Yp) / (4*(1 - 2*Yp)), mu_e = hbar*(3*pi^2*rho*Yp)^(1/3)",
           "rho_0.10": 26.299,
@@ -787,14 +834,26 @@
           "vs_canonical_L_target_MeV": 73,
           "interpretation": "M5 has +7.39 MeV higher E_sym at rho_sat than canonical (stiffer symmetry energy), but L_sym (71.2) is close to the canonical target (73). M5's distinctive feature is the rising E_sym at high density (rho>0.25) - softer than M3 at moderate density but steeper growth, consistent with the extreme proton-fraction tail: the larger clusters and lower transition density reflect a softer inner-crust E_sym but a steeper high-density E_sym growth. M5 vs M3: M5 has LARGER clusters (Aav 773 vs 560), LOWER transition density (0.071 vs 0.079), and at rho>0.25 HIGHER E_sym (softer at moderate density, steeper growth)."
         },
-        "coupling_extraction_status": "UNDERDETERMINED: same as SPG_M3 - the unified export provides beta-equil trajectory only, 12 coupling parameters cannot be uniquely determined from 6 NMPs. Symmetric-matter E_SN(rho) cannot be reliably extracted from beta-equil via parabolic approximation (delta ~ 0.88 amplifies errors). Per-model coupling requires symmetric-matter cut, numeric Fig. 19 tables, or multi-Yp fit. The extracted E_sym trajectory is recorded for consistency checking and future isovector-coupling retuning."
+        "coupling_extraction_status": "UNDERDETERMINED: same as SPG_M3 - the unified export provides beta-equil trajectory only, 12 coupling parameters cannot be uniquely determined from 6 NMPs. Symmetric-matter E_SN(rho) cannot be reliably extracted from beta-equil via parabolic approximation (delta ~ 0.88 amplifies errors). Per-model coupling requires symmetric-matter cut, numeric Fig. 19 tables, or multi-Yp fit. The extracted E_sym trajectory is recorded for consistency checking and future isovector-coupling retuning.",
+        "evidence_scope": "Historical table observations retained; accompanying parabolic-approximation and source-model inference text is superseded by source_model_relation."
       },
-      "note": "See SPG_M2 note. Per-model NMP variations documented via E_sym trajectory (M5 +7.4 MeV stiffer than canonical at rho_sat, L close to canonical); 12-coupling extraction remains underdetermined from beta-equil-only unified export.",
+      "note": "Legacy four-meson proxy numerical parameters retained unchanged for existing receipts. These are not Scurto2024 M1-M5 source couplings. Author-origin candidate three-meson vectors are now acquired separately; see source_model_relation and docs/research_generator_20261116/crust_literature.md.",
       "nucleon_masses_MeV": {
         "neutron": 938.9,
         "proton": 938.9
       },
-      "nucleon_masses_source": "CompOSE export page 319 (319.zip, sha256 prefix 7eb1d26af84b5b76) eos.thermo header 938.9 938.9"
+      "nucleon_masses_source": "CompOSE export page 319 (319.zip, sha256 prefix 7eb1d26af84b5b76) eos.thermo header 938.9 938.9",
+      "source_model_relation": {
+        "status": "LEGACY_SURROGATE_NOT_SOURCE_MODEL",
+        "source": "https://arxiv.org/html/2402.15548v1",
+        "author_data": "https://zenodo.org/records/11084025",
+        "candidate_vectors": "data/research_generator_20261116/spg_author_candidates.json",
+        "source_selection_role": "high R1.4 extreme of the 90% CI",
+        "author_candidate_index": "246826",
+        "source_definition": "Three mesons sigma,omega,rho; model-specific n_sat; common nucleon mass938.9MeV. No delta meson.",
+        "historical_fit_scope": "Existing coupling values, saturation targets and fit receipts are preserved as legacy-proxy evidence. A beta-equilibrium-trajectory inverse fit does not recover the source functional uniquely.",
+        "precedence": "This relation supersedes earlier assertions of canonical Scurto physics or verified source coupling extraction in legacy note and fit metadata."
+      }
     }
   },
   "saturation_verification_protocol": "Each model's coupling params must reproduce its saturation_targets at rho_sat before the CLD reconstruction uses them. rmf_solver.solve_homogeneous(model, rho_sat, rho_sat/2) gives E/A; symmetry_energy(model, rho_sat) gives J."

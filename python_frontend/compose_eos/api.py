@@ -6,6 +6,7 @@ import tempfile
 from pathlib import Path
 from typing import Any
 from .eos_data import EOSData
+from .physical_domain import physical_domain_report
 from .native import run_native, NativeFeatureUnavailable, NativeExecutionError
 
 def read_compose(directory: str | Path) -> EOSData:
@@ -149,6 +150,20 @@ _CRUST_ONLY_SOURCE_SPECS: dict[str, dict[str, Any]] = {
     "GPPVA_FSU2R": {"source_n":296,"last_nb_fm3":0.082999997,"eos_nb_git_blob_sha1":"756b25cc31d84d5c4124e3593fe0e122685e8ac3","method":"Thomas-Fermi","method_reference":"Grill et al., PRC 90, 045803 (2014), arXiv:1404.2753","expected_nadd":1},
     "GPPVA_NL3wrL55": {"source_n":298,"last_nb_fm3":0.082000002,"eos_nb_git_blob_sha1":"f829b08138181ea68c9e99adae5193a7d7308d75","method":"Thomas-Fermi","method_reference":"Grill et al., PRC 90, 045803 (2014), arXiv:1404.2753","expected_nadd":1},
     "GPPVA_TM1e": {"source_n":303,"last_nb_fm3":0.089000002,"eos_nb_git_blob_sha1":"e39714a8993e7aea62c1f880644cc46e60e6307d","method":"Thomas-Fermi","method_reference":"Grill et al., PRC 90, 045803 (2014), arXiv:1404.2753","expected_nadd":1},
+    "GPPVA_TW": {'source_n': 289,
+     'last_nb_fm3': 0.074000001,
+     'eos_nb_git_blob_sha1': '1ae3b88523f9fcbe94ab6198cd2e6e99833b7c86',
+     'method': 'Thomas-Fermi',
+     'method_reference': 'Grill et al., PRC 90, 045803 (2014), arXiv:1404.2753',
+     'expected_nadd': 1,
+     'source_file_sha256': {'eos.nb': '8775fff862b03ebca7d3fb23536ae43e5c576e3a1bbed70dd161abbf85f0bd6d',
+                            'eos.t': 'f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad',
+                            'eos.yq': 'f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad',
+                            'eos.thermo': '440293cd0a1ee55caaa029ef5b5b1db5240ecc3b697c51a288eb7125bc97de41',
+                            'eos.compo': 'df43bf65190dacd23cec46f7a19b8a7bf2eaa473e756a302a22b27f7d6a8b387'},
+     'outer_crust_provider': 'UNRESOLVED_BPS_BSk22',
+     'bibliography_conflict': 'CompOSE page 212 names BPS; linked PDF names BSk22. The first 217 '
+                              'thermodynamic and composition rows match the pinned DD2 outer segment.'},
 }
 
 
@@ -366,6 +381,7 @@ def build_core_only(
 
         # Diagnostics only: no physical repair, clipping, or source modification.
         physical_report = check_consistency(core)
+        domain_report = physical_domain_report(core)
         output_names = (
             "eos.nb", "eos.t", "eos.yq", "eos.thermo", "eos.compo"
         )
@@ -403,6 +419,7 @@ def build_core_only(
                 "native_fortran_compose_writer",
                 "native_fortran_compose_readback",
             ],
+            "physical_domain": domain_report,
             "checks": {
                 "source_identity": "PASS",
                 "native_readback": "PASS",
@@ -477,10 +494,11 @@ def build_crust_only(
     source_root: str | Path | None = None,
     model_ids: list[str] | tuple[str, ...] | None = None,
 ) -> list[dict[str, Any]]:
-    """Build the 12 source-admitted crust-only CompOSE components natively.
+    """Build the 13 source-admitted crust-only CompOSE components natively.
 
-    The source tables already contain the BSk22 outer-crust segment and the
-    model-specific CLD or Thomas-Fermi inner-crust segment. This operation is
+    The source tables contain outer-crust and model-specific CLD or
+    Thomas-Fermi inner-crust segments. Per-model receipts retain the
+    outer-provider attribution, including TW's unresolved bibliography. This operation is
     an exact native Fortran projection over the full source support: it does
     not re-solve either microphysical method or reconstruct composition.
     """
@@ -549,7 +567,6 @@ def build_crust_only(
     if unknown:
         raise ValueError(
             "models are not admitted for crust-only construction "
-            "(GPPVA_TW remains blocked by the BPS/BSk22 provider conflict): "
             f"{unknown}"
         )
 
@@ -587,9 +604,8 @@ def build_crust_only(
         },
         "composition_semantics": composition_semantics,
         "components": [],
-        "blocked": {
-            "GPPVA_TW": "BLOCKED: official CompOSE live page 212 says BPS below 0.002 fm^-3 while its linked PDF says BSk22; no provider choice is inferred."
-        },
+        "blocked": {},
+        "bibliography_conflicts": {"GPPVA_TW": _CRUST_ONLY_SOURCE_SPECS["GPPVA_TW"]["bibliography_conflict"]},
     }
 
     for model_id in selected:
@@ -612,7 +628,17 @@ def build_crust_only(
             missing = sorted(set(input_names) - set(input_hashes))
             raise FileNotFoundError(f"{model_id} missing mandatory source files: {missing}")
 
+        if "source_file_sha256" in spec and input_hashes != spec["source_file_sha256"]:
+            raise ValueError(f"{model_id} pinned source file identity mismatch")
         source = read_compose(source_dir)
+        if model_id == "GPPVA_TW":
+            reference = read_compose(inputs / "GPPVA_DD2")
+            for field in ("nb", "Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7",
+                          "Iphase", "Yn", "Yp", "Ye", "Ymu", "Aav", "Zav", "Yh",
+                          "Yn_present", "Yp_present", "Ye_present", "Ymu_present",
+                          "Abar_present", "Zbar_present", "Yh_present"):
+                if not np.array_equal(getattr(source, field)[:217], getattr(reference, field)[:217]):
+                    raise ValueError(f"GPPVA_TW outer-source identity differs from DD2 in {field}")
         if source.n != spec["source_n"]:
             raise ValueError(
                 f"{model_id} source point count differs from E390-01C: "
@@ -722,6 +748,7 @@ def build_crust_only(
             raise NativeExecutionError(f"{model_id} beta-equilibrium summary changed")
 
         physical_report = check_consistency(crust)
+        domain_report = physical_domain_report(crust)
         output_names = ("eos.nb", "eos.t", "eos.yq", "eos.thermo", "eos.compo")
         output_hashes = _sha256_files(output_dir, output_names)
         if set(output_hashes) != set(output_names):
@@ -742,7 +769,8 @@ def build_crust_only(
                 "input_file_sha256": input_hashes,
             },
             "construction_provenance": {
-                "outer_crust_provider": "BSk22",
+                "outer_crust_provider": spec.get("outer_crust_provider", "BSk22"),
+                "bibliography_conflict": spec.get("bibliography_conflict"),
                 "inner_crust_method": method,
                 "inner_crust_reference": spec["method_reference"],
                 "provider_splice_nB_fm3": 2.0e-3,
@@ -806,6 +834,7 @@ def build_crust_only(
                 "native_fortran_compose_writer",
                 "native_fortran_compose_readback",
             ],
+            "physical_domain": domain_report,
             "checks": {
                 "source_identity": "PASS",
                 "reader_derived_status_stable_on_native_readback": "PASS",
@@ -847,7 +876,8 @@ def build_crust_only(
             "source_rows": [1, source.n],
             "outer_crust_rows": [1, 217],
             "inner_crust_rows": [218, source.n],
-            "outer_crust_provider": "BSk22",
+            "outer_crust_provider": spec.get("outer_crust_provider", "BSk22"),
+            "bibliography_conflict": spec.get("bibliography_conflict"),
             "inner_crust_method": method,
             "inner_crust_reference": spec["method_reference"],
             "neutron_drip_last_outer_nb_fm3": float(source.nb[216]),
@@ -880,6 +910,7 @@ def build_crust_only(
         "admitted_model_count": len(receipts),
         "total_output_rows": int(sum(item["output"]["n"] for item in receipts)),
         "blocked_models": coverage["blocked"],
+        "bibliography_conflicts": coverage["bibliography_conflicts"],
         "composition_semantics_status": composition_semantics["status"],
         "coverage_report": str(target_root / "crust_coverage_report.v1.json"),
         "components": [
@@ -897,7 +928,7 @@ def build_crust_only(
             "The provider group-composition semantics remain blocked; the reader-derived row_status is not a raw eos.compo source field.",
             "C3/C4 NOT_AVAILABLE is not a closure PASS. Matched-product composition must wait for E390-03 reconstruction/adjudication.",
             "It does not certify any matched core-crust EOS or the 390 smooth-method matrix.",
-            "GPPVA_TW remains blocked and is not included in the artifact.",
+            "GPPVA_TW preserves source rows and the unresolved BPS/BSk22 bibliography conflict.",
         ],
     }
     (target_root / "crust_only_manifest.v1.json").write_text(

@@ -641,10 +641,10 @@
         "E390-03A",
         "E390-03B"
       ],
-      "status": "PARTIAL_NATIVE_RMF_VALIDATED_CLD_PROXY_STATIONARITY_FIXED_SOURCE_CALIBRATION_OPEN",
+      "status": "PARTIAL_COMPOSITION_REGENERATION_AND_DOMAIN_DIAGNOSTICS_FULL_CRUST_OPEN",
       "outputs": [
         "native DD-RMF homogeneous symmetry energy, beta-equilibrium and electron/muon branch diagnostics (DELIVERED, b3d80cc)",
-        "native CLD cell composition reconstruction for GPPVA_DD2/DDME2/TW over the inner-crust density grid (DELIVERED: 3 models x 20 points = 60 rows, 5 physics invariants PASS; Scurto 2024 CLD on the Fortran DD-RMF solver; Lattimer surface tension, RPW Coulomb lattice, Nelder-Mead 3-var)",
+        "native CLD cell composition reconstruction for GPPVA_DD2/DDME2/TW over the inner-crust density grid (DELIVERED: 3 models x 20 points = 60 rows, 5 physics invariants PASS; historical exploratory CLD proxy on the Fortran DD-RMF solver; source-calibrated CLD remains open, Nelder-Mead 3-var)",
         "row-level CompOSE-standard group abundances with baryon/charge closure (DELIVERED: C3 Yn+Yp+Yh=1 PASS, C4 Yp+(Zbar/Abar)Yh=Ye+Ymu PASS at 1e-9; Zbar/Abar=rho_Ip/rho_I exact; Abar/Zbar absolute = NaN, CLD continuous-phase model does not fix cluster nucleon count)",
         "per-model reconstructed composition and readback receipts (DELIVERED: data/receipts/eos390_m3/cld/ and data/receipts/eos390_m3/compose_closure/; full CompOSE eos.thermo/eos.compo table assembly is E390-07 scope)",
         "full Thomas-Fermi Wigner-Seitz gas composition beyond the pure-neutron approximation (REMAINING: requires model-specific TF functionals, separate from the CLD continuous-phase cluster model)"
@@ -722,7 +722,10 @@
           "outer-crust physical stellar boundary",
           "composition and mode/radial stability validation"
         ]
-      }
+      },
+      "previous_status_before_generator_research_20261116": "PARTIAL_NATIVE_RMF_VALIDATED_CLD_PROXY_STATIONARITY_FIXED_SOURCE_CALIBRATION_OPEN",
+      "generator_research_receipt": "data/research_generator_20261116/MODEL_COVERAGE.json",
+      "research_implementation": "Python source-functional prototypes plus native DD-RMF and native CompOSE I/O; Fortran port of new functionals pending"
     },
     {
       "id": "E390-04",
@@ -1189,7 +1192,7 @@
         "E390-02A",
         "E390-10A"
       ],
-      "status": "CONSTRUCTION_IMPLEMENTED_CI_PASS_PHYSICAL_DIAGNOSTICS_PARTIAL_FAIL",
+      "status": "FIVE_SOURCE_COMPONENTS_EXECUTED_DENSITY_RESOLVED_DIAGNOSTICS",
       "outputs": [
         "one standalone core-only artifact per admitted model",
         "source-backed boundary selection and composition provenance",
@@ -1267,7 +1270,9 @@
         "No matching method or 390 smooth EOS composition matrix has been executed.",
         "This node does not certify all five core EOS as physically admissible.",
         "No composition reconstruction, interpolation, extrapolation or thermodynamic repair was performed."
-      ]
+      ],
+      "previous_status_before_generator_research_20261116": "CONSTRUCTION_IMPLEMENTED_CI_PASS_PHYSICAL_DIAGNOSTICS_PARTIAL_FAIL",
+      "generator_research_receipt": "data/research_generator_20261116/MODEL_COVERAGE.json"
     },
     {
       "id": "E390-03B",
@@ -1278,9 +1283,9 @@
         "E390-02A",
         "E390-10A"
       ],
-      "status": "CONSTRUCTION_CLOSED_CI_PASS_PROVIDER_EXPORT_NONCONFORMANT_RECONSTRUCTION_REQUIRED_E390_03",
+      "status": "THIRTEEN_SOURCE_COMPONENTS_EXECUTED_DOMAIN_DIAGNOSTICS_COMPOSITION_SEMANTICS_OPEN",
       "outputs": [
-        "one standalone native-Fortran crust-only artifact per admitted model (12 models; GPPVA_TW excluded)",
+        "one standalone native-Fortran crust-only artifact per admitted model (13 models; GPPVA_TW source identity verified and bibliography conflict recorded)",
         "outer-crust/neutron-drip/provider-splice/inner-crust/cluster-pasta coverage report",
         "per-model E390-03B construction receipt with source and output hashes and physical diagnostics"
       ],
@@ -1331,7 +1336,9 @@
         "admitted_models": 12,
         "output_rows": 3883,
         "physical_admissibility": "MIXED; five GPPVA models fail C2, while all models have C3/C4 NOT_AVAILABLE and provider composition semantics blocked."
-      }
+      },
+      "previous_status_before_generator_research_20261116": "CONSTRUCTION_CLOSED_CI_PASS_PROVIDER_EXPORT_NONCONFORMANT_RECONSTRUCTION_REQUIRED_E390_03",
+      "generator_research_receipt": "data/research_generator_20261116/MODEL_COVERAGE.json"
     },
     {
       "id": "E390-01B",
@@ -2655,5 +2662,15 @@
         "Complete native TOV/tidal/Cowling and 390 source-backed batch validation after component and matching gates close."
       ]
     }
-  ]
+  ],
+  "generator_research_20261116": {
+    "base_commit": "677585947e4d126bc27cc3d8f30c265c407a7773",
+    "status": "PARTIALLY_COMPLETE",
+    "report": "docs/research_generator_20261116/REPORT_KO.md",
+    "coverage": "data/research_generator_20261116/MODEL_COVERAGE.json",
+    "policy": "Resolve density support and source convention before whole-model physical exclusion",
+    "next": "Full source-calibrated CLD/TF crust solvers and original core source-fidelity reconciliation",
+    "candidate_surface_fits_executed": 5,
+    "apr_phase": "PROVIDER_GIBBS_IDENTIFIED_IMPLEMENTED_AND_EXECUTED"
+  }
 }

@@ -1,0 +1,1475 @@
+{
+  "schema": "ns-cowling.source-domain-campaign.v1",
+  "base_commit": "677585947e4d126bc27cc3d8f30c265c407a7773",
+  "source_identity": {
+    "python_frontend/compose_eos/physical_domain.py": "27e97bdad1e378df9452bd6f1e66bc33ebf200d658e37ecfb37bc7da3870a3c7",
+    "python_frontend/compose_eos/api.py": "296d81f2c93adfa3fda043ba34a0cea687bdbfa01125279f9045348aa87a04e4",
+    "scripts/build_e390_03a_core_only.py": "6b75d487236ded53628007d643f925804b352c8a412389d93e8279e6917d8a6b",
+    "scripts/build_e390_03b_crust_only.py": "bb792549923f1a30ebc5c3ad60623b280dcff773371627e9e12d2d783d3eecde"
+  },
+  "scope": "5 core and13crust source projections with native readback and density-resolved sampled diagnostics",
+  "core_count": 5,
+  "crust_count": 13,
+  "crust_rows": 4172,
+  "commands": [
+    "bash fortran_eos/build.sh build/compose_eos_fortran",
+    "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python3 scripts/build_e390_03a_core_only.py build/domain_research_roundoff/core_only",
+    "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python3 scripts/build_e390_03b_crust_only.py build/domain_research_roundoff/crust_only"
+  ],
+  "exit_codes": [
+    0,
+    0,
+    0
+  ],
+  "method": "Adjacent-row secants; log-step>0.25 and categorical Iphase changes split connected interpolation ranges while secant diagnostics remain available; coarse spacing is not a physical exclusion. Euler applicability uses Il and lepton presence. Interpolation/convergence still needed for continuous physical ranges.",
+  "policy_override": {
+    "previous": "Whole-component hold for TW BPS/BSk22 bibliography conflict",
+    "replacement": "Pinned source extraction plus exact outer217-field comparison to DD2, with bibliographic conflict retained",
+    "authority": "User request to enable all component regeneration and first resolve support"
+  },
+  "components": [
+    {
+      "model_id": "APR_APR",
+      "role": "core_only",
+      "output_rows": 103,
+      "source_hashes": {
+        "eos.nb": "35216571b367befd05388f804016b0950da9455cc83d96f4723cc3b0316cdc33",
+        "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+        "eos.thermo": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a",
+        "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554"
+      },
+      "native_full_table_diagnostics": {
+        "failed_checks": [
+          "C10"
+        ],
+        "finite_primary_arrays": true,
+        "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11.",
+        "pass_": false,
+        "status": "FAIL"
+      },
+      "mechanically_causal_segments": [
+        {
+          "first_row": 1,
+          "last_row": 80,
+          "n_max_fm3": 0.88,
+          "n_min_fm3": 0.085
+        }
+      ],
+      "thermodynamically_supported_segments": [
+        {
+          "first_row": 1,
+          "last_row": 80,
+          "n_max_fm3": 0.88,
+          "n_min_fm3": 0.085
+        }
+      ],
+      "first_interval_findings": {
+        "ACAUSAL_SECANT": {
+          "cs2_over_c2_first_law_secant": 1.025173954761944,
+          "cs2_over_c2_secant": 1.0252323518679414,
+          "left_row": 80,
+          "n_left_fm3": 0.88,
+          "n_right_fm3": 0.9,
+          "right_row": 81
+        }
+      },
+      "euler_failed_row_count": 0,
+      "euler_unavailable_row_count": 0,
+      "composition": {
+        "available": false,
+        "file_present": false,
+        "status_counts": {
+          "CHECKED": 0,
+          "FAIL": 0,
+          "NOT_AVAILABLE": 103,
+          "PARTIAL": 0,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    {
+      "model_id": "BBB_BHF2",
+      "role": "core_only",
+      "output_rows": 15,
+      "source_hashes": {
+        "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+        "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+        "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda",
+        "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554"
+      },
+      "native_full_table_diagnostics": {
+        "failed_checks": [],
+        "finite_primary_arrays": true,
+        "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11.",
+        "pass_": true,
+        "status": "PASS"
+      },
+      "mechanically_causal_segments": [
+        {
+          "first_row": 1,
+          "last_row": 2,
+          "n_max_fm3": 0.2,
+          "n_min_fm3": 0.16
+        },
+        {
+          "first_row": 4,
+          "last_row": 15,
+          "n_max_fm3": 1.5,
+          "n_min_fm3": 0.4
+        }
+      ],
+      "thermodynamically_supported_segments": [
+        {
+          "first_row": 1,
+          "last_row": 2,
+          "n_max_fm3": 0.2,
+          "n_min_fm3": 0.16
+        },
+        {
+          "first_row": 4,
+          "last_row": 15,
+          "n_max_fm3": 1.5,
+          "n_min_fm3": 0.4
+        }
+      ],
+      "first_interval_findings": {
+        "COARSE_SAMPLING": {
+          "cs2_over_c2_first_law_secant": 0.09682393959236948,
+          "cs2_over_c2_secant": 0.09699052806408309,
+          "left_row": 2,
+          "n_left_fm3": 0.2,
+          "n_right_fm3": 0.3,
+          "right_row": 3
+        }
+      },
+      "euler_failed_row_count": 0,
+      "euler_unavailable_row_count": 0,
+      "composition": {
+        "available": false,
+        "file_present": false,
+        "status_counts": {
+          "CHECKED": 0,
+          "FAIL": 0,
+          "NOT_AVAILABLE": 15,
+          "PARTIAL": 0,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    {
+      "model_id": "GM_GM1",
+      "role": "core_only",
+      "output_rows": 301,
+      "source_hashes": {
+        "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0",
+        "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+        "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+        "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+        "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554"
+      },
+      "native_full_table_diagnostics": {
+        "failed_checks": [],
+        "finite_primary_arrays": true,
+        "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11.",
+        "pass_": true,
+        "status": "PASS"
+      },
+      "mechanically_causal_segments": [
+        {
+          "first_row": 1,
+          "last_row": 301,
+          "n_max_fm3": 1.0,
+          "n_min_fm3": 0.048
+        }
+      ],
+      "thermodynamically_supported_segments": [
+        {
+          "first_row": 1,
+          "last_row": 301,
+          "n_max_fm3": 1.0,
+          "n_min_fm3": 0.048
+        }
+      ],
+      "first_interval_findings": {},
+      "euler_failed_row_count": 0,
+      "euler_unavailable_row_count": 0,
+      "composition": {
+        "available": true,
+        "file_present": true,
+        "status_counts": {
+          "CHECKED": 0,
+          "FAIL": 0,
+          "NOT_AVAILABLE": 0,
+          "PARTIAL": 301,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    {
+      "model_id": "RG_KDE0v1",
+      "role": "core_only",
+      "output_rows": 274,
+      "source_hashes": {
+        "eos.compo": "488e95274a7b2c6c84aeed589c1e8b4d5dcb06c4b83b091b9d07396e50f0966e",
+        "eos.nb": "c3b6034fce1d8b75479c692e6b61cfa28e1b28e498fbd9035804599059f370a9",
+        "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+        "eos.thermo": "359c117b5d699fd026429e33555083168d07502179700eec14fa7f165ff4cc60",
+        "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554"
+      },
+      "native_full_table_diagnostics": {
+        "failed_checks": [
+          "C2",
+          "C10"
+        ],
+        "finite_primary_arrays": true,
+        "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11.",
+        "pass_": false,
+        "status": "FAIL"
+      },
+      "mechanically_causal_segments": [
+        {
+          "first_row": 1,
+          "last_row": 256,
+          "n_max_fm3": 1.425315,
+          "n_min_fm3": 0.04582369
+        }
+      ],
+      "thermodynamically_supported_segments": [],
+      "first_interval_findings": {
+        "ACAUSAL_SECANT": {
+          "cs2_over_c2_first_law_secant": 1.0033694981070327,
+          "cs2_over_c2_secant": 1.0033767421036124,
+          "left_row": 256,
+          "n_left_fm3": 1.425315,
+          "n_right_fm3": 1.442943,
+          "right_row": 257
+        }
+      },
+      "euler_failed_row_count": 274,
+      "euler_unavailable_row_count": 0,
+      "composition": {
+        "available": true,
+        "file_present": true,
+        "status_counts": {
+          "CHECKED": 0,
+          "FAIL": 0,
+          "NOT_AVAILABLE": 0,
+          "PARTIAL": 274,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    {
+      "model_id": "RG_SLY4",
+      "role": "core_only",
+      "output_rows": 54,
+      "source_hashes": {
+        "eos.compo": "39ef13e075c5225a8a838e7015052263d038a16d0303398f427fbbee34e30d65",
+        "eos.nb": "e8fa40bd55e0b6ab5e2fd3a536ce162b755afce32011c97f19aa290b5bbc402e",
+        "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+        "eos.thermo": "454aab2370ba7e5ee11ef3fd00801489222cdb2ce9ad416ccfa8821456c65e3f",
+        "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554"
+      },
+      "native_full_table_diagnostics": {
+        "failed_checks": [
+          "C2"
+        ],
+        "finite_primary_arrays": true,
+        "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11.",
+        "pass_": false,
+        "status": "FAIL"
+      },
+      "mechanically_causal_segments": [
+        {
+          "first_row": 1,
+          "last_row": 54,
+          "n_max_fm3": 1.21,
+          "n_min_fm3": 0.05248075
+        }
+      ],
+      "thermodynamically_supported_segments": [],
+      "first_interval_findings": {},
+      "euler_failed_row_count": 54,
+      "euler_unavailable_row_count": 0,
+      "composition": {
+        "available": true,
+        "file_present": true,
+        "status_counts": {
+          "CHECKED": 0,
+          "FAIL": 0,
+          "NOT_AVAILABLE": 0,
+          "PARTIAL": 54,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    {
+      "model_id": "GPPVA_DD2",
+      "role": "crust_only",
+      "output_rows": 283,
+      "source_hashes": {
+        "eos.compo": "8812f119fb3821a618414336dc4b4153dcee65b29fbda0663587bd10be863184",
+        "eos.nb": "e671b93a47f28df63a3f02fbfae58fcebf72207a312d6850732e9d2298ad4c22",
+        "eos.t": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad",
+        "eos.thermo": "9a2d39421de4835aca4ce67d73c7f915baa3b8907c1e4fcfac14f4043ba5c201",
+        "eos.yq": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad"
+      },
+      "native_full_table_diagnostics": {
+        "failed_checks": [
+          "C2"
+        ],
+        "finite_primary_arrays": true,
+        "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11.",
+        "pass_": false,
+        "status": "FAIL"
+      },
+      "mechanically_causal_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 220,
+          "last_row": 283,
+          "n_max_fm3": 0.067000002,
+          "n_min_fm3": 0.0040000002
+        }
+      ],
+      "thermodynamically_supported_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        }
+      ],
+      "first_interval_findings": {
+        "COARSE_SAMPLING": {
+          "cs2_over_c2_first_law_secant": 0.00011288582456090652,
+          "cs2_over_c2_secant": 0.00011288576752479421,
+          "left_row": 13,
+          "n_left_fm3": 5.08413e-09,
+          "n_right_fm3": 7.07088e-09,
+          "right_row": 14
+        },
+        "PHASE_BOUNDARY": {
+          "cs2_over_c2_first_law_secant": 0.0008982152376072888,
+          "cs2_over_c2_secant": 0.0008975215018836598,
+          "left_row": 217,
+          "n_left_fm3": 0.000269021,
+          "n_right_fm3": 0.0020000001,
+          "right_row": 218
+        }
+      },
+      "euler_failed_row_count": 66,
+      "euler_unavailable_row_count": 0,
+      "composition": {
+        "available": true,
+        "file_present": true,
+        "status_counts": {
+          "CHECKED": 0,
+          "FAIL": 283,
+          "NOT_AVAILABLE": 0,
+          "PARTIAL": 0,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    {
+      "model_id": "GPPVA_DDME2",
+      "role": "crust_only",
+      "output_rows": 288,
+      "source_hashes": {
+        "eos.compo": "c9afb0c026201ea267e979ed937593794b694a1a485b3026a698c3d3da6502cc",
+        "eos.nb": "c71502d7769a916346684d4b0de58432b74e69ab4f3b29f8a98f174d1bf92de5",
+        "eos.t": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad",
+        "eos.thermo": "11d0250691e3cd9f18bddcc460cd4328a2c8b4f1a57e6ec8f29aa876b9b77714",
+        "eos.yq": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad"
+      },
+      "native_full_table_diagnostics": {
+        "failed_checks": [
+          "C2"
+        ],
+        "finite_primary_arrays": true,
+        "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11.",
+        "pass_": false,
+        "status": "FAIL"
+      },
+      "mechanically_causal_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 220,
+          "last_row": 288,
+          "n_max_fm3": 0.071999997,
+          "n_min_fm3": 0.0040000002
+        }
+      ],
+      "thermodynamically_supported_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        }
+      ],
+      "first_interval_findings": {
+        "COARSE_SAMPLING": {
+          "cs2_over_c2_first_law_secant": 0.00011288582456090652,
+          "cs2_over_c2_secant": 0.00011288576752479421,
+          "left_row": 13,
+          "n_left_fm3": 5.08413e-09,
+          "n_right_fm3": 7.07088e-09,
+          "right_row": 14
+        },
+        "PHASE_BOUNDARY": {
+          "cs2_over_c2_first_law_secant": 0.0009227863552659826,
+          "cs2_over_c2_secant": 0.000922086979913237,
+          "left_row": 217,
+          "n_left_fm3": 0.000269021,
+          "n_right_fm3": 0.0020000001,
+          "right_row": 218
+        }
+      },
+      "euler_failed_row_count": 71,
+      "euler_unavailable_row_count": 0,
+      "composition": {
+        "available": true,
+        "file_present": true,
+        "status_counts": {
+          "CHECKED": 0,
+          "FAIL": 288,
+          "NOT_AVAILABLE": 0,
+          "PARTIAL": 0,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    {
+      "model_id": "GPPVA_FSU2",
+      "role": "crust_only",
+      "output_rows": 269,
+      "source_hashes": {
+        "eos.compo": "0250865a4848a855727b18b6d312450a2d8e3d972bb52a811fe14fee5adfc5d8",
+        "eos.nb": "c9913dcfc998a8062c8fbc163eadab61a1da2e5a3dcc629cae8b82dcd57d7f62",
+        "eos.t": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad",
+        "eos.thermo": "0b5f98c1b8d77858b75bd81212197525dd7c80c8e44272c405a5c6b2631142e9",
+        "eos.yq": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad"
+      },
+      "native_full_table_diagnostics": {
+        "failed_checks": [],
+        "finite_primary_arrays": true,
+        "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11.",
+        "pass_": true,
+        "status": "PASS"
+      },
+      "mechanically_causal_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 219,
+          "last_row": 269,
+          "n_max_fm3": 0.054000001,
+          "n_min_fm3": 0.0040000002
+        }
+      ],
+      "thermodynamically_supported_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 219,
+          "last_row": 269,
+          "n_max_fm3": 0.054000001,
+          "n_min_fm3": 0.0040000002
+        }
+      ],
+      "first_interval_findings": {
+        "COARSE_SAMPLING": {
+          "cs2_over_c2_first_law_secant": 0.00011288582456090652,
+          "cs2_over_c2_secant": 0.00011288576752479421,
+          "left_row": 13,
+          "n_left_fm3": 5.08413e-09,
+          "n_right_fm3": 7.07088e-09,
+          "right_row": 14
+        },
+        "PHASE_BOUNDARY": {
+          "cs2_over_c2_first_law_secant": 0.0007214572137655502,
+          "cs2_over_c2_secant": 0.0007211771037752803,
+          "left_row": 217,
+          "n_left_fm3": 0.000269021,
+          "n_right_fm3": 0.003,
+          "right_row": 218
+        }
+      },
+      "euler_failed_row_count": 0,
+      "euler_unavailable_row_count": 0,
+      "composition": {
+        "available": true,
+        "file_present": true,
+        "status_counts": {
+          "CHECKED": 0,
+          "FAIL": 269,
+          "NOT_AVAILABLE": 0,
+          "PARTIAL": 0,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    {
+      "model_id": "GPPVA_FSU2H",
+      "role": "crust_only",
+      "output_rows": 300,
+      "source_hashes": {
+        "eos.compo": "cd2bc3eed25639b38cfb0a4d16962f6c4511dcd063f9bf92a28209e3cdaa08b4",
+        "eos.nb": "f7786640fce19edef86bb8dc2e52a5305b2b4af097e3ecac6c4d917c9b7dd0d8",
+        "eos.t": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad",
+        "eos.thermo": "c28d2faf066145eb95b640ca4bf7dad9bbc03f1bf10a0bfe3c51ba6b896a216c",
+        "eos.yq": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad"
+      },
+      "native_full_table_diagnostics": {
+        "failed_checks": [],
+        "finite_primary_arrays": true,
+        "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11.",
+        "pass_": true,
+        "status": "PASS"
+      },
+      "mechanically_causal_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 220,
+          "last_row": 300,
+          "n_max_fm3": 0.086999997,
+          "n_min_fm3": 0.0040000002
+        }
+      ],
+      "thermodynamically_supported_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 220,
+          "last_row": 300,
+          "n_max_fm3": 0.086999997,
+          "n_min_fm3": 0.0040000002
+        }
+      ],
+      "first_interval_findings": {
+        "COARSE_SAMPLING": {
+          "cs2_over_c2_first_law_secant": 0.00011288582456090652,
+          "cs2_over_c2_secant": 0.00011288576752479421,
+          "left_row": 13,
+          "n_left_fm3": 5.08413e-09,
+          "n_right_fm3": 7.07088e-09,
+          "right_row": 14
+        },
+        "PHASE_BOUNDARY": {
+          "cs2_over_c2_first_law_secant": 0.0010090054982819633,
+          "cs2_over_c2_secant": 0.001008584384789742,
+          "left_row": 217,
+          "n_left_fm3": 0.000269021,
+          "n_right_fm3": 0.0020000001,
+          "right_row": 218
+        }
+      },
+      "euler_failed_row_count": 0,
+      "euler_unavailable_row_count": 0,
+      "composition": {
+        "available": true,
+        "file_present": true,
+        "status_counts": {
+          "CHECKED": 0,
+          "FAIL": 300,
+          "NOT_AVAILABLE": 0,
+          "PARTIAL": 0,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    {
+      "model_id": "GPPVA_FSU2R",
+      "role": "crust_only",
+      "output_rows": 296,
+      "source_hashes": {
+        "eos.compo": "2e777888095cc36737d793993f52c5cd5e33c85d0f32fb8c5956f1571742c260",
+        "eos.nb": "5120b7b5467a4cd26833d3ad5365e2dd821d9f8174ce0bae1b04cc5fb6a9629f",
+        "eos.t": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad",
+        "eos.thermo": "2344370fd68aa285fcc5dc42d01f7d35dfe730b4b8adc3117bbe7b60d48cbd05",
+        "eos.yq": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad"
+      },
+      "native_full_table_diagnostics": {
+        "failed_checks": [
+          "C2"
+        ],
+        "finite_primary_arrays": true,
+        "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11.",
+        "pass_": false,
+        "status": "FAIL"
+      },
+      "mechanically_causal_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 220,
+          "last_row": 296,
+          "n_max_fm3": 0.082999997,
+          "n_min_fm3": 0.0040000002
+        }
+      ],
+      "thermodynamically_supported_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 220,
+          "last_row": 296,
+          "n_max_fm3": 0.082999997,
+          "n_min_fm3": 0.0040000002
+        }
+      ],
+      "first_interval_findings": {
+        "COARSE_SAMPLING": {
+          "cs2_over_c2_first_law_secant": 0.00011288582456090652,
+          "cs2_over_c2_secant": 0.00011288576752479421,
+          "left_row": 13,
+          "n_left_fm3": 5.08413e-09,
+          "n_right_fm3": 7.07088e-09,
+          "right_row": 14
+        },
+        "PHASE_BOUNDARY": {
+          "cs2_over_c2_first_law_secant": 0.0010458446285696338,
+          "cs2_over_c2_secant": 0.0010454008007522249,
+          "left_row": 217,
+          "n_left_fm3": 0.000269021,
+          "n_right_fm3": 0.0020000001,
+          "right_row": 218
+        }
+      },
+      "euler_failed_row_count": 1,
+      "euler_unavailable_row_count": 0,
+      "composition": {
+        "available": true,
+        "file_present": true,
+        "status_counts": {
+          "CHECKED": 0,
+          "FAIL": 296,
+          "NOT_AVAILABLE": 0,
+          "PARTIAL": 0,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    {
+      "model_id": "GPPVA_NL3wrL55",
+      "role": "crust_only",
+      "output_rows": 298,
+      "source_hashes": {
+        "eos.compo": "469d0b29aea5ae9404107d4dd1447920ae32d152da183f0be957a898cedf3242",
+        "eos.nb": "486a285eaef750069086480ac44525c688f0dd5e15872da038f7dc0dea71c465",
+        "eos.t": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad",
+        "eos.thermo": "e718b8857be096b4f7e00dde8a9da4c72f0cc831a5f994774cc74b125ffb4155",
+        "eos.yq": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad"
+      },
+      "native_full_table_diagnostics": {
+        "failed_checks": [
+          "C2"
+        ],
+        "finite_primary_arrays": true,
+        "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11.",
+        "pass_": false,
+        "status": "FAIL"
+      },
+      "mechanically_causal_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 220,
+          "last_row": 298,
+          "n_max_fm3": 0.082000002,
+          "n_min_fm3": 0.0040000002
+        }
+      ],
+      "thermodynamically_supported_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 220,
+          "last_row": 298,
+          "n_max_fm3": 0.082000002,
+          "n_min_fm3": 0.0040000002
+        }
+      ],
+      "first_interval_findings": {
+        "COARSE_SAMPLING": {
+          "cs2_over_c2_first_law_secant": 0.00011288582456090652,
+          "cs2_over_c2_secant": 0.00011288576752479421,
+          "left_row": 13,
+          "n_left_fm3": 5.08413e-09,
+          "n_right_fm3": 7.07088e-09,
+          "right_row": 14
+        },
+        "PHASE_BOUNDARY": {
+          "cs2_over_c2_first_law_secant": 0.0008432094473838363,
+          "cs2_over_c2_secant": 0.0008428978616061681,
+          "left_row": 217,
+          "n_left_fm3": 0.000269021,
+          "n_right_fm3": 0.0020000001,
+          "right_row": 218
+        }
+      },
+      "euler_failed_row_count": 1,
+      "euler_unavailable_row_count": 0,
+      "composition": {
+        "available": true,
+        "file_present": true,
+        "status_counts": {
+          "CHECKED": 0,
+          "FAIL": 298,
+          "NOT_AVAILABLE": 0,
+          "PARTIAL": 0,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    {
+      "model_id": "GPPVA_TM1e",
+      "role": "crust_only",
+      "output_rows": 303,
+      "source_hashes": {
+        "eos.compo": "ad37b9bbc51c4fcba16a1ed9425121d439a4230ec2ee9a1c6a6eac420c5a1f6a",
+        "eos.nb": "48a36b442f740538e8167cd21db6ca0605b3b376b48dd27a2e3d90020ee55cc9",
+        "eos.t": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad",
+        "eos.thermo": "9e401855e42ca8fda7c24ec802a8ce9189cd9575c2ee3dfc2b66fb8ec86d4659",
+        "eos.yq": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad"
+      },
+      "native_full_table_diagnostics": {
+        "failed_checks": [
+          "C2"
+        ],
+        "finite_primary_arrays": true,
+        "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11.",
+        "pass_": false,
+        "status": "FAIL"
+      },
+      "mechanically_causal_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 220,
+          "last_row": 303,
+          "n_max_fm3": 0.089000002,
+          "n_min_fm3": 0.0040000002
+        }
+      ],
+      "thermodynamically_supported_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 93,
+          "n_max_fm3": 2.25185e-05,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 220,
+          "last_row": 303,
+          "n_max_fm3": 0.089000002,
+          "n_min_fm3": 0.0040000002
+        }
+      ],
+      "first_interval_findings": {
+        "COARSE_SAMPLING": {
+          "cs2_over_c2_first_law_secant": 0.00011300616264075952,
+          "cs2_over_c2_secant": 0.00011300611482492723,
+          "left_row": 13,
+          "n_left_fm3": 5.08413e-09,
+          "n_right_fm3": 7.07088e-09,
+          "right_row": 14
+        },
+        "PHASE_BOUNDARY": {
+          "cs2_over_c2_first_law_secant": 0.001089984362827988,
+          "cs2_over_c2_secant": 0.0010895210123255184,
+          "left_row": 217,
+          "n_left_fm3": 0.000269021,
+          "n_right_fm3": 0.0020000001,
+          "right_row": 218
+        }
+      },
+      "euler_failed_row_count": 124,
+      "euler_unavailable_row_count": 0,
+      "composition": {
+        "available": true,
+        "file_present": true,
+        "status_counts": {
+          "CHECKED": 0,
+          "FAIL": 303,
+          "NOT_AVAILABLE": 0,
+          "PARTIAL": 0,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    {
+      "model_id": "GPPVA_TW",
+      "role": "crust_only",
+      "output_rows": 289,
+      "source_hashes": {
+        "eos.compo": "df43bf65190dacd23cec46f7a19b8a7bf2eaa473e756a302a22b27f7d6a8b387",
+        "eos.nb": "8775fff862b03ebca7d3fb23536ae43e5c576e3a1bbed70dd161abbf85f0bd6d",
+        "eos.t": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad",
+        "eos.thermo": "440293cd0a1ee55caaa029ef5b5b1db5240ecc3b697c51a288eb7125bc97de41",
+        "eos.yq": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad"
+      },
+      "native_full_table_diagnostics": {
+        "failed_checks": [],
+        "finite_primary_arrays": true,
+        "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11.",
+        "pass_": true,
+        "status": "PASS"
+      },
+      "mechanically_causal_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 219,
+          "last_row": 289,
+          "n_max_fm3": 0.074000001,
+          "n_min_fm3": 0.0040000002
+        }
+      ],
+      "thermodynamically_supported_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 219,
+          "last_row": 289,
+          "n_max_fm3": 0.074000001,
+          "n_min_fm3": 0.0040000002
+        }
+      ],
+      "first_interval_findings": {
+        "COARSE_SAMPLING": {
+          "cs2_over_c2_first_law_secant": 0.00011288582456090652,
+          "cs2_over_c2_secant": 0.00011288576752479421,
+          "left_row": 13,
+          "n_left_fm3": 5.08413e-09,
+          "n_right_fm3": 7.07088e-09,
+          "right_row": 14
+        },
+        "PHASE_BOUNDARY": {
+          "cs2_over_c2_first_law_secant": 0.0011067085601889559,
+          "cs2_over_c2_secant": 0.001106169033765875,
+          "left_row": 217,
+          "n_left_fm3": 0.000269021,
+          "n_right_fm3": 0.003,
+          "right_row": 218
+        }
+      },
+      "euler_failed_row_count": 0,
+      "euler_unavailable_row_count": 0,
+      "composition": {
+        "available": true,
+        "file_present": true,
+        "status_counts": {
+          "CHECKED": 0,
+          "FAIL": 289,
+          "NOT_AVAILABLE": 0,
+          "PARTIAL": 0,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    {
+      "model_id": "SPG_M1",
+      "role": "crust_only",
+      "output_rows": 365,
+      "source_hashes": {
+        "eos.compo": "8ce704b9af8a3a7a74e6985d9edc5481a8dc7a8b03e50f7b4d39c3d292dfec27",
+        "eos.nb": "46e5fb4504d3e53a6d61f210c1627234e34f8ed993fd54921299203756b0818c",
+        "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+        "eos.thermo": "20ef365b0fc9ff66b3b268c7f319d2d8dca0b782bd44a32612d3c4a82c8641e5",
+        "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554"
+      },
+      "native_full_table_diagnostics": {
+        "failed_checks": [],
+        "finite_primary_arrays": true,
+        "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11.",
+        "pass_": true,
+        "status": "PASS"
+      },
+      "mechanically_causal_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 218,
+          "last_row": 365,
+          "n_max_fm3": 0.07413102413,
+          "n_min_fm3": 0.002511886432
+        }
+      ],
+      "thermodynamically_supported_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 218,
+          "last_row": 365,
+          "n_max_fm3": 0.07413102413,
+          "n_min_fm3": 0.002511886432
+        }
+      ],
+      "first_interval_findings": {
+        "COARSE_SAMPLING": {
+          "cs2_over_c2_first_law_secant": 0.00011289784683455085,
+          "cs2_over_c2_secant": 0.00011289779071869394,
+          "left_row": 13,
+          "n_left_fm3": 5.08413e-09,
+          "n_right_fm3": 7.07088e-09,
+          "right_row": 14
+        },
+        "PHASE_BOUNDARY": {
+          "cs2_over_c2_first_law_secant": 0.0012340015538351383,
+          "cs2_over_c2_secant": 0.0012337129023900883,
+          "left_row": 217,
+          "n_left_fm3": 0.000269021,
+          "n_right_fm3": 0.002511886432,
+          "right_row": 218
+        }
+      },
+      "euler_failed_row_count": 0,
+      "euler_unavailable_row_count": 0,
+      "composition": {
+        "available": true,
+        "file_present": true,
+        "status_counts": {
+          "CHECKED": 0,
+          "FAIL": 365,
+          "NOT_AVAILABLE": 0,
+          "PARTIAL": 0,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    {
+      "model_id": "SPG_M2",
+      "role": "crust_only",
+      "output_rows": 377,
+      "source_hashes": {
+        "eos.compo": "b3e1d5aae1d7103817586b710ac8837e582d03f9d2a445acf994c3ba81e79a5f",
+        "eos.nb": "41351b355baac019927a66ca745ba2d4c90dbb6720c8aaed34a94cc9ab2307aa",
+        "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+        "eos.thermo": "0a90ad4fca400d66c8b86842adf45bb214ee335e34922ff47bdf5bafb8041221",
+        "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554"
+      },
+      "native_full_table_diagnostics": {
+        "failed_checks": [],
+        "finite_primary_arrays": true,
+        "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11.",
+        "pass_": true,
+        "status": "PASS"
+      },
+      "mechanically_causal_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 218,
+          "last_row": 377,
+          "n_max_fm3": 0.08912509381,
+          "n_min_fm3": 0.002290867653
+        }
+      ],
+      "thermodynamically_supported_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 218,
+          "last_row": 377,
+          "n_max_fm3": 0.08912509381,
+          "n_min_fm3": 0.002290867653
+        }
+      ],
+      "first_interval_findings": {
+        "COARSE_SAMPLING": {
+          "cs2_over_c2_first_law_secant": 0.00011289784683455085,
+          "cs2_over_c2_secant": 0.00011289779071869394,
+          "left_row": 13,
+          "n_left_fm3": 5.08413e-09,
+          "n_right_fm3": 7.07088e-09,
+          "right_row": 14
+        },
+        "PHASE_BOUNDARY": {
+          "cs2_over_c2_first_law_secant": 0.0013073762037890309,
+          "cs2_over_c2_secant": 0.0013071380438127319,
+          "left_row": 217,
+          "n_left_fm3": 0.000269021,
+          "n_right_fm3": 0.002290867653,
+          "right_row": 218
+        }
+      },
+      "euler_failed_row_count": 0,
+      "euler_unavailable_row_count": 0,
+      "composition": {
+        "available": true,
+        "file_present": true,
+        "status_counts": {
+          "CHECKED": 0,
+          "FAIL": 377,
+          "NOT_AVAILABLE": 0,
+          "PARTIAL": 0,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    {
+      "model_id": "SPG_M3",
+      "role": "crust_only",
+      "output_rows": 366,
+      "source_hashes": {
+        "eos.compo": "809a5540b1cc2a3a2c1623190258dbde73a491248ae37601f09b6a8ad7c02111",
+        "eos.nb": "d3eb5d66c2127f9a0a0879d27264187a847546bc8d60fc8ab69ee7bfe2e8924a",
+        "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+        "eos.thermo": "a73d22c35513224673b233a9e0349305868420a9d30f05efbd6d3e0daa81276e",
+        "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554"
+      },
+      "native_full_table_diagnostics": {
+        "failed_checks": [],
+        "finite_primary_arrays": true,
+        "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11.",
+        "pass_": true,
+        "status": "PASS"
+      },
+      "mechanically_causal_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 218,
+          "last_row": 366,
+          "n_max_fm3": 0.07943282347,
+          "n_min_fm3": 0.002630267992
+        }
+      ],
+      "thermodynamically_supported_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 218,
+          "last_row": 366,
+          "n_max_fm3": 0.07943282347,
+          "n_min_fm3": 0.002630267992
+        }
+      ],
+      "first_interval_findings": {
+        "COARSE_SAMPLING": {
+          "cs2_over_c2_first_law_secant": 0.00011289784683455085,
+          "cs2_over_c2_secant": 0.00011289779071869394,
+          "left_row": 13,
+          "n_left_fm3": 5.08413e-09,
+          "n_right_fm3": 7.07088e-09,
+          "right_row": 14
+        },
+        "PHASE_BOUNDARY": {
+          "cs2_over_c2_first_law_secant": 0.0012272427383800291,
+          "cs2_over_c2_secant": 0.0012269476895147803,
+          "left_row": 217,
+          "n_left_fm3": 0.000269021,
+          "n_right_fm3": 0.002630267992,
+          "right_row": 218
+        }
+      },
+      "euler_failed_row_count": 0,
+      "euler_unavailable_row_count": 0,
+      "composition": {
+        "available": true,
+        "file_present": true,
+        "status_counts": {
+          "CHECKED": 0,
+          "FAIL": 366,
+          "NOT_AVAILABLE": 0,
+          "PARTIAL": 0,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    {
+      "model_id": "SPG_M4",
+      "role": "crust_only",
+      "output_rows": 375,
+      "source_hashes": {
+        "eos.compo": "37f2e38debd22a77f0e938b87da7f4067cecd7faee3b80fc02f3b2bfdb595377",
+        "eos.nb": "2c80615495ce6cd1837b84651e35ad160b8f749abd981115a124b211aa8c2cc9",
+        "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+        "eos.thermo": "9da4c2a40b478f64a4c06abb50881be23dd4060ff60bc9f69118be0636114517",
+        "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554"
+      },
+      "native_full_table_diagnostics": {
+        "failed_checks": [],
+        "finite_primary_arrays": true,
+        "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11.",
+        "pass_": true,
+        "status": "PASS"
+      },
+      "mechanically_causal_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 218,
+          "last_row": 375,
+          "n_max_fm3": 0.0977237221,
+          "n_min_fm3": 0.002630267992
+        }
+      ],
+      "thermodynamically_supported_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 218,
+          "last_row": 375,
+          "n_max_fm3": 0.0977237221,
+          "n_min_fm3": 0.002630267992
+        }
+      ],
+      "first_interval_findings": {
+        "COARSE_SAMPLING": {
+          "cs2_over_c2_first_law_secant": 0.00011289784683455085,
+          "cs2_over_c2_secant": 0.00011289779071869394,
+          "left_row": 13,
+          "n_left_fm3": 5.08413e-09,
+          "n_right_fm3": 7.07088e-09,
+          "right_row": 14
+        },
+        "PHASE_BOUNDARY": {
+          "cs2_over_c2_first_law_secant": 0.0012617937369353365,
+          "cs2_over_c2_secant": 0.0012615258304414603,
+          "left_row": 217,
+          "n_left_fm3": 0.000269021,
+          "n_right_fm3": 0.002630267992,
+          "right_row": 218
+        }
+      },
+      "euler_failed_row_count": 0,
+      "euler_unavailable_row_count": 0,
+      "composition": {
+        "available": true,
+        "file_present": true,
+        "status_counts": {
+          "CHECKED": 0,
+          "FAIL": 375,
+          "NOT_AVAILABLE": 0,
+          "PARTIAL": 0,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    {
+      "model_id": "SPG_M5",
+      "role": "crust_only",
+      "output_rows": 363,
+      "source_hashes": {
+        "eos.compo": "c70fd7a101298ca363a4c928ce531b9f2dd33ca747209a3a994fb74747bef1b1",
+        "eos.nb": "e5c832b3f326885838ef1830c9d3e5f2389d106ca1b3a6398bb12d570599d12a",
+        "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+        "eos.thermo": "ce749823d0c6f5e48f046e4bd992507f1f384e2068ae93590aa3a953700aaabc",
+        "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554"
+      },
+      "native_full_table_diagnostics": {
+        "failed_checks": [],
+        "finite_primary_arrays": true,
+        "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11.",
+        "pass_": true,
+        "status": "PASS"
+      },
+      "mechanically_causal_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 218,
+          "last_row": 363,
+          "n_max_fm3": 0.07079457844,
+          "n_min_fm3": 0.002511886432
+        }
+      ],
+      "thermodynamically_supported_segments": [
+        {
+          "first_row": 1,
+          "last_row": 13,
+          "n_max_fm3": 5.08413e-09,
+          "n_min_fm3": 4.67962e-10
+        },
+        {
+          "first_row": 23,
+          "last_row": 217,
+          "n_max_fm3": 0.000269021,
+          "n_min_fm3": 1.61673e-07
+        },
+        {
+          "first_row": 218,
+          "last_row": 363,
+          "n_max_fm3": 0.07079457844,
+          "n_min_fm3": 0.002511886432
+        }
+      ],
+      "first_interval_findings": {
+        "COARSE_SAMPLING": {
+          "cs2_over_c2_first_law_secant": 0.00011289784683455085,
+          "cs2_over_c2_secant": 0.00011289779071869394,
+          "left_row": 13,
+          "n_left_fm3": 5.08413e-09,
+          "n_right_fm3": 7.07088e-09,
+          "right_row": 14
+        },
+        "PHASE_BOUNDARY": {
+          "cs2_over_c2_first_law_secant": 0.0012258198947562172,
+          "cs2_over_c2_secant": 0.0012255402862258972,
+          "left_row": 217,
+          "n_left_fm3": 0.000269021,
+          "n_right_fm3": 0.002511886432,
+          "right_row": 218
+        }
+      },
+      "euler_failed_row_count": 0,
+      "euler_unavailable_row_count": 0,
+      "composition": {
+        "available": true,
+        "file_present": true,
+        "status_counts": {
+          "CHECKED": 0,
+          "FAIL": 363,
+          "NOT_AVAILABLE": 0,
+          "PARTIAL": 0,
+          "UNKNOWN": 0
+        }
+      }
+    }
+  ]
+}

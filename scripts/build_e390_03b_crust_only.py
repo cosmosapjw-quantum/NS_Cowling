@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the twelve source-admitted E390-03B crust-only CompOSE components."""
+"""Build the thirteen source-admitted E390-03B crust-only CompOSE components."""
 from __future__ import annotations
 
 import json
@@ -21,14 +21,14 @@ def main() -> int:
     expected = {
         "SPG_M1": 365, "SPG_M2": 377, "SPG_M3": 366, "SPG_M4": 375, "SPG_M5": 363,
         "GPPVA_DD2": 283, "GPPVA_DDME2": 288, "GPPVA_FSU2": 269, "GPPVA_FSU2H": 300,
-        "GPPVA_FSU2R": 296, "GPPVA_NL3wrL55": 298, "GPPVA_TM1e": 303,
+        "GPPVA_FSU2R": 296, "GPPVA_NL3wrL55": 298, "GPPVA_TM1e": 303, "GPPVA_TW": 289,
     }
     observed = {item["model_id"]: item["output"]["n"] for item in receipts}
     if observed != expected:
         raise RuntimeError(f"E390-03B cohort mismatch: {observed!r}")
     if manifest.get("status") != "ALL_ADMITTED_CRUST_COMPONENTS_CONSTRUCTED_NATIVE_READBACK_VERIFIED":
         raise RuntimeError(f"E390-03B manifest is not certified: {manifest.get('status')!r}")
-    if manifest.get("total_output_rows") != 3883:
+    if manifest.get("total_output_rows") != 4172:
         raise RuntimeError(f"E390-03B output-row total mismatch: {manifest.get('total_output_rows')!r}")
     print(json.dumps({
         "status": "E390-03B_CRUST_ONLY_ARTIFACTS_BUILT",

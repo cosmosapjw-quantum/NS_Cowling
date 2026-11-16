@@ -459,13 +459,21 @@ def solve_homogeneous(model: RMFModel, rho_B: float, rho_p: float,
     # parameter tables. SPG_GOGELEIN follows Scurto et al. (2024), where the
     # isovector vertex is written with an explicit 1/2. The rho rearrangement
     # contribution must use the same convention as the vector self-energy.
-    rho_iso_factor = 1.0 if model.functional_form == "DD2_TYYPEL_RATIONAL" else 0.5
+    # The energy density above uses b = g_rho rho_3 / m_rho^2 and
+    # E ⊃ (1/2) m_rho^2 b^2 for every functional form (this is the form that
+    # reproduces the SPG symmetry energy J = 32.1 MeV).  Hellmann-Feynman then
+    # fixes mu_{n,p} ∓ g_rho b and Sigma^R_rho = (dg_rho/drho) b rho_3 with
+    # factor 1; an explicit-1/2 vertex would have to change the field and the
+    # energy as well.  Verified by test_rmf_chemical_potential_consistency.
+    rho_iso_factor = 1.0
     sigma_R = (dgw * omega0 * rho_B
                + rho_iso_factor * dgr * rho03 * (rho_p - rho_n)
                - dgs * sigma0 * (rs_n + rs_p) / HBARC ** 3)
     if has_delta:
         dgd = model.dg_drho_fm("delta", rho_B_M)
-        sigma_R += 0.5 * dgd * delta0 * (rs_p - rs_n) / HBARC ** 3
+        # M*_n = M - g_s sigma + g_d delta, M*_p = M - g_s sigma - g_d delta
+        # => dE/dg_d (fields fixed) = delta (rho_s,n - rho_s,p).
+        sigma_R += -dgd * delta0 * (rs_p - rs_n) / HBARC ** 3
 
     En_n = math.sqrt(kF_n ** 2 + Mstar_n ** 2)
     En_p = math.sqrt(kF_p ** 2 + Mstar_p ** 2)

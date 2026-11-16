@@ -69,7 +69,8 @@ class RadialGrid:
 def _band_solve(matrix,rhs):
     n=len(rhs); band=np.zeros((3,n))
     band[0,1:]=np.diag(matrix,1);band[1]=np.diag(matrix);band[2,:-1]=np.diag(matrix,-1)
-    return solve_banded((1,1),band,rhs,check_finite=False)
+    # LAPACK solves in float64; retain extended precision in the caller.
+    return solve_banded((1,1),band,np.asarray(rhs,dtype=np.float64),check_finite=False)
 
 
 def _coupled_band_solve(jw,jr,cross,rw,rr):

@@ -1,0 +1,52 @@
+.FF..........                                                            [100%]
+=================================== FAILURES ===================================
+____ test_pressure_from_independent_source_energy[4e-06-32-82--65.415-4.12] ____
+
+ne = 4e-06, z = 32, a = 82, excess = -65.415, radius = 4.12
+
+    @pytest.mark.parametrize("ne,z,a,excess,radius",[
+        (5e-10,26,56,-60.607082,3.756),(4e-6,32,82,-65.415,4.12),
+        (8e-5,38,128,63.45,4.72)])
+    def test_pressure_from_independent_source_energy(ne,z,a,excess,radius):
+        import mpmath as m
+        with m.workdps(60):
+            n=m.mpf(str(ne))
+            # Keep mpmath argument exact through the source function.
+            fun=lambda q:source_energy(q,z,a,excess,radius)
+            en=fun(n); pressure=n*m.diff(fun,n)-en
+            actual=oc.isotope_state(ne,z,a,excess,radius)
+>           assert actual["epsilon"]==pytest.approx(float(en),rel=3e-13)
+E           assert 0.009565428651467058 == 0.009565428623239452 ± 1.0e-12
+E             
+E             comparison failed
+E             Obtained: 0.009565428651467058
+E             Expected: 0.009565428623239452 ± 1.0e-12
+
+python_frontend/tests/test_outer_crust.py:43: AssertionError
+____ test_pressure_from_independent_source_energy[8e-05-38-128-63.45-4.72] _____
+
+ne = 8e-05, z = 38, a = 128, excess = 63.45, radius = 4.72
+
+    @pytest.mark.parametrize("ne,z,a,excess,radius",[
+        (5e-10,26,56,-60.607082,3.756),(4e-6,32,82,-65.415,4.12),
+        (8e-5,38,128,63.45,4.72)])
+    def test_pressure_from_independent_source_energy(ne,z,a,excess,radius):
+        import mpmath as m
+        with m.workdps(60):
+            n=m.mpf(str(ne))
+            # Keep mpmath argument exact through the source function.
+            fun=lambda q:source_energy(q,z,a,excess,radius)
+            en=fun(n); pressure=n*m.diff(fun,n)-en
+            actual=oc.isotope_state(ne,z,a,excess,radius)
+>           assert actual["epsilon"]==pytest.approx(float(en),rel=3e-13)
+E           assert 0.2526042392104447 == 0.25260423895378303 ± 1.0e-12
+E             
+E             comparison failed
+E             Obtained: 0.2526042392104447
+E             Expected: 0.25260423895378303 ± 1.0e-12
+
+python_frontend/tests/test_outer_crust.py:43: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_outer_crust.py::test_pressure_from_independent_source_energy[4e-06-32-82--65.415-4.12]
+FAILED python_frontend/tests/test_outer_crust.py::test_pressure_from_independent_source_energy[8e-05-38-128-63.45-4.72]
+2 failed, 11 passed in 1.74s

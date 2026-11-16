@@ -52,6 +52,19 @@ jobs:
           COMPOSE_EOS_FORTRAN_ROOT: .
           COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
         run: python -m pytest -q python_frontend/tests pipeline/tests
+      - name: Regenerate all five composition-aware core models
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+        run: python scripts/generate_core_eos.py build/independent_core_generation
+      - name: Preserve independent core regeneration evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: independent-core-regeneration-${{ github.sha }}
+          path: build/independent_core_generation/
+          if-no-files-found: error
+          retention-days: 30
       - name: Install EOS generator package and test dependencies
         run: python -m pip install -e 'eos_generator/compose_eos_pkg[test]'
 

@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-16",
+  "base_commit": "c8ff2d6c97a93f1ccf621051861d3091bfe94d81",
+  "scope": "Primary-source screened nucleonic finite-range RMF TF inner-crust functional and independent implementation checks for8GPPVAmodels",
+  "status": "PASS_SCOPED_FUNCTIONAL; full equilibrium campaign status is external",
+  "prior_evidence_reused": [
+    "docs/research_generator_20261116/crust_literature.md",
+    "data/research_generator_20261116/crust_literature.json"
+  ],
+  "research_services": [
+    "SciSpace: scholarly identity/source discovery",
+    "Parallel: primary-source search and extraction",
+    "Direct arXiv HTML retrieval: preserved raw SHA256"
+  ],
+  "source_artifacts_committed": false,
+  "sources": [
+    {
+      "id": "grill2014",
+      "url": "https://arxiv.org/html/1404.2753",
+      "title": "Equation of state and thickness of the inner crust of neutron stars",
+      "bibliography": "Phys. Rev. C 90, 045803 (2014)",
+      "sha256": "f2855907bf3d340d0a846bab3a4c50d16b4360cfccac504c641376659ba5bb7c",
+      "bytes": 523226,
+      "file": "build/tf_literature/1404.2753.html",
+      "role": "GPPVA TF framework; homogeneous comparison; transition and tabular diagnostic benchmarks",
+      "locators": [
+        "Sec. II",
+        "Sec. III",
+        "Tables 3\u20135"
+      ]
+    },
+    {
+      "id": "pais2016",
+      "url": "https://arxiv.org/html/1607.05899",
+      "title": "The Vlasov formalism for extended relativistic mean field models: the crust-core transition and the stellar matter equation of state",
+      "sha256": "8447a502265fb89e34f14e409fe34ab03bbeaf9d1cc37f6649f7f08173771c0b",
+      "bytes": 687311,
+      "file": "build/tf_literature/1607.05899.html",
+      "role": "Additional nonlinear model/pasta framework and tabulated independent diagnostics; not all8 parameter identity"
+    },
+    {
+      "id": "avancini2009",
+      "url": "https://arxiv.org/html/0812.3170",
+      "title": "The pasta phase within density dependent hadronic models",
+      "bibliography": "Phys. Rev. C 79, 035804 (2009)",
+      "sha256": "9793fb1a10ec5f24d336565b3a3dd6ec27b5bc188d1bf6e58beab07ebb57c632",
+      "bytes": 354896,
+      "file": "build/tf_literature/0812.3170.html",
+      "role": "Explicit off-shell functional, local screened electrons, chemical potentials; uniform electrons only in distinct CP approximation",
+      "locators": [
+        "Sec. IV",
+        "Eqs. 53\u201361"
+      ]
+    },
+    {
+      "id": "avancini2010",
+      "url": "https://arxiv.org/html/1010.3644",
+      "title": "Warm pasta phase in the Thomas-Fermi approximation",
+      "bibliography": "Phys. Rev. C 82, 055807 (2010); erratum Phys. Rev. C 85, 059904 (2012)",
+      "sha256": "c24625c1582e40cba42403e0c1898dd4ed24146ea9f936120e9ac180a47351fd",
+      "bytes": 328870,
+      "file": "build/tf_literature/1010.3644.html",
+      "role": "Local electron effective chemical potential; local DD rearrangement",
+      "locators": [
+        "Eqs. 9\u201311"
+      ],
+      "caveat": "Erratum checked in acquired full text: CP code incorrectly used zero-temperature surface tension at finite T, and CP surface parametrization should use global Yp. TF results unchanged except two finite-T T=5MeV Yl=.4 pressure misprints; zero-T field/rearrangement equations unchanged.",
+      "resolved_version": "v3, 11May2012, includes original paper and erratum"
+    },
+    {
+      "id": "maruyama2005",
+      "url": "https://arxiv.org/html/nucl-th/0503027",
+      "title": "Nuclear pasta structures and the charge screening effect",
+      "bibliography": "Phys. Rev. C 72, 015802 (2005)",
+      "sha256": "798e664ac3d99e9571d2d15fe50be428d1786854df358ed28863593451da5339",
+      "file": "build/tf_literature/maruyama2005.html",
+      "role": "WS boundary conditions, allfive topologies, electron screening, finite-range gradients, radius diagnostic",
+      "locators": [
+        "Sec. II",
+        "Eq. 15"
+      ],
+      "bytes": 213646
+    },
+    {
+      "id": "baoshen2014",
+      "url": "https://arxiv.org/html/1410.0851v2",
+      "title": "Effects of the symmetry energy on properties of neutron star crusts\nnear the neutron drip density",
+      "sha256": "25b6176cc49d01a23b1297b43540edbca0d2c74b838e3eb022f1b812e35ed1f0",
+      "bytes": 345684,
+      "file": "build/tf_literature/1410.0851v2.html",
+      "role": "Counterexample showing uniform-electron TF is a different approximation; not substituted for GPPVA screened TF"
+    }
+  ],
+  "claims": [
+    {
+      "id": "electrons_local",
+      "state": "literature-supported",
+      "sources": [
+        "avancini2009",
+        "avancini2010"
+      ],
+      "claim": "TF electrons are spatially variable; equilibrium EFe(r)-V(r)=constant; uniform electrons are not the same approximation."
+    },
+    {
+      "id": "rearrangement_local",
+      "state": "literature-supported and derived",
+      "sources": [
+        "avancini2010"
+      ],
+      "claim": "g couplings depend on local baryon density; common SigmaR=gomega_prime*omega*n+grho_prime*rho*n3/2-gsigma_prime*phi*ns."
+    },
+    {
+      "id": "field_gradients",
+      "state": "literature-supported and derived",
+      "sources": [
+        "avancini2009"
+      ],
+      "claim": "Off-shell scalar gradient positive, time-like vector/Coulomb gradients negative; Coulomb energy positive after Poisson elimination."
+    },
+    {
+      "id": "neumann_ws",
+      "state": "literature-supported",
+      "sources": [
+        "maruyama2005"
+      ],
+      "claim": "Regular centre and zero boundary field gradients; global neutrality supplies Neumann Poisson solvability; meanV=0 fixes gauge."
+    },
+    {
+      "id": "radius_virial",
+      "state": "derived and numerically checked",
+      "sources": [],
+      "claim": "At fixed scaled profiles d epsilon/d logR=-2Gsigma+2Gomega+2Grho+2EC; finite differences checked for8models\u00d73dimensions."
+    },
+    {
+      "id": "pressure",
+      "state": "derived",
+      "sources": [],
+      "claim": "P=nB*muB-epsilon valid for fully optimized neutral beta-equilibrium branch; independent density finite differences and branch handling still required."
+    },
+    {
+      "id": "composition",
+      "state": "derived",
+      "sources": [
+        "maruyama2005"
+      ],
+      "claim": "Mean species fractions are unambiguous; spherical cell counts include dripped neutrons; finite A/Z for rods/slabs requires an additional longitudinal convention."
+    },
+    {
+      "id": "source_scope",
+      "state": "literature-supported",
+      "sources": [
+        "grill2014"
+      ],
+      "claim": "FSU2H crust nucleonic; source crust npe approximation must monitor muon onset; no outer crust nuclear mass fidelity claim."
+    },
+    {
+      "id": "parameter_conventions",
+      "state": "literature-supported and implementation-verified through separate bulk review",
+      "sources": [],
+      "claim": "DD rho normalization factor2; FSU g\u00b2 inputs; revisedFSU2R Lambda.045; unscaledNL3 scalar nonlinear coefficients; TM1e phi=-sigma cubic sign conversion. Primary parameter provenance reused from prior crust literature and gppva_rmf source registry."
+    }
+  ],
+  "implementation_review": {
+    "script": "data/research_completion_20261116/tf_review/check_functional.py",
+    "receipt": "data/research_completion_20261116/tf_review/functional_review.json",
+    "log": "data/research_completion_20261116/tf_review/functional_review.log",
+    "state": "implementation-verified",
+    "coverage": "18 kinetic quadrature cases;24 nonuniform profiles(all8models\u00d73dimensions), three species directional derivatives and radius derivative each;24 homogeneous reductions;weightedPoisson checks",
+    "exclusions": [
+      "not a mesh convergence proof",
+      "not an equilibrium/profile optimization review",
+      "not a global minimum proof",
+      "not complete density coverage",
+      "not an outer crust or core-crust join result"
+    ],
+    "harness_incident": "Initial independent review harness failed while serializing NumPy bools; fixed using scalar .item(); preserved as review_harness_serialization_error.log. This was a review harness runtime error, not a physics implementation failure."
+  },
+  "unresolved": [
+    "Exact producer cluster/gas decomposition for diffuse profiles",
+    "Every-model full density/mesh/radius/initialization convergence",
+    "Every-model thermodynamic pressure finite differences; DDME2 one spherical branch checked",
+    "Published source hbarc/parameterprecision explanation of small bulk NMP offsets",
+    "DDME2 at n=.03: source Table4 energy per baryon offset about .60MeV and pressure difference .409%; exact source normalization/physical origin unresolved, no fit applied"
+  ],
+  "admission_policy": "Never gate solely on100percentCompOSEmatch or discard supported low-densitymodel branch merely because continuation is acausal. Separate source convention differences, implementation failures, numerical convergence and model applicability.",
+  "optimized_branch_review": {
+    "state": "numerically checked",
+    "receipt": "data/research_completion_20261116/tf_review/optimized_branch_review.json",
+    "script": "data/research_completion_20261116/tf_review/check_optimized_branch.py",
+    "log": "data/research_completion_20261116/tf_review/optimized_branch_review.log",
+    "scope": "One independently optimized spherical DDME2 branch; no geometry-global or full-density claim",
+    "summary": {
+      "coarse_status": "STATIONARY",
+      "fine_status": "STATIONARY",
+      "coarse_pressure": 0.07935290539131756,
+      "fine_pressure": 0.07938262340650226,
+      "mesh_pressure_relative_change": 0.00037436423627018264,
+      "coarse_energy_per_baryon": 943.7908358818439,
+      "fine_energy_per_baryon": 943.791153153375,
+      "mesh_energy_change_MeV": 0.000317271531116603,
+      "fine_kkt_MeV": 0.0002503713458565926,
+      "fine_radius_stationarity_MeV": 5.5450927125462925e-09,
+      "source_pressure_relative_difference": 0.004092747003886027,
+      "source_energy_relative_difference": -0.0006381023744409963,
+      "pressure_derivative_relative_differences": [
+        2.55607198180265e-07,
+        2.7703985129922966e-08
+      ]
+    }
+  }
+}

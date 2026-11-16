@@ -1,0 +1,50 @@
+.............................F.F                                         [100%]
+=================================== FAILURES ===================================
+__________ test_screened_electrons_stale_empty_gauge_shifted_guess[1] __________
+
+dimension = 1
+
+    @pytest.mark.parametrize("dimension",[1,2,3])
+    def test_screened_electrons_stale_empty_gauge_shifted_guess(dimension):
+        from compose_eos.spatial_tf import ELECTRON_MASS
+        g=RadialGrid(32,dimension);protons=.003*(1+.8*np.cos(np.pi*g.x))
+        reference=screened_electrons(g,protons,35.)
+        for potential,mu in [(np.zeros(32),ELECTRON_MASS),
+                             (np.full(32,100.),ELECTRON_MASS-100.)]:
+            actual=screened_electrons(g,protons,35.,initial=(potential,mu))
+            assert actual[0]==pytest.approx(reference[0],rel=2e-10,abs=1e-13)
+            assert actual[1]==pytest.approx(reference[1],rel=2e-10,abs=1e-10)
+>           assert actual[2]==pytest.approx(reference[2],abs=1e-10)
+E           assert 87.93628874835176 == 87.93628874814227 ± 1.0e-10
+E             
+E             comparison failed
+E             Obtained: 87.93628874835176
+E             Expected: 87.93628874814227 ± 1.0e-10
+
+python_frontend/tests/test_spatial_tf_equilibrium.py:85: AssertionError
+__________ test_screened_electrons_stale_empty_gauge_shifted_guess[3] __________
+
+dimension = 3
+
+    @pytest.mark.parametrize("dimension",[1,2,3])
+    def test_screened_electrons_stale_empty_gauge_shifted_guess(dimension):
+        from compose_eos.spatial_tf import ELECTRON_MASS
+        g=RadialGrid(32,dimension);protons=.003*(1+.8*np.cos(np.pi*g.x))
+        reference=screened_electrons(g,protons,35.)
+        for potential,mu in [(np.zeros(32),ELECTRON_MASS),
+                             (np.full(32,100.),ELECTRON_MASS-100.)]:
+            actual=screened_electrons(g,protons,35.,initial=(potential,mu))
+            assert actual[0]==pytest.approx(reference[0],rel=2e-10,abs=1e-13)
+            assert actual[1]==pytest.approx(reference[1],rel=2e-10,abs=1e-10)
+>           assert actual[2]==pytest.approx(reference[2],abs=1e-10)
+E           assert 70.50428238213603 == 70.50428238227438 ± 1.0e-10
+E             
+E             comparison failed
+E             Obtained: 70.50428238213603
+E             Expected: 70.50428238227438 ± 1.0e-10
+
+python_frontend/tests/test_spatial_tf_equilibrium.py:85: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_spatial_tf_equilibrium.py::test_screened_electrons_stale_empty_gauge_shifted_guess[1]
+FAILED python_frontend/tests/test_spatial_tf_equilibrium.py::test_screened_electrons_stale_empty_gauge_shifted_guess[3]
+2 failed, 30 passed in 3.39s

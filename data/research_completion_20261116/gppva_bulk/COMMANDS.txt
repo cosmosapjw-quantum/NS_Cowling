@@ -1,0 +1,17 @@
+Base c8ff2d6c97a93f1ccf621051861d3091bfe94d81; dirty new source hashes are in SUMMARY.json
+PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=/tmp/ns_cowling_regen_674aa04/build/compose_eos_fortran/compose_eos_fortran python3 scripts/verify_gppva_bulk.py build/gppva_bulk_campaign_final
+PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=/tmp/ns_cowling_regen_674aa04/build/compose_eos_fortran/compose_eos_fortran python3 -m pytest -q python_frontend/tests/test_gppva_rmf.py
+Both commands completed exit0; campaign stdout and test log retained. Final tests have explicit rel=0 for absolute derivative/closure thresholds.
+
+PYTHONPATH=python_frontend python3 data/research_completion_20261116/gppva_bulk/reproduce_beta_boundary.py > data/research_completion_20261116/gppva_bulk/beta_boundary_reproduction.json
+
+Independent screened-electron review (all exit 0 on final hash):
+PYTHONPATH=python_frontend OPENBLAS_NUM_THREADS=1 python3 data/research_completion_20261116/gppva_bulk/review_screened_electrons.py data/research_completion_20261116/gppva_bulk/screened_functional_review.json
+PYTHONPATH=python_frontend OPENBLAS_NUM_THREADS=1 python3 data/research_completion_20261116/gppva_bulk/review_screened_warmstarts.py data/research_completion_20261116/gppva_bulk/screened_warmstart_review.json
+PYTHONPATH=python_frontend OPENBLAS_NUM_THREADS=1 python3 data/research_completion_20261116/gppva_bulk/review_screened_repairs.py data/research_completion_20261116/gppva_bulk/screened_repair_review.json
+
+PYTHONPATH=python_frontend OPENBLAS_NUM_THREADS=1 python3 data/research_completion_20261116/gppva_bulk/review_screened_campaign.py build/spatial_tf/campaign_refined data/research_completion_20261116/gppva_bulk/screened_campaign_review.json
+Final all8 selected-profile review completed exit 0; source and compressed input hashes retained.
+
+PYTHONPATH=python_frontend OPENBLAS_NUM_THREADS=1 python3 data/research_completion_20261116/gppva_bulk/review_screened_campaign.py build/spatial_tf/campaign_final data/research_completion_20261116/gppva_bulk/screened_campaign_review.json
+Final 226-profile review completed exit 0. On a fresh checkout, pass data/research_completion_20261116/gppva_tf/final as the input folder and a fresh output path.

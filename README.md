@@ -2,6 +2,8 @@
 
 The default numerical path is Fortran. The Python frontend exposes CompOSE reading/writing, EOS thermodynamic verification, normalized EOS export, TOV solves and relativistic Cowling f/p1 calculations. See docs/FORTRAN_PYTHON_FRONTEND_V4.md and docs/FORTRAN_EOS_FEATURE_PARITY.md.
 
+Current independent EOS regeneration work is documented in [the 2026-11-16 completion-loop report](docs/research_completion_20261116/REPORT_KO.md), [per-model coverage](data/research_completion_20261116/MODEL_COVERAGE.json), and [replay commands](docs/research_completion_20261116/REPRODUCE.md). These research generators evaluate declared physical models in Python and export through native Fortran I/O. Their implementation, numerical support and original-table agreement are assessed separately; exact CompOSE matching is not an unconditional pass criterion. The production Fortran-port objective remains a distinct engineering task.
+
 Install and test:
 
     python -m pip install -e .

@@ -169,3 +169,57 @@ this is a sub-MeV Hamiltonian difference that normalization cannot remove.
 For DD2/SPG it is a 3e-5 MeV difference of tabulated constants; admitting it
 would require an explicit, labelled decision on mass-constant equivalence,
 not a tolerance change. No coexistence result is claimed or excluded.
+
+## Continuation 2026-11-16: SPG Hamiltonian fixes, v5 crusts, stellar integration
+
+| Defect (counterexample) | Correction | Commit |
+|---|---|---|
+| SPG parameter sets recorded no nucleon mass; solver used 939.56536/938.27203 although Gögelein 2008 and the CompOSE 317/319 exports use 938.9/938.9 | source-backed `nucleon_masses_MeV` with citation per set | `ebd4967` |
+| SPG μ_n differed from dε/dn by 4–44 MeV (pure neutron matter: E/A rising, μ_n − m falling to −18.6 MeV); energy used the no-½ isovector convention, μ and rearrangement the explicit-½ one; δ rearrangement had the wrong sign | one convention (the energy's, which reproduces J = 32.1 MeV); new regression μ_i = ∂ε/∂n_i for 6 models × 4 states | `7d4d0e5` |
+| receipt compared μ_B with the cluster *bulk* μ_n (3 MeV apart) and called it non-equilibrium | judge by the gas μ_n (variational optimum); DD2 agrees to 0.06 MeV | `9c3f5fd` |
+| v4 SPG tables: gas μ_n vs μ_B off by up to 37 MeV | writer refuses |μ_n,gas − μ_B|/μ_B > 5e-4 | gas-equilibrium gate commit |
+| adapter compared the two jump rows bit-exactly; TW+GM1 differed by one ulp after read-back | declared 1e-10 pressure gate | `f90a476` |
+| `MaxwellEOS` anchored the low branch at the surface, so the CLD knot drift (5e-6) landed on the coexistence check (2e-8) | each phase anchored at the interface; far-end drift reported | `6a3aaf3` |
+
+**v5 crusts** (byte-identical rerun under the gate): SPG_M1 16 rows, SPG_M5 15,
+GPPVA_DD2 19, DDME2 14, TW 14 (GPPVA identical to v4 — a control); SPG_M3
+rejected; SPG_M2/M4 not generated. Gas-equilibrium audit: ≤ 0.17 MeV
+(`CLD_GAS_EQUILIBRIUM_v5.json`; v4 receipt shows the 37 MeV SPG failure).
+
+**Census `a05d0c9`** (`CENSUS_a05d0c9.json`, manifest `1bbb2f0a…5fb1`):
+80/50 evaluated, **8 CSS survivors** {SPG_M1, GPPVA_DD2, DDME2, TW} ×
+{BBB_BHF2, GM_GM1}; 0 Maxwell. SPG_M5 now fails the native crust-endpoint
+sound-speed check: its CLD crust softens to c_s² ≈ 8e-5 near n_B = 0.039
+(dμ/dn → 2.5 MeV fm³), an onset of mechanical instability in the model.
+
+**Stellar integration** (`CSS_SURVIVOR_STARS_a05d0c9.json`, adapter
+`compose_cowling.css_adapter`): all 8 survivors integrated with the
+phase-segmented TOV and slow/rapid Cowling path. M_max follows the core
+(1.916 M☉ BBB_BHF2, 2.385 M☉ GM1). For the 1.4 M☉ star one zero-node l=2
+root lies in 800–4000 Hz (1.91–1.93 kHz with GM1, 2.55 kHz with BBB); slow
+and rapid conversion differ by 0.1–0.6 Hz because the crust–CSS jump sits at
+P_t ≤ 0.3 MeV fm⁻³. Radii are truncation radii (no outer crust; 1.4 M☉:
+10.76–13.21 km). Roots are not labelled as f/p modes.
+
+**RG cores**: provider Q5 is a density-independent μ_l (1.2996 MeV SLy4,
+0.56698 MeV KDE0v1) on every row — a convention offset rather than a
+β-equilibrium residual. The provider sheets do not define it; the 1e-8
+contract is not overridden. Needs provider clarification.
+
+### DAG status after this continuation
+
+Updated (`scripts/update_dags_20261116.py`, previous status kept in
+`status_history`): CLOUD-00, EOS-03, EOS-04, EOS-06, COW-02, COW-07; E390-03,
+E390-05, E390-05A, E390-06.
+
+Not executed, with the binding reason:
+
+| Node(s) | Reason |
+|---|---|
+| COW-03, COW-04, COW-05, COW-06 | research-scale Abel–Liouville / LA10–LA11 derivations and mode identity; no executable acceptance without new mathematics |
+| COW-01 | synthetic reference only; live source branch requires COW-02 profile export |
+| EOS-07/08/09, E390-07/08/09, RELEASE-00 | full 390-case campaign depends on EOS-05 smooth kernels on admitted sources, provider semantics (EOS-02A) and the source admission above |
+| EOS-01, EOS-01A/01C, EOS-03A/03B, E390-01A/01C/03A/03B | model-boundary and provider-semantics adjudication; GPPVA_TW source blocked; raw M0 inputs not staged |
+| EOS-02A, EOS-10, E390-10B, E390-02 | per-row composition masks and the composition tensor; composition-aware Maxwell v2 depends on them |
+| EOS-05, E390-04 | smooth Hermite kernels on admitted crust/core sources; current admitted crusts are CLD composites without outer crust |
+| Outer-crust splice (EOS-04 remaining) | CLD tables start at 1e-3 fm⁻³; a source-backed outer crust and its splice contract are needed before physical radii |

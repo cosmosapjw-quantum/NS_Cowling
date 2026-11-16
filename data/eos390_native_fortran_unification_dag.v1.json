@@ -641,7 +641,7 @@
         "E390-03A",
         "E390-03B"
       ],
-      "status": "RESOLVED_20261114_NATIVE_DDRMF_CLD_TF_GAS_COMPOSITION_PASS_COMPOSE_CLOSURE_PASS",
+      "status": "RESOLVED_20261114_NATIVE_DDRMF_CLD_TF_GAS_COMPOSITION_PASS_COMPOSE_CLOSURE_PASS__20261116_PYTHON_CLD_COMPOSE_WRITER_DEFECT_FIXED_V5",
       "outputs": [
         "native DD-RMF homogeneous symmetry energy, beta-equilibrium and electron/muon branch diagnostics (DELIVERED, b3d80cc)",
         "native CLD cell composition reconstruction for GPPVA_DD2/DDME2/TW over the inner-crust density grid (DELIVERED: 3 models x 20 points = 60 rows, 5 physics invariants PASS; Scurto 2024 CLD on the Fortran DD-RMF solver; Lattimer surface tension, RPW Coulomb lattice, Nelder-Mead 3-var)",
@@ -699,6 +699,16 @@
         "python_normalizer_max_abs_diff": 0.0,
         "readback_verified_all": true,
         "scope_boundary_retained": "reconstruct_compo_closure_ws / reconstruct-compo-native performs row-wise algebraic CompOSE C3/C4 abundance closure reconstruction from raw provider group tuples (SPG_M1..M5, GPPVA_*) with independent native readback and deterministic FNV-1a hashing; it is NOT a self-consistent spatial Thomas-Fermi density-profile solver or variational pasta phase minimization, and multi-T/full-tensor CompOSE writing remains unimplemented."
+      },
+      "status_history": [
+        "RESOLVED_20261114_NATIVE_DDRMF_CLD_TF_GAS_COMPOSITION_PASS_COMPOSE_CLOSURE_PASS"
+      ],
+      "update_20261116": {
+        "git_head_before_update": "c33c6b163c202f6d78adf236e0fa06bc76259e5a",
+        "evidence": [
+          "data/receipts/core_crust_audit_20261115/CLD_COLUMN_DEFECT_EVIDENCE.json",
+          "docs/CORE_CRUST_REAUDIT_CONTINUATION_20261115.md"
+        ]
       }
     },
     {
@@ -751,7 +761,7 @@
         "E390-03A",
         "E390-03B"
       ],
-      "status": "REMEDIATION_20261114_MAXWELL_CENSUS_65_PAIRS_ALL_MASS_MISMATCH_GATE_PRESERVED (data/remediation/MAXWELL_V2_CENSUS.json)",
+      "status": "REMEDIATION_20261116_MAXWELL_MASS_GATE_ADJUDICATED_CONSTITUENT_MASS_DIFFERENCE",
       "outputs": [
         "branch selector",
         "composition-aware P(mu) interpolation/root isolation",
@@ -774,7 +784,21 @@
         "status": "M5_REAL_MAXWELL_NATIVE_PASS"
       },
       "last_update_utc": "2026-11-14T02:24:50Z",
-      "status_pre_remediation": "PARTIAL_M5_REAL_MAXWELL_NATIVE_PASS_GITHUB_CI_PENDING"
+      "status_pre_remediation": "PARTIAL_M5_REAL_MAXWELL_NATIVE_PASS_GITHUB_CI_PENDING",
+      "status_history": [
+        "REMEDIATION_20261114_MAXWELL_CENSUS_65_PAIRS_ALL_MASS_MISMATCH_GATE_PRESERVED (data/remediation/MAXWELL_V2_CENSUS.json)"
+      ],
+      "update_20261116": {
+        "git_head_before_update": "c33c6b163c202f6d78adf236e0fa06bc76259e5a",
+        "evidence": [
+          "docs/CORE_CRUST_REAUDIT_CONTINUATION_20261115.md (section 'B re-adjudicated on v3 crusts')",
+          "data/receipts/core_crust_audit_20261115/CENSUS_a05d0c9.json"
+        ],
+        "finding": "all 25 evaluated Maxwell attempts stop at the 1e-12 mass gate: DD-ME2/TW crusts use 939/939, SPG 938.9/938.9, DD2 939.56536/938.27203 versus provider cores 939.56533/938.272 -- Hamiltonian-level constituent-mass differences, not normalization",
+        "remaining": [
+          "explicit labelled decision on mass-constant equivalence (DD2 vs cores, 3e-5 MeV)"
+        ]
+      }
     },
     {
       "id": "E390-06",
@@ -785,7 +809,7 @@
         "E390-05",
         "E390-05A"
       ],
-      "status": "NATIVE_TOV_LOVE_PASS_COWLING_RUNTIME_COMPILE_REMAINS",
+      "status": "NATIVE_TOV_LOVE_PASS_PHASE_SEGMENTED_COWLING_ADAPTER_ON_GENERATED_EOS",
       "outputs": [
         "native stellar interfaces (DELIVERED: Fortran TOV RK45 integration, smooth + sharp-Maxwell barotropes)",
         "tidal Love solver (DELIVERED: l=2 y(r) ODE Takatsy-Kovacs 2020 Eq. 2-3, k2 and Lambda from Thorne 1971)",
@@ -828,6 +852,19 @@
         ],
         "solver_fix": "solve_cowling_spectrum target_mass_kg default 0, frequency brackets default to Fortran f/p1 bands",
         "verdict": "compose_cowling runtime-compile path resolved + end-to-end spectrum physics verified on causal EOS"
+      },
+      "status_history": [
+        "NATIVE_TOV_LOVE_PASS_COWLING_RUNTIME_COMPILE_REMAINS"
+      ],
+      "update_20261116": {
+        "git_head_before_update": "c33c6b163c202f6d78adf236e0fa06bc76259e5a",
+        "evidence": [
+          "python_frontend/compose_cowling/css_adapter.py",
+          "data/receipts/core_crust_audit_20261115/CSS_SURVIVOR_STARS_a05d0c9.json"
+        ],
+        "remaining": [
+          "Cowling end-to-end tests still skip without raw M0 inputs"
+        ]
       }
     },
     {
@@ -896,7 +933,7 @@
         "E390-00",
         "E390-02"
       ],
-      "status": "PARTIAL_M5A_REAL_CSS_NATIVE_PASS_GITHUB_CI_PENDING",
+      "status": "CI_PASS",
       "files": [
         "fortran_eos/src/compose_eos_css.f90",
         "fortran_eos/tests/test_css_segment.f90",
@@ -933,7 +970,16 @@
         ],
         "status": "M5A_REAL_CSS_PASS"
       },
-      "last_update_utc": "2026-11-14T02:24:50Z"
+      "last_update_utc": "2026-11-14T02:24:50Z",
+      "status_history": [
+        "PARTIAL_M5A_REAL_CSS_NATIVE_PASS_GITHUB_CI_PENDING"
+      ],
+      "update_20261116": {
+        "git_head_before_update": "c33c6b163c202f6d78adf236e0fa06bc76259e5a",
+        "evidence": [
+          "GitHub Actions runs 607-609 on PR #15 (fortran-eos-ci)"
+        ]
+      }
     },
     {
       "id": "E390-10A",

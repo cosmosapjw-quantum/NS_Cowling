@@ -168,14 +168,25 @@
       "name": "Live repository snapshot and branch isolation",
       "track": "shared",
       "depends_on": [],
-      "status": "IN_PROGRESS",
+      "status": "COMPLETE_ISOLATED_WORKTREE_DROPBOX_RECONCILED",
       "cloud_action": true,
       "acceptance": [
         "fetch exact PR #3/#13 heads and bases",
         "record tree/parent/branch and clean-state",
         "create isolated child branch/worktree per independent patch",
         "no force push or implicit merge"
-      ]
+      ],
+      "status_history": [
+        "IN_PROGRESS"
+      ],
+      "update_20261116": {
+        "git_head_before_update": "c33c6b163c202f6d78adf236e0fa06bc76259e5a",
+        "evidence": [
+          "data/receipts/core_crust_audit_20261115/DROPBOX_RECONCILIATION.json",
+          "work performed in an isolated worktree at the exact remote HEAD"
+        ],
+        "finding": "Dropbox checkout holds only older committed versions or empty files; no unique work"
+      }
     },
     {
       "id": "EOS-01",
@@ -255,14 +266,29 @@
       "depends_on": [
         "EOS-01"
       ],
-      "status": "PARTIAL_OR_SOURCE_BLOCKED",
+      "status": "PARTIAL_SPG_MASS_AND_CHEMICAL_POTENTIAL_CORRECTED",
       "cloud_action": true,
       "acceptance": [
         "each parameter is linked to correct original paper/data sheet",
         "unit and convention reconciliation",
         "independent Euler/first-law checks",
         "ambiguous coupling source remains blocked"
-      ]
+      ],
+      "status_history": [
+        "PARTIAL_OR_SOURCE_BLOCKED"
+      ],
+      "update_20261116": {
+        "git_head_before_update": "c33c6b163c202f6d78adf236e0fa06bc76259e5a",
+        "evidence": [
+          "SPG nucleon mass 938.9 MeV (Goegelein 2008; CompOSE 317/319 headers)",
+          "SPG mu_{n,p} now equal d eps/d n_i (test_rmf_chemical_potential_consistency)"
+        ],
+        "remaining": [
+          "SPG_M2/M4 parameter sets are placeholders of M1 (Scurto 2024 curves only)",
+          "RG cores: provider Q5 is a density-independent mu_l offset (1.2996 / 0.56698 MeV); convention unresolved, beta contract not overridden",
+          "APR core acausal at high density (max c_s^2 1.4709)"
+        ]
+      }
     },
     {
       "id": "EOS-04",
@@ -274,7 +300,7 @@
         "EOS-03A",
         "EOS-03B"
       ],
-      "status": "PARTIAL",
+      "status": "PARTIAL_INNER_CRUST_V5_ADMITTED_OUTER_CRUST_SPLICE_MISSING",
       "cloud_action": true,
       "acceptance": [
         "native Fortran interpolation/derivative/reconstruction",
@@ -282,7 +308,24 @@
         "no interpolation of categorical Nadd/q_extra",
         "one-sided discontinuities retained",
         "source columns and optional files preserved"
-      ]
+      ],
+      "status_history": [
+        "PARTIAL"
+      ],
+      "update_20261116": {
+        "git_head_before_update": "c33c6b163c202f6d78adf236e0fa06bc76259e5a",
+        "evidence": [
+          "data/receipts/core_crust_audit_20261115/CLD_COLUMN_DEFECT_EVIDENCE.json",
+          "download/reconstruction_v5/regeneration_index.json",
+          "data/receipts/core_crust_audit_20261115/CLD_GAS_EQUILIBRIUM_v5.json"
+        ],
+        "finding": "former CLD writer put n_B in the Q1 slot (P = n_B^2); corrected writer derives P and mu_B from eps(n_B), trims optimizer-box rows, refuses non-convex, acausal and gas-nonequilibrium tables",
+        "remaining": [
+          "outer-crust splice (CLD tables start at n_B >= 1e-3 fm^-3)",
+          "SPG_M3 rejected (interior box-bound minima)",
+          "composition columns not emitted"
+        ]
+      }
     },
     {
       "id": "EOS-05",
@@ -313,7 +356,7 @@
         "EOS-03A",
         "EOS-03B"
       ],
-      "status": "PARTIAL_NATIVE_KERNEL_JOIN_NOT_RUN",
+      "status": "CSS_JOIN_RUN_NATIVE_8_ADMITTED_SURVIVORS",
       "cloud_action": true,
       "acceptance": [
         "per-task source-backed parameter manifest",
@@ -322,7 +365,20 @@
         "Delta_epsilon and first-law jump verified",
         "sound speed and causal checks",
         "native read-back"
-      ]
+      ],
+      "status_history": [
+        "PARTIAL_NATIVE_KERNEL_JOIN_NOT_RUN"
+      ],
+      "update_20261116": {
+        "git_head_before_update": "c33c6b163c202f6d78adf236e0fa06bc76259e5a",
+        "evidence": [
+          "data/receipts/core_crust_audit_20261115/CENSUS_a05d0c9.json",
+          "scripts/match_report_admission.py"
+        ],
+        "remaining": [
+          "per-task source-backed CSS parameter manifest (cs2 is solved per pair, not a source parameter)"
+        ]
+      }
     },
     {
       "id": "EOS-07",
@@ -408,7 +464,7 @@
       "depends_on": [
         "COW-01"
       ],
-      "status": "NOT_RUN_ON_LIVE_NATIVE_PROFILE",
+      "status": "PHASE_SPLIT_ADAPTER_IMPLEMENTED_PROFILE_EXPORT_SCHEMA_PENDING",
       "cloud_action": true,
       "acceptance": [
         "W/V/r/q/P/epsilon/h/chi/nu/lambda/nu_prime on each side",
@@ -416,7 +472,20 @@
         "finite equal-length arrays",
         "no interpolation/averaging/zero filling across jump",
         "profile schema and SHA receipt"
-      ]
+      ],
+      "status_history": [
+        "NOT_RUN_ON_LIVE_NATIVE_PROFILE"
+      ],
+      "update_20261116": {
+        "git_head_before_update": "c33c6b163c202f6d78adf236e0fa06bc76259e5a",
+        "evidence": [
+          "python_frontend/compose_cowling/css_adapter.py",
+          "python_frontend/tests/test_css_cowling_adapter.py"
+        ],
+        "remaining": [
+          "W/V/r/q/P/eps/h/chi/nu/lambda/nu' per-side profile export with schema and SHA receipt"
+        ]
+      }
     },
     {
       "id": "COW-03",
@@ -499,14 +568,28 @@
         "EOS-09",
         "COW-06"
       ],
-      "status": "BLOCKED_SOURCE_ADMISSION",
+      "status": "INTEGRATED_ON_CLD_COMPOSITE_EOS_SOURCE_ADMISSION_BLOCKED",
       "cloud_action": "local_input_then_cloud_review",
       "acceptance": [
         "source EOS admitted with provenance/composition closure",
         "TOV sharp transition preserves separate phases",
         "native Cowling RHS and interface transfers integrated",
         "root convergence and mode labels validated"
-      ]
+      ],
+      "status_history": [
+        "BLOCKED_SOURCE_ADMISSION"
+      ],
+      "update_20261116": {
+        "git_head_before_update": "c33c6b163c202f6d78adf236e0fa06bc76259e5a",
+        "evidence": [
+          "data/receipts/core_crust_audit_20261115/CSS_SURVIVOR_STARS_a05d0c9.json"
+        ],
+        "finding": "phase-segmented TOV and slow/rapid Cowling roots computed for every admitted survivor; radii are truncation radii (no outer crust); roots unlabelled",
+        "remaining": [
+          "source-admitted microscopic crust with outer crust and composition",
+          "mode identity (COW-06)"
+        ]
+      }
     },
     {
       "id": "RELEASE-00",

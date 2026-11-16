@@ -1,27 +1,14 @@
-"""Compressible Liquid Drop (CLD) cell model for the EOS390 inner-crust reconstruction.
+"""Exploratory spherical-droplet CLD proxy for inner-crust experiments.
 
-Implements the Scurto 2024 (PRD 109 103015) eq. 21-25 CLD cell model on top of
-the validated RMF homogeneous-matter solver (rmf_solver.py).
+The bulk energies come from rmf_solver.  The explicitly chosen interface
+functions below are historical proxies, not Scurto et al. (2024) eqs. 24-25.
+In particular, sigma_0 and b have not been fitted to measured nuclear masses.
+Source-faithful crust predictions require those functions and fitted inputs.
 
-The CLD model describes each Wigner-Seitz cell as:
-  - a high-density "cluster" phase (I) at density rho_I, proton density rho_Ip
-  - a low-density "gas" phase (II) at density rho_II, proton density rho_IIp
-  - a uniform electron background of energy density E_L
-  - interface Coulomb (E_Coul) and surface (E_surf) corrections
-
-The cell energy density (Scurto eq. 21):
-  E_cell = f * E(rho_I, rho_Ip) + (1 - f) * E(rho_II, rho_IIp)
-         + E_Coul + E_surf + E_L
-
-is minimized with respect to four variables:
-  R_d (cluster radius), rho_I, rho_Ip, f (volume fraction).
-
-The gas density rho_II and composition rho_IIp are determined by beta-equilibrium
-and charge-neutrality constraints at the cell level (mu_n - mu_p = mu_e; rho_p
-total = rho_e). The Coulomb and surface terms follow the Ravenhall-Pethick-Wilson
-[68] standard forms (Scurto eq. 22-25).
-
-All units: densities fm^-3, energies MeV, energy densities MeV/fm^3, lengths fm.
+The total cell energy is minimized over f, R_d, rho_I and rho_Ip, with pure
+neutron gas and uniform electrons.  The conditional rho_Ip solve includes
+surface/Coulomb derivatives and the full nucleon rest masses.  Units: fm^-3,
+MeV, MeV fm^-3 and fm.  Output E_cell excludes nucleon rest masses only.
 """
 from __future__ import annotations
 
@@ -39,31 +26,21 @@ E2 = ALPHA * HBARC      # e^2 in MeV*fm = 1.439965 MeV*fm
 
 
 def coulomb_lattice_phi(u: float) -> float:
-    """Ravenhall-Pethick-Wilson lattice function Phi(u) for spherical droplets.
-    Standard RPW form: Phi = (1/2)*[(2-3u)^(1/2)*(2-(1-3u/2)^2) ... ].
-    The most-used simple form for the inner-crust CLD droplet phase:
-      Phi(u) = (1/2)*(2 - 3u)^(1/2)   (dilute-sphere limit, valid for u < ~0.3)
-    More complete form including the (1-3u/2) geometric correction:
-      Phi(u) = (1/2)*[ (2-3u)^(1/2)*(1 + (1 - 3u/2)*(1-u)^(-1)) - (1 - 3u/2)^2 ]
-    We use the dilute-sphere limit which is accurate for the inner-crust droplet
-    regime where u << 1; this matches the Scurto eq. 23 functional dependence
-    on (2-3f)^(1/2)."""
+    """Historical proxy Phi(u)=sqrt(2-3u)/2 on 0<u<2/3.
+
+    This is not the spherical WS result (2-3*u**(1/3)+u)/5.  Kept explicitly
+    for reproducibility of the exploratory functional; no source calibration.
+    """
     if u <= 0 or u >= 2.0 / 3.0:
         return 0.0
     return 0.5 * math.sqrt(2.0 - 3.0 * u)
 
 
 def surface_tension(yp_I: float, sigma_0: float, b: float) -> float:
-    """Surface tension sigma (Scurto eq. 25, Lattimer form):
-      sigma = sigma_0 * [(b + 2)/(...) * y_p,I^(-3) + (1 - y_p,I)^(-3)] / (b + ...)
-    The PDF text is corrupted; the standard Lattimer-Swestsky form is:
-      sigma(yp) = sigma_0 * [(2/b) * (yp^(2/3) + (1-yp)^(2/3) - 1) ... ]
-    The simplest physically reasonable form used in CLD codes:
-      sigma(yp) = sigma_0 * (yp^(2/3) + (1-yp)^(2/3) - 2^(2/3))
-    normalized to vanish at yp=0 (pure neutron) and yp=1 (pure proton).
-    We use the Lattimer et al. empirical form: sigma = sigma_0 * [yp*(1-yp)]^b
-    which gives sigma=0 at yp=0,1 and peaks at yp=0.5, controlled by b.
-    For b=1 (default) this is sigma_0*yp*(1-yp).
+    """Historical proxy sigma=sigma_0*[yp*(1-yp)]**b.
+
+    This is not Scurto eq. 25 or a fitted Lattimer-Swesty surface tension.
+    b is an exponent in this proxy, not the source's denominator parameter.
     """
     if yp_I <= 0 or yp_I >= 1:
         return 0.0
@@ -161,11 +138,11 @@ def cld_cell_energy(model: RMFModel, rho_B: float, f: float, R_d: float,
     E_II = rII.binding_energy
     # electron background
     E_L = electron_energy_density(rho_e)
-    # Coulomb (Scurto eq. 22): E_Coul = 2*pi*e^2 * f * Phi * R_d^2 * (rho_Ip - rho_IIp)^2
+    # Coulomb geometry structure with the declared proxy Phi: E_Coul = 2*pi*e^2 * f * Phi * R_d^2 * (rho_Ip - rho_IIp)^2
     Phi = coulomb_lattice_phi(f)
     rho_p_diff = rho_Ip - rho_IIp
     E_coul = 2.0 * math.pi * E2 * f * Phi * R_d ** 2 * rho_p_diff ** 2
-    # Surface (Scurto eq. 24): E_surf = (3*f*sigma)/R_d
+    # Surface geometry structure with the declared proxy sigma: E_surf = (3*f*sigma)/R_d
     yp_I = rho_Ip / rho_I if rho_I > 0 else 0.0
     sigma = surface_tension(yp_I, sigma_0, b)
     E_surf = (3.0 * f * sigma) / R_d if R_d > 0 else 0.0
@@ -186,25 +163,56 @@ def cld_cell_energy(model: RMFModel, rho_B: float, f: float, R_d: float,
 
 
 def solve_beta_equilibrium_cluster(model: RMFModel, rho_I: float,
-                                   rho_IIp_gas: float, f: float) -> tuple[float, float, float, float]:
-    """Solve for the cluster proton density rho_Ip from beta-equilibrium at the
-    CLUSTER phase (the dense, equilibrating phase):
-        mu_n(I) - mu_p(I) = mu_e(cell)
-    with cell charge neutrality:
-        rho_e = f*rho_Ip + (1-f)*rho_IIp_gas   (rho_IIp_gas fixed = 0 for pure neutron gas)
-        mu_e = sqrt((3*pi^2*rho_e)^(2/3)*hbar^2 + m_e^2)
-    At rho_Ip=0 (pure neutron cluster) mu_n-mu_p is large positive; at rho_Ip=rho_I
-    (symmetric cluster) mu_n-mu_p ~ 0; mu_e grows with rho_Ip. Sign change exists.
-    Returns (rho_Ip, rho_e, mu_e, |residual|).
+                                   rho_IIp_gas: float, f: float, *, R_d: float,
+                                   sigma_0: float, b: float) -> tuple[float, float, float, float]:
+    """Solve d eps_cell/d rho_Ip=0 at fixed f,R_d,rho_I and pure neutron gas.
+
+    Dividing by f gives mu_p(I)-mu_n(I)+mu_e + 4*pi*e^2*Phi*R_d^2*rho_Ip
+    + 3*sigma'(yp)/(R_d*rho_I).  Full homogeneous chemical potentials include
+    the neutron/proton rest-mass difference.  The last two terms are essential
+    even when bulk beta equilibrium is very accurately solved.
     """
     rho_IIp_gas = 0.0  # pure neutron gas (low-density inner-crust approximation)
     def residual(rho_Ip):
-        rho_Ip = max(0.0, min(rho_Ip, rho_I))
+        rho_Ip = max(1e-12*rho_I, min(rho_Ip, (1.0-1e-12)*rho_I))
         rI = solve_homogeneous(model, rho_I, rho_Ip)
         rho_e = f * rho_Ip + (1.0 - f) * rho_IIp_gas
         rho_e = max(0.0, rho_e)
         mu_e = electron_chemical_potential(rho_e) if rho_e > 0 else 0.511
-        return (rI.mu_n - rI.mu_p) - mu_e
+        yp = rho_Ip / rho_I
+        dsigma = b * surface_tension(yp, sigma_0, b) * (1.0 - 2.0*yp) / (yp*(1.0-yp))
+        interface = (4.0 * math.pi * E2 * coulomb_lattice_phi(f) * R_d**2 * rho_Ip
+                     + 3.0*dsigma/(R_d*rho_I))
+        return (rI.mu_n - rI.mu_p) - mu_e - interface
+    if b < 1.0:
+        # Fractional powers have singular endpoint derivatives: the endpoint
+        # sign bracket alone can select a maximum near yp=1.  Isolate observed
+        # sign changes on a uniform grid plus logarithmic endpoint refinement,
+        # then select by the FULL energy.  This is a numerical search, not a
+        # proof of global uniqueness for arbitrary RMF/surface parameters.
+        from scipy.optimize import brentq
+        ys = sorted(set([i/64.0 for i in range(65)] +
+                        [10.0**(-k) for k in range(2, 13)] +
+                        [1.0-10.0**(-k) for k in range(2, 13)]))
+        vals = [residual(y*rho_I) for y in ys]
+        candidates = [0.0, rho_I]
+        for y0, y1, v0, v1 in zip(ys[:-1], ys[1:], vals[:-1], vals[1:]):
+            if v0 == 0.0:
+                candidates.append(y0*rho_I)
+            if v0*v1 < 0.0:
+                root = brentq(lambda y: residual(y*rho_I), y0, y1,
+                              xtol=5e-324, rtol=1e-14)
+                candidates.append(root*rho_I)
+        def energy(p):
+            r = solve_homogeneous(model, rho_I, p)
+            y = p/rho_I
+            return (f*(r.binding_energy + (model.mp-model.mn)*p)
+                    + electron_energy_density(f*p)
+                    + 2*math.pi*E2*f*coulomb_lattice_phi(f)*R_d**2*p**2
+                    + 3*f*surface_tension(y, sigma_0, b)/R_d)
+        p = min(candidates, key=energy)
+        ne = f*p
+        return p, ne, electron_chemical_potential(ne), abs(residual(p))
     r_lo = residual(0.0)
     r_hi = residual(rho_I)
     if r_lo * r_hi > 0:
@@ -232,8 +240,8 @@ def solve_beta_equilibrium_cluster(model: RMFModel, rho_I: float,
 def _cld_objective(model: RMFModel, rho_B: float, sigma_0: float, b: float,
                    x: tuple[float, float, float]) -> tuple[float, dict]:
     """Objective for the Nelder-Mead: x = (f, log R_d, rho_I).
-    The cluster proton density rho_Ip is solved from beta-equilibrium at the
-    cluster phase (mu_n - mu_p = mu_e), with the gas treated as pure neutron
+    The cluster proton density rho_Ip solves the full cell beta-equilibrium
+    condition including interface terms, with the gas treated as pure neutron
     (rho_IIp = 0) - the standard low-density inner-crust approximation.
     Returns (E_cell, info)."""
     f, log_Rd, rho_I = x
@@ -247,7 +255,8 @@ def _cld_objective(model: RMFModel, rho_B: float, sigma_0: float, b: float,
     if rho_II < 0 or rho_II > rho_I:
         return float("inf"), {}
     # beta-equilibrium at the cluster: solve for rho_Ip
-    rho_Ip, rho_e, mu_e, beta_resid = solve_beta_equilibrium_cluster(model, rho_I, 0.0, f)
+    rho_Ip, rho_e, mu_e, beta_resid = solve_beta_equilibrium_cluster(model, rho_I, 0.0, f,
+        R_d=R_d, sigma_0=sigma_0, b=b)
     rho_IIp = 0.0  # pure neutron gas
     try:
         E, info = cld_cell_energy(model, rho_B, f, R_d, rho_I, rho_Ip, rho_II, rho_IIp,
@@ -258,12 +267,16 @@ def _cld_objective(model: RMFModel, rho_B: float, sigma_0: float, b: float,
         return float("inf"), {}
     info["rho_Ip"] = rho_Ip; info["rho_IIp"] = rho_IIp
     info["rho_e"] = rho_e; info["mu_e"] = mu_e; info["beta_resid"] = beta_resid
-    return E, info
+    if not info["rI_converged"] or not info["rII_converged"] or beta_resid > 1e-6:
+        return float("inf"), {}
+    # At fixed n_B the mn*n_B term is constant.  The proton rest-mass
+    # correction is not: varying charge changes the species mixture.
+    return E + (model.mp - model.mn) * rho_e, info
 
 
-def _nelder_mead(model, rho_B, sigma_0, b, x0, max_iter=120, tol=1e-6):
+def _nelder_mead(model, rho_B, sigma_0, b, x0, max_iter=500, tol=1e-10):
     """Lightweight Nelder-Mead (no scipy) in 3 variables (f, log R_d, rho_I).
-    Returns (best_x, best_E, best_info, n_iter)."""
+    Returns (best_x, best_E, best_info, n_iter, converged)."""
     n = 3
     simplex = [list(x0)]
     steps = [0.02, math.log(1.5), 0.02 * model.rho_sat]
@@ -274,12 +287,15 @@ def _nelder_mead(model, rho_B, sigma_0, b, x0, max_iter=120, tol=1e-6):
     for i in range(len(simplex)):
         fvals[i], infos[i] = _cld_objective(model, rho_B, sigma_0, b, tuple(simplex[i]))
     alpha, gamma, rho_coef, sigma_coef = 1.0, 2.0, 0.5, 0.5
+    converged = False
     for it in range(max_iter):
         order = sorted(range(len(simplex)), key=lambda k: fvals[k])
         simplex = [simplex[k] for k in order]
         fvals = [fvals[k] for k in order]
         infos = [infos[k] for k in order]
-        if abs(fvals[-1] - fvals[0]) < tol and fvals[0] != float("inf"):
+        spread = max(abs(simplex[j][i] - simplex[0][i]) for j in range(1, n+1) for i in range(n))
+        if abs(fvals[-1] - fvals[0]) < tol and fvals[0] != float("inf") and spread < 1e-6:
+            converged = True
             break
         centroid = [sum(simplex[j][i] for j in range(n)) / n for i in range(n)]
         xr = [centroid[i] + alpha * (centroid[i] - simplex[-1][i]) for i in range(n)]
@@ -304,7 +320,7 @@ def _nelder_mead(model, rho_B, sigma_0, b, x0, max_iter=120, tol=1e-6):
             simplex[j] = [simplex[0][i] + sigma_coef * (simplex[j][i] - simplex[0][i]) for i in range(n)]
             fvals[j], infos[j] = _cld_objective(model, rho_B, sigma_0, b, tuple(simplex[j]))
     bi = min(range(len(simplex)), key=lambda k: fvals[k])
-    return simplex[bi], fvals[bi], infos[bi], it + 1
+    return simplex[bi], fvals[bi], infos[bi], it + 1, converged
 
 
 def minimize_cld_cell(model: RMFModel, rho_B: float, sigma_0: float, b: float,
@@ -312,15 +328,18 @@ def minimize_cld_cell(model: RMFModel, rho_B: float, sigma_0: float, b: float,
     """Minimize the CLD cell energy at fixed total baryon density rho_B.
 
     Two-stage optimization (3 free variables: f, R_d, rho_I; the cluster proton
-    density rho_Ip is solved from beta-equilibrium mu_n(I) - mu_p(I) = mu_e; the
+    density rho_Ip solves full cell beta equilibrium with interface terms; the
     gas is treated as pure neutron, rho_IIp = 0):
       1. Coarse grid scan over (f, R_d, rho_I) for a good starting point.
       2. Nelder-Mead simplex refinement.
 
     The gas density rho_II is set by baryon conservation. beta-equilibrium is
-    enforced at the cluster phase (the dense, equilibrating phase); the pure-
+    enforced for the full cell energy, including interface terms; the pure-
     neutron gas approximation is the standard low-density inner-crust limit.
     """
+    if not (math.isfinite(rho_B) and rho_B > 0.0 and math.isfinite(sigma_0)
+            and sigma_0 >= 0.0 and math.isfinite(b) and b > 0.0):
+        raise ValueError("CLD requires finite positive density/exponent and nonnegative surface coefficient")
     rho_sat = model.rho_sat
     f_grid = [0.005, 0.01, 0.03, 0.08, 0.15, 0.25, 0.4]
     Rd_grid = [4.0, 6.0, 9.0, 13.0, 20.0]
@@ -337,7 +356,7 @@ def minimize_cld_cell(model: RMFModel, rho_B: float, sigma_0: float, b: float,
     if best_x is None:
         return CLDCellResult(rho_B, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                             0, 0, 0, False, 0, "no feasible point")
-    x_nm, E_nm, info_nm, n_iter_nm = _nelder_mead(model, rho_B, sigma_0, b, best_x)
+    x_nm, E_nm, info_nm, n_iter_nm, optimizer_converged = _nelder_mead(model, rho_B, sigma_0, b, best_x)
     if E_nm < best_E:
         best_x, best_E, best_info = x_nm, E_nm, info_nm
     f, log_Rd, rho_I = best_x
@@ -345,7 +364,8 @@ def minimize_cld_cell(model: RMFModel, rho_B: float, sigma_0: float, b: float,
     R_d = math.exp(max(math.log(2.0), min(math.log(40.0), log_Rd)))
     rho_I = max(0.01, min(0.5, rho_I))
     # final beta-equilibrium solve
-    rho_Ip, rho_e, mu_e, beta_resid = solve_beta_equilibrium_cluster(model, rho_I, 0.0, f)
+    rho_Ip, rho_e, mu_e, beta_resid = solve_beta_equilibrium_cluster(model, rho_I, 0.0, f,
+        R_d=R_d, sigma_0=sigma_0, b=b)
     rho_IIp = 0.0
     if f < 1:
         rho_II = (rho_B - f * rho_I) / (1.0 - f)
@@ -370,6 +390,7 @@ def minimize_cld_cell(model: RMFModel, rho_B: float, sigma_0: float, b: float,
         E_coul=info["E_coul"], E_surf=info["E_surf"], E_L=info["E_L"],
         P_cell=P_cell, mu_n=mu_n_cell, mu_p=mu_p_cell, mu_e=mu_e,
         mu_n_gas=solve_homogeneous(model, rho_II, rho_IIp).mu_n if rho_II > 0 else float("nan"),
-        converged=True, n_iter=n_iter_nm,
-        message=f"Nelder-Mead + beta-equil (resid={beta_resid:.3e})",
+        converged=(optimizer_converged and info["rI_converged"] and info["rII_converged"]
+                   and beta_resid <= 1e-6), n_iter=n_iter_nm,
+        message=f"proxy CLD; Nelder-Mead converged={optimizer_converged}; full cell beta resid={beta_resid:.3e}",
     )

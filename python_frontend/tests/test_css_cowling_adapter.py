@@ -116,3 +116,45 @@ def test_adapter_uses_declared_pressure_gate_not_bit_equality(matched, monkeypat
     else:
         with pytest.raises(ValueError, match="first-order jump"):
             adapter.phase_table_from_css_match(compose, report)
+
+
+def test_css_provider_preserves_exact_constant_sound_speed_and_energy(matched):
+    compose, report = matched
+    eos, _ = css_match_maxwell_eos(compose, report)
+    join = report["css_core_bridge_index"] - report["css_transition_high_index"]
+    pressures = np.geomspace(eos.high.pressure[0], eos.high.pressure[join], 101)[:-1]
+    speed = report["css_single_sound_speed"]
+    eps0 = report["css_transition_epsilon_high"]
+    pt = report["css_transition_pressure"]
+    for pressure in pressures:
+        state = eos.high.evaluate(pressure)
+        assert state.sound_speed_sq == pytest.approx(speed, rel=2e-13)
+        assert state.energy == pytest.approx(eps0 + (pressure - pt) / speed, rel=2e-13)
+
+
+def test_css_core_join_preserves_one_sided_derivatives_and_continuous_state(matched):
+    compose, report = matched
+    eos, _ = css_match_maxwell_eos(compose, report)
+    join = report["css_core_bridge_index"] - report["css_transition_high_index"]
+    pressure = eos.high.pressure[join]
+    left = eos.high.evaluate(np.nextafter(pressure, 0.))
+    right = eos.high.evaluate(pressure)
+    assert left.sound_speed_sq == pytest.approx(report["css_single_sound_speed"], rel=2e-13)
+    assert right.sound_speed_sq != pytest.approx(left.sound_speed_sq, rel=1e-5)
+    assert right.energy == pytest.approx(left.energy, rel=2e-12)
+    assert right.number_density == pytest.approx(left.number_density, rel=2e-12)
+    assert right.chemical_potential == pytest.approx(left.chemical_potential, rel=2e-12)
+
+
+@pytest.mark.parametrize("field,value", [("css_single_sound_speed", .75),
+    ("css_core_bridge_index", 1), ("css_core_bridge_index", 4.5)])
+def test_css_provider_rejects_report_that_disagrees_with_bridge(matched, field, value):
+    compose, report = matched
+    with pytest.raises(ValueError, match="CSS|css"):
+        css_match_maxwell_eos(compose, dict(report, **{field: value}))
+
+
+def test_css_provider_rejects_overflowing_analytic_bridge(matched):
+    compose, report = matched
+    with pytest.raises(ValueError, match="CSS|css"):
+        css_match_maxwell_eos(compose, dict(report, css_single_sound_speed=np.nextafter(0., 1.)))

@@ -22,7 +22,9 @@ program test_ddrmf_homogeneous
   type(ddrmf_state_t) :: st
   type(ddrmf_beta_result_t) :: beta
   character(len=120) :: status
-  real(wp) :: rho_b, charge_resid
+  real(wp) :: rho_b, charge_resid, rn, rp, dh, mn_fd, mp_fd
+  type(ddrmf_state_t) :: plus, minus
+  integer :: j
   integer :: i
 
   fails = 0
@@ -46,6 +48,33 @@ program test_ddrmf_homogeneous
       write(*,'(2x,a,a)') 'PASS load ', trim(model%id)
     end if
   end do
+
+  ! Independent energy derivatives at asymmetric states check the rearrangement
+  ! and isovector conventions rather than merely reusing the Euler identity.
+  do i=1,3
+    select case(i)
+    case(1); call load_ddrmf_model('GPPVA_DD2',model,status)
+    case(2); call load_ddrmf_model('GPPVA_DDME2',model,status)
+    case(3); call load_ddrmf_model('GPPVA_TW',model,status)
+    end select
+    do j=1,3
+      rho_b=0.04_wp*real(j,wp); rn=.9_wp*rho_b; rp=.1_wp*rho_b
+      dh=1.e-5_wp*rho_b
+      call solve_ddrmf_homogeneous(model,rho_b,.1_wp,st,status)
+      call solve_ddrmf_homogeneous(model,rho_b+dh,rp/(rho_b+dh),plus,status)
+      call solve_ddrmf_homogeneous(model,rho_b-dh,rp/(rho_b-dh),minus,status)
+      mn_fd=(plus%eps_b-minus%eps_b)/(2._wp*dh)
+      call solve_ddrmf_homogeneous(model,rho_b+dh,(rp+dh)/(rho_b+dh),plus,status)
+      call solve_ddrmf_homogeneous(model,rho_b-dh,(rp-dh)/(rho_b-dh),minus,status)
+      mp_fd=(plus%eps_b-minus%eps_b)/(2._wp*dh)
+      if(max(abs(mn_fd-st%mu_n),abs(mp_fd-st%mu_p))>1.e-3_wp) then
+        write(*,'(2x,a,a,2es14.6)') 'FAIL independent chemical potentials ',trim(model%id),mn_fd-st%mu_n,mp_fd-st%mu_p
+        fails=fails+1
+      else
+        write(*,'(2x,a,a,2es14.6)') 'PASS independent chemical potentials ',trim(model%id),mn_fd-st%mu_n,mp_fd-st%mu_p
+      endif
+    enddo
+  enddo
 
   ! unknown id must fail (status starts with 'unknown')
   call load_ddrmf_model('NOT_A_MODEL', model, status)

@@ -25,6 +25,7 @@ import numpy as np
 from compose_eos import EOSData, read_compose
 
 from .maxwell import MaxwellEOS
+from .css_barotrope import CSSCoreBarotrope
 
 CSS_KIND = "css_single_speed_with_crust_density_jump"
 PRESSURE_REL_GATE = 1.0e-10   # scripts/match_report_admission.PRESSURE_REL_GATE
@@ -36,9 +37,12 @@ def phase_table_from_css_match(compose_dir: str | Path, match_report: Mapping[st
         raise ValueError("match report is not a css single-speed construction")
     data = read_compose(str(compose_dir))
     try:
-        lo = int(match_report["css_transition_low_index"])
-        hi = int(match_report["css_transition_high_index"])
-        n_rows = int(match_report["n"])
+        fields = [match_report[key] for key in
+                  ("css_transition_low_index", "css_transition_high_index", "n")]
+        if any(isinstance(value, (bool, np.bool_)) or not isinstance(value, (int, np.integer))
+               for value in fields):
+            raise ValueError("css transition index fields must be exact integers")
+        lo, hi, n_rows = map(int, fields)
     except (KeyError, TypeError, ValueError) as exc:
         raise ValueError("match report lacks css transition index fields") from exc
     if hi != lo + 1 or lo < 1 or hi >= data.n - 1 or n_rows != data.n:
@@ -58,16 +62,33 @@ def css_match_maxwell_eos(compose_dir: str | Path, match_report: Mapping[str, An
                           ) -> tuple[MaxwellEOS, dict[str, Any]]:
     """Build the phase-segmented EOS and its scope metadata."""
     table = phase_table_from_css_match(compose_dir, match_report)
-    eos = MaxwellEOS(table)
+    join = match_report.get("css_core_bridge_index")
+    if (isinstance(join, (bool, np.bool_)) or not isinstance(join, (int, np.integer))
+            or not match_report["css_transition_high_index"] < join < table.n - 1):
+        raise ValueError("invalid css core join index")
+    high = table.Iphase == 2
+    provider = CSSCoreBarotrope(
+        table.p[high], table.eps[high], table.nb[high], table.mub[high],
+        join_index=int(join - match_report["css_transition_high_index"]),
+        sound_speed_sq=match_report.get("css_single_sound_speed", float("nan")))
+    eos = MaxwellEOS(table, high_provider=provider)
     meta = {
         "construction_kind": CSS_KIND,
         "crust_rows": int(np.count_nonzero(table.Iphase == 1)),
         "css_and_core_rows": int(np.count_nonzero(table.Iphase == 2)),
-        "css_core_join": "continuous in n_B, P, eps, mu_B; not an interface",
+        "css_core_join": "continuous in n_B, P, eps, mu_B; one-sided sound-speed derivative",
+        "css_provider": "exact analytic constant-sound-speed bridge",
+        "core_provider": "separate PCHIP(eps-P versus ln P), first-law density",
+        "css_core_join_pressure_mev_fm3": provider.join_pressure,
+        "css_core_cs2_left": provider.sound_speed_sq,
+        "css_core_cs2_right": provider.core.evaluate(provider.join_pressure).sound_speed_sq,
         "low_branch_first_law_anchor": "interface",
         "low_branch_surface_density_drift_relative": eos.low_branch_surface_density_drift_relative,
         "high_branch_end_density_drift_relative": eos.high_branch_end_density_drift_relative,
         "pressure_cutoff_mev_fm3": float(eos.low.pressure[0]),
+        "perturbation_boundary": "Delta P=0 at finite cutoff pressure; artificial truncation boundary",
+        "lapse_normalization": "vacuum Schwarzschild value at cutoff; complete exterior not modeled",
+        "frequency_scope": "truncated fluid model; no complete-star observable or stability claim",
         "surface_definition": ("truncation at the crust table minimum pressure "
                                "(no outer crust in the CLD reconstruction)"),
         "composition": "none; no abundance or elastic-crust claim",

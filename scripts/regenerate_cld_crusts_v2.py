@@ -1,12 +1,13 @@
 """Regenerate CLD inner-crust tables with the corrected CompOSE writer.
 
-Output: download/reconstruction_v3/<MODEL>/ (v2 kept rows on the optimizer
+Output: download/reconstruction_v6_proxy/<MODEL>/ (v2 kept rows on the optimizer
 box bound; v3 trims them at the table ends and refuses interior ones; the historical
 download/reconstruction/ tree is left untouched as evidence of the former
 column-layout defect).  For each model the original density grid is reused,
 the CLD minimization is rerun with the parameters that reproduce the stored
 rows (sigma_0 = 1 MeV fm^-2, b = 1), and the table is emitted only if it is an
-admissible cold barotrope.  Otherwise ``REJECTED.json`` records why and no
+admissible cold proxy barotrope. The interface functional is exploratory,
+not the source-calibrated Scurto functional; every receipt states this scope.  Otherwise ``REJECTED.json`` records why and no
 CompOSE file is written.  SPG_M2/SPG_M4 parameter sets are placeholders equal
 to SPG_M1 and are not regenerated (``NOT_GENERATED.json``).
 
@@ -57,9 +58,17 @@ def main(out_root: Path) -> int:
     params_json = json.loads(PARAMS.read_text())
     head = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"],
                           capture_output=True, text=True).stdout.strip()
+    source_paths = ["python_frontend/compose_eos/cld_cell.py",
+                    "python_frontend/compose_eos/reconstruct_cld.py",
+                    "python_frontend/compose_eos/rmf_solver.py",
+                    "scripts/regenerate_cld_crusts_v2.py"]
+    source_hashes = {p: sha256(ROOT / p) for p in source_paths}
+    tracked_dirty = bool(subprocess.run(["git", "-C", str(ROOT), "diff", "HEAD", "--name-only"],
+                                       capture_output=True, text=True).stdout.strip())
     index = {"schema": "ns-cowling.cld-regeneration-index.v1", "git_head": head,
              "sigma_0": SIGMA_0, "b": B_EXP, "parameter_sets_sha256": sha256(PARAMS),
-             "models": {}}
+             "scientific_scope": "exploratory_proxy_CLD", "source_calibrated": False,
+             "source_sha256": source_hashes, "git_tracked_dirty": tracked_dirty, "models": {}}
     for name in MODELS:
         out = out_root / name
         out.mkdir()
@@ -77,7 +86,8 @@ def main(out_root: Path) -> int:
         provenance = {"sigma_0": SIGMA_0, "b": B_EXP, "density_grid_source":
                       str((SOURCE_ROOT / name).relative_to(ROOT)), "git_head": head,
                       "nucleon_masses_recorded_in_parameter_set": masses_recorded,
-                      "hamiltonian_masses_used_MeV": {"neutron": model.mn, "proton": model.mp}}
+                      "hamiltonian_masses_used_MeV": {"neutron": model.mn, "proton": model.mp},
+                      "source_sha256": source_hashes, "git_tracked_dirty": tracked_dirty}
         cells = reconstruct_inner_crust(model, SIGMA_0, B_EXP, densities=grid)
         try:
             receipt = emit_compose_set(cells, out, name, mn=model.mn, mp=model.mp,
@@ -100,5 +110,5 @@ def main(out_root: Path) -> int:
 
 
 if __name__ == "__main__":
-    target = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "download" / "reconstruction_v3"
+    target = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "download" / "reconstruction_v6_proxy"
     raise SystemExit(main(target))

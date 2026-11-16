@@ -51,11 +51,11 @@ CRUST_MODELS = [
     "GPPVA_DD2", "GPPVA_DDME2", "GPPVA_TW",
 ]
 CORE_MODELS = ["APR_APR", "BBB_BHF2", "GM_GM1", "RG_SLY4", "RG_KDE0v1"]
-# v3 tables come from the corrected CLD writer (box-bound end rows trimmed; (docs/CORE_CRUST_REAUDIT_
-# CONTINUATION_20261115.md); download/reconstruction holds the historical
-# tables whose Q1 slot carries n_B and is kept only as evidence.
+# v6 uses full-cell stationarity for the explicitly exploratory proxy CLD
+# functional. Source-calibrated microscopic crust admission remains open.
+# Earlier reconstruction trees are immutable historical evidence.
 CRUST_ROOT = Path(os.environ.get("NS_COWLING_CRUST_ROOT",
-                                 str(ROOT / "download" / "reconstruction_v5"))).expanduser()
+                                 str(ROOT / "download" / "reconstruction_v6_proxy"))).expanduser()
 CORE_ROOT = ROOT / "eos_generator" / "eos_data"
 DEFAULT_RUN_STAMP = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 DEFAULT_OUT_ROOT = ROOT / "download" / "matched_runs" / DEFAULT_RUN_STAMP
@@ -374,6 +374,23 @@ def _source_compose_hashes(directory: Path) -> dict[str, str]:
     return hashes
 
 
+def _source_scope(directory: Path) -> dict:
+    """Carry reconstruction scope forward without inferring physical calibration."""
+    receipt = directory / "reconstruction_receipt.json"
+    if not receipt.is_file():
+        return {"scientific_scope": "not_recorded", "source_calibrated": None}
+    try:
+        record = json.loads(receipt.read_text(encoding="utf-8"))
+        if not isinstance(record, dict):
+            raise ValueError("receipt must be an object")
+        return {"scientific_scope": record.get("scientific_scope", "not_recorded"),
+                "source_calibrated": record.get("source_calibrated"),
+                "reconstruction_receipt_sha256": sha256_file(receipt)}
+    except (OSError, UnicodeError, ValueError) as exc:
+        return {"scientific_scope": "unreadable_receipt", "source_calibrated": None,
+                "error": str(exc)}
+
+
 def _source_identity(directory: Path) -> str | None:
     """SHA-256 over the required CompOSE files, or None if any is missing."""
     if _missing_sources(directory):
@@ -400,8 +417,11 @@ def _source_marker(directory: Path) -> tuple[str, str] | None:
         path = directory / name
         if path.is_file():
             try:
-                reason = str(json.loads(path.read_text(encoding="utf-8")).get("reason", ""))
-            except (OSError, UnicodeError, json.JSONDecodeError):
+                record = json.loads(path.read_text(encoding="utf-8"))
+                if not isinstance(record, dict):
+                    raise ValueError("source marker must be an object")
+                reason = str(record.get("reason", ""))
+            except (OSError, UnicodeError, ValueError):
                 reason = f"unreadable {name}"
             return category, f"{name[:-5]}: {reason}"
     return None
@@ -464,7 +484,19 @@ def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) ->
             raise NotADirectoryError(f"matching output is not a directory: {out_dir}")
         if any(out_dir.iterdir()):
             raise FileExistsError(f"matching output directory is not empty: {out_dir}")
-    res = _run_pipeline(method, crust_dir, core_dir, out_dir)
+    marker = _source_marker(Path(crust_dir)) or _source_marker(Path(core_dir))
+    if marker is not None:
+        res = {"survived": False, "method": method, "stage": "source",
+               "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+               "failure_category": marker[0], "error": marker[1],
+               "source_marker": marker[1]}
+    else:
+        res = _run_pipeline(method, crust_dir, core_dir, out_dir)
+    # Preserve input identity on failures too, before the per-pair receipt is saved.
+    res.setdefault("source_sha256", {"crust": _source_compose_hashes(Path(crust_dir)),
+                                     "core": _source_compose_hashes(Path(core_dir))})
+    res.setdefault("source_scope", {"crust": _source_scope(Path(crust_dir)),
+                                    "core": _source_scope(Path(core_dir))})
     if not res.get("survived"):
         res.setdefault("failure_category", classify_failure(
             res.get("stage"), res.get("error"), res.get("native_category")))
@@ -734,7 +766,13 @@ def main() -> int:
                 out_dir = OUT_ROOT / pair_id
                 out_dir.mkdir(parents=True, exist_ok=False)
                 t0 = time.time()
-                if missing["crust"] or missing["core"]:
+                marker = _source_marker(crust_dir) or _source_marker(core_dir)
+                if marker is not None:
+                    res = {"survived": False, "method": method, "stage": "source",
+                           "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+                           "failure_category": marker[0], "error": marker[1],
+                           "source_marker": marker[1]}
+                elif missing["crust"] or missing["core"]:
                     names = sorted(set(missing["crust"]) | set(missing["core"]))
                     res = {
                         "survived": False, "method": method, "stage": "source",
@@ -753,6 +791,11 @@ def main() -> int:
                 else:
                     res = run_pipeline(method, crust_dir, core_dir, out_dir)
                     res["outcome"] = "SURVIVED" if res["survived"] else "FAILED"
+                res.setdefault("source_sha256", {
+                    "crust": _source_compose_hashes(crust_dir),
+                    "core": _source_compose_hashes(core_dir)})
+                res.setdefault("source_scope", {"crust": _source_scope(crust_dir),
+                                                "core": _source_scope(core_dir)})
                 res["crust_model"] = crust
                 res["core_model"] = core
                 res["pair_id"] = pair_id
@@ -781,6 +824,7 @@ def main() -> int:
                         "consistency_report": res["consistency_report"],
                         "admission": res["admission"],
                         "source_sha256": res["source_sha256"],
+                        "source_scope": res["source_scope"],
                         "output_sha256": res["output_sha256"],
                         "fortran_executable_sha256": res["fortran_executable_sha256"],
                         "output_dir": str(out_dir / "compose"),
@@ -798,7 +842,7 @@ def main() -> int:
         m = by_method.setdefault(r["method"], {
             "configured": 0, "evaluated": 0, "survivors": 0, "failures_by_category": {}})
         m["configured"] += 1
-        if r["outcome"] != "NOT_EVALUATED_SOURCE_INCOMPLETE":
+        if not r["outcome"].startswith("NOT_EVALUATED_SOURCE_"):
             m["evaluated"] += 1
         if r["survived"]:
             m["survivors"] += 1
@@ -827,12 +871,20 @@ def main() -> int:
     except (OSError, subprocess.CalledProcessError):
         git_dirty = None
     built_at = datetime.now(timezone.utc)
+    execution_failures = [r["pair_id"] for r in results
+                          if r.get("failure_category") in {"environment", "implementation", "unclassified"}
+                          or r.get("consistency_status") == "INVALID_REPORT"]
     manifest = {
+        "execution_status": "FAILED" if execution_failures else "COMPLETED",
+        "execution_failure_pair_ids": execution_failures,
+        "not_evaluated_source_marked": sum(
+            r["outcome"] == "NOT_EVALUATED_SOURCE_MARKED" for r in results),
         "schema": "ns-cowling.core-crust-matching.v3",
         "built_at_utc": built_at.isoformat(),
         "built_date_utc": built_at.date().isoformat(),
         "output_root": str(OUT_ROOT),
         "crust_root": str(CRUST_ROOT),
+        "scientific_scope": "thermodynamic matching; microscopic interpretation inherits each source_scope",
         "core_root": str(CORE_ROOT),
         "crust_models": CRUST_MODELS,
         "core_models": CORE_MODELS,
@@ -864,7 +916,7 @@ def main() -> int:
         "admission_schema": "ns-cowling.match-report-admission.v1",
         "configured_attempts": len(CRUST_MODELS) * len(CORE_MODELS) * len(METHODS),
         "evaluated_attempts": sum(
-            1 for r in results if r["outcome"] != "NOT_EVALUATED_SOURCE_INCOMPLETE"),
+            1 for r in results if not r["outcome"].startswith("NOT_EVALUATED_SOURCE_")),
         "not_evaluated_source_incomplete": sum(
             1 for r in results if r["outcome"] == "NOT_EVALUATED_SOURCE_INCOMPLETE"),
         "source_identity_sha256": source_identity,
@@ -889,7 +941,7 @@ def main() -> int:
     print(f"\nMatching complete: {len(survivors)}/{len(results)} survived "
           f"(maxwell={n_maxwell}, css={n_css})")
     print(f"Manifest: {manifest_path}")
-    return 0
+    return 1 if execution_failures else 0
 
 
 if __name__ == "__main__":

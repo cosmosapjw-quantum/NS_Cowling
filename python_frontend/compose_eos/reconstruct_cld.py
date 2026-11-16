@@ -15,7 +15,7 @@ R(n) = eps - m_n n_B is represented by a not-a-knot cubic spline, mu_B =
 m_n + R'(n_B) and P = n_B mu_B - eps (Euler exact by construction).  The
 table is refused (CLDThermodynamicsError, nothing written) unless every cell
 converged and n_B, eps, mu_B (convexity / mechanical stability) and P are
-strictly increasing with P > 0 and row secants dP/deps <= 1.
+strictly increasing with P > 0 and the declared energy spline is mechanically stable and causal on every interval.
 
 Every Q column is encoded against the model's reference masses, which are
 also written in the header; normalization never changes eps, P or mu_B.
@@ -37,6 +37,7 @@ from .cld_cell import minimize_cld_cell, CLDCellResult
 COMPOSE_COLUMNS = "iT inb iYq Q1 Q2 Q3 Q4 Q5 Q6 Q7 Nadd"
 # Optimizer box used by cld_cell.minimize_cld_cell (rows on it are flagged).
 R_D_BOUNDS = (2.0, 40.0)
+RHO_I_BOUNDS = (0.01, 0.5)
 F_BOUNDS = (1e-4, 0.95)
 GAS_EQUILIBRIUM_REL_GATE = 5.0e-4   # provider Euler tolerance of the Maxwell kernel
 
@@ -62,6 +63,8 @@ def reconstruct_inner_crust(model: RMFModel, sigma_0: float, b: float,
 
 def thermodynamic_table(results: list[CLDCellResult], *, mn: float, mp: float) -> dict:
     """Derive (n, eps, mu_B, P) from minimized cells; raise if inadmissible."""
+    if not (math.isfinite(mn) and math.isfinite(mp) and mn > 0.0 and mp > 0.0):
+        raise CLDThermodynamicsError("reference masses must be finite and positive")
     if len(results) < 4:
         raise CLDThermodynamicsError("at least four CLD cells are required")
     bad = [i for i, r in enumerate(results) if not r.converged]
@@ -74,8 +77,34 @@ def thermodynamic_table(results: list[CLDCellResult], *, mn: float, mp: float) -
         raise CLDThermodynamicsError("nonfinite CLD cell values")
     if np.any(n <= 0.0) or np.any(np.diff(n) <= 0.0):
         raise CLDThermodynamicsError("baryon densities must be positive and strictly increasing")
+    if np.any((yp < 0.0) | (yp > 1.0)):
+        raise CLDThermodynamicsError("cell proton fraction must lie in [0, 1]")
+    mu_e = np.array([r.mu_e for r in results], dtype=float)
+    if np.any(~np.isfinite(mu_e)) or np.any(mu_e < 0.0):
+        raise CLDThermodynamicsError("electron chemical potentials must be finite and nonnegative")
+    gas_density = np.array([r.rho_II for r in results], dtype=float)
+    mu_gas = np.array([getattr(r, "mu_n_gas", float("nan")) for r in results], dtype=float)
+    if np.any(~np.isfinite(gas_density)) or np.any(gas_density < 0.0):
+        raise CLDThermodynamicsError("gas densities must be finite and nonnegative")
+    if np.any((gas_density > 0.0) & ~np.isfinite(mu_gas)):
+        raise CLDThermodynamicsError("gas neutron equilibrium requires a finite chemical potential at every gas row")
     eps = e_cell + mn * n * (1.0 - yp) + mp * n * yp
+    if np.any(~np.isfinite(eps)) or np.any(eps <= 0.0):
+        raise CLDThermodynamicsError("total energy density must be finite and positive")
     spline = CubicSpline(n, eps - mn * n, bc_type="not-a-knot")
+    # On each cubic interval R''' is constant.  R'' is affine, and
+    # d/dn(mu - n R'') = -n R'''.  Thus checking BOTH interval endpoints
+    # certifies R'' > 0 and mu - n R'' >= 0 everywhere, without sampling.
+    # This certificate applies only to this declared energy interpolant.
+    for i, width in enumerate(np.diff(n)):
+        a, b, c, _ = spline.c[:, i]
+        x = np.array([0.0, width])
+        mu_edge = mn + (3.0*a*x + 2.0*b)*x + c
+        curvature = 6.0*a*x + 2.0*b
+        if np.any(~np.isfinite(mu_edge)) or np.any(mu_edge <= 0.0) or np.any(curvature <= 0.0):
+            raise CLDThermodynamicsError(f"energy spline interval {i} violates positivity or mechanical stability")
+        if np.any(mu_edge - (n[i] + x)*curvature < 0.0):
+            raise CLDThermodynamicsError(f"energy spline interval {i} violates causality (dP/deps > 1)")
     mu = mn + spline(n, 1)
     p = n * mu - eps
     problems = []
@@ -95,8 +124,7 @@ def thermodynamic_table(results: list[CLDCellResult], *, mn: float, mp: float) -
     if problems:
         raise CLDThermodynamicsError("; ".join(problems))
     mu_solver = np.array([r.mu_n for r in results], dtype=float)
-    mu_gas = np.array([getattr(r, "mu_n_gas", float("nan")) for r in results], dtype=float)
-    gas_ok = np.isfinite(mu_gas)
+    gas_ok = gas_density > 0.0
     if gas_ok.any():
         # At the variational optimum the cell mu_B equals the gas neutron
         # chemical potential; reuse the declared provider-Euler tolerance.
@@ -111,7 +139,8 @@ def thermodynamic_table(results: list[CLDCellResult], *, mn: float, mp: float) -
             float(np.max(np.abs(mu_gas[gas_ok] - mu[gas_ok]))) if gas_ok.any() else None,
         "gas_mu_n_rows": int(gas_ok.sum()),
         "n": n, "eps": eps, "mu": mu, "P": p, "yp": yp,
-        "mu_e": np.array([r.mu_e for r in results], dtype=float),
+        "mu_e": mu_e,
+        "continuous_causality_validation": "analytic cubic interval endpoints: R_second > 0; mu - n R_second >= 0",
         "solver_cluster_mu_n_minus_derived_mu_B_max_abs_MeV": float(np.max(np.abs(mu_solver - mu))),
         "interpolant": "not-a-knot cubic spline of eps - m_n n_B; mu_B = m_n + derivative; P = n_B mu_B - eps",
     }
@@ -120,8 +149,12 @@ def thermodynamic_table(results: list[CLDCellResult], *, mn: float, mp: float) -
 def _box_bound_rows(results: list[CLDCellResult]) -> list[int]:
     rows = []
     for i, r in enumerate(results):
+        for value, bounds in ((r.R_d, R_D_BOUNDS), (r.f, F_BOUNDS), (r.rho_I, RHO_I_BOUNDS)):
+            if not math.isfinite(value) or not bounds[0] <= value <= bounds[1]:
+                raise CLDThermodynamicsError(f"invalid optimizer geometry at row {i}")
         on = any(abs(r.R_d - v) <= 1e-9 * v for v in R_D_BOUNDS) or \
-             any(abs(r.f - v) <= 1e-9 * v for v in F_BOUNDS)
+             any(abs(r.f - v) <= 1e-9 * v for v in F_BOUNDS) or \
+             any(abs(r.rho_I - v) <= 1e-9 * v for v in RHO_I_BOUNDS)
         if on:
             rows.append(i)
     return rows
@@ -137,6 +170,9 @@ def emit_compose_set(results: list[CLDCellResult], outdir: Path, model_key: str,
     runs at the table ends (recorded in the receipt); a bound row inside the
     table is refused.
     """
+    outdir = Path(outdir)
+    if outdir.exists() and (not outdir.is_dir() or any(outdir.iterdir())):
+        raise FileExistsError(f"output directory is not empty: {outdir}")
     bound = _box_bound_rows(results)
     lo, hi = 0, len(results)
     while lo < hi and lo in bound:
@@ -179,11 +215,20 @@ def emit_compose_set(results: list[CLDCellResult], outdir: Path, model_key: str,
     receipt = {
         "schema": "ns-cowling.cld-reconstruction-receipt.v2",
         "model": model_key,
+        "scientific_scope": "exploratory_proxy_CLD",
+        "source_calibrated": False,
+        "interface_functional": {
+            "coulomb_phi": "0.5*sqrt(2-3*f) for 0<f<2/3, zero otherwise",
+            "surface_sigma": "sigma_0*(yp*(1-yp))**b",
+            "source_equivalence": False,
+            "reference": "Scurto et al. 2024 arXiv:2402.15548 eqs.24-25 have different functions and require fitted parameters",
+        },
         "columns": COMPOSE_COLUMNS,
         "reference_masses_MeV": {"neutron": mn, "proton": mp},
         "rows": int(len(n)),
         "n_B_range_fm3": [float(n[0]), float(n[-1])],
         "thermodynamics": table["interpolant"],
+        "continuous_causality_validation": table["continuous_causality_validation"],
         "max_euler_relative_residual": float(euler.max()),
         "gas_mu_n_minus_derived_mu_B_max_abs_MeV": table["gas_mu_n_minus_derived_mu_B_max_abs_MeV"],
         "gas_mu_n_rows": table["gas_mu_n_rows"],
@@ -193,7 +238,7 @@ def emit_compose_set(results: list[CLDCellResult], outdir: Path, model_key: str,
                     "surface and Coulomb derivative terms"),
         "dropped_box_bound_rows": dropped,
         "source_row_offset": lo,
-        "box_bounds": {"R_d_fm": list(R_D_BOUNDS), "f": list(F_BOUNDS)},
+        "box_bounds": {"R_d_fm": list(R_D_BOUNDS), "f": list(F_BOUNDS), "rho_I_fm3": list(RHO_I_BOUNDS)},
         "omitted_files": ["eos.compo", "eos.init", "eos.mr"],
         "provenance": provenance or {},
     }

@@ -1,11 +1,12 @@
 ! E390-03: native Compressible Liquid Drop (CLD) cell reconstruction for the
 ! inner crust, ported from python_frontend/compose_eos/cld_cell.py.
 !
-! Physics (Scurto 2024 PRD 109 103015, eq. 21-25) on top of the validated
+! Exploratory proxy CLD functional, NOT the fitted surface/lattice functions
+! of Scurto 2024 Eqs. 24-25. This module operates on the validated
 ! DD-RMF homogeneous-matter solver (module compose_eos_rmf):
 !   E_cell = f*E(rho_I,rho_Ip) + (1-f)*E(rho_II,rho_IIp) + E_Coul + E_surf + E_L
 ! minimised over (f, R_d, rho_I); the cluster proton density rho_Ip is solved
-! from beta-equilibrium at the cluster (mu_n - mu_p = mu_e); the gas is the
+! from stationarity of the full cell energy including finite-size terms; the gas is the
 ! standard low-density pure-neutron approximation (rho_IIp = 0).
 !
 ! All units: densities fm^-3, energies MeV, energy densities MeV/fm^3,
@@ -37,6 +38,7 @@ module compose_eos_cld
   real(wp), parameter :: rd_hi = 40._wp
   real(wp), parameter :: rhoI_lo = 0.01_wp
   real(wp), parameter :: rhoI_hi = 0.5_wp
+  integer, parameter :: nm_max_iter = 500
 
   type :: cld_cell_result_t
     real(wp) :: rho_b = 0._wp
@@ -48,7 +50,8 @@ module compose_eos_cld
     real(wp) :: rho_iip = 0._wp       ! gas proton density
     real(wp) :: rho_e = 0._wp         ! electron density
     real(wp) :: yp_cell = 0._wp       ! cell-averaged proton fraction
-    real(wp) :: e_cell = 0._wp        ! cell binding energy density
+    real(wp) :: e_cell = 0._wp        ! baryon-rest-subtracted energy density
+    real(wp) :: eps_total = 0._wp     ! physical energy density, including rest masses
     real(wp) :: e_binding_per_baryon = 0._wp
     real(wp) :: e_coul = 0._wp
     real(wp) :: e_surf = 0._wp
@@ -65,8 +68,7 @@ module compose_eos_cld
 contains
 
   !------------------------------------------------------------------
-  ! Ravenhall-Pethick-Wilson lattice function Phi(u) for spherical droplets
-  ! (dilute-sphere limit used in python cld_cell.coulomb_lattice_phi).
+  ! Proxy lattice function; NOT the Ravenhall-Pethick-Wilson sphere function.
   pure function coulomb_lattice_phi(u) result(phi)
     real(wp), intent(in) :: u
     real(wp) :: phi
@@ -77,7 +79,7 @@ contains
     endif
   end function coulomb_lattice_phi
 
-  ! Lattimer empirical surface tension: sigma = sigma_0 * (yp*(1-yp))^b
+  ! Proxy surface tension (not a source-calibrated fit): sigma = sigma_0 * (yp*(1-yp))^b
   pure function surface_tension(yp_i, sigma_0, b) result(sigma)
     real(wp), intent(in) :: yp_i, sigma_0, b
     real(wp) :: sigma
@@ -114,94 +116,93 @@ contains
   end function electron_chemical_potential
 
   !------------------------------------------------------------------
-  ! Solve for the cluster proton density rho_ip from beta-equilibrium at the
-  ! cluster phase (mu_n - mu_p = mu_e), with the gas treated as pure neutron.
-  ! Returns (rho_ip, rho_e, mu_e, |residual|).
-  subroutine solve_beta_equilibrium_cluster(model, rho_i, f, rho_ip, rho_e, mu_e, beta_resid)
+  ! Conditional proton stationarity for the declared proxy functional.
+  ! The derivative of epsilon_cell/f includes electron, Coulomb and surface
+  ! terms. A finite scan brackets local minima; it is not a proof of global
+  ! uniqueness for arbitrary sigma_0,b. Endpoint solutions are not admitted
+  ! as beta-equilibrated cells by the residual gate below.
+  subroutine proton_energy_residual(model,rho_i,f,r_d,sigma_0,b,rho_ip,energy,residual,ok)
     type(ddrmf_model_t), intent(in) :: model
-    real(wp), intent(in)  :: rho_i, f
-    real(wp), intent(out) :: rho_ip, rho_e, mu_e, beta_resid
-    real(wp) :: lo, hi, mid, r_lo, r_hi, r_mid, rho_ip_mid, rho_e_mid
+    real(wp), intent(in) :: rho_i,f,r_d,sigma_0,b,rho_ip
+    real(wp), intent(out) :: energy,residual
+    logical, intent(out) :: ok
     type(ddrmf_state_t) :: st
-    character(len=80) :: st_status
-    integer :: it
-    real(wp), parameter :: rho_iip_gas = 0._wp   ! pure neutron gas
+    character(len=80) :: status
+    real(wp) :: y, ysafe, phi, sigma, dsigma, ne
+    y=rho_ip/rho_i; ysafe=max(1.e-12_wp,min(1._wp-1.e-12_wp,y))
+    call solve_ddrmf_homogeneous(model,rho_i,y,st,status)
+    ok=status=='ok'
+    energy=huge(1._wp); residual=huge(1._wp)
+    if(.not.ok) return
+    phi=coulomb_lattice_phi(f); sigma=surface_tension(y,sigma_0,b)
+    dsigma=sigma_0*b*(ysafe*(1._wp-ysafe))**(b-1._wp)*(1._wp-2._wp*ysafe)
+    ne=f*rho_ip
+    energy=st%eps_b+electron_energy_density(ne)/f+ &
+      2._wp*pi*e2*phi*r_d*r_d*rho_ip*rho_ip+3._wp*sigma/r_d
+    residual=st%mu_p-st%mu_n+electron_chemical_potential(ne)+ &
+      4._wp*pi*e2*phi*r_d*r_d*rho_ip+3._wp*dsigma/(r_d*rho_i)
+    ok=ieee_is_finite(energy).and.ieee_is_finite(residual)
+  end subroutine proton_energy_residual
 
-    ! residual at rho_ip = 0 (pure neutron cluster)
-    call solve_ddrmf_homogeneous(model, rho_i, 0._wp, st, st_status)
-    if (st_status /= 'ok') then
-      rho_e = 0._wp; mu_e = m_e; rho_ip = 0._wp
-      beta_resid = huge(1._wp); return
-    endif
-    rho_e_mid = f*0._wp + (1._wp - f)*rho_iip_gas
-    rho_e_mid = max(0._wp, rho_e_mid)
-    mu_e = electron_chemical_potential(rho_e_mid)
-    r_lo = (st%mu_n - st%mu_p) - mu_e
-
-    ! residual at rho_ip = rho_i (symmetric cluster)
-    call solve_ddrmf_homogeneous(model, rho_i, 1._wp, st, st_status)
-    if (st_status /= 'ok') then
-      rho_e = 0._wp; mu_e = m_e; rho_ip = 0._wp
-      beta_resid = huge(1._wp); return
-    endif
-    rho_e_mid = f*rho_i + (1._wp - f)*rho_iip_gas
-    rho_e_mid = max(0._wp, rho_e_mid)
-    mu_e = electron_chemical_potential(rho_e_mid)
-    r_hi = (st%mu_n - st%mu_p) - mu_e
-
-    if (r_lo*r_hi > 0._wp) then
-      ! no sign change: return the endpoint with the smaller |residual|
-      if (abs(r_lo) < abs(r_hi)) then
-        rho_ip = 0._wp
-        rho_e = max(0._wp, f*0._wp + (1._wp - f)*rho_iip_gas)
-        mu_e = electron_chemical_potential(rho_e)
-        beta_resid = abs(r_lo)
-      else
-        rho_ip = rho_i
-        rho_e = max(0._wp, f*rho_i + (1._wp - f)*rho_iip_gas)
-        mu_e = electron_chemical_potential(rho_e)
-        beta_resid = abs(r_hi)
-      endif
-      return
-    endif
-
-    lo = 0._wp; hi = rho_i
-    do it = 1, 60
-      mid = 0.5_wp*(lo + hi)
-      call solve_ddrmf_homogeneous(model, rho_i, mid/rho_i, st, st_status)
-      if (st_status /= 'ok') then
-        ! solver failed at this rho_ip: shrink the bracket toward the good side
-        if (r_lo*it < r_hi*it) then
-          hi = mid
-        else
-          lo = mid
+  subroutine solve_beta_equilibrium_cluster(model,rho_i,f,r_d,sigma_0,b,rho_ip,rho_e,mu_e,beta_resid)
+    type(ddrmf_model_t), intent(in) :: model
+    real(wp), intent(in) :: rho_i,f,r_d,sigma_0,b
+    real(wp), intent(out) :: rho_ip,rho_e,mu_e,beta_resid
+    real(wp) :: left,right,dl,dr,lo,hi,mid,dm,energy,best_energy,best_residual
+    logical :: ok, ok_left
+    real(wp) :: nodes(151), temp
+    integer :: j,it,k,l
+    do j=1,129
+      nodes(j)=real(j-1,wp)/128._wp
+    enddo
+    do j=1,11
+      nodes(129+2*j-1)=10._wp**(-j)
+      nodes(129+2*j)=1._wp-10._wp**(-j)
+    enddo
+    do k=2,size(nodes)
+      temp=nodes(k); l=k-1
+      do while(l>=1)
+        if(nodes(l)<=temp) exit
+        nodes(l+1)=nodes(l); l=l-1
+      enddo
+      nodes(l+1)=temp
+    enddo
+    call proton_energy_residual(model,rho_i,f,r_d,sigma_0,b,0._wp,best_energy,dl,ok_left)
+    rho_ip=0._wp; best_residual=huge(1._wp)
+    left=0._wp
+    do j=2,size(nodes)
+      right=rho_i*nodes(j)
+      call proton_energy_residual(model,rho_i,f,r_d,sigma_0,b,right,energy,dr,ok)
+      if(ok.and.ok_left.and.dl<0._wp.and.dr>=0._wp) then
+        lo=left; hi=right
+        do it=1,64
+          mid=0.5_wp*(lo+hi)
+          call proton_energy_residual(model,rho_i,f,r_d,sigma_0,b,mid,energy,dm,ok)
+          if(.not.ok) exit
+          if(abs(dm)<=1.e-9_wp.or.hi-lo<=1.e-14_wp*rho_i) exit
+          if(dm>0._wp) then
+            hi=mid
+          else
+            lo=mid
+          endif
+        enddo
+        if(ok.and.abs(dm)<1.e-6_wp.and.energy<best_energy) then
+          rho_ip=mid; best_energy=energy; best_residual=abs(dm)
         endif
-        cycle
       endif
-      rho_e_mid = max(0._wp, f*mid + (1._wp - f)*rho_iip_gas)
-      mu_e = electron_chemical_potential(rho_e_mid)
-      r_mid = (st%mu_n - st%mu_p) - mu_e
-      if (r_mid == 0._wp .or. (hi - lo) < 1.e-12_wp) exit
-      if (r_lo*r_mid < 0._wp) then
-        hi = mid; r_hi = r_mid
-      else
-        lo = mid; r_lo = r_mid
-      endif
-    end do
-    rho_ip = 0.5_wp*(lo + hi)
-    rho_e = max(0._wp, f*rho_ip + (1._wp - f)*rho_iip_gas)
-    mu_e = electron_chemical_potential(rho_e)
-    ! final residual
-    call solve_ddrmf_homogeneous(model, rho_i, rho_ip/rho_i, st, st_status)
-    if (st_status == 'ok') then
-      beta_resid = abs((st%mu_n - st%mu_p) - mu_e)
-    else
-      beta_resid = abs(r_mid)
+      left=right
+      call proton_energy_residual(model,rho_i,f,r_d,sigma_0,b,left,energy,dl,ok_left)
+    enddo
+    ! Include the other composition endpoint in the conditional energy comparison.
+    if(ok_left.and.energy<best_energy) then
+      rho_ip=rho_i; best_residual=huge(1._wp)
     endif
+    rho_e=f*rho_ip; mu_e=electron_chemical_potential(rho_e)
+    beta_resid=best_residual
   end subroutine solve_beta_equilibrium_cluster
 
   !------------------------------------------------------------------
-  ! CLD cell binding energy density at fixed rho_b and variational point
+  ! CLD total energy density (including baryon rest masses) at fixed rho_b and variational point
   ! (f, R_d, rho_i).  rho_ii is set by baryon conservation; rho_ip by beta-
   ! equilibrium at the cluster; rho_iip = 0 (pure neutron gas).
   function cld_cell_energy(model, rho_b, f, r_d, rho_i, sigma_0, b, &
@@ -223,11 +224,14 @@ contains
     endif
     rho_ii = max(0._wp, rho_ii)
 
-    ! beta-equilibrium at the cluster gives rho_ip; rho_e follows
-    call solve_beta_equilibrium_cluster(model, rho_i, f, rho_ip, rho_e_tmp, mu_e, beta_resid)
+    ! Full proton variation, including finite-size terms.
+    call solve_beta_equilibrium_cluster(model,rho_i,f,r_d,sigma_0,b,rho_ip,rho_e_tmp,mu_e,beta_resid)
+    if(beta_resid>1.e-6_wp) then
+      e_cell=huge(1._wp); return
+    endif
     rho_e = max(0._wp, rho_e_tmp)
 
-    ! homogeneous binding energies for cluster and gas (binding = eps_b, rest-mass-free)
+    ! Native eps_b is TOTAL baryonic energy, including constituent rest masses.
     call solve_ddrmf_homogeneous(model, rho_i, rho_ip/rho_i, st_i, st_status)
     if (st_status /= 'ok') then
       e_cell = huge(1._wp); return
@@ -243,10 +247,10 @@ contains
       e_ii = 0._wp
     endif
 
-    ! Coulomb (Scurto eq. 22): E_Coul = 2*pi*e^2 * f * Phi * R_d^2 * (rho_ip - rho_iip)^2
+    ! Proxy Coulomb term: E_Coul = 2*pi*e^2 * f * Phi * R_d^2 * (rho_ip - rho_iip)^2
     phi = coulomb_lattice_phi(f)
     e_coul = 2._wp*pi*e2*f*phi*r_d*r_d*(rho_ip - rho_iip)**2
-    ! Surface (Scurto eq. 24): E_surf = 3*f*sigma/R_d
+    ! Proxy surface term: E_surf = 3*f*sigma/R_d
     yp_i = rho_ip/rho_i
     sigma = surface_tension(yp_i, sigma_0, b)
     if (r_d > 0._wp) then
@@ -295,8 +299,8 @@ contains
     real(wp), intent(in)  :: rho_b, sigma_0, b, x0(3)
     real(wp), intent(out) :: x_best(3), e_best
     integer, intent(out) :: n_iter
-    integer, parameter :: max_iter = 120
-    real(wp), parameter :: tol = 1.e-6_wp
+    integer, parameter :: max_iter = nm_max_iter
+    real(wp), parameter :: tol = 1.e-10_wp, x_tol = 1.e-6_wp
     real(wp), parameter :: alpha = 1._wp, gamma = 2._wp, rho_c = 0.5_wp, sigma_c = 0.5_wp
     real(wp) :: simplex(4, 3), fvals(4), centroid(3), xr(3), xe(3), xc(3)
     real(wp) :: fr, fe, fc, steps(3)
@@ -321,7 +325,8 @@ contains
       simplex = simplex(order, :)
       fvals = fvals(order)
       ok = ok(order)
-      if (abs(fvals(4) - fvals(1)) < tol .and. fvals(1) < huge(1._wp)) exit
+      if (abs(fvals(4) - fvals(1)) < tol .and. fvals(1) < huge(1._wp) &
+          .and.maxval(abs(simplex(2:4,:)-spread(simplex(1,:),1,3)))<x_tol) exit
       if (fvals(1) >= huge(1._wp)) exit   ! no feasible point at all
       centroid = 0._wp
       do j = 1, 3
@@ -402,6 +407,9 @@ contains
 
     result = cld_cell_result_t()
     result%rho_b = rho_b
+    if(.not.all(ieee_is_finite([rho_b,sigma_0,b])).or.rho_b<=0._wp.or.sigma_0<0._wp.or.b<=0._wp) then
+      result%status='invalid density or surface parameters'; return
+    endif
     call load_ddrmf_model(trim(model_id), model, status)
     if (status /= 'ok') then
       result%status = 'model load failed'; return
@@ -439,10 +447,11 @@ contains
     f = max(f_lo, min(f_hi, best_x(1)))
     r_d = exp(max(log(rd_lo), min(log(rd_hi), best_x(2))))
     rho_i = max(rhoI_lo, min(rhoI_hi, best_x(3)))
-    result%e_cell = cld_cell_energy(model, rho_b, f, r_d, rho_i, sigma_0, b, &
+    result%eps_total = cld_cell_energy(model, rho_b, f, r_d, rho_i, sigma_0, b, &
                                     rho_ip, rho_ii, rho_e, e_coul, e_surf, e_l)
     result%f = f; result%r_d = r_d; result%rho_i = rho_i; result%rho_ip = rho_ip
     result%rho_ii = rho_ii; result%rho_iip = 0._wp; result%rho_e = rho_e
+    result%e_cell=result%eps_total-model%mn*(rho_b-rho_e)-model%mp*rho_e
     result%e_coul = e_coul; result%e_surf = e_surf; result%e_l = e_l
     if (rho_b > 0._wp) then
       result%e_binding_per_baryon = result%e_cell/rho_b
@@ -453,15 +462,17 @@ contains
     if (status == 'ok') then
       result%mu_n = st_i%mu_n; result%mu_p = st_i%mu_p
     endif
-    result%mu_e = electron_chemical_potential(rho_e)
-    result%converged = ieee_is_finite(result%e_cell) .and. result%e_cell < huge(1._wp)
+    call solve_beta_equilibrium_cluster(model,rho_i,f,r_d,sigma_0,b,rho_ip,rho_e,result%mu_e,result%beta_resid)
+    result%converged = ieee_is_finite(result%eps_total).and.result%eps_total<huge(1._wp) &
+      .and.result%beta_resid<=1.e-6_wp.and.n_iter_nm<=nm_max_iter
     result%status = 'ok'
+    if(.not.result%converged) result%status='proxy optimizer or stationarity not converged'
   end subroutine cld_reconstruct_point
 
   !------------------------------------------------------------------
   ! Reconstruct one model over a log-spaced inner-crust density grid and emit
   ! a JSON array (one object per density point) to stdout.  This is the
-  ! production entry point used by the cld-reconstruct CLI subcommand.
+  ! exploratory entry point used by the cld-reconstruct CLI subcommand.
   subroutine cld_reconstruct_model(model_id, sigma_0, b, rho_min, rho_max, n_points)
     character(len=*), intent(in) :: model_id
     real(wp), intent(in) :: sigma_0, b, rho_min, rho_max
@@ -501,6 +512,8 @@ contains
       ',"rho_e_fm3":'//trim(fmt(r%rho_e))// &
       ',"yp_cell":'//trim(fmt(r%yp_cell))// &
       ',"E_cell_MeV_fm3":'//trim(fmt(r%e_cell))// &
+      ',"epsilon_total_MeV_fm3":'//trim(fmt(r%eps_total))// &
+      ',"physical_scope":"exploratory_proxy_CLD","source_calibrated":false'// &
       ',"E_binding_per_baryon_MeV":'//trim(fmt(r%e_binding_per_baryon))// &
       ',"E_coul_MeV_fm3":'//trim(fmt(r%e_coul))// &
       ',"E_surf_MeV_fm3":'//trim(fmt(r%e_surf))// &

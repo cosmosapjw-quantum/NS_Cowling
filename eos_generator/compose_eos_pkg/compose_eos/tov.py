@@ -1,9 +1,11 @@
 """Causality-aware barotropic interpolation and TOV integration.
 
 All EOS arrays are in CompOSE natural units (MeV, fm^-3). TOV integration is
-performed in SI units. The interpolant is a monotone PCHIP representation of
-log(P) as a function of log(epsilon), so its derivative defines a single
-barotropic sound speed consistently with the pressure used in the TOV RHS.
+performed in SI units. The TOV RHS uses the monotone PCHIP
+log(epsilon)(log(P)); causal admission
+and the central expansion use that same interpolant. Independent P(epsilon)
+and n(epsilon) interpolants remain available as table diagnostics and must
+not be used as inverses of the RHS representation.
 
 This module deliberately does not extrapolate below/above the tabulated EOS.
 The stellar surface is the lowest tabulated pressure; the returned radius is
@@ -36,6 +38,10 @@ class TOVConfig:
     causal_tolerance: float = 1.0e-8
 
     def __post_init__(self):
+        if not all(np.isfinite(v) for v in (
+                self.rtol, self.max_radius_m, self.max_step_m,
+                self.initial_radius_m, self.causal_tolerance)):
+            raise ValueError("TOV controls must be finite")
         if not (0.0 < self.rtol < 1.0):
             raise ValueError("rtol must lie in (0, 1)")
         if self.max_radius_m <= 0 or self.max_step_m <= 0 or self.initial_radius_m <= 0:
@@ -161,7 +167,7 @@ def _rhs_interval_polys(eos: BarotropicEOS, j: int):
 
 
 def _poly_range(poly, a, b):
-    """Exact (min, max) of a polynomial of degree <= 3 on [a, b]."""
+    """Extremal candidates of a degree <= 3 polynomial, evaluated in float64."""
     cand = [a, b]
     d = poly.deriv().trim(tol=0.0)
     if d.degree() >= 1:
@@ -176,19 +182,22 @@ def _certify_rhs_causality(eos: BarotropicEOS, tolerance: float, min_width: floa
     """Ordered branch-and-bound certificate of 0 < c_s^2 <= 1 + tolerance.
 
     On the RHS interpolant c_s^2 = exp(x - z(x)) / z'(x).  On any sub-interval
-    w = x - z is a cubic and z' a quadratic, so their exact ranges give rigorous
-    bounds  exp(min w)/max z' <= c_s^2 <= exp(max w)/min z'.  Sub-intervals are
-    processed left to right and bisected until certified or a violating point is
-    found.  A leaf of width ``min_width`` (in the unit interval coordinate) that
-    is neither certified nor violating at its endpoints is recorded as
-    unresolved and the scan continues; if no genuine violation follows, the
-    domain is cut fail-closed at the first unresolved leaf.
+    w = x - z is a cubic and z' a quadratic. Their algebraic ranges give
+    exp(min w)/max z' <= c_s^2 <= exp(max w)/min z' in real arithmetic.
+    Polynomial extrema and exponentials are evaluated in float64: this is
+    an interval-based numerical check, not directed-rounding interval arithmetic.
+    Sub-intervals are processed left to right and bisected until admitted or a
+    violating point is found. An undecided leaf cuts the connected admissible
+    prefix immediately; later violations cannot override that uncertainty.
 
     Returns (violation_x, certified_max, x_safe, undecided) with x = ln P.
     """
+    if not np.isfinite(tolerance) or tolerance < 0.0:
+        raise ValueError("tolerance must be finite and non-negative")
+    if not np.isfinite(min_width) or not 0.0 < min_width <= 1.0:
+        raise ValueError("min_width must be finite and in (0, 1]")
     bound = 1.0 + tolerance
     certified_max = -np.inf
-    unresolved = None
     nint = len(eos._lneps_of_lnp.x) - 1
     for j in range(nint):
         x0, h, z_s, dz_s = _rhs_interval_polys(eos, j)
@@ -213,15 +222,10 @@ def _certify_rhs_causality(eos: BarotropicEOS, tolerance: float, min_width: floa
             if b - a <= min_width:
                 if cs2_at(b) > bound:
                     return x0 + h * b, certified_max, x0 + h * a, False
-                certified_max = max(certified_max, cs2_at(a), cs2_at(b))
-                if unresolved is None:
-                    unresolved = x0 + h * a
-                continue
+                return x0 + h * a, certified_max, x0 + h * a, True
             mid = 0.5 * (a + b)
             stack.append((mid, b))   # right half processed after left half
             stack.append((a, mid))
-    if unresolved is not None:
-        return unresolved, certified_max, unresolved, True
     return None, certified_max, float(eos._lneps_of_lnp.x[-1]), False
 
 
@@ -241,8 +245,8 @@ def find_causal_domain(eos: BarotropicEOS, tolerance: float = 1e-8,
     certified side already lies in (1, 1 + tolerance]).  ``samples_per_interval``
     is accepted for configuration compatibility and is not used for any gate.
     """
-    if tolerance < 0:
-        raise ValueError("tolerance must be non-negative")
+    if not np.isfinite(tolerance) or tolerance < 0:
+        raise ValueError("tolerance must be finite and non-negative")
     if samples_per_interval < 2:
         raise ValueError("samples_per_interval must be at least 2")
     violation, cert_max, x_safe, undecided = _certify_rhs_causality(eos, tolerance)
@@ -252,35 +256,47 @@ def find_causal_domain(eos: BarotropicEOS, tolerance: float = 1e-8,
             eps_max=float(eos.energy_density[-1]), pressure_max=float(eos.pressure[-1]),
             cs2_at_limit=float(eos.cs2_of_pressure(eos.pressure[-1])),
             reason=("Certified 0 < c_s^2 <= 1 + tol on the TOV RHS interpolant "
-                    "ln eps(ln P) by exact interval bounds; no sampling."),
+                    "ln eps(ln P) by exact interval bounds evaluated in float64; no sampling."),
             cs2_certified_max=float(cert_max))
     x_first = float(eos._lneps_of_lnp.x[0])
     if violation <= x_first:
+        if undecided:
+            raise ValueError("Causality bound is unresolved at the first tabulated point")
         raise ValueError("EOS is mechanically unstable or acausal at the first tabulated point")
     cs2 = lambda x: float(eos.cs2_of_pressure(np.exp(x)))
     target = 1.0
-    if undecided:
-        x_cross = x_safe
-    else:
-        # Cut at the c_s^2 = 1 crossing connected to the violation: step back
-        # from the last certified point until c_s^2 <= 1, then root-solve.
+    x_cross = x_safe
+    if not undecided or cs2(x_safe) > 1.0:
+        # Even an unresolved leaf can be preceded by a numerically located
+        # c_s^2=1 crossing. Only move backward within the admitted prefix.
         x_hi, x_lo, step = violation, x_safe, 1e-12 * max(1.0, abs(x_safe))
         while cs2(x_lo) > 1.0 and x_lo > x_first:
             x_hi = x_lo
             x_lo = max(x_first, x_lo - step)
             step *= 2.0
         if cs2(x_lo) > 1.0:
-            target = 1.0 + tolerance
-            x_lo = x_first
-        x_cross = float(brentq(lambda x: cs2(x) - target, x_lo, x_hi,
-                               xtol=1e-15 * max(1.0, abs(x_hi)), rtol=1e-15))
+            if not undecided:
+                target = 1.0 + tolerance
+                x_lo = x_first
+                x_cross = float(brentq(lambda x: cs2(x) - target, x_lo, x_hi,
+                                       xtol=1e-15 * max(1.0, abs(x_hi)), rtol=1e-15))
+        else:
+            x_cross = float(brentq(lambda x: cs2(x) - target, x_lo, x_hi,
+                                   xtol=1e-15 * max(1.0, abs(x_hi)), rtol=1e-15))
     p_cross = float(np.exp(x_cross))
     eps_cross = float(eos.energy_of_pressure(p_cross))
-    nb_cross = float(eos.nb_of_energy(min(max(eps_cross, eos.energy_density[0]), eos.energy_density[-1])))
+    # Invert the actual central-pressure map, not an independently fitted
+    # n(epsilon). The latter can map this pressure cutoff back above the
+    # admitted domain when composed with P(n).
+    lognb_cross = brentq(
+        lambda lognb: float(eos._lnp_of_lnnb(lognb)) - x_cross,
+        float(eos._ln_nb[0]), float(eos._ln_nb[-1]),
+        xtol=4.0 * np.finfo(float).eps, rtol=4.0 * np.finfo(float).eps)
+    nb_cross = float(np.exp(lognb_cross))
     source_interval = max(0, min(len(eos.pressure) - 2,
                                  int(np.searchsorted(eos.pressure, p_cross, side="right") - 1)))
     reason = ("First c_s^2 crossing of the TOV RHS interpolant ln eps(ln P), located by "
-              "exact interval bounds; higher-density branch excluded.")
+              "exact interval bounds evaluated in float64; higher-density branch excluded.")
     if undecided:
         reason += " Bound undecided at minimum width; cut fail-closed at the last certified point."
     elif target != 1.0:
@@ -299,7 +315,11 @@ def solve_tov_star(eos: BarotropicEOS, central_nb: float,
     if causal_domain is not None and central_nb > causal_domain.nb_max * (1.0 + 2e-12):
         raise ValueError(f"central density {central_nb:g} lies outside causal domain ending at {causal_domain.nb_max:g}")
     pc_mev = float(eos.pressure_of_nb(central_nb))
-    ec_mev = float(eos.energy_of_nb(central_nb))
+    if causal_domain is not None and pc_mev > causal_domain.pressure_max * (1.0 + 2e-12):
+        raise ValueError(f"central pressure {pc_mev:g} lies outside causal domain "
+                         f"ending at {causal_domain.pressure_max:g}")
+    # The origin expansion must use exactly the epsilon(P) used by the RHS.
+    ec_mev = float(eos.energy_of_pressure(pc_mev))
     pc = pc_mev * MEV_FM3_TO_PA
     surface_p_mev = float(eos.pressure[0])
     surface_p = max(1.0, surface_p_mev * MEV_FM3_TO_PA)
@@ -403,39 +423,62 @@ def first_law_nb_consistency(eos: BarotropicEOS, oversampling: int = 12) -> dict
 
 
 def stable_branch_summary(results: Iterable[TOVStarResult]) -> dict:
-    """Summarize the sampled stable branch up to the first mass maximum."""
-    results = list(results)
+    """Summarize the first connected, increasing successful mass segment.
+
+    A sampled turning point is descriptive, not a radial-mode stability
+    determination. Legacy fields containing "stable_branch" are retained as
+    aliases of this explicitly scoped segment.
+    """
+    results = sorted(results, key=lambda r: r.central_nb)
     good = [r for r in results if r.status == "SUCCESS"]
     if len(good) < 3:
-        return {"status": "INSUFFICIENT_SUCCESSFUL_STARS", "n_success": len(good)}
-    nc = np.asarray([r.central_nb for r in good])
-    mass = np.asarray([r.mass_solar for r in good])
-    radius = np.asarray([r.radius_km for r in good])
-    order = np.argsort(nc)
-    nc, mass, radius = nc[order], mass[order], radius[order]
-    imax = int(np.argmax(mass))
+        return {"status": "INSUFFICIENT_SUCCESSFUL_STARS", "n_success": len(good),
+                "radial_stability_validated": False}
+    first = next(i for i, r in enumerate(results) if r.status == "SUCCESS")
+    segment = []
+    ended_at_gap = False
+    for row in results[first:]:
+        if row.status != "SUCCESS":
+            ended_at_gap = True
+            break
+        segment.append(row)
+    nc = np.asarray([r.central_nb for r in segment])
+    mass = np.asarray([r.mass_solar for r in segment])
+    radius = np.asarray([r.radius_km for r in segment])
+    nonincreasing = np.flatnonzero(np.diff(mass) <= 0.0)
+    if nonincreasing.size:
+        imax = int(nonincreasing[0])
+        peak_kind = ("PLATEAU_LIMITED" if mass[imax + 1] == mass[imax]
+                     else "FIRST_TURNOVER_SAMPLED")
+    else:
+        imax = len(mass) - 1
+        peak_kind = "GAP_LIMITED" if ended_at_gap else "UPPER_DOMAIN_LIMITED"
     branch_mass = mass[:imax + 1]
     branch_radius = radius[:imax + 1]
-    branch_nc = nc[:imax + 1]
     r14 = None
     crosses = np.flatnonzero((branch_mass[:-1] - 1.4) * (branch_mass[1:] - 1.4) <= 0.0)
     if crosses.size:
         j = int(crosses[0])
-        if branch_mass[j + 1] != branch_mass[j]:
-            frac = (1.4 - branch_mass[j]) / (branch_mass[j + 1] - branch_mass[j])
-            r14 = float(branch_radius[j] + frac * (branch_radius[j + 1] - branch_radius[j]))
-    upper_limited = bool(imax == len(mass) - 1)
+        frac = (1.4 - branch_mass[j]) / (branch_mass[j + 1] - branch_mass[j])
+        r14 = float(branch_radius[j] + frac * (branch_radius[j + 1] - branch_radius[j]))
     return {
         "status": "SAMPLED_SEQUENCE",
         "n_success": len(good),
         "n_fail": sum(r.status != "SUCCESS" for r in results),
+        "n_on_sampled_segment": int(imax + 1),
+        "sampled_segment_has_lower_gap": bool(first > 0),
+        "sampled_segment_scope": "first connected increasing successful mass segment",
+        "radial_stability_validated": False,
         "Mmax_sampled_solar": float(mass[imax]),
-        "Mmax_peak_classification": ("UPPER_DOMAIN_LIMITED" if upper_limited else "INTERIOR_PEAK_RESOLVED"),
+        "max_on_sampled_segment_solar": float(mass[imax]),
+        "Mmax_peak_classification": peak_kind,
         "Mmax_is_global_maximum_claimed": False,
         "R_at_Mmax_km": float(radius[imax]),
         "nc_at_Mmax_fm3": float(nc[imax]),
+        "R14_km_linear_on_sampled_segment": r14,
         "R14_km_linear_on_stable_branch": r14,
         "R14_in_sampled_stable_branch": r14 is not None,
+        "legacy_stable_branch_keys_are_sampled_segment_aliases": True,
     }
 
 

@@ -139,3 +139,14 @@ def test_vacuous_derivative_residual_is_not_reported_as_evidence():
     report = _branchwise_first_law_report(mu, p, n, eps)
     assert "max_relative_residual" not in report
     assert "by construction" in report["identity"]
+
+
+@pytest.mark.parametrize("mu", [
+    np.array([0.0, 1.0, 2.0, 3.0]),
+    np.array([-2.0, -1.0, 0.0, 1.0]),
+])
+def test_branch_audit_rejects_nonpositive_chemical_potential(mu):
+    n = np.array([0.1, 0.2, 0.3, 0.4])
+    p = np.array([0.01, 0.02, 0.03, 0.04])
+    with pytest.raises(ValueError, match="positive"):
+        _branchwise_first_law_report(mu, p, n, mu * n - p)

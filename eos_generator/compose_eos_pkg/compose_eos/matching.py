@@ -459,6 +459,39 @@ def _endpoint_sound_speed_squared(data: EOSData, index: int, side: str, points: 
     return cs2
 
 
+SOURCE_EULER_RELATIVE_TOLERANCE = 5.0e-4  # native match_crust_core / sharp Maxwell gate
+
+
+def _source_euler_relative_residual(source: EOSData, label: str) -> float:
+    """Validate provider mu on every source row before output Q3 is re-derived.
+
+    At T=0, mu_E = F + P/n. For Il=0 the charge contribution Yq*mu_q
+    must be added to CompOSE mu_b. This checks the same relative residual as
+    compose_eos_matching.f90; no energy-reference shift is performed.
+    """
+    arrays = [np.asarray(getattr(source, name), dtype=float)
+              for name in ("Q1", "Q3", "Q4", "Q6")]
+    if (source.n == 0 or any(a.shape != source.nb.shape for a in arrays)
+            or not np.isfinite(source.mn) or source.mn <= 0.0
+            or source.Il not in (0, 1) or not np.isfinite(source.charge_fraction_grid)):
+        raise ValueError(f"{label} source Euler check requires valid thermodynamic metadata and rows")
+    q1, q3, q4, q6 = arrays
+    with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+        mu_source = (q3 + 1.0) * source.mn
+        if source.Il == 0:
+            mu_source = mu_source + source.charge_fraction_grid * q4 * source.mn
+        mu_euler = (q6 + 1.0) * source.mn + q1
+        residual = np.abs(mu_source - mu_euler) / np.abs(mu_euler)
+    if not np.all(np.isfinite(residual)):
+        raise ValueError(f"{label} source rows violate the provider Q3 Euler relation: nonfinite residual")
+    worst = float(np.max(residual))
+    if worst > SOURCE_EULER_RELATIVE_TOLERANCE:
+        raise ValueError(f"{label} source rows violate the provider Q3 Euler relation "
+                         f"mu_B = F + P/n_B (relative residual {worst:.8g}, "
+                         f"tolerance {SOURCE_EULER_RELATIVE_TOLERANCE:g})")
+    return worst
+
+
 def match_crust_core(
     d_cr: EOSData,
     d_co: EOSData,
@@ -488,6 +521,8 @@ def match_crust_core(
     if core_compo_mode not in ("literature_beta_eq", "strict_thermo_only"):
         raise ValueError("core_compo_mode must be 'strict_thermo_only' or 'literature_beta_eq'")
 
+    source_euler_residual = max(_source_euler_relative_residual(d_cr, "crust"),
+                                _source_euler_relative_residual(d_co, "core"))
     i1, i2 = find_convex_transition_window(d_cr, d_co, cr_name, co_name)
     mn = d_co.mn
     mp = d_co.mp
@@ -837,6 +872,8 @@ def match_crust_core(
         pt_order=None,
         pt_class="not_assigned_no_density_jump",
         dm_crust=dm_cr, dm_core=dm_co,
+        source_euler_relative_residual=source_euler_residual,
+        source_euler_relative_tolerance=SOURCE_EULER_RELATIVE_TOLERANCE,
         composition_provenance=compo_prov,
         core_composition_input_status=core_composition_rejection,
         core_composition_input_usable=bool(core_composition_usable),

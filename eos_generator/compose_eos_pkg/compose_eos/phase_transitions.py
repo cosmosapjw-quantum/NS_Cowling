@@ -164,8 +164,10 @@ def _branchwise_first_law_report(mu, p, n, eps, *, samples_per_interval=8,
       * c_s^2 <= 1 + tol  <=>  g(s) = (1+tol) mu dn/dmu - n >= 0 when
         dn/dmu > 0; g is cubic, so its minimum is at the endpoints or at the
         real roots of the quadratic g'(s) (closed form);
-      * the reported c_s^2 extrema use the roots of the quintic stationarity
+      * the reported c_s^2 extrema use the roots of the at-most-quartic stationarity
         polynomial of n/(mu dn/dmu) plus every candidate above.
+    Root solving and evaluation use float64; exact refers to the algebraic
+    candidate set, not a directed-rounding interval proof.
     ``samples_per_interval`` is accepted for configuration compatibility only
     and is not used for any gate.
     """
@@ -175,8 +177,8 @@ def _branchwise_first_law_report(mu, p, n, eps, *, samples_per_interval=8,
     if (mu.ndim != 1 or mu.size < 2 or n.shape != mu.shape or p.shape != mu.shape
             or eps.shape != mu.shape):
         raise ValueError("branch audit requires matching 1-D arrays with >= 2 rows")
-    if not np.all(np.isfinite(mu)) or np.any(np.diff(mu) <= 0.0):
-        raise ValueError("branch audit requires strictly increasing finite mu_B; "
+    if not np.all(np.isfinite(mu)) or np.any(mu <= 0.0) or np.any(np.diff(mu) <= 0.0):
+        raise ValueError("branch audit requires strictly increasing finite positive mu_B; "
                          "a phase jump must be split into one-sided branches")
     if not (np.isfinite(cs2_tolerance) and cs2_tolerance >= 0.0):
         raise ValueError("invalid causal tolerance")
@@ -268,7 +270,7 @@ def _branchwise_first_law_report(mu, p, n, eps, *, samples_per_interval=8,
 
 def _phase_arrays(data: EOSData, *, differential_tolerance=5e-3, differential_samples_per_interval=8):
     n=np.asarray(data.nb,float); mu=np.asarray(data.mub,float); p=np.asarray(data.p,float); eps=np.asarray(data.eps,float)
-    if n.ndim!=1 or len(n)<5 or eps.shape!=n.shape or np.any(~np.isfinite(n+mu+p+eps)) or np.any(n<=0) or np.any(p<=0) or np.any(eps<=0):
+    if n.ndim!=1 or len(n)<5 or eps.shape!=n.shape or np.any(~np.isfinite(n+mu+p+eps)) or np.any(n<=0) or np.any(mu<=0) or np.any(p<=0) or np.any(eps<=0):
         raise ValueError('phase EOS needs finite positive 1-D n, P, epsilon and mu arrays')
     if not np.isfinite(data.temperature_mev) or abs(float(data.temperature_mev))>1e-12:
         raise ValueError('Maxwell phase input must be a cold T=0 slice')
@@ -762,6 +764,11 @@ def solve_tov_with_phase_transition(eos: MaxwellEOS, central_pressure_MeV_fm3: f
     then integrates the low-density phase to the finite tabulated surface.
     All stellar structure equations are in G=c=1 geometric units.
     """
+    from .tov import BarotropicEOS, find_causal_domain
+    if not np.isfinite(rtol) or not 0.0 < rtol < 1.0:
+        raise ValueError('rtol must be finite and in (0, 1)')
+    if not np.isfinite(max_step_km) or max_step_km <= 0.0:
+        raise ValueError('max_step_km must be finite and positive')
     d=eos.data; t=eos.transition; pt=float(t['pressure_MeV_fm3'])
     pc=float(central_pressure_MeV_fm3); pgrid=d.p; eps=d.eps
     if not np.isfinite(pc) or pc<=pgrid[0] or pc>pgrid[-1]: raise ValueError('central pressure outside tabulated EOS range')
@@ -769,7 +776,8 @@ def solve_tov_with_phase_transition(eos: MaxwellEOS, central_pressure_MeV_fm3: f
     def make_branch(start,stop):
         pp=np.asarray(pgrid[start:stop],float); ee=np.asarray(eps[start:stop],float)
         if len(pp)<4 or np.any(np.diff(pp)<=0) or np.any(np.diff(ee)<=0): raise ValueError('each smooth phase branch needs >=4 strictly increasing P/epsilon points')
-        sp=PchipInterpolator(np.log(pp),np.log(ee),extrapolate=False)
+        barotrope = BarotropicEOS(np.asarray(d.nb[start:stop], float), pp, ee)
+        sp = barotrope._lneps_of_lnp
         def state(P):
             values = np.asarray(P, dtype=float)
             if np.any(~np.isfinite(values)):
@@ -784,9 +792,22 @@ def solve_tov_with_phase_transition(eos: MaxwellEOS, central_pressure_MeV_fm3: f
             lp=np.log(clipped); ev=np.exp(sp(lp)); dedp=ev/clipped*sp.derivative()(lp)
             if np.any(~np.isfinite(ev+dedp)) or np.any(dedp<=0): raise FloatingPointError('invalid d epsilon/dP in phase branch')
             return ev,dedp
-        return (pp,ee,state)
+        return (pp,ee,state,barotrope)
     low=make_branch(0,il+1); high=make_branch(ih,d.n)
     active_high=pc>pt
+    # A causal center does not imply a causal shell. Certify each traversed
+    # pressure range on the actual epsilon(P) RHS interpolant. The independent
+    # Maxwell n(mu) potential has a different interpolation contract.
+    traversed = [('low', low, pt if active_high else pc)]
+    if active_high:
+        traversed.append(('high', high, pc))
+    causal_domains = {}
+    for label, phase, pressure_end in traversed:
+        domain = find_causal_domain(phase[3], tolerance=1e-5)
+        if pressure_end > domain.pressure_max * (1.0 + 2e-12):
+            raise ValueError(f'{label} phase pressure path exceeds its causal domain '
+                             f'ending at {domain.pressure_max:g} MeV fm^-3')
+        causal_domains[label] = domain.to_dict()
     branch=high if active_high else low
     ec,de_dp=branch[2](pc); ec=float(ec); de_dp=float(de_dp); cs2c=1.0/de_dp
     if not (0<cs2c<=1+1e-5): raise ValueError(f'central sound speed is noncausal: {cs2c:g}')
@@ -846,6 +867,7 @@ def solve_tov_with_phase_transition(eos: MaxwellEOS, central_pressure_MeV_fm3: f
     return {'status':'SUCCESS','mass_Msun':Mgeom/_MSUN_GEOM_KM,'radius_km':R,'compactness':C,
             'k2':k2,'Lambda':lam,'central_pressure_MeV_fm3':pc,'surface_y':yR,
             'phase_interfaces':transitions,'tidal_jump_formula':'Takatsy-Kovacs-2020 Eq. (11)',
+            'rhs_causal_domains':causal_domains,
             'seidov_small_core_stable':bool(eos.transition['seidov_small_core_stable']),
             'radial_stability_scope':'Seidov small-core onset criterion only; no full radial-mode eigenfrequency calculation is performed.'}
 

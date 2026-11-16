@@ -507,7 +507,7 @@ def test_census_flags_byte_identical_source_models(tmp_path, monkeypatch):
                     "source_sha256": {}, "output_sha256": {},
                     "fortran_executable_sha256": None, "match_report": {}}
         return {"survived": False, "method": method, "stage": method, "error": "x",
-                "failure_category": "unclassified"}
+                "failure_category": "physical"}
 
     monkeypatch.setattr(pipeline, "run_pipeline", fake_pipeline)
     assert pipeline.main() == 0

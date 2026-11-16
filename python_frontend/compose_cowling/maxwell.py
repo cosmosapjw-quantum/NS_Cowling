@@ -54,10 +54,13 @@ class MaxwellInterface:
 class MaxwellEOS:
     """Two single-phase providers separated by one exact Maxwell jump."""
 
-    def __init__(self, transition_table: EOSData):
+    def __init__(self, transition_table: EOSData, *, high_provider=None):
         if not isinstance(transition_table, EOSData):
             raise TypeError("transition_table must be an EOSData instance")
-        tags = np.asarray(transition_table.Iphase, dtype=int)
+        raw_tags = np.asarray(transition_table.Iphase)
+        if raw_tags.dtype.kind not in "iuf" or not np.all(np.isin(raw_tags, [1, 2])):
+            raise ValueError("phase labels must be exact integers 1 or 2")
+        tags = raw_tags.astype(int)
         if tags.ndim != 1 or tags.size != transition_table.n:
             raise ValueError("invalid phase labels")
         changes = np.flatnonzero(np.diff(tags) != 0)
@@ -80,14 +83,20 @@ class MaxwellEOS:
         # identities are imposed; first-law drift of a table shows up away
         # from the interface and is reported, not hidden.
         self.low = subtable(tags == 1, "last")
-        self.high = subtable(tags == 2, "first")
+        self.high = subtable(tags == 2, "first") if high_provider is None else high_provider
+        if high_provider is not None:
+            for name, values in (("pressure", transition_table.p),
+                                 ("energy", transition_table.eps),
+                                 ("number_density_source", transition_table.nb)):
+                if not np.array_equal(np.asarray(getattr(high_provider, name)), values[tags == 2]):
+                    raise ValueError("high-phase provider must preserve source knots")
         self.low_branch_surface_density_drift_relative = float(
             self.low.number_density_knots[0] / self.low.number_density_source[0] - 1.0)
         self.high_branch_end_density_drift_relative = float(
             self.high.number_density_knots[-1] / self.high.number_density_source[-1] - 1.0)
         p_lo = float(self.low.pressure[-1])
         p_hi = float(self.high.pressure[0])
-        scale = max(abs(p_lo), abs(p_hi), 1.0)
+        scale = max(abs(p_lo), abs(p_hi))
         if abs(p_lo - p_hi) > 5e-10 * scale:
             raise ValueError("phase providers do not share one transition pressure")
         self.transition_pressure_mev_fm3 = 0.5 * (p_lo + p_hi)
@@ -111,6 +120,9 @@ class MaxwellEOS:
         seidov_critical = 0.5 + 1.5 * self.transition_pressure_mev_fm3 / low_t.energy
         self.interface_thermo = {
             "pressure_pa": self.transition_pressure_pa,
+            "source_transition_pressure_relative_mismatch": abs(p_lo - p_hi) / scale,
+            "source_transition_pressure_low_mev_fm3": p_lo,
+            "source_transition_pressure_high_mev_fm3": p_hi,
             "pressure_mev_fm3": self.transition_pressure_mev_fm3,
             "chemical_potential_mev": self.mu_transition_mev,
             "energy_low_mev_fm3": low_t.energy,
@@ -144,7 +156,17 @@ class MaxwellEOS:
         # P_ref*exp(-q), which can land an ulp outside the provider domain.
         ulps = 64.0 * np.finfo(float).eps
         lo_p, hi_p = float(provider.pressure[0]), float(provider.pressure[-1])
-        if lo_p * (1.0 - ulps) <= p_mev < lo_p:
+        # The admitted two source pressures can differ within their declared
+        # relative gate. At the common interface coordinate use the original
+        # one-sided endpoint state, rather than extrapolating either provider.
+        at_transition = abs(p / self.transition_pressure_pa - 1.0) <= ulps
+        if at_transition:
+            p_mev = hi_p if side == "low" else lo_p
+        elif side == "low" and hi_p < p_mev <= self.transition_pressure_mev_fm3:
+            p_mev = hi_p
+        elif side == "high" and self.transition_pressure_mev_fm3 <= p_mev < lo_p:
+            p_mev = lo_p
+        elif lo_p * (1.0 - ulps) <= p_mev < lo_p:
             p_mev = lo_p
         elif hi_p < p_mev <= hi_p * (1.0 + ulps):
             p_mev = hi_p
@@ -625,10 +647,10 @@ def scan_maxwell_cowling_modes(
                                              rtol=rtol, max_step_m=max_step_m,
                                              output_points_per_segment=80).residual
     roots: list[dict[str, object]] = []
-    for i in range(grid.size - 1):
+    for i in range(grid.size):
         if residuals[i] == 0:
             root_hz = float(grid[i])
-        elif residuals[i] * residuals[i + 1] < 0:
+        elif i + 1 < grid.size and residuals[i] * residuals[i + 1] < 0:
             root_hz = float(brentq(
                 lambda f: shoot_maxwell_cowling(
                     star, float(f), conversion=conversion, rtol=rtol,

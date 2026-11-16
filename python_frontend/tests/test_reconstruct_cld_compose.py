@@ -33,7 +33,8 @@ def _cell(n, *, k=K, rd=8.0, f=0.05):
         rho_B=n, f=f, R_d=rd, rho_I=0.15, rho_Ip=0.015, rho_II=n, rho_IIp=0.0,
         rho_e=YP * n, y_p_cell=YP, E_cell=e_cell, E_binding_per_baryon=e_cell / n,
         E_coul=0.0, E_surf=0.0, E_L=0.0, P_cell=float("nan"), mu_n=MN, mu_p=MP,
-        mu_e=10.0, converged=True, n_iter=1)
+        mu_e=10.0, converged=True, n_iter=1,
+        mu_n_gas=(1 - YP) * MN + YP * MP + 5 / 3 * k * n ** (2 / 3))
 
 
 def _grid():

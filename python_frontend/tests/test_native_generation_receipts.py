@@ -113,3 +113,34 @@ def test_lower_malformed_composition_cannot_pass(tmp_path):
     (tmp_path/"lower_source_fit/eos.compo").write_text("invalid\n")
     with pytest.raises(ValueError,match="readback failed"):
         verify_native_generation(tmp_path,request)
+
+
+def test_native_physical_diagnostics_are_hashed_without_becoming_pass_gates(tmp_path):
+    request=core_request();record=evidence(tmp_path,request)
+    (tmp_path/"sound_speed.csv").write_text("n_b,cs2_over_c2_fd\n.4,1.2\n")
+    result=verify_native_generation(tmp_path,request)
+    assert "sound_speed.csv" in result["output_sha256"]
+    record["output_sha256"]=result["output_sha256"]
+    (tmp_path/"RESULT.json").write_text(json.dumps(record))
+    (tmp_path/"sound_speed.csv").write_text("modified evidence")
+    with pytest.raises(ValueError,match="checksum mismatch"):
+        verify_native_generation(tmp_path,request)
+
+
+def test_native_attachment_evidence_is_hashed(tmp_path):
+    request=tf_request(include_lower_crust=True);evidence(tmp_path,request)
+    (tmp_path/"attachment_diagnostics.json").write_text(json.dumps({
+        "equilibrium_established":False,"cross_interval_supported":False}))
+    result=verify_native_generation(tmp_path,request)
+    assert "attachment_diagnostics.json" in result["output_sha256"]
+
+
+@pytest.mark.parametrize("name", ["sound_speed.csv", "attachment_diagnostics.json"])
+def test_sealed_native_diagnostic_cannot_disappear(tmp_path, name):
+    request=core_request();record=evidence(tmp_path,request)
+    (tmp_path/name).write_text("native evidence")
+    record["output_sha256"]=verify_native_generation(tmp_path,request)["output_sha256"]
+    (tmp_path/"RESULT.json").write_text(json.dumps(record))
+    (tmp_path/name).unlink()
+    with pytest.raises(ValueError,match="sealed native diagnostic missing"):
+        verify_native_generation(tmp_path,request)

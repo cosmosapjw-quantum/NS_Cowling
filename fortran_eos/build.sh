@@ -63,8 +63,8 @@ compile compose_eos_fortran app
 "$FC" "${FARGS[@]}" "${OLD_OBJECTS[@]}" "$STAGE/obj/compose_eos_fortran.o" "${LINK_ARGS[@]}" -o "$STAGE/compose_eos_fortran"
 "$FC" "${LEGACY_ARGS[@]}" -c "$SRC/vendor/slsqp/slsqp_optmz.f" -o "$STAGE/obj/slsqp_optmz.o"
 NATIVE_MODULES=(
-  compose_eos_optimize_native compose_eos_core_native compose_eos_gdfm_native
-  compose_eos_lower_crust_native compose_eos_tf_models compose_eos_spg_native compose_eos_spatial_tf
+  compose_eos_optimize_native compose_eos_core_native compose_eos_core_domain compose_eos_gdfm_native
+  compose_eos_lower_crust_native compose_eos_crust_attachment compose_eos_tf_models compose_eos_spg_native compose_eos_spatial_tf
 )
 NATIVE_OBJECTS=()
 for name in "${NATIVE_MODULES[@]}"; do

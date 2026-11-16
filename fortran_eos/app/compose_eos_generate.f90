@@ -3,11 +3,13 @@ program compose_eos_generate
  use compose_eos_types,only:wp,eos_data_t,allocate_eos
  use compose_eos_io,only:write_compose,read_compose
  use compose_eos_core_native
+ use compose_eos_core_domain
  use compose_eos_gdfm_native
  use compose_eos_spg_native
  use compose_eos_tf_models,only:tf_model_t,load_tf_model
  use compose_eos_spatial_tf
  use compose_eos_lower_crust_native
+ use compose_eos_crust_attachment
  use,intrinsic::ieee_arithmetic,only:ieee_is_finite
  implicit none
  character(1024)::request_path,out,mass_catalogue=''
@@ -81,6 +83,7 @@ program compose_eos_generate
    write(u,'(*(es25.16e3,:,","))')n,h,err
   enddo
   close(u)
+  call write_core_domain_diagnostics()
  case('spg')
   if(n_points<3.or.n_points>100000.or.sigma0<=0.or.surface_b<=-16)call fail('invalid SPG request')
   if(transition_policy/='fixed_density_source')call fail('unsupported SPG transition policy')
@@ -201,6 +204,7 @@ program compose_eos_generate
   write(u,'(a,es25.16e3,a)')'"lower_last_density":',lower_eos%nb(lower_eos%n),','
   write(u,'(a,es25.16e3,a)')'"inner_first_density":',eos%nb(1),'}'
   close(u)
+  call write_attachment_diagnostics()
  endif
  open(newunit=u,file=trim(out)//'/SUPPORT.json',status='replace')
  write(u,'(a)')'{"scope":"computed_native_samples","global_minimum_proven":false,"continuous_mesh_limit_proven":false,'
@@ -220,6 +224,70 @@ program compose_eos_generate
  close(u)
  write(*,'(a,i0)')'REQUESTED_ROWS_NATIVE_VERIFIED rows=',eos%n
 contains
+ subroutine write_core_domain_diagnostics()
+ integer::v,l
+ real(wp)::cs,cm,fl,ca,frozen,hyy,beta,hstep
+ character(256)::fd_status,analytic_status
+ character(:),allocatable::fd_values,analytic_value
+ open(newunit=v,file=trim(out)//'/sound_speed.csv',status='replace')
+ write(v,'(a)')'n_b,cs2_over_c2_fd,cs2_over_c2_mu,firstlaw_relative,fd_status,cs2_over_c2_analytic,analytic_status'
+ do l=1,size(core)
+  hstep=2e-5_wp*core(l)%n_b
+  fd_status='stencil outside declared model support'
+  if(core(l)%n_b-2*hstep>=lo.and.core(l)%n_b+2*hstep<=hi) &
+   call core_sound_speed_fd(trim(model),core(l)%n_b,2e-5_wp,cs,cm,fl,fd_status)
+  fd_values=',,'
+  if(fd_status=='ok')fd_values=real_string(cs)//','//real_string(cm)//','//real_string(fl)
+  call core_sound_speed_analytic(trim(model),core(l)%n_b,ca,frozen,hyy,beta,analytic_status)
+  if(model=='APR_APR'.and.index(analytic_status,'mixed-phase')==1) &
+   call core_sound_speed_gibbs(core(l)%n_b,ca,analytic_status)
+  analytic_value=''
+  if(analytic_status=='ok')analytic_value=real_string(ca)
+  write(v,'(a)')real_string(core(l)%n_b)//','//fd_values//','//csvquote(fd_status)//','// &
+   analytic_value//','//csvquote(analytic_status)
+ enddo
+ close(v)
+ end subroutine
+ subroutine write_attachment_diagnostics()
+ integer::v
+ type(crust_attachment_t)::d
+ real(wp)::left(4),right(4)
+ character(256)::s
+ open(newunit=v,file=trim(out)//'/attachment_diagnostics.json',status='replace')
+ write(v,'(a)')'{"interpretation":"source-prescription endpoints; no equilibrium or interpolation certification",'
+ left=eos_endpoint(outer_eos,outer_eos%n);right=eos_endpoint(lower_eos,1)
+ call source_attachment_diagnostics(left,right,BSK_DRIP,d,s)
+ write(v,'(a)')'"outer_to_lower":'
+ call write_attachment_record(v,left,right,d,s)
+ write(v,'(a)')', "lower_to_inner":'
+ left=eos_endpoint(lower_eos,lower_eos%n);right=eos_endpoint(eos,1)
+ call source_attachment_diagnostics(left,right,BSK_LOWER_MAX,d,s)
+ call write_attachment_record(v,left,right,d,s)
+ write(v,'(a)')'}'
+ close(v)
+ end subroutine
+ function eos_endpoint(e,k)result(x)
+ type(eos_data_t),intent(in)::e
+ integer,intent(in)::k
+ real(wp)::x(4)
+ x=[e%nb(k),e%nb(k)*e%mn*(1+e%q(7,k)),e%nb(k)*e%q(1,k),e%mn*(1+e%q(3,k))]
+ end function
+ subroutine write_attachment_record(v,left,right,d,s)
+ integer,intent(in)::v
+ real(wp),intent(in)::left(4),right(4)
+ type(crust_attachment_t),intent(in)::d
+ character(*),intent(in)::s
+ ! Raw endpoint differences remain reportable even for a malformed attachment.
+ write(v,'(a)')'{"status":'//csvquote(s)//','
+ write(v,'(a,es25.16e3,a)')'"delta_n":',right(1)-left(1),','
+ write(v,'(a,es25.16e3,a)')'"delta_epsilon":',right(2)-left(2),','
+ write(v,'(a,es25.16e3,a)')'"delta_P":',right(3)-left(3),','
+ write(v,'(a,es25.16e3,a)')'"delta_mu":',right(4)-left(4),','
+ write(v,'(a)')'"source_prescription_valid":'//bool_string(d%source_prescription_valid)//','
+ write(v,'(a)')'"density_overlap":'//bool_string(right(1)<left(1))//','
+ write(v,'(a)')'"density_gap":'//bool_string(right(1)>left(1))//','
+ write(v,'(a)')'"equilibrium_established":false,"cross_interval_supported":false}'
+ end subroutine
  subroutine require_ok(s)
  character(*),intent(in)::s
  if(trim(s)/='ok')call fail(trim(s))

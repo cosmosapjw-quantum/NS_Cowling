@@ -184,7 +184,17 @@ def verify_native_generation(output,request):
             consistency[segment]=segment_checks
             for name,value in segment_hashes.items():
                 hashes[segment+"/"+name]=value
+    # Optional native diagnostics are evidence, never a physical acceptance gate.
+    # Hash them when present while keeping historical receipts readable.
+    for name in ("sound_speed.csv", "attachment_diagnostics.json"):
+        path=output/name
+        if path.is_file():
+            hashes[name]=file_sha(path)
     expected_hashes=receipt.get("output_sha256")
+    if expected_hashes is not None:
+        for name in ("sound_speed.csv", "attachment_diagnostics.json"):
+            if name in expected_hashes and name not in hashes:
+                raise ValueError("sealed native diagnostic missing: "+name)
     if expected_hashes is not None and any(expected_hashes.get(k)!=v for k,v in hashes.items()):
         raise ValueError("native output checksum mismatch")
     return {"rows":rows,"native_directory":str(output),"backend":"fortran",

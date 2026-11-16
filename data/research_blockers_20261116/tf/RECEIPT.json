@@ -1,0 +1,126 @@
+{
+  "schema": "ns-cowling.tf-blocker-repair.v1",
+  "baseline": "a49aaf9f82ddfda484e0f965aefdfe73aa7918f2",
+  "status": "FINITE_REQUESTED_CAMPAIGN_COMPLETE_WITH_RESEARCH_CANDIDATES",
+  "physical_producer": "native Fortran TF; Python orchestration/file diagnostics only",
+  "counts": {
+    "original_remaining_intervals": 50,
+    "original_endpoint_union_model_density_points": 97,
+    "new_N32_N64_unique_mesh_density_nodes": 190,
+    "reused_N32_N64_endpoint_mesh_nodes": 4,
+    "new_N128_unique_mesh_density_nodes": 9,
+    "total_new_generator_unique_mesh_density_nodes": 199,
+    "generator_attempts": 1412,
+    "generator_status_counts": {
+      "STATIONARY": 1010,
+      "UNIFORM_STATIONARY": 226,
+      "EVALUATION_FAILED": 160,
+      "REQUIRES_REFINEMENT": 16
+    },
+    "local_energy_derivative_jobs": 97,
+    "local_energy_derivative_solves": 485,
+    "initial_common_tangent_solves": 76,
+    "diagnosed_TM1e_precision_repair_solves": 26,
+    "native_branch_solves_all_stationary": 587,
+    "native_generator_plus_branch_solve_attempts": 1999,
+    "upper_dispatch_provenance_failures": 2,
+    "recovered_native_child_outputs": 2,
+    "research_chord_native_readback_rows": 6
+  },
+  "old_failure_histories_preserved": [
+    "data/research_native_20261116/source_grid_cohort (prior 87 failures)",
+    "data/research_native_refinement_20261116/native_mesh_runs.tar.gz (prior 7 evaluation failures + 1 requires-refinement)"
+  ],
+  "new_failure_classification": {
+    "evaluation_failures": {
+      "vector field Newton line search failed": 160
+    },
+    "requires_refinement": 16,
+    "optimizer_mode_for_requires_refinement": 0,
+    "provenance_race": "two unrelated unlinked source files changed during N128 execution; original upper dispatch failures preserved, native child exit0; typed identity/readback recovery recorded",
+    "initial_TM1e_halfstep_target_failure": "preserved; substantive h/ftol repair reached same unchanged target"
+  },
+  "physics_dependency_identity": {
+    "fortran_eos/src/compose_eos_types.f90": {
+      "prior": "26fb4fb7b9482ca238ff41e504c75b090a42d902d7946a4c0612ece4e8729d44",
+      "current": "26fb4fb7b9482ca238ff41e504c75b090a42d902d7946a4c0612ece4e8729d44",
+      "byte_identical": true
+    },
+    "fortran_eos/src/compose_eos_optimize_native.f90": {
+      "prior": "ac9f7e1cedd3a0cc5823a9f5e85ea82a5a06549a715d2f8d619b167bbb6a78f5",
+      "current": "ac9f7e1cedd3a0cc5823a9f5e85ea82a5a06549a715d2f8d619b167bbb6a78f5",
+      "byte_identical": true
+    },
+    "fortran_eos/src/compose_eos_tf_models.f90": {
+      "prior": "0712f95176d6cc53d77efff9602bae32e15b8c5502d30d69556b0a8dc90d49fe",
+      "current": "0712f95176d6cc53d77efff9602bae32e15b8c5502d30d69556b0a8dc90d49fe",
+      "byte_identical": true
+    },
+    "fortran_eos/src/compose_eos_spatial_tf.f90": {
+      "prior": "32f89d3597c5d5a966e5ec6f17e6455f8666dd79910c5e5ad3d241f3701f3711",
+      "current": "32f89d3597c5d5a966e5ec6f17e6455f8666dd79910c5e5ad3d241f3701f3711",
+      "byte_identical": true
+    },
+    "fortran_eos/vendor/slsqp/slsqp_optmz.f": {
+      "prior": "bb1b489a87bc6137fee6132166c8a04cdb838d9042de809179d7f4f6ef9e43ae",
+      "current": "bb1b489a87bc6137fee6132166c8a04cdb838d9042de809179d7f4f6ef9e43ae",
+      "byte_identical": true
+    }
+  },
+  "previous_source_identity": "SOURCE_IDENTITY.json",
+  "typed_readback_recovery": "ambiguous_N128/READBACK_RECOVERY.json",
+  "repair_outcomes": {
+    "SAMPLED_PRESSURE_ORDERING_RECOVERED": 48,
+    "FINITE_TWO_BRANCH_COEXISTENCE_CANDIDATE": 2
+  },
+  "derivative_max_abs_pressure_residual_MeV_fm3": 8.689438715236975e-07,
+  "tangent_final_numerical_targets": {
+    "FSU2R": true,
+    "TM1e": true
+  },
+  "scope_limits": [
+    "sampled endpoint refinement does not certify continuous support",
+    "finite canonical separately neutral beta-equilibrated T0 branches, not global two-charge Gibbs",
+    "no global minimum certificate",
+    "production raw pressure drops retained; research candidates are separate",
+    "composition and interphase charge potential not invented"
+  ],
+  "concurrency": {
+    "max_native_processes": 4,
+    "BLAS_OMP_MKL_threads_per_child": 1
+  },
+  "validation": {
+    "probe_build": "bash fortran_eos/tests/blocker_tf_build.sh build/blocker_tf_replaycheck: exit0",
+    "python_syntax": "python3 -m py_compile scripts/blocker_tf_*.py: exit0",
+    "native_chord_readback": "both exporters exit0, three rows each",
+    "all_587_branch_states": "STATIONARY",
+    "numerical_targets_unchanged": true
+  },
+  "delivered_replay_source_sha256": {
+    "fortran_eos/tests/blocker_tf_branch_derivative.f90": "403e7ad9f620c7c20f7f73630aeb87ace02dba64fc2ebe95d28c46c9e3b33c0d",
+    "fortran_eos/tests/blocker_tf_build.sh": "c9b0a7e2bbce34c453d4d9dc442b588198c7eeadf33cb3cce5d15e725db2a4c3",
+    "fortran_eos/tests/blocker_tf_common_tangent.f90": "05f65dad0ab01f1cb4900d474d161e13707d6ef3a919aaf845ad05d5efbc2713",
+    "fortran_eos/tests/blocker_tf_common_tangent_polish.f90": "6877e8f9fb6a9b15b06d3badece970ab59c4dcf6807a81e024d29cfc5c2c4fc1",
+    "fortran_eos/tests/blocker_tf_export_chord.f90": "b9393046001e183732bef1cfeef1616192d29965ea0481c004190f8a8ae44623",
+    "scripts/blocker_tf_ambiguous.py": "ad56a61e7366693c6f56b5488590783edb1b4913d3dfcdc243a35cbae542b01d",
+    "scripts/blocker_tf_common_tangent.py": "9c8c69d1e7ba50f88da7bf0b0658919946c0b9babdcf95c41d24122b5cddf652",
+    "scripts/blocker_tf_derivatives.py": "51aecad2110afe4b02c3bf6ffd6ef8f023e4f3e6a77e0924bcb01098db9f5a6a",
+    "scripts/blocker_tf_export_candidates.py": "6448cff1f9a6ff8729f4504985256ef2fd4b2aa7797288152d25dcf9d9e0dfe8",
+    "scripts/blocker_tf_recover_readback.py": "76f0b3abf05c5f1e8d9d1137034b70079809f65cd99bc4b93f5958c779c7c8b9",
+    "scripts/blocker_tf_remaining.py": "85f84e349f4b06ea8c1c95430e3e5558c35ff8b5a1afc34210c23f8dfe390f71",
+    "scripts/blocker_tf_summarize.py": "e87f05aeaa2d57367c6d388ff564da8e27962c5bc3c10f866612c32793617ded",
+    "scripts/blocker_tf_tangent_polish.py": "2863d9a7a9d5dba0b62010da234197ca14668a429b241d76634fd24c822efbca"
+  },
+  "replay_identity_note": "Delivered Python wrappers include post-execution build-env and overwrite guards; their final bytes are not asserted as original wrapper execution bytes. Native driver/binary/input/output identities are separately recorded in per-job receipts.",
+  "commands": [
+    "python3 scripts/blocker_tf_remaining.py",
+    "python3 scripts/blocker_tf_derivatives.py --workers 4",
+    "python3 scripts/blocker_tf_ambiguous.py",
+    "COMPOSE_EOS_FORTRAN_EXE=build/blocker_tf_native/compose_eos_fortran python3 scripts/blocker_tf_recover_readback.py",
+    "python3 scripts/blocker_tf_common_tangent.py",
+    "python3 scripts/blocker_tf_tangent_polish.py",
+    "python3 scripts/blocker_tf_export_candidates.py",
+    "python3 scripts/blocker_tf_summarize.py",
+    "bash fortran_eos/tests/blocker_tf_build.sh build/blocker_tf_replaycheck"
+  ]
+}

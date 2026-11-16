@@ -55,7 +55,7 @@ CORE_MODELS = ["APR_APR", "BBB_BHF2", "GM_GM1", "RG_SLY4", "RG_KDE0v1"]
 # CONTINUATION_20261115.md); download/reconstruction holds the historical
 # tables whose Q1 slot carries n_B and is kept only as evidence.
 CRUST_ROOT = Path(os.environ.get("NS_COWLING_CRUST_ROOT",
-                                 str(ROOT / "download" / "reconstruction_v4"))).expanduser()
+                                 str(ROOT / "download" / "reconstruction_v5"))).expanduser()
 CORE_ROOT = ROOT / "eos_generator" / "eos_data"
 DEFAULT_RUN_STAMP = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 DEFAULT_OUT_ROOT = ROOT / "download" / "matched_runs" / DEFAULT_RUN_STAMP

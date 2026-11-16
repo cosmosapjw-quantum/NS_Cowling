@@ -149,3 +149,14 @@ def test_receipt_reports_gas_equilibrium_against_derived_mu(tmp_path):
     value = receipt["gas_mu_n_minus_derived_mu_B_max_abs_MeV"]
     assert 0.01 - spline_err - 1e-12 <= value <= 0.01 + spline_err + 1e-12
     assert "cluster bulk" in receipt["mu_note"]
+
+
+def test_cell_out_of_neutron_equilibrium_with_gas_is_refused(tmp_path):
+    """Former SPG crusts: gas mu_n differed from the cell mu_B by up to 37 MeV."""
+    cells = []
+    for n in _grid():
+        _, mu, _ = _analytic(n)
+        cells.append(replace(_cell(n), mu_n_gas=float(mu) * (1.0 + 2e-3)))
+    with pytest.raises(CLDThermodynamicsError, match="equilibrium"):
+        emit_compose_set(cells, tmp_path / "X", "X", mn=MN, mp=MP)
+    assert not (tmp_path / "X" / "eos.thermo").exists()

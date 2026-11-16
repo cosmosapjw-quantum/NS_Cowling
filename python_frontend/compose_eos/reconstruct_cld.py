@@ -38,6 +38,7 @@ COMPOSE_COLUMNS = "iT inb iYq Q1 Q2 Q3 Q4 Q5 Q6 Q7 Nadd"
 # Optimizer box used by cld_cell.minimize_cld_cell (rows on it are flagged).
 R_D_BOUNDS = (2.0, 40.0)
 F_BOUNDS = (1e-4, 0.95)
+GAS_EQUILIBRIUM_REL_GATE = 5.0e-4   # provider Euler tolerance of the Maxwell kernel
 
 
 class CLDThermodynamicsError(ValueError):
@@ -96,6 +97,15 @@ def thermodynamic_table(results: list[CLDCellResult], *, mn: float, mp: float) -
     mu_solver = np.array([r.mu_n for r in results], dtype=float)
     mu_gas = np.array([getattr(r, "mu_n_gas", float("nan")) for r in results], dtype=float)
     gas_ok = np.isfinite(mu_gas)
+    if gas_ok.any():
+        # At the variational optimum the cell mu_B equals the gas neutron
+        # chemical potential; reuse the declared provider-Euler tolerance.
+        rel = np.abs(mu_gas[gas_ok] - mu[gas_ok]) / mu[gas_ok]
+        if np.max(rel) > GAS_EQUILIBRIUM_REL_GATE:
+            bad = np.flatnonzero(gas_ok)[rel > GAS_EQUILIBRIUM_REL_GATE].tolist()
+            raise CLDThermodynamicsError(
+                f"cells out of neutron equilibrium with the gas (|mu_n,gas - mu_B|/mu_B > "
+                f"{GAS_EQUILIBRIUM_REL_GATE:g}) at rows {bad}")
     return {
         "gas_mu_n_minus_derived_mu_B_max_abs_MeV":
             float(np.max(np.abs(mu_gas[gas_ok] - mu[gas_ok]))) if gas_ok.any() else None,

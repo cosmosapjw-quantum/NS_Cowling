@@ -153,3 +153,14 @@ def test_stellar_receipt_records_executed_source_identity(tmp_path):
     assert receipt["executed_source_sha256"][relative] == hashlib.sha256((ROOT / relative).read_bytes()).hexdigest()
     assert isinstance(receipt["git_tracked_tree_dirty"], bool)
     assert receipt["runtime"]["python"]
+
+
+def test_mode_scan_rejects_a_sign_jump_without_a_residual_zero(monkeypatch):
+    def shot(star, frequency_hz, **kwargs):
+        ones = np.ones(3)
+        return SimpleNamespace(residual=-1. if frequency_hz < 2.1 else 1.,
+            w_inner_m3=ones, w_outer_m3=ones, v_inner_m2=ones, v_outer_m2=ones,
+            interface_diagnostics={})
+    monkeypatch.setattr(maxwell, "shoot_maxwell_cowling", shot)
+    with pytest.raises(ArithmeticError, match="residual"):
+        maxwell.scan_maxwell_cowling_modes(None, np.array([1., 2., 3.]))

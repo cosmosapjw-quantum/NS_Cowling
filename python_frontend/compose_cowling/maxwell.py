@@ -632,12 +632,17 @@ def scan_maxwell_cowling_modes(
     conversion: Conversion = "slow",
     rtol: float = 2e-9,
     max_step_m: float = 100.0,
+    residual_tol: float = 1e-5,
 ) -> list[dict[str, object]]:
     """Find real-frequency roots from sign changes on a caller-supplied grid.
 
     The caller must inspect node counts and mode overlaps before assigning f/p1
     labels; roots are returned unlabelled to avoid order-based mode identity.
     """
+    # Match the default normalized residual contract of the native spectrum
+    # solver; frequency-bracket convergence alone cannot certify an eigenroot.
+    if not np.isfinite(residual_tol) or not 0 < residual_tol < 1:
+        raise ValueError("residual_tol must satisfy 0 < residual_tol < 1")
     grid = np.asarray(frequency_grid_hz, dtype=float)
     if grid.ndim != 1 or grid.size < 3 or np.any(~np.isfinite(grid)) or np.any(grid <= 0) or np.any(np.diff(grid) <= 0):
         raise ValueError("frequency_grid_hz must be a strictly increasing positive 1-D grid")
@@ -662,6 +667,8 @@ def scan_maxwell_cowling_modes(
             continue
         shot = shoot_maxwell_cowling(star, root_hz, conversion=conversion,
                                      rtol=rtol, max_step_m=max_step_m)
+        if not np.isfinite(shot.residual) or abs(shot.residual) > residual_tol:
+            raise ArithmeticError("Cowling root candidate fails normalized surface residual tolerance")
         # Count W and V separately in each phase. The interface transfer is
         # one-sided, and the finite jump must never be counted as an interior node.
         nodes = _sampled_phase_nodes(
@@ -670,6 +677,7 @@ def scan_maxwell_cowling_modes(
         roots.append({
             "frequency_hz": root_hz,
             "residual": shot.residual,
+            "residual_tolerance": residual_tol,
             **nodes,
             "conversion": conversion,
             "interface_diagnostics": shot.interface_diagnostics,

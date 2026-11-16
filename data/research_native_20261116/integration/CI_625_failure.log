@@ -1,0 +1,541 @@
+﻿2026-11-16T11:58:49.4452868Z Current runner version: '2.338.2'
+2026-11-16T11:58:49.4504825Z ##[group]Runner Image Provisioner
+2026-11-16T11:58:49.4505716Z Hosted Compute Agent
+2026-11-16T11:58:49.4506405Z Version: 20261103.629
+2026-11-16T11:58:49.4507094Z Commit: 15dbd9ccb5dbf34fae002b6ed1a2670f52df37bc
+2026-11-16T11:58:49.4507854Z Build Date: 2026-11-03T17:26:59Z
+2026-11-16T11:58:49.4508608Z Worker ID: {99d1a832-47ab-4ac9-a58e-718ea6c94269}
+2026-11-16T11:58:49.4509360Z Region: southcentralus
+2026-11-16T11:58:49.4509972Z Cloud: Azure
+2026-11-16T11:58:49.4510532Z ##[endgroup]
+2026-11-16T11:58:49.4512296Z ##[group]Operating System
+2026-11-16T11:58:49.4513067Z Ubuntu
+2026-11-16T11:58:49.4513678Z 26.04.1
+2026-11-16T11:58:49.4514179Z LTS
+2026-11-16T11:58:49.4515169Z ##[endgroup]
+2026-11-16T11:58:49.4515778Z ##[group]Runner Image
+2026-11-16T11:58:49.4516756Z Image: ubuntu-26.04
+2026-11-16T11:58:49.4517374Z Version: 20261111.196.1
+2026-11-16T11:58:49.4518733Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261111.196/images/ubuntu/Ubuntu2604-Readme.md
+2026-11-16T11:58:49.4520281Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261111.196
+2026-11-16T11:58:49.4521313Z ##[endgroup]
+2026-11-16T11:58:49.4522608Z ##[group]GITHUB_TOKEN Permissions
+2026-11-16T11:58:49.4524898Z Contents: read
+2026-11-16T11:58:49.4525510Z Metadata: read
+2026-11-16T11:58:49.4526055Z ##[endgroup]
+2026-11-16T11:58:49.4528303Z Secret source: Actions
+2026-11-16T11:58:49.4529258Z Cache mode: write
+2026-11-16T11:58:49.4530347Z Prepare workflow directory
+2026-11-16T11:58:49.4877941Z Prepare all required actions
+2026-11-16T11:58:49.4928827Z Getting action download info
+2026-11-16T11:58:49.7668599Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-16T11:58:49.8929901Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-11-16T11:58:49.9924124Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-11-16T11:58:50.2057648Z Complete job name: native
+2026-11-16T11:58:50.3237141Z ##[group]Run actions/checkout@v4
+2026-11-16T11:58:50.3238054Z with:
+2026-11-16T11:58:50.3238532Z   repository: cosmosapjw-quantum/NS_Cowling
+2026-11-16T11:58:50.3242828Z   token: ***
+2026-11-16T11:58:50.3243271Z   ssh-strict: true
+2026-11-16T11:58:50.3243745Z   ssh-user: git
+2026-11-16T11:58:50.3244196Z   persist-credentials: true
+2026-11-16T11:58:50.3244686Z   clean: true
+2026-11-16T11:58:50.3245130Z   sparse-checkout-cone-mode: true
+2026-11-16T11:58:50.3245647Z   fetch-depth: 1
+2026-11-16T11:58:50.3246079Z   fetch-tags: false
+2026-11-16T11:58:50.3246525Z   show-progress: true
+2026-11-16T11:58:50.3246977Z   lfs: false
+2026-11-16T11:58:50.3247391Z   submodules: false
+2026-11-16T11:58:50.3247848Z   set-safe-directory: true
+2026-11-16T11:58:50.3248354Z   allow-unsafe-pr-checkout: false
+2026-11-16T11:58:50.3249161Z ##[endgroup]
+2026-11-16T11:58:50.6295776Z Syncing repository: cosmosapjw-quantum/NS_Cowling
+2026-11-16T11:58:50.6298727Z ##[group]Getting Git version info
+2026-11-16T11:58:50.6300139Z Working directory is '/home/runner/work/NS_Cowling/NS_Cowling'
+2026-11-16T11:58:50.6302284Z [command]/usr/bin/git version
+2026-11-16T11:58:50.6327692Z git version 2.56.1
+2026-11-16T11:58:50.6364073Z ##[endgroup]
+2026-11-16T11:58:50.6371117Z Temporarily overriding HOME='/home/runner/work/_temp/50ce758e-6b31-4272-b617-692fb02a7dac' before making global git config changes
+2026-11-16T11:58:50.6380425Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-16T11:58:50.6382537Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/NS_Cowling/NS_Cowling
+2026-11-16T11:58:50.6458100Z Deleting the contents of '/home/runner/work/NS_Cowling/NS_Cowling'
+2026-11-16T11:58:50.6461478Z ##[group]Initializing the repository
+2026-11-16T11:58:50.6466886Z [command]/usr/bin/git init /home/runner/work/NS_Cowling/NS_Cowling
+2026-11-16T11:58:50.6603494Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-16T11:58:50.6605718Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-16T11:58:50.6607241Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-16T11:58:50.6608584Z hint: call:
+2026-11-16T11:58:50.6609213Z hint:
+2026-11-16T11:58:50.6610013Z hint: 	git config --global init.defaultBranch <name>
+2026-11-16T11:58:50.6611102Z hint:
+2026-11-16T11:58:50.6612169Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-16T11:58:50.6613798Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-16T11:58:50.6614998Z hint:
+2026-11-16T11:58:50.6615653Z hint: 	git branch -m <name>
+2026-11-16T11:58:50.6616400Z hint:
+2026-11-16T11:58:50.6617393Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-16T11:58:50.6619075Z Initialized empty Git repository in /home/runner/work/NS_Cowling/NS_Cowling/.git/
+2026-11-16T11:58:50.6630630Z [command]/usr/bin/git remote add origin https://github.com/cosmosapjw-quantum/NS_Cowling
+2026-11-16T11:58:50.6688542Z ##[endgroup]
+2026-11-16T11:58:50.6690189Z ##[group]Disabling automatic garbage collection
+2026-11-16T11:58:50.6691842Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-16T11:58:50.6764787Z ##[endgroup]
+2026-11-16T11:58:50.6766228Z ##[group]Setting up auth
+2026-11-16T11:58:50.6767526Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-16T11:58:50.6794926Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-16T11:58:50.7299973Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-16T11:58:50.7336841Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-16T11:58:50.7609972Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-16T11:58:50.7645452Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-16T11:58:50.7915614Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-16T11:58:50.7967296Z ##[endgroup]
+2026-11-16T11:58:50.7968160Z ##[group]Fetching the repository
+2026-11-16T11:58:50.7977182Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +2c0437653925b03f9d777a9b94db76ce64187224:refs/remotes/pull/15/merge
+2026-11-16T11:58:56.8536208Z From https://github.com/cosmosapjw-quantum/NS_Cowling
+2026-11-16T11:58:56.8539377Z  * [new ref]         2c0437653925b03f9d777a9b94db76ce64187224 -> pull/15/merge
+2026-11-16T11:58:56.8545389Z ##[endgroup]
+2026-11-16T11:58:56.8548141Z ##[group]Determining the checkout info
+2026-11-16T11:58:56.8550909Z ##[endgroup]
+2026-11-16T11:58:56.8563308Z [command]/usr/bin/git sparse-checkout disable
+2026-11-16T11:58:56.8648368Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-16T11:58:56.8680025Z ##[group]Checking out the ref
+2026-11-16T11:58:56.8683042Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/15/merge
+2026-11-16T11:58:57.8893228Z Updating files:  38% (4608/11944)
+2026-11-16T11:58:57.9027003Z Updating files:  39% (4659/11944)
+2026-11-16T11:58:57.9165084Z Updating files:  40% (4778/11944)
+2026-11-16T11:58:57.9435780Z Updating files:  41% (4898/11944)
+2026-11-16T11:58:57.9953537Z Updating files:  42% (5017/11944)
+2026-11-16T11:58:58.0760352Z Updating files:  43% (5136/11944)
+2026-11-16T11:58:58.0841726Z Updating files:  44% (5256/11944)
+2026-11-16T11:58:58.1125573Z Updating files:  45% (5375/11944)
+2026-11-16T11:58:58.1382754Z Updating files:  46% (5495/11944)
+2026-11-16T11:58:58.1759946Z Updating files:  47% (5614/11944)
+2026-11-16T11:58:58.2119195Z Updating files:  48% (5734/11944)
+2026-11-16T11:58:58.2275501Z Updating files:  49% (5853/11944)
+2026-11-16T11:58:58.2423829Z Updating files:  50% (5972/11944)
+2026-11-16T11:58:58.2506942Z Updating files:  51% (6092/11944)
+2026-11-16T11:58:58.2615003Z Updating files:  52% (6211/11944)
+2026-11-16T11:58:58.2738076Z Updating files:  53% (6331/11944)
+2026-11-16T11:58:58.2839053Z Updating files:  54% (6450/11944)
+2026-11-16T11:58:58.2990265Z Updating files:  55% (6570/11944)
+2026-11-16T11:58:58.3274773Z Updating files:  56% (6689/11944)
+2026-11-16T11:58:58.3651622Z Updating files:  57% (6809/11944)
+2026-11-16T11:58:58.3749856Z Updating files:  58% (6928/11944)
+2026-11-16T11:58:58.3817251Z Updating files:  59% (7047/11944)
+2026-11-16T11:58:58.3874425Z Updating files:  60% (7167/11944)
+2026-11-16T11:58:58.3932664Z Updating files:  61% (7286/11944)
+2026-11-16T11:58:58.3995820Z Updating files:  62% (7406/11944)
+2026-11-16T11:58:58.4050816Z Updating files:  63% (7525/11944)
+2026-11-16T11:58:58.4109140Z Updating files:  64% (7645/11944)
+2026-11-16T11:58:58.4169902Z Updating files:  65% (7764/11944)
+2026-11-16T11:58:58.4313907Z Updating files:  66% (7884/11944)
+2026-11-16T11:58:58.4452163Z Updating files:  67% (8003/11944)
+2026-11-16T11:58:58.4559321Z Updating files:  68% (8122/11944)
+2026-11-16T11:58:58.4735467Z Updating files:  69% (8242/11944)
+2026-11-16T11:58:58.4827535Z Updating files:  70% (8361/11944)
+2026-11-16T11:58:58.4914497Z Updating files:  71% (8481/11944)
+2026-11-16T11:58:58.4994883Z Updating files:  72% (8600/11944)
+2026-11-16T11:58:58.5071806Z Updating files:  73% (8720/11944)
+2026-11-16T11:58:58.5144833Z Updating files:  74% (8839/11944)
+2026-11-16T11:58:58.5216988Z Updating files:  75% (8958/11944)
+2026-11-16T11:58:58.5286089Z Updating files:  76% (9078/11944)
+2026-11-16T11:58:58.5394998Z Updating files:  77% (9197/11944)
+2026-11-16T11:58:58.5486223Z Updating files:  78% (9317/11944)
+2026-11-16T11:58:58.5556343Z Updating files:  79% (9436/11944)
+2026-11-16T11:58:58.5628108Z Updating files:  80% (9556/11944)
+2026-11-16T11:58:58.5713976Z Updating files:  81% (9675/11944)
+2026-11-16T11:58:58.5801855Z Updating files:  82% (9795/11944)
+2026-11-16T11:58:58.5890609Z Updating files:  83% (9914/11944)
+2026-11-16T11:58:58.5964463Z Updating files:  84% (10033/11944)
+2026-11-16T11:58:58.6084398Z Updating files:  85% (10153/11944)
+2026-11-16T11:58:58.6238112Z Updating files:  86% (10272/11944)
+2026-11-16T11:58:58.6316499Z Updating files:  87% (10392/11944)
+2026-11-16T11:58:58.6367736Z Updating files:  88% (10511/11944)
+2026-11-16T11:58:58.6473258Z Updating files:  89% (10631/11944)
+2026-11-16T11:58:58.6572730Z Updating files:  90% (10750/11944)
+2026-11-16T11:58:58.6678855Z Updating files:  91% (10870/11944)
+2026-11-16T11:58:58.7316738Z Updating files:  92% (10989/11944)
+2026-11-16T11:58:58.7453574Z Updating files:  93% (11108/11944)
+2026-11-16T11:58:58.7769301Z Updating files:  94% (11228/11944)
+2026-11-16T11:58:58.8153632Z Updating files:  95% (11347/11944)
+2026-11-16T11:58:58.8268064Z Updating files:  96% (11467/11944)
+2026-11-16T11:58:58.8341566Z Updating files:  97% (11586/11944)
+2026-11-16T11:58:58.8418657Z Updating files:  98% (11706/11944)
+2026-11-16T11:58:58.8499127Z Updating files:  99% (11825/11944)
+2026-11-16T11:58:58.8499694Z Updating files: 100% (11944/11944)
+2026-11-16T11:58:58.8500238Z Updating files: 100% (11944/11944), done.
+2026-11-16T11:58:58.8639641Z Note: switching to 'refs/remotes/pull/15/merge'.
+2026-11-16T11:58:58.8640408Z 
+2026-11-16T11:58:58.8640862Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-16T11:58:58.8642276Z changes and commit them, and you can discard any commits you make in this
+2026-11-16T11:58:58.8643639Z state without impacting any branches by switching back to a branch.
+2026-11-16T11:58:58.8644458Z 
+2026-11-16T11:58:58.8644978Z If you want to create a new branch to retain commits you create, you may
+2026-11-16T11:58:58.8645980Z do so (now or later) by using -c with the switch command. Example:
+2026-11-16T11:58:58.8646866Z 
+2026-11-16T11:58:58.8647069Z   git switch -c <new-branch-name>
+2026-11-16T11:58:58.8647369Z 
+2026-11-16T11:58:58.8647540Z Or undo this operation with:
+2026-11-16T11:58:58.8647813Z 
+2026-11-16T11:58:58.8647964Z   git switch -
+2026-11-16T11:58:58.8648167Z 
+2026-11-16T11:58:58.8648542Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-16T11:58:58.8649091Z 
+2026-11-16T11:58:58.8649708Z HEAD is now at 2c04376 Merge 59f7d1e9ae24de09c81fa0ad3c11f3f87256d2d1 into b12ba451b6755bf8f13d22c882075a23eae800a7
+2026-11-16T11:58:58.8749430Z ##[endgroup]
+2026-11-16T11:58:58.8816323Z [command]/usr/bin/git log -1 --format=%H
+2026-11-16T11:58:58.8845220Z 2c0437653925b03f9d777a9b94db76ce64187224
+2026-11-16T11:58:58.9142767Z ##[group]Run actions/setup-python@v5
+2026-11-16T11:58:58.9143079Z with:
+2026-11-16T11:58:58.9143294Z   python-version: 3.13
+2026-11-16T11:58:58.9143523Z   cache: pip
+2026-11-16T11:58:58.9143719Z   check-latest: false
+2026-11-16T11:58:58.9146401Z   token: ***
+2026-11-16T11:58:58.9146670Z   update-environment: true
+2026-11-16T11:58:58.9146918Z   allow-prereleases: false
+2026-11-16T11:58:58.9147147Z   freethreaded: false
+2026-11-16T11:58:58.9147377Z ##[endgroup]
+2026-11-16T11:58:59.0554699Z ##[group]Installed versions
+2026-11-16T11:58:59.0680603Z (node:2436) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-16T11:58:59.0681548Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-16T11:58:59.0692854Z Successfully set up CPython (3.13.18)
+2026-11-16T11:58:59.0693709Z ##[endgroup]
+2026-11-16T11:59:00.2907249Z [command]/opt/hostedtoolcache/Python/3.13.18/x64/bin/pip cache dir
+2026-11-16T11:59:01.5707107Z /home/runner/.cache/pip
+2026-11-16T11:59:01.7531381Z Cache hit for: setup-python-Linux-x64-26.04-Ubuntu-python-3.13.18-pip-c69fe97628028663f3286e466bdaacb314755a7d933ccecdae3969def0d245cf
+2026-11-16T11:59:01.7641022Z (node:2436) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-16T11:59:02.5616145Z Received 57166433 of 57166433 (100.0%), 82.4 MBs/sec
+2026-11-16T11:59:02.5616819Z Cache Size: ~55 MB (57166433 B)
+2026-11-16T11:59:02.5740819Z [command]/usr/bin/tar -xf /home/runner/work/_temp/67f2a06d-8882-4677-8170-41a46ff74fbd/cache.tzst -P -C /home/runner/work/NS_Cowling/NS_Cowling --use-compress-program unzstd
+2026-11-16T11:59:02.6590987Z Cache restored successfully
+2026-11-16T11:59:02.6625127Z Cache restored from key: setup-python-Linux-x64-26.04-Ubuntu-python-3.13.18-pip-c69fe97628028663f3286e466bdaacb314755a7d933ccecdae3969def0d245cf
+2026-11-16T11:59:02.6845067Z ##[group]Run sudo apt-get update
+2026-11-16T11:59:02.6845469Z [36;1msudo apt-get update[0m
+2026-11-16T11:59:02.6845849Z [36;1msudo apt-get install -y gfortran liblapack-dev libblas-dev[0m
+2026-11-16T11:59:02.6904304Z shell: /usr/bin/bash -e {0}
+2026-11-16T11:59:02.6904595Z env:
+2026-11-16T11:59:02.6904891Z   pythonLocation: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T11:59:02.6905424Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.13.18/x64/lib/pkgconfig
+2026-11-16T11:59:02.6905882Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T11:59:02.6906301Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T11:59:02.6906693Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T11:59:02.6907084Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.13.18/x64/lib
+2026-11-16T11:59:02.6907417Z ##[endgroup]
+2026-11-16T11:59:02.7740272Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2026-11-16T11:59:02.8147104Z Hit:2 http://azure.archive.ubuntu.com/ubuntu resolute InRelease
+2026-11-16T11:59:02.8151744Z Get:6 https://packages.microsoft.com/ubuntu/26.04/prod resolute InRelease [3964 B]
+2026-11-16T11:59:02.8173064Z Get:3 http://azure.archive.ubuntu.com/ubuntu resolute-updates InRelease [137 kB]
+2026-11-16T11:59:02.8215760Z Get:4 http://azure.archive.ubuntu.com/ubuntu resolute-backports InRelease [137 kB]
+2026-11-16T11:59:02.8244788Z Get:5 http://azure.archive.ubuntu.com/ubuntu resolute-security InRelease [137 kB]
+2026-11-16T11:59:02.8476213Z Get:7 https://packages.microsoft.com/ubuntu/26.04/prod resolute/main arm64 Packages [143 kB]
+2026-11-16T11:59:02.8696990Z Get:8 http://azure.archive.ubuntu.com/ubuntu resolute-updates/main amd64v3 Packages [873 kB]
+2026-11-16T11:59:02.8753163Z Get:12 https://packages.microsoft.com/ubuntu/26.04/prod resolute/main amd64 Packages [158 kB]
+2026-11-16T11:59:02.8812645Z Get:9 http://azure.archive.ubuntu.com/ubuntu resolute-updates/main Translation-en [195 kB]
+2026-11-16T11:59:02.8928346Z Get:10 http://azure.archive.ubuntu.com/ubuntu resolute-updates/universe amd64v3 Packages [386 kB]
+2026-11-16T11:59:02.8929786Z Get:11 http://azure.archive.ubuntu.com/ubuntu resolute-updates/universe Translation-en [122 kB]
+2026-11-16T11:59:02.9116554Z Get:13 http://azure.archive.ubuntu.com/ubuntu resolute-security/main amd64v3 Packages [719 kB]
+2026-11-16T11:59:02.9147289Z Get:14 http://azure.archive.ubuntu.com/ubuntu resolute-security/main Translation-en [157 kB]
+2026-11-16T11:59:02.9175618Z Get:15 http://azure.archive.ubuntu.com/ubuntu resolute-security/universe amd64v3 Packages [221 kB]
+2026-11-16T11:59:02.9186128Z Get:16 http://azure.archive.ubuntu.com/ubuntu resolute-security/universe Translation-en [72.6 kB]
+2026-11-16T11:59:02.9205567Z Get:17 http://azure.archive.ubuntu.com/ubuntu resolute-security/restricted amd64v3 Packages [590 kB]
+2026-11-16T11:59:02.9239857Z Get:18 http://azure.archive.ubuntu.com/ubuntu resolute-security/restricted Translation-en [122 kB]
+2026-11-16T11:59:05.2744890Z Fetched 4172 kB in 0s (11.3 MB/s)
+2026-11-16T11:59:06.0410024Z Reading package lists...
+2026-11-16T11:59:06.0793631Z Reading package lists...
+2026-11-16T11:59:06.2702460Z Building dependency tree...
+2026-11-16T11:59:06.2710593Z Reading state information...
+2026-11-16T11:59:06.3088023Z gfortran is already the newest version (4:15.2.0-5ubuntu1).
+2026-11-16T11:59:06.3760269Z Solving dependencies...
+2026-11-16T11:59:06.4787956Z The following additional packages will be installed:
+2026-11-16T11:59:06.4797612Z   libblas3 liblapack3
+2026-11-16T11:59:06.4806852Z Suggested packages:
+2026-11-16T11:59:06.4807286Z   liblapack-doc
+2026-11-16T11:59:06.5036561Z The following NEW packages will be installed:
+2026-11-16T11:59:06.5046832Z   libblas-dev libblas3 liblapack-dev liblapack3
+2026-11-16T11:59:06.5278577Z 0 upgraded, 4 newly installed, 0 to remove and 25 not upgraded.
+2026-11-16T11:59:06.5279292Z Need to get 8781 kB of archives.
+2026-11-16T11:59:06.5279898Z After this operation, 35.8 MB of additional disk space will be used.
+2026-11-16T11:59:06.5281192Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2026-11-16T11:59:06.5740659Z Get:2 http://azure.archive.ubuntu.com/ubuntu resolute/main amd64v3 libblas3 amd64 3.12.1-7ubuntu1 [258 kB]
+2026-11-16T11:59:06.6081436Z Get:3 http://azure.archive.ubuntu.com/ubuntu resolute/main amd64v3 libblas-dev amd64 3.12.1-7ubuntu1 [255 kB]
+2026-11-16T11:59:06.6391422Z Get:4 http://azure.archive.ubuntu.com/ubuntu resolute/main amd64v3 liblapack3 amd64 3.12.1-7ubuntu1 [2763 kB]
+2026-11-16T11:59:06.6970159Z Get:5 http://azure.archive.ubuntu.com/ubuntu resolute/main amd64v3 liblapack-dev amd64 3.12.1-7ubuntu1 [5506 kB]
+2026-11-16T11:59:07.1090115Z Fetched 8781 kB in 0s (36.5 MB/s)
+2026-11-16T11:59:07.1362317Z Selecting previously unselected package libblas3:amd64.
+2026-11-16T11:59:07.1708951Z (Reading database ... 
+2026-11-16T11:59:07.1709455Z (Reading database ... 5%
+2026-11-16T11:59:07.1710048Z (Reading database ... 10%
+2026-11-16T11:59:07.1710454Z (Reading database ... 15%
+2026-11-16T11:59:07.1710746Z (Reading database ... 20%
+2026-11-16T11:59:07.1711159Z (Reading database ... 25%
+2026-11-16T11:59:07.1711599Z (Reading database ... 30%
+2026-11-16T11:59:07.1712244Z (Reading database ... 35%
+2026-11-16T11:59:07.1712632Z (Reading database ... 40%
+2026-11-16T11:59:07.1713170Z (Reading database ... 45%
+2026-11-16T11:59:07.1713389Z (Reading database ... 50%
+2026-11-16T11:59:07.2524233Z (Reading database ... 55%
+2026-11-16T11:59:07.4548863Z (Reading database ... 60%
+2026-11-16T11:59:07.5718357Z (Reading database ... 65%
+2026-11-16T11:59:07.7382283Z (Reading database ... 70%
+2026-11-16T11:59:07.9022239Z (Reading database ... 75%
+2026-11-16T11:59:08.0618017Z (Reading database ... 80%
+2026-11-16T11:59:08.2425205Z (Reading database ... 85%
+2026-11-16T11:59:08.4039880Z (Reading database ... 90%
+2026-11-16T11:59:08.5537045Z (Reading database ... 95%
+2026-11-16T11:59:08.5537645Z (Reading database ... 100%
+2026-11-16T11:59:08.5538357Z (Reading database ... 213946 files and directories currently installed.)
+2026-11-16T11:59:08.5583608Z Preparing to unpack .../libblas3_3.12.1-7ubuntu1_amd64v3.deb ...
+2026-11-16T11:59:08.5657099Z Unpacking libblas3:amd64 (3.12.1-7ubuntu1) ...
+2026-11-16T11:59:08.5964554Z Selecting previously unselected package libblas-dev:amd64.
+2026-11-16T11:59:08.6103460Z Preparing to unpack .../libblas-dev_3.12.1-7ubuntu1_amd64v3.deb ...
+2026-11-16T11:59:08.6145872Z Unpacking libblas-dev:amd64 (3.12.1-7ubuntu1) ...
+2026-11-16T11:59:08.6487355Z Selecting previously unselected package liblapack3:amd64.
+2026-11-16T11:59:08.6629931Z Preparing to unpack .../liblapack3_3.12.1-7ubuntu1_amd64v3.deb ...
+2026-11-16T11:59:08.6673191Z Unpacking liblapack3:amd64 (3.12.1-7ubuntu1) ...
+2026-11-16T11:59:08.7273509Z Selecting previously unselected package liblapack-dev:amd64.
+2026-11-16T11:59:08.7413362Z Preparing to unpack .../liblapack-dev_3.12.1-7ubuntu1_amd64v3.deb ...
+2026-11-16T11:59:08.7459353Z Unpacking liblapack-dev:amd64 (3.12.1-7ubuntu1) ...
+2026-11-16T11:59:08.8801450Z Setting up libblas3:amd64 (3.12.1-7ubuntu1) ...
+2026-11-16T11:59:08.8862890Z update-alternatives: using /usr/lib/x86_64-linux-gnu/blas/libblas.so.3 to provide /usr/lib/x86_64-linux-gnu/libblas.so.3 (libblas.so.3-x86_64-linux-gnu) in auto mode
+2026-11-16T11:59:08.8882184Z Setting up libblas-dev:amd64 (3.12.1-7ubuntu1) ...
+2026-11-16T11:59:08.8942362Z update-alternatives: using /usr/lib/x86_64-linux-gnu/blas/libblas.so to provide /usr/lib/x86_64-linux-gnu/libblas.so (libblas.so-x86_64-linux-gnu) in auto mode
+2026-11-16T11:59:08.8965953Z Setting up liblapack3:amd64 (3.12.1-7ubuntu1) ...
+2026-11-16T11:59:08.9023887Z update-alternatives: using /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3 to provide /usr/lib/x86_64-linux-gnu/liblapack.so.3 (liblapack.so.3-x86_64-linux-gnu) in auto mode
+2026-11-16T11:59:08.9041805Z Setting up liblapack-dev:amd64 (3.12.1-7ubuntu1) ...
+2026-11-16T11:59:08.9102227Z update-alternatives: using /usr/lib/x86_64-linux-gnu/lapack/liblapack.so to provide /usr/lib/x86_64-linux-gnu/liblapack.so (liblapack.so-x86_64-linux-gnu) in auto mode
+2026-11-16T11:59:08.9129280Z Processing triggers for libc-bin (2.43-2ubuntu2.4) ...
+2026-11-16T11:59:09.6051154Z 
+2026-11-16T11:59:09.6051815Z Running kernel seems to be up-to-date.
+2026-11-16T11:59:09.6052401Z 
+2026-11-16T11:59:09.6052623Z Restarting services...
+2026-11-16T11:59:09.6146775Z 
+2026-11-16T11:59:09.6147310Z Service restarts being deferred:
+2026-11-16T11:59:09.6150924Z  systemctl restart hosted-compute-agent.service
+2026-11-16T11:59:09.6151331Z 
+2026-11-16T11:59:09.6152553Z No containers need to be restarted.
+2026-11-16T11:59:09.6152893Z 
+2026-11-16T11:59:09.6163143Z No user sessions are running outdated binaries.
+2026-11-16T11:59:09.6163544Z 
+2026-11-16T11:59:09.6163877Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+2026-11-16T11:59:10.6652677Z ##[group]Run python -m pip install --upgrade pip
+2026-11-16T11:59:10.6653122Z [36;1mpython -m pip install --upgrade pip[0m
+2026-11-16T11:59:10.6653459Z [36;1mpython -m pip install -e '.[test,plot]'[0m
+2026-11-16T11:59:10.6706261Z shell: /usr/bin/bash -e {0}
+2026-11-16T11:59:10.6706531Z env:
+2026-11-16T11:59:10.6706821Z   pythonLocation: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T11:59:10.6707268Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.13.18/x64/lib/pkgconfig
+2026-11-16T11:59:10.6707916Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T11:59:10.6708312Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T11:59:10.6708694Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T11:59:10.6709100Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.13.18/x64/lib
+2026-11-16T11:59:10.6709433Z ##[endgroup]
+2026-11-16T11:59:11.6188913Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.13.18/x64/lib/python3.13/site-packages (26.3)
+2026-11-16T11:59:12.2191030Z Obtaining file:///home/runner/work/NS_Cowling/NS_Cowling
+2026-11-16T11:59:12.2209386Z   Installing build dependencies: started
+2026-11-16T11:59:12.8890900Z   Installing build dependencies: finished with status 'done'
+2026-11-16T11:59:12.8896585Z   Checking if build backend supports build_editable: started
+2026-11-16T11:59:13.2573051Z   Checking if build backend supports build_editable: finished with status 'done'
+2026-11-16T11:59:13.2580648Z   Getting requirements to build editable: started
+2026-11-16T11:59:13.6223787Z   Getting requirements to build editable: finished with status 'done'
+2026-11-16T11:59:13.6232389Z   Preparing editable metadata (pyproject.toml): started
+2026-11-16T11:59:13.8327843Z   Preparing editable metadata (pyproject.toml): finished with status 'done'
+2026-11-16T11:59:14.1048441Z Collecting numpy>=1.23 (from compose-cowling-pipeline==2.0.0)
+2026-11-16T11:59:14.1503358Z   Downloading numpy-2.5.5-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+2026-11-16T11:59:14.2811288Z Collecting scipy>=1.7 (from compose-cowling-pipeline==2.0.0)
+2026-11-16T11:59:14.2825582Z   Using cached scipy-1.18.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+2026-11-16T11:59:14.3261888Z Collecting pytest>=7 (from compose-cowling-pipeline==2.0.0)
+2026-11-16T11:59:14.3276098Z   Using cached pytest-9.2.0-py3-none-any.whl.metadata (7.9 kB)
+2026-11-16T11:59:14.3500966Z Collecting mpmath>=1.3 (from compose-cowling-pipeline==2.0.0)
+2026-11-16T11:59:14.3610310Z   Downloading mpmath-1.4.1-py3-none-any.whl.metadata (9.1 kB)
+2026-11-16T11:59:14.4969632Z Collecting matplotlib>=3.6 (from compose-cowling-pipeline==2.0.0)
+2026-11-16T11:59:14.5086142Z   Downloading matplotlib-3.11.2-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (80 kB)
+2026-11-16T11:59:14.6026202Z Collecting contourpy>=1.0.1 (from matplotlib>=3.6->compose-cowling-pipeline==2.0.0)
+2026-11-16T11:59:14.6134659Z   Downloading contourpy-1.4.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (3.8 kB)
+2026-11-16T11:59:14.6339501Z Collecting cycler>=0.10 (from matplotlib>=3.6->compose-cowling-pipeline==2.0.0)
+2026-11-16T11:59:14.6448159Z   Downloading cycler-0.12.1-py3-none-any.whl.metadata (3.8 kB)
+2026-11-16T11:59:14.7996351Z Collecting fonttools>=4.28.2 (from matplotlib>=3.6->compose-cowling-pipeline==2.0.0)
+2026-11-16T11:59:14.8104345Z   Downloading fonttools-4.68.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (139 kB)
+2026-11-16T11:59:14.8999237Z Collecting kiwisolver>=1.3.1 (from matplotlib>=3.6->compose-cowling-pipeline==2.0.0)
+2026-11-16T11:59:14.9109105Z   Downloading kiwisolver-1.5.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (5.2 kB)
+2026-11-16T11:59:14.9251531Z Collecting packaging>=20.0 (from matplotlib>=3.6->compose-cowling-pipeline==2.0.0)
+2026-11-16T11:59:14.9264318Z   Using cached packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+2026-11-16T11:59:15.0939182Z Collecting pillow>=9 (from matplotlib>=3.6->compose-cowling-pipeline==2.0.0)
+2026-11-16T11:59:15.1049381Z   Downloading pillow-13.0.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (9.1 kB)
+2026-11-16T11:59:15.1380801Z Collecting pyparsing>=3 (from matplotlib>=3.6->compose-cowling-pipeline==2.0.0)
+2026-11-16T11:59:15.1491108Z   Downloading pyparsing-3.3.3-py3-none-any.whl.metadata (5.9 kB)
+2026-11-16T11:59:15.1714883Z Collecting python-dateutil>=2.7 (from matplotlib>=3.6->compose-cowling-pipeline==2.0.0)
+2026-11-16T11:59:15.1821555Z   Downloading python_dateutil-4.0.0-py3-none-any.whl.metadata (7.3 kB)
+2026-11-16T11:59:15.2081894Z Collecting iniconfig>=2 (from pytest>=7->compose-cowling-pipeline==2.0.0)
+2026-11-16T11:59:15.2096098Z   Using cached iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)
+2026-11-16T11:59:15.2302275Z Collecting pluggy<2,>=1.6 (from pytest>=7->compose-cowling-pipeline==2.0.0)
+2026-11-16T11:59:15.2313892Z   Using cached pluggy-1.7.0-py3-none-any.whl.metadata (5.0 kB)
+2026-11-16T11:59:15.2553100Z Collecting pygments>=2.15 (from pytest>=7->compose-cowling-pipeline==2.0.0)
+2026-11-16T11:59:15.2566028Z   Using cached pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+2026-11-16T11:59:15.2796272Z Collecting tzdata (from python-dateutil>=2.7->matplotlib>=3.6->compose-cowling-pipeline==2.0.0)
+2026-11-16T11:59:15.2903029Z   Downloading tzdata-2026.6-py2.py3-none-any.whl.metadata (1.4 kB)
+2026-11-16T11:59:15.3101058Z Downloading matplotlib-3.11.2-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (9.9 MB)
+2026-11-16T11:59:15.3714956Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.9/9.9 MB 170.9 MB/s  0:00:00
+2026-11-16T11:59:15.3847109Z Downloading contourpy-1.4.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (384 kB)
+2026-11-16T11:59:15.3992465Z Downloading cycler-0.12.1-py3-none-any.whl (8.3 kB)
+2026-11-16T11:59:15.4121034Z Downloading fonttools-4.68.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (5.4 MB)
+2026-11-16T11:59:15.4338571Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.4/5.4 MB 272.7 MB/s  0:00:00
+2026-11-16T11:59:15.4468428Z Downloading kiwisolver-1.5.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (1.5 MB)
+2026-11-16T11:59:15.4542660Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.5/1.5 MB 236.4 MB/s  0:00:00
+2026-11-16T11:59:15.4651775Z Downloading mpmath-1.4.1-py3-none-any.whl (567 kB)
+2026-11-16T11:59:15.4703593Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 567.8/567.8 kB 106.4 MB/s  0:00:00
+2026-11-16T11:59:15.4813755Z Downloading numpy-2.5.5-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (15.7 MB)
+2026-11-16T11:59:15.5279637Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 15.7/15.7 MB 350.1 MB/s  0:00:00
+2026-11-16T11:59:15.5292281Z Using cached packaging-26.3-py3-none-any.whl (129 kB)
+2026-11-16T11:59:15.5400098Z Downloading pillow-13.0.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (7.1 MB)
+2026-11-16T11:59:15.5627312Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.1/7.1 MB 342.2 MB/s  0:00:00
+2026-11-16T11:59:15.5737013Z Downloading pyparsing-3.3.3-py3-none-any.whl (126 kB)
+2026-11-16T11:59:15.5773083Z Using cached pytest-9.2.0-py3-none-any.whl (411 kB)
+2026-11-16T11:59:15.5785966Z Using cached pluggy-1.7.0-py3-none-any.whl (27 kB)
+2026-11-16T11:59:15.5797924Z Using cached iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+2026-11-16T11:59:15.5809319Z Using cached pygments-2.21.0-py3-none-any.whl (1.3 MB)
+2026-11-16T11:59:15.5920746Z Downloading python_dateutil-4.0.0-py3-none-any.whl (92 kB)
+2026-11-16T11:59:15.5957377Z Using cached scipy-1.18.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (35.3 MB)
+2026-11-16T11:59:15.6204393Z Downloading tzdata-2026.6-py2.py3-none-any.whl (348 kB)
+2026-11-16T11:59:15.7745389Z Building wheels for collected packages: compose-cowling-pipeline
+2026-11-16T11:59:15.7753177Z   Building editable for compose-cowling-pipeline (pyproject.toml): started
+2026-11-16T11:59:16.0042577Z   Building editable for compose-cowling-pipeline (pyproject.toml): finished with status 'done'
+2026-11-16T11:59:16.0047444Z   Created wheel for compose-cowling-pipeline: filename=compose_cowling_pipeline-2.0.0-0.editable-py3-none-any.whl size=1858 sha256=b942028d3e6a0a4adf0172c0a58d0b171d23938230c75acb6ae97fcdcb95aca0
+2026-11-16T11:59:16.0049161Z   Stored in directory: /tmp/pip-ephem-wheel-cache-iu9qwxwa/wheels/8f/0d/2b/1781c9e599b92c86a30a024fa9c9af67e8944533be163cb00a
+2026-11-16T11:59:16.0063777Z Successfully built compose-cowling-pipeline
+2026-11-16T11:59:16.0874071Z Installing collected packages: tzdata, pyparsing, pygments, pluggy, pillow, packaging, numpy, mpmath, kiwisolver, iniconfig, fonttools, cycler, scipy, python-dateutil, pytest, contourpy, matplotlib, compose-cowling-pipeline
+2026-11-16T11:59:27.1457962Z 
+2026-11-16T11:59:27.1486850Z Successfully installed compose-cowling-pipeline-2.0.0 contourpy-1.4.0 cycler-0.12.1 fonttools-4.68.0 iniconfig-2.3.1 kiwisolver-1.5.1 matplotlib-3.11.2 mpmath-1.4.1 numpy-2.5.5 packaging-26.3 pillow-13.0.0 pluggy-1.7.0 pygments-2.21.0 pyparsing-3.3.3 pytest-9.2.0 python-dateutil-4.0.0 scipy-1.18.1 tzdata-2026.6
+2026-11-16T11:59:27.2565028Z ##[group]Run bash fortran_eos/build.sh build/compose_eos_fortran
+2026-11-16T11:59:27.2565677Z [36;1mbash fortran_eos/build.sh build/compose_eos_fortran[0m
+2026-11-16T11:59:27.2615722Z shell: /usr/bin/bash -e {0}
+2026-11-16T11:59:27.2615988Z env:
+2026-11-16T11:59:27.2616266Z   pythonLocation: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T11:59:27.2616715Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.13.18/x64/lib/pkgconfig
+2026-11-16T11:59:27.2617164Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T11:59:27.2617550Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T11:59:27.2617949Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T11:59:27.2618347Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.13.18/x64/lib
+2026-11-16T11:59:27.2618674Z ##[endgroup]
+2026-11-16T11:59:50.8670624Z /usr/bin/x86_64-linux-gnu-ld.bfd: warning: /home/runner/work/NS_Cowling/NS_Cowling/build/compose_eos_fortran/.compile.c1XtbmpL/obj/compose_eos_spg_native.o: requires executable stack (because the .note.GNU-stack section is executable)
+2026-11-16T11:59:50.9081346Z /home/runner/work/NS_Cowling/NS_Cowling/build/compose_eos_fortran/compose_eos_fortran
+2026-11-16T11:59:50.9082596Z /home/runner/work/NS_Cowling/NS_Cowling/build/compose_eos_fortran/compose_eos_generate
+2026-11-16T11:59:50.9156359Z ##[group]Run python -m pytest -q python_frontend/tests pipeline/tests
+2026-11-16T11:59:50.9156927Z [36;1mpython -m pytest -q python_frontend/tests pipeline/tests[0m
+2026-11-16T11:59:50.9206565Z shell: /usr/bin/bash -e {0}
+2026-11-16T11:59:50.9206827Z env:
+2026-11-16T11:59:50.9207099Z   pythonLocation: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T11:59:50.9207549Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.13.18/x64/lib/pkgconfig
+2026-11-16T11:59:50.9207980Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T11:59:50.9208363Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T11:59:50.9208746Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T11:59:50.9209169Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.13.18/x64/lib
+2026-11-16T11:59:50.9209516Z   PYTHONPATH: python_frontend
+2026-11-16T11:59:50.9209767Z   COMPOSE_EOS_FORTRAN_ROOT: .
+2026-11-16T11:59:50.9210145Z   COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+2026-11-16T11:59:50.9210515Z ##[endgroup]
+2026-11-16T11:59:57.3953097Z ........................................................................ [  6%]
+2026-11-16T12:00:03.5926081Z ........................................................................ [ 13%]
+2026-11-16T12:00:08.0239746Z ...sss.................................................................. [ 19%]
+2026-11-16T12:00:10.7995701Z ..............................................................s......... [ 26%]
+2026-11-16T12:00:22.8155362Z ........................................................................ [ 33%]
+2026-11-16T12:00:23.9549760Z ........................................................................ [ 39%]
+2026-11-16T12:00:26.5693677Z .....ss.........................s....................................... [ 46%]
+2026-11-16T12:00:50.9527343Z ........................................................................ [ 53%]
+2026-11-16T12:01:27.1937011Z ........................................................................ [ 59%]
+2026-11-16T12:01:42.5445331Z .................................................F...................... [ 66%]
+2026-11-16T12:01:43.0322941Z ........................................................................ [ 73%]
+2026-11-16T12:01:43.4542865Z ........................................................................ [ 79%]
+2026-11-16T12:01:52.3594732Z ........................................................................ [ 86%]
+2026-11-16T12:01:56.3468094Z ................................................ss...................... [ 93%]
+2026-11-16T12:02:04.5385030Z ........................................................................ [ 99%]
+2026-11-16T12:02:04.6039340Z ...                                                                      [100%]
+2026-11-16T12:02:04.6040080Z =================================== FAILURES ===================================
+2026-11-16T12:02:04.6040962Z _ test_source_crossing_tracks_cluster_branch_past_uniform_limit_trials[geometric_area__nine] _
+2026-11-16T12:02:04.6041622Z 
+2026-11-16T12:02:04.6042543Z native_spg = PosixPath('/tmp/pytest-of-runner/pytest-0/native_spg0/native_spg_probe')
+2026-11-16T12:02:04.6043568Z variant = 'geometric_area__nine'
+2026-11-16T12:02:04.6043882Z 
+2026-11-16T12:02:04.6044387Z     @pytest.mark.parametrize('variant',['geometric_area__nine','geometric_area__eight_measured'])
+2026-11-16T12:02:04.6045572Z     def test_source_crossing_tracks_cluster_branch_past_uniform_limit_trials(native_spg,variant):
+2026-11-16T12:02:04.6046954Z         fit=json.loads((ROOT/'data/research_completion_20261116/theory_review/surface_fit_variants_321.json').read_text())['models']['SPG_M5']['variants'][variant]
+2026-11-16T12:02:04.6047922Z         crossing=probe(native_spg,'transition','SPG_M5',fit['sigma0_MeV_fm2'],fit['b'])
+2026-11-16T12:02:04.6048439Z         assert .07<crossing[0]<.08
+2026-11-16T12:02:04.6048763Z         assert abs(crossing[1])<3e-10
+2026-11-16T12:02:04.6049082Z         assert crossing[3]<1e-5
+2026-11-16T12:02:04.6049930Z         # General cell selection still refuses a lower, nonstationary trial. The
+2026-11-16T12:02:04.6050568Z         # source endpoint routine is explicitly a stationary branch comparison.
+2026-11-16T12:02:04.6051069Z         if variant=='geometric_area__nine':
+2026-11-16T12:02:04.6051805Z             p=subprocess.run([str(native_spg),'solve','SPG_M5',str(fit['sigma0_MeV_fm2']),str(fit['b']),'.07345312500000005'],capture_output=True,text=True)
+2026-11-16T12:02:04.6053039Z             assert p.returncode!=0
+2026-11-16T12:02:04.6053499Z >           assert 'SEARCH_BOUND_ACTIVE' in p.stdout
+2026-11-16T12:02:04.6054753Z E           assert 'SEARCH_BOUND_ACTIVE' in '  6.9555276875853565E+001   2.7835248921855149E-001   9.5072373524029194E+002   8.0680995406664579E+001   2.127739831...8453125049E-002   3.1426657324643108E-002   4.2011869685400251E-002   0.0000000000000000E+000\nSTATIONARITY_RESIDUAL\n'
+2026-11-16T12:02:04.6057482Z E            +  where '  6.9555276875853565E+001   2.7835248921855149E-001   9.5072373524029194E+002   8.0680995406664579E+001   2.127739831...8453125049E-002   3.1426657324643108E-002   4.2011869685400251E-002   0.0000000000000000E+000\nSTATIONARITY_RESIDUAL\n' = CompletedProcess(args=['/tmp/pytest-of-runner/pytest-0/native_spg0/native_spg_probe', 'solve', 'SPG_M5', '1.0279751389...f procedure 'solve_linear'\nNote: The following floating-point exceptions are signalling: IEEE_INVALID_FLAG\nSTOP 2\n").stdout
+2026-11-16T12:02:04.6059201Z 
+2026-11-16T12:02:04.6059375Z python_frontend/tests/test_native_spg.py:107: AssertionError
+2026-11-16T12:02:04.6059790Z =========================== short test summary info ============================
+2026-11-16T12:02:04.6061347Z FAILED python_frontend/tests/test_native_spg.py::test_source_crossing_tracks_cluster_branch_past_uniform_limit_trials[geometric_area__nine] - assert 'SEARCH_BOUND_ACTIVE' in '  6.9555276875853565E+001   2.7835248921855149E-001   9.5072373524029194E+002   8.0680995406664579E+001   2.127739831...8453125049E-002   3.1426657324643108E-002   4.2011869685400251E-002   0.0000000000000000E+000\nSTATIONARITY_RESIDUAL\n'
+2026-11-16T12:02:04.6064595Z  +  where '  6.9555276875853565E+001   2.7835248921855149E-001   9.5072373524029194E+002   8.0680995406664579E+001   2.127739831...8453125049E-002   3.1426657324643108E-002   4.2011869685400251E-002   0.0000000000000000E+000\nSTATIONARITY_RESIDUAL\n' = CompletedProcess(args=['/tmp/pytest-of-runner/pytest-0/native_spg0/native_spg_probe', 'solve', 'SPG_M5', '1.0279751389...f procedure 'solve_linear'\nNote: The following floating-point exceptions are signalling: IEEE_INVALID_FLAG\nSTOP 2\n").stdout
+2026-11-16T12:02:04.6066329Z 1 failed, 1073 passed, 9 skipped in 133.23s (0:02:13)
+2026-11-16T12:02:04.7304391Z ##[error]Process completed with exit code 1.
+2026-11-16T12:02:04.7424415Z ##[group]Run actions/upload-artifact@v4
+2026-11-16T12:02:04.7424724Z with:
+2026-11-16T12:02:04.7425023Z   name: core-crust-census-2c0437653925b03f9d777a9b94db76ce64187224
+2026-11-16T12:02:04.7425409Z   path: build/core_crust_census/
+2026-11-16T12:02:04.7425670Z   if-no-files-found: warn
+2026-11-16T12:02:04.7425900Z   retention-days: 30
+2026-11-16T12:02:04.7426134Z   compression-level: 6
+2026-11-16T12:02:04.7426346Z   overwrite: false
+2026-11-16T12:02:04.7426569Z   include-hidden-files: false
+2026-11-16T12:02:04.7426801Z env:
+2026-11-16T12:02:04.7427059Z   pythonLocation: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T12:02:04.7427494Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.13.18/x64/lib/pkgconfig
+2026-11-16T12:02:04.7427934Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T12:02:04.7428320Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T12:02:04.7428696Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T12:02:04.7429110Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.13.18/x64/lib
+2026-11-16T12:02:04.7429439Z ##[endgroup]
+2026-11-16T12:02:04.9234083Z (node:4445) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-16T12:02:04.9234834Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-16T12:02:04.9264811Z ##[warning]No files were found with the provided path: build/core_crust_census/. No artifacts will be uploaded.
+2026-11-16T12:02:04.9499227Z ##[group]Run python - <<'PY'
+2026-11-16T12:02:04.9499801Z [36;1mpython - <<'PY'[0m
+2026-11-16T12:02:04.9500193Z [36;1mfrom pathlib import Path[0m
+2026-11-16T12:02:04.9500597Z [36;1mfrom hashlib import sha256[0m
+2026-11-16T12:02:04.9501283Z [36;1mfor line in Path("SHA256SUMS_v4.txt").read_text(encoding="utf-8").splitlines():[0m
+2026-11-16T12:02:04.9502229Z [36;1m    if not line.strip():[0m
+2026-11-16T12:02:04.9502671Z [36;1m        continue[0m
+2026-11-16T12:02:04.9503131Z [36;1m    expected, name = line.split(maxsplit=1)[0m
+2026-11-16T12:02:04.9503666Z [36;1m    name = name.lstrip("* ")[0m
+2026-11-16T12:02:04.9504116Z [36;1m    path = Path(name)[0m
+2026-11-16T12:02:04.9504546Z [36;1m    if not path.is_file():[0m
+2026-11-16T12:02:04.9505135Z [36;1m        print(f"MISSING {name} expected={expected}")[0m
+2026-11-16T12:02:04.9505703Z [36;1m        continue[0m
+2026-11-16T12:02:04.9506159Z [36;1m    actual = sha256(path.read_bytes()).hexdigest()[0m
+2026-11-16T12:02:04.9506783Z [36;1m    if actual != expected:[0m
+2026-11-16T12:02:04.9507392Z [36;1m        print(f"MISMATCH {name} expected={expected} actual={actual}")[0m
+2026-11-16T12:02:04.9508036Z [36;1mPY[0m
+2026-11-16T12:02:04.9567352Z shell: /usr/bin/bash -e {0}
+2026-11-16T12:02:04.9567624Z env:
+2026-11-16T12:02:04.9567939Z   pythonLocation: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T12:02:04.9568408Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.13.18/x64/lib/pkgconfig
+2026-11-16T12:02:04.9568854Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T12:02:04.9569245Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T12:02:04.9569629Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-16T12:02:04.9570022Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.13.18/x64/lib
+2026-11-16T12:02:04.9570587Z ##[endgroup]
+2026-11-16T12:02:05.5707099Z Post job cleanup.
+2026-11-16T12:02:05.6704024Z [command]/usr/bin/git version
+2026-11-16T12:02:05.6754705Z git version 2.56.1
+2026-11-16T12:02:05.6803895Z Temporarily overriding HOME='/home/runner/work/_temp/80d688a8-5d87-4445-bda5-f9a09e26e72a' before making global git config changes
+2026-11-16T12:02:05.6805402Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-16T12:02:05.6812994Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/NS_Cowling/NS_Cowling
+2026-11-16T12:02:05.6879360Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-16T12:02:05.6913635Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-16T12:02:05.7411548Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-16T12:02:05.7444152Z http.https://github.com/.extraheader
+2026-11-16T12:02:05.7464318Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-16T12:02:05.7516221Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-16T12:02:05.7901474Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-16T12:02:05.7947881Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-16T12:02:05.8467346Z Cleaning up orphan processes
+2026-11-16T12:02:05.8965646Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

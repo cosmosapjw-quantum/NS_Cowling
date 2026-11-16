@@ -104,4 +104,18 @@ def test_source_crossing_tracks_cluster_branch_past_uniform_limit_trials(native_
     if variant=='geometric_area__nine':
         p=subprocess.run([str(native_spg),'solve','SPG_M5',str(fit['sigma0_MeV_fm2']),str(fit['b']),'.07345312500000005'],capture_output=True,text=True)
         assert p.returncode!=0
-        assert 'SEARCH_BOUND_ACTIVE' in p.stdout
+        # GCC13 and GCC15 can stop at different rejected trial points. Both
+        # must refuse the point; validate the reported reason numerically.
+        lines=p.stdout.strip().splitlines()
+        values=np.fromstring(lines[0],sep=' ')
+        assert values.shape==(15,)
+        assert np.isfinite(values).all()
+        if lines[-1]=='STATIONARITY_RESIDUAL':
+            assert values[4]>1e-5
+        else:
+            assert lines[-1]=='SEARCH_BOUND_ACTIVE'
+            assert values[4]<=1e-5
+            z=values[10:13]
+            lo=np.array([1e-8,.07345312500000005*(1+1e-6),.0001])
+            hi=np.array([1.,.25,.499999])
+            assert np.any(z-lo<1e-6*(hi-lo)) or np.any(hi[1:]-z[1:]<1e-6*(hi[1:]-lo[1:]))

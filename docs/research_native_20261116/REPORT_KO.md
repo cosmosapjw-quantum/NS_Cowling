@@ -45,3 +45,5 @@ Native SLSQP는 SciPy v1.15.3의 허가된 Fortran 원본을 exact commit과 SHA
 5. 접합 부근의 물리적 연결 처방 선택. 문헌 prescribed boundary를 그대로 생성하는 것과 thermodynamic seamless EOS는 별도 결과다.
 
 재현 명령은 REPRODUCE.md, 모델별 상태와 정확한 실행 결과는 data/research_native_20261116의 receipt 및 MODEL_STATUS.json을 기준으로 한다. 최종 회귀와 게시 SHA는 EXECUTION.json 및 Git commit에 연결된다.
+
+CI #625에서는 GCC15가 동일한 미수렴 후보를 STATIONARITY_RESIDUAL로 거부했지만 테스트가 GCC13의 SEARCH_BOUND_ACTIVE 문자열만 요구하여 1개 실패했다(나머지 1,073 passed, 9 skipped). 반환된 잔차 또는 활성 경계가 실제 거부 사유를 충족하는지 검사하도록 테스트를 수정했고, 로컬 SPG 27개 검사는 통과했다. 생산 물리 코드와 허용오차는 바꾸지 않았다. 원 CI 로그와 검토 결과는 integration/CI_COMPATIBILITY.json에 보존했다.

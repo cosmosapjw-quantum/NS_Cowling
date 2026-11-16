@@ -2,23 +2,90 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$ROOT/fortran_eos"
+MODE=force
+case "${1:-}" in
+  --ensure) MODE=ensure; shift ;;
+  --signature) MODE=signature; shift ;;
+esac
 BUILD="${1:-$ROOT/build/compose_eos_fortran}"
-mkdir -p "$BUILD/mod" "$BUILD/obj"
 FC="${FC:-gfortran}"
 FLAGS="${FFLAGS:--std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all}"
-"$FC" $FLAGS -J"$BUILD/mod" -I"$BUILD/mod" -c "$SRC/src/compose_eos_types.f90" -o "$BUILD/obj/compose_eos_types.o"
-"$FC" $FLAGS -J"$BUILD/mod" -I"$BUILD/mod" -c "$SRC/src/compose_eos_rmf.f90" -o "$BUILD/obj/compose_eos_rmf.o"
-"$FC" $FLAGS -J"$BUILD/mod" -I"$BUILD/mod" -c "$SRC/src/compose_eos_cld.f90" -o "$BUILD/obj/compose_eos_cld.o"
-"$FC" $FLAGS -J"$BUILD/mod" -I"$BUILD/mod" -c "$SRC/src/compose_eos_tov.f90" -o "$BUILD/obj/compose_eos_tov.o"
-"$FC" $FLAGS -J"$BUILD/mod" -I"$BUILD/mod" -c "$SRC/src/compose_eos_component.f90" -o "$BUILD/obj/compose_eos_component.o"
-"$FC" $FLAGS -J"$BUILD/mod" -I"$BUILD/mod" -c "$SRC/src/compose_eos_css.f90" -o "$BUILD/obj/compose_eos_css.o"
-"$FC" $FLAGS -J"$BUILD/mod" -I"$BUILD/mod" -c "$SRC/src/compose_eos_phase_transition.f90" -o "$BUILD/obj/compose_eos_phase_transition.o"
-"$FC" $FLAGS -J"$BUILD/mod" -I"$BUILD/mod" -c "$SRC/src/compose_eos_matching.f90" -o "$BUILD/obj/compose_eos_matching.o"
-"$FC" $FLAGS -J"$BUILD/mod" -I"$BUILD/mod" -c "$SRC/src/compose_eos_reconstruct.f90" -o "$BUILD/obj/compose_eos_reconstruct.o"
-"$FC" $FLAGS -J"$BUILD/mod" -I"$BUILD/mod" -c "$SRC/src/compose_eos_causality.f90" -o "$BUILD/obj/compose_eos_causality.o"
-"$FC" $FLAGS -J"$BUILD/mod" -I"$BUILD/mod" -c "$SRC/src/compose_eos_io.f90" -o "$BUILD/obj/compose_eos_io.o"
-"$FC" $FLAGS -J"$BUILD/mod" -I"$BUILD/mod" -c "$SRC/src/compose_eos_verify.f90" -o "$BUILD/obj/compose_eos_verify.o"
-"$FC" $FLAGS -J"$BUILD/mod" -I"$BUILD/mod" -c "$SRC/src/compose_eos_wigner_seitz.f90" -o "$BUILD/obj/compose_eos_wigner_seitz.o"
-"$FC" $FLAGS -J"$BUILD/mod" -I"$BUILD/mod" -c "$SRC/app/compose_eos_fortran.f90" -o "$BUILD/obj/compose_eos_fortran.o"
-"$FC" $FLAGS "$BUILD/obj/compose_eos_types.o" "$BUILD/obj/compose_eos_rmf.o" "$BUILD/obj/compose_eos_cld.o" "$BUILD/obj/compose_eos_tov.o" "$BUILD/obj/compose_eos_component.o" "$BUILD/obj/compose_eos_css.o" "$BUILD/obj/compose_eos_phase_transition.o" "$BUILD/obj/compose_eos_matching.o" "$BUILD/obj/compose_eos_reconstruct.o" "$BUILD/obj/compose_eos_causality.o" "$BUILD/obj/compose_eos_io.o" "$BUILD/obj/compose_eos_verify.o" "$BUILD/obj/compose_eos_wigner_seitz.o" "$BUILD/obj/compose_eos_fortran.o" -o "$BUILD/compose_eos_fortran"
-echo "$BUILD/compose_eos_fortran"
+LEGACY_FLAGS="${SLSQP_FFLAGS:--std=legacy -O2 -ffixed-line-length-none}"
+LINK_FLAGS="${LDFLAGS:-}"
+NATIVE_LIBS="${NATIVE_LIBS:--llapack -lblas}"
+COMPILER="$(command -v "$FC")"
+signature() {
+  {
+    printf '%s\n' "compiler=$COMPILER" "FFLAGS=$FLAGS" "SLSQP_FFLAGS=$LEGACY_FLAGS" "LDFLAGS=$LINK_FLAGS" "NATIVE_LIBS=$NATIVE_LIBS"
+    "$FC" --version
+    "$FC" -dumpmachine
+    sha256sum "$COMPILER" "$SRC/build.sh" "$SRC/run-generator.sh"
+    find "$SRC/src" "$SRC/app" "$SRC/vendor" -type f \( -name '*.f90' -o -name '*.f' -o -name 'PROVENANCE.json' -o -name '*LICENSE*' \) -print0 |
+      LC_ALL=C sort -z | xargs -0 sha256sum
+  } | sha256sum | cut -d' ' -f1
+}
+if [[ "$MODE" == signature ]]; then
+  signature
+  exit 0
+fi
+mkdir -p "$BUILD"
+BUILD="$(cd "$BUILD" && pwd)"
+exec 9>"$BUILD/.build.lock"
+flock 9
+BEFORE="$(signature)"
+if [[ "$MODE" == ensure && -x "$BUILD/compose_eos_fortran" && -x "$BUILD/compose_eos_generate" &&
+      -f "$BUILD/.source-signature" && "$(cat "$BUILD/.source-signature")" == "$BEFORE" ]]; then
+  printf '%s\n' "$BUILD/compose_eos_fortran" "$BUILD/compose_eos_generate"
+  exit 0
+fi
+STAGE="$(mktemp -d "$BUILD/.compile.XXXXXXXX")"
+trap 'rm -rf "$STAGE"' EXIT
+mkdir -p "$STAGE/mod" "$STAGE/obj"
+read -r -a FARGS <<< "$FLAGS"
+read -r -a LEGACY_ARGS <<< "$LEGACY_FLAGS"
+read -r -a LINK_ARGS <<< "$LINK_FLAGS"
+read -r -a LIB_ARGS <<< "$NATIVE_LIBS"
+compile() {
+  local name="$1" directory="${2:-src}"
+  "$FC" "${FARGS[@]}" -J"$STAGE/mod" -I"$STAGE/mod" -c "$SRC/$directory/$name.f90" -o "$STAGE/obj/$name.o"
+}
+OLD_MODULES=(
+  compose_eos_types compose_eos_rmf compose_eos_cld compose_eos_tov compose_eos_component
+  compose_eos_css compose_eos_phase_transition compose_eos_matching compose_eos_reconstruct
+  compose_eos_causality compose_eos_io compose_eos_verify compose_eos_wigner_seitz
+)
+OLD_OBJECTS=()
+for name in "${OLD_MODULES[@]}"; do
+  compile "$name"
+  OLD_OBJECTS+=("$STAGE/obj/$name.o")
+done
+compile compose_eos_fortran app
+"$FC" "${FARGS[@]}" "${OLD_OBJECTS[@]}" "$STAGE/obj/compose_eos_fortran.o" "${LINK_ARGS[@]}" -o "$STAGE/compose_eos_fortran"
+"$FC" "${LEGACY_ARGS[@]}" -c "$SRC/vendor/slsqp/slsqp_optmz.f" -o "$STAGE/obj/slsqp_optmz.o"
+NATIVE_MODULES=(
+  compose_eos_optimize_native compose_eos_core_native compose_eos_gdfm_native
+  compose_eos_lower_crust_native compose_eos_tf_models compose_eos_spg_native compose_eos_spatial_tf
+)
+NATIVE_OBJECTS=()
+for name in "${NATIVE_MODULES[@]}"; do
+  compile "$name"
+  NATIVE_OBJECTS+=("$STAGE/obj/$name.o")
+done
+compile compose_eos_generate app
+"$FC" "${FARGS[@]}" "$STAGE/obj/compose_eos_types.o" "$STAGE/obj/compose_eos_io.o" \
+  "${NATIVE_OBJECTS[@]}" "$STAGE/obj/slsqp_optmz.o" "$STAGE/obj/compose_eos_generate.o" \
+  "${LINK_ARGS[@]}" "${LIB_ARGS[@]}" -o "$STAGE/compose_eos_generate"
+AFTER="$(signature)"
+if [[ "$BEFORE" != "$AFTER" ]]; then
+  printf '%s\n' 'Fortran sources or build configuration changed during compilation; refusing to publish a stale build.' >&2
+  exit 75
+fi
+# Publish only after both executables have compiled successfully.
+mkdir -p "$BUILD/mod" "$BUILD/obj"
+cp "$STAGE/mod/"*.mod "$BUILD/mod/"
+cp "$STAGE/obj/"*.o "$BUILD/obj/"
+mv "$STAGE/compose_eos_fortran" "$BUILD/compose_eos_fortran"
+mv "$STAGE/compose_eos_generate" "$BUILD/compose_eos_generate"
+printf '%s\n' "$AFTER" > "$BUILD/.source-signature.tmp"
+mv "$BUILD/.source-signature.tmp" "$BUILD/.source-signature"
+printf '%s\n' "$BUILD/compose_eos_fortran" "$BUILD/compose_eos_generate"

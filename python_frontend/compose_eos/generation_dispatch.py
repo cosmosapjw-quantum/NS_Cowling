@@ -27,7 +27,7 @@ NATIVE_FILES = ("eos.nb", "eos.t", "eos.yq", "eos.thermo", "eos.compo")
 
 
 def generator_catalog():
-    from .core_regeneration import MODEL_CONTRACTS
+    from .native_model_contracts import MODEL_CONTRACTS
     result = {}
     for model, contract in MODEL_CONTRACTS.items():
         result[model] = dict(family="core", region="core_only",
@@ -71,13 +71,15 @@ def _finite_positive(values, label, integer=False):
 
 def generation_request(model, *, points=None, n_min=None, n_max=None,
                        variant="AME2408_candidate", densities=None,
-                       resolutions=None, workers=1):
+                       resolutions=None, workers=1, include_lower_crust=False):
     catalog = generator_catalog()
     if model not in catalog:
         raise ValueError(f"unknown model: {model}")
     if not isinstance(workers, int) or isinstance(workers, bool) or workers < 1:
         raise ValueError("workers must be a positive integer")
     family = catalog[model]["family"]
+    if include_lower_crust and family == "core":
+        raise ValueError("lower crust segments are only available for crust models")
     request = {"model": model, "family": family, "contract": catalog[model]}
     if family == "core":
         if densities is not None or resolutions is not None or variant != "AME2408_candidate":
@@ -107,23 +109,15 @@ def generation_request(model, *, points=None, n_min=None, n_max=None,
         if len(densities) < 3 or min(resolutions) < 8:
             raise ValueError("TF native output requires >=3 densities and resolutions >=8")
         request.update(densities=list(densities), resolutions=list(resolutions), workers=workers)
+    if include_lower_crust:
+        request["include_lower_crust"] = True
     return request
 
 
 def _command(root, output, request):
-    command = [sys.executable, str(root / "scripts" / SCRIPTS[request["family"]]),
-               str(output), "--models", request["model"]]
-    if request["family"] == "core":
-        command += ["--points", str(request["points"]), "--n-min", str(request["n_min"]),
-                    "--n-max", str(request["n_max"])]
-    elif request["family"] == "spg":
-        command += ["--points", str(request["points"]), "--variants", request["variant"],
-                    "--workers", str(request["workers"])]
-    else:
-        command += ["--densities", *map(str, request["densities"]),
-                    "--resolutions", *map(str, request["resolutions"]),
-                    "--workers", str(request["workers"])]
-    return command
+    from .native_generation import write_request
+    request_file=write_request(root,output,request)
+    return [str(root / "fortran_eos/run-generator.sh"), str(request_file), str(output)]
 
 
 def _read_json(path):
@@ -259,11 +253,19 @@ def run_generation(model, output, *, root=None, **options):
     output.mkdir(parents=True, exist_ok=False)
     child_output = output / "generated"
     command = _command(root, child_output, request)
-    tracked = [Path(__file__).resolve(), root / "scripts" / SCRIPTS[request["family"]]]
+    from .native_generation import source_files, surface_input, verify_native_generation
+    tracked = [Path(__file__).resolve(), Path(__file__).with_name("native_generation.py"), *source_files(root)]
     initial = {str(p): _sha(p) for p in tracked}
     receipt = {"status": "RUNNING", "request": request, "command": command,
                "repository_root": str(root), "source_sha256": initial,
-               "completion_scope": "requested finite rows/native readback only; no whole-crust or original-fit promotion"}
+               "backend": "fortran",
+               "completion_scope": "requested finite native rows/readback; source equivalence and full-crust completion remain separate"}
+    if request["family"] == "spg":
+        receipt["surface_input"] = surface_input(root, model, request["variant"])
+    if request.get("include_lower_crust"):
+        mass = root / "data/outer_crust/hfb22_ame2016_cu.csv"
+        receipt["mass_input"] = {"path": str(mass.relative_to(root)), "sha256": _sha(mass)}
+    receipt["request_sha256"] = _sha(output / "request.nml")
     path = output / "DISPATCH.json"
     save = lambda: path.write_text(json.dumps(receipt, indent=2, allow_nan=False) + "\n")
     save()
@@ -280,7 +282,7 @@ def run_generation(model, output, *, root=None, **options):
         else:
             if initial != {str(p): _sha(p) for p in tracked}:
                 raise ValueError("dispatcher or runner source changed during execution")
-            receipt["evidence"] = verify_generation(child_output, request)
+            receipt["evidence"] = verify_native_generation(child_output, request)
             receipt["status"] = "REQUESTED_ROWS_NATIVE_VERIFIED"
             code = 0
     except Exception as exc:

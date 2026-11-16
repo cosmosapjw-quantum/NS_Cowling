@@ -1,0 +1,17 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________________ test_native_tf_sources_present ________________________
+
+    def test_native_tf_sources_present():
+        # Would fail if the public native solver or physical kernel is removed.
+        for name in ("compose_eos_tf_models.f90","compose_eos_spatial_tf.f90"):
+>           assert (ROOT/"fortran_eos/src"/name).is_file(), "native spatial TF backend missing: "+name
+E           AssertionError: native spatial TF backend missing: compose_eos_tf_models.f90
+E           assert False
+E            +  where False = is_file()
+E            +    where is_file = ((PosixPath('/tmp/ns_eos_native_4de4943_20261116') / 'fortran_eos/src') / 'compose_eos_tf_models.f90').is_file
+
+python_frontend/tests/test_native_spatial_tf.py:12: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_native_spatial_tf.py::test_native_tf_sources_present
+1 failed in 0.10s

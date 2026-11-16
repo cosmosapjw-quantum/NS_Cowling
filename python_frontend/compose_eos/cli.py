@@ -20,6 +20,7 @@ def main(argv=None):
     g.add_argument("--densities",nargs="+",type=float)
     g.add_argument("--resolutions",nargs="+",type=int)
     g.add_argument("--workers",type=int,default=1)
+    g.add_argument("--include-lower-crust",action="store_true",help="Regenerate separate native outer and BSk22 source-fit segments; no cross-segment interpolation claim")
     args=parser.parse_args(argv)
     if args.command=="generators":
         from .generation_dispatch import generator_catalog
@@ -29,7 +30,8 @@ def main(argv=None):
         try:
             return run_generation(args.model,args.output,root=args.repository_root,
                 points=args.points,n_min=args.n_min,n_max=args.n_max,variant=args.variant,
-                densities=args.densities,resolutions=args.resolutions,workers=args.workers)
+                densities=args.densities,resolutions=args.resolutions,workers=args.workers,
+                include_lower_crust=args.include_lower_crust)
         except (ValueError,OSError) as exc:
             parser.error(str(exc))
     if args.command=="read":

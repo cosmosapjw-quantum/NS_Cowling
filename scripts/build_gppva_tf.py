@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 """Execute spatial TF geometry/mesh campaigns and export sparse CompOSE data."""
 from __future__ import annotations
+# Historical research oracle; production physics lives in the Fortran backend.
+# Imports remain available to pinned-campaign audit and regression helpers.
+import sys as _oracle_sys
+if __name__ == '__main__':
+    if '--historical-python-oracle' not in _oracle_sys.argv:
+        raise SystemExit('This is a historical Python research oracle. Use compose-eos generate for production; add --historical-python-oracle only to reproduce the explicitly archived Python campaign.')
+    _oracle_sys.argv.remove('--historical-python-oracle')
 import argparse,csv,gzip,hashlib,json,os,time
 from concurrent.futures import ProcessPoolExecutor,as_completed
 from pathlib import Path

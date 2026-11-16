@@ -1,0 +1,299 @@
+{
+  "model": "BBB_BHF2",
+  "attempt_directory": "data/research_native_20261116/public_cohort/BBB_BHF2/attempt_001",
+  "command": [
+    "/usr/bin/python3",
+    "-m",
+    "compose_eos.cli",
+    "generate",
+    "BBB_BHF2",
+    "/tmp/ns_eos_native_4de4943_20261116/data/research_native_20261116/public_cohort/BBB_BHF2/attempt_001/output",
+    "--repository-root",
+    "/tmp/ns_eos_native_4de4943_20261116",
+    "--points",
+    "161"
+  ],
+  "started_utc": "2026-11-16T11:46:16.834373+00:00",
+  "status": "REQUESTED_ROWS_NATIVE_VERIFIED",
+  "returncode": 0,
+  "dispatch_status": "REQUESTED_ROWS_NATIVE_VERIFIED",
+  "dispatch_sha256": "244b5d9b60d0e1a68899c4cbb5119b4469258a467c72c0fc4757d6f8623b34d8",
+  "request": {
+    "model": "BBB_BHF2",
+    "family": "core",
+    "contract": {
+      "family": "core",
+      "region": "core_only",
+      "composition": "nucleon and lepton fractions",
+      "default_interval_fm3": [
+        0.08,
+        1.5
+      ],
+      "species": "npemu",
+      "representation": "PublishedParis+UrbanaSNM/PNMenergies; parabolic isospin; PCHIP energy derivative",
+      "paper_implementation": "PUBLISHED_ENERGY_TABLE_RECONSTRUCTION; original BHF kernel is not re-solved",
+      "microscopic_support_max_fm3": 0.8,
+      "source": "https://arxiv.org/pdf/astro-ph/9707277"
+    },
+    "points": 161,
+    "n_min": 0.08,
+    "n_max": 1.5
+  },
+  "native_evidence": {
+    "rows": 161,
+    "native_directory": "/tmp/ns_eos_native_4de4943_20261116/data/research_native_20261116/public_cohort/BBB_BHF2/attempt_001/output/generated",
+    "backend": "fortran",
+    "native_result": {
+      "backend": "fortran",
+      "status": "REQUESTED_ROWS_NATIVE_VERIFIED",
+      "native_readback": true,
+      "model": "BBB_BHF2",
+      "family": "core",
+      "rows": 161,
+      "held_nodes": 0,
+      "meshes": [],
+      "lower_crust_segments": false
+    },
+    "native_frontend_readback": {
+      "generated": 161
+    },
+    "output_sha256": {
+      "eos.nb": "96fe924f6a395d3b334cab99904ea9ec041c7659eeff3a6ae75c6ec264df406d",
+      "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+      "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+      "eos.thermo": "d61054d766230816455f9534d5a62a903fb2b4049606737f7c588ff01edd9cbc",
+      "eos.compo": "1700ecc230b0287731fc265b9e40c5596d84f3d58d31f9d87a89deed327f8604"
+    },
+    "native_consistency": {
+      "generated": {
+        "C1": {
+          "temperature_mev": 0.0,
+          "maxQ2": 0.0,
+          "maxQ6mQ7": 0.0,
+          "maxmul": 0.0,
+          "pass_": true
+        },
+        "C2": {
+          "applicable": true,
+          "max_rel": 4.337530546794177e-16,
+          "pass_": true,
+          "basis": "Fortran CompOSE thermodynamic closure"
+        },
+        "C3": {
+          "status": "CHECKED",
+          "max_abs": 0.0,
+          "pass_": true
+        },
+        "C4": {
+          "status": "CHECKED",
+          "max_abs": 7.494005416219807e-16,
+          "pass_": true
+        },
+        "C5": {
+          "maxmul": 0.0,
+          "applicable": true,
+          "pass_": true
+        },
+        "C6": {
+          "min_dPdnb": 13.326757458256067,
+          "min_delta_p": 0.019711661232025002,
+          "pass_": true
+        },
+        "C7": {
+          "max_rel": 0.0019029712237468243,
+          "n_points": 161,
+          "status": "FINITE_DIFFERENCE_DIAGNOSTIC"
+        },
+        "C8": {
+          "max_rel": 0.0039309495033463164,
+          "n_points": 161,
+          "status": "FINITE_DIFFERENCE_DIAGNOSTIC"
+        },
+        "C9": {
+          "max_rel": 0.0003856401477313247,
+          "n_points": 161,
+          "status": "FINITE_DIFFERENCE_DIAGNOSTIC"
+        },
+        "C10": {
+          "min_cs2": 0.013778240748609121,
+          "max_cs2": 0.833398604198146,
+          "min_cs2_first_law": 0.013778227182862531,
+          "max_cs2_first_law": 0.8333692085216716,
+          "acausal_point_count": 0,
+          "acausal_point_count_first_law": 0,
+          "n_points": 161,
+          "pass_": true
+        },
+        "C11": {
+          "min_dmubdnb": 164.1150912611629,
+          "n_points": 161,
+          "pass_": true
+        },
+        "overall": {
+          "status": "PASS",
+          "pass_": true,
+          "failed_checks": [],
+          "finite_primary_arrays": true,
+          "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11."
+        },
+        "native_report": {
+          "schema": "compose-eos-fortran-verification-v1",
+          "n": 161,
+          "temperature_mev": 0.0,
+          "C1": {
+            "pass": true
+          },
+          "C2": {
+            "applicable": true,
+            "pass": true
+          },
+          "C3": {
+            "status": "CHECKED",
+            "pass": true
+          },
+          "C4": {
+            "status": "CHECKED",
+            "pass": true
+          },
+          "C5": {
+            "applicable": true,
+            "pass": true
+          },
+          "C6": {
+            "pass": true
+          },
+          "C7": {
+            "status": "FINITE_DIFFERENCE_DIAGNOSTIC",
+            "max_rel": 0.0019029712237468243,
+            "n_points": 161
+          },
+          "C8": {
+            "status": "FINITE_DIFFERENCE_DIAGNOSTIC",
+            "max_rel": 0.0039309495033463164,
+            "n_points": 161
+          },
+          "C9": {
+            "status": "FINITE_DIFFERENCE_DIAGNOSTIC",
+            "max_rel": 0.0003856401477313247,
+            "n_points": 161
+          },
+          "C10": {
+            "pass": true
+          },
+          "C11": {
+            "pass": true
+          },
+          "C3_applicable_points": 161,
+          "C3_masked_points": 0,
+          "C4_applicable_points": 161,
+          "C4_masked_points": 0,
+          "derivative_points": 161,
+          "derivative_masked_points": 0,
+          "C1_max_Q2": 0.0,
+          "C1_max_Q6_minus_Q7": 0.0,
+          "C1_max_mu_l": 0.0,
+          "C2_max_relative_residual": 4.337530546794177e-16,
+          "C3_max_absolute_residual": 0.0,
+          "C4_max_absolute_residual": 7.494005416219807e-16,
+          "C7_max_relative_residual": 0.0019029712237468243,
+          "C8_max_relative_residual": 0.0039309495033463164,
+          "C9_max_relative_residual": 0.0003856401477313247,
+          "min_cs2": 0.013778240748609121,
+          "max_cs2": 0.833398604198146,
+          "min_cs2_first_law": 0.013778227182862531,
+          "max_cs2_first_law": 0.8333692085216716,
+          "min_dmu_b_dnb": 164.1150912611629,
+          "acausal_point_count": 0,
+          "acausal_point_count_first_law": 0,
+          "min_dP_dnb": 13.326757458256067,
+          "min_delta_P": 0.019711661232025002,
+          "failed_checks": "",
+          "overall": {
+            "status": "PASS",
+            "pass": true
+          }
+        }
+      }
+    }
+  },
+  "readbacks": [
+    {
+      "directory": "data/research_native_20261116/public_cohort/BBB_BHF2/attempt_001/output/generated",
+      "returncode": 0,
+      "result": {
+        "status": "ok",
+        "n": 161,
+        "composition_available": true,
+        "nadd": 0,
+        "source_dir": "/tmp/ns_eos_native_4de4943_20261116/data/research_native_20261116/public_cohort/BBB_BHF2/attempt_001/output/generated"
+      },
+      "output_sha256": {
+        "eos.nb": "96fe924f6a395d3b334cab99904ea9ec041c7659eeff3a6ae75c6ec264df406d",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "d61054d766230816455f9534d5a62a903fb2b4049606737f7c588ff01edd9cbc",
+        "eos.compo": "1700ecc230b0287731fc265b9e40c5596d84f3d58d31f9d87a89deed327f8604"
+      }
+    }
+  ],
+  "elapsed_seconds": 0.3327009570057271,
+  "finished_utc": "2026-11-16T11:46:17.167081+00:00",
+  "preserved_files": {
+    "output/DISPATCH.json": {
+      "size": 10982,
+      "sha256": "244b5d9b60d0e1a68899c4cbb5119b4469258a467c72c0fc4757d6f8623b34d8"
+    },
+    "output/execution.log": {
+      "size": 205,
+      "sha256": "05d24b428e6b3fbb795a7fc1c97d81714a4db799f346e4b35be1ae08db66253d"
+    },
+    "output/generated/RESULT.json": {
+      "size": 192,
+      "sha256": "6d55cb0ca57f35fe9e974da6a3bd5c81a20f77113e285e17abfdd8ea27aa9a75"
+    },
+    "output/generated/SUPPORT.json": {
+      "size": 254,
+      "sha256": "01dfff782864a3e26950c08fc5ae1ecef17a891039eba07ec3657a5adf684421"
+    },
+    "output/generated/eos.compo": {
+      "size": 33380,
+      "sha256": "1700ecc230b0287731fc265b9e40c5596d84f3d58d31f9d87a89deed327f8604"
+    },
+    "output/generated/eos.nb": {
+      "size": 4192,
+      "sha256": "96fe924f6a395d3b334cab99904ea9ec041c7659eeff3a6ae75c6ec264df406d"
+    },
+    "output/generated/eos.t": {
+      "size": 30,
+      "sha256": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+    },
+    "output/generated/eos.thermo": {
+      "size": 30858,
+      "sha256": "d61054d766230816455f9534d5a62a903fb2b4049606737f7c588ff01edd9cbc"
+    },
+    "output/generated/eos.yq": {
+      "size": 30,
+      "sha256": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+    },
+    "output/generated/first_law.csv": {
+      "size": 934,
+      "sha256": "31ff6c28f8229cb663b20a96069e7a8e77150b0106b624a9afc6e1d646c3e23b"
+    },
+    "output/generated/states.csv": {
+      "size": 58703,
+      "sha256": "36a415ff076de65068bd9c80b0bbb34fe1f048e94422fe0ca420af2de104d87d"
+    },
+    "output/request.nml": {
+      "size": 123,
+      "sha256": "b218174344ce424de192ade1b77b1769a3fa3b1210b2dc52d390ace3af98bef1"
+    },
+    "public_cli.log": {
+      "size": 198,
+      "sha256": "4f6dca0214c67e92ae5811fb0b86477e3a928036b971784469d0753987e72fe9"
+    },
+    "read_inner.log": {
+      "size": 216,
+      "sha256": "a07bbbfa92fe09cbe31f7229a64bf0acc3c3698bd35507f9e97ca45952406b57"
+    }
+  }
+}

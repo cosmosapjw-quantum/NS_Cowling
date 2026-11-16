@@ -29,7 +29,14 @@ def test_narrow_cli_derivative_audit_stays_inside_requested_domain(tmp_path):
     output=tmp_path/'narrow'
     env={**os.environ,'COMPOSE_EOS_FORTRAN_EXE':str(executable),'COMPOSE_EOS_FORTRAN_ROOT':str(root)}
     subprocess.run([sys.executable,str(root/'scripts/generate_core_eos.py'),str(output),
-        '--models','APR_APR','--points','3','--n-min','1.95','--n-max','1.96'],env=env,cwd=root,check=True,capture_output=True,text=True)
+        '--models','APR_APR','--points','3','--n-min','1.20','--n-max','1.21'],env=env,cwd=root,check=True,capture_output=True,text=True)
     receipt=json.loads((output/'APR_APR/RECEIPT.json').read_text())
-    assert all(1.95<r['n_fm3']<1.96 for r in receipt['first_law_independent_differences'])
+    assert receipt['backend']=='fortran'
+    differences=receipt['first_law_independent_differences']
+    assert len(differences)==7
+    for row in differences:
+        assert row['backend']=='fortran'
+        for h in row['actual_steps_fm3']:
+            assert 1.20<row['n_fm3']-2*h<row['n_fm3']+2*h<1.21
+        assert max(abs(x) for x in row['energy_derivative_minus_mu_MeV'])<2e-6
     assert json.loads((output/'SUMMARY.json').read_text())['status']=='COMPLETE'

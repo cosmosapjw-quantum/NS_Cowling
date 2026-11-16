@@ -4,7 +4,7 @@
   "plan_id": "eos390_native_fortran_unification_v1",
   "revision": "1.5.3",
   "created_utc": "2026-11-11",
-  "status": "E390-03_PARTIAL_NATIVE_DDRMF_SOLVER_LOCAL_PASS_CLD_TF_REMAINS_CURRENT",
+  "status": "PARTIALLY_COMPLETE_PROXY_CLD_AND_EXACT_CSS_IMPLEMENTATION_VERIFIED_SOURCE_CALIBRATION_OPEN",
   "authority": {
     "repository": "cosmosapjw-quantum/NS_Cowling",
     "work_branch": "cloud/eos390-fortran-unification-v1",
@@ -641,7 +641,7 @@
         "E390-03A",
         "E390-03B"
       ],
-      "status": "RESOLVED_20261114_NATIVE_DDRMF_CLD_TF_GAS_COMPOSITION_PASS_COMPOSE_CLOSURE_PASS__20261116_PYTHON_CLD_COMPOSE_WRITER_DEFECT_FIXED_V5",
+      "status": "PARTIAL_NATIVE_RMF_VALIDATED_CLD_PROXY_STATIONARITY_FIXED_SOURCE_CALIBRATION_OPEN",
       "outputs": [
         "native DD-RMF homogeneous symmetry energy, beta-equilibrium and electron/muon branch diagnostics (DELIVERED, b3d80cc)",
         "native CLD cell composition reconstruction for GPPVA_DD2/DDME2/TW over the inner-crust density grid (DELIVERED: 3 models x 20 points = 60 rows, 5 physics invariants PASS; Scurto 2024 CLD on the Fortran DD-RMF solver; Lattimer surface tension, RPW Coulomb lattice, Nelder-Mead 3-var)",
@@ -701,13 +701,26 @@
         "scope_boundary_retained": "reconstruct_compo_closure_ws / reconstruct-compo-native performs row-wise algebraic CompOSE C3/C4 abundance closure reconstruction from raw provider group tuples (SPG_M1..M5, GPPVA_*) with independent native readback and deterministic FNV-1a hashing; it is NOT a self-consistent spatial Thomas-Fermi density-profile solver or variational pasta phase minimization, and multi-T/full-tensor CompOSE writing remains unimplemented."
       },
       "status_history": [
-        "RESOLVED_20261114_NATIVE_DDRMF_CLD_TF_GAS_COMPOSITION_PASS_COMPOSE_CLOSURE_PASS"
+        "RESOLVED_20261114_NATIVE_DDRMF_CLD_TF_GAS_COMPOSITION_PASS_COMPOSE_CLOSURE_PASS",
+        "RESOLVED_20261114_NATIVE_DDRMF_CLD_TF_GAS_COMPOSITION_PASS_COMPOSE_CLOSURE_PASS__20261116_PYTHON_CLD_COMPOSE_WRITER_DEFECT_FIXED_V5"
       ],
       "update_20261116": {
         "git_head_before_update": "c33c6b163c202f6d78adf236e0fa06bc76259e5a",
         "evidence": [
           "data/receipts/core_crust_audit_20261115/CLD_COLUMN_DEFECT_EVIDENCE.json",
           "docs/CORE_CRUST_REAUDIT_CONTINUATION_20261115.md"
+        ]
+      },
+      "adversarial_update_20261116": {
+        "implementation_commit": "42950053088fa80752826f4aae56d0a0b013c0e4",
+        "report": "docs/CORE_CRUST_ADVERSARIAL_REAUDIT_20261116.md",
+        "receipt": "data/receipts/core_crust_audit_20261116/AUDIT_RECEIPT.json",
+        "source_calibrated": false,
+        "remaining": [
+          "source-calibrated interface functional and fitted parameters",
+          "global-minimum and resolution checks",
+          "outer-crust physical stellar boundary",
+          "composition and mode/radial stability validation"
         ]
       }
     },
@@ -809,7 +822,7 @@
         "E390-05",
         "E390-05A"
       ],
-      "status": "NATIVE_TOV_LOVE_PASS_PHASE_SEGMENTED_COWLING_ADAPTER_ON_GENERATED_EOS",
+      "status": "NATIVE_TOV_LOVE_PASS_EXACT_CSS_TRUNCATED_PROXY_COWLING_IMPLEMENTED",
       "outputs": [
         "native stellar interfaces (DELIVERED: Fortran TOV RK45 integration, smooth + sharp-Maxwell barotropes)",
         "tidal Love solver (DELIVERED: l=2 y(r) ODE Takatsy-Kovacs 2020 Eq. 2-3, k2 and Lambda from Thorne 1971)",
@@ -854,7 +867,8 @@
         "verdict": "compose_cowling runtime-compile path resolved + end-to-end spectrum physics verified on causal EOS"
       },
       "status_history": [
-        "NATIVE_TOV_LOVE_PASS_COWLING_RUNTIME_COMPILE_REMAINS"
+        "NATIVE_TOV_LOVE_PASS_COWLING_RUNTIME_COMPILE_REMAINS",
+        "NATIVE_TOV_LOVE_PASS_PHASE_SEGMENTED_COWLING_ADAPTER_ON_GENERATED_EOS"
       ],
       "update_20261116": {
         "git_head_before_update": "c33c6b163c202f6d78adf236e0fa06bc76259e5a",
@@ -864,6 +878,18 @@
         ],
         "remaining": [
           "Cowling end-to-end tests still skip without raw M0 inputs"
+        ]
+      },
+      "adversarial_update_20261116": {
+        "implementation_commit": "42950053088fa80752826f4aae56d0a0b013c0e4",
+        "report": "docs/CORE_CRUST_ADVERSARIAL_REAUDIT_20261116.md",
+        "receipt": "data/receipts/core_crust_audit_20261116/AUDIT_RECEIPT.json",
+        "source_calibrated": false,
+        "remaining": [
+          "source-calibrated interface functional and fitted parameters",
+          "global-minimum and resolution checks",
+          "outer-crust physical stellar boundary",
+          "composition and mode/radial stability validation"
         ]
       }
     },
@@ -1428,201 +1454,20 @@
     "provider_semantics_stop": "Production EOS390 composition matching for SPG/GPPVA is blocked until providers define the raw field. Generic parser and presence-mask work may continue only without assigning that field a meaning."
   },
   "evidence_status": {
-    "code_execution_in_this_turn": "NATIVE_DDRMF_HOMOGENEOUS_SOLVER_BUILD_AND_TEST; 3_MODEL_X_32_POINT_DIAGNOSTIC_GRID; INDEPENDENT_REFERENCE_COMPARISON",
-    "static_source_patch": "E390-03_DDRMF_NATIVE_FORTRAN_SLICE_AND_REGRESSION_TESTS; NO_CLD_TF_OR_MATCHING_IMPLEMENTED",
-    "github_ci": "PENDING_EXACT_HEAD_PUSH_RUN",
-    "local_runtime": "LOCAL_SOURCE_SNAPSHOT_BASE_7A0415E; GNU_FORTRAN_BUILD_PASS; 15_NATIVE_DDRMF_TESTS_PASS; FULL_FRONTEND_PIPELINE_153_PASS_3_SKIP; 96_NATIVE_DIAGNOSTIC_ROWS",
-    "source_cohort_admission": "REMEDIATION_20261114_MEASURED_18_SOURCES: 9_ADMITTED_7_CONDITIONALLY_ADMITTED_2_SOURCE_INADMISSIBLE_RG_Q5_NE_0 (SOURCE_ADMISSION_MATRIX.json); 65 pairs: 8_ADMITTED_31_CONDITIONAL_26_BLOCKED_BETA_EQUILIBRIUM (PAIR_ELIGIBILITY_MATRIX.json)",
-    "regenerated_390": "REMEDIATION_20261114_RUN_325_EXECUTED_130_PASS_65_PHYSICS_FAIL_APR_APR_ACausal_TAIL_130_BLOCKED_RG_BETA_EQUIL_65_NOT_RUN_FLCHPB_METHOD_PRESENT_IN_ad8e52f_BASE (M7_FINAL_BATCH_MANIFEST.json)",
-    "github_actions_execution": {
-      "previous_head_before_css": {
-        "id": 43007372958,
-        "run_number": 193,
-        "head_sha": "ce24f85cbb4861c28c9f9eea0f3ddea28950fab8",
-        "conclusion": "success",
-        "pytest": "78 passed in 33.26 s"
-      },
-      "current_css": {
-        "id": 43009330939,
-        "run_number": 194,
-        "head_sha": "6c580cc33c03009e82c9aef798daa63fdb0a7073",
-        "conclusion": "success",
-        "job_id": 130484668591,
-        "steps": [
-          "Fortran EOS executable build: success",
-          "frontend and direct-provider tests: 78 passed in 44.87 s",
-          "polynomial extrema: PASS",
-          "CSS segment analytic checks: PASS",
-          "sha256sum -c SHA256SUMS_v4.txt: all entries OK",
-          "source archive upload: success"
-        ],
-        "artifact": {
-          "id": 13848959429,
-          "name": "NS_Cowling-cd8076f757bddc97c80d7c3ea7940072838eae51",
-          "size_bytes": 199200919,
-          "sha256": "dbeb061fe5bb59b19fc5054d8d41cd555435827f9416a4a95af22ffe70844c05"
-        }
-      },
-      "local_runtime": "NOT_RUN",
-      "source_cohort_admission": "NOT_ADMITTED",
-      "regenerated_390": "RUN_234_PASS_156_FAIL_CLOSED_RG_CORES_BETA_EQUILIBRIUM_GATE_DROPBOX_SNAPSHOT_DEFERRED",
-      "latest_docs_ci": {
-        "id": 43010496646,
-        "head_sha": "8762d03c1c57552e94f2a97e8af4557037aca53e",
-        "conclusion": "failure",
-        "failure": "Only handoff document manifest line wrong; all code/pytest/Fortran tests passed. Fixed by using verified CI raw byte SHA."
-      },
-      "eol_repair_run_43011091262": {
-        "id": 43011091262,
-        "head_sha": "cb950178d0f15b92ddc6d0b89253153d51f08ac2",
-        "status": "CANCELLED",
-        "note": "Triggered by .gitattributes eol=lf and checkout-byte diagnostic; diagnostic Python source initially contained over-escaped CRLF/LF byte literals. Preserve its eventual result; corrected diagnostic is committed separately.",
-        "cancel_reason": "Superseded after over-escaped diagnostic literal caused assertion failure."
-      },
-      "checkout_eol_retry_43011261697": {
-        "id": 43011261697,
-        "head_sha": "ff014752c721cbaaabe8f3fb75734a4743119e54",
-        "conclusion": "failure",
-        "results": [
-          "Fortran build PASS",
-          "78 pytest PASS",
-          "polynomial-extrema PASS",
-          "CSS analytic PASS",
-          "LF-only check PASS",
-          "manifest failed only because the manifest expected hash was wrong"
-        ],
-        "diagnosis": "Checkout and git blob were byte-identical: 31195 bytes, SHA c9e09221b6fdfd726080b170115153462348dede46c5ad6c41544f74d1e5c835. No line-ending transformation."
-      },
-      "manifest_hash_repair": {
-        "source_run_ids": [
-          43011631591,
-          43011641626
-        ],
-        "source_head_sha": "82caffe8f36224ec69fed74f0b12fad2fb8d6d70",
-        "checkout_bytes": 31195,
-        "checkout_sha256": "c9e09221b6fdfd726080b170115153462348dede46c5ad6c41544f74d1e5c835",
-        "git_blob_sha256": "c9e09221b6fdfd726080b170115153462348dede46c5ad6c41544f74d1e5c835",
-        "status": "CI_PASS_RUN_43011967628",
-        "fix": "Updated only the handoff-document SHA256SUMS_v4.txt entry to the measured checkout/blob byte hash; added .gitattributes LF and diagnostic step."
-      },
-      "current_head": {
-        "commit": "d7b07438b35828d0418d51805b26a83a02fcb677",
-        "run_id": 43011967628,
-        "run_number": 205,
-        "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43011967628",
-        "conclusion": "success",
-        "compiler": "GNU Fortran 15.2",
-        "tests": {
-          "pytest": "78 passed in 34.03 s",
-          "polynomial_extrema": "PASS",
-          "css_segment_analytic": "PASS",
-          "fortran_eos_build": "PASS",
-          "handoff_doc_blob_checkout_diagnostic": "PASS",
-          "sha256_manifest": "PASS",
-          "artifact_upload": "PASS"
-        },
-        "handoff_document": {
-          "checkout_bytes": 31195,
-          "git_blob_bytes": 31195,
-          "checkout_sha256": "c9e09221b6fdfd726080b170115153462348dede46c5ad6c41544f74d1e5c835",
-          "git_blob_sha256": "c9e09221b6fdfd726080b170115153462348dede46c5ad6c41544f74d1e5c835",
-          "line_endings": {
-            "crlf": 0,
-            "cr": 0,
-            "lf": 355
-          }
-        },
-        "artifact": {
-          "id": 13850547956,
-          "name": "NS_Cowling-d7b07438b35828d0418d51805b26a83a02fcb677",
-          "size_bytes": 199195043,
-          "sha256": "86847f2c7273a590249fcfa6e23905d8b48cffe75adf69aa9d365628eef38f10",
-          "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43011967628/artifacts/13850547956"
-        }
-      }
-    },
-    "open_source_pdf_download": "PUBLIC_ARXIV_PDF_URLS_CONFIRMED_DIRECT_CONTAINER_DOWNLOAD_TOOL_FAILED; LOCAL_AGENT_DOWNLOAD_REQUIRED",
-    "source_bibliography": "18_COMPOSE_DATASHEETS_READ_MODEL_SPECIFIC_REFERENCES_REGISTERED_OPEN_URLS_VERIFIED_BINARY_DOWNLOAD_LOCAL_AGENT_PENDING",
-    "css_kernel": "GITHUB_CI_PASS_LOCAL_REPLAY_PENDING",
-    "generator_upgrade": "M10_PARTIALLY_IMPLEMENTED_THERMO_ROUNDTRIP_PASS_COMPOSITION_TENSOR_PENDING",
-    "native_subagent": "NOT_RUN_NO_NATIVE_DELEGATION_TOOL_EXPOSED",
-    "open_source_references": {
-      "dd2": "arXiv:0908.2344",
-      "ddme2": "University of Zagreb institutional repository",
-      "nl3wrL55": "arXiv:1607.05899",
-      "tw_supporting": "arXiv:nucl-th/0212080; arXiv:0704.0407",
-      "tw_current_datasheet": "arXiv:2208.12893; arXiv:2201.12053; arXiv:2506.11492",
-      "gm1_original": "BLOCKED_PDF_NOT_FOUND_APS_403_REQUEST_USER"
-    },
-    "branch_before_update": "6ecf8ad195a39240e922e65df6ce028f33a4d8f9",
-    "current_head": {
-      "commit": "6ecf8ad195a39240e922e65df6ce028f33a4d8f9",
-      "run_id": 43016176896,
-      "run_number": 212,
-      "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43016176896",
+    "source_commit": "42950053088fa80752826f4aae56d0a0b013c0e4",
+    "github_ci": {
+      "run_id": 43784499587,
+      "run_number": 612,
+      "tested_merge_sha": "31e596acf975527536575d808da31f3b907abd44",
       "conclusion": "success",
-      "tests": {
-        "fortran_build": "PASS",
-        "pytest": "78 passed in 45.79 s",
-        "polynomial_extrema": "PASS",
-        "css_segment_analytic": "PASS",
-        "sha256_manifest": "PASS",
-        "source_archive_upload": "PASS"
-      },
-      "artifact": {
-        "id": 13852892302,
-        "name": "NS_Cowling-938dc92a6850db549560737a277326452c9ff3f6.zip",
-        "size_bytes": 199210037,
-        "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43016176896/artifacts/13852892302"
-      }
+      "frontend_pipeline": "459 passed,9 skipped",
+      "generator": "142 passed"
     },
-    "c6b": {
-      "status": "PROVIDER_SEMANTICS_UNRESOLVED__BLOCKED",
-      "tests": "10 passed in prior C6B audit",
-      "production_changed": false,
-      "pairs_before_root_search": "65 BLOCKED"
-    },
-    "reconstructed_source_cohort": {
-      "status": "INDEPENDENTLY_REVERIFIED_20261114_PASS",
-      "models": 18,
-      "files": 158,
-      "total_file_bytes": 3883275,
-      "current_vs_v3_2_relative_paths_and_sizes": "158_OF_158_MATCH",
-      "source_archive": "EoS_complete_core_crust_release_v3_2.zip",
-      "archive_sha256": "d671310eb630ffd13f1b278425d945741ad7e08ce14c0d9aff42309c707e6a3b (INDEPENDENTLY_REHASHED_20261114)",
-      "archive_sha256_match": true,
-      "archive_size_match": true,
-      "archive_member_count": 2516,
-      "archive_crc_testzip": "PASS",
-      "cloud_staging": "DONE_LOCALLY_20261114 (inputs/replacement + inputs/raw_compose linked from extracted code_package/eos_data)",
-      "fresh_file_hashes": "DONE_20261114 (data/eos390_m0_source_integrity_receipt/SHA256SUMS.txt, 158 entries)",
-      "reverification_receipt": "data/eos390_m0_source_integrity_receipt/m0_source_integrity_receipt.json",
-      "reverification_commit": "92225de",
-      "regenerated_390": "RUN_234_PASS_156_FAIL_CLOSED_RG_CORES_BETA_EQUILIBRIUM_GATE_DROPBOX_SNAPSHOT_DEFERRED"
-    },
-    "e390_03a": {
-      "status": "CONSTRUCTION_IMPLEMENTED_CI_PASS_PHYSICAL_DIAGNOSTICS_PARTIAL_FAIL",
-      "source_cohort": "5/5 CORE_ONLY ADMITTED AND CONSTRUCTED",
-      "native_readback": "5/5 PASS",
-      "production_artifact_id": 14045374660,
-      "production_artifact_sha256": "e999734e36a255bb03cb4ddb02ea93855d2c086e37d9245348f9e0e2cd0b3e1c",
-      "physical_validation": "2/5 PASS; 3/5 FAIL retained in per-model receipts",
-      "matched_eos_generation": "NOT_RUN",
-      "crust_only_construction": "NOT_RUN"
-    },
-    "e390_03_ddrmf_partial": {
-      "status": "LOCAL_VERIFIED_GITHUB_CI_PENDING",
-      "receipt": "data/receipts/eos390_m3/E390-03_DDRMF_NATIVE_SOLVER_20261114.json",
-      "models": [
-        "GPPVA_DD2",
-        "GPPVA_DDME2",
-        "GPPVA_TW"
-      ],
-      "rows": 96,
-      "tests": "153 passed, 3 skipped in 28.12 s"
-    },
-    "mass_normalization": "REMEDIATION_20261114_CONTRACT_DERIVED_dmcr_UNIFORM_GAUGE_SHIFT_REPRESENTATION_ONLY_MAXWELL_1e-12_GATE_PRESERVED (MASS_NORMALIZATION_CONTRACT.json + 14 regression tests)",
-    "remediation_execution_environment": "SSH_KEY_RECOVERED_2026-11-14_PUSH_COMPLETED: ad8e52f was the real remote HEAD (the local sandbox only had the 2026-11-12 c2087ca snapshot); rebase of 9 remediation commits onto ad8e52f performed; origin/cloud/eos390-fortran-unification-v1 pushed"
+    "native": "polynomial,CSS,RMF,CLD,WS,TOV-Love tests and Cowling runtime compile PASS",
+    "source_cohort": "v6 exploratory_proxy_CLD; source_calibrated:false",
+    "census": "80 configured,40 evaluated,40 source-marked,8 CSS survivors,0 Maxwell",
+    "full_native_390": "historical campaign results retained; full source-calibrated campaign not completed",
+    "scientific_interpretation": "truncated proxy-star diagnostics only; physical outer-crust boundary and mode/radial stability open"
   },
   "legacy_feature_inventory": [
     {
@@ -1743,7 +1588,7 @@
     ],
     "policy": "Track separately from the 390 matrix; never reinterpret EOS390 method=maxwell."
   },
-  "last_update_utc": "2026-11-14T02:24:50Z",
+  "last_update_utc": "2026-11-16T01:14:27.748646+00:00",
   "known_remaining_implementation_gaps": [
     {
       "area": "native literature-derived composition",
@@ -2437,13 +2282,13 @@
     }
   ],
   "next_actions": [
-    "Continue E390-03: implement source-exact SPG GDFM four-meson homogeneous solver and native CLD minimization for M1-M5; preserve gas/cluster fields and provenance.",
-    "Continue E390-03: implement model-specific GPPVA homogeneous functionals and Thomas-Fermi Wigner-Seitz reconstruction; DD2 homogeneous support alone is not the GPPVA crust solver.",
-    "Reconstruct CompOSE-standard group abundances and validate Yn+Yp+Yh=1 and Yp+(Z/A)Yh=Ye+Ymu by construction, with per-row provenance and native readback.",
-    "Retain E390-03A/B physical diagnostics: APR_APR C10; RG_KDE0v1 C2/C10; RG_SLY4 C2; also GPPVA source-component physical failures and C3/C4 availability are not PASS.",
-    "Complete E390-10B full multi-T composition tensor and lossless CompOSE write/readback without weakening the cold-slice path.",
-    "Only after E390-03 closes and component physical gates are adjudicated, proceed to the five smooth matching methods (FLCHPB, CSS, cubic_F, cubic_P, quintic_F, quintic_P) and separate composition-aware sharp Maxwell workflow; do not start the 390 batch before its gates.",
-    "Complete native TOV/tidal/Cowling and 390 source-backed batch validation after component and matching gates close."
+    "Implement source-calibrated spherical interface functions with per-model nuclear-mass-fit parameters; preserve the proxy path and source provenance.",
+    "Validate full variational gradients, multiple initial guesses/global-minimum candidates and density-grid convergence; current finite searches do not certify global minima.",
+    "Construct source-backed outer crust and physical pressure-zero stellar boundary before interpreting radii/frequencies as full-star observables.",
+    "Complete native SPG GDFM and source-specific GPPVA reconstruction with gas/cluster composition and conservation, preserving validated homogeneous contracts.",
+    "Adjudicate RG Q5 and DD2 mass-constant versions from provider sources without additive energy shifts or relaxed gates.",
+    "Complete composition masks/tensors, composition-aware Maxwell v2, native smooth-kernel source admission and the remaining EOS390 campaign.",
+    "Validate mode identity and radial stability separately from real Cowling root scans."
   ],
   "provenance": {
     "last_reconciled_utc": "2026-11-11",
@@ -2571,7 +2416,7 @@
     "readback_receipts": "eos_generator/receipts/readback_receipts_v3_3_1.json",
     "scope_limitations": "Spatial Thomas-Fermi profiles, variational pasta minimization, and multi-T/full-tensor CompOSE writing remain outside current implementation scope; Gibbs mixed-phase outputs remain thermo_only with (939, 939) MeV serving solely as the CompOSE normalization reference."
   },
-  "latest_evidence_receipt": "eos_generator/receipts/readback_receipts_v3_3_1.json",
+  "latest_evidence_receipt": "data/receipts/core_crust_audit_20261116/AUDIT_RECEIPT.json",
   "adversarial_reaudit_20261115": {
     "baseline": "d90d3dca033f759c79ed034b3b8ff939acb43145",
     "receipt": "data/receipts/core_crust_audit_20261115/AUDIT_RECEIPT.json",
@@ -2580,5 +2425,235 @@
     "status": "BOUNDED_IMPLEMENTATION_VERIFIED_SCIENTIFIC_SCOPE_PARTIAL",
     "historical_matching_results": "RECOMPUTE_AFTER_PHYSICAL_ENERGY_NORMALIZATION_CORRECTION",
     "full_project_complete": false
-  }
+  },
+  "adversarial_reaudit_20261116": {
+    "baseline": "eda4af96743c9af3369d1810ef733badb1709b93",
+    "implementation_commit": "42950053088fa80752826f4aae56d0a0b013c0e4",
+    "status": "PARTIALLY_COMPLETE_SCIENTIFIC_PROJECT",
+    "report": "docs/CORE_CRUST_ADVERSARIAL_REAUDIT_20261116.md",
+    "handoff": "docs/CORE_CRUST_REAUDIT_HANDOFF_20261116.md",
+    "census": {
+      "configured": 80,
+      "evaluated": 40,
+      "source_marked": 40,
+      "css_survivors": 8,
+      "maxwell_survivors": 0
+    },
+    "claim_scope": "exploratory_proxy_CLD; artificial finite-pressure truncated stellar model"
+  },
+  "summary_history": [
+    {
+      "superseded_on": "2026-11-16",
+      "reason": "top-level summary still described 2026-11-14 runtime and historical CI as current",
+      "status": "E390-03_PARTIAL_NATIVE_DDRMF_SOLVER_LOCAL_PASS_CLD_TF_REMAINS_CURRENT",
+      "last_update_utc": "2026-11-14T02:24:50Z",
+      "latest_evidence_receipt": "eos_generator/receipts/readback_receipts_v3_3_1.json",
+      "evidence_status": {
+        "code_execution_in_this_turn": "NATIVE_DDRMF_HOMOGENEOUS_SOLVER_BUILD_AND_TEST; 3_MODEL_X_32_POINT_DIAGNOSTIC_GRID; INDEPENDENT_REFERENCE_COMPARISON",
+        "static_source_patch": "E390-03_DDRMF_NATIVE_FORTRAN_SLICE_AND_REGRESSION_TESTS; NO_CLD_TF_OR_MATCHING_IMPLEMENTED",
+        "github_ci": "PENDING_EXACT_HEAD_PUSH_RUN",
+        "local_runtime": "LOCAL_SOURCE_SNAPSHOT_BASE_7A0415E; GNU_FORTRAN_BUILD_PASS; 15_NATIVE_DDRMF_TESTS_PASS; FULL_FRONTEND_PIPELINE_153_PASS_3_SKIP; 96_NATIVE_DIAGNOSTIC_ROWS",
+        "source_cohort_admission": "REMEDIATION_20261114_MEASURED_18_SOURCES: 9_ADMITTED_7_CONDITIONALLY_ADMITTED_2_SOURCE_INADMISSIBLE_RG_Q5_NE_0 (SOURCE_ADMISSION_MATRIX.json); 65 pairs: 8_ADMITTED_31_CONDITIONAL_26_BLOCKED_BETA_EQUILIBRIUM (PAIR_ELIGIBILITY_MATRIX.json)",
+        "regenerated_390": "REMEDIATION_20261114_RUN_325_EXECUTED_130_PASS_65_PHYSICS_FAIL_APR_APR_ACausal_TAIL_130_BLOCKED_RG_BETA_EQUIL_65_NOT_RUN_FLCHPB_METHOD_PRESENT_IN_ad8e52f_BASE (M7_FINAL_BATCH_MANIFEST.json)",
+        "github_actions_execution": {
+          "previous_head_before_css": {
+            "id": 43007372958,
+            "run_number": 193,
+            "head_sha": "ce24f85cbb4861c28c9f9eea0f3ddea28950fab8",
+            "conclusion": "success",
+            "pytest": "78 passed in 33.26 s"
+          },
+          "current_css": {
+            "id": 43009330939,
+            "run_number": 194,
+            "head_sha": "6c580cc33c03009e82c9aef798daa63fdb0a7073",
+            "conclusion": "success",
+            "job_id": 130484668591,
+            "steps": [
+              "Fortran EOS executable build: success",
+              "frontend and direct-provider tests: 78 passed in 44.87 s",
+              "polynomial extrema: PASS",
+              "CSS segment analytic checks: PASS",
+              "sha256sum -c SHA256SUMS_v4.txt: all entries OK",
+              "source archive upload: success"
+            ],
+            "artifact": {
+              "id": 13848959429,
+              "name": "NS_Cowling-cd8076f757bddc97c80d7c3ea7940072838eae51",
+              "size_bytes": 199200919,
+              "sha256": "dbeb061fe5bb59b19fc5054d8d41cd555435827f9416a4a95af22ffe70844c05"
+            }
+          },
+          "local_runtime": "NOT_RUN",
+          "source_cohort_admission": "NOT_ADMITTED",
+          "regenerated_390": "RUN_234_PASS_156_FAIL_CLOSED_RG_CORES_BETA_EQUILIBRIUM_GATE_DROPBOX_SNAPSHOT_DEFERRED",
+          "latest_docs_ci": {
+            "id": 43010496646,
+            "head_sha": "8762d03c1c57552e94f2a97e8af4557037aca53e",
+            "conclusion": "failure",
+            "failure": "Only handoff document manifest line wrong; all code/pytest/Fortran tests passed. Fixed by using verified CI raw byte SHA."
+          },
+          "eol_repair_run_43011091262": {
+            "id": 43011091262,
+            "head_sha": "cb950178d0f15b92ddc6d0b89253153d51f08ac2",
+            "status": "CANCELLED",
+            "note": "Triggered by .gitattributes eol=lf and checkout-byte diagnostic; diagnostic Python source initially contained over-escaped CRLF/LF byte literals. Preserve its eventual result; corrected diagnostic is committed separately.",
+            "cancel_reason": "Superseded after over-escaped diagnostic literal caused assertion failure."
+          },
+          "checkout_eol_retry_43011261697": {
+            "id": 43011261697,
+            "head_sha": "ff014752c721cbaaabe8f3fb75734a4743119e54",
+            "conclusion": "failure",
+            "results": [
+              "Fortran build PASS",
+              "78 pytest PASS",
+              "polynomial-extrema PASS",
+              "CSS analytic PASS",
+              "LF-only check PASS",
+              "manifest failed only because the manifest expected hash was wrong"
+            ],
+            "diagnosis": "Checkout and git blob were byte-identical: 31195 bytes, SHA c9e09221b6fdfd726080b170115153462348dede46c5ad6c41544f74d1e5c835. No line-ending transformation."
+          },
+          "manifest_hash_repair": {
+            "source_run_ids": [
+              43011631591,
+              43011641626
+            ],
+            "source_head_sha": "82caffe8f36224ec69fed74f0b12fad2fb8d6d70",
+            "checkout_bytes": 31195,
+            "checkout_sha256": "c9e09221b6fdfd726080b170115153462348dede46c5ad6c41544f74d1e5c835",
+            "git_blob_sha256": "c9e09221b6fdfd726080b170115153462348dede46c5ad6c41544f74d1e5c835",
+            "status": "CI_PASS_RUN_43011967628",
+            "fix": "Updated only the handoff-document SHA256SUMS_v4.txt entry to the measured checkout/blob byte hash; added .gitattributes LF and diagnostic step."
+          },
+          "current_head": {
+            "commit": "d7b07438b35828d0418d51805b26a83a02fcb677",
+            "run_id": 43011967628,
+            "run_number": 205,
+            "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43011967628",
+            "conclusion": "success",
+            "compiler": "GNU Fortran 15.2",
+            "tests": {
+              "pytest": "78 passed in 34.03 s",
+              "polynomial_extrema": "PASS",
+              "css_segment_analytic": "PASS",
+              "fortran_eos_build": "PASS",
+              "handoff_doc_blob_checkout_diagnostic": "PASS",
+              "sha256_manifest": "PASS",
+              "artifact_upload": "PASS"
+            },
+            "handoff_document": {
+              "checkout_bytes": 31195,
+              "git_blob_bytes": 31195,
+              "checkout_sha256": "c9e09221b6fdfd726080b170115153462348dede46c5ad6c41544f74d1e5c835",
+              "git_blob_sha256": "c9e09221b6fdfd726080b170115153462348dede46c5ad6c41544f74d1e5c835",
+              "line_endings": {
+                "crlf": 0,
+                "cr": 0,
+                "lf": 355
+              }
+            },
+            "artifact": {
+              "id": 13850547956,
+              "name": "NS_Cowling-d7b07438b35828d0418d51805b26a83a02fcb677",
+              "size_bytes": 199195043,
+              "sha256": "86847f2c7273a590249fcfa6e23905d8b48cffe75adf69aa9d365628eef38f10",
+              "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43011967628/artifacts/13850547956"
+            }
+          }
+        },
+        "open_source_pdf_download": "PUBLIC_ARXIV_PDF_URLS_CONFIRMED_DIRECT_CONTAINER_DOWNLOAD_TOOL_FAILED; LOCAL_AGENT_DOWNLOAD_REQUIRED",
+        "source_bibliography": "18_COMPOSE_DATASHEETS_READ_MODEL_SPECIFIC_REFERENCES_REGISTERED_OPEN_URLS_VERIFIED_BINARY_DOWNLOAD_LOCAL_AGENT_PENDING",
+        "css_kernel": "GITHUB_CI_PASS_LOCAL_REPLAY_PENDING",
+        "generator_upgrade": "M10_PARTIALLY_IMPLEMENTED_THERMO_ROUNDTRIP_PASS_COMPOSITION_TENSOR_PENDING",
+        "native_subagent": "NOT_RUN_NO_NATIVE_DELEGATION_TOOL_EXPOSED",
+        "open_source_references": {
+          "dd2": "arXiv:0908.2344",
+          "ddme2": "University of Zagreb institutional repository",
+          "nl3wrL55": "arXiv:1607.05899",
+          "tw_supporting": "arXiv:nucl-th/0212080; arXiv:0704.0407",
+          "tw_current_datasheet": "arXiv:2208.12893; arXiv:2201.12053; arXiv:2506.11492",
+          "gm1_original": "BLOCKED_PDF_NOT_FOUND_APS_403_REQUEST_USER"
+        },
+        "branch_before_update": "6ecf8ad195a39240e922e65df6ce028f33a4d8f9",
+        "current_head": {
+          "commit": "6ecf8ad195a39240e922e65df6ce028f33a4d8f9",
+          "run_id": 43016176896,
+          "run_number": 212,
+          "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43016176896",
+          "conclusion": "success",
+          "tests": {
+            "fortran_build": "PASS",
+            "pytest": "78 passed in 45.79 s",
+            "polynomial_extrema": "PASS",
+            "css_segment_analytic": "PASS",
+            "sha256_manifest": "PASS",
+            "source_archive_upload": "PASS"
+          },
+          "artifact": {
+            "id": 13852892302,
+            "name": "NS_Cowling-938dc92a6850db549560737a277326452c9ff3f6.zip",
+            "size_bytes": 199210037,
+            "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43016176896/artifacts/13852892302"
+          }
+        },
+        "c6b": {
+          "status": "PROVIDER_SEMANTICS_UNRESOLVED__BLOCKED",
+          "tests": "10 passed in prior C6B audit",
+          "production_changed": false,
+          "pairs_before_root_search": "65 BLOCKED"
+        },
+        "reconstructed_source_cohort": {
+          "status": "INDEPENDENTLY_REVERIFIED_20261114_PASS",
+          "models": 18,
+          "files": 158,
+          "total_file_bytes": 3883275,
+          "current_vs_v3_2_relative_paths_and_sizes": "158_OF_158_MATCH",
+          "source_archive": "EoS_complete_core_crust_release_v3_2.zip",
+          "archive_sha256": "d671310eb630ffd13f1b278425d945741ad7e08ce14c0d9aff42309c707e6a3b (INDEPENDENTLY_REHASHED_20261114)",
+          "archive_sha256_match": true,
+          "archive_size_match": true,
+          "archive_member_count": 2516,
+          "archive_crc_testzip": "PASS",
+          "cloud_staging": "DONE_LOCALLY_20261114 (inputs/replacement + inputs/raw_compose linked from extracted code_package/eos_data)",
+          "fresh_file_hashes": "DONE_20261114 (data/eos390_m0_source_integrity_receipt/SHA256SUMS.txt, 158 entries)",
+          "reverification_receipt": "data/eos390_m0_source_integrity_receipt/m0_source_integrity_receipt.json",
+          "reverification_commit": "92225de",
+          "regenerated_390": "RUN_234_PASS_156_FAIL_CLOSED_RG_CORES_BETA_EQUILIBRIUM_GATE_DROPBOX_SNAPSHOT_DEFERRED"
+        },
+        "e390_03a": {
+          "status": "CONSTRUCTION_IMPLEMENTED_CI_PASS_PHYSICAL_DIAGNOSTICS_PARTIAL_FAIL",
+          "source_cohort": "5/5 CORE_ONLY ADMITTED AND CONSTRUCTED",
+          "native_readback": "5/5 PASS",
+          "production_artifact_id": 14045374660,
+          "production_artifact_sha256": "e999734e36a255bb03cb4ddb02ea93855d2c086e37d9245348f9e0e2cd0b3e1c",
+          "physical_validation": "2/5 PASS; 3/5 FAIL retained in per-model receipts",
+          "matched_eos_generation": "NOT_RUN",
+          "crust_only_construction": "NOT_RUN"
+        },
+        "e390_03_ddrmf_partial": {
+          "status": "LOCAL_VERIFIED_GITHUB_CI_PENDING",
+          "receipt": "data/receipts/eos390_m3/E390-03_DDRMF_NATIVE_SOLVER_20261114.json",
+          "models": [
+            "GPPVA_DD2",
+            "GPPVA_DDME2",
+            "GPPVA_TW"
+          ],
+          "rows": 96,
+          "tests": "153 passed, 3 skipped in 28.12 s"
+        },
+        "mass_normalization": "REMEDIATION_20261114_CONTRACT_DERIVED_dmcr_UNIFORM_GAUGE_SHIFT_REPRESENTATION_ONLY_MAXWELL_1e-12_GATE_PRESERVED (MASS_NORMALIZATION_CONTRACT.json + 14 regression tests)",
+        "remediation_execution_environment": "SSH_KEY_RECOVERED_2026-11-14_PUSH_COMPLETED: ad8e52f was the real remote HEAD (the local sandbox only had the 2026-11-12 c2087ca snapshot); rebase of 9 remediation commits onto ad8e52f performed; origin/cloud/eos390-fortran-unification-v1 pushed"
+      },
+      "next_actions": [
+        "Continue E390-03: implement source-exact SPG GDFM four-meson homogeneous solver and native CLD minimization for M1-M5; preserve gas/cluster fields and provenance.",
+        "Continue E390-03: implement model-specific GPPVA homogeneous functionals and Thomas-Fermi Wigner-Seitz reconstruction; DD2 homogeneous support alone is not the GPPVA crust solver.",
+        "Reconstruct CompOSE-standard group abundances and validate Yn+Yp+Yh=1 and Yp+(Z/A)Yh=Ye+Ymu by construction, with per-row provenance and native readback.",
+        "Retain E390-03A/B physical diagnostics: APR_APR C10; RG_KDE0v1 C2/C10; RG_SLY4 C2; also GPPVA source-component physical failures and C3/C4 availability are not PASS.",
+        "Complete E390-10B full multi-T composition tensor and lossless CompOSE write/readback without weakening the cold-slice path.",
+        "Only after E390-03 closes and component physical gates are adjudicated, proceed to the five smooth matching methods (FLCHPB, CSS, cubic_F, cubic_P, quintic_F, quintic_P) and separate composition-aware sharp Maxwell workflow; do not start the 390 batch before its gates.",
+        "Complete native TOV/tidal/Cowling and 390 source-backed batch validation after component and matching gates close."
+      ]
+    }
+  ]
 }

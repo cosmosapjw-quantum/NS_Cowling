@@ -1,0 +1,3380 @@
+{
+  "execution_status": "COMPLETED",
+  "execution_failure_pair_ids": [],
+  "not_evaluated_source_marked": 40,
+  "schema": "ns-cowling.core-crust-matching.v3",
+  "built_at_utc": "2026-11-16T01:08:41.697066+00:00",
+  "built_date_utc": "2026-11-16",
+  "output_root": "build/audit_census_v6_final",
+  "crust_root": "/tmp/NS_Cowling_audit_20261116_eda4af9/download/reconstruction_v6_proxy",
+  "scientific_scope": "thermodynamic matching; microscopic interpretation inherits each source_scope",
+  "core_root": "/tmp/NS_Cowling_audit_20261116_eda4af9/eos_generator/eos_data",
+  "crust_models": [
+    "SPG_M1",
+    "SPG_M2",
+    "SPG_M3",
+    "SPG_M4",
+    "SPG_M5",
+    "GPPVA_DD2",
+    "GPPVA_DDME2",
+    "GPPVA_TW"
+  ],
+  "core_models": [
+    "APR_APR",
+    "BBB_BHF2",
+    "GM_GM1",
+    "RG_SLY4",
+    "RG_KDE0v1"
+  ],
+  "methods": [
+    "maxwell",
+    "css"
+  ],
+  "method_contracts": {
+    "maxwell": {
+      "construction_kind": "sharp_first_order_local_neutrality_coexistence",
+      "interfaces": {
+        "crust_core": "common pressure and baryon chemical potential; finite density and energy-density jump"
+      },
+      "composition": "dropped"
+    },
+    "css": {
+      "construction_kind": "css_single_speed_with_crust_density_jump",
+      "interfaces": {
+        "crust_css": "common pressure and baryon chemical potential; finite positive density and energy-density jump with Delta_epsilon=mu_t Delta_n",
+        "css_core": "continuous n_B, pressure, energy density, and baryon chemical potential"
+      },
+      "sound_speed": "one constant cs2 across the CSS bridge",
+      "composition": "dropped",
+      "smooth_over_entire_crust_plus_bridge": false
+    }
+  },
+  "git_head": "42950053088fa80752826f4aae56d0a0b013c0e4",
+  "git_tracked_tree_dirty": false,
+  "fortran_executable_sha256": "bfb794cf060025346e025cc597a20e53f8c5f04dff28a5bbb81046044b83dbb3",
+  "required_source_files": [
+    "eos.nb",
+    "eos.t",
+    "eos.yq",
+    "eos.thermo"
+  ],
+  "source_missing_files": {
+    "crust": {
+      "SPG_M1": [],
+      "SPG_M2": [
+        "eos.nb",
+        "eos.t",
+        "eos.yq",
+        "eos.thermo"
+      ],
+      "SPG_M3": [
+        "eos.nb",
+        "eos.t",
+        "eos.yq",
+        "eos.thermo"
+      ],
+      "SPG_M4": [
+        "eos.nb",
+        "eos.t",
+        "eos.yq",
+        "eos.thermo"
+      ],
+      "SPG_M5": [
+        "eos.nb",
+        "eos.t",
+        "eos.yq",
+        "eos.thermo"
+      ],
+      "GPPVA_DD2": [],
+      "GPPVA_DDME2": [],
+      "GPPVA_TW": []
+    },
+    "core": {
+      "APR_APR": [],
+      "BBB_BHF2": [],
+      "GM_GM1": [],
+      "RG_SLY4": [],
+      "RG_KDE0v1": []
+    }
+  },
+  "admission_schema": "ns-cowling.match-report-admission.v1",
+  "configured_attempts": 80,
+  "evaluated_attempts": 40,
+  "not_evaluated_source_incomplete": 0,
+  "source_identity_sha256": {
+    "crust": {
+      "SPG_M1": "495e1b42e185baf96bf160e0183b4c62b573d698ddc786ba963505e3a2086794",
+      "SPG_M2": null,
+      "SPG_M3": null,
+      "SPG_M4": null,
+      "SPG_M5": null,
+      "GPPVA_DD2": "8343fc56d753fdd5ac3e0e84e1d72c8a3df7922ffb2cecbdd275560129d322b0",
+      "GPPVA_DDME2": "f1cfddd19bbd914b741977509355c819038c3bb27d080cbb5d86d703579ab6ff",
+      "GPPVA_TW": "06a3d69fe2e75350aa593f5e4385bd9a57a218bc10d2e0f5718b47b332bea830"
+    },
+    "core": {
+      "APR_APR": "0db09795f2832fab7b40c73dc338f772037154731131c431d584e63327263b09",
+      "BBB_BHF2": "59dfedba7acefb7479621d094a67494409add20e044b08de864bed5ab907c3df",
+      "GM_GM1": "e03a3fbac24d9a98964827f8ea736f1aaa170ba549d12407b2858a8369c24d39",
+      "RG_SLY4": "1a4e9cd42ff6e57169f5d83b55709fe3ec0f08760641ab8751f484d6bf619f1a",
+      "RG_KDE0v1": "51d4a000c9eb510e6cc8f5f987eb2bf26727cab47de0ac52cf094574f06d1509"
+    }
+  },
+  "source_duplicate_groups": {
+    "crust": [],
+    "core": []
+  },
+  "distinct_source_survivors": 8,
+  "failures_by_category": {
+    "implementation_convention": 20,
+    "native_consistency_gate": 4,
+    "input_contract": 8,
+    "data_provenance": 20,
+    "source_reconstruction_rejected": 20
+  },
+  "by_method": {
+    "maxwell": {
+      "configured": 40,
+      "evaluated": 20,
+      "survivors": 0,
+      "failures_by_category": {
+        "implementation_convention": 20,
+        "data_provenance": 10,
+        "source_reconstruction_rejected": 10
+      }
+    },
+    "css": {
+      "configured": 40,
+      "evaluated": 20,
+      "survivors": 8,
+      "failures_by_category": {
+        "native_consistency_gate": 4,
+        "input_contract": 8,
+        "data_provenance": 10,
+        "source_reconstruction_rejected": 10
+      }
+    }
+  },
+  "total_attempts": 80,
+  "total_survivors": 8,
+  "survivors_maxwell": 0,
+  "survivors_css": 8,
+  "full_manifest_sha256": "58833cc501b4096d8c25caa526b816f57a3fde1c4e37ab46e7f289caf6d77b46",
+  "full_manifest_bytes": 421393,
+  "results": [
+    {
+      "stage": "maxwell",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "5b17ff628100aea02ea2068c722c89c771bc475f63e098d73e61958d5a04a894",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "df0b0836d0e0d9befbcf700ecb12a5b0875cbed51f050b2d4d876b42d341b3a3"
+        },
+        "core": {
+          "eos.nb": "35216571b367befd05388f804016b0950da9455cc83d96f4723cc3b0316cdc33",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "2af84015eecd0d68c2d7b8ce7d386a35c88692dce8ce54f659cc3c596a260124"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "implementation_convention",
+      "outcome": "FAILED",
+      "pair_id": "SPG_M1__APR_APR__maxwell",
+      "pair_report_sha256": "b4e0c562e112c4815132b236c0a05ee33fa032f3887e06c32434ce35f0349463"
+    },
+    {
+      "stage": "consistency",
+      "error": "native consistency overall=FAIL; failed_checks=C10",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "5b17ff628100aea02ea2068c722c89c771bc475f63e098d73e61958d5a04a894",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "df0b0836d0e0d9befbcf700ecb12a5b0875cbed51f050b2d4d876b42d341b3a3"
+        },
+        "core": {
+          "eos.nb": "35216571b367befd05388f804016b0950da9455cc83d96f4723cc3b0316cdc33",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "2af84015eecd0d68c2d7b8ce7d386a35c88692dce8ce54f659cc3c596a260124"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "native_consistency_gate",
+      "outcome": "FAILED",
+      "pair_id": "SPG_M1__APR_APR__css",
+      "pair_report_sha256": "fbf57aade29805a385b58d582a44dd4018d69b51dccb8a547219af7dff205b60"
+    },
+    {
+      "stage": "maxwell",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "5b17ff628100aea02ea2068c722c89c771bc475f63e098d73e61958d5a04a894",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "df0b0836d0e0d9befbcf700ecb12a5b0875cbed51f050b2d4d876b42d341b3a3"
+        },
+        "core": {
+          "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "2af84015eecd0d68c2d7b8ce7d386a35c88692dce8ce54f659cc3c596a260124"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "implementation_convention",
+      "outcome": "FAILED",
+      "pair_id": "SPG_M1__BBB_BHF2__maxwell",
+      "pair_report_sha256": "a1fd6aad370aba11fa0cffe5e0a23c51252027b056ef4e665c5a5bf5e5249aba"
+    },
+    {
+      "stage": "complete",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "5b17ff628100aea02ea2068c722c89c771bc475f63e098d73e61958d5a04a894",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "df0b0836d0e0d9befbcf700ecb12a5b0875cbed51f050b2d4d876b42d341b3a3"
+        },
+        "core": {
+          "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+        }
+      },
+      "output_sha256": {
+        "eos.nb": "f33ed4d7bde8e79678f4ad43c6d443e21a2b5968dffdae69b8a3f19aa2e7f95d",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "13a606eadcdfe6c62af5f783066368b2043b18dc4b47c3f314e74b689dcf5eb4"
+      },
+      "fortran_executable_sha256": "bfb794cf060025346e025cc597a20e53f8c5f04dff28a5bbb81046044b83dbb3",
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "2af84015eecd0d68c2d7b8ce7d386a35c88692dce8ce54f659cc3c596a260124"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "outcome": "SURVIVED",
+      "pair_id": "SPG_M1__BBB_BHF2__css",
+      "pair_report_sha256": "737dbd53af91b5c5e89c47983a3527b6216020834bdc57466fea45921dd5adfd"
+    },
+    {
+      "stage": "maxwell",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "5b17ff628100aea02ea2068c722c89c771bc475f63e098d73e61958d5a04a894",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "df0b0836d0e0d9befbcf700ecb12a5b0875cbed51f050b2d4d876b42d341b3a3"
+        },
+        "core": {
+          "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+          "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "2af84015eecd0d68c2d7b8ce7d386a35c88692dce8ce54f659cc3c596a260124"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "implementation_convention",
+      "outcome": "FAILED",
+      "pair_id": "SPG_M1__GM_GM1__maxwell",
+      "pair_report_sha256": "9e1457bed62e1dc785eb68bd45d3219fc5d6d2af30f6f79bb97d24d9a8b2e179"
+    },
+    {
+      "stage": "complete",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "5b17ff628100aea02ea2068c722c89c771bc475f63e098d73e61958d5a04a894",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "df0b0836d0e0d9befbcf700ecb12a5b0875cbed51f050b2d4d876b42d341b3a3"
+        },
+        "core": {
+          "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+          "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+        }
+      },
+      "output_sha256": {
+        "eos.nb": "f1f7ba3cf8a83aa10d62059577af6360de493704af4ca0589837f750927b8028",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "6927ae17810949b25a53e01e91574babf05c81ea7b7b69d554cc847df4b5ccc3"
+      },
+      "fortran_executable_sha256": "bfb794cf060025346e025cc597a20e53f8c5f04dff28a5bbb81046044b83dbb3",
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "2af84015eecd0d68c2d7b8ce7d386a35c88692dce8ce54f659cc3c596a260124"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "outcome": "SURVIVED",
+      "pair_id": "SPG_M1__GM_GM1__css",
+      "pair_report_sha256": "312b58898f9ee42d6be614843ddf2ce531bf7211ec70a69c3cbc8f9792b5bba2"
+    },
+    {
+      "stage": "maxwell",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "5b17ff628100aea02ea2068c722c89c771bc475f63e098d73e61958d5a04a894",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "df0b0836d0e0d9befbcf700ecb12a5b0875cbed51f050b2d4d876b42d341b3a3"
+        },
+        "core": {
+          "eos.nb": "e8fa40bd55e0b6ab5e2fd3a536ce162b755afce32011c97f19aa290b5bbc402e",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "454aab2370ba7e5ee11ef3fd00801489222cdb2ce9ad416ccfa8821456c65e3f",
+          "eos.compo": "39ef13e075c5225a8a838e7015052263d038a16d0303398f427fbbee34e30d65"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "2af84015eecd0d68c2d7b8ce7d386a35c88692dce8ce54f659cc3c596a260124"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "implementation_convention",
+      "outcome": "FAILED",
+      "pair_id": "SPG_M1__RG_SLY4__maxwell",
+      "pair_report_sha256": "c6da73174fb510e8ff7a5501224c30c9f5e2960aca82ed1c66ac36b0a044b08c"
+    },
+    {
+      "stage": "css",
+      "error": "NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: native matching requires beta-equilibrated cold barotropes",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "5b17ff628100aea02ea2068c722c89c771bc475f63e098d73e61958d5a04a894",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "df0b0836d0e0d9befbcf700ecb12a5b0875cbed51f050b2d4d876b42d341b3a3"
+        },
+        "core": {
+          "eos.nb": "e8fa40bd55e0b6ab5e2fd3a536ce162b755afce32011c97f19aa290b5bbc402e",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "454aab2370ba7e5ee11ef3fd00801489222cdb2ce9ad416ccfa8821456c65e3f",
+          "eos.compo": "39ef13e075c5225a8a838e7015052263d038a16d0303398f427fbbee34e30d65"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "2af84015eecd0d68c2d7b8ce7d386a35c88692dce8ce54f659cc3c596a260124"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "input_contract",
+      "outcome": "FAILED",
+      "pair_id": "SPG_M1__RG_SLY4__css",
+      "pair_report_sha256": "3e6ada3ddeb7a9a50255cffcbfd914ee1238ed2695f179604f123d37deddd865"
+    },
+    {
+      "stage": "maxwell",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "5b17ff628100aea02ea2068c722c89c771bc475f63e098d73e61958d5a04a894",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "df0b0836d0e0d9befbcf700ecb12a5b0875cbed51f050b2d4d876b42d341b3a3"
+        },
+        "core": {
+          "eos.nb": "c3b6034fce1d8b75479c692e6b61cfa28e1b28e498fbd9035804599059f370a9",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "359c117b5d699fd026429e33555083168d07502179700eec14fa7f165ff4cc60",
+          "eos.compo": "488e95274a7b2c6c84aeed589c1e8b4d5dcb06c4b83b091b9d07396e50f0966e"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "2af84015eecd0d68c2d7b8ce7d386a35c88692dce8ce54f659cc3c596a260124"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "implementation_convention",
+      "outcome": "FAILED",
+      "pair_id": "SPG_M1__RG_KDE0v1__maxwell",
+      "pair_report_sha256": "b2461798ab9199b8422be93221cae705600b99678330a05e63a672d28f0bb1cc"
+    },
+    {
+      "stage": "css",
+      "error": "NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: native matching requires beta-equilibrated cold barotropes",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "5b17ff628100aea02ea2068c722c89c771bc475f63e098d73e61958d5a04a894",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "df0b0836d0e0d9befbcf700ecb12a5b0875cbed51f050b2d4d876b42d341b3a3"
+        },
+        "core": {
+          "eos.nb": "c3b6034fce1d8b75479c692e6b61cfa28e1b28e498fbd9035804599059f370a9",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "359c117b5d699fd026429e33555083168d07502179700eec14fa7f165ff4cc60",
+          "eos.compo": "488e95274a7b2c6c84aeed589c1e8b4d5dcb06c4b83b091b9d07396e50f0966e"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "2af84015eecd0d68c2d7b8ce7d386a35c88692dce8ce54f659cc3c596a260124"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "input_contract",
+      "outcome": "FAILED",
+      "pair_id": "SPG_M1__RG_KDE0v1__css",
+      "pair_report_sha256": "556b3fcedab689dc7196f9284733f2aabe90f6f94e6b102ba2ff0f087444af63"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "data_provenance",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "35216571b367befd05388f804016b0950da9455cc83d96f4723cc3b0316cdc33",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M2__APR_APR__maxwell",
+      "pair_report_sha256": "46dafed107e6f83df9500715eb2314667a8200b2625b71bbdce1418e58b398c2"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "data_provenance",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "35216571b367befd05388f804016b0950da9455cc83d96f4723cc3b0316cdc33",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M2__APR_APR__css",
+      "pair_report_sha256": "2303779aea14d2a6b7acf410d42ef3ebdab51c741825c6e31edf9ad5266c08fd"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "data_provenance",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M2__BBB_BHF2__maxwell",
+      "pair_report_sha256": "c4eb1d9542055a479701776ce40ab32effa52e6b3be3253a6f17ec0f82e170bd"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "data_provenance",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M2__BBB_BHF2__css",
+      "pair_report_sha256": "a2e2cf54baaf6d31ce4cc1f3f5203a94ec9c6484427f56a963c403c423dc9284"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "data_provenance",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+          "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M2__GM_GM1__maxwell",
+      "pair_report_sha256": "f2dc68cfbd61dce15820fbb351e241f31b6cffb0ed372c76d3b7d7046a88b121"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "data_provenance",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+          "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M2__GM_GM1__css",
+      "pair_report_sha256": "0fa241adcccf4ab3767fc35ddae5441880a8b7de34afdeb8da734c9959ad3f24"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "data_provenance",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "e8fa40bd55e0b6ab5e2fd3a536ce162b755afce32011c97f19aa290b5bbc402e",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "454aab2370ba7e5ee11ef3fd00801489222cdb2ce9ad416ccfa8821456c65e3f",
+          "eos.compo": "39ef13e075c5225a8a838e7015052263d038a16d0303398f427fbbee34e30d65"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M2__RG_SLY4__maxwell",
+      "pair_report_sha256": "d62afead216f1a62bf32a3c465c34e77ffa816a9e24e5a670034451612588bc3"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "data_provenance",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "e8fa40bd55e0b6ab5e2fd3a536ce162b755afce32011c97f19aa290b5bbc402e",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "454aab2370ba7e5ee11ef3fd00801489222cdb2ce9ad416ccfa8821456c65e3f",
+          "eos.compo": "39ef13e075c5225a8a838e7015052263d038a16d0303398f427fbbee34e30d65"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M2__RG_SLY4__css",
+      "pair_report_sha256": "563c77f880398f33ef42a9d146827385d015cc8115ee7eded0c4c3fc1e274334"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "data_provenance",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "c3b6034fce1d8b75479c692e6b61cfa28e1b28e498fbd9035804599059f370a9",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "359c117b5d699fd026429e33555083168d07502179700eec14fa7f165ff4cc60",
+          "eos.compo": "488e95274a7b2c6c84aeed589c1e8b4d5dcb06c4b83b091b9d07396e50f0966e"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M2__RG_KDE0v1__maxwell",
+      "pair_report_sha256": "f4672a181209f13cbe09d62564c71e570bbc271bbe32a6531aabf4714cfef1d7"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "data_provenance",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "c3b6034fce1d8b75479c692e6b61cfa28e1b28e498fbd9035804599059f370a9",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "359c117b5d699fd026429e33555083168d07502179700eec14fa7f165ff4cc60",
+          "eos.compo": "488e95274a7b2c6c84aeed589c1e8b4d5dcb06c4b83b091b9d07396e50f0966e"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M2__RG_KDE0v1__css",
+      "pair_report_sha256": "733ed575046d4ec42e06db3e68d2c76e91176f062f53acaa7968996e33ed7909"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "source_reconstruction_rejected",
+      "error": "REJECTED: optimizer box-bound minimum inside the table at rows [1, 2]",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "35216571b367befd05388f804016b0950da9455cc83d96f4723cc3b0316cdc33",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M3__APR_APR__maxwell",
+      "pair_report_sha256": "6e803784ff6120fc82a3515bed1c9dd21a7ae562b09a2ecbbe992a67206089d7"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "source_reconstruction_rejected",
+      "error": "REJECTED: optimizer box-bound minimum inside the table at rows [1, 2]",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "35216571b367befd05388f804016b0950da9455cc83d96f4723cc3b0316cdc33",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M3__APR_APR__css",
+      "pair_report_sha256": "85d12e07157e2ce17c6ba561f37a9806b5510236c9a9ab62c012ed4976e69419"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "source_reconstruction_rejected",
+      "error": "REJECTED: optimizer box-bound minimum inside the table at rows [1, 2]",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M3__BBB_BHF2__maxwell",
+      "pair_report_sha256": "2da42a878eb873d789d0023acb12ad115225d2b8959da2110460c554929ddb60"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "source_reconstruction_rejected",
+      "error": "REJECTED: optimizer box-bound minimum inside the table at rows [1, 2]",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M3__BBB_BHF2__css",
+      "pair_report_sha256": "9fc30da30f4444b9facbb1cae9b37aff635fb5e493f71f21a7419d06379a6b19"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "source_reconstruction_rejected",
+      "error": "REJECTED: optimizer box-bound minimum inside the table at rows [1, 2]",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+          "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M3__GM_GM1__maxwell",
+      "pair_report_sha256": "f142f0ea2331065b3345497f433eb81337e9e843e6825478fc2daa3660560ccd"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "source_reconstruction_rejected",
+      "error": "REJECTED: optimizer box-bound minimum inside the table at rows [1, 2]",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+          "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M3__GM_GM1__css",
+      "pair_report_sha256": "5ab5700510241d10084fa4c5c50d659478ee6f621537e836b258da01bb92d670"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "source_reconstruction_rejected",
+      "error": "REJECTED: optimizer box-bound minimum inside the table at rows [1, 2]",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "e8fa40bd55e0b6ab5e2fd3a536ce162b755afce32011c97f19aa290b5bbc402e",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "454aab2370ba7e5ee11ef3fd00801489222cdb2ce9ad416ccfa8821456c65e3f",
+          "eos.compo": "39ef13e075c5225a8a838e7015052263d038a16d0303398f427fbbee34e30d65"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M3__RG_SLY4__maxwell",
+      "pair_report_sha256": "1dca110b62c5409b201c499c5004681d6791527747cf6d153688336a5c0886d6"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "source_reconstruction_rejected",
+      "error": "REJECTED: optimizer box-bound minimum inside the table at rows [1, 2]",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "e8fa40bd55e0b6ab5e2fd3a536ce162b755afce32011c97f19aa290b5bbc402e",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "454aab2370ba7e5ee11ef3fd00801489222cdb2ce9ad416ccfa8821456c65e3f",
+          "eos.compo": "39ef13e075c5225a8a838e7015052263d038a16d0303398f427fbbee34e30d65"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M3__RG_SLY4__css",
+      "pair_report_sha256": "953c21921eb6dc3042e9fb5f6881c061ba65c741cd599e1cb449a4053a8bf3db"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "source_reconstruction_rejected",
+      "error": "REJECTED: optimizer box-bound minimum inside the table at rows [1, 2]",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "c3b6034fce1d8b75479c692e6b61cfa28e1b28e498fbd9035804599059f370a9",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "359c117b5d699fd026429e33555083168d07502179700eec14fa7f165ff4cc60",
+          "eos.compo": "488e95274a7b2c6c84aeed589c1e8b4d5dcb06c4b83b091b9d07396e50f0966e"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M3__RG_KDE0v1__maxwell",
+      "pair_report_sha256": "9b3220d69605fd914a4fac524db23fab7f8ac7f992bc44aca4b455cf6f09c818"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "source_reconstruction_rejected",
+      "error": "REJECTED: optimizer box-bound minimum inside the table at rows [1, 2]",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "c3b6034fce1d8b75479c692e6b61cfa28e1b28e498fbd9035804599059f370a9",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "359c117b5d699fd026429e33555083168d07502179700eec14fa7f165ff4cc60",
+          "eos.compo": "488e95274a7b2c6c84aeed589c1e8b4d5dcb06c4b83b091b9d07396e50f0966e"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M3__RG_KDE0v1__css",
+      "pair_report_sha256": "7a55ff0ea4fb41c45d8e42d70658b7721943051340cd100434d6c63a162a1eb3"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "data_provenance",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "35216571b367befd05388f804016b0950da9455cc83d96f4723cc3b0316cdc33",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M4__APR_APR__maxwell",
+      "pair_report_sha256": "e55e15b956efaa9b499d78182fa2c56ddaaa3b8c98fd0d04ce336038fd172acd"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "data_provenance",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "35216571b367befd05388f804016b0950da9455cc83d96f4723cc3b0316cdc33",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M4__APR_APR__css",
+      "pair_report_sha256": "5a733d71ff3cac43c949a98b77e81832e7a4308912cf96bb11369c5589c3b6a8"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "data_provenance",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M4__BBB_BHF2__maxwell",
+      "pair_report_sha256": "3a57bf05d135181cfea167b77510e35b1c7061a329afd8843ad464d907e70708"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "data_provenance",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M4__BBB_BHF2__css",
+      "pair_report_sha256": "864b72f9dd91559104112f0a16a56d8e4fa42fd86f0ca72ccb8332e857f940e4"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "data_provenance",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+          "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M4__GM_GM1__maxwell",
+      "pair_report_sha256": "7051050c8981181a8a073bef04faf44e3ab7a129396caf8c1919ad36ae39bdba"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "data_provenance",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+          "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M4__GM_GM1__css",
+      "pair_report_sha256": "ddf7ecf12fc1d3ad9a46b1bd7f0d02b5354bb5141eb20b4f92f9c23a50eab50c"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "data_provenance",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "e8fa40bd55e0b6ab5e2fd3a536ce162b755afce32011c97f19aa290b5bbc402e",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "454aab2370ba7e5ee11ef3fd00801489222cdb2ce9ad416ccfa8821456c65e3f",
+          "eos.compo": "39ef13e075c5225a8a838e7015052263d038a16d0303398f427fbbee34e30d65"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M4__RG_SLY4__maxwell",
+      "pair_report_sha256": "b13e707e4839d9005502978eccf2f157a7792bd165ac9db4dffd291df6e26733"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "data_provenance",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "e8fa40bd55e0b6ab5e2fd3a536ce162b755afce32011c97f19aa290b5bbc402e",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "454aab2370ba7e5ee11ef3fd00801489222cdb2ce9ad416ccfa8821456c65e3f",
+          "eos.compo": "39ef13e075c5225a8a838e7015052263d038a16d0303398f427fbbee34e30d65"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M4__RG_SLY4__css",
+      "pair_report_sha256": "3e7ce199865d4943c27ecf3b24af8dc0c69163148791c92e0543d67f04a04338"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "data_provenance",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "c3b6034fce1d8b75479c692e6b61cfa28e1b28e498fbd9035804599059f370a9",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "359c117b5d699fd026429e33555083168d07502179700eec14fa7f165ff4cc60",
+          "eos.compo": "488e95274a7b2c6c84aeed589c1e8b4d5dcb06c4b83b091b9d07396e50f0966e"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M4__RG_KDE0v1__maxwell",
+      "pair_report_sha256": "f1c0b7c3d7146e16e8e057856c01c9b5eba8b83c83d246c0107258a261686271"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "data_provenance",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "c3b6034fce1d8b75479c692e6b61cfa28e1b28e498fbd9035804599059f370a9",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "359c117b5d699fd026429e33555083168d07502179700eec14fa7f165ff4cc60",
+          "eos.compo": "488e95274a7b2c6c84aeed589c1e8b4d5dcb06c4b83b091b9d07396e50f0966e"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M4__RG_KDE0v1__css",
+      "pair_report_sha256": "b3e71bf103d0cfb08ff4e5d44f9fa23d2d560d034b333a5d859fa2366ddf334e"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "source_reconstruction_rejected",
+      "error": "REJECTED: energy spline interval 13 violates positivity or mechanical stability",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "35216571b367befd05388f804016b0950da9455cc83d96f4723cc3b0316cdc33",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M5__APR_APR__maxwell",
+      "pair_report_sha256": "e824e378b707dad69395e3e25a17da769e0538702f86350a51a3c11ca5cef006"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "source_reconstruction_rejected",
+      "error": "REJECTED: energy spline interval 13 violates positivity or mechanical stability",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "35216571b367befd05388f804016b0950da9455cc83d96f4723cc3b0316cdc33",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M5__APR_APR__css",
+      "pair_report_sha256": "7a048c147478e053a9193deaf4be388720488d59576f85f12cfca0b2dd7222b9"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "source_reconstruction_rejected",
+      "error": "REJECTED: energy spline interval 13 violates positivity or mechanical stability",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M5__BBB_BHF2__maxwell",
+      "pair_report_sha256": "8ec41e7b73d1669866eb84516b8ed9f12a70c1135152793702e27702f3ac5e58"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "source_reconstruction_rejected",
+      "error": "REJECTED: energy spline interval 13 violates positivity or mechanical stability",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M5__BBB_BHF2__css",
+      "pair_report_sha256": "2775be7af31ee6dce54d8d1624bdbf57bd054b8814418e1c2ca09389ce16c3af"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "source_reconstruction_rejected",
+      "error": "REJECTED: energy spline interval 13 violates positivity or mechanical stability",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+          "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M5__GM_GM1__maxwell",
+      "pair_report_sha256": "43b956c2567f5138d110134659abe3c7c372c73e157f640dc2997e15b3adf434"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "source_reconstruction_rejected",
+      "error": "REJECTED: energy spline interval 13 violates positivity or mechanical stability",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+          "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M5__GM_GM1__css",
+      "pair_report_sha256": "e92420a2bbe819f354e19a7aa1906a4bdf96b6aefa5798d05a81708dbf989fe3"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "source_reconstruction_rejected",
+      "error": "REJECTED: energy spline interval 13 violates positivity or mechanical stability",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "e8fa40bd55e0b6ab5e2fd3a536ce162b755afce32011c97f19aa290b5bbc402e",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "454aab2370ba7e5ee11ef3fd00801489222cdb2ce9ad416ccfa8821456c65e3f",
+          "eos.compo": "39ef13e075c5225a8a838e7015052263d038a16d0303398f427fbbee34e30d65"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M5__RG_SLY4__maxwell",
+      "pair_report_sha256": "fa0713e02aacfe31675eb9d594fe2e77cda3be3dc11d2d7d3cb21b9c8dcbeff5"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "source_reconstruction_rejected",
+      "error": "REJECTED: energy spline interval 13 violates positivity or mechanical stability",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "e8fa40bd55e0b6ab5e2fd3a536ce162b755afce32011c97f19aa290b5bbc402e",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "454aab2370ba7e5ee11ef3fd00801489222cdb2ce9ad416ccfa8821456c65e3f",
+          "eos.compo": "39ef13e075c5225a8a838e7015052263d038a16d0303398f427fbbee34e30d65"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M5__RG_SLY4__css",
+      "pair_report_sha256": "e14800d838b06bc7be13b5e8140318070cdc08b76e969eedfcbaeac7835105df"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "source_reconstruction_rejected",
+      "error": "REJECTED: energy spline interval 13 violates positivity or mechanical stability",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "c3b6034fce1d8b75479c692e6b61cfa28e1b28e498fbd9035804599059f370a9",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "359c117b5d699fd026429e33555083168d07502179700eec14fa7f165ff4cc60",
+          "eos.compo": "488e95274a7b2c6c84aeed589c1e8b4d5dcb06c4b83b091b9d07396e50f0966e"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M5__RG_KDE0v1__maxwell",
+      "pair_report_sha256": "a2265d37f36ccf9cb353b41967e7c072c8919cc5a7046a00c49a144f6174df51"
+    },
+    {
+      "stage": "source",
+      "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+      "failure_category": "source_reconstruction_rejected",
+      "error": "REJECTED: energy spline interval 13 violates positivity or mechanical stability",
+      "source_sha256": {
+        "crust": {},
+        "core": {
+          "eos.nb": "c3b6034fce1d8b75479c692e6b61cfa28e1b28e498fbd9035804599059f370a9",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "359c117b5d699fd026429e33555083168d07502179700eec14fa7f165ff4cc60",
+          "eos.compo": "488e95274a7b2c6c84aeed589c1e8b4d5dcb06c4b83b091b9d07396e50f0966e"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "pair_id": "SPG_M5__RG_KDE0v1__css",
+      "pair_report_sha256": "b4dc9b454684fd911657bde11eef0a2e9c4f187765e8e333583a7dc09e994eae"
+    },
+    {
+      "stage": "maxwell",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "4612e80c2f001a48b7deaf4e7cea20c242debc8b2af6921035e0f8786f9ca0ef",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "7b8c2f04992dc3cf930b8dcdd30a3dfa935a3dcddbcf76930be06868bea6bfd3"
+        },
+        "core": {
+          "eos.nb": "35216571b367befd05388f804016b0950da9455cc83d96f4723cc3b0316cdc33",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "cab1e3437ee81851987741f566f97e6becefe0946cd7a2c4ba8e6ab6ffe96138"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "implementation_convention",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_DD2__APR_APR__maxwell",
+      "pair_report_sha256": "c793f179a57be60997c216bb0914f04a73e10ad69993bd2cfe00e286b13aba4c"
+    },
+    {
+      "stage": "consistency",
+      "error": "native consistency overall=FAIL; failed_checks=C10",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "4612e80c2f001a48b7deaf4e7cea20c242debc8b2af6921035e0f8786f9ca0ef",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "7b8c2f04992dc3cf930b8dcdd30a3dfa935a3dcddbcf76930be06868bea6bfd3"
+        },
+        "core": {
+          "eos.nb": "35216571b367befd05388f804016b0950da9455cc83d96f4723cc3b0316cdc33",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "cab1e3437ee81851987741f566f97e6becefe0946cd7a2c4ba8e6ab6ffe96138"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "native_consistency_gate",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_DD2__APR_APR__css",
+      "pair_report_sha256": "ae3ea420b2982acceb35cd4053eaad443f15660f7187c2ee294ffa14a04e3e20"
+    },
+    {
+      "stage": "maxwell",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "4612e80c2f001a48b7deaf4e7cea20c242debc8b2af6921035e0f8786f9ca0ef",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "7b8c2f04992dc3cf930b8dcdd30a3dfa935a3dcddbcf76930be06868bea6bfd3"
+        },
+        "core": {
+          "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "cab1e3437ee81851987741f566f97e6becefe0946cd7a2c4ba8e6ab6ffe96138"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "implementation_convention",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_DD2__BBB_BHF2__maxwell",
+      "pair_report_sha256": "922391c21ac0c80c0c34feeef1efd9889e317846919e6413a07781e3309bc483"
+    },
+    {
+      "stage": "complete",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "4612e80c2f001a48b7deaf4e7cea20c242debc8b2af6921035e0f8786f9ca0ef",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "7b8c2f04992dc3cf930b8dcdd30a3dfa935a3dcddbcf76930be06868bea6bfd3"
+        },
+        "core": {
+          "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+        }
+      },
+      "output_sha256": {
+        "eos.nb": "f087b2ea78cc3aac6960dd0dbbf90ef93f2faac586c22a74332a0f6a020160bb",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "27af1c81525cf94c40d0c0f80c5aba3629fbfb9dc670b4bf4c22931ee92d6361"
+      },
+      "fortran_executable_sha256": "bfb794cf060025346e025cc597a20e53f8c5f04dff28a5bbb81046044b83dbb3",
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "cab1e3437ee81851987741f566f97e6becefe0946cd7a2c4ba8e6ab6ffe96138"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "outcome": "SURVIVED",
+      "pair_id": "GPPVA_DD2__BBB_BHF2__css",
+      "pair_report_sha256": "7cf6ceb67b76b1c627c13b5eef8bfe7e37be644303e8164c42b5e69114ca87ff"
+    },
+    {
+      "stage": "maxwell",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "4612e80c2f001a48b7deaf4e7cea20c242debc8b2af6921035e0f8786f9ca0ef",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "7b8c2f04992dc3cf930b8dcdd30a3dfa935a3dcddbcf76930be06868bea6bfd3"
+        },
+        "core": {
+          "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+          "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "cab1e3437ee81851987741f566f97e6becefe0946cd7a2c4ba8e6ab6ffe96138"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "implementation_convention",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_DD2__GM_GM1__maxwell",
+      "pair_report_sha256": "f42d594c57296251d8a49b12f0b99dea30421525fb0147af0eafb72e1cfee8fa"
+    },
+    {
+      "stage": "complete",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "4612e80c2f001a48b7deaf4e7cea20c242debc8b2af6921035e0f8786f9ca0ef",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "7b8c2f04992dc3cf930b8dcdd30a3dfa935a3dcddbcf76930be06868bea6bfd3"
+        },
+        "core": {
+          "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+          "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+        }
+      },
+      "output_sha256": {
+        "eos.nb": "cf573d42f0fa831314285bbd16dff46fcc76d644e07eb01762f9430ddfc0c803",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "3e3a109916bc666a809f90defaee3ff996f315168d63336fa2148235343cb37c"
+      },
+      "fortran_executable_sha256": "bfb794cf060025346e025cc597a20e53f8c5f04dff28a5bbb81046044b83dbb3",
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "cab1e3437ee81851987741f566f97e6becefe0946cd7a2c4ba8e6ab6ffe96138"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "outcome": "SURVIVED",
+      "pair_id": "GPPVA_DD2__GM_GM1__css",
+      "pair_report_sha256": "82ef5ec30d275a2f3c0e7de7496ce4f6a10465b331aceedd485f86c2806b9323"
+    },
+    {
+      "stage": "maxwell",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "4612e80c2f001a48b7deaf4e7cea20c242debc8b2af6921035e0f8786f9ca0ef",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "7b8c2f04992dc3cf930b8dcdd30a3dfa935a3dcddbcf76930be06868bea6bfd3"
+        },
+        "core": {
+          "eos.nb": "e8fa40bd55e0b6ab5e2fd3a536ce162b755afce32011c97f19aa290b5bbc402e",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "454aab2370ba7e5ee11ef3fd00801489222cdb2ce9ad416ccfa8821456c65e3f",
+          "eos.compo": "39ef13e075c5225a8a838e7015052263d038a16d0303398f427fbbee34e30d65"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "cab1e3437ee81851987741f566f97e6becefe0946cd7a2c4ba8e6ab6ffe96138"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "implementation_convention",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_DD2__RG_SLY4__maxwell",
+      "pair_report_sha256": "ed984d23db2b0e7e54ba73c1b084380b4eff97ce4968217e61e14c32c9fb2e8b"
+    },
+    {
+      "stage": "css",
+      "error": "NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: native matching requires beta-equilibrated cold barotropes",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "4612e80c2f001a48b7deaf4e7cea20c242debc8b2af6921035e0f8786f9ca0ef",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "7b8c2f04992dc3cf930b8dcdd30a3dfa935a3dcddbcf76930be06868bea6bfd3"
+        },
+        "core": {
+          "eos.nb": "e8fa40bd55e0b6ab5e2fd3a536ce162b755afce32011c97f19aa290b5bbc402e",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "454aab2370ba7e5ee11ef3fd00801489222cdb2ce9ad416ccfa8821456c65e3f",
+          "eos.compo": "39ef13e075c5225a8a838e7015052263d038a16d0303398f427fbbee34e30d65"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "cab1e3437ee81851987741f566f97e6becefe0946cd7a2c4ba8e6ab6ffe96138"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "input_contract",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_DD2__RG_SLY4__css",
+      "pair_report_sha256": "3d996b603d457f736ca044fb947d5516cfe90707fd689657e705cd4543b5e28a"
+    },
+    {
+      "stage": "maxwell",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "4612e80c2f001a48b7deaf4e7cea20c242debc8b2af6921035e0f8786f9ca0ef",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "7b8c2f04992dc3cf930b8dcdd30a3dfa935a3dcddbcf76930be06868bea6bfd3"
+        },
+        "core": {
+          "eos.nb": "c3b6034fce1d8b75479c692e6b61cfa28e1b28e498fbd9035804599059f370a9",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "359c117b5d699fd026429e33555083168d07502179700eec14fa7f165ff4cc60",
+          "eos.compo": "488e95274a7b2c6c84aeed589c1e8b4d5dcb06c4b83b091b9d07396e50f0966e"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "cab1e3437ee81851987741f566f97e6becefe0946cd7a2c4ba8e6ab6ffe96138"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "implementation_convention",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_DD2__RG_KDE0v1__maxwell",
+      "pair_report_sha256": "ebf37d923f72e1d7700bef7f0c0bd914145f83838f75a20d68bbeceefc31c913"
+    },
+    {
+      "stage": "css",
+      "error": "NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: native matching requires beta-equilibrated cold barotropes",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "4612e80c2f001a48b7deaf4e7cea20c242debc8b2af6921035e0f8786f9ca0ef",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "7b8c2f04992dc3cf930b8dcdd30a3dfa935a3dcddbcf76930be06868bea6bfd3"
+        },
+        "core": {
+          "eos.nb": "c3b6034fce1d8b75479c692e6b61cfa28e1b28e498fbd9035804599059f370a9",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "359c117b5d699fd026429e33555083168d07502179700eec14fa7f165ff4cc60",
+          "eos.compo": "488e95274a7b2c6c84aeed589c1e8b4d5dcb06c4b83b091b9d07396e50f0966e"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "cab1e3437ee81851987741f566f97e6becefe0946cd7a2c4ba8e6ab6ffe96138"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "input_contract",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_DD2__RG_KDE0v1__css",
+      "pair_report_sha256": "dec0f84a3a42b4259249eb9f41ace609aacf775853dccbec6bd62e0063d3e5b8"
+    },
+    {
+      "stage": "maxwell",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0486bd546d749a0330f585c9c4a19f830e7d5bbbed4add0d94d45eaa33594006",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "c7b52761a8567d92f19d0260ccd905d139f98d8c4d83e9c833a6d3b8a58919e9"
+        },
+        "core": {
+          "eos.nb": "35216571b367befd05388f804016b0950da9455cc83d96f4723cc3b0316cdc33",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "9ecf0cbd738c7b76d61305ee0a03c031c18d3c50faa685a020dd72f44363bab5"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "implementation_convention",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_DDME2__APR_APR__maxwell",
+      "pair_report_sha256": "57d32a49eac204da9045069280c3dc686c7bed64fd7e6b8247b63ab521968c18"
+    },
+    {
+      "stage": "consistency",
+      "error": "native consistency overall=FAIL; failed_checks=C10",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0486bd546d749a0330f585c9c4a19f830e7d5bbbed4add0d94d45eaa33594006",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "c7b52761a8567d92f19d0260ccd905d139f98d8c4d83e9c833a6d3b8a58919e9"
+        },
+        "core": {
+          "eos.nb": "35216571b367befd05388f804016b0950da9455cc83d96f4723cc3b0316cdc33",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "9ecf0cbd738c7b76d61305ee0a03c031c18d3c50faa685a020dd72f44363bab5"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "native_consistency_gate",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_DDME2__APR_APR__css",
+      "pair_report_sha256": "c169a4ef27d28b1b154c14b57d1e9b92303dc7008d7d60908e68b9251c37fd70"
+    },
+    {
+      "stage": "maxwell",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0486bd546d749a0330f585c9c4a19f830e7d5bbbed4add0d94d45eaa33594006",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "c7b52761a8567d92f19d0260ccd905d139f98d8c4d83e9c833a6d3b8a58919e9"
+        },
+        "core": {
+          "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "9ecf0cbd738c7b76d61305ee0a03c031c18d3c50faa685a020dd72f44363bab5"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "implementation_convention",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_DDME2__BBB_BHF2__maxwell",
+      "pair_report_sha256": "e1550f01bfb4cf6081cb6fa912449741a29cb8083f980ec9ca4a4be1d4d1c9c8"
+    },
+    {
+      "stage": "complete",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0486bd546d749a0330f585c9c4a19f830e7d5bbbed4add0d94d45eaa33594006",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "c7b52761a8567d92f19d0260ccd905d139f98d8c4d83e9c833a6d3b8a58919e9"
+        },
+        "core": {
+          "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+        }
+      },
+      "output_sha256": {
+        "eos.nb": "0c918cb054ab3126c0a5b8346989c2a804b017b276b93bce0566cf87c5de03ee",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "b338b1607966eab5325c9000ec333d05d1d888552de843dcda45f7ffa60a9591"
+      },
+      "fortran_executable_sha256": "bfb794cf060025346e025cc597a20e53f8c5f04dff28a5bbb81046044b83dbb3",
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "9ecf0cbd738c7b76d61305ee0a03c031c18d3c50faa685a020dd72f44363bab5"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "outcome": "SURVIVED",
+      "pair_id": "GPPVA_DDME2__BBB_BHF2__css",
+      "pair_report_sha256": "b8a37cb25a0486f0fb6693f06b31bb9cc5f2384bb4b707d8dca68edbebd1233c"
+    },
+    {
+      "stage": "maxwell",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0486bd546d749a0330f585c9c4a19f830e7d5bbbed4add0d94d45eaa33594006",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "c7b52761a8567d92f19d0260ccd905d139f98d8c4d83e9c833a6d3b8a58919e9"
+        },
+        "core": {
+          "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+          "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "9ecf0cbd738c7b76d61305ee0a03c031c18d3c50faa685a020dd72f44363bab5"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "implementation_convention",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_DDME2__GM_GM1__maxwell",
+      "pair_report_sha256": "38ef1252b92fe0f436ca9d8b6e50ccd394f81cc118c216438b4e1e67ab130261"
+    },
+    {
+      "stage": "complete",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0486bd546d749a0330f585c9c4a19f830e7d5bbbed4add0d94d45eaa33594006",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "c7b52761a8567d92f19d0260ccd905d139f98d8c4d83e9c833a6d3b8a58919e9"
+        },
+        "core": {
+          "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+          "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+        }
+      },
+      "output_sha256": {
+        "eos.nb": "dfc2a6860bd2715902889f7c9261b686c92288ab8830b1fa41c1c7f726e0ea0e",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "4227aad94f78c4318a3edebe61be70ae2f4ad265b023e99b68b96f4501b39516"
+      },
+      "fortran_executable_sha256": "bfb794cf060025346e025cc597a20e53f8c5f04dff28a5bbb81046044b83dbb3",
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "9ecf0cbd738c7b76d61305ee0a03c031c18d3c50faa685a020dd72f44363bab5"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "outcome": "SURVIVED",
+      "pair_id": "GPPVA_DDME2__GM_GM1__css",
+      "pair_report_sha256": "10535c868a499020ebd2972b25e101b4c12f2faefd6070e70f59da7cfa4de81e"
+    },
+    {
+      "stage": "maxwell",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0486bd546d749a0330f585c9c4a19f830e7d5bbbed4add0d94d45eaa33594006",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "c7b52761a8567d92f19d0260ccd905d139f98d8c4d83e9c833a6d3b8a58919e9"
+        },
+        "core": {
+          "eos.nb": "e8fa40bd55e0b6ab5e2fd3a536ce162b755afce32011c97f19aa290b5bbc402e",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "454aab2370ba7e5ee11ef3fd00801489222cdb2ce9ad416ccfa8821456c65e3f",
+          "eos.compo": "39ef13e075c5225a8a838e7015052263d038a16d0303398f427fbbee34e30d65"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "9ecf0cbd738c7b76d61305ee0a03c031c18d3c50faa685a020dd72f44363bab5"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "implementation_convention",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_DDME2__RG_SLY4__maxwell",
+      "pair_report_sha256": "62ee41782ccbf58e1d746a3cf21604e2f57f758d76aa3b395ced4a6898c24527"
+    },
+    {
+      "stage": "css",
+      "error": "NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: native matching requires beta-equilibrated cold barotropes",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0486bd546d749a0330f585c9c4a19f830e7d5bbbed4add0d94d45eaa33594006",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "c7b52761a8567d92f19d0260ccd905d139f98d8c4d83e9c833a6d3b8a58919e9"
+        },
+        "core": {
+          "eos.nb": "e8fa40bd55e0b6ab5e2fd3a536ce162b755afce32011c97f19aa290b5bbc402e",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "454aab2370ba7e5ee11ef3fd00801489222cdb2ce9ad416ccfa8821456c65e3f",
+          "eos.compo": "39ef13e075c5225a8a838e7015052263d038a16d0303398f427fbbee34e30d65"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "9ecf0cbd738c7b76d61305ee0a03c031c18d3c50faa685a020dd72f44363bab5"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "input_contract",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_DDME2__RG_SLY4__css",
+      "pair_report_sha256": "6a2e8dac353edd5a103921757b30ba1f0dfeb3507e59bd328840a2491c810997"
+    },
+    {
+      "stage": "maxwell",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0486bd546d749a0330f585c9c4a19f830e7d5bbbed4add0d94d45eaa33594006",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "c7b52761a8567d92f19d0260ccd905d139f98d8c4d83e9c833a6d3b8a58919e9"
+        },
+        "core": {
+          "eos.nb": "c3b6034fce1d8b75479c692e6b61cfa28e1b28e498fbd9035804599059f370a9",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "359c117b5d699fd026429e33555083168d07502179700eec14fa7f165ff4cc60",
+          "eos.compo": "488e95274a7b2c6c84aeed589c1e8b4d5dcb06c4b83b091b9d07396e50f0966e"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "9ecf0cbd738c7b76d61305ee0a03c031c18d3c50faa685a020dd72f44363bab5"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "implementation_convention",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_DDME2__RG_KDE0v1__maxwell",
+      "pair_report_sha256": "6a89e7ae1d4b297cf836d07b6716f52a2a67b6011fa876fee7b7f95926152c64"
+    },
+    {
+      "stage": "css",
+      "error": "NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: native matching requires beta-equilibrated cold barotropes",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0486bd546d749a0330f585c9c4a19f830e7d5bbbed4add0d94d45eaa33594006",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "c7b52761a8567d92f19d0260ccd905d139f98d8c4d83e9c833a6d3b8a58919e9"
+        },
+        "core": {
+          "eos.nb": "c3b6034fce1d8b75479c692e6b61cfa28e1b28e498fbd9035804599059f370a9",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "359c117b5d699fd026429e33555083168d07502179700eec14fa7f165ff4cc60",
+          "eos.compo": "488e95274a7b2c6c84aeed589c1e8b4d5dcb06c4b83b091b9d07396e50f0966e"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "9ecf0cbd738c7b76d61305ee0a03c031c18d3c50faa685a020dd72f44363bab5"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "input_contract",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_DDME2__RG_KDE0v1__css",
+      "pair_report_sha256": "b665bfdff876c4d4752623110de29ca0cad446e368f21afe7f405bf081c93c39"
+    },
+    {
+      "stage": "maxwell",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0202d2515cd0125e904bbc708829d7d380c590b1104f2ca67c5b48b7ae157352",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "ad75cda103796eb3f6dff036fc9c7a7009c1f2b1506430a5358cbf4d5a71381e"
+        },
+        "core": {
+          "eos.nb": "35216571b367befd05388f804016b0950da9455cc83d96f4723cc3b0316cdc33",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "e53ec155bb009d050f486f0f7def35b4a5a49c9ade578534eb3e842525eb0348"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "implementation_convention",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_TW__APR_APR__maxwell",
+      "pair_report_sha256": "66a4c07898461dce6e703b60c087a2a65834f84ea39a40b07efea0a01ac06d42"
+    },
+    {
+      "stage": "consistency",
+      "error": "native consistency overall=FAIL; failed_checks=C10",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0202d2515cd0125e904bbc708829d7d380c590b1104f2ca67c5b48b7ae157352",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "ad75cda103796eb3f6dff036fc9c7a7009c1f2b1506430a5358cbf4d5a71381e"
+        },
+        "core": {
+          "eos.nb": "35216571b367befd05388f804016b0950da9455cc83d96f4723cc3b0316cdc33",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "e53ec155bb009d050f486f0f7def35b4a5a49c9ade578534eb3e842525eb0348"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "native_consistency_gate",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_TW__APR_APR__css",
+      "pair_report_sha256": "a752957202fa9d55441387bc7d3a2a5cacbb22d4f7301144434bd26f85211044"
+    },
+    {
+      "stage": "maxwell",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0202d2515cd0125e904bbc708829d7d380c590b1104f2ca67c5b48b7ae157352",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "ad75cda103796eb3f6dff036fc9c7a7009c1f2b1506430a5358cbf4d5a71381e"
+        },
+        "core": {
+          "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "e53ec155bb009d050f486f0f7def35b4a5a49c9ade578534eb3e842525eb0348"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "implementation_convention",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_TW__BBB_BHF2__maxwell",
+      "pair_report_sha256": "774c0bad4a4ecf334ec93e42ad9f4cc9909b1abb3163705532e04a819f1c7aca"
+    },
+    {
+      "stage": "complete",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0202d2515cd0125e904bbc708829d7d380c590b1104f2ca67c5b48b7ae157352",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "ad75cda103796eb3f6dff036fc9c7a7009c1f2b1506430a5358cbf4d5a71381e"
+        },
+        "core": {
+          "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+        }
+      },
+      "output_sha256": {
+        "eos.nb": "33081e1cbd39eb17b7a672658abad4d4f374b83df7a17aa1aa3041d428ba2179",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "23c38f06988107b8f40e7ec007c6b1a28af17ef249b7e6a8a1e134aaac5a75f1"
+      },
+      "fortran_executable_sha256": "bfb794cf060025346e025cc597a20e53f8c5f04dff28a5bbb81046044b83dbb3",
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "e53ec155bb009d050f486f0f7def35b4a5a49c9ade578534eb3e842525eb0348"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "outcome": "SURVIVED",
+      "pair_id": "GPPVA_TW__BBB_BHF2__css",
+      "pair_report_sha256": "1792a08e7f9f8bf8f884545e0c0134ff09e4f6fff953c34467018c31b6f0ed9c"
+    },
+    {
+      "stage": "maxwell",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0202d2515cd0125e904bbc708829d7d380c590b1104f2ca67c5b48b7ae157352",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "ad75cda103796eb3f6dff036fc9c7a7009c1f2b1506430a5358cbf4d5a71381e"
+        },
+        "core": {
+          "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+          "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "e53ec155bb009d050f486f0f7def35b4a5a49c9ade578534eb3e842525eb0348"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "implementation_convention",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_TW__GM_GM1__maxwell",
+      "pair_report_sha256": "fe45a4860776c37007eda614896ac86a9e8f8b4b741805a47daa40f4220d0129"
+    },
+    {
+      "stage": "complete",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0202d2515cd0125e904bbc708829d7d380c590b1104f2ca67c5b48b7ae157352",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "ad75cda103796eb3f6dff036fc9c7a7009c1f2b1506430a5358cbf4d5a71381e"
+        },
+        "core": {
+          "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+          "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+        }
+      },
+      "output_sha256": {
+        "eos.nb": "6fee918060877d311d43d7c64900ae3ed0928a5b26cdfdb5ddc2d30ed8ab8f28",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "f25d3fcfc2f0217f037dc401600e46f12fc5917226b433110593b202836f16be"
+      },
+      "fortran_executable_sha256": "bfb794cf060025346e025cc597a20e53f8c5f04dff28a5bbb81046044b83dbb3",
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "e53ec155bb009d050f486f0f7def35b4a5a49c9ade578534eb3e842525eb0348"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "outcome": "SURVIVED",
+      "pair_id": "GPPVA_TW__GM_GM1__css",
+      "pair_report_sha256": "d8753793afd205e4733fc297ce55cb580fd842a523adf15855fb2b1c468f485a"
+    },
+    {
+      "stage": "maxwell",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0202d2515cd0125e904bbc708829d7d380c590b1104f2ca67c5b48b7ae157352",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "ad75cda103796eb3f6dff036fc9c7a7009c1f2b1506430a5358cbf4d5a71381e"
+        },
+        "core": {
+          "eos.nb": "e8fa40bd55e0b6ab5e2fd3a536ce162b755afce32011c97f19aa290b5bbc402e",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "454aab2370ba7e5ee11ef3fd00801489222cdb2ce9ad416ccfa8821456c65e3f",
+          "eos.compo": "39ef13e075c5225a8a838e7015052263d038a16d0303398f427fbbee34e30d65"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "e53ec155bb009d050f486f0f7def35b4a5a49c9ade578534eb3e842525eb0348"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "implementation_convention",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_TW__RG_SLY4__maxwell",
+      "pair_report_sha256": "c20d874004ddf192ed7ea17669eae75e47bb1ca27ae228d03bb87a7991849885"
+    },
+    {
+      "stage": "css",
+      "error": "NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: native matching requires beta-equilibrated cold barotropes",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0202d2515cd0125e904bbc708829d7d380c590b1104f2ca67c5b48b7ae157352",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "ad75cda103796eb3f6dff036fc9c7a7009c1f2b1506430a5358cbf4d5a71381e"
+        },
+        "core": {
+          "eos.nb": "e8fa40bd55e0b6ab5e2fd3a536ce162b755afce32011c97f19aa290b5bbc402e",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "454aab2370ba7e5ee11ef3fd00801489222cdb2ce9ad416ccfa8821456c65e3f",
+          "eos.compo": "39ef13e075c5225a8a838e7015052263d038a16d0303398f427fbbee34e30d65"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "e53ec155bb009d050f486f0f7def35b4a5a49c9ade578534eb3e842525eb0348"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "input_contract",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_TW__RG_SLY4__css",
+      "pair_report_sha256": "58c424638ba95dbf251bf2bbaf79790313e92536a4898bfc339c2c25324dc3b1"
+    },
+    {
+      "stage": "maxwell",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0202d2515cd0125e904bbc708829d7d380c590b1104f2ca67c5b48b7ae157352",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "ad75cda103796eb3f6dff036fc9c7a7009c1f2b1506430a5358cbf4d5a71381e"
+        },
+        "core": {
+          "eos.nb": "c3b6034fce1d8b75479c692e6b61cfa28e1b28e498fbd9035804599059f370a9",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "359c117b5d699fd026429e33555083168d07502179700eec14fa7f165ff4cc60",
+          "eos.compo": "488e95274a7b2c6c84aeed589c1e8b4d5dcb06c4b83b091b9d07396e50f0966e"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "e53ec155bb009d050f486f0f7def35b4a5a49c9ade578534eb3e842525eb0348"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "implementation_convention",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_TW__RG_KDE0v1__maxwell",
+      "pair_report_sha256": "7a584a070e2fa13e6f709d2effba080b36e3229ddb15d9c57656f8e6d78973aa"
+    },
+    {
+      "stage": "css",
+      "error": "NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: native matching requires beta-equilibrated cold barotropes",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0202d2515cd0125e904bbc708829d7d380c590b1104f2ca67c5b48b7ae157352",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "ad75cda103796eb3f6dff036fc9c7a7009c1f2b1506430a5358cbf4d5a71381e"
+        },
+        "core": {
+          "eos.nb": "c3b6034fce1d8b75479c692e6b61cfa28e1b28e498fbd9035804599059f370a9",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "359c117b5d699fd026429e33555083168d07502179700eec14fa7f165ff4cc60",
+          "eos.compo": "488e95274a7b2c6c84aeed589c1e8b4d5dcb06c4b83b091b9d07396e50f0966e"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "e53ec155bb009d050f486f0f7def35b4a5a49c9ade578534eb3e842525eb0348"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "failure_category": "input_contract",
+      "outcome": "FAILED",
+      "pair_id": "GPPVA_TW__RG_KDE0v1__css",
+      "pair_report_sha256": "c6576ce6b343076f89a11478022f089fc8ab0b9ba07c1685dbef70c06ca4732d"
+    }
+  ],
+  "survivors": [
+    {
+      "pair_id": "SPG_M1__BBB_BHF2__css",
+      "crust_model": "SPG_M1",
+      "core_model": "BBB_BHF2",
+      "method": "css",
+      "combined_n": 39,
+      "readback_n": 39,
+      "consistency_status": "PASS",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "5b17ff628100aea02ea2068c722c89c771bc475f63e098d73e61958d5a04a894",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "df0b0836d0e0d9befbcf700ecb12a5b0875cbed51f050b2d4d876b42d341b3a3"
+        },
+        "core": {
+          "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "2af84015eecd0d68c2d7b8ce7d386a35c88692dce8ce54f659cc3c596a260124"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "output_sha256": {
+        "eos.nb": "f33ed4d7bde8e79678f4ad43c6d443e21a2b5968dffdae69b8a3f19aa2e7f95d",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "13a606eadcdfe6c62af5f783066368b2043b18dc4b47c3f314e74b689dcf5eb4"
+      },
+      "fortran_executable_sha256": "bfb794cf060025346e025cc597a20e53f8c5f04dff28a5bbb81046044b83dbb3",
+      "match_report": {
+        "status": "ok",
+        "operation": "match-core",
+        "n": 39,
+        "method": "css",
+        "construction_kind": "css_single_speed_with_crust_density_jump",
+        "spline_mode": "single_speed_css_analytic",
+        "i1": 15,
+        "i2": 70,
+        "n_bridge": 8,
+        "n1": 0.050856112561,
+        "n2": 0.2,
+        "P1": 0.1417238697679366,
+        "P2": 3.3080001645911086,
+        "F1": 944.3745291098876,
+        "F2": 957.2991134228231,
+        "mu1": 947.1612908702944,
+        "mu2": 973.8391142457787,
+        "cs2_source_left": 0.009049627901619037,
+        "cs2_source_right": 0.06156829765600029,
+        "cs2_left": 0.023949834310318698,
+        "cs2_right": 0.023949834310318698,
+        "cs2_min": 0.023949834310318698,
+        "cs2_max": 0.023949834310318698,
+        "css_single_sound_speed": 0.023949834310318698,
+        "css_transition_nb_low": 0.050856112561,
+        "css_transition_nb_high": 0.06271057463190094,
+        "css_transition_delta_nb": 0.011854462070900941,
+        "css_transition_delta_eps": 11.228087597647479,
+        "css_transition_epsilon_low": 48.02721735215381,
+        "css_transition_epsilon_high": 59.255304949801285,
+        "css_transition_pressure": 0.1417238697679366,
+        "css_transition_mu": 947.1612908702944,
+        "css_transition_low_index": 15,
+        "css_transition_high_index": 16,
+        "css_core_bridge_index": 25,
+        "seidov_critical_delta_eps": 24.22619448072881,
+        "seidov_ratio": 0.46346889547919196,
+        "seidov_small_core_stable": true,
+        "pressure_span": 3.166276294823172,
+        "first_law_relative_residual": 0.0,
+        "dm_mass_gauge_meV": 0.0,
+        "source_euler_residual_meV": 2.2737367544323206e-13,
+        "source_euler_relative_residual": 3.6206782185295305e-16,
+        "composition_dropped": false,
+        "is_exact_maxwell": true,
+        "seidov_applicable": true
+      },
+      "pair_report_sha256": "737dbd53af91b5c5e89c47983a3527b6216020834bdc57466fea45921dd5adfd"
+    },
+    {
+      "pair_id": "SPG_M1__GM_GM1__css",
+      "crust_model": "SPG_M1",
+      "core_model": "GM_GM1",
+      "method": "css",
+      "combined_n": 306,
+      "readback_n": 306,
+      "consistency_status": "PASS",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "5b17ff628100aea02ea2068c722c89c771bc475f63e098d73e61958d5a04a894",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "df0b0836d0e0d9befbcf700ecb12a5b0875cbed51f050b2d4d876b42d341b3a3"
+        },
+        "core": {
+          "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+          "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "2af84015eecd0d68c2d7b8ce7d386a35c88692dce8ce54f659cc3c596a260124"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "output_sha256": {
+        "eos.nb": "f1f7ba3cf8a83aa10d62059577af6360de493704af4ca0589837f750927b8028",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "6927ae17810949b25a53e01e91574babf05c81ea7b7b69d554cc847df4b5ccc3"
+      },
+      "fortran_executable_sha256": "bfb794cf060025346e025cc597a20e53f8c5f04dff28a5bbb81046044b83dbb3",
+      "match_report": {
+        "status": "ok",
+        "operation": "match-core",
+        "n": 306,
+        "method": "css",
+        "construction_kind": "css_single_speed_with_crust_density_jump",
+        "spline_mode": "single_speed_css_analytic",
+        "i1": 15,
+        "i2": 68,
+        "n_bridge": 8,
+        "n1": 0.050856112561,
+        "n2": 0.11146666667,
+        "P1": 0.1417238697679366,
+        "P2": 1.5521196512560151,
+        "F1": 944.3745291098876,
+        "F2": 947.7682301760003,
+        "mu1": 947.1612908702944,
+        "mu2": 961.6927485780003,
+        "cs2_source_left": 0.009049627901619037,
+        "cs2_source_right": 0.04604274367518583,
+        "cs2_left": 0.05355813963643098,
+        "cs2_right": 0.05355813963643098,
+        "cs2_min": 0.05355813963643098,
+        "cs2_max": 0.05355813963643098,
+        "css_single_sound_speed": 0.05355813963643098,
+        "css_transition_nb_low": 0.050856112561,
+        "css_transition_nb_high": 0.08388472978415769,
+        "css_transition_delta_nb": 0.03302861722315769,
+        "css_transition_delta_eps": 31.283427724746875,
+        "css_transition_epsilon_low": 48.02721735215381,
+        "css_transition_epsilon_high": 79.31064507690068,
+        "css_transition_pressure": 0.1417238697679366,
+        "css_transition_mu": 947.1612908702944,
+        "css_transition_low_index": 15,
+        "css_transition_high_index": 16,
+        "css_core_bridge_index": 25,
+        "seidov_critical_delta_eps": 24.22619448072881,
+        "seidov_ratio": 1.2913058941069706,
+        "seidov_small_core_stable": false,
+        "pressure_span": 1.4103957814880774,
+        "first_law_relative_residual": 3.34993670647124e-14,
+        "dm_mass_gauge_meV": 0.0,
+        "source_euler_residual_meV": 2.2737367544323206e-13,
+        "source_euler_relative_residual": 2.730133217957746e-11,
+        "composition_dropped": true,
+        "is_exact_maxwell": true,
+        "seidov_applicable": true
+      },
+      "pair_report_sha256": "312b58898f9ee42d6be614843ddf2ce531bf7211ec70a69c3cbc8f9792b5bba2"
+    },
+    {
+      "pair_id": "GPPVA_DD2__BBB_BHF2__css",
+      "crust_model": "GPPVA_DD2",
+      "core_model": "BBB_BHF2",
+      "method": "css",
+      "combined_n": 42,
+      "readback_n": 42,
+      "consistency_status": "PASS",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "4612e80c2f001a48b7deaf4e7cea20c242debc8b2af6921035e0f8786f9ca0ef",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "7b8c2f04992dc3cf930b8dcdd30a3dfa935a3dcddbcf76930be06868bea6bfd3"
+        },
+        "core": {
+          "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "cab1e3437ee81851987741f566f97e6becefe0946cd7a2c4ba8e6ab6ffe96138"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "output_sha256": {
+        "eos.nb": "f087b2ea78cc3aac6960dd0dbbf90ef93f2faac586c22a74332a0f6a020160bb",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "27af1c81525cf94c40d0c0f80c5aba3629fbfb9dc670b4bf4c22931ee92d6361"
+      },
+      "fortran_executable_sha256": "bfb794cf060025346e025cc597a20e53f8c5f04dff28a5bbb81046044b83dbb3",
+      "match_report": {
+        "status": "ok",
+        "operation": "match-core",
+        "n": 42,
+        "method": "css",
+        "construction_kind": "css_single_speed_with_crust_density_jump",
+        "spline_mode": "single_speed_css_analytic",
+        "i1": 18,
+        "i2": 70,
+        "n_bridge": 8,
+        "n1": 0.059754941901,
+        "n2": 0.2,
+        "P1": 0.2789944242939484,
+        "P2": 3.3080001645911086,
+        "F1": 946.3600443610286,
+        "F2": 957.2991134228231,
+        "mu1": 951.0290209413452,
+        "mu2": 973.8391142457787,
+        "cs2_source_left": 0.010489748219628904,
+        "cs2_source_right": 0.06156829765600029,
+        "cs2_left": 0.02669770903889366,
+        "cs2_right": 0.02669770903889366,
+        "cs2_min": 0.02669770903889366,
+        "cs2_max": 0.02669770903889366,
+        "css_single_sound_speed": 0.02669770903889366,
+        "css_transition_nb_low": 0.059754941901,
+        "css_transition_nb_high": 0.08231418030891782,
+        "css_transition_delta_nb": 0.02255923840791782,
+        "css_transition_delta_eps": 21.454490416264473,
+        "css_transition_epsilon_low": 56.54968946822105,
+        "css_transition_epsilon_high": 78.00417988448552,
+        "css_transition_pressure": 0.2789944242939484,
+        "css_transition_mu": 951.0290209413452,
+        "css_transition_low_index": 18,
+        "css_transition_high_index": 19,
+        "css_core_bridge_index": 28,
+        "seidov_critical_delta_eps": 28.693336370551446,
+        "seidov_ratio": 0.7477168266247229,
+        "seidov_small_core_stable": true,
+        "pressure_span": 3.029005740297162,
+        "first_law_relative_residual": 0.0,
+        "dm_mass_gauge_meV": 0.0,
+        "source_euler_residual_meV": 2.2737367544323206e-13,
+        "source_euler_relative_residual": 3.6206782185295305e-16,
+        "composition_dropped": false,
+        "is_exact_maxwell": true,
+        "seidov_applicable": true
+      },
+      "pair_report_sha256": "7cf6ceb67b76b1c627c13b5eef8bfe7e37be644303e8164c42b5e69114ca87ff"
+    },
+    {
+      "pair_id": "GPPVA_DD2__GM_GM1__css",
+      "crust_model": "GPPVA_DD2",
+      "core_model": "GM_GM1",
+      "method": "css",
+      "combined_n": 298,
+      "readback_n": 298,
+      "consistency_status": "PASS",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "4612e80c2f001a48b7deaf4e7cea20c242debc8b2af6921035e0f8786f9ca0ef",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "7b8c2f04992dc3cf930b8dcdd30a3dfa935a3dcddbcf76930be06868bea6bfd3"
+        },
+        "core": {
+          "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+          "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "cab1e3437ee81851987741f566f97e6becefe0946cd7a2c4ba8e6ab6ffe96138"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "output_sha256": {
+        "eos.nb": "cf573d42f0fa831314285bbd16dff46fcc76d644e07eb01762f9430ddfc0c803",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "3e3a109916bc666a809f90defaee3ff996f315168d63336fa2148235343cb37c"
+      },
+      "fortran_executable_sha256": "bfb794cf060025346e025cc597a20e53f8c5f04dff28a5bbb81046044b83dbb3",
+      "match_report": {
+        "status": "ok",
+        "operation": "match-core",
+        "n": 298,
+        "method": "css",
+        "construction_kind": "css_single_speed_with_crust_density_jump",
+        "spline_mode": "single_speed_css_analytic",
+        "i1": 18,
+        "i2": 79,
+        "n_bridge": 8,
+        "n1": 0.059754941901,
+        "n2": 0.14637333333,
+        "P1": 0.2789944242939484,
+        "P2": 3.632295722146669,
+        "F1": 946.3600443610286,
+        "F2": 952.9164100039112,
+        "mu1": 951.0290209413452,
+        "mu2": 977.7316932219112,
+        "cs2_source_left": 0.010489748219628904,
+        "cs2_source_right": 0.07781766604436481,
+        "cs2_left": 0.08756505582978408,
+        "cs2_right": 0.08756505582978408,
+        "cs2_min": 0.08756505582978408,
+        "cs2_max": 0.08756505582978408,
+        "css_single_sound_speed": 0.08756505582978408,
+        "css_transition_nb_low": 0.059754941901,
+        "css_transition_nb_high": 0.10669030306161824,
+        "css_transition_delta_nb": 0.046935361160618236,
+        "css_transition_delta_eps": 44.6368905721112,
+        "css_transition_epsilon_low": 56.54968946822105,
+        "css_transition_epsilon_high": 101.18658004033225,
+        "css_transition_pressure": 0.2789944242939484,
+        "css_transition_mu": 951.0290209413452,
+        "css_transition_low_index": 18,
+        "css_transition_high_index": 19,
+        "css_core_bridge_index": 28,
+        "seidov_critical_delta_eps": 28.693336370551446,
+        "seidov_ratio": 1.5556535495092494,
+        "seidov_small_core_stable": false,
+        "pressure_span": 3.3533012978527226,
+        "first_law_relative_residual": 0.0,
+        "dm_mass_gauge_meV": 0.0,
+        "source_euler_residual_meV": 2.2737367544323206e-13,
+        "source_euler_relative_residual": 2.730133217957746e-11,
+        "composition_dropped": true,
+        "is_exact_maxwell": true,
+        "seidov_applicable": true
+      },
+      "pair_report_sha256": "82ef5ec30d275a2f3c0e7de7496ce4f6a10465b331aceedd485f86c2806b9323"
+    },
+    {
+      "pair_id": "GPPVA_DDME2__BBB_BHF2__css",
+      "crust_model": "GPPVA_DDME2",
+      "core_model": "BBB_BHF2",
+      "method": "css",
+      "combined_n": 37,
+      "readback_n": 37,
+      "consistency_status": "PASS",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0486bd546d749a0330f585c9c4a19f830e7d5bbbed4add0d94d45eaa33594006",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "c7b52761a8567d92f19d0260ccd905d139f98d8c4d83e9c833a6d3b8a58919e9"
+        },
+        "core": {
+          "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "9ecf0cbd738c7b76d61305ee0a03c031c18d3c50faa685a020dd72f44363bab5"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "output_sha256": {
+        "eos.nb": "0c918cb054ab3126c0a5b8346989c2a804b017b276b93bce0566cf87c5de03ee",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "b338b1607966eab5325c9000ec333d05d1d888552de843dcda45f7ffa60a9591"
+      },
+      "fortran_executable_sha256": "bfb794cf060025346e025cc597a20e53f8c5f04dff28a5bbb81046044b83dbb3",
+      "match_report": {
+        "status": "ok",
+        "operation": "match-core",
+        "n": 37,
+        "method": "css",
+        "construction_kind": "css_single_speed_with_crust_density_jump",
+        "spline_mode": "single_speed_css_analytic",
+        "i1": 13,
+        "i2": 70,
+        "n_bridge": 8,
+        "n1": 0.055778877,
+        "n2": 0.2,
+        "P1": 0.2705211986843423,
+        "P2": 3.3080001645911086,
+        "F1": 946.0842355047774,
+        "F2": 957.2991134228231,
+        "mu1": 950.934121576961,
+        "mu2": 973.8391142457787,
+        "cs2_source_left": 0.010088090181985173,
+        "cs2_source_right": 0.06156829765600029,
+        "cs2_left": 0.0267134150793263,
+        "cs2_right": 0.0267134150793263,
+        "cs2_min": 0.0267134150793263,
+        "cs2_max": 0.0267134150793263,
+        "css_single_sound_speed": 0.0267134150793263,
+        "css_transition_nb_low": 0.055778877,
+        "css_transition_nb_high": 0.0820500760007991,
+        "css_transition_delta_nb": 0.0262711990007991,
+        "css_transition_delta_eps": 24.982179544598427,
+        "css_transition_epsilon_low": 52.77151620386001,
+        "css_transition_epsilon_high": 77.75369574845844,
+        "css_transition_pressure": 0.2705211986843423,
+        "css_transition_mu": 950.934121576961,
+        "css_transition_low_index": 13,
+        "css_transition_high_index": 14,
+        "css_core_bridge_index": 23,
+        "seidov_critical_delta_eps": 26.79153989995652,
+        "seidov_ratio": 0.9324652348422485,
+        "seidov_small_core_stable": true,
+        "pressure_span": 3.0374789659067694,
+        "first_law_relative_residual": 0.0,
+        "dm_mass_gauge_meV": 0.0,
+        "source_euler_residual_meV": 2.2737367544323206e-13,
+        "source_euler_relative_residual": 3.6206782185295305e-16,
+        "composition_dropped": false,
+        "is_exact_maxwell": true,
+        "seidov_applicable": true
+      },
+      "pair_report_sha256": "b8a37cb25a0486f0fb6693f06b31bb9cc5f2384bb4b707d8dca68edbebd1233c"
+    },
+    {
+      "pair_id": "GPPVA_DDME2__GM_GM1__css",
+      "crust_model": "GPPVA_DDME2",
+      "core_model": "GM_GM1",
+      "method": "css",
+      "combined_n": 292,
+      "readback_n": 292,
+      "consistency_status": "PASS",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0486bd546d749a0330f585c9c4a19f830e7d5bbbed4add0d94d45eaa33594006",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "c7b52761a8567d92f19d0260ccd905d139f98d8c4d83e9c833a6d3b8a58919e9"
+        },
+        "core": {
+          "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+          "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "9ecf0cbd738c7b76d61305ee0a03c031c18d3c50faa685a020dd72f44363bab5"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "output_sha256": {
+        "eos.nb": "dfc2a6860bd2715902889f7c9261b686c92288ab8830b1fa41c1c7f726e0ea0e",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "4227aad94f78c4318a3edebe61be70ae2f4ad265b023e99b68b96f4501b39516"
+      },
+      "fortran_executable_sha256": "bfb794cf060025346e025cc597a20e53f8c5f04dff28a5bbb81046044b83dbb3",
+      "match_report": {
+        "status": "ok",
+        "operation": "match-core",
+        "n": 292,
+        "method": "css",
+        "construction_kind": "css_single_speed_with_crust_density_jump",
+        "spline_mode": "single_speed_css_analytic",
+        "i1": 13,
+        "i2": 80,
+        "n_bridge": 8,
+        "n1": 0.055778877,
+        "n2": 0.14954666667,
+        "P1": 0.2705211986843423,
+        "P2": 3.8788625430037915,
+        "F1": 946.0842355047774,
+        "F2": 953.4606029649036,
+        "mu1": 950.934121576961,
+        "mu2": 979.3980753899036,
+        "cs2_source_left": 0.010088090181985173,
+        "cs2_source_right": 0.08099165681532955,
+        "cs2_left": 0.08626432873587886,
+        "cs2_right": 0.08626432873587886,
+        "cs2_min": 0.08626432873587886,
+        "cs2_max": 0.08626432873587886,
+        "css_single_sound_speed": 0.08626432873587886,
+        "css_transition_nb_low": 0.055778877,
+        "css_transition_nb_high": 0.10624130657728115,
+        "css_transition_delta_nb": 0.05046242957728115,
+        "css_transition_delta_eps": 47.98644614271111,
+        "css_transition_epsilon_low": 52.77151620386001,
+        "css_transition_epsilon_high": 100.75796234657112,
+        "css_transition_pressure": 0.2705211986843423,
+        "css_transition_mu": 950.934121576961,
+        "css_transition_low_index": 13,
+        "css_transition_high_index": 14,
+        "css_core_bridge_index": 23,
+        "seidov_critical_delta_eps": 26.79153989995652,
+        "seidov_ratio": 1.7911044427419787,
+        "seidov_small_core_stable": false,
+        "pressure_span": 3.608341344319446,
+        "first_law_relative_residual": 1.5412306712777482e-14,
+        "dm_mass_gauge_meV": 0.0,
+        "source_euler_residual_meV": 2.2737367544323206e-13,
+        "source_euler_relative_residual": 2.730133217957746e-11,
+        "composition_dropped": true,
+        "is_exact_maxwell": true,
+        "seidov_applicable": true
+      },
+      "pair_report_sha256": "10535c868a499020ebd2972b25e101b4c12f2faefd6070e70f59da7cfa4de81e"
+    },
+    {
+      "pair_id": "GPPVA_TW__BBB_BHF2__css",
+      "crust_model": "GPPVA_TW",
+      "core_model": "BBB_BHF2",
+      "method": "css",
+      "combined_n": 37,
+      "readback_n": 37,
+      "consistency_status": "PASS",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0202d2515cd0125e904bbc708829d7d380c590b1104f2ca67c5b48b7ae157352",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "ad75cda103796eb3f6dff036fc9c7a7009c1f2b1506430a5358cbf4d5a71381e"
+        },
+        "core": {
+          "eos.nb": "9527b71b0f6428645b67c362c744d8c9514e2f9802ee4af3b12f8ce34ae2b953",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "7a1b83379695a19512e58b7ac46b25b960d2f7c9cd05c3ff3a92e389b0366bda"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "e53ec155bb009d050f486f0f7def35b4a5a49c9ade578534eb3e842525eb0348"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "output_sha256": {
+        "eos.nb": "33081e1cbd39eb17b7a672658abad4d4f374b83df7a17aa1aa3041d428ba2179",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "23c38f06988107b8f40e7ec007c6b1a28af17ef249b7e6a8a1e134aaac5a75f1"
+      },
+      "fortran_executable_sha256": "bfb794cf060025346e025cc597a20e53f8c5f04dff28a5bbb81046044b83dbb3",
+      "match_report": {
+        "status": "ok",
+        "operation": "match-core",
+        "n": 37,
+        "method": "css",
+        "construction_kind": "css_single_speed_with_crust_density_jump",
+        "spline_mode": "single_speed_css_analytic",
+        "i1": 13,
+        "i2": 70,
+        "n_bridge": 8,
+        "n1": 0.056119551,
+        "n2": 0.2,
+        "P1": 0.22902956401048158,
+        "P2": 3.3080001645911086,
+        "F1": 946.3295742246037,
+        "F2": 957.2991134228231,
+        "mu1": 950.4106753725883,
+        "mu2": 973.8391142457787,
+        "cs2_source_left": 0.008086347836696562,
+        "cs2_source_right": 0.06156829765600029,
+        "cs2_left": 0.026690547169545914,
+        "cs2_right": 0.026690547169545914,
+        "cs2_min": 0.026690547169545914,
+        "cs2_max": 0.026690547169545914,
+        "css_single_sound_speed": 0.026690547169545914,
+        "css_transition_nb_low": 0.056119551,
+        "css_transition_nb_high": 0.08031344980825243,
+        "css_transition_delta_nb": 0.024193898808252436,
+        "css_transition_delta_eps": 22.994139706247257,
+        "css_transition_epsilon_low": 53.10759080350593,
+        "css_transition_epsilon_high": 76.10173050975318,
+        "css_transition_pressure": 0.22902956401048158,
+        "css_transition_mu": 950.4106753725883,
+        "css_transition_low_index": 13,
+        "css_transition_high_index": 14,
+        "css_core_bridge_index": 23,
+        "seidov_critical_delta_eps": 26.897339747768687,
+        "seidov_ratio": 0.8548852757141076,
+        "seidov_small_core_stable": true,
+        "pressure_span": 3.0789706005806297,
+        "first_law_relative_residual": 0.0,
+        "dm_mass_gauge_meV": 0.0,
+        "source_euler_residual_meV": 2.2737367544323206e-13,
+        "source_euler_relative_residual": 3.6206782185295305e-16,
+        "composition_dropped": false,
+        "is_exact_maxwell": true,
+        "seidov_applicable": true
+      },
+      "pair_report_sha256": "1792a08e7f9f8bf8f884545e0c0134ff09e4f6fff953c34467018c31b6f0ed9c"
+    },
+    {
+      "pair_id": "GPPVA_TW__GM_GM1__css",
+      "crust_model": "GPPVA_TW",
+      "core_model": "GM_GM1",
+      "method": "css",
+      "combined_n": 294,
+      "readback_n": 294,
+      "consistency_status": "PASS",
+      "source_sha256": {
+        "crust": {
+          "eos.nb": "0202d2515cd0125e904bbc708829d7d380c590b1104f2ca67c5b48b7ae157352",
+          "eos.t": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.yq": "6bc63cc0b5cee4e7e6ad2375ddd51149a93e0e2f93f8fd0b77ee2ea681a82bbb",
+          "eos.thermo": "ad75cda103796eb3f6dff036fc9c7a7009c1f2b1506430a5358cbf4d5a71381e"
+        },
+        "core": {
+          "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+          "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+        }
+      },
+      "source_scope": {
+        "crust": {
+          "scientific_scope": "exploratory_proxy_CLD",
+          "source_calibrated": false,
+          "reconstruction_receipt_sha256": "e53ec155bb009d050f486f0f7def35b4a5a49c9ade578534eb3e842525eb0348"
+        },
+        "core": {
+          "scientific_scope": "not_recorded",
+          "source_calibrated": null
+        }
+      },
+      "output_sha256": {
+        "eos.nb": "6fee918060877d311d43d7c64900ae3ed0928a5b26cdfdb5ddc2d30ed8ab8f28",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "f25d3fcfc2f0217f037dc401600e46f12fc5917226b433110593b202836f16be"
+      },
+      "fortran_executable_sha256": "bfb794cf060025346e025cc597a20e53f8c5f04dff28a5bbb81046044b83dbb3",
+      "match_report": {
+        "status": "ok",
+        "operation": "match-core",
+        "n": 294,
+        "method": "css",
+        "construction_kind": "css_single_speed_with_crust_density_jump",
+        "spline_mode": "single_speed_css_analytic",
+        "i1": 13,
+        "i2": 78,
+        "n_bridge": 8,
+        "n1": 0.056119551,
+        "n2": 0.1432,
+        "P1": 0.22902956401048158,
+        "P2": 3.3959147695247998,
+        "F1": 946.3295742246037,
+        "F2": 952.3846511321105,
+        "mu1": 950.4106753725883,
+        "mu2": 976.0991397461105,
+        "cs2_source_left": 0.008086347836696562,
+        "cs2_source_right": 0.07468854567367679,
+        "cs2_left": 0.08634540267551782,
+        "cs2_right": 0.08634540267551782,
+        "cs2_min": 0.08634540267551782,
+        "cs2_max": 0.08634540267551782,
+        "css_single_sound_speed": 0.08634540267551782,
+        "css_transition_nb_low": 0.056119551,
+        "css_transition_nb_high": 0.1051477783129345,
+        "css_transition_delta_nb": 0.0490282273129345,
+        "css_transition_delta_eps": 46.59695063280686,
+        "css_transition_epsilon_low": 53.10759080350593,
+        "css_transition_epsilon_high": 99.7045414363128,
+        "css_transition_pressure": 0.22902956401048158,
+        "css_transition_mu": 950.4106753725883,
+        "css_transition_low_index": 13,
+        "css_transition_high_index": 14,
+        "css_core_bridge_index": 23,
+        "seidov_critical_delta_eps": 26.897339747768687,
+        "seidov_ratio": 1.732399972256453,
+        "seidov_small_core_stable": false,
+        "pressure_span": 3.1668852055143195,
+        "first_law_relative_residual": 0.0,
+        "dm_mass_gauge_meV": 0.0,
+        "source_euler_residual_meV": 2.2737367544323206e-13,
+        "source_euler_relative_residual": 2.730133217957746e-11,
+        "composition_dropped": true,
+        "is_exact_maxwell": true,
+        "seidov_applicable": true
+      },
+      "pair_report_sha256": "d8753793afd205e4733fc297ce55cb580fd842a523adf15855fb2b1c468f485a"
+    }
+  ]
+}

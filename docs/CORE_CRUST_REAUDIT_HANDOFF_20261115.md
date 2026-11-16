@@ -1,3 +1,5 @@
+> Superseded for current work by [2026-11-16 handoff](CORE_CRUST_REAUDIT_HANDOFF_20261116.md). Historical content below is preserved.
+
 # NS_Cowling: resume after physical normalization and Maxwell/admission repair
 
 Repository: https://github.com/cosmosapjw-quantum/NS_Cowling

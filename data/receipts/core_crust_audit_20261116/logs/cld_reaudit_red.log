@@ -1,0 +1,263 @@
+FFFFFF..FFFFF                                                            [100%]
+=================================== FAILURES ===================================
+________ test_invalid_physical_inputs_refused_before_writing[mu_e-nan] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-71/test_invalid_physical_inputs_r0')
+field = 'mu_e', value = nan
+
+    @pytest.mark.parametrize('field,value', [('mu_e',float('nan')),('mu_e',float('inf')),
+        ('mu_e',-1.),('y_p_cell',-.01),('y_p_cell',1.01),('mu_n_gas',float('nan'))])
+    def test_invalid_physical_inputs_refused_before_writing(tmp_path,field,value):
+        rows=cells(); rows[1]=replace(rows[1], **{field:value})
+        out=tmp_path/'bad'
+>       with pytest.raises(CLDThermodynamicsError):
+E       Failed: DID NOT RAISE CLDThermodynamicsError
+
+python_frontend/tests/test_cld_adversarial_reaudit.py:30: Failed
+________ test_invalid_physical_inputs_refused_before_writing[mu_e-inf] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-71/test_invalid_physical_inputs_r1')
+field = 'mu_e', value = inf
+
+    @pytest.mark.parametrize('field,value', [('mu_e',float('nan')),('mu_e',float('inf')),
+        ('mu_e',-1.),('y_p_cell',-.01),('y_p_cell',1.01),('mu_n_gas',float('nan'))])
+    def test_invalid_physical_inputs_refused_before_writing(tmp_path,field,value):
+        rows=cells(); rows[1]=replace(rows[1], **{field:value})
+        out=tmp_path/'bad'
+>       with pytest.raises(CLDThermodynamicsError):
+E       Failed: DID NOT RAISE CLDThermodynamicsError
+
+python_frontend/tests/test_cld_adversarial_reaudit.py:30: Failed
+________ test_invalid_physical_inputs_refused_before_writing[mu_e--1.0] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-71/test_invalid_physical_inputs_r2')
+field = 'mu_e', value = -1.0
+
+    @pytest.mark.parametrize('field,value', [('mu_e',float('nan')),('mu_e',float('inf')),
+        ('mu_e',-1.),('y_p_cell',-.01),('y_p_cell',1.01),('mu_n_gas',float('nan'))])
+    def test_invalid_physical_inputs_refused_before_writing(tmp_path,field,value):
+        rows=cells(); rows[1]=replace(rows[1], **{field:value})
+        out=tmp_path/'bad'
+>       with pytest.raises(CLDThermodynamicsError):
+E       Failed: DID NOT RAISE CLDThermodynamicsError
+
+python_frontend/tests/test_cld_adversarial_reaudit.py:30: Failed
+_____ test_invalid_physical_inputs_refused_before_writing[y_p_cell--0.01] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-71/test_invalid_physical_inputs_r3')
+field = 'y_p_cell', value = -0.01
+
+    @pytest.mark.parametrize('field,value', [('mu_e',float('nan')),('mu_e',float('inf')),
+        ('mu_e',-1.),('y_p_cell',-.01),('y_p_cell',1.01),('mu_n_gas',float('nan'))])
+    def test_invalid_physical_inputs_refused_before_writing(tmp_path,field,value):
+        rows=cells(); rows[1]=replace(rows[1], **{field:value})
+        out=tmp_path/'bad'
+>       with pytest.raises(CLDThermodynamicsError):
+E       Failed: DID NOT RAISE CLDThermodynamicsError
+
+python_frontend/tests/test_cld_adversarial_reaudit.py:30: Failed
+______ test_invalid_physical_inputs_refused_before_writing[y_p_cell-1.01] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-71/test_invalid_physical_inputs_r4')
+field = 'y_p_cell', value = 1.01
+
+    @pytest.mark.parametrize('field,value', [('mu_e',float('nan')),('mu_e',float('inf')),
+        ('mu_e',-1.),('y_p_cell',-.01),('y_p_cell',1.01),('mu_n_gas',float('nan'))])
+    def test_invalid_physical_inputs_refused_before_writing(tmp_path,field,value):
+        rows=cells(); rows[1]=replace(rows[1], **{field:value})
+        out=tmp_path/'bad'
+>       with pytest.raises(CLDThermodynamicsError):
+E       Failed: DID NOT RAISE CLDThermodynamicsError
+
+python_frontend/tests/test_cld_adversarial_reaudit.py:30: Failed
+______ test_invalid_physical_inputs_refused_before_writing[mu_n_gas-nan] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-71/test_invalid_physical_inputs_r5')
+field = 'mu_n_gas', value = nan
+
+    @pytest.mark.parametrize('field,value', [('mu_e',float('nan')),('mu_e',float('inf')),
+        ('mu_e',-1.),('y_p_cell',-.01),('y_p_cell',1.01),('mu_n_gas',float('nan'))])
+    def test_invalid_physical_inputs_refused_before_writing(tmp_path,field,value):
+        rows=cells(); rows[1]=replace(rows[1], **{field:value})
+        out=tmp_path/'bad'
+>       with pytest.raises(CLDThermodynamicsError):
+E       Failed: DID NOT RAISE CLDThermodynamicsError
+
+python_frontend/tests/test_cld_adversarial_reaudit.py:30: Failed
+_________________ test_invalid_reference_mass_is_refused[nan] __________________
+
+mass = nan
+
+    @pytest.mark.parametrize('mass',[0.,-1000.,float('nan'),float('inf')])
+    def test_invalid_reference_mass_is_refused(mass):
+        with pytest.raises(CLDThermodynamicsError):
+>           thermodynamic_table(cells(),mn=mass,mp=1000.)
+
+python_frontend/tests/test_cld_adversarial_reaudit.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/reconstruct_cld.py:78: in thermodynamic_table
+    spline = CubicSpline(n, eps - mn * n, bc_type="not-a-knot")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/cosmosapjw/.local/lib/python3.12/site-packages/scipy/interpolate/_cubic.py:792: in __init__
+    x, dx, y, axis, _ = prepare_input(x, y, axis, xp=np_compat)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+x = array([1., 2., 3., 4.]), y = array([nan, nan, nan, nan]), axis = 0
+dydx = None
+xp = <module 'scipy._lib.array_api_compat.numpy' from '/home/cosmosapjw/.local/lib/python3.12/site-packages/scipy/_lib/array_api_compat/numpy/__init__.py'>
+
+    def prepare_input(x, y, axis, dydx=None, xp=None):
+        """Prepare input for cubic spline interpolators.
+    
+        All data are converted to numpy arrays and checked for correctness.
+        Axes equal to `axis` of arrays `y` and `dydx` are moved to be the 0th
+        axis. The value of `axis` is converted to lie in
+        [0, number of dimensions of `y`).
+        """
+    
+        x, y = map(xp.asarray, (x, y))
+        if xp.isdtype(x.dtype, "complex floating"):
+            raise ValueError("`x` must contain real values.")
+        x = xp.astype(x, xp.float64)
+    
+        if xp.isdtype(y.dtype, "complex floating"):
+            dtype = xp.complex128
+        else:
+            dtype = xp.float64
+    
+        if dydx is not None:
+            dydx = xp.asarray(dydx)
+            if y.shape != dydx.shape:
+                raise ValueError("The shapes of `y` and `dydx` must be identical.")
+            if xp.isdtype(dydx.dtype, "complex floating"):
+                dtype = xp.complex128
+            dydx = xp.astype(dydx, dtype, copy=False)
+    
+        y = xp.astype(y, dtype, copy=False)
+        axis = axis % y.ndim
+        if x.ndim != 1:
+            raise ValueError("`x` must be 1-dimensional.")
+        if x.shape[0] < 2:
+            raise ValueError("`x` must contain at least 2 elements.")
+        if x.shape[0] != y.shape[axis]:
+            raise ValueError(f"The length of `y` along `axis`={axis} doesn't "
+                             "match the length of `x`")
+    
+        if not xp.all(xp.isfinite(x)):
+            raise ValueError("`x` must contain only finite values.")
+        if not xp.all(xp.isfinite(y)):
+>           raise ValueError("`y` must contain only finite values.")
+E           ValueError: `y` must contain only finite values.
+
+/home/cosmosapjw/.local/lib/python3.12/site-packages/scipy/interpolate/_cubic.py:58: ValueError
+_________________ test_invalid_reference_mass_is_refused[inf] __________________
+
+mass = inf
+
+    @pytest.mark.parametrize('mass',[0.,-1000.,float('nan'),float('inf')])
+    def test_invalid_reference_mass_is_refused(mass):
+        with pytest.raises(CLDThermodynamicsError):
+>           thermodynamic_table(cells(),mn=mass,mp=1000.)
+
+python_frontend/tests/test_cld_adversarial_reaudit.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/reconstruct_cld.py:78: in thermodynamic_table
+    spline = CubicSpline(n, eps - mn * n, bc_type="not-a-knot")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/cosmosapjw/.local/lib/python3.12/site-packages/scipy/interpolate/_cubic.py:792: in __init__
+    x, dx, y, axis, _ = prepare_input(x, y, axis, xp=np_compat)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+x = array([1., 2., 3., 4.]), y = array([nan, nan, nan, nan]), axis = 0
+dydx = None
+xp = <module 'scipy._lib.array_api_compat.numpy' from '/home/cosmosapjw/.local/lib/python3.12/site-packages/scipy/_lib/array_api_compat/numpy/__init__.py'>
+
+    def prepare_input(x, y, axis, dydx=None, xp=None):
+        """Prepare input for cubic spline interpolators.
+    
+        All data are converted to numpy arrays and checked for correctness.
+        Axes equal to `axis` of arrays `y` and `dydx` are moved to be the 0th
+        axis. The value of `axis` is converted to lie in
+        [0, number of dimensions of `y`).
+        """
+    
+        x, y = map(xp.asarray, (x, y))
+        if xp.isdtype(x.dtype, "complex floating"):
+            raise ValueError("`x` must contain real values.")
+        x = xp.astype(x, xp.float64)
+    
+        if xp.isdtype(y.dtype, "complex floating"):
+            dtype = xp.complex128
+        else:
+            dtype = xp.float64
+    
+        if dydx is not None:
+            dydx = xp.asarray(dydx)
+            if y.shape != dydx.shape:
+                raise ValueError("The shapes of `y` and `dydx` must be identical.")
+            if xp.isdtype(dydx.dtype, "complex floating"):
+                dtype = xp.complex128
+            dydx = xp.astype(dydx, dtype, copy=False)
+    
+        y = xp.astype(y, dtype, copy=False)
+        axis = axis % y.ndim
+        if x.ndim != 1:
+            raise ValueError("`x` must be 1-dimensional.")
+        if x.shape[0] < 2:
+            raise ValueError("`x` must contain at least 2 elements.")
+        if x.shape[0] != y.shape[axis]:
+            raise ValueError(f"The length of `y` along `axis`={axis} doesn't "
+                             "match the length of `x`")
+    
+        if not xp.all(xp.isfinite(x)):
+            raise ValueError("`x` must contain only finite values.")
+        if not xp.all(xp.isfinite(y)):
+>           raise ValueError("`y` must contain only finite values.")
+E           ValueError: `y` must contain only finite values.
+
+/home/cosmosapjw/.local/lib/python3.12/site-packages/scipy/interpolate/_cubic.py:58: ValueError
+_______ test_cubic_instability_hidden_by_positive_row_secants_is_refused _______
+
+    def test_cubic_instability_hidden_by_positive_row_secants_is_refused():
+>       with pytest.raises(CLDThermodynamicsError, match='interval|convex|stability'):
+E       Failed: DID NOT RAISE CLDThermodynamicsError
+
+python_frontend/tests/test_cld_adversarial_reaudit.py:42: Failed
+________ test_cubic_acausality_hidden_by_causal_row_secants_is_refused _________
+
+    def test_cubic_acausality_hidden_by_causal_row_secants_is_refused():
+>       with pytest.raises(CLDThermodynamicsError, match='interval|causal'):
+E       Failed: DID NOT RAISE CLDThermodynamicsError
+
+python_frontend/tests/test_cld_adversarial_reaudit.py:47: Failed
+_________ test_nonempty_output_cannot_leave_stale_composition_sidecar __________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-71/test_nonempty_output_cannot_le0')
+
+    def test_nonempty_output_cannot_leave_stale_composition_sidecar(tmp_path):
+        out=tmp_path/'old'; out.mkdir(); stale=out/'eos.compo'; stale.write_text('old composition\n')
+>       with pytest.raises(FileExistsError):
+E       Failed: DID NOT RAISE FileExistsError
+
+python_frontend/tests/test_cld_adversarial_reaudit.py:53: Failed
+=============================== warnings summary ===============================
+python_frontend/tests/test_cld_adversarial_reaudit.py::test_invalid_reference_mass_is_refused[inf]
+  /tmp/NS_Cowling_audit_20261116_eda4af9/python_frontend/compose_eos/reconstruct_cld.py:78: RuntimeWarning: invalid value encountered in subtract
+    spline = CubicSpline(n, eps - mn * n, bc_type="not-a-knot")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_cld_adversarial_reaudit.py::test_invalid_physical_inputs_refused_before_writing[mu_e-nan]
+FAILED python_frontend/tests/test_cld_adversarial_reaudit.py::test_invalid_physical_inputs_refused_before_writing[mu_e-inf]
+FAILED python_frontend/tests/test_cld_adversarial_reaudit.py::test_invalid_physical_inputs_refused_before_writing[mu_e--1.0]
+FAILED python_frontend/tests/test_cld_adversarial_reaudit.py::test_invalid_physical_inputs_refused_before_writing[y_p_cell--0.01]
+FAILED python_frontend/tests/test_cld_adversarial_reaudit.py::test_invalid_physical_inputs_refused_before_writing[y_p_cell-1.01]
+FAILED python_frontend/tests/test_cld_adversarial_reaudit.py::test_invalid_physical_inputs_refused_before_writing[mu_n_gas-nan]
+FAILED python_frontend/tests/test_cld_adversarial_reaudit.py::test_invalid_reference_mass_is_refused[nan]
+FAILED python_frontend/tests/test_cld_adversarial_reaudit.py::test_invalid_reference_mass_is_refused[inf]
+FAILED python_frontend/tests/test_cld_adversarial_reaudit.py::test_cubic_instability_hidden_by_positive_row_secants_is_refused
+FAILED python_frontend/tests/test_cld_adversarial_reaudit.py::test_cubic_acausality_hidden_by_causal_row_secants_is_refused
+FAILED python_frontend/tests/test_cld_adversarial_reaudit.py::test_nonempty_output_cannot_leave_stale_composition_sidecar
+11 failed, 2 passed, 1 warning in 0.43s

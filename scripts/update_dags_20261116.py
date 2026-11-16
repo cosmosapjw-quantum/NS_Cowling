@@ -88,6 +88,14 @@ def apply(path: Path, updates: dict, head: str) -> list[str]:
 
 
 def main() -> int:
+    # This writer describes the earlier continuation, not the later re-audit.
+    # Preserve the current authoritative state instead of replaying old labels.
+    for filename in ("ns_cowling_cloud_agent_dag.v1.json",
+                     "eos390_native_fortran_unification_dag.v1.json"):
+        current = json.loads((ROOT / "data" / filename).read_text(encoding="utf-8"))
+        if "adversarial_reaudit_20261116" in current:
+            print("Historical DAG updater superseded by the 2026-11-16 re-audit; no changes.")
+            return 0
     head = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"],
                           capture_output=True, text=True).stdout.strip()
     print(apply(ROOT / "data" / "ns_cowling_cloud_agent_dag.v1.json", CLOUD, head))

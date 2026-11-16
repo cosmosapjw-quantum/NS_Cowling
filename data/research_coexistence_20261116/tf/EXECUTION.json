@@ -1,0 +1,152 @@
+{
+  "baseline_head": "a0b158f3dc4af9825192bf6a185a6331619868a5",
+  "scope": "finite N256 re-solve of two locally neutral two-branch candidates plus N128 midpoint competition across six native families; not a global-minimum certificate",
+  "production_physics": "Fortran native TF; Python helper only resamples input radial arrays",
+  "runtime": {
+    "compiler": "GNU Fortran 13.3.0",
+    "thread_caps": {
+      "OMP_NUM_THREADS": 1,
+      "OPENBLAS_NUM_THREADS": 1,
+      "MKL_NUM_THREADS": 1
+    },
+    "max_processes": 4,
+    "stdout_buffering": "native Fortran stdout visibility can be delayed between writes; an empty output file alone is inconclusive"
+  },
+  "producer_sha256": {
+    "fortran_eos/tests/blocker_tf_common_tangent_polish.f90": "6877e8f9fb6a9b15b06d3badece970ab59c4dcf6807a81e024d29cfc5c2c4fc1",
+    "fortran_eos/tests/tf_coexistence_mesh_refine.py": "fffd6322d5d70b233c6d3ae6bb81cdfc2df62c3e563d58deffbb6095a7ea92cb",
+    "fortran_eos/tests/tf_coexistence_competing.f90": "ab20a801da0e42f46b361696df71d27ee7385b0bc8e2166ad4ea9b4b91fdbae2",
+    "fortran_eos/src/compose_eos_types.f90": "26fb4fb7b9482ca238ff41e504c75b090a42d902d7946a4c0612ece4e8729d44",
+    "fortran_eos/src/compose_eos_optimize_native.f90": "ac9f7e1cedd3a0cc5823a9f5e85ea82a5a06549a715d2f8d619b167bbb6a78f5",
+    "fortran_eos/src/compose_eos_tf_models.f90": "0712f95176d6cc53d77efff9602bae32e15b8c5502d30d69556b0a8dc90d49fe",
+    "fortran_eos/src/compose_eos_spatial_tf.f90": "32f89d3597c5d5a966e5ec6f17e6455f8666dd79910c5e5ad3d241f3701f3711",
+    "fortran_eos/vendor/slsqp/slsqp_optmz.f": "bb1b489a87bc6137fee6132166c8a04cdb838d9042de809179d7f4f6ef9e43ae"
+  },
+  "mesh_refinement": {
+    "source_n128": {
+      "FSU2R": {
+        "path": "data/research_blockers_20261116/tf/common_tangent/FSU2R/input.txt",
+        "sha256": "9e5babcc47f3211fdabe1d8850cc43a710747fd0fc8b8618fb30db15afd5fb20"
+      },
+      "TM1e": {
+        "path": "data/research_blockers_20261116/tf/common_tangent/TM1e_polish/input.txt",
+        "sha256": "782c96a9ae03223dcda9dc0c7ed7e5ba8bd04e53461ef76cf56cd0930af1dcb0"
+      }
+    },
+    "target_n256": {
+      "FSU2R": {
+        "path": "data/research_coexistence_20261116/tf/input_n256/FSU2R.txt",
+        "sha256": "dbeef3efe7b774c4c7e006d96c17d14a48141d81b805445e872b61e68e881a25"
+      },
+      "TM1e": {
+        "path": "data/research_coexistence_20261116/tf/input_n256/TM1e.txt",
+        "sha256": "3d66f5dff70cbc9fb50cb7b2d425fc00ae8d1630fe1b55455606fa6508a86cfd"
+      }
+    },
+    "native_executable_sha256": "8289dbabf10a59e08e98a5428968b065cb1ed651b162f633ee9674f7a54e1ff5",
+    "runs": {
+      "FSU2R": {
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 build/coexistence_native/blocker_tf_common_tangent_polish GPPVA_FSU2R 256 < data/research_coexistence_20261116/tf/input_n256/FSU2R.txt",
+        "status": "HOLD_BRANCH_CHANGE_OR_UNRESOLVED",
+        "pid": 1823486,
+        "exit_code": 3,
+        "elapsed_seconds_lower_bound": 1289,
+        "tangent_root": {
+          "n_low_fm3": 0.07276303723858797,
+          "n_high_fm3": 0.07433020338896663,
+          "delta_mu_MeV": 2.2808421817899216e-7,
+          "delta_pressure_MeV_fm3": 1.698971630048618e-8
+        },
+        "halfstep": {
+          "delta_mu_MeV": 3.2116531656356528e-7,
+          "delta_pressure_MeV_fm3": 2.3934077830745082e-8,
+          "within_existing_targets": true
+        },
+        "failure_classification": "HOLD; first subsequent finite tube chord state returned REQUIRES_REFINEMENT and driver STOP 3; geometry stayed tube; specific optimizer reason unknown because mode/success/bound flags are not emitted; no completed chord-gap check or N256 candidate admission",
+        "stdout_path": "data/research_coexistence_20261116/tf/output_n256/FSU2R.stdout",
+        "stdout_sha256": "2b90d01477ee03f8de0f08689303dbd8001711a09e80622906887e28beb7c714",
+        "stderr_path": "data/research_coexistence_20261116/tf/output_n256/FSU2R.stderr",
+        "stderr_sha256": "d4ce94bb5a1233bfe702caf05fbf741d133ae04318ae42a3d760f54ae8866c93",
+        "state_30_evidence": {
+          "geometry": "tube (unchanged)",
+          "epsilon_MeV_fm3": 69.03705031807739,
+          "pressure_MeV_fm3": 0.23085729070349714,
+          "mu_B_MeV": 951.9655890895999,
+          "numerical_status": "REQUIRES_REFINEMENT",
+          "max_chemical_KKT_residual_MeV": 4.952691358539596e-5,
+          "radius_stationarity_MeV": 2.3728373467232037e-9,
+          "baryon_constraint_error": 9.756084828893563e-15,
+          "charge_constraint_error": 1.094366567852556e-18,
+          "all_printed_values_finite": true
+        },
+        "state_29_evidence": "STATIONARY; baryon 2.1094e-15, charge 2.3886e-19",
+        "stderr_classification": "IEEE_INVALID_FLAG reported; run retained; not assigned a cause"
+      },
+      "TM1e": {
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 build/coexistence_native/blocker_tf_common_tangent_polish GPPVA_TM1e 256 < data/research_coexistence_20261116/tf/input_n256/TM1e.txt",
+        "status": "COMPLETED_FINITE_CANDIDATE",
+        "pid": 1831114,
+        "exit_code": 0,
+        "candidate_scope": "finite N256 slab/tube branch tangent; not a global minimum certificate",
+        "n_low_fm3": 0.08122637595761807,
+        "n_high_fm3": 0.08238499217845303,
+        "mu_t_MeV": 953.1380397426402,
+        "P_t_MeV_fm3": 0.3275477437997626,
+        "root_delta_mu_MeV": -2.5153212845907547e-7,
+        "root_delta_pressure_MeV_fm3": -2.2750569428353629e-8,
+        "halfstep_delta_mu_MeV": -3.3537617127876729e-7,
+        "halfstep_delta_pressure_MeV_fm3": -2.9470356821548194e-8,
+        "common_tangent_energy_residual_MeV_fm3": -2.173812241323958e-9,
+        "minimum_sampled_interior_chord_gap_MeV_fm3": 1.7180526441507027e-6,
+        "endpoint_chord_energy_gaps_MeV_fm3": [1.1598331184359267e-9, -1.0146123941012775e-9],
+        "all_26_emitted_states_stationary": true,
+        "max_abs_baryon_constraint_error": 3.0531133177191805e-15,
+        "max_abs_charge_constraint_error": 2.0599841277224584e-18,
+        "max_chemical_KKT_residual_MeV": 2.9287780819231557e-4,
+        "max_radius_stationarity_MeV": 1.6051175814560472e-7,
+        "stdout_path": "data/research_coexistence_20261116/tf/output_n256/TM1e.stdout",
+        "stdout_sha256": "01e67d52070379f8cc38845c1cf59b78b9c37a2d38b9cd7a5826861c6bccb71b",
+        "stderr_path": "data/research_coexistence_20261116/tf/output_n256/TM1e.stderr",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  },
+  "midpoint_competition_n128": {
+    "families": ["slab", "rod", "tube", "droplet", "bubble", "uniform"],
+    "binary_sha256": "771701c5b1f7af62876a71e01ec436ec369445ad10c7ce5b6eaee6b2991e2898",
+    "attempt_count_each_model": 7,
+    "retained_statuses_each_model": {
+      "STATIONARY": 5,
+      "UNIFORM_STATIONARY": 1,
+      "REQUIRES_REFINEMENT": 1
+    },
+    "runs": {
+      "FSU2R": {
+        "density_fm3": 0.07353912736994549,
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 build/coexistence_native/tf_coexistence_competing GPPVA_FSU2R 128 0.07353912736994549",
+        "status": "COMPLETED",
+        "stdout_path": "data/research_coexistence_20261116/tf/competition_n128/FSU2R.stdout",
+        "stdout_sha256": "1f695f72cdc04947896e322440d16d639cf22a863dad54133a86dd42fc13eeef",
+        "stderr_path": "data/research_coexistence_20261116/tf/competition_n128/FSU2R.stderr",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "TM1e_corrected": {
+        "density_fm3": 0.08179918771866158,
+        "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 build/coexistence_native/tf_coexistence_competing GPPVA_TM1e 128 0.08179918771866158",
+        "status": "COMPLETED",
+        "stdout_path": "data/research_coexistence_20261116/tf/competition_n128/TM1e.stdout",
+        "stdout_sha256": "57c53b6684e3e1689ab07c89af29a852b7db5ec78be97725164dd0b9527c1afb",
+        "stderr_path": "data/research_coexistence_20261116/tf/competition_n128/TM1e.stderr",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "TM1e_prelabel_fix": {
+        "status": "PRESERVED_IDENTITY_UNCERTAIN_EXCLUDED",
+        "stdout_path": "data/research_coexistence_20261116/tf/competition_n128/TM1e_prelabel_fix_identity_uncertain.stdout",
+        "stderr_path": "data/research_coexistence_20261116/tf/competition_n128/TM1e_prelabel_fix_identity_uncertain.stderr",
+        "stdout_sha256": "83b9dadb0191e6b6c4ae01990c797c5a2b614e42d458fb1ee6bc96f820713193",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "identical_legacy_copy_path": "data/research_coexistence_20261116/tf/output_n256/TM1e_competition.stdout"
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+# Independent review
+
+Read-only reviewer: `/root/native_review`, separate from both implementation workers. Scope: uncommitted changes against `a0b158f3dc4af9825192bf6a185a6331619868a5`. Final verdict **PASS_SCOPED**, with **FSU2R N256 chord HOLD**. No unresolved BLOCKER or MAJOR for publishing the evidence; this is not scientific promotion of the full EOS.
+
+The review found and the workers corrected: reversed TF initial-family labels; SPG driver GDFM statuses not checked; SPG summary implying success from row count alone; missing competition-driver build command; and reproduction commands that would overwrite retained evidence. The TM1e first competition run with uncertain executable identity is retained and excluded. An invalid-density negative test exits 21.
+
+The reviewer independently checked 760 distinct SPG states times five steps, finite outputs, 15 source hashes, seven direct dependency hashes and executable replay with identical stdout `b9ccf639b61150f238cc8b90d8034aa0d6853b8798c2a0598b986d28921f8160`. The observed finite-difference comparison covers the y direction of the explicit functional only, not original author calibration or all variational derivatives.
+
+For each N128 midpoint, six selected family states and one `REQUIRES_REFINEMENT` attempt were checked; all twelve reported energy differences were independently recalculated. N256 TM1e has 26 stationary states, 512 endpoint profile cells, both root and halfstep tolerances satisfied, three positive interior chord gaps, and independently recalculated profile conservation. The signed endpoint gaps are +1.159833118e-9 and -1.014612394e-9 MeV fm^-3. N256 FSU2R has 29 stationary states and one `REQUIRES_REFINEMENT`, exit 3, no completed chord check or final profile; its exact rejection cause is not established. `IEEE_INVALID_FLAG` is retained without asserting cause.
+
+The reviewer checked TF direct source, seed and executable identities, and final receipt SHA256 `8737296e1b678fdbe04eb35083d80b0474ef35016dc9cf04ad50a564fe532022`. The 42-file historical identity comparison and recovery of the three changed historical blobs were independently confirmed. Two meshes and finite candidates do not prove continuum convergence, global minimization, original source fidelity or full-crust completion.

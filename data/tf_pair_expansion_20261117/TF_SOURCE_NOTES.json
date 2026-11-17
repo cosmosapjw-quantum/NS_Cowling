@@ -1,0 +1,213 @@
+{
+  "schema": "ns-cowling.tf-source-notes.v1",
+  "date": "2026-11-17",
+  "scope": "Stage C bounded TF continuation source/formula support; no new full audit",
+  "base_commit_supplied": "894cbf1c8315f07ee926c29b83766ffdab2ac7b7",
+  "state": "SOURCE_LOCAL_NOTE_COMPLETE",
+  "numerical_campaign_run": false,
+  "provider_equality_claim": false,
+  "repo_inspected": [
+    {
+      "path": "fortran_eos/src/compose_eos_spatial_tf.f90",
+      "sha256": "32f89d3597c5d5a966e5ec6f17e6455f8666dd79910c5e5ad3d241f3701f3711",
+      "sections": [
+        "make_tf_grid",
+        "screened_electrons_native",
+        "meson_fields",
+        "evaluate_spatial_tf_profile",
+        "initial_tf_profile",
+        "solve_spatial_tf"
+      ]
+    },
+    {
+      "path": "fortran_eos/src/compose_eos_tf_models.f90",
+      "sha256": "0712f95176d6cc53d77efff9602bae32e15b8c5502d30d69556b0a8dc90d49fe",
+      "inspection": "file identity only; model conventions reused from valid ledger"
+    },
+    {
+      "path": "data/matched_eos_reference_20261117/reference_support/SEED_CATALOG.json",
+      "sha256": "8a229aa2dacb11b13a487279b3970c15d9bd9eb9d0e6a6e98ef2c4ec5c02b3e5"
+    },
+    {
+      "path": "data/research_completion_20261116/tf_literature.json",
+      "sha256": "980a2a649f7ccfe3e82f6364bfa84b013d641f072702499ee22a5f491055ef1a",
+      "raw_html_in_current_worktree": false
+    }
+  ],
+  "seed_semantics": {
+    "state": "repo-inspected + derived + provider-supported",
+    "nB": "mean baryon number density fm^-3",
+    "Ye": "mean electron number / baryon number",
+    "Ymu": "mean muon number / baryon number",
+    "Yp_total": "Ye+Ymu under global neutrality; includes clustered protons",
+    "missing": [
+      "local species profiles",
+      "meson fields",
+      "Coulomb field",
+      "WS radius",
+      "cluster radius",
+      "free/cluster nucleon decomposition"
+    ],
+    "phase7": "eos.compo inner crust; not a geometry",
+    "geometry_source": "eos.thermo extra last column; codes1 droplet2 rod3 slab4 tube5 bubble6 homogeneous",
+    "eos_mr_radius": "stellar radius km, not WS radius fm",
+    "public_Ye_initial_only": true
+  },
+  "derived_stationarity": {
+    "equation": "d epsilon/dlogR=2*(-Gsigma+Gomega+Grho+EC)",
+    "equation_units": "MeV fm^-3",
+    "radius_residual": "abs(d epsilon/dlogR)/nB in MeV",
+    "interior_condition": "Gsigma-Gomega-Grho=EC",
+    "assumptions": [
+      "fixed x=r/R density profiles",
+      "stationary eliminated meson/electron/Coulomb fields",
+      "neutral Neumann Poisson problem",
+      "no sharp-interface surface replacement"
+    ],
+    "implementation_equality": "direct native expression inspected",
+    "new_finite_difference_check": false
+  },
+  "diagnostics": {
+    "source": "current native code inspected; not new numerical pass",
+    "meson_residual_normalization": "max field equation residual/(hbarc)^3",
+    "meson_inner_target": 2e-10,
+    "meson_accepted": 2e-8,
+    "electron_PDE_accepted_MeV_fm2": 2e-10,
+    "neutrality_accepted_fm3": 2e-11,
+    "chemical_KKT_stationary_MeV": 0.02,
+    "radius_stationary_MeV": 0.0002,
+    "default_radius_bounds_fm": [
+      5,
+      180
+    ],
+    "density_upper_bound_fm3": 0.4,
+    "mesh_requirement": "reoptimize transferred profiles on refined grid and compare states/observables/residuals/energy ordering",
+    "pressure_check": "nB*muB-epsilon vs nB^2*d(epsilon/nB)/dnB on reoptimized smooth branch"
+  },
+  "sources": [
+    {
+      "id": "compose210",
+      "url": "https://compose.obspm.fr/eos/210",
+      "state": "literature-supported",
+      "role": "official crust source and particle/construction scope"
+    },
+    {
+      "id": "compose_dd2_submission",
+      "url": "https://compose.obspm.fr/download/1D/Crust/DD2/eos.pdf",
+      "state": "literature-supported",
+      "role": "geometry versus phase labels, missing micro, stellar radius and BsK22 join",
+      "quote": "eos.micro : not available",
+      "acquired_at_reported": "2026-11-10T00:00:00Z"
+    },
+    {
+      "id": "compose217",
+      "url": "https://compose.obspm.fr/eos/217",
+      "state": "literature-supported",
+      "role": "official unified npemu core above .067fm^-3",
+      "acquired_at_reported": "2025-12-21T00:00:00Z"
+    },
+    {
+      "id": "grill2014",
+      "url": "https://arxiv.org/html/1404.2753",
+      "state": "literature-supported",
+      "role": "WS TF framework, geometry/uniform energy comparison",
+      "caveats": [
+        "DD2 is not among paper's listed sample models",
+        "original paper BPS outer crust is not current DD2 provider BsK22"
+      ]
+    },
+    {
+      "id": "avancini2009",
+      "url": "https://arxiv.org/html/0812.3170",
+      "state": "prior-evidence-reused + bibliographic-refresh",
+      "locators": [
+        "Eqs53-61"
+      ],
+      "caveat": "new Exa fetch returned bibliographic summary; exact equations not re-extracted; raw historical HTML absent"
+    },
+    {
+      "id": "avancini2010",
+      "url": "https://arxiv.org/html/1010.3644v3",
+      "state": "prior-evidence-reused + partial-primary-text-refresh",
+      "locators": [
+        "Eqs9-11"
+      ],
+      "caveat": "new extract partial; prior valid source/formula ledger reused"
+    },
+    {
+      "id": "maruyama2005",
+      "url": "https://arxiv.org/html/nucl-th/0503027",
+      "state": "prior-evidence-reused",
+      "role": "WS field boundary conditions; no new fetch"
+    },
+    {
+      "id": "scispace_warm_pasta_discovery",
+      "url": "https://scispace.com/papers/warm-pasta-phase-in-the-thomas-fermi-approximation-l6jn1qcgw2xm?utm_source=chatgpt&utm_medium=tool",
+      "state": "discovery-only",
+      "paper_id": "warm-pasta-phase-in-the-thomas-fermi-approximation-l6jn1qcgw2xm",
+      "caveat": "repository metadata2022; primary original year2010 used instead"
+    }
+  ],
+  "provider_calls": {
+    "total": 5,
+    "exa": {
+      "search": 1,
+      "fetch": 1,
+      "requested_num_results": 5,
+      "query": "Grill2014 TF framework geometry and screened electrons"
+    },
+    "scispace": {
+      "search": 1,
+      "query": "Avancini screening/rearrangement equations; limit5"
+    },
+    "parallel": {
+      "search": 1,
+      "fetch": 1,
+      "search_id": "search_31e54ab9a4f3f6acbf4188686fdc671a",
+      "extract_id": "extract_e0e2604a08f9693b6a44557891f48feb",
+      "session_id": "session_31e54ab9a4f3f6acbf4188686fdc671a"
+    },
+    "source_fetch_failures": 0,
+    "limitations": [
+      "Exa equation excerpt coverage limited",
+      "SciSpace year metadata unsuitable for original-publication attribution",
+      "Parallel cached acquired_at preserved; no claim of live byte freshness"
+    ]
+  },
+  "claims_not_admitted": [
+    "exact provider generator/code identity",
+    "seed determines local fields or cell geometry",
+    "phase7 is droplet",
+    "finite-grid stationary candidate is global minimum",
+    "interpolation alone establishes mesh convergence",
+    "this source pass verifies new production matching"
+  ],
+  "skill_context_used": [
+    {
+      "resource": "skill://plugins_6acdfbba921881919e0c17843706aef4/physmath-research-loop/SKILL.md",
+      "actually_loaded": true,
+      "excerpt": "Retrieve only the sources and prerequisite evidence needed for selected work."
+    },
+    {
+      "resource": "skill://plugins_6acdfbba921881919e0c17843706aef4/physmath-research-loop/references/POLICY_INTEGRATION.md",
+      "actually_loaded": true,
+      "excerpts": [
+        "Reuse unchanged valid work",
+        "Numerical/scientific output: justified residuals, state/operator/observable agreement, invariants, convergence and uncertainty"
+      ]
+    },
+    {
+      "resource": "c4/Search: SKILL.md; references/searching.md; references/patterns-papers.md",
+      "actually_loaded": true
+    },
+    {
+      "resource": "c5/parallel-web-search: SKILL.md",
+      "actually_loaded": true
+    },
+    {
+      "resource": "SciSpace live search tool schema",
+      "actually_loaded": true
+    }
+  ],
+  "delegation": "none; bounded source child obeys parent no-recursion instruction"
+}

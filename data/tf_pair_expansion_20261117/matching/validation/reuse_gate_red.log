@@ -1,0 +1,36 @@
+....FF                                                                   [100%]
+=================================== FAILURES ===================================
+_________________ test_reuse_output_seal_detects_changed_table _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-523/test_reuse_output_seal_detects0')
+
+    def test_reuse_output_seal_detects_changed_table(tmp_path):
+        import pytest
+        m = runner()
+        (tmp_path/'eos.thermo').write_text('original')
+        hashes={'eos.thermo':m.historical.sha(tmp_path/'eos.thermo')}
+>       m.verify_output_seal(tmp_path,hashes)
+        ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'pair_expansion' has no attribute 'verify_output_seal'
+
+python_frontend/tests/test_pair_expansion_20261117.py:52: AttributeError
+______ test_legacy_generated_label_without_method_admission_is_not_reused ______
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-523/test_legacy_generated_label_wi0')
+
+    def test_legacy_generated_label_without_method_admission_is_not_reused(tmp_path):
+        import pytest
+        m=runner()
+        record=dict(status='GENERATED_VERIFIED_FINITE_DOMAIN',admission={'status':'REJECTED'},
+                    readback={'numerical':{'status':'PASS'},'metadata':{'status':'PASS'}},
+                    serialized_native_verification={'overall':'PASS'},output_path='.',output_sha256={})
+        with pytest.raises(ValueError,match='admission'):
+>           m.verify_maxwell_output(tmp_path,record)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'pair_expansion' has no attribute 'verify_maxwell_output'
+
+python_frontend/tests/test_pair_expansion_20261117.py:64: AttributeError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_pair_expansion_20261117.py::test_reuse_output_seal_detects_changed_table
+FAILED python_frontend/tests/test_pair_expansion_20261117.py::test_legacy_generated_label_without_method_admission_is_not_reused
+2 failed, 4 passed in 0.15s

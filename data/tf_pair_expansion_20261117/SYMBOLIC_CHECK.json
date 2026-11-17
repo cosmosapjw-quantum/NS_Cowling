@@ -1,0 +1,28 @@
+{
+  "schema": "ns-cowling.symbolic-check.v1",
+  "stage": "C",
+  "context_tool": {
+    "status": "TOOL_ERROR",
+    "message": "WolframContext returned internal error -32603; no source evidence was obtained from that call."
+  },
+  "evaluator_tool": "mcp__codex_apps__wolfram_wolframlanguageevaluator",
+  "scientific_scope": "Algebraic verification of radius scaling and constrained-pressure envelope identities for the finite-range TF objective; not a native numerical solver validation.",
+  "equation_source": "docs/research_completion_20261116/TF_THEORY.md",
+  "identities": {
+    "radius": "d epsilon/d log R = -2 G_sigma + 2 G_omega + 2 G_rho + 2 E_C",
+    "stationary_radius": "G_sigma-G_omega-G_rho=E_C",
+    "pressure": "P_path = n partial_n epsilon - epsilon + n sum_a(partial_xa epsilon)(d xa/dn)",
+    "conditioned_objective": "At fixed n, d_x[(epsilon-m_n c^2 n)/n] = (d_x epsilon)/n"
+  },
+  "code": "ClearAll[r,as,aw,ar,bc,e0,n,z,w,ef,mn,q]; energyScale=e0+(as-aw-ar)/r^2+bc r^2; scaleCheck=FullSimplify[r D[energyScale,r]-(-2 as/r^2+2 aw/r^2+2 ar/r^2+2 bc r^2)]; constrainedEnergy=ef[n,z[n],w[n]]; pathPressure=n D[constrainedEnergy,n]-constrainedEnergy; stationaryPressure=n Derivative[1,0,0][ef][n,z[n],w[n]]-constrainedEnergy; residualCorrection=n (Derivative[0,1,0][ef][n,z[n],w[n]] z'[n]+Derivative[0,0,1][ef][n,z[n],w[n]] w'[n]); envelopeCheck=FullSimplify[pathPressure-stationaryPressure-residualCorrection]; conditionedCheck=FullSimplify[D[(ef[n,q]-mn n)/n,q]-Derivative[0,1][ef][n,q]/n]; virialCheck=FullSimplify[(r D[energyScale,r]/2)-(-(as/r^2-aw/r^2-ar/r^2)+bc r^2)]; <|\"radius_scaling_residual\"->scaleCheck,\"pressure_envelope_with_nonstationary_correction_residual\"->envelopeCheck,\"fixed_density_objective_gradient_residual\"->conditionedCheck,\"virial_identity_residual\"->virialCheck,\"assumptions\"->\"Real positive radius and baryon density; fixed dimensionless density profiles; meson fields stationary; electrostatic field eliminated with neutral Neumann Poisson inverse; composition/profile stationarity required before setting correction to zero\"|>",
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Out[1]= <|\"radius_scaling_residual\" -> 0, \"pressure_envelope_with_nonstationary_correction_residual\" -> 0, \"fixed_density_objective_gradient_residual\" -> 0, \"virial_identity_residual\" -> 0, \"assumptions\" -> \"Real positive radius and baryon density; fixed dimensionless density profiles; meson fields stationary; electrostatic field eliminated with neutral Neumann Poisson inverse; composition/profile stationarity required before setting correction to zero\"|>"
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

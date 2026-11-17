@@ -1,0 +1,15 @@
+{
+  "classification": "EXECUTION_ENVIRONMENT_ERROR",
+  "initial_receipt": "data/tf_pair_expansion_20261117/FRONTEND_PIPELINE_REGRESSION.json",
+  "initial_result": {
+    "passed": 1065,
+    "failed": 257,
+    "errors": 37,
+    "skipped": 28
+  },
+  "cause": "Fresh C worktree had no general EOS native executable at the path selected by the test environment. Stage-C matching used the sealed B executable; TF had its own built driver.",
+  "repair": "Run the repository CI native build command in C worktree and explicitly bind ROOT/EXE for final tests. Preserve original failed output.",
+  "native_executable_sha256": "fe92565cb3a5297fd17d4a5ea239c518c2b62287a264f0dfdd97ee25194e98c3",
+  "host_settings_or_dependencies_changed": false,
+  "source_note": "Initial failed regression also overlapped a TF output-root orchestration repair; final run binds the completed source bytes."
+}

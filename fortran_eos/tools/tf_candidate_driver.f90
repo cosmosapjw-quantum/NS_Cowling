@@ -1,0 +1,46 @@
+! Thin retained-profile adapter; field equations and optimizer stay native.
+program tf_candidate_driver
+ use compose_eos_types, only: wp
+ use compose_eos_spatial_tf
+ implicit none
+ type(tf_state_t)::s
+ type(tf_grid_t)::g
+ integer::n,d,i,maxiter,has_initial
+ character(160)::model,seed,status
+ real(wp)::nb,r,ftol
+ real(wp),allocatable::nn(:),np(:)
+ read(*,*)model,n,d,seed,nb,r,maxiter,ftol,has_initial
+ if(has_initial>0)then
+  allocate(nn(n),np(n));read(*,*)nn;read(*,*)np
+  if(has_initial==2)then
+   call make_tf_grid(n,d,g,status)
+   if(status/='ok')stop 3
+   call evaluate_screened_tf_profile(trim(model),nb,g,nn,np,r,s,status)
+   if(status=='ok')then
+    s%numerical_status='PROFILE_EVALUATED'
+    s%geometry=tf_geometry_label(s)
+    s%max_chemical_KKT_residual_MeV=max(maxval(abs(s%mu_n-s%mu_B)), &
+     maxval(abs(s%mu_p+s%mu_Q_lepton-s%mu_B)),maxval(abs(s%mu_e-s%mu_Q_lepton)))
+    s%radius_stationarity_MeV=abs(s%d_epsilon_d_log_radius/nb)
+   endif
+  else
+   call solve_spatial_tf(trim(model),nb,n,d,trim(seed),r,maxiter,ftol,s,status,initial_nn=nn,initial_np=np)
+  endif
+ else
+  call solve_spatial_tf(trim(model),nb,n,d,trim(seed),r,maxiter,ftol,s,status)
+ endif
+ print '(a)',trim(status)
+ if(status/='ok')stop 2
+ print '(a,1x,a)',trim(s%numerical_status),trim(s%geometry)
+ print '(*(es25.16e3,1x))',s%epsilon,s%pressure,s%mu_B,s%mu_Q_lepton, &
+ s%scalar_pde_residual,s%vector_pde_residual,s%electron_pde_residual, &
+ s%d_epsilon_d_log_radius,s%max_chemical_KKT_residual_MeV,s%radius_stationarity_MeV,s%Y_p,s%radius_fm, &
+ real(s%iterations,wp),real(s%evaluations,wp),real(s%optimizer_mode,wp), &
+ s%baryon_constraint_error,s%charge_constraint_error, &
+ merge(1._wp,0._wp,s%optimizer_success),merge(1._wp,0._wp,s%radius_at_search_bound), &
+ merge(1._wp,0._wp,s%density_at_search_bound),merge(1._wp,0._wp,s%muon_threshold_crossed), &
+ s%baryon_density_contrast,s%gradient_sigma,s%gradient_omega,s%gradient_rho,s%coulomb_energy
+ do i=1,n
+  print '(*(es25.16e3,1x))',s%nn(i),s%np(i),s%ne(i),s%mu_n(i),s%mu_p(i),s%mu_e(i),s%phi(i),s%omega(i),s%rho(i),s%coulomb(i)
+ enddo
+end program

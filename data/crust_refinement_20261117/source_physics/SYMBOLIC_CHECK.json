@@ -1,0 +1,28 @@
+{
+  "schema": "ns_cowling.g_source_physics.symbolic.v1",
+  "purpose": "Conditional envelope pressure and quadratic versus finite-asymmetry symmetry energy",
+  "input": "Clear[n, d, q, r, e, e0, s2, s4, s6]; a = e[n, q[n], r[n]]; chainRemainder = Expand[n^2 D[a/n, n] - (n Derivative[1,0,0][e][n,q[n],r[n]] - a)]; stationaryRemainder = Simplify[chainRemainder /. {Derivative[0,1,0][e][n,q[n],r[n]] -> 0, Derivative[0,0,1][e][n,q[n],r[n]] -> 0}]; b = e0[n] + s2[n] d^2 + s4[n] d^4 + s6[n] d^6; {chainRemainder, stationaryRemainder, Simplify[D[b,{d,2}]/2 /. d->0], Simplify[(b /. d->1)-(b /. d->0)]}",
+  "evaluator_result": {
+    "status": "fulfilled",
+    "value": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Out[1]= {n*Derivative[1][r][n]*Derivative[0, 0, 1][e][n, q[n], r[n]] + n*Derivative[1][q][n]*Derivative[0, 1, 0][e][n, q[n], r[n]], 0, s2[n], s2[n] + s4[n] + s6[n]}"
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    }
+  },
+  "prior_wolfram_context": {
+    "content": [
+      {
+        "type": "text",
+        "text": "tool call error: tool call failed for `codex_apps/wolfram.WolframContext`\n\nCaused by:\n    Mcp error: -32603: Internal error"
+      }
+    ],
+    "isError": true
+  },
+  "interpretation": "Exact algebra only; does not certify numerical TF stationarity, muon absence, source functional identity, or a Maxwell crossing."
+}

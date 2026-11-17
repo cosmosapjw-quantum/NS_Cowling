@@ -1,0 +1,23 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_exported_tf_transport_has_no_invented_abundance_masks __________
+
+drivers = (PosixPath('/tmp/pytest-of-cosmosapjw/pytest-594/tf_candidate0/tf_build/tf_candidate_driver'), PosixPath('/tmp/pytest-...t-594/tf_candidate0/bulk_build/rmf_candidate_driver'), PosixPath('/tmp/pytest-of-cosmosapjw/pytest-594/tf_candidate0'))
+
+    def test_exported_tf_transport_has_no_invented_abundance_masks(drivers):
+        from compose_eos.api import diagnose_maxwell_phase
+        tf, _, where = drivers
+        rows=[tf_candidate.run_state(tf,"DDME2",n,16,3,"uniform",40.,
+              work_dir=where/f"transport_{i}") for i,n in enumerate([.008,.01,.012])]
+        data,_=tf_candidate.export_compose(where/"transport_export",rows,mn=939.,mp=939.,model="DDME2")
+        assert not np.any(data.Yn_present)
+        assert not np.any(data.Yp_present)
+        assert not np.any(data.C3_applicable)
+        diagnostic=diagnose_maxwell_phase(data)
+>       assert diagnostic["global_validation_category"] != "COMPOSITION_UNSUPPORTED"
+E       AssertionError: assert 'COMPOSITION_UNSUPPORTED' != 'COMPOSITION_UNSUPPORTED'
+
+python_frontend/tests/test_tf_candidate.py:55: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_tf_candidate.py::test_exported_tf_transport_has_no_invented_abundance_masks
+1 failed, 4 deselected in 8.85s

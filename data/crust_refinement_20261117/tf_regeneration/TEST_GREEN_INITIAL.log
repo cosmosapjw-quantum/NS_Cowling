@@ -1,0 +1,67 @@
+FFF.                                                                     [100%]
+=================================== FAILURES ===================================
+_ test_new_registry_uniform_limit_matches_frozen_parameter_driver[TM1_CANONICAL] _
+
+drivers = (PosixPath('/tmp/pytest-of-cosmosapjw/pytest-592/tf_candidate0/tf_build/tf_candidate_driver'), PosixPath('/tmp/pytest-...t-592/tf_candidate0/bulk_build/rmf_candidate_driver'), PosixPath('/tmp/pytest-of-cosmosapjw/pytest-592/tf_candidate0'))
+model = 'TM1_CANONICAL'
+
+    @pytest.mark.parametrize("model", ["TM1_CANONICAL", "DDMEX_ORIGINAL_TABLE_RHO0", "NL3_PROVIDER_PRECISION"])
+    def test_new_registry_uniform_limit_matches_frozen_parameter_driver(drivers, model):
+        tf, bulk, where = drivers
+        params = rmf_candidate.load_parameters(SOURCE, model)
+        states = rmf_candidate.evaluate_states(bulk, params, [0.04], work_dir=where / (model+"_bulk"))
+        s = tf_candidate.run_state(tf, model, 0.04, 16, 3, "uniform", 30.,
+                                   work_dir=where / (model+"_tf"))
+        assert s["accepted_stationary"], s
+>       assert s["geometry"] == "near_uniform_profile"
+E       AssertionError: assert 'droplet' == 'near_uniform_profile'
+E         
+E         - near_uniform_profile
+E         + droplet
+
+python_frontend/tests/test_tf_candidate.py:26: AssertionError
+_ test_new_registry_uniform_limit_matches_frozen_parameter_driver[DDMEX_ORIGINAL_TABLE_RHO0] _
+
+drivers = (PosixPath('/tmp/pytest-of-cosmosapjw/pytest-592/tf_candidate0/tf_build/tf_candidate_driver'), PosixPath('/tmp/pytest-...t-592/tf_candidate0/bulk_build/rmf_candidate_driver'), PosixPath('/tmp/pytest-of-cosmosapjw/pytest-592/tf_candidate0'))
+model = 'DDMEX_ORIGINAL_TABLE_RHO0'
+
+    @pytest.mark.parametrize("model", ["TM1_CANONICAL", "DDMEX_ORIGINAL_TABLE_RHO0", "NL3_PROVIDER_PRECISION"])
+    def test_new_registry_uniform_limit_matches_frozen_parameter_driver(drivers, model):
+        tf, bulk, where = drivers
+        params = rmf_candidate.load_parameters(SOURCE, model)
+        states = rmf_candidate.evaluate_states(bulk, params, [0.04], work_dir=where / (model+"_bulk"))
+        s = tf_candidate.run_state(tf, model, 0.04, 16, 3, "uniform", 30.,
+                                   work_dir=where / (model+"_tf"))
+        assert s["accepted_stationary"], s
+>       assert s["geometry"] == "near_uniform_profile"
+E       AssertionError: assert 'uniform' == 'near_uniform_profile'
+E         
+E         - near_uniform_profile
+E         + uniform
+
+python_frontend/tests/test_tf_candidate.py:26: AssertionError
+_ test_new_registry_uniform_limit_matches_frozen_parameter_driver[NL3_PROVIDER_PRECISION] _
+
+drivers = (PosixPath('/tmp/pytest-of-cosmosapjw/pytest-592/tf_candidate0/tf_build/tf_candidate_driver'), PosixPath('/tmp/pytest-...t-592/tf_candidate0/bulk_build/rmf_candidate_driver'), PosixPath('/tmp/pytest-of-cosmosapjw/pytest-592/tf_candidate0'))
+model = 'NL3_PROVIDER_PRECISION'
+
+    @pytest.mark.parametrize("model", ["TM1_CANONICAL", "DDMEX_ORIGINAL_TABLE_RHO0", "NL3_PROVIDER_PRECISION"])
+    def test_new_registry_uniform_limit_matches_frozen_parameter_driver(drivers, model):
+        tf, bulk, where = drivers
+        params = rmf_candidate.load_parameters(SOURCE, model)
+        states = rmf_candidate.evaluate_states(bulk, params, [0.04], work_dir=where / (model+"_bulk"))
+        s = tf_candidate.run_state(tf, model, 0.04, 16, 3, "uniform", 30.,
+                                   work_dir=where / (model+"_tf"))
+        assert s["accepted_stationary"], s
+>       assert s["geometry"] == "near_uniform_profile"
+E       AssertionError: assert 'uniform' == 'near_uniform_profile'
+E         
+E         - near_uniform_profile
+E         + uniform
+
+python_frontend/tests/test_tf_candidate.py:26: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_tf_candidate.py::test_new_registry_uniform_limit_matches_frozen_parameter_driver[TM1_CANONICAL]
+FAILED python_frontend/tests/test_tf_candidate.py::test_new_registry_uniform_limit_matches_frozen_parameter_driver[DDMEX_ORIGINAL_TABLE_RHO0]
+FAILED python_frontend/tests/test_tf_candidate.py::test_new_registry_uniform_limit_matches_frozen_parameter_driver[NL3_PROVIDER_PRECISION]
+3 failed, 1 passed in 7.19s

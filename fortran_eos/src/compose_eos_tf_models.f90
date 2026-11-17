@@ -58,6 +58,22 @@ contains
  case('NL3wrL55')
   p%ms=508.194_wp;p%mw=782.501_wp;p%mr=763;p%gs=10.217_wp;p%gw=12.868_wp;p%gr=11.2766_wp
   p%a3=4.384_wp*939/2;p%a4=-173.31_wp/6;p%cross=.03_wp*p%gw**2*p%gr**2
+ case('TM1_CANONICAL')
+  ! Frozen F canonical TM1; distinct from the existing TM1e rho interaction.
+  p%mn=938;p%mp=938;p%ms=511.198_wp;p%mw=783;p%mr=770
+  p%gs=10.0289_wp;p%gw=12.6139_wp;p%gr=9.2644_wp
+  p%a3=7.2325_wp*tf_hbarc;p%a4=.6183_wp;p%b4=71.3075_wp
+ case('NL3_PROVIDER_PRECISION')
+  ! Frozen F provider-precision NL3; not the existing NL3wrL55 model.
+  p%mn=939;p%mp=939;p%ms=508.1941_wp;p%mw=782.501_wp;p%mr=763
+  p%gs=10.2169_wp;p%gw=12.8675_wp;p%gr=8.9488_wp
+  p%a3=10.4307_wp*tf_hbarc;p%a4=-28.8851_wp
+ case('DDMEX_ORIGINAL_TABLE_RHO0')
+  ! Frozen F current-provider-supported vector; original supplemental NMP unresolved.
+  p%mn=938.5_wp;p%mp=938.5_wp;p%n0=.151832_wp;p%ms=547.332728_wp;p%mw=783;p%mr=763
+  p%gs=10.706722_wp;p%gw=13.338846_wp;p%gr=7.23804_wp
+  p%sa=1.397043_wp;p%sb=1.334964_wp;p%sc=2.067122_wp;p%sd=.401565_wp
+  p%wa=1.393601_wp;p%wb=1.019082_wp;p%wc=1.605966_wp;p%wd=.455586_wp;p%ra=.62022_wp
  case('TM1e')
   p%mn=938;p%mp=938;p%ms=511.198_wp;p%mw=783;p%mr=770
   p%gs=10.0289_wp;p%gw=12.6139_wp;p%gr=13.9714_wp

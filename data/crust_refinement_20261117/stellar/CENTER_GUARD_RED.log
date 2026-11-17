@@ -1,0 +1,14 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_center_taylor_start_must_not_swallow_a_sharp_interface __________
+
+    def test_center_taylor_start_must_not_swallow_a_sharp_interface():
+        eos=SharpContractEnthalpyEOS(WholeCrustBarotrope.from_contract(contract()))
+>       with pytest.raises(ValueError,match="smaller r0"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_stellar_sharp.py:97: Failed
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_stellar_sharp.py::test_center_taylor_start_must_not_swallow_a_sharp_interface
+1 failed, 6 deselected in 0.46s

@@ -1,0 +1,45 @@
+....F                                                                    [100%]
+=================================== FAILURES ===================================
+__________ test_exported_tf_transport_has_no_invented_abundance_masks __________
+
+drivers = (PosixPath('/tmp/pytest-of-cosmosapjw/pytest-595/tf_candidate0/tf_build/tf_candidate_driver'), PosixPath('/tmp/pytest-...t-595/tf_candidate0/bulk_build/rmf_candidate_driver'), PosixPath('/tmp/pytest-of-cosmosapjw/pytest-595/tf_candidate0'))
+
+    def test_exported_tf_transport_has_no_invented_abundance_masks(drivers):
+        from compose_eos.api import diagnose_maxwell_phase
+        tf, _, where = drivers
+        rows=[tf_candidate.run_state(tf,"DDME2",n,16,3,"uniform",40.,
+              work_dir=where/f"transport_{i}") for i,n in enumerate([.008,.01,.012])]
+>       data,_=tf_candidate.export_compose(where/"transport_export",rows,mn=939.,mp=939.,model="DDME2")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_tf_candidate.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/tf_candidate.py:138: in export_compose
+    write_compose(directory/"compose",data); back=read_compose(directory/"compose")
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+directory = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-595/tf_candidate0/transport_export/compose')
+data = EOSData(nb=array([0.008, 0.01 , 0.012]), mn=939.0, mp=939.0, Q1=array([1.25440882, 1.36287274, 1.46415739]), Q2=array(..., yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64))
+copy_from = None, composition_tolerance = 0.002
+
+    def write_compose(directory: str | Path, data: EOSData, copy_from: str | Path | None = None, *,
+                      composition_tolerance: float = 2e-3) -> None:
+        """Write a complete CompOSE table using the Fortran backend."""
+        if data.nT > 1 or data.nYq > 1:
+            raise NativeFeatureUnavailable(
+                "multidimensional CompOSE writer is not implemented; refusing lossy serialization"
+            )
+        if data.composition_available and not data.composition_file_present:
+            raise NativeFeatureUnavailable("composition values cannot be exported without an eos.compo sidecar")
+        if any(int(value) != 0 for value in data.Iphase) and not data.composition_file_present:
+>           raise NativeFeatureUnavailable(
+                "cannot export a phase-discontinuous barotrope without phase composition; "
+                "non-default Iphase labels require an eos.compo sidecar"
+            )
+E           compose_eos.native.NativeFeatureUnavailable: cannot export a phase-discontinuous barotrope without phase composition; non-default Iphase labels require an eos.compo sidecar
+
+python_frontend/compose_eos/api.py:31: NativeFeatureUnavailable
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_tf_candidate.py::test_exported_tf_transport_has_no_invented_abundance_masks
+1 failed, 4 passed in 8.54s

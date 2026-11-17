@@ -1,0 +1,133 @@
+{
+  "schema": "ns_cowling.G_support_regeneration_plan.v1",
+  "created_at_utc": "2026-11-17T13:17:14.215737+00:00",
+  "configurations": [
+    {
+      "id": "GPPVA_NL3wrL55",
+      "model": "GPPVA_NL3wrL55",
+      "core_id": "new_native:PK1_CANONICAL:fine",
+      "bounds": [
+        0.01,
+        0.015
+      ],
+      "step": 0.00025,
+      "extra_density": [
+        0.01201,
+        0.01202,
+        0.01204,
+        0.01208
+      ],
+      "mn": 939.0,
+      "mp": 939.0,
+      "anchors": [
+        {
+          "name": "upper_F_component",
+          "kind": "native",
+          "node": 11
+        },
+        {
+          "name": "lower_adjacent_branch",
+          "kind": "native",
+          "node": 10
+        }
+      ]
+    },
+    {
+      "id": "GPPVA_TM1e",
+      "model": "GPPVA_TM1e",
+      "core_id": "new_native:PK1_CANONICAL:fine",
+      "bounds": [
+        0.006,
+        0.012
+      ],
+      "step": 0.00025,
+      "mn": 938.0,
+      "mp": 938.0,
+      "anchors": [
+        {
+          "name": "upper_F_component",
+          "kind": "native",
+          "node": 7
+        },
+        {
+          "name": "lower_adjacent_branch",
+          "kind": "native",
+          "node": 6
+        }
+      ]
+    },
+    {
+      "id": "NL3_PROVIDER_PRECISION",
+      "model": "NL3_PROVIDER_PRECISION",
+      "core_id": "native_generated:GM_GM1",
+      "bounds": [
+        0.026,
+        0.038
+      ],
+      "step": 0.0005,
+      "mn": 939.0,
+      "mp": 939.0,
+      "anchors": [
+        {
+          "name": "provider_radius_seed",
+          "kind": "public",
+          "source_model": "XMLSLZ_NL3",
+          "density": 0.03
+        }
+      ]
+    },
+    {
+      "id": "DDMEX_ORIGINAL_TABLE_RHO0",
+      "model": "DDMEX_ORIGINAL_TABLE_RHO0",
+      "core_id": "native_generated:GM_GM1",
+      "bounds": [
+        0.005,
+        0.012
+      ],
+      "step": 0.00025,
+      "mn": 938.5,
+      "mp": 938.5,
+      "anchors": [
+        {
+          "name": "provider_radius_seed",
+          "kind": "public",
+          "source_model": "XMLSLZ_DDME-X",
+          "density": 0.008
+        }
+      ]
+    }
+  ],
+  "meshes": [
+    16,
+    32,
+    64
+  ],
+  "source_sha256": {
+    "scripts/repair_maxwell_support_20261117.py": "b47a18d1f114e0c29d7bd8be74f45511e991c7184c4b26a751a05ada6302d7d8",
+    "python_frontend/compose_eos/tf_candidate.py": "61ad299bfeab5ee5588758b6367f7b69e3911317257dcecea23665f08a3c4c18",
+    "fortran_eos/src/compose_eos_tf_models.f90": "6f226cf27ae6902f1eec57c2c2e9ef8385024b3e0190e0403437466150dacf7b",
+    "fortran_eos/tools/tf_candidate_driver.f90": "3a11492a13b89df053776ff6078ce1ce80a0c59d955817afcc184017a1d2e586"
+  },
+  "executable_sha256": "21f00ecd9cd492e37329e5690d342842c19025d4b649f97f99e84e592522c189",
+  "branch_policy": "Frozen source anchors and full predetermined density windows; no partner-based trimming. All accepted contiguous runs are diagnosed afterwards.",
+  "repair_policy": "At most one optimizer reset using its returned finite profile for mode8/9, with unchanged ftol1e-14 and native acceptance.",
+  "public_sources": "Original public tables remain unchanged; their native counterparts are explicitly relabelled as regenerated sources.",
+  "prospective_reproduction": {
+    "status": "PROSPECTIVE_NOT_EXECUTED",
+    "created_at_utc": "2026-11-17T13:29:43.115293+00:00",
+    "original_production_plan_path": "data/crust_refinement_20261117/support_repair/PLAN.json",
+    "original_production_plan_sha256": "0eef613ca56cefc9015c4c3d4fa2015b0720893b475f30a01e11e9b88d1cdca0",
+    "transport_repair_path": "data/crust_refinement_20261117/support_repair/TRANSPORT_REPAIR.json",
+    "transport_repair_sha256": "937a483f7f4ae1324765455e8c450608c41b33e01004cdb2b89f65d8fcb56857",
+    "only_non_provenance_change": "source_sha256.python_frontend/compose_eos/tf_candidate.py",
+    "previous_API_sha256": "9e056c9f68cada2f0561134960240b8c84f61c408b7468632cd5bfa37425c36c",
+    "final_API_sha256": "61ad299bfeab5ee5588758b6367f7b69e3911317257dcecea23665f08a3c4c18",
+    "unchanged_physical_functions_AST": [
+      "run_state",
+      "interpolate_initial",
+      "build_driver"
+    ],
+    "configurations_meshes_gates_and_Fortran_identity_unchanged": true,
+    "execution_evidence": "None. This plan declares a future reproduction using the final transport API, not the historical production identity."
+  }
+}

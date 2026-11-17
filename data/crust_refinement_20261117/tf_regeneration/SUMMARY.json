@@ -1,0 +1,821 @@
+{
+  "schema": "ns_cowling.tf_crust_regeneration.G.v1",
+  "base_F_commit": "d89d877d50b6ae3ad4d5cdea29d5ff67e3a7d09a",
+  "status": "COMPLETED_FINITE_BRANCH_COMPUTATIONS",
+  "units": {
+    "density": "fm^-3",
+    "energy_density_and_pressure": "MeV fm^-3",
+    "chemical_potential": "MeV",
+    "radius": "fm"
+  },
+  "source_sha256": {
+    "fortran_eos/tools/tf_candidate_driver.f90": "3a11492a13b89df053776ff6078ce1ce80a0c59d955817afcc184017a1d2e586",
+    "fortran_eos/src/compose_eos_tf_models.f90": "6f226cf27ae6902f1eec57c2c2e9ef8385024b3e0190e0403437466150dacf7b",
+    "fortran_eos/src/compose_eos_spatial_tf.f90": "32f89d3597c5d5a966e5ec6f17e6455f8666dd79910c5e5ad3d241f3701f3711",
+    "python_frontend/compose_eos/tf_candidate.py": "61ad299bfeab5ee5588758b6367f7b69e3911317257dcecea23665f08a3c4c18",
+    "python_frontend/tests/test_tf_candidate.py": "95d519dd0f21d89b2c51058e08f0d6f8ee18a841bf962a300f629dfecf9bc79b",
+    "scripts/run_crust_refinement_20261117.py": "44335cc36dde8e493866ee1a8bfe0b11c7cf8b70ee4e7b8764089bc5cf3fe716",
+    "scripts/check_tf_selected_anchor_20261117.py": "48f08cb98306b2f291feb85402242e0c8918072373f13e453ee1fcaac699243f",
+    "data/new_model_maxwell_20261117/sources/PARAMETER_INPUTS.json": "f76284c2d291719767209a9530480cd82fd4f0f527eee7538d5706863ed04451"
+  },
+  "physical_functional_changed": false,
+  "added_model_cases": [
+    "TM1_CANONICAL",
+    "NL3_PROVIDER_PRECISION",
+    "DDMEX_ORIGINAL_TABLE_RHO0"
+  ],
+  "actual_native_invocations": 102,
+  "requested_states": 77,
+  "requested_grid_states": 63,
+  "accepted_grid_states": 62,
+  "requested_auxiliary_controls": 14,
+  "accepted_auxiliary_controls": 14,
+  "accepted_native_states": 76,
+  "native_status_counts": {
+    "REQUIRES_REFINEMENT": 26,
+    "STATIONARY": 76
+  },
+  "native_state_manifest_sha256": "6d81208fa5579223e138645df1ae46952a12b709b637dcd3a78dad8116e2daa6",
+  "independently_verified_mesh_variants": 7,
+  "pair_types": 2,
+  "mesh_results": [
+    {
+      "model": "DDME2",
+      "points": 16,
+      "requested_grid_states": 9,
+      "accepted_requested_states": 9,
+      "source_summary": "data/crust_refinement_20261117/tf_regeneration/tables_v2/DDME2/N016/SUMMARY.json",
+      "source_summary_sha256": "ee1d4694a2e66fa8ed74fd145cc13f88b6ff422890071ab6dc461771b3f848da",
+      "anchor": {
+        "n_b": 0.01,
+        "epsilon": 9.417017504690525,
+        "pressure": 0.013998089876938735,
+        "mu_B": 943.1015594567464,
+        "mu_e": 42.35306166654602,
+        "radius": 30.51944905761755,
+        "kkt": 6.896061336192361e-06,
+        "radius_stationarity": 5.5174986541423054e-08
+      },
+      "components": [
+        {
+          "start": 0,
+          "stop": 3,
+          "phase_id": 1,
+          "density": [
+            0.006,
+            0.008
+          ],
+          "mu_E": [
+            942.2635248634414,
+            942.777181405927
+          ]
+        },
+        {
+          "start": 3,
+          "stop": 9,
+          "phase_id": 1,
+          "density": [
+            0.009000000000000001,
+            0.014
+          ],
+          "mu_E": [
+            942.9029121864384,
+            943.858719227056
+          ]
+        }
+      ],
+      "matches": [
+        {
+          "status": "REJECTED",
+          "error": "v2: native boundary-segment construction rejected: Fortran operation 'maxwell-transition' failed with exit code 3: the two phases have no overlapping baryon-chemical-potential interval"
+        },
+        {
+          "status": "GENERATED_VERIFIED_FINITE_DOMAIN",
+          "error": null,
+          "mu_transition": 943.1103353147776,
+          "pressure_transition": 0.01408604060069598,
+          "n_low": 0.01004379864748567,
+          "n_high": 0.017156729033675384,
+          "epsilon_low": 9.458324269663624,
+          "epsilon_high": 16.166602431253676,
+          "density_jump": 0.007112930386189714,
+          "latent_energy_density": 6.7082781615900515,
+          "low_phase_rows": 3,
+          "high_phase_rows": 762,
+          "maxwell_identity_residual": 0.0,
+          "compose_path": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/tables_v2/DDME2/N016/block_00/match_01_00/compose",
+          "table_sha256": {
+            "eos.compo": "fb40ccd568fecb11638a499cbde995f41ccb41052c9119aa65a556940c03412d",
+            "eos.nb": "cf735b79de9e40a3d69d6a9a5044383e0a8281900ba6bf1b188d3d4b1d47934d",
+            "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+            "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+            "eos.thermo": "1c6878a83a64b53f130f30e0c83ee1ffec25672055502f3e7476fe73bc02b161"
+          },
+          "independent_admission": "ADMITTED",
+          "readback": "PASS",
+          "metadata": "PASS",
+          "native_serialized_consistency": "PASS"
+        }
+      ]
+    },
+    {
+      "model": "DDME2",
+      "points": 32,
+      "requested_grid_states": 9,
+      "accepted_requested_states": 9,
+      "source_summary": "data/crust_refinement_20261117/tf_regeneration/tables_v2/DDME2/N032/SUMMARY.json",
+      "source_summary_sha256": "a22b5555603cbb7ae431bb9aecd7753cf51e5628188c5c3f80e9c7dcb6aa7d18",
+      "anchor": {
+        "n_b": 0.01,
+        "epsilon": 9.417035023853192,
+        "pressure": 0.014627914676585974,
+        "mu_B": 943.1662938529778,
+        "mu_e": 39.78758751700439,
+        "radius": 33.11796641335511,
+        "kkt": 1.5111451034499623e-05,
+        "radius_stationarity": 3.980007716626599e-08
+      },
+      "components": [
+        {
+          "start": 0,
+          "stop": 9,
+          "phase_id": 1,
+          "density": [
+            0.006,
+            0.014
+          ],
+          "mu_E": [
+            942.2795955052065,
+            943.8789262268066
+          ]
+        }
+      ],
+      "matches": [
+        {
+          "status": "GENERATED_VERIFIED_FINITE_DOMAIN",
+          "error": null,
+          "mu_transition": 943.1089766432035,
+          "pressure_transition": 0.014062743373131579,
+          "n_low": 0.009721607507246344,
+          "n_high": 0.017137395486765978,
+          "epsilon_low": 9.154472564112853,
+          "epsilon_high": 16.148368776480584,
+          "density_jump": 0.007415787979519634,
+          "latent_energy_density": 6.993896212367732,
+          "low_phase_rows": 5,
+          "high_phase_rows": 762,
+          "maxwell_identity_residual": 0.0,
+          "compose_path": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/tables_v2/DDME2/N032/block_00/match_00_00/compose",
+          "table_sha256": {
+            "eos.compo": "14fe3bf7835f62e32e1777364cd7f929b2491c4baebfc4ab5912a03cf6c69fde",
+            "eos.nb": "f8029ddece82f807218ba503758b115953243b60048dae118e812281d24d973e",
+            "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+            "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+            "eos.thermo": "1abf244bb0a178c66cda3443c6889a14286b51877cc93511da96dde5ad806293"
+          },
+          "independent_admission": "ADMITTED",
+          "readback": "PASS",
+          "metadata": "PASS",
+          "native_serialized_consistency": "PASS"
+        }
+      ]
+    },
+    {
+      "model": "DDME2",
+      "points": 64,
+      "requested_grid_states": 9,
+      "accepted_requested_states": 8,
+      "source_summary": "data/crust_refinement_20261117/tf_regeneration/tables_v2/DDME2/N064/SUMMARY.json",
+      "source_summary_sha256": "33e7b637198e42032d519f83f0163ac22bec4971d3c77a4e7b953db38207ebf7",
+      "anchor": {
+        "n_b": 0.01,
+        "epsilon": 9.417049775242358,
+        "pressure": 0.014472607152754335,
+        "mu_B": 943.1522382395111,
+        "mu_e": 40.304481996294285,
+        "radius": 32.410415687065424,
+        "kkt": 3.8382052025554e-05,
+        "radius_stationarity": 6.761466907201363e-08
+      },
+      "components": [
+        {
+          "start": 0,
+          "stop": 7,
+          "phase_id": 1,
+          "density": [
+            0.008,
+            0.014
+          ],
+          "mu_E": [
+            942.7391746982739,
+            943.8712436812007
+          ]
+        }
+      ],
+      "matches": [
+        {
+          "status": "GENERATED_VERIFIED_FINITE_DOMAIN",
+          "error": null,
+          "mu_transition": 943.1065095149688,
+          "pressure_transition": 0.014020506557422187,
+          "n_low": 0.009773412476684373,
+          "n_high": 0.017102257625049758,
+          "epsilon_low": 9.203348420378424,
+          "epsilon_high": 16.115229987029014,
+          "density_jump": 0.007328845148365385,
+          "latent_energy_density": 6.911881566650591,
+          "low_phase_rows": 3,
+          "high_phase_rows": 762,
+          "maxwell_identity_residual": 1.2850023703900428e-16,
+          "compose_path": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/tables_v2/DDME2/N064/block_00/match_00_00/compose",
+          "table_sha256": {
+            "eos.compo": "fb40ccd568fecb11638a499cbde995f41ccb41052c9119aa65a556940c03412d",
+            "eos.nb": "5fe37cf39ba46d9d58b63f266bde62ca81be68195bfc5dc21c89ce44096373d0",
+            "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+            "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+            "eos.thermo": "2309a8df42e6a025f65519c733d5923f6ad2a768283e5fec094620adefa793e0"
+          },
+          "independent_admission": "ADMITTED",
+          "readback": "PASS",
+          "metadata": "PASS",
+          "native_serialized_consistency": "PASS"
+        }
+      ]
+    },
+    {
+      "model": "DDME2",
+      "points": 128,
+      "requested_grid_states": 9,
+      "accepted_requested_states": 9,
+      "source_summary": "data/crust_refinement_20261117/tf_regeneration/tables_v2/DDME2/N128/SUMMARY.json",
+      "source_summary_sha256": "f53982848b2fb66402adf9939bff993cf58106bc50bd0b1c7edcaabbb599935c",
+      "anchor": {
+        "n_b": 0.01,
+        "epsilon": 9.417054157788373,
+        "pressure": 0.014445908693671683,
+        "mu_B": 943.1500066482045,
+        "mu_e": 40.38083447085852,
+        "radius": 32.31410479069013,
+        "kkt": 5.0395005018799566e-05,
+        "radius_stationarity": 9.489615469294999e-08
+      },
+      "components": [
+        {
+          "start": 0,
+          "stop": 9,
+          "phase_id": 1,
+          "density": [
+            0.006,
+            0.014
+          ],
+          "mu_E": [
+            942.2544534730021,
+            943.8721562128588
+          ]
+        }
+      ],
+      "matches": [
+        {
+          "status": "GENERATED_VERIFIED_FINITE_DOMAIN",
+          "error": null,
+          "mu_transition": 943.1058672809809,
+          "pressure_transition": 0.014009525845495105,
+          "n_low": 0.00977355894875663,
+          "n_high": 0.017093104048714065,
+          "epsilon_low": 9.20349126294342,
+          "epsilon_high": 16.10659719254103,
+          "density_jump": 0.007319545099957435,
+          "latent_energy_density": 6.903105929597611,
+          "low_phase_rows": 5,
+          "high_phase_rows": 762,
+          "maxwell_identity_residual": 1.2866359414998837e-16,
+          "compose_path": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/tables_v2/DDME2/N128/block_00/match_00_00/compose",
+          "table_sha256": {
+            "eos.compo": "14fe3bf7835f62e32e1777364cd7f929b2491c4baebfc4ab5912a03cf6c69fde",
+            "eos.nb": "0eb064dd8de3a3ffa73947a06acd8de9cb33d4fce3f7c3333e933edc681cb2b2",
+            "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+            "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+            "eos.thermo": "153fcdb76c64558751afece35555051bb595ac2b7b4923788c4a6e27312e8660"
+          },
+          "independent_admission": "ADMITTED",
+          "readback": "PASS",
+          "metadata": "PASS",
+          "native_serialized_consistency": "PASS"
+        }
+      ]
+    },
+    {
+      "model": "TM1_CANONICAL",
+      "points": 16,
+      "requested_grid_states": 9,
+      "accepted_requested_states": 9,
+      "source_summary": "data/crust_refinement_20261117/tf_regeneration/tables_v2/TM1_CANONICAL/N016/SUMMARY.json",
+      "source_summary_sha256": "a8eae8b26d9e9477b11cd67fb1661055de1ee5c9d437bc34d402e31812e67ad6",
+      "anchor": {
+        "n_b": 0.044,
+        "epsilon": 41.45824546532346,
+        "pressure": 0.13271452950697693,
+        "mu_B": 945.2490907916008,
+        "mu_e": 53.65077676742409,
+        "radius": 18.548149773731932,
+        "kkt": 6.9061920839885715e-06,
+        "radius_stationarity": 1.0605663187157358e-10
+      },
+      "components": [
+        {
+          "start": 0,
+          "stop": 9,
+          "phase_id": 1,
+          "density": [
+            0.036,
+            0.052
+          ],
+          "mu_E": [
+            943.8302091880236,
+            946.9716182868866
+          ]
+        }
+      ],
+      "matches": [
+        {
+          "status": "GENERATED_VERIFIED_FINITE_DOMAIN",
+          "error": null,
+          "mu_transition": 945.2525552316283,
+          "pressure_transition": 0.13286699537240118,
+          "n_low": 0.04401760900012486,
+          "n_high": 0.053523285393089155,
+          "epsilon_low": 41.47489038718234,
+          "epsilon_high": 50.46015528683681,
+          "density_jump": 0.009505676392964298,
+          "latent_energy_density": 8.985264899654467,
+          "low_phase_rows": 6,
+          "high_phase_rows": 289,
+          "maxwell_identity_residual": 3.95393315442166e-16,
+          "compose_path": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/tables_v2/TM1_CANONICAL/N016/block_00/match_00_00/compose",
+          "table_sha256": {
+            "eos.compo": "dd9283dbfea88850ce6206eadf0800c29496bdbd09bab6cd8ab5f777a1eff7f0",
+            "eos.nb": "33d6cb99d8cb890220bdbba4ab63f36803ef061fe7f778d0e86ec91814e2c1c7",
+            "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+            "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+            "eos.thermo": "88018a4ce5117b2edbb301eb80076ab63af6287e16564c01c828a91d7bca4925"
+          },
+          "independent_admission": "ADMITTED",
+          "readback": "PASS",
+          "metadata": "PASS",
+          "native_serialized_consistency": "PASS"
+        }
+      ]
+    },
+    {
+      "model": "TM1_CANONICAL",
+      "points": 32,
+      "requested_grid_states": 9,
+      "accepted_requested_states": 9,
+      "source_summary": "data/crust_refinement_20261117/tf_regeneration/tables_v2/TM1_CANONICAL/N032/SUMMARY.json",
+      "source_summary_sha256": "9cd8adebe8cddc8f8ce8ab65f5e6a96daf813d427fc1a565d43c001aa0b5219c",
+      "anchor": {
+        "n_b": 0.044,
+        "epsilon": 41.45826308052885,
+        "pressure": 0.13252574260936,
+        "mu_B": 945.2452005258685,
+        "mu_e": 53.66854449952414,
+        "radius": 18.498623576132132,
+        "kkt": 0.0005573015179152208,
+        "radius_stationarity": 1.7427526977954744e-09
+      },
+      "components": [
+        {
+          "start": 0,
+          "stop": 9,
+          "phase_id": 1,
+          "density": [
+            0.036,
+            0.052
+          ],
+          "mu_E": [
+            943.8303957386818,
+            946.9702469884007
+          ]
+        }
+      ],
+      "matches": [
+        {
+          "status": "GENERATED_VERIFIED_FINITE_DOMAIN",
+          "error": null,
+          "mu_transition": 945.2507092612598,
+          "pressure_transition": 0.13276820365161546,
+          "n_low": 0.04402783884198316,
+          "n_high": 0.05351171506377553,
+          "epsilon_low": 41.48457768897341,
+          "epsilon_high": 50.44921841416864,
+          "density_jump": 0.009483876221792364,
+          "latent_energy_density": 8.964640725195231,
+          "low_phase_rows": 6,
+          "high_phase_rows": 289,
+          "maxwell_identity_residual": 1.9815148134244555e-16,
+          "compose_path": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/tables_v2/TM1_CANONICAL/N032/block_00/match_00_00/compose",
+          "table_sha256": {
+            "eos.compo": "dd9283dbfea88850ce6206eadf0800c29496bdbd09bab6cd8ab5f777a1eff7f0",
+            "eos.nb": "cbf03e8259dc8b970ea50c6532635f19d21a0d7f1f016f99044f4e89a3c661fa",
+            "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+            "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+            "eos.thermo": "fd89a475687e7de1f16a666e8c2111c0e51ee44e9c4374b4107ea2be20359d43"
+          },
+          "independent_admission": "ADMITTED",
+          "readback": "PASS",
+          "metadata": "PASS",
+          "native_serialized_consistency": "PASS"
+        }
+      ]
+    },
+    {
+      "model": "TM1_CANONICAL",
+      "points": 64,
+      "requested_grid_states": 9,
+      "accepted_requested_states": 9,
+      "source_summary": "data/crust_refinement_20261117/tf_regeneration/tables_v2/TM1_CANONICAL/N064/SUMMARY.json",
+      "source_summary_sha256": "e2a65f02767f653fa46cf907c35b08fe8ec64df3e3b885362f61275af5c8cbcc",
+      "anchor": {
+        "n_b": 0.044,
+        "epsilon": 41.458267031868814,
+        "pressure": 0.13251597314983599,
+        "mu_B": 945.2450682958785,
+        "mu_e": 53.66285214251835,
+        "radius": 18.511097481204857,
+        "kkt": 0.00010751592799351783,
+        "radius_stationarity": 2.2192959034376014e-08
+      },
+      "components": [
+        {
+          "start": 0,
+          "stop": 9,
+          "phase_id": 1,
+          "density": [
+            0.036,
+            0.052
+          ],
+          "mu_E": [
+            943.8304886671522,
+            946.9699121207128
+          ]
+        }
+      ],
+      "matches": [
+        {
+          "status": "GENERATED_VERIFIED_FINITE_DOMAIN",
+          "error": null,
+          "mu_transition": 945.250293008161,
+          "pressure_transition": 0.13274592977779495,
+          "n_low": 0.0440265202925149,
+          "n_high": 0.0535091055173758,
+          "epsilon_low": 41.483335276851655,
+          "epsilon_high": 50.446751739126285,
+          "density_jump": 0.009482585224860902,
+          "latent_energy_density": 8.96341646227463,
+          "low_phase_rows": 6,
+          "high_phase_rows": 289,
+          "maxwell_identity_residual": 3.9635709148997137e-16,
+          "compose_path": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/tables_v2/TM1_CANONICAL/N064/block_00/match_00_00/compose",
+          "table_sha256": {
+            "eos.compo": "dd9283dbfea88850ce6206eadf0800c29496bdbd09bab6cd8ab5f777a1eff7f0",
+            "eos.nb": "331bedab9c183f7f6021a2992cfa11f72fbbb0c07cb563fdbd12a41210fc0710",
+            "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+            "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+            "eos.thermo": "dd7633883de7210eee2fe51ac8ef21bfe672ab2fe725af965c954102d5c6269a"
+          },
+          "independent_admission": "ADMITTED",
+          "readback": "PASS",
+          "metadata": "PASS",
+          "native_serialized_consistency": "PASS"
+        }
+      ]
+    }
+  ],
+  "finest_sources": {
+    "DDME2": {
+      "mesh": 128,
+      "source_density_fm3": [
+        0.006,
+        0.014
+      ],
+      "all_requested_states_accepted": true,
+      "max_abs_diagnostics": {
+        "kkt": 7.295098293980118e-05,
+        "radius_stationarity": 9.489615469294999e-08,
+        "scalar_residual": 8.441502424680323e-11,
+        "vector_residual": 1.0420908426636823e-10,
+        "electron_residual": 4.537749299579619e-14,
+        "baryon_error": 8.27463098040937e-16,
+        "charge_error": 1.6517142471458857e-19,
+        "muon_threshold_crossed": 0.0,
+        "radius_bound": 0.0,
+        "density_bound": 0.0
+      },
+      "max_local_electron_kinetic_mu_MeV": 53.10023399729584,
+      "pressure_derivative_check": {
+        "model": "DDME2",
+        "mesh": 128,
+        "n_b": 0.01,
+        "h": 1e-05,
+        "center_state": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/states/DDME2/N128_i04/STATE.json",
+        "states": {
+          "-2": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/states/DDME2/N128_derivative_-2/STATE.json",
+          "-1": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/states/DDME2/N128_derivative_-1_warm/STATE.json",
+          "1": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/states/DDME2/N128_derivative_+1/STATE.json",
+          "2": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/states/DDME2/N128_derivative_+2_warm/STATE.json"
+        },
+        "all_accepted": true,
+        "same_geometry": true,
+        "euler_pressure": 0.014445908693671683,
+        "P_h": 0.01444591340430179,
+        "P_2h": 0.014445925068287124,
+        "abs_Euler_difference": 4.710630106471991e-09,
+        "relative_Euler_difference": 3.2608748998500707e-07,
+        "derivative_step_difference": 1.1663985334878224e-08
+      },
+      "rod_control_at_N64": {
+        "accepted": true,
+        "density_fm3": 0.01,
+        "rod_minus_droplet_energy_per_baryon_MeV": 0.037379352345467964,
+        "scope": "two computed geometries at one density; not a global geometry minimum"
+      }
+    },
+    "TM1_CANONICAL": {
+      "mesh": 64,
+      "source_density_fm3": [
+        0.036,
+        0.052
+      ],
+      "all_requested_states_accepted": true,
+      "max_abs_diagnostics": {
+        "kkt": 0.00041304084891180537,
+        "radius_stationarity": 9.257214757772693e-08,
+        "scalar_residual": 1.8020324219877895e-10,
+        "vector_residual": 1.0307655271585902e-10,
+        "electron_residual": 1.6125447331594156e-14,
+        "baryon_error": 1.8041124150158794e-16,
+        "charge_error": 3.9302328752599536e-19,
+        "muon_threshold_crossed": 0.0,
+        "radius_bound": 0.0,
+        "density_bound": 0.0
+      },
+      "max_local_electron_kinetic_mu_MeV": 62.03032649388827,
+      "pressure_derivative_check": {
+        "model": "TM1_CANONICAL",
+        "mesh": 64,
+        "n_b": 0.044,
+        "h": 1e-05,
+        "center_state": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/states/TM1_CANONICAL/N064_i04/STATE.json",
+        "states": {
+          "-2": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/states/TM1_CANONICAL/N064_derivative_-2/STATE.json",
+          "-1": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/states/TM1_CANONICAL/N064_derivative_-1/STATE.json",
+          "1": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/states/TM1_CANONICAL/N064_derivative_+1/STATE.json",
+          "2": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/states/TM1_CANONICAL/N064_derivative_+2/STATE.json"
+        },
+        "all_accepted": true,
+        "same_geometry": true,
+        "euler_pressure": 0.13251597314983599,
+        "P_h": 0.13251597288981426,
+        "P_2h": 0.13251597473313265,
+        "abs_Euler_difference": 2.600217263726279e-10,
+        "relative_Euler_difference": 1.962191577302315e-09,
+        "derivative_step_difference": 1.8433183868182823e-09
+      },
+      "rod_control_at_N64": {
+        "accepted": true,
+        "density_fm3": 0.044,
+        "rod_minus_droplet_energy_per_baryon_MeV": 0.004414932861316536,
+        "scope": "two computed geometries at one density; not a global geometry minimum"
+      }
+    }
+  },
+  "selected_anchor_control": {
+    "schema": "ns_cowling.tf_selected_anchor_control.v1",
+    "script_sha256": "48f08cb98306b2f291feb85402242e0c8918072373f13e453ee1fcaac699243f",
+    "seed_sha256": "d0a347dff6c72529a96433eedf28133a95c9416c79e84719f063f38b99b661ba",
+    "results": [
+      {
+        "points": 16,
+        "n_b": 0.01,
+        "control_state": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/states/DDME2/SELECTED_F_ANCHOR_N016/STATE.json",
+        "control_sha256": "97745b9cb5c052c926978dd7ddbdbd065fe84e7d0769fc554dc0f0d7aebacc96",
+        "production_state": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/states/DDME2/N016_i04/STATE.json",
+        "production_sha256": "48abc0e770ff8e7525ede5d2f321dc67fe56b51132f6f43f8a5db8f8b0b7b45d",
+        "accepted": true,
+        "control_geometry": "droplet",
+        "production_geometry": "droplet",
+        "control_scalars": {
+          "epsilon": 9.416968026650851,
+          "pressure": 0.015197781524554088,
+          "mu_B": 943.2165808175405,
+          "radius": 35.4598737498955,
+          "kkt": 2.4315947030117968e-05,
+          "radius_stationarity": 1.1449513429365177e-08
+        },
+        "delta_control_minus_production": {
+          "epsilon": -4.947803967425557e-05,
+          "pressure": 0.001199691647615353,
+          "mu_B": 0.11502136079411684,
+          "radius": 4.940424692277951
+        },
+        "delta_energy_per_baryon": -0.004947803967425557,
+        "weighted_rms_nucleon_profile_difference_fm3": 0.003485315406605192,
+        "max_nucleon_profile_difference_fm3": 0.032052720586033014,
+        "comparison_scope": "same physical model, density, mesh, native executable and unchanged acceptance gates; initial basin differs"
+      },
+      {
+        "points": 32,
+        "n_b": 0.01,
+        "control_state": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/states/DDME2/SELECTED_F_ANCHOR_N032_warm/STATE.json",
+        "control_sha256": "09808c783a3e137bbe58d38c6f6f12037034884cd537d2d5236b4fde048f5147",
+        "production_state": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/states/DDME2/N032_i04/STATE.json",
+        "production_sha256": "aabd3b464d037790a5956013864e2c4f874a480ff6b78823a26db440b72d0047",
+        "accepted": true,
+        "control_geometry": "droplet",
+        "production_geometry": "droplet",
+        "control_scalars": {
+          "epsilon": 9.41703502385274,
+          "pressure": 0.014627915837557737,
+          "mu_B": 943.1662939690299,
+          "radius": 33.117976732655976,
+          "kkt": 4.7799988919905445e-05,
+          "radius_stationarity": 1.9997691219977853e-08
+        },
+        "delta_control_minus_production": {
+          "epsilon": -4.511946372076636e-13,
+          "pressure": 1.1609717631699823e-09,
+          "mu_B": 1.1605209238041425e-07,
+          "radius": 1.0319300862704495e-05
+        },
+        "delta_energy_per_baryon": -4.511946372076636e-11,
+        "weighted_rms_nucleon_profile_difference_fm3": 6.670370808733514e-09,
+        "max_nucleon_profile_difference_fm3": 6.481988604201128e-08,
+        "comparison_scope": "same physical model, density, mesh, native executable and unchanged acceptance gates; initial basin differs"
+      },
+      {
+        "points": 64,
+        "n_b": 0.01,
+        "control_state": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/states/DDME2/SELECTED_F_ANCHOR_N064/STATE.json",
+        "control_sha256": "28ee8725e05f988d6e16071148eadab21897b778c15dc940fac628b7fd86d622",
+        "production_state": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/states/DDME2/N064_i04/STATE.json",
+        "production_sha256": "27b16603c5251818e869a11becd0520243e0d23ccd8ffa908fb31455ee7590bc",
+        "accepted": true,
+        "control_geometry": "droplet",
+        "production_geometry": "droplet",
+        "control_scalars": {
+          "epsilon": 9.417049775241855,
+          "pressure": 0.014472607856472308,
+          "mu_B": 943.1522383098327,
+          "radius": 32.41041488487841,
+          "kkt": 6.815186804942641e-05,
+          "radius_stationarity": 8.057677021271192e-08
+        },
+        "delta_control_minus_production": {
+          "epsilon": -5.027089855502709e-13,
+          "pressure": 7.037179727831244e-10,
+          "mu_B": 7.03215619068942e-08,
+          "radius": -8.02187010151556e-07
+        },
+        "delta_energy_per_baryon": -5.027089855502709e-11,
+        "weighted_rms_nucleon_profile_difference_fm3": 7.1567787219059055e-09,
+        "max_nucleon_profile_difference_fm3": 2.1065875668857537e-07,
+        "comparison_scope": "same physical model, density, mesh, native executable and unchanged acceptance gates; initial basin differs"
+      },
+      {
+        "points": 128,
+        "n_b": 0.01,
+        "control_state": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/states/DDME2/SELECTED_F_ANCHOR_N128_warm/STATE.json",
+        "control_sha256": "6ce030e13ef93f25ac0c166665e86ac65c3732b032e56413f10d97ee32fef03b",
+        "production_state": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/data/crust_refinement_20261117/tf_regeneration/states/DDME2/N128_i04/STATE.json",
+        "production_sha256": "9f65b38b2023d8b5ea69dfc600ebfed0b828a0b94a889e15b6eed5a7a94de4c5",
+        "accepted": true,
+        "control_geometry": "droplet",
+        "production_geometry": "droplet",
+        "control_scalars": {
+          "epsilon": 9.417054157787675,
+          "pressure": 0.014445908401642171,
+          "mu_B": 943.1500066189317,
+          "radius": 32.31409633645536,
+          "kkt": 7.298108880604559e-05,
+          "radius_stationarity": 2.545771957390003e-07
+        },
+        "delta_control_minus_production": {
+          "epsilon": -6.981082378842984e-13,
+          "pressure": -2.920295116837224e-10,
+          "mu_B": -2.9272769097588025e-08,
+          "radius": -8.454234773580538e-06
+        },
+        "delta_energy_per_baryon": -6.981082378842984e-11,
+        "weighted_rms_nucleon_profile_difference_fm3": 4.301450871012836e-09,
+        "max_nucleon_profile_difference_fm3": 1.4361722112943287e-07,
+        "comparison_scope": "same physical model, density, mesh, native executable and unchanged acceptance gates; initial basin differs"
+      }
+    ],
+    "scope": "four fixed-density controls only; no replacement of production state or full-grid branch-minimum claim"
+  },
+  "execution_receipts": {
+    "PRODUCTION_RUN.json": {
+      "argv": [
+        "/home/cosmosapjw/ns_cowling_wt/.venv-gen/bin/python",
+        "scripts/run_crust_refinement_20261117.py",
+        "production"
+      ],
+      "actual_exit_code": 0,
+      "wall_seconds": 14.01934196500224,
+      "environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "PYTHONPATH": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/python_frontend:/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117/pipeline:/tmp/ns_cowling_audit_20261117_pydeps",
+        "COMPOSE_EOS_FORTRAN_EXE": "/home/cosmosapjw/ns_cowling_wt/stellar_consumers_20261117/build/compose_eos_fortran/compose_eos_fortran"
+      }
+    },
+    "TEST_GREEN.json": {
+      "argv": [
+        "/home/cosmosapjw/ns_cowling_wt/.venv-gen/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "python_frontend/tests/test_tf_candidate.py"
+      ],
+      "actual_exit_code": 0,
+      "wall_seconds": 5.449891151976772
+    },
+    "TEST_EXPORT_RED.json": {
+      "actual_exit_code": 1
+    },
+    "TEST_FINAL.json": {
+      "argv": [
+        "/home/cosmosapjw/ns_cowling_wt/.venv-gen/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "python_frontend/tests/test_tf_candidate.py"
+      ],
+      "actual_exit_code": 1,
+      "wall_seconds": 9.06921763898572
+    },
+    "TEST_FINAL_REPAIRED.json": {
+      "argv": [
+        "/home/cosmosapjw/ns_cowling_wt/.venv-gen/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "python_frontend/tests/test_tf_candidate.py"
+      ],
+      "actual_exit_code": 0,
+      "wall_seconds": 7.198124624992488
+    },
+    "REPROJECT.json": {
+      "argv": [
+        "/home/cosmosapjw/ns_cowling_wt/.venv-gen/bin/python",
+        "scripts/run_crust_refinement_20261117.py",
+        "reproject"
+      ],
+      "actual_exit_code": 0,
+      "wall_seconds": 2.403724993026117
+    },
+    "REFINE128.json": {
+      "argv": [
+        "/home/cosmosapjw/ns_cowling_wt/.venv-gen/bin/python",
+        "scripts/run_crust_refinement_20261117.py",
+        "refine128",
+        "--models",
+        "DDME2"
+      ],
+      "actual_exit_code": 0,
+      "wall_seconds": 37.3185733880091,
+      "api_sha256": "61ad299bfeab5ee5588758b6367f7b69e3911317257dcecea23665f08a3c4c18",
+      "script_sha256": "44335cc36dde8e493866ee1a8bfe0b11c7cf8b70ee4e7b8764089bc5cf3fe716"
+    },
+    "DERIVATIVE.json": {
+      "argv": [
+        "/home/cosmosapjw/ns_cowling_wt/.venv-gen/bin/python",
+        "scripts/run_crust_refinement_20261117.py",
+        "derivative"
+      ],
+      "actual_exit_code": 0,
+      "wall_seconds": 12.086440936021972,
+      "api_sha256": "61ad299bfeab5ee5588758b6367f7b69e3911317257dcecea23665f08a3c4c18",
+      "script_sha256": "44335cc36dde8e493866ee1a8bfe0b11c7cf8b70ee4e7b8764089bc5cf3fe716"
+    },
+    "SELECTED_ANCHOR.json": {
+      "argv": [
+        "/home/cosmosapjw/ns_cowling_wt/.venv-gen/bin/python",
+        "scripts/check_tf_selected_anchor_20261117.py"
+      ],
+      "actual_exit_code": 0,
+      "wall_seconds": 5.186918764986331,
+      "api_sha256": "61ad299bfeab5ee5588758b6367f7b69e3911317257dcecea23665f08a3c4c18"
+    }
+  },
+  "publication_status": "not_committed_or_pushed_by_subtask",
+  "limitations": [
+    "finite continued stationary branches and finite mesh evidence; no global minimum or continuum-limit theorem",
+    "DDME2 N64 requested n=.007 remained optimizer_mode8 after one warm restart and was not bridged; N128 separately solved that density",
+    "DDME2 N16 production and F-selected profiles are distinct stationary basins; N32/64/128 anchor controls become numerically indistinguishable at n=.01 only",
+    "TM1 canonical uses frozen F coefficients and physical nucleon rest energies938MeV; it is a native counterpart, not byte/numerical identity with public TM1",
+    "phase-only thermo export contains no claimed abundances; cell charge/profile evidence remains in native states",
+    "finite-domain sharp tables require independent lower closure and interface-aware stellar consumers; this report does not claim complete stellar EOS"
+  ]
+}

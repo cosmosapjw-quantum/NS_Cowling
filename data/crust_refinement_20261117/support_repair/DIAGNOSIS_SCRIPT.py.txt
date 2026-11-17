@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+"""G targeted support diagnosis and actual source regeneration orchestration."""
+from __future__ import annotations
+import argparse, json, sys, hashlib
+from pathlib import Path
+import numpy as np
+from scipy.interpolate import CubicHermiteSpline
+from numpy.polynomial import Polynomial
+ROOT=Path(__file__).resolve().parents[1]
+sys.path[:0]=[str(ROOT/"python_frontend"),str(ROOT/"scripts")]
+from maxwell_three_family_campaign import read_prepared
+from compose_eos.maxwell_v2 import _segment_eosdata
+BASE=ROOT/"data/crust_refinement_20261117/support_repair"
+FBASE=ROOT/"data/new_model_maxwell_20261117"
+TARGETS=[
+ ("old_native_crust__new_native_core","GPPVA_NL3wrL55__PK1_CANONICAL",1),
+ ("old_native_crust__new_native_core","GPPVA_TM1e__PK1_CANONICAL",1),
+ ("reference_assisted_hybrid","XMLSLZ_NL3__GM_GM1",8),
+ ("reference_assisted_hybrid","XMLSLZ_DDME-X__GM_GM1",4),
+]
+def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def load(p):return json.loads(Path(p).read_text())
+def save(p,d):
+ Path(p).parent.mkdir(parents=True,exist_ok=True)
+ Path(p).write_text(json.dumps(d,ensure_ascii=False,indent=2)+"\n")
+def poly_on_unit(spline,a,b):
+ i=min(max(np.searchsorted(spline.x,a,side="right")-1,0),len(spline.x)-2)
+ c=spline.c[:,i];x=Polynomial([a-spline.x[i],b-a])
+ return ((c[0]*x+c[1])*x+c[2])*x+c[3]
+def diagnose():
+ records={r["id"]:r for r in load(FBASE/"prepared/MANIFEST.json")["source_records"]}
+ campaign=load(FBASE/"campaign/CAMPAIGN.json")
+ cells={(c["category"],c["id"]):c for c in campaign["cells"]}
+ results=[]
+ for category,name,index in TARGETS:
+  c=cells[category,name];original=c["candidate_results"][index]
+  arrays=[]
+  for key,skey in [("crust_component","crust_source_id"),("core_component","core_source_id")]:
+   comp=original[key];data=read_prepared(records[c[skey]])
+   arrays.append(_segment_eosdata(data,(comp["phase_id"],comp["start_zero_based"],comp["stop_exclusive"])))
+  low,high=arrays
+  ml=(low.eps+low.p)/low.nb;mh=(high.eps+high.p)/high.nb
+  sl=CubicHermiteSpline(ml,low.p,low.nb);sh=CubicHermiteSpline(mh,high.p,high.nb)
+  lo,hi=max(ml[0],mh[0]),min(ml[-1],mh[-1])
+  union=np.unique(np.r_[lo,ml[(ml>lo)&(ml<hi)],mh[(mh>lo)&(mh<hi)],hi]);roots=[]
+  for a,b in zip(union[:-1],union[1:]):
+   for z in (poly_on_unit(sh,a,b)-poly_on_unit(sl,a,b)).roots():
+    if abs(z.imag)<=1e-9 and -1e-10<=z.real<=1+1e-10:
+     mu=float(a+(b-a)*z.real)
+     if not roots or abs(mu-roots[-1])>1e-8:roots.append(mu)
+  root_records=[]
+  for mu in roots:
+   tol=1e-10*max(1,abs(mu));nlow=int(np.sum(ml<mu-tol));nhigh=int(np.sum(mh>mu+tol))
+   root_records.append({"mu_transition_MeV":mu,"pressure_MeV_fm3":float(sl(mu)),
+    "n_low_fm3":float(sl(mu,1)),"n_high_fm3":float(sh(mu,1)),
+    "retained_low_source_knots":nlow,"retained_high_source_knots":nhigh,
+    "native_mu_exclusion_tolerance":tol,
+    "low_source_bracket_nb":low.nb[max(0,np.searchsorted(ml,mu)-1):min(low.n,np.searchsorted(ml,mu)+1)].tolist(),
+    "low_source_bracket_mu":ml[max(0,np.searchsorted(ml,mu)-1):min(low.n,np.searchsorted(ml,mu)+1)].tolist()})
+  results.append({"category":category,"cell":name,"candidate_index":index,
+   "original_status":original["status"],"original_error":original["error"],
+   "crust_source_id":c["crust_source_id"],"core_source_id":c["core_source_id"],
+   "crust_component":original["crust_component"],"core_component":original["core_component"],
+   "roots":root_records,"source_identity":{k:{"internal":records[c[k]]["internal_sha256"],"raw":records[c[k]]["source_table_sha256"]} for k in ["crust_source_id","core_source_id"]},
+   "interpretation":"Independent root diagnostics only. No output admitted or source row replaced."})
+ d={"schema":"ns_cowling.G_concrete_support_diagnosis.v1","F_campaign_sha256":sha(FBASE/"campaign/CAMPAIGN.json"),
+  "F_prepared_manifest_sha256":sha(FBASE/"prepared/MANIFEST.json"),"script_sha256":sha(__file__),"results":results}
+ save(BASE/"DIAGNOSIS.json",d)
+ print(json.dumps({"diagnosed":len(results),"roots":[{"cell":r["cell"],"roots":r["roots"]} for r in results]},indent=2))
+if __name__=="__main__":
+ p=argparse.ArgumentParser();p.add_argument("action",choices=["diagnose"]);a=p.parse_args()
+ if a.action=="diagnose":diagnose()

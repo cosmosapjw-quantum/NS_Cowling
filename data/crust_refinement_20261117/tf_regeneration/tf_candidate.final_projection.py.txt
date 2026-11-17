@@ -1,0 +1,147 @@
+"""Native spatial-TF execution and evidence, with explicit branch/mesh identity.
+
+Python only prepares nonnegative starting profiles, runs the native solver and
+serializes its result. Missing/failed states do not become interpolation support.
+"""
+from pathlib import Path
+import hashlib
+import json
+import os
+import subprocess
+import time
+import numpy as np
+from .eos_data import EOSData
+from .api import write_compose, read_compose, _thermo_only_view
+
+KEYS = ("epsilon pressure mu_B mu_e scalar_residual vector_residual electron_residual "
+        "d_epsilon_d_log_radius kkt radius_stationarity Y_p radius iterations evaluations "
+        "optimizer_mode baryon_error charge_error optimizer_success radius_bound density_bound "
+        "muon_threshold_crossed density_contrast gradient_sigma gradient_omega gradient_rho coulomb_energy").split()
+PROFILE_COLUMNS = "nn np ne mu_n mu_p mu_e phi omega rho coulomb".split()
+GEOMETRY = {"droplet": 1, "rod": 2, "slab": 3, "tube": 4, "bubble": 5, "near_uniform_profile": 6, "uniform": 6}
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+def save(path, obj):
+    Path(path).write_text(json.dumps(obj, indent=2, allow_nan=False)+"\n")
+
+def weights(points, dimension):
+    return np.diff(np.linspace(0., 1., points+1)**dimension)
+
+def build_driver(repo, build_dir):
+    repo=Path(repo).resolve(); build_dir=Path(build_dir).resolve()
+    build_dir.mkdir(parents=True, exist_ok=True)
+    modules=["compose_eos_types", "compose_eos_optimize_native", "compose_eos_tf_models", "compose_eos_spatial_tf"]
+    sources=[repo/"fortran_eos/vendor/slsqp/slsqp_optmz.f",
+             *(repo/f"fortran_eos/src/{name}.f90" for name in modules),
+             repo/"fortran_eos/tools/tf_candidate_driver.f90"]
+    exe=build_dir/"tf_candidate_driver"
+    sources_sha={str(p):sha(p) for p in sources}
+    old=build_dir/"BUILD.json"
+    if old.exists() and exe.exists():
+        rec=json.loads(old.read_text())
+        if rec.get("source_sha256")==sources_sha and rec.get("executable_sha256")==sha(exe):
+            return exe
+        raise ValueError("build directory contains a different source/executable identity")
+    commands=[["gfortran","-std=legacy","-O2","-ffixed-line-length-none","-c",str(sources[0]),"-o",str(build_dir/"slsqp.o")]]
+    for name in modules:
+        commands.append(["gfortran","-std=f2018","-O2","-fcheck=all","-ffree-line-length-none",
+                         "-J",str(build_dir),"-I",str(build_dir),"-c",str(repo/f"fortran_eos/src/{name}.f90"),
+                         "-o",str(build_dir/f"{name}.o")])
+    commands.append(["gfortran","-std=f2018","-O2","-fcheck=all","-ffree-line-length-none","-I",str(build_dir),
+                     str(sources[-1]),*(str(build_dir/f"{name}.o") for name in modules),
+                     str(build_dir/"slsqp.o"),"-llapack","-lblas","-o",str(exe)])
+    records=[]; start=time.monotonic()
+    for i,command in enumerate(commands):
+        proc=subprocess.run(command,cwd=build_dir,capture_output=True,text=True)
+        (build_dir/f"compile_{i}.stdout.log").write_text(proc.stdout)
+        (build_dir/f"compile_{i}.stderr.log").write_text(proc.stderr)
+        records.append({"argv":command,"actual_exit_code":proc.returncode})
+        if proc.returncode: break
+    rec={"source_sha256":sources_sha,"commands":records,"wall_seconds":time.monotonic()-start,
+         "compiler":subprocess.check_output(["gfortran","--version"],text=True).splitlines()[0]}
+    if records[-1]["actual_exit_code"]==0: rec["executable_sha256"]=sha(exe)
+    save(old,rec)
+    if records[-1]["actual_exit_code"]: raise RuntimeError("native TF build failed; see BUILD.json and compiler logs")
+    return exe
+
+def interpolate_initial(old, points, target_density, *, proton_fraction=None, radius_factor=1.):
+    profile=np.asarray(old["profile"], dtype=float)
+    if profile.ndim!=2 or profile.shape[1]<2 or not np.all(np.isfinite(profile[:,:2])) or np.any(profile[:,:2]<0):
+        raise ValueError("invalid retained nucleon profile")
+    dimension=int(old["dimension"]); w=weights(points,dimension)
+    x=(np.arange(points)+.5)/points; xo=(np.arange(len(profile))+.5)/len(profile)
+    nn=np.interp(x,xo,profile[:,0]); pp=np.interp(x,xo,profile[:,1])
+    if proton_fraction is None:
+        fac=target_density/(w@(nn+pp)); nn*=fac; pp*=fac
+    else:
+        nn*=target_density*(1-proton_fraction)/(w@nn)
+        pp*=target_density*proton_fraction/(w@pp)
+    return nn,pp,float(old["radius"])*radius_factor
+
+def run_state(executable, model, density, points, dimension, seed, radius, *,
+              work_dir, initial_nn=None, initial_np=None, parent=None,
+              maxiter=1800, ftol=1e-14, timeout=1200, evaluation_only=False):
+    work_dir=Path(work_dir).resolve(); work_dir.mkdir(parents=True,exist_ok=False)
+    if (initial_nn is None)!=(initial_np is None): raise ValueError("both initial nucleon profiles must be supplied")
+    initial=initial_nn is not None
+    if evaluation_only and not initial: raise ValueError("profile evaluation requires explicit nucleon profiles")
+    if initial:
+        nn=np.asarray(initial_nn,dtype=float); pp=np.asarray(initial_np,dtype=float)
+        if nn.shape!=(points,) or pp.shape!=(points,) or not np.all(np.isfinite(nn+pp)) or np.any(nn<0) or np.any(pp<0):
+            raise ValueError("invalid starting profile")
+    inp=f"{model} {points} {dimension} {seed} {density:.17g} {radius:.17g} {maxiter} {ftol:.17g} {2 if evaluation_only else int(initial)}\n"
+    if initial: inp+="\n".join(" ".join(f"{v:.17g}" for v in a) for a in [nn,pp])+"\n"
+    (work_dir/"input.txt").write_text(inp)
+    rec={"schema":"ns_cowling.native_tf_state.v1","model":model,"n_b":density,"points":points,
+         "dimension":dimension,"seed":seed,"starting_radius":radius,"parent":parent,"initial_profile_supplied":initial,"evaluation_only":evaluation_only,
+         "input_sha256":sha(work_dir/"input.txt"),"executable":str(executable),"executable_sha256":sha(executable),
+         "status":"RUNNING","accepted_stationary":False,"state_path":str(work_dir/"STATE.json")}
+    save(work_dir/"STATE.json",rec); start=time.monotonic()
+    env={**os.environ,"OMP_NUM_THREADS":"1","OPENBLAS_NUM_THREADS":"1","MKL_NUM_THREADS":"1"}
+    try:
+        proc=subprocess.run([str(executable)],input=inp,text=True,capture_output=True,env=env,timeout=timeout)
+        (work_dir/"stdout.txt").write_text(proc.stdout); (work_dir/"stderr.txt").write_text(proc.stderr)
+        rec.update(actual_exit_code=proc.returncode,wall_seconds=time.monotonic()-start)
+        lines=proc.stdout.splitlines()
+        if proc.returncode==0 and lines and lines[0]=="ok":
+            status,geometry=lines[1].split(); values=list(map(float,lines[2].split()))
+            profile=np.loadtxt(lines[3:])
+            if len(values)!=len(KEYS) or profile.shape!=(points,10) or not np.all(np.isfinite(profile)):
+                raise ValueError("native TF output layout or finite profile mismatch")
+            rec.update(zip(KEYS,values)); rec.update(status=status,geometry=geometry,profile=profile.tolist(),profile_columns=PROFILE_COLUMNS)
+            rec["accepted_stationary"]=(status in ("STATIONARY","UNIFORM_STATIONARY") and rec["optimizer_success"]==1.
+               and rec["muon_threshold_crossed"]==0. and rec["baryon_error"]<1e-10 and rec["charge_error"]<1e-10)
+        else: rec.update(status="PROCESS_OR_FIELD_FAILURE",native_message=lines[0] if lines else "no stdout")
+    except subprocess.TimeoutExpired as exc:
+        (work_dir/"stdout.txt").write_bytes(exc.stdout or b""); (work_dir/"stderr.txt").write_bytes(exc.stderr or b"")
+        rec.update(status="TIMEOUT",actual_exit_code=None,wall_seconds=time.monotonic()-start)
+    save(work_dir/"STATE.json",rec)
+    return rec
+
+def export_compose(directory, states, *, mn, mp, model):
+    directory=Path(directory); directory.mkdir(parents=True,exist_ok=False)
+    rows=sorted(states,key=lambda s:s["n_b"])
+    if len(rows)<3 or any(not s.get("accepted_stationary") for s in rows):
+        raise ValueError("only at least three actually accepted states may be exported")
+    n=np.array([s["n_b"] for s in rows]); eps=np.array([s["epsilon"] for s in rows])
+    pressure=np.array([s["pressure"] for s in rows]); mu=np.array([s["mu_B"] for s in rows])
+    mue=np.array([s["mu_e"] for s in rows]); phase=np.array([GEOMETRY[s["geometry"]] for s in rows])
+    if np.any(np.diff(n)<=0): raise ValueError("distinct increasing density required")
+    zero=np.zeros(len(n))
+    data=EOSData(nb=n,mn=mn,mp=mp,Q1=pressure/n,Q2=zero,Q3=mu/mn-1,Q4=-mue/mn,Q5=zero,
+        Q6=eps/(n*mn)-1,Q7=eps/(n*mn)-1,q_extra=zero,Iphase=phase,
+        Yn=zero,Yp=zero,Ye=zero,Ymu=zero,Aav=zero,Zav=zero,Yh=zero,
+        composition_file_present=True,composition_available=False,beta_equilibrated=True)
+    write_compose(directory/"compose",data); back=read_compose(directory/"compose")
+    errors={key:float(np.max(np.abs(a-b)/np.maximum(1.,np.abs(b)))) for key,a,b in
+            [("n",back.nb,n),("epsilon",back.eps,eps),("pressure",back.p,pressure),("mu_B",back.mub,mu)]}
+    if max(errors.values())>5e-13: raise ValueError("native serialized TF readback mismatch")
+    rec={"model":model,"rows":len(rows),"support_density":[float(n[0]),float(n[-1])],
+         "source_states":[{"path":s["state_path"],"sha256":sha(s["state_path"])} for s in rows],
+         "composition_scope":"thermo-only output; total profiles and mean composition remain in STATE.json",
+         "readback_residuals":errors,"compose_path":str(directory/"compose"),
+         "table_sha256":{p.name:sha(p) for p in (directory/"compose").glob("eos.*")}}
+    save(directory/"GENERATION.json",rec)
+    return _thermo_only_view(data),rec

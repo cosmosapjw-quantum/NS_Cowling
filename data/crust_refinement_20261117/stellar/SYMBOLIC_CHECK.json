@@ -1,0 +1,35 @@
+{
+  "cas": {
+    "input": "Clear[aa,bb,qq,ww,vv]; slow[q_]:={{1,0},{(q-1)bb/aa,q}}; rapid[q_]:={{q,(q-1)aa/bb},{0,1}}; z={ww,vv}; zs=slow[qq].z; zr=rapid[qq].z; FullSimplify[{slow[1/qq].slow[qq]-IdentityMatrix[2],rapid[1/qq].rapid[qq]-IdentityMatrix[2],slow[1]-IdentityMatrix[2],rapid[1]-IdentityMatrix[2],qq (aa vv+bb ww)-(aa zs[[2]]+bb zs[[1]]),qq (aa vv+bb ww)-(aa zr[[2]]+bb zr[[1]]),zs[[1]]-ww,zr[[2]]-vv},Assumptions->aa!=0&&bb!=0&&qq>0]",
+    "result": {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "Out[1]= {{{0, 0}, {0, 0}}, {{0, 0}, {0, 0}}, {{0, 0}, {0, 0}}, {{0, 0}, {0, 0}}, 0, 0, 0, 0}"
+          }
+        ],
+        "structuredContent": null,
+        "isError": false
+      }
+    }
+  },
+  "context_helper_failure": {
+    "status": "fulfilled",
+    "value": {
+      "content": [
+        {
+          "type": "text",
+          "text": "tool call error: tool call failed for `codex_apps/wolfram.WolframContext`\n\nCaused by:\n    Mcp error: -32603: Internal error"
+        }
+      ],
+      "isError": true
+    }
+  },
+  "sources": [
+    "https://arxiv.org/abs/gr-qc/0108060",
+    "https://arxiv.org/abs/2003.01259"
+  ],
+  "scope": "Cowling reduction of slow/rapid perfect-fluid junction conditions; no conversion-rate microphysics inference"
+}

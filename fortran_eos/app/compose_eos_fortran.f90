@@ -9,7 +9,8 @@ program compose_eos_fortran
   use compose_eos_reconstruct, only: fill_density_gap, reconstruct_master
   use compose_eos_causality, only: causal_complete, causal_completion_report_t
   use compose_eos_matching, only: match_crust_core, match_report_t
-  use compose_eos_phase_transition, only: construct_maxwell_transition, maxwell_transition_report_t
+  use compose_eos_phase_transition, only: construct_maxwell_transition, maxwell_transition_report_t, &
+                                         diagnose_maxwell_phase, maxwell_status_category
   use compose_eos_wigner_seitz, only: wigner_seitz_state_t, reconstruct_wigner_seitz_table, &
                                        wigner_seitz_output_hash, reconstruct_compo_closure_ws
   implicit none
@@ -25,6 +26,8 @@ program compose_eos_fortran
   character(len=2048)::arg1,arg2,arg3
   character(len=128)::arg4,arg5,arg6,arg7
   character(len=512)::status
+  character(len=512)::phase_diagnostic_global_status
+  character(len=40)::phase_diagnostic_global_category
   integer::narg,ios,n_fill,fit_points,gap_phase,n_points,n_bridge
   integer::core_first,core_last,expected_source_n,expected_phase
   integer::crust_outer_last,expected_outer_phase,expected_inner_phase
@@ -40,6 +43,7 @@ program compose_eos_fortran
   real(wp)::tov_pc,tov_ptrans,tov_deps,tov_p,tov_e
   integer::cld_n_points
   integer::igap_sel
+  integer::phase_diagnostic_valid_intervals
   logical::has_gap_phase,drop_composition,local_neutrality_confirmed
   logical::smooth_master_flag,fix_dissolution,recompute_extra_cs2,outer_crust_corrected
   logical::has_min_ratio
@@ -346,6 +350,23 @@ program compose_eos_fortran
       ',"composition_reconstructed":'//logical_text(out%composition_available)// &
       ',"outer_crust_correction_applied":'//logical_text(outer_crust_corrected)// &
       ',"q_extra_recomputed_as_cs2":'//logical_text(recompute_extra_cs2)//'}'
+  case('maxwell-phase-diagnostic')
+    if(narg/=3)then
+      call emit_failure('maxwell-phase-diagnostic requires PHASE_INTERNAL OUTPUT_CSV');stop 2
+    endif
+    call read_internal_csv(trim(arg1)//'/eos_data.csv',trim(arg1)//'/eos_data.nml',eos,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    call diagnose_maxwell_phase(eos,trim(arg2),phase_diagnostic_valid_intervals,phase_diagnostic_global_status,status)
+    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    phase_diagnostic_global_category=maxwell_status_category(phase_diagnostic_global_status)
+    if(phase_diagnostic_global_status=='ok')phase_diagnostic_global_category='PASS'
+    write(*,'(a)')'{"status":"ok","operation":"maxwell-phase-diagnostic","source_rows":'//integer_text(eos%n)// &
+      ',"interval_count":'//integer_text(eos%n-1)// &
+      ',"valid_intervals":'//integer_text(phase_diagnostic_valid_intervals)// &
+      ',"source_beta_equilibrated":'//logical_text(eos%beta_equilibrated)// &
+      ',"interval_beta_summary":"recomputed_from_selected_Q5"'// &
+      ',"global_validation_category":"'//trim(phase_diagnostic_global_category)// &
+      '","global_validation_message":"'//trim(phase_diagnostic_global_status)//'"}'
   case('maxwell-transition')
     if(narg/=5)then
       call emit_failure('maxwell-transition requires LOW_PHASE_INTERNAL HIGH_PHASE_INTERNAL OUTPUT_INTERNAL LOCAL_NEUTRALITY_CONFIRMED');stop 2
@@ -376,6 +397,7 @@ program compose_eos_fortran
     write(*,'(a)')'{"status":"ok","operation":"maxwell-transition","n":'//integer_text(out%n)// &
       ',"mass_normalization_semantics":"physical_energy_preserving_Q_reencoding"'// &
       ',"physical_energy_shift_mev":0.0'// &
+      ',"retained_thermodynamic_rows":"physical_columns_preserved_without_reconstruction"'// &
       ',"rest_energy_reference_mev":{"low":['//real_text(phase_low%mn)//','//real_text(phase_low%mp)// &
       '],"high":['//real_text(phase_high%mn)//','//real_text(phase_high%mp)// &
       '],"output":['//real_text(out%mn)//','//real_text(out%mp)//']}'// &
@@ -389,6 +411,8 @@ program compose_eos_fortran
       ',"density_jump":'//real_text(phase_report%density_jump)// &
       ',"latent_energy_density":'//real_text(phase_report%latent_energy_density)// &
       ',"maxwell_identity_residual":'//real_text(phase_report%maxwell_identity_residual)// &
+      ',"interface_pressure_encoding_difference":'//real_text(phase_report%interface_pressure_encoding_difference)// &
+      ',"interface_pressure_roundoff_bound":'//real_text(phase_report%interface_pressure_roundoff_bound)// &
       ',"max_euler_residual_low":'//real_text(phase_report%max_euler_residual_low)// &
       ',"max_euler_residual_high":'//real_text(phase_report%max_euler_residual_high)// &
       ',"min_cs2_low":'//real_text(phase_report%min_cs2_low)// &

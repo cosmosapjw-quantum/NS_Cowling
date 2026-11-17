@@ -1,247 +1,248 @@
-"""Node 10: Iphase-segmented thermo-only Maxwell v2 orchestration.
+"""Segmented thermo-only Maxwell construction with lossless retained tails.
 
-The v1 native Fortran kernel is explicitly thermo-only and rejects
-composition-bearing input. This v2 wrapper only segments thermo-only inputs at
-contiguous Iphase boundaries before calling v1. It does NOT preserve or
-transform composition. Until a dedicated native composition-aware kernel and
-round-trip representation exist, both composition_available and
-composition_file_present inputs fail closed with COMPOSITION_UNSUPPORTED.
-
-The wrapper preserves the v1 mass, stability, causality, beta-equilibrium and
-first-law gates. It is opt-in via construct_maxwell_transition_v2.
+Only the last smooth low-density segment and first smooth high-density segment
+are submitted to the native Maxwell kernel. Remaining outer-crust and high-core
+rows are retained verbatim in physical units, with separately recorded inherited
+phase boundaries. Those boundaries are not silently interpolated or certified
+as additional Maxwell transitions. Composition must be explicitly discarded.
 """
 from __future__ import annotations
-import sys
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Any
 import numpy as np
 
-REPO = Path(__file__).resolve().parents[2]
-PYTHON_FRONTEND = REPO / "python_frontend"
-if str(PYTHON_FRONTEND) not in sys.path:
-    sys.path.insert(0, str(PYTHON_FRONTEND))
-from compose_eos.api import construct_maxwell_transition, read_compose
+from compose_eos.api import construct_maxwell_transition, _thermo_only_view
 from compose_eos.eos_data import EOSData
 from compose_eos.native import NativeExecutionError
+
+_ROW_FIELDS = (
+    "nb", "Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "q_extra", "Iphase",
+    "Yn", "Yp", "Ye", "Ymu", "Aav", "Zav", "Yh", "row_status",
+    "Yn_present", "Yp_present", "Ye_present", "Ymu_present", "Abar_present",
+    "Zbar_present", "Yh_present", "C3_applicable", "C4_applicable",
+)
 
 
 @dataclass
 class Segment:
-    """A contiguous smooth Iphase segment of an input phase."""
+    """One contiguous source Iphase segment; missing composition is not zero."""
     iphase_label: int
-    row_slice: slice  # indices into the original EOSData arrays
+    row_slice: slice
     n_rows: int
     composition_available: bool
-    charge_neutrality_residual: float  # |Yp - Ye - Ymu| at this segment
+    charge_neutrality_residual: float | None
     provenance: dict = field(default_factory=dict)
 
 
 @dataclass
 class MaxwellV2Report:
-    """Composition-aware v2 report. Mirrors v1 plus segment evidence."""
+    """Native interface evidence, source retention, and uncertified boundaries."""
     status: str = "uninitialized"
     segments_low: list = field(default_factory=list)
     segments_high: list = field(default_factory=list)
-    admitted_pairs: list = field(default_factory=list)  # (seg_low_idx, seg_high_idx)
+    attempted_pairs: list = field(default_factory=list)
+    admitted_pairs: list = field(default_factory=list)
     coexistence_results: list = field(default_factory=list)
     axis_value_slice_compatible: bool = False
     local_neutrality_evidence_low: dict = field(default_factory=dict)
     local_neutrality_evidence_high: dict = field(default_factory=dict)
     rejection_category: str = ""
+    native_report: dict = field(default_factory=dict)
+    transition_row_indices_zero_based: list = field(default_factory=list)
+    output_phase_map: list = field(default_factory=list)
+    retained_source_rows: dict = field(default_factory=dict)
+    inherited_interfaces: list = field(default_factory=list)
+    inherited_interfaces_status: str = "NONE"
+    validation_scope: str = "native_boundary_segments_and_new_maxwell_interface"
+    composition_dropped: bool = False
+    source_thermodynamic_rows_preserved: bool = False
+
+
+class MaxwellV2Error(NativeExecutionError):
+    """A structured failure retaining the v2 evidence accumulated so far."""
+    def __init__(self, message: str, *, report: MaxwellV2Report, category: str):
+        super().__init__(message, category=category, operation="maxwell-transition-v2")
+        self.report = report
+
+
+def _fail(report, category, message):
+    report.status = report.rejection_category = category
+    raise MaxwellV2Error("v2: " + message, report=report, category=category)
 
 
 def _segment_by_iphase(iphase: np.ndarray) -> list:
-    """Split a 1D Iphase array into contiguous segments.
-
-    Returns a list of (label, start_idx, end_idx_exclusive) tuples. A segment
-    is a maximal run of identical Iphase values.
-    """
-    segments = []
     if len(iphase) == 0:
-        return segments
-    start = 0
-    cur = int(iphase[0])
-    for i in range(1, len(iphase)):
-        if int(iphase[i]) != cur:
-            segments.append((cur, start, i))
-            start = i
-            cur = int(iphase[i])
-    segments.append((cur, start, len(iphase)))
-    return segments
+        return []
+    breaks = np.r_[0, np.flatnonzero(np.diff(iphase) != 0)+1, len(iphase)]
+    return [(int(iphase[a]), int(a), int(b)) for a, b in zip(breaks[:-1], breaks[1:])]
 
 
 def _segment_eosdata(d: EOSData, seg: tuple) -> EOSData:
-    """Extract a sub-slice of an EOSData as a single-smooth-phase EOSData."""
-    label, start, end = seg
-    n = np.asarray(d.nb, float)[start:end]
-    z = np.zeros_like(n)
-    sl = slice(start, end)
-    return EOSData(
-        nb=n, mn=float(d.mn), mp=float(d.mp),
-        Q1=np.asarray(d.Q1, float)[sl], Q2=np.asarray(d.Q2, float)[sl],
-        Q3=np.asarray(d.Q3, float)[sl], Q4=np.asarray(d.Q4, float)[sl],
-        Q5=np.asarray(d.Q5, float)[sl], Q6=np.asarray(d.Q6, float)[sl],
-        Q7=np.asarray(d.Q7, float)[sl], q_extra=np.asarray(d.q_extra, float)[sl],
-        Iphase=np.asarray(d.Iphase, int)[sl],
-        Yn=np.asarray(d.Yn, float)[sl], Yp=np.asarray(d.Yp, float)[sl],
-        Ye=np.asarray(d.Ye, float)[sl], Ymu=np.asarray(d.Ymu, float)[sl],
-        Aav=np.asarray(d.Aav, float)[sl], Zav=np.asarray(d.Zav, float)[sl],
-        Yh=np.asarray(d.Yh, float)[sl],
-        Il=d.Il, iT=d.iT, iYq=d.iYq, inb_start=d.inb_start,
-        temperature_mev=d.temperature_mev,
-        charge_fraction_grid=float(getattr(d, 'charge_fraction_grid', 0.0)),
-        q_extra_count=int(getattr(d, 'q_extra_count', 0)),
-        composition_available=bool(getattr(d, 'composition_available', False)),
-        beta_equilibrated=True)
+    """Slice rows without losing support seals, masks, axes or beta evidence."""
+    _, start, end = seg
+    out = d.copy()
+    for name in _ROW_FIELDS:
+        setattr(out, name, np.asarray(getattr(d, name))[start:end].copy())
+    for name in ("q_full", "q_extra_full"):
+        arr = np.asarray(getattr(d, name))
+        if arr.size:
+            setattr(out, name, arr[..., start:end].copy())
+    out.inb_start = d.inb_start + start
+    return out
 
 
-def _local_neutrality_residual(d: EOSData, sl: slice) -> float:
-    """|Yp - Ye - Ymu| max over a slice -- local charge neutrality evidence."""
-    Yp = np.asarray(d.Yp, float)[sl]
-    Ye = np.asarray(d.Ye, float)[sl]
-    Ymu = np.asarray(d.Ymu, float)[sl]
-    return float(np.max(np.abs(Yp - Ye - Ymu))) if len(Yp) else 0.0
+def _local_neutrality_residual(d: EOSData, sl: slice) -> float | None:
+    """Evaluate total charge only where the complete nuclear/lepton inventory exists."""
+    applicable = np.asarray(d.C4_applicable, bool)[sl]
+    if not d.composition_available or not applicable.size or not np.all(applicable):
+        return None
+    yp, ye, ym = (np.asarray(getattr(d, name), float)[sl] for name in ("Yp", "Ye", "Ymu"))
+    a, z, yh = (np.asarray(getattr(d, name), float)[sl] for name in ("Aav", "Zav", "Yh"))
+    if np.any(a <= 0):
+        return None
+    return float(np.max(np.abs(yp+(z/a)*yh-ye-ym)))
 
 
-def construct_maxwell_transition_v2(low: EOSData, high: EOSData,
-                                      *, assume_local_charge_neutrality: bool = True,
+def _physical_reencode(data: EOSData, mn: float, mp: float) -> EOSData:
+    """Change the serialization reference, preserving each physical column."""
+    out = data.copy()
+    if data.mn != mn:
+        for name in ("Q3", "Q6", "Q7"):
+            setattr(out, name, (getattr(data, name)+1.)*data.mn/mn-1.)
+        for name in ("Q4", "Q5"):
+            setattr(out, name, getattr(data, name)*data.mn/mn)
+    out.mn, out.mp = mn, mp
+    return out
+
+
+def _retain_tails(low, high, matched, raw_low, raw_high, report):
+    prefix = _segment_eosdata(low, (0, 0, raw_low[-1][1]))
+    suffix = _segment_eosdata(high, (0, raw_high[0][2], high.n))
+    prefix = _physical_reencode(prefix, matched.mn, matched.mp)
+    suffix = _physical_reencode(suffix, matched.mn, matched.mp)
+    nlow_segments = len(raw_low)
+    report.output_phase_map = []
+    for side, segments, offset in (("low", raw_low, 0), ("high", raw_high, nlow_segments)):
+        for i, (label, start, end) in enumerate(segments):
+            report.output_phase_map.append({
+                "output_iphase": offset+i+1, "source": side,
+                "source_iphase": label, "source_rows_zero_based": [start, end-1],
+                "boundary_segment": (side == "low" and i == len(segments)-1) or (side == "high" and i == 0),
+            })
+    for i, (_, a, b) in enumerate(raw_low[:-1]):
+        prefix.Iphase[a:b] = i+1
+    for i, (_, a, b) in enumerate(raw_high[1:], start=1):
+        suffix.Iphase[a-raw_high[0][2]:b-raw_high[0][2]] = nlow_segments+i+1
+    middle = matched.copy()
+    middle.Iphase = np.where(matched.Iphase == 1, nlow_segments, nlow_segments+1)
+    out = matched.copy()
+    for name in _ROW_FIELDS:
+        setattr(out, name, np.concatenate([getattr(part, name) for part in (prefix, middle, suffix)]))
+    out.inb_start = 1
+    out.source_dir = None  # a composite is not a sealed source directory
+    out.composition_file_present = True
+    out.composition_available = False
+    out.row_status[:] = 1  # phase-only, no abundance inventory
+    out.beta_equilibrated = bool(low.beta_equilibrated and high.beta_equilibrated)
+    if np.any(np.diff(out.nb) <= 0) or not np.all(np.isfinite(out.nb)):
+        _fail(report, "INVALID_RETAINED_SOURCE_ORDER", "retained source tails do not form an ordered density table")
+    first = prefix.n + int(report.native_report["low_phase_rows"]) - 1
+    report.transition_row_indices_zero_based = [first, first+1]
+    report.retained_source_rows = {"low_prefix": prefix.n, "high_suffix": suffix.n}
+    boundaries = np.flatnonzero(np.diff(out.Iphase) != 0)
+    report.inherited_interfaces = [{
+        "row_indices_zero_based": [int(i), int(i+1)],
+        "left_output_iphase": int(out.Iphase[i]), "right_output_iphase": int(out.Iphase[i+1]),
+        "status": "PRESERVED_SOURCE_BOUNDARY_NO_CROSS_PHASE_INTERPOLATION",
+    } for i in boundaries if i != first]
+    report.inherited_interfaces_status = (
+        "PRESERVED_SOURCE_BOUNDARIES_NO_CROSS_PHASE_INTERPOLATION" if report.inherited_interfaces else "NONE")
+    report.source_thermodynamic_rows_preserved = True
+    return out
+
+
+def construct_maxwell_transition_v2(low: EOSData, high: EOSData, *,
+                                      assume_local_charge_neutrality: bool = False,
+                                      drop_composition: bool = False,
                                       return_report: bool = True):
-    """Composition-aware v2 Maxwell. Segments at Iphase boundaries, runs v1
-    on each smooth segment-pair, preserves per-segment composition.
+    """Match boundary segments and retain all other supplied source rows.
 
-    Returns (matched, report) on success or raises with a v2 status category.
+    Composition is dropped only by explicit request. A successful report proves
+    the new interface and its two native boundary segments; inherited source
+    interfaces remain explicitly unvalidated. It does not certify a surface EOS
+    or a stellar solver's support for all phase boundaries.
     """
     report = MaxwellV2Report()
-
-    # v1 is a thermo-only kernel. Do not silently drop a CompOSE composition
-    # sidecar or its row-level semantics while extracting an Iphase segment.
-    has_composition = any(
-        bool(getattr(phase, flag, False))
-        for phase in (low, high)
-        for flag in ("composition_available", "composition_file_present")
-    )
-    if has_composition:
-        report.status = "COMPOSITION_UNSUPPORTED"
-        report.rejection_category = "COMPOSITION_UNSUPPORTED"
-        raise RuntimeError(
-            "v2: COMPOSITION_UNSUPPORTED: current native v1 kernel is "
-            "thermo-only; composition-bearing inputs require a dedicated "
-            "composition-aware native transition and output path."
-        )
-
-    # axis-value slice compatibility (charge_fraction_grid value, not iYq int)
-    cf_low = float(getattr(low, 'charge_fraction_grid', 0.0))
-    cf_high = float(getattr(high, 'charge_fraction_grid', 0.0))
-    report.axis_value_slice_compatible = abs(cf_low - cf_high) < 1e-12
+    if not isinstance(low, EOSData) or not isinstance(high, EOSData):
+        raise TypeError("low and high must both be EOSData instances")
+    if not isinstance(drop_composition, bool) or not isinstance(return_report, bool):
+        raise TypeError("drop_composition and return_report must be bool")
+    if not isinstance(assume_local_charge_neutrality, bool):
+        raise TypeError("assume_local_charge_neutrality must be bool")
+    if not assume_local_charge_neutrality:
+        _fail(report, "LOCAL_NEUTRALITY_NOT_CONFIRMED", "caller must confirm local charge neutrality")
+    has_composition = any(bool(getattr(d, flag)) for d in (low, high)
+                          for flag in ("composition_available", "composition_file_present"))
+    if has_composition and not drop_composition:
+        _fail(report, "COMPOSITION_UNSUPPORTED", "COMPOSITION_UNSUPPORTED: native kernel is thermo-only; explicit drop_composition=True is required")
+    cf_low, cf_high = float(low.charge_fraction_grid), float(high.charge_fraction_grid)
+    report.axis_value_slice_compatible = (low.Il == high.Il and abs(cf_low-cf_high) < 1e-12)
     if not report.axis_value_slice_compatible:
-        report.status = "NO_COMMON_MU_SUPPORT"
-        report.rejection_category = "NO_COMMON_MU_SUPPORT"
-        raise RuntimeError(
-            f"v2: charge_fraction_grid mismatch (low={cf_low}, high={cf_high}); "
-            f"axis-value slice incompatible. Original iYq labels: low={low.iYq}, high={high.iYq}.")
-
-    # segment each input at Iphase boundaries
-    segs_low_raw = _segment_by_iphase(np.asarray(low.Iphase, int))
-    segs_high_raw = _segment_by_iphase(np.asarray(high.Iphase, int))
-
-    if not segs_low_raw or not segs_high_raw:
-        report.status = "INVALID_PHASE_INPUT"
-        report.rejection_category = "INVALID_PHASE_INPUT"
-        raise RuntimeError("v2: empty input phase (no Iphase segments)")
-
-    # build segment metadata (composition, local neutrality evidence)
-    for s in segs_low_raw:
-        sl = slice(s[1], s[2])
-        report.segments_low.append(Segment(
-            iphase_label=s[0], row_slice=sl, n_rows=s[2]-s[1],
-            composition_available=bool(getattr(low, 'composition_available', False)),
-            charge_neutrality_residual=_local_neutrality_residual(low, sl),
-            provenance={"source": "low", "iYq_label": int(low.iYq)}))
-    for s in segs_high_raw:
-        sl = slice(s[1], s[2])
-        report.segments_high.append(Segment(
-            iphase_label=s[0], row_slice=sl, n_rows=s[2]-s[1],
-            composition_available=bool(getattr(high, 'composition_available', False)),
-            charge_neutrality_residual=_local_neutrality_residual(high, sl),
-            provenance={"source": "high", "iYq_label": int(high.iYq)}))
-
-    # local neutrality evidence per phase (recorded, not just boolean)
-    report.local_neutrality_evidence_low = {
-        f"segment_{i}_iphase_{s.iphase_label}": {
-            "n_rows": s.n_rows, "charge_neutrality_residual": s.charge_neutrality_residual,
-            "composition_available": s.composition_available}
-        for i, s in enumerate(report.segments_low)}
-    report.local_neutrality_evidence_high = {
-        f"segment_{i}_iphase_{s.iphase_label}": {
-            "n_rows": s.n_rows, "charge_neutrality_residual": s.charge_neutrality_residual,
-            "composition_available": s.composition_available}
-        for i, s in enumerate(report.segments_high)}
-
-    # reject if any segment has nonzero Nadd and the provider semantics
-    # are not recognised (COMPOSITION_UNSUPPORTED_LAYOUT)
-    nadd_low = int(getattr(low, 'q_extra_count', 0))
-    nadd_high = int(getattr(high, 'q_extra_count', 0))
-    if nadd_low > 0 or nadd_high > 0:
-        report.status = "COMPOSITION_UNSUPPORTED"
-        report.rejection_category = "COMPOSITION_UNSUPPORTED"
-        raise RuntimeError(
-            f"v2: nonzero Nadd (low={nadd_low}, high={nadd_high}) from an "
-            f"unrecognised provider; provider-specific q_extra semantics "
-            f"cannot be preserved generically. COMPOSITION_UNSUPPORTED_LAYOUT.")
-
-    # run v1 native Maxwell on each (low-seg, high-seg) pair
-    # the densest low segment vs the least-dense high segment is the
-    # physically relevant coexistence candidate (crust-core transition)
-    # pick the LAST low segment (highest density) and FIRST high segment
-    # (lowest density) -- this is the crust-core boundary
-    last_low = segs_low_raw[-1]
-    first_high = segs_high_raw[0]
-    report.admitted_pairs.append((len(segs_low_raw)-1, 0))
-
-    low_seg = _segment_eosdata(low, last_low)
-    high_seg = _segment_eosdata(high, first_high)
-
+        _fail(report, "SLICE_CONVENTION_MISMATCH", f"charge_fraction_grid mismatch or Il mismatch (low={cf_low}/{low.Il}, high={cf_high}/{high.Il}); axis-value slice incompatible")
+    raw_low = _segment_by_iphase(np.asarray(low.Iphase, int))
+    raw_high = _segment_by_iphase(np.asarray(high.Iphase, int))
+    if not raw_low or not raw_high:
+        _fail(report, "INVALID_PHASE_INPUT", "empty input phase (no Iphase segments)")
+    for side, data, segments in (("low", low, raw_low), ("high", high, raw_high)):
+        target = getattr(report, "segments_"+side)
+        for label, start, end in segments:
+            sl = slice(start, end)
+            target.append(Segment(label, sl, end-start, data.composition_available,
+                _local_neutrality_residual(data, sl),
+                {"source": side, "iYq_label": data.iYq, "source_dir": data.source_dir}))
+        setattr(report, "local_neutrality_evidence_"+side, {
+            f"segment_{i}_iphase_{s.iphase_label}": {
+                "n_rows": s.n_rows, "charge_neutrality_residual": s.charge_neutrality_residual,
+                "composition_available": s.composition_available,
+                "basis": "complete_inventory" if s.charge_neutrality_residual is not None else "unavailable_caller_assumption_only",
+            } for i, s in enumerate(target)})
+    if low.q_extra_count > 0 or high.q_extra_count > 0:
+        _fail(report, "COMPOSITION_UNSUPPORTED", "COMPOSITION_UNSUPPORTED_LAYOUT: nonzero Nadd requires explicit provider semantics")
+    low_input = _thermo_only_view(low) if drop_composition else low
+    high_input = _thermo_only_view(high) if drop_composition else high
+    report.composition_dropped = has_composition and drop_composition
+    selected = (len(raw_low)-1, 0)
+    report.attempted_pairs.append(selected)
     try:
-        matched, v1_report = construct_maxwell_transition(
-            low_seg, high_seg,
-            assume_local_charge_neutrality=assume_local_charge_neutrality,
-            return_report=True)
-    except NativeExecutionError as e:
-        # Structured-status taxonomy (§3/§4). The Fortran layer emits a stable
-        # `category` field alongside the free-form message; the v2 layer
-        # consumes it directly instead of inferring a category from the
-        # exception text. This guarantees that the same underlying failure
-        # receives the same status in every transformation and every run, and
-        # removes the text-based category inference that previously produced
-        # inconsistent labels for identical Q5 beta-equilibrium failures.
-        cat = e.category or "INTERPOLATION_UNSTABLE"
-        # Map the §3/§4 Fortran category to the v2 report status. The category
-        # names are identical to the §3 terminal-outcome set.
-        report.status = cat
-        report.rejection_category = cat
-        raise RuntimeError(f"v2: v1 kernel rejected segment pair: {e}") from e
-    except Exception as e:
-        report.status = "INTERPOLATION_UNSTABLE"; report.rejection_category = "INTERPOLATION_UNSTABLE"
-        raise RuntimeError(f"v2: v1 kernel rejected segment pair: {e}") from e
-
-    # success -- record coexistence with per-segment composition provenance
-    coex = {
-        "mu_t_mev": float(v1_report.get("mu_transition", 0.0)),
-        "P_t_mev_fm3": float(v1_report.get("pressure_transition", 0.0)),
-        "n_low_fm3": float(v1_report.get("n_low", 0.0)),
-        "n_high_fm3": float(v1_report.get("n_high", 0.0)),
-        "delta_n_fm3": float(v1_report.get("n_high", 0.0)) - float(v1_report.get("n_low", 0.0)),
-        "first_law_resid": float(v1_report.get("maxwell_identity_residual", 0.0)),
-        "low_segment_iphase": last_low[0],
-        "high_segment_iphase": first_high[0],
-        "low_segment_n_rows": last_low[2]-last_low[1],
-        "high_segment_n_rows": first_high[2]-first_high[1],
+        matched, native = construct_maxwell_transition(
+            _segment_eosdata(low_input, raw_low[-1]),
+            _segment_eosdata(high_input, raw_high[0]),
+            assume_local_charge_neutrality=True, return_report=True)
+    except NativeExecutionError as exc:
+        _fail(report, exc.category or "UNKNOWN", f"native boundary-segment construction rejected: {exc}")
+    except (ValueError, TypeError) as exc:
+        _fail(report, "INPUT_CONTRACT_FAILURE", f"source support/input contract rejected: {exc}")
+    required = ("mu_transition", "pressure_transition", "n_low", "n_high",
+                "maxwell_identity_residual", "low_phase_rows", "high_phase_rows")
+    if any(name not in native for name in required):
+        _fail(report, "MALFORMED_NATIVE_REPORT", "required coexistence fields missing from native report")
+    if native.get("retained_thermodynamic_rows") != "physical_columns_preserved_without_reconstruction":
+        _fail(report, "MALFORMED_NATIVE_REPORT", "native backend does not declare lossless retained-row semantics; rebuild the current backend")
+    report.native_report = dict(native)
+    out = _retain_tails(low_input, high_input, matched, raw_low, raw_high, report)
+    report.coexistence_results.append({
+        "mu_t_mev": float(native["mu_transition"]),
+        "P_t_mev_fm3": float(native["pressure_transition"]),
+        "n_low_fm3": float(native["n_low"]), "n_high_fm3": float(native["n_high"]),
+        "delta_n_fm3": float(native["n_high"])-float(native["n_low"]),
+        "first_law_resid": float(native["maxwell_identity_residual"]),
+        "low_segment_iphase": raw_low[-1][0], "high_segment_iphase": raw_high[0][0],
+        "low_segment_n_rows": raw_low[-1][2]-raw_low[-1][1],
+        "high_segment_n_rows": raw_high[0][2]-raw_high[0][1],
         "low_composition_preserved_from_segment": False,
         "high_composition_preserved_from_segment": False,
-        "composition_status": "NOT_AVAILABLE_THERMO_ONLY",
-        "output_composition_available": False,
-    }
-    report.coexistence_results.append(coex)
+        "composition_status": "NOT_AVAILABLE_THERMO_ONLY", "output_composition_available": False,
+    })
+    report.admitted_pairs.append(selected)
     report.status = "PASS"
-    return matched, report
+    return (out, report) if return_report else out

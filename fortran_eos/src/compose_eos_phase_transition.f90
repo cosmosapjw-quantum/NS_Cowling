@@ -4,7 +4,7 @@ module compose_eos_phase_transition
   implicit none
   private
   public :: maxwell_transition_report_t, construct_maxwell_transition
-  public :: maxwell_status_category
+  public :: maxwell_status_category, diagnose_maxwell_phase
   character(len=*), parameter, public :: MAXWELL_METHOD_ID = 'maxwell'
 
   ! Structured terminal-outcome identifiers for the Maxwell construction. The
@@ -68,6 +68,8 @@ module compose_eos_phase_transition
     real(wp) :: density_jump = 0._wp
     real(wp) :: latent_energy_density = 0._wp
     real(wp) :: maxwell_identity_residual = 0._wp
+    real(wp) :: interface_pressure_encoding_difference = 0._wp
+    real(wp) :: interface_pressure_roundoff_bound = 0._wp
     real(wp) :: max_euler_residual_low = 0._wp
     real(wp) :: max_euler_residual_high = 0._wp
     real(wp) :: min_cs2_low = huge(1._wp)
@@ -168,12 +170,13 @@ contains
     endif
   end subroutine quadratic_interval_minimum
 
-  subroutine validate_phase(eos,mu_grid,p_grid,eps_grid,max_euler,min_cs2,max_cs2,status)
+  subroutine validate_phase(eos,mu_grid,p_grid,eps_grid,max_euler,min_cs2,max_cs2,status,diagnostic_interval)
     type(eos_data_t),intent(in) :: eos
     real(wp),allocatable,intent(out) :: mu_grid(:),p_grid(:),eps_grid(:)
     real(wp),intent(out) :: max_euler,min_cs2,max_cs2
     character(len=*),intent(out) :: status
-    integer :: npts,i,j
+    logical,optional,intent(in) :: diagnostic_interval
+    integer :: npts,i,j,minimum_points
     real(wp) :: mu_source,residual,muq,p,nbval,dndmu,eps,cs2
     real(wp) :: mu0,mu1,mumid,p0,pmid,p1,n0,nmid,n1,d0,dmid,d1
     real(wp) :: h0,hmid,h1,min_n,min_h,min_dn,scale
@@ -183,7 +186,14 @@ contains
     min_cs2=huge(1._wp)
     max_cs2=0._wp
     npts=eos%n
-    if(npts<3) then
+    minimum_points=3
+    ! Only the read-only interval diagnostic may examine two knots. The
+    ! production constructor never passes this argument and still requires
+    ! at least three source knots, plus two retained knots on each side.
+    if(present(diagnostic_interval))then
+      if(diagnostic_interval)minimum_points=2
+    endif
+    if(npts<minimum_points) then
       status='each Maxwell phase requires at least three source points'
       return
     endif
@@ -332,6 +342,57 @@ contains
     enddo
     status='ok'
   end subroutine validate_phase
+
+  subroutine diagnose_maxwell_phase(eos,csv_path,n_valid,global_status,status)
+    !! Read-only, source-local diagnostic. Each interval is checked by the
+    !! exact production validator, independently of any partner EOS or root.
+    !! No row is modified and no invalid interval is implicitly bridged.
+    type(eos_data_t),intent(in) :: eos
+    character(len=*),intent(in) :: csv_path
+    integer,intent(out) :: n_valid
+    character(len=*),intent(out) :: global_status,status
+    type(eos_data_t) :: cell
+    real(wp),allocatable :: mu(:),p(:),eps(:)
+    real(wp) :: max_euler,min_cs2,max_cs2
+    integer :: i,u,ios
+    character(len=512) :: interval_status
+    character(len=40) :: category
+
+    n_valid=0
+    call validate_phase(eos,mu,p,eps,max_euler,min_cs2,max_cs2,global_status)
+    if(eos%n<2)then
+      status='phase diagnostic requires at least two source rows';return
+    endif
+    open(newunit=u,file=csv_path,status='replace',action='write',iostat=ios)
+    if(ios/=0)then
+      status='cannot write Maxwell phase interval diagnostic';return
+    endif
+    write(u,'(a)')'left_row_zero_based,right_row_zero_based,n_left_fm3,n_right_fm3,valid,category,message,max_euler_residual,min_cs2,max_cs2'
+    cell=eos
+    call allocate_eos(cell,2)
+    do i=1,eos%n-1
+      cell%nb=eos%nb(i:i+1)
+      cell%q=eos%q(:,i:i+1)
+      cell%q_extra=eos%q_extra(i:i+1)
+      cell%iphase=eos%iphase(i:i+1)
+      ! The reader's beta flag summarizes its selected Q5 rows. Recompute
+      ! that same summary for this diagnostic slice; the global flag and
+      ! global validation status are separately returned to the caller.
+      cell%beta_equilibrated=all(ieee_is_finite(cell%q(5,:))).and. &
+                             maxval(abs(cell%q(5,:)))<lepton_potential_tolerance
+      call validate_phase(cell,mu,p,eps,max_euler,min_cs2,max_cs2,interval_status,.true.)
+      category=maxwell_status_category(interval_status)
+      if(interval_status=='ok')then
+        category='PASS';n_valid=n_valid+1
+      endif
+      if(cell%iphase(1)/=cell%iphase(2))category='INHERITED_PHASE_BOUNDARY'
+      write(u,'(i0,a,i0,a,es24.16e3,a,es24.16e3,a,i0,5a,es24.16e3,a,es24.16e3,a,es24.16e3)') &
+        i-1,',',i,',',cell%nb(1),',',cell%nb(2),',',merge(1,0,interval_status=='ok'), &
+        ',',trim(category),',"',trim(interval_status),'",',max_euler,',',min_cs2,',',max_cs2
+    enddo
+    close(u)
+    status='ok'
+  end subroutine diagnose_maxwell_phase
 
   recursive subroutine quick_sort(values,left,right)
     real(wp),intent(inout) :: values(:)
@@ -680,16 +741,19 @@ contains
     real(wp),intent(in) :: mu_euler
     out%nb(k)=eos%nb(i)
     out%q(:,k)=eos%q(:,i)
-    ! CompOSE Q4 and Q6/Q7 depend on the source normalization mass.
-    ! Decode with that source's mass and re-encode with the output reference;
-    ! no additive rest-energy-per-baryon shift is applied.
-    out%q(4,k)=eos%q(4,i)*eos%mn/out%mn
-    out%q(2,k)=0._wp
-    out%q(5,k)=0._wp
-    out%q(3,k)=mu_euler/out%mn-1._wp
-    if(eos%il==0)out%q(3,k)=out%q(3,k)-eos%charge_fraction_grid*out%q(4,k)
-    out%q(6,k)=(1._wp+eos%q(7,i))*eos%mn/out%mn-1._wp
-    out%q(7,k)=out%q(6,k)
+    ! A retained source row is not a thermodynamic reconstruction. Preserve
+    ! its supplied entropy, all three chemical potentials, free energy and
+    ! internal energy separately, including deviations admitted by the input
+    ! tolerances. Only the two newly constructed coexistence rows are derived
+    ! from the Maxwell identities. Re-encoding a different header mass must
+    ! leave physical mu_B, mu_Q, mu_L, F/n and epsilon/n unchanged.
+    if(eos%mn/=out%mn)then
+      out%q(3,k)=(1._wp+eos%q(3,i))*eos%mn/out%mn-1._wp
+      out%q(4,k)=eos%q(4,i)*eos%mn/out%mn
+      out%q(5,k)=eos%q(5,i)*eos%mn/out%mn
+      out%q(6,k)=(1._wp+eos%q(6,i))*eos%mn/out%mn-1._wp
+      out%q(7,k)=(1._wp+eos%q(7,i))*eos%mn/out%mn-1._wp
+    endif
     out%q_extra(k)=0._wp
     out%iphase(k)=phase_id
   end subroutine copy_source_row
@@ -703,7 +767,7 @@ contains
     real(wp),allocatable :: mu_low(:),p_low(:),eps_low(:),mu_high(:),p_high(:),eps_high(:)
     real(wp) :: euler_low,euler_high,mincs_low,maxcs_low,mincs_high,maxcs_high
     real(wp) :: mu_t,p_t,pa,na,ca,pb,nb,cb,q4,q5,qe,epsa,epsb
-    real(wp) :: identity_residual,mu_tol
+    real(wp) :: identity_residual,mu_tol,pressure_roundoff
     real(wp),allocatable :: p_out(:),eps_out(:)
     integer :: roots,nlow,nhigh,i,k
     logical :: ok
@@ -835,10 +899,27 @@ contains
     allocate(p_out(out%n),eps_out(out%n))
     p_out=eos_pressure(out)
     eps_out=eos_energy(out)
-    if(any(out%nb(2:)<=out%nb(:out%n-1)).or.any(p_out(2:)<p_out(:out%n-1))) then
+    if(any(out%nb(2:)<=out%nb(:out%n-1))) then
       status='Maxwell output is not ordered by strictly increasing density and nondecreasing pressure'
       return
     endif
+    ! Both coexistence knots encode the SAME physical p_t as Q1=p_t/n.
+    ! Re-decoding Q1*n can differ by one ulp between distinct densities.
+    ! Permit only floating-point re-encoding error at this known pair; do not
+    ! alter a pressure and do not relax any within-phase monotonicity gate.
+    pressure_roundoff=64._wp*epsilon(1._wp)* &
+      max(tiny(1._wp),abs(p_t),abs(p_out(nlow+1)),abs(p_out(nlow+2)))
+    do i=1,out%n-1
+      if(i==nlow+1)then
+        if(abs(p_out(i+1)-p_out(i))>pressure_roundoff)then
+          status='Maxwell coexistence pressure re-encoding exceeds its floating-point roundoff bound'
+          return
+        endif
+      else if(p_out(i+1)<=p_out(i))then
+        status='Maxwell output pressure is not strictly increasing within a retained phase'
+        return
+      endif
+    enddo
     if(any(eps_out(2:)<=eps_out(:out%n-1))) then
       status='Maxwell output energy density is not strictly increasing'
       return
@@ -857,6 +938,8 @@ contains
     report%density_jump=nb-na
     report%latent_energy_density=epsb-epsa
     report%maxwell_identity_residual=identity_residual
+    report%interface_pressure_encoding_difference=p_out(nlow+2)-p_out(nlow+1)
+    report%interface_pressure_roundoff_bound=pressure_roundoff
     report%max_euler_residual_low=euler_low
     report%max_euler_residual_high=euler_high
     report%min_cs2_low=mincs_low
@@ -906,6 +989,13 @@ contains
     if(index(s,'rest-mass')>0 .or. index(s,'mass conventions')>0 .or. &
        index(s,'nucleon masses')>0) then
       category = 'MASS_CONVENTION_FAIL'; return
+    endif
+
+    ! A metadata mismatch is not evidence of failed beta equilibrium, and
+    ! must be classified before the generic lepton-potential branch below.
+    if(index(s,'lepton-content')>0 .or. index(s,'charge_fraction_grid')>0 .or. &
+       index(s,'charge-fraction')>0) then
+      category = 'SLICE_CONVENTION_MISMATCH'; return
     endif
 
     ! beta-equilibrium / lepton-potential / entropy / T=0
@@ -967,12 +1057,6 @@ contains
     if(index(s,'denser high-density')>0 .or. index(s,'nonpositive')>0 .or. &
        index(s,'not ordered')>0 .or. index(s,'nondecreasing pressure')>0) then
       category = 'NONPOSITIVE_DENSITY_JUMP'; return
-    endif
-
-    ! lepton-content / charge-fraction axis mismatch
-    if(index(s,'lepton-content')>0 .or. index(s,'charge_fraction_grid')>0 .or. &
-       index(s,'charge-fraction')>0) then
-      category = 'NO_COMMON_MU_SUPPORT'; return
     endif
 
     ! caller did not confirm local charge neutrality

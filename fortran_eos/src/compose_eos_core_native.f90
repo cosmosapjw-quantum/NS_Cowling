@@ -37,9 +37,14 @@ contains
   select case(trim(model))
   case('APR_APR');lo=.085_wp;hi=1.34_wp;mn=939.5654133_wp;mp=938.2720813_wp
   case('BBB_BHF2');lo=.08_wp;hi=1.5_wp
-  case('GM_GM1');lo=.08_wp;hi=1._wp
-  case('RG_KDE0v1');lo=.08_wp;hi=1.8_wp;mn=939.5654_wp;mp=938.2720_wp
-  case('RG_SLY4');lo=.08_wp;hi=1.4_wp;mn=939.5654_wp;mp=938.2720_wp
+  ! These three analytic functionals also define a homogeneous
+  ! beta-equilibrated branch below the customary .08 default sampling limit.
+  ! Computational support is not a claim that uniform matter is the global
+  ! ground state: mechanical stability, causality and crust coexistence are
+  ! checked independently. No table extrapolation or pressure clipping occurs.
+  case('GM_GM1');lo=.02_wp;hi=1._wp
+  case('RG_KDE0v1');lo=.02_wp;hi=1.8_wp;mn=939.5654_wp;mp=938.2720_wp
+  case('RG_SLY4');lo=.02_wp;hi=1.4_wp;mn=939.5654_wp;mp=938.2720_wp
   case default;status='unknown native core model: '//trim(model)
   end select
  end subroutine

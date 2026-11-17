@@ -9,8 +9,8 @@ program test_maxwell_status_category
   use compose_eos_phase_transition, only: maxwell_status_category, MAXWELL_STATUS_UNKNOWN
   implicit none
   integer :: fails, i
-  character(len=160) :: statuses(11)
-  character(len=40)  :: expected(11)
+  character(len=160) :: statuses(12)
+  character(len=40)  :: expected(12)
   character(len=40)  :: got
 
   fails = 0
@@ -37,9 +37,11 @@ program test_maxwell_status_category
   expected(10) = 'COMPOSITION_UNSUPPORTED'
   statuses(11) = 'some unrecognized status string'
   expected(11) = MAXWELL_STATUS_UNKNOWN
+  statuses(12) = 'phase tables must use the same CompOSE lepton-content and charge-fraction conventions'
+  expected(12) = 'SLICE_CONVENTION_MISMATCH'
 
   write(*,'(a)') 'maxwell_status_category native checks:'
-  do i = 1, 11
+  do i = 1, 12
     got = maxwell_status_category(statuses(i))
     if (trim(got) /= trim(expected(i))) then
       write(*,'(2x,a,i0,2a)') 'FAIL ', i, ' expected ', trim(expected(i))

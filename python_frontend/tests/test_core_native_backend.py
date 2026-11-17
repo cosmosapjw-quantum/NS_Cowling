@@ -29,7 +29,10 @@ def native_core(tmp_path_factory):
     unit = build / "unit"
     subprocess.run(common + [str(ROOT / "fortran_eos/tests/test_core_native.f90"),
                              "-o", str(unit)], check=True, capture_output=True, text=True)
-    return probe, unit
+    subsaturation = build / "subsaturation"
+    subprocess.run(common + [str(ROOT / "fortran_eos/tests/test_core_subsaturation.f90"),
+                             "-o", str(subsaturation)], check=True, capture_output=True, text=True)
+    return probe, unit, subsaturation
 
 
 def native_rows(native_core, model, *args):
@@ -47,6 +50,22 @@ def oracle(model):
 def test_native_independent_first_law_conservation_and_gibbs(native_core):
     run = subprocess.run([str(native_core[1])], check=True, capture_output=True, text=True)
     assert "PASS native core functional, Gibbs, composition and generation tests" in run.stdout
+
+
+def test_native_subsaturation_domain_and_independent_first_law(native_core):
+    run = subprocess.run([str(native_core[2])], check=True, capture_output=True, text=True)
+    assert "PASS native subsaturation domain and independent first-law checks" in run.stdout
+
+
+def test_computational_support_is_distinct_from_default_sampling():
+    from compose_eos.generation_dispatch import generation_request
+    from compose_eos.native_model_contracts import MODEL_CONTRACTS
+    for model in ("GM_GM1", "RG_KDE0v1", "RG_SLY4"):
+        assert generation_request(model)["n_min"] == .08
+        assert MODEL_CONTRACTS[model]["computational_interval_fm3"][0] == .02
+        assert generation_request(model, n_min=.02)["n_min"] == .02
+    assert MODEL_CONTRACTS["APR_APR"]["default_interval_fm3"][0] == .085
+    assert MODEL_CONTRACTS["BBB_BHF2"]["default_interval_fm3"][0] == .08
 
 
 @pytest.mark.parametrize("model", MODELS)

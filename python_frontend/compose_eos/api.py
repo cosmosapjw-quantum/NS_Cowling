@@ -1187,6 +1187,46 @@ def _thermo_only_view(data: EOSData) -> EOSData:
     return result
 
 
+def diagnose_maxwell_phase(data: EOSData, *, drop_composition: bool = False) -> dict[str, Any]:
+    """Diagnose every original interval using the native Maxwell validator.
+
+    This read-only source diagnostic is independent of a matching partner and
+    returns no repaired or interpolated EOS. Two-knot tests identify contiguous
+    valid support; production matching still requires at least three knots and
+    independently repeats every physical gate. Phase boundaries remain explicit
+    invalid interpolation intervals. The per-interval beta flag is the same Q5
+    summary used by the selected-slice reader; the source flag is also reported.
+    """
+    import csv
+    if not isinstance(data, EOSData):
+        raise TypeError("data must be an EOSData instance")
+    if not isinstance(drop_composition, bool):
+        raise TypeError("drop_composition must be bool")
+    source = _thermo_only_view(data) if drop_composition else data
+    with tempfile.TemporaryDirectory(prefix="compose-eos-phase-diagnostic-") as td:
+        root = Path(td)
+        internal = root / "input"
+        internal.mkdir()
+        source.write_internal_directory(internal)
+        csv_path = root / "intervals.csv"
+        payload = run_native("maxwell-phase-diagnostic", internal, csv_path)
+        rows = list(csv.DictReader(csv_path.open(newline="", encoding="utf-8")))
+    intervals = []
+    for row in rows:
+        item = dict(row)
+        for key in ("left_row_zero_based", "right_row_zero_based"):
+            item[key] = int(row[key])
+        item["valid"] = bool(int(row["valid"]))
+        for key in ("n_left_fm3", "n_right_fm3", "max_euler_residual", "min_cs2", "max_cs2"):
+            item[key] = float(row[key])
+        intervals.append(item)
+    if len(intervals) != max(data.n-1, 0):
+        raise NativeExecutionError("native Maxwell diagnostic interval count differs from source grid")
+    return {**payload, "drop_composition_requested": drop_composition,
+            "intervals": intervals, "source_mutated": False,
+            "scope": "source_local_original_intervals_no_partner_conditioned_truncation"}
+
+
 def construct_maxwell_transition(phase_low: EOSData, phase_high: EOSData, *,
                                   assume_local_charge_neutrality: bool = False,
                                   drop_composition: bool = False,

@@ -209,6 +209,15 @@ program compose_eos_generate
  open(newunit=u,file=trim(out)//'/SUPPORT.json',status='replace')
  write(u,'(a)')'{"scope":"computed_native_samples","global_minimum_proven":false,"continuous_mesh_limit_proven":false,'
  write(u,'(a)')'"cross_phase_interpolation":"UNAPPROVED","cross_segment_interpolation":"UNAPPROVED",'
+ if(family=='core')then
+  write(u,'(a,es25.16e3,a,es25.16e3,a)')'"computational_interval_fm3":[',lo,',',hi,'],'
+  write(u,'(a,es25.16e3,a,es25.16e3,a)')'"requested_sample_interval_fm3":[',n_min,',',n_max,'],'
+  if(model=='GM_GM1'.or.model=='RG_KDE0v1'.or.model=='RG_SLY4')then
+   write(u,'(a)')'"homogeneous_branch_scope":"computed functional branch; no global-ground-state or stability guarantee",'
+  else
+   write(u,'(a)')'"branch_scope":"unchanged original model domain and phase prescription",'
+  endif
+ endif
  write(u,'(a)')'"physical_acceptance":"independent_of_CompOSE_numeric_agreement"}'
  close(u)
  open(newunit=u,file=trim(out)//'/RESULT.json',status='replace')

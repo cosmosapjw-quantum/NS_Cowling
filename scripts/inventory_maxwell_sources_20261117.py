@@ -37,7 +37,11 @@ def phase_inventory(path: Path):
                 start = end
     else:
         blocks = []
-    base.update(phase_blocks=blocks, source_Q5_range=[min(float(r[7]) for r in rows), max(float(r[7]) for r in rows)],
+    nadd = sorted({int(row[10]) for row in rows})
+    extra = [float(row[11]) for row in rows if len(row) > 11]
+    base.update(phase_blocks=blocks, nadd_values=nadd,
+                q_extra_range=[min(extra), max(extra)] if extra else None,
+                source_Q5_range=[min(float(r[7]) for r in rows), max(float(r[7]) for r in rows)],
                 thermodynamic_changes="NONE", table_sha256={f.name: sha(f) for f in sorted(path.glob("eos.*")) if f.is_file()})
     return base
 
@@ -108,10 +112,16 @@ def public_entry(model: str, path: Path):
         if model.startswith("RG_"):
             result["homogeneous_core_selection"]["phase_dictionary"] = "Provider PDF: Iphase4 heavy nuclei; Iphase3 homogeneous matter"
             result["chemical_column_status"] = "Provider says beta equilibrium, stored Q5 nonzero; must resolve representation/thermodynamic semantics, not automatically classify source as non-beta-equilibrated."
+        if model == "RG_KDE0v1":
+            result["extra_column_semantics"] = "UNKNOWN_PROVIDER_AUXILIARY; neither supplied 3-page PDF, README.txt nor eos.init defines the single extra column. It must not be called sound speed based on numerical resemblance."
+            result["auxiliary_projection_policy"] = "Lossless raw plus row-indexed auxiliary sidecar; Nadd=0 only in an explicitly named thermodynamic-only working view; never fabricate or interpret the omitted quantity."
     else:
         result["source_scope"] = "Public full raw crust including attached lower segment; source gap between phases0 and7 is not licensed as a smooth interpolating interval."
         if model in TF:
             result["extra_column_semantics"] = "Nadd categorical geometry; distinct from Iphase; no numerical interpolation"
+            result["extra_column_primary_evidence"] = {"path": relative(path / "eos.pdf"), "sha256": sha(path / "eos.pdf"), "page": 2,
+                "definition": {"0": "outer crust", "1": "droplets", "2": "rods", "3": "slabs", "4": "tubes", "5": "bubbles", "6": "homogeneous core"}}
+            result["auxiliary_projection_policy"] = "Retain exact per-row geometry separately from Iphase; a thermo-only working view may omit the payload only with a declared loss receipt and without erasing its branch-boundary information."
     return result
 
 

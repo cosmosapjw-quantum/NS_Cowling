@@ -17,11 +17,11 @@ program core_domain_bounds
  enddo
  call core_sound_speed_fd('RG_SLY4',1.3999_wp,1.e-4_wp,cs,cm,fl,status)
  call expect('upper stencil overrun',status,'finite-difference stencil outside declared native core model bounds')
- call core_sound_speed_fd('RG_SLY4',.08001_wp,1.e-4_wp,cs,cm,fl,status)
+ call core_sound_speed_fd('RG_SLY4',.020001_wp,1.e-4_wp,cs,cm,fl,status)
  call expect('lower stencil overrun',status,'finite-difference stencil outside declared native core model bounds')
  call core_sound_speed_analytic('RG_SLY4',1.4_wp,cs,fr,hh,br,status)
  call expect('analytic inclusive upper endpoint',status,'ok')
- call core_sound_speed_analytic('RG_SLY4',.08_wp,cs,fr,hh,br,status)
+ call core_sound_speed_analytic('RG_SLY4',.02_wp,cs,fr,hh,br,status)
  call expect('analytic inclusive lower endpoint',status,'ok')
  call core_sound_speed_fd('RG_SLY4',1.399_wp,2.e-5_wp,cs,cm,fl,status)
  call expect('interior full stencil',status,'ok')

@@ -1,0 +1,1062 @@
+{
+  "schema": "ns-cowling.extension-modes.v1",
+  "stage": "E",
+  "status": "SELECTED_PRIMARY_MODES_ACCEPTED",
+  "closure": "equilibrium barotropic perfect fluid: Gamma1=Gamma_eq",
+  "convention": "(-+++), geometric km, Phi half temporal metric, frequency at infinity",
+  "ell": 2,
+  "center": "regular series at finite r0; center-radius sensitivity tested",
+  "surface": "TOV h=0 vacuum surface; mode DeltaP=0 at positive hcut, surface sensitivity tested",
+  "eos_interface": "continuous W,V at continuous EOS knots; no sharp Maxwell jump",
+  "residual_acceptance": 2e-06,
+  "models": [
+    {
+      "label": "near_endpoint",
+      "central_density_fm3": 1.1818927792638818,
+      "reason": "0.98 of fixed selected near-turning-point density; within common causal support"
+    },
+    {
+      "label": "endpoint",
+      "central_density_fm3": 1.2060130400651856,
+      "reason": "fixed selected near-turning-point density; peak coordinate precision being refined separately"
+    }
+  ],
+  "configurations": [
+    {
+      "model": "near_endpoint",
+      "label": "baseline",
+      "source_grid": "fine",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-08,
+        "atol": 1e-11,
+        "surface_h": 1e-09,
+        "match_h_fraction": 0.15,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 1.1818927792638818,
+        "h_c": 0.7641964078929182,
+        "h_start": 0.7641963968637784,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 809.1485288928072,
+        "radius_km": 10.064567875336323,
+        "mass_msun": 2.050038951599584,
+        "mass_geom_km": 3.0271388449099734,
+        "compactness": 0.30077186446604565,
+        "nfev": 4259,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2886.2159749082025,
+          "ell": 2,
+          "bracket_hz": [
+            2750.0,
+            3000.0
+          ],
+          "root_converged": true,
+          "root_iterations": 10,
+          "matching_residual": -1.98696777672232e-07,
+          "relative_join_mismatch": 1.986967777110522e-07,
+          "surface_BC_relative": 9.605857878276392e-17,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 10.064567862002994,
+          "nfev": 19429,
+          "name": "f",
+          "bracket_endpoint_residuals": [
+            -0.0993126522409569,
+            0.07467396834156076
+          ],
+          "residual_accepted": true,
+          "root_and_nodes_accepted": true,
+          "csv_W_nodes": 0,
+          "csv_V_nodes": 0,
+          "csv_center_regularity_ratio": 1.0,
+          "profile_path": "data/stellar_extension_20261117/cowling/near_endpoint/baseline_f_profile.csv",
+          "profile_sha256": "18fba44078ae7d0ccfdcd9ad4893515efd92c094f433fd68f59de01973f7a30a",
+          "accepted": true
+        },
+        {
+          "frequency_hz": 7493.943366276016,
+          "ell": 2,
+          "bracket_hz": [
+            7250.0,
+            7500.0
+          ],
+          "root_converged": true,
+          "root_iterations": 12,
+          "matching_residual": -2.750710885321631e-08,
+          "relative_join_mismatch": 2.7507108853456823e-08,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 10.064567862002994,
+          "nfev": 32158,
+          "name": "p1",
+          "bracket_endpoint_residuals": [
+            0.04954923994215715,
+            -0.0011622331002344882
+          ],
+          "residual_accepted": true,
+          "root_and_nodes_accepted": true,
+          "csv_W_nodes": 1,
+          "csv_V_nodes": 1,
+          "csv_center_regularity_ratio": 1.0,
+          "profile_path": "data/stellar_extension_20261117/cowling/near_endpoint/baseline_p1_profile.csv",
+          "profile_sha256": "59310774a3a0ffc8eeaed5063ef01948041c8fb59f5fc80dabd0f4ebcea6f8b2",
+          "accepted": true
+        }
+      ],
+      "wall_seconds": 35.79168694000691,
+      "accepted": true,
+      "frequency_shifts_hz": [
+        0.0,
+        0.0
+      ],
+      "shift_reference": "fine_baseline"
+    },
+    {
+      "model": "near_endpoint",
+      "label": "ode_tight",
+      "source_grid": "fine",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-09,
+        "atol": 1e-12,
+        "surface_h": 1e-09,
+        "match_h_fraction": 0.15,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 1.1818927792638818,
+        "h_c": 0.7641964078929182,
+        "h_start": 0.7641963968637784,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 809.1485288928072,
+        "radius_km": 10.064567875336323,
+        "mass_msun": 2.050038951599584,
+        "mass_geom_km": 3.0271388449099734,
+        "compactness": 0.30077186446604565,
+        "nfev": 4259,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2886.2160090461634,
+          "ell": 2,
+          "bracket_hz": [
+            2750.0,
+            3000.0
+          ],
+          "root_converged": true,
+          "root_iterations": 13,
+          "matching_residual": 5.213035870884581e-08,
+          "relative_join_mismatch": 5.21303587351543e-08,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 10.064567862002994,
+          "nfev": 29860,
+          "name": "f",
+          "bracket_endpoint_residuals": [
+            -0.09931136650231522,
+            0.07467492420702793
+          ],
+          "residual_accepted": true,
+          "root_and_nodes_accepted": true,
+          "csv_W_nodes": 0,
+          "csv_V_nodes": 0,
+          "csv_center_regularity_ratio": 1.0,
+          "profile_path": "data/stellar_extension_20261117/cowling/near_endpoint/ode_tight_f_profile.csv",
+          "profile_sha256": "74543236c5c331848daf8b05be1dfa020459a6859181d070bef64a12202d4f45",
+          "accepted": true
+        },
+        {
+          "frequency_hz": 7493.942557364436,
+          "ell": 2,
+          "bracket_hz": [
+            7250.0,
+            7500.0
+          ],
+          "root_converged": true,
+          "root_iterations": 9,
+          "matching_residual": -1.0602664553430221e-08,
+          "relative_join_mismatch": 1.0602664558936382e-08,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 10.064567862002994,
+          "nfev": 53551,
+          "name": "p1",
+          "bracket_endpoint_residuals": [
+            0.04954893999275088,
+            -0.0011623657464989224
+          ],
+          "residual_accepted": true,
+          "root_and_nodes_accepted": true,
+          "csv_W_nodes": 1,
+          "csv_V_nodes": 1,
+          "csv_center_regularity_ratio": 0.9999999999999999,
+          "profile_path": "data/stellar_extension_20261117/cowling/near_endpoint/ode_tight_p1_profile.csv",
+          "profile_sha256": "9436bfd5dfc7a1727432f5d56aa3565455fb62478cfed4827b47f2feb66c5cae",
+          "accepted": true
+        }
+      ],
+      "wall_seconds": 74.77248780999798,
+      "accepted": true,
+      "frequency_shifts_hz": [
+        3.413796093809651e-05,
+        -0.0008089115799521096
+      ],
+      "shift_reference": "fine_baseline"
+    },
+    {
+      "model": "near_endpoint",
+      "label": "surface_h1e_7",
+      "source_grid": "fine",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-08,
+        "atol": 1e-11,
+        "surface_h": 1e-07,
+        "match_h_fraction": 0.15,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 1.1818927792638818,
+        "h_c": 0.7641964078929182,
+        "h_start": 0.7641963968637784,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 809.1485288928072,
+        "radius_km": 10.064567875336323,
+        "mass_msun": 2.050038951599584,
+        "mass_geom_km": 3.0271388449099734,
+        "compactness": 0.30077186446604565,
+        "nfev": 4259,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2886.2158666302284,
+          "ell": 2,
+          "bracket_hz": [
+            2750.0,
+            3000.0
+          ],
+          "root_converged": true,
+          "root_iterations": 11,
+          "matching_residual": 2.059427264989257e-08,
+          "relative_join_mismatch": 2.059427261705584e-08,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 10.064566542003746,
+          "nfev": 21013,
+          "name": "f",
+          "bracket_endpoint_residuals": [
+            -0.09931233995491803,
+            0.07467535797044442
+          ],
+          "residual_accepted": true,
+          "root_and_nodes_accepted": true,
+          "csv_W_nodes": 0,
+          "csv_V_nodes": 0,
+          "csv_center_regularity_ratio": 1.0,
+          "profile_path": "data/stellar_extension_20261117/cowling/near_endpoint/surface_h1e_7_f_profile.csv",
+          "profile_sha256": "2b84c1f5bc84eb84c965798fa7ea27cbc8dab1213beb003ac126102c9dda9285",
+          "accepted": true
+        },
+        {
+          "frequency_hz": 7493.944046294082,
+          "ell": 2,
+          "bracket_hz": [
+            7250.0,
+            7500.0
+          ],
+          "root_converged": true,
+          "root_iterations": 9,
+          "matching_residual": -8.392843866415825e-08,
+          "relative_join_mismatch": 8.39284386508165e-08,
+          "surface_BC_relative": 6.036644921906524e-17,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 10.064566542003746,
+          "nfev": 32002,
+          "name": "p1",
+          "bracket_endpoint_residuals": [
+            0.0495491519485668,
+            -0.001162723253800254
+          ],
+          "residual_accepted": true,
+          "root_and_nodes_accepted": true,
+          "csv_W_nodes": 1,
+          "csv_V_nodes": 1,
+          "csv_center_regularity_ratio": 0.9999999999999999,
+          "profile_path": "data/stellar_extension_20261117/cowling/near_endpoint/surface_h1e_7_p1_profile.csv",
+          "profile_sha256": "3ade81482732af9b43d5879d79631dbcaf128eb6240ea5fa6a231ad148682d96",
+          "accepted": true
+        }
+      ],
+      "wall_seconds": 45.17992458801018,
+      "accepted": true,
+      "frequency_shifts_hz": [
+        -0.00010827797404999728,
+        0.0006800180663049105
+      ],
+      "shift_reference": "fine_baseline"
+    },
+    {
+      "model": "near_endpoint",
+      "label": "center_0p1m",
+      "source_grid": "fine",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-08,
+        "atol": 1e-11,
+        "surface_h": 1e-09,
+        "match_h_fraction": 0.15,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 1.1818927792638818,
+        "h_c": 0.7641964078929182,
+        "h_start": 0.7641964077826268,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 809.1485288928072,
+        "radius_km": 10.06456797772893,
+        "mass_msun": 2.05003876575615,
+        "mass_geom_km": 3.0271385704889058,
+        "compactness": 0.3007718341400661,
+        "nfev": 4592,
+        "config": {
+          "r0_km": 0.0001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2886.2162742118376,
+          "ell": 2,
+          "bracket_hz": [
+            2750.0,
+            3000.0
+          ],
+          "root_converged": true,
+          "root_iterations": 14,
+          "matching_residual": 2.819404991043461e-07,
+          "relative_join_mismatch": 2.819404990720741e-07,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 10.064567964395597,
+          "nfev": 18262,
+          "name": "f",
+          "bracket_endpoint_residuals": [
+            -0.09931214478009684,
+            0.07466115435354954
+          ],
+          "residual_accepted": true,
+          "root_and_nodes_accepted": true,
+          "csv_W_nodes": 0,
+          "csv_V_nodes": 0,
+          "csv_center_regularity_ratio": 1.0,
+          "profile_path": "data/stellar_extension_20261117/cowling/near_endpoint/center_0p1m_f_profile.csv",
+          "profile_sha256": "9a53f36627ec7d7bc223f8298c537c2b000728d3943d072b43815ca26311da72",
+          "accepted": true
+        },
+        {
+          "frequency_hz": 7493.943724834333,
+          "ell": 2,
+          "bracket_hz": [
+            7250.0,
+            7500.0
+          ],
+          "root_converged": true,
+          "root_iterations": 13,
+          "matching_residual": -1.081581998919905e-07,
+          "relative_join_mismatch": 1.0815819989315694e-07,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 10.064567964395597,
+          "nfev": 31999,
+          "name": "p1",
+          "bracket_endpoint_residuals": [
+            0.04954870710198486,
+            -0.0011620129069503458
+          ],
+          "residual_accepted": true,
+          "root_and_nodes_accepted": true,
+          "csv_W_nodes": 1,
+          "csv_V_nodes": 1,
+          "csv_center_regularity_ratio": 0.9999999999999999,
+          "profile_path": "data/stellar_extension_20261117/cowling/near_endpoint/center_0p1m_p1_profile.csv",
+          "profile_sha256": "f39ec8edfe0fec0810188d4e30116e8200b7b1560ed0b8d3124e4a44e6424552",
+          "accepted": true
+        }
+      ],
+      "wall_seconds": 49.26477241999237,
+      "accepted": true,
+      "frequency_shifts_hz": [
+        0.000299303635074466,
+        0.0003585583172025508
+      ],
+      "shift_reference": "fine_baseline"
+    },
+    {
+      "model": "near_endpoint",
+      "label": "source_grid_coarse",
+      "source_grid": "coarse",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-09,
+        "atol": 1e-12,
+        "surface_h": 1e-09,
+        "match_h_fraction": 0.15,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 1.1818927792638818,
+        "h_c": 0.7641964078906384,
+        "h_start": 0.7641963968614985,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 809.1485288852674,
+        "radius_km": 10.064567887333599,
+        "mass_msun": 2.050038920537651,
+        "mass_geom_km": 3.0271387990431458,
+        "compactness": 0.30077185955025876,
+        "nfev": 4205,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2886.216029673768,
+          "ell": 2,
+          "bracket_hz": [
+            2750.0,
+            3000.0
+          ],
+          "root_converged": true,
+          "root_iterations": 11,
+          "matching_residual": 4.3011701547044426e-08,
+          "relative_join_mismatch": 4.301170148035803e-08,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 10.06456787400027,
+          "nfev": 30334,
+          "name": "f",
+          "bracket_endpoint_residuals": [
+            -0.09931186519515704,
+            0.07467494849166735
+          ],
+          "residual_accepted": true,
+          "root_and_nodes_accepted": true,
+          "csv_W_nodes": 0,
+          "csv_V_nodes": 0,
+          "csv_center_regularity_ratio": 1.0,
+          "profile_path": "data/stellar_extension_20261117/cowling/near_endpoint/source_grid_coarse_f_profile.csv",
+          "profile_sha256": "7e54cb8a143ef6f2c99c3c21e72f95897758531875bc437da2972e907dfa5a10",
+          "accepted": true
+        },
+        {
+          "frequency_hz": 7493.942564188215,
+          "ell": 2,
+          "bracket_hz": [
+            7250.0,
+            7500.0
+          ],
+          "root_converged": true,
+          "root_iterations": 11,
+          "matching_residual": 7.305943287334028e-09,
+          "relative_join_mismatch": 7.305943295939525e-09,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 10.06456787400027,
+          "nfev": 56191,
+          "name": "p1",
+          "bracket_endpoint_residuals": [
+            0.04954899612848007,
+            -0.0011623576387670043
+          ],
+          "residual_accepted": true,
+          "root_and_nodes_accepted": true,
+          "csv_W_nodes": 1,
+          "csv_V_nodes": 1,
+          "csv_center_regularity_ratio": 1.0,
+          "profile_path": "data/stellar_extension_20261117/cowling/near_endpoint/source_grid_coarse_p1_profile.csv",
+          "profile_sha256": "19526f162796480a3ec54e2fd8f784a0bbf94f0b66155851d62811bdb05f40e4",
+          "accepted": true
+        }
+      ],
+      "wall_seconds": 79.1797872169991,
+      "accepted": true,
+      "frequency_shifts_hz": [
+        2.062760449916823e-05,
+        6.82377958582947e-06
+      ],
+      "shift_reference": "fine_ode_tight"
+    },
+    {
+      "model": "endpoint",
+      "label": "baseline",
+      "source_grid": "fine",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-08,
+        "atol": 1e-11,
+        "surface_h": 1e-09,
+        "match_h_fraction": 0.15,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 1.2060130400651856,
+        "h_c": 0.7836136693954961,
+        "h_start": 0.7836136578427815,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 855.8856865776601,
+        "radius_km": 10.006456602371196,
+        "mass_msun": 2.050381277571948,
+        "mass_geom_km": 3.027644332011941,
+        "compactness": 0.3025690763795938,
+        "nfev": 4274,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2899.489457960419,
+          "ell": 2,
+          "bracket_hz": [
+            2750.0,
+            3000.0
+          ],
+          "root_converged": true,
+          "root_iterations": 11,
+          "matching_residual": 6.325700738522555e-07,
+          "relative_join_mismatch": 6.325700737972677e-07,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 10.006456589312466,
+          "nfev": 20413,
+          "name": "f",
+          "bracket_endpoint_residuals": [
+            -0.11046685621861434,
+            0.066750134251449
+          ],
+          "residual_accepted": true,
+          "root_and_nodes_accepted": true,
+          "csv_W_nodes": 0,
+          "csv_V_nodes": 0,
+          "csv_center_regularity_ratio": 1.0,
+          "profile_path": "data/stellar_extension_20261117/cowling/endpoint/baseline_f_profile.csv",
+          "profile_sha256": "133266b1e79d973dd4aadfc404a63af7a4b87f72a7ef0c36bcc086f50cf5156b",
+          "accepted": true
+        },
+        {
+          "frequency_hz": 7504.249074578502,
+          "ell": 2,
+          "bracket_hz": [
+            7500.0,
+            7750.0
+          ],
+          "root_converged": true,
+          "root_iterations": 15,
+          "matching_residual": 2.2751237118949475e-07,
+          "relative_join_mismatch": 2.2751237118011928e-07,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 10.006456589312466,
+          "nfev": 32572,
+          "name": "p1",
+          "bracket_endpoint_residuals": [
+            0.0008362309348503009,
+            -0.04621332334281813
+          ],
+          "residual_accepted": true,
+          "root_and_nodes_accepted": true,
+          "csv_W_nodes": 1,
+          "csv_V_nodes": 1,
+          "csv_center_regularity_ratio": 1.0,
+          "profile_path": "data/stellar_extension_20261117/cowling/endpoint/baseline_p1_profile.csv",
+          "profile_sha256": "b5adaa5b90f299878115fed0bcf32711d28a408548526dac4c6d403bb55c2c52",
+          "accepted": true
+        }
+      ],
+      "wall_seconds": 50.39377737700124,
+      "accepted": true,
+      "frequency_shifts_hz": [
+        0.0,
+        0.0
+      ],
+      "shift_reference": "fine_baseline"
+    },
+    {
+      "model": "endpoint",
+      "label": "ode_tight",
+      "source_grid": "fine",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-09,
+        "atol": 1e-12,
+        "surface_h": 1e-09,
+        "match_h_fraction": 0.15,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 1.2060130400651856,
+        "h_c": 0.7836136693954961,
+        "h_start": 0.7836136578427815,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 855.8856865776601,
+        "radius_km": 10.006456602371196,
+        "mass_msun": 2.050381277571948,
+        "mass_geom_km": 3.027644332011941,
+        "compactness": 0.3025690763795938,
+        "nfev": 4274,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2899.488634734179,
+          "ell": 2,
+          "bracket_hz": [
+            2750.0,
+            3000.0
+          ],
+          "root_converged": true,
+          "root_iterations": 14,
+          "matching_residual": 2.412112075965293e-08,
+          "relative_join_mismatch": 2.4121120737299137e-08,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 10.006456589312466,
+          "nfev": 31036,
+          "name": "f",
+          "bracket_endpoint_residuals": [
+            -0.11046677035492453,
+            0.06675005644644584
+          ],
+          "residual_accepted": true,
+          "root_and_nodes_accepted": true,
+          "csv_W_nodes": 0,
+          "csv_V_nodes": 0,
+          "csv_center_regularity_ratio": 1.0,
+          "profile_path": "data/stellar_extension_20261117/cowling/endpoint/ode_tight_f_profile.csv",
+          "profile_sha256": "73d7420ed6342f1d536cf9a7b38d37d31e48ed82fd598adc73d34f8e4202f80c",
+          "accepted": true
+        },
+        {
+          "frequency_hz": 7504.249293098334,
+          "ell": 2,
+          "bracket_hz": [
+            7500.0,
+            7750.0
+          ],
+          "root_converged": true,
+          "root_iterations": 9,
+          "matching_residual": -7.2002216893422405e-09,
+          "relative_join_mismatch": 7.2002216990020325e-09,
+          "surface_BC_relative": 5.93798949603101e-17,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 10.006456589312466,
+          "nfev": 55363,
+          "name": "p1",
+          "bracket_endpoint_residuals": [
+            0.0008360657267378196,
+            -0.0462137708979171
+          ],
+          "residual_accepted": true,
+          "root_and_nodes_accepted": true,
+          "csv_W_nodes": 1,
+          "csv_V_nodes": 1,
+          "csv_center_regularity_ratio": 0.9999999999999999,
+          "profile_path": "data/stellar_extension_20261117/cowling/endpoint/ode_tight_p1_profile.csv",
+          "profile_sha256": "e1f781d6866b5315da797788f012f0df6b221f011789c98f75817a69ddd16845",
+          "accepted": true
+        }
+      ],
+      "wall_seconds": 70.95770554398769,
+      "accepted": true,
+      "frequency_shifts_hz": [
+        -0.0008232262398450985,
+        0.00021851983274245868
+      ],
+      "shift_reference": "fine_baseline"
+    },
+    {
+      "model": "endpoint",
+      "label": "surface_h1e_7",
+      "source_grid": "fine",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-08,
+        "atol": 1e-11,
+        "surface_h": 1e-07,
+        "match_h_fraction": 0.15,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 1.2060130400651856,
+        "h_c": 0.7836136693954961,
+        "h_start": 0.7836136578427815,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 855.8856865776601,
+        "radius_km": 10.006456602371196,
+        "mass_msun": 2.050381277571948,
+        "mass_geom_km": 3.027644332011941,
+        "compactness": 0.3025690763795938,
+        "nfev": 4274,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2899.4882570799136,
+          "ell": 2,
+          "bracket_hz": [
+            2750.0,
+            3000.0
+          ],
+          "root_converged": true,
+          "root_iterations": 10,
+          "matching_residual": 8.314294662352973e-09,
+          "relative_join_mismatch": 8.314294640234866e-09,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 10.006455296498476,
+          "nfev": 20776,
+          "name": "f",
+          "bracket_endpoint_residuals": [
+            -0.11046616500550947,
+            0.06674956979295416
+          ],
+          "residual_accepted": true,
+          "root_and_nodes_accepted": true,
+          "csv_W_nodes": 0,
+          "csv_V_nodes": 0,
+          "csv_center_regularity_ratio": 0.9999999999999998,
+          "profile_path": "data/stellar_extension_20261117/cowling/endpoint/surface_h1e_7_f_profile.csv",
+          "profile_sha256": "43753644fb792ce5dc46e5abff4f2707928bccd75c0d135f1ca364b4560f92c4",
+          "accepted": true
+        },
+        {
+          "frequency_hz": 7504.250191868575,
+          "ell": 2,
+          "bracket_hz": [
+            7500.0,
+            7750.0
+          ],
+          "root_converged": true,
+          "root_iterations": 12,
+          "matching_residual": -1.1605887291001205e-07,
+          "relative_join_mismatch": 1.160588729025949e-07,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 10.006455296498476,
+          "nfev": 33181,
+          "name": "p1",
+          "bracket_endpoint_residuals": [
+            0.0008361657845604268,
+            -0.04621375111016304
+          ],
+          "residual_accepted": true,
+          "root_and_nodes_accepted": true,
+          "csv_W_nodes": 1,
+          "csv_V_nodes": 1,
+          "csv_center_regularity_ratio": 0.9999999999999999,
+          "profile_path": "data/stellar_extension_20261117/cowling/endpoint/surface_h1e_7_p1_profile.csv",
+          "profile_sha256": "2c8db2970abab67c021ddd0bb41653ea3c0169c113d69d2f886b2ecfe28902b0",
+          "accepted": true
+        }
+      ],
+      "wall_seconds": 47.70017441001255,
+      "accepted": true,
+      "frequency_shifts_hz": [
+        -0.001200880505166424,
+        0.0011172900731253321
+      ],
+      "shift_reference": "fine_baseline"
+    },
+    {
+      "model": "endpoint",
+      "label": "center_0p1m",
+      "source_grid": "fine",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-08,
+        "atol": 1e-11,
+        "surface_h": 1e-09,
+        "match_h_fraction": 0.15,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 1.2060130400651856,
+        "h_c": 0.7836136693954961,
+        "h_start": 0.783613669279969,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 855.8856865776601,
+        "radius_km": 10.006456607685575,
+        "mass_msun": 2.0503812742930028,
+        "mass_geom_km": 3.0276443271701687,
+        "compactness": 0.30256907573503605,
+        "nfev": 4688,
+        "config": {
+          "r0_km": 0.0001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2899.4882917536565,
+          "ell": 2,
+          "bracket_hz": [
+            2750.0,
+            3000.0
+          ],
+          "root_converged": true,
+          "root_iterations": 12,
+          "matching_residual": 2.4860426396407233e-08,
+          "relative_join_mismatch": 2.4860426359511973e-08,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 10.006456594626844,
+          "nfev": 18784,
+          "name": "f",
+          "bracket_endpoint_residuals": [
+            -0.11046687210302793,
+            0.06674940209631512
+          ],
+          "residual_accepted": true,
+          "root_and_nodes_accepted": true,
+          "csv_W_nodes": 0,
+          "csv_V_nodes": 0,
+          "csv_center_regularity_ratio": 0.9999999999999998,
+          "profile_path": "data/stellar_extension_20261117/cowling/endpoint/center_0p1m_f_profile.csv",
+          "profile_sha256": "da1b63ae24c8a78c7ebbe46921572929171ed3983bcf71089f443031bba200a2",
+          "accepted": true
+        },
+        {
+          "frequency_hz": 7504.248103858442,
+          "ell": 2,
+          "bracket_hz": [
+            7500.0,
+            7750.0
+          ],
+          "root_converged": true,
+          "root_iterations": 14,
+          "matching_residual": 4.0923248485770025e-07,
+          "relative_join_mismatch": 4.0923248484462364e-07,
+          "surface_BC_relative": 5.938023918480256e-17,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 10.006456594626844,
+          "nfev": 32224,
+          "name": "p1",
+          "bracket_endpoint_residuals": [
+            0.0008361736423037663,
+            -0.046213743741329694
+          ],
+          "residual_accepted": true,
+          "root_and_nodes_accepted": true,
+          "csv_W_nodes": 1,
+          "csv_V_nodes": 1,
+          "csv_center_regularity_ratio": 0.9999999999999999,
+          "profile_path": "data/stellar_extension_20261117/cowling/endpoint/center_0p1m_p1_profile.csv",
+          "profile_sha256": "bbb5ea9b4a56ffebf4ed63f6cd9f668c2d70c8b039486feae141b8dd78ffbdd0",
+          "accepted": true
+        }
+      ],
+      "wall_seconds": 46.74412157799816,
+      "accepted": true,
+      "frequency_shifts_hz": [
+        -0.001166206762263755,
+        -0.0009707200597404153
+      ],
+      "shift_reference": "fine_baseline"
+    },
+    {
+      "model": "endpoint",
+      "label": "source_grid_coarse",
+      "source_grid": "coarse",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-09,
+        "atol": 1e-12,
+        "surface_h": 1e-09,
+        "match_h_fraction": 0.15,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 1.2060130400651856,
+        "h_c": 0.783613669407364,
+        "h_start": 0.7836136578546493,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 855.8856866067948,
+        "radius_km": 10.006456599545823,
+        "mass_msun": 2.0503812899286467,
+        "mass_geom_km": 3.0276443502581523,
+        "compactness": 0.3025690782884695,
+        "nfev": 4409,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2899.48865820411,
+          "ell": 2,
+          "bracket_hz": [
+            2750.0,
+            3000.0
+          ],
+          "root_converged": true,
+          "root_iterations": 12,
+          "matching_residual": 2.553181805931149e-08,
+          "relative_join_mismatch": 2.5531818098780878e-08,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 10.006456586487094,
+          "nfev": 30733,
+          "name": "f",
+          "bracket_endpoint_residuals": [
+            -0.11046736509409899,
+            0.06675013842854204
+          ],
+          "residual_accepted": true,
+          "root_and_nodes_accepted": true,
+          "csv_W_nodes": 0,
+          "csv_V_nodes": 0,
+          "csv_center_regularity_ratio": 1.0,
+          "profile_path": "data/stellar_extension_20261117/cowling/endpoint/source_grid_coarse_f_profile.csv",
+          "profile_sha256": "d0647f70fcca299e730192d597b84b67b9bafd8731bb4ca76bf908c375d2c28a",
+          "accepted": true
+        },
+        {
+          "frequency_hz": 7504.249078908753,
+          "ell": 2,
+          "bracket_hz": [
+            7500.0,
+            7750.0
+          ],
+          "root_converged": true,
+          "root_iterations": 5,
+          "matching_residual": -6.94109360786226e-10,
+          "relative_join_mismatch": 6.941093686924257e-10,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 10.006456586487094,
+          "nfev": 53665,
+          "name": "p1",
+          "bracket_endpoint_residuals": [
+            0.0008360325754575166,
+            -0.04621374062412383
+          ],
+          "residual_accepted": true,
+          "root_and_nodes_accepted": true,
+          "csv_W_nodes": 1,
+          "csv_V_nodes": 1,
+          "csv_center_regularity_ratio": 0.9999999999999999,
+          "profile_path": "data/stellar_extension_20261117/cowling/endpoint/source_grid_coarse_p1_profile.csv",
+          "profile_sha256": "1efa70bcaf43df527b6b217b1acc13cb2d3d6501f9f4fca2425b2fef3250745d",
+          "accepted": true
+        }
+      ],
+      "wall_seconds": 58.52385642999434,
+      "accepted": true,
+      "frequency_shifts_hz": [
+        2.3469930965802632e-05,
+        -0.00021418958112917608
+      ],
+      "shift_reference": "fine_ode_tight"
+    }
+  ],
+  "rejected_attempts": [],
+  "source_grid_comparison_skips": [],
+  "wall_seconds": 587.2095241149946,
+  "uncertainty_interpretation": "Observed control and source-grid sensitivities; no rigorous global error bound",
+  "scope": "equilibrium l=2 Cowling f/p1 only; no radial-stability inference, frozen response, g-mode, elasticity, superfluidity, or full-GR modes",
+  "provenance_path": "data/stellar_extension_20261117/cowling/PROVENANCE.json"
+}

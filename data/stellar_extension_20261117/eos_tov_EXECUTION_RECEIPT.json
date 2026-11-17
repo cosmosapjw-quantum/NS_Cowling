@@ -1,0 +1,93 @@
+{
+  "stage": "E_C1_C8_EOS_TOV",
+  "baseline": "300e5a0532dd137cb09738568fca0f35cfcc9282",
+  "actual_remote_runs": [
+    {
+      "name": "native_eos",
+      "pid": 2209343,
+      "exit_code": 0,
+      "elapsed_seconds": 25.36,
+      "stdout": "eos_run.stdout.log",
+      "stderr": "eos_run.stderr.log"
+    },
+    {
+      "name": "initial_tov",
+      "pid": 2211936,
+      "exit_code": 0,
+      "elapsed_seconds": 20.26,
+      "stdout": "tov_run.stdout.log",
+      "stderr": "tov_run.stderr.log"
+    },
+    {
+      "name": "tight_ode_diagnostic",
+      "pid": 2214423,
+      "exit_code": 0,
+      "elapsed_seconds": 47.78,
+      "output": "tov/TIGHT_ODE_DIAGNOSTIC.json"
+    },
+    {
+      "name": "maximum_refinement",
+      "pid": 2220311,
+      "exit_code": 0,
+      "elapsed_seconds": 101.51,
+      "stdout": "refine_run.stdout.log",
+      "stderr": "refine_run.stderr.log"
+    },
+    {
+      "name": "reused_targeted_tests",
+      "pid": 2210334,
+      "exit_code": 0,
+      "tests_passed": 12,
+      "log": "eos_targeted_tests.log"
+    },
+    {
+      "name": "E_artifact_regressions",
+      "pid": 2217211,
+      "exit_code": 0,
+      "tests_passed": 7,
+      "log": "eos_artifact_tests.log"
+    }
+  ],
+  "current_runner_compile": "PASS",
+  "current_runner_help_exit_code": 0,
+  "final_runner_sha256": "a2e11d6c86c2b239706302b7dc19e95090efd8280e1cd9ff1dedc1a407e7fd15",
+  "initial_executed_runner_sha256": "33ce9e47025a6afb055ae8fe5de99067a9119cf2ea6b060a23b98eebccdb3c20",
+  "refinement_executed_runner_sha256": "9d2a0545adb7e4c35ed6deaa635597971baaa1fdafbe2d9ea751d44fbf3a3414",
+  "final_result_sha256": "ffc811acb14637f8afc718040f26fb99f35e1dc9d49c97237d0a52ec733e36c5",
+  "final_report_sha256": "8a6654ea9738f84d610fd3344a3ed9f1d8723c4d96fe9bfc80825ee8dd9c4d96",
+  "source_contracts": {
+    "coarse": {
+      "path": "data/stellar_extension_20261117/eos/coarse/REPRESENTATION.json",
+      "sha256": "993e9e669f43e96e70bca55878c0473b1a51fe8a98c951e8fa572d38a08486b5",
+      "tail_intervals": 64,
+      "support_n_fm3": [
+        0.0,
+        1.2649856715193053
+      ],
+      "continuous_chi_max": 0.9999918438563513
+    },
+    "medium": {
+      "path": "data/stellar_extension_20261117/eos/medium/REPRESENTATION.json",
+      "sha256": "9ead5ff4548c23fba16c01600439175fff165a4f423ad0e13b9bd635d1950eef",
+      "tail_intervals": 128,
+      "support_n_fm3": [
+        0.0,
+        1.2649856715193053
+      ],
+      "continuous_chi_max": 0.9999902103496859
+    },
+    "fine": {
+      "path": "data/stellar_extension_20261117/eos/fine/REPRESENTATION.json",
+      "sha256": "f1bd5c3c41b45a07a7299e665594173473ac790af6f519bf53085db843bd936d",
+      "tail_intervals": 256,
+      "support_n_fm3": [
+        0.0,
+        1.2649856715193053
+      ],
+      "continuous_chi_max": 0.999989800271408
+    }
+  },
+  "issue_resolution": "initial one-sided derivative ODE noise preserved; source/ODE/center convergence confirms bracket1.2060--1.2061; derived metadata corrections separately logged",
+  "scope": "equilibrium-barotropic maximum for unchanged B hybrid; full microscopic causality and complete radial stability spectrum not computed",
+  "publication": "worker did not commit or push"
+}

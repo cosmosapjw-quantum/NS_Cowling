@@ -1,0 +1,243 @@
+{
+  "schema": "ns-cowling.stage-independent-review.v1",
+  "stage": "E_C9",
+  "reviewer_task": "/root/e_independent_review",
+  "created_utc": "2026-11-17T12:05:52.628366+00:00",
+  "verdict": "ACCEPT_WITH_SCOPE",
+  "open_block_now_count": 0,
+  "open_findings": [],
+  "findings": [
+    {
+      "id": "E-C9-01",
+      "classification": "representation_issue",
+      "severity": "NONBLOCKING",
+      "blocking_relevance": "NOT_BLOCK_NOW",
+      "object": "docs/stellar_extension_20261117/EOS_TOV_RESULTS_KO.md",
+      "evidence": "Missing LaTeX escapes for atol/Delta and malformed range terminators in TOV convergence paragraphs",
+      "impact": "mathematical markup rendering; numeric evidence unaffected",
+      "minimal_repair": "fix only the affected mathematical markup",
+      "status": "CLOSED",
+      "closure": "parent correction and reviewer selective readback of the two paragraphs"
+    }
+  ],
+  "baseline_commit": "300e5a0532dd137cb09738568fca0f35cfcc9282",
+  "reviewed_head": "300e5a0532dd137cb09738568fca0f35cfcc9282",
+  "skill_context_used": {
+    "name": "physmath-research-loop",
+    "version": "1.3.0",
+    "package": "c43/physmath-research-loop",
+    "resources": [
+      "SKILL.md",
+      "references/POLICY_INTEGRATION.md",
+      "references/CODING_LOOP.md:C9",
+      "references/SUBAGENT_MODE.md"
+    ],
+    "fresh_review_passes": 1,
+    "recursive_reviewers": 0
+  },
+  "scientific_scope": "unchanged native SLy4 extension; preserved hybrid lower EOS; equilibrium-barotropic TOV turning point and fixed-density ell=2 Cowling f/p1",
+  "result_validity": "NUMERICALLY_CHECKED_WITHIN_DECLARED_SCOPE",
+  "provenance_validity": "CURRENT_SOURCE_INPUT_CONTRACT_AND_PROFILE_IDENTITIES_VERIFIED",
+  "packaging_validity": "REVIEW_ARTIFACTS_WRITTEN; PUBLICATION_NOT_PERFORMED_BY_REVIEWER",
+  "typed_identity": {
+    "D_sources": {
+      "relation": "BYTE_IDENTITY",
+      "count": 50,
+      "mismatches": []
+    },
+    "native_binaries": {
+      "relation": "BYTE_IDENTITY",
+      "count": 4,
+      "mismatches": []
+    },
+    "cowling_D_reuse": {
+      "relation": "BYTE_IDENTITY",
+      "count": 7,
+      "mismatches": []
+    },
+    "prefix": {
+      "relation": "STRUCTURAL_IDENTITY_AND_NUMERICAL_IDENTITY",
+      "old_rows": 773,
+      "all_ROW_FIELDS_exact": true,
+      "continuous_state_fields_exact": [
+        "n",
+        "p",
+        "epsilon",
+        "mu",
+        "enthalpy"
+      ],
+      "interior_chi_exact": true,
+      "old_n1_endpoint_derivative": "left old and right appended interval intentionally distinguished"
+    },
+    "one_TOV_reexecution": {
+      "relation": "NUMERICAL_IDENTITY",
+      "mass_delta_msun": 0.0,
+      "radius_delta_km": 0.0
+    }
+  },
+  "actual_reviewer_verification": {
+    "targeted_pytest": {
+      "command": [
+        "/home/cosmosapjw/ns_cowling_wt/.venv-gen/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "python_frontend/tests/test_stellar_extension_evidence.py"
+      ],
+      "exit_code": 0,
+      "passed": 7,
+      "elapsed_seconds": 4.52
+    },
+    "source_and_numeric_pid": 2239778,
+    "source_and_numeric_exit_code": 0,
+    "main_cowling_profile_pid": 2252463,
+    "main_cowling_profile_exit_code": 0,
+    "tight_background_profile_pid": 2259142,
+    "tight_background_profile_exit_code": 0,
+    "native_direct_probes": 3,
+    "TOV_reexecutions": 1,
+    "raw_derivative_brackets": 4,
+    "raw_quadratic_fits": 6,
+    "raw_convergence_rows": 6,
+    "mode_profiles_checked": 22,
+    "mode_profile_rows_each": 1199,
+    "node_thresholds": [
+      1e-10,
+      1e-09,
+      1e-08
+    ],
+    "log_path": "data/stellar_extension_20261117/INDEPENDENT_REVIEW.log"
+  },
+  "reused_parent_full_suite": {
+    "receipt_path": "data/stellar_extension_20261117/FRONTEND_PIPELINE.json",
+    "log_path": "data/stellar_extension_20261117/FRONTEND_PIPELINE.log",
+    "passed": 1404,
+    "skipped": 9,
+    "exit_code": 0,
+    "rerun_by_reviewer": false
+  },
+  "accepted_results": {
+    "equilibrium_causal_density_fm3": 1.2650056715193052,
+    "export_upper_density_fm3": 1.2649856715193053,
+    "maximum_bracket_fm3": [
+      1.206,
+      1.2061
+    ],
+    "representative_maximum": {
+      "central_density_fm3": 1.2060328050005111,
+      "h_c": 0.7836295346119296,
+      "h_start": 0.7836295230587795,
+      "surface_h": 0.0,
+      "central_pressure_MeV_fm3": 855.9246351636019,
+      "radius_km": 10.006409438136822,
+      "mass_msun": 2.0503812906965106,
+      "mass_geom_km": 3.027644351391999,
+      "compactness": 0.3025705044461724,
+      "nfev": 120260,
+      "config": {
+        "r0_km": 0.001,
+        "rtol": 1e-12,
+        "atol": 1e-14,
+        "surface_h": 0.0,
+        "max_step_h": 0.0001
+      },
+      "backend": "Python exact-contract enthalpy DOP853 reference"
+    },
+    "cowling_selected_models": [
+      {
+        "label": "near_endpoint",
+        "central_density_fm3": 1.1818927792638818,
+        "reason": "0.98 of fixed selected near-turning-point density; within common causal support"
+      },
+      {
+        "label": "endpoint",
+        "central_density_fm3": 1.2060130400651856,
+        "reason": "fixed selected near-turning-point density; peak coordinate precision being refined separately"
+      }
+    ],
+    "main_cowling_configurations": 10,
+    "main_cowling_modes": 20,
+    "rejected_main_modes": 0,
+    "additional_tight_background_modes": 2,
+    "mode_residual_acceptance": 2e-06,
+    "max_matching_residual": 6.325700738522555e-07,
+    "max_join_mismatch": 6.325700737972677e-07,
+    "max_surface_BC_relative": 9.605857878276392e-17,
+    "max_center_regularity_delta": 2.220446049250313e-16,
+    "tight_background_frequency_shifts_hz": [
+      3.838575958070578e-05,
+      -0.00016548277835681802
+    ]
+  },
+  "preexisting_repairs_verified": [
+    "initial adaptive-ODE mass excursion preserved and superseded by tightened centered-derivative evidence",
+    "native fixed-Yp diagnostic distinguished from fully frozen species",
+    "initial candidate and authoritative maximum refinement kept distinct"
+  ],
+  "scope_limits": [
+    "finite native scan and local root; not a global analytic monotonicity theorem",
+    "microscopic/full fixed-species causality not established",
+    "maximum precision is the measured density bracket; representative digits are identifiers and observed control shifts are not total model error bounds",
+    "complete radial stability spectrum, frozen-response modes, g-modes, elastic, superfluid and full-GR modes not computed"
+  ],
+  "artifacts_sha256": {
+    "scripts/extend_stellar_support_20261117.py": "a2e11d6c86c2b239706302b7dc19e95090efd8280e1cd9ff1dedc1a407e7fd15",
+    "scripts/run_stellar_extension_modes_20261117.py": "c8555dc166c2974033e81f51d70833a3f1197c90907a0e479300f8760e96f748",
+    "scripts/plot_stellar_extension_20261117.py": "93fa0a41b2b9a2c58d8c7dbdfa451454c64a992ebe68c6e25f2280bebcae012f",
+    "python_frontend/tests/test_stellar_extension_evidence.py": "611433506d0fc78c7b8365769c17d056a13abc08fe95a40c6e04fb955982ba37",
+    "data/stellar_extension_20261117/eos/SOURCE_BINDING.json": "8b17add75352894d7b91e54f68bddb25813421e08c465e621c865b2d2016d18f",
+    "data/stellar_extension_20261117/eos/EOS_RESULT.json": "277b263547e0b5f39f336b69174130b7e67951aa97ff9117db1be6c4cd7dbb62",
+    "data/stellar_extension_20261117/eos/NATIVE_CAUSAL_ENDPOINT.json": "1549cc5378995d9a9f2d6cc703dba1be03b1720bc862c9a2299894209e3d3666",
+    "data/stellar_extension_20261117/eos/RESPONSE_SCOPE.json": "2b8e74f622bf9543baf682dbb2eff4e75a4dd5fe93036717309040f01f814237",
+    "data/stellar_extension_20261117/tov/TOV_RESULT_INITIAL.json": "4a3b148a3ee5727b06374490ed7e0c62ddf74c76c53bfb06b1584319d2c9deff",
+    "data/stellar_extension_20261117/tov/TOV_RESULT.json": "2375f292bd92ff3c912dddd662577e16c645210b29dc6c7581e08d8839ac7aaf",
+    "data/stellar_extension_20261117/tov/MAXIMUM_REFINEMENT.json": "ffc811acb14637f8afc718040f26fb99f35e1dc9d49c97237d0a52ec733e36c5",
+    "data/stellar_extension_20261117/tov/POSTPROCESS_RECEIPT.json": "709006f29e9d10d10ef25c6c40a05b9ed29470be0d6d2c6768b8e04996c1c560",
+    "data/stellar_extension_20261117/tov/RUNNER_INITIAL_SNAPSHOT.py": "33ce9e47025a6afb055ae8fe5de99067a9119cf2ea6b060a23b98eebccdb3c20",
+    "data/stellar_extension_20261117/tov/RUNNER_REFINEMENT_SNAPSHOT.py": "9d2a0545adb7e4c35ed6deaa635597971baaa1fdafbe2d9ea751d44fbf3a3414",
+    "data/stellar_extension_20261117/cowling/SUMMARY.json": "b48c5151b19258d0b82a02f622320e7934ff15d8db3cfa81f80438741f5faf95",
+    "data/stellar_extension_20261117/cowling/PROVENANCE.json": "d13bcb8d465a3a7d8cc24e22835111367d260d8b19aa3154c9bd926c3b85d299",
+    "data/stellar_extension_20261117/cowling/SELECTION_USED.json": "3f941d36901acd2d2def1922f6651dc8afa1db14700166514d080739c822522d",
+    "data/stellar_extension_20261117/cowling/TIGHT_BACKGROUND_COMPARISON.json": "441c33670f196a26e697eccca619c0da944de08dfdc2a2bf0662511be9a5e300",
+    "data/stellar_extension_20261117/cowling/EXECUTION.json": "a4ef07fc91e6edc4ce25ebe57977547aa4f818f28ff5641b3e148481d613ff04",
+    "data/stellar_extension_20261117/cowling/EXECUTION_TIGHT_BACKGROUND.json": "407d3cd8428f16e689cd762b885491b2e6c6b74fa010727d897d9d451bbf4e2a",
+    "data/stellar_extension_20261117/cowling/tight_background_check.py": "f559cdd3b16393aeb5f4baddc082e465a5fd8d142818b287a4605b9c4bdeccca",
+    "data/stellar_extension_20261117/FRONTEND_PIPELINE.json": "7f02a09688d50716afa644eb917f7e6b412eefccc99fd22433ee512b3cf9d6f8",
+    "data/stellar_extension_20261117/FRONTEND_PIPELINE.log": "ada9d77924ccfb3870315568debb896fe7555cd3b9e0d6afe6ad525fdb2ac2f9",
+    "data/stellar_extension_20261117/INDEPENDENT_REVIEW.log": "d239ad60779a39fad5598a398f09c4078b25bf5ee56a2f1ce56b486e98f0f10c",
+    "docs/stellar_extension_20261117/EOS_TOV_RESULTS_KO.md": "f447eda853d5ea06ed1f3e124d9dd38de5bb3669cee91d38406ff4e6f3270bbb",
+    "data/stellar_extension_20261117/eos/coarse/REPRESENTATION.json": "993e9e669f43e96e70bca55878c0473b1a51fe8a98c951e8fa572d38a08486b5",
+    "data/stellar_extension_20261117/eos/medium/REPRESENTATION.json": "9ead5ff4548c23fba16c01600439175fff165a4f423ad0e13b9bd635d1950eef",
+    "data/stellar_extension_20261117/eos/fine/REPRESENTATION.json": "f1bd5c3c41b45a07a7299e665594173473ac790af6f519bf53085db843bd936d"
+  },
+  "mode_profiles_sha256": {
+    "data/stellar_extension_20261117/cowling/near_endpoint/baseline_f_profile.csv": "18fba44078ae7d0ccfdcd9ad4893515efd92c094f433fd68f59de01973f7a30a",
+    "data/stellar_extension_20261117/cowling/near_endpoint/baseline_p1_profile.csv": "59310774a3a0ffc8eeaed5063ef01948041c8fb59f5fc80dabd0f4ebcea6f8b2",
+    "data/stellar_extension_20261117/cowling/near_endpoint/ode_tight_f_profile.csv": "74543236c5c331848daf8b05be1dfa020459a6859181d070bef64a12202d4f45",
+    "data/stellar_extension_20261117/cowling/near_endpoint/ode_tight_p1_profile.csv": "9436bfd5dfc7a1727432f5d56aa3565455fb62478cfed4827b47f2feb66c5cae",
+    "data/stellar_extension_20261117/cowling/near_endpoint/surface_h1e_7_f_profile.csv": "2b84c1f5bc84eb84c965798fa7ea27cbc8dab1213beb003ac126102c9dda9285",
+    "data/stellar_extension_20261117/cowling/near_endpoint/surface_h1e_7_p1_profile.csv": "3ade81482732af9b43d5879d79631dbcaf128eb6240ea5fa6a231ad148682d96",
+    "data/stellar_extension_20261117/cowling/near_endpoint/center_0p1m_f_profile.csv": "9a53f36627ec7d7bc223f8298c537c2b000728d3943d072b43815ca26311da72",
+    "data/stellar_extension_20261117/cowling/near_endpoint/center_0p1m_p1_profile.csv": "f39ec8edfe0fec0810188d4e30116e8200b7b1560ed0b8d3124e4a44e6424552",
+    "data/stellar_extension_20261117/cowling/near_endpoint/source_grid_coarse_f_profile.csv": "7e54cb8a143ef6f2c99c3c21e72f95897758531875bc437da2972e907dfa5a10",
+    "data/stellar_extension_20261117/cowling/near_endpoint/source_grid_coarse_p1_profile.csv": "19526f162796480a3ec54e2fd8f784a0bbf94f0b66155851d62811bdb05f40e4",
+    "data/stellar_extension_20261117/cowling/endpoint/baseline_f_profile.csv": "133266b1e79d973dd4aadfc404a63af7a4b87f72a7ef0c36bcc086f50cf5156b",
+    "data/stellar_extension_20261117/cowling/endpoint/baseline_p1_profile.csv": "b5adaa5b90f299878115fed0bcf32711d28a408548526dac4c6d403bb55c2c52",
+    "data/stellar_extension_20261117/cowling/endpoint/ode_tight_f_profile.csv": "73d7420ed6342f1d536cf9a7b38d37d31e48ed82fd598adc73d34f8e4202f80c",
+    "data/stellar_extension_20261117/cowling/endpoint/ode_tight_p1_profile.csv": "e1f781d6866b5315da797788f012f0df6b221f011789c98f75817a69ddd16845",
+    "data/stellar_extension_20261117/cowling/endpoint/surface_h1e_7_f_profile.csv": "43753644fb792ce5dc46e5abff4f2707928bccd75c0d135f1ca364b4560f92c4",
+    "data/stellar_extension_20261117/cowling/endpoint/surface_h1e_7_p1_profile.csv": "2c8db2970abab67c021ddd0bb41653ea3c0169c113d69d2f886b2ecfe28902b0",
+    "data/stellar_extension_20261117/cowling/endpoint/center_0p1m_f_profile.csv": "da1b63ae24c8a78c7ebbe46921572929171ed3983bcf71089f443031bba200a2",
+    "data/stellar_extension_20261117/cowling/endpoint/center_0p1m_p1_profile.csv": "bbb5ea9b4a56ffebf4ed63f6cd9f668c2d70c8b039486feae141b8dd78ffbdd0",
+    "data/stellar_extension_20261117/cowling/endpoint/source_grid_coarse_f_profile.csv": "d0647f70fcca299e730192d597b84b67b9bafd8731bb4ca76bf908c375d2c28a",
+    "data/stellar_extension_20261117/cowling/endpoint/source_grid_coarse_p1_profile.csv": "1efa70bcaf43df527b6b217b1acc13cb2d3d6501f9f4fca2425b2fef3250745d",
+    "data/stellar_extension_20261117/cowling/endpoint/background_tight_f_profile.csv": "7b33ce739d2a2c450dedc8cf812b928f09bc6bb59ad107421025142194ae7c29",
+    "data/stellar_extension_20261117/cowling/endpoint/background_tight_p1_profile.csv": "624f2f60b9b88859a2b0390aa39a39743f1c0f7464242ca612d47cabd29a56f8"
+  },
+  "report": {
+    "path": "docs/stellar_extension_20261117/INDEPENDENT_REVIEW_KO.md",
+    "sha256": "08ba4b121dfbcfb691c0c0be12981158d19d958e3fd8633e2768f936d52984cd"
+  },
+  "publication_performed": false,
+  "review_closed": true
+}

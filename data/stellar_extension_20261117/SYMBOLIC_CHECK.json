@@ -1,0 +1,41 @@
+{
+  "schema": "ns-cowling.symbolic-check.v1",
+  "stage": "E_and_following_Maxwell",
+  "initial_call": {
+    "input": "Clear[n,y,mu,pt,nl,nh,ms,g2,g3,sigma,phi,e]; eps= e[n,y]; yp=-D[eps,n,y]/D[eps,{y,2}]; mueq=D[eps,n]; muprime=Simplify[D[mueq,n]+D[mueq,y]*yp]; chiEq=n*muprime/mu; chiFixed=n*D[eps,{n,2}]/mu; uSig=ms^2*sigma^2/2+g2*sigma^3/3+g3*sigma^4/4; uPhi=Expand[uSig/.sigma->-phi]; <|\"EquilibriumCurvature\"->muprime,\"FixedMinusEquilibrium\"->FullSimplify[chiFixed-chiEq],\"SigmaConventionPotential\"->uPhi,\"PotentialDerivative\"->D[uPhi,phi],\"MaxwellLatentIdentityResidual\"->Simplify[(mu*nh-pt)-(mu*nl-pt)-mu*(nh-nl)]|>",
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "tool call error: tool call failed for `codex_apps/wolfram.WolframLanguageEvaluator`\n\nCaused by:\n    Mcp error: -32603: Internal error"
+        }
+      ],
+      "isError": true
+    }
+  },
+  "diagnostic_retry": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Out[1]= {(m^2*p^2)/2 - (g2*p^3)/3 + (g3*p^4)/4, 0}"
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "equilibrium_curvature": {
+    "input": "Clear[n,y,e,mu]; curvature= D[e[n,y],{n,2}]-D[e[n,y],n,y]^2/D[e[n,y],{y,2}]; {curvature, Simplify[n*D[e[n,y],{n,2}]/mu-n*curvature/mu]}",
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Out[1]= {-(Derivative[1, 1][e][n, y]^2/Derivative[0, 2][e][n, y]) + Derivative[2, 0][e][n, y], (n*Derivative[1, 1][e][n, y]^2)/(mu*Derivative[0, 2][e][n, y])}"
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    }
+  },
+  "scope": "Algebraic thermodynamic and scalar-field-convention identities only; not a microscopic or numerical proof. Initial evaluator returned MCP -32603, simple diagnostic retry succeeded.",
+  "derivation": "At stationary composition e_y=0 and e_yy>0, y'=-e_ny/e_yy, d²e_eq/dn²=e_nn-e_ny²/e_yy. chi_fixed-chi_eq=n*e_ny²/(mu*e_yy)>=0. Native fixed-Yp diagnostic allows lepton repartition and is not full frozen species."
+}

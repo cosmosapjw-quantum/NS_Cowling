@@ -1442,6 +1442,11 @@ def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
         raise ValueError("native matching requires beta-equilibrated inputs")
     source_support = {}
     for label, data in (("crust", d_cr), ("core", d_co)):
+        import numpy as np
+        tags = np.asarray(data.Iphase)
+        if (tags.shape != (data.n,) or tags.dtype.kind not in "iu"
+                or np.any(tags < -2147483648) or np.any(tags > 2147483647)):
+            raise ValueError(f"{label} Iphase must be a one-dimensional vector of exact native-range integers")
         if not all(len(getattr(data, name)) == data.n for name in
                    ("Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Iphase")):
             raise ValueError(f"{label} EOS arrays have inconsistent lengths")
@@ -1462,6 +1467,25 @@ def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
             "true" if drop_composition else "false",
         )
         matched = EOSData.from_internal_directory(target_dir, source_dir=d_cr.source_dir)
+
+    # Bind retained labels to source ranges independently of the native receipt.
+    # This is categorical transport validation, not an interpolation approval.
+    left, right = int(payload["i1"]) + 1, int(payload["i2"])
+    core_start = matched.n - (d_co.n - right)
+    labels = [int(tag) for tag in matched.Iphase]
+    if (labels != payload.get("output_phase_ids")
+            or labels[:left] != list(d_cr.Iphase[:left])
+            or labels[core_start:] != list(d_co.Iphase[right:])
+            or any(tag != payload["bridge_phase_id"] for tag in labels[left:core_start])):
+        raise NativeExecutionError("native matching did not preserve the retained source phase layout")
+    phase_provenance = {
+        "status": "RETAINED_SOURCE_LABELS_VERIFIED",
+        "crust_source_rows": [0, left - 1], "crust_output_rows": [0, left - 1],
+        "core_source_rows": [right, d_co.n - 1], "core_output_rows": [core_start, matched.n - 1],
+        "bridge_phase_id": int(payload["bridge_phase_id"]),
+        "interpolation_across_source_boundaries": "NOT_AUTHORIZED_BY_LABEL_RETENTION",
+        "composition": "phase_only_no_abundances",
+    }
 
     # Preserve the legacy tuple return while adding the complete native report
     # and an independently generated C1-C11 consistency record.
@@ -1532,6 +1556,7 @@ def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
         "core_composition_input_status": "explicitly_dropped" if core_has_composition else "input_eos_compo_absent",
         "core_composition_input_usable": False,
         "composition_dropped": bool(payload["composition_dropped"]),
+        "phase_provenance": phase_provenance,
         "source_support": source_support,
         "diagnostic_only": not bool(consistency["overall"]["pass_"]),
         "consistency": consistency,

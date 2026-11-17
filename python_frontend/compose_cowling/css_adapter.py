@@ -3,9 +3,10 @@
 The native ``match-core css`` table contains exactly one first-order interface
 (crust row ``css_transition_low_index`` -> CSS row ``css_transition_high_index``,
 equal P and mu_B, positive density and energy jump) and one continuous
-CSS->core join.  This adapter labels the rows below and above the jump as
-Iphase 1 and 2 so :class:`compose_cowling.maxwell.MaxwellEOS` builds two
-single-phase providers; it never interpolates across the jump.  MaxwellEOS
+CSS->core join. Intake preserves the source Iphase labels verbatim. The
+current two-provider solver rejects retained internal source boundaries before
+constructing interpolants. Solver role labels 1/2 are assigned only on a
+private copy after that check. MaxwellEOS
 re-checks pressure and chemical-potential continuity and the latent-energy
 identity itself.
 
@@ -31,8 +32,19 @@ CSS_KIND = "css_single_speed_with_crust_density_jump"
 PRESSURE_REL_GATE = 1.0e-10   # scripts/match_report_admission.PRESSURE_REL_GATE
 
 
+class UnsupportedSourcePhaseBoundary(ValueError):
+    """Intake retained a boundary for which the solver has no declared law."""
+
+    category = "UNSUPPORTED_RETAINED_SOURCE_PHASE_BOUNDARY"
+
+    def __init__(self, boundaries):
+        self.boundaries = boundaries
+        super().__init__(f"{self.category}: source boundary pairs {boundaries}; "
+                         "phase labels do not specify an interpolation or interface law")
+
+
 def phase_table_from_css_match(compose_dir: str | Path, match_report: Mapping[str, Any]) -> EOSData:
-    """Return the matched table with Iphase 1 (crust) / 2 (CSS + core)."""
+    """Validate CSS indices and return the table with its serialized labels."""
     if match_report.get("construction_kind") != CSS_KIND:
         raise ValueError("match report is not a css single-speed construction")
     data = read_compose(str(compose_dir))
@@ -53,9 +65,14 @@ def phase_table_from_css_match(compose_dir: str | Path, match_report: Mapping[st
     if (abs(float(data.p[hi]) - float(data.p[lo])) > PRESSURE_REL_GATE * p_scale
             or not (data.nb[hi] > data.nb[lo] and data.eps[hi] > data.eps[lo])):
         raise ValueError("rows at the css transition index are not a positive first-order jump")
-    table = copy.deepcopy(data)
-    table.Iphase = np.where(np.arange(table.n) <= lo, 1, 2).astype(int)
-    return table
+    expected = match_report.get("output_phase_ids")
+    valid = (isinstance(expected, list) and len(expected) == data.n
+             and type(match_report.get("bridge_phase_id")) is int
+             and all(type(tag) is int for tag in expected)
+             and np.array_equal(data.Iphase, expected))
+    if not valid:
+        raise ValueError("CSS serialized phase layout disagrees with native receipt")
+    return data
 
 
 def css_match_maxwell_eos(compose_dir: str | Path, match_report: Mapping[str, Any]
@@ -66,6 +83,22 @@ def css_match_maxwell_eos(compose_dir: str | Path, match_report: Mapping[str, An
     if (isinstance(join, (bool, np.bool_)) or not isinstance(join, (int, np.integer))
             or not match_report["css_transition_high_index"] < join < table.n - 1):
         raise ValueError("invalid css core join index")
+    if "bridge_phase_id" in match_report:
+        tag = match_report["bridge_phase_id"]
+        hi = match_report["css_transition_high_index"]
+        if (type(tag) is not int or not np.all(table.Iphase[hi:join] == tag)
+                or np.any(table.Iphase[:hi] == tag) or np.any(table.Iphase[join:] == tag)):
+            raise ValueError("CSS bridge phase layout disagrees with retained source labels")
+    lo = match_report["css_transition_low_index"]
+    boundaries = [(i - 1, i) for start, end in ((0, lo + 1), (join, table.n))
+                  for i in range(start + 1, end) if table.Iphase[i] != table.Iphase[i - 1]]
+    if boundaries:
+        raise UnsupportedSourcePhaseBoundary(boundaries)
+    # Provider roles belong only to the solver's private view. The intake
+    # table and CompOSE source retain every original label and boundary.
+    source_phase_ids = table.Iphase.tolist()
+    table = copy.deepcopy(table)
+    table.Iphase = np.where(np.arange(table.n) <= lo, 1, 2).astype(int)
     high = table.Iphase == 2
     provider = CSSCoreBarotrope(
         table.p[high], table.eps[high], table.nb[high], table.mub[high],
@@ -74,6 +107,8 @@ def css_match_maxwell_eos(compose_dir: str | Path, match_report: Mapping[str, An
     eos = MaxwellEOS(table, high_provider=provider)
     meta = {
         "construction_kind": CSS_KIND,
+        "source_phase_ids": source_phase_ids,
+        "source_phase_boundaries": boundaries,
         "crust_rows": int(np.count_nonzero(table.Iphase == 1)),
         "css_and_core_rows": int(np.count_nonzero(table.Iphase == 2)),
         "css_core_join": "continuous in n_B, P, eps, mu_B; one-sided sound-speed derivative",

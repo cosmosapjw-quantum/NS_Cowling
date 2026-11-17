@@ -1,5 +1,10 @@
 # NS_Cowling local handoff — 2026-11-17
 
+후속 phase 보존 수리는 [PHASE_RETENTION_REPAIR_KO.md](PHASE_RETENTION_REPAIR_KO.md)와
+`data/research_matching_20261117/phase_retention_repair/assembly_003/RECEIPT.json`을 따른다.
+native retained label/CompOSE 전달은 구현했고, 미승인 source 경계의 stellar 적용은 typed HOLD다.
+public 전체 APR SUPPORT guard는 유지한다. 아래 내용은 앞선 캠페인의 인계 기록이다.
+
 중앙 저장소는 cosmosapjw-quantum/NS_Cowling, 작업 branch는
 remediation/2026-11-15-m5a-maxwell-eos-contracts, PR15다.
 이번 작업의 시작 commit은 478c7b5de1514ac512f91156f36551478f36f688이다.

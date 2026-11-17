@@ -89,6 +89,9 @@ def _css_case():
         "source_euler_relative_residual": 1.0e-12,
         "composition_dropped": True, "is_exact_maxwell": True,
     }
+    for i in range(report["css_transition_high_index"], report["css_core_bridge_index"]):
+        rows[i][9] = 1
+    report.update(bridge_phase_id=1, output_phase_ids=[int(row[9]) for row in rows])
     return report, rows
 
 

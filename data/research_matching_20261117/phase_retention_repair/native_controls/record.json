@@ -1,0 +1,94 @@
+{
+  "baseline": false,
+  "scope": "Native matching scientific controls; not a CompOSE census or end-to-end pipeline claim",
+  "threads": 1,
+  "test_probe_sha256": "0aa1e385267d12f79f42637e821ffec1a7377155e6ffa6961defad1b231e24f3",
+  "test_probe_semantic_identity": "Exact source text restored by reversing one public-access declaration; no physical or executable statements changed",
+  "source_sha256": {
+    "fortran_eos/src/compose_eos_matching.f90": "3240ea99d5231470dd9faed9cf776afc4b148ef4a9c4d1b3b07d7f494e5c0a52",
+    "fortran_eos/src/compose_eos_types.f90": "26fb4fb7b9482ca238ff41e504c75b090a42d902d7946a4c0612ece4e8729d44",
+    "fortran_eos/tests/test_matching_thermodynamic_adversarial.f90": "44ed8039b169b6e93130ecfef69e9ebe259416abe0b234267c0edfd266e6fc45",
+    "fortran_eos/tests/test_matching_interval_adversarial.f90": "a2287d173f98c380309323a29ef43e4dd71ca62462b1b4024e3deaecddca83b5",
+    "fortran_eos/tests/test_matching_extrema_controls.f90": "51b4df5d456b36776f540bc59cb1bf2d614c7600f6b6d5602384b16dfd42ff62"
+  },
+  "commands": [
+    {
+      "command": [
+        "gfortran",
+        "-O1",
+        "-g",
+        "-fcheck=all",
+        "-ffree-line-length-none",
+        "-ffpe-trap=zero,invalid,overflow",
+        "-J",
+        "/tmp/ns_cowling_phase_20261117/build/phase_matching_controls",
+        "-I",
+        "/tmp/ns_cowling_phase_20261117/build/phase_matching_controls",
+        "/tmp/ns_cowling_phase_20261117/fortran_eos/src/compose_eos_types.f90",
+        "/tmp/ns_cowling_phase_20261117/build/phase_matching_controls/compose_eos_matching_probe.f90",
+        "/tmp/ns_cowling_phase_20261117/fortran_eos/tests/test_matching_thermodynamic_adversarial.f90",
+        "-o",
+        "/tmp/ns_cowling_phase_20261117/build/phase_matching_controls/matching_thermodynamic_adversarial"
+      ],
+      "returncode": 0
+    },
+    {
+      "command": [
+        "/tmp/ns_cowling_phase_20261117/build/phase_matching_controls/matching_thermodynamic_adversarial"
+      ],
+      "returncode": 0
+    },
+    {
+      "command": [
+        "gfortran",
+        "-O1",
+        "-g",
+        "-fcheck=all",
+        "-ffree-line-length-none",
+        "-ffpe-trap=zero,invalid,overflow",
+        "-J",
+        "/tmp/ns_cowling_phase_20261117/build/phase_matching_controls",
+        "-I",
+        "/tmp/ns_cowling_phase_20261117/build/phase_matching_controls",
+        "/tmp/ns_cowling_phase_20261117/fortran_eos/src/compose_eos_types.f90",
+        "/tmp/ns_cowling_phase_20261117/build/phase_matching_controls/compose_eos_matching_probe.f90",
+        "/tmp/ns_cowling_phase_20261117/fortran_eos/tests/test_matching_interval_adversarial.f90",
+        "-o",
+        "/tmp/ns_cowling_phase_20261117/build/phase_matching_controls/matching_interval_adversarial"
+      ],
+      "returncode": 0
+    },
+    {
+      "command": [
+        "/tmp/ns_cowling_phase_20261117/build/phase_matching_controls/matching_interval_adversarial"
+      ],
+      "returncode": 0
+    },
+    {
+      "command": [
+        "gfortran",
+        "-O1",
+        "-g",
+        "-fcheck=all",
+        "-ffree-line-length-none",
+        "-ffpe-trap=zero,invalid,overflow",
+        "-J",
+        "/tmp/ns_cowling_phase_20261117/build/phase_matching_controls",
+        "-I",
+        "/tmp/ns_cowling_phase_20261117/build/phase_matching_controls",
+        "/tmp/ns_cowling_phase_20261117/fortran_eos/src/compose_eos_types.f90",
+        "/tmp/ns_cowling_phase_20261117/build/phase_matching_controls/compose_eos_matching_probe.f90",
+        "/tmp/ns_cowling_phase_20261117/fortran_eos/tests/test_matching_extrema_controls.f90",
+        "-o",
+        "/tmp/ns_cowling_phase_20261117/build/phase_matching_controls/matching_extrema_controls"
+      ],
+      "returncode": 0
+    },
+    {
+      "command": [
+        "/tmp/ns_cowling_phase_20261117/build/phase_matching_controls/matching_extrema_controls"
+      ],
+      "returncode": 0
+    }
+  ]
+}

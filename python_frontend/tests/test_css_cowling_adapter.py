@@ -43,7 +43,8 @@ def test_phase_table_splits_exactly_at_the_crust_css_jump(matched):
     compose, report = matched
     table = phase_table_from_css_match(compose, report)
     lo, hi = report["css_transition_low_index"], report["css_transition_high_index"]
-    assert np.all(table.Iphase[: lo + 1] == 1) and np.all(table.Iphase[hi:] == 2)
+    np.testing.assert_array_equal(table.Iphase, report["output_phase_ids"])
+    assert table.Iphase[lo] != table.Iphase[hi]
     assert abs(table.p[lo] - table.p[hi]) <= 1e-10 * table.p[lo] and table.nb[hi] > table.nb[lo]
 
 
@@ -112,7 +113,7 @@ def test_adapter_uses_declared_pressure_gate_not_bit_equality(matched, monkeypat
     monkeypatch.setattr(adapter, "read_compose", fake_read)
     if ok:
         table = adapter.phase_table_from_css_match(compose, report)
-        assert table.Iphase[hi] == 2
+        assert table.Iphase[hi] == report["bridge_phase_id"]
     else:
         with pytest.raises(ValueError, match="first-order jump"):
             adapter.phase_table_from_css_match(compose, report)
@@ -158,3 +159,31 @@ def test_css_provider_rejects_overflowing_analytic_bridge(matched):
     compose, report = matched
     with pytest.raises(ValueError, match="CSS|css"):
         css_match_maxwell_eos(compose, dict(report, css_single_sound_speed=np.nextafter(0., 1.)))
+
+
+@pytest.mark.parametrize("side", ["crust", "core"])
+def test_stellar_intake_keeps_boundaries_and_refuses_undeclared_interpolation(matched, monkeypatch, side):
+    import compose_cowling.css_adapter as adapter
+    compose, report = matched
+    data = adapter.read_compose(compose)
+    index = (report["css_transition_low_index"] // 2 if side == "crust"
+             else report["css_core_bridge_index"] + 2)
+    data.Iphase[index] = 123456
+    receipt = dict(report, output_phase_ids=data.Iphase.tolist())
+    monkeypatch.setattr(adapter, "read_compose", lambda _: data.copy())
+    # The intake result and source keep every phase; no provider is constructed.
+    np.testing.assert_array_equal(adapter.phase_table_from_css_match(compose, receipt).Iphase, data.Iphase)
+    with pytest.raises(adapter.UnsupportedSourcePhaseBoundary) as exc:
+        adapter.css_match_maxwell_eos(compose, receipt)
+    assert (index - 1, index) in exc.value.boundaries
+    assert data.Iphase[index] == 123456
+
+
+def test_stellar_intake_rejects_erased_phase_sidecar(matched, monkeypatch):
+    import compose_cowling.css_adapter as adapter
+    compose, report = matched
+    data = adapter.read_compose(compose)
+    data.Iphase[:] = 0
+    monkeypatch.setattr(adapter, "read_compose", lambda _: data)
+    with pytest.raises(ValueError, match="phase layout"):
+        adapter.phase_table_from_css_match(compose, report)

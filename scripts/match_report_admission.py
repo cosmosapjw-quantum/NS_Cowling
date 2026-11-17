@@ -348,8 +348,16 @@ def admit_css(report: Mapping[str, Any], rows: list[dict[str, float]],
     if not _physical_rows(c, rows):
         return c.result("css")
     _cold_checks(c, rows, meta, "css")
-    c.add("serialized_phase_layout", all(row.get("Iphase") == 0 for row in rows),
-          expected="native thermo-only CSS output uses Iphase=0")
+    expected_phases = report.get("output_phase_ids")
+    phase_ok = (isinstance(expected_phases, list) and len(expected_phases) == len(rows)
+                and all(type(tag) is int and row.get("Iphase") == tag
+                        for row, tag in zip(rows, expected_phases)))
+    bridge_tag = report.get("bridge_phase_id")
+    phase_ok = (phase_ok and type(bridge_tag) is int
+                and all(row.get("Iphase") == bridge_tag for row in rows[hi:core])
+                and all(row.get("Iphase") != bridge_tag for row in rows[:hi] + rows[core:]))
+    c.add("serialized_phase_layout", phase_ok,
+          expected="mandatory exact native output_phase_ids and distinct bridge_phase_id")
     _branch_checks(c, rows[:lo + 1], "crust_branch")
     _branch_checks(c, rows[hi:core + 1], "css_branch")
     _branch_checks(c, rows[core:], "core_branch")

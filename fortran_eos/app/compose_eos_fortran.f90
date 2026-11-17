@@ -288,6 +288,8 @@ program compose_eos_fortran
       ',"css_transition_low_index":'//integer_text(match_report%css_transition_low_index)// &
       ',"css_transition_high_index":'//integer_text(match_report%css_transition_high_index)// &
       ',"css_core_bridge_index":'//integer_text(match_report%css_core_bridge_index)// &
+      ',"bridge_phase_id":'//integer_text(match_report%bridge_phase_id)// &
+      ',"output_phase_ids":'//integer_array_text(out%iphase)// &
       ',"seidov_critical_delta_eps":'//real_text(match_report%seidov_critical_delta_eps)// &
       ',"seidov_ratio":'//real_text(match_report%seidov_ratio)// &
       ',"seidov_small_core_stable":'//logical_text(match_report%seidov_small_core_stable)// &
@@ -599,6 +601,17 @@ program compose_eos_fortran
     call emit_failure('unknown operation: '//trim(action));stop 2
   end select
 contains
+  function integer_array_text(values) result(s)
+    integer,intent(in)::values(:)
+    character(len=:),allocatable::s
+    integer::j
+    s='['
+    do j=1,size(values)
+      if(j>1)s=s//','
+      s=s//trim(integer_text(values(j)))
+    enddo
+    s=s//']'
+  end function integer_array_text
   subroutine emit_failure(message)
     character(len=*),intent(in)::message
     write(*,'(a)')'{"status":"error","message":"'//trim(message)//'"}'

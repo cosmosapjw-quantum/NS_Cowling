@@ -18,7 +18,7 @@ module compose_eos_matching
     real(wp) :: css_transition_pressure=0._wp, css_transition_mu=0._wp
     real(wp) :: seidov_critical_delta_eps=0._wp, seidov_ratio=0._wp
     integer :: css_transition_low_index=-1, css_transition_high_index=-1
-    integer :: css_core_bridge_index=-1
+    integer :: css_core_bridge_index=-1, bridge_phase_id=0
     logical :: seidov_small_core_stable=.false.
     ! CompOSE normalization preserves physical energy and chemical potentials.
     ! dm_mass_gauge_meV is retained as a legacy report field: the applied
@@ -108,6 +108,17 @@ contains
     else if(side=='right')then
       lo=index;hi=min(eos%n,index+5)
     else;return;endif
+    ! A phase ID is categorical. Endpoint derivatives must use only the
+    ! contiguous source phase on the requested side, never the next phase.
+    if(side=='left')then
+      do j=index-1,lo,-1
+        if(eos%iphase(j)/=eos%iphase(index))then;lo=j+1;exit;endif
+      enddo
+    else
+      do j=index+1,hi
+        if(eos%iphase(j)/=eos%iphase(index))then;hi=j-1;exit;endif
+      enddo
+    endif
     n=hi-lo+1
     if(n<3)then;message='not enough points for one-sided endpoint sound speed';return;endif
     allocate(x(n),lp(n),le(n),mp(n),me(n))
@@ -872,6 +883,12 @@ contains
     endif
     call validate_eos(cr,ok1,msg);if(.not.ok1)then;status='invalid crust EOS: '//trim(msg);return;endif
     call validate_eos(co,ok1,msg);if(.not.ok1)then;status='invalid core EOS: '//trim(msg);return;endif
+    if(.not.allocated(cr%iphase).or..not.allocated(co%iphase))then
+      status='source phase arrays are not allocated';return
+    endif
+    if(size(cr%iphase)/=cr%n.or.size(co%iphase)/=co%n)then
+      status='source phase arrays have inconsistent lengths';return
+    endif
     if(.not.ieee_is_finite(cr%temperature_mev).or..not.ieee_is_finite(co%temperature_mev).or. &
        .not.ieee_is_finite(cr%charge_fraction_grid).or..not.ieee_is_finite(co%charge_fraction_grid))then
       status='native matching requires finite thermodynamic metadata';return
@@ -995,12 +1012,23 @@ contains
     out%selected_iT=out%iT;out%selected_iYq=out%iYq
     allocate(out%t_axis(1),out%yq_axis(1))
     out%t_axis(1)=out%temperature_mev;out%yq_axis(1)=out%charge_fraction_grid
-    out%composition_file_present=.false.;out%composition_available=.false.;out%beta_equilibrated=.true.
+    ! Iphase lives in eos.compo independently of abundances. Emit phase-only
+    ! rows (Npairs=Nquad=0); all presence/closure masks remain false.
+    out%composition_file_present=.true.;out%composition_available=.false.;out%beta_equilibrated=.true.
+    out%row_status=1
     out%q=0._wp;out%q_extra=0._wp;out%iphase=0
+    ! Pick a deterministic bridge label absent from BOTH provider namespaces.
+    ! Copy source labels verbatim; equality never assigns physical semantics.
+    do j=0,cr%n+co%n
+      if(any(cr%iphase==j).or.any(co%iphase==j))cycle
+      report%bridge_phase_id=j;exit
+    enddo
+    out%iphase=report%bridge_phase_id
     out%yn=0._wp;out%yp=0._wp;out%ye=0._wp;out%ymu=0._wp;out%abar=0._wp;out%zbar=0._wp;out%yh=0._wp
     ! Retain crust source rows, then (for CSS) an explicit high-density
     ! transition row, the bridge interior, and finally the continuous core.
     out%nb(1:nleft)=cr%nb(1:i1)
+    out%iphase(1:nleft)=cr%iphase(1:i1)
     out%q(1,1:nleft)=cr%q(1,1:i1)
     do j=1,nleft
       ff=(cr%q(6,j)+1._wp)*cr%mn;qq=cr%q(1,j)
@@ -1037,6 +1065,7 @@ contains
         k=nleft+n_bridge+j
       endif
       out%nb(k)=co%nb(i2+j-1);out%q(1,k)=co%q(1,i2+j-1)
+      out%iphase(k)=co%iphase(i2+j-1)
       ff=(co%q(6,i2+j-1)+1._wp)*co%mn;qq=co%q(1,i2+j-1)
       out%q(3,k)=(ff+qq)/out%mn-1._wp;out%q(6,k)=ff/out%mn-1._wp
       out%q(4,k)=co%q(4,i2+j-1)*co%mn/out%mn

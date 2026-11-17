@@ -1,5 +1,9 @@
 # EOS 생성 완료 범위와 core–crust matching 수정 — 2026-11-17
 
+후속 native phase 보존 수리와 독립 리뷰는
+[PHASE_RETENTION_REPAIR_KO.md](PHASE_RETENTION_REPAIR_KO.md)를 따른다.
+아래 결과는 이전 `4a443333` 캠페인의 기록으로 보존한다.
+
 기준 HEAD는 478c7b5de1514ac512f91156f36551478f36f688, 기준 원격 CI는 #629 성공이다.
 이 작업은 실제 EOS 생성의 남은 수치·입력 문제와 노출된 matching 방법의 이론/구현 결함을
 병렬로 조사한 뒤, 실제 생성 테이블을 연결하는 계산까지 수행했다.

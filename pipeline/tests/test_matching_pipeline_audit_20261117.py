@@ -71,6 +71,29 @@ def test_maxwell_phase_boundary_must_match_serialized_output(tmp_path):
     assert result["status"] == "REJECTED", result
 
 
+@pytest.mark.parametrize("tamper", ["erase", "receipt_missing", "both_fields_missing", "bridge_collision"])
+def test_css_phase_retention_receipt_is_bound_to_serialized_rows(tmp_path, tamper):
+    report, raw = _css_case()
+    hi, core = report["css_transition_high_index"], report["css_core_bridge_index"]
+    for i, row in enumerate(raw):
+        row[9] = 17 if hi <= i < core else 23
+    report.update(bridge_phase_id=17, output_phase_ids=[int(row[9]) for row in raw])
+    assert adm.admit_match_report("css", report, *_write_rows(tmp_path, raw))["status"] == "ADMITTED"
+    if tamper == "erase":
+        raw[-1][9] = 0
+    elif tamper == "receipt_missing":
+        del report["output_phase_ids"]
+    elif tamper == "both_fields_missing":
+        del report["output_phase_ids"]
+        del report["bridge_phase_id"]
+        for row in raw:
+            row[9] = 0
+    else:
+        report["bridge_phase_id"] = 23
+    result = adm.admit_match_report("css", report, *_write_rows(tmp_path, raw))
+    assert "serialized_phase_layout" in result["failed_checks"]
+
+
 def _survivor(tmp_path):
     directory = tmp_path / "case" / "compose"
     directory.mkdir(parents=True)
@@ -80,6 +103,23 @@ def _survivor(tmp_path):
         hashes[name] = hashlib.sha256((directory / name).read_bytes()).hexdigest()
     return {"pair_id": "case", "method": "css", "admission": {"status": "ADMITTED"},
             "output_sha256": hashes}
+
+
+def test_preserved_phase_erased_apr_baseline_cannot_enter_new_stellar_solver(monkeypatch):
+    from pathlib import Path
+    from compose_eos import EOSData
+    import compose_cowling.css_adapter as adapter
+    root = Path(__file__).resolve().parents[2] / "data/research_matching_20261117/phase_retention_repair/attempts"
+    report = next(json.loads(line) for line in (root / "overbroad_guard/baseline.log").read_text().splitlines()
+                  if line.startswith("{"))
+    internal = root / "phase_erased_baseline/internal"
+    result = adm.admit_match_report("css", report, internal / "eos_data.csv", internal / "eos_data.nml")
+    assert "serialized_phase_layout" in result["failed_checks"]
+    data = EOSData.from_internal_directory(internal)
+    assert not any(data.Iphase)  # actual old phase-erased output, unchanged
+    monkeypatch.setattr(adapter, "read_compose", lambda _: data)
+    with pytest.raises(ValueError, match="phase layout"):
+        adapter.css_match_maxwell_eos(internal, report)
 
 
 def test_status_only_survivor_cannot_replace_pair_receipt(tmp_path):

@@ -29,6 +29,17 @@ def _must_not_match(*args):
     raise RuntimeError("native matching entered")
 
 
+@pytest.mark.parametrize("labels", [np.full(6, 0.5), np.ones(6, dtype=bool),
+    np.ones((6, 1), dtype=int), np.full(6, 2147483648, dtype=np.int64),
+    np.full(6, np.nan)])
+def test_matching_labels_cannot_be_truncated_to_integers(tmp_path, monkeypatch, labels):
+    data = _table(tmp_path, [9] * 6)
+    data.Iphase = labels
+    monkeypatch.setattr(api, "run_native", _must_not_match)
+    with pytest.raises(ValueError, match="Iphase.*exact native-range integers"):
+        api.match_crust_core(data, data, method="css", n_bridge=8)
+
+
 def test_declared_unapproved_cross_phase_input_rejected_before_native(tmp_path, monkeypatch):
     data = _table(tmp_path, [1, 1, 1, 9, 9, 9])
     _support(tmp_path)

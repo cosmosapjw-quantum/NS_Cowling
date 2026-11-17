@@ -114,9 +114,12 @@ def test_native_smooth_matching_differential_against_legacy(method, tmp_path):
     # This benchmark has an input crust composition table. Its omission is a
     # deliberate, explicitly requested approximation of the native v1 API.
     assert info["composition_dropped"] is True
-    assert matched.composition_file_present is False
+    assert matched.composition_file_present is True  # phase-only sidecar
     assert matched.composition_available is False
-    assert np.all(matched.Iphase == 0)
+    i1, i2 = info["i1"], info["i2"]
+    np.testing.assert_array_equal(matched.Iphase[:i1+1], crust.Iphase[:i1+1])
+    np.testing.assert_array_equal(matched.Iphase[-(core.n-i2):], core.Iphase[i2:])
+    assert np.all(matched.Iphase[i1+1:-(core.n-i2)] == info["native_report"]["bridge_phase_id"])
     for field in (matched.Yn, matched.Yp, matched.Ye, matched.Ymu,
                   matched.Aav, matched.Zav, matched.Yh):
         assert np.all(field == 0.0)

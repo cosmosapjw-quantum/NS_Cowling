@@ -1,0 +1,250 @@
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+______________ test_segment_keeps_support_axes_and_beta_evidence _______________
+
+    def test_segment_keeps_support_axes_and_beta_evidence():
+        low, _ = pair()
+        low.source_dir = "/retained/source/eos"
+        low.beta_equilibrated = False
+        low.inb_start = 19
+        low.nT = low.nYq = 1
+        low.t_first = low.t_last = low.selected_iT = 0
+        low.yq_first = low.yq_last = low.selected_iYq = 1
+        low.t_axis = np.array([0.])
+        low.yq_axis = np.array([0.])
+        segment = _segment_eosdata(low, (0, 20, 60))
+>       assert segment.source_dir == low.source_dir
+E       AssertionError: assert None == '/retained/source/eos'
+E        +  where None = EOSData(nb=array([0.575  , 0.58875, 0.6025 , 0.61625, 0.63   , 0.64375, 0.6575 ,\n       0.67125, 0.685  , 0.69875, 0.7..., yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)).source_dir
+E        +  and   '/retained/source/eos' = EOSData(nb=array([0.3    , 0.31375, 0.3275 , 0.34125, 0.355  , 0.36875, 0.3825 ,\n       0.39625, 0.41   , 0.42375, 0.4...s=array([0.]), yq_axis=array([0.]), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)).source_dir
+
+python_frontend/tests/test_maxwell_v2_retention.py:50: AssertionError
+___________ test_missing_composition_is_not_zero_neutrality_evidence ___________
+
+    def test_missing_composition_is_not_zero_neutrality_evidence():
+        low, _ = pair()
+>       assert _local_neutrality_residual(low, slice(None)) is None
+E       assert 0.0 is None
+E        +  where 0.0 = _local_neutrality_residual(EOSData(nb=array([0.3    , 0.31375, 0.3275 , 0.34125, 0.355  , 0.36875, 0.3825 ,\n       0.39625, 0.41   , 0.42375, 0.4..., yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)), slice(None, None, None))
+E        +    where slice(None, None, None) = slice(None)
+
+python_frontend/tests/test_maxwell_v2_retention.py:60: AssertionError
+____________ test_native_error_keeps_category_and_unadmitted_report ____________
+
+args = (EOSData(nb=array([0.3    , 0.31375, 0.3275 , 0.34125, 0.355  , 0.36875, 0.3825 ,
+       0.39625, 0.41   , 0.42375, 0.... yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)))
+kwargs = {'assume_local_charge_neutrality': True, 'return_report': True}
+
+    def reject(*args, **kwargs):
+>       raise NativeExecutionError("finite-domain crossing absent", category="NO_COEXISTENCE_CROSSING",
+                                   operation="maxwell-transition")
+E       compose_eos.native.NativeExecutionError: finite-domain crossing absent
+
+python_frontend/tests/test_maxwell_v2_retention.py:67: NativeExecutionError
+
+The above exception was the direct cause of the following exception:
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7e78225f3740>
+
+    def test_native_error_keeps_category_and_unadmitted_report(monkeypatch):
+        import compose_eos.maxwell_v2 as module
+        low, high = pair()
+        def reject(*args, **kwargs):
+            raise NativeExecutionError("finite-domain crossing absent", category="NO_COEXISTENCE_CROSSING",
+                                       operation="maxwell-transition")
+        monkeypatch.setattr(module, "construct_maxwell_transition", reject)
+        with pytest.raises(NativeExecutionError) as caught:
+>           construct_maxwell_transition_v2(low, high, assume_local_charge_neutrality=True)
+
+python_frontend/tests/test_maxwell_v2_retention.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+low = EOSData(nb=array([0.3    , 0.31375, 0.3275 , 0.34125, 0.355  , 0.36875, 0.3825 ,
+       0.39625, 0.41   , 0.42375, 0.4..., yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64))
+high = EOSData(nb=array([1.3    , 1.31875, 1.3375 , 1.35625, 1.375  , 1.39375, 1.4125 ,
+       1.43125, 1.45   , 1.46875, 1.4..., yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64))
+assume_local_charge_neutrality = True, return_report = True
+
+    def construct_maxwell_transition_v2(low: EOSData, high: EOSData,
+                                          *, assume_local_charge_neutrality: bool = True,
+                                          return_report: bool = True):
+        """Composition-aware v2 Maxwell. Segments at Iphase boundaries, runs v1
+        on each smooth segment-pair, preserves per-segment composition.
+    
+        Returns (matched, report) on success or raises with a v2 status category.
+        """
+        report = MaxwellV2Report()
+    
+        # v1 is a thermo-only kernel. Do not silently drop a CompOSE composition
+        # sidecar or its row-level semantics while extracting an Iphase segment.
+        has_composition = any(
+            bool(getattr(phase, flag, False))
+            for phase in (low, high)
+            for flag in ("composition_available", "composition_file_present")
+        )
+        if has_composition:
+            report.status = "COMPOSITION_UNSUPPORTED"
+            report.rejection_category = "COMPOSITION_UNSUPPORTED"
+            raise RuntimeError(
+                "v2: COMPOSITION_UNSUPPORTED: current native v1 kernel is "
+                "thermo-only; composition-bearing inputs require a dedicated "
+                "composition-aware native transition and output path."
+            )
+    
+        # axis-value slice compatibility (charge_fraction_grid value, not iYq int)
+        cf_low = float(getattr(low, 'charge_fraction_grid', 0.0))
+        cf_high = float(getattr(high, 'charge_fraction_grid', 0.0))
+        report.axis_value_slice_compatible = abs(cf_low - cf_high) < 1e-12
+        if not report.axis_value_slice_compatible:
+            report.status = "NO_COMMON_MU_SUPPORT"
+            report.rejection_category = "NO_COMMON_MU_SUPPORT"
+            raise RuntimeError(
+                f"v2: charge_fraction_grid mismatch (low={cf_low}, high={cf_high}); "
+                f"axis-value slice incompatible. Original iYq labels: low={low.iYq}, high={high.iYq}.")
+    
+        # segment each input at Iphase boundaries
+        segs_low_raw = _segment_by_iphase(np.asarray(low.Iphase, int))
+        segs_high_raw = _segment_by_iphase(np.asarray(high.Iphase, int))
+    
+        if not segs_low_raw or not segs_high_raw:
+            report.status = "INVALID_PHASE_INPUT"
+            report.rejection_category = "INVALID_PHASE_INPUT"
+            raise RuntimeError("v2: empty input phase (no Iphase segments)")
+    
+        # build segment metadata (composition, local neutrality evidence)
+        for s in segs_low_raw:
+            sl = slice(s[1], s[2])
+            report.segments_low.append(Segment(
+                iphase_label=s[0], row_slice=sl, n_rows=s[2]-s[1],
+                composition_available=bool(getattr(low, 'composition_available', False)),
+                charge_neutrality_residual=_local_neutrality_residual(low, sl),
+                provenance={"source": "low", "iYq_label": int(low.iYq)}))
+        for s in segs_high_raw:
+            sl = slice(s[1], s[2])
+            report.segments_high.append(Segment(
+                iphase_label=s[0], row_slice=sl, n_rows=s[2]-s[1],
+                composition_available=bool(getattr(high, 'composition_available', False)),
+                charge_neutrality_residual=_local_neutrality_residual(high, sl),
+                provenance={"source": "high", "iYq_label": int(high.iYq)}))
+    
+        # local neutrality evidence per phase (recorded, not just boolean)
+        report.local_neutrality_evidence_low = {
+            f"segment_{i}_iphase_{s.iphase_label}": {
+                "n_rows": s.n_rows, "charge_neutrality_residual": s.charge_neutrality_residual,
+                "composition_available": s.composition_available}
+            for i, s in enumerate(report.segments_low)}
+        report.local_neutrality_evidence_high = {
+            f"segment_{i}_iphase_{s.iphase_label}": {
+                "n_rows": s.n_rows, "charge_neutrality_residual": s.charge_neutrality_residual,
+                "composition_available": s.composition_available}
+            for i, s in enumerate(report.segments_high)}
+    
+        # reject if any segment has nonzero Nadd and the provider semantics
+        # are not recognised (COMPOSITION_UNSUPPORTED_LAYOUT)
+        nadd_low = int(getattr(low, 'q_extra_count', 0))
+        nadd_high = int(getattr(high, 'q_extra_count', 0))
+        if nadd_low > 0 or nadd_high > 0:
+            report.status = "COMPOSITION_UNSUPPORTED"
+            report.rejection_category = "COMPOSITION_UNSUPPORTED"
+            raise RuntimeError(
+                f"v2: nonzero Nadd (low={nadd_low}, high={nadd_high}) from an "
+                f"unrecognised provider; provider-specific q_extra semantics "
+                f"cannot be preserved generically. COMPOSITION_UNSUPPORTED_LAYOUT.")
+    
+        # run v1 native Maxwell on each (low-seg, high-seg) pair
+        # the densest low segment vs the least-dense high segment is the
+        # physically relevant coexistence candidate (crust-core transition)
+        # pick the LAST low segment (highest density) and FIRST high segment
+        # (lowest density) -- this is the crust-core boundary
+        last_low = segs_low_raw[-1]
+        first_high = segs_high_raw[0]
+        report.admitted_pairs.append((len(segs_low_raw)-1, 0))
+    
+        low_seg = _segment_eosdata(low, last_low)
+        high_seg = _segment_eosdata(high, first_high)
+    
+        try:
+            matched, v1_report = construct_maxwell_transition(
+                low_seg, high_seg,
+                assume_local_charge_neutrality=assume_local_charge_neutrality,
+                return_report=True)
+        except NativeExecutionError as e:
+            # Structured-status taxonomy (§3/§4). The Fortran layer emits a stable
+            # `category` field alongside the free-form message; the v2 layer
+            # consumes it directly instead of inferring a category from the
+            # exception text. This guarantees that the same underlying failure
+            # receives the same status in every transformation and every run, and
+            # removes the text-based category inference that previously produced
+            # inconsistent labels for identical Q5 beta-equilibrium failures.
+            cat = e.category or "INTERPOLATION_UNSTABLE"
+            # Map the §3/§4 Fortran category to the v2 report status. The category
+            # names are identical to the §3 terminal-outcome set.
+            report.status = cat
+            report.rejection_category = cat
+>           raise RuntimeError(f"v2: v1 kernel rejected segment pair: {e}") from e
+E           RuntimeError: v2: v1 kernel rejected segment pair: finite-domain crossing absent
+
+python_frontend/compose_eos/maxwell_v2.py:223: RuntimeError
+_____ test_v2_retains_both_source_tails_and_records_original_phase_labels ______
+
+    def test_v2_retains_both_source_tails_and_records_original_phase_labels():
+        low, high = pair()
+        low.Iphase[:20] = 4
+        low.Iphase[20:] = 7
+        high.Iphase[:60] = 3
+        high.Iphase[60:] = 6
+        # Header reference changes must not change any physical source column.
+        old_mn = high.mn
+        high.mn = 940.
+        for name in ("Q3", "Q6", "Q7"):
+            setattr(high, name, (getattr(high, name)+1)*old_mn/high.mn-1)
+        for name in ("Q4", "Q5"):
+            setattr(high, name, getattr(high, name)*old_mn/high.mn)
+        out, report = construct_maxwell_transition_v2(
+            low, high, assume_local_charge_neutrality=True)
+>       assert out.nb[0] == low.nb[0] and out.nb[-1] == high.nb[-1]
+E       assert (np.float64(0.575) == np.float64(0.3))
+
+python_frontend/tests/test_maxwell_v2_retention.py:92: AssertionError
+_______________ test_v2_return_report_false_returns_only_eosdata _______________
+
+    def test_v2_return_report_false_returns_only_eosdata():
+        low, high = pair()
+        out = construct_maxwell_transition_v2(
+            low, high, assume_local_charge_neutrality=True, return_report=False)
+>       assert isinstance(out, EOSData)
+E       AssertionError: assert False
+E        +  where False = isinstance((EOSData(nb=array([0.3    , 0.31375, 0.3275 , 0.34125, 0.355  , 0.36875, 0.3825 ,\n       0.39625, 0.41   , 0.42375, 0...._iphase_0': {'n_rows': 81, 'charge_neutrality_residual': 0.0, 'composition_available': False}}, rejection_category='')), EOSData)
+
+python_frontend/tests/test_maxwell_v2_retention.py:114: AssertionError
+__ test_native_retained_source_thermodynamics_are_not_silently_reconstructed ___
+
+    def test_native_retained_source_thermodynamics_are_not_silently_reconstructed():
+        low, high = pair()
+        # A small source inconsistency lies inside the existing native acceptance
+        # tolerance. It must stay visible on unchanged rows, rather than silently
+        # turning the public-original cohort into a reconstruction cohort.
+        low.Q3[4] += 1e-6
+        low.Q2[4] = 1e-12
+        low.Q5[4] = 1e-10
+        low.Q6[4] += 1e-12
+        out = construct_maxwell_transition(low, high, assume_local_charge_neutrality=True)
+        hit = np.flatnonzero(out.nb == low.nb[4])
+        assert hit.size == 1
+        for name in ("Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7"):
+>           assert getattr(out, name)[hit[0]] == pytest.approx(getattr(low, name)[4], rel=0, abs=2e-16)
+E           assert np.float64(0.0) == 1e-12 ± 2.0e-16
+E             
+E             comparison failed
+E             Obtained: 0.0
+E             Expected: 1e-12 ± 2.0e-16
+
+python_frontend/tests/test_maxwell_v2_retention.py:130: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_maxwell_v2_retention.py::test_segment_keeps_support_axes_and_beta_evidence
+FAILED python_frontend/tests/test_maxwell_v2_retention.py::test_missing_composition_is_not_zero_neutrality_evidence
+FAILED python_frontend/tests/test_maxwell_v2_retention.py::test_native_error_keeps_category_and_unadmitted_report
+FAILED python_frontend/tests/test_maxwell_v2_retention.py::test_v2_retains_both_source_tails_and_records_original_phase_labels
+FAILED python_frontend/tests/test_maxwell_v2_retention.py::test_v2_return_report_false_returns_only_eosdata
+FAILED python_frontend/tests/test_maxwell_v2_retention.py::test_native_retained_source_thermodynamics_are_not_silently_reconstructed
+6 failed in 0.34s

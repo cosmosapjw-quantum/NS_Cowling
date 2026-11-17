@@ -1,0 +1,49 @@
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+____ test_native_maxwell_allows_only_interface_pressure_reencoding_roundoff ____
+
+    def test_native_maxwell_allows_only_interface_pressure_reencoding_roundoff():
+        low, high = roundoff_pair()
+>       out, report = construct_maxwell_transition(
+            low, high, assume_local_charge_neutrality=True, return_report=True)
+
+python_frontend/tests/test_maxwell_v2_retention.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1270: in construct_maxwell_transition
+    payload = run_native("maxwell-transition", low_dir, high_dir, target_dir, "true")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+action = 'maxwell-transition'
+args = (PosixPath('/tmp/compose-eos-maxwell-_c4z2dkd/low'), PosixPath('/tmp/compose-eos-maxwell-_c4z2dkd/high'), PosixPath('/tmp/compose-eos-maxwell-_c4z2dkd/maxwell'), 'true')
+
+    def run_native(action: str, *args: str | os.PathLike[str]) -> dict[str, Any]:
+        exe = executable()
+        command = [str(exe), action, *(str(a) for a in args)]
+        completed = subprocess.run(command, capture_output=True, text=True)
+        lines = [line.strip() for line in completed.stdout.splitlines() if line.strip()]
+        payload: dict[str, Any] = {}
+        for line in reversed(lines):
+            try:
+                candidate = json.loads(line)
+                if isinstance(candidate, dict):
+                    payload = candidate
+                    break
+            except json.JSONDecodeError:
+                continue
+        # the structured category the Fortran layer attaches to structured failures
+        # (e.g. maxwell-transition). None when the Fortran layer did not emit one.
+        category = payload.get("category")
+        op = payload.get("operation", action)
+        if completed.returncode:
+>           raise NativeExecutionError(
+                f"Fortran operation {action!r} failed with exit code {completed.returncode}: "
+                f"{payload.get('message', completed.stderr.strip() or completed.stdout.strip())}",
+                category=category, operation=op,
+            )
+E           compose_eos.native.NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: Maxwell output is not ordered by strictly increasing density and nondecreasing pressure
+
+python_frontend/compose_eos/native.py:88: NativeExecutionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_maxwell_v2_retention.py::test_native_maxwell_allows_only_interface_pressure_reencoding_roundoff
+1 failed, 1 passed, 11 deselected in 0.45s

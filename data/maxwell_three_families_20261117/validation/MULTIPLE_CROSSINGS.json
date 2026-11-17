@@ -1,0 +1,772 @@
+{
+  "schema": "ns_cowling.multiple_maxwell_crossings_diagnostic.v1",
+  "created_at_utc": "2026-11-17T05:46:06.530468+00:00",
+  "script_sha256": "8826a3f369d15b2e1299f448d2435b9c515107dad2e6c9ea54a247f8df4eb6a2",
+  "numpy_version": "2.5.4",
+  "scipy_version": "1.18.1",
+  "prepared_manifest_sha256": "2eee6a7239ca821ba6306dd22c6223168868ae9e8bbc0f2d98dcc802ec27892d",
+  "campaign_cell_sha256": "c83e9df94af1a520c707c0db3e5eb4b1a8410c47efc443991c8f9b6925e619cd",
+  "native_rejection_category": "MULTIPLE_COEXISTENCE_CROSSINGS",
+  "native_rejection_error": "v2: native boundary-segment construction rejected: Fortran operation 'maxwell-transition' failed with exit code 3: multiple pressure-equality roots found; v1 accepts exactly one isolated transition",
+  "algorithm": "Independent SciPy CubicHermiteSpline P(mu) with slope n; analytic coefficient translations on every union interval; exhaustive cubic polynomial roots plus stationary-point/sign-bracket controls.",
+  "analytic_controls": [
+    {
+      "name": "three_simple",
+      "expected": [
+        0.2,
+        0.5,
+        0.8
+      ],
+      "computed": [
+        0.20000000000000026,
+        0.49999999999999856,
+        0.8000000000000005
+      ],
+      "pass": true
+    },
+    {
+      "name": "one_tangent_one_simple",
+      "expected": [
+        0.2,
+        0.5
+      ],
+      "computed": [
+        0.19999999999999998,
+        0.5000000000000002
+      ],
+      "pass": true
+    },
+    {
+      "name": "endpoints",
+      "expected": [
+        0.0,
+        0.3,
+        1.0
+      ],
+      "computed": [
+        0.0,
+        0.3,
+        1.0
+      ],
+      "pass": true
+    }
+  ],
+  "crust": {
+    "model": "SPG_M4",
+    "family": "native_generated",
+    "source_path": "data/research_matching_20261117/spg/native_129_repaired/SPG_M4/generated",
+    "source_table_sha256": {
+      "eos.compo": "58de630e4be854c7d5ed689c9a4de16dd9adab3c3966eea33cef9de972b90efe",
+      "eos.nb": "d2f5814812cdc3625da2cf613c59356c0fe4c4dca12464df58c2b1b4741a8fe5",
+      "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+      "eos.thermo": "b9dc4fd1d8e07921aa8c0d57157ca0816b6fb5d0f2f6ad27f398028880b76e33",
+      "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+    },
+    "internal_path": "data/maxwell_three_families_20261117/prepared/native_generated/SPG_M4/internal",
+    "internal_sha256": {
+      "eos_data.csv": "e53f9ad4bffd29d7ed95a49d1529d2c24610d3a5587765e0d4328437a19582ef",
+      "eos_data.nml": "2a788e7fd435e433cb36cd176c169341a755b880d42a275c34626697fb4e2aae"
+    },
+    "component": {
+      "id": "component_000",
+      "start_zero_based": 0,
+      "stop_exclusive": 129,
+      "original_source_rows_zero_based": [
+        0,
+        128
+      ],
+      "rows": 129,
+      "phase_id": 1,
+      "density_fm3": [
+        0.0002475602850151845,
+        0.09882555854320535
+      ],
+      "mu_E_MeV": [
+        938.9000000000144,
+        955.0098859099811
+      ]
+    },
+    "mn_reference_MeV": 938.9,
+    "density_fm3": [
+      0.0002475602850151845,
+      0.09882555854320535
+    ],
+    "mu_E_support_MeV": [
+      938.9000000000144,
+      955.0098859099811
+    ],
+    "pressure_support_MeV_fm3": [
+      0.0004890664023492752,
+      0.5809622287182776
+    ]
+  },
+  "core": {
+    "model": "BBB_BHF2",
+    "family": "native_generated",
+    "source_path": "data/research_matching_20261117/integration/real_pairs_v2/core/BBB_BHF2/generated",
+    "source_table_sha256": {
+      "eos.compo": "808f38898700f84883ad499d678ea72d15882d06fb40318816638fcced7b5b93",
+      "eos.nb": "68b8087eafd788eebde549d83c939fa2561538394f41e0cbd2e42a7a63c95b51",
+      "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+      "eos.thermo": "1f372900b8788f13e12dafb513c845a52ffde0ccd51bd2498ec9921d107dae5e",
+      "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+    },
+    "internal_path": "data/maxwell_three_families_20261117/prepared/native_generated/BBB_BHF2/internal",
+    "internal_sha256": {
+      "eos_data.csv": "134d4aa6d35d2dcd324c3917e248a38586cb7d63be35269136029786ed14022b",
+      "eos_data.nml": "142db4990ea321c915222b2b607b7277732ad012d065e3b31cf42f935253b847"
+    },
+    "component": {
+      "id": "component_000",
+      "start_zero_based": 0,
+      "stop_exclusive": 129,
+      "original_source_rows_zero_based": [
+        0,
+        128
+      ],
+      "rows": 129,
+      "phase_id": 6,
+      "density_fm3": [
+        0.08,
+        0.5
+      ],
+      "mu_E_MeV": [
+        952.7595172340465,
+        1155.0512245082539
+      ]
+    },
+    "mn_reference_MeV": 939.0,
+    "density_fm3": [
+      0.08,
+      0.5
+    ],
+    "mu_E_support_MeV": [
+      952.7595172340465,
+      1155.0512245082539
+    ],
+    "pressure_support_MeV_fm3": [
+      0.38589221197543105,
+      68.1063578709945
+    ]
+  },
+  "common_mu_support_MeV": [
+    952.7595172340465,
+    955.0098859099811
+  ],
+  "union_intervals": 17,
+  "represented_real_root_count": 2,
+  "roots": [
+    {
+      "index": 0,
+      "mu_MeV": 952.9276986081848,
+      "P_crust_MeV_fm3": 0.3994326704990897,
+      "P_core_MeV_fm3": 0.3994326704990896,
+      "pressure_residual_MeV_fm3": -1.1102230246251565e-16,
+      "n_crust_fm3": 0.07619324205929921,
+      "n_core_fm3": 0.08102074859630747,
+      "delta_n_core_minus_crust_fm3": 0.004827506537008253,
+      "epsilon_crust_MeV_fm3": 72.20721813456525,
+      "epsilon_core_MeV_fm3": 76.80748282889249,
+      "latent_energy_core_minus_crust_MeV_fm3": 4.600264694327237,
+      "latent_identity_residual_MeV_fm3": -5.329070518200751e-15,
+      "crust_to_core_positive_density_jump": true,
+      "d_deltaP_d_mu_fm3": 0.004827506537008253,
+      "d2_deltaP_d_mu2": -0.003950283998908528,
+      "left_preferred_phase": "crust",
+      "right_preferred_phase": "core",
+      "probe_delta_mu_MeV": 0.0016818137413827116,
+      "deltaP_left_probe_MeV_fm3": -8.124552604960034e-06,
+      "deltaP_right_probe_MeV_fm3": 8.113379236451834e-06
+    },
+    {
+      "index": 1,
+      "mu_MeV": 954.9897120608823,
+      "P_crust_MeV_fm3": 0.5789710493646166,
+      "P_core_MeV_fm3": 0.5789710493646164,
+      "pressure_residual_MeV_fm3": -2.220446049250313e-16,
+      "n_crust_fm3": 0.0985766845405685,
+      "n_core_fm3": 0.09294738934419262,
+      "delta_n_core_minus_crust_fm3": -0.00562929519637588,
+      "epsilon_crust_MeV_fm3": 93.56074853594933,
+      "epsilon_core_MeV_fm3": 88.18482953725662,
+      "latent_energy_core_minus_crust_MeV_fm3": -5.375918998692711,
+      "latent_identity_residual_MeV_fm3": -8.881784197001252e-16,
+      "crust_to_core_positive_density_jump": false,
+      "d_deltaP_d_mu_fm3": -0.00562929519637588,
+      "d2_deltaP_d_mu2": -0.006757581312292422,
+      "left_preferred_phase": "core",
+      "right_preferred_phase": "crust",
+      "probe_delta_mu_MeV": 0.00020173849098796383,
+      "deltaP_left_probe_MeV_fm3": 1.1355080112851468e-06,
+      "deltaP_right_probe_MeV_fm3": -1.135783034622584e-06
+    }
+  ],
+  "pressure_ordering_intervals": [
+    {
+      "mu_interval_MeV": [
+        952.7595172340465,
+        952.9276986081848
+      ],
+      "deltaP_midpoint_MeV_fm3": -0.00041980133452718116,
+      "preferred_phase_at_fixed_mu": "crust",
+      "min_deltaP_MeV_fm3": -0.0008668537496753226,
+      "min_at_mu_MeV": 952.7595172340465,
+      "max_deltaP_MeV_fm3": -1.1102230246251565e-16,
+      "max_at_mu_MeV": 952.9276986081848
+    },
+    {
+      "mu_interval_MeV": [
+        952.9276986081848,
+        954.9897120608823
+      ],
+      "deltaP_midpoint_MeV_fm3": 0.0026765492571588223,
+      "preferred_phase_at_fixed_mu": "core",
+      "min_deltaP_MeV_fm3": -2.220446049250313e-16,
+      "min_at_mu_MeV": 954.9897120608823,
+      "max_deltaP_MeV_fm3": 0.0026797121058760864,
+      "max_at_mu_MeV": 953.9940783032829
+    },
+    {
+      "mu_interval_MeV": [
+        954.9897120608823,
+        955.0098859099811
+      ],
+      "deltaP_midpoint_MeV_fm3": -5.7126635066850895e-05,
+      "preferred_phase_at_fixed_mu": "crust",
+      "min_deltaP_MeV_fm3": -0.00011494431069214439,
+      "min_at_mu_MeV": 955.0098859099811,
+      "max_deltaP_MeV_fm3": -2.220446049250313e-16,
+      "max_at_mu_MeV": 954.9897120608823
+    }
+  ],
+  "union_cubic_polynomials": [
+    {
+      "mu_interval_MeV": [
+        952.7595172340465,
+        952.7706747360045
+      ],
+      "coordinate": "t=(mu-left)/(right-left)",
+      "deltaP_ascending_coefficients_MeV_fm3": [
+        -0.0008668537496753226,
+        6.109441699512477e-05,
+        -2.3382221470371195e-07,
+        -2.7304647317528803e-10
+      ],
+      "algebraic_roots_t_real_imag": [
+        [
+          -1068.5276565390059,
+          0.0
+        ],
+        [
+          15.073667834003857,
+          0.0
+        ],
+        [
+          197.10813671663095,
+          0.0
+        ]
+      ],
+      "real_roots_t_in_unit_interval": [],
+      "critical_points_t_in_unit_interval": [],
+      "roots_mu_MeV": []
+    },
+    {
+      "mu_interval_MeV": [
+        952.7706747360045,
+        952.949686184178
+      ],
+      "coordinate": "t=(mu-left)/(right-left)",
+      "deltaP_ascending_coefficients_MeV_fm3": [
+        -0.0008059934279414094,
+        0.0009726854416513327,
+        -6.0406721771163836e-05,
+        -1.097047302798228e-06
+      ],
+      "algebraic_roots_t_real_imag": [
+        [
+          -68.21802271744677,
+          0.0
+        ],
+        [
+          0.8771722355328855,
+          0.0
+        ],
+        [
+          12.277844887638244,
+          0.0
+        ]
+      ],
+      "real_roots_t_in_unit_interval": [
+        0.8771722355328855
+      ],
+      "critical_points_t_in_unit_interval": [],
+      "roots_mu_MeV": [
+        952.9276986081848
+      ]
+    },
+    {
+      "mu_interval_MeV": [
+        952.949686184178,
+        953.1277032402894
+      ],
+      "coordinate": "t=(mu-left)/(right-left)",
+      "deltaP_ascending_coefficients_MeV_fm3": [
+        0.00010518824463595644,
+        0.0008438670679150519,
+        -6.299212430174351e-05,
+        -1.0700181652572762e-06
+      ],
+      "algebraic_roots_t_real_imag": [
+        [
+          -70.10039621006378,
+          0.0
+        ],
+        [
+          -0.12351385381398394,
+          0.0
+        ],
+        [
+          11.3537652877864,
+          0.0
+        ]
+      ],
+      "real_roots_t_in_unit_interval": [],
+      "critical_points_t_in_unit_interval": [],
+      "roots_mu_MeV": []
+    },
+    {
+      "mu_interval_MeV": [
+        953.1277032402894,
+        953.144329953103
+      ],
+      "coordinate": "t=(mu-left)/(right-left)",
+      "deltaP_ascending_coefficients_MeV_fm3": [
+        0.000884993170084003,
+        6.675011415117915e-05,
+        -5.775692330731728e-07,
+        -8.337808704448869e-10
+      ],
+      "algebraic_roots_t_real_imag": [
+        [
+          -792.0900604528014,
+          0.0
+        ],
+        [
+          -12.028188465849482,
+          0.0
+        ],
+        [
+          111.40718592077378,
+          0.0
+        ]
+      ],
+      "real_roots_t_in_unit_interval": [],
+      "critical_points_t_in_unit_interval": [],
+      "roots_mu_MeV": []
+    },
+    {
+      "mu_interval_MeV": [
+        953.144329953103,
+        953.3435520211584
+      ],
+      "coordinate": "t=(mu-left)/(right-left)",
+      "deltaP_ascending_coefficients_MeV_fm3": [
+        0.000951164881221267,
+        0.0007859321643347503,
+        -8.328038352146787e-05,
+        -1.4225495951745002e-06
+      ],
+      "algebraic_roots_t_real_imag": [
+        [
+          -66.6784149273827,
+          0.0
+        ],
+        [
+          -1.0872933297515495,
+          0.0
+        ],
+        [
+          9.222664271907082,
+          0.0
+        ]
+      ],
+      "real_roots_t_in_unit_interval": [],
+      "critical_points_t_in_unit_interval": [],
+      "roots_mu_MeV": []
+    },
+    {
+      "mu_interval_MeV": [
+        953.3435520211584,
+        953.4908890165435
+      ],
+      "coordinate": "t=(mu-left)/(right-left)",
+      "deltaP_ascending_coefficients_MeV_fm3": [
+        0.0016523941124393926,
+        0.00045490712469577893,
+        -4.7884495399002844e-05,
+        -5.709129167213652e-07
+      ],
+      "algebraic_roots_t_real_imag": [
+        [
+          -92.17720351256416,
+          0.0
+        ],
+        [
+          -2.822196247849315,
+          0.0
+        ],
+        [
+          11.125845674453036,
+          0.0
+        ]
+      ],
+      "real_roots_t_in_unit_interval": [],
+      "critical_points_t_in_unit_interval": [],
+      "roots_mu_MeV": []
+    },
+    {
+      "mu_interval_MeV": [
+        953.4908890165435,
+        953.5474593862323
+      ],
+      "coordinate": "t=(mu-left)/(right-left)",
+      "deltaP_ascending_coefficients_MeV_fm3": [
+        0.0020588458288194333,
+        0.00013723428176881658,
+        -7.311698188640872e-06,
+        -3.05296777663203e-08
+      ],
+      "algebraic_roots_t_real_imag": [
+        [
+          -256.0233676170753,
+          0.0
+        ],
+        [
+          -9.948400726021312,
+          0.0
+        ],
+        [
+          26.47699723526051,
+          0.0
+        ]
+      ],
+      "real_roots_t_in_unit_interval": [],
+      "critical_points_t_in_unit_interval": [],
+      "roots_mu_MeV": []
+    },
+    {
+      "mu_interval_MeV": [
+        953.5474593862323,
+        953.7561627846231
+      ],
+      "coordinate": "t=(mu-left)/(right-left)",
+      "deltaP_ascending_coefficients_MeV_fm3": [
+        0.0021887378827218362,
+        0.0004520068307685768,
+        -0.00010076400342985505,
+        -1.5208409607448368e-06
+      ],
+      "algebraic_roots_t_real_imag": [
+        [
+          -70.19729490969505,
+          0.0
+        ],
+        [
+          -2.967318490936605,
+          0.0
+        ],
+        [
+          6.9091626133872275,
+          0.0
+        ]
+      ],
+      "real_roots_t_in_unit_interval": [],
+      "critical_points_t_in_unit_interval": [],
+      "roots_mu_MeV": []
+    },
+    {
+      "mu_interval_MeV": [
+        953.7561627846231,
+        953.8611699510013
+      ],
+      "coordinate": "t=(mu-left)/(right-left)",
+      "deltaP_ascending_coefficients_MeV_fm3": [
+        0.0025384598690998406,
+        0.0001237304909077197,
+        -2.6663454511232225e-05,
+        -1.9224151394968184e-07
+      ],
+      "algebraic_roots_t_real_imag": [
+        [
+          -142.56264220649732,
+          0.0
+        ],
+        [
+          -7.883693124425264,
+          0.0
+        ],
+        [
+          11.748642187436246,
+          0.0
+        ]
+      ],
+      "real_roots_t_in_unit_interval": [],
+      "critical_points_t_in_unit_interval": [],
+      "roots_mu_MeV": []
+    },
+    {
+      "mu_interval_MeV": [
+        953.8611699510013,
+        953.9697769260383
+      ],
+      "coordinate": "t=(mu-left)/(right-left)",
+      "deltaP_ascending_coefficients_MeV_fm3": [
+        0.0026353346639823583,
+        7.22206304005369e-05,
+        -2.9132518589965328e-05,
+        -2.044911597681873e-07
+      ],
+      "algebraic_roots_t_real_imag": [
+        [
+          -144.29210383508257,
+          0.0
+        ],
+        [
+          -8.580404190734335,
+          0.0
+        ],
+        [
+          10.40904592315109,
+          0.0
+        ]
+      ],
+      "real_roots_t_in_unit_interval": [],
+      "critical_points_t_in_unit_interval": [],
+      "roots_mu_MeV": []
+    },
+    {
+      "mu_interval_MeV": [
+        953.9697769260383,
+        954.1884207431522
+      ],
+      "coordinate": "t=(mu-left)/(right-left)",
+      "deltaP_ascending_coefficients_MeV_fm3": [
+        0.0026782182846331604,
+        2.6859895394699962e-05,
+        -0.0001205555621336517,
+        -1.6558889307224325e-06
+      ],
+      "algebraic_roots_t_real_imag": [
+        [
+          -72.72135252331408,
+          0.0
+        ],
+        [
+          -4.757601522902185,
+          0.0
+        ],
+        [
+          4.674818516995927,
+          0.0
+        ]
+      ],
+      "real_roots_t_in_unit_interval": [],
+      "critical_points_t_in_unit_interval": [
+        0.11114596134198251
+      ],
+      "roots_mu_MeV": []
+    },
+    {
+      "mu_interval_MeV": [
+        954.1884207431522,
+        954.2394355533222
+      ],
+      "coordinate": "t=(mu-left)/(right-left)",
+      "deltaP_ascending_coefficients_MeV_fm3": [
+        0.002582866728963462,
+        -5.1148989693142535e-05,
+        -6.833482553721057e-06,
+        -2.0882217052100938e-08
+      ],
+      "algebraic_roots_t_real_imag": [
+        [
+          -318.3239957868131,
+          0.0
+        ],
+        [
+          -24.667287240843468,
+          0.0
+        ],
+        [
+          15.751960848810157,
+          0.0
+        ]
+      ],
+      "real_roots_t_in_unit_interval": [],
+      "critical_points_t_in_unit_interval": [],
+      "roots_mu_MeV": []
+    },
+    {
+      "mu_interval_MeV": [
+        954.2394355533222,
+        954.412217656117
+      ],
+      "coordinate": "t=(mu-left)/(right-left)",
+      "deltaP_ascending_coefficients_MeV_fm3": [
+        0.002524863374499531,
+        -0.00021973738896320823,
+        -7.898325408239174e-05,
+        -9.108559096092051e-07
+      ],
+      "algebraic_roots_t_real_imag": [
+        [
+          -83.42312394552012,
+          0.0
+        ],
+        [
+          -7.6395487844390155,
+          0.0
+        ],
+        [
+          4.349447016488373,
+          0.0
+        ]
+      ],
+      "real_roots_t_in_unit_interval": [],
+      "critical_points_t_in_unit_interval": [],
+      "roots_mu_MeV": []
+    },
+    {
+      "mu_interval_MeV": [
+        954.412217656117,
+        954.6256195676415
+      ],
+      "coordinate": "t=(mu-left)/(right-left)",
+      "deltaP_ascending_coefficients_MeV_fm3": [
+        0.0022252318755443534,
+        -0.0004698742954323924,
+        -0.0001246536796995276,
+        -1.7056447949412506e-06
+      ],
+      "algebraic_roots_t_real_imag": [
+        [
+          -68.80354158337568,
+          0.0
+        ],
+        [
+          -6.991558684560037,
+          0.0
+        ],
+        [
+          2.7120761416719246,
+          0.0
+        ]
+      ],
+      "real_roots_t_in_unit_interval": [],
+      "critical_points_t_in_unit_interval": [],
+      "roots_mu_MeV": []
+    },
+    {
+      "mu_interval_MeV": [
+        954.6256195676415,
+        954.6412958523355
+      ],
+      "coordinate": "t=(mu-left)/(right-left)",
+      "deltaP_ascending_coefficients_MeV_fm3": [
+        0.0016289982556174643,
+        -5.3206228598908336e-05,
+        -6.782922890791684e-07,
+        -2.186883518584374e-09
+      ],
+      "algebraic_roots_t_real_imag": [
+        [
+          -166.69453310092064,
+          -65.46493662189344
+        ],
+        [
+          -166.69453310092064,
+          65.46493662189344
+        ],
+        [
+          23.225180784549067,
+          0.0
+        ]
+      ],
+      "real_roots_t_in_unit_interval": [],
+      "critical_points_t_in_unit_interval": [],
+      "roots_mu_MeV": []
+    },
+    {
+      "mu_interval_MeV": [
+        954.6412958523355,
+        954.8757885817403
+      ],
+      "coordinate": "t=(mu-left)/(right-left)",
+      "deltaP_ascending_coefficients_MeV_fm3": [
+        0.0015751115478459532,
+        -0.0008162725837488095,
+        -0.0001532391241901927,
+        -7.306383786148742e-06
+      ],
+      "algebraic_roots_t_real_imag": [
+        [
+          -11.229574122126667,
+          -4.357472719412195
+        ],
+        [
+          -11.229574122126667,
+          4.357472719412195
+        ],
+        [
+          1.4858283810537523,
+          0.0
+        ]
+      ],
+      "real_roots_t_in_unit_interval": [],
+      "critical_points_t_in_unit_interval": [],
+      "roots_mu_MeV": []
+    },
+    {
+      "mu_interval_MeV": [
+        954.8757885817403,
+        955.0098859099811
+      ],
+      "coordinate": "t=(mu-left)/(right-left)",
+      "deltaP_ascending_coefficients_MeV_fm3": [
+        0.0005982934561208353,
+        -0.0006545925193194684,
+        -5.728118949395329e-05,
+        -1.3640579995513689e-06
+      ],
+      "algebraic_roots_t_real_imag": [
+        [
+          -21.421389748222765,
+          -7.576782140884929
+        ],
+        [
+          -21.421389748222765,
+          7.576782140884929
+        ],
+        [
+          0.8495581577687699,
+          0.0
+        ]
+      ],
+      "real_roots_t_in_unit_interval": [
+        0.8495581577687699
+      ],
+      "critical_points_t_in_unit_interval": [],
+      "roots_mu_MeV": [
+        954.9897120608823
+      ]
+    }
+  ],
+  "deltaP_definition": "P_core(mu_E)-P_crust(mu_E)",
+  "equilibrium_criterion": "The phase with larger pressure at a fixed chemical potential minimizes grand-potential density.",
+  "source_values_changed": false,
+  "physical_energy_offset_applied_MeV_per_baryon": 0.0,
+  "classification": "REENTRANT_PRESSURE_ORDERING_IN_SUPPLIED_SUPPORT",
+  "single_jump_policy_note": "Selecting one positive crust-to-core density-jump root does not justify retaining the core where the supplied crust branch has higher P(mu). All common-support intervals must respect the selected phase ordering. A reentrant phase chain needs an explicit different construction and remains outside the present one-jump kernel.",
+  "plot_path": "data/maxwell_three_families_20261117/validation/MULTIPLE_CROSSINGS.png",
+  "plot_sha256": "2e431da8d92f427e6c72a7941dda9011be1a204a550f6b0c537a5190b7ef2455"
+}

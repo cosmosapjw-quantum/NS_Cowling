@@ -1,0 +1,13 @@
+{
+  "code": "ClearAll[n,nr,f,x,p,ee,mu,h,t,p0,p1,n0,n1,s]; x=Log[n/nr];ee=n f[x];p=n Derivative[1][f][x];mu=f[x]+Derivative[1][f][x];first=FullSimplify[D[ee,n]-mu,n>0&&nr>0];euler=FullSimplify[ee+p-n mu];sound=FullSimplify[D[p,n]/D[ee,n]-(Derivative[1][f][x]+Derivative[2][f][x])/(f[x]+Derivative[1][f][x]),n>0&&nr>0];hp=(2 t^3-3 t^2+1)p0+(t^3-2t^2+t)h n0+(-2t^3+3t^2)p1+(t^3-t^2)h n1;d0=FullSimplify[(D[hp,{t,2}]/h^2/.t->0)/.p1->p0+h s];d1=FullSimplify[(D[hp,{t,2}]/h^2/.t->1)/.p1->p0+h s];ExportString[<|\"first_law_residual\"->first,\"Euler_residual\"->euler,\"sound_speed_residual\"->sound,\"Hermite_dndmu_left\"->ToString[d0,InputForm],\"Hermite_dndmu_right\"->ToString[d1,InputForm],\"latent_identity_residual\"->Expand[(muT nH-pT)-(muT nL-pT)-muT(nH-nL)]|>,\"RawJSON\"]",
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Out[1]= \"{\\n\\t\\\"first_law_residual\\\":0,\\n\\t\\\"Euler_residual\\\":0,\\n\\t\\\"sound_speed_residual\\\":0,\\n\\t\\\"Hermite_dndmu_left\\\":\\\"(-2*(2*n0 + n1 - 3*s))\\\\/h\\\",\\n\\t\\\"Hermite_dndmu_right\\\":\\\"(2*(n0 + 2*n1 - 3*s))\\\\/h\\\",\\n\\t\\\"latent_identity_residual\\\":0\\n}\""
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}

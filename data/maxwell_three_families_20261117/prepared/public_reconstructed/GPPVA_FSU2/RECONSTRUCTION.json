@@ -1,0 +1,162 @@
+{
+  "schema": "ns_cowling.public_thermo_reconstruction.v1",
+  "version": "1.0.0",
+  "model": "GPPVA_FSU2",
+  "status": "READY",
+  "family": "public_thermo_reconstructed",
+  "source_family": "public_original",
+  "orchestration_source_sha256": "7ded71f82f35dea46a0e2fc58a8047869c476af85045ae7ae63c1f8a3566ae82",
+  "native_source_sha256": "e69453e318c3f2dc06eaf3f02e9d3fa5ce9ccc0727d7ae5fc9e530ae290baf42",
+  "native_binary_sha256": "5606585cde15fbd3274fa45f02c21e8a45d1a1c6ec253e134ace87c90d0ad709",
+  "raw_source_dir": "/home/cosmosapjw/ns_cowling_wt/maxwell_three_families_20261117/data/maxwell_three_families_20261117/intake/references/GPPVA_FSU2",
+  "changed_fields": [
+    "Q1",
+    "Q3"
+  ],
+  "immutable_field_exact_preservation": {
+    "nb": true,
+    "mn": true,
+    "mp": true,
+    "Q2": true,
+    "Q4": true,
+    "Q5": true,
+    "Q6": true,
+    "Q7": true,
+    "q_extra": true,
+    "Iphase": true,
+    "Yn": true,
+    "Yp": true,
+    "Ye": true,
+    "Ymu": true,
+    "Aav": true,
+    "Zav": true,
+    "Yh": true,
+    "Il": true,
+    "iT": true,
+    "iYq": true,
+    "inb_start": true,
+    "beta_equilibrated": true
+  },
+  "physical_energy_offset_MeV_per_baryon": 0.0,
+  "density_grid_changed": false,
+  "nuclear_parameters_changed": false,
+  "composition_changed": false,
+  "interpolation": "phase-segmented C2 not-a-knot cubic F(log(n_B/n_0)); no smoothing",
+  "first_law": "Q1=dF/dln n_B; P=n_B Q1; epsilon=n_B F; mu_E=F+Q1",
+  "pressure_repair_trigger": "at least three interior discrepancies >5*coordinate-control +8*printing-sensitivity +1e-7*abs(Q1)",
+  "readiness_is_not_admission": true,
+  "native_maxwell_source_admission": "NOT_TESTED_BY_THIS_HELPER",
+  "all_reconstructed_intervals_diagnostic_pass": true,
+  "ready_for_matching": true,
+  "source_beta_convention_supported": true,
+  "phase_boundaries_interpolated": false,
+  "warnings": [],
+  "segments": [
+    {
+      "phase": 1,
+      "first_row": 0,
+      "last_row": 51,
+      "rows": 52,
+      "density_fm3": [
+        0.003,
+        0.054000001
+      ],
+      "original_intervals": {
+        "all_intervals_pass": true,
+        "intervals": 51,
+        "mechanical_failure_intervals": [],
+        "causality_failure_intervals": [],
+        "mechanical_failure_density_fm3": [],
+        "causality_failure_density_fm3": [],
+        "contiguous_admissible_ranges": [
+          {
+            "first_row": 0,
+            "last_row": 51,
+            "density_fm3": [
+              0.003,
+              0.054000001
+            ],
+            "rows": 52
+          }
+        ],
+        "scope": "independent diagnostic of P(mu) Hermite cells; native kernel remains authoritative"
+      },
+      "decision": "ENERGY_PRIMARY_PRESSURE_AND_EULER_REPAIR",
+      "pressure_inconsistency_diagnosed": true,
+      "printing_precision_known": true,
+      "significant_first_law_rows": 43,
+      "significant_first_law_row_indices": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        49
+      ],
+      "max_abs_first_law_q1_discrepancy_MeV": 0.03219582418675948,
+      "max_abs_interpolation_control_q1_MeV": 0.010534181307329082,
+      "max_printing_sensitivity_q1_MeV": 4.015928331325062e-05,
+      "max_relative_pressure_change": 0.006826505974488938,
+      "max_abs_euler_source_discrepancy_MeV": 0.032324147186727714,
+      "changed_pressure_rows": 52,
+      "changed_mu_rows": 52,
+      "reconstructed_intervals": {
+        "all_intervals_pass": true,
+        "intervals": 51,
+        "mechanical_failure_intervals": [],
+        "causality_failure_intervals": [],
+        "mechanical_failure_density_fm3": [],
+        "causality_failure_density_fm3": [],
+        "contiguous_admissible_ranges": [
+          {
+            "first_row": 0,
+            "last_row": 51,
+            "density_fm3": [
+              0.003,
+              0.054000001
+            ],
+            "rows": 52
+          }
+        ],
+        "scope": "independent diagnostic of P(mu) Hermite cells; native kernel remains authoritative"
+      }
+    }
+  ]
+}

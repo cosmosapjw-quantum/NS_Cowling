@@ -1,0 +1,41 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_row_data_uses_density_indices_and_fortran_exponents ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-504/test_row_data_uses_density_ind0')
+
+    def test_row_data_uses_density_indices_and_fortran_exponents(tmp_path):
+        directory = tmp_path / "table"
+        table(directory, [.01, .05, .2, 1.0])
+        expected = packager.row_data(directory)
+        (directory / "eos.nb").write_text("0\n3\n1d-2\n5D-2\n2d-1\n1D0\n")
+        lines = (directory / "eos.thermo").read_text().splitlines()
+        rows = []
+        for i, line in enumerate(lines[1:]):
+            row = line.split()
+            row[1] = str(i)
+            for j in range(3, 10):
+                row[j] = f"{float(row[j]):.17E}".replace("E", "d" if j % 2 else "D")
+            rows.append(row)
+        rows.reverse()
+        (directory / "eos.thermo").write_text("9.39d2 9.38D2\n" + "\n".join(" ".join(r) for r in rows) + "\n")
+>       actual = packager.row_data(directory)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_maxwell_three_family_packaging.py:158: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+directory = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-504/test_row_data_uses_density_ind0/table')
+
+    def row_data(directory: Path):
+        """Read the supplied single cold slice; no interpolation or EOS evaluation."""
+        density = (directory / "eos.nb").read_text().split()
+        start, stop = map(int, density[:2])
+>       nb = [float(x.replace("D", "E")) for x in density[2:]]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: could not convert string to float: '1d-2'
+
+scripts/package_maxwell_three_families_20261117.py:63: ValueError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_maxwell_three_family_packaging.py::test_row_data_uses_density_indices_and_fortran_exponents
+1 failed, 3 deselected in 0.10s

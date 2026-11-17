@@ -46,3 +46,12 @@ interface laws, or establish original-author EOS equivalence. Those remain HOLD
 or not established. The next executable step is the authorized commit/push/CI
 verification; subsequent physical support work starts from the existing retained
 data and boundary-specific evidence, without replaying the full campaign.
+
+Packaging follow-up: after repair commit `3ffab7f6d478c9407acd361cdbd4e7d08a84416b`,
+root manifest verification found 14 intentionally modified entries still bound to
+prior bytes. This is a packaging inventory issue, preserved as
+`attempts/package_manifest_3ffab7f.log`. Refresh only changed entries and new repair
+files; retain all other existing manifest scope and immutable raw artifacts.
+The reviewed production diff and assembly source identities remain unchanged.
+Remote CI #631 belongs to the first repair commit; the final containing HEAD
+requires its own successful CI after the packaging refresh.

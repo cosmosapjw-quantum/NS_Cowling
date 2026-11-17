@@ -85,6 +85,11 @@ receipt에 있다. 재현 명령은 새 out directory를 요구하며 기존 시
 module shadowing 실패도 `actual_assembly_001.log`에 보존하고 frontend import 경로를 고쳤다.
 9 skipped는 전체 회귀의 기존 입력/환경 조건을 따른다. 실패를 통과로 재분류하지 않았다.
 
+게시 후 전체 root `SHA256SUMS_v4.txt` 검사에서 수정 파일 14개의 이전 hash가 남은
+패키징 불일치를 확인했다. raw 실패는 `attempts/package_manifest_3ffab7f.log`에 보존했다.
+기존 manifest 범위를 유지하며 의도적으로 변경한 파일의 항목과 이 수리의 새 파일만 갱신했다.
+물리 source/input, 실행 산출물, 허용오차를 변경하지 않는 포장 목록 수정이다.
+
 ## Remaining risks
 
 source fidelity, 독립 물리 검증, 수치 지원범위, CompOSE 숫자 비교는 별도 축이다.

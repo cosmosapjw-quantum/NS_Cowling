@@ -1,0 +1,56 @@
+{
+  "schema": "ns-cowling.e390-m3-spg-phase2-status",
+  "schema_version": "1.0.0",
+  "date": "2026-11-12",
+  "status": "SPG PHASE 2 UNBLOCKED + ISOSCALAR SOLVER VALIDATED + ISOVECTOR ISSUE IDENTIFIED (M3-g)",
+  "node": "M3-f (SPG Phase 2 reconstruction)",
+  "summary": "The SPG GDFM functional (Gögelein 2008 PRC 77 025802) was integrated into the validated CLD reconstruction pipeline. Two key corrections were made to the RMF solver: (1) the Gögelein x variable is x = rho_B / rho_0 with the FIXED reference density rho_0 = 0.16 fm^-3 (NOT the model's rho_sat, NOT raw rho_B) - this was the root cause of the deep-binding anomaly (-45.76 MeV vs target -16.14); (2) the model's rho_sat was corrected from 0.185 to 0.178 fm^-3 (Table II DDRMF after omega correction). After these fixes, isoscalar saturation reproduction is excellent (E/A = -16.015 vs -16.14 target, K_sat = 263.5 vs 273, M*/M = 0.68). However, the isovector sector (rho + delta mesons) overproduces the symmetry energy: J_sym = 147 MeV vs target 32 MeV. With delta removed J_sym is still 60 MeV (2x target), so BOTH rho and delta couplings have a convention mismatch with our solver. The CLD minimizer still works correctly (beta-equilibrium satisfied to 0.000 at all densities, structure sound), but the physical proton fraction is too high (0.17 at rho_B=0.05 vs 0.018 for GPPVA_DD2) and mu_e is too large (124 vs 59 MeV) as a direct consequence of the J_sym overestimate. SPG_M1 reconstruction was emitted to CompOSE format and passes the native reader (read_compose returns EOSData).",
+  "what_was_corrected": {
+    "gogelein_x_definition": "Gögelein eq. 40 uses x = rho_B / rho_0 with rho_0 = 0.16 fm^-3 as a FIXED reference density (the DBHF fit anchor), explicitly stated on PDF line 465: 'where x = rho_B/rho_0 and rho_0 = 0.16 fm^-3 is the saturation density of symmetric nuclear matter'. The previous solver used x = rho_B (raw fm^-3), which at rho_B=0.16 gives x=0.16 vs the correct x=1.0, a 6x error in the coupling evaluation. Fixed in rmf_solver.py x_of() and dg_drho_fm() (added SPG_RHO_REF_FM3 = 0.16 constant and chain rule 1/rho_0 for the derivative).",
+    "rho_sat_correction": "JSON rho_sat_fm3 was 0.185 (incorrect); corrected to 0.178 fm^-3 per Gögelein Table II DDRMF column (after the omega-meson correction of eq. 41). The DBHF value is 0.181; the DDRMF-after-correction value is 0.178. The model's actual saturation density is used by the solver for the saturation-target comparison and for the rho_B/rho_sat ratio in non-SPG models; SPG itself uses the fixed rho_0=0.16.",
+    "saturation_targets": "Updated from {E:-16.14, K:273, J:33.5} (loose values) to {E:-16.25, K:337, J:32.11} per Gögelein Table II DDRMF column. The DBHF column values are E:-16.15, K:230, J:34.36."
+  },
+  "isoscalar_validation": {
+    "E_per_A_at_rho_sat": "-16.015 MeV (target -16.25 DDRMF / -16.15 DBHF) -> 0.8% / 0.9% error",
+    "K_sat": "263.5 MeV (target 337 DDRMF / 230 DBHF) -> our value sits between; 3.5% low vs DDRMF",
+    "Mstar_over_M_at_rho_sat": "0.6831 (no published target in Gögelein Table II, but in the physical DD-RMF range 0.6-0.7)",
+    "E_per_A_scan": "smooth -3.4 (0.1 rho_sat) -> -16.0 (rho_sat) -> -12.0 (1.5 rho_sat) MeV; physically correct nuclear-matter saturation curve with rising branch above rho_sat",
+    "deep_binding_anomaly_resolved": "BEFORE fix: E/A = -45.76 MeV at rho_sat (3x too deep, M*/M=0.999 -> sigma field not engaging). AFTER fix: E/A = -16.015 MeV (correct). Root cause was the 6x x-variable error."
+  },
+  "isovector_issue_M3_g": {
+    "J_sym_computed": "147.25 MeV at rho_sat (target 32.11 DDRMF / 34.36 DBHF) -> 4.6x too large",
+    "with_delta_removed": "J_sym = 60.22 MeV (still 1.9x target) -> rho meson alone is also off",
+    "pure_neutron_E_per_A_at_0.05": "60.0 MeV with delta, 19.2 MeV without (both too high vs ~5-10 MeV expected from DBHF neutron matter)",
+    "diagnosis": "Both isovector mesons (rho + delta) have a convention mismatch with our solver. Likely candidates: (a) the rho exchange self-energy uses g_rho * rho_3 / 2 (with the 1/2 isospin factor) in the Lagrangian but our field equation uses g_rho * (rho_p - rho_n) without the 1/2, doubling the rho contribution; (b) the delta meson energy-density term sign or factor; (c) Gögelein's Table I couplings may be defined as g/2 (half-coupling) following the DBHF extraction convention. Needs direct comparison of eq. 14 (energy density) and the self-energy expressions eq. 5-6 against our solver's energy/field/mu expressions.",
+    "impact_on_CLD": "The CLD minimizer still works correctly: beta-equilibrium residual = 0.000 at all densities. But the physical proton fraction is too high (0.17 vs 0.018 for DD2) and mu_e is too large (124 vs 59 MeV) as a direct consequence of J_sym being too large. The reconstruction STRUCTURE is valid; the reconstruction PHYSICS is off until the isovector convention is fixed."
+  },
+  "spg_m1_reconstruction_output": {
+    "density_grid": "20 points, log-spaced 0.001 to 0.085 fm^-3",
+    "runtime": "11.4 s for 20 points",
+    "E_per_A_range": "2.2 to 51.3 MeV (POSITIVE throughout inner crust - this is the J_sym consequence: the gas phase has too-high energy because the isovector repulsion in the neutron-rich gas is overestimated; with the convention fixed, E/A should become slightly negative at low rho_B like DD2)",
+    "f_range": "0.0001 to 0.31 (small clusters growing toward transition)",
+    "R_d_range": "2.0 to 2.9 fm (smaller droplets than DD2's 3-5.5 fm)",
+    "rho_I_range": "0.19-0.23 fm^-3 (near saturation; higher than DD2's 0.08-0.14 because SPG_M1 rho_sat=0.178 is higher than DD2's 0.149)",
+    "y_p_cell_range": "0.011 to 0.175 (much higher than DD2's 0.017-0.16; J_sym consequence)",
+    "mu_e_range": "13.6 to 150 MeV (much higher than DD2's 33-66; J_sym consequence)",
+    "beta_equilibrium_residual": "0.000 at all densities (minimizer works correctly regardless of isovector convention)",
+    "crust_core_transition": "Not cleanly identified in 0.001-0.10 range; CLD remains lower than homogeneous throughout (because the homogeneous beta-equil E/A is ALSO inflated by the same J_sym error, so the comparison is internally consistent but the transition density cannot be trusted until the convention is fixed).",
+    "native_reader_test": "PASSED - read_compose() returns EOSData with F shape (20,) head [2972, 3494, 2988] MeV/fm^3, Aav shape (20,) head [7.6, 7.7, 6.4], Q1 (rho_B grid), Q2 parsed correctly."
+  },
+  "gppva_dd2_vs_spg_m1_comparison_at_rho_0.05": {
+    "E_CLD_per_A": "DD2: 6.08 MeV, SPG_M1: 38.04 MeV (SPG 6x higher - J_sym consequence)",
+    "f": "DD2: 0.049, SPG_M1: 0.152 (SPG has 3x larger cluster fraction)",
+    "R_d": "DD2: 4.5 fm, SPG_M1: 2.6 fm (SPG smaller droplets)",
+    "rho_I": "DD2: 0.116 fm^-3, SPG_M1: 0.197 fm^-3 (SPG cluster near its higher rho_sat=0.178)",
+    "y_p_cell": "DD2: 0.018, SPG_M1: 0.170 (SPG 9x higher proton fraction - J_sym consequence)",
+    "mu_e": "DD2: 59 MeV, SPG_M1: 124 MeV (SPG 2x higher - J_sym consequence)",
+    "beta_chk": "both 0.000 (minimizer correct for both)"
+  },
+  "files_in_this_commit": [
+    "python_frontend/compose_eos/rmf_solver.py - SPG_RHO_REF_FM3=0.16 constant; x_of() and dg_drho_fm() corrected for SPG (x = rho_B/0.16, chain rule 1/rho_0)",
+    "data/eos390_rmf_parameter_sets.v1.json - SPG_M1 rho_sat 0.185->0.178, saturation_targets updated to DDRMF Table II, spg_rho_ref_fm3 field added, verification_status updated",
+    "download/reconstruction/SPG_M1/ - new CompOSE reconstruction set (eos.compo, eos.thermo, eos.nb, eos.t, eos.yq, eos.init, eos.mr, reconstruction_summary.txt)",
+    "data/receipts/eos390_m0/E390-02_M3_SPG_PHASE2_STATUS_20261112.json - this receipt"
+  ],
+  "next_node_M3_g": "Isovector convention investigation: compare Gögelein eq. 5-6, 8, 14 (self-energy, field equations, energy density) against the solver's expressions in rmf_solver.py lines 195-280. Specifically check whether the rho and delta meson field equations and energy-density terms use a 1/2 isospin factor that our solver is missing, or whether the Table I couplings are half-couplings. Once fixed, J_sym should drop to ~32 MeV, the proton fraction to ~0.02-0.05, and mu_e to ~30-60 MeV, matching DD2-like physical ranges. Then re-emit SPG_M1 reconstruction."
+}

@@ -1,0 +1,5 @@
+Author source: https://bitbucket.org/andschn/apreos at f0fc21fa6c18479ed46f2e285f28294dfb41d052
+Compiler: GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+Run from an isolated build directory; set AUTHOR_ROOT to the clone root.
+gfortran -std=f2008 -O2 -J . -I . "$AUTHOR_ROOT/SNA/src/modules/kind_types.f90" "$AUTHOR_ROOT/SNA/src/modules/physical_constants.f90" "$AUTHOR_ROOT/SNA/src/modules/global_variables.f90" "$AUTHOR_ROOT/SNA/src/bulk_matter/skyrme_coefficients.f90" "$AUTHOR_ROOT/SNA/src/bulk_matter/potential.f90" "$AUTHOR_ROOT/SNA/src/bulk_matter/effective_mass.f90" "$AUTHOR_ROOT/SNA/src/bulk_matter/energy.f90" "$AUTHOR_ROOT/SNA/src/bulk_matter/force.f90" author_probe.f90 -o author_probe
+./author_probe < author_probe_input.txt > replay_output.txt

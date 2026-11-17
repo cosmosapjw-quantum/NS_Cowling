@@ -1,0 +1,163 @@
+......................................................FF................ [ 88%]
+.........                                                                [100%]
+=================================== FAILURES ===================================
+__________ test_assembly_preserves_partial_composition_sidecar[left] ___________
+
+sidecar_branch = 'left'
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-411/test_assembly_preserves_partia0')
+
+    @pytest.mark.parametrize("sidecar_branch", ["left", "right"])
+    def test_assembly_preserves_partial_composition_sidecar(sidecar_branch, tmp_path):
+        """A thermo-only branch must not suppress the other branch's row data."""
+        from compose_eos.api import read_compose, write_compose
+    
+        left = branch([.0001, .001], [.0001, .002], [939, 940], phase=2)
+        right = branch([.0012, .002], [.002, .003], [940, 941], phase=3)
+        for item in (left, right):
+            # Explicit, neutral free-nucleon composition, including written zeros.
+            item.Yn[:] = .9
+            item.Yp[:] = .1
+            item.Ye[:] = .1
+            item.Ymu[:] = 0.
+            item.Aav[:] = 1.
+            item.Zav[:] = 0.
+            item.Yh[:] = 0.
+        missing = right if sidecar_branch == "left" else left
+        missing.composition_file_present = False
+        missing.composition_available = False
+        missing.Iphase[:] = 0
+        for field in ("Yn", "Yp", "Ye", "Ymu", "Aav", "Zav", "Yh"):
+            getattr(missing, field)[:] = 0.
+        for field in ("Yn_present", "Yp_present", "Ye_present", "Ymu_present",
+                      "Abar_present", "Zbar_present", "Yh_present",
+                      "C3_applicable", "C4_applicable", "row_status"):
+            getattr(missing, field)[:] = 0
+    
+        merged, _ = assemble_crust([left, right], labels=["left", "right"],
+                                   mn=939., mp=938.)
+        assert merged.composition_file_present is True
+        assert merged.composition_available is True
+        expected_presence = [True, True, False, False] if sidecar_branch == "left" else [False, False, True, True]
+        np.testing.assert_array_equal(merged.Yn_present, expected_presence)
+        np.testing.assert_array_equal(merged.C3_applicable, expected_presence)
+        np.testing.assert_array_equal(merged.C4_applicable, expected_presence)
+>       write_compose(tmp_path / "compose", merged)
+
+python_frontend/tests/test_crust_assembly.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:41: in write_compose
+    run_native("write", internal, target)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+action = 'write'
+args = (PosixPath('/tmp/compose-eos-write-2erolpcm/internal'), PosixPath('/tmp/pytest-of-cosmosapjw/pytest-411/test_assembly_preserves_partia0/compose'))
+
+    def run_native(action: str, *args: str | os.PathLike[str]) -> dict[str, Any]:
+        exe = executable()
+        command = [str(exe), action, *(str(a) for a in args)]
+        completed = subprocess.run(command, capture_output=True, text=True)
+        lines = [line.strip() for line in completed.stdout.splitlines() if line.strip()]
+        payload: dict[str, Any] = {}
+        for line in reversed(lines):
+            try:
+                candidate = json.loads(line)
+                if isinstance(candidate, dict):
+                    payload = candidate
+                    break
+            except json.JSONDecodeError:
+                continue
+        # the structured category the Fortran layer attaches to structured failures
+        # (e.g. maxwell-transition). None when the Fortran layer did not emit one.
+        category = payload.get("category")
+        op = payload.get("operation", action)
+        if completed.returncode:
+>           raise NativeExecutionError(
+                f"Fortran operation {action!r} failed with exit code {completed.returncode}: "
+                f"{payload.get('message', completed.stderr.strip() or completed.stdout.strip())}",
+                category=category, operation=op,
+            )
+E           compose_eos.native.NativeExecutionError: Fortran operation 'write' failed with exit code 3: C3 baryon abundance closure failed on an applicable row
+
+python_frontend/compose_eos/native.py:88: NativeExecutionError
+__________ test_assembly_preserves_partial_composition_sidecar[right] __________
+
+sidecar_branch = 'right'
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-411/test_assembly_preserves_partia1')
+
+    @pytest.mark.parametrize("sidecar_branch", ["left", "right"])
+    def test_assembly_preserves_partial_composition_sidecar(sidecar_branch, tmp_path):
+        """A thermo-only branch must not suppress the other branch's row data."""
+        from compose_eos.api import read_compose, write_compose
+    
+        left = branch([.0001, .001], [.0001, .002], [939, 940], phase=2)
+        right = branch([.0012, .002], [.002, .003], [940, 941], phase=3)
+        for item in (left, right):
+            # Explicit, neutral free-nucleon composition, including written zeros.
+            item.Yn[:] = .9
+            item.Yp[:] = .1
+            item.Ye[:] = .1
+            item.Ymu[:] = 0.
+            item.Aav[:] = 1.
+            item.Zav[:] = 0.
+            item.Yh[:] = 0.
+        missing = right if sidecar_branch == "left" else left
+        missing.composition_file_present = False
+        missing.composition_available = False
+        missing.Iphase[:] = 0
+        for field in ("Yn", "Yp", "Ye", "Ymu", "Aav", "Zav", "Yh"):
+            getattr(missing, field)[:] = 0.
+        for field in ("Yn_present", "Yp_present", "Ye_present", "Ymu_present",
+                      "Abar_present", "Zbar_present", "Yh_present",
+                      "C3_applicable", "C4_applicable", "row_status"):
+            getattr(missing, field)[:] = 0
+    
+        merged, _ = assemble_crust([left, right], labels=["left", "right"],
+                                   mn=939., mp=938.)
+        assert merged.composition_file_present is True
+        assert merged.composition_available is True
+        expected_presence = [True, True, False, False] if sidecar_branch == "left" else [False, False, True, True]
+        np.testing.assert_array_equal(merged.Yn_present, expected_presence)
+        np.testing.assert_array_equal(merged.C3_applicable, expected_presence)
+        np.testing.assert_array_equal(merged.C4_applicable, expected_presence)
+>       write_compose(tmp_path / "compose", merged)
+
+python_frontend/tests/test_crust_assembly.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:41: in write_compose
+    run_native("write", internal, target)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+action = 'write'
+args = (PosixPath('/tmp/compose-eos-write-i340j3fq/internal'), PosixPath('/tmp/pytest-of-cosmosapjw/pytest-411/test_assembly_preserves_partia1/compose'))
+
+    def run_native(action: str, *args: str | os.PathLike[str]) -> dict[str, Any]:
+        exe = executable()
+        command = [str(exe), action, *(str(a) for a in args)]
+        completed = subprocess.run(command, capture_output=True, text=True)
+        lines = [line.strip() for line in completed.stdout.splitlines() if line.strip()]
+        payload: dict[str, Any] = {}
+        for line in reversed(lines):
+            try:
+                candidate = json.loads(line)
+                if isinstance(candidate, dict):
+                    payload = candidate
+                    break
+            except json.JSONDecodeError:
+                continue
+        # the structured category the Fortran layer attaches to structured failures
+        # (e.g. maxwell-transition). None when the Fortran layer did not emit one.
+        category = payload.get("category")
+        op = payload.get("operation", action)
+        if completed.returncode:
+>           raise NativeExecutionError(
+                f"Fortran operation {action!r} failed with exit code {completed.returncode}: "
+                f"{payload.get('message', completed.stderr.strip() or completed.stdout.strip())}",
+                category=category, operation=op,
+            )
+E           compose_eos.native.NativeExecutionError: Fortran operation 'write' failed with exit code 3: C3 baryon abundance closure failed on an applicable row
+
+python_frontend/compose_eos/native.py:88: NativeExecutionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_crust_assembly.py::test_assembly_preserves_partial_composition_sidecar[left]
+FAILED python_frontend/tests/test_crust_assembly.py::test_assembly_preserves_partial_composition_sidecar[right]
+2 failed, 79 passed in 0.60s

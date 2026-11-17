@@ -1,0 +1,75 @@
+FFF...............                                                       [100%]
+=================================== FAILURES ===================================
+__________________ test_native_support_is_hashed_when_present __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-334/test_native_support_is_hashed_0')
+
+    def test_native_support_is_hashed_when_present(tmp_path):
+        request = core_request()
+        evidence(tmp_path, request)
+        support = tmp_path / "SUPPORT.json"
+        support.write_text(json.dumps({"scope": "computed_native_samples",
+                                      "cross_phase_interpolation": "UNAPPROVED"}))
+        result = verify_native_generation(tmp_path, request)
+>       assert result["output_sha256"]["SUPPORT.json"] == hashlib.sha256(support.read_bytes()).hexdigest()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'SUPPORT.json'
+
+python_frontend/tests/test_generation_closure_20261117.py:27: KeyError
+____________ test_sealed_support_cannot_change_or_disappear[change] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-334/test_sealed_support_cannot_cha0')
+mutation = 'change'
+
+    @pytest.mark.parametrize("mutation", ["change", "delete"])
+    def test_sealed_support_cannot_change_or_disappear(tmp_path, mutation):
+        request = core_request()
+        record = evidence(tmp_path, request)
+        support = tmp_path / "SUPPORT.json"
+        support.write_text(json.dumps({"scope": "computed_native_samples",
+                                      "cross_phase_interpolation": "UNAPPROVED"}))
+        record["output_sha256"] = verify_native_generation(tmp_path, request)["output_sha256"]
+        # Explicitly seal it so this catches ignored expected hashes independently
+        # of whether the unsealed readback above already includes SUPPORT.json.
+        record["output_sha256"]["SUPPORT.json"] = hashlib.sha256(support.read_bytes()).hexdigest()
+        (tmp_path / "RESULT.json").write_text(json.dumps(record))
+        if mutation == "change":
+            support.write_text(json.dumps({"cross_phase_interpolation": "APPROVED",
+                                          "global_minimum_proven": True}))
+        else:
+            support.unlink()
+>       with pytest.raises(ValueError, match="checksum|sealed.*missing"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_closure_20261117.py:47: Failed
+____________ test_sealed_support_cannot_change_or_disappear[delete] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-334/test_sealed_support_cannot_cha1')
+mutation = 'delete'
+
+    @pytest.mark.parametrize("mutation", ["change", "delete"])
+    def test_sealed_support_cannot_change_or_disappear(tmp_path, mutation):
+        request = core_request()
+        record = evidence(tmp_path, request)
+        support = tmp_path / "SUPPORT.json"
+        support.write_text(json.dumps({"scope": "computed_native_samples",
+                                      "cross_phase_interpolation": "UNAPPROVED"}))
+        record["output_sha256"] = verify_native_generation(tmp_path, request)["output_sha256"]
+        # Explicitly seal it so this catches ignored expected hashes independently
+        # of whether the unsealed readback above already includes SUPPORT.json.
+        record["output_sha256"]["SUPPORT.json"] = hashlib.sha256(support.read_bytes()).hexdigest()
+        (tmp_path / "RESULT.json").write_text(json.dumps(record))
+        if mutation == "change":
+            support.write_text(json.dumps({"cross_phase_interpolation": "APPROVED",
+                                          "global_minimum_proven": True}))
+        else:
+            support.unlink()
+>       with pytest.raises(ValueError, match="checksum|sealed.*missing"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_closure_20261117.py:47: Failed
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_generation_closure_20261117.py::test_native_support_is_hashed_when_present
+FAILED python_frontend/tests/test_generation_closure_20261117.py::test_sealed_support_cannot_change_or_disappear[change]
+FAILED python_frontend/tests/test_generation_closure_20261117.py::test_sealed_support_cannot_change_or_disappear[delete]
+3 failed, 15 passed in 0.30s

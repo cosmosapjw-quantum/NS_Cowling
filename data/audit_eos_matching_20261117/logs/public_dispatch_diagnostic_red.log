@@ -1,0 +1,145 @@
+FFFF.F..                                                                 [100%]
+=================================== FAILURES ===================================
+__ test_public_dispatch_seal_rejects_changed_diagnostic[changed-SUPPORT.json] __
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-430/test_public_dispatch_seal_reje0')
+name = 'SUPPORT.json', mutation = 'changed'
+
+    @pytest.mark.parametrize("name", ["SUPPORT.json", "profiles.csv"])
+    @pytest.mark.parametrize("mutation", ["changed", "deleted"])
+    def test_public_dispatch_seal_rejects_changed_diagnostic(tmp_path, name, mutation):
+        request = core_request()
+        output = tmp_path / "generated"
+        evidence(output, request)
+        path = output / name
+        path.write_text("original native evidence\n")
+        checked = verify_native_generation(output, request)
+        # Actual public runs seal the inventory in this outer receipt, while the
+        # native generated/RESULT.json normally has no output_sha256 field.
+        (tmp_path / "DISPATCH.json").write_text(json.dumps({
+            "status": "REQUESTED_ROWS_NATIVE_VERIFIED", "request": request,
+            "evidence": {"output_sha256": checked["output_sha256"]}}))
+        if mutation == "changed":
+            path.write_text("different native evidence\n")
+        else:
+            path.unlink()
+>       with pytest.raises(ValueError, match="checksum mismatch|sealed native diagnostic missing"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:80: Failed
+__ test_public_dispatch_seal_rejects_changed_diagnostic[changed-profiles.csv] __
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-430/test_public_dispatch_seal_reje1')
+name = 'profiles.csv', mutation = 'changed'
+
+    @pytest.mark.parametrize("name", ["SUPPORT.json", "profiles.csv"])
+    @pytest.mark.parametrize("mutation", ["changed", "deleted"])
+    def test_public_dispatch_seal_rejects_changed_diagnostic(tmp_path, name, mutation):
+        request = core_request()
+        output = tmp_path / "generated"
+        evidence(output, request)
+        path = output / name
+        path.write_text("original native evidence\n")
+        checked = verify_native_generation(output, request)
+        # Actual public runs seal the inventory in this outer receipt, while the
+        # native generated/RESULT.json normally has no output_sha256 field.
+        (tmp_path / "DISPATCH.json").write_text(json.dumps({
+            "status": "REQUESTED_ROWS_NATIVE_VERIFIED", "request": request,
+            "evidence": {"output_sha256": checked["output_sha256"]}}))
+        if mutation == "changed":
+            path.write_text("different native evidence\n")
+        else:
+            path.unlink()
+>       with pytest.raises(ValueError, match="checksum mismatch|sealed native diagnostic missing"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:80: Failed
+__ test_public_dispatch_seal_rejects_changed_diagnostic[deleted-SUPPORT.json] __
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-430/test_public_dispatch_seal_reje2')
+name = 'SUPPORT.json', mutation = 'deleted'
+
+    @pytest.mark.parametrize("name", ["SUPPORT.json", "profiles.csv"])
+    @pytest.mark.parametrize("mutation", ["changed", "deleted"])
+    def test_public_dispatch_seal_rejects_changed_diagnostic(tmp_path, name, mutation):
+        request = core_request()
+        output = tmp_path / "generated"
+        evidence(output, request)
+        path = output / name
+        path.write_text("original native evidence\n")
+        checked = verify_native_generation(output, request)
+        # Actual public runs seal the inventory in this outer receipt, while the
+        # native generated/RESULT.json normally has no output_sha256 field.
+        (tmp_path / "DISPATCH.json").write_text(json.dumps({
+            "status": "REQUESTED_ROWS_NATIVE_VERIFIED", "request": request,
+            "evidence": {"output_sha256": checked["output_sha256"]}}))
+        if mutation == "changed":
+            path.write_text("different native evidence\n")
+        else:
+            path.unlink()
+>       with pytest.raises(ValueError, match="checksum mismatch|sealed native diagnostic missing"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:80: Failed
+__ test_public_dispatch_seal_rejects_changed_diagnostic[deleted-profiles.csv] __
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-430/test_public_dispatch_seal_reje3')
+name = 'profiles.csv', mutation = 'deleted'
+
+    @pytest.mark.parametrize("name", ["SUPPORT.json", "profiles.csv"])
+    @pytest.mark.parametrize("mutation", ["changed", "deleted"])
+    def test_public_dispatch_seal_rejects_changed_diagnostic(tmp_path, name, mutation):
+        request = core_request()
+        output = tmp_path / "generated"
+        evidence(output, request)
+        path = output / name
+        path.write_text("original native evidence\n")
+        checked = verify_native_generation(output, request)
+        # Actual public runs seal the inventory in this outer receipt, while the
+        # native generated/RESULT.json normally has no output_sha256 field.
+        (tmp_path / "DISPATCH.json").write_text(json.dumps({
+            "status": "REQUESTED_ROWS_NATIVE_VERIFIED", "request": request,
+            "evidence": {"output_sha256": checked["output_sha256"]}}))
+        if mutation == "changed":
+            path.write_text("different native evidence\n")
+        else:
+            path.unlink()
+>       with pytest.raises(ValueError, match="checksum mismatch|sealed native diagnostic missing"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:80: Failed
+_______ test_native_and_public_dispatch_seals_are_both_checked[dispatch] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-430/test_native_and_public_dispatc1')
+bad_seal = 'dispatch'
+
+    @pytest.mark.parametrize("bad_seal", ["native", "dispatch"])
+    def test_native_and_public_dispatch_seals_are_both_checked(tmp_path, bad_seal):
+        request = core_request()
+        output = tmp_path / "generated"
+        receipt = evidence(output, request)
+        (output / "profiles.csv").write_text("retained profile\n")
+        hashes = verify_native_generation(output, request)["output_sha256"]
+        native_hashes, dispatch_hashes = dict(hashes), dict(hashes)
+        (native_hashes if bad_seal == "native" else dispatch_hashes)["profiles.csv"] = "0" * 64
+        receipt["output_sha256"] = native_hashes
+        (output / "RESULT.json").write_text(json.dumps(receipt))
+        (tmp_path / "DISPATCH.json").write_text(json.dumps({
+            "status": "REQUESTED_ROWS_NATIVE_VERIFIED", "request": request,
+            "evidence": {"output_sha256": dispatch_hashes}}))
+>       with pytest.raises(ValueError, match="checksum mismatch"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:98: Failed
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_public_dispatch_seal_rejects_changed_diagnostic[changed-SUPPORT.json]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_public_dispatch_seal_rejects_changed_diagnostic[changed-profiles.csv]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_public_dispatch_seal_rejects_changed_diagnostic[deleted-SUPPORT.json]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_public_dispatch_seal_rejects_changed_diagnostic[deleted-profiles.csv]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_native_and_public_dispatch_seals_are_both_checked[dispatch]
+5 failed, 3 passed, 20 deselected in 0.26s

@@ -8,6 +8,7 @@ module ns_tov_cases
     use ns_polytrope
     use ns_background_records
     use ns_tov
+    use ns_production_solvers, only: solve_tov_star
     use ns_target_mass
     use, intrinsic :: iso_fortran_env, only: int64
     use, intrinsic :: ieee_arithmetic, only: ieee_value,ieee_quiet_nan,ieee_is_finite
@@ -123,7 +124,7 @@ contains
                 end if
             else
                 if(use_stops) then
-                    call integrate_tov(eos,pc_pa,options,profile,[stop1_pa,stop2_pa])
+                    call solve_tov_star(eos,pc_pa,options,profile,[stop1_pa,stop2_pa])
                 else
                     call integrate_tov(eos,pc_pa,options,profile)
                 end if

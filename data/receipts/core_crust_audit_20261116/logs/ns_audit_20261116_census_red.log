@@ -1,0 +1,131 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_census_respects_source_veto_even_with_complete_stale_table[REJECTED.json] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-70/test_census_respects_source_ve0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74a36080b0b0>
+marker = 'REJECTED.json'
+
+    @pytest.mark.parametrize('marker', ['REJECTED.json', 'NOT_GENERATED.json'])
+    def test_census_respects_source_veto_even_with_complete_stale_table(tmp_path, monkeypatch, marker):
+        crust, core = _sources(tmp_path, monkeypatch)
+        (crust / marker).write_text(json.dumps({'reason': 'invalid reconstruction'}))
+        # Calling the solver at all is a contract violation regardless of its result.
+        monkeypatch.setattr(pipeline, 'run_pipeline', lambda *a: pytest.fail('vetoed table reached solver'))
+>       assert pipeline.main() == 0
+               ^^^^^^^^^^^^^^^
+
+pipeline/tests/test_census_execution_contract.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/match_core_crust.py:754: in main
+    res = run_pipeline(method, crust_dir, core_dir, out_dir)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+a = ('maxwell', PosixPath('/tmp/pytest-of-cosmosapjw/pytest-70/test_census_respects_source_ve0/crust/C'), PosixPath('/tmp/...ource_ve0/core/K'), PosixPath('/tmp/pytest-of-cosmosapjw/pytest-70/test_census_respects_source_ve0/run/C__K__maxwell'))
+
+>   monkeypatch.setattr(pipeline, 'run_pipeline', lambda *a: pytest.fail('vetoed table reached solver'))
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: vetoed table reached solver
+
+pipeline/tests/test_census_execution_contract.py:26: Failed
+_ test_census_respects_source_veto_even_with_complete_stale_table[NOT_GENERATED.json] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-70/test_census_respects_source_ve1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74a360808200>
+marker = 'NOT_GENERATED.json'
+
+    @pytest.mark.parametrize('marker', ['REJECTED.json', 'NOT_GENERATED.json'])
+    def test_census_respects_source_veto_even_with_complete_stale_table(tmp_path, monkeypatch, marker):
+        crust, core = _sources(tmp_path, monkeypatch)
+        (crust / marker).write_text(json.dumps({'reason': 'invalid reconstruction'}))
+        # Calling the solver at all is a contract violation regardless of its result.
+        monkeypatch.setattr(pipeline, 'run_pipeline', lambda *a: pytest.fail('vetoed table reached solver'))
+>       assert pipeline.main() == 0
+               ^^^^^^^^^^^^^^^
+
+pipeline/tests/test_census_execution_contract.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/match_core_crust.py:754: in main
+    res = run_pipeline(method, crust_dir, core_dir, out_dir)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+a = ('maxwell', PosixPath('/tmp/pytest-of-cosmosapjw/pytest-70/test_census_respects_source_ve1/crust/C'), PosixPath('/tmp/...ource_ve1/core/K'), PosixPath('/tmp/pytest-of-cosmosapjw/pytest-70/test_census_respects_source_ve1/run/C__K__maxwell'))
+
+>   monkeypatch.setattr(pipeline, 'run_pipeline', lambda *a: pytest.fail('vetoed table reached solver'))
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: vetoed table reached solver
+
+pipeline/tests/test_census_execution_contract.py:26: Failed
+_________________ test_direct_pair_runner_respects_source_veto _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-70/test_direct_pair_runner_respec0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74a3608717c0>
+
+    def test_direct_pair_runner_respects_source_veto(tmp_path, monkeypatch):
+        crust, core = _sources(tmp_path, monkeypatch)
+        (core / 'REJECTED.json').write_text('{"reason": "invalid core"}')
+        monkeypatch.setattr(pipeline, 'executable', lambda: pytest.fail('vetoed source reached executable'))
+>       result = pipeline.run_pipeline('css', crust, core, tmp_path / 'pair')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+pipeline/tests/test_census_execution_contract.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/match_core_crust.py:467: in run_pipeline
+    res = _run_pipeline(method, crust_dir, core_dir, out_dir)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/match_core_crust.py:487: in _run_pipeline
+    exe = executable()
+          ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   monkeypatch.setattr(pipeline, 'executable', lambda: pytest.fail('vetoed source reached executable'))
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: vetoed source reached executable
+
+pipeline/tests/test_census_execution_contract.py:38: Failed
+________ test_census_missing_executable_is_nonzero_but_retains_reports _________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-70/test_census_missing_executable0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74a360872cc0>
+
+    def test_census_missing_executable_is_nonzero_but_retains_reports(tmp_path, monkeypatch):
+        _sources(tmp_path, monkeypatch)
+        def absent():
+            raise RuntimeError('native executable unavailable')
+        monkeypatch.setattr(pipeline, 'executable', absent)
+>       assert pipeline.main() == 1
+E       assert 0 == 1
+E        +  where 0 = <function main at 0x74a360800ea0>()
+E        +    where <function main at 0x74a360800ea0> = pipeline.main
+
+pipeline/tests/test_census_execution_contract.py:50: AssertionError
+----------------------------- Captured stdout call -----------------------------
+  [FAILED@executable   ] C              + K            / maxwell  [environment] (n=-)  0.0s  RuntimeError: native executable unavailable
+  [FAILED@executable   ] C              + K            / css      [environment] (n=-)  0.0s  RuntimeError: native executable unavailable
+
+Matching complete: 0/2 survived (maxwell=0, css=0)
+Manifest: /tmp/pytest-of-cosmosapjw/pytest-70/test_census_missing_executable0/run/matching_manifest.json
+___________________ test_failed_pair_retains_source_identity ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-70/test_failed_pair_retains_sourc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74a360870ef0>
+
+    def test_failed_pair_retains_source_identity(tmp_path, monkeypatch):
+        crust, core = _sources(tmp_path, monkeypatch)
+        monkeypatch.setattr(pipeline, 'executable', lambda: tmp_path / 'absent')
+        result = pipeline.run_pipeline('css', crust, core, tmp_path / 'pair')
+        assert result['failure_category'] == 'environment'
+>       assert result['source_sha256']['crust']['eos.thermo'] == pipeline.sha256_file(crust / 'eos.thermo')
+               ^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'source_sha256'
+
+pipeline/tests/test_census_execution_contract.py:65: KeyError
+=========================== short test summary info ============================
+FAILED pipeline/tests/test_census_execution_contract.py::test_census_respects_source_veto_even_with_complete_stale_table[REJECTED.json]
+FAILED pipeline/tests/test_census_execution_contract.py::test_census_respects_source_veto_even_with_complete_stale_table[NOT_GENERATED.json]
+FAILED pipeline/tests/test_census_execution_contract.py::test_direct_pair_runner_respects_source_veto
+FAILED pipeline/tests/test_census_execution_contract.py::test_census_missing_executable_is_nonzero_but_retains_reports
+FAILED pipeline/tests/test_census_execution_contract.py::test_failed_pair_retains_source_identity
+5 failed in 0.16s

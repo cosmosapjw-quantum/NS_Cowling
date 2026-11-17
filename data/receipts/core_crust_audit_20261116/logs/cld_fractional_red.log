@@ -1,0 +1,24 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_fractional_surface_exponent_selects_energy_minimum_not_maximum ______
+
+    def test_fractional_surface_exponent_selects_energy_minimum_not_maximum():
+        from pathlib import Path
+        from compose_eos.cld_cell import solve_beta_equilibrium_cluster, cld_cell_energy
+        from compose_eos.rmf_solver import load_models
+        m=load_models(Path(__file__).resolve().parents[2]/'data/eos390_rmf_parameter_sets.v1.json')['GPPVA_DD2']
+        nI,f,R=.14,.02,5.
+        p,_,_,res=solve_beta_equilibrium_cluster(m,nI,0.,f,R_d=R,sigma_0=1.,b=.59)
+        def e(p):
+            val,_=cld_cell_energy(m,.01,f,R,nI,p,0.,0.,1.,.59)
+            return val+(m.mp-m.mn)*f*p
+        # Baseline endpoint-bracket bisection selects y~.999988, an energy maximum.
+>       assert e(p) < e(.3*nI)
+E       assert 0.3009526928282386 < 0.032885673712384135
+E        +  where 0.3009526928282386 = <function test_fractional_surface_exponent_selects_energy_minimum_not_maximum.<locals>.e at 0x73f1103a8f40>(0.1399983429087661)
+E        +  and   0.032885673712384135 = <function test_fractional_surface_exponent_selects_energy_minimum_not_maximum.<locals>.e at 0x73f1103a8f40>((0.3 * 0.14))
+
+python_frontend/tests/test_cld_adversarial_reaudit.py:108: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_cld_adversarial_reaudit.py::test_fractional_surface_exponent_selects_energy_minimum_not_maximum
+1 failed, 21 deselected in 0.41s

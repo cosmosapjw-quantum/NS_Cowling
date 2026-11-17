@@ -1,0 +1,4907 @@
+{
+  "schema_version": 1,
+  "model_id": "APR_APR",
+  "sources": {
+    "hamiltonian": "https://arxiv.org/html/1901.09652v2",
+    "original": "https://doi.org/10.1103/PhysRevC.58.1804",
+    "author_code": "https://bitbucket.org/andschn/apreos"
+  },
+  "head": "677585947e4d126bc27cc3d8f30c265c407a7773",
+  "generator_sha256": "a382b4aaef0878d4f7abb6f8fe2648376e4c5d9ec5b47cf8aa8c755f43d814d4",
+  "script_sha256": "2989eaa38a763a04a33153779fc5e88db5781e611f9ff9254b016ce91276d59e",
+  "dependency_sha256": {
+    "cold_leptons.py": "ac995eb2504560da1569190a2f95bbbe266961dab0498dc0665951afca4c2ded",
+    "physical_domain.py": "27e97bdad1e378df9452bd6f1e66bc33ebf200d658e37ecfb37bc7da3870a3c7",
+    "apr_gibbs.py": "345ab53f89a88af061ea8231fcec0ba26083e68553a7a66c1bda4217fba730f1"
+  },
+  "runtime": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "numpy": "2.4.2",
+    "scipy": "1.17.0"
+  },
+  "source_input_sha256": {
+    "eos.init": "7a04fffc29028bc42ab4256698fd07dc0def78d41e81282c5e88bb8c23db6059",
+    "eos.mr": "7b2472aaa700930ba24de802a37551d64b9570276645d323447a756d13898074",
+    "eos.nb": "35216571b367befd05388f804016b0950da9455cc83d96f4723cc3b0316cdc33",
+    "eos.pdf": "b65ac6d1f90ffc6ce032a997f53200bc131de2e7dbe842921f21379f66510d38",
+    "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+    "eos.thermo": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a",
+    "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554"
+  },
+  "parameters_p1_to_p21": [
+    337.2,
+    -382.0,
+    89.8,
+    0.457,
+    -59.0,
+    -19.1,
+    214.6,
+    -384.0,
+    6.4,
+    69.0,
+    -33.0,
+    0.35,
+    0.0,
+    0.0,
+    287.0,
+    -1.54,
+    175.0,
+    -1.45,
+    0.32,
+    0.195,
+    0.0
+  ],
+  "nucleon_masses_mev": {
+    "neutron": 939.5654133,
+    "proton": 938.2720813
+  },
+  "mass_convention": "explicit split nucleon masses; author SNA proton constant differs by 0.0000600 MeV",
+  "source_rows_compared": 103,
+  "source_density_interval_fm3": [
+    0.085,
+    1.34
+  ],
+  "lower_bound_status": "uniform-core comparison window chosen for this run; provider phase labels unavailable",
+  "phase_construction": {
+    "construction": "local_neutrality_Maxwell_npemu",
+    "left": {
+      "n_b": 0.20475121895848236,
+      "epsilon": 196.72482199163414,
+      "mu_n": 989.4648641698087,
+      "mu_p": 850.4482434214993,
+      "pressure": 5.869315063723392,
+      "branch": "low",
+      "mstar_n": 713.8576226582916,
+      "mstar_p": 530.7006430180186,
+      "Y_n": 0.9264953660477145,
+      "Y_p": 0.07350463395228547,
+      "Y_e": 0.05767458437776925,
+      "Y_mu": 0.015830049574516374,
+      "mu_e": 139.01662074830938,
+      "charge_residual_fm3": -3.0357660829594124e-17,
+      "euler_residual_mev_fm3": 2.842170943040401e-14,
+      "species": "npemu"
+    },
+    "right": {
+      "n_b": 0.2369166062704041,
+      "epsilon": 228.551342579194,
+      "mu_n": 989.4648641698086,
+      "mu_p": 853.1816033931541,
+      "pressure": 5.869315063723368,
+      "branch": "high",
+      "mstar_n": 695.1466263267484,
+      "mstar_p": 497.8733234393495,
+      "Y_n": 0.9412052576153017,
+      "Y_p": 0.05879474238469828,
+      "Y_e": 0.04696155579935571,
+      "Y_mu": 0.011833186585342152,
+      "mu_e": 136.28326077665452,
+      "charge_residual_fm3": 9.80118763926896e-17,
+      "euler_residual_mev_fm3": -2.842170943040401e-14,
+      "species": "npemu"
+    },
+    "pressure": 5.869315063723381,
+    "mu_b": 989.4648641698086,
+    "pressure_residual_mev_fm3": 2.398081733190338e-14,
+    "chemical_residual_mev": 1.1368683772161603e-13,
+    "multistart_max_density_difference_fm3": 4.218847493575595e-15,
+    "tangent_check": {
+      "n_min_fm3": 0.08,
+      "n_max_fm3": 1.34,
+      "points_per_branch": 401,
+      "minimum_energy_excess_mev_fm3": 5.1454715077170476e-05,
+      "status": "SAMPLED_MINORANT"
+    },
+    "global_phase_minimum_status": "NOT_PROVEN",
+    "source_provider_phase_prescription": "GIBBS in official 2025 provider PDF; Maxwell is an explicit alternative"
+  },
+  "gibbs_phase_construction": {
+    "construction": "bulk_two_charge_Gibbs",
+    "species": "npemu",
+    "left": {
+      "n_b": 0.20439495489346152,
+      "epsilon": 196.37233754755988,
+      "pressure": 5.839084138328056,
+      "mu_n": 989.3170885322893,
+      "mu_p": 850.413510106658,
+      "mu_e": 138.90357842563125,
+      "Y_n": 0.9265995444224442,
+      "Y_p": 0.07340045557755576,
+      "Y_e": 0.057634284193189354,
+      "Y_mu": 0.015766171384366385,
+      "mstar_n": null,
+      "mstar_p": null,
+      "branch": "gibbs_mixed",
+      "species": "npemu",
+      "high_phase_volume_fraction": 0.0,
+      "n_low": 0.20439495489346152,
+      "n_high": 0.23351094142391204,
+      "Yp_low": 0.07340045557755576,
+      "Yp_high": 0.04950926596443281,
+      "charge_residual_fm3": 3.903127820947816e-18,
+      "euler_residual_mev_fm3": -2.842170943040401e-14,
+      "gibbs_residuals": {
+        "mu_n_difference_mev": 0.0,
+        "mu_p_difference_mev": 1.1368683772161603e-13,
+        "nuclear_pressure_difference_mev_fm3": -2.842170943040401e-14,
+        "beta_residual_mev": -8.526512829121202e-14,
+        "charge_residual_fm3": 3.903127820947816e-18
+      },
+      "nuclear_pressure": 5.389620951761472,
+      "nuclear_phase_states": {
+        "low": {
+          "n_b": 0.20439495489346152,
+          "epsilon": 194.73787440625864,
+          "mu_n": 989.3170885322893,
+          "mu_p": 850.4135101066581,
+          "pressure": 5.389620951761458,
+          "branch": "low",
+          "mstar_n": 714.1582111355915,
+          "mstar_p": 531.0479620869799
+        },
+        "high": {
+          "n_b": 0.23351094142391204,
+          "epsilon": 224.02088569635472,
+          "mu_n": 989.3170885322893,
+          "mu_p": 850.413510106658,
+          "pressure": 5.389620951761486,
+          "branch": "high",
+          "mstar_n": 700.3611619362426,
+          "mstar_p": 499.4146679525598
+        }
+      }
+    },
+    "right": {
+      "n_b": 0.2373842489373486,
+      "epsilon": 229.01409162245344,
+      "pressure": 5.902854828556434,
+      "mu_n": 989.6062923408623,
+      "mu_p": 853.2023887424746,
+      "mu_e": 136.40390359838776,
+      "Y_n": 0.9411177590866254,
+      "Y_p": 0.05888224091337462,
+      "Y_e": 0.046993624819346005,
+      "Y_mu": 0.011888616094028677,
+      "mstar_n": null,
+      "mstar_p": null,
+      "branch": "gibbs_mixed",
+      "species": "npemu",
+      "high_phase_volume_fraction": 1.0,
+      "n_low": 0.20767276741150792,
+      "n_high": 0.2373842489373486,
+      "Yp_low": 0.08345945355636811,
+      "Yp_high": 0.05888224091337462,
+      "charge_residual_fm3": -1.431146867680866e-17,
+      "euler_residual_mev_fm3": 2.842170943040401e-14,
+      "gibbs_residuals": {
+        "mu_n_difference_mev": -2.2737367544323206e-13,
+        "mu_p_difference_mev": -2.2737367544323206e-13,
+        "nuclear_pressure_difference_mev_fm3": -5.684341886080802e-14,
+        "beta_residual_mev": -2.5579538487363607e-13,
+        "charge_residual_fm3": -1.431146867680866e-17
+      },
+      "nuclear_pressure": 5.48960250344615,
+      "nuclear_phase_states": {
+        "low": {
+          "n_b": 0.20767276741150792,
+          "epsilon": 197.6604875409908,
+          "mu_n": 989.6062923408622,
+          "mu_p": 853.2023887424747,
+          "pressure": 5.489602503446122,
+          "branch": "low",
+          "mstar_n": 708.7756839023497,
+          "mstar_p": 529.3315361583085
+        },
+        "high": {
+          "n_b": 0.23738424893734864,
+          "epsilon": 227.52072884880215,
+          "mu_n": 989.6062923408624,
+          "mu_p": 853.2023887424749,
+          "pressure": 5.489602503446179,
+          "branch": "high",
+          "mstar_n": 694.8012811238698,
+          "mstar_p": 497.476404503302
+        }
+      }
+    },
+    "multistart_max_density_or_fraction_difference": 2.886579864025407e-15,
+    "volume_fraction_path": [
+      {
+        "n_b": 0.20439495489346152,
+        "epsilon": 196.37233754755988,
+        "pressure": 5.839084138328056,
+        "mu_n": 989.3170885322893,
+        "mu_p": 850.413510106658,
+        "mu_e": 138.90357842563125,
+        "Y_n": 0.9265995444224442,
+        "Y_p": 0.07340045557755576,
+        "Y_e": 0.057634284193189354,
+        "Y_mu": 0.015766171384366385,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 0.0,
+        "n_low": 0.20439495489346152,
+        "n_high": 0.23351094142391204,
+        "Yp_low": 0.07340045557755576,
+        "Yp_high": 0.04950926596443281,
+        "charge_residual_fm3": 3.903127820947816e-18,
+        "euler_residual_mev_fm3": -2.842170943040401e-14,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": 0.0,
+          "mu_p_difference_mev": 1.1368683772161603e-13,
+          "nuclear_pressure_difference_mev_fm3": -2.842170943040401e-14,
+          "beta_residual_mev": -8.526512829121202e-14,
+          "charge_residual_fm3": 3.903127820947816e-18
+        },
+        "nuclear_pressure": 5.389620951761472,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.20439495489346152,
+            "epsilon": 194.73787440625864,
+            "mu_n": 989.3170885322893,
+            "mu_p": 850.4135101066581,
+            "pressure": 5.389620951761458,
+            "branch": "low",
+            "mstar_n": 714.1582111355915,
+            "mstar_p": 531.0479620869799
+          },
+          "high": {
+            "n_b": 0.23351094142391204,
+            "epsilon": 224.02088569635472,
+            "mu_n": 989.3170885322893,
+            "mu_p": 850.413510106658,
+            "pressure": 5.389620951761486,
+            "branch": "high",
+            "mstar_n": 700.3611619362426,
+            "mstar_p": 499.4146679525598
+          }
+        }
+      },
+      {
+        "n_b": 0.20602054518695462,
+        "epsilon": 197.98057414889814,
+        "pressure": 5.8421978806365,
+        "mu_n": 989.3322622002305,
+        "mu_p": 850.5571729950209,
+        "mu_e": 138.77508920520967,
+        "Y_n": 0.9274400851890151,
+        "Y_p": 0.07255991481098488,
+        "Y_e": 0.057020992216322466,
+        "Y_mu": 0.015538922594662413,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 0.05,
+        "n_low": 0.20456326703090758,
+        "n_high": 0.23370883015184882,
+        "Yp_low": 0.07391727516414057,
+        "Yp_high": 0.04998629063175482,
+        "charge_residual_fm3": -4.336808689942018e-19,
+        "euler_residual_mev_fm3": 0.0,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": -2.2737367544323206e-13,
+          "mu_p_difference_mev": 0.0,
+          "nuclear_pressure_difference_mev_fm3": -8.526512829121202e-14,
+          "beta_residual_mev": -1.7053025658242404e-13,
+          "charge_residual_fm3": -4.336808689942018e-19
+        },
+        "nuclear_pressure": 5.394658916185378,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.20456326703090758,
+            "epsilon": 194.88799609819745,
+            "mu_n": 989.3322622002304,
+            "mu_p": 850.5571729950209,
+            "pressure": 5.394658916185335,
+            "branch": "low",
+            "mstar_n": 713.8816012625693,
+            "mstar_p": 530.9582142837627
+          },
+          "high": {
+            "n_b": 0.2337088301518488,
+            "epsilon": 224.1998231619376,
+            "mu_n": 989.3322622002306,
+            "mu_p": 850.5571729950209,
+            "pressure": 5.394658916185421,
+            "branch": "high",
+            "mstar_n": 700.077379599555,
+            "mstar_p": 499.31360279064575
+          }
+        }
+      },
+      {
+        "n_b": 0.20764874485535803,
+        "epsilon": 199.59141692247664,
+        "pressure": 5.845322902621278,
+        "mu_n": 989.3473710529724,
+        "mu_p": 850.7004742236708,
+        "mu_e": 138.6468968293017,
+        "Y_n": 0.9282671599995559,
+        "Y_p": 0.07173284000044408,
+        "Y_e": 0.056417247157278895,
+        "Y_mu": 0.015315592843165195,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 0.1,
+        "n_low": 0.2047312253043545,
+        "n_high": 0.2339064208143899,
+        "Yp_low": 0.07443296567464051,
+        "Yp_high": 0.05046279396039214,
+        "charge_residual_fm3": -3.0357660829594124e-18,
+        "euler_residual_mev_fm3": 2.842170943040401e-14,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": 0.0,
+          "mu_p_difference_mev": 2.2737367544323206e-13,
+          "nuclear_pressure_difference_mev_fm3": -2.842170943040401e-14,
+          "beta_residual_mev": -1.4210854715202004e-13,
+          "charge_residual_fm3": -3.0357660829594124e-18
+        },
+        "nuclear_pressure": 5.399696827777589,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.2047312253043545,
+            "epsilon": 195.03779698636257,
+            "mu_n": 989.3473710529724,
+            "mu_p": 850.7004742236709,
+            "pressure": 5.399696827777575,
+            "branch": "low",
+            "mstar_n": 713.6055983356476,
+            "mstar_p": 530.8688286343686
+          },
+          "high": {
+            "n_b": 0.23390642081438992,
+            "epsilon": 224.37847711465832,
+            "mu_n": 989.3473710529724,
+            "mu_p": 850.7004742236707,
+            "pressure": 5.399696827777603,
+            "branch": "high",
+            "mstar_n": 699.7939939516135,
+            "mstar_p": 499.212909930119
+          }
+        }
+      },
+      {
+        "n_b": 0.20927954057003997,
+        "epsilon": 201.20485265322625,
+        "pressure": 5.848458615853637,
+        "mu_n": 989.3624130916177,
+        "mu_p": 850.8433983464485,
+        "mu_e": 138.5190147451692,
+        "Y_n": 0.9290810254996017,
+        "Y_p": 0.07091897450039826,
+        "Y_e": 0.055822866325573005,
+        "Y_mu": 0.015096108174825231,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 0.15000000000000002,
+        "n_low": 0.20489880894899948,
+        "n_high": 0.23410368642260268,
+        "Yp_low": 0.07494746538706246,
+        "Yp_high": 0.05093870998370521,
+        "charge_residual_fm3": 4.7704895589362195e-18,
+        "euler_residual_mev_fm3": 5.684341886080802e-14,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": 0.0,
+          "mu_p_difference_mev": 3.410605131648481e-13,
+          "nuclear_pressure_difference_mev_fm3": -5.684341886080802e-14,
+          "beta_residual_mev": -8.526512829121202e-14,
+          "charge_residual_fm3": 4.7704895589362195e-18
+        },
+        "nuclear_pressure": 5.4047339624091535,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.20489880894899948,
+            "epsilon": 195.18725857102314,
+            "mu_n": 989.3624130916177,
+            "mu_p": 850.8433983464486,
+            "pressure": 5.404733962409125,
+            "branch": "low",
+            "mstar_n": 713.3302360725996,
+            "mstar_p": 530.779815135218
+          },
+          "high": {
+            "n_b": 0.23410368642260268,
+            "epsilon": 224.55682323986073,
+            "mu_n": 989.3624130916177,
+            "mu_p": 850.8433983464482,
+            "pressure": 5.404733962409182,
+            "branch": "high",
+            "mstar_n": 699.5110441035985,
+            "mstar_p": 499.1126018850019
+          }
+        }
+      },
+      {
+        "n_b": 0.21091291827314113,
+        "epsilon": 202.82086740027617,
+        "pressure": 5.851604435463407,
+        "mu_n": 989.3773863841755,
+        "mu_p": 850.9859303120645,
+        "mu_e": 138.39145607211094,
+        "Y_n": 0.929881932223318,
+        "Y_p": 0.07011806777668192,
+        "Y_e": 0.05523767152120739,
+        "Y_mu": 0.014880396255474531,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 0.2,
+        "n_low": 0.20506599769875974,
+        "n_high": 0.2343006005706666,
+        "Yp_low": 0.0754607140941236,
+        "Yp_high": 0.05141397406511089,
+        "charge_residual_fm3": 4.336808689942018e-19,
+        "euler_residual_mev_fm3": 0.0,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": 1.1368683772161603e-13,
+          "mu_p_difference_mev": 1.1368683772161603e-13,
+          "nuclear_pressure_difference_mev_fm3": 5.684341886080802e-14,
+          "beta_residual_mev": 0.0,
+          "charge_residual_fm3": 4.336808689942018e-19
+        },
+        "nuclear_pressure": 5.409769606871009,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.20506599769875974,
+            "epsilon": 195.33636280038473,
+            "mu_n": 989.3773863841755,
+            "mu_p": 850.9859303120645,
+            "pressure": 5.409769606871038,
+            "branch": "low",
+            "mstar_n": 713.055547366007,
+            "mstar_p": 530.6911834335458
+          },
+          "high": {
+            "n_b": 0.2343006005706666,
+            "epsilon": 224.73483775674657,
+            "mu_n": 989.3773863841753,
+            "mu_p": 850.9859303120644,
+            "pressure": 5.409769606870981,
+            "branch": "high",
+            "mstar_n": 699.2285683347907,
+            "mstar_p": 499.01269076277987
+          }
+        }
+      },
+      {
+        "n_b": 0.21254886320554306,
+        "epsilon": 204.43944652467695,
+        "pressure": 5.8547597805914355,
+        "mu_n": 989.3922890658121,
+        "mu_p": 851.1280554676664,
+        "mu_e": 138.26423359814564,
+        "Y_n": 0.9306701248089386,
+        "Y_p": 0.06932987519106133,
+        "Y_e": 0.05466148887348382,
+        "Y_mu": 0.014668386317577524,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 0.25,
+        "n_low": 0.20523277179221705,
+        "n_high": 0.2344971374455211,
+        "Yp_low": 0.07597265311945756,
+        "Yp_high": 0.051888522923445965,
+        "charge_residual_fm3": -3.469446951953614e-18,
+        "euler_residual_mev_fm3": -2.842170943040401e-14,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": 2.2737367544323206e-13,
+          "mu_p_difference_mev": 2.2737367544323206e-13,
+          "nuclear_pressure_difference_mev_fm3": 0.0,
+          "beta_residual_mev": 2.842170943040401e-14,
+          "charge_residual_fm3": -3.469446951953614e-18
+        },
+        "nuclear_pressure": 5.414803059255831,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.20523277179221705,
+            "epsilon": 195.48509207579127,
+            "mu_n": 989.3922890658122,
+            "mu_p": 851.1280554676665,
+            "pressure": 5.414803059255831,
+            "branch": "low",
+            "mstar_n": 712.7815642740372,
+            "mstar_p": 530.6029428272992
+          },
+          "high": {
+            "n_b": 0.2344971374455211,
+            "epsilon": 224.9124974268581,
+            "mu_n": 989.392289065812,
+            "mu_p": 851.1280554676663,
+            "pressure": 5.414803059255831,
+            "branch": "high",
+            "mstar_n": 698.9466040782696,
+            "mstar_p": 498.91318826331855
+          }
+        }
+      },
+      {
+        "n_b": 0.21418735993496874,
+        "epsilon": 206.06057471725774,
+        "pressure": 5.857924074822349,
+        "mu_n": 989.4071193389867,
+        "mu_p": 851.269759561761,
+        "mu_e": 138.13735977722564,
+        "Y_n": 0.9314458422034299,
+        "Y_p": 0.06855415779657012,
+        "Y_e": 0.054094148687698414,
+        "Y_mu": 0.014460009108871723,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 0.30000000000000004,
+        "n_low": 0.20539911197765984,
+        "n_high": 0.23469327183535613,
+        "Yp_low": 0.07648322533119249,
+        "Yp_high": 0.05236229465565318,
+        "charge_residual_fm3": -3.469446951953614e-18,
+        "euler_residual_mev_fm3": -2.842170943040401e-14,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": 0.0,
+          "mu_p_difference_mev": -1.1368683772161603e-13,
+          "nuclear_pressure_difference_mev_fm3": -2.842170943040401e-14,
+          "beta_residual_mev": -5.684341886080802e-14,
+          "charge_residual_fm3": -3.469446951953614e-18
+        },
+        "nuclear_pressure": 5.41983362931218,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.20539911197765984,
+            "epsilon": 195.6334292561179,
+            "mu_n": 989.4071193389867,
+            "mu_p": 851.2697595617611,
+            "pressure": 5.419833629312166,
+            "branch": "low",
+            "mstar_n": 712.5083180126834,
+            "mstar_p": 530.5151022655655
+          },
+          "high": {
+            "n_b": 0.2346932718353561,
+            "epsilon": 225.0897795615092,
+            "mu_n": 989.4071193389867,
+            "mu_p": 851.2697595617612,
+            "pressure": 5.419833629312194,
+            "branch": "high",
+            "mstar_n": 698.6651879082602,
+            "mstar_p": 498.8141056784414
+          }
+        }
+      },
+      {
+        "n_b": 0.21582839238418583,
+        "epsilon": 207.6842360265893,
+        "pressure": 5.86109674659939,
+        "mu_n": 989.4218754734866,
+        "mu_p": 851.4110287465094,
+        "mu_e": 138.01084672697718,
+        "Y_n": 0.9322093178569674,
+        "Y_p": 0.06779068214303259,
+        "Y_e": 0.05353548529930159,
+        "Y_mu": 0.014255196843730977,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 0.35000000000000003,
+        "n_low": 0.20556499951727833,
+        "n_high": 0.23488897913701406,
+        "Yp_low": 0.0769923751529697,
+        "Yp_high": 0.05283522875684097,
+        "charge_residual_fm3": 3.469446951953614e-18,
+        "euler_residual_mev_fm3": 0.0,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": 3.410605131648481e-13,
+          "mu_p_difference_mev": -2.2737367544323206e-13,
+          "nuclear_pressure_difference_mev_fm3": 8.526512829121202e-14,
+          "beta_residual_mev": 3.694822225952521e-13,
+          "charge_residual_fm3": 3.469446951953614e-18
+        },
+        "nuclear_pressure": 5.424860638773069,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.20556499951727833,
+            "epsilon": 195.7813576614089,
+            "mu_n": 989.4218754734867,
+            "mu_p": 851.4110287465091,
+            "pressure": 5.4248606387731115,
+            "branch": "low",
+            "mstar_n": 712.2358389494033,
+            "mstar_p": 530.4276703494722
+          },
+          "high": {
+            "n_b": 0.23488897913701406,
+            "epsilon": 225.26666202823037,
+            "mu_n": 989.4218754734864,
+            "mu_p": 851.4110287465094,
+            "pressure": 5.424860638773026,
+            "branch": "high",
+            "mstar_n": 698.3843555290711,
+            "mstar_p": 498.7154538921063
+          }
+        }
+      },
+      {
+        "n_b": 0.21747194385924068,
+        "epsilon": 209.31041388698085,
+        "pressure": 5.8642772296208125,
+        "mu_n": 989.4365558063623,
+        "mu_p": 851.5518495794089,
+        "mu_e": 137.88470622695345,
+        "Y_n": 0.9329607799077831,
+        "Y_p": 0.0670392200922169,
+        "Y_e": 0.052985336935126574,
+        "Y_mu": 0.01405388315709033,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 0.4,
+        "n_low": 0.2057304161905165,
+        "n_high": 0.23508423536232692,
+        "Yp_low": 0.07750004857247551,
+        "Yp_high": 0.05330726613777007,
+        "charge_residual_fm3": -1.734723475976807e-18,
+        "euler_residual_mev_fm3": 0.0,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": 1.1368683772161603e-13,
+          "mu_p_difference_mev": 0.0,
+          "nuclear_pressure_difference_mev_fm3": 2.842170943040401e-14,
+          "beta_residual_mev": -2.842170943040401e-14,
+          "charge_residual_fm3": -1.734723475976807e-18
+        },
+        "nuclear_pressure": 5.429883421658886,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.20573041619051652,
+            "epsilon": 195.92886107576172,
+            "mu_n": 989.4365558063623,
+            "mu_p": 851.5518495794089,
+            "pressure": 5.4298834216589,
+            "branch": "low",
+            "mstar_n": 711.964156598134,
+            "mstar_p": 530.3406553335636
+          },
+          "high": {
+            "n_b": 0.23508423536232692,
+            "epsilon": 225.44312325625057,
+            "mu_n": 989.4365558063622,
+            "mu_p": 851.5518495794089,
+            "pressure": 5.429883421658872,
+            "branch": "high",
+            "mstar_n": 698.1041417655836,
+            "mstar_p": 498.6172433811566
+          }
+        }
+      },
+      {
+        "n_b": 0.21911799707763707,
+        "epsilon": 210.93909114642628,
+        "pressure": 5.867464963215548,
+        "mu_n": 989.4511587417612,
+        "mu_p": 851.6922090243851,
+        "mu_e": 137.75894971737614,
+        "Y_n": 0.9337004513579237,
+        "Y_p": 0.06629954864207628,
+        "Y_e": 0.052443545581303236,
+        "Y_mu": 0.013856003060773173,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 0.45,
+        "n_low": 0.20589534429659107,
+        "n_high": 0.23527901714335991,
+        "Yp_low": 0.07800619314754594,
+        "Yp_high": 0.05377834913981759,
+        "charge_residual_fm3": -2.8189256484623115e-17,
+        "euler_residual_mev_fm3": -2.842170943040401e-14,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": 3.410605131648481e-13,
+          "mu_p_difference_mev": 1.1368683772161603e-13,
+          "nuclear_pressure_difference_mev_fm3": 1.1368683772161603e-13,
+          "beta_residual_mev": -1.1368683772161603e-13,
+          "charge_residual_fm3": -2.8189256484623115e-17
+        },
+        "nuclear_pressure": 5.434901324552982,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.20589534429659107,
+            "epsilon": 196.07592374946614,
+            "mu_n": 989.4511587417613,
+            "mu_p": 851.6922090243853,
+            "pressure": 5.434901324553039,
+            "branch": "low",
+            "mstar_n": 711.6932996156556,
+            "mstar_p": 530.2540651276371
+          },
+          "high": {
+            "n_b": 0.23527901714335991,
+            "epsilon": 225.61914224098638,
+            "mu_n": 989.451158741761,
+            "mu_p": 851.6922090243852,
+            "pressure": 5.434901324552925,
+            "branch": "high",
+            "mstar_n": 697.8245805552996,
+            "mstar_p": 498.5194842166705
+          }
+        }
+      },
+      {
+        "n_b": 0.22076653419643355,
+        "epsilon": 212.57025009447239,
+        "pressure": 5.8706593927001425,
+        "mu_n": 989.4656827506667,
+        "mu_p": 851.8320944523058,
+        "mu_e": 137.6335882983609,
+        "Y_n": 0.9344285502404149,
+        "Y_p": 0.06557144975958504,
+        "Y_e": 0.05190995685750303,
+        "Y_mu": 0.013661492902082,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 0.5,
+        "n_low": 0.2060597666562186,
+        "n_high": 0.2354733017366485,
+        "Yp_low": 0.07851075800993809,
+        "Yp_high": 0.05424842154748408,
+        "charge_residual_fm3": 2.168404344971009e-18,
+        "euler_residual_mev_fm3": 0.0,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": -1.1368683772161603e-13,
+          "mu_p_difference_mev": 0.0,
+          "nuclear_pressure_difference_mev_fm3": -8.526512829121202e-14,
+          "beta_residual_mev": -1.1368683772161603e-13,
+          "charge_residual_fm3": 2.168404344971009e-18
+        },
+        "nuclear_pressure": 5.439913706852238,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.2060597666562186,
+            "epsilon": 196.22253040043645,
+            "mu_n": 989.4656827506666,
+            "mu_p": 851.8320944523058,
+            "pressure": 5.439913706852195,
+            "branch": "low",
+            "mstar_n": 711.4232957992473,
+            "mstar_p": 530.167907299013
+          },
+          "high": {
+            "n_b": 0.2354733017366485,
+            "epsilon": 225.79469854762152,
+            "mu_n": 989.4656827506667,
+            "mu_p": 851.8320944523058,
+            "pressure": 5.4399137068522805,
+            "branch": "high",
+            "mstar_n": 697.5457049418634,
+            "mstar_p": 498.42218606583356
+          }
+        }
+      },
+      {
+        "n_b": 0.22241753684016125,
+        "epsilon": 214.20387248991318,
+        "pressure": 5.873859969713419,
+        "mu_n": 989.4801263705382,
+        "mu_p": 851.9714936409401,
+        "mu_e": 137.50863272959805,
+        "Y_n": 0.9351452897783203,
+        "Y_p": 0.0648547102216796,
+        "Y_e": 0.05138441989717112,
+        "Y_mu": 0.013470290324508504,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 0.55,
+        "n_low": 0.20622366661255329,
+        "n_high": 0.23566706702638593,
+        "Yp_low": 0.07901369386683135,
+        "Yp_high": 0.054717428598505445,
+        "charge_residual_fm3": -3.903127820947816e-18,
+        "euler_residual_mev_fm3": 0.0,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": -6.821210263296962e-13,
+          "mu_p_difference_mev": -4.547473508864641e-13,
+          "nuclear_pressure_difference_mev_fm3": -1.1368683772161603e-13,
+          "beta_residual_mev": 0.0,
+          "charge_residual_fm3": -3.903127820947816e-18
+        },
+        "nuclear_pressure": 5.444919940989706,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.2062236666125533,
+            "epsilon": 196.36866621493732,
+            "mu_n": 989.4801263705378,
+            "mu_p": 851.9714936409398,
+            "pressure": 5.444919940989649,
+            "branch": "low",
+            "mstar_n": 711.1541720856106,
+            "mstar_p": 530.0821890752302
+          },
+          "high": {
+            "n_b": 0.23566706702638593,
+            "epsilon": 225.9697723137342,
+            "mu_n": 989.4801263705385,
+            "mu_p": 851.9714936409403,
+            "pressure": 5.444919940989763,
+            "branch": "high",
+            "mstar_n": 697.2675470700667,
+            "mstar_p": 498.3253581943704
+          }
+        }
+      },
+      {
+        "n_b": 0.22407098612862597,
+        "epsilon": 215.83993958837198,
+        "pressure": 5.877066152538694,
+        "mu_n": 989.4944882048941,
+        "mu_p": 852.1103947743914,
+        "mu_e": 137.38409343050267,
+        "Y_n": 0.9358508785361218,
+        "Y_p": 0.06414912146387823,
+        "Y_e": 0.05086678723342965,
+        "Y_mu": 0.013282334230448577,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 0.6000000000000001,
+        "n_low": 0.20638702803144154,
+        "n_high": 0.2358602915267489,
+        "Yp_low": 0.07951495300017117,
+        "Yp_high": 0.05518531699166551,
+        "charge_residual_fm3": 1.3010426069826053e-18,
+        "euler_residual_mev_fm3": 0.0,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": 2.2737367544323206e-13,
+          "mu_p_difference_mev": 0.0,
+          "nuclear_pressure_difference_mev_fm3": 0.0,
+          "beta_residual_mev": -5.684341886080802e-14,
+          "charge_residual_fm3": 1.3010426069826053e-18
+        },
+        "nuclear_pressure": 5.4499194126391615,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.20638702803144154,
+            "epsilon": 196.51431684770483,
+            "mu_n": 989.4944882048942,
+            "mu_p": 852.1103947743916,
+            "pressure": 5.4499194126391615,
+            "branch": "low",
+            "mstar_n": 710.885954550952,
+            "mstar_p": 529.9969173470743
+          },
+          "high": {
+            "n_b": 0.2358602915267489,
+            "epsilon": 226.1443442511523,
+            "mu_n": 989.494488204894,
+            "mu_p": 852.1103947743916,
+            "pressure": 5.4499194126391615,
+            "branch": "high",
+            "mstar_n": 696.9901381821799,
+            "mstar_p": 498.2290094693785
+          }
+        }
+      },
+      {
+        "n_b": 0.2257268627043707,
+        "epsilon": 217.478432169551,
+        "pressure": 5.8802774063981,
+        "mu_n": 989.508766922778,
+        "mu_p": 852.2487864420088,
+        "mu_e": 137.25998048076914,
+        "Y_n": 0.9365455205638907,
+        "Y_p": 0.0634544794361093,
+        "Y_e": 0.05035691469033399,
+        "Y_mu": 0.013097564745775343,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 0.65,
+        "n_low": 0.2065498353008879,
+        "n_high": 0.23605295438316914,
+        "Yp_low": 0.08001448926389407,
+        "Yp_high": 0.055652034892342724,
+        "charge_residual_fm3": -8.239936510889834e-18,
+        "euler_residual_mev_fm3": 5.684341886080802e-14,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": 0.0,
+          "mu_p_difference_mev": 1.1368683772161603e-13,
+          "nuclear_pressure_difference_mev_fm3": 0.0,
+          "beta_residual_mev": -8.526512829121202e-14,
+          "charge_residual_fm3": -8.239936510889834e-18
+        },
+        "nuclear_pressure": 5.454911520887265,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.2065498353008879,
+            "epsilon": 196.65946842135813,
+            "mu_n": 989.508766922778,
+            "mu_p": 852.248786442009,
+            "pressure": 5.454911520887265,
+            "branch": "low",
+            "mstar_n": 710.6186684122866,
+            "mstar_p": 529.9120986720443
+          },
+          "high": {
+            "n_b": 0.23605295438316914,
+            "epsilon": 226.31839564684913,
+            "mu_n": 989.508766922778,
+            "mu_p": 852.2487864420088,
+            "pressure": 5.454911520887265,
+            "branch": "high",
+            "mstar_n": 696.713508615724,
+            "mstar_p": 498.1331483627288
+          }
+        }
+      },
+      {
+        "n_b": 0.22738514675990462,
+        "epsilon": 219.11933056425136,
+        "pressure": 5.8834932037328,
+        "mu_n": 989.5229612581691,
+        "mu_p": 852.3866576368133,
+        "mu_e": 137.13630362135575,
+        "Y_n": 0.9372294155346196,
+        "Y_p": 0.0627705844653804,
+        "Y_e": 0.04985466127920397,
+        "Y_mu": 0.012915923186176419,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 0.7000000000000001,
+        "n_low": 0.20671207332988586,
+        "n_high": 0.23624503537276978,
+        "Yp_low": 0.08051225807917281,
+        "Yp_high": 0.0561175319359003,
+        "charge_residual_fm3": 3.0357660829594124e-18,
+        "euler_residual_mev_fm3": -2.842170943040401e-14,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": -1.1368683772161603e-13,
+          "mu_p_difference_mev": 2.2737367544323206e-13,
+          "nuclear_pressure_difference_mev_fm3": 2.842170943040401e-14,
+          "beta_residual_mev": -3.410605131648481e-13,
+          "charge_residual_fm3": 3.0357660829594124e-18
+        },
+        "nuclear_pressure": 5.459895678386928,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.20671207332988584,
+            "epsilon": 196.80410752524853,
+            "mu_n": 989.5229612581691,
+            "mu_p": 852.3866576368137,
+            "pressure": 5.459895678386943,
+            "branch": "low",
+            "mstar_n": 710.352338029811,
+            "mstar_p": 529.8277392781166
+          },
+          "high": {
+            "n_b": 0.23624503537276978,
+            "epsilon": 226.491908363089,
+            "mu_n": 989.5229612581692,
+            "mu_p": 852.3866576368134,
+            "pressure": 5.459895678386914,
+            "branch": "high",
+            "mstar_n": 696.4376878025035,
+            "mstar_p": 498.0377829548495
+          }
+        }
+      },
+      {
+        "n_b": 0.22904581806458882,
+        "epsilon": 220.7626146810571,
+        "pressure": 5.886713024462977,
+        "mu_n": 989.537070009316,
+        "mu_p": 852.5239977534546,
+        "mu_e": 137.0130722558614,
+        "Y_n": 0.937902758875116,
+        "Y_p": 0.06209724112488402,
+        "Y_e": 0.04935988909974883,
+        "Y_mu": 0.012737352025135191,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 0.75,
+        "n_low": 0.2068737275465781,
+        "n_high": 0.23643651490392575,
+        "Yp_low": 0.08100821642773752,
+        "Yp_high": 0.05658175922899008,
+        "charge_residual_fm3": -1.3010426069826053e-18,
+        "euler_residual_mev_fm3": 0.0,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": -1.1368683772161603e-13,
+          "mu_p_difference_mev": 1.1368683772161603e-13,
+          "nuclear_pressure_difference_mev_fm3": -2.842170943040401e-14,
+          "beta_residual_mev": -2.2737367544323206e-13,
+          "charge_residual_fm3": -1.3010426069826053e-18
+        },
+        "nuclear_pressure": 5.464871311486505,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.2068737275465781,
+            "epsilon": 196.94822121371018,
+            "mu_n": 989.5370700093159,
+            "mu_p": 852.5239977534548,
+            "pressure": 5.46487131148649,
+            "branch": "low",
+            "mstar_n": 710.0869869103519,
+            "mstar_p": 529.7438450678444
+          },
+          "high": {
+            "n_b": 0.23643651490392573,
+            "epsilon": 226.66486483678293,
+            "mu_n": 989.537070009316,
+            "mu_p": 852.5239977534546,
+            "pressure": 5.464871311486519,
+            "branch": "high",
+            "mstar_n": 696.162704268902,
+            "mstar_p": 497.94292093893336
+          }
+        }
+      },
+      {
+        "n_b": 0.23070885599113825,
+        "epsilon": 222.4082640326398,
+        "pressure": 5.889936356227854,
+        "mu_n": 989.5510920379963,
+        "mu_p": 852.6607965857204,
+        "mu_e": 136.890295452276,
+        "Y_n": 0.9385657418908231,
+        "Y_p": 0.06143425810917693,
+        "Y_e": 0.048872463245724036,
+        "Y_mu": 0.0125617948634529,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 0.8,
+        "n_low": 0.20703478389578672,
+        "n_high": 0.2366273740149761,
+        "Yp_low": 0.08150232284337548,
+        "Yp_high": 0.05704466934884557,
+        "charge_residual_fm3": -1.734723475976807e-18,
+        "euler_residual_mev_fm3": -2.842170943040401e-14,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": 0.0,
+          "mu_p_difference_mev": 1.1368683772161603e-13,
+          "nuclear_pressure_difference_mev_fm3": 0.0,
+          "beta_residual_mev": -5.684341886080802e-14,
+          "charge_residual_fm3": -1.734723475976807e-18
+        },
+        "nuclear_pressure": 5.469837860335474,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.20703478389578672,
+            "epsilon": 197.09179700374827,
+            "mu_n": 989.5510920379963,
+            "mu_p": 852.6607965857204,
+            "pressure": 5.469837860335474,
+            "branch": "low",
+            "mstar_n": 709.8226377118307,
+            "mstar_p": 529.6604216227653
+          },
+          "high": {
+            "n_b": 0.2366273740149761,
+            "epsilon": 226.8372480780781,
+            "mu_n": 989.5510920379963,
+            "mu_p": 852.6607965857203,
+            "pressure": 5.469837860335474,
+            "branch": "high",
+            "mstar_n": 695.8885856373945,
+            "mstar_p": 497.84856962554585
+          }
+        }
+      },
+      {
+        "n_b": 0.23237423954175399,
+        "epsilon": 224.05625776170115,
+        "pressure": 5.893162694610147,
+        "mu_n": 989.5650262687273,
+        "mu_p": 852.7970443236253,
+        "mu_e": 136.76798194510192,
+        "Y_n": 0.939218551884899,
+        "Y_p": 0.060781448115100965,
+        "Y_e": 0.04839225171487904,
+        "Y_mu": 0.012389196400221977,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 0.8500000000000001,
+        "n_low": 0.2071952288359761,
+        "n_high": 0.23681759437218539,
+        "Yp_low": 0.08199453740170531,
+        "Yp_high": 0.05750621634066442,
+        "charge_residual_fm3": -1.1275702593849246e-17,
+        "euler_residual_mev_fm3": 0.0,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": 1.1368683772161603e-13,
+          "mu_p_difference_mev": 1.1368683772161603e-13,
+          "nuclear_pressure_difference_mev_fm3": -2.842170943040401e-14,
+          "beta_residual_mev": -8.526512829121202e-14,
+          "charge_residual_fm3": -1.1275702593849246e-17
+        },
+        "nuclear_pressure": 5.47479477897123,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.20719522883597613,
+            "epsilon": 197.2348228722253,
+            "mu_n": 989.5650262687273,
+            "mu_p": 852.7970443236254,
+            "pressure": 5.474794778971216,
+            "branch": "low",
+            "mstar_n": 709.5593122486675,
+            "mstar_p": 529.577474208058
+          },
+          "high": {
+            "n_b": 0.23681759437218539,
+            "epsilon": 227.0090416682744,
+            "mu_n": 989.5650262687271,
+            "mu_p": 852.7970443236253,
+            "pressure": 5.474794778971244,
+            "branch": "high",
+            "mstar_n": 695.615358629184,
+            "mstar_p": 497.7547359475614
+          }
+        }
+      },
+      {
+        "n_b": 0.23404194737372885,
+        "epsilon": 225.70657466639452,
+        "pressure": 5.896391543335747,
+        "mu_n": 989.5788716878865,
+        "mu_p": 852.9327315500939,
+        "mu_e": 136.64614013779263,
+        "Y_n": 0.9398613722719076,
+        "Y_p": 0.060138627728092434,
+        "Y_e": 0.0479191253229509,
+        "Y_mu": 0.012219502405141506,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 0.9,
+        "n_low": 0.20735504933558616,
+        "n_high": 0.2370071582668558,
+        "Yp_low": 0.08248482170829616,
+        "Yp_high": 0.05796635571313565,
+        "charge_residual_fm3": 6.5052130349130266e-18,
+        "euler_residual_mev_fm3": -5.684341886080802e-14,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": 1.1368683772161603e-13,
+          "mu_p_difference_mev": 2.2737367544323206e-13,
+          "nuclear_pressure_difference_mev_fm3": 5.684341886080802e-14,
+          "beta_residual_mev": -2.842170943040401e-14,
+          "charge_residual_fm3": 6.5052130349130266e-18
+        },
+        "nuclear_pressure": 5.4797415353786505,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.20735504933558616,
+            "epsilon": 197.3772872524808,
+            "mu_n": 989.5788716878865,
+            "mu_p": 852.9327315500939,
+            "pressure": 5.479741535378679,
+            "branch": "low",
+            "mstar_n": 709.297031498152,
+            "mstar_p": 529.4950077775239
+          },
+          "high": {
+            "n_b": 0.23700715826685578,
+            "epsilon": 227.18022975697005,
+            "mu_n": 989.5788716878864,
+            "mu_p": 852.9327315500936,
+            "pressure": 5.479741535378622,
+            "branch": "high",
+            "mstar_n": 695.3430490680025,
+            "mstar_p": 497.6614264655127
+          }
+        }
+      },
+      {
+        "n_b": 0.23571195782471605,
+        "epsilon": 227.35919322541608,
+        "pressure": 5.899622414465113,
+        "mu_n": 989.592627342822,
+        "mu_p": 853.0678492372718,
+        "mu_e": 136.52477810555015,
+        "Y_n": 0.9404943826863847,
+        "Y_p": 0.059505617313615304,
+        "Y_e": 0.047452957621498204,
+        "Y_mu": 0.012052659692117126,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 0.9500000000000001,
+        "n_low": 0.20751423286893708,
+        "n_high": 0.2371960486118623,
+        "Yp_low": 0.0829731388852592,
+        "Yp_high": 0.058425044432242855,
+        "charge_residual_fm3": -6.5052130349130266e-18,
+        "euler_residual_mev_fm3": 0.0,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": 1.0231815394945443e-12,
+          "mu_p_difference_mev": -1.1368683772161603e-13,
+          "nuclear_pressure_difference_mev_fm3": 2.8421709430404007e-13,
+          "beta_residual_mev": 5.400124791776761e-13,
+          "charge_residual_fm3": -6.5052130349130266e-18
+        },
+        "nuclear_pressure": 5.484677611538501,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.20751423286893708,
+            "epsilon": 197.51917903057932,
+            "mu_n": 989.5926273428224,
+            "mu_p": 853.0678492372717,
+            "pressure": 5.484677611538643,
+            "branch": "low",
+            "mstar_n": 709.0358156075882,
+            "mstar_p": 529.4130269786993
+          },
+          "high": {
+            "n_b": 0.2371960486118623,
+            "epsilon": 227.3507970586989,
+            "mu_n": 989.5926273428214,
+            "mu_p": 853.0678492372718,
+            "pressure": 5.484677611538359,
+            "branch": "high",
+            "mstar_n": 695.0716818848548,
+            "mstar_p": 497.56864737313015
+          }
+        }
+      },
+      {
+        "n_b": 0.2373842489373486,
+        "epsilon": 229.01409162245344,
+        "pressure": 5.902854828556434,
+        "mu_n": 989.6062923408623,
+        "mu_p": 853.2023887424746,
+        "mu_e": 136.40390359838776,
+        "Y_n": 0.9411177590866254,
+        "Y_p": 0.05888224091337462,
+        "Y_e": 0.046993624819346005,
+        "Y_mu": 0.011888616094028677,
+        "mstar_n": null,
+        "mstar_p": null,
+        "branch": "gibbs_mixed",
+        "species": "npemu",
+        "high_phase_volume_fraction": 1.0,
+        "n_low": 0.20767276741150792,
+        "n_high": 0.2373842489373486,
+        "Yp_low": 0.08345945355636811,
+        "Yp_high": 0.05888224091337462,
+        "charge_residual_fm3": -1.431146867680866e-17,
+        "euler_residual_mev_fm3": 2.842170943040401e-14,
+        "gibbs_residuals": {
+          "mu_n_difference_mev": -2.2737367544323206e-13,
+          "mu_p_difference_mev": -2.2737367544323206e-13,
+          "nuclear_pressure_difference_mev_fm3": -5.684341886080802e-14,
+          "beta_residual_mev": -2.5579538487363607e-13,
+          "charge_residual_fm3": -1.431146867680866e-17
+        },
+        "nuclear_pressure": 5.48960250344615,
+        "nuclear_phase_states": {
+          "low": {
+            "n_b": 0.20767276741150792,
+            "epsilon": 197.6604875409908,
+            "mu_n": 989.6062923408622,
+            "mu_p": 853.2023887424747,
+            "pressure": 5.489602503446122,
+            "branch": "low",
+            "mstar_n": 708.7756839023497,
+            "mstar_p": 529.3315361583085
+          },
+          "high": {
+            "n_b": 0.23738424893734864,
+            "epsilon": 227.52072884880215,
+            "mu_n": 989.6062923408624,
+            "mu_p": 853.2023887424749,
+            "pressure": 5.489602503446179,
+            "branch": "high",
+            "mstar_n": 694.8012811238698,
+            "mstar_p": 497.476404503302
+          }
+        }
+      }
+    ],
+    "sampled_tangent_plane": {
+      "n_interval_fm3": [
+        0.08,
+        1.34
+      ],
+      "n_points": 101,
+      "Yp_interval": [
+        0.0,
+        0.5
+      ],
+      "Yp_points": 51,
+      "branches": [
+        "low",
+        "high"
+      ],
+      "endpoint_count": 2,
+      "minimum_excess_mev_fm3": 0.0005547399758238925,
+      "status": "SAMPLED_MINORANT"
+    },
+    "global_phase_minimum_status": "NOT_PROVEN",
+    "source_phase_prescription": {
+      "url": "https://compose.obspm.fr/download/1D/NS/Classical/APR/eos.pdf",
+      "date": "2025-03-14",
+      "pdf_sha256": "f4d5f27e88d9f5752a95c39062f487cbe762e2e28aa7ee7f889196c26dd612af",
+      "phase_description": "inhomogeneous mixed phase with a Gibbs construction",
+      "provider_thermo_sha256": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a",
+      "provider_thermo_identity": "downloaded current file byte-identical to repository APR_APR/eos.thermo"
+    },
+    "finite_size_terms": "surface and Coulomb energies omitted; bulk Gibbs limit"
+  },
+  "provider_phase_evidence": {
+    "url": "https://compose.obspm.fr/download/1D/NS/Classical/APR/eos.pdf",
+    "date": "2025-03-14",
+    "pdf_sha256": "f4d5f27e88d9f5752a95c39062f487cbe762e2e28aa7ee7f889196c26dd612af",
+    "phase_description": "inhomogeneous mixed phase with a Gibbs construction",
+    "provider_thermo_sha256": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a",
+    "provider_thermo_identity": "downloaded current file byte-identical to repository APR_APR/eos.thermo"
+  },
+  "runs": {
+    "low_branch": {
+      "points": 103,
+      "native_composition_readback": "passed",
+      "max_charge_residual_fm3": 1.0186296250935811e-14,
+      "max_euler_residual_mev_fm3": 3.183231456205249e-12
+    },
+    "high_branch": {
+      "points": 103,
+      "native_composition_readback": "passed",
+      "max_charge_residual_fm3": 8.826273045769994e-15,
+      "max_euler_residual_mev_fm3": 2.7284841053187847e-12
+    },
+    "local_neutral_Maxwell": {
+      "points": 98,
+      "native_composition_readback": "passed",
+      "max_charge_residual_fm3": 8.826273045769994e-15,
+      "max_euler_residual_mev_fm3": 2.7284841053187847e-12
+    },
+    "bulk_Gibbs": {
+      "points": 124,
+      "native_composition_readback": "passed",
+      "max_charge_residual_fm3": 8.826273045769994e-15,
+      "max_euler_residual_mev_fm3": 2.7284841053187847e-12
+    },
+    "sampled_causal_Maxwell": {
+      "points": 74,
+      "native_composition_readback": "passed",
+      "max_charge_residual_fm3": 1.6306400674181987e-15,
+      "max_euler_residual_mev_fm3": 5.684341886080801e-13
+    },
+    "sampled_causal_Gibbs": {
+      "points": 100,
+      "native_composition_readback": "passed",
+      "max_charge_residual_fm3": 1.6306400674181987e-15,
+      "max_euler_residual_mev_fm3": 5.684341886080801e-13
+    }
+  },
+  "causality_crossing_refinement": {
+    "low": {
+      "method": "central thermodynamic derivative on beta-minimized homogeneous branch; one-sided at computational limits",
+      "density_scan_fm3": [
+        0.085,
+        1.34
+      ],
+      "refinements": [
+        {
+          "relative_density_difference_step": 0.0001,
+          "cs2_equal_1_roots_fm3": [
+            0.9047944791427155
+          ]
+        },
+        {
+          "relative_density_difference_step": 3e-05,
+          "cs2_equal_1_roots_fm3": [
+            0.9047944805709903
+          ]
+        },
+        {
+          "relative_density_difference_step": 1e-05,
+          "cs2_equal_1_roots_fm3": [
+            0.9047944806853248
+          ]
+        }
+      ],
+      "meaning": "model-functional crossing; not empirical validity endpoint"
+    },
+    "high": {
+      "method": "central thermodynamic derivative on beta-minimized homogeneous branch; one-sided at computational limits",
+      "density_scan_fm3": [
+        0.085,
+        1.34
+      ],
+      "refinements": [
+        {
+          "relative_density_difference_step": 0.0001,
+          "cs2_equal_1_roots_fm3": [
+            0.8689531503126885
+          ]
+        },
+        {
+          "relative_density_difference_step": 3e-05,
+          "cs2_equal_1_roots_fm3": [
+            0.8689531514903457
+          ]
+        },
+        {
+          "relative_density_difference_step": 1e-05,
+          "cs2_equal_1_roots_fm3": [
+            0.8689531515847208
+          ]
+        }
+      ],
+      "meaning": "model-functional crossing; not empirical validity endpoint"
+    }
+  },
+  "source_comparison": [
+    {
+      "source_row_1based": 70,
+      "n_b_fm3": 0.085,
+      "provider_pressure_mev_fm3": 0.4485585808088097,
+      "provider_epsilon_mev_fm3": 80.75641520981695,
+      "provider_mu_b_mev": 955.3526328308913,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.07101253727815227,
+        "epsilon_relative_difference": -0.0014634547843292989,
+        "mu_b_difference_mev": -1.0156479913290468,
+        "generated_Yp": 0.03340279217633191
+      },
+      "high": {
+        "P_relative_difference": 0.21437078166357226,
+        "epsilon_relative_difference": 0.0020985961151509525,
+        "mu_b_difference_mev": 3.1250935626198952,
+        "generated_Yp": 0.027705028933266658
+      },
+      "maxwell": {
+        "P_relative_difference": 0.07101253727815227,
+        "epsilon_relative_difference": -0.0014634547843292989,
+        "mu_b_difference_mev": -1.0156479913290468,
+        "generated_Yp": 0.03340279217633191
+      },
+      "gibbs": {
+        "P_relative_difference": 0.07101253727815227,
+        "epsilon_relative_difference": -0.0014634547843292989,
+        "mu_b_difference_mev": -1.0156479913290468,
+        "generated_Yp": 0.03340279217633191
+      }
+    },
+    {
+      "source_row_1based": 71,
+      "n_b_fm3": 0.09,
+      "provider_pressure_mev_fm3": 0.5007251192534371,
+      "provider_epsilon_mev_fm3": 85.53466994509459,
+      "provider_mu_b_mev": 955.9488340483114,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.10774201929861338,
+        "epsilon_relative_difference": -0.001433983534560035,
+        "mu_b_difference_mev": -0.7634019208154541,
+        "generated_Yp": 0.03527656150782373
+      },
+      "high": {
+        "P_relative_difference": 0.20038926072932162,
+        "epsilon_relative_difference": 0.002165357138052215,
+        "mu_b_difference_mev": 3.1728116065818313,
+        "generated_Yp": 0.02913321092286647
+      },
+      "maxwell": {
+        "P_relative_difference": 0.10774201929861338,
+        "epsilon_relative_difference": -0.001433983534560035,
+        "mu_b_difference_mev": -0.7634019208154541,
+        "generated_Yp": 0.03527656150782373
+      },
+      "gibbs": {
+        "P_relative_difference": 0.10774201929861338,
+        "epsilon_relative_difference": -0.001433983534560035,
+        "mu_b_difference_mev": -0.7634019208154541,
+        "generated_Yp": 0.03527656150782373
+      }
+    },
+    {
+      "source_row_1based": 72,
+      "n_b_fm3": 0.095,
+      "provider_pressure_mev_fm3": 0.557560306986959,
+      "provider_epsilon_mev_fm3": 90.31595036508135,
+      "provider_mu_b_mev": 956.5632702322979,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.14506153504022867,
+        "epsilon_relative_difference": -0.001392548824468376,
+        "mu_b_difference_mev": -0.4725138579220811,
+        "generated_Yp": 0.0370730719002811
+      },
+      "high": {
+        "P_relative_difference": 0.18740442641358213,
+        "epsilon_relative_difference": 0.0022275348301601383,
+        "mu_b_difference_mev": 3.2175915229381644,
+        "generated_Yp": 0.03048437923253652
+      },
+      "maxwell": {
+        "P_relative_difference": 0.14506153504022867,
+        "epsilon_relative_difference": -0.001392548824468376,
+        "mu_b_difference_mev": -0.4725138579220811,
+        "generated_Yp": 0.0370730719002811
+      },
+      "gibbs": {
+        "P_relative_difference": 0.14506153504022867,
+        "epsilon_relative_difference": -0.001392548824468376,
+        "mu_b_difference_mev": -0.4725138579220811,
+        "generated_Yp": 0.0370730719002811
+      }
+    },
+    {
+      "source_row_1based": 73,
+      "n_b_fm3": 0.1,
+      "provider_pressure_mev_fm3": 0.6194885666720024,
+      "provider_epsilon_mev_fm3": 95.10035387782216,
+      "provider_mu_b_mev": 957.1984244449415,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.18235514401835173,
+        "epsilon_relative_difference": -0.00133894200732243,
+        "mu_b_difference_mev": -0.1436693192504208,
+        "generated_Yp": 0.038792432956292075
+      },
+      "high": {
+        "P_relative_difference": 0.17534440339593305,
+        "epsilon_relative_difference": 0.0022856725241189313,
+        "mu_b_difference_mev": 3.259921190262162,
+        "generated_Yp": 0.031759277010733264
+      },
+      "maxwell": {
+        "P_relative_difference": 0.18235514401835173,
+        "epsilon_relative_difference": -0.00133894200732243,
+        "mu_b_difference_mev": -0.1436693192504208,
+        "generated_Yp": 0.038792432956292075
+      },
+      "gibbs": {
+        "P_relative_difference": 0.18235514401835173,
+        "epsilon_relative_difference": -0.00133894200732243,
+        "mu_b_difference_mev": -0.1436693192504208,
+        "generated_Yp": 0.038792432956292075
+      }
+    },
+    {
+      "source_row_1based": 74,
+      "n_b_fm3": 0.105,
+      "provider_pressure_mev_fm3": 0.6868781473834934,
+      "provider_epsilon_mev_fm3": 99.88798805428553,
+      "provider_mu_b_mev": 957.8558685873243,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.2191940174740803,
+        "epsilon_relative_difference": -0.001273021233629379,
+        "mu_b_difference_mev": 0.22285762726176017,
+        "generated_Yp": 0.04043582695329492
+      },
+      "high": {
+        "P_relative_difference": 0.1642405598754766,
+        "epsilon_relative_difference": 0.002340244490573573,
+        "mu_b_difference_mev": 3.3007196686761517,
+        "generated_Yp": 0.0329595778361537
+      },
+      "maxwell": {
+        "P_relative_difference": 0.2191940174740803,
+        "epsilon_relative_difference": -0.001273021233629379,
+        "mu_b_difference_mev": 0.22285762726176017,
+        "generated_Yp": 0.04043582695329492
+      },
+      "gibbs": {
+        "P_relative_difference": 0.2191940174740803,
+        "epsilon_relative_difference": -0.001273021233629379,
+        "mu_b_difference_mev": 0.22285762726176017,
+        "generated_Yp": 0.04043582695329492
+      }
+    },
+    {
+      "source_row_1based": 75,
+      "n_b_fm3": 0.11,
+      "provider_pressure_mev_fm3": 0.7600910566866136,
+      "provider_epsilon_mev_fm3": 104.6789676306357,
+      "provider_mu_b_mev": 958.5368971574756,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.25521627893249255,
+        "epsilon_relative_difference": -0.0011946903666141262,
+        "mu_b_difference_mev": 0.6266241538362465,
+        "generated_Yp": 0.042005331410644775
+      },
+      "high": {
+        "P_relative_difference": 0.15409356140798058,
+        "epsilon_relative_difference": 0.0023916787254520955,
+        "mu_b_difference_mev": 3.3407599800335674,
+        "generated_Yp": 0.03408773088101194
+      },
+      "maxwell": {
+        "P_relative_difference": 0.25521627893249255,
+        "epsilon_relative_difference": -0.0011946903666141262,
+        "mu_b_difference_mev": 0.6266241538362465,
+        "generated_Yp": 0.042005331410644775
+      },
+      "gibbs": {
+        "P_relative_difference": 0.25521627893249255,
+        "epsilon_relative_difference": -0.0011946903666141262,
+        "mu_b_difference_mev": 0.6266241538362465,
+        "generated_Yp": 0.042005331410644775
+      }
+    },
+    {
+      "source_row_1based": 76,
+      "n_b_fm3": 0.115,
+      "provider_pressure_mev_fm3": 0.8396078908316904,
+      "provider_epsilon_mev_fm3": 109.47341596884989,
+      "provider_mu_b_mev": 959.2436857363615,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.2899331019825331,
+        "epsilon_relative_difference": -0.0011039216535895235,
+        "mu_b_difference_mev": 1.0659134422384113,
+        "generated_Yp": 0.04350375803988628
+      },
+      "high": {
+        "P_relative_difference": 0.14470818850460598,
+        "epsilon_relative_difference": 0.0024403354971120894,
+        "mu_b_difference_mev": 3.3795652166551235,
+        "generated_Yp": 0.03514681958491496
+      },
+      "maxwell": {
+        "P_relative_difference": 0.2899331019825331,
+        "epsilon_relative_difference": -0.0011039216535895235,
+        "mu_b_difference_mev": 1.0659134422384113,
+        "generated_Yp": 0.04350375803988628
+      },
+      "gibbs": {
+        "P_relative_difference": 0.2899331019825331,
+        "epsilon_relative_difference": -0.0011039216535895235,
+        "mu_b_difference_mev": 1.0659134422384113,
+        "generated_Yp": 0.04350375803988628
+      }
+    },
+    {
+      "source_row_1based": 77,
+      "n_b_fm3": 0.12,
+      "provider_pressure_mev_fm3": 0.9257407253059495,
+      "provider_epsilon_mev_fm3": 114.27146310027284,
+      "provider_mu_b_mev": 959.9766985464898,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.3217697109254969,
+        "epsilon_relative_difference": -0.0010008454835178648,
+        "mu_b_difference_mev": 1.5292270652897741,
+        "generated_Yp": 0.04506584493300416
+      },
+      "high": {
+        "P_relative_difference": 0.13613716929293362,
+        "epsilon_relative_difference": 0.0024865236304654204,
+        "mu_b_difference_mev": 3.418053459408611,
+        "generated_Yp": 0.036140433283419746
+      },
+      "maxwell": {
+        "P_relative_difference": 0.3217697109254969,
+        "epsilon_relative_difference": -0.0010008454835178648,
+        "mu_b_difference_mev": 1.5292270652897741,
+        "generated_Yp": 0.04506584493300416
+      },
+      "gibbs": {
+        "P_relative_difference": 0.3217697109254969,
+        "epsilon_relative_difference": -0.0010008454835178648,
+        "mu_b_difference_mev": 1.5292270652897741,
+        "generated_Yp": 0.04506584493300416
+      }
+    },
+    {
+      "source_row_1based": 78,
+      "n_b_fm3": 0.125,
+      "provider_pressure_mev_fm3": 1.0189264657915065,
+      "provider_epsilon_mev_fm3": 119.0732437295957,
+      "provider_mu_b_mev": 960.7373615630978,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.3486250908795758,
+        "epsilon_relative_difference": -0.0008865639209302278,
+        "mu_b_difference_mev": 1.9972583191789681,
+        "generated_Yp": 0.046893418875471
+      },
+      "high": {
+        "P_relative_difference": 0.12824542429318875,
+        "epsilon_relative_difference": 0.002530515366786501,
+        "mu_b_difference_mev": 3.455914639678781,
+        "generated_Yp": 0.03707255119437727
+      },
+      "maxwell": {
+        "P_relative_difference": 0.3486250908795758,
+        "epsilon_relative_difference": -0.0008865639209302278,
+        "mu_b_difference_mev": 1.9972583191789681,
+        "generated_Yp": 0.046893418875471
+      },
+      "gibbs": {
+        "P_relative_difference": 0.3486250908795758,
+        "epsilon_relative_difference": -0.0008865639209302278,
+        "mu_b_difference_mev": 1.9972583191789681,
+        "generated_Yp": 0.046893418875471
+      }
+    },
+    {
+      "source_row_1based": 79,
+      "n_b_fm3": 0.13,
+      "provider_pressure_mev_fm3": 1.1195396028730322,
+      "provider_epsilon_mev_fm3": 123.87889807285484,
+      "provider_mu_b_mev": 961.5264436594454,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.372950488913544,
+        "epsilon_relative_difference": -0.0007618310762937952,
+        "mu_b_difference_mev": 2.48583113846621,
+        "generated_Yp": 0.0487805782540949
+      },
+      "high": {
+        "P_relative_difference": 0.12098089883791507,
+        "epsilon_relative_difference": 0.0025725368097846424,
+        "mu_b_difference_mev": 3.4932764052936136,
+        "generated_Yp": 0.03794743814639045
+      },
+      "maxwell": {
+        "P_relative_difference": 0.372950488913544,
+        "epsilon_relative_difference": -0.0007618310762937952,
+        "mu_b_difference_mev": 2.48583113846621,
+        "generated_Yp": 0.0487805782540949
+      },
+      "gibbs": {
+        "P_relative_difference": 0.372950488913544,
+        "epsilon_relative_difference": -0.0007618310762937952,
+        "mu_b_difference_mev": 2.48583113846621,
+        "generated_Yp": 0.0487805782540949
+      }
+    },
+    {
+      "source_row_1based": 80,
+      "n_b_fm3": 0.135,
+      "provider_pressure_mev_fm3": 1.2279546271351975,
+      "provider_epsilon_mev_fm3": 128.68856997052288,
+      "provider_mu_b_mev": 962.3446266493194,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.39537338655350096,
+        "epsilon_relative_difference": -0.0006269435333924323,
+        "mu_b_difference_mev": 2.998667501480668,
+        "generated_Yp": 0.05066983395356614
+      },
+      "high": {
+        "P_relative_difference": 0.11417224030623307,
+        "epsilon_relative_difference": 0.002612780854591712,
+        "mu_b_difference_mev": 3.5291360192458114,
+        "generated_Yp": 0.038783853914194
+      },
+      "maxwell": {
+        "P_relative_difference": 0.39537338655350096,
+        "epsilon_relative_difference": -0.0006269435333924323,
+        "mu_b_difference_mev": 2.998667501480668,
+        "generated_Yp": 0.05066983395356614
+      },
+      "gibbs": {
+        "P_relative_difference": 0.39537338655350096,
+        "epsilon_relative_difference": -0.0006269435333924323,
+        "mu_b_difference_mev": 2.998667501480668,
+        "generated_Yp": 0.05066983395356614
+      }
+    },
+    {
+      "source_row_1based": 81,
+      "n_b_fm3": 0.14,
+      "provider_pressure_mev_fm3": 1.3446708593575631,
+      "provider_epsilon_mev_fm3": 133.50240871322828,
+      "provider_mu_b_mev": 963.1934255184701,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.41600253399976395,
+        "epsilon_relative_difference": -0.00048209429976875384,
+        "mu_b_difference_mev": 3.5358981045881137,
+        "generated_Yp": 0.05253621155996859
+      },
+      "high": {
+        "P_relative_difference": 0.1061222888920137,
+        "epsilon_relative_difference": 0.0026510790454625788,
+        "mu_b_difference_mev": 3.5473213404272883,
+        "generated_Yp": 0.039793302661383735
+      },
+      "maxwell": {
+        "P_relative_difference": 0.41600253399976395,
+        "epsilon_relative_difference": -0.00048209429976875384,
+        "mu_b_difference_mev": 3.5358981045881137,
+        "generated_Yp": 0.05253621155996859
+      },
+      "gibbs": {
+        "P_relative_difference": 0.41600253399976395,
+        "epsilon_relative_difference": -0.00048209429976875384,
+        "mu_b_difference_mev": 3.5358981045881137,
+        "generated_Yp": 0.05253621155996859
+      }
+    },
+    {
+      "source_row_1based": 82,
+      "n_b_fm3": 0.145,
+      "provider_pressure_mev_fm3": 1.4700003750273545,
+      "provider_epsilon_mev_fm3": 138.32056754657904,
+      "provider_mu_b_mev": 964.0728822179752,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.4350329746273367,
+        "epsilon_relative_difference": -0.0003274441906593317,
+        "mu_b_difference_mev": 4.097974962480407,
+        "generated_Yp": 0.05436756631256403
+      },
+      "high": {
+        "P_relative_difference": 0.0979454641411388,
+        "epsilon_relative_difference": 0.0026871001770283343,
+        "mu_b_difference_mev": 3.556283383177629,
+        "generated_Yp": 0.0408661338378125
+      },
+      "maxwell": {
+        "P_relative_difference": 0.4350329746273367,
+        "epsilon_relative_difference": -0.0003274441906593317,
+        "mu_b_difference_mev": 4.097974962480407,
+        "generated_Yp": 0.05436756631256403
+      },
+      "gibbs": {
+        "P_relative_difference": 0.4350329746273367,
+        "epsilon_relative_difference": -0.0003274441906593317,
+        "mu_b_difference_mev": 4.097974962480407,
+        "generated_Yp": 0.05436756631256403
+      }
+    },
+    {
+      "source_row_1based": 83,
+      "n_b_fm3": 0.15,
+      "provider_pressure_mev_fm3": 1.6043176647292425,
+      "provider_epsilon_mev_fm3": 143.14320094791447,
+      "provider_mu_b_mev": 964.9834574176248,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.4525272600960848,
+        "epsilon_relative_difference": -0.0001631381075168914,
+        "mu_b_difference_mev": 4.684302441580826,
+        "generated_Yp": 0.05615836257912593
+      },
+      "high": {
+        "P_relative_difference": 0.09008376502006143,
+        "epsilon_relative_difference": 0.0027208276489378846,
+        "mu_b_difference_mev": 3.55993969615713,
+        "generated_Yp": 0.0419504627321123
+      },
+      "maxwell": {
+        "P_relative_difference": 0.4525272600960848,
+        "epsilon_relative_difference": -0.0001631381075168914,
+        "mu_b_difference_mev": 4.684302441580826,
+        "generated_Yp": 0.05615836257912593
+      },
+      "gibbs": {
+        "P_relative_difference": 0.4525272600960848,
+        "epsilon_relative_difference": -0.0001631381075168914,
+        "mu_b_difference_mev": 4.684302441580826,
+        "generated_Yp": 0.05615836257912593
+      }
+    },
+    {
+      "source_row_1based": 84,
+      "n_b_fm3": 0.155,
+      "provider_pressure_mev_fm3": 1.7481220492427878,
+      "provider_epsilon_mev_fm3": 147.9704675931078,
+      "provider_mu_b_mev": 965.9263847893588,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.46842218524005275,
+        "epsilon_relative_difference": 1.0655683235771818e-05,
+        "mu_b_difference_mev": 5.293134689054796,
+        "generated_Yp": 0.05790687193471006
+      },
+      "high": {
+        "P_relative_difference": 0.08259480381409068,
+        "epsilon_relative_difference": 0.0027523158930189418,
+        "mu_b_difference_mev": 3.5590146280916315,
+        "generated_Yp": 0.04302747440038025
+      },
+      "maxwell": {
+        "P_relative_difference": 0.46842218524005275,
+        "epsilon_relative_difference": 1.0655683235771818e-05,
+        "mu_b_difference_mev": 5.293134689054796,
+        "generated_Yp": 0.05790687193471006
+      },
+      "gibbs": {
+        "P_relative_difference": 0.46842218524005275,
+        "epsilon_relative_difference": 1.0655683235771818e-05,
+        "mu_b_difference_mev": 5.293134689054796,
+        "generated_Yp": 0.05790687193471006
+      }
+    },
+    {
+      "source_row_1based": 85,
+      "n_b_fm3": 0.16,
+      "provider_pressure_mev_fm3": 1.9016631889577715,
+      "provider_epsilon_mev_fm3": 152.80252814233882,
+      "provider_mu_b_mev": 966.9011958206037,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.48287506359734444,
+        "epsilon_relative_difference": 0.00019375392284626258,
+        "mu_b_difference_mev": 5.9241988909817564,
+        "generated_Yp": 0.059613672679145746
+      },
+      "high": {
+        "P_relative_difference": 0.07560865918946669,
+        "epsilon_relative_difference": 0.002781649339381964,
+        "mu_b_difference_mev": 3.5551578463131364,
+        "generated_Yp": 0.044088702207138925
+      },
+      "maxwell": {
+        "P_relative_difference": 0.48287506359734444,
+        "epsilon_relative_difference": 0.00019375392284626258,
+        "mu_b_difference_mev": 5.9241988909817564,
+        "generated_Yp": 0.059613672679145746
+      },
+      "gibbs": {
+        "P_relative_difference": 0.48287506359734444,
+        "epsilon_relative_difference": 0.00019375392284626258,
+        "mu_b_difference_mev": 5.9241988909817564,
+        "generated_Yp": 0.059613672679145746
+      }
+    },
+    {
+      "source_row_1based": 86,
+      "n_b_fm3": 0.165,
+      "provider_pressure_mev_fm3": 2.0653155744588636,
+      "provider_epsilon_mev_fm3": 157.63954289987896,
+      "provider_mu_b_mev": 967.908233177805,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.49592522222640634,
+        "epsilon_relative_difference": 0.0003859698373347431,
+        "mu_b_difference_mev": 6.576279963404545,
+        "generated_Yp": 0.06128075867064576
+      },
+      "high": {
+        "P_relative_difference": 0.06912181927051764,
+        "epsilon_relative_difference": 0.0028089355089639945,
+        "mu_b_difference_mev": 3.5488344214707013,
+        "generated_Yp": 0.045130599494913715
+      },
+      "maxwell": {
+        "P_relative_difference": 0.49592522222640634,
+        "epsilon_relative_difference": 0.0003859698373347431,
+        "mu_b_difference_mev": 6.576279963404545,
+        "generated_Yp": 0.06128075867064576
+      },
+      "gibbs": {
+        "P_relative_difference": 0.49592522222640634,
+        "epsilon_relative_difference": 0.0003859698373347431,
+        "mu_b_difference_mev": 6.576279963404545,
+        "generated_Yp": 0.06128075867064576
+      }
+    },
+    {
+      "source_row_1based": 87,
+      "n_b_fm3": 0.17,
+      "provider_pressure_mev_fm3": 2.239703356720516,
+      "provider_epsilon_mev_fm3": 162.48167746838394,
+      "provider_mu_b_mev": 968.9492989712026,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.5074511587683046,
+        "epsilon_relative_difference": 0.0005870759023771654,
+        "mu_b_difference_mev": 7.24664200637983,
+        "generated_Yp": 0.06291097325953576
+      },
+      "high": {
+        "P_relative_difference": 0.06299473080883233,
+        "epsilon_relative_difference": 0.0028342581571898506,
+        "mu_b_difference_mev": 3.5388501753346873,
+        "generated_Yp": 0.04615231862325963
+      },
+      "maxwell": {
+        "P_relative_difference": 0.5074511587683046,
+        "epsilon_relative_difference": 0.0005870759023771654,
+        "mu_b_difference_mev": 7.24664200637983,
+        "generated_Yp": 0.06291097325953576
+      },
+      "gibbs": {
+        "P_relative_difference": 0.5074511587683046,
+        "epsilon_relative_difference": 0.0005870759023771654,
+        "mu_b_difference_mev": 7.24664200637983,
+        "generated_Yp": 0.06291097325953576
+      }
+    },
+    {
+      "source_row_1based": 88,
+      "n_b_fm3": 0.175,
+      "provider_pressure_mev_fm3": 2.425013781035063,
+      "provider_epsilon_mev_fm3": 167.32909985176764,
+      "provider_mu_b_mev": 970.0235064731585,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.5176600537517873,
+        "epsilon_relative_difference": 0.0007968259845470005,
+        "mu_b_difference_mev": 7.935228222698129,
+        "generated_Yp": 0.06450763321528155
+      },
+      "high": {
+        "P_relative_difference": 0.057310456360614825,
+        "epsilon_relative_difference": 0.0028576936219313342,
+        "mu_b_difference_mev": 3.526593987895808,
+        "generated_Yp": 0.0471545810826872
+      },
+      "maxwell": {
+        "P_relative_difference": 0.5176600537517873,
+        "epsilon_relative_difference": 0.0007968259845470005,
+        "mu_b_difference_mev": 7.935228222698129,
+        "generated_Yp": 0.06450763321528155
+      },
+      "gibbs": {
+        "P_relative_difference": 0.5176600537517873,
+        "epsilon_relative_difference": 0.0007968259845470005,
+        "mu_b_difference_mev": 7.935228222698129,
+        "generated_Yp": 0.06450763321528155
+      }
+    },
+    {
+      "source_row_1based": 89,
+      "n_b_fm3": 0.18,
+      "provider_pressure_mev_fm3": 2.621746168182066,
+      "provider_epsilon_mev_fm3": 172.1819781201406,
+      "provider_mu_b_mev": 971.1318016017929,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.5265468806865119,
+        "epsilon_relative_difference": 0.0010149718180860745,
+        "mu_b_difference_mev": 8.640178456568151,
+        "generated_Yp": 0.06607427143207155
+      },
+      "high": {
+        "P_relative_difference": 0.05199424981171119,
+        "epsilon_relative_difference": 0.0028793232878487895,
+        "mu_b_difference_mev": 3.511573914225096,
+        "generated_Yp": 0.048139027703695846
+      },
+      "maxwell": {
+        "P_relative_difference": 0.5265468806865119,
+        "epsilon_relative_difference": 0.0010149718180860745,
+        "mu_b_difference_mev": 8.640178456568151,
+        "generated_Yp": 0.06607427143207155
+      },
+      "gibbs": {
+        "P_relative_difference": 0.5265468806865119,
+        "epsilon_relative_difference": 0.0010149718180860745,
+        "mu_b_difference_mev": 8.640178456568151,
+        "generated_Yp": 0.06607427143207155
+      }
+    },
+    {
+      "source_row_1based": 90,
+      "n_b_fm3": 0.185,
+      "provider_pressure_mev_fm3": 2.830275008746196,
+      "provider_epsilon_mev_fm3": 177.0404831996649,
+      "provider_mu_b_mev": 972.274368694114,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.5341998658870397,
+        "epsilon_relative_difference": 0.0012412487778472592,
+        "mu_b_difference_mev": 9.360453045928239,
+        "generated_Yp": 0.06761445785862118
+      },
+      "high": {
+        "P_relative_difference": 0.047034453727175185,
+        "epsilon_relative_difference": 0.0028992162919823095,
+        "mu_b_difference_mev": 3.4940491468485106,
+        "generated_Yp": 0.04910781543518884
+      },
+      "maxwell": {
+        "P_relative_difference": 0.5341998658870397,
+        "epsilon_relative_difference": 0.0012412487778472592,
+        "mu_b_difference_mev": 9.360453045928239,
+        "generated_Yp": 0.06761445785862118
+      },
+      "gibbs": {
+        "P_relative_difference": 0.5341998658870397,
+        "epsilon_relative_difference": 0.0012412487778472592,
+        "mu_b_difference_mev": 9.360453045928239,
+        "generated_Yp": 0.06761445785862118
+      }
+    },
+    {
+      "source_row_1based": 91,
+      "n_b_fm3": 0.19,
+      "provider_pressure_mev_fm3": 3.0509747933121236,
+      "provider_epsilon_mev_fm3": 181.90478689907098,
+      "provider_mu_b_mev": 973.4513773283321,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.540709126747686,
+        "epsilon_relative_difference": 0.0014753908530553694,
+        "mu_b_difference_mev": 10.09510828915188,
+        "generated_Yp": 0.06913167411917658
+      },
+      "high": {
+        "P_relative_difference": 0.04241987459504393,
+        "epsilon_relative_difference": 0.002917442118067548,
+        "mu_b_difference_mev": 3.4743087100126786,
+        "generated_Yp": 0.05006335476241636
+      },
+      "maxwell": {
+        "P_relative_difference": 0.540709126747686,
+        "epsilon_relative_difference": 0.0014753908530553694,
+        "mu_b_difference_mev": 10.09510828915188,
+        "generated_Yp": 0.06913167411917658
+      },
+      "gibbs": {
+        "P_relative_difference": 0.540709126747686,
+        "epsilon_relative_difference": 0.0014753908530553694,
+        "mu_b_difference_mev": 10.09510828915188,
+        "generated_Yp": 0.06913167411917658
+      }
+    },
+    {
+      "source_row_1based": 92,
+      "n_b_fm3": 0.195,
+      "provider_pressure_mev_fm3": 3.2841575973670745,
+      "provider_epsilon_mev_fm3": 186.77506104198238,
+      "provider_mu_b_mev": 974.6626596889716,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.5461949755866404,
+        "epsilon_relative_difference": 0.0017171378883387156,
+        "mu_b_difference_mev": 10.843635449377302,
+        "generated_Yp": 0.070629226238697
+      },
+      "high": {
+        "P_relative_difference": 0.03816048086216428,
+        "epsilon_relative_difference": 0.0029340758553160207,
+        "mu_b_difference_mev": 3.4530114365182953,
+        "generated_Yp": 0.051008133680404195
+      },
+      "maxwell": {
+        "P_relative_difference": 0.5461949755866404,
+        "epsilon_relative_difference": 0.0017171378883387156,
+        "mu_b_difference_mev": 10.843635449377302,
+        "generated_Yp": 0.070629226238697
+      },
+      "gibbs": {
+        "P_relative_difference": 0.5461949755866404,
+        "epsilon_relative_difference": 0.0017171378883387156,
+        "mu_b_difference_mev": 10.843635449377302,
+        "generated_Yp": 0.070629226238697
+      }
+    },
+    {
+      "source_row_1based": 93,
+      "n_b_fm3": 0.2,
+      "provider_pressure_mev_fm3": 3.5303851567880535,
+      "provider_epsilon_mev_fm3": 191.65147975224582,
+      "provider_mu_b_mev": 975.9093245451694,
+      "provider_composition_available": false,
+      "generated_phase": "low",
+      "low": {
+        "P_relative_difference": 0.5506599190126062,
+        "epsilon_relative_difference": 0.0019662256082275675,
+        "mu_b_difference_mev": 11.604358259318701,
+        "generated_Yp": 0.07211018515235251
+      },
+      "high": {
+        "P_relative_difference": 0.03418911527417223,
+        "epsilon_relative_difference": 0.0029491865259749783,
+        "mu_b_difference_mev": 3.4295835342807095,
+        "generated_Yp": 0.05194459808008319
+      },
+      "maxwell": {
+        "P_relative_difference": 0.5506599190126062,
+        "epsilon_relative_difference": 0.0019662256082275675,
+        "mu_b_difference_mev": 11.604358259318701,
+        "generated_Yp": 0.07211018515235251
+      },
+      "gibbs": {
+        "P_relative_difference": 0.5506599190126062,
+        "epsilon_relative_difference": 0.0019662256082275675,
+        "mu_b_difference_mev": 11.604358259318701,
+        "generated_Yp": 0.07211018515235251
+      }
+    },
+    {
+      "source_row_1based": 94,
+      "n_b_fm3": 0.205,
+      "provider_pressure_mev_fm3": 3.789907131964843,
+      "provider_epsilon_mev_fm3": 196.53421870267545,
+      "provider_mu_b_mev": 977.1908577299525,
+      "provider_composition_available": false,
+      "generated_phase": "mixed",
+      "low": {
+        "P_relative_difference": 0.5542559097137454,
+        "epsilon_relative_difference": 0.002222392836155773,
+        "mu_b_difference_mev": 12.377339828595723,
+        "generated_Yp": 0.07357734791782909
+      },
+      "high": {
+        "P_relative_difference": 0.030541827718382653,
+        "epsilon_relative_difference": 0.0029628428811050433,
+        "mu_b_difference_mev": 3.4051253730243616,
+        "generated_Yp": 0.05287507056208636
+      },
+      "maxwell": {
+        "P_relative_difference": 0.5486698906736767,
+        "epsilon_relative_difference": 0.00222232744656381,
+        "mu_b_difference_mev": 12.274006439856066,
+        "generated_Yp": 0.07337314792322092
+      },
+      "gibbs": {
+        "P_relative_difference": 0.5409987898633943,
+        "epsilon_relative_difference": 0.0022220151954490674,
+        "mu_b_difference_mev": 12.131888743761579,
+        "generated_Yp": 0.07308585787757933
+      }
+    },
+    {
+      "source_row_1based": 95,
+      "n_b_fm3": 0.21,
+      "provider_pressure_mev_fm3": 4.063285258774448,
+      "provider_epsilon_mev_fm3": 201.42345478596187,
+      "provider_mu_b_mev": 978.5082859273158,
+      "provider_composition_available": false,
+      "generated_phase": "mixed",
+      "low": {
+        "P_relative_difference": 0.5569980106915662,
+        "epsilon_relative_difference": 0.0024853857112563382,
+        "mu_b_difference_mev": 13.161222773555323,
+        "generated_Yp": 0.07503321461304062
+      },
+      "high": {
+        "P_relative_difference": 0.027166352296556617,
+        "epsilon_relative_difference": 0.002975116390572463,
+        "mu_b_difference_mev": 3.379251717146417,
+        "generated_Yp": 0.05380169633950892
+      },
+      "maxwell": {
+        "P_relative_difference": 0.4444752681463622,
+        "epsilon_relative_difference": 0.00245677260625099,
+        "mu_b_difference_mev": 10.95657824249281,
+        "generated_Yp": 0.0707965922344313
+      },
+      "gibbs": {
+        "P_relative_difference": 0.43968370890011443,
+        "epsilon_relative_difference": 0.0024535163112595626,
+        "mu_b_difference_mev": 10.860743165176132,
+        "generated_Yp": 0.07056396751949802
+      }
+    },
+    {
+      "source_row_1based": 96,
+      "n_b_fm3": 0.215,
+      "provider_pressure_mev_fm3": 4.350644367411759,
+      "provider_epsilon_mev_fm3": 206.31936478685589,
+      "provider_mu_b_mev": 979.8605076942682,
+      "provider_composition_available": false,
+      "generated_phase": "mixed",
+      "low": {
+        "P_relative_difference": 0.5590736065922066,
+        "epsilon_relative_difference": 0.0027549662217267734,
+        "mu_b_difference_mev": 13.95689915518551,
+        "generated_Yp": 0.0764799772588573
+      },
+      "high": {
+        "P_relative_difference": 0.02412767805375471,
+        "epsilon_relative_difference": 0.002986088727430225,
+        "mu_b_difference_mev": 3.353762214250537,
+        "generated_Yp": 0.054726408745346254
+      },
+      "maxwell": {
+        "P_relative_difference": 0.3490679927063527,
+        "epsilon_relative_difference": 0.002647671712705746,
+        "mu_b_difference_mev": 9.604356475540385,
+        "generated_Yp": 0.06833987634512027
+      },
+      "gibbs": {
+        "P_relative_difference": 0.34681079115231306,
+        "epsilon_relative_difference": 0.0026427222303158082,
+        "mu_b_difference_mev": 9.553931102086722,
+        "generated_Yp": 0.06817442155556297
+      }
+    },
+    {
+      "source_row_1based": 97,
+      "n_b_fm3": 0.22,
+      "provider_pressure_mev_fm3": 4.652671023948671,
+      "provider_epsilon_mev_fm3": 211.22212652700742,
+      "provider_mu_b_mev": 981.249079777073,
+      "provider_composition_available": false,
+      "generated_phase": "mixed",
+      "low": {
+        "P_relative_difference": 0.5604531600828488,
+        "epsilon_relative_difference": 0.003030907810559924,
+        "mu_b_difference_mev": 14.762722596598906,
+        "generated_Yp": 0.07791951802310843
+      },
+      "high": {
+        "P_relative_difference": 0.021350951520392014,
+        "epsilon_relative_difference": 0.0029958464780515115,
+        "mu_b_difference_mev": 3.3278546241598406,
+        "generated_Yp": 0.055650909207059444
+      },
+      "maxwell": {
+        "P_relative_difference": 0.2614936739589546,
+        "epsilon_relative_difference": 0.0027971905043364664,
+        "mu_b_difference_mev": 8.2157843927356,
+        "generated_Yp": 0.06599482935986885
+      },
+      "gibbs": {
+        "P_relative_difference": 0.26146332296596864,
+        "epsilon_relative_difference": 0.0027916908007177277,
+        "mu_b_difference_mev": 8.209862246012904,
+        "generated_Yp": 0.0659084383765915
+      }
+    },
+    {
+      "source_row_1based": 98,
+      "n_b_fm3": 0.225,
+      "provider_pressure_mev_fm3": 4.969552473677521,
+      "provider_epsilon_mev_fm3": 216.13191982655178,
+      "provider_mu_b_mev": 982.6732102232412,
+      "provider_composition_available": false,
+      "generated_phase": "mixed",
+      "low": {
+        "P_relative_difference": 0.5612872974848475,
+        "epsilon_relative_difference": 0.0033129923565557995,
+        "mu_b_difference_mev": 15.579511449123174,
+        "generated_Yp": 0.07935341459714285
+      },
+      "high": {
+        "P_relative_difference": 0.018883132219120746,
+        "epsilon_relative_difference": 0.0030044773880852915,
+        "mu_b_difference_mev": 3.303129699523083,
+        "generated_Yp": 0.056576658039290136
+      },
+      "maxwell": {
+        "P_relative_difference": 0.181055053711914,
+        "epsilon_relative_difference": 0.002907296379156099,
+        "mu_b_difference_mev": 6.791653946567408,
+        "generated_Yp": 0.06375400668507304
+      },
+      "gibbs": {
+        "P_relative_difference": 0.18297730308415905,
+        "epsilon_relative_difference": 0.002902290402935881,
+        "mu_b_difference_mev": 6.8293018037608135,
+        "generated_Yp": 0.06375793935369291
+      }
+    },
+    {
+      "source_row_1based": 99,
+      "n_b_fm3": 0.23,
+      "provider_pressure_mev_fm3": 5.301850452475315,
+      "provider_epsilon_mev_fm3": 221.04892472741145,
+      "provider_mu_b_mev": 984.1338051299425,
+      "provider_composition_available": false,
+      "generated_phase": "mixed",
+      "low": {
+        "P_relative_difference": 0.5615949843667927,
+        "epsilon_relative_difference": 0.003601019875375977,
+        "mu_b_difference_mev": 16.406496492812266,
+        "generated_Yp": 0.0807829510867998
+      },
+      "high": {
+        "P_relative_difference": 0.016688050341198357,
+        "epsilon_relative_difference": 0.003012079470727347,
+        "mu_b_difference_mev": 3.279541197609319,
+        "generated_Yp": 0.05750487338418442
+      },
+      "maxwell": {
+        "P_relative_difference": 0.10703142541169353,
+        "epsilon_relative_difference": 0.0029797881565514217,
+        "mu_b_difference_mev": 5.331059039866091,
+        "generated_Yp": 0.06161061108309444
+      },
+      "gibbs": {
+        "P_relative_difference": 0.11066176844129205,
+        "epsilon_relative_difference": 0.002976228897972888,
+        "mu_b_difference_mev": 5.411323237923739,
+        "generated_Yp": 0.06171547962498738
+      }
+    },
+    {
+      "source_row_1based": 100,
+      "n_b_fm3": 0.235,
+      "provider_pressure_mev_fm3": 5.649814620731832,
+      "provider_epsilon_mev_fm3": 225.97332235007633,
+      "provider_mu_b_mev": 985.6303700885452,
+      "provider_composition_available": false,
+      "generated_phase": "mixed",
+      "low": {
+        "P_relative_difference": 0.5614900796412103,
+        "epsilon_relative_difference": 0.003894805125039591,
+        "mu_b_difference_mev": 17.244412405804837,
+        "generated_Yp": 0.08220913308726616
+      },
+      "high": {
+        "P_relative_difference": 0.014794577190119895,
+        "epsilon_relative_difference": 0.003018757150535567,
+        "mu_b_difference_mev": 3.258490217833696,
+        "generated_Yp": 0.058436536292484235
+      },
+      "maxwell": {
+        "P_relative_difference": 0.038850910645120695,
+        "epsilon_relative_difference": 0.0030163103282134784,
+        "mu_b_difference_mev": 3.834494081263415,
+        "generated_Yp": 0.05955842380460429
+      },
+      "gibbs": {
+        "P_relative_difference": 0.04397148456588851,
+        "epsilon_relative_difference": 0.003015067157378537,
+        "mu_b_difference_mev": 3.956406293866735,
+        "generated_Yp": 0.05977418760760587
+      }
+    },
+    {
+      "source_row_1based": 101,
+      "n_b_fm3": 0.24,
+      "provider_pressure_mev_fm3": 6.01400671432408,
+      "provider_epsilon_mev_fm3": 230.90529465706638,
+      "provider_mu_b_mev": 987.1637557141269,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.5609904517136566,
+        "epsilon_relative_difference": 0.004194179221354677,
+        "mu_b_difference_mev": 18.09274388428787,
+        "generated_Yp": 0.08363270585559543
+      },
+      "high": {
+        "P_relative_difference": 0.013172011265530692,
+        "epsilon_relative_difference": 0.003024622544118394,
+        "mu_b_difference_mev": 3.2400746832005325,
+        "generated_Yp": 0.05937240040201803
+      },
+      "maxwell": {
+        "P_relative_difference": 0.013172011265530692,
+        "epsilon_relative_difference": 0.003024622544118394,
+        "mu_b_difference_mev": 3.2400746832005325,
+        "generated_Yp": 0.05937240040201803
+      },
+      "gibbs": {
+        "P_relative_difference": 0.013172011265530692,
+        "epsilon_relative_difference": 0.003024622544118394,
+        "mu_b_difference_mev": 3.2400746832005325,
+        "generated_Yp": 0.05937240040201803
+      }
+    },
+    {
+      "source_row_1based": 102,
+      "n_b_fm3": 0.245,
+      "provider_pressure_mev_fm3": 6.3944267332520575,
+      "provider_epsilon_mev_fm3": 235.8450220220888,
+      "provider_mu_b_mev": 988.7324438993505,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.5602571901405129,
+        "epsilon_relative_difference": 0.0044990002052680556,
+        "mu_b_difference_mev": 18.953430027020318,
+        "generated_Yp": 0.08505417468186215
+      },
+      "high": {
+        "P_relative_difference": 0.011885470919613006,
+        "epsilon_relative_difference": 0.0030298057951176904,
+        "mu_b_difference_mev": 3.226797499827967,
+        "generated_Yp": 0.06031300500277497
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011885470919613006,
+        "epsilon_relative_difference": 0.0030298057951176904,
+        "mu_b_difference_mev": 3.226797499827967,
+        "generated_Yp": 0.06031300500277497
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011885470919613006,
+        "epsilon_relative_difference": 0.0030298057951176904,
+        "mu_b_difference_mev": 3.226797499827967,
+        "generated_Yp": 0.06031300500277497
+      }
+    },
+    {
+      "source_row_1based": 103,
+      "n_b_fm3": 0.25,
+      "provider_pressure_mev_fm3": 6.792010903977442,
+      "provider_epsilon_mev_fm3": 240.79268678130498,
+      "provider_mu_b_mev": 990.3387907411299,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.5592081367562907,
+        "epsilon_relative_difference": 0.004809137154958121,
+        "mu_b_difference_mev": 19.824611276334963,
+        "generated_Yp": 0.08647382670741413
+      },
+      "high": {
+        "P_relative_difference": 0.010844896849959262,
+        "epsilon_relative_difference": 0.0030344390903049856,
+        "mu_b_difference_mev": 3.2173175963446283,
+        "generated_Yp": 0.061258690522734
+      },
+      "maxwell": {
+        "P_relative_difference": 0.010844896849959262,
+        "epsilon_relative_difference": 0.0030344390903049856,
+        "mu_b_difference_mev": 3.2173175963446283,
+        "generated_Yp": 0.061258690522734
+      },
+      "gibbs": {
+        "P_relative_difference": 0.010844896849959262,
+        "epsilon_relative_difference": 0.0030344390903049856,
+        "mu_b_difference_mev": 3.2173175963446283,
+        "generated_Yp": 0.061258690522734
+      }
+    },
+    {
+      "source_row_1based": 104,
+      "n_b_fm3": 0.26,
+      "provider_pressure_mev_fm3": 7.63024566266534,
+      "provider_epsilon_mev_fm3": 250.71240474932765,
+      "provider_mu_b_mev": 993.6255785076653,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.5584408374334275,
+        "epsilon_relative_difference": 0.005445545296866472,
+        "mu_b_difference_mev": 21.639640516270788,
+        "generated_Yp": 0.08930787426237494
+      },
+      "high": {
+        "P_relative_difference": 0.010844880891194286,
+        "epsilon_relative_difference": 0.0030432481388216193,
+        "mu_b_difference_mev": 3.252804478903954,
+        "generated_Yp": 0.06316577548145628
+      },
+      "maxwell": {
+        "P_relative_difference": 0.010844880891194286,
+        "epsilon_relative_difference": 0.0030432481388216193,
+        "mu_b_difference_mev": 3.252804478903954,
+        "generated_Yp": 0.06316577548145628
+      },
+      "gibbs": {
+        "P_relative_difference": 0.010844880891194286,
+        "epsilon_relative_difference": 0.0030432481388216193,
+        "mu_b_difference_mev": 3.252804478903954,
+        "generated_Yp": 0.06316577548145628
+      }
+    },
+    {
+      "source_row_1based": 105,
+      "n_b_fm3": 0.27,
+      "provider_pressure_mev_fm3": 8.547747595108532,
+      "provider_epsilon_mev_fm3": 260.66586001711505,
+      "provider_mu_b_mev": 997.087435600828,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.5555481715235275,
+        "epsilon_relative_difference": 0.006102842790537855,
+        "mu_b_difference_mev": 23.479586339451544,
+        "generated_Yp": 0.09213364633340637
+      },
+      "high": {
+        "P_relative_difference": 0.010891583175912434,
+        "epsilon_relative_difference": 0.003052413842439927,
+        "mu_b_difference_mev": 3.29169845654269,
+        "generated_Yp": 0.06509307324527551
+      },
+      "maxwell": {
+        "P_relative_difference": 0.010891583175912434,
+        "epsilon_relative_difference": 0.003052413842439927,
+        "mu_b_difference_mev": 3.29169845654269,
+        "generated_Yp": 0.06509307324527551
+      },
+      "gibbs": {
+        "P_relative_difference": 0.010891583175912434,
+        "epsilon_relative_difference": 0.003052413842439927,
+        "mu_b_difference_mev": 3.29169845654269,
+        "generated_Yp": 0.06509307324527551
+      }
+    },
+    {
+      "source_row_1based": 106,
+      "n_b_fm3": 0.28,
+      "provider_pressure_mev_fm3": 9.550134060077085,
+      "provider_epsilon_mev_fm3": 270.6548416168783,
+      "provider_mu_b_mev": 1000.7320559891259,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.550882281785501,
+        "epsilon_relative_difference": 0.006779315391928664,
+        "mu_b_difference_mev": 25.34233634302177,
+        "generated_Yp": 0.0949478920457388
+      },
+      "high": {
+        "P_relative_difference": 0.010995603262747622,
+        "epsilon_relative_difference": 0.003062015425572273,
+        "mu_b_difference_mev": 3.334852804526804,
+        "generated_Yp": 0.06703797808443086
+      },
+      "maxwell": {
+        "P_relative_difference": 0.010995603262747622,
+        "epsilon_relative_difference": 0.003062015425572273,
+        "mu_b_difference_mev": 3.334852804526804,
+        "generated_Yp": 0.06703797808443086
+      },
+      "gibbs": {
+        "P_relative_difference": 0.010995603262747622,
+        "epsilon_relative_difference": 0.003062015425572273,
+        "mu_b_difference_mev": 3.334852804526804,
+        "generated_Yp": 0.06703797808443086
+      }
+    },
+    {
+      "source_row_1based": 107,
+      "n_b_fm3": 0.29,
+      "provider_pressure_mev_fm3": 10.64177411439215,
+      "provider_epsilon_mev_fm3": 280.68119020608174,
+      "provider_mu_b_mev": 1004.5619459326689,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.544962352301662,
+        "epsilon_relative_difference": 0.007473478544874457,
+        "mu_b_difference_mev": 27.23114174826526,
+        "generated_Yp": 0.09774597506368987
+      },
+      "high": {
+        "P_relative_difference": 0.011299923755958341,
+        "epsilon_relative_difference": 0.0030722385047146084,
+        "mu_b_difference_mev": 3.3881751593827403,
+        "generated_Yp": 0.0689964346459297
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011299923755958341,
+        "epsilon_relative_difference": 0.0030722385047146084,
+        "mu_b_difference_mev": 3.3881751593827403,
+        "generated_Yp": 0.0689964346459297
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011299923755958341,
+        "epsilon_relative_difference": 0.0030722385047146084,
+        "mu_b_difference_mev": 3.3881751593827403,
+        "generated_Yp": 0.0689964346459297
+      }
+    },
+    {
+      "source_row_1based": 108,
+      "n_b_fm3": 0.3,
+      "provider_pressure_mev_fm3": 11.837023230466109,
+      "provider_epsilon_mev_fm3": 290.74693547557007,
+      "provider_mu_b_mev": 1008.6131956867872,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.5369017741938362,
+        "epsilon_relative_difference": 0.008183562344539652,
+        "mu_b_difference_mev": 29.11554815519628,
+        "generated_Yp": 0.10052245745322597
+      },
+      "high": {
+        "P_relative_difference": 0.011047218403579251,
+        "epsilon_relative_difference": 0.0030828747072477736,
+        "mu_b_difference_mev": 3.4236751815419666,
+        "generated_Yp": 0.07096346237391385
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011047218403579251,
+        "epsilon_relative_difference": 0.0030828747072477736,
+        "mu_b_difference_mev": 3.4236751815419666,
+        "generated_Yp": 0.07096346237391385
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011047218403579251,
+        "epsilon_relative_difference": 0.0030828747072477736,
+        "mu_b_difference_mev": 3.4236751815419666,
+        "generated_Yp": 0.07096346237391385
+      }
+    },
+    {
+      "source_row_1based": 109,
+      "n_b_fm3": 0.31,
+      "provider_pressure_mev_fm3": 13.13213650245225,
+      "provider_epsilon_mev_fm3": 300.8541612594846,
+      "provider_mu_b_mev": 1012.8590250385058,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.5283639721113427,
+        "epsilon_relative_difference": 0.008908002108349633,
+        "mu_b_difference_mev": 31.027604217901285,
+        "generated_Yp": 0.10327158836044442
+      },
+      "high": {
+        "P_relative_difference": 0.011170932689706481,
+        "epsilon_relative_difference": 0.0030938242416220785,
+        "mu_b_difference_mev": 3.475768097543437,
+        "generated_Yp": 0.0729336097786017
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011170932689706481,
+        "epsilon_relative_difference": 0.0030938242416220785,
+        "mu_b_difference_mev": 3.475768097543437,
+        "generated_Yp": 0.0729336097786017
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011170932689706481,
+        "epsilon_relative_difference": 0.0030938242416220785,
+        "mu_b_difference_mev": 3.475768097543437,
+        "generated_Yp": 0.0729336097786017
+      }
+    },
+    {
+      "source_row_1based": 110,
+      "n_b_fm3": 0.32,
+      "provider_pressure_mev_fm3": 14.544590157635207,
+      "provider_epsilon_mev_fm3": 311.00502469412294,
+      "provider_mu_b_mev": 1017.3425464117443,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.5182343843704207,
+        "epsilon_relative_difference": 0.009645328406988396,
+        "mu_b_difference_mev": 32.9289135176889,
+        "generated_Yp": 0.10598769187868329
+      },
+      "high": {
+        "P_relative_difference": 0.010795524866772599,
+        "epsilon_relative_difference": 0.003104999728884783,
+        "mu_b_difference_mev": 3.50839688150279,
+        "generated_Yp": 0.07490132822705454
+      },
+      "maxwell": {
+        "P_relative_difference": 0.010795524866772599,
+        "epsilon_relative_difference": 0.003104999728884783,
+        "mu_b_difference_mev": 3.50839688150279,
+        "generated_Yp": 0.07490132822705454
+      },
+      "gibbs": {
+        "P_relative_difference": 0.010795524866772599,
+        "epsilon_relative_difference": 0.003104999728884783,
+        "mu_b_difference_mev": 3.50839688150279,
+        "generated_Yp": 0.07490132822705454
+      }
+    },
+    {
+      "source_row_1based": 111,
+      "n_b_fm3": 0.33,
+      "provider_pressure_mev_fm3": 16.066270233347115,
+      "provider_epsilon_mev_fm3": 321.20171026747755,
+      "provider_mu_b_mev": 1022.0241833358324,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.5082798570957145,
+        "epsilon_relative_difference": 0.010394277574755861,
+        "mu_b_difference_mev": 34.863094764464336,
+        "generated_Yp": 0.10866545638048873
+      },
+      "high": {
+        "P_relative_difference": 0.010971996857781274,
+        "epsilon_relative_difference": 0.0031164485160315447,
+        "mu_b_difference_mev": 3.5675383631104296,
+        "generated_Yp": 0.07686126280605932
+      },
+      "maxwell": {
+        "P_relative_difference": 0.010971996857781274,
+        "epsilon_relative_difference": 0.0031164485160315447,
+        "mu_b_difference_mev": 3.5675383631104296,
+        "generated_Yp": 0.07686126280605932
+      },
+      "gibbs": {
+        "P_relative_difference": 0.010971996857781274,
+        "epsilon_relative_difference": 0.0031164485160315447,
+        "mu_b_difference_mev": 3.5675383631104296,
+        "generated_Yp": 0.07686126280605932
+      }
+    },
+    {
+      "source_row_1based": 112,
+      "n_b_fm3": 0.34,
+      "provider_pressure_mev_fm3": 17.706538994204745,
+      "provider_epsilon_mev_fm3": 331.4462784392251,
+      "provider_mu_b_mev": 1026.9200512747937,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.49817061124490025,
+        "epsilon_relative_difference": 0.011154201224515159,
+        "mu_b_difference_mev": 36.81734070177208,
+        "generated_Yp": 0.11130013331388078
+      },
+      "high": {
+        "P_relative_difference": 0.011381565400858662,
+        "epsilon_relative_difference": 0.003128769701955081,
+        "mu_b_difference_mev": 3.6427858982112866,
+        "generated_Yp": 0.07880846371922628
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011381565400858662,
+        "epsilon_relative_difference": 0.003128769701955081,
+        "mu_b_difference_mev": 3.6427858982112866,
+        "generated_Yp": 0.07880846371922628
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011381565400858662,
+        "epsilon_relative_difference": 0.003128769701955081,
+        "mu_b_difference_mev": 3.6427858982112866,
+        "generated_Yp": 0.07880846371922628
+      }
+    },
+    {
+      "source_row_1based": 113,
+      "n_b_fm3": 0.35,
+      "provider_pressure_mev_fm3": 19.48536927139053,
+      "provider_epsilon_mev_fm3": 341.741094564387,
+      "provider_mu_b_mev": 1032.0756109593647,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.48689108412888493,
+        "epsilon_relative_difference": 0.011923684231294862,
+        "mu_b_difference_mev": 38.748758484690825,
+        "generated_Yp": 0.11388765716725906
+      },
+      "high": {
+        "P_relative_difference": 0.011245752477893722,
+        "epsilon_relative_difference": 0.0031417515837903753,
+        "mu_b_difference_mev": 3.6936950424578754,
+        "generated_Yp": 0.08073852582884578
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011245752477893722,
+        "epsilon_relative_difference": 0.0031417515837903753,
+        "mu_b_difference_mev": 3.6936950424578754,
+        "generated_Yp": 0.08073852582884578
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011245752477893722,
+        "epsilon_relative_difference": 0.0031417515837903753,
+        "mu_b_difference_mev": 3.6936950424578754,
+        "generated_Yp": 0.08073852582884578
+      }
+    },
+    {
+      "source_row_1based": 114,
+      "n_b_fm3": 0.36,
+      "provider_pressure_mev_fm3": 21.3921504983388,
+      "provider_epsilon_mev_fm3": 352.08853875385626,
+      "provider_mu_b_mev": 1037.4463590338753,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.47593609550252514,
+        "epsilon_relative_difference": 0.01270146823835927,
+        "mu_b_difference_mev": 40.703716596261756,
+        "generated_Yp": 0.11642470023883691
+      },
+      "high": {
+        "P_relative_difference": 0.011496732816048683,
+        "epsilon_relative_difference": 0.0031552971618973302,
+        "mu_b_difference_mev": 3.7691216825185165,
+        "generated_Yp": 0.08264766652792094
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011496732816048683,
+        "epsilon_relative_difference": 0.0031552971618973302,
+        "mu_b_difference_mev": 3.7691216825185165,
+        "generated_Yp": 0.08264766652792094
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011496732816048683,
+        "epsilon_relative_difference": 0.0031552971618973302,
+        "mu_b_difference_mev": 3.7691216825185165,
+        "generated_Yp": 0.08264766652792094
+      }
+    },
+    {
+      "source_row_1based": 115,
+      "n_b_fm3": 0.37,
+      "provider_pressure_mev_fm3": 23.446855506231994,
+      "provider_epsilon_mev_fm3": 362.49097348222375,
+      "provider_mu_b_mev": 1043.0752134823126,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.4643804102677793,
+        "epsilon_relative_difference": 0.013486502514074461,
+        "mu_b_difference_mev": 42.640529201813024,
+        "generated_Yp": 0.11890867632061132
+      },
+      "high": {
+        "P_relative_difference": 0.011436531479099177,
+        "epsilon_relative_difference": 0.0031694799410686425,
+        "mu_b_difference_mev": 3.8298880279821788,
+        "generated_Yp": 0.08453275335072442
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011436531479099177,
+        "epsilon_relative_difference": 0.0031694799410686425,
+        "mu_b_difference_mev": 3.8298880279821788,
+        "generated_Yp": 0.08453275335072442
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011436531479099177,
+        "epsilon_relative_difference": 0.0031694799410686425,
+        "mu_b_difference_mev": 3.8298880279821788,
+        "generated_Yp": 0.08453275335072442
+      }
+    },
+    {
+      "source_row_1based": 116,
+      "n_b_fm3": 0.38,
+      "provider_pressure_mev_fm3": 25.650732597019015,
+      "provider_epsilon_mev_fm3": 372.950929542141,
+      "provider_mu_b_mev": 1048.9517424714736,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.4526947894780562,
+        "epsilon_relative_difference": 0.014277394832634238,
+        "mu_b_difference_mev": 44.57031754535956,
+        "generated_Yp": 0.1213377067750616
+      },
+      "high": {
+        "P_relative_difference": 0.011328264760759987,
+        "epsilon_relative_difference": 0.003184004387690731,
+        "mu_b_difference_mev": 3.8896202268999787,
+        "generated_Yp": 0.08639129285820608
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011328264760759987,
+        "epsilon_relative_difference": 0.003184004387690731,
+        "mu_b_difference_mev": 3.8896202268999787,
+        "generated_Yp": 0.08639129285820608
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011328264760759987,
+        "epsilon_relative_difference": 0.003184004387690731,
+        "mu_b_difference_mev": 3.8896202268999787,
+        "generated_Yp": 0.08639129285820608
+      }
+    },
+    {
+      "source_row_1based": 117,
+      "n_b_fm3": 0.39,
+      "provider_pressure_mev_fm3": 28.002533468750958,
+      "provider_epsilon_mev_fm3": 383.47080540994347,
+      "provider_mu_b_mev": 1055.0598432787037,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.44133615125745984,
+        "epsilon_relative_difference": 0.015073240632178742,
+        "mu_b_difference_mev": 46.50943095363118,
+        "generated_Yp": 0.12371056109516877
+      },
+      "high": {
+        "P_relative_difference": 0.011443664105646567,
+        "epsilon_relative_difference": 0.003199029580364554,
+        "mu_b_difference_mev": 3.9671436841952072,
+        "generated_Yp": 0.0882213916427826
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011443664105646567,
+        "epsilon_relative_difference": 0.003199029580364554,
+        "mu_b_difference_mev": 3.9671436841952072,
+        "generated_Yp": 0.0882213916427826
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011443664105646567,
+        "epsilon_relative_difference": 0.003199029580364554,
+        "mu_b_difference_mev": 3.9671436841952072,
+        "generated_Yp": 0.0882213916427826
+      }
+    },
+    {
+      "source_row_1based": 118,
+      "n_b_fm3": 0.4,
+      "provider_pressure_mev_fm3": 30.511620386044587,
+      "provider_epsilon_mev_fm3": 394.05297590786,
+      "provider_mu_b_mev": 1061.4114907347614,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.4301118702153235,
+        "epsilon_relative_difference": 0.01587327053455878,
+        "mu_b_difference_mev": 48.44579899768746,
+        "generated_Yp": 0.12602658221208168
+      },
+      "high": {
+        "P_relative_difference": 0.01161244025765229,
+        "epsilon_relative_difference": 0.0032148209735971545,
+        "mu_b_difference_mev": 4.05281035138546,
+        "generated_Yp": 0.09002169905509197
+      },
+      "maxwell": {
+        "P_relative_difference": 0.01161244025765229,
+        "epsilon_relative_difference": 0.0032148209735971545,
+        "mu_b_difference_mev": 4.05281035138546,
+        "generated_Yp": 0.09002169905509197
+      },
+      "gibbs": {
+        "P_relative_difference": 0.01161244025765229,
+        "epsilon_relative_difference": 0.0032148209735971545,
+        "mu_b_difference_mev": 4.05281035138546,
+        "generated_Yp": 0.09002169905509197
+      }
+    },
+    {
+      "source_row_1based": 119,
+      "n_b_fm3": 0.41,
+      "provider_pressure_mev_fm3": 33.18985221741448,
+      "provider_epsilon_mev_fm3": 404.69996157057466,
+      "provider_mu_b_mev": 1068.023936068266,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.4187849374723238,
+        "epsilon_relative_difference": 0.016676401147982522,
+        "mu_b_difference_mev": 50.36182704709677,
+        "generated_Yp": 0.12828560481398346
+      },
+      "high": {
+        "P_relative_difference": 0.011634658201602699,
+        "epsilon_relative_difference": 0.0032313074050789314,
+        "mu_b_difference_mev": 4.131372119437856,
+        "generated_Yp": 0.09179133970637923
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011634658201602699,
+        "epsilon_relative_difference": 0.0032313074050789314,
+        "mu_b_difference_mev": 4.131372119437856,
+        "generated_Yp": 0.09179133970637923
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011634658201602699,
+        "epsilon_relative_difference": 0.0032313074050789314,
+        "mu_b_difference_mev": 4.131372119437856,
+        "generated_Yp": 0.09179133970637923
+      }
+    },
+    {
+      "source_row_1based": 120,
+      "n_b_fm3": 0.42,
+      "provider_pressure_mev_fm3": 36.04596707650296,
+      "provider_epsilon_mev_fm3": 415.41441257977846,
+      "provider_mu_b_mev": 1074.9056658482891,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.4073240926799153,
+        "epsilon_relative_difference": 0.017481309522045407,
+        "mu_b_difference_mev": 52.2485208581727,
+        "generated_Yp": 0.13048787296577902
+      },
+      "high": {
+        "P_relative_difference": 0.011458309170155667,
+        "epsilon_relative_difference": 0.003248155826633292,
+        "mu_b_difference_mev": 4.196087094733457,
+        "generated_Yp": 0.0935298421458083
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011458309170155667,
+        "epsilon_relative_difference": 0.003248155826633292,
+        "mu_b_difference_mev": 4.196087094733457,
+        "generated_Yp": 0.0935298421458083
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011458309170155667,
+        "epsilon_relative_difference": 0.003248155826633292,
+        "mu_b_difference_mev": 4.196087094733457,
+        "generated_Yp": 0.0935298421458083
+      }
+    },
+    {
+      "source_row_1based": 121,
+      "n_b_fm3": 0.43,
+      "provider_pressure_mev_fm3": 39.069354396744345,
+      "provider_epsilon_mev_fm3": 426.19883771024365,
+      "provider_mu_b_mev": 1082.0190514116,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.3964105884007223,
+        "epsilon_relative_difference": 0.018287108364390736,
+        "mu_b_difference_mev": 54.14290719728956,
+        "generated_Yp": 0.13263396151125142
+      },
+      "high": {
+        "P_relative_difference": 0.011551477597907311,
+        "epsilon_relative_difference": 0.0032654371524425407,
+        "mu_b_difference_mev": 4.286126258292825,
+        "generated_Yp": 0.0952370685056087
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011551477597907311,
+        "epsilon_relative_difference": 0.0032654371524425407,
+        "mu_b_difference_mev": 4.286126258292825,
+        "generated_Yp": 0.0952370685056087
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011551477597907311,
+        "epsilon_relative_difference": 0.0032654371524425407,
+        "mu_b_difference_mev": 4.286126258292825,
+        "generated_Yp": 0.0952370685056087
+      }
+    },
+    {
+      "source_row_1based": 122,
+      "n_b_fm3": 0.44,
+      "provider_pressure_mev_fm3": 42.27062474470431,
+      "provider_epsilon_mev_fm3": 437.05562116080563,
+      "provider_mu_b_mev": 1089.3778316034318,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.3858152765231624,
+        "epsilon_relative_difference": 0.019093254509814583,
+        "mu_b_difference_mev": 56.03060678284896,
+        "generated_Yp": 0.13472470418024937
+      },
+      "high": {
+        "P_relative_difference": 0.011737069019948532,
+        "epsilon_relative_difference": 0.0032835339046428658,
+        "mu_b_difference_mev": 4.389136796457024,
+        "generated_Yp": 0.09691314845330573
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011737069019948532,
+        "epsilon_relative_difference": 0.0032835339046428658,
+        "mu_b_difference_mev": 4.389136796457024,
+        "generated_Yp": 0.09691314845330573
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011737069019948532,
+        "epsilon_relative_difference": 0.0032835339046428658,
+        "mu_b_difference_mev": 4.389136796457024,
+        "generated_Yp": 0.09691314845330573
+      }
+    },
+    {
+      "source_row_1based": 123,
+      "n_b_fm3": 0.45,
+      "provider_pressure_mev_fm3": 45.66912680059083,
+      "provider_epsilon_mev_fm3": 447.9873765108104,
+      "provider_mu_b_mev": 1097.0144518031138,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.3751106051812074,
+        "epsilon_relative_difference": 0.01989870324397658,
+        "mu_b_difference_mev": 57.878537010006085,
+        "generated_Yp": 0.13676113005029913
+      },
+      "high": {
+        "P_relative_difference": 0.011690197564666605,
+        "epsilon_relative_difference": 0.0033023063012236342,
+        "mu_b_difference_mev": 4.473939224944388,
+        "generated_Yp": 0.09855841955058017
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011690197564666605,
+        "epsilon_relative_difference": 0.0033023063012236342,
+        "mu_b_difference_mev": 4.473939224944388,
+        "generated_Yp": 0.09855841955058017
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011690197564666605,
+        "epsilon_relative_difference": 0.0033023063012236342,
+        "mu_b_difference_mev": 4.473939224944388,
+        "generated_Yp": 0.09855841955058017
+      }
+    },
+    {
+      "source_row_1based": 124,
+      "n_b_fm3": 0.46,
+      "provider_pressure_mev_fm3": 49.2561224507616,
+      "provider_epsilon_mev_fm3": 458.99672836381086,
+      "provider_mu_b_mev": 1104.8975017708099,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.36478091004553104,
+        "epsilon_relative_difference": 0.02070245329154563,
+        "mu_b_difference_mev": 59.71750326701522,
+        "generated_Yp": 0.13874440902735646
+      },
+      "high": {
+        "P_relative_difference": 0.01175522278668839,
+        "epsilon_relative_difference": 0.003321629176621377,
+        "mu_b_difference_mev": 4.57311656070442,
+        "generated_Yp": 0.10017337511756448
+      },
+      "maxwell": {
+        "P_relative_difference": 0.01175522278668839,
+        "epsilon_relative_difference": 0.003321629176621377,
+        "mu_b_difference_mev": 4.57311656070442,
+        "generated_Yp": 0.10017337511756448
+      },
+      "gibbs": {
+        "P_relative_difference": 0.01175522278668839,
+        "epsilon_relative_difference": 0.003321629176621377,
+        "mu_b_difference_mev": 4.57311656070442,
+        "generated_Yp": 0.10017337511756448
+      }
+    },
+    {
+      "source_row_1based": 125,
+      "n_b_fm3": 0.47,
+      "provider_pressure_mev_fm3": 53.05096037542461,
+      "provider_epsilon_mev_fm3": 470.0862936122877,
+      "provider_mu_b_mev": 1113.0579872078986,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.3544507742241465,
+        "epsilon_relative_difference": 0.02150358497568905,
+        "mu_b_difference_mev": 61.51594582766461,
+        "generated_Yp": 0.14067580629286186
+      },
+      "high": {
+        "P_relative_difference": 0.011647635696842018,
+        "epsilon_relative_difference": 0.00334142867182452,
+        "mu_b_difference_mev": 4.656761871337039,
+        "generated_Yp": 0.10175861993831306
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011647635696842018,
+        "epsilon_relative_difference": 0.00334142867182452,
+        "mu_b_difference_mev": 4.656761871337039,
+        "generated_Yp": 0.10175861993831306
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011647635696842018,
+        "epsilon_relative_difference": 0.00334142867182452,
+        "mu_b_difference_mev": 4.656761871337039,
+        "generated_Yp": 0.10175861993831306
+      }
+    },
+    {
+      "source_row_1based": 126,
+      "n_b_fm3": 0.48,
+      "provider_pressure_mev_fm3": 57.04303000801418,
+      "provider_epsilon_mev_fm3": 481.258679827026,
+      "provider_mu_b_mev": 1121.4618954896673,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.34456217901775443,
+        "epsilon_relative_difference": 0.02230125716482667,
+        "mu_b_difference_mev": 63.30738395617482,
+        "generated_Yp": 0.14255664517918293
+      },
+      "high": {
+        "P_relative_difference": 0.011691650366000506,
+        "epsilon_relative_difference": 0.003361678420483516,
+        "mu_b_difference_mev": 4.759925169407779,
+        "generated_Yp": 0.10331483359722764
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011691650366000506,
+        "epsilon_relative_difference": 0.003361678420483516,
+        "mu_b_difference_mev": 4.759925169407779,
+        "generated_Yp": 0.10331483359722764
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011691650366000506,
+        "epsilon_relative_difference": 0.003361678420483516,
+        "mu_b_difference_mev": 4.759925169407779,
+        "generated_Yp": 0.10331483359722764
+      }
+    },
+    {
+      "source_row_1based": 127,
+      "n_b_fm3": 0.49,
+      "provider_pressure_mev_fm3": 61.251055877763854,
+      "provider_epsilon_mev_fm3": 492.5164618452456,
+      "provider_mu_b_mev": 1130.137791271448,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.33478996778130776,
+        "epsilon_relative_difference": 0.023094749964281736,
+        "mu_b_difference_mev": 65.06282359897182,
+        "generated_Yp": 0.14438827764058706
+      },
+      "high": {
+        "P_relative_difference": 0.011641508595596095,
+        "epsilon_relative_difference": 0.0033824407560181236,
+        "mu_b_difference_mev": 4.855025402133833,
+        "generated_Yp": 0.10484274087711845
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011641508595596095,
+        "epsilon_relative_difference": 0.0033824407560181236,
+        "mu_b_difference_mev": 4.855025402133833,
+        "generated_Yp": 0.10484274087711845
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011641508595596095,
+        "epsilon_relative_difference": 0.0033824407560181236,
+        "mu_b_difference_mev": 4.855025402133833,
+        "generated_Yp": 0.10484274087711845
+      }
+    },
+    {
+      "source_row_1based": 128,
+      "n_b_fm3": 0.5,
+      "provider_pressure_mev_fm3": 65.66692402200576,
+      "provider_epsilon_mev_fm3": 503.86222518595144,
+      "provider_mu_b_mev": 1139.0582984159144,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.3254410260898386,
+        "epsilon_relative_difference": 0.023883365966980596,
+        "mu_b_difference_mev": 66.80927410987624,
+        "generated_Yp": 0.14617206134055374
+      },
+      "high": {
+        "P_relative_difference": 0.011728209790036415,
+        "epsilon_relative_difference": 0.003403769271419055,
+        "mu_b_difference_mev": 4.970372440626534,
+        "generated_Yp": 0.10634308844185757
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011728209790036415,
+        "epsilon_relative_difference": 0.003403769271419055,
+        "mu_b_difference_mev": 4.970372440626534,
+        "generated_Yp": 0.10634308844185757
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011728209790036415,
+        "epsilon_relative_difference": 0.003403769271419055,
+        "mu_b_difference_mev": 4.970372440626534,
+        "generated_Yp": 0.10634308844185757
+      }
+    },
+    {
+      "source_row_1based": 129,
+      "n_b_fm3": 0.51,
+      "provider_pressure_mev_fm3": 70.31060727192234,
+      "provider_epsilon_mev_fm3": 515.2985629951957,
+      "provider_mu_b_mev": 1148.2532750335647,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.31620934245193943,
+        "epsilon_relative_difference": 0.024666436365455624,
+        "mu_b_difference_mev": 68.51656883565238,
+        "generated_Yp": 0.1479093423384607
+      },
+      "high": {
+        "P_relative_difference": 0.011719438287352446,
+        "epsilon_relative_difference": 0.003425714652395939,
+        "mu_b_difference_mev": 5.076993451922817,
+        "generated_Yp": 0.10781662693504344
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011719438287352446,
+        "epsilon_relative_difference": 0.003425714652395939,
+        "mu_b_difference_mev": 5.076993451922817,
+        "generated_Yp": 0.10781662693504344
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011719438287352446,
+        "epsilon_relative_difference": 0.003425714652395939,
+        "mu_b_difference_mev": 5.076993451922817,
+        "generated_Yp": 0.10781662693504344
+      }
+    },
+    {
+      "source_row_1based": 130,
+      "n_b_fm3": 0.52,
+      "provider_pressure_mev_fm3": 75.18522638238584,
+      "provider_epsilon_mev_fm3": 526.8281976187365,
+      "provider_mu_b_mev": 1157.7181230790816,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.30716369327484205,
+        "epsilon_relative_difference": 0.025443083619107743,
+        "mu_b_difference_mev": 70.18904942353038,
+        "generated_Yp": 0.1496014423956911
+      },
+      "high": {
+        "P_relative_difference": 0.011667395182920481,
+        "epsilon_relative_difference": 0.0034480923956052845,
+        "mu_b_difference_mev": 5.180323173307897,
+        "generated_Yp": 0.10926409761831633
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011667395182920481,
+        "epsilon_relative_difference": 0.0034480923956052845,
+        "mu_b_difference_mev": 5.180323173307897,
+        "generated_Yp": 0.10926409761831633
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011667395182920481,
+        "epsilon_relative_difference": 0.0034480923956052845,
+        "mu_b_difference_mev": 5.180323173307897,
+        "generated_Yp": 0.10926409761831633
+      }
+    },
+    {
+      "source_row_1based": 131,
+      "n_b_fm3": 0.53,
+      "provider_pressure_mev_fm3": 80.28453984365176,
+      "provider_epsilon_mev_fm3": 538.4537188538104,
+      "provider_mu_b_mev": 1167.4306767876644,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.29850636026380006,
+        "epsilon_relative_difference": 0.02621274424706921,
+        "mu_b_difference_mev": 71.84867055732207,
+        "generated_Yp": 0.15124965000477544
+      },
+      "high": {
+        "P_relative_difference": 0.011730609383357127,
+        "epsilon_relative_difference": 0.0034709949409315044,
+        "mu_b_difference_mev": 5.303314548105618,
+        "generated_Yp": 0.11068622272126197
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011730609383357127,
+        "epsilon_relative_difference": 0.0034709949409315044,
+        "mu_b_difference_mev": 5.303314548105618,
+        "generated_Yp": 0.11068622272126197
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011730609383357127,
+        "epsilon_relative_difference": 0.0034709949409315044,
+        "mu_b_difference_mev": 5.303314548105618,
+        "generated_Yp": 0.11068622272126197
+      }
+    },
+    {
+      "source_row_1based": 132,
+      "n_b_fm3": 0.54,
+      "provider_pressure_mev_fm3": 85.62727218495361,
+      "provider_epsilon_mev_fm3": 550.1777305836523,
+      "provider_mu_b_mev": 1177.4166717937144,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.29000775348118557,
+        "epsilon_relative_difference": 0.026974865182038288,
+        "mu_b_difference_mev": 73.4695239846933,
+        "generated_Yp": 0.1528552143536817
+      },
+      "high": {
+        "P_relative_difference": 0.011733762764153388,
+        "epsilon_relative_difference": 0.0034944941279853037,
+        "mu_b_difference_mev": 5.420968420060717,
+        "generated_Yp": 0.11208369875666414
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011733762764153388,
+        "epsilon_relative_difference": 0.0034944941279853037,
+        "mu_b_difference_mev": 5.420968420060717,
+        "generated_Yp": 0.11208369875666414
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011733762764153388,
+        "epsilon_relative_difference": 0.0034944941279853037,
+        "mu_b_difference_mev": 5.420968420060717,
+        "generated_Yp": 0.11208369875666414
+      }
+    },
+    {
+      "source_row_1based": 133,
+      "n_b_fm3": 0.56,
+      "provider_pressure_mev_fm3": 97.0492350174097,
+      "provider_epsilon_mev_fm3": 573.9318872446139,
+      "provider_mu_b_mev": 1198.180575467899,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.27374376234687503,
+        "epsilon_relative_difference": 0.028474017124715756,
+        "mu_b_difference_mev": 76.62280198638496,
+        "generated_Yp": 0.15594319258378453
+      },
+      "high": {
+        "P_relative_difference": 0.01177161113524372,
+        "epsilon_relative_difference": 0.0035431657648350434,
+        "mu_b_difference_mev": 5.671360124697003,
+        "generated_Yp": 0.11480733665997639
+      },
+      "maxwell": {
+        "P_relative_difference": 0.01177161113524372,
+        "epsilon_relative_difference": 0.0035431657648350434,
+        "mu_b_difference_mev": 5.671360124697003,
+        "generated_Yp": 0.11480733665997639
+      },
+      "gibbs": {
+        "P_relative_difference": 0.01177161113524372,
+        "epsilon_relative_difference": 0.0035431657648350434,
+        "mu_b_difference_mev": 5.671360124697003,
+        "generated_Yp": 0.11480733665997639
+      }
+    },
+    {
+      "source_row_1based": 134,
+      "n_b_fm3": 0.58,
+      "provider_pressure_mev_fm3": 109.48232242847665,
+      "provider_epsilon_mev_fm3": 598.1117606878216,
+      "provider_mu_b_mev": 1219.9897984763766,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.258508981516423,
+        "epsilon_relative_difference": 0.029936418285116062,
+        "mu_b_difference_mev": 79.6680819210967,
+        "generated_Yp": 0.1588744804524857
+      },
+      "high": {
+        "P_relative_difference": 0.011918454792091637,
+        "epsilon_relative_difference": 0.003594378415299193,
+        "mu_b_difference_mev": 5.956379505086261,
+        "generated_Yp": 0.11743994394495748
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011918454792091637,
+        "epsilon_relative_difference": 0.003594378415299193,
+        "mu_b_difference_mev": 5.956379505086261,
+        "generated_Yp": 0.11743994394495748
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011918454792091637,
+        "epsilon_relative_difference": 0.003594378415299193,
+        "mu_b_difference_mev": 5.956379505086261,
+        "generated_Yp": 0.11743994394495748
+      }
+    },
+    {
+      "source_row_1based": 135,
+      "n_b_fm3": 0.6,
+      "provider_pressure_mev_fm3": 123.02015706432216,
+      "provider_epsilon_mev_fm3": 622.7391148731683,
+      "provider_mu_b_mev": 1242.9321198958176,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.24372217499341087,
+        "epsilon_relative_difference": 0.031357399254945184,
+        "mu_b_difference_mev": 82.51703217416116,
+        "generated_Yp": 0.16165745319521357
+      },
+      "high": {
+        "P_relative_difference": 0.011737670108726617,
+        "epsilon_relative_difference": 0.003647405122485292,
+        "mu_b_difference_mev": 6.192253096508466,
+        "generated_Yp": 0.11998591070808355
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011737670108726617,
+        "epsilon_relative_difference": 0.003647405122485292,
+        "mu_b_difference_mev": 6.192253096508466,
+        "generated_Yp": 0.11998591070808355
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011737670108726617,
+        "epsilon_relative_difference": 0.003647405122485292,
+        "mu_b_difference_mev": 6.192253096508466,
+        "generated_Yp": 0.11998591070808355
+      }
+    },
+    {
+      "source_row_1based": 136,
+      "n_b_fm3": 0.62,
+      "provider_pressure_mev_fm3": 137.63777288596816,
+      "provider_epsilon_mev_fm3": 647.8354952183578,
+      "provider_mu_b_mev": 1266.8923679102031,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.23010085045077444,
+        "epsilon_relative_difference": 0.032733306895182945,
+        "mu_b_difference_mev": 85.28446238352763,
+        "generated_Yp": 0.16429978550627708
+      },
+      "high": {
+        "P_relative_difference": 0.011842855698482424,
+        "epsilon_relative_difference": 0.0037020635612328157,
+        "mu_b_difference_mev": 6.497342683016541,
+        "generated_Yp": 0.12244910123057415
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011842855698482424,
+        "epsilon_relative_difference": 0.0037020635612328157,
+        "mu_b_difference_mev": 6.497342683016541,
+        "generated_Yp": 0.12244910123057415
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011842855698482424,
+        "epsilon_relative_difference": 0.0037020635612328157,
+        "mu_b_difference_mev": 6.497342683016541,
+        "generated_Yp": 0.12244910123057415
+      }
+    },
+    {
+      "source_row_1based": 137,
+      "n_b_fm3": 0.64,
+      "provider_pressure_mev_fm3": 153.44751706881584,
+      "provider_epsilon_mev_fm3": 673.4223693920706,
+      "provider_mu_b_mev": 1291.984197595135,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.21695114535507298,
+        "epsilon_relative_difference": 0.034061147894846266,
+        "mu_b_difference_mev": 87.85648984301997,
+        "generated_Yp": 0.16680849849039842
+      },
+      "high": {
+        "P_relative_difference": 0.011702271183917867,
+        "epsilon_relative_difference": 0.003758383687669564,
+        "mu_b_difference_mev": 6.760412664489877,
+        "generated_Yp": 0.12483289249554635
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011702271183917867,
+        "epsilon_relative_difference": 0.003758383687669564,
+        "mu_b_difference_mev": 6.760412664489877,
+        "generated_Yp": 0.12483289249554635
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011702271183917867,
+        "epsilon_relative_difference": 0.003758383687669564,
+        "mu_b_difference_mev": 6.760412664489877,
+        "generated_Yp": 0.12483289249554635
+      }
+    },
+    {
+      "source_row_1based": 138,
+      "n_b_fm3": 0.66,
+      "provider_pressure_mev_fm3": 170.44938961286522,
+      "provider_epsilon_mev_fm3": 699.5216939366047,
+      "provider_mu_b_mev": 1318.1380053779849,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.20463696344790572,
+        "epsilon_relative_difference": 0.035337670623484696,
+        "mu_b_difference_mev": 90.3025950397564,
+        "generated_Yp": 0.16919001276806905
+      },
+      "high": {
+        "P_relative_difference": 0.011649447380431166,
+        "epsilon_relative_difference": 0.003815734615234545,
+        "mu_b_difference_mev": 7.052773237853671,
+        "generated_Yp": 0.12714022051562887
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011649447380431166,
+        "epsilon_relative_difference": 0.003815734615234545,
+        "mu_b_difference_mev": 7.052773237853671,
+        "generated_Yp": 0.12714022051562887
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011649447380431166,
+        "epsilon_relative_difference": 0.003815734615234545,
+        "mu_b_difference_mev": 7.052773237853671,
+        "generated_Yp": 0.12714022051562887
+      }
+    },
+    {
+      "source_row_1based": 139,
+      "n_b_fm3": 0.68,
+      "provider_pressure_mev_fm3": 188.62466598888278,
+      "provider_epsilon_mev_fm3": 726.1538176956525,
+      "provider_mu_b_mev": 1345.2624760066692,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.19348268093729803,
+        "epsilon_relative_difference": 0.036562439139321334,
+        "mu_b_difference_mev": 92.71406004663936,
+        "generated_Yp": 0.17145020116507126
+      },
+      "high": {
+        "P_relative_difference": 0.011997247610657347,
+        "epsilon_relative_difference": 0.0038758245441359307,
+        "mu_b_difference_mev": 7.46679648939562,
+        "generated_Yp": 0.1293736273154598
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011997247610657347,
+        "epsilon_relative_difference": 0.0038758245441359307,
+        "mu_b_difference_mev": 7.46679648939562,
+        "generated_Yp": 0.1293736273154598
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011997247610657347,
+        "epsilon_relative_difference": 0.0038758245441359307,
+        "mu_b_difference_mev": 7.46679648939562,
+        "generated_Yp": 0.1293736273154598
+      }
+    },
+    {
+      "source_row_1based": 140,
+      "n_b_fm3": 0.7,
+      "provider_pressure_mev_fm3": 208.19804054767093,
+      "provider_epsilon_mev_fm3": 753.3407849571769,
+      "provider_mu_b_mev": 1373.6268935783542,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.1822758633910615,
+        "epsilon_relative_difference": 0.03773282778727238,
+        "mu_b_difference_mev": 94.82165100153065,
+        "generated_Yp": 0.17359443807918545
+      },
+      "high": {
+        "P_relative_difference": 0.011753299061345812,
+        "epsilon_relative_difference": 0.003937865179392874,
+        "mu_b_difference_mev": 7.733668971203315,
+        "generated_Yp": 0.13153530527223461
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011753299061345812,
+        "epsilon_relative_difference": 0.003937865179392874,
+        "mu_b_difference_mev": 7.733668971203315,
+        "generated_Yp": 0.13153530527223461
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011753299061345812,
+        "epsilon_relative_difference": 0.003937865179392874,
+        "mu_b_difference_mev": 7.733668971203315,
+        "generated_Yp": 0.13153530527223461
+      }
+    },
+    {
+      "source_row_1based": 141,
+      "n_b_fm3": 0.72,
+      "provider_pressure_mev_fm3": 229.03844158459492,
+      "provider_epsilon_mev_fm3": 781.1049123273236,
+      "provider_mu_b_mev": 1402.9768804332202,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.17206922788775003,
+        "epsilon_relative_difference": 0.03884630960446489,
+        "mu_b_difference_mev": 96.87987646932015,
+        "generated_Yp": 0.175627644496012
+      },
+      "high": {
+        "P_relative_difference": 0.011842974492126901,
+        "epsilon_relative_difference": 0.004000816868774848,
+        "mu_b_difference_mev": 8.107714070729116,
+        "generated_Yp": 0.13362713753983396
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011842974492126901,
+        "epsilon_relative_difference": 0.004000816868774848,
+        "mu_b_difference_mev": 8.107714070729116,
+        "generated_Yp": 0.13362713753983396
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011842974492126901,
+        "epsilon_relative_difference": 0.004000816868774848,
+        "mu_b_difference_mev": 8.107714070729116,
+        "generated_Yp": 0.13362713753983396
+      }
+    },
+    {
+      "source_row_1based": 142,
+      "n_b_fm3": 0.74,
+      "provider_pressure_mev_fm3": 251.270699294545,
+      "provider_epsilon_mev_fm3": 809.467054640295,
+      "provider_mu_b_mev": 1433.4293972092432,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.16234025017036657,
+        "epsilon_relative_difference": 0.03990270049181244,
+        "mu_b_difference_mev": 98.77198597737902,
+        "generated_Yp": 0.1775543285167073
+      },
+      "high": {
+        "P_relative_difference": 0.011851451342582031,
+        "epsilon_relative_difference": 0.00406557633596738,
+        "mu_b_difference_mev": 8.471449417022313,
+        "generated_Yp": 0.135650734266256
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011851451342582031,
+        "epsilon_relative_difference": 0.00406557633596738,
+        "mu_b_difference_mev": 8.471449417022313,
+        "generated_Yp": 0.135650734266256
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011851451342582031,
+        "epsilon_relative_difference": 0.00406557633596738,
+        "mu_b_difference_mev": 8.471449417022313,
+        "generated_Yp": 0.135650734266256
+      }
+    },
+    {
+      "source_row_1based": 143,
+      "n_b_fm3": 0.76,
+      "provider_pressure_mev_fm3": 274.8823306580321,
+      "provider_epsilon_mev_fm3": 838.4485253061283,
+      "provider_mu_b_mev": 1464.9090210054744,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.15331023450149894,
+        "epsilon_relative_difference": 0.040901414022745275,
+        "mu_b_difference_mev": 100.57369058395739,
+        "generated_Yp": 0.179378621641176
+      },
+      "high": {
+        "P_relative_difference": 0.012000629703641685,
+        "epsilon_relative_difference": 0.004132339433362331,
+        "mu_b_difference_mev": 8.899361797720985,
+        "generated_Yp": 0.1376074647519282
+      },
+      "maxwell": {
+        "P_relative_difference": 0.012000629703641685,
+        "epsilon_relative_difference": 0.004132339433362331,
+        "mu_b_difference_mev": 8.899361797720985,
+        "generated_Yp": 0.1376074647519282
+      },
+      "gibbs": {
+        "P_relative_difference": 0.012000629703641685,
+        "epsilon_relative_difference": 0.004132339433362331,
+        "mu_b_difference_mev": 8.899361797720985,
+        "generated_Yp": 0.1376074647519282
+      }
+    },
+    {
+      "source_row_1based": 144,
+      "n_b_fm3": 0.78,
+      "provider_pressure_mev_fm3": 299.9856828504574,
+      "provider_epsilon_mev_fm3": 868.0707729386265,
+      "provider_mu_b_mev": 1497.5082766526716,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.14463573147847053,
+        "epsilon_relative_difference": 0.04184193251423274,
+        "mu_b_difference_mev": 102.19282996284664,
+        "generated_Yp": 0.1811043111849567
+      },
+      "high": {
+        "P_relative_difference": 0.012018284795736855,
+        "epsilon_relative_difference": 0.00420107881602938,
+        "mu_b_difference_mev": 9.297624495060063,
+        "generated_Yp": 0.1394984858657283
+      },
+      "maxwell": {
+        "P_relative_difference": 0.012018284795736855,
+        "epsilon_relative_difference": 0.00420107881602938,
+        "mu_b_difference_mev": 9.297624495060063,
+        "generated_Yp": 0.1394984858657283
+      },
+      "gibbs": {
+        "P_relative_difference": 0.012018284795736855,
+        "epsilon_relative_difference": 0.00420107881602938,
+        "mu_b_difference_mev": 9.297624495060063,
+        "generated_Yp": 0.1394984858657283
+      }
+    },
+    {
+      "source_row_1based": 145,
+      "n_b_fm3": 0.8,
+      "provider_pressure_mev_fm3": 326.6618954984997,
+      "provider_epsilon_mev_fm3": 898.3566430632318,
+      "provider_mu_b_mev": 1531.2731732021643,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.13618717330582775,
+        "epsilon_relative_difference": 0.04272234985233658,
+        "mu_b_difference_mev": 103.58383371472814,
+        "generated_Yp": 0.18273486923250545
+      },
+      "high": {
+        "P_relative_difference": 0.011812691142694787,
+        "epsilon_relative_difference": 0.0042701615333258225,
+        "mu_b_difference_mev": 9.618605075034111,
+        "generated_Yp": 0.1413247670812798
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011812691142694787,
+        "epsilon_relative_difference": 0.0042701615333258225,
+        "mu_b_difference_mev": 9.618605075034111,
+        "generated_Yp": 0.1413247670812798
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011812691142694787,
+        "epsilon_relative_difference": 0.0042701615333258225,
+        "mu_b_difference_mev": 9.618605075034111,
+        "generated_Yp": 0.1413247670812798
+      }
+    },
+    {
+      "source_row_1based": 146,
+      "n_b_fm3": 0.82,
+      "provider_pressure_mev_fm3": 354.82358746573567,
+      "provider_epsilon_mev_fm3": 929.3278280934501,
+      "provider_mu_b_mev": 1566.0383116575435,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.12841058280841566,
+        "epsilon_relative_difference": 0.043542478786962935,
+        "mu_b_difference_mev": 104.91261085553856,
+        "generated_Yp": 0.18427347850914955
+      },
+      "high": {
+        "P_relative_difference": 0.011804348955455124,
+        "epsilon_relative_difference": 0.004339365153000596,
+        "mu_b_difference_mev": 10.025797850017625,
+        "generated_Yp": 0.14308711248939832
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011804348955455124,
+        "epsilon_relative_difference": 0.004339365153000596,
+        "mu_b_difference_mev": 10.025797850017625,
+        "generated_Yp": 0.14308711248939832
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011804348955455124,
+        "epsilon_relative_difference": 0.004339365153000596,
+        "mu_b_difference_mev": 10.025797850017625,
+        "generated_Yp": 0.14308711248939832
+      }
+    },
+    {
+      "source_row_1based": 147,
+      "n_b_fm3": 0.84,
+      "provider_pressure_mev_fm3": 384.5706229080776,
+      "provider_epsilon_mev_fm3": 961.0050393642683,
+      "provider_mu_b_mev": 1601.8757884194597,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.12105608882904773,
+        "epsilon_relative_difference": 0.04430341457889897,
+        "mu_b_difference_mev": 106.10764304662939,
+        "generated_Yp": 0.1857230555183477
+      },
+      "high": {
+        "P_relative_difference": 0.011795593981408947,
+        "epsilon_relative_difference": 0.004409471990072689,
+        "mu_b_difference_mev": 10.444956819519348,
+        "generated_Yp": 0.14478618011635797
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011795593981408947,
+        "epsilon_relative_difference": 0.004409471990072689,
+        "mu_b_difference_mev": 10.444956819519348,
+        "generated_Yp": 0.14478618011635797
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011795593981408947,
+        "epsilon_relative_difference": 0.004409471990072689,
+        "mu_b_difference_mev": 10.444956819519348,
+        "generated_Yp": 0.14478618011635797
+      }
+    },
+    {
+      "source_row_1based": 148,
+      "n_b_fm3": 0.86,
+      "provider_pressure_mev_fm3": 415.8905188060365,
+      "provider_epsilon_mev_fm3": 993.4090841594164,
+      "provider_mu_b_mev": 1638.7204685644804,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.11424224960330309,
+        "epsilon_relative_difference": 0.04500621214775946,
+        "mu_b_difference_mev": 107.23470749799617,
+        "generated_Yp": 0.1870862712524206
+      },
+      "high": {
+        "P_relative_difference": 0.01191644376103329,
+        "epsilon_relative_difference": 0.004481013512182885,
+        "mu_b_difference_mev": 10.93885524109578,
+        "generated_Yp": 0.14642249884588532
+      },
+      "maxwell": {
+        "P_relative_difference": 0.01191644376103329,
+        "epsilon_relative_difference": 0.004481013512182885,
+        "mu_b_difference_mev": 10.93885524109578,
+        "generated_Yp": 0.14642249884588532
+      },
+      "gibbs": {
+        "P_relative_difference": 0.01191644376103329,
+        "epsilon_relative_difference": 0.004481013512182885,
+        "mu_b_difference_mev": 10.93885524109578,
+        "generated_Yp": 0.14642249884588532
+      }
+    },
+    {
+      "source_row_1based": 149,
+      "n_b_fm3": 0.88,
+      "provider_pressure_mev_fm3": 448.88938082526886,
+      "provider_epsilon_mev_fm3": 1026.5608488338216,
+      "provider_mu_b_mev": 1676.6479882489664,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.10775068301897428,
+        "epsilon_relative_difference": 0.04565191487468567,
+        "mu_b_difference_mev": 108.21887030515222,
+        "generated_Yp": 0.18836556974849689
+      },
+      "high": {
+        "P_relative_difference": 0.011990729076545747,
+        "epsilon_relative_difference": 0.004554317766090499,
+        "mu_b_difference_mev": 11.429312798444244,
+        "generated_Yp": 0.1479964832114027
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011990729076545747,
+        "epsilon_relative_difference": 0.004554317766090499,
+        "mu_b_difference_mev": 11.429312798444244,
+        "generated_Yp": 0.1479964832114027
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011990729076545747,
+        "epsilon_relative_difference": 0.004554317766090499,
+        "mu_b_difference_mev": 11.429312798444244,
+        "generated_Yp": 0.1479964832114027
+      }
+    },
+    {
+      "source_row_1based": 150,
+      "n_b_fm3": 0.9,
+      "provider_pressure_mev_fm3": 483.6670731216871,
+      "provider_epsilon_mev_fm3": 1060.482615185668,
+      "provider_mu_b_mev": 1715.7218758970612,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.1014347113375429,
+        "epsilon_relative_difference": 0.04624026259060865,
+        "mu_b_difference_mev": 108.9973606050371,
+        "generated_Yp": 0.18956318472854491
+      },
+      "high": {
+        "P_relative_difference": 0.01190255158348208,
+        "epsilon_relative_difference": 0.004628287625166871,
+        "mu_b_difference_mev": 11.850100946256816,
+        "generated_Yp": 0.14950844629588717
+      },
+      "maxwell": {
+        "P_relative_difference": 0.01190255158348208,
+        "epsilon_relative_difference": 0.004628287625166871,
+        "mu_b_difference_mev": 11.850100946256816,
+        "generated_Yp": 0.14950844629588717
+      },
+      "gibbs": {
+        "P_relative_difference": 0.01190255158348208,
+        "epsilon_relative_difference": 0.004628287625166871,
+        "mu_b_difference_mev": 11.850100946256816,
+        "generated_Yp": 0.14950844629588717
+      }
+    },
+    {
+      "source_row_1based": 151,
+      "n_b_fm3": 0.92,
+      "provider_pressure_mev_fm3": 520.1299730491235,
+      "provider_epsilon_mev_fm3": 1095.195804900032,
+      "provider_mu_b_mev": 1755.7888890751692,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.09559482131184738,
+        "epsilon_relative_difference": 0.04677205512299465,
+        "mu_b_difference_mev": 109.72422868459034,
+        "generated_Yp": 0.19068115453331738
+      },
+      "high": {
+        "P_relative_difference": 0.0119453468143349,
+        "epsilon_relative_difference": 0.004702690084118499,
+        "mu_b_difference_mev": 12.351629748340656,
+        "generated_Yp": 0.1509586109504837
+      },
+      "maxwell": {
+        "P_relative_difference": 0.0119453468143349,
+        "epsilon_relative_difference": 0.004702690084118499,
+        "mu_b_difference_mev": 12.351629748340656,
+        "generated_Yp": 0.1509586109504837
+      },
+      "gibbs": {
+        "P_relative_difference": 0.0119453468143349,
+        "epsilon_relative_difference": 0.004702690084118499,
+        "mu_b_difference_mev": 12.351629748340656,
+        "generated_Yp": 0.1509586109504837
+      }
+    },
+    {
+      "source_row_1based": 152,
+      "n_b_fm3": 0.94,
+      "provider_pressure_mev_fm3": 558.3654617440011,
+      "provider_epsilon_mev_fm3": 1130.7207833885846,
+      "provider_mu_b_mev": 1796.9002607793466,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.09008887307224756,
+        "epsilon_relative_difference": 0.04724918322596383,
+        "mu_b_difference_mev": 110.34909434331371,
+        "generated_Yp": 0.19172133553456908
+      },
+      "high": {
+        "P_relative_difference": 0.012006703783310702,
+        "epsilon_relative_difference": 0.00477820050612654,
+        "mu_b_difference_mev": 12.879722682411511,
+        "generated_Yp": 0.15234711951961144
+      },
+      "maxwell": {
+        "P_relative_difference": 0.012006703783310702,
+        "epsilon_relative_difference": 0.00477820050612654,
+        "mu_b_difference_mev": 12.879722682411511,
+        "generated_Yp": 0.15234711951961144
+      },
+      "gibbs": {
+        "P_relative_difference": 0.012006703783310702,
+        "epsilon_relative_difference": 0.00477820050612654,
+        "mu_b_difference_mev": 12.879722682411511,
+        "generated_Yp": 0.15234711951961144
+      }
+    },
+    {
+      "source_row_1based": 153,
+      "n_b_fm3": 0.96,
+      "provider_pressure_mev_fm3": 598.4858863817211,
+      "provider_epsilon_mev_fm3": 1167.07916864135,
+      "provider_mu_b_mev": 1839.1302656490325,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.08476252462393963,
+        "epsilon_relative_difference": 0.04767239346702157,
+        "mu_b_difference_mev": 110.79857501681863,
+        "generated_Yp": 0.1926854141876869
+      },
+      "high": {
+        "P_relative_difference": 0.011959287879259373,
+        "epsilon_relative_difference": 0.004854273353771976,
+        "mu_b_difference_mev": 13.357069080198926,
+        "generated_Yp": 0.15367404223956915
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011959287879259373,
+        "epsilon_relative_difference": 0.004854273353771976,
+        "mu_b_difference_mev": 13.357069080198926,
+        "generated_Yp": 0.15367404223956915
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011959287879259373,
+        "epsilon_relative_difference": 0.004854273353771976,
+        "mu_b_difference_mev": 13.357069080198926,
+        "generated_Yp": 0.15367404223956915
+      }
+    },
+    {
+      "source_row_1based": 154,
+      "n_b_fm3": 0.98,
+      "provider_pressure_mev_fm3": 640.5037299817727,
+      "provider_epsilon_mev_fm3": 1204.2930067294128,
+      "provider_mu_b_mev": 1882.4456497052915,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.07966831798934604,
+        "epsilon_relative_difference": 0.048042177376028894,
+        "mu_b_difference_mev": 111.10685007709753,
+        "generated_Yp": 0.19357491786751443
+      },
+      "high": {
+        "P_relative_difference": 0.011866215637802657,
+        "epsilon_relative_difference": 0.004930012168849807,
+        "mu_b_difference_mev": 13.813810770221153,
+        "generated_Yp": 0.1549393844592713
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011866215637802657,
+        "epsilon_relative_difference": 0.004930012168849807,
+        "mu_b_difference_mev": 13.813810770221153,
+        "generated_Yp": 0.1549393844592713
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011866215637802657,
+        "epsilon_relative_difference": 0.004930012168849807,
+        "mu_b_difference_mev": 13.813810770221153,
+        "generated_Yp": 0.1549393844592713
+      }
+    },
+    {
+      "source_row_1based": 155,
+      "n_b_fm3": 1.0,
+      "provider_pressure_mev_fm3": 684.3815434856888,
+      "provider_epsilon_mev_fm3": 1242.3832010938368,
+      "provider_mu_b_mev": 1926.7647445795255,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.07492124112761789,
+        "epsilon_relative_difference": 0.04836014013727241,
+        "mu_b_difference_mev": 111.35654035187372,
+        "generated_Yp": 0.19439122461325153
+      },
+      "high": {
+        "P_relative_difference": 0.011849672979504122,
+        "epsilon_relative_difference": 0.005005496386736752,
+        "mu_b_difference_mev": 14.3284421075316,
+        "generated_Yp": 0.15614309281552477
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011849672979504122,
+        "epsilon_relative_difference": 0.005005496386736752,
+        "mu_b_difference_mev": 14.3284421075316,
+        "generated_Yp": 0.15614309281552477
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011849672979504122,
+        "epsilon_relative_difference": 0.005005496386736752,
+        "mu_b_difference_mev": 14.3284421075316,
+        "generated_Yp": 0.15614309281552477
+      }
+    },
+    {
+      "source_row_1based": 156,
+      "n_b_fm3": 1.02,
+      "provider_pressure_mev_fm3": 730.0693948155131,
+      "provider_epsilon_mev_fm3": 1281.3689463501362,
+      "provider_mu_b_mev": 1971.998373691813,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.07062133317619534,
+        "epsilon_relative_difference": 0.04862930190384818,
+        "mu_b_difference_mev": 111.63779540714313,
+        "generated_Yp": 0.1951355718936356
+      },
+      "high": {
+        "P_relative_difference": 0.012018900630188956,
+        "epsilon_relative_difference": 0.00508208264117993,
+        "mu_b_difference_mev": 14.986916067277207,
+        "generated_Yp": 0.15728506048085
+      },
+      "maxwell": {
+        "P_relative_difference": 0.012018900630188956,
+        "epsilon_relative_difference": 0.00508208264117993,
+        "mu_b_difference_mev": 14.986916067277207,
+        "generated_Yp": 0.15728506048085
+      },
+      "gibbs": {
+        "P_relative_difference": 0.012018900630188956,
+        "epsilon_relative_difference": 0.00508208264117993,
+        "mu_b_difference_mev": 14.986916067277207,
+        "generated_Yp": 0.15728506048085
+      }
+    },
+    {
+      "source_row_1based": 157,
+      "n_b_fm3": 1.04,
+      "provider_pressure_mev_fm3": 777.9417745559165,
+      "provider_epsilon_mev_fm3": 1321.2717644782545,
+      "provider_mu_b_mev": 2018.474556763626,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.06625624717594447,
+        "epsilon_relative_difference": 0.04885067911622509,
+        "mu_b_difference_mev": 111.62358220704391,
+        "generated_Yp": 0.1958090644907948
+      },
+      "high": {
+        "P_relative_difference": 0.01190274326181795,
+        "epsilon_relative_difference": 0.005159140695944142,
+        "mu_b_difference_mev": 15.45795014009991,
+        "generated_Yp": 0.15836513158919405
+      },
+      "maxwell": {
+        "P_relative_difference": 0.01190274326181795,
+        "epsilon_relative_difference": 0.005159140695944142,
+        "mu_b_difference_mev": 15.45795014009991,
+        "generated_Yp": 0.15836513158919405
+      },
+      "gibbs": {
+        "P_relative_difference": 0.01190274326181795,
+        "epsilon_relative_difference": 0.005159140695944142,
+        "mu_b_difference_mev": 15.45795014009991,
+        "generated_Yp": 0.15836513158919405
+      }
+    },
+    {
+      "source_row_1based": 158,
+      "n_b_fm3": 1.06,
+      "provider_pressure_mev_fm3": 827.7490223171185,
+      "provider_epsilon_mev_fm3": 1362.113698208861,
+      "provider_mu_b_mev": 2065.908226911302,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.06223913963715244,
+        "epsilon_relative_difference": 0.04902496146747892,
+        "mu_b_difference_mev": 111.59996089955212,
+        "generated_Yp": 0.19641268159001093
+      },
+      "high": {
+        "P_relative_difference": 0.011903527834225436,
+        "epsilon_relative_difference": 0.005235674121446543,
+        "mu_b_difference_mev": 16.023317893475905,
+        "generated_Yp": 0.15938310493357702
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011903527834225436,
+        "epsilon_relative_difference": 0.005235674121446543,
+        "mu_b_difference_mev": 16.023317893475905,
+        "generated_Yp": 0.15938310493357702
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011903527834225436,
+        "epsilon_relative_difference": 0.005235674121446543,
+        "mu_b_difference_mev": 16.023317893475905,
+        "generated_Yp": 0.15938310493357702
+      }
+    },
+    {
+      "source_row_1based": 159,
+      "n_b_fm3": 1.08,
+      "provider_pressure_mev_fm3": 879.6159682940092,
+      "provider_epsilon_mev_fm3": 1403.91469344214,
+      "provider_mu_b_mev": 2114.380242348286,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.05843150205799552,
+        "epsilon_relative_difference": 0.04915451701391915,
+        "mu_b_difference_mev": 111.48706569121305,
+        "generated_Yp": 0.19694728315292973
+      },
+      "high": {
+        "P_relative_difference": 0.011901559771462011,
+        "epsilon_relative_difference": 0.005312252819724028,
+        "mu_b_difference_mev": 16.59884426988401,
+        "generated_Yp": 0.16033873701981544
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011901559771462011,
+        "epsilon_relative_difference": 0.005312252819724028,
+        "mu_b_difference_mev": 16.59884426988401,
+        "generated_Yp": 0.16033873701981544
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011901559771462011,
+        "epsilon_relative_difference": 0.005312252819724028,
+        "mu_b_difference_mev": 16.59884426988401,
+        "generated_Yp": 0.16033873701981544
+      }
+    },
+    {
+      "source_row_1based": 160,
+      "n_b_fm3": 1.1,
+      "provider_pressure_mev_fm3": 933.5426124865888,
+      "provider_epsilon_mev_fm3": 1446.6951409485437,
+      "provider_mu_b_mev": 2163.852503122848,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.05486543717245285,
+        "epsilon_relative_difference": 0.0492413037410262,
+        "mu_b_difference_mev": 111.32398037209487,
+        "generated_Yp": 0.19741361564328683
+      },
+      "high": {
+        "P_relative_difference": 0.011938342825555726,
+        "epsilon_relative_difference": 0.005389022013568612,
+        "mu_b_difference_mev": 17.219294283295312,
+        "generated_Yp": 0.16123174455164746
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011938342825555726,
+        "epsilon_relative_difference": 0.005389022013568612,
+        "mu_b_difference_mev": 17.219294283295312,
+        "generated_Yp": 0.16123174455164746
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011938342825555726,
+        "epsilon_relative_difference": 0.005389022013568612,
+        "mu_b_difference_mev": 17.219294283295312,
+        "generated_Yp": 0.16123174455164746
+      }
+    },
+    {
+      "source_row_1based": 161,
+      "n_b_fm3": 1.12,
+      "provider_pressure_mev_fm3": 990.0906907718634,
+      "provider_epsilon_mev_fm3": 1490.4796824718564,
+      "provider_mu_b_mev": 2214.7949761104637,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.050966594482282135,
+        "epsilon_relative_difference": 0.04928424051252689,
+        "mu_b_difference_mev": 110.64170525645523,
+        "generated_Yp": 0.19781231716688588
+      },
+      "high": {
+        "P_relative_difference": 0.011471611834687812,
+        "epsilon_relative_difference": 0.005463192970460273,
+        "mu_b_difference_mev": 17.411351972828015,
+        "generated_Yp": 0.16206180641481885
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011471611834687812,
+        "epsilon_relative_difference": 0.005463192970460273,
+        "mu_b_difference_mev": 17.411351972828015,
+        "generated_Yp": 0.16206180641481885
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011471611834687812,
+        "epsilon_relative_difference": 0.005463192970460273,
+        "mu_b_difference_mev": 17.411351972828015,
+        "generated_Yp": 0.16206180641481885
+      }
+    },
+    {
+      "source_row_1based": 162,
+      "n_b_fm3": 1.14,
+      "provider_pressure_mev_fm3": 1047.387750226479,
+      "provider_epsilon_mev_fm3": 1535.2808575632625,
+      "provider_mu_b_mev": 2265.4987787629316,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.04872677017323945,
+        "epsilon_relative_difference": 0.0492908196966495,
+        "mu_b_difference_mev": 111.15006501878952,
+        "generated_Yp": 0.19814392208117013
+      },
+      "high": {
+        "P_relative_difference": 0.012429096224330083,
+        "epsilon_relative_difference": 0.005540179499868181,
+        "mu_b_difference_mev": 18.880539180142932,
+        "generated_Yp": 0.1628285652208541
+      },
+      "maxwell": {
+        "P_relative_difference": 0.012429096224330083,
+        "epsilon_relative_difference": 0.005540179499868181,
+        "mu_b_difference_mev": 18.880539180142932,
+        "generated_Yp": 0.1628285652208541
+      },
+      "gibbs": {
+        "P_relative_difference": 0.012429096224330083,
+        "epsilon_relative_difference": 0.005540179499868181,
+        "mu_b_difference_mev": 18.880539180142932,
+        "generated_Yp": 0.1628285652208541
+      }
+    },
+    {
+      "source_row_1based": 163,
+      "n_b_fm3": 1.16,
+      "provider_pressure_mev_fm3": 1108.6169608201371,
+      "provider_epsilon_mev_fm3": 1581.121289431904,
+      "provider_mu_b_mev": 2318.7398709069325,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.044919023190938434,
+        "epsilon_relative_difference": 0.04926115343384718,
+        "mu_b_difference_mev": 110.07400811135676,
+        "generated_Yp": 0.19840886512421443
+      },
+      "high": {
+        "P_relative_difference": 0.0117081777497543,
+        "epsilon_relative_difference": 0.005618319435754859,
+        "mu_b_difference_mev": 18.847524917565806,
+        "generated_Yp": 0.1635316284651911
+      },
+      "maxwell": {
+        "P_relative_difference": 0.0117081777497543,
+        "epsilon_relative_difference": 0.005618319435754859,
+        "mu_b_difference_mev": 18.847524917565806,
+        "generated_Yp": 0.1635316284651911
+      },
+      "gibbs": {
+        "P_relative_difference": 0.0117081777497543,
+        "epsilon_relative_difference": 0.005618319435754859,
+        "mu_b_difference_mev": 18.847524917565806,
+        "generated_Yp": 0.1635316284651911
+      }
+    },
+    {
+      "source_row_1based": 164,
+      "n_b_fm3": 1.18,
+      "provider_pressure_mev_fm3": 1170.844812972917,
+      "provider_epsilon_mev_fm3": 1628.0261232645937,
+      "provider_mu_b_mev": 2371.9245222351788,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.042465656681107466,
+        "epsilon_relative_difference": 0.049193866433910216,
+        "mu_b_difference_mev": 110.00813009606463,
+        "generated_Yp": 0.19860748510819248
+      },
+      "high": {
+        "P_relative_difference": 0.012140205311851116,
+        "epsilon_relative_difference": 0.005694527610568656,
+        "mu_b_difference_mev": 19.902657735141474,
+        "generated_Yp": 0.16417056934911084
+      },
+      "maxwell": {
+        "P_relative_difference": 0.012140205311851116,
+        "epsilon_relative_difference": 0.005694527610568656,
+        "mu_b_difference_mev": 19.902657735141474,
+        "generated_Yp": 0.16417056934911084
+      },
+      "gibbs": {
+        "P_relative_difference": 0.012140205311851116,
+        "epsilon_relative_difference": 0.005694527610568656,
+        "mu_b_difference_mev": 19.902657735141474,
+        "generated_Yp": 0.16417056934911084
+      }
+    },
+    {
+      "source_row_1based": 165,
+      "n_b_fm3": 1.2,
+      "provider_pressure_mev_fm3": 1236.1310049005076,
+      "provider_epsilon_mev_fm3": 1676.011333764998,
+      "provider_mu_b_mev": 2426.785282221255,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.0394645461398313,
+        "epsilon_relative_difference": 0.049093632139619814,
+        "mu_b_difference_mev": 109.22069413288955,
+        "generated_Yp": 0.19874002821830133
+      },
+      "high": {
+        "P_relative_difference": 0.011891013544861329,
+        "epsilon_relative_difference": 0.005771525861110405,
+        "mu_b_difference_mev": 20.30999439902598,
+        "generated_Yp": 0.1647449273102496
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011891013544861329,
+        "epsilon_relative_difference": 0.005771525861110405,
+        "mu_b_difference_mev": 20.30999439902598,
+        "generated_Yp": 0.1647449273102496
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011891013544861329,
+        "epsilon_relative_difference": 0.005771525861110405,
+        "mu_b_difference_mev": 20.30999439902598,
+        "generated_Yp": 0.1647449273102496
+      }
+    },
+    {
+      "source_row_1based": 166,
+      "n_b_fm3": 1.22,
+      "provider_pressure_mev_fm3": 1303.2896497514516,
+      "provider_epsilon_mev_fm3": 1725.1002187695474,
+      "provider_mu_b_mev": 2482.2867774762285,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.03699172542196849,
+        "epsilon_relative_difference": 0.04896029284355263,
+        "mu_b_difference_mev": 108.74782357732238,
+        "generated_Yp": 0.19880665095459185
+      },
+      "high": {
+        "P_relative_difference": 0.012013017913809598,
+        "epsilon_relative_difference": 0.005847421418115006,
+        "mu_b_difference_mev": 21.10149989915817,
+        "generated_Yp": 0.1652542083025751
+      },
+      "maxwell": {
+        "P_relative_difference": 0.012013017913809598,
+        "epsilon_relative_difference": 0.005847421418115006,
+        "mu_b_difference_mev": 21.10149989915817,
+        "generated_Yp": 0.1652542083025751
+      },
+      "gibbs": {
+        "P_relative_difference": 0.012013017913809598,
+        "epsilon_relative_difference": 0.005847421418115006,
+        "mu_b_difference_mev": 21.10149989915817,
+        "generated_Yp": 0.1652542083025751
+      }
+    },
+    {
+      "source_row_1based": 167,
+      "n_b_fm3": 1.24,
+      "provider_pressure_mev_fm3": 1373.4442192797612,
+      "provider_epsilon_mev_fm3": 1775.3144090605656,
+      "provider_mu_b_mev": 2539.321474468006,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.03416157506883599,
+        "epsilon_relative_difference": 0.04879483058767442,
+        "mu_b_difference_mev": 107.69772873366992,
+        "generated_Yp": 0.19880742275137434
+      },
+      "high": {
+        "P_relative_difference": 0.011649821430825824,
+        "epsilon_relative_difference": 0.005921434736030573,
+        "mu_b_difference_mev": 21.38128089435031,
+        "generated_Yp": 0.16569788486316017
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011649821430825824,
+        "epsilon_relative_difference": 0.005921434736030573,
+        "mu_b_difference_mev": 21.38128089435031,
+        "generated_Yp": 0.16569788486316017
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011649821430825824,
+        "epsilon_relative_difference": 0.005921434736030573,
+        "mu_b_difference_mev": 21.38128089435031,
+        "generated_Yp": 0.16569788486316017
+      }
+    },
+    {
+      "source_row_1based": 168,
+      "n_b_fm3": 1.26,
+      "provider_pressure_mev_fm3": 1444.5350152697474,
+      "provider_epsilon_mev_fm3": 1826.6678009674006,
+      "provider_mu_b_mev": 2596.192711299324,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.0325407700092093,
+        "epsilon_relative_difference": 0.04860269334858325,
+        "mu_b_difference_mev": 107.76766403356487,
+        "generated_Yp": 0.19874232830622038
+      },
+      "high": {
+        "P_relative_difference": 0.012340932283243511,
+        "epsilon_relative_difference": 0.005997096369047217,
+        "mu_b_difference_mev": 22.84254892131321,
+        "generated_Yp": 0.16607539600040291
+      },
+      "maxwell": {
+        "P_relative_difference": 0.012340932283243511,
+        "epsilon_relative_difference": 0.005997096369047217,
+        "mu_b_difference_mev": 22.84254892131321,
+        "generated_Yp": 0.16607539600040291
+      },
+      "gibbs": {
+        "P_relative_difference": 0.012340932283243511,
+        "epsilon_relative_difference": 0.005997096369047217,
+        "mu_b_difference_mev": 22.84254892131321,
+        "generated_Yp": 0.16607539600040291
+      }
+    },
+    {
+      "source_row_1based": 169,
+      "n_b_fm3": 1.28,
+      "provider_pressure_mev_fm3": 1519.7452076911115,
+      "provider_epsilon_mev_fm3": 1879.1819459744436,
+      "provider_mu_b_mev": 2655.411838801215,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.029826347084101368,
+        "epsilon_relative_difference": 0.04838457744483793,
+        "mu_b_difference_mev": 106.44677534526363,
+        "generated_Yp": 0.19861126964887657
+      },
+      "high": {
+        "P_relative_difference": 0.011836957901626866,
+        "epsilon_relative_difference": 0.006073411668536588,
+        "mu_b_difference_mev": 22.970473127049445,
+        "generated_Yp": 0.1663861469357779
+      },
+      "maxwell": {
+        "P_relative_difference": 0.011836957901626866,
+        "epsilon_relative_difference": 0.006073411668536588,
+        "mu_b_difference_mev": 22.970473127049445,
+        "generated_Yp": 0.1663861469357779
+      },
+      "gibbs": {
+        "P_relative_difference": 0.011836957901626866,
+        "epsilon_relative_difference": 0.006073411668536588,
+        "mu_b_difference_mev": 22.970473127049445,
+        "generated_Yp": 0.1663861469357779
+      }
+    },
+    {
+      "source_row_1based": 170,
+      "n_b_fm3": 1.3,
+      "provider_pressure_mev_fm3": 1596.7030228409385,
+      "provider_epsilon_mev_fm3": 1932.8849126524888,
+      "provider_mu_b_mev": 2715.067642687252,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.02774221239616992,
+        "epsilon_relative_difference": 0.04813767768292876,
+        "mu_b_difference_mev": 105.64666562824732,
+        "generated_Yp": 0.19841406797874853
+      },
+      "high": {
+        "P_relative_difference": 0.01183372982864439,
+        "epsilon_relative_difference": 0.006146058546956157,
+        "mu_b_difference_mev": 23.672750789668953,
+        "generated_Yp": 0.16662950872940469
+      },
+      "maxwell": {
+        "P_relative_difference": 0.01183372982864439,
+        "epsilon_relative_difference": 0.006146058546956157,
+        "mu_b_difference_mev": 23.672750789668953,
+        "generated_Yp": 0.16662950872940469
+      },
+      "gibbs": {
+        "P_relative_difference": 0.01183372982864439,
+        "epsilon_relative_difference": 0.006146058546956157,
+        "mu_b_difference_mev": 23.672750789668953,
+        "generated_Yp": 0.16662950872940469
+      }
+    },
+    {
+      "source_row_1based": 171,
+      "n_b_fm3": 1.32,
+      "provider_pressure_mev_fm3": 1675.8453664013448,
+      "provider_epsilon_mev_fm3": 1987.788595664597,
+      "provider_mu_b_mev": 2775.4802742923803,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.02596355534028416,
+        "epsilon_relative_difference": 0.047868134518398,
+        "mu_b_difference_mev": 105.04745136646216,
+        "generated_Yp": 0.198150465298588
+      },
+      "high": {
+        "P_relative_difference": 0.012019697186302913,
+        "epsilon_relative_difference": 0.00621933745633152,
+        "mu_b_difference_mev": 24.625668108711125,
+        "generated_Yp": 0.1668048178182089
+      },
+      "maxwell": {
+        "P_relative_difference": 0.012019697186302913,
+        "epsilon_relative_difference": 0.00621933745633152,
+        "mu_b_difference_mev": 24.625668108711125,
+        "generated_Yp": 0.1668048178182089
+      },
+      "gibbs": {
+        "P_relative_difference": 0.012019697186302913,
+        "epsilon_relative_difference": 0.00621933745633152,
+        "mu_b_difference_mev": 24.625668108711125,
+        "generated_Yp": 0.1668048178182089
+      }
+    },
+    {
+      "source_row_1based": 172,
+      "n_b_fm3": 1.34,
+      "provider_pressure_mev_fm3": 1757.8588044442258,
+      "provider_epsilon_mev_fm3": 2043.9130108131994,
+      "provider_mu_b_mev": 2837.1431457144963,
+      "provider_composition_available": false,
+      "generated_phase": "high",
+      "low": {
+        "P_relative_difference": 0.024077506457403253,
+        "epsilon_relative_difference": 0.04757736117853528,
+        "mu_b_difference_mev": 104.15585391654895,
+        "generated_Yp": 0.1978201258713437
+      },
+      "high": {
+        "P_relative_difference": 0.01199338998399413,
+        "epsilon_relative_difference": 0.006293054377468854,
+        "mu_b_difference_mev": 25.332195446537753,
+        "generated_Yp": 0.16691137549446172
+      },
+      "maxwell": {
+        "P_relative_difference": 0.01199338998399413,
+        "epsilon_relative_difference": 0.006293054377468854,
+        "mu_b_difference_mev": 25.332195446537753,
+        "generated_Yp": 0.16691137549446172
+      },
+      "gibbs": {
+        "P_relative_difference": 0.01199338998399413,
+        "epsilon_relative_difference": 0.006293054377468854,
+        "mu_b_difference_mev": 25.332195446537753,
+        "generated_Yp": 0.16691137549446172
+      }
+    }
+  ],
+  "max_absolute_relative_comparison": {
+    "low": {
+      "P_relative_difference": 0.5615949843667927,
+      "epsilon_relative_difference": 0.0492908196966495
+    },
+    "high": {
+      "P_relative_difference": 0.21437078166357226,
+      "epsilon_relative_difference": 0.006293054377468854
+    },
+    "maxwell": {
+      "P_relative_difference": 0.5506599190126062,
+      "epsilon_relative_difference": 0.006293054377468854
+    },
+    "gibbs": {
+      "P_relative_difference": 0.5506599190126062,
+      "epsilon_relative_difference": 0.006293054377468854
+    }
+  },
+  "source_equivalence_status": "PARTIAL; provider Gibbs prescription identified and implemented in bulk limit, numerical table mismatch remains unresolved",
+  "native_Maxwell_representation": "pure-phase endpoints retained only inside requested window; any density jump marked by phase6-to7; mixed states only in JSON because one global local charge potential is undefined",
+  "native_Gibbs_representation": "phase6 low, phase8 two-charge bulk Gibbs, phase7 high; common charge chemical potential and averaged species densities retained",
+  "scope": "cold uniform APR functional with composition; no crust, no joining, no stellar solve",
+  "caveats": [
+    "local-neutral Maxwell is distinct from globally neutral Gibbs",
+    "Gibbs calculation omits finite-size surface and Coulomb energies",
+    "minorants tested on sampled branch states; global phase minimum not proven",
+    "high-density acausality retained and localized, not a model-wide rejection",
+    "source table mismatch is reported without parameter tuning"
+  ]
+}

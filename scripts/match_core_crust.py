@@ -1,0 +1,1149 @@
+"""Run native core--crust matching and verify the serialized CompOSE readback.
+
+Runs the native Fortran Maxwell and CSS methods for each configured crust/core
+pair. A pair survives only if the native match, CompOSE write, CompOSE readback,
+reported point counts, and every numerical/metadata column in the internal
+readback CSV all agree, the native consistency verifier passes, AND the
+independent method-specific admission layer (scripts/match_report_admission.py)
+re-derives the interface conditions from the serialized rows and admits them.
+
+Every configured (crust, core, method) triple is recorded with a per-pair JSON
+report; nothing is deleted. Incomplete source directories are recorded as
+NOT_EVALUATED data-provenance gaps, never as failed physics.
+
+Physics:
+  - maxwell: sharp first-order local-neutrality coexistence, with common
+    pressure and baryon chemical potential and a finite density/energy jump.
+  - css: one constant-sound-speed CSS bridge. At crust--CSS, P and mu_B are
+    continuous while n_B and epsilon jump; at CSS--core, n_B, P, epsilon and
+    mu_B are continuous. This is not a smooth density-continuous join over
+    the complete crust-plus-bridge domain.
+
+Both methods are thermodynamic-only in this pipeline. Composition is explicitly
+dropped; no composition-preservation claim is made.
+"""
+from __future__ import annotations
+import copy
+import csv
+import json
+import math
+import os
+import re
+import subprocess
+import sys
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "python_frontend"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from compose_eos.native import executable, run_native  # noqa: E402
+from compose_eos.eos_data import EOSData  # noqa: E402
+from compose_eos.api import _matching_source_support, _matching_support_record, _thermo_only_view  # noqa: E402
+from match_report_admission import admit_match_report, classify_failure  # noqa: E402
+
+# CompOSE files the native reader needs for a thermodynamic table. A model
+# directory missing any of them is a data-provenance gap, not a physics case.
+REQUIRED_SOURCE_FILES = ("eos.nb", "eos.t", "eos.yq", "eos.thermo")
+METHODS = ("maxwell", "css")
+
+CRUST_MODELS = [
+    "SPG_M1", "SPG_M2", "SPG_M3", "SPG_M4", "SPG_M5",
+    "GPPVA_DD2", "GPPVA_DDME2", "GPPVA_TW",
+]
+CORE_MODELS = ["APR_APR", "BBB_BHF2", "GM_GM1", "RG_SLY4", "RG_KDE0v1"]
+# v6 uses full-cell stationarity for the explicitly exploratory proxy CLD
+# functional. Source-calibrated microscopic crust admission remains open.
+# Earlier reconstruction trees are immutable historical evidence.
+CRUST_ROOT = Path(os.environ.get("NS_COWLING_CRUST_ROOT",
+                                 str(ROOT / "download" / "reconstruction_v6_proxy"))).expanduser()
+CORE_ROOT = ROOT / "eos_generator" / "eos_data"
+DEFAULT_RUN_STAMP = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+DEFAULT_OUT_ROOT = ROOT / "download" / "matched_runs" / DEFAULT_RUN_STAMP
+OUT_ROOT = Path(os.environ.get("NS_COWLING_MATCH_OUT_ROOT", str(DEFAULT_OUT_ROOT))).expanduser()
+N_BRIDGE = 8
+CURRENT_GENERATOR_ALLOWANCE_ROOT = ROOT / "data/current_generator_intake_20261117"
+
+
+def sha256_file(path: Path | str) -> str:
+    import hashlib
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+# Integer-valued metadata columns in the native Fortran internal CSV.
+_INTEGER_COLUMNS = {
+    "Iphase", "row_status", "yn_present", "yp_present", "ye_present",
+    "ymu_present", "abar_present", "zbar_present", "yh_present",
+    "c3_applicable", "c4_applicable", "iy_local", "it_local",
+}
+
+_METADATA_INTEGER_KEYS = {
+    "il", "iT", "iYq", "inb_start", "nadd", "nadd_max", "naxis_t", "naxis_yq",
+}
+_METADATA_BOOLEAN_KEYS = {
+    "composition_file_present", "composition_available", "beta_equilibrated",
+}
+_METADATA_FLOAT_KEYS = {
+    "mn", "mp", "temperature_mev", "charge_fraction_grid",
+}
+_METADATA_REQUIRED_KEYS = (
+    _METADATA_INTEGER_KEYS | _METADATA_BOOLEAN_KEYS | _METADATA_FLOAT_KEYS
+)
+
+
+def verify_internal_readback(
+    expected_csv: Path | str,
+    actual_csv: Path | str,
+    *,
+    expected_n: int,
+    actual_n: int,
+    rtol: float = 5e-13,
+    atol: float = 1e-14,
+) -> dict:
+    """Compare the full native internal EOS table before/after CompOSE I/O.
+
+    This is intentionally stricter than checking a successful process exit or
+    an unchanged row count. Every numeric column emitted by write_internal_csv
+    is compared row-by-row, including Q1..Q7, q_extra slots, phase labels,
+    composition values, row status, presence masks and C3/C4 applicability.
+    Integer metadata is exact; floating-point columns use the declared
+    mixed absolute/relative tolerance.
+    """
+    expected_path = Path(expected_csv)
+    actual_path = Path(actual_csv)
+    errors: list[str] = []
+    report = {
+        "schema": "native-compose-internal-readback-v1",
+        "status": "FAIL",
+        "expected_n_reported": int(expected_n),
+        "actual_n_reported": int(actual_n),
+        "expected_path": str(expected_path),
+        "actual_path": str(actual_path),
+        "rtol": float(rtol),
+        "atol": float(atol),
+        "columns": [],
+        "expected_rows": None,
+        "actual_rows": None,
+        "max_abs_residuals": {},
+        "max_rel_residuals": {},
+        "errors": errors,
+        "metadata_status": "NOT_CHECKED",
+        "metadata_max_abs_residuals": {},
+        "metadata_max_rel_residuals": {},
+    }
+
+    if expected_n < 0 or actual_n < 0:
+        errors.append("native readback row counts must be nonnegative")
+    if int(expected_n) != int(actual_n):
+        errors.append(
+            f"native readback row count mismatch: expected {expected_n}, got {actual_n}"
+        )
+    if not expected_path.is_file():
+        errors.append(f"expected internal CSV is missing: {expected_path}")
+    if not actual_path.is_file():
+        errors.append(f"readback internal CSV is missing: {actual_path}")
+    if errors:
+        return report
+
+    def load_table(path: Path):
+        with path.open("r", encoding="utf-8", newline="") as handle:
+            reader = csv.DictReader(handle)
+            header = reader.fieldnames
+            if not header:
+                raise ValueError(f"{path}: missing CSV header")
+            if len(set(header)) != len(header):
+                raise ValueError(f"{path}: duplicate CSV column names")
+            rows = list(reader)
+            for line_number, row in enumerate(rows, start=2):
+                if None in row:
+                    raise ValueError(
+                        f"{path}:{line_number}: row has more values than the header"
+                    )
+                if any(value is None for value in row.values()):
+                    raise ValueError(
+                        f"{path}:{line_number}: row has fewer values than the header"
+                    )
+            return list(header), rows
+
+    try:
+        expected_header, expected_rows = load_table(expected_path)
+        actual_header, actual_rows = load_table(actual_path)
+    except (OSError, UnicodeError, csv.Error, ValueError) as exc:
+        errors.append(f"internal CSV parse failure: {type(exc).__name__}: {exc}")
+        return report
+
+    report["expected_rows"] = len(expected_rows)
+    report["actual_rows"] = len(actual_rows)
+    report["columns"] = expected_header
+
+    if len(expected_rows) != int(expected_n):
+        errors.append(
+            f"expected internal CSV row count mismatch: native match reported "
+            f"{expected_n}, file contains {len(expected_rows)}"
+        )
+    if len(actual_rows) != int(actual_n):
+        errors.append(
+            f"readback internal CSV row count mismatch: native read reported "
+            f"{actual_n}, file contains {len(actual_rows)}"
+        )
+    expected_columns = set(expected_header)
+    actual_columns = set(actual_header)
+    if expected_columns != actual_columns:
+        missing = sorted(expected_columns - actual_columns)
+        extra = sorted(actual_columns - expected_columns)
+        errors.append(
+            f"internal CSV column mismatch: missing={missing}, extra={extra}"
+        )
+    if len(expected_rows) != len(actual_rows):
+        errors.append(
+            f"internal CSV row count mismatch: expected {len(expected_rows)}, "
+            f"got {len(actual_rows)}"
+        )
+        return report
+    if expected_columns != actual_columns:
+        return report
+
+    # Validate the serialized schema needed to preserve the EOS contract.
+    required = {"nb", *(f"Q{i}" for i in range(1, 8)), "Iphase"}
+    missing_required = sorted(required - expected_columns)
+    if missing_required:
+        errors.append(f"internal CSV lacks required EOS columns: {missing_required}")
+        return report
+
+    max_abs = {name: 0.0 for name in expected_header}
+    max_rel = {name: 0.0 for name in expected_header}
+    for row_index, (expected_row, actual_row) in enumerate(
+        zip(expected_rows, actual_rows), start=1
+    ):
+        for name in expected_header:
+            try:
+                expected_value = float(expected_row[name])
+                actual_value = float(actual_row[name])
+            except (TypeError, ValueError):
+                errors.append(
+                    f"row {row_index} column {name}: non-numeric value "
+                    f"(expected={expected_row.get(name)!r}, actual={actual_row.get(name)!r})"
+                )
+                continue
+            if not (math.isfinite(expected_value) and math.isfinite(actual_value)):
+                errors.append(
+                    f"row {row_index} column {name}: non-finite value "
+                    f"(expected={expected_value!r}, actual={actual_value!r})"
+                )
+                continue
+            difference = abs(actual_value - expected_value)
+            scale = max(abs(expected_value), abs(actual_value), 1e-30)
+            max_abs[name] = max(max_abs[name], difference)
+            max_rel[name] = max(max_rel[name], difference / scale)
+
+            if name in _INTEGER_COLUMNS:
+                if not expected_value.is_integer() or not actual_value.is_integer():
+                    errors.append(
+                        f"row {row_index} column {name}: integer metadata is not integral"
+                    )
+                elif int(expected_value) != int(actual_value):
+                    errors.append(
+                        f"row {row_index} column {name}: exact metadata mismatch "
+                        f"(expected={int(expected_value)}, actual={int(actual_value)})"
+                    )
+            elif difference > atol + rtol * abs(expected_value):
+                errors.append(
+                    f"row {row_index} column {name}: numerical mismatch "
+                    f"(expected={expected_value:.17g}, actual={actual_value:.17g}, "
+                    f"abs={difference:.3e}, rel={difference/scale:.3e})"
+                )
+
+    report["max_abs_residuals"] = max_abs
+    report["max_rel_residuals"] = max_rel
+    report["status"] = "PASS" if not errors else "FAIL"
+    return report
+
+
+def _parse_fortran_metadata(path: Path) -> dict[str, bool | int | float]:
+    """Parse the scalar fields emitted by the native write_metadata routine."""
+    text = path.read_text(encoding="utf-8")
+    values = {}
+    for match in re.finditer(
+        r"^\s*([A-Za-z][A-Za-z0-9_]*)\s*=\s*([^,\s/]+)",
+        text,
+        flags=re.MULTILINE,
+    ):
+        key, raw = match.group(1), match.group(2).strip()
+        if key in _METADATA_BOOLEAN_KEYS:
+            normalized = raw.strip(".").upper()
+            if normalized in {"T", "TRUE"}:
+                value = True
+            elif normalized in {"F", "FALSE"}:
+                value = False
+            else:
+                raise ValueError(f"{path}: invalid Fortran logical {key}={raw!r}")
+        elif key in _METADATA_INTEGER_KEYS:
+            value_float = float(raw.replace("D", "E").replace("d", "e"))
+            if not value_float.is_integer():
+                raise ValueError(f"{path}: non-integral metadata {key}={raw!r}")
+            value = int(value_float)
+        else:
+            value = float(raw.replace("D", "E").replace("d", "e"))
+            if not math.isfinite(value):
+                raise ValueError(f"{path}: non-finite metadata {key}={raw!r}")
+        if key in values:
+            raise ValueError(f"{path}: duplicate metadata key {key}")
+        values[key] = value
+    missing = sorted(_METADATA_REQUIRED_KEYS - set(values))
+    if missing:
+        raise ValueError(f"{path}: missing required metadata keys {missing}")
+    return values
+
+
+def verify_internal_metadata_readback(
+    expected_metadata: Path | str,
+    actual_metadata: Path | str,
+    *,
+    rtol: float = 5e-13,
+    atol: float = 1e-14,
+) -> dict:
+    """Compare all scalar EOS metadata written before and after CompOSE I/O."""
+    expected_path = Path(expected_metadata)
+    actual_path = Path(actual_metadata)
+    report = {
+        "status": "FAIL",
+        "expected_path": str(expected_path),
+        "actual_path": str(actual_path),
+        "rtol": float(rtol),
+        "atol": float(atol),
+        "max_abs_residuals": {},
+        "max_rel_residuals": {},
+        "expected_values": {},
+        "actual_values": {},
+        "errors": [],
+    }
+    if not expected_path.is_file():
+        report["errors"].append(f"expected internal metadata is missing: {expected_path}")
+    if not actual_path.is_file():
+        report["errors"].append(f"readback internal metadata is missing: {actual_path}")
+    if report["errors"]:
+        return report
+    try:
+        expected = _parse_fortran_metadata(expected_path)
+        actual = _parse_fortran_metadata(actual_path)
+    except (OSError, UnicodeError, ValueError) as exc:
+        report["errors"].append(f"internal metadata parse failure: {type(exc).__name__}: {exc}")
+        return report
+    report["expected_values"] = expected
+    report["actual_values"] = actual
+    if set(expected) != set(actual):
+        report["errors"].append(
+            f"internal metadata key mismatch: missing={sorted(set(expected)-set(actual))}, "
+            f"extra={sorted(set(actual)-set(expected))}"
+        )
+        return report
+    max_abs = {}
+    max_rel = {}
+    for key in sorted(expected):
+        ev, av = expected[key], actual[key]
+        if key in _METADATA_BOOLEAN_KEYS or key in _METADATA_INTEGER_KEYS:
+            if type(ev) is not type(av) or ev != av:
+                report["errors"].append(
+                    f"metadata {key}: exact mismatch (expected={ev!r}, actual={av!r})"
+                )
+        else:
+            difference = abs(float(av) - float(ev))
+            scale = max(abs(float(ev)), abs(float(av)), 1e-30)
+            max_abs[key] = difference
+            max_rel[key] = difference / scale
+            if difference > atol + rtol * abs(float(ev)):
+                report["errors"].append(
+                    f"metadata {key}: numerical mismatch (expected={ev:.17g}, actual={av:.17g}, "
+                    f"abs={difference:.3e}, rel={difference/scale:.3e})"
+                )
+    report["max_abs_residuals"] = max_abs
+    report["max_rel_residuals"] = max_rel
+    report["status"] = "PASS" if not report["errors"] else "FAIL"
+    return report
+
+
+def _source_compose_hashes(directory: Path) -> dict[str, str]:
+    """Return hashes of the CompOSE source files actually present."""
+    hashes = {}
+    for name in ("eos.nb", "eos.t", "eos.yq", "eos.thermo", "eos.compo"):
+        path = directory / name
+        if path.is_file():
+            hashes[name] = sha256_file(path)
+    return hashes
+
+
+def _source_scope(directory: Path) -> dict:
+    """Carry reconstruction scope forward without inferring physical calibration."""
+    try:
+        support = _matching_support_record(directory)
+    except (OSError, UnicodeError, ValueError) as exc:
+        support = {"support_error": str(exc)}
+    receipt = directory / "reconstruction_receipt.json"
+    if not receipt.is_file():
+        return {"scientific_scope": "not_recorded", "source_calibrated": None, **support}
+    try:
+        record = json.loads(receipt.read_text(encoding="utf-8"))
+        if not isinstance(record, dict):
+            raise ValueError("receipt must be an object")
+        return {"scientific_scope": record.get("scientific_scope", "not_recorded"),
+                "source_calibrated": record.get("source_calibrated"),
+                "reconstruction_receipt_sha256": sha256_file(receipt), **support}
+    except (OSError, UnicodeError, ValueError) as exc:
+        return {"scientific_scope": "unreadable_receipt", "source_calibrated": None,
+                "error": str(exc), **support}
+
+
+def _source_identity(directory: Path) -> str | None:
+    """SHA-256 over the required CompOSE files, or None if any is missing."""
+    if _missing_sources(directory):
+        return None
+    import hashlib
+    h = hashlib.sha256()
+    for name in REQUIRED_SOURCE_FILES:
+        h.update(name.encode() + b"\0" + sha256_file(directory / name).encode() + b"\n")
+    return h.hexdigest()
+
+
+def _duplicate_groups(identities: dict[str, str | None]) -> list[list[str]]:
+    groups: dict[str, list[str]] = {}
+    for model, ident in identities.items():
+        if ident is not None:
+            groups.setdefault(ident, []).append(model)
+    return sorted(sorted(g) for g in groups.values() if len(g) > 1)
+
+
+def _source_marker(directory: Path) -> tuple[str, str] | None:
+    """(failure_category, reason) recorded by a reconstruction that wrote no table."""
+    for name, category in (("REJECTED.json", "source_reconstruction_rejected"),
+                           ("NOT_GENERATED.json", "data_provenance")):
+        path = directory / name
+        if path.is_file():
+            try:
+                record = json.loads(path.read_text(encoding="utf-8"))
+                if not isinstance(record, dict):
+                    raise ValueError("source marker must be an object")
+                reason = str(record.get("reason", ""))
+            except (OSError, UnicodeError, ValueError):
+                reason = f"unreadable {name}"
+            return category, f"{name[:-5]}: {reason}"
+    return None
+
+
+def _missing_sources(directory: Path) -> list[str]:
+    if not directory.is_dir():
+        return list(REQUIRED_SOURCE_FILES)
+    return [name for name in REQUIRED_SOURCE_FILES if not (directory / name).is_file()]
+
+
+def _consistency_report_errors(report: object, expected_n: int) -> list[str]:
+    """Check the persisted verifier receipt, including applicability, against stdout."""
+    if not isinstance(report, dict):
+        return ["consistency report must be an object"]
+    errors = []
+    if report.get("schema") != "compose-eos-fortran-verification-v1":
+        errors.append("unexpected consistency schema")
+    if type(report.get("n")) is not int or report["n"] != expected_n:
+        errors.append("consistency row count mismatch")
+    if report.get("overall") != {"status": "PASS", "pass": True}:
+        errors.append("consistency overall is not PASS")
+    if report.get("failed_checks") != "":
+        errors.append("consistency failed_checks is not empty")
+    for name in ("C1", "C2", "C6", "C10", "C11"):
+        entry = report.get(name)
+        if not isinstance(entry, dict) or entry.get("pass") is not True:
+            errors.append(f"consistency {name} missing or failed")
+    for name in ("C3", "C4"):
+        entry = report.get(name)
+        count = report.get(f"{name}_applicable_points")
+        valid = isinstance(entry, dict) and type(count) is int and 0 <= count <= expected_n
+        if valid and count == 0:
+            valid = entry.get("status") == "NOT_AVAILABLE" and entry.get("pass") is None
+        elif valid:
+            valid = entry.get("status") in ("CHECKED", "PARTIAL") and entry.get("pass") is True
+        if not valid:
+            errors.append(f"consistency {name} applicability missing or inconsistent")
+    entry = report.get("C5")
+    if not isinstance(entry, dict) or not (
+        (entry.get("applicable") is True and entry.get("pass") is True)
+        or (entry.get("applicable") is False and entry.get("pass") is None)
+    ):
+        errors.append("consistency C5 missing or failed")
+    return errors
+
+
+def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) -> dict:
+    """Run one (crust, core, method) match. Returns a result dict.
+
+    method in {"maxwell", "css"}. Every non-surviving result carries a
+    ``failure_category`` separating data-provenance, input-contract,
+    implementation, numerical, physical and admission failures.
+    """
+    if method not in METHODS:
+        raise ValueError(f"unsupported matching method: {method!r}")
+    out_dir = Path(out_dir)
+    if out_dir.exists():
+        if not out_dir.is_dir():
+            raise NotADirectoryError(f"matching output is not a directory: {out_dir}")
+        if any(out_dir.iterdir()):
+            raise FileExistsError(f"matching output directory is not empty: {out_dir}")
+    kernel_state = {"invoked": False}
+    marker = _source_marker(Path(crust_dir)) or _source_marker(Path(core_dir))
+    if marker is not None:
+        res = {"survived": False, "method": method, "stage": "source",
+               "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+               "failure_category": marker[0], "error": marker[1],
+               "source_marker": marker[1]}
+    else:
+        missing = {"crust": _missing_sources(Path(crust_dir)),
+                   "core": _missing_sources(Path(core_dir))}
+        if any(missing.values()):
+            res = {"survived": False, "method": method, "stage": "source",
+                   "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+                   "failure_category": "data_provenance",
+                   "error": "missing CompOSE source files: " + "; ".join(
+                       f"{side}={','.join(names)}" for side, names in missing.items() if names),
+                   "missing_source_files": sorted(set(missing["crust"]) | set(missing["core"])),
+                   "missing_source_detail": missing}
+        else:
+            res = _run_pipeline(method, crust_dir, core_dir, out_dir,
+                                kernel_state=kernel_state)
+    res.setdefault("matching_kernel_invoked", kernel_state["invoked"])
+    # Preserve input identity on failures too, before the per-pair receipt is saved.
+    res.setdefault("source_sha256", {"crust": _source_compose_hashes(Path(crust_dir)),
+                                     "core": _source_compose_hashes(Path(core_dir))})
+    res.setdefault("source_scope", {"crust": _source_scope(Path(crust_dir)),
+                                    "core": _source_scope(Path(core_dir))})
+    if not res.get("survived"):
+        res.setdefault("failure_category", classify_failure(
+            res.get("stage"), res.get("error"), res.get("native_category")))
+    return res
+
+
+def _run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path,
+                  *, kernel_state: dict | None = None) -> dict:
+    if kernel_state is None:
+        kernel_state = {"invoked": False}
+    result = _run_pipeline_impl(method, crust_dir, core_dir, out_dir,
+                                kernel_state=kernel_state)
+    result.setdefault("matching_kernel_invoked", kernel_state["invoked"])
+    return result
+
+
+def _run_pipeline_impl(method: str, crust_dir: Path, core_dir: Path, out_dir: Path,
+                       *, kernel_state: dict) -> dict:
+    work = out_dir / "work"
+    work.mkdir(parents=True, exist_ok=False)
+    (out_dir / "compose").mkdir(parents=True, exist_ok=True)
+
+    crust_internal = work / "crust_internal"
+    core_internal = work / "core_internal"
+    matched_internal = work / "matched_internal"
+    crust_internal.mkdir(exist_ok=True)
+    core_internal.mkdir(exist_ok=True)
+    matched_internal.mkdir(exist_ok=True)
+
+    try:
+        exe = executable()
+        exe_sha = sha256_file(exe)
+    except (OSError, RuntimeError) as exc:
+        return {"survived": False, "method": method, "stage": "executable",
+                "failure_category": "environment",
+                "error": f"{type(exc).__name__}: {exc}"}
+
+    stage = "read_crust"
+    composition_transport = {}
+    try:
+        # 1. read crust -> internal
+        r1 = run_native("read", str(crust_dir), str(crust_internal))
+        if r1.get("status") != "ok":
+            return {"survived": False, "method": method, "stage": "read_crust",
+                    "error": r1.get("message", "?")}
+        # 2. read core -> internal
+        stage = "read_core"
+        r2 = run_native("read", str(core_dir), str(core_internal))
+        if r2.get("status") != "ok":
+            return {"survived": False, "method": method, "stage": "read_core",
+                    "error": r2.get("message", "?")}
+
+        stage = "source_support"
+        source_support = {
+            "crust": _matching_source_support(EOSData.from_internal_directory(
+                crust_internal, source_dir=str(crust_dir))),
+            "core": _matching_source_support(EOSData.from_internal_directory(
+                core_internal, source_dir=str(core_dir))),
+        } if (_matching_support_record(crust_dir) or _matching_support_record(core_dir)) else {
+            "crust": {"status": "NOT_DECLARED"}, "core": {"status": "NOT_DECLARED"}}
+        stage = method
+        if method == "maxwell":
+            # This pipeline explicitly promises thermo-only matching. Preserve
+            # the original native readback and serialize distinct views with
+            # abundance values/masks removed, retaining every physical column
+            # and phase label. The strict native kernel itself is unchanged.
+            views = {}
+            composition_transport = {"policy": "explicit_thermo_only_pipeline",
+                                     "composition_dropped": False, "sources": {}}
+            for side, original, source in (("crust", crust_internal, crust_dir),
+                                           ("core", core_internal, core_dir)):
+                data = EOSData.from_internal_directory(original, source_dir=str(source))
+                present = bool(data.composition_file_present or data.composition_available)
+                view = _thermo_only_view(data)
+                target = work / (side + "_thermo_internal")
+                view.write_internal_directory(target)
+                views[side] = target
+                composition_transport["composition_dropped"] |= present
+                composition_transport["sources"][side] = {
+                    "composition_input_present": present,
+                    "thermo_internal_sha256": {name: sha256_file(target/name)
+                                               for name in ("eos_data.csv", "eos_data.nml")}}
+            (work / "composition_transport.json").write_text(
+                json.dumps(composition_transport, indent=2) + "\n", encoding="utf-8")
+            kernel_state["invoked"] = True
+            r3 = run_native("maxwell-transition", str(views["crust"]), str(views["core"]),
+                            str(matched_internal), "true")
+            r3 = dict(r3, composition_dropped=composition_transport["composition_dropped"])
+        else:  # css
+            kernel_state["invoked"] = True
+            r3 = run_native("match-core", str(crust_internal), str(core_internal),
+                            str(matched_internal), "css", str(N_BRIDGE), "true")
+        if r3.get("status") != "ok":
+            return {"survived": False, "method": method, "stage": method,
+                    "error": r3.get("message", "?"),
+                    "report": r3}
+
+        combined_n = int(r3.get("n", 0))
+        if combined_n < 4:
+            return {"survived": False, "method": method, "stage": "match",
+                    "error": f"combined n={combined_n} too small", "report": r3}
+
+        # 4. write internal -> CompOSE output
+        stage = "write"
+        r4 = run_native("write", str(matched_internal), str(out_dir / "compose"))
+        if r4.get("status") != "ok":
+            return {"survived": False, "method": method, "stage": "write",
+                    "error": r4.get("message", "?")}
+
+        # 5. readback verification
+        readback_internal = work / "readback_internal"
+        readback_internal.mkdir(exist_ok=True)
+        try:
+            r5 = run_native("read", str(out_dir / "compose"), str(readback_internal))
+        except Exception as exc:
+            return {
+                "survived": False, "method": method, "stage": "readback",
+                "error": f"native CompOSE readback failed: {type(exc).__name__}: {exc}",
+                "combined_n": combined_n,
+                "readback_n": 0,
+                "readback_status": "ERROR",
+                "readback_validation": {
+                    "schema": "native-compose-internal-readback-v1",
+                    "status": "FAIL",
+                    "errors": [f"native CompOSE readback failed: {type(exc).__name__}: {exc}"],
+                },
+                "match_report": r3,
+                "write_report": r4,
+            }
+
+        readback_n = int(r5.get("n", 0)) if r5.get("status") == "ok" else 0
+        expected_csv = matched_internal / "eos_data.csv"
+        actual_csv = readback_internal / "eos_data.csv"
+        expected_nml = matched_internal / "eos_data.nml"
+        actual_nml = readback_internal / "eos_data.nml"
+        readback_validation = verify_internal_readback(
+            expected_csv, actual_csv,
+            expected_n=combined_n, actual_n=readback_n,
+        )
+        metadata_validation = verify_internal_metadata_readback(
+            expected_nml, actual_nml,
+        )
+        readback_validation["metadata_status"] = metadata_validation["status"]
+        readback_validation["metadata"] = metadata_validation
+        readback_validation["metadata_max_abs_residuals"] = metadata_validation["max_abs_residuals"]
+        readback_validation["metadata_max_rel_residuals"] = metadata_validation["max_rel_residuals"]
+        readback_validation["errors"].extend(metadata_validation["errors"])
+        if metadata_validation["status"] != "PASS":
+            readback_validation["status"] = "FAIL"
+        if r5.get("status") != "ok":
+            readback_validation["status"] = "FAIL"
+            readback_validation["errors"].append(
+                f"native readback returned status={r5.get('status')!r}"
+            )
+        if readback_validation["status"] != "PASS":
+            return {
+                "survived": False,
+                "method": method,
+                "stage": "readback",
+                "error": "; ".join(readback_validation["errors"][:8]),
+                "combined_n": combined_n,
+                "readback_n": readback_n,
+                "readback_status": r5.get("status", "?"),
+                "readback_validation": readback_validation,
+                "fortran_executable_sha256": exe_sha,
+                "match_report": r3,
+                "write_report": r4,
+            }
+
+        # 6. Verify the actual serialized CompOSE artefact with the native
+        # C1/C2/C3/C4/C5/C6/C10/C11 checker. C7-C9 remain diagnostics only.
+        consistency_path = work / "consistency_verification.json"
+        try:
+            r6 = run_native("verify", str(out_dir / "compose"), str(consistency_path))
+        except Exception as exc:
+            return {
+                "survived": False, "method": method, "stage": "consistency",
+                "error": f"native consistency verification failed: {type(exc).__name__}: {exc}",
+                "combined_n": combined_n,
+                "readback_n": readback_n,
+                "readback_status": r5.get("status", "?"),
+                "readback_validation": readback_validation,
+                "match_report": r3,
+                "write_report": r4,
+            }
+        if r6.get("status") != "ok" or r6.get("overall") != "PASS":
+            consistency_report = None
+            try:
+                consistency_report = json.loads(consistency_path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, json.JSONDecodeError):
+                pass
+            return {
+                "survived": False,
+                "method": method,
+                "stage": "consistency",
+                "error": f"native consistency overall={r6.get('overall', 'UNKNOWN')}; "
+                         f"failed_checks={r6.get('failed_checks', 'unavailable')}",
+                "combined_n": combined_n,
+                "readback_n": readback_n,
+                "readback_status": r5.get("status", "?"),
+                "readback_validation": readback_validation,
+                "consistency_status": r6.get("overall", "UNKNOWN"),
+                "consistency_report": consistency_report,
+                "match_report": r3,
+                "write_report": r4,
+            }
+        try:
+            consistency_report = json.loads(consistency_path.read_text(encoding="utf-8"))
+            receipt_errors = _consistency_report_errors(consistency_report, combined_n)
+            if receipt_errors:
+                raise ValueError("; ".join(receipt_errors))
+        except (OSError, UnicodeError, ValueError) as exc:
+            return {
+                "survived": False, "method": method, "stage": "consistency",
+                "error": f"native verifier did not produce valid JSON: {type(exc).__name__}: {exc}",
+                "combined_n": combined_n,
+                "readback_n": readback_n,
+                "readback_status": r5.get("status", "?"),
+                "readback_validation": readback_validation,
+                "consistency_status": "INVALID_REPORT",
+                "match_report": r3,
+                "write_report": r4,
+            }
+
+        output_files = sorted(p.name for p in (out_dir / "compose").iterdir() if p.is_file())
+        output_hashes = _source_compose_hashes(out_dir / "compose")
+        source_hashes = {
+            "crust": _source_compose_hashes(crust_dir),
+            "core": _source_compose_hashes(core_dir),
+        }
+
+        # 7. Independent method-specific admission. Native status/verifier
+        # PASS is necessary but never sufficient: interface conditions are
+        # re-derived from the serialized readback rows.
+        stage = "admission"
+        admission = admit_match_report(
+            method, r3,
+            readback_internal / "eos_data.csv", readback_internal / "eos_data.nml",
+        )
+        (work / "admission.json").write_text(
+            json.dumps(admission, indent=2) + "\n", encoding="utf-8")
+        common = {
+            "method": method,
+            "combined_n": combined_n,
+            "readback_n": readback_n,
+            "readback_status": r5.get("status", "?"),
+            "readback_validation": readback_validation,
+            "consistency_status": "PASS",
+            "consistency_report": consistency_report,
+            "admission": admission,
+            "source_sha256": source_hashes,
+            "source_support": source_support,
+            "composition_dropped": bool(r3.get("composition_dropped", False)),
+            "composition_transport": composition_transport,
+            "output_sha256": output_hashes,
+            "output_files": output_files,
+            "fortran_executable_sha256": exe_sha,
+            "match_report": r3,
+            "write_report": r4,
+        }
+        if admission.get("status") != "ADMITTED":
+            return {
+                "survived": False,
+                "stage": "admission",
+                "error": "independent admission rejected: "
+                         + ",".join(admission.get("failed_checks", []) or ["unknown"]),
+                **common,
+            }
+        return {"survived": True, "stage": "complete", **common}
+    except Exception as exc:
+        return {"survived": False, "method": method, "stage": stage,
+                "error": f"{type(exc).__name__}: {exc}",
+                "native_category": getattr(exc, "category", None),
+                "composition_transport": composition_transport,
+                "composition_dropped": bool(composition_transport.get("composition_dropped", False)),
+                "exception_type": type(exc).__name__}
+
+
+def main() -> int:
+    # Never delete a previous match census. A fresh timestamped run root is
+    # the default; an explicit override is allowed only when its directory is
+    # absent or empty. This makes reruns and interrupted jobs fail closed.
+    if OUT_ROOT.exists():
+        if not OUT_ROOT.is_dir():
+            raise NotADirectoryError(f"matching output root is not a directory: {OUT_ROOT}")
+        if any(OUT_ROOT.iterdir()):
+            raise FileExistsError(
+                f"matching output root is not empty: {OUT_ROOT}; "
+                "choose a new NS_COWLING_MATCH_OUT_ROOT"
+            )
+    OUT_ROOT.mkdir(parents=True, exist_ok=True)
+
+    results = []
+    survivors = []
+    source_presence = {
+        "crust": {c: _missing_sources(CRUST_ROOT / c) for c in CRUST_MODELS},
+        "core": {c: _missing_sources(CORE_ROOT / c) for c in CORE_MODELS},
+    }
+    # Byte-identical source tables under different model names are reported
+    # so that survivor counts are not mistaken for independent evidence.
+    source_identity = {
+        "crust": {c: _source_identity(CRUST_ROOT / c) for c in CRUST_MODELS},
+        "core": {c: _source_identity(CORE_ROOT / c) for c in CORE_MODELS},
+    }
+    # Every configured (crust, core, method) triple is recorded. Incomplete
+    # source directories are NOT_EVALUATED data-provenance gaps -- never
+    # counted as failed physics -- and no attempt directory is ever deleted.
+    for crust in CRUST_MODELS:
+        crust_dir = CRUST_ROOT / crust
+        for core in CORE_MODELS:
+            core_dir = CORE_ROOT / core
+            missing = {"crust": source_presence["crust"][crust],
+                       "core": source_presence["core"][core]}
+            for method in METHODS:
+                pair_id = f"{crust}__{core}__{method}"
+                out_dir = OUT_ROOT / pair_id
+                out_dir.mkdir(parents=True, exist_ok=False)
+                t0 = time.time()
+                marker = _source_marker(crust_dir) or _source_marker(core_dir)
+                if marker is not None:
+                    res = {"survived": False, "method": method, "stage": "source",
+                           "outcome": "NOT_EVALUATED_SOURCE_MARKED",
+                           "failure_category": marker[0], "error": marker[1],
+                           "source_marker": marker[1]}
+                elif missing["crust"] or missing["core"]:
+                    names = sorted(set(missing["crust"]) | set(missing["core"]))
+                    res = {
+                        "survived": False, "method": method, "stage": "source",
+                        "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+                        "error": "missing CompOSE source files: "
+                                 + "; ".join(f"{side}={','.join(v)}"
+                                             for side, v in missing.items() if v),
+                        "missing_source_files": names,
+                        "missing_source_detail": missing,
+                        "failure_category": "data_provenance",
+                    }
+                    marker = _source_marker(crust_dir) or _source_marker(core_dir)
+                    if marker is not None:
+                        res["failure_category"], res["error"] = marker[0], marker[1]
+                        res["source_marker"] = marker[1]
+                else:
+                    res = run_pipeline(method, crust_dir, core_dir, out_dir)
+                    res["outcome"] = "SURVIVED" if res["survived"] else "FAILED"
+                res.setdefault("source_sha256", {
+                    "crust": _source_compose_hashes(crust_dir),
+                    "core": _source_compose_hashes(core_dir)})
+                res.setdefault("source_scope", {"crust": _source_scope(crust_dir),
+                                                "core": _source_scope(core_dir)})
+                res["crust_model"] = crust
+                res["core_model"] = core
+                res["pair_id"] = pair_id
+                res["elapsed_s"] = round(time.time() - t0, 2)
+                report_path = out_dir / "pair_report.json"
+                report_path.write_text(
+                    json.dumps(res, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+                res["pair_report_sha256"] = sha256_file(report_path)
+                results.append(res)
+                status = "SURVIVED" if res["survived"] else f"FAILED@{res.get('stage')}"
+                print(f"  [{status:20s}] {crust:14s} + {core:12s} / {method:7s}  "
+                      f"[{res.get('failure_category', '-')}] "
+                      f"(n={res.get('combined_n','-')})  {res.get('elapsed_s','-')}s  "
+                      f"{str(res.get('error',''))[:60]}")
+                if res["survived"]:
+                    survivors.append({
+                        "pair_id": pair_id,
+                        "crust_model": crust,
+                        "core_model": core,
+                        "method": method,
+                        "combined_n": res["combined_n"],
+                        "readback_n": res["readback_n"],
+                        "readback_status": res["readback_status"],
+                        "readback_validation": res["readback_validation"],
+                        "consistency_status": res["consistency_status"],
+                        "consistency_report": res["consistency_report"],
+                        "admission": res["admission"],
+                        "source_sha256": res["source_sha256"],
+                        "source_scope": res["source_scope"],
+                        "output_sha256": res["output_sha256"],
+                        "fortran_executable_sha256": res["fortran_executable_sha256"],
+                        "output_dir": str(out_dir / "compose"),
+                        "match_report": res["match_report"],
+                        "pair_report_sha256": res["pair_report_sha256"],
+                    })
+
+    # write manifest
+    n_maxwell = sum(1 for s in survivors if s["method"] == "maxwell")
+    n_css = sum(1 for s in survivors if s["method"] == "css")
+    failures_by_category: dict[str, int] = {}
+    by_method: dict[str, dict] = {}
+    by_pair: dict[str, dict] = {}
+    for r in results:
+        m = by_method.setdefault(r["method"], {
+            "configured": 0, "evaluated": 0, "survivors": 0, "failures_by_category": {}})
+        m["configured"] += 1
+        if not r["outcome"].startswith("NOT_EVALUATED_SOURCE_"):
+            m["evaluated"] += 1
+        if r["survived"]:
+            m["survivors"] += 1
+        else:
+            cat = r.get("failure_category", "unclassified")
+            failures_by_category[cat] = failures_by_category.get(cat, 0) + 1
+            m["failures_by_category"][cat] = m["failures_by_category"].get(cat, 0) + 1
+        by_pair.setdefault(f"{r['crust_model']}__{r['core_model']}", {})[r["method"]] = {
+            "outcome": r["outcome"], "stage": r.get("stage"),
+            "failure_category": r.get("failure_category"),
+            "error": str(r.get("error", ""))[:240] or None,
+        }
+    try:
+        exe_sha_top = sha256_file(executable())
+    except (OSError, RuntimeError):
+        exe_sha_top = None
+    try:
+        git_head = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"],
+                                  capture_output=True, text=True, check=True).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        git_head = None
+    try:
+        git_dirty = bool(subprocess.run(
+            ["git", "-C", str(ROOT), "status", "--porcelain", "--untracked-files=no"],
+            capture_output=True, text=True, check=True).stdout.strip())
+    except (OSError, subprocess.CalledProcessError):
+        git_dirty = None
+    built_at = datetime.now(timezone.utc)
+    execution_failures = [r["pair_id"] for r in results
+                          if r.get("failure_category") in {"environment", "implementation", "unclassified"}
+                          or r.get("consistency_status") == "INVALID_REPORT"]
+    manifest = {
+        "execution_status": "FAILED" if execution_failures else "COMPLETED",
+        "execution_failure_pair_ids": execution_failures,
+        "not_evaluated_source_marked": sum(
+            r["outcome"] == "NOT_EVALUATED_SOURCE_MARKED" for r in results),
+        "schema": "ns-cowling.core-crust-matching.v3",
+        "built_at_utc": built_at.isoformat(),
+        "built_date_utc": built_at.date().isoformat(),
+        "output_root": str(OUT_ROOT),
+        "crust_root": str(CRUST_ROOT),
+        "scientific_scope": "thermodynamic matching; microscopic interpretation inherits each source_scope",
+        "core_root": str(CORE_ROOT),
+        "crust_models": CRUST_MODELS,
+        "core_models": CORE_MODELS,
+        "methods": ["maxwell", "css"],
+        "method_contracts": {
+            "maxwell": {
+                "construction_kind": "sharp_first_order_local_neutrality_coexistence",
+                "interfaces": {
+                    "crust_core": "common pressure and baryon chemical potential; finite density and energy-density jump"
+                },
+                "composition": "dropped",
+            },
+            "css": {
+                "construction_kind": "css_single_speed_with_crust_density_jump",
+                "interfaces": {
+                    "crust_css": "common pressure and baryon chemical potential; finite positive density and energy-density jump with Delta_epsilon=mu_t Delta_n",
+                    "css_core": "continuous n_B, pressure, energy density, and baryon chemical potential",
+                },
+                "sound_speed": "one constant cs2 across the CSS bridge",
+                "composition": "dropped",
+                "smooth_over_entire_crust_plus_bridge": False,
+            },
+        },
+        "git_head": git_head,
+        "git_tracked_tree_dirty": git_dirty,
+        "fortran_executable_sha256": exe_sha_top,
+        "required_source_files": list(REQUIRED_SOURCE_FILES),
+        "source_missing_files": source_presence,
+        "admission_schema": "ns-cowling.match-report-admission.v1",
+        "configured_attempts": len(CRUST_MODELS) * len(CORE_MODELS) * len(METHODS),
+        "evaluated_attempts": sum(
+            1 for r in results if not r["outcome"].startswith("NOT_EVALUATED_SOURCE_")),
+        "not_evaluated_source_incomplete": sum(
+            1 for r in results if r["outcome"] == "NOT_EVALUATED_SOURCE_INCOMPLETE"),
+        "source_identity_sha256": source_identity,
+        "source_duplicate_groups": {
+            side: _duplicate_groups(ids) for side, ids in source_identity.items()},
+        "distinct_source_survivors": len({
+            (source_identity["crust"][s["crust_model"]],
+             source_identity["core"][s["core_model"]], s["method"]) for s in survivors}),
+        "failures_by_category": failures_by_category,
+        "by_method": by_method,
+        "by_pair": by_pair,
+        "total_attempts": len(results),
+        "total_survivors": len(survivors),
+        "survivors_maxwell": n_maxwell,
+        "survivors_css": n_css,
+        "survivors": survivors,
+        "all_results": results,
+    }
+    manifest_path = OUT_ROOT / "matching_manifest.json"
+    manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
+                             encoding="utf-8")
+    print(f"\nMatching complete: {len(survivors)}/{len(results)} survived "
+          f"(maxwell={n_maxwell}, css={n_css})")
+    print(f"Manifest: {manifest_path}")
+    return 1 if execution_failures else 0
+
+
+def execute_current_generator_manifest(manifest_path: Path, output_root: Path,
+                                       *, root: Path = ROOT) -> dict:
+    """Execute the one authorized fresh cell and preserve its raw outcome.
+
+    The input manifest is immutable. A new output directory contains a receipt
+    even if executable resolution or the matching call fails.
+    """
+    from current_generator_manifest import build_manifest, validate_manifest, validate_source
+
+    manifest_path = Path(manifest_path)
+    output_root = Path(output_root)
+    input_sha = sha256_file(manifest_path)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    validate_manifest(manifest)
+    if manifest != build_manifest(root):
+        raise ValueError("manifest differs from live sealed intake")
+    eligible = [cell for cell in manifest["cells"] if cell["eligible"]]
+    if (len(eligible) != 1 or eligible[0]["id"] != "SPG_M1__GM_GM1__css"
+            or eligible[0]["n_bridge"] != 40 or eligible[0]["attempted"]
+            or eligible[0]["admitted"]):
+        raise ValueError("exactly one eligible unattempted CSS cell is required")
+    source_by_id = {source["id"]: source for source in manifest["sources"]}
+    cell = eligible[0]
+    crust = source_by_id[cell["crust_source_id"]]
+    core = source_by_id[cell["core_source_id"]]
+    validate_source(root, crust)
+    validate_source(root, core)
+    crust_dir = root / crust["compose_path"]
+    core_dir = root / core["compose_path"]
+    allowance_root = CURRENT_GENERATOR_ALLOWANCE_ROOT
+    template = json.loads((allowance_root / "ALLOWANCE_UNUSED.json").read_text(encoding="utf-8"))
+    if template != {"schema_version": "ns-cowling.current-generator-allowance.v1",
+                    "task_id": "current_generator_intake_20261117",
+                    "status": "UNUSED", "max_pipeline_invocations": 1,
+                    "claim_path": "runtime/CLAIM.json"}:
+        raise ValueError("current-generator allowance template invalid")
+    claim_path = allowance_root / template["claim_path"]
+    output_root.mkdir(parents=True, exist_ok=False)
+    cell_dir = output_root / cell["id"]
+    cell_dir.mkdir(exist_ok=False)
+    receipt = {
+        "schema_version": "ns-cowling.current-generator-execution.v1",
+        "input_manifest_sha256": input_sha,
+        "input_manifest_path": str(manifest_path),
+        "cell_id": cell["id"],
+        "n_bridge": 40,
+        "current_executable_sha256": None,
+        "execution_started": True,
+        "source_verified": True,
+        "pipeline_invoked": False,
+        "matching_kernel_invoked": False,
+        "allowance_claim_path": str(claim_path),
+        "attempted": False,
+        "admitted": False,
+        "status": "HOLD",
+        "outcome": "NOT_STARTED",
+        "result": None,
+    }
+    global N_BRIDGE
+    old_n_bridge = N_BRIDGE
+    try:
+        receipt["current_executable_sha256"] = sha256_file(executable())
+        claim_path.parent.mkdir(parents=True, exist_ok=True)
+        with claim_path.open("x", encoding="utf-8") as stream:
+            json.dump({"schema_version": "ns-cowling.current-generator-claim.v1",
+                       "task_id": template["task_id"],
+                       "input_manifest_sha256": input_sha,
+                       "cell_id": cell["id"],
+                       "output_root": str(output_root),
+                       "current_executable_sha256": receipt["current_executable_sha256"]}, stream,
+                      indent=2)
+            stream.write("\n")
+        N_BRIDGE = 40
+        receipt["pipeline_invoked"] = True
+        result = run_pipeline("css", crust_dir, core_dir, cell_dir)
+        receipt["result"] = result
+        receipt["matching_kernel_invoked"] = result.get("matching_kernel_invoked") is True
+        receipt["attempted"] = receipt["matching_kernel_invoked"]
+        receipt["admitted"] = (receipt["attempted"] and result.get("survived") is True
+                               and result.get("admission", {}).get("status") == "ADMITTED")
+        receipt["outcome"] = "SURVIVED" if receipt["admitted"] else "FAILED"
+        receipt["status"] = "HOLD_INDEPENDENT_REVIEW" if receipt["admitted"] else "HOLD_MATCH_FAILURE"
+    except Exception as exc:
+        receipt["outcome"] = "EXCEPTION"
+        receipt["status"] = ("HOLD_ALLOWANCE_ALREADY_CLAIMED" if isinstance(exc, FileExistsError)
+                             and not receipt["pipeline_invoked"] else "HOLD_EXECUTION_EXCEPTION")
+        receipt["error"] = f"{type(exc).__name__}: {exc}"
+    finally:
+        N_BRIDGE = old_n_bridge
+        (output_root / "MATCH_EXECUTION.json").write_text(
+            json.dumps(receipt, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        census = copy.deepcopy(manifest)
+        census["schema_version"] = "ns-cowling.current-generator-result-census.v1"
+        census["execution"] = {
+            "input_manifest_sha256": input_sha,
+            "current_executable_sha256": receipt["current_executable_sha256"],
+            "cell_id": cell["id"],
+            "publication_status": "HOLD_INDEPENDENT_REVIEW",
+            "outcome": receipt["outcome"],
+        }
+        selected = next(item for item in census["cells"] if item["id"] == cell["id"])
+        selected["attempted"] = receipt["attempted"]
+        selected["admitted"] = receipt["admitted"]
+        selected["status"] = receipt["status"]
+        selected["reason_code"] = receipt["outcome"]
+        selected["evidence_refs"] = ["MATCH_EXECUTION.json"]
+        (output_root / "MATCH_RESULT_CENSUS.json").write_text(
+            json.dumps(census, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return receipt
+
+
+if __name__ == "__main__":
+    if len(sys.argv) == 3 and sys.argv[1] == "--current-generator-manifest":
+        from current_generator_manifest import build_manifest, validate_manifest
+        target = Path(sys.argv[2]).expanduser()
+        if target.exists():
+            raise FileExistsError(f"manifest already exists: {target}")
+        manifest = build_manifest(ROOT)
+        validate_manifest(manifest)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with target.open("x", encoding="utf-8") as stream:
+            json.dump(manifest, stream, indent=2, ensure_ascii=False)
+            stream.write("\n")
+        print(f"Current-generator intake manifest: {target}")
+    elif len(sys.argv) == 4 and sys.argv[1] == "--current-generator-execute":
+        execution = execute_current_generator_manifest(Path(sys.argv[2]), Path(sys.argv[3]))
+        print(f"Current-generator execution receipt: {Path(sys.argv[3]) / 'MATCH_EXECUTION.json'}")
+        raise SystemExit(0 if execution["admitted"] else 1)
+    elif len(sys.argv) == 1:
+        raise SystemExit(main())
+    else:
+        raise SystemExit("usage: match_core_crust.py [--current-generator-manifest PATH | --current-generator-execute MANIFEST_PATH OUTPUT_ROOT]")

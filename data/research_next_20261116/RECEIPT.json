@@ -1,0 +1,96 @@
+{
+  "schema": "ns-cowling.research-next.v1",
+  "base_head": "43b7d8637fefd9bdb8240d9bf8092b921384d794",
+  "status": "PARTIALLY_COMPLETE",
+  "scope": "NL3 local density/mesh/optimizer sensitivity; SciPy banded-input compatibility; no new matching or stellar computation",
+  "scientific_code_sha256": {
+    "python_frontend/compose_eos/spatial_tf.py": "88704abb9ab0cefaab9554a1f5bfaadfcb8bcbd6a365337c12dc8be3b9bebe75",
+    "python_frontend/compose_eos/spatial_tf_equilibrium.py": "8be3c6756f1b04a38cb59fdeeacb5c0aed5c98d8337c8ed14c64e7091501bdca",
+    "python_frontend/tests/test_banded_precision_contract.py": "89ca223cf722d8447e393577b718dfcc423f0a7306de89f8fdc6c8d2b9124dc4",
+    "scripts/probe_nl3_tube_precision.py": "09493c23813bc7aa50dd6e8403dd8d4cd602a4b11e783ad22ac4951d72eb49fe",
+    "scripts/audit_screened_electron_cast.py": "3adfc03388ad4649c4ae8e9d8ab9180bb4a44e903fc43f2c78617915172cccff",
+    "scripts/export_nl3_midpoint_samples.py": "0796f29574bb0078e68706d021a6f74ad5300f031ac9973d825cdad54faf96ea",
+    "data/research_finish_20261116/geometry/extend_upper.py": "a778afe31e0e234cee487ce413280ac992865664ed3e973f37349a6ebb2f2b63"
+  },
+  "native_executable_sha256": "183439d86a96cb1834af955a97fa2b8c146661c8fb33b93a62eb94b13222f10d",
+  "python": "3.12.3",
+  "source_identity": {
+    "old_spatial_tf": "2d1f1edc72b170b01194f2705e62905383a2d4292bd84cc58067bc2cc1067c02",
+    "new_spatial_tf": "88704abb9ab0cefaab9554a1f5bfaadfcb8bcbd6a365337c12dc8be3b9bebe75",
+    "unchanged_screened_electron": "8be3c6756f1b04a38cb59fdeeacb5c0aed5c98d8337c8ed14c64e7091501bdca",
+    "geometry_executed_before_cast": true
+  },
+  "geometry": {
+    "model": "GPPVA_NL3wrL55",
+    "two_branch_actual_solves": 16,
+    "six_family_new_mesh_density_nodes": 2,
+    "reused_anchors_not_new": 2,
+    "new_density": 0.08625,
+    "near_uniform_not_promoted": true,
+    "continuous_transition_proven": false,
+    "global_minimum_proven": false,
+    "field_code_snapshot": "geometry/six_family_midpoint/SOURCE_SNAPSHOT.json.gz",
+    "native_readback": {
+      "N192": "SERIALIZATION_PASS_OVERALL_FAIL_C10_C11_NO_SAME_PHASE_DERIVATIVE_POINTS",
+      "N384": "SERIALIZATION_PASS_OVERALL_PASS_ONE_SAME_PHASE_DERIVATIVE_POINT",
+      "rows_each": 3,
+      "reused_rows_each": 2,
+      "new_rows_each": 1
+    },
+    "new_unique_mesh_density_pairs": [
+      {
+        "n_b": 0.085,
+        "points": 576,
+        "scope": "two branches only"
+      },
+      {
+        "n_b": 0.08625,
+        "points": 192,
+        "scope": "six seed families"
+      },
+      {
+        "n_b": 0.08625,
+        "points": 384,
+        "scope": "six seed families; two-branch probe separate"
+      },
+      {
+        "n_b": 0.08625,
+        "points": 576,
+        "scope": "two branches only"
+      }
+    ]
+  },
+  "electron": {
+    "captured_failure_inputs": 8,
+    "baseline_pass": 8,
+    "post_cast_pass": 8,
+    "max_delta_electron_density": 0,
+    "max_delta_potential": 0,
+    "max_delta_mu": 0,
+    "max_final_pde_residual": 2.544076060928546e-13,
+    "precision": "longdouble potential state and update remain, float64 band solve inputs"
+  },
+  "tests": {
+    "frontend_pipeline_passed": 973,
+    "frontend_pipeline_skipped": 9,
+    "generator_passed": 142,
+    "generator_warning": "Matplotlib Axes3D warning",
+    "root_checksum_entries": 5202
+  },
+  "commands": [
+    "bash fortran_eos/build.sh build/compose_eos_fortran",
+    "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=python_frontend:scripts python3 scripts/probe_nl3_tube_precision.py build/nl3_tube_precision --workers 4",
+    "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=python_frontend:scripts COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python3 data/research_finish_20261116/geometry/extend_upper.py data/research_finish_20261116/geometry/accelerated_final build/nl3_mid_six --densities .08625 --meshes 192 384 --workers 2",
+    "PYTHONPATH=python_frontend:scripts COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python3 scripts/export_nl3_midpoint_samples.py build/nl3_mid_six data/research_finish_20261116/geometry/nl3_upper_extension build/nl3_mid_readback",
+    "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=python_frontend python3 scripts/audit_screened_electron_cast.py build/electron_cast_after.json",
+    "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -m pytest -q python_frontend/tests pipeline/tests",
+    "PYTHONPATH=eos_generator:eos_generator/compose_eos_pkg OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -m pytest -q eos_generator/tests",
+    "sha256sum -c SHA256SUMS_v4.txt"
+  ],
+  "independent_review": {
+    "status": "PASS_SCOPED",
+    "path": "data/research_next_20261116/INDEPENDENT_REVIEW.json",
+    "sha256": "cc855567d5f4191443a7b38b1d50fd4e8dc0f0cb78888b96c8f8a852bc3ec245",
+    "preflight": "SOURCE_VERSION_CHANGED_BEFORE_REEVALUATION"
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "schema": "ns-cowling.adversarial-reaudit.v2",
+  "date": "2026-11-16",
+  "timezone": "Asia/Seoul",
+  "baseline": "eda4af96743c9af3369d1810ef733badb1709b93",
+  "implementation_commits": [
+    "d21d44a73588365cbf83ed93d3d5c44604cb76cd",
+    "42950053088fa80752826f4aae56d0a0b013c0e4"
+  ],
+  "scientific_project_status": "PARTIALLY_COMPLETE",
+  "checks": {
+    "native_units": {
+      "status": "pass_scoped",
+      "exit_code": 0,
+      "log": "data/receipts/core_crust_audit_20261116/logs/ns_audit_20261116_native_units.log",
+      "scope": "native polynomial,CSS,DDRMF,CLD,WS,TOV-Love units and Cowling runtime compile"
+    },
+    "generator": {
+      "status": "pass_scoped",
+      "passed": 142,
+      "ci_warning_count": 0,
+      "local_warning": "existing Matplotlib Axes3D duplicate-install warning",
+      "log": "data/receipts/core_crust_audit_20261116/logs/NS_Cowling_generator_reaudit_final.log"
+    },
+    "frontend_pipeline": {
+      "status": "pass_scoped",
+      "passed": 459,
+      "skipped": 9,
+      "authority": "CI_612.json; job133028997580 logs"
+    },
+    "ci_612": {
+      "status": "success",
+      "run_id": 43784499587,
+      "run_number": 612,
+      "head_sha": "42950053088fa80752826f4aae56d0a0b013c0e4",
+      "tested_merge_sha": "31e596acf975527536575d808da31f3b907abd44",
+      "base_sha": "b12ba451b6755bf8f13d22c882075a23eae800a7"
+    },
+    "census": {
+      "status": "pass_scoped",
+      "configured": 80,
+      "evaluated": 40,
+      "source_marked": 40,
+      "css_survivors": 8,
+      "maxwell_survivors": 0,
+      "receipt": "data/receipts/core_crust_audit_20261116/CENSUS_v6.json"
+    },
+    "stellar_campaign": {
+      "status": "pass_scoped",
+      "execution_status": "completed",
+      "exit_code": 0,
+      "source_head": "42950053088fa80752826f4aae56d0a0b013c0e4",
+      "git_tracked_tree_dirty": false,
+      "survivors": 8,
+      "slow_roots": 8,
+      "rapid_roots": 8,
+      "max_abs_normalized_residual": 3.3776188144152286e-06,
+      "wall_s_sum_pairs": 464.0,
+      "receipt": "data/receipts/core_crust_audit_20261116/CSS_SURVIVOR_STARS_v6.json",
+      "scope": "phase-segmented reference TOV/Cowling; radius = truncation radius at the CLD crust table minimum pressure (no outer crust); no composition; Cowling roots unlabelled; finite-pressure Delta P=0 boundary and vacuum-normalized lapse at cutoff are an artificial truncation model; frequencies are not complete-star observables or stability certification",
+      "executed_source_hashes_verified": true
+    },
+    "historical_dag_writer": {
+      "status": "pass_scoped",
+      "regression": "1RED then1PASS; no rollback of later audited states",
+      "log": "data/receipts/core_crust_audit_20261116/logs/ns_audit_20261116_dag_green.log"
+    }
+  },
+  "execution_environment": {
+    "python": "3.12.3",
+    "numpy": "2.4.2",
+    "scipy": "1.17.0",
+    "gfortran": "13.3.0",
+    "worktree": "/tmp/NS_Cowling_audit_20261116_eda4af9",
+    "user_dirty_checkout_preserved": "/home/cosmosapjw/Dropbox/NS_Cowling"
+  },
+  "physical_scope": {
+    "crust": "exploratory_proxy_CLD",
+    "source_calibrated": false,
+    "stellar_boundary": "finite-pressure DeltaP=0 and vacuum lapse at cutoff; artificial truncated model",
+    "radial_stability_validated": false,
+    "spectral_completeness_validated": false,
+    "global_minimum_certified": false,
+    "interval_arithmetic": "float64 algebraic extrema/bounds; no directed-rounding proof"
+  },
+  "regeneration": {
+    "path": "download/reconstruction_v6_proxy",
+    "actual_generation_head": "eda4af96743c9af3369d1810ef733badb1709b93",
+    "git_tracked_dirty": true,
+    "source_hashes_checked_against_committed_files": true
+  },
+  "sources": [
+    "https://arxiv.org/html/2402.15548v1",
+    "https://arxiv.org/abs/2003.01259",
+    "https://compose.obspm.fr/download/pdf/manual_v3.00.pdf"
+  ],
+  "evidence": [
+    "docs/CORE_CRUST_ADVERSARIAL_REAUDIT_20261116.md",
+    "data/receipts/core_crust_audit_20261116/LOG_INDEX.json",
+    "data/receipts/core_crust_audit_20261116/CI_612.json",
+    "data/receipts/core_crust_audit_20261116/CENSUS_v6.json",
+    "data/receipts/core_crust_audit_20261116/CSS_SURVIVOR_STARS_v6.json"
+  ],
+  "remaining": [
+    "source-calibrated interface functions and fitted nuclear-mass parameters",
+    "global minimum and density/grid convergence",
+    "outer crust and physical surface boundary",
+    "composition-aware Maxwell v2 and per-row masks",
+    "provider beta/mass convention adjudication",
+    "mode identity and radial stability",
+    "complete native EOS390 campaign"
+  ],
+  "interrupted_exploratory_execution": {
+    "reason": "source changed during the exploratory stellar process; restarted at committed4295005 to remove import-time identity uncertainty",
+    "log": "/tmp/ns_audit_20261116_stars_v6.log",
+    "status": "terminated",
+    "final_evidence": false
+  }
+}

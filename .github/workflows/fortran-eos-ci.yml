@@ -1,0 +1,350 @@
+name: Fortran EOS frontend CI
+
+on:
+  push:
+    branches:
+      - main
+      - research/fortran-eos-gap-fill-v1
+      - research/eos390-fortran-unification-v1
+      - cloud/eos390-fortran-unification-v1
+  pull_request:
+    branches:
+      - main
+      - research/fortran-eos-gap-fill-v1
+      - research/eos390-fortran-unification-v1
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fortran-eos-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install native compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gfortran liblapack-dev libblas-dev
+
+      - name: Install Python package and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test,plot]'
+
+      - name: Build Fortran EOS executable
+        run: bash fortran_eos/build.sh build/compose_eos_fortran
+
+      - name: Run frontend and direct-provider tests
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+        run: python -m pytest -q python_frontend/tests pipeline/tests
+      - name: Run matching thermodynamic and interval counterexamples
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+          OMP_NUM_THREADS: 1
+          OPENBLAS_NUM_THREADS: 1
+          MKL_NUM_THREADS: 1
+        run: |
+          python fortran_eos/tests/run_matching_native_adversarial.py --build-dir build/matching_controls --log-dir build/matching_controls/logs
+          python -m pytest -q fortran_eos/tests/matching_theory_soft_barotrope.py fortran_eos/tests/matching_theory_maxwell_topology.py
+
+      - name: Verify Maxwell physical invariance under reference reencoding
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/test_maxwell_reference_normalization.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_phase_transition.o \
+            -o build/compose_eos_fortran/test_maxwell_reference_normalization
+          build/compose_eos_fortran/test_maxwell_reference_normalization
+
+      - name: Verify SPG dilute uniform-limit classification
+        env:
+          OMP_NUM_THREADS: 1
+          OPENBLAS_NUM_THREADS: 1
+          MKL_NUM_THREADS: 1
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/spg_finish_regression.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_gdfm_native.o \
+            build/compose_eos_fortran/obj/compose_eos_spg_native.o \
+            build/compose_eos_fortran/obj/compose_eos_optimize_native.o \
+            build/compose_eos_fortran/obj/slsqp_optmz.o \
+            -o build/compose_eos_fortran/spg_finish_regression
+          build/compose_eos_fortran/spg_finish_regression
+
+      - name: Regenerate all five composition-aware core models
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+        run: python scripts/generate_core_eos.py build/independent_core_generation
+      - name: Preserve independent core regeneration evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: independent-core-regeneration-${{ github.sha }}
+          path: build/independent_core_generation/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Install EOS generator package and test dependencies
+        run: python -m pip install -e 'eos_generator/compose_eos_pkg[test]'
+
+      - name: Run EOS generator adversarial and phase-transition suite
+        env:
+          PYTHONPATH: eos_generator:eos_generator/compose_eos_pkg
+        run: python -m pytest -q eos_generator/tests
+
+      - name: Run full configured core-crust census
+        env:
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+          NS_COWLING_MATCH_OUT_ROOT: build/core_crust_census
+        run: python scripts/match_core_crust.py
+
+      - name: Preserve core-crust census evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-crust-census-${{ github.sha }}
+          path: build/core_crust_census/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Verify EOS generator SHA-256 package manifest
+        run: |
+          cd eos_generator
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          from hashlib import sha256
+          manifest = Path("SHA256SUMS_v3_3.txt")
+          failures = []
+          count = 0
+          for line in manifest.read_text(encoding="utf-8").splitlines():
+              if not line.strip():
+                  continue
+              expected, name = line.split(maxsplit=1)
+              name = name.lstrip("* ")
+              path = Path(name)
+              count += 1
+              if not path.is_file():
+                  failures.append(f"PACKAGE_MISSING {name} expected={expected}")
+                  continue
+              actual = sha256(path.read_bytes()).hexdigest()
+              if actual != expected:
+                  failures.append(f"PACKAGE_MISMATCH {name} expected={expected} actual={actual}")
+          if failures or count == 0:
+              for f in failures:
+                  print(f)
+              print(f"FAIL: {len(failures)} SHA256SUMS_v3_3.txt errors out of {count} entries")
+              sys.exit(1)
+          print(f"PASS: all {count} entries in eos_generator/SHA256SUMS_v3_3.txt verified")
+          PY
+
+      - name: Build admitted E390-03A standalone core-only cohort
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+        run: python scripts/build_e390_03a_core_only.py build/e390_03a/core_only
+      - name: Upload E390-03A core-only tables and construction receipts
+        uses: actions/upload-artifact@v4
+        with:
+          name: E390-03A-core-only-${{ github.sha }}
+          path: build/e390_03a/core_only/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Build admitted E390-03B standalone crust-only cohort
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+        run: python scripts/build_e390_03b_crust_only.py build/e390_03b/crust_only
+      - name: Upload E390-03B crust-only tables and construction receipts
+        uses: actions/upload-artifact@v4
+        with:
+          name: E390-03B-crust-only-${{ github.sha }}
+          path: build/e390_03b/crust_only/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Build native E390-03 DD-RMF beta-equilibrium and symmetry grid
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+        run: python scripts/build_e390_03_ddrmf.py build/e390_03/ddrmf
+      - name: Upload E390-03 DD-RMF native diagnostic grids and receipts
+        uses: actions/upload-artifact@v4
+        with:
+          name: E390-03-DDRMF-native-${{ github.sha }}
+          path: build/e390_03/ddrmf/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Run native Fortran polynomial-extrema unit tests
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/test_polynomial_extrema.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_reconstruct.o \
+            -o build/compose_eos_fortran/test_polynomial_extrema
+          build/compose_eos_fortran/test_polynomial_extrema
+
+      - name: Run native Fortran CSS segment analytic tests
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/test_css_segment.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_css.o \
+            -o build/compose_eos_fortran/test_css_segment
+          build/compose_eos_fortran/test_css_segment
+
+      - name: Run native Fortran DD-RMF homogeneous + beta-equilibrium tests (E390-03/M3)
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/test_ddrmf_homogeneous.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_rmf.o \
+            -o build/compose_eos_fortran/test_ddrmf_homogeneous
+          build/compose_eos_fortran/test_ddrmf_homogeneous
+
+      - name: Run native Fortran CLD cell reconstruction tests (E390-03/M3)
+        env:
+          GFORTRAN_WARN_ARRAY_TEMPORARY: "0"
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/test_cld_cell.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_rmf.o \
+            build/compose_eos_fortran/obj/compose_eos_cld.o \
+            -o build/compose_eos_fortran/test_cld_cell
+          build/compose_eos_fortran/test_cld_cell
+
+      - name: Run native Fortran Wigner-Seitz TF gas composition tests (E390-03/M3)
+        env:
+          GFORTRAN_WARN_ARRAY_TEMPORARY: "0"
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/test_wigner_seitz_cell.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_io.o \
+            build/compose_eos_fortran/obj/compose_eos_wigner_seitz.o \
+            -o build/compose_eos_fortran/test_wigner_seitz_cell
+          build/compose_eos_fortran/test_wigner_seitz_cell
+
+      - name: Run Wigner-Seitz end-to-end reconstruction tests (E390-03/M3, skips if M0 not staged)
+        env:
+          PYTHONPATH: python_frontend
+          COMPOSE_EOS_FORTRAN_ROOT: .
+          COMPOSE_EOS_FORTRAN_EXE: build/compose_eos_fortran/compose_eos_fortran
+        run: |
+          python -m pytest -q python_frontend/tests/test_wigner_seitz_reconstruction.py
+
+      - name: Run native Fortran TOV-Love + Maxwell + thermodynamic-jump tests (E390-06/M6)
+        run: |
+          gfortran -std=f2018 -O2 -ffree-line-length-none -fimplicit-none -fcheck=all \
+            -Ibuild/compose_eos_fortran/mod \
+            fortran_eos/tests/test_tov_love.f90 \
+            build/compose_eos_fortran/obj/compose_eos_types.o \
+            build/compose_eos_fortran/obj/compose_eos_tov.o \
+            build/compose_eos_fortran/obj/compose_eos_verify.o \
+            -o build/compose_eos_fortran/test_tov_love
+          build/compose_eos_fortran/test_tov_love
+
+      - name: Verify Cowling runtime-compile path (E390-06/M6)
+        run: |
+          pip install -e python_frontend >/dev/null 2>&1 || true
+          python - <<'PY'
+          import os, sys
+          sys.path.insert(0, "python_frontend")
+          os.environ.setdefault("COMPOSE_EOS_FORTRAN_ROOT", os.getcwd())
+          from compose_cowling.solver import _compile_solver
+          case_driver, cell_solve = _compile_solver()
+          assert case_driver.is_file() and cell_solve.is_file(), \
+              "Cowling runtime-compile did not produce case_driver + cell_solve"
+          print("PASS Cowling runtime-compile: case_driver + cell_solve built")
+          PY
+
+      - name: Run Cowling end-to-end spectrum tests (E390-06/M6, skips if M0 not staged)
+        run: |
+          python -m pytest -q python_frontend/tests/test_cowling_end_to_end.py
+
+      - name: Diagnose local-agent handoff document checkout bytes
+        run: |
+          git check-attr -a -- docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md
+          git config --get core.autocrlf || true
+          git config --get core.eol || true
+          git hash-object docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md
+          git rev-parse :docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md
+          sha256sum docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md
+          python - <<'PY'
+          from pathlib import Path
+          from hashlib import sha256
+          import subprocess
+          name = "docs/EOS390_NATIVE_FORTRAN_LOCAL_AGENT_DAG_20261111.md"
+          worktree = Path(name).read_bytes()
+          blob = subprocess.check_output(["git", "show", f"HEAD:{name}"])
+          for label, data in (("worktree", worktree), ("git_blob", blob)):
+              print(f"{label}: bytes={len(data)} sha256={sha256(data).hexdigest()} "
+                    f"CRLF={data.count(bytes([13, 10]))} CR={data.count(bytes([13]))} "
+                    f"LF={data.count(bytes([10]))}")
+          PY
+
+      - name: Diagnose exact SHA-256 manifest mismatches
+        if: always()
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from hashlib import sha256
+          for line in Path("SHA256SUMS_v4.txt").read_text(encoding="utf-8").splitlines():
+              if not line.strip():
+                  continue
+              expected, name = line.split(maxsplit=1)
+              name = name.lstrip("* ")
+              path = Path(name)
+              if not path.is_file():
+                  print(f"MISSING {name} expected={expected}")
+                  continue
+              actual = sha256(path.read_bytes()).hexdigest()
+              if actual != expected:
+                  print(f"MISMATCH {name} expected={expected} actual={actual}")
+          PY
+
+      - name: Verify tracked SHA-256 manifest
+        run: sha256sum -c SHA256SUMS_v4.txt
+
+      - name: Package verified source snapshot
+        run: |
+          mkdir -p dist
+          git archive --format=tar.gz --prefix=NS_Cowling-${GITHUB_SHA}/ HEAD > "dist/NS_Cowling-${GITHUB_SHA}.tar.gz"
+          sha256sum "dist/NS_Cowling-${GITHUB_SHA}.tar.gz" > "dist/NS_Cowling-${GITHUB_SHA}.tar.gz.sha256"
+
+      - name: Upload verified source package
+        uses: actions/upload-artifact@v4
+        with:
+          name: NS_Cowling-${{ github.sha }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 30

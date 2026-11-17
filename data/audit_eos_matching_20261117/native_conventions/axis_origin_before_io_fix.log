@@ -1,0 +1,160 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+___ test_single_slice_preserves_declared_axis_labels_above_point_count[7-7] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-422/test_single_slice_preserves_de0')
+t_first = 7, thermo_it = 7
+
+    @pytest.mark.parametrize("t_first,thermo_it", [(7, 7), (0, 1)])
+    def test_single_slice_preserves_declared_axis_labels_above_point_count(tmp_path, t_first, thermo_it):
+        """CompOSE bounds identify grid labels, not local array offsets.
+    
+        A slice retaining Yq label 9 has one grid point, stored at local slot 1.
+        Keep the established zero-declared/one-labelled cold-T provider case.
+        """
+        d = tmp_path / "offset-slice"
+        _write_cold_slice_dir(d, n=3, t_first=t_first, t_value=0.0,
+                              yq_first=9, yq_value=.1, thermo_iT=thermo_it,
+                              thermo_iYq=9)
+>       eos = read_compose(d)
+              ^^^^^^^^^^^^^^^
+
+/tmp/ns_matching_slice_audit_20261117/test_m10_generic_axes_probe.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:18: in read_compose
+    run_native("read", source, target)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+action = 'read'
+args = (PosixPath('/tmp/pytest-of-cosmosapjw/pytest-422/test_single_slice_preserves_de0/offset-slice'), PosixPath('/tmp/compose-eos-read-zpy8vlg0/internal'))
+
+    def run_native(action: str, *args: str | os.PathLike[str]) -> dict[str, Any]:
+        exe = executable()
+        command = [str(exe), action, *(str(a) for a in args)]
+        completed = subprocess.run(command, capture_output=True, text=True)
+        lines = [line.strip() for line in completed.stdout.splitlines() if line.strip()]
+        payload: dict[str, Any] = {}
+        for line in reversed(lines):
+            try:
+                candidate = json.loads(line)
+                if isinstance(candidate, dict):
+                    payload = candidate
+                    break
+            except json.JSONDecodeError:
+                continue
+        # the structured category the Fortran layer attaches to structured failures
+        # (e.g. maxwell-transition). None when the Fortran layer did not emit one.
+        category = payload.get("category")
+        op = payload.get("operation", action)
+        if completed.returncode:
+>           raise NativeExecutionError(
+                f"Fortran operation {action!r} failed with exit code {completed.returncode}: "
+                f"{payload.get('message', completed.stderr.strip() or completed.stdout.strip())}",
+                category=category, operation=op,
+            )
+E           compose_eos.native.NativeExecutionError: Fortran operation 'read' failed with exit code 3: cold Yq slice could not be resolved from eos.yq grid
+
+python_frontend/compose_eos/native.py:88: NativeExecutionError
+___ test_single_slice_preserves_declared_axis_labels_above_point_count[0-1] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-422/test_single_slice_preserves_de1')
+t_first = 0, thermo_it = 1
+
+    @pytest.mark.parametrize("t_first,thermo_it", [(7, 7), (0, 1)])
+    def test_single_slice_preserves_declared_axis_labels_above_point_count(tmp_path, t_first, thermo_it):
+        """CompOSE bounds identify grid labels, not local array offsets.
+    
+        A slice retaining Yq label 9 has one grid point, stored at local slot 1.
+        Keep the established zero-declared/one-labelled cold-T provider case.
+        """
+        d = tmp_path / "offset-slice"
+        _write_cold_slice_dir(d, n=3, t_first=t_first, t_value=0.0,
+                              yq_first=9, yq_value=.1, thermo_iT=thermo_it,
+                              thermo_iYq=9)
+>       eos = read_compose(d)
+              ^^^^^^^^^^^^^^^
+
+/tmp/ns_matching_slice_audit_20261117/test_m10_generic_axes_probe.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:18: in read_compose
+    run_native("read", source, target)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+action = 'read'
+args = (PosixPath('/tmp/pytest-of-cosmosapjw/pytest-422/test_single_slice_preserves_de1/offset-slice'), PosixPath('/tmp/compose-eos-read-0d0g2x_m/internal'))
+
+    def run_native(action: str, *args: str | os.PathLike[str]) -> dict[str, Any]:
+        exe = executable()
+        command = [str(exe), action, *(str(a) for a in args)]
+        completed = subprocess.run(command, capture_output=True, text=True)
+        lines = [line.strip() for line in completed.stdout.splitlines() if line.strip()]
+        payload: dict[str, Any] = {}
+        for line in reversed(lines):
+            try:
+                candidate = json.loads(line)
+                if isinstance(candidate, dict):
+                    payload = candidate
+                    break
+            except json.JSONDecodeError:
+                continue
+        # the structured category the Fortran layer attaches to structured failures
+        # (e.g. maxwell-transition). None when the Fortran layer did not emit one.
+        category = payload.get("category")
+        op = payload.get("operation", action)
+        if completed.returncode:
+>           raise NativeExecutionError(
+                f"Fortran operation {action!r} failed with exit code {completed.returncode}: "
+                f"{payload.get('message', completed.stderr.strip() or completed.stdout.strip())}",
+                category=category, operation=op,
+            )
+E           compose_eos.native.NativeExecutionError: Fortran operation 'read' failed with exit code 3: cold Yq slice could not be resolved from eos.yq grid
+
+python_frontend/compose_eos/native.py:88: NativeExecutionError
+_ test_shifted_axis_still_rejects_thermo_label_outside_declared_range[7-8-Yq label outside the declared] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-422/test_shifted_axis_still_reject0')
+thermo_it = 7, thermo_iy = 8, match = 'Yq label outside the declared'
+
+    @pytest.mark.parametrize("thermo_it,thermo_iy,match", [
+        (7, 8, "Yq label outside the declared"),
+        (20, 9, "not a single selected T slice"),
+    ])
+    def test_shifted_axis_still_rejects_thermo_label_outside_declared_range(tmp_path, thermo_it, thermo_iy, match):
+        d = tmp_path / "wrong-offset-slice"
+        _write_cold_slice_dir(d, n=3, t_first=7, t_value=0.0,
+                              yq_first=9, yq_value=.1, thermo_iT=thermo_it,
+                              thermo_iYq=thermo_iy)
+>       with pytest.raises(NativeExecutionError, match=match):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'Yq label outside the declared'
+E         Actual message: "Fortran operation 'read' failed with exit code 3: cold Yq slice could not be resolved from eos.yq grid"
+
+/tmp/ns_matching_slice_audit_20261117/test_m10_generic_axes_probe.py:133: AssertionError
+_ test_shifted_axis_still_rejects_thermo_label_outside_declared_range[20-9-not a single selected T slice] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-422/test_shifted_axis_still_reject1')
+thermo_it = 20, thermo_iy = 9, match = 'not a single selected T slice'
+
+    @pytest.mark.parametrize("thermo_it,thermo_iy,match", [
+        (7, 8, "Yq label outside the declared"),
+        (20, 9, "not a single selected T slice"),
+    ])
+    def test_shifted_axis_still_rejects_thermo_label_outside_declared_range(tmp_path, thermo_it, thermo_iy, match):
+        d = tmp_path / "wrong-offset-slice"
+        _write_cold_slice_dir(d, n=3, t_first=7, t_value=0.0,
+                              yq_first=9, yq_value=.1, thermo_iT=thermo_it,
+                              thermo_iYq=thermo_iy)
+>       with pytest.raises(NativeExecutionError, match=match):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'not a single selected T slice'
+E         Actual message: "Fortran operation 'read' failed with exit code 3: cold Yq slice could not be resolved from eos.yq grid"
+
+/tmp/ns_matching_slice_audit_20261117/test_m10_generic_axes_probe.py:133: AssertionError
+=========================== short test summary info ============================
+FAILED ../../../../tmp/ns_matching_slice_audit_20261117/test_m10_generic_axes_probe.py::test_single_slice_preserves_declared_axis_labels_above_point_count[7-7]
+FAILED ../../../../tmp/ns_matching_slice_audit_20261117/test_m10_generic_axes_probe.py::test_single_slice_preserves_declared_axis_labels_above_point_count[0-1]
+FAILED ../../../../tmp/ns_matching_slice_audit_20261117/test_m10_generic_axes_probe.py::test_shifted_axis_still_rejects_thermo_label_outside_declared_range[7-8-Yq label outside the declared]
+FAILED ../../../../tmp/ns_matching_slice_audit_20261117/test_m10_generic_axes_probe.py::test_shifted_axis_still_rejects_thermo_label_outside_declared_range[20-9-not a single selected T slice]
+4 failed, 8 deselected in 0.46s

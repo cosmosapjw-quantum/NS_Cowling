@@ -1,0 +1,17 @@
+.....F.                                                                  [100%]
+=================================== FAILURES ===================================
+_______ test_constant_total_density_does_not_hide_composition_structure ________
+
+    def test_constant_total_density_does_not_hide_composition_structure():
+        row=profile([.005,.015,.025,.015,.005],[.06]*5)
+        row['baryon_density_contrast']=0.
+>       assert profile_morphology(row)['classification']=='NEAR_UNIFORM_COMPOSITION_PROFILE'
+E       AssertionError: assert 'UNIFORM' == 'NEAR_UNIFORM...ITION_PROFILE'
+E         
+E         - NEAR_UNIFORM_COMPOSITION_PROFILE
+E         + UNIFORM
+
+python_frontend/tests/test_tf_morphology.py:35: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_tf_morphology.py::test_constant_total_density_does_not_hide_composition_structure
+1 failed, 6 passed in 0.15s

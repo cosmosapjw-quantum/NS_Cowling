@@ -1,0 +1,220 @@
+{
+  "status": "COMPLETE",
+  "provenance": {
+    "head": "c8ff2d6c97a93f1ccf621051861d3091bfe94d81",
+    "code_sha256": {
+      "core_regeneration.py": "602d9121d79671f83406941266ab092fe62c5fb5ff856b336ff26531737bb04a",
+      "apr_uniform.py": "a382b4aaef0878d4f7abb6f8fe2648376e4c5d9ec5b47cf8aa8c755f43d814d4",
+      "apr_gibbs.py": "345ab53f89a88af061ea8231fcec0ba26083e68553a7a66c1bda4217fba730f1",
+      "bbb_uniform.py": "438cb6695a31b216258d1400a70309b5255e06f6123c0d1d18ced198a4b79f77",
+      "gm1_uniform.py": "b301f918ec8bc8ccd574ce7ce69a9d8e32c6bf61f4896d0f72b107b99e8a8b83",
+      "skyrme_uniform.py": "ddbf21bb0f4af460c88219a715da63924f36f132c50f70b25e7743737a2fdfe3",
+      "cold_leptons.py": "ac995eb2504560da1569190a2f95bbbe266961dab0498dc0665951afca4c2ded",
+      "physical_domain.py": "27e97bdad1e378df9452bd6f1e66bc33ebf200d658e37ecfb37bc7da3870a3c7",
+      "eos_data.py": "0ce674327889f38d22939ba3a6de55ea3e4432153fb7077a68ba05e0dbfc25a3",
+      "api.py": "296d81f2c93adfa3fda043ba34a0cea687bdbfa01125279f9045348aa87a04e4"
+    },
+    "runner_sha256": "a5a559b7edf3bf38df4d20383209305f958a45501888bfc99513b0a25dcefad9",
+    "density_grid_source": "Caller-defined geomspace; CompOSE target thermodynamics are not read"
+  },
+  "models": {
+    "APR_APR": {
+      "points": 163,
+      "implementation_checks": {
+        "fraction_closure_max_abs": 6.966649479522857e-15,
+        "euler_scaled_max_abs": 2.7108997942460383e-14,
+        "beta_max_abs_MeV": 5.684341886080802e-14,
+        "composition_phase_codes": {
+          "6": "uniformlow/default",
+          "7": "APRhigh",
+          "8": "APRbulkGibbs"
+        },
+        "acceptance": "Independent functional/constraints; CompOSE differences have no unconditional rejection threshold",
+        "requested_interval_fm3": [
+          0.085,
+          1.34
+        ],
+        "physical_support": "Determined separately by density-resolved derivatives and model assumptions"
+      },
+      "native_readback": "PASS",
+      "max_first_law_error_MeV": 5.183994744584197e-08,
+      "sampled_thermodynamic_segments": [
+        {
+          "first_row": 1,
+          "last_row": 52,
+          "n_min_fm3": 0.085,
+          "n_max_fm3": 0.20439495489346152
+        },
+        {
+          "first_row": 53,
+          "last_row": 61,
+          "n_min_fm3": 0.20472991099278096,
+          "n_max_fm3": 0.23499877113858253
+        },
+        {
+          "first_row": 62,
+          "last_row": 138,
+          "n_min_fm3": 0.2373842489373486,
+          "n_max_fm3": 0.8708961702694124
+        }
+      ],
+      "first_interval_findings": {
+        "PHASE_BOUNDARY": {
+          "left_row": 52,
+          "right_row": 53,
+          "n_left_fm3": 0.20439495489346152,
+          "n_right_fm3": 0.20472991099278096,
+          "cs2_over_c2_secant": 0.0019344989552451252,
+          "cs2_over_c2_first_law_secant": 0.0019344989558442815
+        },
+        "ACAUSAL_SECANT": {
+          "left_row": 138,
+          "right_row": 139,
+          "n_left_fm3": 0.8708961702694124,
+          "n_right_fm3": 0.8860371214059386,
+          "cs2_over_c2_secant": 1.0133016457415205,
+          "cs2_over_c2_first_law_secant": 1.0132707183550484
+        }
+      }
+    },
+    "BBB_BHF2": {
+      "points": 161,
+      "implementation_checks": {
+        "fraction_closure_max_abs": 7.345513086676192e-14,
+        "euler_scaled_max_abs": 2.25179403180419e-14,
+        "beta_max_abs_MeV": 0.0,
+        "composition_phase_codes": {
+          "6": "uniformlow/default",
+          "7": "APRhigh",
+          "8": "APRbulkGibbs"
+        },
+        "acceptance": "Independent functional/constraints; CompOSE differences have no unconditional rejection threshold",
+        "requested_interval_fm3": [
+          0.08,
+          1.5
+        ],
+        "physical_support": "Determined separately by density-resolved derivatives and model assumptions"
+      },
+      "native_readback": "PASS",
+      "max_first_law_error_MeV": 1.231683199875988e-09,
+      "sampled_thermodynamic_segments": [
+        {
+          "first_row": 1,
+          "last_row": 161,
+          "n_min_fm3": 0.08,
+          "n_max_fm3": 1.5
+        }
+      ],
+      "first_interval_findings": {}
+    },
+    "GM_GM1": {
+      "points": 161,
+      "implementation_checks": {
+        "fraction_closure_max_abs": 7.505107646466058e-14,
+        "euler_scaled_max_abs": 2.5701648512863822e-14,
+        "beta_max_abs_MeV": 0.0,
+        "composition_phase_codes": {
+          "6": "uniformlow/default",
+          "7": "APRhigh",
+          "8": "APRbulkGibbs"
+        },
+        "acceptance": "Independent functional/constraints; CompOSE differences have no unconditional rejection threshold",
+        "requested_interval_fm3": [
+          0.08,
+          1.0
+        ],
+        "physical_support": "Determined separately by density-resolved derivatives and model assumptions"
+      },
+      "native_readback": "PASS",
+      "max_first_law_error_MeV": 5.852143658557907e-09,
+      "sampled_thermodynamic_segments": [
+        {
+          "first_row": 1,
+          "last_row": 161,
+          "n_min_fm3": 0.08,
+          "n_max_fm3": 1.0
+        }
+      ],
+      "first_interval_findings": {}
+    },
+    "RG_KDE0v1": {
+      "points": 161,
+      "implementation_checks": {
+        "fraction_closure_max_abs": 2.9351521213527576e-15,
+        "euler_scaled_max_abs": 1.1854584929739678e-15,
+        "beta_max_abs_MeV": 0.0,
+        "composition_phase_codes": {
+          "6": "uniformlow/default",
+          "7": "APRhigh",
+          "8": "APRbulkGibbs"
+        },
+        "acceptance": "Independent functional/constraints; CompOSE differences have no unconditional rejection threshold",
+        "requested_interval_fm3": [
+          0.08,
+          1.8
+        ],
+        "physical_support": "Determined separately by density-resolved derivatives and model assumptions"
+      },
+      "native_readback": "PASS",
+      "max_first_law_error_MeV": 2.103661245200783e-09,
+      "sampled_thermodynamic_segments": [
+        {
+          "first_row": 1,
+          "last_row": 148,
+          "n_min_fm3": 0.08,
+          "n_max_fm3": 1.397679757984355
+        }
+      ],
+      "first_interval_findings": {
+        "ACAUSAL_SECANT": {
+          "left_row": 148,
+          "right_row": 149,
+          "n_left_fm3": 1.397679757984355,
+          "n_right_fm3": 1.4251442215594896,
+          "cs2_over_c2_secant": 1.0002222553508053,
+          "cs2_over_c2_first_law_secant": 1.0002005061187242
+        }
+      }
+    },
+    "RG_SLY4": {
+      "points": 161,
+      "implementation_checks": {
+        "fraction_closure_max_abs": 2.1510571102112408e-15,
+        "euler_scaled_max_abs": 8.268657449527393e-16,
+        "beta_max_abs_MeV": 0.0,
+        "composition_phase_codes": {
+          "6": "uniformlow/default",
+          "7": "APRhigh",
+          "8": "APRbulkGibbs"
+        },
+        "acceptance": "Independent functional/constraints; CompOSE differences have no unconditional rejection threshold",
+        "requested_interval_fm3": [
+          0.08,
+          1.4
+        ],
+        "physical_support": "Determined separately by density-resolved derivatives and model assumptions"
+      },
+      "native_readback": "PASS",
+      "max_first_law_error_MeV": 2.921751729445532e-09,
+      "sampled_thermodynamic_segments": [
+        {
+          "first_row": 1,
+          "last_row": 155,
+          "n_min_fm3": 0.08,
+          "n_max_fm3": 1.2575177064723682
+        }
+      ],
+      "first_interval_findings": {
+        "ACAUSAL_SECANT": {
+          "left_row": 155,
+          "right_row": 156,
+          "n_left_fm3": 1.2575177064723682,
+          "n_right_fm3": 1.2802155460320568,
+          "cs2_over_c2_secant": 1.0019888772616345,
+          "cs2_over_c2_first_law_secant": 1.001971413017615
+        }
+      }
+    }
+  },
+  "wall_seconds": 1.783587826997973
+}

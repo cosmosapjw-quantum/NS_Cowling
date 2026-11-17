@@ -1,0 +1,120 @@
+{
+  "schema": "ns-cowling.e390-02-c6b-adjudication",
+  "version": "1.0.0",
+  "date": "2026-11-11",
+  "status": "BLOCKED_PROVIDER_SEMANTICS_UNRESOLVED",
+  "manual": {
+    "title": "CompOSE Reference Manual v3.01 (2022)",
+    "arxiv": "2203.03209",
+    "row_schema": "iT inb iYq Iphase Npairs (particle_id,Y_i)* Nquad (group_id,Aav,Zav,YI)*",
+    "definitions": {
+      "Yi": "particle number fraction n_i/n_B",
+      "Aav": "number-abundance-weighted group-average mass number",
+      "Zav": "number-abundance-weighted group-average charge number",
+      "YI": "combined nuclear-group number fraction",
+      "Xh": "Aav*YI, the group's baryon fraction",
+      "Iphase": "model-specific categorical phase index",
+      "empty": "Npairs=0 and Nquad=0 is legal for phase-only metadata"
+    }
+  },
+  "sampled_raw_files": [
+    {
+      "model": "SPG_M1",
+      "rows": 365,
+      "Iphase": {
+        "0": 217,
+        "7": 148
+      },
+      "row_width": 18,
+      "pair_ids": [
+        10,
+        11,
+        0,
+        1
+      ],
+      "path": "/ns_eos/EoS_matching_code_package/eos_data/SPG_M1/eos.compo"
+    },
+    {
+      "model": "GPPVA_DD2",
+      "rows": 283,
+      "Iphase": {
+        "0": 217,
+        "7": 66
+      },
+      "row_width": 18,
+      "pair_ids": [
+        10,
+        11,
+        0,
+        1
+      ],
+      "path": "/ns_eos/EoS_matching_code_package/eos_data/GPPVA_DD2/eos.compo"
+    },
+    {
+      "model": "GPPVA_FSU2H",
+      "rows": 300,
+      "Iphase": {
+        "0": 217,
+        "7": 83
+      },
+      "row_width": 18,
+      "pair_ids": [
+        10,
+        11,
+        0,
+        1
+      ],
+      "path": "/ns_eos/EoS_matching_code_package/eos_data/GPPVA_FSU2H/eos.compo"
+    }
+  ],
+  "established": {
+    "schema": "The sampled records satisfy the official 18-token row grammar and (iT,inb,iYq) keys align row-by-row with eos.thermo.",
+    "parser_hypothesis": "The prior parser-width/indexing hypothesis is rejected for the sampled sources.",
+    "nadd": "Nadd counts separate eos.thermo extension columns. In sampled GPPVA_FSU2H, q_extra is a categorical pasta-geometry value and is not Iphase."
+  },
+  "numerical_findings": {
+    "outer_crust": "Representative Aav=56,Zav=26 rows have final tuple value=1, Ye=26/56, Yn=Yp=Ymu=0. Treating final value as standard YI gives Xh=56, violating baryon normalization. Interpreting it as Xh=1 is only a diagnostic hypothesis, not a documented convention.",
+    "inner_crust": "In sampled SPG_M1/GPPVA_FSU2H rows, final value equals Ye+Ymu to printed precision. SPG_M1 C3- and C4-implied cluster baryon fractions disagree in all 148 Iphase=7 rows; C6B records C3-implied range 0.096..0.543 versus C4-implied 1.",
+    "rejected_maps": [
+      "Yh=Aav*last_value: global baryon-normalization failure",
+      "Yh=last_value: outer rows only; fails SPG inner rows",
+      "Yh=1: diagnostic only, undocumented, and fails SPG inner charge closure"
+    ]
+  },
+  "questions_for_providers": [
+    "Define the fourth tuple value separately for Iphase=0 and Iphase=7.",
+    "Are Aav/Zav representative cluster/group quantities or transformed whole-cell quantities?",
+    "Why does the final tuple value equal Ye+Ymu in inspected inner-crust rows?",
+    "Where is free-neutron gas represented in SPG inner crust if Yn=0?",
+    "Are Yn=Yp=0 intended zeros or missing/unexported abundances?"
+  ],
+  "stop_rules": [
+    "Do not infer the final value to mean YI, Xh, Ye, gas fraction, or another aggregate.",
+    "Do not relax C3/C4, drop composition, or fabricate Yn/Yp.",
+    "Do not interpolate Iphase or categorical Nadd values.",
+    "Block SPG/GPPVA composition production admission until written provider semantics and independent closure exist."
+  ],
+  "gm1_coverage_issue": {
+    "status": "DIAGNOSED_NOT_PATCHED",
+    "reason": "A global composition_available flag conflates absent/partial data with measured zero. GM_GM1 contains phase-only Npairs=0,Nquad=0 rows in the outer-crust segment and core rows without complete lepton coverage.",
+    "required_design": "Add row-level masks for each particle ID and group field; assess C3 and C4 independently per row; distinguish CHECKED/PARTIAL/NOT_AVAILABLE/FAIL; preserve masks through CSV, transformations, matching, and CompOSE round-trip.",
+    "required_tests": [
+      "Phase-only fixture retains Iphase and records composition as absent.",
+      "GM_GM1 outer rows do not fail from zero-initialized missing data.",
+      "GM_GM1 core C3 is unavailable unless the required charge-carrier inventory is complete; C4 is independently applicable only with complete baryon inventory.",
+      "Mixed source coverage yields row-level CHECKED/PARTIAL/NOT_AVAILABLE/FAIL receipts.",
+      "No SPG/GPPVA ambiguous-field remapping is made by the coverage-mask task."
+    ]
+  },
+  "historical_c6b": {
+    "path": "/NS_Cowling_wt/eos_recon/artifacts/sharp_maxwell/C6B_COMPOSITION_SEMANTICS_20261110T100954Z/",
+    "tests": "10 passed; deterministic audit rerun; no production change; 65 pairs BLOCKED_BEFORE_ROOT_SEARCH"
+  },
+  "evidence_paths": [
+    "Dropbox:/NS_Cowling_wt/eos_recon/artifacts/sharp_maxwell/C6B_COMPOSITION_SEMANTICS_20261110T100954Z/hypothesis_adjudication.md",
+    "Dropbox:/NS_Cowling_wt/eos_recon/artifacts/sharp_maxwell/C6B_COMPOSITION_SEMANTICS_20261110T100954Z/provider_provenance.md",
+    "Dropbox:/ns_eos/EoS_matching_code_package/eos_data/SPG_M1/eos.compo",
+    "Dropbox:/ns_eos/EoS_matching_code_package/eos_data/GPPVA_DD2/eos.compo",
+    "Dropbox:/ns_eos/EoS_matching_code_package/eos_data/GPPVA_FSU2H/eos.compo"
+  ]
+}

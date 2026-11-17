@@ -1,0 +1,138 @@
+{
+  "node": "NSC_EOS390_FULL_REMEDIATION_2026-11-14",
+  "phase": "B",
+  "artifact": "MASS_NORMALIZATION_CONTRACT",
+  "generated_utc": "2026-11-14T09:16:23.586374+00:00",
+  "status": "CORRECTED_PHYSICAL_ENERGY_PRESERVING_NORMALIZATION",
+  "compose_variable_semantics": {
+    "source": "Typel et al., CompOSE Reference Manual v3.01 (2022), arXiv:2203.03209; cross-checked against repo implementation python_frontend/compose_eos/eos_data.py:94-118 and fortran_eos/src/compose_eos_types.f90:118-143 and docs/NS_COWLING_PHYSICS_AND_CODE_GUIDE_V4.md:25",
+    "units": "n_B [fm^-3], P, eps, F per volume [MeV fm^-3], m_n c^2, m_p c^2, mu [MeV], Q1 [MeV], Q2..Q7 dimensionless",
+    "Q1": "P / n_B  (pressure per baryon, MeV)",
+    "Q2": "entropy per baryon (must be 0 for cold T=0)",
+    "Q3": "mu_B / m_n - 1 for Il=1 (barotropic enthalpy derivative gauge); for Il=0 Q3 stores mu_B/m_n - 1 - Yq*Q4 (charge-shifted)",
+    "Q4": "mu_Q / m_n  (charge chemical potential, mu_Q = mu_p - mu_n)",
+    "Q5": "mu_lepton / m_n  (per-CompOSE the included lepton potential)",
+    "Q6": "F / m_n - 1  (free energy per baryon, includes rest mass)",
+    "Q7": "eps / (n_B m_n) - 1  (energy density per baryon, includes rest mass)",
+    "Il": "lepton-content flag; all 18 sources in this cohort are Il=1, Yq=0",
+    "cold_identity": "T=0, beta-equilibrium, no trapped leptons => Q2=0, Q5=0 (for Il=1), Q6=Q7, mu_B = F + P/n_B",
+    "observed_in_cohort": {
+      "Il": "18/18 models Il=1",
+      "Q6_minus_Q7": "0 for all 18 models (exact in stored precision)",
+      "Q5": "APR/BBB/GM/GPPVA/SPG = 0; RG_SLY4=1.383e-3, RG_KDE0v1=6.035e-4 constant => beta_equilibrated=False (this is the true cause of the 156 M7 rejections, NOT a mass issue)"
+    }
+  },
+  "mass_conventions_observed": {
+    "physical_split_cores": {
+      "models": [
+        "APR_APR",
+        "BBB_BHF2",
+        "GM_GM1"
+      ],
+      "mn_mp_MeV": [
+        939.56533,
+        938.272
+      ],
+      "note": "physical neutron/proton split; mn-mp = 1.29333 MeV"
+    },
+    "physical_split_RG": {
+      "models": [
+        "RG_SLY4"
+      ],
+      "mn_mp_MeV": [
+        939.5654,
+        938.272
+      ]
+    },
+    "uniform_convention_crusts": {
+      "GPPVA_family": {
+        "models": [
+          "GPPVA_DD2",
+          "GPPVA_DDME2",
+          "GPPVA_FSU2",
+          "GPPVA_FSU2H",
+          "GPPVA_FSU2R",
+          "GPPVA_NL3wrL55",
+          "GPPVA_TW"
+        ],
+        "mn_mp_MeV": [
+          939.0,
+          939.0
+        ]
+      },
+      "GPPVA_TM1e": {
+        "mn_mp_MeV": [
+          938.0,
+          938.0
+        ]
+      },
+      "SPG_family": {
+        "models": [
+          "SPG_M1",
+          "SPG_M2",
+          "SPG_M3",
+          "SPG_M4",
+          "SPG_M5"
+        ],
+        "mn_mp_MeV": [
+          938.9,
+          938.9
+        ]
+      }
+    },
+    "consequence": "Every crust-core pair in the 65-pair matrix carries a different rest-mass convention between crust and core; dmcr ranges from +0.56533 (GPPVA 939 family) to +1.56533 MeV (TM1e)."
+  },
+  "gauge_alignment_derivation": {
+    "name": "CompOSE normalization with unchanged physical thermodynamics",
+    "code_location": [
+      "fortran_eos/src/compose_eos_matching.f90",
+      "eos_generator/compose_eos_pkg/compose_eos/matching.py"
+    ],
+    "definition": [
+      "n_out=n_src; P_out=P_src",
+      "(1+Q6_out)*mn_out=(1+Q6_src)*mn_src=F_src",
+      "(1+Q7_out)*mn_out=(1+Q7_src)*mn_src=epsilon_src/n",
+      "Q4_out*mn_out=Q4_src*mn_src=mu_Q_src",
+      "For a pure re-encoding, (1+Q3_out)*mn_out=(1+Q3_src)*mn_src; matcher Euler re-derivation is disclosed separately."
+    ],
+    "what_it_is": "A dimensionless representation change only. Each source is decoded with its own mass reference, and the physical EOS is encoded with the output reference.",
+    "what_it_is_NOT": "No constituent-mass correction, no additive rest-energy shift, no reconciliation of different microscopic Hamiltonians, and no proof that mismatched source model masses are scientifically interchangeable.",
+    "invariants_preserved": [
+      "n_B, P, F, epsilon and mu_Q on retained source rows",
+      "The physical P(epsilon) and sound speed of retained source branches are unchanged by mass-reference re-encoding.",
+      "Matching physical output and chosen endpoints are invariant under consistent re-encoding of an identical input EOS with another normalization reference."
+    ],
+    "provider_euler_correction": "The matcher continues to re-derive output Q3 from F+Q1. This may repair a provider Euler residual and is distinct from normalization. The maximum retained-source residual remains reported.",
+    "rejected_previous_argument": "If epsilon_new=epsilon+n*dm, then (cs_new/c)^2=(dP/dn)/(d epsilon/dn+dm), which differs from (cs/c)^2 for dm!=0. Preserving dF/dn alone does not preserve gravitating energy or sound speed.",
+    "report_compatibility": {
+      "dm_mass_gauge_meV": "Legacy field now reports the applied physical energy-per-baryon shift, always zero. It is not the difference of normalization references.",
+      "source_euler_residual_meV": "Unchanged provider residual diagnostic."
+    },
+    "forbidden_cases": [
+      "No physical species-mass correction without source-backed composition and equilibrium recalculation.",
+      "Native sharp Maxwell mass-pair gate remains unchanged; this correction does not bypass it.",
+      "No changes to raw EOS sources."
+    ]
+  },
+  "implementation_changes_this_phase": {
+    "fortran": [
+      "Decode source F and chemical potentials with source mn; remove additive dmcr from window search, bridge endpoints and retained crust rows.",
+      "Applied physical-energy-shift report field is zero.",
+      "Require finite thermodynamic metadata and enforce existing Q5 beta-equilibrium bound even if a caller supplies beta_equilibrated=true."
+    ],
+    "python": [
+      "Reference matcher no longer shifts physical energies using header differences."
+    ],
+    "tests": "python_frontend/tests/test_mass_normalization_contract.py adds re-encoding invariance across all five exposed native methods and independent Python source-energy preservation."
+  },
+  "acceptance": {
+    "maxwell_mass_gate": "PRESERVED verbatim (1e-12 relative, neutron and proton checked independently)",
+    "gate_weakening": "NONE (no tolerance was widened to make any pair pass)",
+    "tests_file": "python_frontend/tests/test_mass_normalization_contract.py"
+  },
+  "corrected_utc": "2026-11-15",
+  "supersedes": {
+    "baseline_commit": "d90d3dca033f759c79ed034b3b8ff939acb43145",
+    "defect": "The prior additive F/mu/epsilon transformation was incorrectly labelled representation-only and sound-speed invariant. Historical receipts retain their original interpretation and must be recomputed before reuse."
+  }
+}

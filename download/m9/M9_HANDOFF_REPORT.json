@@ -1,0 +1,70 @@
+{
+  "schema": "ns-cowling.eos390-m9-handoff-report",
+  "schema_version": "1.0.0",
+  "generated_utc": "2026-11-12T11:56:00Z",
+  "node": "M9 (New versioned 390 regeneration and handoff)",
+  "m9_node_id": "E390-09",
+  "acceptance_criteria": {
+    "c1_all_390_statuses_exist": {
+      "status": "PASS",
+      "detail": {
+        "total_rows": 390,
+        "missing": 0,
+        "status_counts": {
+          "FAIL": 364,
+          "PASS": 26
+        }
+      }
+    },
+    "c2_all_compose_read_back": {
+      "status": "PASS",
+      "detail": {
+        "pass_outputs": 26,
+        "ok": 26,
+        "fail": 0
+      }
+    },
+    "c3_output_manifest_sha256_complete": {
+      "status": "PASS",
+      "detail": {
+        "total_tasks": 390,
+        "files_hashed": 130
+      }
+    },
+    "c4_historical_unchanged": {
+      "status": "PASS",
+      "detail": {
+        "historical_v3_2_release_zip": {
+          "path": "/home/z/my-project/upload/EoS_complete_core_crust_release_v3_2.zip",
+          "sha256": "d671310eb630ffd13f1b278425d945741ad7e08ce14c0d9aff42309c707e6a3b",
+          "size_bytes": 19398255
+        },
+        "matched_eos_390_file_count": 2109,
+        "matched_eos_390_sha256_sample": {
+          "GPPVA_DD2__APR_APR__css/MATCHING_METADATA.json": "c658982e5788193db2511bdc83150094219359faf9eab2e3013ad204dd7bb319",
+          "GPPVA_DD2__APR_APR__css/eos.nb": "4ea3543c60c1cb5bf529e3a77a8a23da7a2e778972dc223ff560a28aaa6e53aa",
+          "GPPVA_DD2__APR_APR__css/eos.t": "73ff4ff1446f1526fb13fba0e0100079258a41bfd2b157f97c0ccaf9476c3454"
+        },
+        "full_sha256_map_written_to": "download/m9/M9_V3_2_REFERENCE_SHA256_MAP.json",
+        "v3_2_tree_not_modified": true,
+        "evidence": "M7 wrote to download/m7_batch/; M8 wrote to download/m8/; M9 writes to download/m9/. The v3.2 tree at upload/v3_2_extracted/ is read-only reference."
+      }
+    },
+    "c5_snapshot_and_receipt_saved": {
+      "status": "PASS",
+      "detail": {
+        "snapshot_written": true,
+        "receipt_written": true
+      }
+    }
+  },
+  "overall": "PASS",
+  "files_in_m9_corpus": [
+    "download/m9/M9_PAIR_METHOD_STATUS_MANIFEST.json (390 rows)",
+    "download/m9/M9_READBACK_REPORT.json (per-PASS-output read-back)",
+    "download/m9/M9_OUTPUT_MANIFEST_SHA256.json (SHA-256 per output file)",
+    "download/m9/M9_V3_2_REFERENCE_SHA256_MAP.json (historical v3.2 SHA-256 map)",
+    "download/m9/M9_DROPBOX_PROGRESS_SNAPSHOT.json (research handoff snapshot)",
+    "data/receipts/eos390_m0/E390-02_M9_VERSIONED_REGENERATION_AND_HANDOFF_20261112.json (this receipt)"
+  ]
+}

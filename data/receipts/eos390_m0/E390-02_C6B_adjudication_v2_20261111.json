@@ -1,0 +1,112 @@
+{
+  "schema": "ns-cowling.e390-02-c6b-adjudication-v2",
+  "schema_version": "2.0.0",
+  "date": "2026-11-11",
+  "supersedes": [
+    "data/receipts/eos390_m0/E390-02_C6B_adjudication_20261111.json (v1.0.0 - BLOCKED_PROVIDER_SEMANTICS_UNRESOLVED)",
+    "data/receipts/eos390_m0/E390-02_C6B_adjudication_update_20261111T1430Z.json (still BLOCKED after 4 user-PDF intake)"
+  ],
+  "trigger": "After collecting 17 open-access PDFs (4 C6B-critical: Grill 2014, Scurto 2024, CompOSE inner crust datasheet, CompOSE manual v3.01), re-extracted the cluster-composition text and verified the disputed final group field against actual SPG/GPPVA eos.compo rows.",
+  "status": "RESOLVED_STANDARD_DOCUMENTED_PROVIDER_EXPORT_DEVIATES",
+  "summary": "The CompOSE Reference Manual v3.01 (arXiv:2203.03209, eq. 3.10/3.12/4.19-4.23) explicitly and unambiguously defines the disputed final group field YI as the combined NUMBER fraction (YI = Sigma(j in M) Yj), with Y_h = Aav * YI being the baryon fraction and X_h = Y_h the mass number fraction. The standard is therefore DOCUMENTED, answering the first half of C6B. However, direct verification against the actual SPG_M1 and GPPVA_DD2 eos.compo rows shows the provider export DEVIATES from this standard: in inner-crust (Iphase=7) rows the final field equals Ye (the electron fraction), not the number-fraction YI, and Yn is exported as 0 in all 365 rows (free-neutron gas is not explicitly represented, consistent with the CLD model folding the gas phase into the cluster's effective composition). The provider-side semantics therefore require a written provider clarification, which the manual alone does not provide. C6B is RESOLVED to the extent that (a) the standard definition is now cited verbatim, (b) the parser must read the field as the manual's YI (number fraction) and compute Y_h = Aav*YI, (c) a row whose final field does not satisfy the manual definition must be flagged with row_status=FAIL (already implemented in M2A), and (d) production use of SPG/GPPVA composition still requires a written provider statement that the inner-crust final field is intentionally set equal to Ye (or a corrected export).",
+  "authoritative_standard_definition": {
+    "source": "CompOSE Reference Manual v3.01 (Typel, Oertel, Klahn et al. 2022), arXiv:2203.03209",
+    "local_pdf": "inputs/open_access_pdfs/compose_manual_v3.01_2203.03209.pdf",
+    "sha256_of_local_pdf": "see open_access_pdf_manifest.json entry COMPOSE_MANUAL_2022",
+    "eq_3_10_particle_number_fraction": "Yi = ni / nb [dimensionless] (line 643 of extracted text)",
+    "eq_3_11_baryon_normalization": "Sum_i Bi * Yi = 1 (line 647)",
+    "eq_3_12_mass_number_fraction": "Xi = Bi * Yi [dimensionless] - the manual explicitly states 'We prefer to use Yi and not Xi since the latter quantity is zero for all particles with baryon number Bi = 0, e.g. mesons' (lines 651-662)",
+    "eq_4_19_row_grammar": "iT inb iYq Iphase Npairs (Ii Yi)* Nquad (Ii Aav_Ii Zav_Ii YI_i)* (lines 2763-2786)",
+    "eq_4_20_Aav": "Aav_Ii = Sum(j in M_Ii) Aj*Yj / Sum(j in M_Ii) Yj - number-abundance-weighted group-average mass number (lines 2791-2801)",
+    "eq_4_21_Zav": "Zav_Ii = Sum(j in M_Ii) Zj*Yj / Sum(j in M_Ii) Yj - number-abundance-weighted group-average charge number (lines 2803-2822)",
+    "eq_4_22_YI_combined_number_fraction": "YI_i = Sum(j in M_Ii) Aj*Yj / Aav_Ii = Sum(j in M_Ii) Yj - the COMBINED NUMBER FRACTION of the group (lines 2826-2834). This is the disputed final group field.",
+    "eq_4_23_Nav": "Nav_Ii = Aav_Ii - Zav_Ii (not stored; lines 2838-2856)",
+    "phase_index_Iphase": "Iphase is a model-specific categorical phase index; 'The correspondence of the phase index Iphase with the actual structure of the phase is defined for each EoS model on the corresponding web page.' (lines 2756-2758)",
+    "omittable_particles": "Since the composition of matter can vary rapidly with a change of the parameters, it is not required that the fractions of all particles or particle sets have to be given in each row. It is sufficient to list only those that are relevant, e.g. with nonzero Yi. Others can be omitted. (lines 2864-2867)"
+  },
+  "physics_model_documented": {
+    "source": "Scurto, Pais, Gulminelli PRD 109 103015 (2024), arXiv:2402.15548; Grill et al. PRC 90 045803 (2014), arXiv:1404.2753",
+    "model": "Compressible Liquid Drop (CLD) within Wigner-Seitz cells. Each cell has a high-density 'cluster' phase (I) and a low-density 'gas' phase (II), both homogeneous, with volume fraction f of the cluster. The cell energy is minimized over four variables: cluster radius Rd, cluster baryon density rho_I, cluster proton density rho_Ip, and volume fraction f (Scurto 2024 eq. 21, line 384).",
+    "free_neutron_gas_representation": "The free-neutron gas is the low-density phase II of the CLD cell. In the SPG/GPPVA CompOSE export, this gas phase is NOT explicitly represented as a separate particle (Yn=0 in all 365 sampled SPG_M1 rows); it is folded into the cluster's effective composition. This is consistent with the manual's 'omittable particles' clause (a provider may omit particles with zero or folded-out fractions), but it means the exported Yn=0 is an intended omission, not a measured zero.",
+    "pasta_phases": "Both Grill 2014 and Scurto 2024 discuss pasta phases (droplet, rod, slab, tube, bubble). Grill 2014 finds lasagna-like structures for most models except NL3 and TM1. Scurto 2024 restricts to spherical clusters, finding the pasta phases have negligible effect on the EoS and crust-core transition."
+  },
+  "verification_against_actual_data": {
+    "SPG_M1_outer_crust_Iphase0_sample": {
+      "row": "iT=0 inb=1 iYq=1 Iphase=0 Npairs=4 (10,0.0) (11,0.0) (0,0.46429) (1,0.0) Nquad=1 (1, 56.0, 26.0, 1.0)",
+      "parsed": "Yn=0 Yp=0 Ye=0.46429 Ymu=0 Aav=56.0 Zav=26.0 YI=1.0",
+      "Ye_equals_Z_over_A": "Ye = 0.46429 = 26/56 = Zav/Aav exactly (confirmed). The representative nucleus is 56Fe with charge fraction 26/56.",
+      "YI_field_value": "YI = 1.0",
+      "manual_interpretation": "If YI is the manual's number fraction (eq. 4.22), then Y_h = Aav*YI = 56*1.0 = 56 (impossible, > 1; violates baryon normalization eq. 3.11).",
+      "baryon_fraction_interpretation": "If YI = 1.0 is intended as the baryon fraction X_h = Y_h (the whole cell is baryons in the cluster), then Y_h = 1.0 is consistent with Yn=Yp=0 and Ye=Z/A=26/56. This interpretation is plausible for the outer crust where the cell is entirely the cluster (no free gas).",
+      "discrepancy": "The provider's YI=1.0 in the outer row matches the baryon-fraction interpretation (X_h=1.0), NOT the manual's number-fraction definition (which would give YI=1/56)."
+    },
+    "SPG_M1_inner_crust_Iphase7_sample": {
+      "row": "iT=0 inb=218 iYq=1 Iphase=7 Npairs=4 (10,0.0) (11,0.0) (0,0.06087) (1,0.0) Nquad=1 (1, 82.107, 24.387, 0.06087)",
+      "parsed": "Yn=0 Yp=0 Ye=0.06087 Ymu=0 Aav=82.107 Zav=24.387 YI=0.06087",
+      "YI_equals_Ye_exactly": "YI = 0.06087 = Ye exactly (confirmed across all sampled Iphase=7 rows).",
+      "manual_interpretation": "If YI is the manual's number fraction, Y_h = Aav*YI = 82.107*0.06087 = 4.998 (impossible, > 1).",
+      "baryon_fraction_interpretation": "If YI = 0.06087 is the baryon fraction X_h = Y_h, then charge closure Yp + (Z/A)*Y_h = 0 + (24.387/82.107)*0.06087 = 0.01808, but Ye + Ymu = 0.06087 + 0 = 0.06087. These do NOT match (0.01808 vs 0.06087). So YI = 0.06087 is also NOT a consistent baryon fraction in these inner rows.",
+      "discrepancy": "The provider's YI = Ye in the inner row matches NEITHER the manual's number-fraction definition NOR a consistent baryon fraction. It appears to be an electron-fraction copy or an undocumented aggregate."
+    },
+    "free_neutron_gas": "Yn = 0 in all 365 SPG_M1 rows (including all 148 Iphase=7 inner-crust rows). The free-neutron gas is NOT explicitly represented; consistent with the CLD model folding the gas phase into the cluster's effective composition. The manual's 'omittable particles' clause permits this.",
+    "GPPVA_DD2_inner_crust_Iphase7_sample": {
+      "row": "iT=1 inb=218 iYq=1 Iphase=7 Npairs=4 (10,0.0) (11,0.0) (0,0.06988) (1,0.0) Nquad=1 (1, 644.0, 45.0, 0.06988)",
+      "YI_equals_Ye": "YI = 0.06988 = Ye (same pattern as SPG_M1).",
+      "interpretation": "Same provider deviation as SPG_M1: the final field equals Ye, not the manual's number fraction."
+    },
+    "conclusion_from_data": "The SPG/GPPVA provider exports a final group field that equals 1.0 (= X_h, the baryon fraction) in outer-crust Iphase=0 rows and equals Ye (the electron fraction) in inner-crust Iphase=7 rows. Neither interpretation is consistent with the CompOSE manual v3.01 definition (YI = combined number fraction = Y_h/Aav). This is a genuine provider export deviation from the standard, not a parser bug. The standard is documented; the provider's choice is not."
+  },
+  "resolution": {
+    "standard_is_documented": true,
+    "standard_citation": "CompOSE Reference Manual v3.01, arXiv:2203.03209, eq. 3.10, 3.11, 3.12, 4.19, 4.20, 4.21, 4.22, 4.23",
+    "physics_model_is_documented": true,
+    "physics_citation": "Scurto, Pais, Gulminelli PRD 109 103015 (2024) arXiv:2402.15548 (CLD model); Grill et al. PRC 90 045803 (2014) arXiv:1404.2753 (Thomas-Fermi)",
+    "provider_semantics_are_documented": false,
+    "provider_semantics_status": "The SPG/GPPVA providers export a final group field that deviates from the CompOSE manual definition in inner-crust rows (YI = Ye instead of the combined number fraction). A written provider statement is still needed to clarify whether this is an intentional export convention (e.g. 'in Iphase=7 we export Ye in the YI slot because the cluster baryon fraction equals Ye by beta-equilibrium in this model') or a bug in the export. The CompOSE manual and the physics papers do not document this provider-specific choice.",
+    "parser_action": "The native parser MUST read the final group field as the manual's YI (combined number fraction) and compute Y_h = Aav*YI, regardless of the provider's actual intent. The M2A per-row range check then flags rows where this interpretation violates baryon normalization (Y_h > 1+5e-3) as row_status=FAIL. This is the correct, contract-compliant behavior: do not choose between YI/Y_h/X_h/Ye by making whichever formula pass; preserve the source token and metadata; flag deviations as FAIL rather than silently remapping.",
+    "production_action": "Production use of SPG/GPPVA composition for the 390 batch still requires EITHER (a) a written provider statement that the inner-crust YI=Ye export is intentional and the corresponding baryon fraction is Y_h = Ye (which would then need independent closure verification), OR (b) a corrected provider export with the manual-conformant YI = Y_h/Aav. Until then, SPG/GPPVA composition rows are flagged FAIL and not used in production. C6B is no longer a parser blocker; it is a provider-data-quality blocker."
+  },
+  "stop_rules_updated": [
+    "DO read the final group field as the manual's YI (combined number fraction) and compute Y_h = Aav*YI. This is the standard.",
+    "DO flag rows where Aav*YI > 1+5e-3 (baryon normalization violation) as row_status=FAIL (already implemented in M2A).",
+    "DO NOT silently remap the provider's YI=Ye or YI=1.0 to make a closure formula pass.",
+    "DO NOT use SPG/GPPVA composition in production until the provider clarifies or corrects the inner-crust YI export.",
+    "DO preserve the source token (the raw YI value) and the per-row mask so the deviation is auditable."
+  ],
+  "questions_for_providers_narrowed": [
+    "In SPG/GPPVA inner-crust (Iphase=7) rows, the final group field YI equals Ye exactly. Is this an intentional export convention (e.g. because the cluster baryon fraction equals Ye in this CLD model at beta-equilibrium) or an export bug? If intentional, what is the correct Y_h to use in the baryon normalization Yn+Yp+Yh=1?",
+    "In SPG/GPPVA outer-crust (Iphase=0) rows, the final group field YI equals 1.0. Is this intended as the baryon fraction X_h=1.0 (whole cell is cluster, no free gas), or the manual's number fraction YI=1/Aav=1/56?",
+    "Why is Yn=0 exported in all 365 SPG_M1 rows? Is the free-neutron gas folded into the cluster's effective composition (consistent with the CLD model), or is the gas fraction simply not exported? If the former, how should the parser reconstruct the gas fraction for the baryon normalization?"
+  ],
+  "remaining_open_access_pdfs_to_request_from_researcher": [
+    {
+      "key": "DDME2_2005_ZAGREB",
+      "status": "RESOLVED_USER_SUPPLIED_20261111",
+      "note": "The user supplied the DD-ME2 PDF directly (lalazissis2005.pdf, SHA-256 66dfece6eccc1e13b9516f2a114a403f950a53ddf32e29655c5b2540764a18a9, 167923 bytes). Verified as PRC 71 024312 (2005) by Lalazissis, Niksic, Vretenar, Ring. The DD-ME2 framework basis for GPPVA_DDME2 is now fully secured. No longer a request."
+    },
+    {
+      "key": "GOGELEIN_2008",
+      "status": "RESOLVED_USER_SUPPLIED_20261112",
+      "note": "The user supplied the Gögelein 2008 PDF directly. SPG Phase 2 reconstruction is now unblocked. No longer a request."
+    }
+  ],
+  "ddme2_resolution_20261111": {
+    "status": "USER_SUPPLIED",
+    "pdf": "inputs/open_access_pdfs/ddme2_2005_lalazissis_zagreb.pdf",
+    "sha256": "66dfece6eccc1e13b9516f2a114a403f950a53ddf32e29655c5b2540764a18a9",
+    "bytes": 167923,
+    "citation": "Lalazissis, Niksic, Vretenar, Ring, PRC 71, 024312 (2005)",
+    "doi": "10.1103/PhysRevC.71.024312",
+    "role": "DD-ME2 relativistic mean-field interaction with density-dependent meson-nucleon couplings; parameterization source for the GPPVA_DDME2 core model."
+  },
+  "gogelein_resolution_20261112": {
+    "status": "USER_SUPPLIED",
+    "pdf": "inputs/open_access_pdfs/gogelein2008_spg_gdfm.pdf",
+    "sha256": "45f4c62af14ea82519b2535f4a90f34122253eda13fd6079a5532ecf8a305314",
+    "bytes": 454740,
+    "citation": "Gögelein, van Dalen, Fuchs, Muther, PRC 77, 025802 (2008)",
+    "doi": "10.1103/PhysRevC.77.025802",
+    "role": "SPG density-dependent RMF GDFM functional basis (eq. 40, 16-parameter coupling set for sigma/omega/delta/rho). DBHF-derived. Resolves the LAST remaining SPG reconstruction blocker.",
+    "implication": "SPG reconstruction Phase 2 is now UNBLOCKED. Both GPPVA (Phase 1) and SPG (Phase 2) reconstruction can proceed from collected papers alone."
+  }
+}

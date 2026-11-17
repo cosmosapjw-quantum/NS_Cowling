@@ -1,0 +1,1785 @@
+{
+  "schema": "ns-cowling.css-survivor-stars.v1",
+  "git_head": "42950053088fa80752826f4aae56d0a0b013c0e4",
+  "git_tracked_tree_dirty": false,
+  "executed_source_sha256": {
+    "scripts/run_css_survivor_stars.py": "8de97d243f1935219b4c68f9d61b8d613d893240d38cfe7ba1a9d6a816945b9c",
+    "python_frontend/compose_cowling/css_adapter.py": "27791ac8e306913fa2efbdd6c71d6fc67273363d3e9ae310947a8721c00bbaec",
+    "python_frontend/compose_cowling/css_barotrope.py": "98d11e883bb7bfa8d2a5b92318d53097149152a8b30176d123ac321200b0b8d9",
+    "python_frontend/compose_cowling/maxwell.py": "c5612e95606a0fdbb4c231a9b06e5ed5fb6ce5d6874d1ab6b76f2ddb3c3daf2b",
+    "python_frontend/compose_cowling/direct_barotrope.py": "cbb7c3fc9fb7bd06fa989d4aabb429e4bb44dc22587b47d9dc3f40859e2e8f98"
+  },
+  "runtime": {
+    "python": "3.12.3",
+    "numpy": "2.4.2",
+    "scipy": "1.17.0"
+  },
+  "census_manifest_sha256": "58833cc501b4096d8c25caa526b816f57a3fde1c4e37ab46e7f289caf6d77b46",
+  "census_git_head": "42950053088fa80752826f4aae56d0a0b013c0e4",
+  "scope": "phase-segmented reference TOV/Cowling; radius = truncation radius at the CLD crust table minimum pressure (no outer crust); no composition; Cowling roots unlabelled; finite-pressure Delta P=0 boundary and vacuum-normalized lapse at cutoff are an artificial truncation model; frequencies are not complete-star observables or stability certification",
+  "frequency_grid_hz": [
+    800.0,
+    933.3333333333334,
+    1066.6666666666667,
+    1200.0,
+    1333.3333333333335,
+    1466.6666666666667,
+    1600.0,
+    1733.3333333333335,
+    1866.6666666666667,
+    2000.0,
+    2133.3333333333335,
+    2266.666666666667,
+    2400.0,
+    2533.3333333333335,
+    2666.666666666667,
+    2800.0,
+    2933.3333333333335,
+    3066.666666666667,
+    3200.0,
+    3333.3333333333335,
+    3466.666666666667,
+    3600.0,
+    3733.3333333333335,
+    3866.666666666667,
+    4000.0
+  ],
+  "survivors": [
+    {
+      "pair_id": "SPG_M1__BBB_BHF2__css",
+      "input_sha256": {
+        "eos.nb": "f33ed4d7bde8e79678f4ad43c6d443e21a2b5968dffdae69b8a3f19aa2e7f95d",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "13a606eadcdfe6c62af5f783066368b2043b18dc4b47c3f314e74b689dcf5eb4"
+      },
+      "adapter": {
+        "construction_kind": "css_single_speed_with_crust_density_jump",
+        "crust_rows": 16,
+        "css_and_core_rows": 23,
+        "css_core_join": "continuous in n_B, P, eps, mu_B; one-sided sound-speed derivative",
+        "css_provider": "exact analytic constant-sound-speed bridge",
+        "core_provider": "separate PCHIP(eps-P versus ln P), first-law density",
+        "css_core_join_pressure_mev_fm3": 3.3080001645911086,
+        "css_core_cs2_left": 0.023949834310318698,
+        "css_core_cs2_right": 0.07081357329390701,
+        "low_branch_first_law_anchor": "interface",
+        "low_branch_surface_density_drift_relative": -3.112895567647378e-06,
+        "high_branch_end_density_drift_relative": -0.0004428034886521104,
+        "pressure_cutoff_mev_fm3": 0.0016608956868597868,
+        "perturbation_boundary": "Delta P=0 at finite cutoff pressure; artificial truncation boundary",
+        "lapse_normalization": "vacuum Schwarzschild value at cutoff; complete exterior not modeled",
+        "frequency_scope": "truncated fluid model; no complete-star observable or stability claim",
+        "surface_definition": "truncation at the crust table minimum pressure (no outer crust in the CLD reconstruction)",
+        "composition": "none; no abundance or elastic-crust claim"
+      },
+      "interface": {
+        "pressure_pa": 2.27066672622247e+31,
+        "source_transition_pressure_relative_mismatch": 0.0,
+        "source_transition_pressure_low_mev_fm3": 0.1417238697679366,
+        "source_transition_pressure_high_mev_fm3": 0.1417238697679366,
+        "pressure_mev_fm3": 0.1417238697679366,
+        "chemical_potential_mev": 947.1612908702944,
+        "energy_low_mev_fm3": 48.02721735215382,
+        "energy_high_mev_fm3": 59.25530494980129,
+        "density_low_fm3": 0.050856112561000005,
+        "density_high_fm3": 0.06271057463190094,
+        "latent_energy_mev_fm3": 11.228087597647473,
+        "density_jump_fm3": 0.011854462070900934,
+        "maxwell_identity_relative_residual": 1.5820653552546522e-16,
+        "seidov_ratio": 0.23378592841052742,
+        "seidov_critical_ratio": 0.5044263610588376,
+        "seidov_onset_stable_rapid_diagnostic": true,
+        "provider_first_law_residual_low": 3.246406079491161e-16,
+        "provider_first_law_residual_high": 2.0994878518122047e-16
+      },
+      "sequence": [
+        {
+          "p_c_MeV_fm3": 5.0,
+          "mass_solar": 0.28345904746150413,
+          "truncation_radius_km": 10.192469862184973,
+          "interface_radius_km": 8.687584175736756
+        },
+        {
+          "p_c_MeV_fm3": 7.57382601742524,
+          "mass_solar": 0.358131429213484,
+          "truncation_radius_km": 10.209650368463777,
+          "interface_radius_km": 9.011240699574584
+        },
+        {
+          "p_c_MeV_fm3": 11.472568108445497,
+          "mass_solar": 0.4625410729834707,
+          "truncation_radius_km": 10.31923243406695,
+          "interface_radius_km": 9.379835022817707
+        },
+        {
+          "p_c_MeV_fm3": 17.378246965285516,
+          "mass_solar": 0.5983879045941584,
+          "truncation_radius_km": 10.48897093319028,
+          "interface_radius_km": 9.755985392297733
+        },
+        {
+          "p_c_MeV_fm3": 26.32396380058413,
+          "mass_solar": 0.7609422708840772,
+          "truncation_radius_km": 10.665603555396268,
+          "interface_radius_km": 10.091466751063319
+        },
+        {
+          "p_c_MeV_fm3": 39.87462438292486,
+          "mass_solar": 0.943332307944059,
+          "truncation_radius_km": 10.803116609832532,
+          "interface_radius_km": 10.351368245679899
+        },
+        {
+          "p_c_MeV_fm3": 60.40069351729105,
+          "mass_solar": 1.1346764684895936,
+          "truncation_radius_km": 10.868948418813833,
+          "interface_radius_km": 10.511658402104185
+        },
+        {
+          "p_c_MeV_fm3": 91.49286880635735,
+          "mass_solar": 1.3243056710595544,
+          "truncation_radius_km": 10.84733572264235,
+          "interface_radius_km": 10.563674739889414
+        },
+        {
+          "p_c_MeV_fm3": 138.59021403489277,
+          "mass_solar": 1.5024559344330435,
+          "truncation_radius_km": 10.736300598329594,
+          "interface_radius_km": 10.510482975298432
+        },
+        {
+          "p_c_MeV_fm3": 209.93163376360056,
+          "mass_solar": 1.6596809262437713,
+          "truncation_radius_km": 10.54305641788981,
+          "interface_radius_km": 10.362601381153315
+        },
+        {
+          "p_c_MeV_fm3": 317.9971339358691,
+          "mass_solar": 1.7859370733264095,
+          "truncation_radius_km": 10.278130407708154,
+          "interface_radius_km": 10.132721133187104
+        },
+        {
+          "p_c_MeV_fm3": 481.6909932940286,
+          "mass_solar": 1.8726305850215157,
+          "truncation_radius_km": 9.954510115064299,
+          "interface_radius_km": 9.835510901760998
+        },
+        {
+          "p_c_MeV_fm3": 729.6487554739444,
+          "mass_solar": 1.9154842861557206,
+          "truncation_radius_km": 9.587774180682265,
+          "interface_radius_km": 9.488070238111353
+        },
+        {
+          "p_c_MeV_fm3": 1105.2465455581007,
+          "mass_solar": 1.9160815684834447,
+          "truncation_radius_km": 9.19606442753723,
+          "interface_radius_km": 9.109949245924676
+        }
+      ],
+      "max_mass_on_grid_solar": 1.9160815684834447,
+      "mass_grid_scope": "sampled M(Pc); no maximum-mass or radial-stability certification",
+      "canonical_star": {
+        "p_c_MeV_fm3": 108.66311768377851,
+        "mass_solar": 1.3999999625667747,
+        "truncation_radius_km": 10.81186759389856,
+        "interface_radius_km": 10.553854957031904
+      },
+      "cowling_scan_slow": {
+        "status": "ROOTS_FOUND_ON_GRID",
+        "roots_found": 1,
+        "search_method": "sign changes and exact endpoint zeros",
+        "frequency_min_hz": 800.0,
+        "frequency_max_hz": 4000.0,
+        "spectral_completeness": "not_certified"
+      },
+      "cowling_slow": [
+        {
+          "frequency_hz": 2536.9428176201145,
+          "residual": 2.0849897031105513e-08,
+          "residual_tolerance": 1e-05,
+          "w_nodes_inner_sampled": 0,
+          "w_nodes_outer_sampled": 0,
+          "v_nodes_inner_sampled": 0,
+          "v_nodes_outer_sampled": 0,
+          "w_nodes_total_sampled": 0,
+          "v_nodes_total_sampled": 0,
+          "conversion": "slow",
+          "interface_diagnostics": {
+            "w_inner": 2962602526647.2734,
+            "v_inner": -132460068.09081848,
+            "w_outer": 2962602526647.2734,
+            "v_outer": -131726309.9153408,
+            "delta_p_inner_pa": -1.3923319366540649e+32,
+            "delta_p_outer_pa": -1.3923319366540649e+32,
+            "delta_p_relative_jump": 0.0,
+            "radial_displacement_jump_m": 0.0,
+            "isobar_displacement_jump_m": -112.39551321602266,
+            "slow_condition_residual": 0.0,
+            "rapid_condition_residual": 0.005539466996004881
+          },
+          "accepted_steps": 188
+        }
+      ],
+      "cowling_scan_rapid": {
+        "status": "ROOTS_FOUND_ON_GRID",
+        "roots_found": 1,
+        "search_method": "sign changes and exact endpoint zeros",
+        "frequency_min_hz": 800.0,
+        "frequency_max_hz": 4000.0,
+        "spectral_completeness": "not_certified"
+      },
+      "cowling_rapid": [
+        {
+          "frequency_hz": 2536.891097857003,
+          "residual": 3.6233746936176203e-07,
+          "residual_tolerance": 1e-05,
+          "w_nodes_inner_sampled": 0,
+          "w_nodes_outer_sampled": 0,
+          "v_nodes_inner_sampled": 0,
+          "v_nodes_outer_sampled": 0,
+          "w_nodes_total_sampled": 0,
+          "v_nodes_total_sampled": 0,
+          "conversion": "rapid",
+          "interface_diagnostics": {
+            "w_inner": 2962922489634.044,
+            "v_inner": -132462910.06989326,
+            "w_outer": 2979040390188.6616,
+            "v_outer": -132462910.06989326,
+            "delta_p_inner_pa": -1.3999417601110645e+32,
+            "delta_p_outer_pa": -1.3999417601110645e+32,
+            "delta_p_relative_jump": 0.0,
+            "radial_displacement_jump_m": 113.00981357818455,
+            "isobar_displacement_jump_m": 0.0,
+            "slow_condition_residual": 0.005410433711372748,
+            "rapid_condition_residual": 0.0
+          },
+          "accepted_steps": 185
+        }
+      ],
+      "status": "OK",
+      "elapsed_s": 49.3
+    },
+    {
+      "pair_id": "SPG_M1__GM_GM1__css",
+      "input_sha256": {
+        "eos.nb": "f1f7ba3cf8a83aa10d62059577af6360de493704af4ca0589837f750927b8028",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "6927ae17810949b25a53e01e91574babf05c81ea7b7b69d554cc847df4b5ccc3"
+      },
+      "adapter": {
+        "construction_kind": "css_single_speed_with_crust_density_jump",
+        "crust_rows": 16,
+        "css_and_core_rows": 290,
+        "css_core_join": "continuous in n_B, P, eps, mu_B; one-sided sound-speed derivative",
+        "css_provider": "exact analytic constant-sound-speed bridge",
+        "core_provider": "separate PCHIP(eps-P versus ln P), first-law density",
+        "css_core_join_pressure_mev_fm3": 1.5521196512560151,
+        "css_core_cs2_left": 0.05355813963643098,
+        "css_core_cs2_right": 0.04605693155577868,
+        "low_branch_first_law_anchor": "interface",
+        "low_branch_surface_density_drift_relative": -3.112895567647378e-06,
+        "high_branch_end_density_drift_relative": -4.807695352937458e-10,
+        "pressure_cutoff_mev_fm3": 0.0016608956868597868,
+        "perturbation_boundary": "Delta P=0 at finite cutoff pressure; artificial truncation boundary",
+        "lapse_normalization": "vacuum Schwarzschild value at cutoff; complete exterior not modeled",
+        "frequency_scope": "truncated fluid model; no complete-star observable or stability claim",
+        "surface_definition": "truncation at the crust table minimum pressure (no outer crust in the CLD reconstruction)",
+        "composition": "none; no abundance or elastic-crust claim"
+      },
+      "interface": {
+        "pressure_pa": 2.27066672622247e+31,
+        "source_transition_pressure_relative_mismatch": 0.0,
+        "source_transition_pressure_low_mev_fm3": 0.1417238697679366,
+        "source_transition_pressure_high_mev_fm3": 0.1417238697679366,
+        "pressure_mev_fm3": 0.1417238697679366,
+        "chemical_potential_mev": 947.1612908702944,
+        "energy_low_mev_fm3": 48.02721735215382,
+        "energy_high_mev_fm3": 79.3106450769007,
+        "density_low_fm3": 0.050856112561000005,
+        "density_high_fm3": 0.08388472978415769,
+        "latent_energy_mev_fm3": 31.28342772474688,
+        "density_jump_fm3": 0.03302861722315768,
+        "maxwell_identity_relative_residual": 3.406960749371572e-16,
+        "seidov_ratio": 0.651368733178208,
+        "seidov_critical_ratio": 0.5044263610588376,
+        "seidov_onset_stable_rapid_diagnostic": false,
+        "provider_first_law_residual_low": 3.246406079491161e-16,
+        "provider_first_law_residual_high": 3.7937775228582434e-16
+      },
+      "sequence": [
+        {
+          "p_c_MeV_fm3": 5.0,
+          "mass_solar": 0.4283314264186629,
+          "truncation_radius_km": 11.233752206031253,
+          "interface_radius_km": 10.019280365996613
+        },
+        {
+          "p_c_MeV_fm3": 7.293692048981881,
+          "mass_solar": 0.5612072800763562,
+          "truncation_radius_km": 11.734879875920997,
+          "interface_radius_km": 10.735792024059624
+        },
+        {
+          "p_c_MeV_fm3": 10.639588741076302,
+          "mass_solar": 0.7204503263508015,
+          "truncation_radius_km": 12.195429376308853,
+          "interface_radius_km": 11.374525076651361
+        },
+        {
+          "p_c_MeV_fm3": 15.520376761045071,
+          "mass_solar": 0.9057559782651122,
+          "truncation_radius_km": 12.597916813310892,
+          "interface_radius_km": 11.924867266914335
+        },
+        {
+          "p_c_MeV_fm3": 22.640169715847517,
+          "mass_solar": 1.1139305534161217,
+          "truncation_radius_km": 12.925268422948111,
+          "interface_radius_km": 12.374767002226902
+        },
+        {
+          "p_c_MeV_fm3": 33.02608516881548,
+          "mass_solar": 1.3382910835142645,
+          "truncation_radius_km": 13.16196701068636,
+          "interface_radius_km": 12.712611764402306
+        },
+        {
+          "p_c_MeV_fm3": 48.176418960957584,
+          "mass_solar": 1.5685941215407389,
+          "truncation_radius_km": 13.295560609850082,
+          "interface_radius_km": 12.929116304043767
+        },
+        {
+          "p_c_MeV_fm3": 70.27679278479121,
+          "mass_solar": 1.7917693618140451,
+          "truncation_radius_km": 13.318262091313422,
+          "interface_radius_km": 13.019147260594469
+        },
+        {
+          "p_c_MeV_fm3": 102.5154569524758,
+          "mass_solar": 1.9935567243780061,
+          "truncation_radius_km": 13.228334985598028,
+          "interface_radius_km": 12.983257622130383
+        },
+        {
+          "p_c_MeV_fm3": 149.5432346544033,
+          "mass_solar": 2.1608121023019446,
+          "truncation_radius_km": 13.03092220069139,
+          "interface_radius_km": 12.82861563478848
+        },
+        {
+          "p_c_MeV_fm3": 218.1444603155707,
+          "mass_solar": 2.2838728720763424,
+          "truncation_radius_km": 12.738020559473267,
+          "interface_radius_km": 12.569038212439558
+        },
+        {
+          "p_c_MeV_fm3": 318.2157031466241,
+          "mass_solar": 2.358201824976987,
+          "truncation_radius_km": 12.367490951995563,
+          "interface_radius_km": 12.224022067478405
+        },
+        {
+          "p_c_MeV_fm3": 464.1934687803423,
+          "mass_solar": 2.3847598891419146,
+          "truncation_radius_km": 11.9412833064829,
+          "interface_radius_km": 11.81696147880731
+        },
+        {
+          "p_c_MeV_fm3": 677.1368424864999,
+          "mass_solar": 2.3691101947786932,
+          "truncation_radius_km": 11.483292566563376,
+          "interface_radius_km": 11.372985982159687
+        }
+      ],
+      "max_mass_on_grid_solar": 2.3847598891419146,
+      "mass_grid_scope": "sampled M(Pc); no maximum-mass or radial-stability certification",
+      "canonical_star": {
+        "p_c_MeV_fm3": 36.54705969920693,
+        "mass_solar": 1.4000000543658409,
+        "truncation_radius_km": 13.208350522955723,
+        "interface_radius_km": 12.782912396595073
+      },
+      "cowling_scan_slow": {
+        "status": "ROOTS_FOUND_ON_GRID",
+        "roots_found": 1,
+        "search_method": "sign changes and exact endpoint zeros",
+        "frequency_min_hz": 800.0,
+        "frequency_max_hz": 4000.0,
+        "spectral_completeness": "not_certified"
+      },
+      "cowling_slow": [
+        {
+          "frequency_hz": 1912.9333305858893,
+          "residual": 8.671519363678826e-08,
+          "residual_tolerance": 1e-05,
+          "w_nodes_inner_sampled": 0,
+          "w_nodes_outer_sampled": 0,
+          "v_nodes_inner_sampled": 0,
+          "v_nodes_outer_sampled": 0,
+          "w_nodes_total_sampled": 0,
+          "v_nodes_total_sampled": 0,
+          "conversion": "slow",
+          "interface_diagnostics": {
+            "w_inner": 3880745014922.929,
+            "v_inner": -149134853.5393488,
+            "w_outer": 3880745014922.929,
+            "v_outer": -147158749.99128032,
+            "delta_p_inner_pa": -9.201785733235525e+31,
+            "delta_p_outer_pa": -9.201785733235525e+31,
+            "delta_p_relative_jump": 0.0,
+            "radial_displacement_jump_m": 0.0,
+            "isobar_displacement_jump_m": -254.29005594184127,
+            "slow_condition_residual": 0.0,
+            "rapid_condition_residual": 0.013250447505533185
+          },
+          "accepted_steps": 225
+        }
+      ],
+      "cowling_scan_rapid": {
+        "status": "ROOTS_FOUND_ON_GRID",
+        "roots_found": 1,
+        "search_method": "sign changes and exact endpoint zeros",
+        "frequency_min_hz": 800.0,
+        "frequency_max_hz": 4000.0,
+        "spectral_completeness": "not_certified"
+      },
+      "cowling_rapid": [
+        {
+          "frequency_hz": 1912.7799203047334,
+          "residual": -1.7532149193533186e-07,
+          "residual_tolerance": 1e-05,
+          "w_nodes_inner_sampled": 0,
+          "w_nodes_outer_sampled": 0,
+          "v_nodes_inner_sampled": 0,
+          "v_nodes_outer_sampled": 0,
+          "w_nodes_total_sampled": 0,
+          "v_nodes_total_sampled": 0,
+          "conversion": "rapid",
+          "interface_diagnostics": {
+            "w_inner": 3881325405284.826,
+            "v_inner": -149142208.35192367,
+            "w_outer": 3932370154873.1987,
+            "v_outer": -149142208.3519237,
+            "delta_p_inner_pa": -9.320711213883607e+31,
+            "delta_p_outer_pa": -9.320711213883605e+31,
+            "delta_p_relative_jump": 1.932727889117383e-16,
+            "radial_displacement_jump_m": 257.57654489122797,
+            "isobar_displacement_jump_m": 3.637978807091713e-12,
+            "slow_condition_residual": 0.012980657358798144,
+            "rapid_condition_residual": 1.8958744614589628e-16
+          },
+          "accepted_steps": 235
+        }
+      ],
+      "status": "OK",
+      "elapsed_s": 70.1
+    },
+    {
+      "pair_id": "GPPVA_DD2__BBB_BHF2__css",
+      "input_sha256": {
+        "eos.nb": "f087b2ea78cc3aac6960dd0dbbf90ef93f2faac586c22a74332a0f6a020160bb",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "27af1c81525cf94c40d0c0f80c5aba3629fbfb9dc670b4bf4c22931ee92d6361"
+      },
+      "adapter": {
+        "construction_kind": "css_single_speed_with_crust_density_jump",
+        "crust_rows": 19,
+        "css_and_core_rows": 23,
+        "css_core_join": "continuous in n_B, P, eps, mu_B; one-sided sound-speed derivative",
+        "css_provider": "exact analytic constant-sound-speed bridge",
+        "core_provider": "separate PCHIP(eps-P versus ln P), first-law density",
+        "css_core_join_pressure_mev_fm3": 3.3080001645911086,
+        "css_core_cs2_left": 0.02669770903889366,
+        "css_core_cs2_right": 0.07081357329390701,
+        "low_branch_first_law_anchor": "interface",
+        "low_branch_surface_density_drift_relative": -3.106333319458088e-07,
+        "high_branch_end_density_drift_relative": -0.0004428034886521104,
+        "pressure_cutoff_mev_fm3": 0.0017099543182567123,
+        "perturbation_boundary": "Delta P=0 at finite cutoff pressure; artificial truncation boundary",
+        "lapse_normalization": "vacuum Schwarzschild value at cutoff; complete exterior not modeled",
+        "frequency_scope": "truncated fluid model; no complete-star observable or stability claim",
+        "surface_definition": "truncation at the crust table minimum pressure (no outer crust in the CLD reconstruction)",
+        "composition": "none; no abundance or elastic-crust claim"
+      },
+      "interface": {
+        "pressure_pa": 4.469983476200461e+31,
+        "source_transition_pressure_relative_mismatch": 0.0,
+        "source_transition_pressure_low_mev_fm3": 0.2789944242939484,
+        "source_transition_pressure_high_mev_fm3": 0.2789944242939484,
+        "pressure_mev_fm3": 0.2789944242939484,
+        "chemical_potential_mev": 951.0290209413452,
+        "energy_low_mev_fm3": 56.54968946822104,
+        "energy_high_mev_fm3": 78.00417988448552,
+        "density_low_fm3": 0.059754941900999996,
+        "density_high_fm3": 0.08231418030891782,
+        "latent_energy_mev_fm3": 21.454490416264484,
+        "density_jump_fm3": 0.022559238407917827,
+        "maxwell_identity_relative_residual": 1.6559301152672525e-16,
+        "seidov_ratio": 0.37939183429682954,
+        "seidov_critical_ratio": 0.507400423245049,
+        "seidov_onset_stable_rapid_diagnostic": true,
+        "provider_first_law_residual_low": 2.4841149323538576e-16,
+        "provider_first_law_residual_high": 2.6793668110220985e-16
+      },
+      "sequence": [
+        {
+          "p_c_MeV_fm3": 5.0,
+          "mass_solar": 0.26885873777445085,
+          "truncation_radius_km": 10.030145414718632,
+          "interface_radius_km": 7.892355858588397
+        },
+        {
+          "p_c_MeV_fm3": 7.57382601742524,
+          "mass_solar": 0.3478894488956871,
+          "truncation_radius_km": 10.080339144706034,
+          "interface_radius_km": 8.391802080388583
+        },
+        {
+          "p_c_MeV_fm3": 11.472568108445497,
+          "mass_solar": 0.455484428008029,
+          "truncation_radius_km": 10.222073859548633,
+          "interface_radius_km": 8.898121959966895
+        },
+        {
+          "p_c_MeV_fm3": 17.378246965285516,
+          "mass_solar": 0.5935858000418394,
+          "truncation_radius_km": 10.417318731463514,
+          "interface_radius_km": 9.380376722560909
+        },
+        {
+          "p_c_MeV_fm3": 26.32396380058413,
+          "mass_solar": 0.7576939811051824,
+          "truncation_radius_km": 10.61247816706165,
+          "interface_radius_km": 9.796568406129836
+        },
+        {
+          "p_c_MeV_fm3": 39.87462438292486,
+          "mass_solar": 0.9411517869609272,
+          "truncation_radius_km": 10.763256464028927,
+          "interface_radius_km": 10.118571567112829
+        },
+        {
+          "p_c_MeV_fm3": 60.40069351729105,
+          "mass_solar": 1.1332225369780982,
+          "truncation_radius_km": 10.838617454102927,
+          "interface_radius_km": 10.326926924482796
+        },
+        {
+          "p_c_MeV_fm3": 91.49286880635735,
+          "mass_solar": 1.3233437231764957,
+          "truncation_radius_km": 10.823979174118495,
+          "interface_radius_km": 10.416565772601352
+        },
+        {
+          "p_c_MeV_fm3": 138.59021403489277,
+          "mass_solar": 1.50182436538026,
+          "truncation_radius_km": 10.718143700894334,
+          "interface_radius_km": 10.393057350291182
+        },
+        {
+          "p_c_MeV_fm3": 209.93163376360056,
+          "mass_solar": 1.659267716689115,
+          "truncation_radius_km": 10.528809678114914,
+          "interface_radius_km": 10.268547223129719
+        },
+        {
+          "p_c_MeV_fm3": 317.9971339358691,
+          "mass_solar": 1.7856649633785382,
+          "truncation_radius_km": 10.266807922725517,
+          "interface_radius_km": 10.05678800131449
+        },
+        {
+          "p_c_MeV_fm3": 481.6909932940286,
+          "mass_solar": 1.8724476076795533,
+          "truncation_radius_km": 9.945338422370062,
+          "interface_radius_km": 9.773276793967343
+        },
+        {
+          "p_c_MeV_fm3": 729.6487554739444,
+          "mass_solar": 1.9153566748546063,
+          "truncation_radius_km": 9.580146605496804,
+          "interface_radius_km": 9.435872077970775
+        },
+        {
+          "p_c_MeV_fm3": 1105.2465455581007,
+          "mass_solar": 1.9159880252709665,
+          "truncation_radius_km": 9.18951130454435,
+          "interface_radius_km": 9.064836012402612
+        }
+      ],
+      "max_mass_on_grid_solar": 1.9159880252709665,
+      "mass_grid_scope": "sampled M(Pc); no maximum-mass or radial-stability certification",
+      "canonical_star": {
+        "p_c_MeV_fm3": 108.86579880848191,
+        "mass_solar": 1.3999999789857642,
+        "truncation_radius_km": 10.790403592420455,
+        "interface_radius_km": 10.419825673711646
+      },
+      "cowling_scan_slow": {
+        "status": "ROOTS_FOUND_ON_GRID",
+        "roots_found": 1,
+        "search_method": "sign changes and exact endpoint zeros",
+        "frequency_min_hz": 800.0,
+        "frequency_max_hz": 4000.0,
+        "spectral_completeness": "not_certified"
+      },
+      "cowling_slow": [
+        {
+          "frequency_hz": 2543.1450465613693,
+          "residual": 1.0936784422543866e-06,
+          "residual_tolerance": 1e-05,
+          "w_nodes_inner_sampled": 0,
+          "w_nodes_outer_sampled": 0,
+          "v_nodes_inner_sampled": 0,
+          "v_nodes_outer_sampled": 0,
+          "w_nodes_total_sampled": 0,
+          "v_nodes_total_sampled": 0,
+          "conversion": "slow",
+          "interface_diagnostics": {
+            "w_inner": 2755638788946.9985,
+            "v_inner": -126617224.04095298,
+            "w_outer": 2755638788946.9985,
+            "v_outer": -124945097.55103648,
+            "delta_p_inner_pa": -2.6161504594687822e+32,
+            "delta_p_outer_pa": -2.6161504594687822e+32,
+            "delta_p_relative_jump": 0.0,
+            "radial_displacement_jump_m": 0.0,
+            "isobar_displacement_jump_m": -252.18938979762243,
+            "slow_condition_residual": 0.0,
+            "rapid_condition_residual": 0.013206153448567912
+          },
+          "accepted_steps": 189
+        }
+      ],
+      "cowling_scan_rapid": {
+        "status": "ROOTS_FOUND_ON_GRID",
+        "roots_found": 1,
+        "search_method": "sign changes and exact endpoint zeros",
+        "frequency_min_hz": 800.0,
+        "frequency_max_hz": 4000.0,
+        "spectral_completeness": "not_certified"
+      },
+      "cowling_rapid": [
+        {
+          "frequency_hz": 2542.93040936904,
+          "residual": 7.817216657324266e-08,
+          "residual_tolerance": 1e-05,
+          "w_nodes_inner_sampled": 0,
+          "w_nodes_outer_sampled": 0,
+          "v_nodes_inner_sampled": 0,
+          "v_nodes_outer_sampled": 0,
+          "w_nodes_total_sampled": 0,
+          "v_nodes_total_sampled": 0,
+          "conversion": "rapid",
+          "interface_diagnostics": {
+            "w_inner": 2756588797646.842,
+            "v_inner": -126626636.30257341,
+            "w_outer": 2792203833360.592,
+            "v_outer": -126626636.30257341,
+            "delta_p_inner_pa": -2.6499008895102265e+32,
+            "delta_p_outer_pa": -2.6499008895102265e+32,
+            "delta_p_relative_jump": 0.0,
+            "radial_displacement_jump_m": 255.4428343106265,
+            "isobar_displacement_jump_m": 0.0,
+            "slow_condition_residual": 0.012755170409921348,
+            "rapid_condition_residual": 0.0
+          },
+          "accepted_steps": 194
+        }
+      ],
+      "status": "OK",
+      "elapsed_s": 54.7
+    },
+    {
+      "pair_id": "GPPVA_DD2__GM_GM1__css",
+      "input_sha256": {
+        "eos.nb": "cf573d42f0fa831314285bbd16dff46fcc76d644e07eb01762f9430ddfc0c803",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "3e3a109916bc666a809f90defaee3ff996f315168d63336fa2148235343cb37c"
+      },
+      "adapter": {
+        "construction_kind": "css_single_speed_with_crust_density_jump",
+        "crust_rows": 19,
+        "css_and_core_rows": 279,
+        "css_core_join": "continuous in n_B, P, eps, mu_B; one-sided sound-speed derivative",
+        "css_provider": "exact analytic constant-sound-speed bridge",
+        "core_provider": "separate PCHIP(eps-P versus ln P), first-law density",
+        "css_core_join_pressure_mev_fm3": 3.632295722146669,
+        "css_core_cs2_left": 0.08756505582978408,
+        "css_core_cs2_right": 0.077828398794668,
+        "low_branch_first_law_anchor": "interface",
+        "low_branch_surface_density_drift_relative": -3.106333319458088e-07,
+        "high_branch_end_density_drift_relative": -1.6276524572589324e-10,
+        "pressure_cutoff_mev_fm3": 0.0017099543182567123,
+        "perturbation_boundary": "Delta P=0 at finite cutoff pressure; artificial truncation boundary",
+        "lapse_normalization": "vacuum Schwarzschild value at cutoff; complete exterior not modeled",
+        "frequency_scope": "truncated fluid model; no complete-star observable or stability claim",
+        "surface_definition": "truncation at the crust table minimum pressure (no outer crust in the CLD reconstruction)",
+        "composition": "none; no abundance or elastic-crust claim"
+      },
+      "interface": {
+        "pressure_pa": 4.469983476200461e+31,
+        "source_transition_pressure_relative_mismatch": 0.0,
+        "source_transition_pressure_low_mev_fm3": 0.2789944242939484,
+        "source_transition_pressure_high_mev_fm3": 0.2789944242939484,
+        "pressure_mev_fm3": 0.2789944242939484,
+        "chemical_potential_mev": 951.0290209413452,
+        "energy_low_mev_fm3": 56.54968946822104,
+        "energy_high_mev_fm3": 101.18658004033225,
+        "density_low_fm3": 0.059754941900999996,
+        "density_high_fm3": 0.10669030306161824,
+        "latent_energy_mev_fm3": 44.636890572111206,
+        "density_jump_fm3": 0.04693536116061824,
+        "maxwell_identity_relative_residual": 0.0,
+        "seidov_ratio": 0.7893392694436561,
+        "seidov_critical_ratio": 0.507400423245049,
+        "seidov_onset_stable_rapid_diagnostic": false,
+        "provider_first_law_residual_low": 2.4841149323538576e-16,
+        "provider_first_law_residual_high": 3.7937775228582434e-16
+      },
+      "sequence": [
+        {
+          "p_c_MeV_fm3": 5.0,
+          "mass_solar": 0.4083548974349327,
+          "truncation_radius_km": 11.061626520261044,
+          "interface_radius_km": 9.317534099653423
+        },
+        {
+          "p_c_MeV_fm3": 7.293692048981881,
+          "mass_solar": 0.5463405536905178,
+          "truncation_radius_km": 11.604083934016778,
+          "interface_radius_km": 10.177212359210996
+        },
+        {
+          "p_c_MeV_fm3": 10.639588741076302,
+          "mass_solar": 0.7095019747364684,
+          "truncation_radius_km": 12.096847877029505,
+          "interface_radius_km": 10.925241708251699
+        },
+        {
+          "p_c_MeV_fm3": 15.520376761045071,
+          "mass_solar": 0.8978027190847071,
+          "truncation_radius_km": 12.523463086663243,
+          "interface_radius_km": 11.561601981453547
+        },
+        {
+          "p_c_MeV_fm3": 22.640169715847517,
+          "mass_solar": 1.1082372689109885,
+          "truncation_radius_km": 12.868671101468914,
+          "interface_radius_km": 12.08033004615387
+        },
+        {
+          "p_c_MeV_fm3": 33.02608516881548,
+          "mass_solar": 1.3342729078957343,
+          "truncation_radius_km": 13.11857199088014,
+          "interface_radius_km": 12.473673271505275
+        },
+        {
+          "p_c_MeV_fm3": 48.176418960957584,
+          "mass_solar": 1.5657922730203462,
+          "truncation_radius_km": 13.261961029948589,
+          "interface_radius_km": 12.734982700296184
+        },
+        {
+          "p_c_MeV_fm3": 70.27679278479121,
+          "mass_solar": 1.7898317423917616,
+          "truncation_radius_km": 13.291962140744669,
+          "interface_radius_km": 12.86104517118461
+        },
+        {
+          "p_c_MeV_fm3": 102.5154569524758,
+          "mass_solar": 1.992220208561457,
+          "truncation_radius_km": 13.20749098367119,
+          "interface_radius_km": 12.853898650182652
+        },
+        {
+          "p_c_MeV_fm3": 149.5432346544033,
+          "mass_solar": 2.1598857036867414,
+          "truncation_radius_km": 13.014157109926085,
+          "interface_radius_km": 12.721924218461114
+        },
+        {
+          "p_c_MeV_fm3": 218.1444603155707,
+          "mass_solar": 2.2832219637926716,
+          "truncation_radius_km": 12.724295325199888,
+          "interface_radius_km": 12.479971566340579
+        },
+        {
+          "p_c_MeV_fm3": 318.2157031466241,
+          "mass_solar": 2.357734001891584,
+          "truncation_radius_km": 12.356015913797393,
+          "interface_radius_km": 12.148435437873632
+        },
+        {
+          "p_c_MeV_fm3": 464.1934687803423,
+          "mass_solar": 2.3844130361155336,
+          "truncation_radius_km": 11.93145551896376,
+          "interface_radius_km": 11.751488205334892
+        },
+        {
+          "p_c_MeV_fm3": 677.1368424864999,
+          "mass_solar": 2.368843059359851,
+          "truncation_radius_km": 11.474649480008825,
+          "interface_radius_km": 11.314917796967459
+        }
+      ],
+      "max_mass_on_grid_solar": 2.3844130361155336,
+      "mass_grid_scope": "sampled M(Pc); no maximum-mass or radial-stability certification",
+      "canonical_star": {
+        "p_c_MeV_fm3": 36.76502292803952,
+        "mass_solar": 1.3999999763573645,
+        "truncation_radius_km": 13.170526014771804,
+        "interface_radius_km": 12.561545462719248
+      },
+      "cowling_scan_slow": {
+        "status": "ROOTS_FOUND_ON_GRID",
+        "roots_found": 1,
+        "search_method": "sign changes and exact endpoint zeros",
+        "frequency_min_hz": 800.0,
+        "frequency_max_hz": 4000.0,
+        "spectral_completeness": "not_certified"
+      },
+      "cowling_slow": [
+        {
+          "frequency_hz": 1927.162184473702,
+          "residual": -2.254570413695589e-07,
+          "residual_tolerance": 1e-05,
+          "w_nodes_inner_sampled": 0,
+          "w_nodes_outer_sampled": 0,
+          "v_nodes_inner_sampled": 0,
+          "v_nodes_outer_sampled": 0,
+          "w_nodes_total_sampled": 0,
+          "v_nodes_total_sampled": 0,
+          "conversion": "slow",
+          "interface_diagnostics": {
+            "w_inner": 3561304882181.441,
+            "v_inner": -141192528.28307155,
+            "w_outer": 3561304882181.441,
+            "v_outer": -137750368.65859634,
+            "delta_p_inner_pa": -1.7321581753316757e+32,
+            "delta_p_outer_pa": -1.7321581753316753e+32,
+            "delta_p_relative_jump": 2.0799946293625946e-16,
+            "radial_displacement_jump_m": 0.0,
+            "isobar_displacement_jump_m": -439.17335245835056,
+            "slow_condition_residual": 0.0,
+            "rapid_condition_residual": 0.024379191068624895
+          },
+          "accepted_steps": 209
+        }
+      ],
+      "cowling_scan_rapid": {
+        "status": "ROOTS_FOUND_ON_GRID",
+        "roots_found": 1,
+        "search_method": "sign changes and exact endpoint zeros",
+        "frequency_min_hz": 800.0,
+        "frequency_max_hz": 4000.0,
+        "spectral_completeness": "not_certified"
+      },
+      "cowling_rapid": [
+        {
+          "frequency_hz": 1926.6727784453208,
+          "residual": 5.2780596559998116e-08,
+          "residual_tolerance": 1e-05,
+          "w_nodes_inner_sampled": 0,
+          "w_nodes_outer_sampled": 0,
+          "v_nodes_inner_sampled": 0,
+          "v_nodes_outer_sampled": 0,
+          "w_nodes_total_sampled": 0,
+          "v_nodes_total_sampled": 0,
+          "conversion": "rapid",
+          "interface_diagnostics": {
+            "w_inner": 3562507207976.626,
+            "v_inner": -141211431.70664275,
+            "w_outer": 3648674427608.444,
+            "v_outer": -141211431.70664275,
+            "delta_p_inner_pa": -1.772457498791709e+32,
+            "delta_p_outer_pa": -1.772457498791709e+32,
+            "delta_p_relative_jump": 0.0,
+            "radial_displacement_jump_m": 449.39088873060973,
+            "isobar_displacement_jump_m": 0.0,
+            "slow_condition_residual": 0.023616034080710467,
+            "rapid_condition_residual": 0.0
+          },
+          "accepted_steps": 210
+        }
+      ],
+      "status": "OK",
+      "elapsed_s": 64.7
+    },
+    {
+      "pair_id": "GPPVA_DDME2__BBB_BHF2__css",
+      "input_sha256": {
+        "eos.nb": "0c918cb054ab3126c0a5b8346989c2a804b017b276b93bce0566cf87c5de03ee",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "b338b1607966eab5325c9000ec333d05d1d888552de843dcda45f7ffa60a9591"
+      },
+      "adapter": {
+        "construction_kind": "css_single_speed_with_crust_density_jump",
+        "crust_rows": 14,
+        "css_and_core_rows": 23,
+        "css_core_join": "continuous in n_B, P, eps, mu_B; one-sided sound-speed derivative",
+        "css_provider": "exact analytic constant-sound-speed bridge",
+        "core_provider": "separate PCHIP(eps-P versus ln P), first-law density",
+        "css_core_join_pressure_mev_fm3": 3.3080001645911086,
+        "css_core_cs2_left": 0.0267134150793263,
+        "css_core_cs2_right": 0.07081357329390701,
+        "low_branch_first_law_anchor": "interface",
+        "low_branch_surface_density_drift_relative": -1.2780339989637568e-06,
+        "high_branch_end_density_drift_relative": -0.0004428034886521104,
+        "pressure_cutoff_mev_fm3": 0.0015712344106887377,
+        "perturbation_boundary": "Delta P=0 at finite cutoff pressure; artificial truncation boundary",
+        "lapse_normalization": "vacuum Schwarzschild value at cutoff; complete exterior not modeled",
+        "frequency_scope": "truncated fluid model; no complete-star observable or stability claim",
+        "surface_definition": "truncation at the crust table minimum pressure (no outer crust in the CLD reconstruction)",
+        "composition": "none; no abundance or elastic-crust claim"
+      },
+      "interface": {
+        "pressure_pa": 4.334227435337248e+31,
+        "source_transition_pressure_relative_mismatch": 0.0,
+        "source_transition_pressure_low_mev_fm3": 0.2705211986843423,
+        "source_transition_pressure_high_mev_fm3": 0.2705211986843423,
+        "pressure_mev_fm3": 0.2705211986843423,
+        "chemical_potential_mev": 950.9341215769612,
+        "energy_low_mev_fm3": 52.77151620386002,
+        "energy_high_mev_fm3": 77.75369574845844,
+        "density_low_fm3": 0.05577887699999999,
+        "density_high_fm3": 0.0820500760007991,
+        "latent_energy_mev_fm3": 24.982179544598424,
+        "density_jump_fm3": 0.026271199000799106,
+        "maxwell_identity_relative_residual": 7.110495848567101e-16,
+        "seidov_ratio": 0.4734027244563248,
+        "seidov_critical_ratio": 0.5076894094999839,
+        "seidov_onset_stable_rapid_diagnostic": true,
+        "provider_first_law_residual_low": 3.1699689119318756e-16,
+        "provider_first_law_residual_high": 2.1913176509589544e-16
+      },
+      "sequence": [
+        {
+          "p_c_MeV_fm3": 5.0,
+          "mass_solar": 0.26955023431459874,
+          "truncation_radius_km": 10.160673187424166,
+          "interface_radius_km": 7.908710102957924
+        },
+        {
+          "p_c_MeV_fm3": 7.57382601742524,
+          "mass_solar": 0.3483393637108823,
+          "truncation_radius_km": 10.178547582425125,
+          "interface_radius_km": 8.40505278272484
+        },
+        {
+          "p_c_MeV_fm3": 11.472568108445497,
+          "mass_solar": 0.455774828152943,
+          "truncation_radius_km": 10.295955366903907,
+          "interface_radius_km": 8.90876117642481
+        },
+        {
+          "p_c_MeV_fm3": 17.378246965285516,
+          "mass_solar": 0.5937737967586434,
+          "truncation_radius_km": 10.47331485482851,
+          "interface_radius_km": 9.388880070530499
+        },
+        {
+          "p_c_MeV_fm3": 26.32396380058413,
+          "mass_solar": 0.7578170320732686,
+          "truncation_radius_km": 10.655461381262342,
+          "interface_radius_km": 9.803368241080879
+        },
+        {
+          "p_c_MeV_fm3": 39.87462438292486,
+          "mass_solar": 0.9412329657467704,
+          "truncation_radius_km": 10.796598630482086,
+          "interface_radius_km": 10.124012544648044
+        },
+        {
+          "p_c_MeV_fm3": 60.40069351729105,
+          "mass_solar": 1.1332764534644513,
+          "truncation_radius_km": 10.864721410747118,
+          "interface_radius_km": 10.33128755254742
+        },
+        {
+          "p_c_MeV_fm3": 91.49286880635735,
+          "mass_solar": 1.3233796581985875,
+          "truncation_radius_km": 10.8445509725666,
+          "interface_radius_km": 10.420063872852083
+        },
+        {
+          "p_c_MeV_fm3": 138.59021403489277,
+          "mass_solar": 1.501848356956204,
+          "truncation_radius_km": 10.73443077620108,
+          "interface_radius_km": 10.395864939047817
+        },
+        {
+          "p_c_MeV_fm3": 209.93163376360056,
+          "mass_solar": 1.659283801073366,
+          "truncation_radius_km": 10.54177136246226,
+          "interface_radius_km": 10.27080526255783
+        },
+        {
+          "p_c_MeV_fm3": 317.9971339358691,
+          "mass_solar": 1.7856758746378159,
+          "truncation_radius_km": 10.277220189279358,
+          "interface_radius_km": 10.058616562469819
+        },
+        {
+          "p_c_MeV_fm3": 481.6909932940286,
+          "mass_solar": 1.8724551815826593,
+          "truncation_radius_km": 9.953840358522942,
+          "interface_radius_km": 9.774778812794542
+        },
+        {
+          "p_c_MeV_fm3": 729.6487554739444,
+          "mass_solar": 1.9153621177978848,
+          "truncation_radius_km": 9.587258661114966,
+          "interface_radius_km": 9.437133886402474
+        },
+        {
+          "p_c_MeV_fm3": 1105.2465455581007,
+          "mass_solar": 1.9159921148142767,
+          "truncation_radius_km": 9.195647543858545,
+          "interface_radius_km": 9.065927752749491
+        }
+      ],
+      "max_mass_on_grid_solar": 1.9159921148142767,
+      "mass_grid_scope": "sampled M(Pc); no maximum-mass or radial-stability certification",
+      "canonical_star": {
+        "p_c_MeV_fm3": 108.85818956207778,
+        "mass_solar": 1.3999999861534973,
+        "truncation_radius_km": 10.809066943798042,
+        "interface_radius_km": 10.423018532849692
+      },
+      "cowling_scan_slow": {
+        "status": "ROOTS_FOUND_ON_GRID",
+        "roots_found": 1,
+        "search_method": "sign changes and exact endpoint zeros",
+        "frequency_min_hz": 800.0,
+        "frequency_max_hz": 4000.0,
+        "spectral_completeness": "not_certified"
+      },
+      "cowling_slow": [
+        {
+          "frequency_hz": 2542.90604414257,
+          "residual": -2.390028238097308e-07,
+          "residual_tolerance": 1e-05,
+          "w_nodes_inner_sampled": 0,
+          "w_nodes_outer_sampled": 0,
+          "v_nodes_inner_sampled": 0,
+          "v_nodes_outer_sampled": 0,
+          "w_nodes_total_sampled": 0,
+          "v_nodes_total_sampled": 0,
+          "conversion": "slow",
+          "interface_diagnostics": {
+            "w_inner": 2759811655233.6743,
+            "v_inner": -126751687.52285989,
+            "w_outer": 2759811655233.6743,
+            "v_outer": -124680321.75817958,
+            "delta_p_inner_pa": -2.5881043689510532e+32,
+            "delta_p_outer_pa": -2.5881043689510532e+32,
+            "delta_p_relative_jump": 0.0,
+            "radial_displacement_jump_m": 0.0,
+            "isobar_displacement_jump_m": -312.44710144720375,
+            "slow_condition_residual": 0.0,
+            "rapid_condition_residual": 0.016341918637625488
+          },
+          "accepted_steps": 182
+        }
+      ],
+      "cowling_scan_rapid": {
+        "status": "ROOTS_FOUND_ON_GRID",
+        "roots_found": 1,
+        "search_method": "sign changes and exact endpoint zeros",
+        "frequency_min_hz": 800.0,
+        "frequency_max_hz": 4000.0,
+        "spectral_completeness": "not_certified"
+      },
+      "cowling_rapid": [
+        {
+          "frequency_hz": 2542.642044383437,
+          "residual": -6.611781977472475e-07,
+          "residual_tolerance": 1e-05,
+          "w_nodes_inner_sampled": 0,
+          "w_nodes_outer_sampled": 0,
+          "v_nodes_inner_sampled": 0,
+          "v_nodes_outer_sampled": 0,
+          "w_nodes_total_sampled": 0,
+          "v_nodes_total_sampled": 0,
+          "conversion": "rapid",
+          "interface_diagnostics": {
+            "w_inner": 2760985604827.3057,
+            "v_inner": -126763322.29645799,
+            "w_outer": 2805272294539.6914,
+            "v_outer": -126763322.296458,
+            "delta_p_inner_pa": -2.629576076918711e+32,
+            "delta_p_outer_pa": -2.6295760769187104e+32,
+            "delta_p_relative_jump": 2.740274170822382e-16,
+            "radial_displacement_jump_m": 317.45374457258004,
+            "isobar_displacement_jump_m": 3.637978807091713e-12,
+            "slow_condition_residual": 0.015786948667545642,
+            "rapid_condition_residual": 1.9029922766310286e-16
+          },
+          "accepted_steps": 183
+        }
+      ],
+      "status": "OK",
+      "elapsed_s": 51.3
+    },
+    {
+      "pair_id": "GPPVA_DDME2__GM_GM1__css",
+      "input_sha256": {
+        "eos.nb": "dfc2a6860bd2715902889f7c9261b686c92288ab8830b1fa41c1c7f726e0ea0e",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "4227aad94f78c4318a3edebe61be70ae2f4ad265b023e99b68b96f4501b39516"
+      },
+      "adapter": {
+        "construction_kind": "css_single_speed_with_crust_density_jump",
+        "crust_rows": 14,
+        "css_and_core_rows": 278,
+        "css_core_join": "continuous in n_B, P, eps, mu_B; one-sided sound-speed derivative",
+        "css_provider": "exact analytic constant-sound-speed bridge",
+        "core_provider": "separate PCHIP(eps-P versus ln P), first-law density",
+        "css_core_join_pressure_mev_fm3": 3.8788625430037915,
+        "css_core_cs2_left": 0.08626432873587886,
+        "css_core_cs2_right": 0.08100204428600209,
+        "low_branch_first_law_anchor": "interface",
+        "low_branch_surface_density_drift_relative": -1.2780339989637568e-06,
+        "high_branch_end_density_drift_relative": -1.4538537040920119e-10,
+        "pressure_cutoff_mev_fm3": 0.0015712344106887377,
+        "perturbation_boundary": "Delta P=0 at finite cutoff pressure; artificial truncation boundary",
+        "lapse_normalization": "vacuum Schwarzschild value at cutoff; complete exterior not modeled",
+        "frequency_scope": "truncated fluid model; no complete-star observable or stability claim",
+        "surface_definition": "truncation at the crust table minimum pressure (no outer crust in the CLD reconstruction)",
+        "composition": "none; no abundance or elastic-crust claim"
+      },
+      "interface": {
+        "pressure_pa": 4.334227435337248e+31,
+        "source_transition_pressure_relative_mismatch": 0.0,
+        "source_transition_pressure_low_mev_fm3": 0.2705211986843423,
+        "source_transition_pressure_high_mev_fm3": 0.2705211986843423,
+        "pressure_mev_fm3": 0.2705211986843423,
+        "chemical_potential_mev": 950.9341215769612,
+        "energy_low_mev_fm3": 52.77151620386002,
+        "energy_high_mev_fm3": 100.75796234657112,
+        "density_low_fm3": 0.05577887699999999,
+        "density_high_fm3": 0.10624130657728115,
+        "latent_energy_mev_fm3": 47.9864461427111,
+        "density_jump_fm3": 0.050462429577281157,
+        "maxwell_identity_relative_residual": 4.442146436393444e-16,
+        "seidov_ratio": 0.9093247568884726,
+        "seidov_critical_ratio": 0.5076894094999839,
+        "seidov_onset_stable_rapid_diagnostic": false,
+        "provider_first_law_residual_low": 3.1699689119318756e-16,
+        "provider_first_law_residual_high": 3.7937775228582434e-16
+      },
+      "sequence": [
+        {
+          "p_c_MeV_fm3": 5.0,
+          "mass_solar": 0.4088042704538551,
+          "truncation_radius_km": 11.16176236496404,
+          "interface_radius_km": 9.331094227919287
+        },
+        {
+          "p_c_MeV_fm3": 7.293692048981881,
+          "mass_solar": 0.5466726416231766,
+          "truncation_radius_km": 11.68295809545493,
+          "interface_radius_km": 10.18866078339653
+        },
+        {
+          "p_c_MeV_fm3": 10.639588741076302,
+          "mass_solar": 0.7097451903576918,
+          "truncation_radius_km": 12.159811875391227,
+          "interface_radius_km": 10.934845987588002
+        },
+        {
+          "p_c_MeV_fm3": 15.520376761045071,
+          "mass_solar": 0.8979791303506841,
+          "truncation_radius_km": 12.574056458580497,
+          "interface_radius_km": 11.569611878727109
+        },
+        {
+          "p_c_MeV_fm3": 22.640169715847517,
+          "mass_solar": 1.1083640112682969,
+          "truncation_radius_km": 12.909456404823768,
+          "interface_radius_km": 12.086974261519186
+        },
+        {
+          "p_c_MeV_fm3": 33.02608516881548,
+          "mass_solar": 1.3343632160575025,
+          "truncation_radius_km": 13.151510982108972,
+          "interface_radius_km": 12.479159644327547
+        },
+        {
+          "p_c_MeV_fm3": 48.176418960957584,
+          "mass_solar": 1.5658562528698785,
+          "truncation_radius_km": 13.288610810409072,
+          "interface_radius_km": 12.73949905080336
+        },
+        {
+          "p_c_MeV_fm3": 70.27679278479121,
+          "mass_solar": 1.7898769751628598,
+          "truncation_radius_km": 13.313587109823152,
+          "interface_radius_km": 12.864759768902061
+        },
+        {
+          "p_c_MeV_fm3": 102.5154569524758,
+          "mass_solar": 1.9922522756058072,
+          "truncation_radius_km": 13.225130932466499,
+          "interface_radius_km": 12.856960621672078
+        },
+        {
+          "p_c_MeV_fm3": 149.5432346544033,
+          "mass_solar": 2.1599086330922534,
+          "truncation_radius_km": 13.028670472216737,
+          "interface_radius_km": 12.724463824719837
+        },
+        {
+          "p_c_MeV_fm3": 218.1444603155707,
+          "mass_solar": 2.2832386043111934,
+          "truncation_radius_km": 12.736388315291741,
+          "interface_radius_km": 12.482100521725949
+        },
+        {
+          "p_c_MeV_fm3": 318.2157031466241,
+          "mass_solar": 2.3577463418844404,
+          "truncation_radius_km": 12.366264731120207,
+          "interface_radius_km": 12.150247861633872
+        },
+        {
+          "p_c_MeV_fm3": 464.1934687803423,
+          "mass_solar": 2.384422440230532,
+          "truncation_radius_km": 11.940325222909596,
+          "interface_radius_km": 11.753061750372625
+        },
+        {
+          "p_c_MeV_fm3": 677.1368424864999,
+          "mass_solar": 2.368850464124612,
+          "truncation_radius_km": 11.482512488969949,
+          "interface_radius_km": 11.316315773649348
+        }
+      ],
+      "max_mass_on_grid_solar": 2.384422440230532,
+      "mass_grid_scope": "sampled M(Pc); no maximum-mass or radial-stability certification",
+      "canonical_star": {
+        "p_c_MeV_fm3": 36.760118437462275,
+        "mass_solar": 1.3999999720840732,
+        "truncation_radius_km": 13.201477657261513,
+        "interface_radius_km": 12.566635730695737
+      },
+      "cowling_scan_slow": {
+        "status": "ROOTS_FOUND_ON_GRID",
+        "roots_found": 1,
+        "search_method": "sign changes and exact endpoint zeros",
+        "frequency_min_hz": 800.0,
+        "frequency_max_hz": 4000.0,
+        "spectral_completeness": "not_certified"
+      },
+      "cowling_slow": [
+        {
+          "frequency_hz": 1926.6506681055218,
+          "residual": -1.1853565184960502e-08,
+          "residual_tolerance": 1e-05,
+          "w_nodes_inner_sampled": 0,
+          "w_nodes_outer_sampled": 0,
+          "v_nodes_inner_sampled": 0,
+          "v_nodes_outer_sampled": 0,
+          "w_nodes_total_sampled": 0,
+          "v_nodes_total_sampled": 0,
+          "conversion": "slow",
+          "interface_diagnostics": {
+            "w_inner": 3568422592655.9375,
+            "v_inner": -141374599.3396365,
+            "w_outer": 3568422592655.9375,
+            "v_outer": -137377320.15624484,
+            "delta_p_inner_pa": -1.7376206869789026e+32,
+            "delta_p_outer_pa": -1.7376206869789022e+32,
+            "delta_p_relative_jump": 2.0734558059161397e-16,
+            "radial_displacement_jump_m": 0.0,
+            "isobar_displacement_jump_m": -509.8291702684983,
+            "slow_condition_residual": 0.0,
+            "rapid_condition_residual": 0.028274380278091246
+          },
+          "accepted_steps": 201
+        }
+      ],
+      "cowling_scan_rapid": {
+        "status": "ROOTS_FOUND_ON_GRID",
+        "roots_found": 1,
+        "search_method": "sign changes and exact endpoint zeros",
+        "frequency_min_hz": 800.0,
+        "frequency_max_hz": 4000.0,
+        "spectral_completeness": "not_certified"
+      },
+      "cowling_rapid": [
+        {
+          "frequency_hz": 1926.0781584488282,
+          "residual": -6.39042887440322e-07,
+          "residual_tolerance": 1e-05,
+          "w_nodes_inner_sampled": 0,
+          "w_nodes_outer_sampled": 0,
+          "v_nodes_inner_sampled": 0,
+          "v_nodes_outer_sampled": 0,
+          "w_nodes_total_sampled": 0,
+          "v_nodes_total_sampled": 0,
+          "conversion": "rapid",
+          "interface_diagnostics": {
+            "w_inner": 3569841132664.655,
+            "v_inner": -141396787.7196975,
+            "w_outer": 3670330829079.999,
+            "v_outer": -141396787.7196975,
+            "delta_p_inner_pa": -1.784729709181589e+32,
+            "delta_p_outer_pa": -1.784729709181589e+32,
+            "delta_p_relative_jump": 0.0,
+            "radial_displacement_jump_m": 523.651262674357,
+            "isobar_displacement_jump_m": -3.637978807091713e-12,
+            "slow_condition_residual": 0.027378920619134692,
+            "rapid_condition_residual": 2.0184526463499675e-16
+          },
+          "accepted_steps": 203
+        }
+      ],
+      "status": "OK",
+      "elapsed_s": 59.5
+    },
+    {
+      "pair_id": "GPPVA_TW__BBB_BHF2__css",
+      "input_sha256": {
+        "eos.nb": "33081e1cbd39eb17b7a672658abad4d4f374b83df7a17aa1aa3041d428ba2179",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "23c38f06988107b8f40e7ec007c6b1a28af17ef249b7e6a8a1e134aaac5a75f1"
+      },
+      "adapter": {
+        "construction_kind": "css_single_speed_with_crust_density_jump",
+        "crust_rows": 14,
+        "css_and_core_rows": 23,
+        "css_core_join": "continuous in n_B, P, eps, mu_B; one-sided sound-speed derivative",
+        "css_provider": "exact analytic constant-sound-speed bridge",
+        "core_provider": "separate PCHIP(eps-P versus ln P), first-law density",
+        "css_core_join_pressure_mev_fm3": 3.3080001645911086,
+        "css_core_cs2_left": 0.026690547169545914,
+        "css_core_cs2_right": 0.07081357329390701,
+        "low_branch_first_law_anchor": "interface",
+        "low_branch_surface_density_drift_relative": -6.648556354349466e-07,
+        "high_branch_end_density_drift_relative": -0.0004428034886521104,
+        "pressure_cutoff_mev_fm3": 0.001628697521526723,
+        "perturbation_boundary": "Delta P=0 at finite cutoff pressure; artificial truncation boundary",
+        "lapse_normalization": "vacuum Schwarzschild value at cutoff; complete exterior not modeled",
+        "frequency_scope": "truncated fluid model; no complete-star observable or stability claim",
+        "surface_definition": "truncation at the crust table minimum pressure (no outer crust in the CLD reconstruction)",
+        "composition": "none; no abundance or elastic-crust claim"
+      },
+      "interface": {
+        "pressure_pa": 3.669458159528009e+31,
+        "source_transition_pressure_relative_mismatch": 0.0,
+        "source_transition_pressure_low_mev_fm3": 0.22902956401048158,
+        "source_transition_pressure_high_mev_fm3": 0.22902956401048158,
+        "pressure_mev_fm3": 0.22902956401048158,
+        "chemical_potential_mev": 950.4106753725885,
+        "energy_low_mev_fm3": 53.10759080350593,
+        "energy_high_mev_fm3": 76.1017305097532,
+        "density_low_fm3": 0.05611955099999999,
+        "density_high_fm3": 0.08031344980825243,
+        "latent_energy_mev_fm3": 22.994139706247267,
+        "density_jump_fm3": 0.024193898808252443,
+        "maxwell_identity_relative_residual": 0.0,
+        "seidov_ratio": 0.4329727513214419,
+        "seidov_critical_ratio": 0.5064688369556588,
+        "seidov_onset_stable_rapid_diagnostic": true,
+        "provider_first_law_residual_low": 2.0027976054040543e-16,
+        "provider_first_law_residual_high": 2.724863389790795e-16
+      },
+      "sequence": [
+        {
+          "p_c_MeV_fm3": 5.0,
+          "mass_solar": 0.268373487811976,
+          "truncation_radius_km": 10.14544096428262,
+          "interface_radius_km": 8.001699884338237
+        },
+        {
+          "p_c_MeV_fm3": 7.57382601742524,
+          "mass_solar": 0.347552762277849,
+          "truncation_radius_km": 10.167837933881584,
+          "interface_radius_km": 8.479814302860488
+        },
+        {
+          "p_c_MeV_fm3": 11.472568108445497,
+          "mass_solar": 0.45525706161001134,
+          "truncation_radius_km": 10.288519741532795,
+          "interface_radius_km": 8.968450187565981
+        },
+        {
+          "p_c_MeV_fm3": 17.378246965285516,
+          "mass_solar": 0.593434983115506,
+          "truncation_radius_km": 10.468090983070258,
+          "interface_radius_km": 9.436389823346728
+        },
+        {
+          "p_c_MeV_fm3": 26.32396380058413,
+          "mass_solar": 0.7575948527957032,
+          "truncation_radius_km": 10.651696330942823,
+          "interface_radius_km": 9.84124731154661
+        },
+        {
+          "p_c_MeV_fm3": 39.87462438292486,
+          "mass_solar": 0.9410872851321765,
+          "truncation_radius_km": 10.793818502963312,
+          "interface_radius_km": 10.15425661576092
+        },
+        {
+          "p_c_MeV_fm3": 60.40069351729105,
+          "mass_solar": 1.133180943218584,
+          "truncation_radius_km": 10.862624197561246,
+          "interface_radius_km": 10.35548836347782
+        },
+        {
+          "p_c_MeV_fm3": 91.49286880635735,
+          "mass_solar": 1.3233171829100119,
+          "truncation_radius_km": 10.842943300843029,
+          "interface_radius_km": 10.43945532216895
+        },
+        {
+          "p_c_MeV_fm3": 138.59021403489277,
+          "mass_solar": 1.5018076183013354,
+          "truncation_radius_km": 10.733183783866298,
+          "interface_radius_km": 10.411415179740548
+        },
+        {
+          "p_c_MeV_fm3": 209.93163376360056,
+          "mass_solar": 1.6592572269404038,
+          "truncation_radius_km": 10.540793853600773,
+          "interface_radius_km": 10.283303623703027
+        },
+        {
+          "p_c_MeV_fm3": 317.9971339358691,
+          "mass_solar": 1.7856583711700647,
+          "truncation_radius_km": 10.276443548020737,
+          "interface_radius_km": 10.068732875562404
+        },
+        {
+          "p_c_MeV_fm3": 481.6909932940286,
+          "mass_solar": 1.8724433813981096,
+          "truncation_radius_km": 9.953211217685363,
+          "interface_radius_km": 9.783085638998678
+        },
+        {
+          "p_c_MeV_fm3": 729.6487554739444,
+          "mass_solar": 1.9153538567566915,
+          "truncation_radius_km": 9.586735341548092,
+          "interface_radius_km": 9.444110487303162
+        },
+        {
+          "p_c_MeV_fm3": 1105.2465455581007,
+          "mass_solar": 1.9159860354687177,
+          "truncation_radius_km": 9.195197834611625,
+          "interface_radius_km": 9.071962989648725
+        }
+      ],
+      "max_mass_on_grid_solar": 1.9159860354687177,
+      "mass_grid_scope": "sampled M(Pc); no maximum-mass or radial-stability certification",
+      "canonical_star": {
+        "p_c_MeV_fm3": 108.87129590377161,
+        "mass_solar": 1.3999999765724778,
+        "truncation_radius_km": 10.807593436392064,
+        "interface_radius_km": 10.44069105449085
+      },
+      "cowling_scan_slow": {
+        "status": "ROOTS_FOUND_ON_GRID",
+        "roots_found": 1,
+        "search_method": "sign changes and exact endpoint zeros",
+        "frequency_min_hz": 800.0,
+        "frequency_max_hz": 4000.0,
+        "spectral_completeness": "not_certified"
+      },
+      "cowling_slow": [
+        {
+          "frequency_hz": 2543.412832172265,
+          "residual": 3.3776188144152286e-06,
+          "residual_tolerance": 1e-05,
+          "w_nodes_inner_sampled": 0,
+          "w_nodes_outer_sampled": 0,
+          "v_nodes_inner_sampled": 0,
+          "v_nodes_outer_sampled": 0,
+          "w_nodes_total_sampled": 0,
+          "v_nodes_total_sampled": 0,
+          "conversion": "slow",
+          "interface_diagnostics": {
+            "w_inner": 2777188547108.1313,
+            "v_inner": -127455792.6148362,
+            "w_outer": 2777188547108.1313,
+            "v_outer": -125813652.15629607,
+            "delta_p_inner_pa": -2.1914026006797553e+32,
+            "delta_p_outer_pa": -2.1914026006797553e+32,
+            "delta_p_relative_jump": 0.0,
+            "radial_displacement_jump_m": 0.0,
+            "isobar_displacement_jump_m": -248.23949821853967,
+            "slow_condition_residual": 0.0,
+            "rapid_condition_residual": 0.012884000207841117
+          },
+          "accepted_steps": 175
+        }
+      ],
+      "cowling_scan_rapid": {
+        "status": "ROOTS_FOUND_ON_GRID",
+        "roots_found": 1,
+        "search_method": "sign changes and exact endpoint zeros",
+        "frequency_min_hz": 800.0,
+        "frequency_max_hz": 4000.0,
+        "spectral_completeness": "not_certified"
+      },
+      "cowling_rapid": [
+        {
+          "frequency_hz": 2543.235077431045,
+          "residual": 5.79084652674311e-07,
+          "residual_tolerance": 1e-05,
+          "w_nodes_inner_sampled": 0,
+          "w_nodes_outer_sampled": 0,
+          "v_nodes_inner_sampled": 0,
+          "v_nodes_outer_sampled": 0,
+          "w_nodes_total_sampled": 0,
+          "v_nodes_total_sampled": 0,
+          "conversion": "rapid",
+          "interface_diagnostics": {
+            "w_inner": 2778001499213.5713,
+            "v_inner": -127463800.41890457,
+            "w_outer": 2813184423852.655,
+            "v_outer": -127463800.41890459,
+            "delta_p_inner_pa": -2.2191513500223582e+32,
+            "delta_p_outer_pa": -2.219151350022358e+32,
+            "delta_p_relative_jump": 1.62353942278885e-16,
+            "radial_displacement_jump_m": 251.38284376849333,
+            "isobar_displacement_jump_m": 0.0,
+            "slow_condition_residual": 0.012506440864940026,
+            "rapid_condition_residual": 0.0
+          },
+          "accepted_steps": 186
+        }
+      ],
+      "status": "OK",
+      "elapsed_s": 54.5
+    },
+    {
+      "pair_id": "GPPVA_TW__GM_GM1__css",
+      "input_sha256": {
+        "eos.nb": "6fee918060877d311d43d7c64900ae3ed0928a5b26cdfdb5ddc2d30ed8ab8f28",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "f25d3fcfc2f0217f037dc401600e46f12fc5917226b433110593b202836f16be"
+      },
+      "adapter": {
+        "construction_kind": "css_single_speed_with_crust_density_jump",
+        "crust_rows": 14,
+        "css_and_core_rows": 280,
+        "css_core_join": "continuous in n_B, P, eps, mu_B; one-sided sound-speed derivative",
+        "css_provider": "exact analytic constant-sound-speed bridge",
+        "core_provider": "separate PCHIP(eps-P versus ln P), first-law density",
+        "css_core_join_pressure_mev_fm3": 3.3959147695247998,
+        "css_core_cs2_left": 0.08634540267551782,
+        "css_core_cs2_right": 0.07469962134848368,
+        "low_branch_first_law_anchor": "interface",
+        "low_branch_surface_density_drift_relative": -6.648556354349466e-07,
+        "high_branch_end_density_drift_relative": -1.7970813726009283e-10,
+        "pressure_cutoff_mev_fm3": 0.001628697521526723,
+        "perturbation_boundary": "Delta P=0 at finite cutoff pressure; artificial truncation boundary",
+        "lapse_normalization": "vacuum Schwarzschild value at cutoff; complete exterior not modeled",
+        "frequency_scope": "truncated fluid model; no complete-star observable or stability claim",
+        "surface_definition": "truncation at the crust table minimum pressure (no outer crust in the CLD reconstruction)",
+        "composition": "none; no abundance or elastic-crust claim"
+      },
+      "interface": {
+        "pressure_pa": 3.669458159528009e+31,
+        "source_transition_pressure_relative_mismatch": 1.211877415719076e-16,
+        "source_transition_pressure_low_mev_fm3": 0.22902956401048158,
+        "source_transition_pressure_high_mev_fm3": 0.22902956401048155,
+        "pressure_mev_fm3": 0.22902956401048158,
+        "chemical_potential_mev": 950.4106753725885,
+        "energy_low_mev_fm3": 53.10759080350593,
+        "energy_high_mev_fm3": 99.7045414363128,
+        "density_low_fm3": 0.05611955099999999,
+        "density_high_fm3": 0.1051477783129345,
+        "latent_energy_mev_fm3": 46.596950632806866,
+        "density_jump_fm3": 0.049028227312934505,
+        "maxwell_identity_relative_residual": 1.524869602217786e-16,
+        "seidov_ratio": 0.8774065990907413,
+        "seidov_critical_ratio": 0.5064688369556588,
+        "seidov_onset_stable_rapid_diagnostic": false,
+        "provider_first_law_residual_low": 2.0027976054040543e-16,
+        "provider_first_law_residual_high": 3.7937775228582434e-16
+      },
+      "sequence": [
+        {
+          "p_c_MeV_fm3": 5.0,
+          "mass_solar": 0.409494379977343,
+          "truncation_radius_km": 11.154625995081924,
+          "interface_radius_km": 9.419553278860521
+        },
+        {
+          "p_c_MeV_fm3": 7.293692048981881,
+          "mass_solar": 0.5471791756236597,
+          "truncation_radius_km": 11.67791804447597,
+          "interface_radius_km": 10.25986557089797
+        },
+        {
+          "p_c_MeV_fm3": 10.639588741076302,
+          "mass_solar": 0.7101196767868841,
+          "truncation_radius_km": 12.155925635011705,
+          "interface_radius_km": 10.99272573729913
+        },
+        {
+          "p_c_MeV_fm3": 15.520376761045071,
+          "mass_solar": 0.8982542867595446,
+          "truncation_radius_km": 12.570936379617816,
+          "interface_radius_km": 11.616831164755546
+        },
+        {
+          "p_c_MeV_fm3": 22.640169715847517,
+          "mass_solar": 1.108563783929267,
+          "truncation_radius_km": 12.906907024475597,
+          "interface_radius_km": 12.125526295487175
+        },
+        {
+          "p_c_MeV_fm3": 33.02608516881548,
+          "mass_solar": 1.3345062211369012,
+          "truncation_radius_km": 13.14941416116382,
+          "interface_radius_km": 12.510626160129197
+        },
+        {
+          "p_c_MeV_fm3": 48.176418960957584,
+          "mass_solar": 1.5659572160754396,
+          "truncation_radius_km": 13.286882703487056,
+          "interface_radius_km": 12.765180692193745
+        },
+        {
+          "p_c_MeV_fm3": 70.27679278479121,
+          "mass_solar": 1.7899474819091026,
+          "truncation_radius_km": 13.312161283573474,
+          "interface_radius_km": 12.885748009386763
+        },
+        {
+          "p_c_MeV_fm3": 102.5154569524758,
+          "mass_solar": 1.9923012283661596,
+          "truncation_radius_km": 13.223951181395421,
+          "interface_radius_km": 12.874179131244052
+        },
+        {
+          "p_c_MeV_fm3": 149.5432346544033,
+          "mass_solar": 2.1599426769652994,
+          "truncation_radius_km": 13.027688355797402,
+          "interface_radius_km": 12.738693943882305
+        },
+        {
+          "p_c_MeV_fm3": 218.1444603155707,
+          "mass_solar": 2.2832625382061713,
+          "truncation_radius_km": 12.735562238090115,
+          "interface_radius_km": 12.493998037457168
+        },
+        {
+          "p_c_MeV_fm3": 318.2157031466241,
+          "mass_solar": 2.3577635159142347,
+          "truncation_radius_km": 12.365559336437594,
+          "interface_radius_km": 12.160356099798072
+        },
+        {
+          "p_c_MeV_fm3": 464.1934687803423,
+          "mass_solar": 2.3844351372739108,
+          "truncation_radius_km": 11.93971113827996,
+          "interface_radius_km": 11.761824721450056
+        },
+        {
+          "p_c_MeV_fm3": 677.1368424864999,
+          "mass_solar": 2.368860209673411,
+          "truncation_radius_km": 11.48196555799248,
+          "interface_radius_km": 11.324092108500713
+        }
+      ],
+      "max_mass_on_grid_solar": 2.3844351372739108,
+      "mass_grid_scope": "sampled M(Pc); no maximum-mass or radial-stability certification",
+      "canonical_star": {
+        "p_c_MeV_fm3": 36.75235598630079,
+        "mass_solar": 1.4000000481930415,
+        "truncation_radius_km": 13.199402797607952,
+        "interface_radius_km": 12.596180538771115
+      },
+      "cowling_scan_slow": {
+        "status": "ROOTS_FOUND_ON_GRID",
+        "roots_found": 1,
+        "search_method": "sign changes and exact endpoint zeros",
+        "frequency_min_hz": 800.0,
+        "frequency_max_hz": 4000.0,
+        "spectral_completeness": "not_certified"
+      },
+      "cowling_slow": [
+        {
+          "frequency_hz": 1927.1211906477733,
+          "residual": 6.973180183278416e-08,
+          "residual_tolerance": 1e-05,
+          "w_nodes_inner_sampled": 0,
+          "w_nodes_outer_sampled": 0,
+          "v_nodes_inner_sampled": 0,
+          "v_nodes_outer_sampled": 0,
+          "w_nodes_total_sampled": 0,
+          "v_nodes_total_sampled": 0,
+          "conversion": "slow",
+          "interface_diagnostics": {
+            "w_inner": 3599272173178.0757,
+            "v_inner": -142327904.24025723,
+            "w_outer": 3599272173178.0757,
+            "v_outer": -139011835.02263334,
+            "delta_p_inner_pa": -1.475637806208828e+32,
+            "delta_p_outer_pa": -1.475637806208828e+32,
+            "delta_p_relative_jump": 0.0,
+            "radial_displacement_jump_m": 0.0,
+            "isobar_displacement_jump_m": -423.581345954517,
+            "slow_condition_residual": 0.0,
+            "rapid_condition_residual": 0.023298798892072477
+          },
+          "accepted_steps": 200
+        }
+      ],
+      "cowling_scan_rapid": {
+        "status": "ROOTS_FOUND_ON_GRID",
+        "roots_found": 1,
+        "search_method": "sign changes and exact endpoint zeros",
+        "frequency_min_hz": 800.0,
+        "frequency_max_hz": 4000.0,
+        "spectral_completeness": "not_certified"
+      },
+      "cowling_rapid": [
+        {
+          "frequency_hz": 1926.7169709291693,
+          "residual": -2.9822932362533194e-07,
+          "residual_tolerance": 1e-05,
+          "w_nodes_inner_sampled": 0,
+          "w_nodes_outer_sampled": 0,
+          "v_nodes_inner_sampled": 0,
+          "v_nodes_outer_sampled": 0,
+          "w_nodes_total_sampled": 0,
+          "v_nodes_total_sampled": 0,
+          "conversion": "rapid",
+          "interface_diagnostics": {
+            "w_inner": 3600296681995.9087,
+            "v_inner": -142343882.5510324,
+            "w_outer": 3683813168591.9243,
+            "v_outer": -142343882.5510324,
+            "delta_p_inner_pa": -1.508808359531191e+32,
+            "delta_p_outer_pa": -1.5088083595311913e+32,
+            "delta_p_relative_jump": 1.1939487474127807e-16,
+            "radial_displacement_jump_m": 433.10294235386755,
+            "isobar_displacement_jump_m": 0.0,
+            "slow_condition_residual": 0.022671205833149983,
+            "rapid_condition_residual": 0.0
+          },
+          "accepted_steps": 205
+        }
+      ],
+      "status": "OK",
+      "elapsed_s": 59.9
+    }
+  ]
+}

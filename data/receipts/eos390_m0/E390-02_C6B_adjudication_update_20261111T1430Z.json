@@ -1,0 +1,86 @@
+{
+  "schema": "ns-cowling.e390-02-c6b-adjudication-update",
+  "schema_version": "1.0.0",
+  "date": "2026-11-11",
+  "supersedes_path": "data/receipts/eos390_m0/E390-02_C6B_adjudication_20261111.json",
+  "status": "STILL_BLOCKED_PROVIDER_SEMANTICS_UNRESOLVED_AFTER_FRAMEWORK_PDF_INTAKE",
+  "trigger": "User supplied four PDFs (Baym 1971, Chabanat 1998, Glendenning 1991, Typel 1999) and asked whether they unblock C6B.",
+  "uploaded_pdfs": [
+    {
+      "file": "baym1971.pdf",
+      "sha256": "f5d15dbc97c8dae24557b55844c2bfc550984aaa50e514e8d9412e11a05ca495",
+      "bytes": 3404999,
+      "citation": "G. Baym, H. A. Bethe, C. J. Pethick, Nucl. Phys. A 175, 225-271 (1971)",
+      "role": "BPS compressible-liquid-drop outer/inner crust framework (1971). Establishes the lattice-of-nuclei in a free-neutron-gas picture and the Thomas-Fermi surface treatment. Predates CompOSE and the SPG/GPPVA inner-crust models.",
+      "c6b_relevance": "Does not document eos.compo row grammar, the Iphase categorical index, Abar/Zav/Y_I/Y_h normalization, or the meaning of the final group field. C6B unaffected."
+    },
+    {
+      "file": "chabanat1998.pdf",
+      "sha256": "590261491f6e31c23b66392ccd3eee4362795118948d19f9a726c3415d1efcf9",
+      "bytes": 1244812,
+      "citation": "E. Chabanat, P. Bonche, P. Haensel, J. Meyer, R. Schaeffer, Nucl. Phys. A 635, 231-256 (1998) Part II",
+      "doi": "10.1016/S0375-9474(98)00180-8",
+      "role": "SLy4 Skyrme force parameterization. Documents the effective interaction fit to finite nuclei.",
+      "c6b_relevance": "Documents the Skyrme force, not the RG_SLY4 EOS cluster export. The RG_SLY4 model uses the SLy4 force but is a separate EOS (Gulminelli & Raduta, PRC 92 055803 2015, arXiv:1504.04493). C6B unaffected."
+    },
+    {
+      "file": "glendenning1991.pdf",
+      "sha256": "3d2d4ea176150c186adb7409f66876a8214fd9c3156bef1d3d4596bc40ebaa39",
+      "bytes": 193643,
+      "citation": "N. K. Glendenning, S. A. Moszkowski, Phys. Rev. Lett. 67, 2414 (1991)",
+      "doi": "10.1103/PhysRevLett.67.2414",
+      "role": "Reconciliation of neutron-star masses and Lambda binding in hypernuclei. Bounds hyperon-induced neutron-star mass reduction.",
+      "c6b_relevance": "This is NOT the GM1 RMF parameterization paper. The bibliography already mapped this PRL to GM_GM1, but the GM1 EOS parameter set is established in a separate Glendenning RMF EOS reference. Confirm the exact GM1 parameter citation against the GM_GM1 eos.pdf data sheet before claiming GM_GM1 provenance is fully secured. C6B unaffected (composition not addressed)."
+    },
+    {
+      "file": "typel1999.pdf",
+      "sha256": "5ad8606ee0f666ab6e944ac0b5998013c7f3398b420b88b8e04ae63fa8dd2e41",
+      "bytes": 2063522,
+      "citation": "S. Typel, H. H. Wolter, Nucl. Phys. A 656, 331 (1999)",
+      "doi": "10.1016/S0375-9474(99)00310-3",
+      "role": "Density-dependent meson-nucleon coupling RMF framework (TW99). Basis for DD-ME2, DD2, NL3, TW parameterizations.",
+      "c6b_relevance": "Core-EOS framework paper for several GPPVA core models. Does not address inner-crust cluster composition or the disputed final group field. C6B unaffected."
+    }
+  ],
+  "verdict": "The four user-supplied PDFs do NOT resolve the C6B blocker.",
+  "reason": "C6B requires (1) a written provider definition for the final group field in SPG/GPPVA eos.compo rows - whether it encodes Y_I, Y_h, X_h, a charge fraction, a free-neutron-gas fraction, or another aggregate - and (2) independent closure (Y_n + Y_p + Y_h = 1 and Y_p + (Zbar/Abar) Y_h = Y_e + Y_mu) per row. The four uploaded papers address framework, force parameterization, hypernuclear binding, and the RMF functional form. None documents the CompOSE eos.compo row grammar, the Iphase categorical index, the Abar/Zav/Y_I/Y_h convention for a cluster group, or the meaning of the disputed final group field.",
+  "missing_provider_documents_to_unblock_c6b": [
+    {
+      "citation": "F. Grill, H. Pais, C. Providencia, I. Vidana, S. S. Avancini, Phys. Rev. C 90, 045803 (2014)",
+      "doi": "10.1103/PhysRevC.90.045803",
+      "arxiv": "1404.2753",
+      "url": "https://arxiv.org/abs/1404.2753",
+      "pdf_url": "https://arxiv.org/pdf/1404.2753",
+      "role": "GPPVA self-consistent Thomas-Fermi inner crust. Primary source for the GPPVA cluster composition convention."
+    },
+    {
+      "citation": "P. Gogelein, E. N. E. van Dalen, C. Fuchs, H. Muther, Phys. Rev. C 77, 025802 (2008)",
+      "doi": "10.1103/PhysRevC.77.025802",
+      "url": "https://journals.aps.org/prc/abstract/10.1103/PhysRevC.77.025802",
+      "role": "SPG density-dependent RMF GDFM functional. Primary source for the SPG cluster convention."
+    },
+    {
+      "citation": "L. Scurto, H. Pais, F. Gulminelli, Phys. Rev. D 109, 103015 (2024)",
+      "doi": "10.1103/PhysRevD.109.103015",
+      "arxiv": "2402.15548",
+      "url": "https://arxiv.org/abs/2402.15548",
+      "pdf_url": "https://arxiv.org/pdf/2402.15548",
+      "role": "Current CompOSE SPG(M3)/(M5) cited source; variant-specific abundance semantics."
+    },
+    {
+      "citation": "CompOSE inner crust data sheet (Typel et al., arXiv:2207.14153)",
+      "arxiv": "2207.14153",
+      "url": "https://arxiv.org/abs/2207.14153",
+      "pdf_url": "https://arxiv.org/pdf/2207.14153",
+      "role": "CompOSE-provided documentation of the eos.compo convention for inner crust (provider-facing)."
+    },
+    {
+      "citation": "S. Typel et al., CompOSE Reference Manual v3.01 (2022), arXiv:2203.03209",
+      "arxiv": "2203.03209",
+      "url": "https://arxiv.org/abs/2203.03209",
+      "role": "Defines the row grammar iT inb iYq Iphase Npairs (particle_id,Y_i)* Nquad (group_id,Aav,Zav,YI)* but explicitly does NOT resolve provider-specific meaning of the disputed field."
+    }
+  ],
+  "open_question_for_researcher": "Do you hold the Grill 2014, Gogelein 2008, Scurto 2024, and/or arXiv:2207.14153 PDFs locally? If yes, please upload them and I will re-evaluate C6B against the actual cluster-composition text. If no, C6B stays BLOCKED until these can be retrieved from lawful OA/institutional routes (all four are arXiv-available except Gogelein 2008, which is an APS paywalled PRC).",
+  "next_action": "C6B remains BLOCKED. Proceed to M2 (native parser duplicate-key guard verification) and M2A (row-level presence masks), which do not require C6B. Do not start the 390 batch."
+}

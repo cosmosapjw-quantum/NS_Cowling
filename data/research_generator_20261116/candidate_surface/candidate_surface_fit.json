@@ -1,0 +1,1617 @@
+{
+  "completion_status": "COMPLETE",
+  "software": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "numpy": "2.4.2",
+    "scipy": "1.17.0"
+  },
+  "claim": "CANDIDATE_CALIBRATION_NOT_ORIGINAL_SCURTO_FIT",
+  "training_cohort": "N,Z>=8, measured AME2016 mass excess:2408rows; not author-authenticated",
+  "source_ame_sha256": "2167f57a2a98331e4649b2dd2b658a9006ed4fba1975729ebfe52a42b4b9218a",
+  "functional": "E=A*(epsilon_GDFM(n,Z/A)/n)+4*pi*R^2*sigma(Z/A)+3*e2*Z^2/(5R), R=(3A/(4pi*n))^(1/3)",
+  "assumptions": [
+    "Vacuum spherical sharp interface, source finite-nucleus implementation not established",
+    "No shell, pairing, curvature, Coulomb exchange, electron screening or electronic-binding correction",
+    "Bmodel=A*938.9-E; compare AME B/A column timesA; rest-mass shift is restored equally to model and observation for mass weights",
+    "Mass uncertainty .02*(N*939.56536+Z*938.27203-B_AME), inMeV; BE weighting is a separate sensitivity experiment",
+    "All2408training differs from cited nine-magic-nucleus calibration; not assumed source-equivalent"
+  ],
+  "density_search_fm3": [
+    0.04,
+    0.24
+  ],
+  "density_grid_points": 161,
+  "holdout_rule": "A modulo5 equals0 excluded from heldout-fit training",
+  "models": {
+    "SPG_M1": {
+      "all_mass": {
+        "sigma0_MeV_fm2": 1.0415982475887464,
+        "b": 14.084751850892523,
+        "weighting": "mass_2percent",
+        "training": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 21.291959336655452,
+          "rms_binding_per_baryon_residual_MeV": 0.15312703317917478,
+          "max_absolute_mass_residual_MeV": 59.21230230960646,
+          "mean_scaled_square": 6.761520615931885e-05
+        },
+        "heldout": null,
+        "all": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 21.291959336655452,
+          "rms_binding_per_baryon_residual_MeV": 0.15312703317917478,
+          "max_absolute_mass_residual_MeV": 59.21230230960646,
+          "mean_scaled_square": 6.761520615931885e-05
+        },
+        "density_min_fm3": 0.1510990540901179,
+        "density_max_fm3": 0.1778937201791199,
+        "density_boundary_hits": 0,
+        "parameter_bounds_active": [
+          false,
+          false
+        ],
+        "optimizer_success": true,
+        "optimizer_message": "`ftol` termination condition is satisfied.",
+        "nfev": 8,
+        "jacobian_condition_number": 16.018402210583226,
+        "locally_identifiable_two_parameters": true,
+        "multistart_scaled_sumsquares": [
+          0.16281741643164005,
+          0.16281741643163983,
+          0.16281741643163983
+        ],
+        "parameter_search_bounds": {
+          "sigma0": [
+            0.01,
+            10.0
+          ],
+          "b_plus_16": [
+            0.01,
+            1000000.0
+          ]
+        },
+        "independent_density_refinement": [
+          {
+            "A": 16,
+            "Z": 8,
+            "delta_mass_MeV": -2.634791627542654e-06,
+            "delta_n_fm3": -2.472438083434003e-07,
+            "success": true
+          },
+          {
+            "A": 47,
+            "Z": 18,
+            "delta_mass_MeV": 5.894511787118972e-06,
+            "delta_n_fm3": -4.921136484425936e-07,
+            "success": true
+          },
+          {
+            "A": 72,
+            "Z": 29,
+            "delta_mass_MeV": -2.1985560124448966e-05,
+            "delta_n_fm3": -4.089080568314696e-07,
+            "success": true
+          },
+          {
+            "A": 93,
+            "Z": 40,
+            "delta_mass_MeV": 3.0468788168036554e-05,
+            "delta_n_fm3": -1.6578669065347995e-07,
+            "success": true
+          },
+          {
+            "A": 110,
+            "Z": 54,
+            "delta_mass_MeV": -2.2662057517663925e-05,
+            "delta_n_fm3": -5.498905914225194e-07,
+            "success": true
+          },
+          {
+            "A": 129,
+            "Z": 54,
+            "delta_mass_MeV": 1.1158362895002938e-05,
+            "delta_n_fm3": -7.122655702462843e-07,
+            "success": true
+          },
+          {
+            "A": 146,
+            "Z": 60,
+            "delta_mass_MeV": 4.158633441875281e-05,
+            "delta_n_fm3": -5.765609482066836e-07,
+            "success": true
+          },
+          {
+            "A": 163,
+            "Z": 66,
+            "delta_mass_MeV": 5.748597072852135e-05,
+            "delta_n_fm3": -4.27469695502003e-07,
+            "success": true
+          },
+          {
+            "A": 181,
+            "Z": 79,
+            "delta_mass_MeV": -4.468923066269781e-05,
+            "delta_n_fm3": -6.350967114709949e-07,
+            "success": true
+          },
+          {
+            "A": 201,
+            "Z": 78,
+            "delta_mass_MeV": -1.771261531757773e-05,
+            "delta_n_fm3": -8.938354496001999e-07,
+            "success": true
+          },
+          {
+            "A": 223,
+            "Z": 88,
+            "delta_mass_MeV": 5.124900030750723e-05,
+            "delta_n_fm3": -8.055831136610792e-07,
+            "success": true
+          },
+          {
+            "A": 270,
+            "Z": 110,
+            "delta_mass_MeV": -1.6003387372620637e-05,
+            "delta_n_fm3": -9.228187093646145e-07,
+            "success": true
+          }
+        ]
+      },
+      "all_binding": {
+        "sigma0_MeV_fm2": 1.0384106234865809,
+        "b": 14.83530112446411,
+        "weighting": "binding_2percent",
+        "training": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 21.140204036162704,
+          "rms_binding_per_baryon_residual_MeV": 0.15325521071033016,
+          "max_absolute_mass_residual_MeV": 58.90660230115918,
+          "mean_scaled_square": 0.9421364227472406
+        },
+        "heldout": null,
+        "all": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 21.140204036162704,
+          "rms_binding_per_baryon_residual_MeV": 0.15325521071033016,
+          "max_absolute_mass_residual_MeV": 58.90660230115918,
+          "mean_scaled_square": 0.9421364227472406
+        },
+        "density_min_fm3": 0.15111517673663702,
+        "density_max_fm3": 0.1778357669092768,
+        "density_boundary_hits": 0,
+        "parameter_bounds_active": [
+          false,
+          false
+        ],
+        "optimizer_success": true,
+        "optimizer_message": "`ftol` termination condition is satisfied.",
+        "nfev": 8,
+        "jacobian_condition_number": 15.754635289564002,
+        "locally_identifiable_two_parameters": true,
+        "multistart_scaled_sumsquares": [
+          2268.6645059753782,
+          2268.664505975355,
+          2268.664505975372
+        ],
+        "parameter_search_bounds": {
+          "sigma0": [
+            0.01,
+            10.0
+          ],
+          "b_plus_16": [
+            0.01,
+            1000000.0
+          ]
+        }
+      },
+      "heldout_mass": {
+        "sigma0_MeV_fm2": 1.0413809021678606,
+        "b": 14.177096556351099,
+        "weighting": "mass_2percent",
+        "training": {
+          "n": 1927,
+          "rms_mass_residual_MeV": 21.32211840924382,
+          "rms_binding_per_baryon_residual_MeV": 0.15331068245709567,
+          "max_absolute_mass_residual_MeV": 58.27366598272306,
+          "mean_scaled_square": 6.777716206149782e-05
+        },
+        "heldout": {
+          "n": 481,
+          "rms_mass_residual_MeV": 21.35963201369227,
+          "rms_binding_per_baryon_residual_MeV": 0.15239473074818083,
+          "max_absolute_mass_residual_MeV": 59.289917223578186,
+          "mean_scaled_square": 6.697200505117913e-05
+        },
+        "all": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 21.32961705614053,
+          "rms_binding_per_baryon_residual_MeV": 0.15312815824208084,
+          "max_absolute_mass_residual_MeV": 59.289917223578186,
+          "mean_scaled_square": 6.76163312799516e-05
+        },
+        "density_min_fm3": 0.15110275708219456,
+        "density_max_fm3": 0.17788977069508202,
+        "density_boundary_hits": 0,
+        "parameter_bounds_active": [
+          false,
+          false
+        ],
+        "optimizer_success": true,
+        "optimizer_message": "`ftol` termination condition is satisfied.",
+        "nfev": 8,
+        "jacobian_condition_number": 16.013978917857663,
+        "locally_identifiable_two_parameters": true,
+        "multistart_scaled_sumsquares": [
+          0.1306065912925065,
+          0.1306065912925063,
+          0.13060659129250635
+        ],
+        "parameter_search_bounds": {
+          "sigma0": [
+            0.01,
+            10.0
+          ],
+          "b_plus_16": [
+            0.01,
+            1000000.0
+          ]
+        }
+      },
+      "coarse_mass": {
+        "sigma0_MeV_fm2": 1.0415983361850147,
+        "b": 14.084749853315351,
+        "weighting": "mass_2percent",
+        "training": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 21.291983483064516,
+          "rms_binding_per_baryon_residual_MeV": 0.153127027253605,
+          "max_absolute_mass_residual_MeV": 59.21230404220046,
+          "mean_scaled_square": 6.761520081921511e-05
+        },
+        "heldout": null,
+        "all": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 21.291983483064516,
+          "rms_binding_per_baryon_residual_MeV": 0.153127027253605,
+          "max_absolute_mass_residual_MeV": 59.21230404220046,
+          "mean_scaled_square": 6.761520081921511e-05
+        },
+        "density_min_fm3": 0.15109978776162666,
+        "density_max_fm3": 0.1778948228259866,
+        "density_boundary_hits": 0,
+        "parameter_bounds_active": [
+          false,
+          false
+        ],
+        "optimizer_success": true,
+        "optimizer_message": "`ftol` termination condition is satisfied.",
+        "nfev": 8,
+        "jacobian_condition_number": 16.01841313003366,
+        "locally_identifiable_two_parameters": true,
+        "multistart_scaled_sumsquares": [
+          0.1628174035726703,
+          0.16281740357267002,
+          0.16281740357267016
+        ],
+        "parameter_search_bounds": {
+          "sigma0": [
+            0.01,
+            10.0
+          ],
+          "b_plus_16": [
+            0.01,
+            1000000.0
+          ]
+        }
+      },
+      "software_and_parameter_identity_sha256": "b7da15d103be0b7447479db7c577b332f6a78e0700022a6e3cd131df7de97b50",
+      "surface_extrapolation_sensitivity": {
+        "0.01": {
+          "all_mass": 3.13357511558096e-05,
+          "all_binding": 3.201919625232436e-05,
+          "heldout_mass": 3.14253741287866e-05
+        },
+        "0.03": {
+          "all_mass": 0.0008457314283841864,
+          "all_binding": 0.0008641603082387225,
+          "heldout_mass": 0.0008481482582998375
+        },
+        "0.05": {
+          "all_mass": 0.003909574934807256,
+          "all_binding": 0.003994473261921537,
+          "heldout_mass": 0.003920711850108301
+        },
+        "0.1": {
+          "all_mass": 0.03085924901097945,
+          "all_binding": 0.03150903595792662,
+          "heldout_mass": 0.03094469792102966
+        },
+        "0.3": {
+          "all_mass": 0.5799005343904559,
+          "all_binding": 0.5844313894209757,
+          "heldout_mass": 0.5805670180750898
+        },
+        "0.5": {
+          "all_mass": 1.0415982475887464,
+          "all_binding": 1.0384106234865809,
+          "heldout_mass": 1.0413809021678606
+        }
+      },
+      "runtime_seconds": 6.247082354995655
+    },
+    "SPG_M2": {
+      "all_mass": {
+        "sigma0_MeV_fm2": 1.0656369049972167,
+        "b": 34.855328455223194,
+        "weighting": "mass_2percent",
+        "training": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 15.327841599237392,
+          "rms_binding_per_baryon_residual_MeV": 0.11220375314976332,
+          "max_absolute_mass_residual_MeV": 43.15224283390762,
+          "mean_scaled_square": 3.630876489288599e-05
+        },
+        "heldout": null,
+        "all": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 15.327841599237392,
+          "rms_binding_per_baryon_residual_MeV": 0.11220375314976332,
+          "max_absolute_mass_residual_MeV": 43.15224283390762,
+          "mean_scaled_square": 3.630876489288599e-05
+        },
+        "density_min_fm3": 0.15206646601339482,
+        "density_max_fm3": 0.1768908776464041,
+        "density_boundary_hits": 0,
+        "parameter_bounds_active": [
+          false,
+          false
+        ],
+        "optimizer_success": true,
+        "optimizer_message": "`ftol` termination condition is satisfied.",
+        "nfev": 7,
+        "jacobian_condition_number": 23.885061557033026,
+        "locally_identifiable_two_parameters": true,
+        "multistart_scaled_sumsquares": [
+          0.08743150586206948,
+          0.08743150586206946,
+          0.08743150586206955
+        ],
+        "parameter_search_bounds": {
+          "sigma0": [
+            0.01,
+            10.0
+          ],
+          "b_plus_16": [
+            0.01,
+            1000000.0
+          ]
+        },
+        "independent_density_refinement": [
+          {
+            "A": 16,
+            "Z": 8,
+            "delta_mass_MeV": 8.632588958334964e-06,
+            "delta_n_fm3": -2.9244611571277446e-07,
+            "success": true
+          },
+          {
+            "A": 47,
+            "Z": 18,
+            "delta_mass_MeV": 2.1356939612360293e-05,
+            "delta_n_fm3": -4.278762045228923e-07,
+            "success": true
+          },
+          {
+            "A": 72,
+            "Z": 29,
+            "delta_mass_MeV": -3.277938026258198e-05,
+            "delta_n_fm3": -4.540288313092944e-07,
+            "success": true
+          },
+          {
+            "A": 93,
+            "Z": 40,
+            "delta_mass_MeV": 1.0975892109854612e-05,
+            "delta_n_fm3": -9.045279747155188e-07,
+            "success": true
+          },
+          {
+            "A": 110,
+            "Z": 54,
+            "delta_mass_MeV": 6.6087765162592405e-06,
+            "delta_n_fm3": -9.428708115100104e-07,
+            "success": true
+          },
+          {
+            "A": 129,
+            "Z": 54,
+            "delta_mass_MeV": -6.271586221373582e-05,
+            "delta_n_fm3": -2.3205749266619335e-07,
+            "success": true
+          },
+          {
+            "A": 146,
+            "Z": 60,
+            "delta_mass_MeV": -6.682820799142064e-05,
+            "delta_n_fm3": -3.5142493748363535e-07,
+            "success": true
+          },
+          {
+            "A": 163,
+            "Z": 66,
+            "delta_mass_MeV": 7.429131460412464e-05,
+            "delta_n_fm3": -2.6644255338159617e-07,
+            "success": true
+          },
+          {
+            "A": 181,
+            "Z": 79,
+            "delta_mass_MeV": -8.23050206690823e-05,
+            "delta_n_fm3": -4.0093735281798715e-07,
+            "success": true
+          },
+          {
+            "A": 201,
+            "Z": 78,
+            "delta_mass_MeV": -8.66826881065208e-05,
+            "delta_n_fm3": -3.369338061887106e-07,
+            "success": true
+          },
+          {
+            "A": 223,
+            "Z": 88,
+            "delta_mass_MeV": 7.759534128126688e-06,
+            "delta_n_fm3": -8.49498130867099e-07,
+            "success": true
+          },
+          {
+            "A": 270,
+            "Z": 110,
+            "delta_mass_MeV": 4.980402059118205e-05,
+            "delta_n_fm3": -7.834867241929278e-07,
+            "success": true
+          }
+        ]
+      },
+      "all_binding": {
+        "sigma0_MeV_fm2": 1.063418542591594,
+        "b": 36.04726897701225,
+        "weighting": "binding_2percent",
+        "training": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 15.124392730048227,
+          "rms_binding_per_baryon_residual_MeV": 0.11229928380095285,
+          "max_absolute_mass_residual_MeV": 42.74955962098829,
+          "mean_scaled_square": 0.4987257919112247
+        },
+        "heldout": null,
+        "all": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 15.124392730048227,
+          "rms_binding_per_baryon_residual_MeV": 0.11229928380095285,
+          "max_absolute_mass_residual_MeV": 42.74955962098829,
+          "mean_scaled_square": 0.4987257919112247
+        },
+        "density_min_fm3": 0.15207031919263722,
+        "density_max_fm3": 0.17684907609085004,
+        "density_boundary_hits": 0,
+        "parameter_bounds_active": [
+          false,
+          false
+        ],
+        "optimizer_success": true,
+        "optimizer_message": "`ftol` termination condition is satisfied.",
+        "nfev": 7,
+        "jacobian_condition_number": 23.272638871193188,
+        "locally_identifiable_two_parameters": true,
+        "multistart_scaled_sumsquares": [
+          1200.9317069222302,
+          1200.931706922229,
+          1200.931706922231
+        ],
+        "parameter_search_bounds": {
+          "sigma0": [
+            0.01,
+            10.0
+          ],
+          "b_plus_16": [
+            0.01,
+            1000000.0
+          ]
+        }
+      },
+      "heldout_mass": {
+        "sigma0_MeV_fm2": 1.0654379595958476,
+        "b": 35.09576970170108,
+        "weighting": "mass_2percent",
+        "training": {
+          "n": 1927,
+          "rms_mass_residual_MeV": 15.363257462949756,
+          "rms_binding_per_baryon_residual_MeV": 0.11230240435387073,
+          "max_absolute_mass_residual_MeV": 42.49300784582465,
+          "mean_scaled_square": 3.637246169397704e-05
+        },
+        "heldout": {
+          "n": 481,
+          "rms_mass_residual_MeV": 15.392029571103569,
+          "rms_binding_per_baryon_residual_MeV": 0.11181796490658269,
+          "max_absolute_mass_residual_MeV": 43.23960791565855,
+          "mean_scaled_square": 3.6060651288108524e-05
+        },
+        "all": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 15.369009020532241,
+          "rms_binding_per_baryon_residual_MeV": 0.11220580433787028,
+          "max_absolute_mass_residual_MeV": 43.23960791565855,
+          "mean_scaled_square": 3.631017730642606e-05
+        },
+        "density_min_fm3": 0.15206970773070622,
+        "density_max_fm3": 0.1768871193700617,
+        "density_boundary_hits": 0,
+        "parameter_bounds_active": [
+          false,
+          false
+        ],
+        "optimizer_success": true,
+        "optimizer_message": "`ftol` termination condition is satisfied.",
+        "nfev": 7,
+        "jacobian_condition_number": 23.8837581530566,
+        "locally_identifiable_two_parameters": true,
+        "multistart_scaled_sumsquares": [
+          0.0700897336842938,
+          0.07008973368429375,
+          0.07008973368429383
+        ],
+        "parameter_search_bounds": {
+          "sigma0": [
+            0.01,
+            10.0
+          ],
+          "b_plus_16": [
+            0.01,
+            1000000.0
+          ]
+        }
+      },
+      "coarse_mass": {
+        "sigma0_MeV_fm2": 1.065636890339412,
+        "b": 34.85535024602415,
+        "weighting": "mass_2percent",
+        "training": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 15.327829122939313,
+          "rms_binding_per_baryon_residual_MeV": 0.11220372100096651,
+          "max_absolute_mass_residual_MeV": 43.15240497484979,
+          "mean_scaled_square": 3.630874412995422e-05
+        },
+        "heldout": null,
+        "all": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 15.327829122939313,
+          "rms_binding_per_baryon_residual_MeV": 0.11220372100096651,
+          "max_absolute_mass_residual_MeV": 43.15240497484979,
+          "mean_scaled_square": 3.630874412995422e-05
+        },
+        "density_min_fm3": 0.15206895747425153,
+        "density_max_fm3": 0.17689375787260794,
+        "density_boundary_hits": 0,
+        "parameter_bounds_active": [
+          false,
+          false
+        ],
+        "optimizer_success": true,
+        "optimizer_message": "`ftol` termination condition is satisfied.",
+        "nfev": 7,
+        "jacobian_condition_number": 23.885066861011612,
+        "locally_identifiable_two_parameters": true,
+        "multistart_scaled_sumsquares": [
+          0.0874314558649298,
+          0.08743145586492976,
+          0.08743145586492983
+        ],
+        "parameter_search_bounds": {
+          "sigma0": [
+            0.01,
+            10.0
+          ],
+          "b_plus_16": [
+            0.01,
+            1000000.0
+          ]
+        }
+      },
+      "software_and_parameter_identity_sha256": "b5fe37a0d961b21c8031a867cba50f84cedbafbb422ba0c2dfebba3327d59ad4",
+      "surface_extrapolation_sensitivity": {
+        "0.01": {
+          "all_mass": 5.4191370109460146e-05,
+          "all_binding": 5.534597880989448e-05,
+          "heldout_mass": 5.443740598855275e-05
+        },
+        "0.03": {
+          "all_mass": 0.0014618005634512237,
+          "all_binding": 0.0014928996659746329,
+          "heldout_mass": 0.0014684281578146155
+        },
+        "0.05": {
+          "all_mass": 0.00674379898173675,
+          "all_binding": 0.006886470055412115,
+          "heldout_mass": 0.006774215648866442
+        },
+        "0.1": {
+          "all_mass": 0.052298686607319234,
+          "all_binding": 0.05335166439959557,
+          "heldout_mass": 0.052523954677239824
+        },
+        "0.3": {
+          "all_mass": 0.7244338454237319,
+          "all_binding": 0.7282658845783628,
+          "heldout_mass": 0.7253915494643425
+        },
+        "0.5": {
+          "all_mass": 1.0656369049972167,
+          "all_binding": 1.063418542591594,
+          "heldout_mass": 1.0654379595958476
+        }
+      },
+      "runtime_seconds": 6.476180618992657
+    },
+    "SPG_M3": {
+      "all_mass": {
+        "sigma0_MeV_fm2": 1.0611255669569737,
+        "b": 14.90680675349753,
+        "weighting": "mass_2percent",
+        "training": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 22.44423838760107,
+          "rms_binding_per_baryon_residual_MeV": 0.16011236827368158,
+          "max_absolute_mass_residual_MeV": 63.259505595293604,
+          "mean_scaled_square": 7.392552268178896e-05
+        },
+        "heldout": null,
+        "all": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 22.44423838760107,
+          "rms_binding_per_baryon_residual_MeV": 0.16011236827368158,
+          "max_absolute_mass_residual_MeV": 63.259505595293604,
+          "mean_scaled_square": 7.392552268178896e-05
+        },
+        "density_min_fm3": 0.15539751633572133,
+        "density_max_fm3": 0.18291531267643593,
+        "density_boundary_hits": 0,
+        "parameter_bounds_active": [
+          false,
+          false
+        ],
+        "optimizer_success": true,
+        "optimizer_message": "`ftol` termination condition is satisfied.",
+        "nfev": 9,
+        "jacobian_condition_number": 16.347501060197317,
+        "locally_identifiable_two_parameters": true,
+        "multistart_scaled_sumsquares": [
+          0.17801265861774812,
+          0.17801265861774782,
+          0.17801265861774793
+        ],
+        "parameter_search_bounds": {
+          "sigma0": [
+            0.01,
+            10.0
+          ],
+          "b_plus_16": [
+            0.01,
+            1000000.0
+          ]
+        },
+        "independent_density_refinement": [
+          {
+            "A": 16,
+            "Z": 8,
+            "delta_mass_MeV": -1.978381703793275e-06,
+            "delta_n_fm3": -1.7813669844768398e-07,
+            "success": true
+          },
+          {
+            "A": 47,
+            "Z": 18,
+            "delta_mass_MeV": 6.239141953301441e-06,
+            "delta_n_fm3": -7.479659240861025e-07,
+            "success": true
+          },
+          {
+            "A": 72,
+            "Z": 29,
+            "delta_mass_MeV": -1.012705160974292e-05,
+            "delta_n_fm3": -7.597579398943566e-07,
+            "success": true
+          },
+          {
+            "A": 93,
+            "Z": 40,
+            "delta_mass_MeV": -8.598690669714415e-06,
+            "delta_n_fm3": -7.653254977812995e-07,
+            "success": true
+          },
+          {
+            "A": 110,
+            "Z": 54,
+            "delta_mass_MeV": 3.957818705657701e-05,
+            "delta_n_fm3": -3.573437105108823e-07,
+            "success": true
+          },
+          {
+            "A": 129,
+            "Z": 54,
+            "delta_mass_MeV": -5.300760153659212e-05,
+            "delta_n_fm3": -4.608650053250507e-07,
+            "success": true
+          },
+          {
+            "A": 146,
+            "Z": 60,
+            "delta_mass_MeV": -3.1321894539360073e-05,
+            "delta_n_fm3": -8.873044780033368e-07,
+            "success": true
+          },
+          {
+            "A": 163,
+            "Z": 66,
+            "delta_mass_MeV": -1.5833183852009824e-05,
+            "delta_n_fm3": -1.018313397271875e-06,
+            "success": true
+          },
+          {
+            "A": 181,
+            "Z": 79,
+            "delta_mass_MeV": 8.321041059389245e-05,
+            "delta_n_fm3": -3.2894669302341306e-07,
+            "success": true
+          },
+          {
+            "A": 201,
+            "Z": 78,
+            "delta_mass_MeV": 0.00010690410385905125,
+            "delta_n_fm3": -3.2182901374411266e-07,
+            "success": true
+          },
+          {
+            "A": 223,
+            "Z": 88,
+            "delta_mass_MeV": -5.408329957390379e-05,
+            "delta_n_fm3": -1.082209292346814e-06,
+            "success": true
+          },
+          {
+            "A": 270,
+            "Z": 110,
+            "delta_mass_MeV": -0.00010363645878896932,
+            "delta_n_fm3": -9.690021398056636e-07,
+            "success": true
+          }
+        ]
+      },
+      "all_binding": {
+        "sigma0_MeV_fm2": 1.057725546739287,
+        "b": 15.709456665350181,
+        "weighting": "binding_2percent",
+        "training": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 22.255142370642442,
+          "rms_binding_per_baryon_residual_MeV": 0.16024764185460616,
+          "max_absolute_mass_residual_MeV": 62.883303162683205,
+          "mean_scaled_square": 1.028962046296605
+        },
+        "heldout": null,
+        "all": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 22.255142370642442,
+          "rms_binding_per_baryon_residual_MeV": 0.16024764185460616,
+          "max_absolute_mass_residual_MeV": 62.883303162683205,
+          "mean_scaled_square": 1.028962046296605
+        },
+        "density_min_fm3": 0.15541395482034903,
+        "density_max_fm3": 0.18285158788522032,
+        "density_boundary_hits": 0,
+        "parameter_bounds_active": [
+          false,
+          false
+        ],
+        "optimizer_success": true,
+        "optimizer_message": "`ftol` termination condition is satisfied.",
+        "nfev": 9,
+        "jacobian_condition_number": 16.0847767257422,
+        "locally_identifiable_two_parameters": true,
+        "multistart_scaled_sumsquares": [
+          2477.7406074822475,
+          2477.7406074822243,
+          2477.7406074822625
+        ],
+        "parameter_search_bounds": {
+          "sigma0": [
+            0.01,
+            10.0
+          ],
+          "b_plus_16": [
+            0.01,
+            1000000.0
+          ]
+        }
+      },
+      "heldout_mass": {
+        "sigma0_MeV_fm2": 1.060898929819811,
+        "b": 15.005715764735559,
+        "weighting": "mass_2percent",
+        "training": {
+          "n": 1927,
+          "rms_mass_residual_MeV": 22.474148146740724,
+          "rms_binding_per_baryon_residual_MeV": 0.16030776529856927,
+          "max_absolute_mass_residual_MeV": 62.343328144204634,
+          "mean_scaled_square": 7.410574593620742e-05
+        },
+        "heldout": {
+          "n": 481,
+          "rms_mass_residual_MeV": 22.512655763567366,
+          "rms_binding_per_baryon_residual_MeV": 0.15933281322870985,
+          "max_absolute_mass_residual_MeV": 63.33798973808484,
+          "mean_scaled_square": 7.320938883565483e-05
+        },
+        "all": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 22.48184534681841,
+          "rms_binding_per_baryon_residual_MeV": 0.16011349229849559,
+          "max_absolute_mass_residual_MeV": 63.33798973808484,
+          "mean_scaled_square": 7.392669786088942e-05
+        },
+        "density_min_fm3": 0.15540150411134102,
+        "density_max_fm3": 0.1829110672505136,
+        "density_boundary_hits": 0,
+        "parameter_bounds_active": [
+          false,
+          false
+        ],
+        "optimizer_success": true,
+        "optimizer_message": "`ftol` termination condition is satisfied.",
+        "nfev": 9,
+        "jacobian_condition_number": 16.343909495071475,
+        "locally_identifiable_two_parameters": true,
+        "multistart_scaled_sumsquares": [
+          0.1428017724190719,
+          0.14280177241907174,
+          0.14280177241907174
+        ],
+        "parameter_search_bounds": {
+          "sigma0": [
+            0.01,
+            10.0
+          ],
+          "b_plus_16": [
+            0.01,
+            1000000.0
+          ]
+        }
+      },
+      "coarse_mass": {
+        "sigma0_MeV_fm2": 1.0611256751185343,
+        "b": 14.906804682837851,
+        "weighting": "mass_2percent",
+        "training": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 22.444280185984837,
+          "rms_binding_per_baryon_residual_MeV": 0.16011239098147623,
+          "max_absolute_mass_residual_MeV": 63.26068071083796,
+          "mean_scaled_square": 7.392554353227497e-05
+        },
+        "heldout": null,
+        "all": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 22.444280185984837,
+          "rms_binding_per_baryon_residual_MeV": 0.16011239098147623,
+          "max_absolute_mass_residual_MeV": 63.26068071083796,
+          "mean_scaled_square": 7.392554353227497e-05
+        },
+        "density_min_fm3": 0.15540140814056858,
+        "density_max_fm3": 0.1829161641976592,
+        "density_boundary_hits": 0,
+        "parameter_bounds_active": [
+          false,
+          false
+        ],
+        "optimizer_success": true,
+        "optimizer_message": "`ftol` termination condition is satisfied.",
+        "nfev": 9,
+        "jacobian_condition_number": 16.347507046289614,
+        "locally_identifiable_two_parameters": true,
+        "multistart_scaled_sumsquares": [
+          0.17801270882571843,
+          0.1780127088257181,
+          0.17801270882571824
+        ],
+        "parameter_search_bounds": {
+          "sigma0": [
+            0.01,
+            10.0
+          ],
+          "b_plus_16": [
+            0.01,
+            1000000.0
+          ]
+        }
+      },
+      "software_and_parameter_identity_sha256": "4c3a7fd4ad398463a3f97c8ccff82638e6d860136bdf379cd0e99b236aa9eded",
+      "surface_extrapolation_sensitivity": {
+        "0.01": {
+          "all_mass": 3.2795480163894716e-05,
+          "all_binding": 3.353934093735495e-05,
+          "heldout_mass": 3.289340318377124e-05
+        },
+        "0.03": {
+          "all_mass": 0.0008851096497955049,
+          "all_binding": 0.000905166655282505,
+          "heldout_mass": 0.0008877501896466855
+        },
+        "0.05": {
+          "all_mass": 0.004091280380632885,
+          "all_binding": 0.004183662463252135,
+          "heldout_mass": 0.004103446183545272
+        },
+        "0.1": {
+          "all_mass": 0.032270682949797846,
+          "all_binding": 0.03297662215019429,
+          "heldout_mass": 0.032363892388765365
+        },
+        "0.3": {
+          "all_mass": 0.59782034073318,
+          "all_binding": 0.6025643198090306,
+          "heldout_mass": 0.5985262956562827
+        },
+        "0.5": {
+          "all_mass": 1.0611255669569737,
+          "all_binding": 1.057725546739287,
+          "heldout_mass": 1.060898929819811
+        }
+      },
+      "runtime_seconds": 6.3121311830036575
+    },
+    "SPG_M4": {
+      "all_mass": {
+        "sigma0_MeV_fm2": 1.0658722919396697,
+        "b": 28.963036108351936,
+        "weighting": "mass_2percent",
+        "training": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 20.555939175318887,
+          "rms_binding_per_baryon_residual_MeV": 0.14595481617877484,
+          "max_absolute_mass_residual_MeV": 59.155360687518396,
+          "mean_scaled_square": 6.143393448396985e-05
+        },
+        "heldout": null,
+        "all": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 20.555939175318887,
+          "rms_binding_per_baryon_residual_MeV": 0.14595481617877484,
+          "max_absolute_mass_residual_MeV": 59.155360687518396,
+          "mean_scaled_square": 6.143393448396985e-05
+        },
+        "density_min_fm3": 0.15863086604778176,
+        "density_max_fm3": 0.18268841916907835,
+        "density_boundary_hits": 0,
+        "parameter_bounds_active": [
+          false,
+          false
+        ],
+        "optimizer_success": true,
+        "optimizer_message": "`ftol` termination condition is satisfied.",
+        "nfev": 8,
+        "jacobian_condition_number": 21.683820157407926,
+        "locally_identifiable_two_parameters": true,
+        "multistart_scaled_sumsquares": [
+          0.1479329142373995,
+          0.1479329142373994,
+          0.1479329142373994
+        ],
+        "parameter_search_bounds": {
+          "sigma0": [
+            0.01,
+            10.0
+          ],
+          "b_plus_16": [
+            0.01,
+            1000000.0
+          ]
+        },
+        "independent_density_refinement": [
+          {
+            "A": 16,
+            "Z": 8,
+            "delta_mass_MeV": -4.345781206893662e-06,
+            "delta_n_fm3": -1.1451151937513782e-06,
+            "success": true
+          },
+          {
+            "A": 47,
+            "Z": 18,
+            "delta_mass_MeV": -2.5985368552028376e-05,
+            "delta_n_fm3": -3.7134520555759387e-07,
+            "success": true
+          },
+          {
+            "A": 72,
+            "Z": 29,
+            "delta_mass_MeV": -3.4038835337923956e-05,
+            "delta_n_fm3": -6.077833535067523e-07,
+            "success": true
+          },
+          {
+            "A": 93,
+            "Z": 40,
+            "delta_mass_MeV": 1.3215453577686276e-05,
+            "delta_n_fm3": -1.003373399754981e-06,
+            "success": true
+          },
+          {
+            "A": 110,
+            "Z": 54,
+            "delta_mass_MeV": 3.1750272455610684e-06,
+            "delta_n_fm3": -1.0511665297363582e-06,
+            "success": true
+          },
+          {
+            "A": 129,
+            "Z": 54,
+            "delta_mass_MeV": 6.172848770802375e-05,
+            "delta_n_fm3": -4.476312779333469e-07,
+            "success": true
+          },
+          {
+            "A": 146,
+            "Z": 60,
+            "delta_mass_MeV": 6.873172060295474e-05,
+            "delta_n_fm3": -3.9250878675067824e-07,
+            "success": true
+          },
+          {
+            "A": 163,
+            "Z": 66,
+            "delta_mass_MeV": 6.39195052372088e-05,
+            "delta_n_fm3": -5.877940074394683e-07,
+            "success": true
+          },
+          {
+            "A": 181,
+            "Z": 79,
+            "delta_mass_MeV": 8.184928128684987e-05,
+            "delta_n_fm3": -4.674869398257897e-07,
+            "success": true
+          },
+          {
+            "A": 201,
+            "Z": 78,
+            "delta_mass_MeV": 7.322102737816749e-05,
+            "delta_n_fm3": -5.29583184138982e-07,
+            "success": true
+          },
+          {
+            "A": 223,
+            "Z": 88,
+            "delta_mass_MeV": -4.782854148288607e-05,
+            "delta_n_fm3": -7.560117523119914e-07,
+            "success": true
+          },
+          {
+            "A": 270,
+            "Z": 110,
+            "delta_mass_MeV": -3.434219570408459e-05,
+            "delta_n_fm3": -7.990495662357766e-07,
+            "success": true
+          }
+        ]
+      },
+      "all_binding": {
+        "sigma0_MeV_fm2": 1.0627365300959353,
+        "b": 30.370878721828895,
+        "weighting": "binding_2percent",
+        "training": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 20.31467691859363,
+          "rms_binding_per_baryon_residual_MeV": 0.14608995606630545,
+          "max_absolute_mass_residual_MeV": 58.68186567672842,
+          "mean_scaled_square": 0.8493127301139675
+        },
+        "heldout": null,
+        "all": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 20.31467691859363,
+          "rms_binding_per_baryon_residual_MeV": 0.14608995606630545,
+          "max_absolute_mass_residual_MeV": 58.68186567672842,
+          "mean_scaled_square": 0.8493127301139675
+        },
+        "density_min_fm3": 0.1586374698446235,
+        "density_max_fm3": 0.18263101613942986,
+        "density_boundary_hits": 0,
+        "parameter_bounds_active": [
+          false,
+          false
+        ],
+        "optimizer_success": true,
+        "optimizer_message": "`ftol` termination condition is satisfied.",
+        "nfev": 12,
+        "jacobian_condition_number": 21.29220806483549,
+        "locally_identifiable_two_parameters": true,
+        "multistart_scaled_sumsquares": [
+          2045.1450541144338,
+          2045.1450541144343,
+          2045.1450541144336
+        ],
+        "parameter_search_bounds": {
+          "sigma0": [
+            0.01,
+            10.0
+          ],
+          "b_plus_16": [
+            0.01,
+            1000000.0
+          ]
+        }
+      },
+      "heldout_mass": {
+        "sigma0_MeV_fm2": 1.065636561044281,
+        "b": 29.17586853535758,
+        "weighting": "mass_2percent",
+        "training": {
+          "n": 1927,
+          "rms_mass_residual_MeV": 20.590024711324915,
+          "rms_binding_per_baryon_residual_MeV": 0.14614873732304046,
+          "max_absolute_mass_residual_MeV": 58.43538982802579,
+          "mean_scaled_square": 6.159703389552369e-05
+        },
+        "heldout": {
+          "n": 481,
+          "rms_mass_residual_MeV": 20.623929995055335,
+          "rms_binding_per_baryon_residual_MeV": 0.1451837600924636,
+          "max_absolute_mass_residual_MeV": 59.24205123305683,
+          "mean_scaled_square": 6.0788280744969815e-05
+        },
+        "all": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 20.596801780773273,
+          "rms_binding_per_baryon_residual_MeV": 0.14595649223183962,
+          "max_absolute_mass_residual_MeV": 59.24205123305683,
+          "mean_scaled_square": 6.143548478197866e-05
+        },
+        "density_min_fm3": 0.1586341162711697,
+        "density_max_fm3": 0.18268410599107243,
+        "density_boundary_hits": 0,
+        "parameter_bounds_active": [
+          false,
+          false
+        ],
+        "optimizer_success": true,
+        "optimizer_message": "`ftol` termination condition is satisfied.",
+        "nfev": 12,
+        "jacobian_condition_number": 21.688171704979197,
+        "locally_identifiable_two_parameters": true,
+        "multistart_scaled_sumsquares": [
+          0.11869748431667426,
+          0.11869748431667418,
+          0.11869748431667416
+        ],
+        "parameter_search_bounds": {
+          "sigma0": [
+            0.01,
+            10.0
+          ],
+          "b_plus_16": [
+            0.01,
+            1000000.0
+          ]
+        }
+      },
+      "coarse_mass": {
+        "sigma0_MeV_fm2": 1.0658722988139535,
+        "b": 28.963003958694628,
+        "weighting": "mass_2percent",
+        "training": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 20.55598017270359,
+          "rms_binding_per_baryon_residual_MeV": 0.1459549040649703,
+          "max_absolute_mass_residual_MeV": 59.156247264372496,
+          "mean_scaled_square": 6.143400834993753e-05
+        },
+        "heldout": null,
+        "all": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 20.55598017270359,
+          "rms_binding_per_baryon_residual_MeV": 0.1459549040649703,
+          "max_absolute_mass_residual_MeV": 59.156247264372496,
+          "mean_scaled_square": 6.143400834993753e-05
+        },
+        "density_min_fm3": 0.15863132323663037,
+        "density_max_fm3": 0.18269214962301894,
+        "density_boundary_hits": 0,
+        "parameter_bounds_active": [
+          false,
+          false
+        ],
+        "optimizer_success": true,
+        "optimizer_message": "`ftol` termination condition is satisfied.",
+        "nfev": 8,
+        "jacobian_condition_number": 21.683806885607524,
+        "locally_identifiable_two_parameters": true,
+        "multistart_scaled_sumsquares": [
+          0.14793309210664954,
+          0.1479330921066496,
+          0.1479330921066496
+        ],
+        "parameter_search_bounds": {
+          "sigma0": [
+            0.01,
+            10.0
+          ],
+          "b_plus_16": [
+            0.01,
+            1000000.0
+          ]
+        }
+      },
+      "software_and_parameter_identity_sha256": "4e06c6719eca1cee3072cc72bee7c3ddb69ee5ad61f8d6967cd941424fcf95e8",
+      "surface_extrapolation_sensitivity": {
+        "0.01": {
+          "all_mass": 4.792341695135959e-05,
+          "all_binding": 4.92784793327154e-05,
+          "heldout_mass": 4.813960306031315e-05
+        },
+        "0.03": {
+          "all_mass": 0.0012929217510071974,
+          "all_binding": 0.0013294312412548874,
+          "heldout_mass": 0.001298747036720712
+        },
+        "0.05": {
+          "all_mass": 0.005968129782270661,
+          "all_binding": 0.006135815017991591,
+          "heldout_mass": 0.005994894846749304
+        },
+        "0.1": {
+          "all_mass": 0.046513866524170965,
+          "all_binding": 0.04776387614043309,
+          "heldout_mass": 0.0467140544413506
+        },
+        "0.3": {
+          "all_mass": 0.6954144849256784,
+          "all_binding": 0.7007631800692942,
+          "heldout_mass": 0.6964009988358678
+        },
+        "0.5": {
+          "all_mass": 1.0658722919396697,
+          "all_binding": 1.0627365300959353,
+          "heldout_mass": 1.065636561044281
+        }
+      },
+      "runtime_seconds": 6.448935224994784
+    },
+    "SPG_M5": {
+      "all_mass": {
+        "sigma0_MeV_fm2": 1.0177640770912677,
+        "b": 24.759981549859276,
+        "weighting": "mass_2percent",
+        "training": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 15.218433033815872,
+          "rms_binding_per_baryon_residual_MeV": 0.11342524425433469,
+          "max_absolute_mass_residual_MeV": 40.94052997746576,
+          "mean_scaled_square": 3.7101330651023654e-05
+        },
+        "heldout": null,
+        "all": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 15.218433033815872,
+          "rms_binding_per_baryon_residual_MeV": 0.11342524425433469,
+          "max_absolute_mass_residual_MeV": 40.94052997746576,
+          "mean_scaled_square": 3.7101330651023654e-05
+        },
+        "density_min_fm3": 0.1437892486324573,
+        "density_max_fm3": 0.16787203710232546,
+        "density_boundary_hits": 0,
+        "parameter_bounds_active": [
+          false,
+          false
+        ],
+        "optimizer_success": true,
+        "optimizer_message": "`ftol` termination condition is satisfied.",
+        "nfev": 7,
+        "jacobian_condition_number": 20.059430658436266,
+        "locally_identifiable_two_parameters": true,
+        "multistart_scaled_sumsquares": [
+          0.08934000420766545,
+          0.08934000420766497,
+          0.08934000420766502
+        ],
+        "parameter_search_bounds": {
+          "sigma0": [
+            0.01,
+            10.0
+          ],
+          "b_plus_16": [
+            0.01,
+            1000000.0
+          ]
+        },
+        "independent_density_refinement": [
+          {
+            "A": 16,
+            "Z": 8,
+            "delta_mass_MeV": 4.518279382637047e-06,
+            "delta_n_fm3": 4.2204585315452903e-07,
+            "success": true
+          },
+          {
+            "A": 47,
+            "Z": 18,
+            "delta_mass_MeV": 7.520937970184605e-07,
+            "delta_n_fm3": 1.1425522333796678e-08,
+            "success": true
+          },
+          {
+            "A": 72,
+            "Z": 29,
+            "delta_mass_MeV": -2.2389533569366904e-06,
+            "delta_n_fm3": 4.7435177785715155e-08,
+            "success": true
+          },
+          {
+            "A": 93,
+            "Z": 40,
+            "delta_mass_MeV": -4.197912744530186e-06,
+            "delta_n_fm3": 3.880391147292883e-08,
+            "success": true
+          },
+          {
+            "A": 110,
+            "Z": 54,
+            "delta_mass_MeV": 1.0234020919597242e-07,
+            "delta_n_fm3": 1.1271384464661693e-08,
+            "success": true
+          },
+          {
+            "A": 129,
+            "Z": 54,
+            "delta_mass_MeV": -6.02715181230451e-06,
+            "delta_n_fm3": -1.0247546064490187e-07,
+            "success": true
+          },
+          {
+            "A": 146,
+            "Z": 60,
+            "delta_mass_MeV": -7.160997711253003e-06,
+            "delta_n_fm3": -1.391892122670768e-07,
+            "success": true
+          },
+          {
+            "A": 163,
+            "Z": 66,
+            "delta_mass_MeV": -1.2807726079699933e-05,
+            "delta_n_fm3": -2.4647779592323893e-07,
+            "success": true
+          },
+          {
+            "A": 181,
+            "Z": 79,
+            "delta_mass_MeV": 1.965253636626585e-05,
+            "delta_n_fm3": -8.378119978336152e-08,
+            "success": true
+          },
+          {
+            "A": 201,
+            "Z": 78,
+            "delta_mass_MeV": 7.2696666393312626e-06,
+            "delta_n_fm3": -4.303214389267396e-07,
+            "success": true
+          },
+          {
+            "A": 223,
+            "Z": 88,
+            "delta_mass_MeV": 4.673283774536685e-05,
+            "delta_n_fm3": -2.4317016192321184e-07,
+            "success": true
+          },
+          {
+            "A": 270,
+            "Z": 110,
+            "delta_mass_MeV": 4.10490342801495e-05,
+            "delta_n_fm3": -4.4345667427059254e-07,
+            "success": true
+          }
+        ]
+      },
+      "all_binding": {
+        "sigma0_MeV_fm2": 1.0155251397716625,
+        "b": 25.719221194658537,
+        "weighting": "binding_2percent",
+        "training": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 15.105731544883186,
+          "rms_binding_per_baryon_residual_MeV": 0.11352382999309599,
+          "max_absolute_mass_residual_MeV": 40.70913139061486,
+          "mean_scaled_square": 0.5131561566615476
+        },
+        "heldout": null,
+        "all": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 15.105731544883186,
+          "rms_binding_per_baryon_residual_MeV": 0.11352382999309599,
+          "max_absolute_mass_residual_MeV": 40.70913139061486,
+          "mean_scaled_square": 0.5131561566615476
+        },
+        "density_min_fm3": 0.14380148913066426,
+        "density_max_fm3": 0.1678338907439819,
+        "density_boundary_hits": 0,
+        "parameter_bounds_active": [
+          false,
+          false
+        ],
+        "optimizer_success": true,
+        "optimizer_message": "`ftol` termination condition is satisfied.",
+        "nfev": 8,
+        "jacobian_condition_number": 19.60967700545923,
+        "locally_identifiable_two_parameters": true,
+        "multistart_scaled_sumsquares": [
+          1235.6800252410064,
+          1235.6800252410071,
+          1235.680025241011
+        ],
+        "parameter_search_bounds": {
+          "sigma0": [
+            0.01,
+            10.0
+          ],
+          "b_plus_16": [
+            0.01,
+            1000000.0
+          ]
+        }
+      },
+      "heldout_mass": {
+        "sigma0_MeV_fm2": 1.0175684195186505,
+        "b": 24.91991475157659,
+        "weighting": "mass_2percent",
+        "training": {
+          "n": 1927,
+          "rms_mass_residual_MeV": 15.254452208463569,
+          "rms_binding_per_baryon_residual_MeV": 0.11355202385392778,
+          "max_absolute_mass_residual_MeV": 40.16070737542282,
+          "mean_scaled_square": 3.718407086296331e-05
+        },
+        "heldout": {
+          "n": 481,
+          "rms_mass_residual_MeV": 15.284773100565113,
+          "rms_binding_per_baryon_residual_MeV": 0.11292511132985028,
+          "max_absolute_mass_residual_MeV": 41.02583725163936,
+          "mean_scaled_square": 3.6776367575279914e-05
+        },
+        "all": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 15.260513646870988,
+          "rms_binding_per_baryon_residual_MeV": 0.11342707449389501,
+          "max_absolute_mass_residual_MeV": 41.02583725163936,
+          "mean_scaled_square": 3.7102631792624556e-05
+        },
+        "density_min_fm3": 0.14379305366182632,
+        "density_max_fm3": 0.1678687047045268,
+        "density_boundary_hits": 0,
+        "parameter_bounds_active": [
+          false,
+          false
+        ],
+        "optimizer_success": true,
+        "optimizer_message": "`ftol` termination condition is satisfied.",
+        "nfev": 7,
+        "jacobian_condition_number": 20.05367683533077,
+        "locally_identifiable_two_parameters": true,
+        "multistart_scaled_sumsquares": [
+          0.07165370455293084,
+          0.07165370455293031,
+          0.07165370455293035
+        ],
+        "parameter_search_bounds": {
+          "sigma0": [
+            0.01,
+            10.0
+          ],
+          "b_plus_16": [
+            0.01,
+            1000000.0
+          ]
+        }
+      },
+      "coarse_mass": {
+        "sigma0_MeV_fm2": 1.017764191220518,
+        "b": 24.7599757737636,
+        "weighting": "mass_2percent",
+        "training": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 15.21846253735388,
+          "rms_binding_per_baryon_residual_MeV": 0.11342523105854477,
+          "max_absolute_mass_residual_MeV": 40.94072720158647,
+          "mean_scaled_square": 3.7101321965812975e-05
+        },
+        "heldout": null,
+        "all": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 15.21846253735388,
+          "rms_binding_per_baryon_residual_MeV": 0.11342523105854477,
+          "max_absolute_mass_residual_MeV": 40.94072720158647,
+          "mean_scaled_square": 3.7101321965812975e-05
+        },
+        "density_min_fm3": 0.14378934447203684,
+        "density_max_fm3": 0.16787032286212428,
+        "density_boundary_hits": 0,
+        "parameter_bounds_active": [
+          false,
+          false
+        ],
+        "optimizer_success": true,
+        "optimizer_message": "`ftol` termination condition is satisfied.",
+        "nfev": 7,
+        "jacobian_condition_number": 20.059437379354318,
+        "locally_identifiable_two_parameters": true,
+        "multistart_scaled_sumsquares": [
+          0.08933998329367802,
+          0.08933998329367762,
+          0.08933998329367766
+        ],
+        "parameter_search_bounds": {
+          "sigma0": [
+            0.01,
+            10.0
+          ],
+          "b_plus_16": [
+            0.01,
+            1000000.0
+          ]
+        }
+      },
+      "software_and_parameter_identity_sha256": "e973149abbe54ebd9e8f35b0ddc8a46dc26940f3958c3bda7a572f7e8db94413",
+      "surface_extrapolation_sensitivity": {
+        "0.01": {
+          "all_mass": 4.148297513387538e-05,
+          "all_binding": 4.2365784657276076e-05,
+          "heldout_mass": 4.163773245958659e-05
+        },
+        "0.03": {
+          "all_mass": 0.0011192878369941667,
+          "all_binding": 0.0011430791921576682,
+          "heldout_mass": 0.0011234588092690972
+        },
+        "0.05": {
+          "all_mass": 0.0051687547688102405,
+          "all_binding": 0.005278126560417384,
+          "heldout_mass": 0.0051879348916818455
+        },
+        "0.1": {
+          "all_mass": 0.04042760207850305,
+          "all_binding": 0.04124943111022301,
+          "heldout_mass": 0.04057210511467219
+        },
+        "0.3": {
+          "all_mass": 0.6410517894835585,
+          "all_binding": 0.6451319427057242,
+          "heldout_mass": 0.6418571012667648
+        },
+        "0.5": {
+          "all_mass": 1.0177640770912677,
+          "all_binding": 1.0155251397716625,
+          "heldout_mass": 1.0175684195186505
+        }
+      },
+      "runtime_seconds": 6.359710601012921
+    }
+  },
+  "input_file_sha256": {
+    "data/research_generator_20261116/spg_author_candidates.json": "56cbcfbb8baf50f73124eba690ff98cdfb3647eecc01e446b4000afe260e94ab",
+    "python_frontend/compose_eos/gdfm_uniform.py": "c5e8b49ffd914307a8cafb2d78f6b83c844db0a628d868e8108bf123d9b37656",
+    "python_frontend/compose_eos/candidate_surface_fit.py": "7afe39c61b9d3ab02cfb2eabb20ac697d97478fec85c73c1c8c766614f95dc16",
+    "python_frontend/compose_eos/cold_leptons.py": "ac995eb2504560da1569190a2f95bbbe266961dab0498dc0665951afca4c2ded",
+    "python_frontend/compose_eos/gm1_uniform.py": "b301f918ec8bc8ccd574ce7ce69a9d8e32c6bf61f4896d0f72b107b99e8a8b83",
+    "python_frontend/compose_eos/scurto_interface.py": "66b2d8be5396cbddee20a91f43dee1169ae65e38e9fee5ebdae61b2c143ad8f3",
+    "scripts/fit_candidate_spg_surface.py": "cfc5e7a45bc8f64928392357ceb3d18848df1a0a2f6dabf51ced980dc50863d7"
+  },
+  "runtime_seconds": 31.854584779997822
+}

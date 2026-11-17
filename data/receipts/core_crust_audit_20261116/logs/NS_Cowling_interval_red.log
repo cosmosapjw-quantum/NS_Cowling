@@ -1,0 +1,179 @@
+FFFFFFFFFFFFF                                                            [100%]
+=================================== FAILURES ===================================
+___________ test_causal_density_limit_maps_to_the_admitted_pressure ____________
+
+    def test_causal_density_limit_maps_to_the_admitted_pressure():
+        eos = _table()
+        domain = find_causal_domain(eos)
+        actual_pc = float(eos.pressure_of_nb(domain.nb_max))
+>       assert actual_pc == pytest.approx(domain.pressure_max, rel=2e-13)
+E       assert 530.2551879590255 == 530.1666066815916 ± 1.1e-10
+E         
+E         comparison failed
+E         Obtained: 530.2551879590255
+E         Expected: 530.1666066815916 ± 1.1e-10
+
+eos_generator/tests/test_tov_interval_contract.py:26: AssertionError
+________ test_tov_checks_pressure_limit_even_with_stale_density_mapping ________
+
+    def test_tov_checks_pressure_limit_even_with_stale_density_mapping():
+        eos = _table()
+        domain = find_causal_domain(eos)
+        # Reproduce the formerly allowed density from the independent n(epsilon)
+        # interpolation, and a caller's old cached density limit.
+        old_nb = float(eos.nb_of_energy(domain.eps_max))
+        stale = replace(domain, nb_max=old_nb)
+        assert float(eos.pressure_of_nb(old_nb)) > domain.pressure_max * 1.0001
+>       with pytest.raises(ValueError, match="causal domain"):
+E       Failed: DID NOT RAISE ValueError
+
+eos_generator/tests/test_tov_interval_contract.py:38: Failed
+______________ test_central_expansion_uses_the_rhs_energy_density ______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f4d31b0bb00>
+
+    def test_central_expansion_uses_the_rhs_energy_density(monkeypatch):
+        import compose_eos.tov as module
+        eos = _table()
+        nc = 0.35
+        seen = {}
+        def record(rhs, span, state, **kwargs):
+            seen["r0"], seen["m0"] = span[0], state[0]
+            return SimpleNamespace(t_events=[], success=False, nfev=0, message="IC capture")
+        monkeypatch.setattr(module, "solve_ivp", record)
+        solve_tov_star(eos, nc)
+        central_rho = seen["m0"] / (4.0 * np.pi * seen["r0"]**3 / 3.0)
+        expected = float(eos.energy_of_pressure(eos.pressure_of_nb(nc))) * MEV_FM3_TO_PA / C**2
+>       assert central_rho == pytest.approx(expected, rel=2e-14)
+E       assert np.float64(1....930323145e+18) == 1.15197942686...e+18 ± 2.3e+04
+E         
+E         comparison failed
+E         Obtained: 1.1520702930323145e+18
+E         Expected: 1.1519794268662653e+18 ± 2.3e+04
+
+eos_generator/tests/test_tov_interval_contract.py:54: AssertionError
+_____ test_first_unresolved_interval_is_not_overridden_by_later_violation ______
+
+    def test_first_unresolved_interval_is_not_overridden_by_later_violation():
+        eos = _table()
+        x, _, safe, undecided = _certify_rhs_causality(eos, 1e-8, min_width=0.5)
+>       assert undecided
+E       assert False
+
+eos_generator/tests/test_tov_interval_contract.py:60: AssertionError
+_________ test_config_refuses_nonfinite_controls[nan-causal_tolerance] _________
+
+field = 'causal_tolerance', value = nan
+
+    @pytest.mark.parametrize("field", ["causal_tolerance", "max_step_m", "max_radius_m", "initial_radius_m"])
+    @pytest.mark.parametrize("value", [np.nan, np.inf])
+    def test_config_refuses_nonfinite_controls(field, value):
+>       with pytest.raises(ValueError, match="finite"):
+E       Failed: DID NOT RAISE ValueError
+
+eos_generator/tests/test_tov_interval_contract.py:67: Failed
+____________ test_config_refuses_nonfinite_controls[nan-max_step_m] ____________
+
+field = 'max_step_m', value = nan
+
+    @pytest.mark.parametrize("field", ["causal_tolerance", "max_step_m", "max_radius_m", "initial_radius_m"])
+    @pytest.mark.parametrize("value", [np.nan, np.inf])
+    def test_config_refuses_nonfinite_controls(field, value):
+>       with pytest.raises(ValueError, match="finite"):
+E       Failed: DID NOT RAISE ValueError
+
+eos_generator/tests/test_tov_interval_contract.py:67: Failed
+___________ test_config_refuses_nonfinite_controls[nan-max_radius_m] ___________
+
+field = 'max_radius_m', value = nan
+
+    @pytest.mark.parametrize("field", ["causal_tolerance", "max_step_m", "max_radius_m", "initial_radius_m"])
+    @pytest.mark.parametrize("value", [np.nan, np.inf])
+    def test_config_refuses_nonfinite_controls(field, value):
+>       with pytest.raises(ValueError, match="finite"):
+E       Failed: DID NOT RAISE ValueError
+
+eos_generator/tests/test_tov_interval_contract.py:67: Failed
+_________ test_config_refuses_nonfinite_controls[nan-initial_radius_m] _________
+
+field = 'initial_radius_m', value = nan
+
+    @pytest.mark.parametrize("field", ["causal_tolerance", "max_step_m", "max_radius_m", "initial_radius_m"])
+    @pytest.mark.parametrize("value", [np.nan, np.inf])
+    def test_config_refuses_nonfinite_controls(field, value):
+>       with pytest.raises(ValueError, match="finite"):
+E       Failed: DID NOT RAISE ValueError
+
+eos_generator/tests/test_tov_interval_contract.py:67: Failed
+_________ test_config_refuses_nonfinite_controls[inf-causal_tolerance] _________
+
+field = 'causal_tolerance', value = inf
+
+    @pytest.mark.parametrize("field", ["causal_tolerance", "max_step_m", "max_radius_m", "initial_radius_m"])
+    @pytest.mark.parametrize("value", [np.nan, np.inf])
+    def test_config_refuses_nonfinite_controls(field, value):
+>       with pytest.raises(ValueError, match="finite"):
+E       Failed: DID NOT RAISE ValueError
+
+eos_generator/tests/test_tov_interval_contract.py:67: Failed
+____________ test_config_refuses_nonfinite_controls[inf-max_step_m] ____________
+
+field = 'max_step_m', value = inf
+
+    @pytest.mark.parametrize("field", ["causal_tolerance", "max_step_m", "max_radius_m", "initial_radius_m"])
+    @pytest.mark.parametrize("value", [np.nan, np.inf])
+    def test_config_refuses_nonfinite_controls(field, value):
+>       with pytest.raises(ValueError, match="finite"):
+E       Failed: DID NOT RAISE ValueError
+
+eos_generator/tests/test_tov_interval_contract.py:67: Failed
+___________ test_config_refuses_nonfinite_controls[inf-max_radius_m] ___________
+
+field = 'max_radius_m', value = inf
+
+    @pytest.mark.parametrize("field", ["causal_tolerance", "max_step_m", "max_radius_m", "initial_radius_m"])
+    @pytest.mark.parametrize("value", [np.nan, np.inf])
+    def test_config_refuses_nonfinite_controls(field, value):
+>       with pytest.raises(ValueError, match="finite"):
+E       Failed: DID NOT RAISE ValueError
+
+eos_generator/tests/test_tov_interval_contract.py:67: Failed
+_________ test_config_refuses_nonfinite_controls[inf-initial_radius_m] _________
+
+field = 'initial_radius_m', value = inf
+
+    @pytest.mark.parametrize("field", ["causal_tolerance", "max_step_m", "max_radius_m", "initial_radius_m"])
+    @pytest.mark.parametrize("value", [np.nan, np.inf])
+    def test_config_refuses_nonfinite_controls(field, value):
+>       with pytest.raises(ValueError, match="finite"):
+E       Failed: DID NOT RAISE ValueError
+
+eos_generator/tests/test_tov_interval_contract.py:67: Failed
+____________________ test_domain_refuses_infinite_tolerance ____________________
+
+    def test_domain_refuses_infinite_tolerance():
+>       with pytest.raises(ValueError, match="finite"):
+E       Failed: DID NOT RAISE ValueError
+
+eos_generator/tests/test_tov_interval_contract.py:72: Failed
+=============================== warnings summary ===============================
+../../home/cosmosapjw/.local/lib/python3.12/site-packages/matplotlib/projections/__init__.py:63
+  /home/cosmosapjw/.local/lib/python3.12/site-packages/matplotlib/projections/__init__.py:63: UserWarning: Unable to import Axes3D. This may be due to multiple versions of Matplotlib being installed (e.g. as a system package and as a pip package). As a result, the 3D projection is not available.
+    warnings.warn("Unable to import Axes3D. This may be due to multiple versions of "
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED eos_generator/tests/test_tov_interval_contract.py::test_causal_density_limit_maps_to_the_admitted_pressure
+FAILED eos_generator/tests/test_tov_interval_contract.py::test_tov_checks_pressure_limit_even_with_stale_density_mapping
+FAILED eos_generator/tests/test_tov_interval_contract.py::test_central_expansion_uses_the_rhs_energy_density
+FAILED eos_generator/tests/test_tov_interval_contract.py::test_first_unresolved_interval_is_not_overridden_by_later_violation
+FAILED eos_generator/tests/test_tov_interval_contract.py::test_config_refuses_nonfinite_controls[nan-causal_tolerance]
+FAILED eos_generator/tests/test_tov_interval_contract.py::test_config_refuses_nonfinite_controls[nan-max_step_m]
+FAILED eos_generator/tests/test_tov_interval_contract.py::test_config_refuses_nonfinite_controls[nan-max_radius_m]
+FAILED eos_generator/tests/test_tov_interval_contract.py::test_config_refuses_nonfinite_controls[nan-initial_radius_m]
+FAILED eos_generator/tests/test_tov_interval_contract.py::test_config_refuses_nonfinite_controls[inf-causal_tolerance]
+FAILED eos_generator/tests/test_tov_interval_contract.py::test_config_refuses_nonfinite_controls[inf-max_step_m]
+FAILED eos_generator/tests/test_tov_interval_contract.py::test_config_refuses_nonfinite_controls[inf-max_radius_m]
+FAILED eos_generator/tests/test_tov_interval_contract.py::test_config_refuses_nonfinite_controls[inf-initial_radius_m]
+FAILED eos_generator/tests/test_tov_interval_contract.py::test_domain_refuses_infinite_tolerance
+13 failed, 1 warning in 0.71s

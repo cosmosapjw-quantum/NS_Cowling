@@ -1,0 +1,632 @@
+{
+  "schema": "ns-cowling.eos390-pdg-gauge-regeneration.v1",
+  "generated_utc": "2026-11-14T10:26:01.058133+00:00",
+  "git_head": "deb359daead84ef14cf40213e9314a01ee1c646f",
+  "fortran_executable_sha256": "14578d16c3156b0b455edb46bb9cfb3c27a7f8d6f6f3cb0fb2d678012ba500fa",
+  "pdg_source": "PDG 2024 online (pdg.lbl.gov/2024); CODATA 2022 adjusted constants",
+  "pdg2024_mn_mev": 939.56542052,
+  "pdg2024_mp_mev": 938.27208816,
+  "re_derivation_formulas": {
+    "Q6_tgt": "(Q6_src+1)*m_n_src/m_n_PDG - 1",
+    "Q7_tgt": "(Q7_src+1)*m_n_src/m_n_PDG - 1",
+    "Q3_tgt": "(Q3_src+1)*m_n_src/m_n_PDG - 1",
+    "Q4_tgt": "Q4_src*m_n_src/m_n_PDG",
+    "invariant": "F, P, mu_B, mu_Q per baryon"
+  },
+  "distinction_from_gauge_shift": "NOT a gauge shift. A gauge shift applies dmcr to one phase (crust) only, leaving the core m_n/m_p untouched and adding dmcr to F. Here BOTH phases are regenerated to the same PDG m_n/m_p with Q3/Q4/Q6/Q7 re-derived; physical F/P/mu_B/mu_Q are invariant. The resulting EOS tables DIFFER from the originals (different m_n/m_p header AND different Q3/Q4/Q6/Q7).",
+  "distinction_from_matched_regenerated_run": "matched_regenerated/ used the ORIGINAL consistent sources with the CSS kernel's internal dmcr shift; its Maxwell run failed 65/65 at the 1e-12 mass gate. This run's regenerated sources carry PDG m_n/m_p so the mass gate passes for every pair.",
+  "receipts": {
+    "SPG_M1": {
+      "model": "SPG_M1",
+      "status": "PASS",
+      "original_mn_mev": 938.9,
+      "original_mp_mev": 938.9,
+      "pdg2024_mn_mev": 939.56542052,
+      "pdg2024_mp_mev": 938.27208816,
+      "dmcr_original_to_pdg_mev": -0.66542052,
+      "n_in": 365,
+      "n_kept": 217,
+      "iphase_kept": 0,
+      "readback_n": 217,
+      "readback_mn_mev": 939.56542052,
+      "readback_mp_mev": 938.27208816,
+      "re_derivation": {
+        "what": "Q3/Q4/Q6/Q7 re-derived for PDG m_n; Q1/Q2/Q5/Iphase/n_B unchanged",
+        "formulas": {
+          "Q6_tgt": "(Q6_src+1)*m_n_src/m_n_PDG - 1",
+          "Q7_tgt": "(Q7_src+1)*m_n_src/m_n_PDG - 1",
+          "Q3_tgt": "(Q3_src+1)*m_n_src/m_n_PDG - 1",
+          "Q4_tgt": "Q4_src*m_n_src/m_n_PDG",
+          "invariant": "F, P, mu_B, mu_Q per baryon (physical quantities)"
+        },
+        "NOT_a_gauge_shift": "A gauge shift applies dmcr to ONE phase only (crust), leaving the core's m_n/m_p untouched and adding dmcr to F. Here BOTH phases are regenerated to the same PDG m_n/m_p and Q3/Q4/Q6/Q7 are re-derived so the physical F/P/mu_B/mu_Q are invariant. The resulting EOS tables DIFFER from the originals (different m_n/m_p in the header AND different Q3/Q4/Q6/Q7 values).",
+        "distinction_from_matched_regenerated_run": "matched_regenerated/ used the ORIGINAL consistent sources and relied on the CSS match kernel's internal dmcr shift; its Maxwell run failed 65/65 at the 1e-12 mass gate. This run's regenerated sources carry PDG m_n/m_p so the mass gate passes for every pair; the Maxwell result now depends only on the subsequent physics gates (mechanical stability, causal bound, coexistence crossing)."
+      },
+      "pdg_source": "PDG 2024 online (pdg.lbl.gov/2024); CODATA 2022 adjusted constants",
+      "compose_files": [
+        "eos.nb",
+        "eos.t",
+        "eos.thermo",
+        "eos.yq"
+      ]
+    },
+    "SPG_M2": {
+      "model": "SPG_M2",
+      "status": "PASS",
+      "original_mn_mev": 938.9,
+      "original_mp_mev": 938.9,
+      "pdg2024_mn_mev": 939.56542052,
+      "pdg2024_mp_mev": 938.27208816,
+      "dmcr_original_to_pdg_mev": -0.66542052,
+      "n_in": 377,
+      "n_kept": 217,
+      "iphase_kept": 0,
+      "readback_n": 217,
+      "readback_mn_mev": 939.56542052,
+      "readback_mp_mev": 938.27208816,
+      "re_derivation": {
+        "what": "Q3/Q4/Q6/Q7 re-derived for PDG m_n; Q1/Q2/Q5/Iphase/n_B unchanged",
+        "formulas": {
+          "Q6_tgt": "(Q6_src+1)*m_n_src/m_n_PDG - 1",
+          "Q7_tgt": "(Q7_src+1)*m_n_src/m_n_PDG - 1",
+          "Q3_tgt": "(Q3_src+1)*m_n_src/m_n_PDG - 1",
+          "Q4_tgt": "Q4_src*m_n_src/m_n_PDG",
+          "invariant": "F, P, mu_B, mu_Q per baryon (physical quantities)"
+        },
+        "NOT_a_gauge_shift": "A gauge shift applies dmcr to ONE phase only (crust), leaving the core's m_n/m_p untouched and adding dmcr to F. Here BOTH phases are regenerated to the same PDG m_n/m_p and Q3/Q4/Q6/Q7 are re-derived so the physical F/P/mu_B/mu_Q are invariant. The resulting EOS tables DIFFER from the originals (different m_n/m_p in the header AND different Q3/Q4/Q6/Q7 values).",
+        "distinction_from_matched_regenerated_run": "matched_regenerated/ used the ORIGINAL consistent sources and relied on the CSS match kernel's internal dmcr shift; its Maxwell run failed 65/65 at the 1e-12 mass gate. This run's regenerated sources carry PDG m_n/m_p so the mass gate passes for every pair; the Maxwell result now depends only on the subsequent physics gates (mechanical stability, causal bound, coexistence crossing)."
+      },
+      "pdg_source": "PDG 2024 online (pdg.lbl.gov/2024); CODATA 2022 adjusted constants",
+      "compose_files": [
+        "eos.nb",
+        "eos.t",
+        "eos.thermo",
+        "eos.yq"
+      ]
+    },
+    "SPG_M3": {
+      "model": "SPG_M3",
+      "status": "PASS",
+      "original_mn_mev": 938.9,
+      "original_mp_mev": 938.9,
+      "pdg2024_mn_mev": 939.56542052,
+      "pdg2024_mp_mev": 938.27208816,
+      "dmcr_original_to_pdg_mev": -0.66542052,
+      "n_in": 366,
+      "n_kept": 217,
+      "iphase_kept": 0,
+      "readback_n": 217,
+      "readback_mn_mev": 939.56542052,
+      "readback_mp_mev": 938.27208816,
+      "re_derivation": {
+        "what": "Q3/Q4/Q6/Q7 re-derived for PDG m_n; Q1/Q2/Q5/Iphase/n_B unchanged",
+        "formulas": {
+          "Q6_tgt": "(Q6_src+1)*m_n_src/m_n_PDG - 1",
+          "Q7_tgt": "(Q7_src+1)*m_n_src/m_n_PDG - 1",
+          "Q3_tgt": "(Q3_src+1)*m_n_src/m_n_PDG - 1",
+          "Q4_tgt": "Q4_src*m_n_src/m_n_PDG",
+          "invariant": "F, P, mu_B, mu_Q per baryon (physical quantities)"
+        },
+        "NOT_a_gauge_shift": "A gauge shift applies dmcr to ONE phase only (crust), leaving the core's m_n/m_p untouched and adding dmcr to F. Here BOTH phases are regenerated to the same PDG m_n/m_p and Q3/Q4/Q6/Q7 are re-derived so the physical F/P/mu_B/mu_Q are invariant. The resulting EOS tables DIFFER from the originals (different m_n/m_p in the header AND different Q3/Q4/Q6/Q7 values).",
+        "distinction_from_matched_regenerated_run": "matched_regenerated/ used the ORIGINAL consistent sources and relied on the CSS match kernel's internal dmcr shift; its Maxwell run failed 65/65 at the 1e-12 mass gate. This run's regenerated sources carry PDG m_n/m_p so the mass gate passes for every pair; the Maxwell result now depends only on the subsequent physics gates (mechanical stability, causal bound, coexistence crossing)."
+      },
+      "pdg_source": "PDG 2024 online (pdg.lbl.gov/2024); CODATA 2022 adjusted constants",
+      "compose_files": [
+        "eos.nb",
+        "eos.t",
+        "eos.thermo",
+        "eos.yq"
+      ]
+    },
+    "SPG_M4": {
+      "model": "SPG_M4",
+      "status": "PASS",
+      "original_mn_mev": 938.9,
+      "original_mp_mev": 938.9,
+      "pdg2024_mn_mev": 939.56542052,
+      "pdg2024_mp_mev": 938.27208816,
+      "dmcr_original_to_pdg_mev": -0.66542052,
+      "n_in": 375,
+      "n_kept": 217,
+      "iphase_kept": 0,
+      "readback_n": 217,
+      "readback_mn_mev": 939.56542052,
+      "readback_mp_mev": 938.27208816,
+      "re_derivation": {
+        "what": "Q3/Q4/Q6/Q7 re-derived for PDG m_n; Q1/Q2/Q5/Iphase/n_B unchanged",
+        "formulas": {
+          "Q6_tgt": "(Q6_src+1)*m_n_src/m_n_PDG - 1",
+          "Q7_tgt": "(Q7_src+1)*m_n_src/m_n_PDG - 1",
+          "Q3_tgt": "(Q3_src+1)*m_n_src/m_n_PDG - 1",
+          "Q4_tgt": "Q4_src*m_n_src/m_n_PDG",
+          "invariant": "F, P, mu_B, mu_Q per baryon (physical quantities)"
+        },
+        "NOT_a_gauge_shift": "A gauge shift applies dmcr to ONE phase only (crust), leaving the core's m_n/m_p untouched and adding dmcr to F. Here BOTH phases are regenerated to the same PDG m_n/m_p and Q3/Q4/Q6/Q7 are re-derived so the physical F/P/mu_B/mu_Q are invariant. The resulting EOS tables DIFFER from the originals (different m_n/m_p in the header AND different Q3/Q4/Q6/Q7 values).",
+        "distinction_from_matched_regenerated_run": "matched_regenerated/ used the ORIGINAL consistent sources and relied on the CSS match kernel's internal dmcr shift; its Maxwell run failed 65/65 at the 1e-12 mass gate. This run's regenerated sources carry PDG m_n/m_p so the mass gate passes for every pair; the Maxwell result now depends only on the subsequent physics gates (mechanical stability, causal bound, coexistence crossing)."
+      },
+      "pdg_source": "PDG 2024 online (pdg.lbl.gov/2024); CODATA 2022 adjusted constants",
+      "compose_files": [
+        "eos.nb",
+        "eos.t",
+        "eos.thermo",
+        "eos.yq"
+      ]
+    },
+    "SPG_M5": {
+      "model": "SPG_M5",
+      "status": "PASS",
+      "original_mn_mev": 938.9,
+      "original_mp_mev": 938.9,
+      "pdg2024_mn_mev": 939.56542052,
+      "pdg2024_mp_mev": 938.27208816,
+      "dmcr_original_to_pdg_mev": -0.66542052,
+      "n_in": 363,
+      "n_kept": 217,
+      "iphase_kept": 0,
+      "readback_n": 217,
+      "readback_mn_mev": 939.56542052,
+      "readback_mp_mev": 938.27208816,
+      "re_derivation": {
+        "what": "Q3/Q4/Q6/Q7 re-derived for PDG m_n; Q1/Q2/Q5/Iphase/n_B unchanged",
+        "formulas": {
+          "Q6_tgt": "(Q6_src+1)*m_n_src/m_n_PDG - 1",
+          "Q7_tgt": "(Q7_src+1)*m_n_src/m_n_PDG - 1",
+          "Q3_tgt": "(Q3_src+1)*m_n_src/m_n_PDG - 1",
+          "Q4_tgt": "Q4_src*m_n_src/m_n_PDG",
+          "invariant": "F, P, mu_B, mu_Q per baryon (physical quantities)"
+        },
+        "NOT_a_gauge_shift": "A gauge shift applies dmcr to ONE phase only (crust), leaving the core's m_n/m_p untouched and adding dmcr to F. Here BOTH phases are regenerated to the same PDG m_n/m_p and Q3/Q4/Q6/Q7 are re-derived so the physical F/P/mu_B/mu_Q are invariant. The resulting EOS tables DIFFER from the originals (different m_n/m_p in the header AND different Q3/Q4/Q6/Q7 values).",
+        "distinction_from_matched_regenerated_run": "matched_regenerated/ used the ORIGINAL consistent sources and relied on the CSS match kernel's internal dmcr shift; its Maxwell run failed 65/65 at the 1e-12 mass gate. This run's regenerated sources carry PDG m_n/m_p so the mass gate passes for every pair; the Maxwell result now depends only on the subsequent physics gates (mechanical stability, causal bound, coexistence crossing)."
+      },
+      "pdg_source": "PDG 2024 online (pdg.lbl.gov/2024); CODATA 2022 adjusted constants",
+      "compose_files": [
+        "eos.nb",
+        "eos.t",
+        "eos.thermo",
+        "eos.yq"
+      ]
+    },
+    "GPPVA_DD2": {
+      "model": "GPPVA_DD2",
+      "status": "PASS",
+      "original_mn_mev": 939.0,
+      "original_mp_mev": 939.0,
+      "pdg2024_mn_mev": 939.56542052,
+      "pdg2024_mp_mev": 938.27208816,
+      "dmcr_original_to_pdg_mev": -0.56542052,
+      "n_in": 283,
+      "n_kept": 217,
+      "iphase_kept": 0,
+      "readback_n": 217,
+      "readback_mn_mev": 939.56542052,
+      "readback_mp_mev": 938.27208816,
+      "re_derivation": {
+        "what": "Q3/Q4/Q6/Q7 re-derived for PDG m_n; Q1/Q2/Q5/Iphase/n_B unchanged",
+        "formulas": {
+          "Q6_tgt": "(Q6_src+1)*m_n_src/m_n_PDG - 1",
+          "Q7_tgt": "(Q7_src+1)*m_n_src/m_n_PDG - 1",
+          "Q3_tgt": "(Q3_src+1)*m_n_src/m_n_PDG - 1",
+          "Q4_tgt": "Q4_src*m_n_src/m_n_PDG",
+          "invariant": "F, P, mu_B, mu_Q per baryon (physical quantities)"
+        },
+        "NOT_a_gauge_shift": "A gauge shift applies dmcr to ONE phase only (crust), leaving the core's m_n/m_p untouched and adding dmcr to F. Here BOTH phases are regenerated to the same PDG m_n/m_p and Q3/Q4/Q6/Q7 are re-derived so the physical F/P/mu_B/mu_Q are invariant. The resulting EOS tables DIFFER from the originals (different m_n/m_p in the header AND different Q3/Q4/Q6/Q7 values).",
+        "distinction_from_matched_regenerated_run": "matched_regenerated/ used the ORIGINAL consistent sources and relied on the CSS match kernel's internal dmcr shift; its Maxwell run failed 65/65 at the 1e-12 mass gate. This run's regenerated sources carry PDG m_n/m_p so the mass gate passes for every pair; the Maxwell result now depends only on the subsequent physics gates (mechanical stability, causal bound, coexistence crossing)."
+      },
+      "pdg_source": "PDG 2024 online (pdg.lbl.gov/2024); CODATA 2022 adjusted constants",
+      "compose_files": [
+        "eos.nb",
+        "eos.t",
+        "eos.thermo",
+        "eos.yq"
+      ]
+    },
+    "GPPVA_DDME2": {
+      "model": "GPPVA_DDME2",
+      "status": "PASS",
+      "original_mn_mev": 939.0,
+      "original_mp_mev": 939.0,
+      "pdg2024_mn_mev": 939.56542052,
+      "pdg2024_mp_mev": 938.27208816,
+      "dmcr_original_to_pdg_mev": -0.56542052,
+      "n_in": 288,
+      "n_kept": 217,
+      "iphase_kept": 0,
+      "readback_n": 217,
+      "readback_mn_mev": 939.56542052,
+      "readback_mp_mev": 938.27208816,
+      "re_derivation": {
+        "what": "Q3/Q4/Q6/Q7 re-derived for PDG m_n; Q1/Q2/Q5/Iphase/n_B unchanged",
+        "formulas": {
+          "Q6_tgt": "(Q6_src+1)*m_n_src/m_n_PDG - 1",
+          "Q7_tgt": "(Q7_src+1)*m_n_src/m_n_PDG - 1",
+          "Q3_tgt": "(Q3_src+1)*m_n_src/m_n_PDG - 1",
+          "Q4_tgt": "Q4_src*m_n_src/m_n_PDG",
+          "invariant": "F, P, mu_B, mu_Q per baryon (physical quantities)"
+        },
+        "NOT_a_gauge_shift": "A gauge shift applies dmcr to ONE phase only (crust), leaving the core's m_n/m_p untouched and adding dmcr to F. Here BOTH phases are regenerated to the same PDG m_n/m_p and Q3/Q4/Q6/Q7 are re-derived so the physical F/P/mu_B/mu_Q are invariant. The resulting EOS tables DIFFER from the originals (different m_n/m_p in the header AND different Q3/Q4/Q6/Q7 values).",
+        "distinction_from_matched_regenerated_run": "matched_regenerated/ used the ORIGINAL consistent sources and relied on the CSS match kernel's internal dmcr shift; its Maxwell run failed 65/65 at the 1e-12 mass gate. This run's regenerated sources carry PDG m_n/m_p so the mass gate passes for every pair; the Maxwell result now depends only on the subsequent physics gates (mechanical stability, causal bound, coexistence crossing)."
+      },
+      "pdg_source": "PDG 2024 online (pdg.lbl.gov/2024); CODATA 2022 adjusted constants",
+      "compose_files": [
+        "eos.nb",
+        "eos.t",
+        "eos.thermo",
+        "eos.yq"
+      ]
+    },
+    "GPPVA_TW": {
+      "model": "GPPVA_TW",
+      "status": "PASS",
+      "original_mn_mev": 939.0,
+      "original_mp_mev": 939.0,
+      "pdg2024_mn_mev": 939.56542052,
+      "pdg2024_mp_mev": 938.27208816,
+      "dmcr_original_to_pdg_mev": -0.56542052,
+      "n_in": 289,
+      "n_kept": 217,
+      "iphase_kept": 0,
+      "readback_n": 217,
+      "readback_mn_mev": 939.56542052,
+      "readback_mp_mev": 938.27208816,
+      "re_derivation": {
+        "what": "Q3/Q4/Q6/Q7 re-derived for PDG m_n; Q1/Q2/Q5/Iphase/n_B unchanged",
+        "formulas": {
+          "Q6_tgt": "(Q6_src+1)*m_n_src/m_n_PDG - 1",
+          "Q7_tgt": "(Q7_src+1)*m_n_src/m_n_PDG - 1",
+          "Q3_tgt": "(Q3_src+1)*m_n_src/m_n_PDG - 1",
+          "Q4_tgt": "Q4_src*m_n_src/m_n_PDG",
+          "invariant": "F, P, mu_B, mu_Q per baryon (physical quantities)"
+        },
+        "NOT_a_gauge_shift": "A gauge shift applies dmcr to ONE phase only (crust), leaving the core's m_n/m_p untouched and adding dmcr to F. Here BOTH phases are regenerated to the same PDG m_n/m_p and Q3/Q4/Q6/Q7 are re-derived so the physical F/P/mu_B/mu_Q are invariant. The resulting EOS tables DIFFER from the originals (different m_n/m_p in the header AND different Q3/Q4/Q6/Q7 values).",
+        "distinction_from_matched_regenerated_run": "matched_regenerated/ used the ORIGINAL consistent sources and relied on the CSS match kernel's internal dmcr shift; its Maxwell run failed 65/65 at the 1e-12 mass gate. This run's regenerated sources carry PDG m_n/m_p so the mass gate passes for every pair; the Maxwell result now depends only on the subsequent physics gates (mechanical stability, causal bound, coexistence crossing)."
+      },
+      "pdg_source": "PDG 2024 online (pdg.lbl.gov/2024); CODATA 2022 adjusted constants",
+      "compose_files": [
+        "eos.nb",
+        "eos.t",
+        "eos.thermo",
+        "eos.yq"
+      ]
+    },
+    "GPPVA_FSU2": {
+      "model": "GPPVA_FSU2",
+      "status": "PASS",
+      "original_mn_mev": 939.0,
+      "original_mp_mev": 939.0,
+      "pdg2024_mn_mev": 939.56542052,
+      "pdg2024_mp_mev": 938.27208816,
+      "dmcr_original_to_pdg_mev": -0.56542052,
+      "n_in": 269,
+      "n_kept": 217,
+      "iphase_kept": 0,
+      "readback_n": 217,
+      "readback_mn_mev": 939.56542052,
+      "readback_mp_mev": 938.27208816,
+      "re_derivation": {
+        "what": "Q3/Q4/Q6/Q7 re-derived for PDG m_n; Q1/Q2/Q5/Iphase/n_B unchanged",
+        "formulas": {
+          "Q6_tgt": "(Q6_src+1)*m_n_src/m_n_PDG - 1",
+          "Q7_tgt": "(Q7_src+1)*m_n_src/m_n_PDG - 1",
+          "Q3_tgt": "(Q3_src+1)*m_n_src/m_n_PDG - 1",
+          "Q4_tgt": "Q4_src*m_n_src/m_n_PDG",
+          "invariant": "F, P, mu_B, mu_Q per baryon (physical quantities)"
+        },
+        "NOT_a_gauge_shift": "A gauge shift applies dmcr to ONE phase only (crust), leaving the core's m_n/m_p untouched and adding dmcr to F. Here BOTH phases are regenerated to the same PDG m_n/m_p and Q3/Q4/Q6/Q7 are re-derived so the physical F/P/mu_B/mu_Q are invariant. The resulting EOS tables DIFFER from the originals (different m_n/m_p in the header AND different Q3/Q4/Q6/Q7 values).",
+        "distinction_from_matched_regenerated_run": "matched_regenerated/ used the ORIGINAL consistent sources and relied on the CSS match kernel's internal dmcr shift; its Maxwell run failed 65/65 at the 1e-12 mass gate. This run's regenerated sources carry PDG m_n/m_p so the mass gate passes for every pair; the Maxwell result now depends only on the subsequent physics gates (mechanical stability, causal bound, coexistence crossing)."
+      },
+      "pdg_source": "PDG 2024 online (pdg.lbl.gov/2024); CODATA 2022 adjusted constants",
+      "compose_files": [
+        "eos.nb",
+        "eos.t",
+        "eos.thermo",
+        "eos.yq"
+      ]
+    },
+    "GPPVA_FSU2H": {
+      "model": "GPPVA_FSU2H",
+      "status": "PASS",
+      "original_mn_mev": 939.0,
+      "original_mp_mev": 939.0,
+      "pdg2024_mn_mev": 939.56542052,
+      "pdg2024_mp_mev": 938.27208816,
+      "dmcr_original_to_pdg_mev": -0.56542052,
+      "n_in": 300,
+      "n_kept": 217,
+      "iphase_kept": 0,
+      "readback_n": 217,
+      "readback_mn_mev": 939.56542052,
+      "readback_mp_mev": 938.27208816,
+      "re_derivation": {
+        "what": "Q3/Q4/Q6/Q7 re-derived for PDG m_n; Q1/Q2/Q5/Iphase/n_B unchanged",
+        "formulas": {
+          "Q6_tgt": "(Q6_src+1)*m_n_src/m_n_PDG - 1",
+          "Q7_tgt": "(Q7_src+1)*m_n_src/m_n_PDG - 1",
+          "Q3_tgt": "(Q3_src+1)*m_n_src/m_n_PDG - 1",
+          "Q4_tgt": "Q4_src*m_n_src/m_n_PDG",
+          "invariant": "F, P, mu_B, mu_Q per baryon (physical quantities)"
+        },
+        "NOT_a_gauge_shift": "A gauge shift applies dmcr to ONE phase only (crust), leaving the core's m_n/m_p untouched and adding dmcr to F. Here BOTH phases are regenerated to the same PDG m_n/m_p and Q3/Q4/Q6/Q7 are re-derived so the physical F/P/mu_B/mu_Q are invariant. The resulting EOS tables DIFFER from the originals (different m_n/m_p in the header AND different Q3/Q4/Q6/Q7 values).",
+        "distinction_from_matched_regenerated_run": "matched_regenerated/ used the ORIGINAL consistent sources and relied on the CSS match kernel's internal dmcr shift; its Maxwell run failed 65/65 at the 1e-12 mass gate. This run's regenerated sources carry PDG m_n/m_p so the mass gate passes for every pair; the Maxwell result now depends only on the subsequent physics gates (mechanical stability, causal bound, coexistence crossing)."
+      },
+      "pdg_source": "PDG 2024 online (pdg.lbl.gov/2024); CODATA 2022 adjusted constants",
+      "compose_files": [
+        "eos.nb",
+        "eos.t",
+        "eos.thermo",
+        "eos.yq"
+      ]
+    },
+    "GPPVA_FSU2R": {
+      "model": "GPPVA_FSU2R",
+      "status": "PASS",
+      "original_mn_mev": 939.0,
+      "original_mp_mev": 939.0,
+      "pdg2024_mn_mev": 939.56542052,
+      "pdg2024_mp_mev": 938.27208816,
+      "dmcr_original_to_pdg_mev": -0.56542052,
+      "n_in": 296,
+      "n_kept": 217,
+      "iphase_kept": 0,
+      "readback_n": 217,
+      "readback_mn_mev": 939.56542052,
+      "readback_mp_mev": 938.27208816,
+      "re_derivation": {
+        "what": "Q3/Q4/Q6/Q7 re-derived for PDG m_n; Q1/Q2/Q5/Iphase/n_B unchanged",
+        "formulas": {
+          "Q6_tgt": "(Q6_src+1)*m_n_src/m_n_PDG - 1",
+          "Q7_tgt": "(Q7_src+1)*m_n_src/m_n_PDG - 1",
+          "Q3_tgt": "(Q3_src+1)*m_n_src/m_n_PDG - 1",
+          "Q4_tgt": "Q4_src*m_n_src/m_n_PDG",
+          "invariant": "F, P, mu_B, mu_Q per baryon (physical quantities)"
+        },
+        "NOT_a_gauge_shift": "A gauge shift applies dmcr to ONE phase only (crust), leaving the core's m_n/m_p untouched and adding dmcr to F. Here BOTH phases are regenerated to the same PDG m_n/m_p and Q3/Q4/Q6/Q7 are re-derived so the physical F/P/mu_B/mu_Q are invariant. The resulting EOS tables DIFFER from the originals (different m_n/m_p in the header AND different Q3/Q4/Q6/Q7 values).",
+        "distinction_from_matched_regenerated_run": "matched_regenerated/ used the ORIGINAL consistent sources and relied on the CSS match kernel's internal dmcr shift; its Maxwell run failed 65/65 at the 1e-12 mass gate. This run's regenerated sources carry PDG m_n/m_p so the mass gate passes for every pair; the Maxwell result now depends only on the subsequent physics gates (mechanical stability, causal bound, coexistence crossing)."
+      },
+      "pdg_source": "PDG 2024 online (pdg.lbl.gov/2024); CODATA 2022 adjusted constants",
+      "compose_files": [
+        "eos.nb",
+        "eos.t",
+        "eos.thermo",
+        "eos.yq"
+      ]
+    },
+    "GPPVA_NL3wrL55": {
+      "model": "GPPVA_NL3wrL55",
+      "status": "PASS",
+      "original_mn_mev": 939.0,
+      "original_mp_mev": 939.0,
+      "pdg2024_mn_mev": 939.56542052,
+      "pdg2024_mp_mev": 938.27208816,
+      "dmcr_original_to_pdg_mev": -0.56542052,
+      "n_in": 298,
+      "n_kept": 217,
+      "iphase_kept": 0,
+      "readback_n": 217,
+      "readback_mn_mev": 939.56542052,
+      "readback_mp_mev": 938.27208816,
+      "re_derivation": {
+        "what": "Q3/Q4/Q6/Q7 re-derived for PDG m_n; Q1/Q2/Q5/Iphase/n_B unchanged",
+        "formulas": {
+          "Q6_tgt": "(Q6_src+1)*m_n_src/m_n_PDG - 1",
+          "Q7_tgt": "(Q7_src+1)*m_n_src/m_n_PDG - 1",
+          "Q3_tgt": "(Q3_src+1)*m_n_src/m_n_PDG - 1",
+          "Q4_tgt": "Q4_src*m_n_src/m_n_PDG",
+          "invariant": "F, P, mu_B, mu_Q per baryon (physical quantities)"
+        },
+        "NOT_a_gauge_shift": "A gauge shift applies dmcr to ONE phase only (crust), leaving the core's m_n/m_p untouched and adding dmcr to F. Here BOTH phases are regenerated to the same PDG m_n/m_p and Q3/Q4/Q6/Q7 are re-derived so the physical F/P/mu_B/mu_Q are invariant. The resulting EOS tables DIFFER from the originals (different m_n/m_p in the header AND different Q3/Q4/Q6/Q7 values).",
+        "distinction_from_matched_regenerated_run": "matched_regenerated/ used the ORIGINAL consistent sources and relied on the CSS match kernel's internal dmcr shift; its Maxwell run failed 65/65 at the 1e-12 mass gate. This run's regenerated sources carry PDG m_n/m_p so the mass gate passes for every pair; the Maxwell result now depends only on the subsequent physics gates (mechanical stability, causal bound, coexistence crossing)."
+      },
+      "pdg_source": "PDG 2024 online (pdg.lbl.gov/2024); CODATA 2022 adjusted constants",
+      "compose_files": [
+        "eos.nb",
+        "eos.t",
+        "eos.thermo",
+        "eos.yq"
+      ]
+    },
+    "GPPVA_TM1e": {
+      "model": "GPPVA_TM1e",
+      "status": "PASS",
+      "original_mn_mev": 938.0,
+      "original_mp_mev": 938.0,
+      "pdg2024_mn_mev": 939.56542052,
+      "pdg2024_mp_mev": 938.27208816,
+      "dmcr_original_to_pdg_mev": -1.56542052,
+      "n_in": 303,
+      "n_kept": 217,
+      "iphase_kept": 0,
+      "readback_n": 217,
+      "readback_mn_mev": 939.56542052,
+      "readback_mp_mev": 938.27208816,
+      "re_derivation": {
+        "what": "Q3/Q4/Q6/Q7 re-derived for PDG m_n; Q1/Q2/Q5/Iphase/n_B unchanged",
+        "formulas": {
+          "Q6_tgt": "(Q6_src+1)*m_n_src/m_n_PDG - 1",
+          "Q7_tgt": "(Q7_src+1)*m_n_src/m_n_PDG - 1",
+          "Q3_tgt": "(Q3_src+1)*m_n_src/m_n_PDG - 1",
+          "Q4_tgt": "Q4_src*m_n_src/m_n_PDG",
+          "invariant": "F, P, mu_B, mu_Q per baryon (physical quantities)"
+        },
+        "NOT_a_gauge_shift": "A gauge shift applies dmcr to ONE phase only (crust), leaving the core's m_n/m_p untouched and adding dmcr to F. Here BOTH phases are regenerated to the same PDG m_n/m_p and Q3/Q4/Q6/Q7 are re-derived so the physical F/P/mu_B/mu_Q are invariant. The resulting EOS tables DIFFER from the originals (different m_n/m_p in the header AND different Q3/Q4/Q6/Q7 values).",
+        "distinction_from_matched_regenerated_run": "matched_regenerated/ used the ORIGINAL consistent sources and relied on the CSS match kernel's internal dmcr shift; its Maxwell run failed 65/65 at the 1e-12 mass gate. This run's regenerated sources carry PDG m_n/m_p so the mass gate passes for every pair; the Maxwell result now depends only on the subsequent physics gates (mechanical stability, causal bound, coexistence crossing)."
+      },
+      "pdg_source": "PDG 2024 online (pdg.lbl.gov/2024); CODATA 2022 adjusted constants",
+      "compose_files": [
+        "eos.nb",
+        "eos.t",
+        "eos.thermo",
+        "eos.yq"
+      ]
+    },
+    "APR_APR": {
+      "model": "APR_APR",
+      "status": "PASS",
+      "original_mn_mev": 939.56533,
+      "original_mp_mev": 938.272,
+      "pdg2024_mn_mev": 939.56542052,
+      "pdg2024_mp_mev": 938.27208816,
+      "dmcr_original_to_pdg_mev": -9.052e-05,
+      "n_in": 172,
+      "n_kept": 172,
+      "iphase_kept": 0,
+      "readback_n": 172,
+      "readback_mn_mev": 939.56542052,
+      "readback_mp_mev": 938.27208816,
+      "re_derivation": {
+        "what": "Q3/Q4/Q6/Q7 re-derived for PDG m_n; Q1/Q2/Q5/Iphase/n_B unchanged",
+        "formulas": {
+          "Q6_tgt": "(Q6_src+1)*m_n_src/m_n_PDG - 1",
+          "Q7_tgt": "(Q7_src+1)*m_n_src/m_n_PDG - 1",
+          "Q3_tgt": "(Q3_src+1)*m_n_src/m_n_PDG - 1",
+          "Q4_tgt": "Q4_src*m_n_src/m_n_PDG",
+          "invariant": "F, P, mu_B, mu_Q per baryon (physical quantities)"
+        },
+        "NOT_a_gauge_shift": "A gauge shift applies dmcr to ONE phase only (crust), leaving the core's m_n/m_p untouched and adding dmcr to F. Here BOTH phases are regenerated to the same PDG m_n/m_p and Q3/Q4/Q6/Q7 are re-derived so the physical F/P/mu_B/mu_Q are invariant. The resulting EOS tables DIFFER from the originals (different m_n/m_p in the header AND different Q3/Q4/Q6/Q7 values).",
+        "distinction_from_matched_regenerated_run": "matched_regenerated/ used the ORIGINAL consistent sources and relied on the CSS match kernel's internal dmcr shift; its Maxwell run failed 65/65 at the 1e-12 mass gate. This run's regenerated sources carry PDG m_n/m_p so the mass gate passes for every pair; the Maxwell result now depends only on the subsequent physics gates (mechanical stability, causal bound, coexistence crossing)."
+      },
+      "pdg_source": "PDG 2024 online (pdg.lbl.gov/2024); CODATA 2022 adjusted constants",
+      "compose_files": [
+        "eos.nb",
+        "eos.t",
+        "eos.thermo",
+        "eos.yq"
+      ]
+    },
+    "BBB_BHF2": {
+      "model": "BBB_BHF2",
+      "status": "PASS",
+      "original_mn_mev": 939.56533,
+      "original_mp_mev": 938.272,
+      "pdg2024_mn_mev": 939.56542052,
+      "pdg2024_mp_mev": 938.27208816,
+      "dmcr_original_to_pdg_mev": -9.052e-05,
+      "n_in": 84,
+      "n_kept": 84,
+      "iphase_kept": 0,
+      "readback_n": 84,
+      "readback_mn_mev": 939.56542052,
+      "readback_mp_mev": 938.27208816,
+      "re_derivation": {
+        "what": "Q3/Q4/Q6/Q7 re-derived for PDG m_n; Q1/Q2/Q5/Iphase/n_B unchanged",
+        "formulas": {
+          "Q6_tgt": "(Q6_src+1)*m_n_src/m_n_PDG - 1",
+          "Q7_tgt": "(Q7_src+1)*m_n_src/m_n_PDG - 1",
+          "Q3_tgt": "(Q3_src+1)*m_n_src/m_n_PDG - 1",
+          "Q4_tgt": "Q4_src*m_n_src/m_n_PDG",
+          "invariant": "F, P, mu_B, mu_Q per baryon (physical quantities)"
+        },
+        "NOT_a_gauge_shift": "A gauge shift applies dmcr to ONE phase only (crust), leaving the core's m_n/m_p untouched and adding dmcr to F. Here BOTH phases are regenerated to the same PDG m_n/m_p and Q3/Q4/Q6/Q7 are re-derived so the physical F/P/mu_B/mu_Q are invariant. The resulting EOS tables DIFFER from the originals (different m_n/m_p in the header AND different Q3/Q4/Q6/Q7 values).",
+        "distinction_from_matched_regenerated_run": "matched_regenerated/ used the ORIGINAL consistent sources and relied on the CSS match kernel's internal dmcr shift; its Maxwell run failed 65/65 at the 1e-12 mass gate. This run's regenerated sources carry PDG m_n/m_p so the mass gate passes for every pair; the Maxwell result now depends only on the subsequent physics gates (mechanical stability, causal bound, coexistence crossing)."
+      },
+      "pdg_source": "PDG 2024 online (pdg.lbl.gov/2024); CODATA 2022 adjusted constants",
+      "compose_files": [
+        "eos.nb",
+        "eos.t",
+        "eos.thermo",
+        "eos.yq"
+      ]
+    },
+    "GM_GM1": {
+      "model": "GM_GM1",
+      "status": "PASS",
+      "original_mn_mev": 939.56533,
+      "original_mp_mev": 938.272,
+      "pdg2024_mn_mev": 939.56542052,
+      "pdg2024_mp_mev": 938.27208816,
+      "dmcr_original_to_pdg_mev": -9.052e-05,
+      "n_in": 349,
+      "n_kept": 301,
+      "iphase_kept": 3,
+      "readback_n": 301,
+      "readback_mn_mev": 939.56542052,
+      "readback_mp_mev": 938.27208816,
+      "re_derivation": {
+        "what": "Q3/Q4/Q6/Q7 re-derived for PDG m_n; Q1/Q2/Q5/Iphase/n_B unchanged",
+        "formulas": {
+          "Q6_tgt": "(Q6_src+1)*m_n_src/m_n_PDG - 1",
+          "Q7_tgt": "(Q7_src+1)*m_n_src/m_n_PDG - 1",
+          "Q3_tgt": "(Q3_src+1)*m_n_src/m_n_PDG - 1",
+          "Q4_tgt": "Q4_src*m_n_src/m_n_PDG",
+          "invariant": "F, P, mu_B, mu_Q per baryon (physical quantities)"
+        },
+        "NOT_a_gauge_shift": "A gauge shift applies dmcr to ONE phase only (crust), leaving the core's m_n/m_p untouched and adding dmcr to F. Here BOTH phases are regenerated to the same PDG m_n/m_p and Q3/Q4/Q6/Q7 are re-derived so the physical F/P/mu_B/mu_Q are invariant. The resulting EOS tables DIFFER from the originals (different m_n/m_p in the header AND different Q3/Q4/Q6/Q7 values).",
+        "distinction_from_matched_regenerated_run": "matched_regenerated/ used the ORIGINAL consistent sources and relied on the CSS match kernel's internal dmcr shift; its Maxwell run failed 65/65 at the 1e-12 mass gate. This run's regenerated sources carry PDG m_n/m_p so the mass gate passes for every pair; the Maxwell result now depends only on the subsequent physics gates (mechanical stability, causal bound, coexistence crossing)."
+      },
+      "pdg_source": "PDG 2024 online (pdg.lbl.gov/2024); CODATA 2022 adjusted constants",
+      "compose_files": [
+        "eos.nb",
+        "eos.t",
+        "eos.thermo",
+        "eos.yq"
+      ]
+    },
+    "RG_SLY4": {
+      "model": "RG_SLY4",
+      "status": "PASS",
+      "original_mn_mev": 939.5654,
+      "original_mp_mev": 938.272,
+      "pdg2024_mn_mev": 939.56542052,
+      "pdg2024_mp_mev": 938.27208816,
+      "dmcr_original_to_pdg_mev": -2.052e-05,
+      "n_in": 197,
+      "n_kept": 54,
+      "iphase_kept": 3,
+      "readback_n": 54,
+      "readback_mn_mev": 939.56542052,
+      "readback_mp_mev": 938.27208816,
+      "re_derivation": {
+        "what": "Q3/Q4/Q6/Q7 re-derived for PDG m_n; Q1/Q2/Q5/Iphase/n_B unchanged",
+        "formulas": {
+          "Q6_tgt": "(Q6_src+1)*m_n_src/m_n_PDG - 1",
+          "Q7_tgt": "(Q7_src+1)*m_n_src/m_n_PDG - 1",
+          "Q3_tgt": "(Q3_src+1)*m_n_src/m_n_PDG - 1",
+          "Q4_tgt": "Q4_src*m_n_src/m_n_PDG",
+          "invariant": "F, P, mu_B, mu_Q per baryon (physical quantities)"
+        },
+        "NOT_a_gauge_shift": "A gauge shift applies dmcr to ONE phase only (crust), leaving the core's m_n/m_p untouched and adding dmcr to F. Here BOTH phases are regenerated to the same PDG m_n/m_p and Q3/Q4/Q6/Q7 are re-derived so the physical F/P/mu_B/mu_Q are invariant. The resulting EOS tables DIFFER from the originals (different m_n/m_p in the header AND different Q3/Q4/Q6/Q7 values).",
+        "distinction_from_matched_regenerated_run": "matched_regenerated/ used the ORIGINAL consistent sources and relied on the CSS match kernel's internal dmcr shift; its Maxwell run failed 65/65 at the 1e-12 mass gate. This run's regenerated sources carry PDG m_n/m_p so the mass gate passes for every pair; the Maxwell result now depends only on the subsequent physics gates (mechanical stability, causal bound, coexistence crossing)."
+      },
+      "pdg_source": "PDG 2024 online (pdg.lbl.gov/2024); CODATA 2022 adjusted constants",
+      "compose_files": [
+        "eos.nb",
+        "eos.t",
+        "eos.thermo",
+        "eos.yq"
+      ]
+    },
+    "RG_KDE0v1": {
+      "model": "RG_KDE0v1",
+      "status": "PASS",
+      "original_mn_mev": 939.56533,
+      "original_mp_mev": 938.272,
+      "pdg2024_mn_mev": 939.56542052,
+      "pdg2024_mp_mev": 938.27208816,
+      "dmcr_original_to_pdg_mev": -9.052e-05,
+      "n_in": 1240,
+      "n_kept": 274,
+      "iphase_kept": 3,
+      "readback_n": 274,
+      "readback_mn_mev": 939.56542052,
+      "readback_mp_mev": 938.27208816,
+      "re_derivation": {
+        "what": "Q3/Q4/Q6/Q7 re-derived for PDG m_n; Q1/Q2/Q5/Iphase/n_B unchanged",
+        "formulas": {
+          "Q6_tgt": "(Q6_src+1)*m_n_src/m_n_PDG - 1",
+          "Q7_tgt": "(Q7_src+1)*m_n_src/m_n_PDG - 1",
+          "Q3_tgt": "(Q3_src+1)*m_n_src/m_n_PDG - 1",
+          "Q4_tgt": "Q4_src*m_n_src/m_n_PDG",
+          "invariant": "F, P, mu_B, mu_Q per baryon (physical quantities)"
+        },
+        "NOT_a_gauge_shift": "A gauge shift applies dmcr to ONE phase only (crust), leaving the core's m_n/m_p untouched and adding dmcr to F. Here BOTH phases are regenerated to the same PDG m_n/m_p and Q3/Q4/Q6/Q7 are re-derived so the physical F/P/mu_B/mu_Q are invariant. The resulting EOS tables DIFFER from the originals (different m_n/m_p in the header AND different Q3/Q4/Q6/Q7 values).",
+        "distinction_from_matched_regenerated_run": "matched_regenerated/ used the ORIGINAL consistent sources and relied on the CSS match kernel's internal dmcr shift; its Maxwell run failed 65/65 at the 1e-12 mass gate. This run's regenerated sources carry PDG m_n/m_p so the mass gate passes for every pair; the Maxwell result now depends only on the subsequent physics gates (mechanical stability, causal bound, coexistence crossing)."
+      },
+      "pdg_source": "PDG 2024 online (pdg.lbl.gov/2024); CODATA 2022 adjusted constants",
+      "compose_files": [
+        "eos.nb",
+        "eos.t",
+        "eos.thermo",
+        "eos.yq"
+      ]
+    }
+  }
+}

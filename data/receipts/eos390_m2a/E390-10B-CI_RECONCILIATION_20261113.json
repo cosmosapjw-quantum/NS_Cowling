@@ -1,0 +1,179 @@
+{
+  "schema": "ns-cowling.evidence-reconciliation",
+  "schema_version": "1.0.0",
+  "receipt_id": "E390-10B-CI-RECONCILIATION-20261113",
+  "created_utc": "2026-11-13T10:24:00Z",
+  "branch": "cloud/eos390-fortran-unification-v1",
+  "base_head": "9f543b7d233be0fa9239ee5a84b2b9786b4fce2c",
+  "pr_number": 13,
+  "disposition": "M10_PHASE3_THERMO_ONLY_EXPORT_FAIL_CLOSED_CI_PASS_PROVIDER_COMPOSITION_GATE_BLOCKED",
+  "design_record": "data/receipts/eos390_m2a/E390-10B-DESIGN_20261113.json",
+  "authoritative_ci": {
+    "run_id": 43410589930,
+    "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43410589930",
+    "event": "pull_request",
+    "tested_head": "9f543b7d233be0fa9239ee5a84b2b9786b4fce2c",
+    "result": "success",
+    "test_summary": "124 passed, 3 skipped",
+    "build": "PASS",
+    "python_frontend_and_native_tests": "PASS",
+    "fortran_polynomial_extrema_and_css_analytic_tests": "PASS",
+    "checksum_manifest": "PASS (90 tracked manifest entries)",
+    "packaging": "PASS",
+    "artifact_id": 14029895606,
+    "artifact_url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43410589930/artifacts/14029895606",
+    "artifact_name": "NS_Cowling-69056bade04aff4026e9db500f3451a1fc3b3af1",
+    "artifact_size_bytes": 55503422,
+    "artifact_sha256": "0d797b73dd8f584f30ee0096d99e8fb4cf6822b60dbb619a0f24653740972d04",
+    "artifact_expires_utc": "2026-12-13T10:39:08Z"
+  },
+  "phase_adjudication": [
+    {
+      "phase": 1,
+      "scope": "q_full/q_extra_full tensor data model and select_slice",
+      "status": "IMPLEMENTED_SYNTHETIC_TESTED",
+      "evidence": "test_e390_10b_tensor_model.py; 12 tests per design receipt"
+    },
+    {
+      "phase": 2,
+      "scope": "Nadd>=0 native CompOSE I/O and multi-column extra quantities",
+      "status": "IMPLEMENTED_SYNTHETIC_TESTED",
+      "evidence": "test_e390_10b_nadd_relaxation.py; Nadd 0/2/3 cases including round-trip"
+    },
+    {
+      "phase": 3,
+      "scope": "T=0, multi-Yq reader and slice materialization",
+      "status": "IMPLEMENTED_SYNTHETIC_TESTED",
+      "evidence": "test_e390_10b_multi_yq.py; q_full(1,nYq,7,nb)"
+    },
+    {
+      "phase": 4,
+      "scope": "multi-point T axis read into q_full(nT,nYq,7,nb)",
+      "status": "PENDING"
+    },
+    {
+      "phase": 5,
+      "scope": "lossless full T x Yq tensor CompOSE writer/readback",
+      "status": "PENDING"
+    },
+    {
+      "phase": 6,
+      "scope": "source-backed acceptance and complete generic-axis regression",
+      "status": "NOT_REPRODUCED_IN_THIS_CI"
+    },
+    {
+      "phase": "CI-followup",
+      "scope": "unconditional synthetic Nadd and multi-Yq fixture execution",
+      "status": "PASS",
+      "evidence": "Commits f9dd6fef and 9f543b7d remove inappropriate raw-data guards from synthetic tests; CI 124 passed, 3 skipped. This does not supply or validate actual raw eos source files."
+    }
+  ],
+  "source_staging_reconciliation": {
+    "m0_status": "IMPLEMENTED_CI_PASS_IN_ORIGINAL_PROJECT_WORKSPACE",
+    "archive": {
+      "name": "EoS_complete_core_crust_release_v3_2.zip",
+      "size_bytes": 19398255,
+      "sha256": "d671310eb630ffd13f1b278425d945741ad7e08ce14c0d9aff42309c707e6a3b",
+      "zip_members": 2516,
+      "zip_crc": "PASS",
+      "source_models": 18,
+      "source_files": 158
+    },
+    "original_workspace_outputs": "inputs/raw_compose/SHA256SUMS.txt (158 hashes), inputs/raw_compose/source_manifest.json, inputs/replacement/eos390_reconstructed_source_v1.tar.zst; see E390-00-RESOLVED_20261113.json",
+    "github_actions_checkout": {
+      "inputs_raw_compose_entries": 0,
+      "tests_skipped": [
+        "test_real_RG_SLY4_passes_slice_check",
+        "test_real_RG_KDE0v1_passes_slice_check"
+      ],
+      "synthetic_test_change": "The Nadd and multi-Yq synthetic fixture tests no longer gate on inputs/raw_compose and now execute in CI."
+    },
+    "interpretation": "M0 source ingestion was completed in the original project workspace. Its 18-model tree was not committed to the Git checkout, so GitHub Actions does not see those files. This is a CI input-provisioning gap, not a basis for invalidating the M0 source receipt or claiming cloud source tests passed.",
+    "status": "SOURCE_COHORT_VERIFIED_LOCALLY__SOURCE_BACKED_CI_TESTS_NOT_RUN"
+  },
+  "checksum_reconciliation": {
+    "status": "NINE_ENTRIES_VERIFIED_AFTER_REPAIR_ON_f15; LATER_9f543_TEST_COMMITS_ALSO_PASS_MANIFEST",
+    "mismatches": [
+      {
+        "path": "fortran_eos/app/compose_eos_fortran.f90",
+        "sha256": "46ecfe65f298224740aae280fa5db0691dc608e6ad51ef5ddbad5ad41859209c"
+      },
+      {
+        "path": "fortran_eos/src/compose_eos_io.f90",
+        "sha256": "005a03bd85c8def873b75d344a0070003d620ee773abe49750fa4ed51d907cc9"
+      },
+      {
+        "path": "fortran_eos/src/compose_eos_reconstruct.f90",
+        "sha256": "be26160a1e89a7e8ecde3dc006704002480786a1dd8880f7428554c0f67f8eef"
+      },
+      {
+        "path": "fortran_eos/src/compose_eos_types.f90",
+        "sha256": "9dea2bc5a8a0dd64a08632bbe66021b6efb73833bf425579df8eacee278a80a4"
+      },
+      {
+        "path": "python_frontend/compose_eos/__init__.py",
+        "sha256": "206510ad8eb4571814e24236a027f9c9c3a1ad7b1ee391efc0d6569d38ffcf94"
+      },
+      {
+        "path": "python_frontend/compose_eos/api.py",
+        "sha256": "f7ab9b3ab5ee7d16d6013ba2a3a64c4ca02b5e234d613e791c40c626e5d88ffb"
+      },
+      {
+        "path": "python_frontend/compose_eos/eos_data.py",
+        "sha256": "81be704d54cf0c5a163ca1f98a58abc503e805ba8dabbb28756bbad7d9243417"
+      },
+      {
+        "path": "python_frontend/tests/test_native_density_gap.py",
+        "sha256": "46da83a57b51acff81ffcd250611344b5ced9bf4402b9c665e889384118e6c07"
+      },
+      {
+        "path": "data/eos390_native_fortran_unification_dag.v1.json",
+        "sha256": "221b8afdf3cf035cfde04d609d7c1708f6b99326521717765b4581dec07969ea"
+      }
+    ],
+    "note": "Digests independently recomputed from exact UTF-8 GitHub file contents; pure SHA-256 implementation verified against the standard abc vector and the workflow's printed actual values."
+  },
+  "not_claimed": [
+    "full 3D T x Yq x nb input support",
+    "full multidimensional writer/readback",
+    "source-backed RG_SLY4 or RG_KDE0v1 test pass in this GitHub Actions checkout",
+    "provider semantics for SPG/GPPVA composition resolved",
+    "M7 production PASS",
+    "M9 output regeneration",
+    "any of the 390 EOS outputs regenerated",
+    "Dropbox raw source/output upload"
+  ],
+  "updated_phase_status": {
+    "phase_1": "IMPLEMENTED_SYNTHETIC_TESTED",
+    "phase_2": "IMPLEMENTED_SYNTHETIC_TESTED",
+    "phase_3": "IMPLEMENTED_SYNTHETIC_TESTED",
+    "phase_4": "PENDING_MULTI_T_READER",
+    "phase_5": "PENDING_FULL_TENSOR_WRITER_READBACK",
+    "source_acceptance": "PENDING_CONTROLLED_CI_DATA_PROVISIONING"
+  },
+  "source_composition_audit": {
+    "path": "data/receipts/eos390_m0/E390-02_COMPOSITION_CLOSURE_SOURCE_RECONCILIATION_20261113.json",
+    "sha256": "5a38907b5282317e0222b5fe3827348433e8f72fe9b1f8e78e046e487f4d64d7",
+    "status": "BLOCKED_PROVIDER_SEMANTICS_UNRESOLVED_NORMALIZED_CLOSURE_IS_RECONSTRUCTION",
+    "rows": 4172,
+    "phase_counts": {
+      "0": 2821,
+      "7": 1351
+    },
+    "disposition": "Provider semantics BLOCKED; normalized closure is reconstruction, not independent source truth."
+  },
+  "latest_ci_85674051": {
+    "pr_run_id": 43412995065,
+    "push_run_id": 43412979766,
+    "result": "SUCCESS",
+    "test_summary": "127 passed, 3 skipped",
+    "artifact_id": 14029883858
+  },
+  "multidimensional_export_guard": {
+    "head_sha": "85674051e11276eb6a5c68fa7c5ea4dc1e1f09fd",
+    "status": "CI_PASS",
+    "python_api": "rejects nT>1 or nYq>1",
+    "native_fortran_cli": "rejects nT>1 or nYq>1 before output files",
+    "regression_tests": 2
+  }
+}

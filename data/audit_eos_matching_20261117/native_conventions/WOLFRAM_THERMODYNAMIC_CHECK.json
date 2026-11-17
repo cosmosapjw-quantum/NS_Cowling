@@ -1,0 +1,10 @@
+{
+  "basis": "derived; symbolically checked",
+  "tool": "Wolfram Language evaluator",
+  "context_tool_status": "failed: internal error -32603; evaluator remained available",
+  "assumptions": "n>0, n1>0, e1+p1>0, 0<=s<=1; shifted chemical potential positive",
+  "units": "n in fm^-3; e1,p1 in MeV fm^-3; mu1 and cc in MeV; s=c_s^2/c^2 dimensionless",
+  "code": "Clear[n,n1,e1,p1,s,cc]; mu1=(e1+p1)/n1; ee=((e1+p1)(n/n1)^(1+s)+s e1-p1)/(1+s); pp=s ee+p1-s e1; mm=mu1(n/n1)^s; assumptions=n>0&&n1>0&&e1+p1>0&&s>=0&&s<=1; checks=FullSimplify[{D[ee,n]-mm,n D[ee,n]-ee-pp,D[pp,n]-n D[mm,n],D[pp,n]/D[ee,n]-s,(ee+pp)/n-mm},assumptions]; shifted=FullSimplify[{n D[ee+cc n,n]-(ee+cc n)-pp,D[ee+cc n,n]-(mm+cc),D[pp,n]/D[ee+cc n,n]-s mm/(mm+cc)},assumptions&&mm+cc>0]; {checks,shifted,FullSimplify[{ee,pp,mm}/.s->0,assumptions]}",
+  "output": "{{0, 0, 0, 0, 0}, {0, 0, 0}, {-p1 + (n*(e1 + p1))/n1, p1, (e1 + p1)/n1}}",
+  "interpretation": "Constant-sound-speed first-law identities and energy-per-baryon physical-shift identities hold under the declared assumptions; no new general theorem or literature novelty is claimed."
+}

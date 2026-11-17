@@ -1,0 +1,76 @@
+{
+  "schema": "ns-cowling.cld-reconstruction-receipt.v2",
+  "model": "SPG_M1",
+  "scientific_scope": "exploratory_proxy_CLD",
+  "source_calibrated": false,
+  "interface_functional": {
+    "coulomb_phi": "0.5*sqrt(2-3*f) for 0<f<2/3, zero otherwise",
+    "surface_sigma": "sigma_0*(yp*(1-yp))**b",
+    "source_equivalence": false,
+    "reference": "Scurto et al. 2024 arXiv:2402.15548 eqs.24-25 have different functions and require fitted parameters"
+  },
+  "columns": "iT inb iYq Q1 Q2 Q3 Q4 Q5 Q6 Q7 Nadd",
+  "reference_masses_MeV": {
+    "neutron": 938.9,
+    "proton": 938.9
+  },
+  "rows": 16,
+  "n_B_range_fm3": [
+    0.001,
+    0.050856112561
+  ],
+  "thermodynamics": "not-a-knot cubic spline of eps - m_n n_B; mu_B = m_n + derivative; P = n_B mu_B - eps",
+  "continuous_causality_validation": "analytic cubic interval endpoints: R_second > 0; mu - n R_second >= 0",
+  "max_euler_relative_residual": 2.416354032317437e-16,
+  "gas_mu_n_minus_derived_mu_B_max_abs_MeV": 0.04459420805392256,
+  "gas_mu_n_rows": 16,
+  "cluster_bulk_mu_n_minus_derived_mu_B_max_abs_MeV": 0.8019831046742638,
+  "mu_note": "equilibrium check is gas mu_n vs derived mu_B; the cluster bulk mu_n omits surface and Coulomb derivative terms",
+  "dropped_box_bound_rows": [
+    16,
+    17,
+    18,
+    19
+  ],
+  "source_row_offset": 0,
+  "box_bounds": {
+    "R_d_fm": [
+      2.0,
+      40.0
+    ],
+    "f": [
+      0.0001,
+      0.95
+    ],
+    "rho_I_fm3": [
+      0.01,
+      0.5
+    ]
+  },
+  "omitted_files": [
+    "eos.compo",
+    "eos.init",
+    "eos.mr"
+  ],
+  "provenance": {
+    "sigma_0": 1.0,
+    "b": 1.0,
+    "density_grid_source": "download/reconstruction/SPG_M1",
+    "git_head": "eda4af96743c9af3369d1810ef733badb1709b93",
+    "nucleon_masses_recorded_in_parameter_set": {
+      "neutron": 938.9,
+      "proton": 938.9
+    },
+    "hamiltonian_masses_used_MeV": {
+      "neutron": 938.9,
+      "proton": 938.9
+    },
+    "source_sha256": {
+      "python_frontend/compose_eos/cld_cell.py": "a9b0b986dc00db8e5622c2583b11b8bfeba5037f6e896c12620459d79fec1c59",
+      "python_frontend/compose_eos/reconstruct_cld.py": "3880afb8db88788d0d9b956e23b8af5c1fe71e996454d2003bae5beb0db27e61",
+      "python_frontend/compose_eos/rmf_solver.py": "1ddb7e825115df3b44ef202d2f161c59920ee8e83065622a07fe6f9b888d77cf",
+      "scripts/regenerate_cld_crusts_v2.py": "2a8d6d47e63fb8cfa0ddf3c73280fe2fef0997f8fe6ea3c8571046aa75c153cb"
+    },
+    "git_tracked_dirty": true
+  }
+}

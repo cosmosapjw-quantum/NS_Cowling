@@ -21,7 +21,7 @@ sys.path.insert(0, str(PROJECT_DIR / "compose_eos_pkg"))
 
 from compose_eos import (
     CRUST_NAMES, CORE_NAMES, METHODS,
-    read_compose, write_compose, match_crust_core, check_consistency,
+    read_compose, write_compose_verified, match_crust_core, check_consistency,
     solve_star_at_target_mass,
 )
 
@@ -130,7 +130,7 @@ def main(argv=None) -> int:
                     if passed or args.allow_failed:
                         out_dir = args.output / f"{crust_name}__{core_name}__{method}"
                         out_dir.mkdir(parents=True, exist_ok=False)
-                        write_compose(str(out_dir), eos)
+                        write_compose_verified(str(out_dir), eos)
                         metadata = {
                             **result,
                             "schema": "compose-eos-core-crust-match-v3.2",

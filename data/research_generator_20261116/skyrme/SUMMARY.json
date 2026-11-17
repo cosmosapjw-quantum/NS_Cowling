@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "scope": "independent_uniform_Skyrme_npemu",
+  "provenance": {
+    "git_head": "677585947e4d126bc27cc3d8f30c265c407a7773",
+    "tracked_worktree_dirty": true,
+    "source_sha256": {
+      "python_frontend/compose_eos/skyrme_uniform.py": "ddbf21bb0f4af460c88219a715da63924f36f132c50f70b25e7743737a2fdfe3",
+      "python_frontend/compose_eos/cold_leptons.py": "ac995eb2504560da1569190a2f95bbbe266961dab0498dc0665951afca4c2ded",
+      "python_frontend/compose_eos/physical_domain.py": "b9fb141b6e173d0a5a49817f5c6ccbff9032d2beff1c43248d37542d2a2c3346",
+      "scripts/build_skyrme_uniform.py": "a2828f3a52de48b7c04bbaacd7b264b7e5a7b64bdc714e7fd8d863ae7683b965"
+    }
+  },
+  "model_ids": [
+    "RG_KDE0v1",
+    "RG_SLY4"
+  ],
+  "models": [
+    {
+      "model_id": "RG_KDE0v1",
+      "rows": 274,
+      "max_pressure_relative_difference": 0.056189478370246286,
+      "max_energy_relative_difference": 0.0004448130139778461,
+      "max_Yp_absolute_difference": 0.00015063263549311423,
+      "max_charge_residual_fm3": 4.093947403305265e-15,
+      "max_euler_residual_mev_fm3": 1.8189894035458565e-12,
+      "receipt_sha256": "31677090a033f3f3ccd8b1981e12c7d9b609cb6a07d84ebcf06e18a7b71d085d"
+    },
+    {
+      "model_id": "RG_SLY4",
+      "rows": 54,
+      "max_pressure_relative_difference": 0.13088519425690984,
+      "max_energy_relative_difference": 0.00016758565861419583,
+      "max_Yp_absolute_difference": 0.00013304762424658223,
+      "max_charge_residual_fm3": 1.3530843112619095e-15,
+      "max_euler_residual_mev_fm3": 9.094947017729282e-13,
+      "receipt_sha256": "87404042f287526eab071c4eb3ccadfd3602cec73891a5b9b894672cd9685357"
+    }
+  ],
+  "archive": {
+    "name": "skyrme_uniform_generated_tables.zip",
+    "bytes": 144729,
+    "sha256": "2885998a2262c97f292d4a4eb39afd9ac4ce4eb6f2ca1c3b391c8384d23573fa"
+  },
+  "previous_archive_identity": {
+    "name": "skyrme_uniform_generated_tables.zip",
+    "bytes": 142485,
+    "sha256": "4a14d8acf03397496a99a03d3c62901e9251a0480585527f1d6634ee803ca033"
+  },
+  "refresh_reason": "Final physical_domain includes F=epsilon and separate mu_B monotonic diagnostics.",
+  "causal_crossings": [
+    {
+      "model_id": "RG_KDE0v1",
+      "scope": "numerical cs2/c2=1 crossing of uniform npemu model branch",
+      "crossings": [
+        {
+          "relative_derivative_step": 0.001,
+          "causal_crossing_density_fm3": 1.4109655616692842
+        },
+        {
+          "relative_derivative_step": 0.0005,
+          "causal_crossing_density_fm3": 1.4109658104273337
+        },
+        {
+          "relative_derivative_step": 0.00025,
+          "causal_crossing_density_fm3": 1.4109658726158703
+        },
+        {
+          "relative_derivative_step": 0.000125,
+          "causal_crossing_density_fm3": 1.410965888165209
+        }
+      ],
+      "last_refinement_change_fm3": 1.5549338705511673e-08,
+      "other_stability_channels": "spin and finite-wave-number stability unassessed"
+    },
+    {
+      "model_id": "RG_SLY4",
+      "scope": "numerical cs2/c2=1 crossing of uniform npemu model branch",
+      "crossings": [
+        {
+          "relative_derivative_step": 0.001,
+          "causal_crossing_density_fm3": 1.2650054609251185
+        },
+        {
+          "relative_derivative_step": 0.0005,
+          "causal_crossing_density_fm3": 1.2650056188712757
+        },
+        {
+          "relative_derivative_step": 0.00025,
+          "causal_crossing_density_fm3": 1.2650056583575937
+        },
+        {
+          "relative_derivative_step": 0.000125,
+          "causal_crossing_density_fm3": 1.2650056682325175
+        }
+      ],
+      "last_refinement_change_fm3": 9.874923767583255e-09,
+      "other_stability_channels": "spin and finite-wave-number stability unassessed"
+    }
+  ],
+  "tests": {
+    "passed": 38,
+    "log": "tests_final.log"
+  },
+  "frozen_composition_check": {
+    "cases": 10,
+    "all_frozen_sound_speed_ge_equilibrium": true,
+    "results": "frozen_composition.json"
+  },
+  "source_comparison_status": "RESIDUALS_RETAINED; exact provider convention/precision reconciliation remains open",
+  "pressure_fidelity": {
+    "method": "Evaluate exact same source densities; sensitivity-only parameter changes restored after each trial; compare source/model energy-grid derivatives.",
+    "result": "Low-density pressure discrepancies remain after tested constants/species/rounding changes. Provider implementation details remain unresolved.",
+    "results": "pressure_fidelity.json",
+    "replay_script": "diagnose_pressure.py",
+    "models": [
+      {
+        "model_id": "RG_KDE0v1",
+        "source_homogeneous_support_fm3": [
+          0.04582369,
+          1.791349
+        ],
+        "pressure_within_1percent_sampled_ranges": [
+          {
+            "start_index": 41,
+            "end_index": 53,
+            "n_min_fm3": 0.1137985,
+            "n_max_fm3": 0.1314325
+          },
+          {
+            "start_index": 92,
+            "end_index": 272,
+            "n_min_fm3": 0.2102486,
+            "n_max_fm3": 1.767846
+          }
+        ],
+        "pressure_within_1percent_rows": 194,
+        "rows": 274
+      },
+      {
+        "model_id": "RG_SLY4",
+        "source_homogeneous_support_fm3": [
+          0.05248075,
+          1.21
+        ],
+        "pressure_within_1percent_sampled_ranges": [
+          {
+            "start_index": 7,
+            "end_index": 7,
+            "n_min_fm3": 0.1,
+            "n_max_fm3": 0.1
+          },
+          {
+            "start_index": 15,
+            "end_index": 53,
+            "n_min_fm3": 0.2089296,
+            "n_max_fm3": 1.21
+          }
+        ],
+        "pressure_within_1percent_rows": 40,
+        "rows": 54
+      }
+    ],
+    "source_sha256": {
+      "python_frontend/compose_eos/skyrme_uniform.py": "ddbf21bb0f4af460c88219a715da63924f36f132c50f70b25e7743737a2fdfe3",
+      "python_frontend/compose_eos/cold_leptons.py": "ac995eb2504560da1569190a2f95bbbe266961dab0498dc0665951afca4c2ded"
+    }
+  }
+}

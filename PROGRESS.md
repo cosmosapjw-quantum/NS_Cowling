@@ -1,5 +1,8 @@
 # Neutron-star nonradial oscillation follow-up: final checkpoint
 
+> Scope note (2026-11-08): this is the historical v2 234-EOS f/p1 Cowling-spectrum checkpoint. COMPLETE applies only to that cohort, not active v4 EOS work. No new stellar-mode integrations are claimed by the v4 EOS changes.
+
+
 **Status: COMPLETE for the declared calculation scope. No f/p1 integrations were rerun during resumption.**
 
 ## Source and cohort

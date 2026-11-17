@@ -1,30 +1,33 @@
-# compose_eos v3.3.0 delivery
+# compose_eos v3.3.1 delivery
 
-This bundle contains the complete v3.3 source package, raw and normalized cold CompOSE tables, scripts, tests, four reports in Markdown and PDF, machine-readable audit evidence, validation examples, the built wheel, and the preserved v3.2 matched-390 data archive and source-package provenance.
+This bundle contains the `compose_eos` v3.3.1 source package, raw and normalized cold CompOSE tables, scripts, tests, validation/technical reports, machine-readable audit evidence, validation examples, the v3.3.1 wheel, and provenance/readback records.
 
 ## Main results
 
-- Full 390-way matching matrix independently re-read and re-gated: **234 PASS, 156 SOURCE_CORE_ACAUSALITY_PRESERVED**. The 156 original failures remain FAIL and trace to high-density APR_APR/KDE0v1 source tails, not to the crust-core matching bridge.
-- Full suite: **54 passed**. Python compileall: PASS. Wheel build, clean-target install, API imports and both console entrypoints: PASS.
-- Sharp Maxwell construction, phenomenological CSS high-density phase, two-charge Gibbs API, pressure-corrected tidal jump, and phase-aware TOV/Love solver are implemented. Gibbs requires 2-D charge-resolved phase surfaces; it is not fabricated from the supplied 1-D beta-equilibrium tables.
-- An APR+CSS Maxwell table is written/read and passes the EOS gates. Three TOV integrations and an independent tidal-jump recomputation are recorded. APR 0.95 causal completion is robust under PCHIP/cubic/centered-FD diagnostics. KDE0v1 0.80 completion remains diagnostic-only.
+- `compose_eos` version aligned to `3.3.1` across package metadata, CLI (`--version`), docs, wheel, and SHA-256 manifests.
+- Phase 2/3/4/5/6/7/8/9 remediation completed:
+  - CompOSE cold reader rejects single $T>0$ slices (`NotImplementedError`) and infers `beta_equilibrated` strictly from $T=0 \wedge I_l=1 \wedge \max|Q_5|<10^{-8} \wedge \text{charge-neutral}$.
+  - Gibbs construction (`compose-eos-gibbs-v2`) enforces exact knot-union root isolation, 12-field `ChargeResolvedPhase` provenance, lepton double-counting checks, `(939.0, 939.0) MeV` normalization reference labeling, `composition_status = "thermo_only"`, and post-construction / post-readback `validate_gibbs_barotrope` over `PchipInterpolator`.
+  - Causality (`causality_profile`, `causal_completion`) uses exact piecewise-cubic interval extrema via the degree-$\le 6$ stationary polynomial, distinguishing `true_crossing`, `tangential_contact`, and `none`.
+  - All CompOSE writers perform staged serialization + full `verify_compose_readback` before atomic publication.
+  - Native Fortran CLI `compose_eos_fortran reconstruct-compo-native` provides raw-SPG/GPPVA algebraic C3/C4 closure with native readback and `0.000e+00` max difference against `normalize_compose_composition.py` (explicitly bounded as algebraic closure, not spatial Thomas-Fermi).
 
 ## Contents
 
-- `compose_eos_pkg/`: importable package v3.3.0
-- `scripts/`: normalizer, failure classifier, Maxwell/CSS/Gibbs construction, causal completion and phase-aware TOV commands
-- `tests/`: full regression and phase-transition tests
+- `compose_eos_pkg/`: importable package v3.3.1
+- `scripts/`: normalizer, failure classifier, Maxwell/CSS/Gibbs construction, causal completion, phase-aware TOV, and validation report generators
+- `tests/`: regression, adversarial, and phase-transition test suite
 - `eos_data/`, `eos_data_normalized/`: raw and normalized EOS source data, kept separate
-- `docs/`: four full reports/references in `.md` and `.pdf`, root-cause CSV/JSON, audit trace, tests and wheel logs
-- `validation_examples/`: actual APR+CSS Maxwell EOS, TOV outputs, and causal-completion examples
-- `wheels/`: `compose_eos-3.3.0` wheel
-- `provenance/`: prior v3.2 source package, matched-390 archive and reproducibility/readback records
+- `docs/`: technical reference, scope/limitations, v3.3.1 Gibbs/causality/provenance reports, historical v3.3.0 audit reports
+- `receipts/`: per-operation staged readback receipts (`readback_receipts_v3_3_1.json`)
+- `wheels/`: `compose_eos-3.3.1-py3-none-any.whl`
+- `provenance/`: v3.2 provenance metadata (note: large external archive `EoS_revised_code_package_upgraded_v3_2.zip` is excluded from git tracking and omitted from `SHA256SUMS_v3_3.txt`)
 
 ## Installation
 
 ```bash
-python -m pip install wheels/compose_eos-3.3.0-py3-none-any.whl
-python -m pytest -q
+python -m pip install wheels/compose_eos-3.3.1-py3-none-any.whl
+PYTHONPATH=compose_eos_pkg python -m pytest -q tests
 ```
 
-See `docs/TECHNICAL_REFERENCE_v3_3.md` for equations, units, contracts, and reproduction commands. See `docs/FAILURE_ROOT_CAUSE_REPORT_v3_3.md` for the 390-case classification.
+See `docs/TECHNICAL_REFERENCE_v3_3.md` and `docs/EOS_GENERATOR_SCOPE_AND_LIMITATIONS.md` for equations, CompOSE v3.01 semantics, contracts, and reproduction commands.

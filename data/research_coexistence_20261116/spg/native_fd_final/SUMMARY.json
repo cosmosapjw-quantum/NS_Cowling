@@ -1,0 +1,100 @@
+{
+  "at_smallest_step_beta_abs_max_MeV": 0.7835109498904069,
+  "at_smallest_step_beta_rms_MeV": 0.32077272262890605,
+  "baseline_commit": "a0b158f3dc4af9825192bf6a185a6331619868a5",
+  "claim_ceiling": "does not authenticate source solver prescription or infer author-code defect",
+  "command": [
+    "python3",
+    "fortran_eos/tests/spg_residual_run.py",
+    "data/research_coexistence_20261116/spg/native_fd"
+  ],
+  "compiler_command": [
+    "gfortran",
+    "-std=legacy",
+    "-O2",
+    "-ffree-line-length-none",
+    "-fcheck=all",
+    "-J/tmp/spg_residual_fd_37d722n0",
+    "-I/tmp/spg_residual_fd_37d722n0",
+    "/tmp/ns_coexistence_a0b158f/fortran_eos/src/compose_eos_types.f90",
+    "/tmp/ns_coexistence_a0b158f/fortran_eos/src/compose_eos_gdfm_native.f90",
+    "/tmp/ns_coexistence_a0b158f/fortran_eos/tests/spg_residual_fd.f90",
+    "-o",
+    "/tmp/spg_residual_fd_37d722n0/spg_residual_fd"
+  ],
+  "compiler_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "diagnostic_factor_1_minus_f_abs_max_MeV": 0.008099003489168546,
+  "diagnostic_factor_1_minus_f_rms_MeV": 0.004496431276307549,
+  "direct_dependency_sha256": {
+    "data/research_blockers_20261116/spg_inverse/inferred_surface_parameters.json": "7d6974d11c5986eb0b10c04aa6c085b3f1508711735edd9f895abca0b7e0cfcd",
+    "data/research_blockers_20261116/spg_inverse/inputs.txt": "8bf5a931f3aa7fc9bc1ffb0ef50b63a54687ff12be4ad5ee93053760981a832c",
+    "data/research_blockers_20261116/spg_inverse/inverse.csv": "4e6bc602a7f70e9ed686c196dbb73a5f13d1a8204a01b6d964a1a0559d6e7d3b",
+    "fortran_eos/src/compose_eos_gdfm_native.f90": "bbc04dc8708bb43f27801bc2f582db61b2845c2547bec9ed7c401d989450b147",
+    "fortran_eos/src/compose_eos_types.f90": "26fb4fb7b9482ca238ff41e504c75b090a42d902d7946a4c0612ece4e8729d44",
+    "fortran_eos/tests/spg_residual_fd.f90": "0b50da7f31d90fcab4027849ad30c72bf8068d2fe6a0c0549af267cad572d538",
+    "fortran_eos/tests/spg_residual_run.py": "0903f43402bcc6af8b57dc9ce7c47c57634a237530605ba7b6e5144bb54e0048"
+  },
+  "first_failed_attempt": {
+    "classification": "INPUT_SELECTION_COUNT_MISMATCH",
+    "corrected": "selected the 760 baseline source rows by original row id < 100000 and keyed them to inverse.csv",
+    "detail": "initially selected all 880 inverse rows, including 120 rounding probes; native run did not start"
+  },
+  "input_manifest_sha256": "e68827649e162769b09444501d291c6fe93210071287a1f275e5239c003fe602",
+  "native_finite_difference_rows": 3800,
+  "native_returncode": 0,
+  "producer_binary_sha256": "0a3b2edb100fac3b829540fa23ea1fc31dca5f9532af4243d87a582971fadb11",
+  "scope": "SPG source composition beta residual derivative check",
+  "source_input_sha256": {
+    "eos_generator/eos_data/SPG_M1/eos.compo": "8ce704b9af8a3a7a74e6985d9edc5481a8dc7a8b03e50f7b4d39c3d292dfec27",
+    "eos_generator/eos_data/SPG_M1/eos.nb": "46e5fb4504d3e53a6d61f210c1627234e34f8ed993fd54921299203756b0818c",
+    "eos_generator/eos_data/SPG_M1/eos.thermo": "20ef365b0fc9ff66b3b268c7f319d2d8dca0b782bd44a32612d3c4a82c8641e5",
+    "eos_generator/eos_data/SPG_M2/eos.compo": "b3e1d5aae1d7103817586b710ac8837e582d03f9d2a445acf994c3ba81e79a5f",
+    "eos_generator/eos_data/SPG_M2/eos.nb": "41351b355baac019927a66ca745ba2d4c90dbb6720c8aaed34a94cc9ab2307aa",
+    "eos_generator/eos_data/SPG_M2/eos.thermo": "0a90ad4fca400d66c8b86842adf45bb214ee335e34922ff47bdf5bafb8041221",
+    "eos_generator/eos_data/SPG_M3/eos.compo": "809a5540b1cc2a3a2c1623190258dbde73a491248ae37601f09b6a8ad7c02111",
+    "eos_generator/eos_data/SPG_M3/eos.nb": "d3eb5d66c2127f9a0a0879d27264187a847546bc8d60fc8ab69ee7bfe2e8924a",
+    "eos_generator/eos_data/SPG_M3/eos.thermo": "a73d22c35513224673b233a9e0349305868420a9d30f05efbd6d3e0daa81276e",
+    "eos_generator/eos_data/SPG_M4/eos.compo": "37f2e38debd22a77f0e938b87da7f4067cecd7faee3b80fc02f3b2bfdb595377",
+    "eos_generator/eos_data/SPG_M4/eos.nb": "2c80615495ce6cd1837b84651e35ad160b8f749abd981115a124b211aa8c2cc9",
+    "eos_generator/eos_data/SPG_M4/eos.thermo": "9da4c2a40b478f64a4c06abb50881be23dd4060ff60bc9f69118be0636114517",
+    "eos_generator/eos_data/SPG_M5/eos.compo": "c70fd7a101298ca363a4c928ce531b9f2dd33ca747209a3a994fb74747bef1b1",
+    "eos_generator/eos_data/SPG_M5/eos.nb": "e5c832b3f326885838ef1830c9d3e5f2389d106ca1b3a6398bb12d570599d12a",
+    "eos_generator/eos_data/SPG_M5/eos.thermo": "ce749823d0c6f5e48f046e4bd992507f1f384e2068ae93590aa3a953700aaabc"
+  },
+  "source_table_rows": 760,
+  "status": "FINITE_DIFFERENCE_SUPPORTS_FULL_DERIVATIVE",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_csv_sha256": "b9ccf639b61150f238cc8b90d8034aa0d6853b8798c2a0598b986d28921f8160",
+  "steps_in_y": {
+    "1.0e-03": {
+      "count": 760,
+      "max_abs_fd_full_MeV": 0.001789249121798064,
+      "median_abs_fd_full_MeV": 0.0001744471204072652,
+      "rms_abs_fd_full_MeV": 0.0002518340657673479
+    },
+    "1.0e-04": {
+      "count": 760,
+      "max_abs_fd_full_MeV": 1.788659170720575e-05,
+      "median_abs_fd_full_MeV": 1.745839859085968e-06,
+      "rms_abs_fd_full_MeV": 2.518263460941374e-06
+    },
+    "1.0e-05": {
+      "count": 760,
+      "max_abs_fd_full_MeV": 1.954217239141798e-07,
+      "median_abs_fd_full_MeV": 3.520380279647961e-08,
+      "rms_abs_fd_full_MeV": 5.6689606665843217e-08
+    },
+    "3.0e-04": {
+      "count": 760,
+      "max_abs_fd_full_MeV": 0.000161015132101705,
+      "median_abs_fd_full_MeV": 1.5699763331766814e-05,
+      "rms_abs_fd_full_MeV": 2.266428326564607e-05
+    },
+    "3.0e-05": {
+      "count": 760,
+      "max_abs_fd_full_MeV": 1.621618518576895e-06,
+      "median_abs_fd_full_MeV": 1.6035781247314418e-07,
+      "rms_abs_fd_full_MeV": 2.2723760097060435e-07
+    }
+  }
+}

@@ -1,0 +1,951 @@
+{
+  "scope": "Native Fortran TF outputs; finite selected samples and native diagnostics; no interpolation or global-minimum claim",
+  "producer": "fortran",
+  "models": {
+    "FSU2R": {
+      "original_selected_sha256": "b690a98657a5088457edb84de9d430f290599511c3467ac970517cce582c6094",
+      "original_negative_interval_count": 18,
+      "worst_original_interval": {
+        "lower_n": 0.048,
+        "upper_n": 0.048999999,
+        "delta_p": -0.019294162402566428,
+        "geometries": [
+          "noncanonical_radial_profile",
+          "noncanonical_spherical_profile"
+        ]
+      },
+      "runs": [
+        {
+          "status": "REQUESTED_ROWS_NATIVE_VERIFIED",
+          "backend": "fortran",
+          "dispatch_sha256": "56a2585985bcbfce3498d85420a0fa946ce02298670b21702728e9932706dc6a",
+          "selected_sha256": "31fcbe7d19cae8938b1e5446a1277ae57a48781890e158c21442b1f0a0c3b058",
+          "attempts_sha256": "370221f3a0bf097282004e3e14506e1b0421e6b4293ff2826f7f77953395ad69",
+          "profiles_sha256": "363b2ed3cfd35a9539c54bebf5f3f707c6b97f26fee5f12b313702fafb7528dc",
+          "meshes": [
+            {
+              "mesh": 16,
+              "n_b": [
+                0.048,
+                0.0484999995,
+                0.048999999
+              ],
+              "pressure": [
+                0.176290974893206,
+                0.18214268634311992,
+                0.15699681249063957
+              ],
+              "delta_p": [
+                0.005851711449913921,
+                -0.02514587385248035
+              ],
+              "geometry": [
+                "noncanonical_radial_profile",
+                "noncanonical_radial_profile",
+                "noncanonical_spherical_profile"
+              ],
+              "max_kkt": 0.00011891017311427277,
+              "native_diagnostics": {
+                "overall": {
+                  "status": "FAIL",
+                  "pass_": false,
+                  "failed_checks": [
+                    "C6",
+                    "C10",
+                    "C11"
+                  ],
+                  "finite_primary_arrays": true,
+                  "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11."
+                },
+                "C6": {
+                  "min_dPdnb": -50.291797996758625,
+                  "min_delta_p": -0.02514587385248035,
+                  "pass_": false
+                },
+                "C10": {
+                  "min_cs2": -0.08513859853696285,
+                  "max_cs2": 0.04493329725690198,
+                  "min_cs2_first_law": -0.08551072615631786,
+                  "max_cs2_first_law": 0.044901395892754395,
+                  "acausal_point_count": 0,
+                  "acausal_point_count_first_law": 0,
+                  "n_points": 3,
+                  "pass_": false
+                },
+                "C11": {
+                  "min_dmubdnb": -1586.6674092899775,
+                  "n_points": 3,
+                  "pass_": false
+                },
+                "C3": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                },
+                "C4": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                }
+              },
+              "table_sha256": {
+                "eos.nb": "70e838ebc2c96f9c9b8f450a7b5d962ac310d1dec814621f894fd4d9b85a1398",
+                "eos.thermo": "53b08baa98c834021ca2ee568fb7739cce4c2009344060e1e21a2c98cd71da83",
+                "eos.compo": "34815fde047fceda13b3f5f3f0cb4462cb28335413bfbe0d0253df304079e1d9",
+                "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+                "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+              }
+            },
+            {
+              "mesh": 32,
+              "n_b": [
+                0.048,
+                0.0484999995,
+                0.048999999
+              ],
+              "pressure": [
+                0.17053403664468192,
+                0.1724442602363041,
+                0.1745873581688855
+              ],
+              "delta_p": [
+                0.0019102235916221844,
+                0.0021430979325813837
+              ],
+              "geometry": [
+                "rod",
+                "rod",
+                "rod"
+              ],
+              "max_kkt": 0.00010088130227359215,
+              "native_diagnostics": {
+                "overall": {
+                  "status": "PASS",
+                  "pass_": true,
+                  "failed_checks": [],
+                  "finite_primary_arrays": true,
+                  "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11."
+                },
+                "C6": {
+                  "min_dPdnb": 3.820451003695367,
+                  "min_delta_p": 0.0019102235916221844,
+                  "pass_": true
+                },
+                "C10": {
+                  "min_cs2": 0.0037727102727196384,
+                  "max_cs2": 0.004751858872121305,
+                  "min_cs2_first_law": 0.003772703922756922,
+                  "max_cs2_first_law": 0.004751852277884339,
+                  "acausal_point_count": 0,
+                  "acausal_point_count_first_law": 0,
+                  "n_points": 3,
+                  "pass_": true
+                },
+                "C11": {
+                  "min_dmubdnb": 74.79892156668939,
+                  "n_points": 3,
+                  "pass_": true
+                },
+                "C3": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                },
+                "C4": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                }
+              },
+              "table_sha256": {
+                "eos.nb": "70e838ebc2c96f9c9b8f450a7b5d962ac310d1dec814621f894fd4d9b85a1398",
+                "eos.thermo": "328b2603c17077b97e05a98f25ddb09b084f534efe196a64e28d5c9068eea057",
+                "eos.compo": "795b67b4ae6e44eaa5d582511da33251a1443de8c0b3a4da987bf145a60d42e4",
+                "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+                "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+              }
+            },
+            {
+              "mesh": 64,
+              "n_b": [
+                0.048,
+                0.0484999995,
+                0.048999999
+              ],
+              "pressure": [
+                0.1709561420002359,
+                0.17271262432684864,
+                0.17410795015470626
+              ],
+              "delta_p": [
+                0.0017564823266127405,
+                0.0013953258278576186
+              ],
+              "geometry": [
+                "rod",
+                "rod",
+                "rod"
+              ],
+              "max_kkt": 0.0012502408839054624,
+              "native_diagnostics": {
+                "overall": {
+                  "status": "PASS",
+                  "pass_": true,
+                  "failed_checks": [],
+                  "finite_primary_arrays": true,
+                  "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11."
+                },
+                "C6": {
+                  "min_dPdnb": 2.79065444636968,
+                  "min_delta_p": 0.0013953258278576186,
+                  "pass_": true
+                },
+                "C10": {
+                  "min_cs2": 0.002554661122523435,
+                  "max_cs2": 0.0040739870323635435,
+                  "min_cs2_first_law": 0.002554665617498432,
+                  "max_cs2_first_law": 0.004073999039926321,
+                  "acausal_point_count": 0,
+                  "acausal_point_count_first_law": 0,
+                  "n_points": 3,
+                  "pass_": true
+                },
+                "C11": {
+                  "min_dmubdnb": 49.456803724053316,
+                  "n_points": 3,
+                  "pass_": true
+                },
+                "C3": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                },
+                "C4": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                }
+              },
+              "table_sha256": {
+                "eos.nb": "70e838ebc2c96f9c9b8f450a7b5d962ac310d1dec814621f894fd4d9b85a1398",
+                "eos.thermo": "719a28331008b54a254431a58ca2a937703892da65dbffecaf9d97f5ba29046b",
+                "eos.compo": "c2c5356cb4bd8acdacb3a828422947c4e7ab828dba02885180e8e4631e4b528d",
+                "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+                "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+              }
+            }
+          ]
+        },
+        {
+          "status": "REQUESTED_ROWS_NATIVE_VERIFIED",
+          "backend": "fortran",
+          "dispatch_sha256": "c609a754220dc91113e29c7e82cd564838140574b0dd56d59583d59f8d7f6d5c",
+          "selected_sha256": "c4496dcffd28ff4508c76d87b8ff422e3d5b9fae1e1328f30f345cad2a62571c",
+          "attempts_sha256": "b524e2b8ed0709aff6e30efe5f5142753e5cde406733d45d76c77bbf9bad3404",
+          "profiles_sha256": "32169af79eb80781e90e03669fa96ee8ad13961cfedbfec927d2169f9df3b687",
+          "meshes": [
+            {
+              "mesh": 128,
+              "n_b": [
+                0.048,
+                0.0484999995,
+                0.048999999
+              ],
+              "pressure": [
+                0.17100904923061933,
+                0.1725644149910721,
+                0.17415202791978857
+              ],
+              "delta_p": [
+                0.001555365760452787,
+                0.001587612928716453
+              ],
+              "geometry": [
+                "rod",
+                "rod",
+                "rod"
+              ],
+              "max_kkt": 0.00231374519705696,
+              "native_diagnostics": {
+                "overall": {
+                  "status": "PASS",
+                  "pass_": true,
+                  "failed_checks": [],
+                  "finite_primary_arrays": true,
+                  "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11."
+                },
+                "C6": {
+                  "min_dPdnb": 3.1107346316402014,
+                  "min_delta_p": 0.001555365760452787,
+                  "pass_": true
+                },
+                "C10": {
+                  "min_cs2": 0.00323731007164425,
+                  "max_cs2": 0.003372720352236873,
+                  "min_cs2_first_law": 0.0032373086608621414,
+                  "max_cs2_first_law": 0.0033727222366387493,
+                  "acausal_point_count": 0,
+                  "acausal_point_count_first_law": 0,
+                  "n_points": 3,
+                  "pass_": true
+                },
+                "C11": {
+                  "min_dmubdnb": 64.13351545820478,
+                  "n_points": 3,
+                  "pass_": true
+                },
+                "C3": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                },
+                "C4": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                }
+              },
+              "table_sha256": {
+                "eos.nb": "70e838ebc2c96f9c9b8f450a7b5d962ac310d1dec814621f894fd4d9b85a1398",
+                "eos.thermo": "63c96be2af4109225c4227ddd8bf0b108bce9f2a075c50a99896ec7152678f78",
+                "eos.compo": "4e3c2c3e3c6aeec02bb3af1711edf70627bbb6b241701f3d7feaf38a9b16ef7b",
+                "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+                "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "FSU2H": {
+      "original_selected_sha256": "b32806d508d5f1d0b7ad0a5bbf0b350e5ad34a92a43cbad0e20382f14db26e86",
+      "original_negative_interval_count": 18,
+      "worst_original_interval": {
+        "lower_n": 0.050999999,
+        "upper_n": 0.052000001,
+        "delta_p": -0.02033434200177453,
+        "geometries": [
+          "noncanonical_cylindrical_profile",
+          "noncanonical_spherical_profile"
+        ]
+      },
+      "runs": [
+        {
+          "status": "REQUESTED_ROWS_NATIVE_VERIFIED",
+          "backend": "fortran",
+          "dispatch_sha256": "e31a64a3cbc4acfba2d12cb944b4ac6fdfa1db1724b46d2cc8865e3a487ee34e",
+          "selected_sha256": "a8e60aea7a005df0c9dec5d868f49587b2f197e4e9ca5759ef77ecce80fd5c83",
+          "attempts_sha256": "565f7e62d76ba3333c881666df0e40d46dc97d5c1e38a071ce9a1eb379bb6b21",
+          "profiles_sha256": "44d73c1ca4310b2ec3090f09e4bfa985a995167aa938e4fa8bd2a655e9b650b9",
+          "meshes": [
+            {
+              "mesh": 16,
+              "n_b": [
+                0.050999999,
+                0.0515,
+                0.052000001
+              ],
+              "pressure": [
+                0.1986403630193081,
+                0.20229180176241357,
+                0.17830602101753357
+              ],
+              "delta_p": [
+                0.003651438743105473,
+                -0.023985780744880003
+              ],
+              "geometry": [
+                "noncanonical_cylindrical_profile",
+                "noncanonical_cylindrical_profile",
+                "noncanonical_spherical_profile"
+              ],
+              "max_kkt": 2.8084618975299236e-05,
+              "native_diagnostics": {
+                "overall": {
+                  "status": "FAIL",
+                  "pass_": false,
+                  "failed_checks": [
+                    "C6",
+                    "C10",
+                    "C11"
+                  ],
+                  "finite_primary_arrays": true,
+                  "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11."
+                },
+                "C6": {
+                  "min_dPdnb": -47.971465546828924,
+                  "min_delta_p": -0.023985780744880003,
+                  "pass_": false
+                },
+                "C10": {
+                  "min_cs2": -0.07940056484583508,
+                  "max_cs2": 0.03673426988730158,
+                  "min_cs2_first_law": -0.07950375839296085,
+                  "max_cs2_first_law": 0.0367251592245479,
+                  "acausal_point_count": 0,
+                  "acausal_point_count_first_law": 0,
+                  "n_points": 3,
+                  "pass_": false
+                },
+                "C11": {
+                  "min_dmubdnb": -1440.3899029855384,
+                  "n_points": 3,
+                  "pass_": false
+                },
+                "C3": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                },
+                "C4": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                }
+              },
+              "table_sha256": {
+                "eos.nb": "af28c5b729734076ecddfc3b484d140dcdc23070bd1cb2903d4d28d730fa29a1",
+                "eos.thermo": "5dda28be4ada7834e0a7bfab61d99d7109d8ba9baaef641e2e59edbe0dc43f7d",
+                "eos.compo": "fb4c67263f2e77f8d3467cd94eb5dced81e7b4abb9e72444c0a7a33db69a0251",
+                "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+                "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+              }
+            },
+            {
+              "mesh": 32,
+              "n_b": [
+                0.050999999,
+                0.0515,
+                0.052000001
+              ],
+              "pressure": [
+                0.1948158329788967,
+                0.19694500597609021,
+                0.19930049431864205
+              ],
+              "delta_p": [
+                0.002129172997193507,
+                0.002355488342551837
+              ],
+              "geometry": [
+                "rod",
+                "rod",
+                "rod"
+              ],
+              "max_kkt": 0.00020651975398777722,
+              "native_diagnostics": {
+                "overall": {
+                  "status": "PASS",
+                  "pass_": true,
+                  "failed_checks": [],
+                  "finite_primary_arrays": true,
+                  "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11."
+                },
+                "C6": {
+                  "min_dPdnb": 4.258337477712059,
+                  "min_delta_p": 0.002129172997193507,
+                  "pass_": true
+                },
+                "C10": {
+                  "min_cs2": 0.004238269408597018,
+                  "max_cs2": 0.005189359060401406,
+                  "min_cs2_first_law": 0.004238263059394258,
+                  "max_cs2_first_law": 0.005189352355959386,
+                  "acausal_point_count": 0,
+                  "acausal_point_count_first_law": 0,
+                  "n_points": 3,
+                  "pass_": true
+                },
+                "C11": {
+                  "min_dmubdnb": 79.10922202421352,
+                  "n_points": 3,
+                  "pass_": true
+                },
+                "C3": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                },
+                "C4": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                }
+              },
+              "table_sha256": {
+                "eos.nb": "af28c5b729734076ecddfc3b484d140dcdc23070bd1cb2903d4d28d730fa29a1",
+                "eos.thermo": "f95ce4affa0e2a97560e67dec7aca74d272da44af396e46fba1368ba7ebbe388",
+                "eos.compo": "1ab7ee7eee61c77a01919706b79a2085b65b58e5073e3de39aa40dca5d71bfb2",
+                "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+                "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+              }
+            },
+            {
+              "mesh": 64,
+              "n_b": [
+                0.050999999,
+                0.0515,
+                0.052000001
+              ],
+              "pressure": [
+                0.19522881074033194,
+                0.19719620039418828,
+                0.1988506290075378
+              ],
+              "delta_p": [
+                0.001967389653856344,
+                0.0016544286133495234
+              ],
+              "geometry": [
+                "rod",
+                "rod",
+                "rod"
+              ],
+              "max_kkt": 0.001295779539987052,
+              "native_diagnostics": {
+                "overall": {
+                  "status": "PASS",
+                  "pass_": true,
+                  "failed_checks": [],
+                  "finite_primary_arrays": true,
+                  "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11."
+                },
+                "C6": {
+                  "min_dPdnb": 3.3088506089978296,
+                  "min_delta_p": 0.0016544286133495234,
+                  "pass_": true
+                },
+                "C10": {
+                  "min_cs2": 0.0031488661708365725,
+                  "max_cs2": 0.004464953143303542,
+                  "min_cs2_first_law": 0.0031488703780509168,
+                  "max_cs2_first_law": 0.004464965480234881,
+                  "acausal_point_count": 0,
+                  "acausal_point_count_first_law": 0,
+                  "n_points": 3,
+                  "pass_": true
+                },
+                "C11": {
+                  "min_dmubdnb": 57.51415868359618,
+                  "n_points": 3,
+                  "pass_": true
+                },
+                "C3": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                },
+                "C4": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                }
+              },
+              "table_sha256": {
+                "eos.nb": "af28c5b729734076ecddfc3b484d140dcdc23070bd1cb2903d4d28d730fa29a1",
+                "eos.thermo": "6456dc11d07f68052b1ec982c020f4a6dc7b184addc6bf416ce5802f3c6819ac",
+                "eos.compo": "5a5f38511a87aa179478c7239595d2d7236fc9a6144434148336d1494f9767e3",
+                "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+                "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+              }
+            }
+          ]
+        },
+        {
+          "status": "REQUESTED_ROWS_NATIVE_VERIFIED",
+          "backend": "fortran",
+          "dispatch_sha256": "4b8ab214cb199c4b9dfacd867d79841d9da7780bdcdc636dc355c179ebe626e9",
+          "selected_sha256": "d465cf4a1bc4b1415fc434f1b4cf36db3a7e9161fbe002e3bc362390e54233bf",
+          "attempts_sha256": "5ac141b7f9ab1ec78dd62a37d04b377cc38bdf66d300d9cb277608cf66aca943",
+          "profiles_sha256": "c81e43943cca58eda99734aa830933bcfce9a562ad98942650bb2627bdf41f29",
+          "meshes": [
+            {
+              "mesh": 128,
+              "n_b": [
+                0.050999999,
+                0.0515,
+                0.052000001
+              ],
+              "pressure": [
+                0.19526127043213393,
+                0.19706586197892761,
+                0.1988908222883623
+              ],
+              "delta_p": [
+                0.001804591546793688,
+                0.0018249603094346867
+              ],
+              "geometry": [
+                "rod",
+                "rod",
+                "rod"
+              ],
+              "max_kkt": 0.0015440751340065617,
+              "native_diagnostics": {
+                "overall": {
+                  "status": "PASS",
+                  "pass_": true,
+                  "failed_checks": [],
+                  "finite_primary_arrays": true,
+                  "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11."
+                },
+                "C6": {
+                  "min_dPdnb": 3.609175875235626,
+                  "min_delta_p": 0.001804591546793688,
+                  "pass_": true
+                },
+                "C10": {
+                  "min_cs2": 0.003772341041580201,
+                  "max_cs2": 0.003857693070417244,
+                  "min_cs2_first_law": 0.003772339611903674,
+                  "max_cs2_first_law": 0.003857695355154219,
+                  "acausal_point_count": 0,
+                  "acausal_point_count_first_law": 0,
+                  "n_points": 3,
+                  "pass_": true
+                },
+                "C11": {
+                  "min_dmubdnb": 70.36283408652525,
+                  "n_points": 3,
+                  "pass_": true
+                },
+                "C3": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                },
+                "C4": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                }
+              },
+              "table_sha256": {
+                "eos.nb": "af28c5b729734076ecddfc3b484d140dcdc23070bd1cb2903d4d28d730fa29a1",
+                "eos.thermo": "2f5e4ba59780f33dfc468eccf73129763666d28cad1304fa8f1ca7d8c0ee59c0",
+                "eos.compo": "944dd2913e205d54493dd6617a69daf2efd2e2a2d182cb28b4acd5d567fc798e",
+                "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+                "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "TM1e": {
+      "original_selected_sha256": "9bfcce99794dfc93c9454028a0ebd32739943ec510615dfbea53762946b074bd",
+      "original_negative_interval_count": 17,
+      "worst_original_interval": {
+        "lower_n": 0.052000001,
+        "upper_n": 0.052999999,
+        "delta_p": -0.04332304854573721,
+        "geometries": [
+          "noncanonical_radial_profile",
+          "noncanonical_spherical_profile"
+        ]
+      },
+      "runs": [
+        {
+          "status": "REQUESTED_ROWS_NATIVE_VERIFIED",
+          "backend": "fortran",
+          "dispatch_sha256": "4d54b468178c99fd7684bf385f5a5104ec11eab810c53355f67369c66bb49975",
+          "selected_sha256": "55850384f6490dab4da4d466d5f598dbe064303254003a05c02835568ab47419",
+          "attempts_sha256": "eb0059a856bbe59e9c07991dc40e8f12412b135b16e87f38598327591264e148",
+          "profiles_sha256": "ab937328f8300422610faa9af03e9c70f011a28e245b5f18d38dfa8eab9efc98",
+          "meshes": [
+            {
+              "mesh": 16,
+              "n_b": [
+                0.052000001,
+                0.0525,
+                0.052999999
+              ],
+              "pressure": [
+                0.23923225371073897,
+                0.22214422103795073,
+                0.19590920516500177
+              ],
+              "delta_p": [
+                -0.017088032672788245,
+                -0.026235015872948964
+              ],
+              "geometry": [
+                "noncanonical_radial_profile",
+                "noncanonical_cylindrical_profile",
+                "noncanonical_spherical_profile"
+              ],
+              "max_kkt": 0.000321095762387813,
+              "native_diagnostics": {
+                "overall": {
+                  "status": "FAIL",
+                  "pass_": false,
+                  "failed_checks": [
+                    "C6",
+                    "C10",
+                    "C11"
+                  ],
+                  "finite_primary_arrays": true,
+                  "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11."
+                },
+                "C6": {
+                  "min_dPdnb": -52.470136686171195,
+                  "min_delta_p": -0.026235015872948964,
+                  "pass_": false
+                },
+                "C10": {
+                  "min_cs2": -0.06453246146236649,
+                  "max_cs2": -0.026342802848874976,
+                  "min_cs2_first_law": -0.06478984426881593,
+                  "max_cs2_first_law": -0.02629563185512272,
+                  "acausal_point_count": 0,
+                  "acausal_point_count_first_law": 0,
+                  "n_points": 3,
+                  "pass_": false
+                },
+                "C11": {
+                  "min_dmubdnb": -1093.740379873081,
+                  "n_points": 3,
+                  "pass_": false
+                },
+                "C3": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                },
+                "C4": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                }
+              },
+              "table_sha256": {
+                "eos.nb": "dd4328282b46faa63c4508e1c5c9cf5f5adfd43b492b552a8f8c71df1c6b68a5",
+                "eos.thermo": "208779d6c6810c23e428242ff926d776c0742845b035a5003f3f8b21da48f526",
+                "eos.compo": "79d73a5f1c0edacb4a8e9ddd4d4390e2b9c51f464991c9b0bba515c4db6e56e2",
+                "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+                "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+              }
+            },
+            {
+              "mesh": 32,
+              "n_b": [
+                0.052000001,
+                0.0525,
+                0.052999999
+              ],
+              "pressure": [
+                0.2192953032511511,
+                0.22092631899455029,
+                0.22288928159626664
+              ],
+              "delta_p": [
+                0.001631015743399189,
+                0.001962962601716356
+              ],
+              "geometry": [
+                "rod",
+                "rod",
+                "rod"
+              ],
+              "max_kkt": 0.00028625030643070204,
+              "native_diagnostics": {
+                "overall": {
+                  "status": "PASS",
+                  "pass_": true,
+                  "failed_checks": [],
+                  "finite_primary_arrays": true,
+                  "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11."
+                },
+                "C6": {
+                  "min_dPdnb": 3.2620380108743934,
+                  "min_delta_p": 0.001631015743399189,
+                  "pass_": true
+                },
+                "C10": {
+                  "min_cs2": 0.003079528981553442,
+                  "max_cs2": 0.004474717147462785,
+                  "min_cs2_first_law": 0.003079522872822814,
+                  "max_cs2_first_law": 0.004474707475845556,
+                  "acausal_point_count": 0,
+                  "acausal_point_count_first_law": 0,
+                  "n_points": 3,
+                  "pass_": true
+                },
+                "C11": {
+                  "min_dmubdnb": 56.42690802272409,
+                  "n_points": 3,
+                  "pass_": true
+                },
+                "C3": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                },
+                "C4": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                }
+              },
+              "table_sha256": {
+                "eos.nb": "dd4328282b46faa63c4508e1c5c9cf5f5adfd43b492b552a8f8c71df1c6b68a5",
+                "eos.thermo": "36e95a025fef4ef6a9d95b40de0ccfbe999cb1f3724b560c86f9dd717f0406bd",
+                "eos.compo": "1a970c486d1e5f540f06a1a5d4065bf899bc2251ed94bc5cb06c84b0ac145d8b",
+                "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+                "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+              }
+            },
+            {
+              "mesh": 64,
+              "n_b": [
+                0.052000001,
+                0.0525,
+                0.052999999
+              ],
+              "pressure": [
+                0.21923791245787783,
+                0.2212220560305056,
+                0.22331977226635757
+              ],
+              "delta_p": [
+                0.0019841435726277723,
+                0.0020977162358519763
+              ],
+              "geometry": [
+                "rod",
+                "rod",
+                "rod"
+              ],
+              "max_kkt": 0.0005791928030021154,
+              "native_diagnostics": {
+                "overall": {
+                  "status": "PASS",
+                  "pass_": true,
+                  "failed_checks": [],
+                  "finite_primary_arrays": true,
+                  "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11."
+                },
+                "C6": {
+                  "min_dPdnb": 3.968295081845701,
+                  "min_delta_p": 0.0019841435726277723,
+                  "pass_": true
+                },
+                "C10": {
+                  "min_cs2": 0.004051313703915524,
+                  "max_cs2": 0.004528407691353306,
+                  "min_cs2_first_law": 0.004051312928060072,
+                  "max_cs2_first_law": 0.004528403359251767,
+                  "acausal_point_count": 0,
+                  "acausal_point_count_first_law": 0,
+                  "n_points": 3,
+                  "pass_": true
+                },
+                "C11": {
+                  "min_dmubdnb": 74.160183431115,
+                  "n_points": 3,
+                  "pass_": true
+                },
+                "C3": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                },
+                "C4": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                }
+              },
+              "table_sha256": {
+                "eos.nb": "dd4328282b46faa63c4508e1c5c9cf5f5adfd43b492b552a8f8c71df1c6b68a5",
+                "eos.thermo": "930706a61de2fe5f36d8fe3883f06c734afc4f7db95a82e5e96ce0d77fd03972",
+                "eos.compo": "1858c0e3fb6ea020c4f7c259371849199bce7303aab515a4888bdaf6826a605f",
+                "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+                "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+              }
+            }
+          ]
+        },
+        {
+          "status": "REQUESTED_ROWS_NATIVE_VERIFIED",
+          "backend": "fortran",
+          "dispatch_sha256": "b53e055a4401ab1f62af907725288e26ecbde14a8ef117ec1aafe8d5113e511f",
+          "selected_sha256": "a11d5c9f514d5f39b4f08d39dce01b7d029c02a9e8380c53891faff37a310ef5",
+          "attempts_sha256": "8b6ee33ca64a9baa5a1789cb7dc0877abc08f031515c6c5a2172378d49f9b48c",
+          "profiles_sha256": "a3a0de8824b1455d54d05b5c21c911f7656bde5a0f43d865f7e8bba76e72fac0",
+          "meshes": [
+            {
+              "mesh": 128,
+              "n_b": [
+                0.052000001,
+                0.0525,
+                0.052999999
+              ],
+              "pressure": [
+                0.21908049395225504,
+                0.221253201472301,
+                0.2233952911839978
+              ],
+              "delta_p": [
+                0.0021727075200459467,
+                0.0021420897116968263
+              ],
+              "geometry": [
+                "rod",
+                "rod",
+                "rod"
+              ],
+              "max_kkt": 0.0004776064207590025,
+              "native_diagnostics": {
+                "overall": {
+                  "status": "PASS",
+                  "pass_": true,
+                  "failed_checks": [],
+                  "finite_primary_arrays": true,
+                  "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11."
+                },
+                "C6": {
+                  "min_dPdnb": 4.2841879917696275,
+                  "min_delta_p": 0.0021420897116968263,
+                  "pass_": true
+                },
+                "C10": {
+                  "min_cs2": 0.004470130449363312,
+                  "max_cs2": 0.0045992296123961865,
+                  "min_cs2_first_law": 0.0044701295395097,
+                  "max_cs2_first_law": 0.00459923360258416,
+                  "acausal_point_count": 0,
+                  "acausal_point_count_first_law": 0,
+                  "n_points": 3,
+                  "pass_": true
+                },
+                "C11": {
+                  "min_dmubdnb": 80.23390717513394,
+                  "n_points": 3,
+                  "pass_": true
+                },
+                "C3": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                },
+                "C4": {
+                  "status": "NOT_AVAILABLE",
+                  "max_abs": 0.0,
+                  "pass_": null
+                }
+              },
+              "table_sha256": {
+                "eos.nb": "dd4328282b46faa63c4508e1c5c9cf5f5adfd43b492b552a8f8c71df1c6b68a5",
+                "eos.thermo": "16912d64b311dee6910a935d1059c25ef3935e3f4928646f0f45126084284d2f",
+                "eos.compo": "df0ff42d181a23cf99f2f2568bae4c0542d7e281d967e922afad7948945544ca",
+                "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+                "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,257 @@
+FFFFF...FF.....ss                                                        [100%]
+=================================== FAILURES ===================================
+____ test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip[cubic_F] _____
+
+method = 'cubic_F'
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-426/test_il0_nonzero_charge_slice_0')
+
+    @pytest.mark.parametrize("method", ["cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    def test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip(method, tmp_path):
+        crust = quadratic_source(.01, .04, 20)
+        core = quadratic_source(.06, .15, 30)
+        reference, _ = match_crust_core(crust, core, method=method, drop_composition=True)
+        for data, index in ((crust, 3), (core, 9)):
+            data.Il = 0
+            data.iYq = index
+            data.charge_fraction_grid = .1
+            data.Q4[:] = -.01
+            data.Q3 -= data.charge_fraction_grid * data.Q4
+        matched, report = match_crust_core(crust, core, method=method, drop_composition=True)
+        assert matched.Il == 0
+        assert matched.iYq == 9
+        assert matched.charge_fraction_grid == pytest.approx(.1)
+        assert report["diagnostic_only"] is False
+        assert report["native_report"]["source_euler_residual_meV"] < 2e-10
+        np.testing.assert_allclose(matched.eps, reference.eps, rtol=2e-13, atol=2e-12)
+        np.testing.assert_allclose(matched.p, reference.p, rtol=2e-13, atol=2e-12)
+        mu_euler = (matched.eps + matched.p) / matched.nb
+        np.testing.assert_allclose(
+            matched.mub, mu_euler - .1 * matched.Q4 * matched.mn,
+            rtol=2e-13, atol=2e-12,
+        )
+        left, right = report["i1"] + 1, core.n - report["i2"]
+        np.testing.assert_allclose(matched.Q3[:left], crust.Q3[:left], rtol=2e-13, atol=2e-14)
+        np.testing.assert_allclose(matched.Q3[-right:], core.Q3[report["i2"]:], rtol=2e-13, atol=2e-14)
+        target = tmp_path / "matched"
+        write_compose(target, matched)
+        restored = read_compose(target)
+        assert restored.Il == matched.Il
+>       assert restored.iYq == matched.iYq
+E       assert 1 == 9
+E        +  where 1 = EOSData(nb=array([0.01      , 0.01157895, 0.01315789, 0.01473684, 0.01631579,\n       0.01789474, 0.01947368, 0.0210526..., yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)).iYq
+E        +  and   9 = EOSData(nb=array([0.01      , 0.01157895, 0.01315789, 0.01473684, 0.01631579,\n       0.01789474, 0.01947368, 0.0210526..., yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)).iYq
+
+python_frontend/tests/test_matching_slice_roundtrip.py:65: AssertionError
+____ test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip[cubic_P] _____
+
+method = 'cubic_P'
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-426/test_il0_nonzero_charge_slice_1')
+
+    @pytest.mark.parametrize("method", ["cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    def test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip(method, tmp_path):
+        crust = quadratic_source(.01, .04, 20)
+        core = quadratic_source(.06, .15, 30)
+        reference, _ = match_crust_core(crust, core, method=method, drop_composition=True)
+        for data, index in ((crust, 3), (core, 9)):
+            data.Il = 0
+            data.iYq = index
+            data.charge_fraction_grid = .1
+            data.Q4[:] = -.01
+            data.Q3 -= data.charge_fraction_grid * data.Q4
+        matched, report = match_crust_core(crust, core, method=method, drop_composition=True)
+        assert matched.Il == 0
+        assert matched.iYq == 9
+        assert matched.charge_fraction_grid == pytest.approx(.1)
+        assert report["diagnostic_only"] is False
+        assert report["native_report"]["source_euler_residual_meV"] < 2e-10
+        np.testing.assert_allclose(matched.eps, reference.eps, rtol=2e-13, atol=2e-12)
+        np.testing.assert_allclose(matched.p, reference.p, rtol=2e-13, atol=2e-12)
+        mu_euler = (matched.eps + matched.p) / matched.nb
+        np.testing.assert_allclose(
+            matched.mub, mu_euler - .1 * matched.Q4 * matched.mn,
+            rtol=2e-13, atol=2e-12,
+        )
+        left, right = report["i1"] + 1, core.n - report["i2"]
+        np.testing.assert_allclose(matched.Q3[:left], crust.Q3[:left], rtol=2e-13, atol=2e-14)
+        np.testing.assert_allclose(matched.Q3[-right:], core.Q3[report["i2"]:], rtol=2e-13, atol=2e-14)
+        target = tmp_path / "matched"
+        write_compose(target, matched)
+        restored = read_compose(target)
+        assert restored.Il == matched.Il
+>       assert restored.iYq == matched.iYq
+E       assert 1 == 9
+E        +  where 1 = EOSData(nb=array([0.01      , 0.01157895, 0.01315789, 0.01473684, 0.01631579,\n       0.01789474, 0.01947368, 0.0210526..., yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)).iYq
+E        +  and   9 = EOSData(nb=array([0.01      , 0.01157895, 0.01315789, 0.01473684, 0.01631579,\n       0.01789474, 0.01947368, 0.0210526..., yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)).iYq
+
+python_frontend/tests/test_matching_slice_roundtrip.py:65: AssertionError
+___ test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip[quintic_F] ____
+
+method = 'quintic_F'
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-426/test_il0_nonzero_charge_slice_2')
+
+    @pytest.mark.parametrize("method", ["cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    def test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip(method, tmp_path):
+        crust = quadratic_source(.01, .04, 20)
+        core = quadratic_source(.06, .15, 30)
+        reference, _ = match_crust_core(crust, core, method=method, drop_composition=True)
+        for data, index in ((crust, 3), (core, 9)):
+            data.Il = 0
+            data.iYq = index
+            data.charge_fraction_grid = .1
+            data.Q4[:] = -.01
+            data.Q3 -= data.charge_fraction_grid * data.Q4
+        matched, report = match_crust_core(crust, core, method=method, drop_composition=True)
+        assert matched.Il == 0
+        assert matched.iYq == 9
+        assert matched.charge_fraction_grid == pytest.approx(.1)
+        assert report["diagnostic_only"] is False
+        assert report["native_report"]["source_euler_residual_meV"] < 2e-10
+        np.testing.assert_allclose(matched.eps, reference.eps, rtol=2e-13, atol=2e-12)
+        np.testing.assert_allclose(matched.p, reference.p, rtol=2e-13, atol=2e-12)
+        mu_euler = (matched.eps + matched.p) / matched.nb
+        np.testing.assert_allclose(
+            matched.mub, mu_euler - .1 * matched.Q4 * matched.mn,
+            rtol=2e-13, atol=2e-12,
+        )
+        left, right = report["i1"] + 1, core.n - report["i2"]
+        np.testing.assert_allclose(matched.Q3[:left], crust.Q3[:left], rtol=2e-13, atol=2e-14)
+        np.testing.assert_allclose(matched.Q3[-right:], core.Q3[report["i2"]:], rtol=2e-13, atol=2e-14)
+        target = tmp_path / "matched"
+        write_compose(target, matched)
+        restored = read_compose(target)
+        assert restored.Il == matched.Il
+>       assert restored.iYq == matched.iYq
+E       assert 1 == 9
+E        +  where 1 = EOSData(nb=array([0.01      , 0.01157895, 0.01315789, 0.01473684, 0.01631579,\n       0.01789474, 0.01947368, 0.0210526..., yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)).iYq
+E        +  and   9 = EOSData(nb=array([0.01      , 0.01157895, 0.01315789, 0.01473684, 0.01631579,\n       0.01789474, 0.01947368, 0.0210526..., yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)).iYq
+
+python_frontend/tests/test_matching_slice_roundtrip.py:65: AssertionError
+___ test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip[quintic_P] ____
+
+method = 'quintic_P'
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-426/test_il0_nonzero_charge_slice_3')
+
+    @pytest.mark.parametrize("method", ["cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    def test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip(method, tmp_path):
+        crust = quadratic_source(.01, .04, 20)
+        core = quadratic_source(.06, .15, 30)
+        reference, _ = match_crust_core(crust, core, method=method, drop_composition=True)
+        for data, index in ((crust, 3), (core, 9)):
+            data.Il = 0
+            data.iYq = index
+            data.charge_fraction_grid = .1
+            data.Q4[:] = -.01
+            data.Q3 -= data.charge_fraction_grid * data.Q4
+        matched, report = match_crust_core(crust, core, method=method, drop_composition=True)
+        assert matched.Il == 0
+        assert matched.iYq == 9
+        assert matched.charge_fraction_grid == pytest.approx(.1)
+        assert report["diagnostic_only"] is False
+        assert report["native_report"]["source_euler_residual_meV"] < 2e-10
+        np.testing.assert_allclose(matched.eps, reference.eps, rtol=2e-13, atol=2e-12)
+        np.testing.assert_allclose(matched.p, reference.p, rtol=2e-13, atol=2e-12)
+        mu_euler = (matched.eps + matched.p) / matched.nb
+        np.testing.assert_allclose(
+            matched.mub, mu_euler - .1 * matched.Q4 * matched.mn,
+            rtol=2e-13, atol=2e-12,
+        )
+        left, right = report["i1"] + 1, core.n - report["i2"]
+        np.testing.assert_allclose(matched.Q3[:left], crust.Q3[:left], rtol=2e-13, atol=2e-14)
+        np.testing.assert_allclose(matched.Q3[-right:], core.Q3[report["i2"]:], rtol=2e-13, atol=2e-14)
+        target = tmp_path / "matched"
+        write_compose(target, matched)
+        restored = read_compose(target)
+        assert restored.Il == matched.Il
+>       assert restored.iYq == matched.iYq
+E       assert 1 == 9
+E        +  where 1 = EOSData(nb=array([0.01      , 0.01157895, 0.01315789, 0.01473684, 0.01631579,\n       0.01789474, 0.01947368, 0.0210526..., yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)).iYq
+E        +  and   9 = EOSData(nb=array([0.01      , 0.01157895, 0.01315789, 0.01473684, 0.01631579,\n       0.01789474, 0.01947368, 0.0210526..., yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)).iYq
+
+python_frontend/tests/test_matching_slice_roundtrip.py:65: AssertionError
+____ test_maxwell_same_physical_charge_slice_accepts_different_index_labels ____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-426/test_maxwell_same_physical_cha0')
+
+    def test_maxwell_same_physical_charge_slice_accepts_different_index_labels(tmp_path):
+        low = quadratic_source(.3, 1.4, 81, stiffness=1.0)
+        high = quadratic_source(1.3, 2.8, 81, rest_energy=940.0, stiffness=.25)
+        reference, reference_report = construct_maxwell_transition(
+            low, high, assume_local_charge_neutrality=True, return_report=True,
+        )
+        low.iYq, high.iYq = 3, 9
+        matched, report = construct_maxwell_transition(
+            low, high, assume_local_charge_neutrality=True, return_report=True,
+        )
+        assert report["status"] == "ok"
+        assert matched.iYq == 3
+        assert matched.charge_fraction_grid == 0.0
+        np.testing.assert_allclose(matched.nb, reference.nb, rtol=2e-13, atol=2e-14)
+        np.testing.assert_allclose(matched.eps, reference.eps, rtol=2e-13, atol=2e-12)
+        assert report["pressure_transition"] == pytest.approx(reference_report["pressure_transition"], rel=2e-13)
+        target = tmp_path / "maxwell"
+        write_compose(target, matched)
+        restored = read_compose(target)
+>       assert restored.iYq == 3
+E       assert 1 == 3
+E        +  where 1 = EOSData(nb=array([0.3    , 0.31375, 0.3275 , 0.34125, 0.355  , 0.36875, 0.3825 ,\n       0.39625, 0.41   , 0.42375, 0.4..., yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)).iYq
+
+python_frontend/tests/test_matching_slice_roundtrip.py:91: AssertionError
+___ test_single_slice_preserves_declared_axis_labels_above_point_count[7-7] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-426/test_single_slice_preserves_de0')
+t_first = 7, thermo_it = 7
+
+    @pytest.mark.parametrize("t_first,thermo_it", [(7, 7), (0, 1)])
+    def test_single_slice_preserves_declared_axis_labels_above_point_count(tmp_path, t_first, thermo_it):
+        """CompOSE bounds identify grid labels, not local array offsets.
+    
+        A slice retaining Yq label 9 has one grid point, stored at local slot 1.
+        Keep the established zero-declared/one-labelled cold-T provider case.
+        """
+        d = tmp_path / "offset-slice"
+        _write_cold_slice_dir(d, n=3, t_first=t_first, t_value=0.0,
+                              yq_first=9, yq_value=.1, thermo_iT=thermo_it,
+                              thermo_iYq=9)
+        eos = read_compose(d)
+        assert eos.nT == eos.nYq == 1
+>       assert eos.iT == thermo_it
+E       assert 1 == 7
+E        +  where 1 = EOSData(nb=array([0.05 , 0.051, 0.052]), mn=939.0, mp=939.0, Q1=array([0.001  , 0.00101, 0.00102]), Q2=array([0., 0., ..., yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)).iT
+
+python_frontend/tests/test_m10_generic_axes.py:109: AssertionError
+___ test_single_slice_preserves_declared_axis_labels_above_point_count[0-1] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-426/test_single_slice_preserves_de1')
+t_first = 0, thermo_it = 1
+
+    @pytest.mark.parametrize("t_first,thermo_it", [(7, 7), (0, 1)])
+    def test_single_slice_preserves_declared_axis_labels_above_point_count(tmp_path, t_first, thermo_it):
+        """CompOSE bounds identify grid labels, not local array offsets.
+    
+        A slice retaining Yq label 9 has one grid point, stored at local slot 1.
+        Keep the established zero-declared/one-labelled cold-T provider case.
+        """
+        d = tmp_path / "offset-slice"
+        _write_cold_slice_dir(d, n=3, t_first=t_first, t_value=0.0,
+                              yq_first=9, yq_value=.1, thermo_iT=thermo_it,
+                              thermo_iYq=9)
+        eos = read_compose(d)
+        assert eos.nT == eos.nYq == 1
+        assert eos.iT == thermo_it
+>       assert eos.iYq == eos.selected_iYq == 9
+E       assert 1 == 0
+E        +  where 1 = EOSData(nb=array([0.05 , 0.051, 0.052]), mn=939.0, mp=939.0, Q1=array([0.001  , 0.00101, 0.00102]), Q2=array([0., 0., ..., yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)).iYq
+E        +  and   0 = EOSData(nb=array([0.05 , 0.051, 0.052]), mn=939.0, mp=939.0, Q1=array([0.001  , 0.00101, 0.00102]), Q2=array([0., 0., ..., yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)).selected_iYq
+
+python_frontend/tests/test_m10_generic_axes.py:110: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] python_frontend/tests/test_m10_generic_axes.py:212: inputs/raw_compose not staged (M0 not run in this environment)
+SKIPPED [1] python_frontend/tests/test_m10_generic_axes.py:227: inputs/raw_compose not staged (M0 not run in this environment)
+FAILED python_frontend/tests/test_matching_slice_roundtrip.py::test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip[cubic_F]
+FAILED python_frontend/tests/test_matching_slice_roundtrip.py::test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip[cubic_P]
+FAILED python_frontend/tests/test_matching_slice_roundtrip.py::test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip[quintic_F]
+FAILED python_frontend/tests/test_matching_slice_roundtrip.py::test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip[quintic_P]
+FAILED python_frontend/tests/test_matching_slice_roundtrip.py::test_maxwell_same_physical_charge_slice_accepts_different_index_labels
+FAILED python_frontend/tests/test_m10_generic_axes.py::test_single_slice_preserves_declared_axis_labels_above_point_count[7-7]
+FAILED python_frontend/tests/test_m10_generic_axes.py::test_single_slice_preserves_declared_axis_labels_above_point_count[0-1]
+7 failed, 8 passed, 2 skipped in 0.91s

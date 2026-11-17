@@ -15,7 +15,7 @@ module ns_interface_cases
 contains
     logical function is_interface_case(name)
         character(len=*),intent(in)::name
-        is_interface_case=name=='material_transfer'.or.name=='segment_events'.or. &
+        is_interface_case=name=='material_transfer'.or.name=='rapid_transfer'.or.name=='segment_events'.or. &
             name=='segment_restart_probe'.or.name=='interface_identity'
     end function
     subroutine run_interface_case(case_id,path)
@@ -26,6 +26,7 @@ contains
         integer::inner_side,outer_side,ios,u
         logical::candidate_interface_g,root_valid,transfer_valid
         real(wp)::w_out,v_out,dp_in,dp_out,w_rev,v_rev,d1,d2,v_zero,dp_c_in,dp_c_out
+        real(wp)::xi_in,xi_out,iso_in,iso_out,pprime_in,pprime_out,q_in,q_out
         type(status_t)::status,st
         type(segment_event_t)::ev(2),z
         real(wp),allocatable::stops(:)
@@ -71,6 +72,27 @@ contains
                 call emit_real('v_continuous_delta_p_mismatch_pa',dp_c_out-dp_c_in)
                 call emit_bool('zero_jump_identity',abs(v_zero-v_in_m2)<=2e-13_wp*max(abs(v_in_m2),1._wp))
                 call emit_bool('same_radius_two_sides',inner_side==SIDE_INNER.and.outer_side==SIDE_OUTER)
+            end if
+        case('rapid_transfer')
+            call rapid_interface_transfer(r_m,omega_rad_s,pressure_pa,eps_in,eps_out,nu,lambda_value,dnu_dr, &
+                 w_in_m3,v_in_m2,inner_side,outer_side,w_out,v_out,dp_in,dp_out,status)
+            if(is_ok(status))then
+                call lagrangian_pressure_jump(r_m,omega_rad_s,pressure_pa,eps_in,nu,lambda_value,dnu_dr, &
+                    w_in_m3,v_in_m2,dp_c_in,q_in,st)
+                call lagrangian_pressure_jump(r_m,omega_rad_s,pressure_pa,eps_out,nu,lambda_value,dnu_dr, &
+                    w_out,v_out,dp_c_out,q_out,st)
+                xi_in=exp(-lambda_value)*w_in_m3/(r_m*r_m)
+                xi_out=exp(-lambda_value)*w_out/(r_m*r_m)
+                pprime_in=-(eps_in+pressure_pa)*dnu_dr
+                pprime_out=-(eps_out+pressure_pa)*dnu_dr
+                iso_in=xi_in-dp_in/pprime_in
+                iso_out=xi_out-dp_out/pprime_out
+                call emit_real('w_in_m3',w_in_m3);call emit_real('v_in_m2',v_in_m2)
+                call emit_real('w_out_m3',w_out);call emit_real('v_out_m2',v_out)
+                call emit_real('delta_p_in_pa',dp_in);call emit_real('delta_p_out_pa',dp_out)
+                call emit_real('isobar_displacement_in_m',iso_in);call emit_real('isobar_displacement_out_m',iso_out)
+                call emit_real('delta_p_relative_jump',abs(dp_out-dp_in)/max(abs(dp_out),abs(dp_in),1._wp))
+                call emit_real('rapid_condition_residual',abs(iso_out-iso_in)/max(abs(iso_out),abs(iso_in),1._wp))
             end if
         case('segment_events')
             select case(trim(scenario))

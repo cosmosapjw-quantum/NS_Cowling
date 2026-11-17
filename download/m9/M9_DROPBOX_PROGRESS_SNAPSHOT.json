@@ -1,0 +1,41 @@
+{
+  "schema": "ns-cowling.eos390-m9-dropbox-progress-snapshot",
+  "schema_version": "1.0.0",
+  "generated_utc": "2026-11-12T11:56:00Z",
+  "project": "NS_Cowling EOS390 native Fortran unification",
+  "branch": "cloud/eos390-fortran-unification-v1",
+  "gate_status": {
+    "M0": "DONE (v3.2 reference staged; 13 crust + 5 core CompOSE tables)",
+    "M1": "DONE (DAG and gate definitions)",
+    "M2": "PENDING native port (smooth Hermite bridge kernel; Python legacy reference)",
+    "M2A": "PENDING native port (causal-complete extension)",
+    "M10": "PENDING native port (fill-gap / reconstruct-master)",
+    "M3": "DONE (per-model coupling extraction; CLD reconstruction; NL3/TM1 convention BLOCKED on original PDF)",
+    "M4": "DONE (crust splicing; 6 models spliced; C6/C10/C11 failures trace to M3 CLD quality)",
+    "M5": "DONE (sharp Maxwell construction; analytic fixture PASS)",
+    "M5A": "DONE (CSS high-density branch; 5/5 AHP2013 cases PASS)",
+    "M6": "DONE (TOV + l=2 Love + Takatsy-Kovacs tidal y-jump; 3/3 tests PASS)",
+    "M7": "DONE (390 batch orchestration; 26 PASS / 364 FAIL on real v3.2 sources; all 4 acceptance PASS)",
+    "M8": "DONE (differential/physical/numerical validation; all 4 acceptance PASS)",
+    "M9": "DONE (this snapshot + execution receipt + output manifest + SHA-256)"
+  },
+  "key_artifacts": {
+    "native_fortran_backend": "build/compose_eos_fortran/compose_eos_fortran (gfortran 15.3.0 via micromamba)",
+    "m7_batch_outputs": "download/m7_batch/ (390 tasks, 26 PASS, 364 FAIL)",
+    "m8_validation_report": "download/m8/M8_VALIDATION_REPORT.json",
+    "m9_handoff_corpus": "download/m9/ (this snapshot, output manifest, SHA-256 maps)",
+    "v3_2_reference": "upload/v3_2_extracted/ (immutable; read-only oracle)"
+  },
+  "acceptance_summary": {
+    "M7": "all 4 acceptance PASS (390 unique tasks, isolated outputs, fail-closed)",
+    "M8": "all 4 acceptance PASS (v3.2 oracle, analytic fixture, edge cases, C1-C11+convergence)",
+    "M9": "all 5 acceptance PASS (390 statuses, read-back, SHA-256, historical unchanged, snapshot+receipt)"
+  },
+  "open_items_for_next_iteration": [
+    "M2/M10 native port of the smooth Hermite bridge (cubic_F/P, quintic_F/P) to unblock 130 smooth-method tasks",
+    "M4 CLD pressure formula repair (or M5 hard-gate relaxation for diagnostic runs) to unblock 65 maxwell tasks",
+    "M2/M10 native composition-closure fix to unblock 39 css C10-fail tasks",
+    "Stage the M0 replacement ZIP to provide the 5 real core CompOSE tables (currently using v3.2 reference cores)",
+    "Fortran batch command (compose_eos_fortran batch action) to consume the manifest directly in production (no Python in the loop)"
+  ]
+}

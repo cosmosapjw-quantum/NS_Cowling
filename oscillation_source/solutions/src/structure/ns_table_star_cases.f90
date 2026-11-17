@@ -9,7 +9,7 @@ module ns_table_star_cases
     use ns_table_io, only: normalized_table_t,load_normalized_table
     use ns_table_eos, only: table_eos_t,table_audit_t,init_table_eos,eos_table_at_pressure,TABLE_INTERPOLATION_ID
     use ns_background_records, only: star_options_t,star_profile_t
-    use ns_tov, only: integrate_tov
+    use ns_production_solvers, only: solve_tov_star
     use, intrinsic :: iso_fortran_env, only: int64
     implicit none
     private
@@ -69,7 +69,7 @@ contains
         options%ode%atol=[atol_r_m,atol_mass_kg,atol_nu];options%ode%rtol=rtol
         options%ode%h_initial=dq_initial;options%ode%h_min=dq_min;options%ode%h_max=dq_max
         options%ode%max_steps=max_steps
-        call integrate_tov(eos,pc_pa,options,profile)
+        call solve_tov_star(eos,pc_pa,options,profile)
         status=profile%status
         if(profile%valid.and.is_ok(status)) call output_profile()
         call finish()

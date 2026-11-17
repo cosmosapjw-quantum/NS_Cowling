@@ -1,0 +1,54 @@
+....F....                                                                [100%]
+=================================== FAILURES ===================================
+___________ test_nonfinite_rows_remain_strict_json_and_split_support ___________
+
+    def test_nonfinite_rows_remain_strict_json_and_split_support():
+        data = table(energy=(1, 1.12, 1.25, 1.4), pressure=(.1, .15, .2, .3))
+        data.p[2] = np.nan
+        report = physical_domain_report(data)
+        assert report["rows"][2]["P_MeV_fm3"] is None
+        assert report["mechanically_causal_segments"][0]["last_row"] == 2
+>       json.dumps(report, allow_nan=False)
+
+python_frontend/tests/test_physical_domain.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/json/__init__.py:238: in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+/usr/lib/python3.12/json/encoder.py:200: in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/json/encoder.py:258: in iterencode
+    return _iterencode(o, 0)
+           ^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.encoder.JSONEncoder object at 0x7103e73e3bc0>, o = np.True_
+
+    def default(self, o):
+        """Implement this method in a subclass such that it returns
+        a serializable object for ``o``, or calls the base implementation
+        (to raise a ``TypeError``).
+    
+        For example, to support arbitrary iterators, you could
+        implement default like this::
+    
+            def default(self, o):
+                try:
+                    iterable = iter(o)
+                except TypeError:
+                    pass
+                else:
+                    return list(iterable)
+                # Let the base class default method raise the TypeError
+                return super().default(o)
+    
+        """
+>       raise TypeError(f'Object of type {o.__class__.__name__} '
+                        f'is not JSON serializable')
+E       TypeError: Object of type bool is not JSON serializable
+
+/usr/lib/python3.12/json/encoder.py:180: TypeError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_physical_domain.py::test_nonfinite_rows_remain_strict_json_and_split_support
+1 failed, 8 passed in 0.11s

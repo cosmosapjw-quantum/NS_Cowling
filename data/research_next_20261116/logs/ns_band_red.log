@@ -1,0 +1,27 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_banded_rhs_is_explicit_float64_without_mutating_extended_input ______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x70d91462ed80>
+
+    def test_banded_rhs_is_explicit_float64_without_mutating_extended_input(monkeypatch):
+        original=spatial_tf.solve_banded
+        seen=[]
+        def inspect(bandwidth,band,rhs,**kwargs):
+            seen.append((band.dtype,rhs.dtype))
+            return original(bandwidth,band,rhs,**kwargs)
+        monkeypatch.setattr(spatial_tf,'solve_banded',inspect)
+        m=np.array([[2.,-1.,0.],[-1.,2.,-1.],[0.,-1.,2.]],dtype=np.longdouble)
+        rhs=np.array([[1.,2.],[2.,3.],[3.,4.]],dtype=np.longdouble)
+        before=rhs.copy()
+        result=spatial_tf._band_solve(m,rhs)
+>       assert seen==[(np.dtype('float64'),np.dtype('float64'))]
+E       AssertionError: assert [(dtype('floa...('float128'))] == [(dtype('floa...e('float64'))]
+E         
+E         At index 0 diff: (dtype('float64'), dtype('float128')) != (dtype('float64'), dtype('float64'))
+E         Use -v to get more diff
+
+python_frontend/tests/test_banded_precision_contract.py:17: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_banded_precision_contract.py::test_banded_rhs_is_explicit_float64_without_mutating_extended_input
+1 failed in 0.80s

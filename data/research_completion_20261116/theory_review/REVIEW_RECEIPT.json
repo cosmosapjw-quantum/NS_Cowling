@@ -1,0 +1,27 @@
+{
+  "base_commit": "c8ff2d6c97a93f1ccf621051861d3091bfe94d81",
+  "working_head": "c8ff2d6c97a93f1ccf621051861d3091bfe94d81",
+  "scope": "independent bounded theory review; no mutation of shared production modules",
+  "commands": [
+    "PYTHONPATH=python_frontend python3 data/research_completion_20261116/theory_review/run_core_derivative_review.py",
+    "PYTHONPATH=python_frontend python3 data/research_completion_20261116/theory_review/run_two_phase_numerical_review.py",
+    "PYTHONPATH=python_frontend python3 data/research_completion_20261116/theory_review/run_surface_fit_variants.py --ame /tmp/NS_Cowling_generator_research_20261116/build/candidate_surface_fit/mass16.txt",
+    "PYTHONPATH=python_frontend python3 data/research_completion_20261116/theory_review/run_surface_fit_variants.py --ame /tmp/NS_Cowling_generator_research_20261116/build/candidate_surface_fit/mass16.txt --density-points 321 --output-name surface_fit_variants_321.json",
+    "python3 data/research_completion_20261116/theory_review/compare_surface_grids.py",
+    "PYTHONPATH=python_frontend python3 data/research_completion_20261116/theory_review/run_rest_mass_seam.py --points 33 --bsk-max .003",
+    "PYTHONPATH=python_frontend python3 data/research_completion_20261116/theory_review/validate_rest_mass_seam.py",
+    "PYTHONPATH=python_frontend python3 data/research_completion_20261116/theory_review/run_spg_v2_review.py"
+  ],
+  "model_status": "PASS_SCOPED for stated finite checks; complete full crust not admitted",
+  "code_and_inputs": {
+    "data/research_completion_20261116/theory_review/compare_surface_grids.py": "6d9059db1b734e8bcc5ca7635fa39c141cb06b7c2ae0779e651d9fac6485812a",
+    "data/research_completion_20261116/theory_review/run_two_phase_numerical_review.py": "d1eceb7cfff97535566afc6e2f4ac55742aa503e892c97beaacab3dba5664623",
+    "data/research_completion_20261116/theory_review/validate_rest_mass_seam.py": "1eb5ca4a628b0f158e1622ee2f5ec7e598f2a3f0303eb59376c1bd7a5ef3947f",
+    "data/research_completion_20261116/theory_review/run_core_derivative_review.py": "1b6ffeeca66070d99f631b918b8e76bac0148f31b8b7c82f331cdbfcf6a7ab2a",
+    "data/research_completion_20261116/theory_review/run_rest_mass_seam.py": "7b5d687879eb6792c48902874adf30b8434b2a2911812c6e0a763bb9295be0b5",
+    "data/research_completion_20261116/theory_review/run_spg_v2_review.py": "baf101593544d0732f776d3a08e352151ceea8a6b4b878a71c8369ff425a9b6e",
+    "data/research_completion_20261116/theory_review/run_surface_fit_variants.py": "df8f871b47d1d4e048798d378a4353d4ddb65d85096be4cf3bdb6070b784e978"
+  },
+  "reproducibility_note": "Acquire the AME2016 raw file at the recorded SHA and pass its actual local path. Raw file is not committed. Wolfram .wl files and actual response JSON are retained.",
+  "additional_result": "All5 explicitly species-restored SPG candidates cross energy-consistent published BSk22 analytic fit; no complete hybrid exported; final2565SPGrows audited."
+}

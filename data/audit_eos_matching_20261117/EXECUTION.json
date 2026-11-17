@@ -1,0 +1,169 @@
+{
+  "base_sha": "80b923b7126492544643a46007b45915e7e3f3aa",
+  "started_utc": "2026-11-17T02:34:08.058359+00:00",
+  "cwd": "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117",
+  "python_executable": "/home/cosmosapjw/ns_cowling_wt/.venv-gen/bin/python",
+  "threads": 1,
+  "source_sha256_before": {
+    "fortran_eos/src/compose_eos_io.f90": "9c220da3480abfd86cf8461f3e9f6dabedb1a1f2e337fea7f054c18290c6cecf",
+    "fortran_eos/src/compose_eos_matching.f90": "ad69fe2f2c42a55bba57c9123663e82c540a6578b059cbf959bd16be619a0b06",
+    "fortran_eos/src/compose_eos_phase_transition.f90": "355c6e83e123a35a0734fdc9814a42fad7bb3743ee4385d4b4fd72c1aa5e722a",
+    "fortran_eos/tests/run_matching_native_adversarial.py": "1442a538067a6a66a585dcd4fb02aeea356456d2c6dd3b9de7a5963075425002",
+    "fortran_eos/tests/test_matching_slice_conventions.f90": "b5abb7dd5b7d87a1b01b4fc37faca35a5648da9708e854bde8c796a6ad5a48bc",
+    "fortran_eos/tests/test_matching_thermodynamic_adversarial.f90": "9a2aa49406bb63c1c59e1ab655ee2ca3a3fd9161ca2cd3cf9066a296db186228",
+    "python_frontend/compose_eos/api.py": "7f2aaed7763a8a6fa12d5d193c831cd699c8a4f627c43045adffbd10d94e788c",
+    "python_frontend/compose_eos/crust_assembly.py": "a15ac45ea0f4da13c4c33d3bb765013998d502def5f4fa834c582ce4bb8c095f",
+    "python_frontend/compose_eos/eos_data.py": "3882219221063f8eee446c6ba6ef20b0cfc87da3661054cfda325038a3f70f6c",
+    "python_frontend/compose_eos/native_generation.py": "a6fa47384197a6c7ecc83fc6de77680ad4abadb4de938f4b27bcc0de0b086f9d",
+    "python_frontend/tests/test_crust_assembly.py": "db423ce5a4d5d6dcdaa6e876ed536f696fc0643c4864f33cbdb768b5fabe1324",
+    "python_frontend/tests/test_m10_generic_axes.py": "3003f27d7835bacddb44e35503addac417ba527410f93511918d950b4d4e6792",
+    "python_frontend/tests/test_matching_convention_contract.py": "ddd59288169ac2716818a6d0ee46c252cf42d52f78a13757ff73013727dde25a",
+    "python_frontend/tests/test_matching_slice_roundtrip.py": "6db2d13bf7053f0c07ba94af4e10707156ffafd415a8ccc715f9cbc88bf54883",
+    "python_frontend/tests/test_matching_support_20261117.py": "7bb895aeee1c70e6ce89c9706de06e861fb8bea3700f06d4eb1b64f38c622aec",
+    "python_frontend/tests/test_native_generation_diagnostic_inventory.py": "486b8e98968753bb323c88daa19e5c14d2c765c055afe4d7caaf149a18854056"
+  },
+  "steps": [
+    {
+      "name": "build",
+      "command": [
+        "bash",
+        "fortran_eos/build.sh",
+        "build/compose_eos_fortran"
+      ],
+      "environment": {
+        "PYTHONPATH": "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/python_frontend:/tmp/ns_cowling_audit_20261117_pydeps",
+        "COMPOSE_EOS_FORTRAN_ROOT": "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117",
+        "COMPOSE_EOS_FORTRAN_EXE": "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/compose_eos_fortran",
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1"
+      },
+      "returncode": 0,
+      "seconds": 24.73706814099569,
+      "log": "logs/final_build.log",
+      "tail": [
+        "/usr/bin/ld: warning: /home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/.compile.gTdgVfkf/obj/compose_eos_spg_native.o: requires executable stack (because the .note.GNU-stack section is executable)",
+        "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/compose_eos_fortran",
+        "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/compose_eos_generate"
+      ]
+    },
+    {
+      "name": "frontend_pipeline",
+      "command": [
+        "/home/cosmosapjw/ns_cowling_wt/.venv-gen/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-ra",
+        "python_frontend/tests",
+        "pipeline/tests"
+      ],
+      "environment": {
+        "PYTHONPATH": "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/python_frontend:/tmp/ns_cowling_audit_20261117_pydeps",
+        "COMPOSE_EOS_FORTRAN_ROOT": "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117",
+        "COMPOSE_EOS_FORTRAN_EXE": "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/compose_eos_fortran",
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1"
+      },
+      "returncode": 0,
+      "seconds": 116.37748939500307,
+      "log": "logs/final_frontend_pipeline.log",
+      "tail": [
+        "........................................................................ [ 75%]",
+        "........................................................................ [ 81%]",
+        "........................................................................ [ 87%]",
+        ".................................ss..................................... [ 92%]",
+        "........................................................................ [ 98%]",
+        "...............                                                          [100%]",
+        "=========================== short test summary info ============================",
+        "SKIPPED [2] python_frontend/tests/test_cowling_end_to_end.py:41: inputs/raw_compose/BBB_BHF2 not staged (M0 not run)",
+        "SKIPPED [1] python_frontend/tests/test_cowling_end_to_end.py:41: inputs/raw_compose/APR_APR not staged (M0 not run)",
+        "SKIPPED [1] python_frontend/tests/test_e390_10b_tensor_model.py:97: inputs/raw_compose not staged (E390-00)",
+        "SKIPPED [1] python_frontend/tests/test_m10_generic_axes.py:212: inputs/raw_compose not staged (M0 not run in this environment)",
+        "SKIPPED [1] python_frontend/tests/test_m10_generic_axes.py:227: inputs/raw_compose not staged (M0 not run in this environment)",
+        "SKIPPED [1] python_frontend/tests/test_m7_fail_closed.py:214: inputs/raw_compose not staged (M0 not run in this environment)",
+        "SKIPPED [2] python_frontend/tests/test_wigner_seitz_reconstruction.py:78: inputs/raw_compose/SPG_M1 not staged (M0 not run in this environment)",
+        "1230 passed, 9 skipped in 115.65s (0:01:55)"
+      ]
+    },
+    {
+      "name": "generator",
+      "command": [
+        "/home/cosmosapjw/ns_cowling_wt/.venv-gen/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-ra",
+        "eos_generator/tests"
+      ],
+      "environment": {
+        "PYTHONPATH": "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/eos_generator:/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/eos_generator/compose_eos_pkg",
+        "COMPOSE_EOS_FORTRAN_ROOT": "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117",
+        "COMPOSE_EOS_FORTRAN_EXE": "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/compose_eos_fortran",
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1"
+      },
+      "returncode": 0,
+      "seconds": 20.367573405004805,
+      "log": "logs/final_generator.log",
+      "tail": [
+        "........................................................................ [ 50%]",
+        "......................................................................   [100%]",
+        "142 passed in 19.75s"
+      ]
+    },
+    {
+      "name": "theory",
+      "command": [
+        "/home/cosmosapjw/ns_cowling_wt/.venv-gen/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "fortran_eos/tests/matching_theory_soft_barotrope.py",
+        "fortran_eos/tests/matching_theory_maxwell_topology.py"
+      ],
+      "environment": {
+        "PYTHONPATH": "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/python_frontend:/tmp/ns_cowling_audit_20261117_pydeps",
+        "COMPOSE_EOS_FORTRAN_ROOT": "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117",
+        "COMPOSE_EOS_FORTRAN_EXE": "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/compose_eos_fortran",
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1"
+      },
+      "returncode": 0,
+      "seconds": 0.6272113430022728,
+      "log": "logs/final_theory.log",
+      "tail": [
+        "......                                                                   [100%]",
+        "6 passed in 0.26s"
+      ]
+    }
+  ],
+  "source_sha256_after": {
+    "fortran_eos/src/compose_eos_io.f90": "9c220da3480abfd86cf8461f3e9f6dabedb1a1f2e337fea7f054c18290c6cecf",
+    "fortran_eos/src/compose_eos_matching.f90": "ad69fe2f2c42a55bba57c9123663e82c540a6578b059cbf959bd16be619a0b06",
+    "fortran_eos/src/compose_eos_phase_transition.f90": "355c6e83e123a35a0734fdc9814a42fad7bb3743ee4385d4b4fd72c1aa5e722a",
+    "fortran_eos/tests/run_matching_native_adversarial.py": "1442a538067a6a66a585dcd4fb02aeea356456d2c6dd3b9de7a5963075425002",
+    "fortran_eos/tests/test_matching_slice_conventions.f90": "b5abb7dd5b7d87a1b01b4fc37faca35a5648da9708e854bde8c796a6ad5a48bc",
+    "fortran_eos/tests/test_matching_thermodynamic_adversarial.f90": "9a2aa49406bb63c1c59e1ab655ee2ca3a3fd9161ca2cd3cf9066a296db186228",
+    "python_frontend/compose_eos/api.py": "7f2aaed7763a8a6fa12d5d193c831cd699c8a4f627c43045adffbd10d94e788c",
+    "python_frontend/compose_eos/crust_assembly.py": "a15ac45ea0f4da13c4c33d3bb765013998d502def5f4fa834c582ce4bb8c095f",
+    "python_frontend/compose_eos/eos_data.py": "3882219221063f8eee446c6ba6ef20b0cfc87da3661054cfda325038a3f70f6c",
+    "python_frontend/compose_eos/native_generation.py": "a6fa47384197a6c7ecc83fc6de77680ad4abadb4de938f4b27bcc0de0b086f9d",
+    "python_frontend/tests/test_crust_assembly.py": "db423ce5a4d5d6dcdaa6e876ed536f696fc0643c4864f33cbdb768b5fabe1324",
+    "python_frontend/tests/test_m10_generic_axes.py": "3003f27d7835bacddb44e35503addac417ba527410f93511918d950b4d4e6792",
+    "python_frontend/tests/test_matching_convention_contract.py": "ddd59288169ac2716818a6d0ee46c252cf42d52f78a13757ff73013727dde25a",
+    "python_frontend/tests/test_matching_slice_roundtrip.py": "6db2d13bf7053f0c07ba94af4e10707156ffafd415a8ccc715f9cbc88bf54883",
+    "python_frontend/tests/test_matching_support_20261117.py": "7bb895aeee1c70e6ce89c9706de06e861fb8bea3700f06d4eb1b64f38c622aec",
+    "python_frontend/tests/test_native_generation_diagnostic_inventory.py": "486b8e98968753bb323c88daa19e5c14d2c765c055afe4d7caaf149a18854056"
+  },
+  "source_unchanged_during_run": true,
+  "finished_utc": "2026-11-17T02:36:50.261332+00:00",
+  "binary_sha256": {
+    "compose_eos_fortran": "6c5035d83da1804ab5401a96d00ddf1cbca9cccfce3962ad706d09b5ee0e649e",
+    "compose_eos_generate": "832d25b71aa993ee6dcf5d6db8124708f55778b62b517f770f89cd552b069b04"
+  },
+  "status": "PASS"
+}

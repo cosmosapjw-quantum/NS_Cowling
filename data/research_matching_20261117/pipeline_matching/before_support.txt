@@ -1,0 +1,57 @@
+FF..                                                                     [100%]
+=================================== FAILURES ===================================
+______ test_declared_unapproved_cross_phase_input_rejected_before_native _______
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-339/test_declared_unapproved_cross0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x75fbd116ade0>
+
+    def test_declared_unapproved_cross_phase_input_rejected_before_native(tmp_path, monkeypatch):
+        data = _table(tmp_path, [1, 1, 1, 9, 9, 9])
+        _support(tmp_path)
+        monkeypatch.setattr(api, "run_native", _must_not_match)
+        with pytest.raises(ValueError, match="support.*phase|phase.*support"):
+>           api.match_crust_core(data, data, method="css", n_bridge=8)
+
+python_frontend/tests/test_matching_support_20261117.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1345: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-cj13m2x7/crust'), PosixPath('/tmp/compose-eos-match-core-cj13m2x7/core'), PosixPath('/tmp/compose-eos-match-core-cj13m2x7/matched'), 'css', '8', ...)
+
+    def _must_not_match(*args):
+>       raise RuntimeError("native matching entered")
+E       RuntimeError: native matching entered
+
+python_frontend/tests/test_matching_support_20261117.py:29: RuntimeError
+_____________ test_in_memory_cross_segment_concatenation_rejected ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-339/test_in_memory_cross_segment_c0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x75fbd1006f30>
+
+    def test_in_memory_cross_segment_concatenation_rejected(tmp_path, monkeypatch):
+        data = _table(tmp_path, [1] * 6)
+        _support(tmp_path)
+        data.nb[0] = .002  # outside this segment, the historical lower-crust endpoint
+        monkeypatch.setattr(api, "run_native", _must_not_match)
+        with pytest.raises(ValueError, match="support.*source|source.*support"):
+>           api.match_crust_core(data, data, method="css", n_bridge=8)
+
+python_frontend/tests/test_matching_support_20261117.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1345: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-yx491m95/crust'), PosixPath('/tmp/compose-eos-match-core-yx491m95/core'), PosixPath('/tmp/compose-eos-match-core-yx491m95/matched'), 'css', '8', ...)
+
+    def _must_not_match(*args):
+>       raise RuntimeError("native matching entered")
+E       RuntimeError: native matching entered
+
+python_frontend/tests/test_matching_support_20261117.py:29: RuntimeError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_matching_support_20261117.py::test_declared_unapproved_cross_phase_input_rejected_before_native
+FAILED python_frontend/tests/test_matching_support_20261117.py::test_in_memory_cross_segment_concatenation_rejected
+2 failed, 2 passed in 0.25s

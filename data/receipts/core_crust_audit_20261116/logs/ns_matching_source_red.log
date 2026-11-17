@@ -1,0 +1,142 @@
+FFFFFFFF                                                                 [100%]
+=================================== FAILURES ===================================
+_ test_matcher_rejects_inconsistent_source_even_outside_selected_window[finite-crust] _
+
+side = 'crust', bad_value = 'finite'
+
+    @pytest.mark.parametrize('side', ['crust', 'core'])
+    @pytest.mark.parametrize('bad_value', ['finite', 'nan', 'inf'])
+    def test_matcher_rejects_inconsistent_source_even_outside_selected_window(side, bad_value):
+        crust, core = _load_css_admitted_crust_and_core()
+        target = crust if side == 'crust' else core
+        # Row zero is not used by the window search; the core row is discarded.
+        # The old matcher overwrote Q3 via F+P/n and silently admitted the defect.
+        target.Q3[0] = target.Q3[0] + .01 if bad_value == 'finite' else float(bad_value)
+>       with pytest.raises(ValueError, match='source.*Euler'):
+E       Failed: DID NOT RAISE ValueError
+
+eos_generator/tests/test_matching_source_euler_contract.py:18: Failed
+_ test_matcher_rejects_inconsistent_source_even_outside_selected_window[finite-core] _
+
+side = 'core', bad_value = 'finite'
+
+    @pytest.mark.parametrize('side', ['crust', 'core'])
+    @pytest.mark.parametrize('bad_value', ['finite', 'nan', 'inf'])
+    def test_matcher_rejects_inconsistent_source_even_outside_selected_window(side, bad_value):
+        crust, core = _load_css_admitted_crust_and_core()
+        target = crust if side == 'crust' else core
+        # Row zero is not used by the window search; the core row is discarded.
+        # The old matcher overwrote Q3 via F+P/n and silently admitted the defect.
+        target.Q3[0] = target.Q3[0] + .01 if bad_value == 'finite' else float(bad_value)
+>       with pytest.raises(ValueError, match='source.*Euler'):
+E       Failed: DID NOT RAISE ValueError
+
+eos_generator/tests/test_matching_source_euler_contract.py:18: Failed
+_ test_matcher_rejects_inconsistent_source_even_outside_selected_window[nan-crust] _
+
+side = 'crust', bad_value = 'nan'
+
+    @pytest.mark.parametrize('side', ['crust', 'core'])
+    @pytest.mark.parametrize('bad_value', ['finite', 'nan', 'inf'])
+    def test_matcher_rejects_inconsistent_source_even_outside_selected_window(side, bad_value):
+        crust, core = _load_css_admitted_crust_and_core()
+        target = crust if side == 'crust' else core
+        # Row zero is not used by the window search; the core row is discarded.
+        # The old matcher overwrote Q3 via F+P/n and silently admitted the defect.
+        target.Q3[0] = target.Q3[0] + .01 if bad_value == 'finite' else float(bad_value)
+>       with pytest.raises(ValueError, match='source.*Euler'):
+E       Failed: DID NOT RAISE ValueError
+
+eos_generator/tests/test_matching_source_euler_contract.py:18: Failed
+_ test_matcher_rejects_inconsistent_source_even_outside_selected_window[nan-core] _
+
+side = 'core', bad_value = 'nan'
+
+    @pytest.mark.parametrize('side', ['crust', 'core'])
+    @pytest.mark.parametrize('bad_value', ['finite', 'nan', 'inf'])
+    def test_matcher_rejects_inconsistent_source_even_outside_selected_window(side, bad_value):
+        crust, core = _load_css_admitted_crust_and_core()
+        target = crust if side == 'crust' else core
+        # Row zero is not used by the window search; the core row is discarded.
+        # The old matcher overwrote Q3 via F+P/n and silently admitted the defect.
+        target.Q3[0] = target.Q3[0] + .01 if bad_value == 'finite' else float(bad_value)
+>       with pytest.raises(ValueError, match='source.*Euler'):
+E       Failed: DID NOT RAISE ValueError
+
+eos_generator/tests/test_matching_source_euler_contract.py:18: Failed
+_ test_matcher_rejects_inconsistent_source_even_outside_selected_window[inf-crust] _
+
+side = 'crust', bad_value = 'inf'
+
+    @pytest.mark.parametrize('side', ['crust', 'core'])
+    @pytest.mark.parametrize('bad_value', ['finite', 'nan', 'inf'])
+    def test_matcher_rejects_inconsistent_source_even_outside_selected_window(side, bad_value):
+        crust, core = _load_css_admitted_crust_and_core()
+        target = crust if side == 'crust' else core
+        # Row zero is not used by the window search; the core row is discarded.
+        # The old matcher overwrote Q3 via F+P/n and silently admitted the defect.
+        target.Q3[0] = target.Q3[0] + .01 if bad_value == 'finite' else float(bad_value)
+>       with pytest.raises(ValueError, match='source.*Euler'):
+E       Failed: DID NOT RAISE ValueError
+
+eos_generator/tests/test_matching_source_euler_contract.py:18: Failed
+_ test_matcher_rejects_inconsistent_source_even_outside_selected_window[inf-core] _
+
+side = 'core', bad_value = 'inf'
+
+    @pytest.mark.parametrize('side', ['crust', 'core'])
+    @pytest.mark.parametrize('bad_value', ['finite', 'nan', 'inf'])
+    def test_matcher_rejects_inconsistent_source_even_outside_selected_window(side, bad_value):
+        crust, core = _load_css_admitted_crust_and_core()
+        target = crust if side == 'crust' else core
+        # Row zero is not used by the window search; the core row is discarded.
+        # The old matcher overwrote Q3 via F+P/n and silently admitted the defect.
+        target.Q3[0] = target.Q3[0] + .01 if bad_value == 'finite' else float(bad_value)
+>       with pytest.raises(ValueError, match='source.*Euler'):
+E       Failed: DID NOT RAISE ValueError
+
+eos_generator/tests/test_matching_source_euler_contract.py:18: Failed
+_ test_source_euler_residual_is_recorded_without_changing_physical_normalization _
+
+    def test_source_euler_residual_is_recorded_without_changing_physical_normalization():
+        crust, core = _load_css_admitted_crust_and_core()
+        originals = [copy.deepcopy(d) for d in (crust, core)]
+        matched, info = match_crust_core(crust, core, method='css')
+        expected = max(float(np.max(np.abs(d.mub - d.F - d.Q1) / np.abs(d.F + d.Q1)))
+                       for d in (crust, core))
+>       assert info['source_euler_relative_residual'] == pytest.approx(expected, abs=2e-16)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'source_euler_relative_residual'
+
+eos_generator/tests/test_matching_source_euler_contract.py:28: KeyError
+_______ test_nonleptonic_source_euler_includes_charge_chemical_potential _______
+
+    def test_nonleptonic_source_euler_includes_charge_chemical_potential():
+        crust, core = _load_css_admitted_crust_and_core()
+        for source in (crust, core):
+            source.Il = 0
+            source.charge_fraction_grid = .2
+            source.Q4[:] = -.02
+            source.Q3 = source.Q3 - source.charge_fraction_grid * source.Q4
+        _, info = match_crust_core(crust, core, method='css')
+>       assert info['source_euler_relative_residual'] < 5e-4
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'source_euler_relative_residual'
+
+eos_generator/tests/test_matching_source_euler_contract.py:45: KeyError
+=============================== warnings summary ===============================
+../../home/cosmosapjw/.local/lib/python3.12/site-packages/matplotlib/projections/__init__.py:63
+  /home/cosmosapjw/.local/lib/python3.12/site-packages/matplotlib/projections/__init__.py:63: UserWarning: Unable to import Axes3D. This may be due to multiple versions of Matplotlib being installed (e.g. as a system package and as a pip package). As a result, the 3D projection is not available.
+    warnings.warn("Unable to import Axes3D. This may be due to multiple versions of "
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED eos_generator/tests/test_matching_source_euler_contract.py::test_matcher_rejects_inconsistent_source_even_outside_selected_window[finite-crust]
+FAILED eos_generator/tests/test_matching_source_euler_contract.py::test_matcher_rejects_inconsistent_source_even_outside_selected_window[finite-core]
+FAILED eos_generator/tests/test_matching_source_euler_contract.py::test_matcher_rejects_inconsistent_source_even_outside_selected_window[nan-crust]
+FAILED eos_generator/tests/test_matching_source_euler_contract.py::test_matcher_rejects_inconsistent_source_even_outside_selected_window[nan-core]
+FAILED eos_generator/tests/test_matching_source_euler_contract.py::test_matcher_rejects_inconsistent_source_even_outside_selected_window[inf-crust]
+FAILED eos_generator/tests/test_matching_source_euler_contract.py::test_matcher_rejects_inconsistent_source_even_outside_selected_window[inf-core]
+FAILED eos_generator/tests/test_matching_source_euler_contract.py::test_source_euler_residual_is_recorded_without_changing_physical_normalization
+FAILED eos_generator/tests/test_matching_source_euler_contract.py::test_nonleptonic_source_euler_includes_charge_chemical_potential
+8 failed, 1 warning in 0.79s

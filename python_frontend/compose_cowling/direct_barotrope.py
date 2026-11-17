@@ -37,7 +37,16 @@ class EOSState:
 class DirectBarotrope:
     """A causal, thermodynamically closed continuous curve through raw P-epsilon knots."""
 
-    def __init__(self, pressure: np.ndarray, energy: np.ndarray, number_density: np.ndarray, chemical_potential: np.ndarray):
+    def __init__(self, pressure: np.ndarray, energy: np.ndarray, number_density: np.ndarray,
+                 chemical_potential: np.ndarray, *, anchor: str = "first"):
+        """``anchor`` selects the knot whose n_B fixes the first-law integration
+        d ln n = d eps/(eps + P): "first" (lowest pressure) or "last".  A phase
+        branch that ends at a coexistence point is anchored there so the
+        interface state is reproduced exactly; any knot-level first-law
+        inconsistency of the table then appears at the opposite end."""
+        if anchor not in ("first", "last"):
+            raise ValueError("anchor must be 'first' or 'last'")
+        self.anchor = anchor
         p = np.asarray(pressure, dtype=float)
         e = np.asarray(energy, dtype=float)
         n = np.asarray(number_density, dtype=float)
@@ -67,9 +76,14 @@ class DirectBarotrope:
         self._g_of_u = PchipInterpolator(self.u, g, extrapolate=False)
         self._dg_du = self._g_of_u.derivative()
         self.logn_knots = np.empty_like(p)
-        self.logn_knots[0] = np.log(n[0])
-        for i in range(len(p) - 1):
-            self.logn_knots[i + 1] = self.logn_knots[i] + self._integrate_cell(i, self.u[i], self.u[i + 1])
+        if anchor == "first":
+            self.logn_knots[0] = np.log(n[0])
+            for i in range(len(p) - 1):
+                self.logn_knots[i + 1] = self.logn_knots[i] + self._integrate_cell(i, self.u[i], self.u[i + 1])
+        else:
+            self.logn_knots[-1] = np.log(n[-1])
+            for i in range(len(p) - 2, -1, -1):
+                self.logn_knots[i] = self.logn_knots[i + 1] - self._integrate_cell(i, self.u[i], self.u[i + 1])
         self.number_density_knots = np.exp(self.logn_knots)
         self.mu_knots = (e + p) / self.number_density_knots
         if not np.all(np.isfinite(self.mu_knots)) or np.any(self.mu_knots <= 0) or np.any(np.diff(self.mu_knots) <= 0):

@@ -1,0 +1,65 @@
+{
+  "scope": "historical v5 input; exact CSS representation numerical convergence only",
+  "pair_id": "SPG_M1__BBB_BHF2__css",
+  "pressure_MeV_fm3": 60,
+  "mass_relative_difference": 6.204505353935019e-09,
+  "radius_relative_difference": 3.1642144460164445e-09,
+  "adapter": {
+    "construction_kind": "css_single_speed_with_crust_density_jump",
+    "crust_rows": 16,
+    "css_and_core_rows": 23,
+    "css_core_join": "continuous in n_B, P, eps, mu_B; one-sided sound-speed derivative",
+    "css_provider": "exact analytic constant-sound-speed bridge",
+    "core_provider": "separate PCHIP(eps-P versus ln P), first-law density",
+    "css_core_join_pressure_mev_fm3": 3.3080001645911086,
+    "css_core_cs2_left": 0.023960387093483505,
+    "css_core_cs2_right": 0.07081357329390701,
+    "low_branch_first_law_anchor": "interface",
+    "low_branch_surface_density_drift_relative": -2.8997426053667397e-06,
+    "high_branch_end_density_drift_relative": -0.0004428034886521104,
+    "pressure_cutoff_mev_fm3": 0.0016173580353169292,
+    "perturbation_boundary": "Delta P=0 at finite cutoff pressure; artificial truncation boundary",
+    "lapse_normalization": "vacuum Schwarzschild value at cutoff; complete exterior not modeled",
+    "frequency_scope": "truncated fluid model; no complete-star observable or stability claim",
+    "surface_definition": "truncation at the crust table minimum pressure (no outer crust in the CLD reconstruction)",
+    "composition": "none; no abundance or elastic-crust claim"
+  },
+  "cowling": {
+    "slow": {
+      "residual_loose": 0.7327619930218889,
+      "residual_tight": 0.7327619940824345,
+      "residual_difference": 1.0605455402767916e-09,
+      "interface_tight": {
+        "w_inner": 6058735835942.814,
+        "v_inner": -141599866.28044483,
+        "w_outer": 6058735835942.814,
+        "v_outer": -13182651.902891936,
+        "delta_p_inner_pa": -7.55297753694302e+33,
+        "delta_p_outer_pa": -7.552977536943021e+33,
+        "delta_p_relative_jump": 1.526446357039582e-16,
+        "radial_displacement_jump_m": 0.0,
+        "isobar_displacement_jump_m": -8464.171358329659,
+        "slow_condition_residual": 0.0,
+        "rapid_condition_residual": 0.9069020879102876
+      }
+    },
+    "rapid": {
+      "residual_loose": 0.7294396528282457,
+      "residual_tight": 0.7294396554701839,
+      "residual_difference": 2.6419381127240626e-09,
+      "interface_tight": {
+        "w_inner": 6058735835942.814,
+        "v_inner": -141599866.28044483,
+        "w_outer": 7188737941905.387,
+        "v_outer": -141599866.2804449,
+        "delta_p_inner_pa": -7.55297753694302e+33,
+        "delta_p_outer_pa": -7.552977536943021e+33,
+        "delta_p_relative_jump": 1.526446357039582e-16,
+        "radial_displacement_jump_m": 8464.171358329651,
+        "isobar_displacement_jump_m": -7.275957614183426e-12,
+        "slow_condition_residual": 0.15719061052085906,
+        "rapid_condition_residual": 7.795897403891743e-16
+      }
+    }
+  }
+}

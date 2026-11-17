@@ -1,0 +1,325 @@
+...FFFFFF                                                                [100%]
+=================================== FAILURES ===================================
+________ test_public_dispatch_support_seal_reaches_matching[edit-None] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_public_dispatch_support_s3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc79ef82c60>
+segment = None, change = 'edit'
+
+    @pytest.mark.parametrize("segment", [None, "outer", "lower_source_fit"])
+    @pytest.mark.parametrize("change", ["unchanged", "edit", "delete"])
+    def test_public_dispatch_support_seal_reaches_matching(tmp_path, monkeypatch, segment, change):
+        """The public generator stores hashes in DISPATCH, outside native RESULT."""
+        import hashlib
+        generated = tmp_path / "generated"
+        source = generated if segment is None else generated / segment
+        source.mkdir(parents=True)
+        data = _table(source, [9] * 6)
+        _support(generated)
+        path = generated / "SUPPORT.json"
+        (generated / "RESULT.json").write_text(json.dumps({
+            "backend": "fortran", "status": "REQUESTED_ROWS_NATIVE_VERIFIED"}))
+        if segment is not None:
+            (generated / "crust_segments.json").write_text('{}')
+        (tmp_path / "DISPATCH.json").write_text(json.dumps({
+            "status": "REQUESTED_ROWS_NATIVE_VERIFIED", "evidence": {
+                # Archived campaigns can move without changing their artifact bytes.
+                "native_directory": "/old/campaign/output/generated",
+                "output_sha256": {"SUPPORT.json": hashlib.sha256(path.read_bytes()).hexdigest()}}}))
+        if change == "edit":
+            path.write_text('{}')
+        elif change == "delete":
+            path.unlink()
+        monkeypatch.setattr(api, "run_native", _must_not_match)
+        if change == "unchanged":
+            with pytest.raises(RuntimeError, match="native matching entered"):
+                api.match_crust_core(data, data, method="css", n_bridge=8)
+        else:
+            with pytest.raises(ValueError, match="support.*sha256|support.*missing"):
+>               api.match_crust_core(data, data, method="css", n_bridge=8)
+
+python_frontend/tests/test_matching_support_20261117.py:125: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1476: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-cu7kjhom/crust'), PosixPath('/tmp/compose-eos-match-core-cu7kjhom/core'), PosixPath('/tmp/compose-eos-match-core-cu7kjhom/matched'), 'css', '8', ...)
+
+    def _must_not_match(*args):
+>       raise RuntimeError("native matching entered")
+E       RuntimeError: native matching entered
+
+python_frontend/tests/test_matching_support_20261117.py:29: RuntimeError
+________ test_public_dispatch_support_seal_reaches_matching[edit-outer] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_public_dispatch_support_s4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc7a1deea50>
+segment = 'outer', change = 'edit'
+
+    @pytest.mark.parametrize("segment", [None, "outer", "lower_source_fit"])
+    @pytest.mark.parametrize("change", ["unchanged", "edit", "delete"])
+    def test_public_dispatch_support_seal_reaches_matching(tmp_path, monkeypatch, segment, change):
+        """The public generator stores hashes in DISPATCH, outside native RESULT."""
+        import hashlib
+        generated = tmp_path / "generated"
+        source = generated if segment is None else generated / segment
+        source.mkdir(parents=True)
+        data = _table(source, [9] * 6)
+        _support(generated)
+        path = generated / "SUPPORT.json"
+        (generated / "RESULT.json").write_text(json.dumps({
+            "backend": "fortran", "status": "REQUESTED_ROWS_NATIVE_VERIFIED"}))
+        if segment is not None:
+            (generated / "crust_segments.json").write_text('{}')
+        (tmp_path / "DISPATCH.json").write_text(json.dumps({
+            "status": "REQUESTED_ROWS_NATIVE_VERIFIED", "evidence": {
+                # Archived campaigns can move without changing their artifact bytes.
+                "native_directory": "/old/campaign/output/generated",
+                "output_sha256": {"SUPPORT.json": hashlib.sha256(path.read_bytes()).hexdigest()}}}))
+        if change == "edit":
+            path.write_text('{}')
+        elif change == "delete":
+            path.unlink()
+        monkeypatch.setattr(api, "run_native", _must_not_match)
+        if change == "unchanged":
+            with pytest.raises(RuntimeError, match="native matching entered"):
+                api.match_crust_core(data, data, method="css", n_bridge=8)
+        else:
+            with pytest.raises(ValueError, match="support.*sha256|support.*missing"):
+>               api.match_crust_core(data, data, method="css", n_bridge=8)
+
+python_frontend/tests/test_matching_support_20261117.py:125: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1476: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-g_lsy93z/crust'), PosixPath('/tmp/compose-eos-match-core-g_lsy93z/core'), PosixPath('/tmp/compose-eos-match-core-g_lsy93z/matched'), 'css', '8', ...)
+
+    def _must_not_match(*args):
+>       raise RuntimeError("native matching entered")
+E       RuntimeError: native matching entered
+
+python_frontend/tests/test_matching_support_20261117.py:29: RuntimeError
+__ test_public_dispatch_support_seal_reaches_matching[edit-lower_source_fit] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_public_dispatch_support_s5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc7a1df4650>
+segment = 'lower_source_fit', change = 'edit'
+
+    @pytest.mark.parametrize("segment", [None, "outer", "lower_source_fit"])
+    @pytest.mark.parametrize("change", ["unchanged", "edit", "delete"])
+    def test_public_dispatch_support_seal_reaches_matching(tmp_path, monkeypatch, segment, change):
+        """The public generator stores hashes in DISPATCH, outside native RESULT."""
+        import hashlib
+        generated = tmp_path / "generated"
+        source = generated if segment is None else generated / segment
+        source.mkdir(parents=True)
+        data = _table(source, [9] * 6)
+        _support(generated)
+        path = generated / "SUPPORT.json"
+        (generated / "RESULT.json").write_text(json.dumps({
+            "backend": "fortran", "status": "REQUESTED_ROWS_NATIVE_VERIFIED"}))
+        if segment is not None:
+            (generated / "crust_segments.json").write_text('{}')
+        (tmp_path / "DISPATCH.json").write_text(json.dumps({
+            "status": "REQUESTED_ROWS_NATIVE_VERIFIED", "evidence": {
+                # Archived campaigns can move without changing their artifact bytes.
+                "native_directory": "/old/campaign/output/generated",
+                "output_sha256": {"SUPPORT.json": hashlib.sha256(path.read_bytes()).hexdigest()}}}))
+        if change == "edit":
+            path.write_text('{}')
+        elif change == "delete":
+            path.unlink()
+        monkeypatch.setattr(api, "run_native", _must_not_match)
+        if change == "unchanged":
+            with pytest.raises(RuntimeError, match="native matching entered"):
+                api.match_crust_core(data, data, method="css", n_bridge=8)
+        else:
+            with pytest.raises(ValueError, match="support.*sha256|support.*missing"):
+>               api.match_crust_core(data, data, method="css", n_bridge=8)
+
+python_frontend/tests/test_matching_support_20261117.py:125: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1476: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-f0zesgsj/crust'), PosixPath('/tmp/compose-eos-match-core-f0zesgsj/core'), PosixPath('/tmp/compose-eos-match-core-f0zesgsj/matched'), 'css', '8', ...)
+
+    def _must_not_match(*args):
+>       raise RuntimeError("native matching entered")
+E       RuntimeError: native matching entered
+
+python_frontend/tests/test_matching_support_20261117.py:29: RuntimeError
+_______ test_public_dispatch_support_seal_reaches_matching[delete-None] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_public_dispatch_support_s6')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc7a1f5fad0>
+segment = None, change = 'delete'
+
+    @pytest.mark.parametrize("segment", [None, "outer", "lower_source_fit"])
+    @pytest.mark.parametrize("change", ["unchanged", "edit", "delete"])
+    def test_public_dispatch_support_seal_reaches_matching(tmp_path, monkeypatch, segment, change):
+        """The public generator stores hashes in DISPATCH, outside native RESULT."""
+        import hashlib
+        generated = tmp_path / "generated"
+        source = generated if segment is None else generated / segment
+        source.mkdir(parents=True)
+        data = _table(source, [9] * 6)
+        _support(generated)
+        path = generated / "SUPPORT.json"
+        (generated / "RESULT.json").write_text(json.dumps({
+            "backend": "fortran", "status": "REQUESTED_ROWS_NATIVE_VERIFIED"}))
+        if segment is not None:
+            (generated / "crust_segments.json").write_text('{}')
+        (tmp_path / "DISPATCH.json").write_text(json.dumps({
+            "status": "REQUESTED_ROWS_NATIVE_VERIFIED", "evidence": {
+                # Archived campaigns can move without changing their artifact bytes.
+                "native_directory": "/old/campaign/output/generated",
+                "output_sha256": {"SUPPORT.json": hashlib.sha256(path.read_bytes()).hexdigest()}}}))
+        if change == "edit":
+            path.write_text('{}')
+        elif change == "delete":
+            path.unlink()
+        monkeypatch.setattr(api, "run_native", _must_not_match)
+        if change == "unchanged":
+            with pytest.raises(RuntimeError, match="native matching entered"):
+                api.match_crust_core(data, data, method="css", n_bridge=8)
+        else:
+            with pytest.raises(ValueError, match="support.*sha256|support.*missing"):
+>               api.match_crust_core(data, data, method="css", n_bridge=8)
+
+python_frontend/tests/test_matching_support_20261117.py:125: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1476: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-xh7cqs2r/crust'), PosixPath('/tmp/compose-eos-match-core-xh7cqs2r/core'), PosixPath('/tmp/compose-eos-match-core-xh7cqs2r/matched'), 'css', '8', ...)
+
+    def _must_not_match(*args):
+>       raise RuntimeError("native matching entered")
+E       RuntimeError: native matching entered
+
+python_frontend/tests/test_matching_support_20261117.py:29: RuntimeError
+_______ test_public_dispatch_support_seal_reaches_matching[delete-outer] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_public_dispatch_support_s7')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc79efb33b0>
+segment = 'outer', change = 'delete'
+
+    @pytest.mark.parametrize("segment", [None, "outer", "lower_source_fit"])
+    @pytest.mark.parametrize("change", ["unchanged", "edit", "delete"])
+    def test_public_dispatch_support_seal_reaches_matching(tmp_path, monkeypatch, segment, change):
+        """The public generator stores hashes in DISPATCH, outside native RESULT."""
+        import hashlib
+        generated = tmp_path / "generated"
+        source = generated if segment is None else generated / segment
+        source.mkdir(parents=True)
+        data = _table(source, [9] * 6)
+        _support(generated)
+        path = generated / "SUPPORT.json"
+        (generated / "RESULT.json").write_text(json.dumps({
+            "backend": "fortran", "status": "REQUESTED_ROWS_NATIVE_VERIFIED"}))
+        if segment is not None:
+            (generated / "crust_segments.json").write_text('{}')
+        (tmp_path / "DISPATCH.json").write_text(json.dumps({
+            "status": "REQUESTED_ROWS_NATIVE_VERIFIED", "evidence": {
+                # Archived campaigns can move without changing their artifact bytes.
+                "native_directory": "/old/campaign/output/generated",
+                "output_sha256": {"SUPPORT.json": hashlib.sha256(path.read_bytes()).hexdigest()}}}))
+        if change == "edit":
+            path.write_text('{}')
+        elif change == "delete":
+            path.unlink()
+        monkeypatch.setattr(api, "run_native", _must_not_match)
+        if change == "unchanged":
+            with pytest.raises(RuntimeError, match="native matching entered"):
+                api.match_crust_core(data, data, method="css", n_bridge=8)
+        else:
+            with pytest.raises(ValueError, match="support.*sha256|support.*missing"):
+>               api.match_crust_core(data, data, method="css", n_bridge=8)
+
+python_frontend/tests/test_matching_support_20261117.py:125: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1476: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-bijch56d/crust'), PosixPath('/tmp/compose-eos-match-core-bijch56d/core'), PosixPath('/tmp/compose-eos-match-core-bijch56d/matched'), 'css', '8', ...)
+
+    def _must_not_match(*args):
+>       raise RuntimeError("native matching entered")
+E       RuntimeError: native matching entered
+
+python_frontend/tests/test_matching_support_20261117.py:29: RuntimeError
+_ test_public_dispatch_support_seal_reaches_matching[delete-lower_source_fit] __
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_public_dispatch_support_s8')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc79efb2480>
+segment = 'lower_source_fit', change = 'delete'
+
+    @pytest.mark.parametrize("segment", [None, "outer", "lower_source_fit"])
+    @pytest.mark.parametrize("change", ["unchanged", "edit", "delete"])
+    def test_public_dispatch_support_seal_reaches_matching(tmp_path, monkeypatch, segment, change):
+        """The public generator stores hashes in DISPATCH, outside native RESULT."""
+        import hashlib
+        generated = tmp_path / "generated"
+        source = generated if segment is None else generated / segment
+        source.mkdir(parents=True)
+        data = _table(source, [9] * 6)
+        _support(generated)
+        path = generated / "SUPPORT.json"
+        (generated / "RESULT.json").write_text(json.dumps({
+            "backend": "fortran", "status": "REQUESTED_ROWS_NATIVE_VERIFIED"}))
+        if segment is not None:
+            (generated / "crust_segments.json").write_text('{}')
+        (tmp_path / "DISPATCH.json").write_text(json.dumps({
+            "status": "REQUESTED_ROWS_NATIVE_VERIFIED", "evidence": {
+                # Archived campaigns can move without changing their artifact bytes.
+                "native_directory": "/old/campaign/output/generated",
+                "output_sha256": {"SUPPORT.json": hashlib.sha256(path.read_bytes()).hexdigest()}}}))
+        if change == "edit":
+            path.write_text('{}')
+        elif change == "delete":
+            path.unlink()
+        monkeypatch.setattr(api, "run_native", _must_not_match)
+        if change == "unchanged":
+            with pytest.raises(RuntimeError, match="native matching entered"):
+                api.match_crust_core(data, data, method="css", n_bridge=8)
+        else:
+            with pytest.raises(ValueError, match="support.*sha256|support.*missing"):
+>               api.match_crust_core(data, data, method="css", n_bridge=8)
+
+python_frontend/tests/test_matching_support_20261117.py:125: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1476: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-hlolcwag/crust'), PosixPath('/tmp/compose-eos-match-core-hlolcwag/core'), PosixPath('/tmp/compose-eos-match-core-hlolcwag/matched'), 'css', '8', ...)
+
+    def _must_not_match(*args):
+>       raise RuntimeError("native matching entered")
+E       RuntimeError: native matching entered
+
+python_frontend/tests/test_matching_support_20261117.py:29: RuntimeError
+=============================== warnings summary ===============================
+../../../../opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/anyio/pytest_plugin.py:14
+  /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/anyio/pytest_plugin.py:14: PytestRemovedIn10Warning: _pytest.python.CallSpec2 has been renamed to CallSpec.
+  The CallSpec2 alias will be removed in pytest 10.
+  Update imports to use CallSpec instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#callspec2-renamed
+    from _pytest.python import CallSpec2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_matching_support_20261117.py::test_public_dispatch_support_seal_reaches_matching[edit-None]
+FAILED python_frontend/tests/test_matching_support_20261117.py::test_public_dispatch_support_seal_reaches_matching[edit-outer]
+FAILED python_frontend/tests/test_matching_support_20261117.py::test_public_dispatch_support_seal_reaches_matching[edit-lower_source_fit]
+FAILED python_frontend/tests/test_matching_support_20261117.py::test_public_dispatch_support_seal_reaches_matching[delete-None]
+FAILED python_frontend/tests/test_matching_support_20261117.py::test_public_dispatch_support_seal_reaches_matching[delete-outer]
+FAILED python_frontend/tests/test_matching_support_20261117.py::test_public_dispatch_support_seal_reaches_matching[delete-lower_source_fit]
+6 failed, 3 passed, 12 deselected, 1 warning in 0.25s

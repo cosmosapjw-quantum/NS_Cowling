@@ -1,0 +1,793 @@
+FFFFFFFFFFFFFFFFFFFF                                                     [100%]
+=================================== FAILURES ===================================
+_ test_public_matching_rejects_incompatible_thermodynamic_slices[lepton_content-css] _
+
+method = 'css', invalid = 'lepton_content'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fce49cb2000>
+
+    @pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    @pytest.mark.parametrize("invalid", ["lepton_content", "charge_fraction", "nan_charge", "infinite_charge"])
+    def test_public_matching_rejects_incompatible_thermodynamic_slices(method, invalid, monkeypatch):
+        crust, core = _branch(.01, .04), _branch(.06, .15)
+        if invalid == "lepton_content":
+            core.Il = 0
+        elif invalid == "charge_fraction":
+            core.charge_fraction_grid = .1
+        elif invalid == "nan_charge":
+            core.charge_fraction_grid = float("nan")
+        else:
+            core.charge_fraction_grid = float("inf")
+    
+        def unexpected_native_call(*args):
+            raise AssertionError("incompatible source slice entered native matching")
+    
+        monkeypatch.setattr(api, "run_native", unexpected_native_call)
+        with pytest.raises(ValueError, match="lepton-content|charge-fraction"):
+>           api.match_crust_core(crust, core, method=method, n_bridge=8)
+
+python_frontend/tests/test_matching_convention_contract.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1465: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-ke1c3ccf/crust'), PosixPath('/tmp/compose-eos-match-core-ke1c3ccf/core'), PosixPath('/tmp/compose-eos-match-core-ke1c3ccf/matched'), 'css', '8', ...)
+
+    def unexpected_native_call(*args):
+>       raise AssertionError("incompatible source slice entered native matching")
+E       AssertionError: incompatible source slice entered native matching
+
+python_frontend/tests/test_matching_convention_contract.py:40: AssertionError
+_ test_public_matching_rejects_incompatible_thermodynamic_slices[lepton_content-cubic_F] _
+
+method = 'cubic_F', invalid = 'lepton_content'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fce49f69280>
+
+    @pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    @pytest.mark.parametrize("invalid", ["lepton_content", "charge_fraction", "nan_charge", "infinite_charge"])
+    def test_public_matching_rejects_incompatible_thermodynamic_slices(method, invalid, monkeypatch):
+        crust, core = _branch(.01, .04), _branch(.06, .15)
+        if invalid == "lepton_content":
+            core.Il = 0
+        elif invalid == "charge_fraction":
+            core.charge_fraction_grid = .1
+        elif invalid == "nan_charge":
+            core.charge_fraction_grid = float("nan")
+        else:
+            core.charge_fraction_grid = float("inf")
+    
+        def unexpected_native_call(*args):
+            raise AssertionError("incompatible source slice entered native matching")
+    
+        monkeypatch.setattr(api, "run_native", unexpected_native_call)
+        with pytest.raises(ValueError, match="lepton-content|charge-fraction"):
+>           api.match_crust_core(crust, core, method=method, n_bridge=8)
+
+python_frontend/tests/test_matching_convention_contract.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1465: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-6oc4kqup/crust'), PosixPath('/tmp/compose-eos-match-core-6oc4kqup/core'), PosixPath('/tmp/compose-eos-match-core-6oc4kqup/matched'), 'cubic_F', '8', ...)
+
+    def unexpected_native_call(*args):
+>       raise AssertionError("incompatible source slice entered native matching")
+E       AssertionError: incompatible source slice entered native matching
+
+python_frontend/tests/test_matching_convention_contract.py:40: AssertionError
+_ test_public_matching_rejects_incompatible_thermodynamic_slices[lepton_content-cubic_P] _
+
+method = 'cubic_P', invalid = 'lepton_content'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fce49f65400>
+
+    @pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    @pytest.mark.parametrize("invalid", ["lepton_content", "charge_fraction", "nan_charge", "infinite_charge"])
+    def test_public_matching_rejects_incompatible_thermodynamic_slices(method, invalid, monkeypatch):
+        crust, core = _branch(.01, .04), _branch(.06, .15)
+        if invalid == "lepton_content":
+            core.Il = 0
+        elif invalid == "charge_fraction":
+            core.charge_fraction_grid = .1
+        elif invalid == "nan_charge":
+            core.charge_fraction_grid = float("nan")
+        else:
+            core.charge_fraction_grid = float("inf")
+    
+        def unexpected_native_call(*args):
+            raise AssertionError("incompatible source slice entered native matching")
+    
+        monkeypatch.setattr(api, "run_native", unexpected_native_call)
+        with pytest.raises(ValueError, match="lepton-content|charge-fraction"):
+>           api.match_crust_core(crust, core, method=method, n_bridge=8)
+
+python_frontend/tests/test_matching_convention_contract.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1465: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-1ie5th1_/crust'), PosixPath('/tmp/compose-eos-match-core-1ie5th1_/core'), PosixPath('/tmp/compose-eos-match-core-1ie5th1_/matched'), 'cubic_P', '8', ...)
+
+    def unexpected_native_call(*args):
+>       raise AssertionError("incompatible source slice entered native matching")
+E       AssertionError: incompatible source slice entered native matching
+
+python_frontend/tests/test_matching_convention_contract.py:40: AssertionError
+_ test_public_matching_rejects_incompatible_thermodynamic_slices[lepton_content-quintic_F] _
+
+method = 'quintic_F', invalid = 'lepton_content'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fce49f67d40>
+
+    @pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    @pytest.mark.parametrize("invalid", ["lepton_content", "charge_fraction", "nan_charge", "infinite_charge"])
+    def test_public_matching_rejects_incompatible_thermodynamic_slices(method, invalid, monkeypatch):
+        crust, core = _branch(.01, .04), _branch(.06, .15)
+        if invalid == "lepton_content":
+            core.Il = 0
+        elif invalid == "charge_fraction":
+            core.charge_fraction_grid = .1
+        elif invalid == "nan_charge":
+            core.charge_fraction_grid = float("nan")
+        else:
+            core.charge_fraction_grid = float("inf")
+    
+        def unexpected_native_call(*args):
+            raise AssertionError("incompatible source slice entered native matching")
+    
+        monkeypatch.setattr(api, "run_native", unexpected_native_call)
+        with pytest.raises(ValueError, match="lepton-content|charge-fraction"):
+>           api.match_crust_core(crust, core, method=method, n_bridge=8)
+
+python_frontend/tests/test_matching_convention_contract.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1465: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-5re8f4i1/crust'), PosixPath('/tmp/compose-eos-match-core-5re8f4i1/core'), PosixPath('/tmp/compose-eos-match-core-5re8f4i1/matched'), 'quintic_F', '8', ...)
+
+    def unexpected_native_call(*args):
+>       raise AssertionError("incompatible source slice entered native matching")
+E       AssertionError: incompatible source slice entered native matching
+
+python_frontend/tests/test_matching_convention_contract.py:40: AssertionError
+_ test_public_matching_rejects_incompatible_thermodynamic_slices[lepton_content-quintic_P] _
+
+method = 'quintic_P', invalid = 'lepton_content'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fce49cb2d20>
+
+    @pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    @pytest.mark.parametrize("invalid", ["lepton_content", "charge_fraction", "nan_charge", "infinite_charge"])
+    def test_public_matching_rejects_incompatible_thermodynamic_slices(method, invalid, monkeypatch):
+        crust, core = _branch(.01, .04), _branch(.06, .15)
+        if invalid == "lepton_content":
+            core.Il = 0
+        elif invalid == "charge_fraction":
+            core.charge_fraction_grid = .1
+        elif invalid == "nan_charge":
+            core.charge_fraction_grid = float("nan")
+        else:
+            core.charge_fraction_grid = float("inf")
+    
+        def unexpected_native_call(*args):
+            raise AssertionError("incompatible source slice entered native matching")
+    
+        monkeypatch.setattr(api, "run_native", unexpected_native_call)
+        with pytest.raises(ValueError, match="lepton-content|charge-fraction"):
+>           api.match_crust_core(crust, core, method=method, n_bridge=8)
+
+python_frontend/tests/test_matching_convention_contract.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1465: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-nct2ovtk/crust'), PosixPath('/tmp/compose-eos-match-core-nct2ovtk/core'), PosixPath('/tmp/compose-eos-match-core-nct2ovtk/matched'), 'quintic_P', '8', ...)
+
+    def unexpected_native_call(*args):
+>       raise AssertionError("incompatible source slice entered native matching")
+E       AssertionError: incompatible source slice entered native matching
+
+python_frontend/tests/test_matching_convention_contract.py:40: AssertionError
+_ test_public_matching_rejects_incompatible_thermodynamic_slices[charge_fraction-css] _
+
+method = 'css', invalid = 'charge_fraction'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fce49cb3290>
+
+    @pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    @pytest.mark.parametrize("invalid", ["lepton_content", "charge_fraction", "nan_charge", "infinite_charge"])
+    def test_public_matching_rejects_incompatible_thermodynamic_slices(method, invalid, monkeypatch):
+        crust, core = _branch(.01, .04), _branch(.06, .15)
+        if invalid == "lepton_content":
+            core.Il = 0
+        elif invalid == "charge_fraction":
+            core.charge_fraction_grid = .1
+        elif invalid == "nan_charge":
+            core.charge_fraction_grid = float("nan")
+        else:
+            core.charge_fraction_grid = float("inf")
+    
+        def unexpected_native_call(*args):
+            raise AssertionError("incompatible source slice entered native matching")
+    
+        monkeypatch.setattr(api, "run_native", unexpected_native_call)
+        with pytest.raises(ValueError, match="lepton-content|charge-fraction"):
+>           api.match_crust_core(crust, core, method=method, n_bridge=8)
+
+python_frontend/tests/test_matching_convention_contract.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1465: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-l_h3cj6d/crust'), PosixPath('/tmp/compose-eos-match-core-l_h3cj6d/core'), PosixPath('/tmp/compose-eos-match-core-l_h3cj6d/matched'), 'css', '8', ...)
+
+    def unexpected_native_call(*args):
+>       raise AssertionError("incompatible source slice entered native matching")
+E       AssertionError: incompatible source slice entered native matching
+
+python_frontend/tests/test_matching_convention_contract.py:40: AssertionError
+_ test_public_matching_rejects_incompatible_thermodynamic_slices[charge_fraction-cubic_F] _
+
+method = 'cubic_F', invalid = 'charge_fraction'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fce49d201a0>
+
+    @pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    @pytest.mark.parametrize("invalid", ["lepton_content", "charge_fraction", "nan_charge", "infinite_charge"])
+    def test_public_matching_rejects_incompatible_thermodynamic_slices(method, invalid, monkeypatch):
+        crust, core = _branch(.01, .04), _branch(.06, .15)
+        if invalid == "lepton_content":
+            core.Il = 0
+        elif invalid == "charge_fraction":
+            core.charge_fraction_grid = .1
+        elif invalid == "nan_charge":
+            core.charge_fraction_grid = float("nan")
+        else:
+            core.charge_fraction_grid = float("inf")
+    
+        def unexpected_native_call(*args):
+            raise AssertionError("incompatible source slice entered native matching")
+    
+        monkeypatch.setattr(api, "run_native", unexpected_native_call)
+        with pytest.raises(ValueError, match="lepton-content|charge-fraction"):
+>           api.match_crust_core(crust, core, method=method, n_bridge=8)
+
+python_frontend/tests/test_matching_convention_contract.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1465: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-20qt1uia/crust'), PosixPath('/tmp/compose-eos-match-core-20qt1uia/core'), PosixPath('/tmp/compose-eos-match-core-20qt1uia/matched'), 'cubic_F', '8', ...)
+
+    def unexpected_native_call(*args):
+>       raise AssertionError("incompatible source slice entered native matching")
+E       AssertionError: incompatible source slice entered native matching
+
+python_frontend/tests/test_matching_convention_contract.py:40: AssertionError
+_ test_public_matching_rejects_incompatible_thermodynamic_slices[charge_fraction-cubic_P] _
+
+method = 'cubic_P', invalid = 'charge_fraction'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fce49d20950>
+
+    @pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    @pytest.mark.parametrize("invalid", ["lepton_content", "charge_fraction", "nan_charge", "infinite_charge"])
+    def test_public_matching_rejects_incompatible_thermodynamic_slices(method, invalid, monkeypatch):
+        crust, core = _branch(.01, .04), _branch(.06, .15)
+        if invalid == "lepton_content":
+            core.Il = 0
+        elif invalid == "charge_fraction":
+            core.charge_fraction_grid = .1
+        elif invalid == "nan_charge":
+            core.charge_fraction_grid = float("nan")
+        else:
+            core.charge_fraction_grid = float("inf")
+    
+        def unexpected_native_call(*args):
+            raise AssertionError("incompatible source slice entered native matching")
+    
+        monkeypatch.setattr(api, "run_native", unexpected_native_call)
+        with pytest.raises(ValueError, match="lepton-content|charge-fraction"):
+>           api.match_crust_core(crust, core, method=method, n_bridge=8)
+
+python_frontend/tests/test_matching_convention_contract.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1465: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-cleyuki3/crust'), PosixPath('/tmp/compose-eos-match-core-cleyuki3/core'), PosixPath('/tmp/compose-eos-match-core-cleyuki3/matched'), 'cubic_P', '8', ...)
+
+    def unexpected_native_call(*args):
+>       raise AssertionError("incompatible source slice entered native matching")
+E       AssertionError: incompatible source slice entered native matching
+
+python_frontend/tests/test_matching_convention_contract.py:40: AssertionError
+_ test_public_matching_rejects_incompatible_thermodynamic_slices[charge_fraction-quintic_F] _
+
+method = 'quintic_F', invalid = 'charge_fraction'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fce49d220c0>
+
+    @pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    @pytest.mark.parametrize("invalid", ["lepton_content", "charge_fraction", "nan_charge", "infinite_charge"])
+    def test_public_matching_rejects_incompatible_thermodynamic_slices(method, invalid, monkeypatch):
+        crust, core = _branch(.01, .04), _branch(.06, .15)
+        if invalid == "lepton_content":
+            core.Il = 0
+        elif invalid == "charge_fraction":
+            core.charge_fraction_grid = .1
+        elif invalid == "nan_charge":
+            core.charge_fraction_grid = float("nan")
+        else:
+            core.charge_fraction_grid = float("inf")
+    
+        def unexpected_native_call(*args):
+            raise AssertionError("incompatible source slice entered native matching")
+    
+        monkeypatch.setattr(api, "run_native", unexpected_native_call)
+        with pytest.raises(ValueError, match="lepton-content|charge-fraction"):
+>           api.match_crust_core(crust, core, method=method, n_bridge=8)
+
+python_frontend/tests/test_matching_convention_contract.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1465: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-g6ai8qrq/crust'), PosixPath('/tmp/compose-eos-match-core-g6ai8qrq/core'), PosixPath('/tmp/compose-eos-match-core-g6ai8qrq/matched'), 'quintic_F', '8', ...)
+
+    def unexpected_native_call(*args):
+>       raise AssertionError("incompatible source slice entered native matching")
+E       AssertionError: incompatible source slice entered native matching
+
+python_frontend/tests/test_matching_convention_contract.py:40: AssertionError
+_ test_public_matching_rejects_incompatible_thermodynamic_slices[charge_fraction-quintic_P] _
+
+method = 'quintic_P', invalid = 'charge_fraction'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fce49d22c60>
+
+    @pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    @pytest.mark.parametrize("invalid", ["lepton_content", "charge_fraction", "nan_charge", "infinite_charge"])
+    def test_public_matching_rejects_incompatible_thermodynamic_slices(method, invalid, monkeypatch):
+        crust, core = _branch(.01, .04), _branch(.06, .15)
+        if invalid == "lepton_content":
+            core.Il = 0
+        elif invalid == "charge_fraction":
+            core.charge_fraction_grid = .1
+        elif invalid == "nan_charge":
+            core.charge_fraction_grid = float("nan")
+        else:
+            core.charge_fraction_grid = float("inf")
+    
+        def unexpected_native_call(*args):
+            raise AssertionError("incompatible source slice entered native matching")
+    
+        monkeypatch.setattr(api, "run_native", unexpected_native_call)
+        with pytest.raises(ValueError, match="lepton-content|charge-fraction"):
+>           api.match_crust_core(crust, core, method=method, n_bridge=8)
+
+python_frontend/tests/test_matching_convention_contract.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1465: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-tyeo8cwg/crust'), PosixPath('/tmp/compose-eos-match-core-tyeo8cwg/core'), PosixPath('/tmp/compose-eos-match-core-tyeo8cwg/matched'), 'quintic_P', '8', ...)
+
+    def unexpected_native_call(*args):
+>       raise AssertionError("incompatible source slice entered native matching")
+E       AssertionError: incompatible source slice entered native matching
+
+python_frontend/tests/test_matching_convention_contract.py:40: AssertionError
+_ test_public_matching_rejects_incompatible_thermodynamic_slices[nan_charge-css] _
+
+method = 'css', invalid = 'nan_charge'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fce49d207a0>
+
+    @pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    @pytest.mark.parametrize("invalid", ["lepton_content", "charge_fraction", "nan_charge", "infinite_charge"])
+    def test_public_matching_rejects_incompatible_thermodynamic_slices(method, invalid, monkeypatch):
+        crust, core = _branch(.01, .04), _branch(.06, .15)
+        if invalid == "lepton_content":
+            core.Il = 0
+        elif invalid == "charge_fraction":
+            core.charge_fraction_grid = .1
+        elif invalid == "nan_charge":
+            core.charge_fraction_grid = float("nan")
+        else:
+            core.charge_fraction_grid = float("inf")
+    
+        def unexpected_native_call(*args):
+            raise AssertionError("incompatible source slice entered native matching")
+    
+        monkeypatch.setattr(api, "run_native", unexpected_native_call)
+        with pytest.raises(ValueError, match="lepton-content|charge-fraction"):
+>           api.match_crust_core(crust, core, method=method, n_bridge=8)
+
+python_frontend/tests/test_matching_convention_contract.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1465: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-d0vtg0dt/crust'), PosixPath('/tmp/compose-eos-match-core-d0vtg0dt/core'), PosixPath('/tmp/compose-eos-match-core-d0vtg0dt/matched'), 'css', '8', ...)
+
+    def unexpected_native_call(*args):
+>       raise AssertionError("incompatible source slice entered native matching")
+E       AssertionError: incompatible source slice entered native matching
+
+python_frontend/tests/test_matching_convention_contract.py:40: AssertionError
+_ test_public_matching_rejects_incompatible_thermodynamic_slices[nan_charge-cubic_F] _
+
+method = 'cubic_F', invalid = 'nan_charge'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fce49d23170>
+
+    @pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    @pytest.mark.parametrize("invalid", ["lepton_content", "charge_fraction", "nan_charge", "infinite_charge"])
+    def test_public_matching_rejects_incompatible_thermodynamic_slices(method, invalid, monkeypatch):
+        crust, core = _branch(.01, .04), _branch(.06, .15)
+        if invalid == "lepton_content":
+            core.Il = 0
+        elif invalid == "charge_fraction":
+            core.charge_fraction_grid = .1
+        elif invalid == "nan_charge":
+            core.charge_fraction_grid = float("nan")
+        else:
+            core.charge_fraction_grid = float("inf")
+    
+        def unexpected_native_call(*args):
+            raise AssertionError("incompatible source slice entered native matching")
+    
+        monkeypatch.setattr(api, "run_native", unexpected_native_call)
+        with pytest.raises(ValueError, match="lepton-content|charge-fraction"):
+>           api.match_crust_core(crust, core, method=method, n_bridge=8)
+
+python_frontend/tests/test_matching_convention_contract.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1465: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-x_70sfcl/crust'), PosixPath('/tmp/compose-eos-match-core-x_70sfcl/core'), PosixPath('/tmp/compose-eos-match-core-x_70sfcl/matched'), 'cubic_F', '8', ...)
+
+    def unexpected_native_call(*args):
+>       raise AssertionError("incompatible source slice entered native matching")
+E       AssertionError: incompatible source slice entered native matching
+
+python_frontend/tests/test_matching_convention_contract.py:40: AssertionError
+_ test_public_matching_rejects_incompatible_thermodynamic_slices[nan_charge-cubic_P] _
+
+method = 'cubic_P', invalid = 'nan_charge'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fce30aac230>
+
+    @pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    @pytest.mark.parametrize("invalid", ["lepton_content", "charge_fraction", "nan_charge", "infinite_charge"])
+    def test_public_matching_rejects_incompatible_thermodynamic_slices(method, invalid, monkeypatch):
+        crust, core = _branch(.01, .04), _branch(.06, .15)
+        if invalid == "lepton_content":
+            core.Il = 0
+        elif invalid == "charge_fraction":
+            core.charge_fraction_grid = .1
+        elif invalid == "nan_charge":
+            core.charge_fraction_grid = float("nan")
+        else:
+            core.charge_fraction_grid = float("inf")
+    
+        def unexpected_native_call(*args):
+            raise AssertionError("incompatible source slice entered native matching")
+    
+        monkeypatch.setattr(api, "run_native", unexpected_native_call)
+        with pytest.raises(ValueError, match="lepton-content|charge-fraction"):
+>           api.match_crust_core(crust, core, method=method, n_bridge=8)
+
+python_frontend/tests/test_matching_convention_contract.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1465: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-rjpj7hpp/crust'), PosixPath('/tmp/compose-eos-match-core-rjpj7hpp/core'), PosixPath('/tmp/compose-eos-match-core-rjpj7hpp/matched'), 'cubic_P', '8', ...)
+
+    def unexpected_native_call(*args):
+>       raise AssertionError("incompatible source slice entered native matching")
+E       AssertionError: incompatible source slice entered native matching
+
+python_frontend/tests/test_matching_convention_contract.py:40: AssertionError
+_ test_public_matching_rejects_incompatible_thermodynamic_slices[nan_charge-quintic_F] _
+
+method = 'quintic_F', invalid = 'nan_charge'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fce49d22bd0>
+
+    @pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    @pytest.mark.parametrize("invalid", ["lepton_content", "charge_fraction", "nan_charge", "infinite_charge"])
+    def test_public_matching_rejects_incompatible_thermodynamic_slices(method, invalid, monkeypatch):
+        crust, core = _branch(.01, .04), _branch(.06, .15)
+        if invalid == "lepton_content":
+            core.Il = 0
+        elif invalid == "charge_fraction":
+            core.charge_fraction_grid = .1
+        elif invalid == "nan_charge":
+            core.charge_fraction_grid = float("nan")
+        else:
+            core.charge_fraction_grid = float("inf")
+    
+        def unexpected_native_call(*args):
+            raise AssertionError("incompatible source slice entered native matching")
+    
+        monkeypatch.setattr(api, "run_native", unexpected_native_call)
+        with pytest.raises(ValueError, match="lepton-content|charge-fraction"):
+>           api.match_crust_core(crust, core, method=method, n_bridge=8)
+
+python_frontend/tests/test_matching_convention_contract.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1465: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-7bqoq9kt/crust'), PosixPath('/tmp/compose-eos-match-core-7bqoq9kt/core'), PosixPath('/tmp/compose-eos-match-core-7bqoq9kt/matched'), 'quintic_F', '8', ...)
+
+    def unexpected_native_call(*args):
+>       raise AssertionError("incompatible source slice entered native matching")
+E       AssertionError: incompatible source slice entered native matching
+
+python_frontend/tests/test_matching_convention_contract.py:40: AssertionError
+_ test_public_matching_rejects_incompatible_thermodynamic_slices[nan_charge-quintic_P] _
+
+method = 'quintic_P', invalid = 'nan_charge'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fce49d202c0>
+
+    @pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    @pytest.mark.parametrize("invalid", ["lepton_content", "charge_fraction", "nan_charge", "infinite_charge"])
+    def test_public_matching_rejects_incompatible_thermodynamic_slices(method, invalid, monkeypatch):
+        crust, core = _branch(.01, .04), _branch(.06, .15)
+        if invalid == "lepton_content":
+            core.Il = 0
+        elif invalid == "charge_fraction":
+            core.charge_fraction_grid = .1
+        elif invalid == "nan_charge":
+            core.charge_fraction_grid = float("nan")
+        else:
+            core.charge_fraction_grid = float("inf")
+    
+        def unexpected_native_call(*args):
+            raise AssertionError("incompatible source slice entered native matching")
+    
+        monkeypatch.setattr(api, "run_native", unexpected_native_call)
+        with pytest.raises(ValueError, match="lepton-content|charge-fraction"):
+>           api.match_crust_core(crust, core, method=method, n_bridge=8)
+
+python_frontend/tests/test_matching_convention_contract.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1465: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-vv91hqgb/crust'), PosixPath('/tmp/compose-eos-match-core-vv91hqgb/core'), PosixPath('/tmp/compose-eos-match-core-vv91hqgb/matched'), 'quintic_P', '8', ...)
+
+    def unexpected_native_call(*args):
+>       raise AssertionError("incompatible source slice entered native matching")
+E       AssertionError: incompatible source slice entered native matching
+
+python_frontend/tests/test_matching_convention_contract.py:40: AssertionError
+_ test_public_matching_rejects_incompatible_thermodynamic_slices[infinite_charge-css] _
+
+method = 'css', invalid = 'infinite_charge'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fce49d210a0>
+
+    @pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    @pytest.mark.parametrize("invalid", ["lepton_content", "charge_fraction", "nan_charge", "infinite_charge"])
+    def test_public_matching_rejects_incompatible_thermodynamic_slices(method, invalid, monkeypatch):
+        crust, core = _branch(.01, .04), _branch(.06, .15)
+        if invalid == "lepton_content":
+            core.Il = 0
+        elif invalid == "charge_fraction":
+            core.charge_fraction_grid = .1
+        elif invalid == "nan_charge":
+            core.charge_fraction_grid = float("nan")
+        else:
+            core.charge_fraction_grid = float("inf")
+    
+        def unexpected_native_call(*args):
+            raise AssertionError("incompatible source slice entered native matching")
+    
+        monkeypatch.setattr(api, "run_native", unexpected_native_call)
+        with pytest.raises(ValueError, match="lepton-content|charge-fraction"):
+>           api.match_crust_core(crust, core, method=method, n_bridge=8)
+
+python_frontend/tests/test_matching_convention_contract.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1465: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-r_x2ndmb/crust'), PosixPath('/tmp/compose-eos-match-core-r_x2ndmb/core'), PosixPath('/tmp/compose-eos-match-core-r_x2ndmb/matched'), 'css', '8', ...)
+
+    def unexpected_native_call(*args):
+>       raise AssertionError("incompatible source slice entered native matching")
+E       AssertionError: incompatible source slice entered native matching
+
+python_frontend/tests/test_matching_convention_contract.py:40: AssertionError
+_ test_public_matching_rejects_incompatible_thermodynamic_slices[infinite_charge-cubic_F] _
+
+method = 'cubic_F', invalid = 'infinite_charge'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fce49d210d0>
+
+    @pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    @pytest.mark.parametrize("invalid", ["lepton_content", "charge_fraction", "nan_charge", "infinite_charge"])
+    def test_public_matching_rejects_incompatible_thermodynamic_slices(method, invalid, monkeypatch):
+        crust, core = _branch(.01, .04), _branch(.06, .15)
+        if invalid == "lepton_content":
+            core.Il = 0
+        elif invalid == "charge_fraction":
+            core.charge_fraction_grid = .1
+        elif invalid == "nan_charge":
+            core.charge_fraction_grid = float("nan")
+        else:
+            core.charge_fraction_grid = float("inf")
+    
+        def unexpected_native_call(*args):
+            raise AssertionError("incompatible source slice entered native matching")
+    
+        monkeypatch.setattr(api, "run_native", unexpected_native_call)
+        with pytest.raises(ValueError, match="lepton-content|charge-fraction"):
+>           api.match_crust_core(crust, core, method=method, n_bridge=8)
+
+python_frontend/tests/test_matching_convention_contract.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1465: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-fpc4pryu/crust'), PosixPath('/tmp/compose-eos-match-core-fpc4pryu/core'), PosixPath('/tmp/compose-eos-match-core-fpc4pryu/matched'), 'cubic_F', '8', ...)
+
+    def unexpected_native_call(*args):
+>       raise AssertionError("incompatible source slice entered native matching")
+E       AssertionError: incompatible source slice entered native matching
+
+python_frontend/tests/test_matching_convention_contract.py:40: AssertionError
+_ test_public_matching_rejects_incompatible_thermodynamic_slices[infinite_charge-cubic_P] _
+
+method = 'cubic_P', invalid = 'infinite_charge'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fce49cb1790>
+
+    @pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    @pytest.mark.parametrize("invalid", ["lepton_content", "charge_fraction", "nan_charge", "infinite_charge"])
+    def test_public_matching_rejects_incompatible_thermodynamic_slices(method, invalid, monkeypatch):
+        crust, core = _branch(.01, .04), _branch(.06, .15)
+        if invalid == "lepton_content":
+            core.Il = 0
+        elif invalid == "charge_fraction":
+            core.charge_fraction_grid = .1
+        elif invalid == "nan_charge":
+            core.charge_fraction_grid = float("nan")
+        else:
+            core.charge_fraction_grid = float("inf")
+    
+        def unexpected_native_call(*args):
+            raise AssertionError("incompatible source slice entered native matching")
+    
+        monkeypatch.setattr(api, "run_native", unexpected_native_call)
+        with pytest.raises(ValueError, match="lepton-content|charge-fraction"):
+>           api.match_crust_core(crust, core, method=method, n_bridge=8)
+
+python_frontend/tests/test_matching_convention_contract.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1465: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-og523rss/crust'), PosixPath('/tmp/compose-eos-match-core-og523rss/core'), PosixPath('/tmp/compose-eos-match-core-og523rss/matched'), 'cubic_P', '8', ...)
+
+    def unexpected_native_call(*args):
+>       raise AssertionError("incompatible source slice entered native matching")
+E       AssertionError: incompatible source slice entered native matching
+
+python_frontend/tests/test_matching_convention_contract.py:40: AssertionError
+_ test_public_matching_rejects_incompatible_thermodynamic_slices[infinite_charge-quintic_F] _
+
+method = 'quintic_F', invalid = 'infinite_charge'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fce49d232c0>
+
+    @pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    @pytest.mark.parametrize("invalid", ["lepton_content", "charge_fraction", "nan_charge", "infinite_charge"])
+    def test_public_matching_rejects_incompatible_thermodynamic_slices(method, invalid, monkeypatch):
+        crust, core = _branch(.01, .04), _branch(.06, .15)
+        if invalid == "lepton_content":
+            core.Il = 0
+        elif invalid == "charge_fraction":
+            core.charge_fraction_grid = .1
+        elif invalid == "nan_charge":
+            core.charge_fraction_grid = float("nan")
+        else:
+            core.charge_fraction_grid = float("inf")
+    
+        def unexpected_native_call(*args):
+            raise AssertionError("incompatible source slice entered native matching")
+    
+        monkeypatch.setattr(api, "run_native", unexpected_native_call)
+        with pytest.raises(ValueError, match="lepton-content|charge-fraction"):
+>           api.match_crust_core(crust, core, method=method, n_bridge=8)
+
+python_frontend/tests/test_matching_convention_contract.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1465: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-r1rwehkl/crust'), PosixPath('/tmp/compose-eos-match-core-r1rwehkl/core'), PosixPath('/tmp/compose-eos-match-core-r1rwehkl/matched'), 'quintic_F', '8', ...)
+
+    def unexpected_native_call(*args):
+>       raise AssertionError("incompatible source slice entered native matching")
+E       AssertionError: incompatible source slice entered native matching
+
+python_frontend/tests/test_matching_convention_contract.py:40: AssertionError
+_ test_public_matching_rejects_incompatible_thermodynamic_slices[infinite_charge-quintic_P] _
+
+method = 'quintic_P', invalid = 'infinite_charge'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fce49cb0470>
+
+    @pytest.mark.parametrize("method", ["css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    @pytest.mark.parametrize("invalid", ["lepton_content", "charge_fraction", "nan_charge", "infinite_charge"])
+    def test_public_matching_rejects_incompatible_thermodynamic_slices(method, invalid, monkeypatch):
+        crust, core = _branch(.01, .04), _branch(.06, .15)
+        if invalid == "lepton_content":
+            core.Il = 0
+        elif invalid == "charge_fraction":
+            core.charge_fraction_grid = .1
+        elif invalid == "nan_charge":
+            core.charge_fraction_grid = float("nan")
+        else:
+            core.charge_fraction_grid = float("inf")
+    
+        def unexpected_native_call(*args):
+            raise AssertionError("incompatible source slice entered native matching")
+    
+        monkeypatch.setattr(api, "run_native", unexpected_native_call)
+        with pytest.raises(ValueError, match="lepton-content|charge-fraction"):
+>           api.match_crust_core(crust, core, method=method, n_bridge=8)
+
+python_frontend/tests/test_matching_convention_contract.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1465: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('match-core', PosixPath('/tmp/compose-eos-match-core-nsa5qb8h/crust'), PosixPath('/tmp/compose-eos-match-core-nsa5qb8h/core'), PosixPath('/tmp/compose-eos-match-core-nsa5qb8h/matched'), 'quintic_P', '8', ...)
+
+    def unexpected_native_call(*args):
+>       raise AssertionError("incompatible source slice entered native matching")
+E       AssertionError: incompatible source slice entered native matching
+
+python_frontend/tests/test_matching_convention_contract.py:40: AssertionError
+=============================== warnings summary ===============================
+../../../../opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/anyio/pytest_plugin.py:14
+  /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/anyio/pytest_plugin.py:14: PytestRemovedIn10Warning: _pytest.python.CallSpec2 has been renamed to CallSpec.
+  The CallSpec2 alias will be removed in pytest 10.
+  Update imports to use CallSpec instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#callspec2-renamed
+    from _pytest.python import CallSpec2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_matching_convention_contract.py::test_public_matching_rejects_incompatible_thermodynamic_slices[lepton_content-css]
+FAILED python_frontend/tests/test_matching_convention_contract.py::test_public_matching_rejects_incompatible_thermodynamic_slices[lepton_content-cubic_F]
+FAILED python_frontend/tests/test_matching_convention_contract.py::test_public_matching_rejects_incompatible_thermodynamic_slices[lepton_content-cubic_P]
+FAILED python_frontend/tests/test_matching_convention_contract.py::test_public_matching_rejects_incompatible_thermodynamic_slices[lepton_content-quintic_F]
+FAILED python_frontend/tests/test_matching_convention_contract.py::test_public_matching_rejects_incompatible_thermodynamic_slices[lepton_content-quintic_P]
+FAILED python_frontend/tests/test_matching_convention_contract.py::test_public_matching_rejects_incompatible_thermodynamic_slices[charge_fraction-css]
+FAILED python_frontend/tests/test_matching_convention_contract.py::test_public_matching_rejects_incompatible_thermodynamic_slices[charge_fraction-cubic_F]
+FAILED python_frontend/tests/test_matching_convention_contract.py::test_public_matching_rejects_incompatible_thermodynamic_slices[charge_fraction-cubic_P]
+FAILED python_frontend/tests/test_matching_convention_contract.py::test_public_matching_rejects_incompatible_thermodynamic_slices[charge_fraction-quintic_F]
+FAILED python_frontend/tests/test_matching_convention_contract.py::test_public_matching_rejects_incompatible_thermodynamic_slices[charge_fraction-quintic_P]
+FAILED python_frontend/tests/test_matching_convention_contract.py::test_public_matching_rejects_incompatible_thermodynamic_slices[nan_charge-css]
+FAILED python_frontend/tests/test_matching_convention_contract.py::test_public_matching_rejects_incompatible_thermodynamic_slices[nan_charge-cubic_F]
+FAILED python_frontend/tests/test_matching_convention_contract.py::test_public_matching_rejects_incompatible_thermodynamic_slices[nan_charge-cubic_P]
+FAILED python_frontend/tests/test_matching_convention_contract.py::test_public_matching_rejects_incompatible_thermodynamic_slices[nan_charge-quintic_F]
+FAILED python_frontend/tests/test_matching_convention_contract.py::test_public_matching_rejects_incompatible_thermodynamic_slices[nan_charge-quintic_P]
+FAILED python_frontend/tests/test_matching_convention_contract.py::test_public_matching_rejects_incompatible_thermodynamic_slices[infinite_charge-css]
+FAILED python_frontend/tests/test_matching_convention_contract.py::test_public_matching_rejects_incompatible_thermodynamic_slices[infinite_charge-cubic_F]
+FAILED python_frontend/tests/test_matching_convention_contract.py::test_public_matching_rejects_incompatible_thermodynamic_slices[infinite_charge-cubic_P]
+FAILED python_frontend/tests/test_matching_convention_contract.py::test_public_matching_rejects_incompatible_thermodynamic_slices[infinite_charge-quintic_F]
+FAILED python_frontend/tests/test_matching_convention_contract.py::test_public_matching_rejects_incompatible_thermodynamic_slices[infinite_charge-quintic_P]
+20 failed, 1 warning in 0.57s

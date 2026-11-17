@@ -57,9 +57,10 @@ def fill_density_gap(data: EOSData, n_fill: int = 60,
     igap = find_density_gap(nb)
     if n_fill < 1:
         raise ValueError("n_fill must be >= 1")
-    left_phase = int(data.Iphase[igap]) if data.composition_available else 0
-    right_phase = int(data.Iphase[igap + 1]) if data.composition_available else 0
-    if data.composition_available and left_phase != right_phase and gap_phase is None:
+    has_phase_ids = np.asarray(data.Iphase).shape == data.nb.shape
+    left_phase = int(data.Iphase[igap]) if has_phase_ids else 0
+    right_phase = int(data.Iphase[igap + 1]) if has_phase_ids else 0
+    if has_phase_ids and left_phase != right_phase and gap_phase is None:
         raise ValueError(
             f"density gap crosses phase IDs {left_phase}->{right_phase}; "
             "pass gap_phase explicitly instead of silently assigning a phase"

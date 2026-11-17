@@ -1,0 +1,54 @@
+{
+  "mission": "NSC_EOS390_FULL_REMEDIATION_2026-11-14",
+  "phase": "I",
+  "generated_utc": "2026-11-14T09:32:33.651702+00:00",
+  "artifacts": {
+    "DIRECT_V3_PROVENANCE_MANIFEST.json": {
+      "sha256": "e413212e98f147a26d1bcceafbf92e469f03461a00eea6104fe6f2a55751bd05",
+      "size": 4333
+    },
+    "M7_FINAL_BATCH_MANIFEST.json": {
+      "sha256": "560dc8336e08340e0eed1581e5537c3a5b81323cdb169eb0e08a1bfd640a02b2",
+      "size": 289172
+    },
+    "M7_MATCHING_WINDOW_AUDIT.json": {
+      "sha256": "feb7cf389629984c10603afad41e2c2ff04a38431a9f79caf62045402e018ea7",
+      "size": 171389
+    },
+    "MASS_NORMALIZATION_CONTRACT.json": {
+      "sha256": "613814b79ce74eb186f9119527cfc65ec83582b699058d8ca8b72a550592a407",
+      "size": 6933
+    },
+    "MAXWELL_V2_CENSUS.json": {
+      "sha256": "f1bd1df966fec06c1dd1781be2669a5252ba184d18992fa0cd9434438d46109a",
+      "size": 19818
+    },
+    "PAIR_ELIGIBILITY_MATRIX.json": {
+      "sha256": "a6a90af1c26897187e397f01fb5d1446c8af4d7790f81eb1fd804c5e242690fd",
+      "size": 55692
+    },
+    "REMEDIATION_BASELINE.json": {
+      "sha256": "8ba015191e3e9125a024075f3bfd5f2534b576119a6a275564e9d33daeb7846f",
+      "size": 11800
+    },
+    "SOURCE_ADMISSION_MATRIX.json": {
+      "sha256": "5617243a60c74ef6080e4446ef644fdeda37cd67c1b98d22548c3acc43f47296",
+      "size": 23423
+    },
+    "VALIDATION_SUMMARY.json": {
+      "sha256": "d7568a8532bee95cee1fc190933ada46b1197fb2f2ec32e27cb8736501ebae7c",
+      "size": 6427
+    }
+  },
+  "code_changes": {
+    "fortran_eos/src/compose_eos_matching.f90": "match_report_t + provenance fields dm_mass_gauge_meV, source_euler_residual_meV (additive; no behavior change)",
+    "fortran_eos/app/compose_eos_fortran.f90": "match-core JSON emitter exposes the two new fields",
+    "python_frontend/tests/test_mass_normalization_contract.py": "14 regression tests (mission sec 4.6)"
+  },
+  "historical_preservation": {
+    "policy": "no historical output was deleted or overwritten; all remediation artifacts are new files under data/remediation/; raw EOS trees untouched (test_13 pins source immutability)",
+    "raw_tree": "eos_generator/eos_data (preserved)",
+    "normalized_tree": "eos_generator/eos_data_normalized (preserved)",
+    "legacy_spectrum": "data/eos_direct_provider_v3 (preserved; provenance clarified, not relabelled)"
+  }
+}

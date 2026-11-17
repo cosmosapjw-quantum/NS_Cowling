@@ -1,0 +1,98 @@
+F.................                                                       [100%]
+=================================== FAILURES ===================================
+__________ test_native_batch_import_has_no_python_physics_dependency ___________
+
+    def test_native_batch_import_has_no_python_physics_dependency():
+        code="""import runpy,sys
+    runpy.run_path('scripts/generate_core_eos.py',run_name='import_only')
+    blocked=('compose_eos.core_regeneration','compose_eos.apr_uniform','compose_eos.apr_gibbs',
+             'compose_eos.bbb_uniform','compose_eos.gm1_uniform','compose_eos.skyrme_uniform',
+             'numpy','scipy')
+    assert not any(name in sys.modules for name in blocked), sorted(set(blocked)&set(sys.modules))
+    """
+>       subprocess.run([sys.executable,'-c',code],cwd=ROOT,check=True)
+
+python_frontend/tests/test_native_batch_entrypoints.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = False, timeout = None, check = True
+popenargs = (['/usr/bin/python3', '-c', "import runpy,sys\nrunpy.run_path('scripts/generate_core_eos.py',run_name='import_only')\n... 'numpy','scipy')\nassert not any(name in sys.modules for name in blocked), sorted(set(blocked)&set(sys.modules))\n"],)
+kwargs = {'cwd': PosixPath('/tmp/ns_eos_native_4de4943_20261116')}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout is given, and the process takes too long, a TimeoutExpired
+        exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['/usr/bin/python3', '-c', "import runpy,sys\nrunpy.run_path('scripts/generate_core_eos.py',run_name='import_only')\nblocked=('compose_eos.core_regeneration','compose_eos.apr_uniform','compose_eos.apr_gibbs',\n         'compose_eos.bbb_uniform','compose_eos.gm1_uniform','compose_eos.skyrme_uniform',\n         'numpy','scipy')\nassert not any(name in sys.modules for name in blocked), sorted(set(blocked)&set(sys.modules))\n"]' returned non-zero exit status 1.
+
+/usr/lib/python3.12/subprocess.py:571: CalledProcessError
+----------------------------- Captured stderr call -----------------------------
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+AssertionError: ['numpy']
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_native_batch_entrypoints.py::test_native_batch_import_has_no_python_physics_dependency
+1 failed, 17 passed in 1.14s

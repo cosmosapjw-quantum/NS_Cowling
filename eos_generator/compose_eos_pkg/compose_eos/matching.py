@@ -1,12 +1,16 @@
 """Core--crust matching for cold, one-dimensional CompOSE barotropes.
 
-The module constructs smooth single-valued bridges in either the canonical
-F_b(n_b) or grand-canonical P(mu_b) representation. The historical method token
-``maxwell`` is retained for API compatibility, but currently denotes a smooth
-near-pressure-plateau bridge: it does NOT construct an exact Maxwell coexistence
-point, latent-heat density jump, or a Seidov-applicable first-order transition.
-The other methods are interpolation regularity choices, not phase-transition
-orders. ``find_convex_transition_window`` is a candidate-screening heuristic;
+The module provides smooth core--crust bridges and one explicit thermo-only
+single-speed CSS bridge with a finite crust-side density jump. The
+``first_law_constrained_hermite_pressure_bridge`` and cubic/quintic methods
+remain continuous-density interpolation choices. The ``css`` method solves
+one constant c_s^2 over the entire bridge, permits a density/energy jump at the
+crust--CSS boundary, and matches n_B, P, epsilon and mu_B continuously at the
+CSS--core endpoint. It does not reconstruct a composition profile or provide
+phase-interface Cowling/TOV support by itself. The sharp local-neutrality
+Maxwell construction from two tabulated phases is separately implemented in
+the phase-transition API under the token ``maxwell``; that token is not a
+smooth-matcher method. ``find_convex_transition_window`` is a candidate-screening heuristic;
 all completed EOS tables must pass independent consistency and causality gates.
 
 Composition is propagated only when the core input passes the CompOSE baryon and
@@ -32,6 +36,7 @@ from scipy.optimize import brentq
 from .eos_data import EOSData
 from .consistency import check_consistency
 
+
 HBARC = 197.3269804
 ME = 0.51099895
 MMU = 105.6583755
@@ -39,7 +44,10 @@ R_SCHW_SUN = 1.4766250385079258
 CONV_MEV_FM3 = 8.96526390e-7
 FOUR_PI = 4.0 * np.pi
 
-METHODS = ("maxwell", "css", "cubic_F", "cubic_P", "quintic_F", "quintic_P")
+FIRST_LAW_HERMITE_PRESSURE_BRIDGE = "first_law_constrained_hermite_pressure_bridge"
+MAXWELL_METHOD_ID = "maxwell"
+SMOOTH_METHODS = (FIRST_LAW_HERMITE_PRESSURE_BRIDGE, "css", "cubic_F", "cubic_P", "quintic_F", "quintic_P")
+METHODS = SMOOTH_METHODS
 
 CRUST_NAMES = (
     "SPG_M1", "SPG_M2", "SPG_M3", "SPG_M4", "SPG_M5",
@@ -65,16 +73,17 @@ def get_core_start_index(co_name: str, d_co: EOSData) -> int:
 def get_gauge_shifts(
     cr_name: str, co_name: str, d_cr: EOSData, d_co: EOSData
 ) -> Tuple[float, float]:
-    """Return ``(dm_crust, dm_core)`` (in MeV) to align both tables to the
-    common nucleon rest-mass zero point ``d_co.mn``.
+    """Return zero physical-energy shifts for CompOSE normalization.
+
+    ``mn`` normalizes Q3--Q7; changing that reference does not add rest
+    energy to a supplied EOS. Physical F, epsilon and chemical potentials
+    are recovered with each source's own mn, then encoded using the output
+    reference. A constituent-mass model change requires separate source
+    physics and is not implemented by this matcher.
+
+    The historical helper name is retained for API compatibility.
     """
-    # A gauge shift may align different rest-mass conventions; it must not be
-    # used as an empirical fit parameter. Historical +4.96005 MeV (GM1 core)
-    # and +2.45 MeV (FSU2 crust) offsets are deliberately no longer applied:
-    # their provenance is not established by the source data sheets.
-    dm_cr = float(d_co.mn - d_cr.mn)
-    dm_co = 0.0
-    return dm_cr, dm_co
+    return 0.0, 0.0
 
 
 def find_convex_transition_window(
@@ -273,7 +282,7 @@ def build_monotone_hermite_bridge(
     )
 
 
-def build_maxwell_plateau_bridge(
+def build_first_law_constrained_hermite_pressure_bridge(
     x1: float,
     x2: float,
     P1: float,
@@ -292,7 +301,8 @@ def build_maxwell_plateau_bridge(
     3 percent of the endpoint pressure difference. There is no density jump,
     latent-heat discontinuity, or exact equal-pressure coexistence construction.
     The integrated first-law condition is enforced for the smooth barotrope.
-    The public ``maxwell`` method token is retained only for compatibility.
+    This project-defined smooth kernel is not a Maxwell transition. Its public
+    method identity is first_law_constrained_hermite_pressure_bridge.
     """
     Dx = x2 - x1
     x_br = x1 + u_grid * Dx
@@ -449,6 +459,39 @@ def _endpoint_sound_speed_squared(data: EOSData, index: int, side: str, points: 
     return cs2
 
 
+SOURCE_EULER_RELATIVE_TOLERANCE = 5.0e-4  # native match_crust_core / sharp Maxwell gate
+
+
+def _source_euler_relative_residual(source: EOSData, label: str) -> float:
+    """Validate provider mu on every source row before output Q3 is re-derived.
+
+    At T=0, mu_E = F + P/n. For Il=0 the charge contribution Yq*mu_q
+    must be added to CompOSE mu_b. This checks the same relative residual as
+    compose_eos_matching.f90; no energy-reference shift is performed.
+    """
+    arrays = [np.asarray(getattr(source, name), dtype=float)
+              for name in ("Q1", "Q3", "Q4", "Q6")]
+    if (source.n == 0 or any(a.shape != source.nb.shape for a in arrays)
+            or not np.isfinite(source.mn) or source.mn <= 0.0
+            or source.Il not in (0, 1) or not np.isfinite(source.charge_fraction_grid)):
+        raise ValueError(f"{label} source Euler check requires valid thermodynamic metadata and rows")
+    q1, q3, q4, q6 = arrays
+    with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+        mu_source = (q3 + 1.0) * source.mn
+        if source.Il == 0:
+            mu_source = mu_source + source.charge_fraction_grid * q4 * source.mn
+        mu_euler = (q6 + 1.0) * source.mn + q1
+        residual = np.abs(mu_source - mu_euler) / np.abs(mu_euler)
+    if not np.all(np.isfinite(residual)):
+        raise ValueError(f"{label} source rows violate the provider Q3 Euler relation: nonfinite residual")
+    worst = float(np.max(residual))
+    if worst > SOURCE_EULER_RELATIVE_TOLERANCE:
+        raise ValueError(f"{label} source rows violate the provider Q3 Euler relation "
+                         f"mu_B = F + P/n_B (relative residual {worst:.8g}, "
+                         f"tolerance {SOURCE_EULER_RELATIVE_TOLERANCE:g})")
+    return worst
+
+
 def match_crust_core(
     d_cr: EOSData,
     d_co: EOSData,
@@ -468,11 +511,18 @@ def match_crust_core(
         remains absent in the matched table. ``literature_beta_eq`` is an explicit
         opt-in parabolic-symmetry-energy approximation for APR_APR/BBB_BHF2 only.
     """
+    if method == MAXWELL_METHOD_ID:
+        raise ValueError(
+            "method='maxwell' is the sharp first-order local-neutrality transition; "
+            "use build_maxwell_eos from the phase-transition API, not the smooth core-crust matcher"
+        )
     if method not in METHODS:
         raise ValueError(f"Unknown matching method {method!r}; choose from {METHODS}")
     if core_compo_mode not in ("literature_beta_eq", "strict_thermo_only"):
         raise ValueError("core_compo_mode must be 'strict_thermo_only' or 'literature_beta_eq'")
 
+    source_euler_residual = max(_source_euler_relative_residual(d_cr, "crust"),
+                                _source_euler_relative_residual(d_co, "core"))
     i1, i2 = find_convex_transition_window(d_cr, d_co, cr_name, co_name)
     mn = d_co.mn
     mp = d_co.mp
@@ -504,9 +554,12 @@ def match_crust_core(
 
     u_grid = np.linspace(0.0, 1.0, n_bridge + 2)[1:-1]
     extra_meta: Dict[str, object] = {}
+    nb_jump = np.empty(0, dtype=float)
+    Q1_jump = np.empty(0, dtype=float)
+    F_jump = np.empty(0, dtype=float)
 
-    if method == "maxwell":
-        nb_br, P_br, F_br, mu_br, Q1_br, cs2_br, Pt_sol, cs2_left_br, cs2_right_br = build_maxwell_plateau_bridge(
+    if method == FIRST_LAW_HERMITE_PRESSURE_BRIDGE:
+        nb_br, P_br, F_br, mu_br, Q1_br, cs2_br, Pt_sol, cs2_left_br, cs2_right_br = build_first_law_constrained_hermite_pressure_bridge(
             x1, x2, P1, P2, F1, F2, mu1, mu2, cs2_1, cs2_2, u_grid
         )
         extra_meta["P_plateau_reference"] = Pt_sol
@@ -533,46 +586,67 @@ def match_crust_core(
         extra_meta["spline_mode"] = sp_mode
 
     elif method == "css":
-        def _css_knot(s: float) -> Tuple[float, float]:
-            mu_m_v = mu1 * ((mu2 / mu1) ** (1.0 - s))
-            nm_v = n1 + s * (n2 - n1)
-            return mu_m_v, nm_v
+        # Single constant-sound-speed CSS bridge. The crust side remains at
+        # (n1,P1,mu1); the bridge begins at (n_b,P1,mu1) with n_b>n1.
+        # The core endpoint (n2,P2,mu2) is continuous in all state variables.
+        if not (0 < n1 < n2 and 0 < P1 < P2 and 0 < mu1 < mu2):
+            raise ValueError("single-speed CSS requires positive ordered crust/core endpoints")
+        ratio = mu1 / mu2
+        delta_p = P2 - P1
 
-        def _css_int(s: float) -> float:
-            mu_m_v, nm_v = _css_knot(s)
-            csA2 = np.log(mu_m_v / mu1) / np.log(nm_v / n1)
-            csB2 = np.log(mu2 / mu_m_v) / np.log(n2 / nm_v)
-            gA, gB = 1.0 / csA2, 1.0 / csB2
-            IA = (n1 * mu1 / (gA + 1.0)) * ((mu_m_v / mu1) ** (gA + 1.0) - 1.0)
-            IB = (nm_v * mu_m_v / (gB + 1.0)) * ((mu2 / mu_m_v) ** (gB + 1.0) - 1.0)
-            return float((IA + IB) - (P2 - P1))
+        def _single_css_pressure_gain(s: float) -> float:
+            return float(n2 * mu2 * s / (1.0 + s)
+                         * (1.0 - ratio ** (1.0 + 1.0 / s)))
 
-        s_sol = brentq(_css_int, 1e-6, 1.0 - 1e-6, xtol=1e-14)
-        mu_m, nm_sol = _css_knot(s_sol)
-        csA2 = float(np.log(mu_m / mu1) / np.log(nm_sol / n1))
-        csB2 = float(np.log(mu2 / mu_m) / np.log(n2 / nm_sol))
-        gA, gB = 1.0 / csA2, 1.0 / csB2
-        P_m = P1 + (n1 * mu1 / (gA + 1.0)) * ((mu_m / mu1) ** (gA + 1.0) - 1.0)
-        mu_br = mu1 * ((mu2 / mu1) ** u_grid)
-        nb_br = np.empty_like(mu_br)
-        P_br = np.empty_like(mu_br)
-        cs2_br = np.empty_like(mu_br)
-        for k, m_v in enumerate(mu_br):
-            if m_v <= mu_m:
-                nb_br[k] = n1 * ((m_v / mu1) ** gA)
-                P_br[k] = P1 + (n1 * mu1 / (gA + 1.0)) * ((m_v / mu1) ** (gA + 1.0) - 1.0)
-                cs2_br[k] = csA2
-            else:
-                nb_br[k] = nm_sol * ((m_v / mu_m) ** gB)
-                P_br[k] = P_m + (nm_sol * mu_m / (gB + 1.0)) * ((m_v / mu_m) ** (gB + 1.0) - 1.0)
-                cs2_br[k] = csB2
+        f_lo = _single_css_pressure_gain(1e-8) - delta_p
+        f_hi = _single_css_pressure_gain(1.0) - delta_p
+        if f_lo >= 0 or f_hi <= 0:
+            raise ValueError(
+                "no causal single-speed CSS solution for selected endpoints: "
+                f"required DeltaP={delta_p:.8g}, allowed causal range "
+                f"(0,{_single_css_pressure_gain(1.0):.8g})"
+            )
+        cs2_css = float(brentq(
+            lambda s: _single_css_pressure_gain(s) - delta_p,
+            1e-8, 1.0, xtol=1e-13, rtol=1e-13
+        ))
+        n_bridge_start = float(n2 * ratio ** (1.0 / cs2_css))
+        if not np.isfinite(n_bridge_start) or n_bridge_start <= n1:
+            raise ValueError(
+                "single-speed CSS solution does not produce a positive crust-side "
+                f"density jump: n_bridge_start={n_bridge_start:.8g}, n_crust={n1:.8g}"
+            )
+
+        # First-order crust -> CSS interface: P and mu_B continuous,
+        # while n_B and epsilon jump by Delta n and mu_t Delta n.
+        nb_jump = np.asarray([n_bridge_start], dtype=float)
+        Q1_jump = np.asarray([P1 / n_bridge_start], dtype=float)
+        F_jump = np.asarray([mu1 - Q1_jump[0]], dtype=float)
+
+        mu_br = mu1 * (mu2 / mu1) ** u_grid
+        nb_br = n_bridge_start * (mu_br / mu1) ** (1.0 / cs2_css)
+        P_br = P1 + n_bridge_start * mu1 * cs2_css / (1.0 + cs2_css) * (
+            (mu_br / mu1) ** (1.0 + 1.0 / cs2_css) - 1.0
+        )
         Q1_br = P_br / nb_br
         F_br = mu_br - Q1_br
-        cs2_left_br = csA2
-        cs2_right_br = csB2
-        extra_meta["csA2"] = csA2
-        extra_meta["csB2"] = csB2
-        extra_meta["spline_mode"] = "2segment_css"
+        cs2_br = np.full(n_bridge, cs2_css, dtype=float)
+        cs2_left_br = cs2_css
+        cs2_right_br = cs2_css
+        delta_n_css = n_bridge_start - n1
+        delta_eps_css = mu1 * delta_n_css
+        eps_crust = mu1 * n1 - P1
+        seidov_critical = 0.5 * eps_crust + 1.5 * P1
+        extra_meta.update({
+            "cs2_bridge": cs2_css,
+            "spline_mode": "single_speed_css_with_crust_density_jump",
+            "crust_bridge_density_jump_fm3": delta_n_css,
+            "crust_bridge_energy_density_jump_MeV_fm3": delta_eps_css,
+            "crust_bridge_first_law_jump_residual_MeV_fm3": 0.0,
+            "seidov_small_core_critical_jump_MeV_fm3": seidov_critical,
+            "seidov_small_core_stable": bool(delta_eps_css < seidov_critical),
+            "radial_stability_scope": "Seidov small-core onset criterion only; no full radial-mode eigenfrequency calculation.",
+        })
 
     elif method in ("cubic_F", "quintic_F"):
         x_br = x1 + u_grid * Dx
@@ -593,9 +667,9 @@ def match_crust_core(
         cs2_right_br = float((Q1_2 + d1_f / Dx) / mu2)
         extra_meta["spline_mode"] = sp_mode
 
-    nb_full = np.concatenate([nb_cr, nb_br, nb_co])
-    Q1_full = np.concatenate([Q1_cr, Q1_br, Q1_co])
-    F_full = np.concatenate([F_cr, F_br, F_co])
+    nb_full = np.concatenate([nb_cr, nb_jump, nb_br, nb_co])
+    Q1_full = np.concatenate([Q1_cr, Q1_jump, Q1_br, Q1_co])
+    F_full = np.concatenate([F_cr, F_jump, F_br, F_co])
     mub_full = F_full + Q1_full
     N_full = len(nb_full)
 
@@ -623,7 +697,10 @@ def match_crust_core(
     else:
         core_composition_rejection = "input_eos_compo_absent"
 
-    if core_composition_usable:
+    if method == "css":
+        compo_out_available = False
+        core_composition_rejection = "not_applicable_single_speed_css_thermo_only"
+    elif core_composition_usable:
         compo_out_available = bool(d_cr.composition_available)
     elif core_compo_mode == "literature_beta_eq":
         if not d_cr.composition_available:
@@ -703,12 +780,40 @@ def match_crust_core(
         muq_full = np.concatenate([muq_cr, muq_br, muq_co])
     else:
         Yn_full = Yp_full = Ye_full = Ymu_full = A_full = Z_full = Yh_full = np.zeros(N_full)
-        Iph_full = np.zeros(N_full, dtype=int)
         muq_cr = d_cr.muq[:i1 + 1]
         muq_co = d_co.muq[i2:]
         muq_br = (1.0 - s_u) * float(muq_cr[-1]) + s_u * float(muq_co[0])
-        muq_full = np.concatenate([muq_cr, muq_br, muq_co])
-        compo_prov = "none_strict_thermo_only"
+        if method == "css":
+            # Thermo-only CSS carries no charge-composition solution. Hold the
+            # charge chemical potential at the crust-side value across the
+            # jump and bridge; it is metadata only, not a reconstructed species
+            # profile or a claim of beta-equilibrated microscopic composition.
+            muq_jump = np.asarray([float(muq_cr[-1])])
+            muq_br = np.full(n_bridge, float(muq_cr[-1]))
+            muq_full = np.concatenate([muq_cr, muq_jump, muq_br, muq_co])
+        else:
+            muq_full = np.concatenate([muq_cr, muq_br, muq_co])
+        cr_ids = (np.asarray(d_cr.Iphase[:i1 + 1], dtype=int)
+                  if np.asarray(d_cr.Iphase).shape == d_cr.nb.shape else np.zeros(len(nb_cr), dtype=int))
+        co_ids_raw = (np.asarray(d_co.Iphase[i2:], dtype=int)
+                      if np.asarray(d_co.Iphase).shape == d_co.nb.shape else np.zeros(len(nb_co), dtype=int))
+        if method == "css":
+            css_id = int(np.max(cr_ids)) + 1
+            core_base = css_id + 1
+            Iph_full = np.concatenate([
+                cr_ids,
+                np.full(len(nb_jump) + len(nb_br), css_id, dtype=int),
+                core_base + (co_ids_raw - int(co_ids_raw[0]))
+            ])
+            compo_prov = "not_available_single_speed_css_thermo_only"
+        else:
+            core_base = int(np.max(cr_ids)) + 1
+            Iph_full = np.concatenate([
+                cr_ids,
+                np.full(len(nb_jump) + len(nb_br), int(cr_ids[-1]), dtype=int),
+                core_base + (co_ids_raw - int(co_ids_raw[0]))
+            ])
+            compo_prov = "none_strict_thermo_only"
 
     Q2_full = np.zeros(N_full)
     Q3_full = mub_full / mn - 1.0
@@ -735,8 +840,8 @@ def match_crust_core(
     # Seidov's criterion is therefore not applicable to these constructions.
     seidov_ratio = None
     regularity_class = {
-        "maxwell": "smooth_near_pressure_plateau_no_phase_jump",
-        "css": "piecewise_constant_sound_speed_continuous_barotrope",
+        FIRST_LAW_HERMITE_PRESSURE_BRIDGE: "smooth_near_pressure_plateau_no_phase_jump",
+        "css": "css_single_speed_with_crust_density_jump",
         "cubic_F": "cubic_free_energy_bridge",
         "cubic_P": "cubic_pressure_chemical_potential_bridge",
         "quintic_F": "quintic_C2_free_energy_bridge",
@@ -751,11 +856,11 @@ def match_crust_core(
         mu1=mu1, mu2=mu2, dmu=Dmu,
         eps1=eps1, eps2=eps2, deps=eps2 - eps1,
         seidov_ratio=seidov_ratio,
-        seidov_applicable=False,
+        seidov_applicable=(method == "css"),
         is_exact_maxwell=False,
-        phase_transition_order=None,
-        phase_transition_class="not_assigned_no_density_jump",
-        density_jump_fm3=0.0,
+        phase_transition_order=(1 if method == "css" else None),
+        phase_transition_class=("thermo_only_first_order_css_crust_interface" if method == "css" else "not_assigned_no_density_jump"),
+        density_jump_fm3=(float(nb_jump[0] - n1) if method == "css" else 0.0),
         construction_kind=regularity_class,
         regularity_class=regularity_class,
         cs2_1=cs2_1, cs2_2=cs2_2,
@@ -767,6 +872,8 @@ def match_crust_core(
         pt_order=None,
         pt_class="not_assigned_no_density_jump",
         dm_crust=dm_cr, dm_core=dm_co,
+        source_euler_relative_residual=source_euler_residual,
+        source_euler_relative_tolerance=SOURCE_EULER_RELATIVE_TOLERANCE,
         composition_provenance=compo_prov,
         core_composition_input_status=core_composition_rejection,
         core_composition_input_usable=bool(core_composition_usable),
@@ -962,13 +1069,16 @@ def solve_star_at_target_mass(
 
 __all__ = [
     "METHODS",
+    "SMOOTH_METHODS",
+    "FIRST_LAW_HERMITE_PRESSURE_BRIDGE",
+    "MAXWELL_METHOD_ID",
     "CRUST_NAMES",
     "CORE_NAMES",
     "get_core_start_index",
     "get_gauge_shifts",
     "find_convex_transition_window",
     "build_monotone_hermite_bridge",
-    "build_maxwell_plateau_bridge",
+    "build_first_law_constrained_hermite_pressure_bridge",
     "match_crust_core",
     "solve_star_3stage",
     "solve_star_at_target_mass",

@@ -1,0 +1,232 @@
+{
+  "schema": "crust-literature-intake-v1",
+  "date": "2026-11-16",
+  "base_commit": "677585947e4d126bc27cc3d8f30c265c407a7773",
+  "scope": "Thirteen intended independent crust models. No joined EOS or stellar calculation.",
+  "sources": {
+    "scurto2024": {
+      "url": "https://arxiv.org/html/2402.15548v1",
+      "locator": "Sec.II.1-II.2, Eqs.2,13-14,20-25,31; Tables8-9",
+      "status": "primary_source_read"
+    },
+    "spg_author_data": {
+      "url": "https://zenodo.org/records/11084025",
+      "locator": "README.txt, model_par.txt, model_NMP.txt",
+      "status": "raw_files_acquired_hash_checked",
+      "license": "CC-BY-4.0"
+    },
+    "grill2014": {
+      "url": "https://arxiv.org/html/1404.2753",
+      "locator": "finite-range Thomas-Fermi equations and pasta cell minimization",
+      "status": "primary_source_read"
+    },
+    "pais2016": {
+      "url": "https://arxiv.org/html/1607.05899",
+      "locator": "extended RMF Eq.1 onward, Table2 NL3 omega-rho6 L55",
+      "status": "primary_source_read"
+    },
+    "providencia2019": {
+      "url": "https://www.frontiersin.org/journals/astronomy-and-space-sciences/articles/10.3389/fspas.2019.00013/full",
+      "locator": "FSU2/R/H TF crust; Table5 numerical reference",
+      "status": "primary_source_read"
+    },
+    "tolos2017": {
+      "url": "https://arxiv.org/html/1708.08681v2",
+      "locator": "Table1 revised FSU2R/H coupling parameters",
+      "status": "primary_source_read"
+    },
+    "negreiros2018": {
+      "url": "https://arxiv.org/pdf/1804.00334v1",
+      "locator": "Table1 FSU2/R/H parameters and field convention",
+      "status": "primary_source_read"
+    },
+    "tm1e_author_guide": {
+      "url": "https://user.numazu-ct.ac.jp/~sumi/eos/table4/guide_EOS4.pdf",
+      "locator": "Eq.1 Lagrangian and TableI",
+      "status": "primary_source_read"
+    },
+    "bsk22_provider": {
+      "url": "https://compose.obspm.fr/download/1D/NS/Skyrme/BSK22/eos.pdf",
+      "locator": "outer crust AME2016 + HFB22 + 2017 copper measurements",
+      "status": "primary_source_read"
+    },
+    "outer_solver": {
+      "url": "https://zenodo.org/records/3719439",
+      "locator": "Chamel2020 ocrust.c and README",
+      "status": "raw_code_acquired_not_executed",
+      "code_sha256": "cfca995b9a39a81d367112e245eada177d054c605519cb70296591385453e924",
+      "license": "CC-BY-4.0"
+    },
+    "carreau2019": {
+      "url": "https://arxiv.org/html/1902.07032",
+      "locator": "Sec.II.3 nine-nucleus fit; relationship to Scurto2408-mass score unresolved",
+      "status": "primary_source_read_in_baseline_intake"
+    },
+    "tw_page": {
+      "url": "https://compose.obspm.fr/eos/212",
+      "locator": "BPS outer-crust attribution",
+      "status": "primary_source_read"
+    },
+    "tw_pdf": {
+      "url": "https://compose.obspm.fr/download/1D/Crust/TW/eos.pdf",
+      "locator": "BSk22 outer-crust attribution",
+      "status": "primary_source_read"
+    },
+    "avancini2012": {
+      "url": "https://arxiv.org/html/1203.3052",
+      "locator": "Table1 exact NL3 omega-rho constants; Table2 J31.66,L55.23; scalar Lagrangian belowEq11",
+      "status": "primary_source_read"
+    }
+  },
+  "evidence_files": [
+    "crust_archive_evidence.json",
+    "spg_author_candidates.json",
+    "reproduce_crust_intake.py"
+  ],
+  "model_families": {
+    "SPG": {
+      "models": [
+        "SPG_M1",
+        "SPG_M2",
+        "SPG_M3",
+        "SPG_M4",
+        "SPG_M5"
+      ],
+      "functional": "three-meson density-dependent GDFM + spherical CLD",
+      "bulk_author_vectors": "spg_author_candidates.json",
+      "bulk_normalization": "Raw author rho coefficients appear in the no-half vertex Gamma_rho; paper g_rho=2Gamma_rho. Independent NMP oracle required and provided by sibling implementation.",
+      "surface": "sigma(y)=sigma0*(b+16)/(b+y^-3+(1-y)^-3)",
+      "remaining": [
+        "Validate candidate identity against independent archived homogeneous P,epsilon,Yp trajectories, especially printed Table9 Ksat discrepancy for M2/M4",
+        "Recover five model-specific sigma0,b pairs or fully identify the finite-nucleus fit protocol and implement it",
+        "Minimize complete two-phase CLD energy including all finite-size composition derivatives",
+        "Retain independently calibrated BSk22 lower segment and finite-size/phase composition definitions"
+      ],
+      "candidate_surface_calibration": {
+        "status": "EXECUTED_CANDIDATE_NOT_ORIGINAL_SOURCE_FIT",
+        "receipt": "data/research_generator_20261116/candidate_surface/candidate_surface_fit.json",
+        "documentation": "docs/research_generator_20261116/candidate_surface_fit.md",
+        "original_fit_recovered": false,
+        "crust_regeneration_claim": false
+      }
+    },
+    "GPPVA": {
+      "models": [
+        "GPPVA_DD2",
+        "GPPVA_DDME2",
+        "GPPVA_FSU2",
+        "GPPVA_FSU2H",
+        "GPPVA_FSU2R",
+        "GPPVA_NL3wrL55",
+        "GPPVA_TM1e",
+        "GPPVA_TW"
+      ],
+      "functional": "self-consistent finite-range RMF Thomas-Fermi WS cells with pasta",
+      "surface": "Meson gradient and Coulomb fields generate surface contribution; no fitted Scurto sigma0,b needed for source TF method.",
+      "remaining": [
+        "Implement finite-range meson/Poisson boundary-value solver and cell-size/geometry minimization",
+        "Lock nonlinear-coupling, mass and isospin conventions per source version",
+        "Reconstruct cluster versus cell A,Z and dripped fractions from density profiles using provider convention",
+        "Convergence in radial mesh, box size, competing geometries and multiple initial profiles"
+      ]
+    }
+  },
+  "published_nonlinear_parameters": {
+    "FSU2": {
+      "M_MeV": 939,
+      "m_sigma_MeV": 497.479,
+      "m_omega_MeV": 782.5,
+      "m_rho_MeV": 763,
+      "g_sigma_squared": 108.0943,
+      "g_omega_squared": 183.7893,
+      "g_rho_squared": 80.4656,
+      "kappa_MeV": 3.0029,
+      "lambda": -0.000533,
+      "zeta": 0.0256,
+      "Lambda_omega": 0.000823,
+      "source": "negreiros2018"
+    },
+    "FSU2R": {
+      "M_MeV": 939,
+      "m_sigma_MeV": 497.479,
+      "m_omega_MeV": 782.5,
+      "m_rho_MeV": 763,
+      "g_sigma_squared": 107.5751,
+      "g_omega_squared": 182.3949,
+      "g_rho_squared": 206.426,
+      "kappa_MeV": 3.0911,
+      "lambda": -0.00168,
+      "zeta": 0.024,
+      "Lambda_omega": 0.045,
+      "source": "tolos2017"
+    },
+    "FSU2H": {
+      "M_MeV": 939,
+      "m_sigma_MeV": 497.479,
+      "m_omega_MeV": 782.5,
+      "m_rho_MeV": 763,
+      "g_sigma_squared": 102.72,
+      "g_omega_squared": 169.5315,
+      "g_rho_squared": 197.2692,
+      "kappa_MeV": 4.0014,
+      "lambda": -0.013298,
+      "zeta": 0.008,
+      "Lambda_omega": 0.045,
+      "source": "tolos2017"
+    },
+    "TM1e": {
+      "M_MeV": 938,
+      "m_sigma_MeV": 511.198,
+      "m_omega_MeV": 783,
+      "m_rho_MeV": 770,
+      "g_sigma": 10.0289,
+      "g_omega": 12.6139,
+      "g_rho": 13.9714,
+      "g2_fm_inverse": -7.2325,
+      "g3": 0.6183,
+      "c3": 71.3075,
+      "Lambda_v": 0.0429,
+      "source": "tm1e_author_guide"
+    },
+    "NL3wrL55": {
+      "M_MeV": 939,
+      "m_sigma_MeV": 508.194,
+      "m_omega_MeV": 782.501,
+      "m_rho_MeV": 763,
+      "g_sigma": 10.217,
+      "g_omega": 12.868,
+      "g_rho": 11.2766,
+      "kappa_over_M": 4.384,
+      "lambda_unscaled_field": -173.31,
+      "xi": 0,
+      "Lambda_omega": 0.03,
+      "J_MeV": 31.66,
+      "L_MeV": 55.23,
+      "source": "avancini2012",
+      "status": "published_parameter_intake_pending_source_TF_verification",
+      "retuning": "g_rho chosen so S=25.68MeV at kF=1.15fm^-1, not at saturation",
+      "note": "No coupling powers in this paper scalar terms: -kappa*phi^3/3! -lambda*phi^4/4!, unlike FSU2-family scaled fields; kappa column given in nucleon mass units. Published precision retained."
+    }
+  },
+  "nonlinear_conventions": {
+    "FSU2_family": "Published g_i squared; paper rho vertex g_rho*tau3/2. Scalar interactions -kappa(g_sigma*sigma)^3/3! -lambda(g_sigma*sigma)^4/4!; omega +zeta*g_omega^4(omega_mu omega^mu)^2/4!; omega-rho +Lambda_omega*g_omega^2*g_rho^2(omega_mu omega^mu)(rho_mu rho^mu). Revised FSU2R/H have Lambda=.045, distinct from older.05.",
+    "TM1e": "Author2020 guide explicitly g_rho/2. M*=M+g_sigma*sigma; map phi=-sigma to M*=M-g_sigma*phi, changing cubic coefficient sign only, not quartic. g2 given fm^-1. Do not import constants into another solver convention without transformation.",
+    "NL3wrL55": "Avancini2012 Table1 uses rho/2 convention. Scalar terms use the bare scalar field phi, not g_sigma*phi: -kappa*phi^3/3! -lambda*phi^4/4!; kappa/M=4.384,lambda=-173.31. Do not apply FSU2 convention to these same numbers."
+  },
+  "outer_crust": {
+    "table_extraction": "All13 source archives carry composition and can be extracted over their exact source grid intervals.",
+    "TW": "Six token comparisons over first217rows give0mismatches withDD2/DDME2 afterheader/grid-index removal. BibliographicBPS-vsBSk22 conflict remains annotation.",
+    "independent_reproduction": "Gibbs energy per baryon minimization atfixedP over nuclear species with atomic-to-nuclear mass correction, degenerate electrons, bcc lattice, electronexchange/polarization choices matched tosource.",
+    "mass_inputs": [
+      "AME2016 measured masses",
+      "HFB22 theoretical masses for unmeasured nuclei",
+      "Welker etal2017 copper-isotope updates"
+    ],
+    "public_solver": "Chamel2020 ocrust.c acquired in build/crust_literature, SHA recorded; bundledexample usesHFB27, so cannot substitute forHFB22.",
+    "unresolved": [
+      "Acquire exact historical HFB22 mass table and copper mass overrides",
+      "Set exchange, polarization, Wigner-Seitz/lattice options toPearson2018+2019erratum conventions",
+      "Confirm common lower archived segment provenance; Iphase0 includes legacy lower segment beyond neutron drip"
+    ]
+  }
+}

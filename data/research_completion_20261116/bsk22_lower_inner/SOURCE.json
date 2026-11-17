@@ -1,0 +1,36 @@
+{
+  "date": "2026-11-16",
+  "primary_paper": "https://arxiv.org/html/1903.04981v1",
+  "author_code_url": "http://www.ioffe.ru/astro/NSG/BSk/bskfit18.f",
+  "author_page": "https://www.ioffe.ru/astro/NSG/BSk/nsesubr.html",
+  "source_code_version": "13.02.23",
+  "author_code_committed": false,
+  "license_review": "Source header identifies authors/contact and applicability; no explicit redistribution license found. Downloaded author source is kept in ignored build directory only; committed Python evaluates published equations and coefficients independently.",
+  "source_identities": {
+    "build/outer_crust_sources/bskfit18.f": {
+      "sha256": "4bd3b716f04e40c69165fa83b5cd8ecb03c30aa1f2b45342fb070cef09a3a99c",
+      "bytes": 36095
+    },
+    "build/outer_crust_sources/pearson2018.html": {
+      "sha256": "e1b9a6d5f5b60726dc3178e3397c90881b7fcb68e1d4f3ef59cd9f216d963240",
+      "bytes": 1059393
+    },
+    "build/outer_crust_sources/pearson2018.pdf": {
+      "sha256": "dcb27f7c799d0cdc7a6f060d0e6ae8762fd49acb12f38db2f91fd4ec0dcd35e2",
+      "bytes": 1603332
+    }
+  },
+  "primary_equations": {
+    "energy": "Appendix C EqC1,C2; HTML75,76; TableC1/20",
+    "pressure": "EqC4; HTML78; TableC2/21",
+    "Y_proton_total": "EqC6; HTML80; TableC4/23",
+    "Y_neutron_free": "EqC11; HTML85; TableC6/25",
+    "cluster_numbers": "HTML84,86; Zcell40 in BSk22 Table8 at lower-inner densities"
+  },
+  "source_precision_difference": "Python uses paper exponent7/6. Author Fortran uses1.16667 (default-real constant), and other literals are default-real before promotion. No source parameters changed to force numerical equality.",
+  "replay": [
+    "Download author source to build/outer_crust_sources/bskfit18.f and verify recorded SHA256",
+    "gfortran -O2 -std=legacy -ffixed-line-length-none build/outer_crust_sources/bskfit18.f data/research_completion_20261116/bsk22_lower_inner/author_reference_driver.f90 -o build/outer_crust_sources/bsk22_reference",
+    "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python3 scripts/build_bsk22_lower_inner.py <new-output-directory> --author-reference-exe build/outer_crust_sources/bsk22_reference"
+  ]
+}

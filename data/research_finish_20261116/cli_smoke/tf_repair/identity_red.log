@@ -1,0 +1,92 @@
+..................................FF..........F                          [100%]
+=================================== FAILURES ===================================
+_ test_tf_selected_row_requires_physical_evidence_even_after_rehash[model_id-GPPVA_TW] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-223/test_tf_selected_row_requires_1')
+key = 'model_id', value = 'GPPVA_TW'
+
+    @pytest.mark.parametrize("key,value", [
+        ("numerical_status","REQUIRES_REFINEMENT"),
+        ("model_id","GPPVA_TW"),
+        ("points",32),
+        ("muon_threshold_crossed",True),
+        ("baryon_constraint_error",1e-3),
+        ("charge_constraint_error",1e-3),
+        ("scalar_pde_residual",1e-3),
+        ("electron_pde_residual",1e-3),
+        ("epsilon",float("nan")),
+        ("energy_per_baryon",float("inf")),
+        ("pressure",float("nan")),
+        ("mu_B",float("inf")),
+        ("mu_Q_lepton",float("nan")),
+    ])
+    def test_tf_selected_row_requires_physical_evidence_even_after_rehash(tmp_path,key,value):
+        request = dispatch.generation_request("GPPVA_DD2", densities=[.001,.002,.003],resolutions=[16])
+        directory = tf_evidence(tmp_path)
+        path = directory / "selected_states.json.gz"
+        with gzip.open(path,"rt") as stream:
+            rows=json.load(stream)
+        rows[0][key]=value
+        with gzip.open(path,"wt") as stream:
+            json.dump(rows,stream)
+        seal_tf_export(directory)
+>       with pytest.raises(ValueError,match="selected TF row"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_dispatch.py:255: Failed
+_ test_tf_selected_row_requires_physical_evidence_even_after_rehash[points-32] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-223/test_tf_selected_row_requires_2')
+key = 'points', value = 32
+
+    @pytest.mark.parametrize("key,value", [
+        ("numerical_status","REQUIRES_REFINEMENT"),
+        ("model_id","GPPVA_TW"),
+        ("points",32),
+        ("muon_threshold_crossed",True),
+        ("baryon_constraint_error",1e-3),
+        ("charge_constraint_error",1e-3),
+        ("scalar_pde_residual",1e-3),
+        ("electron_pde_residual",1e-3),
+        ("epsilon",float("nan")),
+        ("energy_per_baryon",float("inf")),
+        ("pressure",float("nan")),
+        ("mu_B",float("inf")),
+        ("mu_Q_lepton",float("nan")),
+    ])
+    def test_tf_selected_row_requires_physical_evidence_even_after_rehash(tmp_path,key,value):
+        request = dispatch.generation_request("GPPVA_DD2", densities=[.001,.002,.003],resolutions=[16])
+        directory = tf_evidence(tmp_path)
+        path = directory / "selected_states.json.gz"
+        with gzip.open(path,"rt") as stream:
+            rows=json.load(stream)
+        rows[0][key]=value
+        with gzip.open(path,"wt") as stream:
+            json.dump(rows,stream)
+        seal_tf_export(directory)
+>       with pytest.raises(ValueError,match="selected TF row"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_dispatch.py:255: Failed
+________________ test_tf_all_requested_stage_meshes_must_match _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-223/test_tf_all_requested_stage_me0')
+
+    def test_tf_all_requested_stage_meshes_must_match(tmp_path):
+        request = dispatch.generation_request("GPPVA_DD2", densities=[.001,.002,.003],resolutions=[8,16])
+        directory = tf_evidence(tmp_path)
+        campaign=json.loads((tmp_path/"CAMPAIGN.json").read_text())
+        campaign["resolutions"]=[8,16]
+        dump(tmp_path/"CAMPAIGN.json",campaign)
+        record=json.loads((directory/"RECEIPT.json").read_text())
+        record["stages"].insert(0,{"points":12,"requested_points":3,"selected_stationary_points":3})
+        dump(directory/"RECEIPT.json",record)
+>       with pytest.raises(ValueError,match="all-row"):
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_generation_dispatch.py:268: Failed
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_generation_dispatch.py::test_tf_selected_row_requires_physical_evidence_even_after_rehash[model_id-GPPVA_TW]
+FAILED python_frontend/tests/test_generation_dispatch.py::test_tf_selected_row_requires_physical_evidence_even_after_rehash[points-32]
+FAILED python_frontend/tests/test_generation_dispatch.py::test_tf_all_requested_stage_meshes_must_match
+3 failed, 44 passed in 0.81s

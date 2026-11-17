@@ -1,0 +1,604 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_historical_seal_can_add_previously_unsealed_diagnostics_to_inventory[states.csv] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-409/test_historical_seal_can_add_p0')
+name = 'states.csv'
+
+    @pytest.mark.parametrize("name", DIAGNOSTIC_NAMES)
+    def test_historical_seal_can_add_previously_unsealed_diagnostics_to_inventory(tmp_path, name):
+        request = core_request()
+        receipt = evidence(tmp_path, request)
+        receipt["output_sha256"] = verify_native_generation(tmp_path, request)["output_sha256"]
+        (tmp_path / "RESULT.json").write_text(json.dumps(receipt))
+        # Earlier inventories covered the native tables without these diagnostics.
+        # Record their current bytes without retroactively claiming an old seal.
+        content = b"node,status\n1,HOLD\n"
+        (tmp_path / name).write_bytes(content)
+>       checked = verify_native_generation(tmp_path, request)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-409/test_historical_seal_can_add_p0')
+request = {'model': 'GM_GM1', 'family': 'core', 'contract': {'family': 'core', 'region': 'core_only', 'composition': 'nucleon and lepton fractions', 'default_interval_fm3': [0.08, 1.0], ...}, 'points': 3, ...}
+
+    def verify_native_generation(output,request):
+        output=Path(output)
+        receipt=json.loads((output/"RESULT.json").read_text())
+        if (receipt.get("backend")!="fortran" or receipt.get("model")!=request["model"] or
+            receipt.get("family")!=request["family"]):
+            raise ValueError("native generator model/family/backend identity mismatch")
+        if receipt.get("status")!="REQUESTED_ROWS_NATIVE_VERIFIED":
+            raise ValueError("native physical generation incomplete: "+str(receipt.get("status")))
+        if receipt.get("native_readback") is not True:
+            raise ValueError("native readback evidence missing")
+        rows=receipt.get("rows")
+        if not isinstance(rows,int) or isinstance(rows,bool) or rows<3:
+            raise ValueError("invalid native row count")
+        grid,hashes,checks=_read_native_table(output)
+        if rows!=len(grid):
+            raise ValueError("native receipt row count differs from actual rows")
+        readbacks={"generated":rows}
+        consistency={"generated":checks}
+        if request["family"]=="core":
+            count=request["points"]
+            if rows<count or rows>count+(2 if request["model"]=="APR_APR" else 0):
+                raise ValueError("requested core rows missing")
+            lo,hi=request["n_min"],request["n_max"]
+            expected=[lo*(hi/lo)**(i/(count-1)) for i in range(count)]
+            expected[0]=lo;expected[-1]=hi
+            # APR inserts two in-window Gibbs endpoints. Consume each requested
+            # value once without assuming where those extra rows occur.
+            cursor=0
+            for wanted in expected:
+                while cursor<len(grid) and grid[cursor]<wanted and not math.isclose(grid[cursor],wanted,rel_tol=5e-13):
+                    cursor+=1
+                if cursor>=len(grid) or not math.isclose(grid[cursor],wanted,rel_tol=5e-13,abs_tol=0.):
+                    raise ValueError("requested core density grid row missing")
+                cursor+=1
+            if (not math.isclose(grid[0],lo,rel_tol=5e-13,abs_tol=0.) or
+                not math.isclose(grid[-1],hi,rel_tol=5e-13,abs_tol=0.)):
+                raise ValueError("core output extends beyond the requested support")
+        elif request["family"]=="spg":
+            if rows!=request["points"]:
+                raise ValueError("requested SPG rows missing")
+            expected=[grid[0]*(grid[-1]/grid[0])**(i/(rows-1)) for i in range(rows)]
+            _same_grid(grid,expected,"SPG")
+            transition=json.loads((output/"transition.json").read_text())
+            if transition.get("policy")!="fixed_density_source":
+                raise ValueError("unexpected SPG transition policy")
+            if not math.isclose(float(transition["n_b"]),grid[-1],rel_tol=5e-9,abs_tol=0.):
+                raise ValueError("SPG endpoint differs from its transition receipt")
+            hashes["transition.json"]=file_sha(output/"transition.json")
+        else:
+            _same_grid(grid,request["densities"],"TF")
+            if receipt.get("meshes")!=request["resolutions"]:
+                raise ValueError("requested TF meshes not executed")
+            if receipt.get("held_nodes")!=0:
+                raise ValueError("unresolved TF density support")
+            finest=None
+            for mesh in request["resolutions"]:
+                segment="mesh_"+str(mesh)
+                mesh_grid,mesh_hashes,mesh_checks=_read_native_table(output/segment)
+                _same_grid(mesh_grid,request["densities"],segment)
+                readbacks[segment]=len(mesh_grid)
+                consistency[segment]=mesh_checks
+                for name,value in mesh_hashes.items():
+                    hashes[segment+"/"+name]=value
+                finest=mesh_hashes
+            if finest is None or any(hashes[name]!=finest[name] for name in NATIVE_FILES):
+                raise ValueError("main TF table differs from the highest requested mesh")
+        if request.get("include_lower_crust"):
+            if receipt.get("lower_crust_segments") is not True:
+                raise ValueError("requested lower crust not generated")
+            segments=json.loads((output/"crust_segments.json").read_text())
+            if segments.get("cross_segment_interpolation")!="UNAPPROVED":
+                raise ValueError("missing explicit cross-segment support contract")
+            hashes["crust_segments.json"]=file_sha(output/"crust_segments.json")
+            for segment in ("outer","lower_source_fit"):
+                segment_grid,segment_hashes,segment_checks=_read_native_table(output/segment)
+                readbacks[segment]=len(segment_grid)
+                consistency[segment]=segment_checks
+                for name,value in segment_hashes.items():
+                    hashes[segment+"/"+name]=value
+        # Optional native diagnostics are evidence, never a physical acceptance gate.
+        # Hash them when present while keeping historical receipts readable.
+        for name in NATIVE_DIAGNOSTICS:
+            path=output/name
+            if path.is_file():
+                hashes[name]=file_sha(path)
+        expected_hashes=receipt.get("output_sha256")
+        if expected_hashes is not None:
+            for name in NATIVE_DIAGNOSTICS:
+                if name in expected_hashes and name not in hashes:
+                    raise ValueError("sealed native diagnostic missing: "+name)
+        if expected_hashes is not None and any(expected_hashes.get(k)!=v for k,v in hashes.items()):
+>           raise ValueError("native output checksum mismatch")
+E           ValueError: native output checksum mismatch
+
+python_frontend/compose_eos/native_generation.py:215: ValueError
+_ test_historical_seal_can_add_previously_unsealed_diagnostics_to_inventory[first_law.csv] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-409/test_historical_seal_can_add_p1')
+name = 'first_law.csv'
+
+    @pytest.mark.parametrize("name", DIAGNOSTIC_NAMES)
+    def test_historical_seal_can_add_previously_unsealed_diagnostics_to_inventory(tmp_path, name):
+        request = core_request()
+        receipt = evidence(tmp_path, request)
+        receipt["output_sha256"] = verify_native_generation(tmp_path, request)["output_sha256"]
+        (tmp_path / "RESULT.json").write_text(json.dumps(receipt))
+        # Earlier inventories covered the native tables without these diagnostics.
+        # Record their current bytes without retroactively claiming an old seal.
+        content = b"node,status\n1,HOLD\n"
+        (tmp_path / name).write_bytes(content)
+>       checked = verify_native_generation(tmp_path, request)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-409/test_historical_seal_can_add_p1')
+request = {'model': 'GM_GM1', 'family': 'core', 'contract': {'family': 'core', 'region': 'core_only', 'composition': 'nucleon and lepton fractions', 'default_interval_fm3': [0.08, 1.0], ...}, 'points': 3, ...}
+
+    def verify_native_generation(output,request):
+        output=Path(output)
+        receipt=json.loads((output/"RESULT.json").read_text())
+        if (receipt.get("backend")!="fortran" or receipt.get("model")!=request["model"] or
+            receipt.get("family")!=request["family"]):
+            raise ValueError("native generator model/family/backend identity mismatch")
+        if receipt.get("status")!="REQUESTED_ROWS_NATIVE_VERIFIED":
+            raise ValueError("native physical generation incomplete: "+str(receipt.get("status")))
+        if receipt.get("native_readback") is not True:
+            raise ValueError("native readback evidence missing")
+        rows=receipt.get("rows")
+        if not isinstance(rows,int) or isinstance(rows,bool) or rows<3:
+            raise ValueError("invalid native row count")
+        grid,hashes,checks=_read_native_table(output)
+        if rows!=len(grid):
+            raise ValueError("native receipt row count differs from actual rows")
+        readbacks={"generated":rows}
+        consistency={"generated":checks}
+        if request["family"]=="core":
+            count=request["points"]
+            if rows<count or rows>count+(2 if request["model"]=="APR_APR" else 0):
+                raise ValueError("requested core rows missing")
+            lo,hi=request["n_min"],request["n_max"]
+            expected=[lo*(hi/lo)**(i/(count-1)) for i in range(count)]
+            expected[0]=lo;expected[-1]=hi
+            # APR inserts two in-window Gibbs endpoints. Consume each requested
+            # value once without assuming where those extra rows occur.
+            cursor=0
+            for wanted in expected:
+                while cursor<len(grid) and grid[cursor]<wanted and not math.isclose(grid[cursor],wanted,rel_tol=5e-13):
+                    cursor+=1
+                if cursor>=len(grid) or not math.isclose(grid[cursor],wanted,rel_tol=5e-13,abs_tol=0.):
+                    raise ValueError("requested core density grid row missing")
+                cursor+=1
+            if (not math.isclose(grid[0],lo,rel_tol=5e-13,abs_tol=0.) or
+                not math.isclose(grid[-1],hi,rel_tol=5e-13,abs_tol=0.)):
+                raise ValueError("core output extends beyond the requested support")
+        elif request["family"]=="spg":
+            if rows!=request["points"]:
+                raise ValueError("requested SPG rows missing")
+            expected=[grid[0]*(grid[-1]/grid[0])**(i/(rows-1)) for i in range(rows)]
+            _same_grid(grid,expected,"SPG")
+            transition=json.loads((output/"transition.json").read_text())
+            if transition.get("policy")!="fixed_density_source":
+                raise ValueError("unexpected SPG transition policy")
+            if not math.isclose(float(transition["n_b"]),grid[-1],rel_tol=5e-9,abs_tol=0.):
+                raise ValueError("SPG endpoint differs from its transition receipt")
+            hashes["transition.json"]=file_sha(output/"transition.json")
+        else:
+            _same_grid(grid,request["densities"],"TF")
+            if receipt.get("meshes")!=request["resolutions"]:
+                raise ValueError("requested TF meshes not executed")
+            if receipt.get("held_nodes")!=0:
+                raise ValueError("unresolved TF density support")
+            finest=None
+            for mesh in request["resolutions"]:
+                segment="mesh_"+str(mesh)
+                mesh_grid,mesh_hashes,mesh_checks=_read_native_table(output/segment)
+                _same_grid(mesh_grid,request["densities"],segment)
+                readbacks[segment]=len(mesh_grid)
+                consistency[segment]=mesh_checks
+                for name,value in mesh_hashes.items():
+                    hashes[segment+"/"+name]=value
+                finest=mesh_hashes
+            if finest is None or any(hashes[name]!=finest[name] for name in NATIVE_FILES):
+                raise ValueError("main TF table differs from the highest requested mesh")
+        if request.get("include_lower_crust"):
+            if receipt.get("lower_crust_segments") is not True:
+                raise ValueError("requested lower crust not generated")
+            segments=json.loads((output/"crust_segments.json").read_text())
+            if segments.get("cross_segment_interpolation")!="UNAPPROVED":
+                raise ValueError("missing explicit cross-segment support contract")
+            hashes["crust_segments.json"]=file_sha(output/"crust_segments.json")
+            for segment in ("outer","lower_source_fit"):
+                segment_grid,segment_hashes,segment_checks=_read_native_table(output/segment)
+                readbacks[segment]=len(segment_grid)
+                consistency[segment]=segment_checks
+                for name,value in segment_hashes.items():
+                    hashes[segment+"/"+name]=value
+        # Optional native diagnostics are evidence, never a physical acceptance gate.
+        # Hash them when present while keeping historical receipts readable.
+        for name in NATIVE_DIAGNOSTICS:
+            path=output/name
+            if path.is_file():
+                hashes[name]=file_sha(path)
+        expected_hashes=receipt.get("output_sha256")
+        if expected_hashes is not None:
+            for name in NATIVE_DIAGNOSTICS:
+                if name in expected_hashes and name not in hashes:
+                    raise ValueError("sealed native diagnostic missing: "+name)
+        if expected_hashes is not None and any(expected_hashes.get(k)!=v for k,v in hashes.items()):
+>           raise ValueError("native output checksum mismatch")
+E           ValueError: native output checksum mismatch
+
+python_frontend/compose_eos/native_generation.py:215: ValueError
+_ test_historical_seal_can_add_previously_unsealed_diagnostics_to_inventory[attempts.csv] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-409/test_historical_seal_can_add_p2')
+name = 'attempts.csv'
+
+    @pytest.mark.parametrize("name", DIAGNOSTIC_NAMES)
+    def test_historical_seal_can_add_previously_unsealed_diagnostics_to_inventory(tmp_path, name):
+        request = core_request()
+        receipt = evidence(tmp_path, request)
+        receipt["output_sha256"] = verify_native_generation(tmp_path, request)["output_sha256"]
+        (tmp_path / "RESULT.json").write_text(json.dumps(receipt))
+        # Earlier inventories covered the native tables without these diagnostics.
+        # Record their current bytes without retroactively claiming an old seal.
+        content = b"node,status\n1,HOLD\n"
+        (tmp_path / name).write_bytes(content)
+>       checked = verify_native_generation(tmp_path, request)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-409/test_historical_seal_can_add_p2')
+request = {'model': 'GM_GM1', 'family': 'core', 'contract': {'family': 'core', 'region': 'core_only', 'composition': 'nucleon and lepton fractions', 'default_interval_fm3': [0.08, 1.0], ...}, 'points': 3, ...}
+
+    def verify_native_generation(output,request):
+        output=Path(output)
+        receipt=json.loads((output/"RESULT.json").read_text())
+        if (receipt.get("backend")!="fortran" or receipt.get("model")!=request["model"] or
+            receipt.get("family")!=request["family"]):
+            raise ValueError("native generator model/family/backend identity mismatch")
+        if receipt.get("status")!="REQUESTED_ROWS_NATIVE_VERIFIED":
+            raise ValueError("native physical generation incomplete: "+str(receipt.get("status")))
+        if receipt.get("native_readback") is not True:
+            raise ValueError("native readback evidence missing")
+        rows=receipt.get("rows")
+        if not isinstance(rows,int) or isinstance(rows,bool) or rows<3:
+            raise ValueError("invalid native row count")
+        grid,hashes,checks=_read_native_table(output)
+        if rows!=len(grid):
+            raise ValueError("native receipt row count differs from actual rows")
+        readbacks={"generated":rows}
+        consistency={"generated":checks}
+        if request["family"]=="core":
+            count=request["points"]
+            if rows<count or rows>count+(2 if request["model"]=="APR_APR" else 0):
+                raise ValueError("requested core rows missing")
+            lo,hi=request["n_min"],request["n_max"]
+            expected=[lo*(hi/lo)**(i/(count-1)) for i in range(count)]
+            expected[0]=lo;expected[-1]=hi
+            # APR inserts two in-window Gibbs endpoints. Consume each requested
+            # value once without assuming where those extra rows occur.
+            cursor=0
+            for wanted in expected:
+                while cursor<len(grid) and grid[cursor]<wanted and not math.isclose(grid[cursor],wanted,rel_tol=5e-13):
+                    cursor+=1
+                if cursor>=len(grid) or not math.isclose(grid[cursor],wanted,rel_tol=5e-13,abs_tol=0.):
+                    raise ValueError("requested core density grid row missing")
+                cursor+=1
+            if (not math.isclose(grid[0],lo,rel_tol=5e-13,abs_tol=0.) or
+                not math.isclose(grid[-1],hi,rel_tol=5e-13,abs_tol=0.)):
+                raise ValueError("core output extends beyond the requested support")
+        elif request["family"]=="spg":
+            if rows!=request["points"]:
+                raise ValueError("requested SPG rows missing")
+            expected=[grid[0]*(grid[-1]/grid[0])**(i/(rows-1)) for i in range(rows)]
+            _same_grid(grid,expected,"SPG")
+            transition=json.loads((output/"transition.json").read_text())
+            if transition.get("policy")!="fixed_density_source":
+                raise ValueError("unexpected SPG transition policy")
+            if not math.isclose(float(transition["n_b"]),grid[-1],rel_tol=5e-9,abs_tol=0.):
+                raise ValueError("SPG endpoint differs from its transition receipt")
+            hashes["transition.json"]=file_sha(output/"transition.json")
+        else:
+            _same_grid(grid,request["densities"],"TF")
+            if receipt.get("meshes")!=request["resolutions"]:
+                raise ValueError("requested TF meshes not executed")
+            if receipt.get("held_nodes")!=0:
+                raise ValueError("unresolved TF density support")
+            finest=None
+            for mesh in request["resolutions"]:
+                segment="mesh_"+str(mesh)
+                mesh_grid,mesh_hashes,mesh_checks=_read_native_table(output/segment)
+                _same_grid(mesh_grid,request["densities"],segment)
+                readbacks[segment]=len(mesh_grid)
+                consistency[segment]=mesh_checks
+                for name,value in mesh_hashes.items():
+                    hashes[segment+"/"+name]=value
+                finest=mesh_hashes
+            if finest is None or any(hashes[name]!=finest[name] for name in NATIVE_FILES):
+                raise ValueError("main TF table differs from the highest requested mesh")
+        if request.get("include_lower_crust"):
+            if receipt.get("lower_crust_segments") is not True:
+                raise ValueError("requested lower crust not generated")
+            segments=json.loads((output/"crust_segments.json").read_text())
+            if segments.get("cross_segment_interpolation")!="UNAPPROVED":
+                raise ValueError("missing explicit cross-segment support contract")
+            hashes["crust_segments.json"]=file_sha(output/"crust_segments.json")
+            for segment in ("outer","lower_source_fit"):
+                segment_grid,segment_hashes,segment_checks=_read_native_table(output/segment)
+                readbacks[segment]=len(segment_grid)
+                consistency[segment]=segment_checks
+                for name,value in segment_hashes.items():
+                    hashes[segment+"/"+name]=value
+        # Optional native diagnostics are evidence, never a physical acceptance gate.
+        # Hash them when present while keeping historical receipts readable.
+        for name in NATIVE_DIAGNOSTICS:
+            path=output/name
+            if path.is_file():
+                hashes[name]=file_sha(path)
+        expected_hashes=receipt.get("output_sha256")
+        if expected_hashes is not None:
+            for name in NATIVE_DIAGNOSTICS:
+                if name in expected_hashes and name not in hashes:
+                    raise ValueError("sealed native diagnostic missing: "+name)
+        if expected_hashes is not None and any(expected_hashes.get(k)!=v for k,v in hashes.items()):
+>           raise ValueError("native output checksum mismatch")
+E           ValueError: native output checksum mismatch
+
+python_frontend/compose_eos/native_generation.py:215: ValueError
+_ test_historical_seal_can_add_previously_unsealed_diagnostics_to_inventory[profiles.csv] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-409/test_historical_seal_can_add_p3')
+name = 'profiles.csv'
+
+    @pytest.mark.parametrize("name", DIAGNOSTIC_NAMES)
+    def test_historical_seal_can_add_previously_unsealed_diagnostics_to_inventory(tmp_path, name):
+        request = core_request()
+        receipt = evidence(tmp_path, request)
+        receipt["output_sha256"] = verify_native_generation(tmp_path, request)["output_sha256"]
+        (tmp_path / "RESULT.json").write_text(json.dumps(receipt))
+        # Earlier inventories covered the native tables without these diagnostics.
+        # Record their current bytes without retroactively claiming an old seal.
+        content = b"node,status\n1,HOLD\n"
+        (tmp_path / name).write_bytes(content)
+>       checked = verify_native_generation(tmp_path, request)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-409/test_historical_seal_can_add_p3')
+request = {'model': 'GM_GM1', 'family': 'core', 'contract': {'family': 'core', 'region': 'core_only', 'composition': 'nucleon and lepton fractions', 'default_interval_fm3': [0.08, 1.0], ...}, 'points': 3, ...}
+
+    def verify_native_generation(output,request):
+        output=Path(output)
+        receipt=json.loads((output/"RESULT.json").read_text())
+        if (receipt.get("backend")!="fortran" or receipt.get("model")!=request["model"] or
+            receipt.get("family")!=request["family"]):
+            raise ValueError("native generator model/family/backend identity mismatch")
+        if receipt.get("status")!="REQUESTED_ROWS_NATIVE_VERIFIED":
+            raise ValueError("native physical generation incomplete: "+str(receipt.get("status")))
+        if receipt.get("native_readback") is not True:
+            raise ValueError("native readback evidence missing")
+        rows=receipt.get("rows")
+        if not isinstance(rows,int) or isinstance(rows,bool) or rows<3:
+            raise ValueError("invalid native row count")
+        grid,hashes,checks=_read_native_table(output)
+        if rows!=len(grid):
+            raise ValueError("native receipt row count differs from actual rows")
+        readbacks={"generated":rows}
+        consistency={"generated":checks}
+        if request["family"]=="core":
+            count=request["points"]
+            if rows<count or rows>count+(2 if request["model"]=="APR_APR" else 0):
+                raise ValueError("requested core rows missing")
+            lo,hi=request["n_min"],request["n_max"]
+            expected=[lo*(hi/lo)**(i/(count-1)) for i in range(count)]
+            expected[0]=lo;expected[-1]=hi
+            # APR inserts two in-window Gibbs endpoints. Consume each requested
+            # value once without assuming where those extra rows occur.
+            cursor=0
+            for wanted in expected:
+                while cursor<len(grid) and grid[cursor]<wanted and not math.isclose(grid[cursor],wanted,rel_tol=5e-13):
+                    cursor+=1
+                if cursor>=len(grid) or not math.isclose(grid[cursor],wanted,rel_tol=5e-13,abs_tol=0.):
+                    raise ValueError("requested core density grid row missing")
+                cursor+=1
+            if (not math.isclose(grid[0],lo,rel_tol=5e-13,abs_tol=0.) or
+                not math.isclose(grid[-1],hi,rel_tol=5e-13,abs_tol=0.)):
+                raise ValueError("core output extends beyond the requested support")
+        elif request["family"]=="spg":
+            if rows!=request["points"]:
+                raise ValueError("requested SPG rows missing")
+            expected=[grid[0]*(grid[-1]/grid[0])**(i/(rows-1)) for i in range(rows)]
+            _same_grid(grid,expected,"SPG")
+            transition=json.loads((output/"transition.json").read_text())
+            if transition.get("policy")!="fixed_density_source":
+                raise ValueError("unexpected SPG transition policy")
+            if not math.isclose(float(transition["n_b"]),grid[-1],rel_tol=5e-9,abs_tol=0.):
+                raise ValueError("SPG endpoint differs from its transition receipt")
+            hashes["transition.json"]=file_sha(output/"transition.json")
+        else:
+            _same_grid(grid,request["densities"],"TF")
+            if receipt.get("meshes")!=request["resolutions"]:
+                raise ValueError("requested TF meshes not executed")
+            if receipt.get("held_nodes")!=0:
+                raise ValueError("unresolved TF density support")
+            finest=None
+            for mesh in request["resolutions"]:
+                segment="mesh_"+str(mesh)
+                mesh_grid,mesh_hashes,mesh_checks=_read_native_table(output/segment)
+                _same_grid(mesh_grid,request["densities"],segment)
+                readbacks[segment]=len(mesh_grid)
+                consistency[segment]=mesh_checks
+                for name,value in mesh_hashes.items():
+                    hashes[segment+"/"+name]=value
+                finest=mesh_hashes
+            if finest is None or any(hashes[name]!=finest[name] for name in NATIVE_FILES):
+                raise ValueError("main TF table differs from the highest requested mesh")
+        if request.get("include_lower_crust"):
+            if receipt.get("lower_crust_segments") is not True:
+                raise ValueError("requested lower crust not generated")
+            segments=json.loads((output/"crust_segments.json").read_text())
+            if segments.get("cross_segment_interpolation")!="UNAPPROVED":
+                raise ValueError("missing explicit cross-segment support contract")
+            hashes["crust_segments.json"]=file_sha(output/"crust_segments.json")
+            for segment in ("outer","lower_source_fit"):
+                segment_grid,segment_hashes,segment_checks=_read_native_table(output/segment)
+                readbacks[segment]=len(segment_grid)
+                consistency[segment]=segment_checks
+                for name,value in segment_hashes.items():
+                    hashes[segment+"/"+name]=value
+        # Optional native diagnostics are evidence, never a physical acceptance gate.
+        # Hash them when present while keeping historical receipts readable.
+        for name in NATIVE_DIAGNOSTICS:
+            path=output/name
+            if path.is_file():
+                hashes[name]=file_sha(path)
+        expected_hashes=receipt.get("output_sha256")
+        if expected_hashes is not None:
+            for name in NATIVE_DIAGNOSTICS:
+                if name in expected_hashes and name not in hashes:
+                    raise ValueError("sealed native diagnostic missing: "+name)
+        if expected_hashes is not None and any(expected_hashes.get(k)!=v for k,v in hashes.items()):
+>           raise ValueError("native output checksum mismatch")
+E           ValueError: native output checksum mismatch
+
+python_frontend/compose_eos/native_generation.py:215: ValueError
+_ test_historical_seal_can_add_previously_unsealed_diagnostics_to_inventory[selected.csv] _
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-409/test_historical_seal_can_add_p4')
+name = 'selected.csv'
+
+    @pytest.mark.parametrize("name", DIAGNOSTIC_NAMES)
+    def test_historical_seal_can_add_previously_unsealed_diagnostics_to_inventory(tmp_path, name):
+        request = core_request()
+        receipt = evidence(tmp_path, request)
+        receipt["output_sha256"] = verify_native_generation(tmp_path, request)["output_sha256"]
+        (tmp_path / "RESULT.json").write_text(json.dumps(receipt))
+        # Earlier inventories covered the native tables without these diagnostics.
+        # Record their current bytes without retroactively claiming an old seal.
+        content = b"node,status\n1,HOLD\n"
+        (tmp_path / name).write_bytes(content)
+>       checked = verify_native_generation(tmp_path, request)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-409/test_historical_seal_can_add_p4')
+request = {'model': 'GM_GM1', 'family': 'core', 'contract': {'family': 'core', 'region': 'core_only', 'composition': 'nucleon and lepton fractions', 'default_interval_fm3': [0.08, 1.0], ...}, 'points': 3, ...}
+
+    def verify_native_generation(output,request):
+        output=Path(output)
+        receipt=json.loads((output/"RESULT.json").read_text())
+        if (receipt.get("backend")!="fortran" or receipt.get("model")!=request["model"] or
+            receipt.get("family")!=request["family"]):
+            raise ValueError("native generator model/family/backend identity mismatch")
+        if receipt.get("status")!="REQUESTED_ROWS_NATIVE_VERIFIED":
+            raise ValueError("native physical generation incomplete: "+str(receipt.get("status")))
+        if receipt.get("native_readback") is not True:
+            raise ValueError("native readback evidence missing")
+        rows=receipt.get("rows")
+        if not isinstance(rows,int) or isinstance(rows,bool) or rows<3:
+            raise ValueError("invalid native row count")
+        grid,hashes,checks=_read_native_table(output)
+        if rows!=len(grid):
+            raise ValueError("native receipt row count differs from actual rows")
+        readbacks={"generated":rows}
+        consistency={"generated":checks}
+        if request["family"]=="core":
+            count=request["points"]
+            if rows<count or rows>count+(2 if request["model"]=="APR_APR" else 0):
+                raise ValueError("requested core rows missing")
+            lo,hi=request["n_min"],request["n_max"]
+            expected=[lo*(hi/lo)**(i/(count-1)) for i in range(count)]
+            expected[0]=lo;expected[-1]=hi
+            # APR inserts two in-window Gibbs endpoints. Consume each requested
+            # value once without assuming where those extra rows occur.
+            cursor=0
+            for wanted in expected:
+                while cursor<len(grid) and grid[cursor]<wanted and not math.isclose(grid[cursor],wanted,rel_tol=5e-13):
+                    cursor+=1
+                if cursor>=len(grid) or not math.isclose(grid[cursor],wanted,rel_tol=5e-13,abs_tol=0.):
+                    raise ValueError("requested core density grid row missing")
+                cursor+=1
+            if (not math.isclose(grid[0],lo,rel_tol=5e-13,abs_tol=0.) or
+                not math.isclose(grid[-1],hi,rel_tol=5e-13,abs_tol=0.)):
+                raise ValueError("core output extends beyond the requested support")
+        elif request["family"]=="spg":
+            if rows!=request["points"]:
+                raise ValueError("requested SPG rows missing")
+            expected=[grid[0]*(grid[-1]/grid[0])**(i/(rows-1)) for i in range(rows)]
+            _same_grid(grid,expected,"SPG")
+            transition=json.loads((output/"transition.json").read_text())
+            if transition.get("policy")!="fixed_density_source":
+                raise ValueError("unexpected SPG transition policy")
+            if not math.isclose(float(transition["n_b"]),grid[-1],rel_tol=5e-9,abs_tol=0.):
+                raise ValueError("SPG endpoint differs from its transition receipt")
+            hashes["transition.json"]=file_sha(output/"transition.json")
+        else:
+            _same_grid(grid,request["densities"],"TF")
+            if receipt.get("meshes")!=request["resolutions"]:
+                raise ValueError("requested TF meshes not executed")
+            if receipt.get("held_nodes")!=0:
+                raise ValueError("unresolved TF density support")
+            finest=None
+            for mesh in request["resolutions"]:
+                segment="mesh_"+str(mesh)
+                mesh_grid,mesh_hashes,mesh_checks=_read_native_table(output/segment)
+                _same_grid(mesh_grid,request["densities"],segment)
+                readbacks[segment]=len(mesh_grid)
+                consistency[segment]=mesh_checks
+                for name,value in mesh_hashes.items():
+                    hashes[segment+"/"+name]=value
+                finest=mesh_hashes
+            if finest is None or any(hashes[name]!=finest[name] for name in NATIVE_FILES):
+                raise ValueError("main TF table differs from the highest requested mesh")
+        if request.get("include_lower_crust"):
+            if receipt.get("lower_crust_segments") is not True:
+                raise ValueError("requested lower crust not generated")
+            segments=json.loads((output/"crust_segments.json").read_text())
+            if segments.get("cross_segment_interpolation")!="UNAPPROVED":
+                raise ValueError("missing explicit cross-segment support contract")
+            hashes["crust_segments.json"]=file_sha(output/"crust_segments.json")
+            for segment in ("outer","lower_source_fit"):
+                segment_grid,segment_hashes,segment_checks=_read_native_table(output/segment)
+                readbacks[segment]=len(segment_grid)
+                consistency[segment]=segment_checks
+                for name,value in segment_hashes.items():
+                    hashes[segment+"/"+name]=value
+        # Optional native diagnostics are evidence, never a physical acceptance gate.
+        # Hash them when present while keeping historical receipts readable.
+        for name in NATIVE_DIAGNOSTICS:
+            path=output/name
+            if path.is_file():
+                hashes[name]=file_sha(path)
+        expected_hashes=receipt.get("output_sha256")
+        if expected_hashes is not None:
+            for name in NATIVE_DIAGNOSTICS:
+                if name in expected_hashes and name not in hashes:
+                    raise ValueError("sealed native diagnostic missing: "+name)
+        if expected_hashes is not None and any(expected_hashes.get(k)!=v for k,v in hashes.items()):
+>           raise ValueError("native output checksum mismatch")
+E           ValueError: native output checksum mismatch
+
+python_frontend/compose_eos/native_generation.py:215: ValueError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_historical_seal_can_add_previously_unsealed_diagnostics_to_inventory[states.csv]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_historical_seal_can_add_previously_unsealed_diagnostics_to_inventory[first_law.csv]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_historical_seal_can_add_previously_unsealed_diagnostics_to_inventory[attempts.csv]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_historical_seal_can_add_previously_unsealed_diagnostics_to_inventory[profiles.csv]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_historical_seal_can_add_previously_unsealed_diagnostics_to_inventory[selected.csv]
+5 failed, 15 deselected in 0.58s

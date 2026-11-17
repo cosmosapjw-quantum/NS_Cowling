@@ -1,0 +1,357 @@
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+____ test_append_preserves_all_old_rows_lower_contract_and_original_inputs _____
+
+args = (EOSData(nb=array([0.001, 0.01 , 0.05 , 0.1  , 0.2  , 0.3  , 0.5  ]), mn=1.0, mp=1.0, Q1=array([0.001, 0.01 , 0.05 , 0... yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)))
+
+    def extension(*args):
+        try:
+>           fn = importlib.import_module("compose_eos.core_extension").extend_whole_crust
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_core_extension.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'compose_eos.core_extension'
+import_ = <function _gcd_import at 0x746be17940e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'compose_eos.core_extension'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+
+During handling of the above exception, another exception occurred:
+
+    def test_append_preserves_all_old_rows_lower_contract_and_original_inputs():
+        whole, contract, core, anchor = inputs()
+        before = deepcopy(contract)
+>       combined, record, report = extension(whole, contract, core, anchor)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_core_extension.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (EOSData(nb=array([0.001, 0.01 , 0.05 , 0.1  , 0.2  , 0.3  , 0.5  ]), mn=1.0, mp=1.0, Q1=array([0.001, 0.01 , 0.05 , 0... yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)))
+
+    def extension(*args):
+        try:
+            fn = importlib.import_module("compose_eos.core_extension").extend_whole_crust
+        except ModuleNotFoundError:
+>           pytest.fail("core-tail extension is not implemented")
+E           Failed: core-tail extension is not implemented
+
+python_frontend/tests/test_core_extension.py:49: Failed
+_____________ test_header_change_preserves_dimensional_core_energy _____________
+
+args = (EOSData(nb=array([0.001, 0.01 , 0.05 , 0.1  , 0.2  , 0.3  , 0.5  ]), mn=1.0, mp=1.0, Q1=array([0.001, 0.01 , 0.05 , 0... yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)))
+
+    def extension(*args):
+        try:
+>           fn = importlib.import_module("compose_eos.core_extension").extend_whole_crust
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_core_extension.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'compose_eos.core_extension'
+import_ = <function _gcd_import at 0x746be17940e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'compose_eos.core_extension'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+
+During handling of the above exception, another exception occurred:
+
+    def test_header_change_preserves_dimensional_core_energy():
+        whole, contract, core, anchor = inputs()
+        core,anchor = table([.25,.6,.8,1.],mass=1.1),table([.5],mass=1.1)
+>       combined, record, report = extension(whole,contract,core,anchor)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_core_extension.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (EOSData(nb=array([0.001, 0.01 , 0.05 , 0.1  , 0.2  , 0.3  , 0.5  ]), mn=1.0, mp=1.0, Q1=array([0.001, 0.01 , 0.05 , 0... yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)))
+
+    def extension(*args):
+        try:
+            fn = importlib.import_module("compose_eos.core_extension").extend_whole_crust
+        except ModuleNotFoundError:
+>           pytest.fail("core-tail extension is not implemented")
+E           Failed: core-tail extension is not implemented
+
+python_frontend/tests/test_core_extension.py:49: Failed
+_______________ test_rejects_an_energy_shift_at_existing_anchor ________________
+
+args = (EOSData(nb=array([0.001, 0.01 , 0.05 , 0.1  , 0.2  , 0.3  , 0.5  ]), mn=1.0, mp=1.0, Q1=array([0.001, 0.01 , 0.05 , 0... yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)))
+
+    def extension(*args):
+        try:
+>           fn = importlib.import_module("compose_eos.core_extension").extend_whole_crust
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_core_extension.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'compose_eos.core_extension'
+import_ = <function _gcd_import at 0x746be17940e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'compose_eos.core_extension'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+
+During handling of the above exception, another exception occurred:
+
+    def test_rejects_an_energy_shift_at_existing_anchor():
+        whole, contract, core, anchor = inputs()
+        anchor = replace(anchor,Q7=anchor.Q7+.01/anchor.mn)
+        with pytest.raises(ValueError,match="anchor"):
+>           extension(whole,contract,core,anchor)
+
+python_frontend/tests/test_core_extension.py:85: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (EOSData(nb=array([0.001, 0.01 , 0.05 , 0.1  , 0.2  , 0.3  , 0.5  ]), mn=1.0, mp=1.0, Q1=array([0.001, 0.01 , 0.05 , 0... yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)))
+
+    def extension(*args):
+        try:
+            fn = importlib.import_module("compose_eos.core_extension").extend_whole_crust
+        except ModuleNotFoundError:
+>           pytest.fail("core-tail extension is not implemented")
+E           Failed: core-tail extension is not implemented
+
+python_frontend/tests/test_core_extension.py:49: Failed
+__________________ test_rejects_a_hidden_native_phase_change ___________________
+
+args = (EOSData(nb=array([0.001, 0.01 , 0.05 , 0.1  , 0.2  , 0.3  , 0.5  ]), mn=1.0, mp=1.0, Q1=array([0.001, 0.01 , 0.05 , 0... yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)))
+
+    def extension(*args):
+        try:
+>           fn = importlib.import_module("compose_eos.core_extension").extend_whole_crust
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_core_extension.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'compose_eos.core_extension'
+import_ = <function _gcd_import at 0x746be17940e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'compose_eos.core_extension'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+
+During handling of the above exception, another exception occurred:
+
+    def test_rejects_a_hidden_native_phase_change():
+        whole, contract, core, anchor = inputs()
+        phase = core.Iphase.copy(); phase[-1]=7
+        with pytest.raises(ValueError,match="phase"):
+>           extension(whole,contract,replace(core,Iphase=phase),anchor)
+
+python_frontend/tests/test_core_extension.py:92: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (EOSData(nb=array([0.001, 0.01 , 0.05 , 0.1  , 0.2  , 0.3  , 0.5  ]), mn=1.0, mp=1.0, Q1=array([0.001, 0.01 , 0.05 , 0... yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)))
+
+    def extension(*args):
+        try:
+            fn = importlib.import_module("compose_eos.core_extension").extend_whole_crust
+        except ModuleNotFoundError:
+>           pytest.fail("core-tail extension is not implemented")
+E           Failed: core-tail extension is not implemented
+
+python_frontend/tests/test_core_extension.py:49: Failed
+____________ test_rejects_a_noncausal_tail_without_modifying_input _____________
+
+args = (EOSData(nb=array([0.001, 0.01 , 0.05 , 0.1  , 0.2  , 0.3  , 0.5  ]), mn=1.0, mp=1.0, Q1=array([0.001, 0.01 , 0.05 , 0... yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)))
+
+    def extension(*args):
+        try:
+>           fn = importlib.import_module("compose_eos.core_extension").extend_whole_crust
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_core_extension.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'compose_eos.core_extension'
+import_ = <function _gcd_import at 0x746be17940e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'compose_eos.core_extension'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+
+During handling of the above exception, another exception occurred:
+
+    def test_rejects_a_noncausal_tail_without_modifying_input():
+        whole, contract, core, anchor = inputs()
+        # Cold first-law EOS with asymptotic cs2=2: epsilon=n+10*n^3, P=20*n^3.
+        n=np.asarray([.6,.8,1.])
+        eps=n+10*n**3; p=20*n**3
+        bad=table(n,mass=1.)
+        bad=replace(bad,Q1=p/n,Q3=(eps+p)/n-1,Q6=eps/n-1,Q7=eps/n-1)
+        saved=deepcopy(contract)
+        with pytest.raises(ValueError,match="causal|stable|endpoints"):
+>           extension(whole,contract,bad,anchor)
+
+python_frontend/tests/test_core_extension.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (EOSData(nb=array([0.001, 0.01 , 0.05 , 0.1  , 0.2  , 0.3  , 0.5  ]), mn=1.0, mp=1.0, Q1=array([0.001, 0.01 , 0.05 , 0... yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)))
+
+    def extension(*args):
+        try:
+            fn = importlib.import_module("compose_eos.core_extension").extend_whole_crust
+        except ModuleNotFoundError:
+>           pytest.fail("core-tail extension is not implemented")
+E           Failed: core-tail extension is not implemented
+
+python_frontend/tests/test_core_extension.py:49: Failed
+_________ test_refuses_metadata_only_support_with_no_high_density_rows _________
+
+args = (EOSData(nb=array([0.001, 0.01 , 0.05 , 0.1  , 0.2  , 0.3  , 0.5  ]), mn=1.0, mp=1.0, Q1=array([0.001, 0.01 , 0.05 , 0... yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)))
+
+    def extension(*args):
+        try:
+>           fn = importlib.import_module("compose_eos.core_extension").extend_whole_crust
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_core_extension.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'compose_eos.core_extension'
+import_ = <function _gcd_import at 0x746be17940e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'compose_eos.core_extension'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+
+During handling of the above exception, another exception occurred:
+
+    def test_refuses_metadata_only_support_with_no_high_density_rows():
+        whole, contract, core, anchor = inputs()
+        with pytest.raises(ValueError,match="extend|support"):
+>           extension(whole,contract,table([.1,.2,.4],mass=1.),anchor)
+
+python_frontend/tests/test_core_extension.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (EOSData(nb=array([0.001, 0.01 , 0.05 , 0.1  , 0.2  , 0.3  , 0.5  ]), mn=1.0, mp=1.0, Q1=array([0.001, 0.01 , 0.05 , 0... yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)))
+
+    def extension(*args):
+        try:
+            fn = importlib.import_module("compose_eos.core_extension").extend_whole_crust
+        except ModuleNotFoundError:
+>           pytest.fail("core-tail extension is not implemented")
+E           Failed: core-tail extension is not implemented
+
+python_frontend/tests/test_core_extension.py:49: Failed
+________ test_consumer_refuses_pressure_beyond_actual_extended_support _________
+
+args = (EOSData(nb=array([0.001, 0.01 , 0.05 , 0.1  , 0.2  , 0.3  , 0.5  ]), mn=1.0, mp=1.0, Q1=array([0.001, 0.01 , 0.05 , 0... yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)))
+
+    def extension(*args):
+        try:
+>           fn = importlib.import_module("compose_eos.core_extension").extend_whole_crust
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_core_extension.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'compose_eos.core_extension'
+import_ = <function _gcd_import at 0x746be17940e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'compose_eos.core_extension'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+
+During handling of the above exception, another exception occurred:
+
+    def test_consumer_refuses_pressure_beyond_actual_extended_support():
+        whole, contract, core, anchor = inputs()
+>       _,record,_ = extension(whole,contract,core,anchor)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_core_extension.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (EOSData(nb=array([0.001, 0.01 , 0.05 , 0.1  , 0.2  , 0.3  , 0.5  ]), mn=1.0, mp=1.0, Q1=array([0.001, 0.01 , 0.05 , 0... yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)))
+
+    def extension(*args):
+        try:
+            fn = importlib.import_module("compose_eos.core_extension").extend_whole_crust
+        except ModuleNotFoundError:
+>           pytest.fail("core-tail extension is not implemented")
+E           Failed: core-tail extension is not implemented
+
+python_frontend/tests/test_core_extension.py:49: Failed
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_core_extension.py::test_append_preserves_all_old_rows_lower_contract_and_original_inputs
+FAILED python_frontend/tests/test_core_extension.py::test_header_change_preserves_dimensional_core_energy
+FAILED python_frontend/tests/test_core_extension.py::test_rejects_an_energy_shift_at_existing_anchor
+FAILED python_frontend/tests/test_core_extension.py::test_rejects_a_hidden_native_phase_change
+FAILED python_frontend/tests/test_core_extension.py::test_rejects_a_noncausal_tail_without_modifying_input
+FAILED python_frontend/tests/test_core_extension.py::test_refuses_metadata_only_support_with_no_high_density_rows
+FAILED python_frontend/tests/test_core_extension.py::test_consumer_refuses_pressure_beyond_actual_extended_support
+7 failed in 0.29s

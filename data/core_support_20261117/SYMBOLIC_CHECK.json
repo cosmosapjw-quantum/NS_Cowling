@@ -1,0 +1,31 @@
+{
+  "status": "SYMBOLICALLY_CHECKED",
+  "tool": "Wolfram Language evaluator",
+  "definitions": "P(t)=a0+a1*t+a2*t^2+a3*t^3; mu=m0+w*t; n=(dP/dt)/w; chi=(dn/dt)/w; epsilon=mu*n-P",
+  "residuals": [
+    "d(epsilon)/dmu-mu*chi",
+    "epsilon+P-mu*n",
+    "(dP/dt)/(d(epsilon)/dt)-n/(mu*chi)"
+  ],
+  "exact_results": [
+    0,
+    0,
+    0
+  ],
+  "causal_margin": "mu*chi-n = 2*a2*m0/w^2-a1/w+6*a3*m0*t/w^2+3*a3*t^2/w",
+  "assumptions": "w>0, mu>0, chi>0 for physical causal interpretation; algebraic identities alone do not establish source fidelity",
+  "raw_tool_result": {
+    "status": "fulfilled",
+    "value": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Out[1]= {0, 0, 0, (2*a2$84036*m0$84036)/w$84036^2 - a1$84036/w$84036 + (6*a3$84036*m0$84036*x$84036)/w$84036^2 + (3*a3$84036*x$84036^2)/w$84036}"
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    }
+  },
+  "context_tool_status": "WolframContext internal error; evaluator completed successfully"
+}

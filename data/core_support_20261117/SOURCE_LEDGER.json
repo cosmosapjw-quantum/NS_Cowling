@@ -1,0 +1,700 @@
+{
+  "schema": "ns-cowling.core-source-ledger.v1",
+  "created_utc": "2026-11-17T08:31:05.062911+00:00",
+  "stage": "B1_B4",
+  "base_commit": "4069b258c906790d315e1f4760008bea9e41b598",
+  "branch": "research/core-support-20261117",
+  "status": "SOURCE_CONVENTIONS_IDENTIFIED_VARIANT_NOT_REQUIRED",
+  "authority": [
+    "docs/matched_eos_reference_20261117/PLAN_KO.md",
+    "data/whole_crust_20261117/NEXT_STEP_B.json",
+    "data/matched_eos_reference_20261117/campaign/RECEIPT.json"
+  ],
+  "scope": "source identity and convention ledger; B2 owns stability/causality/domain audit; B3 owns integration; no TOV/Cowling",
+  "native_SLY4": {
+    "status": "IMPLEMENTATION_VERIFIED_SOURCE_DEFINITION_IDENTITY",
+    "A_core_path": "data/research_matching_20261117/integration/real_pairs_v2/core/RG_SLY4/generated",
+    "A_dispatch_path": "data/research_matching_20261117/integration/real_pairs_v2/core/RG_SLY4/DISPATCH.json",
+    "A_actual_rows": 129,
+    "A_actual_density_fm3": [
+      0.08,
+      0.5
+    ],
+    "extended_receipt_path": "data/maxwell_three_families_20261117/native_core_extended_v2/RG_SLY4/RECEIPT.json",
+    "extended_actual_rows": 385,
+    "extended_actual_density_fm3": [
+      0.02,
+      1.0
+    ],
+    "extended_declared_computational_density_fm3": [
+      0.02,
+      1.4
+    ],
+    "larger_metadata_is_generated_support": false,
+    "species": "npemu",
+    "temperature_MeV": 0,
+    "beta_equilibrium": "mu_n-mu_p=mu_e=mu_mu when muons populated; n_p=n_e+n_mu; freely escaping neutrinos",
+    "source_parameters": {
+      "model_id": "RG_SLY4",
+      "t0": -2488.91,
+      "t1": 486.82,
+      "t2": -546.39,
+      "t3": 13777.0,
+      "x0": 0.834,
+      "x1": -0.344,
+      "x2": -1.0,
+      "x3": 1.354,
+      "alpha": 0.16666666666666666,
+      "source": "https://arxiv.org/abs/astro-ph/0006135 Table 1",
+      "parameter_precision": "Published Douchin-Haensel Table 1 rounded coefficients",
+      "kinetic_coefficient_mev_fm2": 20.73553,
+      "kinetic_convention_source": "https://www.fuw.edu.pl/~dobaczew/hfodd/pb208-a.out.txt",
+      "neutron_rest_mass_mev": 939.5654,
+      "proton_rest_mass_mev": 938.272,
+      "electron_mass_mev": 0.51099895,
+      "muon_mass_mev": 105.6583755,
+      "hbar_c_mev_fm": 197.3269804
+    },
+    "A_and_extended_source_parameter_dicts_equal": true,
+    "source_parameter_canonical_sha256": "1c7643bdd64dd9bec2e4f14788f927bd6aa2974dd01c93fe3bd33f8e7c54d3ba",
+    "header_A": {
+      "mn_reference_MeV": 939.5654,
+      "mp_reference_MeV": 938.272,
+      "leptons_flag": 1
+    },
+    "header_extended": {
+      "mn_reference_MeV": 939.5654,
+      "mp_reference_MeV": 938.272,
+      "leptons_flag": 1
+    },
+    "energy_convention": "epsilon includes nuclear rest energy plus fitted functional and cold free leptons including rest energy; preserve original physical epsilon",
+    "energy_shift_applied": false,
+    "A_anchor_exact_state": {
+      "n_b": 0.5,
+      "epsilon": 507.97111194693724,
+      "pressure": 68.33246940869708,
+      "mu_n": 1152.6071627112688,
+      "mu_p": 974.6157139464894,
+      "mu_e": 177.9914487647793,
+      "Yn": 0.9245912016469434,
+      "Yp": 0.07540879835305658,
+      "Ye": 0.04957259227977334,
+      "Ymu": 0.02583620607328312,
+      "chi": 0.0,
+      "gibbs_residual": 0.0,
+      "charge_residual": 6.071532165918825e-17,
+      "euler_residual": 0.0
+    },
+    "A_representation_anchor_exact_equal": true,
+    "new_anchor_sample_needed": false,
+    "byte_identity": {
+      "table_bytes_identical": false,
+      "reason": "129 vs385 density grids and support; source code lower-domain change"
+    },
+    "kernel_source_identity": {
+      "A_sha256": "a5fd20940c286e1390ad95a5542cc1792ad1a9bb5a7b6a3ebea12b99a881d3c6",
+      "extended_sha256": "396f24f0566a9eb03bbe7362cb959dd019a240c92945d533ac10cdbab818f2aa",
+      "byte_equal": false,
+      "core_equations_solver_unchanged": true,
+      "verified_difference": "only lo=.08 to .02 for GM1/KDE0v1/SLy4 and explanatory comments",
+      "diff": "--- historical_A_core_native\n+++ extended_core_native\n@@ -37,9 +37,14 @@\n   select case(trim(model))\n   case('APR_APR');lo=.085_wp;hi=1.34_wp;mn=939.5654133_wp;mp=938.2720813_wp\n   case('BBB_BHF2');lo=.08_wp;hi=1.5_wp\n-  case('GM_GM1');lo=.08_wp;hi=1._wp\n-  case('RG_KDE0v1');lo=.08_wp;hi=1.8_wp;mn=939.5654_wp;mp=938.2720_wp\n-  case('RG_SLY4');lo=.08_wp;hi=1.4_wp;mn=939.5654_wp;mp=938.2720_wp\n+  ! These three analytic functionals also define a homogeneous\n+  ! beta-equilibrated branch below the customary .08 default sampling limit.\n+  ! Computational support is not a claim that uniform matter is the global\n+  ! ground state: mechanical stability, causality and crust coexistence are\n+  ! checked independently. No table extrapolation or pressure clipping occurs.\n+  case('GM_GM1');lo=.02_wp;hi=1._wp\n+  case('RG_KDE0v1');lo=.02_wp;hi=1.8_wp;mn=939.5654_wp;mp=938.2720_wp\n+  case('RG_SLY4');lo=.02_wp;hi=1.4_wp;mn=939.5654_wp;mp=938.2720_wp\n   case default;status='unknown native core model: '//trim(model)\n   end select\n  end subroutine\n",
+      "evidence_status": "IMPLEMENTATION_VERIFIED"
+    },
+    "historical_dependency_differences": [
+      {
+        "path": "fortran_eos/app/compose_eos_fortran.f90",
+        "A_sha256": "61367d4cae6133ea7f84194a655e71a8969a2fd7b358c570ec691175fbcf9377",
+        "extended_sha256": "9301779e691454b62557e5ef6079696c541bc15a4ab64cd6f1e0e785d280cb8c"
+      },
+      {
+        "path": "fortran_eos/app/compose_eos_generate.f90",
+        "A_sha256": "7eed527c7e362469b448581152e873c4b1e99ef21eb4551edf3336f361218416",
+        "extended_sha256": "79684023a9d6ac5f5934880677b2e0da246b574a12e8f89d27fa4c740e143330"
+      },
+      {
+        "path": "fortran_eos/app/reconstruct_public_thermo.f90",
+        "A_sha256": null,
+        "extended_sha256": "e69453e318c3f2dc06eaf3f02e9d3fa5ce9ccc0727d7ae5fc9e530ae290baf42"
+      },
+      {
+        "path": "fortran_eos/src/compose_eos_core_native.f90",
+        "A_sha256": "a5fd20940c286e1390ad95a5542cc1792ad1a9bb5a7b6a3ebea12b99a881d3c6",
+        "extended_sha256": "396f24f0566a9eb03bbe7362cb959dd019a240c92945d533ac10cdbab818f2aa"
+      },
+      {
+        "path": "fortran_eos/src/compose_eos_io.f90",
+        "A_sha256": "caf5b3c4ae5eec690bed32f0090a50912c23d432ef29da96cd2ed0dae75f2283",
+        "extended_sha256": "9c220da3480abfd86cf8461f3e9f6dabedb1a1f2e337fea7f054c18290c6cecf"
+      },
+      {
+        "path": "fortran_eos/src/compose_eos_matching.f90",
+        "A_sha256": "72ff79e1709f51fa479996fd051a3735ca539fea64e213c28fd3fabc884391f2",
+        "extended_sha256": "ad69fe2f2c42a55bba57c9123663e82c540a6578b059cbf959bd16be619a0b06"
+      },
+      {
+        "path": "fortran_eos/src/compose_eos_phase_transition.f90",
+        "A_sha256": "aa15b92d4c4dfe27af7a95e6f5b293b65a7427068a38f13843f14b3b9119daad",
+        "extended_sha256": "24e5520d1981983cebe6b7e1159234bb6b72f3789599377a3db83c4f0448205d"
+      },
+      {
+        "path": "python_frontend/compose_eos/native_generation.py",
+        "A_sha256": "cd8634e6a63a379e5f65cde3f5ba7a284bb800e01853c8305c5221238b46ce04",
+        "extended_sha256": "a6fa47384197a6c7ecc83fc6de77680ad4abadb4de938f4b27bcc0de0b086f9d"
+      }
+    ],
+    "executable_identity": "Historical A binary NOT_INDEPENDENTLY_OBSERVED; no historical/current binary equality claim",
+    "default_variant": "published_rounded_SLY4_common_fitted_K",
+    "kinetic_coefficient_MeV_fm2": 20.73553,
+    "particle_dependent_variant": {
+      "implemented_in_B": false,
+      "required_for_requested_extension": false,
+      "decision": "KEEP_COMMON_K_DEFAULT",
+      "reason": "support extension uses same functional and original anchor; public trajectory fitting is not the objective"
+    }
+  },
+  "public_references": {
+    "RG_SLY4": {
+      "provider_url": "https://compose.obspm.fr/eos/134",
+      "archive_url": "https://compose.obspm.fr/download//1D/NS/Skyrme/SLY4/eos.zip",
+      "downloads": [
+        {
+          "requested_url": "https://compose.obspm.fr/eos/134",
+          "resolved_url": "https://compose.obspm.fr/eos/134",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "retrieved_at_utc": "2026-11-17T04:27:49.656692+00:00",
+          "bytes": 88879,
+          "sha256": "e38f36debdfde815e2f8ae070d6bb3cffb4d46328605a70ec33bc083e6cb40ef"
+        },
+        {
+          "requested_url": "https://compose.obspm.fr/download//1D/NS/Skyrme/SLY4/eos.zip",
+          "resolved_url": "https://compose.obspm.fr/download//1D/NS/Skyrme/SLY4/eos.zip",
+          "status": 200,
+          "content_type": "application/zip",
+          "retrieved_at_utc": "2026-11-17T04:27:51.618507+00:00",
+          "bytes": 128340,
+          "sha256": "2993201b8b674b4d8ffe0021c35f2f34b266fe727954e4c8cc60aba542769419"
+        }
+      ],
+      "provenance_sha256": "ca0964089b87f8d57d5432887e62b516e172ed851981ceefc196861fb0b18718",
+      "files": {
+        "eos.compo": {
+          "sha256": "e6560ef6f76929b754d3235891c6590fbc5243d8ff0c7ac3c46883b01034709f",
+          "matches_intake": true
+        },
+        "eos.thermo": {
+          "sha256": "2bd6548281a66938e87b24db83555deb89cdbcbf61f2bf9dbf909e63cc376f5d",
+          "matches_intake": true
+        },
+        "eos.pdf": {
+          "sha256": "5d25411a33d0498bd2186723603557a9e106fa09b1e9a95205cc9a351bbdaf6a",
+          "matches_intake": true
+        },
+        "eos.mr": {
+          "sha256": "a1579a26e509759760ba67a9448cf44741084995d715805d948c706d77828dd2",
+          "matches_intake": true
+        },
+        "eos.nb": {
+          "sha256": "2aaa0129e05fa57a5c5e5f52adf5fdb66e5f1ab5c46c3bc25284f27109ad175f",
+          "matches_intake": true
+        },
+        "eos.t": {
+          "sha256": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "matches_intake": true
+        },
+        "eos.yq": {
+          "sha256": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "matches_intake": true
+        },
+        "eos.init": {
+          "sha256": "9b0cc5a5cadd124fe9ce9b776e7fe36f69eb1e469d470e1e81ddd4bf6ff10e53",
+          "matches_intake": true
+        },
+        "README.txt": {
+          "sha256": "ee64a25a0e1e88b188581b8c6ee20bae51b63aa5f640a458a6bc34f2aab90947",
+          "matches_intake": true
+        }
+      },
+      "header": {
+        "mn_reference_MeV": 939.5654,
+        "mp_reference_MeV": 938.272,
+        "leptons_flag": 1
+      },
+      "provider_generator_input": "NOT_LOCATED_IN_BOUNDED_PASS"
+    },
+    "GM_GM1": {
+      "provider_url": "https://compose.obspm.fr/eos/54",
+      "archive_url": "https://compose.obspm.fr/download//1D/NS/RMF/GM1/nohyp/eos.zip",
+      "downloads": [
+        {
+          "requested_url": "https://compose.obspm.fr/eos/54",
+          "resolved_url": "https://compose.obspm.fr/eos/54",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "retrieved_at_utc": "2026-11-17T04:27:49.485726+00:00",
+          "bytes": 84905,
+          "sha256": "dcae8e16c46740077528bfab351a28d640c0607652f55134a683c5adddcc110e"
+        },
+        {
+          "requested_url": "https://compose.obspm.fr/download//1D/NS/RMF/GM1/nohyp/eos.zip",
+          "resolved_url": "https://compose.obspm.fr/download//1D/NS/RMF/GM1/nohyp/eos.zip",
+          "status": 200,
+          "content_type": "application/zip",
+          "retrieved_at_utc": "2026-11-17T04:27:51.306398+00:00",
+          "bytes": 65936,
+          "sha256": "5d274a728f66c7b8bb69d4dde532c80bfcfe9c65ee66fb22b5259689fa718459"
+        }
+      ],
+      "provenance_sha256": "fc0640a719e33fa2bce35dfc2971294b4f812bb0cc6f3c4a75477fb7e1eab626",
+      "files": {
+        "eos.compo": {
+          "sha256": "368679992bae0780d41822c630483a8eb21ae7bd8a84836408d51e976fbcb664",
+          "matches_intake": true
+        },
+        "eos.init": {
+          "sha256": "9e18bbc604270258b9bd591805b98c28edb8088d42ebbfbc6d5f34f827ea969f",
+          "matches_intake": true
+        },
+        "eos.nb": {
+          "sha256": "2d4b75a2020673a6a3ca0cc2671efb333283152b13c675cb7c7d01f2834590eb",
+          "matches_intake": true
+        },
+        "eos.pdf": {
+          "sha256": "668627635673ca11a730e42c0a1405d5db142e806e729c876679f254c151cdf6",
+          "matches_intake": true
+        },
+        "eos.t": {
+          "sha256": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "matches_intake": true
+        },
+        "eos.thermo": {
+          "sha256": "665c9d9d75be58c5e4306c29bc7bb3e98bdecb8c5e436f61f048395d61b1caf1",
+          "matches_intake": true
+        },
+        "eos.yq": {
+          "sha256": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "matches_intake": true
+        },
+        "README.txt": {
+          "sha256": "acf7a0519e4a85135f5ead8fee4ce8889d3a60a23a2e716f01763f27bf9a36f7",
+          "matches_intake": true
+        }
+      },
+      "header": {
+        "mn_reference_MeV": 939.56533,
+        "mp_reference_MeV": 938.272,
+        "leptons_flag": 1
+      },
+      "provider_generator_input": "NOT_LOCATED_IN_BOUNDED_PASS"
+    }
+  },
+  "prior_comparison": {
+    "RG_SLY4": {
+      "selected_generated_phases": [
+        6
+      ],
+      "selected_reference_phases": [
+        3
+      ],
+      "requested_density_fm3": [
+        0.08,
+        0.5
+      ],
+      "overlaps": [
+        {
+          "generated_phase": 6,
+          "reference_phase": 3,
+          "support_fm3": [
+            0.08,
+            0.5
+          ],
+          "reference_nodes": 20
+        }
+      ],
+      "interpolation": "generated PCHIP in n_B at exact reference nodes; linear control; no extrapolation",
+      "energy_convention": "epsilon includes rest energy, recovered using each file's mn header",
+      "status": "UNRESOLVED_SOURCE_DIFFERENCE",
+      "pressure_metric": {
+        "compared_rows": 20,
+        "density_fm3": [
+          0.08317638,
+          0.4786301
+        ],
+        "max_abs_difference": 0.010436862881654463,
+        "max_abs_difference_at_n_fm3": 0.4786301,
+        "signed_difference_range": [
+          0.0007240479392120469,
+          0.010436862881654463
+        ],
+        "rms_abs_difference": 0.004808643423001027,
+        "relative_denominator_floor": 6.005204344165e-11,
+        "relative_defined_rows": 20,
+        "interpolation_control_max_abs": 0.006660241496376784,
+        "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+        "max_abs_relative_difference": 0.0018278652352288144,
+        "max_abs_relative_difference_at_n_fm3": 0.08317638,
+        "median_signed_relative_difference": 0.0006933729205157806,
+        "interpolation_control_max_relative": 0.00016014825674544886
+      }
+    },
+    "GM_GM1": {
+      "selected_generated_phases": [
+        6
+      ],
+      "selected_reference_phases": [
+        3
+      ],
+      "requested_density_fm3": [
+        0.08,
+        0.5
+      ],
+      "overlaps": [
+        {
+          "generated_phase": 6,
+          "reference_phase": 3,
+          "support_fm3": [
+            0.08,
+            0.5
+          ],
+          "reference_nodes": 132
+        }
+      ],
+      "interpolation": "generated PCHIP in n_B at exact reference nodes; linear control; no extrapolation",
+      "energy_convention": "epsilon includes rest energy, recovered using each file's mn header",
+      "status": "UNRESOLVED_SOURCE_DIFFERENCE",
+      "pressure_metric": {
+        "compared_rows": 132,
+        "density_fm3": [
+          0.08290666666666666,
+          0.4986133333333333
+        ],
+        "max_abs_difference": 0.24140135572993415,
+        "max_abs_difference_at_n_fm3": 0.4986133333333333,
+        "signed_difference_range": [
+          -0.24140135572993415,
+          -0.0028847009431280934
+        ],
+        "rms_abs_difference": 0.10246564952892903,
+        "relative_denominator_floor": 1.2821215934460282e-10,
+        "relative_defined_rows": 132,
+        "interpolation_control_max_abs": 0.012580373893683827,
+        "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+        "max_abs_relative_difference": 0.004863865296355743,
+        "max_abs_relative_difference_at_n_fm3": 0.08290666666666666,
+        "median_signed_relative_difference": -0.0018477467885854451,
+        "interpolation_control_max_relative": 0.00018538284449113457
+      }
+    }
+  },
+  "SLY4_kinetic_control": {
+    "evidence_status": "NUMERICALLY_CHECKED_IN_PRIOR_DIAGNOSIS_REUSED",
+    "new_calculation_this_stage": false,
+    "coefficients_MeV_fm2": {
+      "common": 20.73553,
+      "split_neutron": 20.72124899117293,
+      "split_proton": 20.74981305729148
+    },
+    "controlled_change": "Only nuclear kinetic K is split by species; the published interaction, rest masses and lepton prescription are unchanged.",
+    "exact_public_nodes_campaign": {
+      "rows": 20,
+      "density_range_fm3": [
+        0.08317638,
+        0.4786301
+      ],
+      "common_K": {
+        "Yp_difference": {
+          "max_abs": 8.940441194263404e-05,
+          "rms": 6.365811938681596e-05,
+          "min_signed": 3.123690857517042e-05,
+          "max_signed": 8.940441194263404e-05
+        },
+        "pressure_difference_mev_fm3": {
+          "max_abs": 0.010429388534809902,
+          "rms": 0.004807879381739415,
+          "min_signed": 0.000724001335996427,
+          "max_signed": 0.010429388534809902,
+          "relative_nonzero_reference": {
+            "max_abs": 0.0018277475850111034,
+            "rms": 0.0010073156903487273,
+            "min_signed": 0.00017367250033620743,
+            "max_signed": 0.0018277475850111034
+          }
+        },
+        "energy_per_baryon_difference_mev": {
+          "max_abs": 0.04301500749375009,
+          "rms": 0.02885573487372262,
+          "min_signed": 0.01532277743206123,
+          "max_signed": 0.04301500749375009
+        },
+        "source_composition_beta_residual_mev": {
+          "max_abs": 0.10053488814818934,
+          "rms": 0.06328293318614302,
+          "min_signed": 0.03201551567086369,
+          "max_signed": 0.10053488814818934
+        }
+      },
+      "split_K": {
+        "Yp_difference": {
+          "max_abs": 5.755931473561127e-06,
+          "rms": 4.652196431354069e-06,
+          "min_signed": 2.1904049472207254e-06,
+          "max_signed": 5.755931473561127e-06
+        },
+        "pressure_difference_mev_fm3": {
+          "max_abs": 0.0029063850214186004,
+          "rms": 0.0011505077377643364,
+          "min_signed": -0.0029063850214186004,
+          "max_signed": 0.0004517825474135151,
+          "relative_nonzero_reference": {
+            "max_abs": 0.00011266918517206675,
+            "rms": 6.171659407917565e-05,
+            "min_signed": -9.908633780527364e-05,
+            "max_signed": 0.00011266918517206675
+          }
+        },
+        "energy_per_baryon_difference_mev": {
+          "max_abs": 0.002886292969265014,
+          "rms": 0.0015315323582941879,
+          "min_signed": -0.0005809700699046516,
+          "max_signed": 0.002886292969265014
+        },
+        "source_composition_beta_residual_mev": {
+          "max_abs": 0.006276931317046319,
+          "rms": 0.004537687791950364,
+          "min_signed": 0.003014658618170074,
+          "max_signed": 0.006276931317046319
+        }
+      }
+    },
+    "analytic_fixed_composition_identity": {
+      "identity": "delta P = n^2*d(delta epsilon/n)/dn = (2/3)*delta epsilon at fixed composition",
+      "density_composition_points": 4,
+      "max_relative_residual": 3.408543854797655e-11,
+      "status": "NUMERICALLY_CHECKED"
+    },
+    "provider_uses_particle_dependent_K": "UNRESOLVED_NOT_DEMONSTRATED",
+    "remaining_issue": "A kinetic prescription can be tested and its composition effect measured; this does not identify the provider prescription or explain every pressure/energy residual.",
+    "scope_warning": "fixed-composition deltaP=(2/3)deltaepsilon is not the full difference between separately solved beta-equilibrium trajectories"
+  },
+  "GM1": {
+    "model_definition": "independent rounded-parameter reconstruction",
+    "species": "npe",
+    "kernel_nucleon_mass_MeV": 939.0,
+    "C_sigma_fm2": 11.79,
+    "C_omega_fm2": 7.149,
+    "C_rho_fm2": 4.411,
+    "b": 0.002947,
+    "c": -0.00107,
+    "isovector_vertex": "g_rho/2",
+    "reference_header_masses_prove_kernel_masses": false,
+    "status": "UNRESOLVED_SOURCE_DIFFERENCE",
+    "pressure_residual": {
+      "exact_public_nodes": {
+        "max_abs": 0.24137847082539565,
+        "rms": 0.10246443835672996,
+        "min_signed": -0.24137847082539565,
+        "max_signed": -0.0028846962125675946,
+        "relative_nonzero_reference": {
+          "max_abs": 0.004863857320205183,
+          "rms": 0.0021437212122047216,
+          "min_signed": -0.004863857320205183,
+          "max_signed": -0.0017281756066071568
+        }
+      },
+      "density_range_fm3": [
+        0.08290666666666666,
+        0.4986133333333333
+      ],
+      "count": 132,
+      "max_relative_percent": 0.48638573202051827,
+      "evidence_status": "NUMERICALLY_CHECKED_IN_PRIOR_DIAGNOSIS_REUSED"
+    },
+    "public_provider_exact_inputs_located": false,
+    "bounded_pass_conclusion": "Provider page/submission identify npe GM1 and original citation. No exact generator input/code located in this finite pass; not proof of absence elsewhere.",
+    "no_new_fit": true,
+    "prior_rounding_control_adopted": false,
+    "remaining_uncertainty": "exact provider calibration, hidden digits, kernel masses/constants and implementation choices"
+  },
+  "source_verification": {
+    "date": "2026-11-17",
+    "finite_pass_calls": 5,
+    "exa_sources_reviewed_requested": 5,
+    "calls": [
+      {
+        "tool": "Exa web_search_exa",
+        "purpose": "GM1 primary provider input",
+        "primary_url": "https://compose.obspm.fr/eos/54",
+        "finding": "cold npe; DH lower below1e-3 fm^-3; no exact generator input located"
+      },
+      {
+        "tool": "SciSpace search",
+        "purpose": "original Douchin-Haensel SLy4 identification",
+        "query": "Which original Douchin and Haensel paper tabulates the SLy4 Skyrme coefficients and specifies its unified cold neutron-star equation of state and nucleon kinetic mass convention? limit:3",
+        "use": "bibliographic discovery only; no exact provider convention inference"
+      },
+      {
+        "tool": "Parallel web_search",
+        "query": "Glendenning Moszkowski 1991 GM1 Table II",
+        "primary_urls": [
+          "https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.67.2414",
+          "https://escholarship.org/uc/item/6sw424k1"
+        ],
+        "finding": "original paper identity; no modern CompOSE exact input located"
+      },
+      {
+        "tool": "Exa web_fetch_exa",
+        "url": "https://arxiv.org/abs/astro-ph/0006135",
+        "finding": "Douchin-Haensel2000 Inner edge paper; parameter values remain repository source contract, not newly inferred provider convention"
+      },
+      {
+        "tool": "Parallel web_fetch",
+        "url": "https://escholarship.org/uc/item/6sw424k1",
+        "extract_id": "extract_d6d9bb67e8648305ed0ec3b17fa1094d",
+        "finding": "1991 original record/PDF link; no provider generator input"
+      }
+    ],
+    "provider_original_distinction": "CompOSE RG(SLY4)134 is Gulminelli-Raduta unified EOS using SLy4; not identical to Douchin-Haensel crust construction supplying rounded parameter table",
+    "raw_reference_mutations": false
+  },
+  "skill_context_used": [
+    {
+      "skill": "PhysMath Research Loop1.3.0",
+      "access": "parent-provided bounded excerpt",
+      "used": "selected B; finite evidence; preserve source/gauge; no TOV/Cowling"
+    },
+    {
+      "skill": "Exa Search",
+      "read": "e19/skills/Search; references/searching.md; patterns-papers.md",
+      "used": "targeted primary-source verification"
+    },
+    {
+      "skill": "Parallel web-search",
+      "read": "e28/skills/parallel-web-search",
+      "used": "primary GM1 identity"
+    }
+  ],
+  "input_file_hashes": {
+    "data/research_matching_20261117/integration/real_pairs_v2/core/RG_SLY4/generated/eos.nb": {
+      "sha256": "68b8087eafd788eebde549d83c939fa2561538394f41e0cbd2e42a7a63c95b51",
+      "authority_sha256": "68b8087eafd788eebde549d83c939fa2561538394f41e0cbd2e42a7a63c95b51",
+      "matches_authority": true
+    },
+    "data/research_matching_20261117/integration/real_pairs_v2/core/RG_SLY4/generated/eos.t": {
+      "sha256": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+      "authority_sha256": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+      "matches_authority": true
+    },
+    "data/research_matching_20261117/integration/real_pairs_v2/core/RG_SLY4/generated/eos.yq": {
+      "sha256": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+      "authority_sha256": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+      "matches_authority": true
+    },
+    "data/research_matching_20261117/integration/real_pairs_v2/core/RG_SLY4/generated/eos.thermo": {
+      "sha256": "aa80448debbbc1822cf1d28d06ccbf252c78d69dce4daa1f2ed51c3ba5d2ce1d",
+      "authority_sha256": "aa80448debbbc1822cf1d28d06ccbf252c78d69dce4daa1f2ed51c3ba5d2ce1d",
+      "matches_authority": true
+    },
+    "data/research_matching_20261117/integration/real_pairs_v2/core/RG_SLY4/generated/eos.compo": {
+      "sha256": "a5d9774f3c7fdbe556233c8e9893283b435dc0d646c7593bab1c3308a513f07b",
+      "authority_sha256": "a5d9774f3c7fdbe556233c8e9893283b435dc0d646c7593bab1c3308a513f07b",
+      "matches_authority": true
+    },
+    "data/research_matching_20261117/integration/real_pairs_v2/core/RG_SLY4/generated/sound_speed.csv": {
+      "sha256": "736a8fadc362f8d5e1d119e2e04e13ef8c91299a01348bb3207709ab34bd5b08",
+      "authority_sha256": "736a8fadc362f8d5e1d119e2e04e13ef8c91299a01348bb3207709ab34bd5b08",
+      "matches_authority": true
+    },
+    "data/research_matching_20261117/integration/real_pairs_v2/core/RG_SLY4/generated/SUPPORT.json": {
+      "sha256": "01dfff782864a3e26950c08fc5ae1ecef17a891039eba07ec3657a5adf684421",
+      "authority_sha256": "01dfff782864a3e26950c08fc5ae1ecef17a891039eba07ec3657a5adf684421",
+      "matches_authority": true
+    },
+    "data/research_matching_20261117/integration/real_pairs_v2/core/RG_SLY4/DISPATCH.json": {
+      "sha256": "843902ee8acb2a385be772c735924da74369afe160ebde8f40d11e6436a8a676",
+      "authority_sha256": "843902ee8acb2a385be772c735924da74369afe160ebde8f40d11e6436a8a676",
+      "matches_authority": true
+    },
+    "data/research_matching_20261117/integration/real_pairs_v2/core/RG_SLY4/generated/RESULT.json": {
+      "sha256": "32149d706af63ca7c4b5d67f5817e40dcfeae9923eea363b2735b8483723438e",
+      "authority_sha256": "32149d706af63ca7c4b5d67f5817e40dcfeae9923eea363b2735b8483723438e",
+      "matches_authority": true
+    },
+    "data/maxwell_three_families_20261117/native_core_extended_v2/RG_SLY4/generated/eos.nb": {
+      "sha256": "7b0529eb031e8a2be1a390903ef40bf6c849d0c004089bb3de5cb99e3e3ec3ec",
+      "authority_sha256": "7b0529eb031e8a2be1a390903ef40bf6c849d0c004089bb3de5cb99e3e3ec3ec",
+      "matches_authority": true
+    },
+    "data/maxwell_three_families_20261117/native_core_extended_v2/RG_SLY4/generated/eos.t": {
+      "sha256": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+      "authority_sha256": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+      "matches_authority": true
+    },
+    "data/maxwell_three_families_20261117/native_core_extended_v2/RG_SLY4/generated/eos.yq": {
+      "sha256": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+      "authority_sha256": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+      "matches_authority": true
+    },
+    "data/maxwell_three_families_20261117/native_core_extended_v2/RG_SLY4/generated/eos.thermo": {
+      "sha256": "b2f7e8d13fd1328b006cf2539b1aed467e79ba00176d2a0250221a9646ce5041",
+      "authority_sha256": "b2f7e8d13fd1328b006cf2539b1aed467e79ba00176d2a0250221a9646ce5041",
+      "matches_authority": true
+    },
+    "data/maxwell_three_families_20261117/native_core_extended_v2/RG_SLY4/generated/eos.compo": {
+      "sha256": "ca492068ecec88f077f489bb8fcd293670f4ab0953b5fed062dae32bbe656bfb",
+      "authority_sha256": "ca492068ecec88f077f489bb8fcd293670f4ab0953b5fed062dae32bbe656bfb",
+      "matches_authority": true
+    },
+    "data/maxwell_three_families_20261117/native_core_extended_v2/RG_SLY4/generated/sound_speed.csv": {
+      "sha256": "98ad4f2a5178deb9933df61488e2ac063d01d5ace0753ac1862a2e9458854f50",
+      "authority_sha256": "98ad4f2a5178deb9933df61488e2ac063d01d5ace0753ac1862a2e9458854f50",
+      "matches_authority": true
+    },
+    "data/maxwell_three_families_20261117/native_core_extended_v2/RG_SLY4/generated/SUPPORT.json": {
+      "sha256": "23a285be93621e8daf3a838365f095d137e63751ce73d2d850f1f88f182c24f2",
+      "authority_sha256": "23a285be93621e8daf3a838365f095d137e63751ce73d2d850f1f88f182c24f2",
+      "matches_authority": true
+    },
+    "data/maxwell_three_families_20261117/native_core_extended_v2/RG_SLY4/generated/states.csv": {
+      "sha256": "acbb43303f4948fee715d7d1d21c1213bdddcda14ca40c19faf529f779e38087",
+      "authority_sha256": "acbb43303f4948fee715d7d1d21c1213bdddcda14ca40c19faf529f779e38087",
+      "matches_authority": true
+    },
+    "data/maxwell_three_families_20261117/native_core_extended_v2/RG_SLY4/generated/first_law.csv": {
+      "sha256": "20bd132e1d2909188bdc5a6415c63316d533be70d28dea187ae42b6c0a08e14b",
+      "authority_sha256": "20bd132e1d2909188bdc5a6415c63316d533be70d28dea187ae42b6c0a08e14b",
+      "matches_authority": true
+    },
+    "data/whole_crust_20261117/production_v2/models/BSk22pp__SPG_M1__RG_SLY4__quintic_P__baseline/REPRESENTATION.json": {
+      "sha256": "1838dcc76e52adb3dfd262573d27021e62e8903a6177e2fbad330b54b5256151"
+    },
+    "data/matched_eos_reference_20261117/campaign/RECEIPT.json": {
+      "sha256": "3aaa4621336d20b96df42efcee0e31d204a5e3b1e5f4945795aef307ce8dca09"
+    },
+    "data/research_matching_20261117/integration/real_pairs_v2/core/RG_SLY4/generated/states.csv": {
+      "sha256": "ae003faeb94a72b7b1bd88906b9ce07fefbea67a37df4c8bbd5967c058853e98"
+    },
+    "data/maxwell_three_families_20261117/native_core_extended_v2/RG_SLY4/RECEIPT.json": {
+      "sha256": "b3cfc9e54324880f9a298559344b720adb60a00e6e5a8eb30693a34721a66d6d"
+    },
+    "data/maxwell_three_families_20261117/native_core_extended_v2/RG_SLY4/request.nml": {
+      "sha256": "f09d3deaee477d26c0b4ff40acdbfe3dc26b02b183fe88bc0f0c61fbd6b2fca9"
+    },
+    "data/whole_crust_20261117/NEXT_STEP_B.json": {
+      "sha256": "87a91e7b464003a5787ebb6d7f33c094cd7a532bc3cd6864f94baf6a3be3fa72"
+    },
+    "data/matched_eos_reference_20261117/comparison/COMPARISON.json": {
+      "sha256": "348b400ccab13819008ddf63b2f3892dad217e32e8e7d1a08861567559b8b5f9"
+    },
+    "data/matched_eos_reference_20261117/diagnosis/DIAGNOSIS.json": {
+      "sha256": "10912c9fbb98177969d7dfb535aaf1cc48a3ce7c1f75728d1f6ad457838099d4"
+    }
+  },
+  "not_claimed": [
+    "provider source fidelity",
+    "global ground state of subsaturation branch",
+    "B2 domain certification",
+    "historical binary identity",
+    "new particle-dependent native variant",
+    "TOV/Cowling"
+  ]
+}

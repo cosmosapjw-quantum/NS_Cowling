@@ -1,0 +1,42 @@
+.........F...................                                            [100%]
+=================================== FAILURES ===================================
+____ test_hermite_luminal_boundary_is_not_rejected_by_coefficient_roundoff _____
+
+whole_crust_executable = PosixPath('/home/cosmosapjw/ns_cowling_wt/whole_crust_20261117/build/whole_crust/whole_crust_kernel')
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-509/test_hermite_luminal_boundary_0')
+
+    def test_hermite_luminal_boundary_is_not_rejected_by_coefficient_roundoff(
+            whole_crust_executable, tmp_path):
+        # P=.005*mu^2, epsilon=P, n=.01*mu implies cs^2/c^2=1 exactly.
+        # Decimal endpoints deliberately exercise cancellation in polynomial bounds.
+>       rows, _ = run_piece(whole_crust_executable, tmp_path, "hermite-bridge",
+                            "0.1 0.5 0.5 0.12 0.72 0.72 17\n")
+
+python_frontend/tests/test_whole_crust_native.py:154: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+executable = PosixPath('/home/cosmosapjw/ns_cowling_wt/whole_crust_20261117/build/whole_crust/whole_crust_kernel')
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-509/test_hermite_luminal_boundary_0')
+mode = 'hermite-bridge', text = '0.1 0.5 0.5 0.12 0.72 0.72 17\n'
+stem = 'piece', expect_success = True
+
+    def run_piece(executable, tmp_path, mode, text, *, stem="piece", expect_success=True):
+        input_path = tmp_path / (stem + ".in")
+        output_path = tmp_path / (stem + ".csv")
+        input_path.write_text(text)
+        before = input_path.read_bytes()
+        result = subprocess.run([str(executable), mode, str(input_path), str(output_path)],
+                                text=True, capture_output=True, timeout=15)
+        assert input_path.read_bytes() == before, "native construction modified its source"
+        if expect_success:
+>           assert result.returncode == 0, result.stdout + result.stderr
+E           AssertionError: bridge exact interval bounds fail
+E             STOP 1
+E             
+E           assert 1 == 0
+E            +  where 1 = CompletedProcess(args=['/home/cosmosapjw/ns_cowling_wt/whole_crust_20261117/build/whole_crust/whole_crust_kernel', 'he..._hermite_luminal_boundary_0/piece.csv'], returncode=1, stdout='', stderr='bridge exact interval bounds fail\nSTOP 1\n').returncode
+
+python_frontend/tests/test_whole_crust_native.py:52: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_whole_crust_native.py::test_hermite_luminal_boundary_is_not_rejected_by_coefficient_roundoff
+1 failed, 28 passed in 1.29s

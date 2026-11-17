@@ -1,0 +1,22 @@
+{
+  "schema_version": "ns-cowling.remote-ci-failure.v1",
+  "head_sha": "a97c0457b89ea7ef1ef472d9f07635e08d9a6563",
+  "runs": [
+    {
+      "id": 44014058466,
+      "workflow": "Fortran EOS frontend CI",
+      "conclusion": "failure",
+      "classification": "PACKAGING_REPRODUCIBILITY",
+      "failure": "SHA256SUMS_v4.txt retained the pre-change scripts/match_core_crust.py digest"
+    },
+    {
+      "id": 44014058906,
+      "workflow": "Native Fortran sharp-Maxwell TOV/Cowling validation",
+      "conclusion": "failure",
+      "classification": "CI_ENVIRONMENT_DEPENDENCY",
+      "failure": "matplotlib was absent from the micromamba environment used by an exercised reconstruction test"
+    }
+  ],
+  "scientific_integrity_failure": false,
+  "repair": "Update the tracked digests and install matplotlib in the existing CI environment; no physics or tolerance change"
+}

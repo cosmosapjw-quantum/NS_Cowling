@@ -1,0 +1,3873 @@
+{
+  "schema": "ns_cowling.H_causal_background_inventory.v1",
+  "status": "PASS_SCOPED",
+  "scope": "Finite 1.4 solar-mass TOV inventory of opt-in lower closures, with sharp source doublets retained",
+  "plan": "data/low_density_crust_20261117/stellar/causal_extension/TOV_PLAN.json",
+  "plan_sha256": "42eef4c3d4cb774ae2c88cb9410ab5deb834af79b94e6394bdd6cacd8d0ab7c4",
+  "target_mass_msun": 1.4,
+  "settings": {
+    "r0_km": 0.001,
+    "rtol": 1e-10,
+    "atol": 1e-12,
+    "max_step_h": 0.002
+  },
+  "source_hashes_before": {
+    "python_frontend/compose_eos/whole_crust.py": "7bb94e914019045a636f2008d5ed4ce2b6e346c8f79e19f0100416c5e924b513",
+    "python_frontend/compose_eos/stellar_sharp.py": "d5d11e595a298541abe660a514d9275dc7152bf46cdd44a5078331c8f8111c82",
+    "python_frontend/compose_eos/stellar_background.py": "525f4c247b1f92b5eb31a37f44efe6630c0f979f7bd5d3575b671ea6f190dd01",
+    "python_frontend/compose_eos/stellar_cowling.py": "ecd9613d016515be2733b9a8d2761b550dff0ae31cba78de432e35ddff18af47",
+    "scripts/prepare_causal_low_density_stellar_20261117.py": "b4057f99765777d7e04088c535b54a6ee9bad58763a5760945648bd8c497a447",
+    "scripts/run_causal_low_density_backgrounds_20261117.py": "bb0e400d357a503e3369dd5fb344e8be241d2dcfbdd5e3b495773067c5fa8d99",
+    "data/low_density_crust_20261117/stellar/h_final/INPUTS.json": "2b079ae4119c2bb797033d84a4df483cb412ef827f268f19d643fb3ce3bd2263",
+    "data/stellar_extension_20261117/eos/fine/REPRESENTATION.json": "f1bd5c3c41b45a07a7299e665594173473ac790af6f519bf53085db843bd936d",
+    "data/low_density_crust_20261117/low_extension/MANIFEST.json": "e98b442907450ec21b10adc77cf79ba686947ae453beee0d1703ad559df13329",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDME2/N128/block_01/match_00_00/compose/eos.compo": "14fe3bf7835f62e32e1777364cd7f929b2491c4baebfc4ab5912a03cf6c69fde",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDME2/N128/block_01/match_00_00/compose/eos.nb": "0eb064dd8de3a3ffa73947a06acd8de9cb33d4fce3f7c3333e933edc681cb2b2",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDME2/N128/block_01/match_00_00/compose/eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDME2/N128/block_01/match_00_00/compose/eos.thermo": "153fcdb76c64558751afece35555051bb595ac2b7b4923788c4a6e27312e8660",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDME2/N128/block_01/match_00_00/compose/eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDME2/N128/block_01/match_00_00/RESULT.json": "d74adde84985e7e42b2c863c257911e1862a4e3966e562a37de0f909f878d307",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDMEX_ORIGINAL_TABLE_RHO0/N128/block_01/match_00_00/compose/eos.compo": "461b3ea1f3323230dce8f65f416f6f51c0db08016f83fd8e95415d4c84ae2e1e",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDMEX_ORIGINAL_TABLE_RHO0/N128/block_01/match_00_00/compose/eos.nb": "313cc99e9d0b73f50694ebdfa9bfdf78eaf0ca521f709721d41b4ca5eae506ee",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDMEX_ORIGINAL_TABLE_RHO0/N128/block_01/match_00_00/compose/eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDMEX_ORIGINAL_TABLE_RHO0/N128/block_01/match_00_00/compose/eos.thermo": "167e6180e5f69de85b35e306d0548e8d6143ee14fea6c11ee3e2998b4b7d9ecb",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDMEX_ORIGINAL_TABLE_RHO0/N128/block_01/match_00_00/compose/eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDMEX_ORIGINAL_TABLE_RHO0/N128/block_01/match_00_00/RESULT.json": "30ce22357bbf9d88935eb787a64a4229296922b0a5daba0c3666e380c20ef27e",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/NL3_PROVIDER_PRECISION/N128/block_01/match_00_00/compose/eos.compo": "ff48bd94db5baa1657fdd220f9feebd9b53391fed4444db23254ecda34c8833a",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/NL3_PROVIDER_PRECISION/N128/block_01/match_00_00/compose/eos.nb": "61d3929364cb431237cc9ed408a55f91642fcae21459e8ead66dde85239508c8",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/NL3_PROVIDER_PRECISION/N128/block_01/match_00_00/compose/eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/NL3_PROVIDER_PRECISION/N128/block_01/match_00_00/compose/eos.thermo": "a4e66e95ad5c29e829462719f135d9623129c122268dbf611f2c0b084fca39c9",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/NL3_PROVIDER_PRECISION/N128/block_01/match_00_00/compose/eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/NL3_PROVIDER_PRECISION/N128/block_01/match_00_00/RESULT.json": "57a671d4d1e37cf0788fda0388bdffd4ffd9c18053dc7ffe6a31f0befd1095f3",
+    "data/low_density_crust_20261117/support_refinement/matching/GPPVA_NL3wrL55/continued_G_lower_adjacent_branch/N128/run0_component_000__component_000/compose/eos.compo": "40ade0c55bcea1b3aeff74e4a28067967f8e3444cfe27452cc1dac2a193d078b",
+    "data/low_density_crust_20261117/support_refinement/matching/GPPVA_NL3wrL55/continued_G_lower_adjacent_branch/N128/run0_component_000__component_000/compose/eos.nb": "6d2b041259eeaf346461c3c2c3e647e0e44eb88cd71bb230f913efe53ec89f8e",
+    "data/low_density_crust_20261117/support_refinement/matching/GPPVA_NL3wrL55/continued_G_lower_adjacent_branch/N128/run0_component_000__component_000/compose/eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "data/low_density_crust_20261117/support_refinement/matching/GPPVA_NL3wrL55/continued_G_lower_adjacent_branch/N128/run0_component_000__component_000/compose/eos.thermo": "b96bbf5918163e01c1a23444cc0e94aa4844161d90f0138aed43291c54029ce9",
+    "data/low_density_crust_20261117/support_refinement/matching/GPPVA_NL3wrL55/continued_G_lower_adjacent_branch/N128/run0_component_000__component_000/compose/eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "data/low_density_crust_20261117/support_refinement/matching/GPPVA_NL3wrL55/continued_G_lower_adjacent_branch/N128/run0_component_000__component_000/RESULT.json": "1fe95cea523427690b1202bd1f116f44e0f54d4dc1b192725554d5729d5e937d",
+    "data/low_density_crust_20261117/stellar/causal_extension/TOV_PLAN.json": "42eef4c3d4cb774ae2c88cb9410ab5deb834af79b94e6394bdd6cacd8d0ab7c4",
+    "data/low_density_crust_20261117/stellar/causal_extension/FULL_CONTRACT_ADMISSION.json": "38551d8be9066908e14a3862f9ec584f11b100a730d72381e8f27dcee6d63974",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDME2_N128/primary/REPRESENTATION.json": "11d2c458fae2e837e0634f378fe34c463d88ff05c0e6a83ea8eb99f3391a6003",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDME2_N128/next_admissible_join_control/REPRESENTATION.json": "d4e854e8c332c96277dffb4fc0213b9c8c19fc7dabf0996bff313b6b1cd19ec5",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDMEX_ORIGINAL_TABLE_RHO0_N128/primary/REPRESENTATION.json": "4a1eead8e898d1dc764ebf2cda6605848a17174407a51866846ce2bb35562ae3",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDMEX_ORIGINAL_TABLE_RHO0_N128/next_admissible_join_control/REPRESENTATION.json": "fe6fd7262d99a7ee830135ba5c13e2eed630180063440065051019c8debb148e",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_NL3_PROVIDER_PRECISION_N128/primary/REPRESENTATION.json": "e0676543eddbf145664e29c31894fc51463e050b255aebfb20e2deec9522ff3e",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_NL3_PROVIDER_PRECISION_N128/next_admissible_join_control/REPRESENTATION.json": "0b44daf797ae15ad7f9e85fd1e46d11933fb6aec657a45ad8f5f050503bd2bf7",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_GPPVA_NL3wrL55_N128/primary/REPRESENTATION.json": "8eae0a84a2fd76c592183787959a24b2f9dafbb089bac4e57734ddf5fa776312",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_GPPVA_NL3wrL55_N128/next_admissible_join_control/REPRESENTATION.json": "5a4873e899dc8427415ab379fcb54a9602796c68630f2a292d88c1db931a5221"
+  },
+  "cases": [
+    {
+      "id": "H_DDME2_N128__primary",
+      "source_id": "H_DDME2_N128",
+      "crust": "DDME2",
+      "core": "PK1_CANONICAL",
+      "label": "primary",
+      "source_row_start": 0,
+      "retained_crust_rows": 5,
+      "upper_start_density": 0.006,
+      "bridge_density_width": 0.005730979,
+      "kappa": 2.4902682205225344,
+      "min_cs2_over_c2": 0.0007468317140360418,
+      "max_cs2_over_c2": 0.0013699720673966981,
+      "contract": "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDME2_N128/primary/REPRESENTATION.json",
+      "contract_sha256": "11d2c458fae2e837e0634f378fe34c463d88ff05c0e6a83ea8eb99f3391a6003",
+      "known_failed_native_knots_in_closure": [
+        0.005
+      ],
+      "status": "PASS_SCOPED",
+      "sequence": [
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.08,
+          "h_c": 0.028645016002527588,
+          "h_start": 0.02864501578599325,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 0.7777092594814394,
+          "radius_km": 25.656781258995764,
+          "mass_msun": 0.13131667536135655,
+          "mass_geom_km": 0.193905490752079,
+          "compactness": 0.007557670184528388,
+          "nfev": 5761,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014259570982404941,
+              "r_km": 9.012148252353606,
+              "m_geom_km": 0.1830106565307834,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.014009525845495105,
+              "n_low_fm3": 0.00977355894875663,
+              "n_high_fm3": 0.017093104048714065,
+              "epsilon_low_MeV_fm3": 9.20349126294342,
+              "epsilon_high_MeV_fm3": 16.10659719254103
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.16,
+          "h_c": 0.06734649328815985,
+          "h_start": 0.06734649281697268,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 5.4091401561512615,
+          "radius_km": 14.821608569205909,
+          "mass_msun": 0.5211653660703829,
+          "mass_geom_km": 0.7695658285040864,
+          "compactness": 0.05192188316880623,
+          "nfev": 4201,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014259570982404941,
+              "r_km": 11.925573886433943,
+              "m_geom_km": 0.7637608672599161,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.014009525845495105,
+              "n_low_fm3": 0.00977355894875663,
+              "n_high_fm3": 0.017093104048714065,
+              "epsilon_low_MeV_fm3": 9.20349126294342,
+              "epsilon_high_MeV_fm3": 16.10659719254103
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.32,
+          "h_c": 0.19613078704909515,
+          "h_start": 0.19613078582676152,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 39.433750980163985,
+          "radius_km": 14.389590030987904,
+          "mass_msun": 1.4924037453375887,
+          "mass_geom_km": 2.203720737245266,
+          "compactness": 0.15314687440709326,
+          "nfev": 4228,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014259570982404941,
+              "r_km": 13.52802445896583,
+              "m_geom_km": 2.2012718546863286,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.014009525845495105,
+              "n_low_fm3": 0.00977355894875663,
+              "n_high_fm3": 0.017093104048714065,
+              "epsilon_low_MeV_fm3": 9.20349126294342,
+              "epsilon_high_MeV_fm3": 16.10659719254103
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.5,
+          "h_c": 0.3714367954339891,
+          "h_start": 0.37143679285269726,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 128.50243961122632,
+          "radius_km": 13.763832581373709,
+          "mass_msun": 2.1286799176823505,
+          "mass_geom_km": 3.1432620644442375,
+          "compactness": 0.2283711347010966,
+          "nfev": 4813,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014259570982404941,
+              "r_km": 13.318412840586625,
+              "m_geom_km": 3.1420129139471187,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.014009525845495105,
+              "n_low_fm3": 0.00977355894875663,
+              "n_high_fm3": 0.017093104048714065,
+              "epsilon_low_MeV_fm3": 9.20349126294342,
+              "epsilon_high_MeV_fm3": 16.10659719254103
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.8,
+          "h_c": 0.5886925091970023,
+          "h_start": 0.5886925035998869,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 339.322473854051,
+          "radius_km": 12.661323146395455,
+          "mass_msun": 2.312866195660578,
+          "mass_geom_km": 3.4152361341721487,
+          "compactness": 0.2697376960277987,
+          "nfev": 6373,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014259570982404941,
+              "r_km": 12.364545055213105,
+              "m_geom_km": 3.414514749138695,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.014009525845495105,
+              "n_low_fm3": 0.00977355894875663,
+              "n_high_fm3": 0.017093104048714065,
+              "epsilon_low_MeV_fm3": 9.20349126294342,
+              "epsilon_high_MeV_fm3": 16.10659719254103
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 1.0,
+          "h_c": 0.6914076348049641,
+          "h_start": 0.6914076268745933,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 501.9799625187186,
+          "radius_km": 12.131522887623621,
+          "mass_msun": 2.2860375318324464,
+          "mass_geom_km": 3.3756202574260996,
+          "compactness": 0.2782519794666382,
+          "nfev": 6934,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014259570982404941,
+              "r_km": 11.865644347596223,
+              "m_geom_km": 3.3750245070751363,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.014009525845495105,
+              "n_low_fm3": 0.00977355894875663,
+              "n_high_fm3": 0.017093104048714065,
+              "epsilon_low_MeV_fm3": 9.20349126294342,
+              "epsilon_high_MeV_fm3": 16.10659719254103
+            }
+          ]
+        }
+      ],
+      "solver_calls": [
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.08,
+          "mass_msun": 0.13131667536135655,
+          "radius_km": 25.656781258995764,
+          "nfev": 5761
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.16,
+          "mass_msun": 0.5211653660703829,
+          "radius_km": 14.821608569205909,
+          "nfev": 4201
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.32,
+          "mass_msun": 1.4924037453375887,
+          "radius_km": 14.389590030987904,
+          "nfev": 4228
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.5,
+          "mass_msun": 2.1286799176823505,
+          "radius_km": 13.763832581373709,
+          "nfev": 4813
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.8,
+          "mass_msun": 2.312866195660578,
+          "radius_km": 12.661323146395455,
+          "nfev": 6373
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 1.0,
+          "mass_msun": 2.2860375318324464,
+          "radius_km": 12.131522887623621,
+          "nfev": 6934
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.16,
+          "mass_msun": 0.5211653660703829,
+          "radius_km": 14.821608569205909,
+          "nfev": 4201
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.32,
+          "mass_msun": 1.4924037453375887,
+          "radius_km": 14.389590030987904,
+          "nfev": 4228
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.30477757925385,
+          "mass_msun": 1.4054303460195685,
+          "radius_km": 14.41879798595238,
+          "nfev": 3829
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.30383297582332125,
+          "mass_msun": 1.399890427654801,
+          "radius_km": 14.42044909338649,
+          "nfev": 4294
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3038516588446856,
+          "mass_msun": 1.4000001507365125,
+          "radius_km": 14.420416619514938,
+          "nfev": 4102
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.30385163317813085,
+          "mass_msun": 1.40000000136784,
+          "radius_km": 14.420416663960237,
+          "nfev": 4432
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3038516329430929,
+          "mass_msun": 1.4000000026026787,
+          "radius_km": 14.42041666311251,
+          "nfev": 4255
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3038423043832071,
+          "mass_msun": 1.3999452172282363,
+          "radius_km": 14.4204328738017,
+          "nfev": 4219
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.30385163249992275,
+          "mass_msun": 1.3999999923054227,
+          "radius_km": 14.420416667351919,
+          "nfev": 4300
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.30385163283107963,
+          "mass_msun": 1.3999999926446063,
+          "radius_km": 14.42041666828277,
+          "nfev": 4135
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3038516328930928,
+          "mass_msun": 1.4000000010468792,
+          "radius_km": 14.420416664194791,
+          "nfev": 4333
+        },
+        {
+          "purpose": "final target-mass background",
+          "central_density_fm3": 0.3038516328930928,
+          "mass_msun": 1.4000000010468792,
+          "radius_km": 14.420416664194791,
+          "nfev": 4333
+        }
+      ],
+      "selection": "first sampled ascending target-mass bracket; no stability inference",
+      "all_sampled_ascending_target_brackets": [
+        [
+          0.16,
+          0.32
+        ]
+      ],
+      "selected_mass_bracket": [
+        0.16,
+        0.32
+      ],
+      "background": {
+        "central_density_fm3": 0.3038516328930928,
+        "h_c": 0.1803407805404375,
+        "h_start": 0.18034077941434054,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 33.90502662245244,
+        "radius_km": 14.420416664194791,
+        "mass_msun": 1.4000000010468792,
+        "mass_geom_km": 2.067275054816023,
+        "compactness": 0.143357511988469,
+        "nfev": 4333,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.002
+        },
+        "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+        "interfaces": [
+          {
+            "h": 0.014259570982404941,
+            "r_km": 13.477554522573396,
+            "m_geom_km": 2.0646247023805344,
+            "r_jump_km": 0.0,
+            "m_jump_km": 0.0,
+            "p_MeV_fm3": 0.014009525845495105,
+            "n_low_fm3": 0.00977355894875663,
+            "n_high_fm3": 0.017093104048714065,
+            "epsilon_low_MeV_fm3": 9.20349126294342,
+            "epsilon_high_MeV_fm3": 16.10659719254103
+          }
+        ]
+      },
+      "lower_bridge_radial_width_km": 0.22374343786057693,
+      "outer_and_surface_radial_width_km": 0.6637632306145882,
+      "sharp_crust_radial_width_km": 0.9428621416213954,
+      "lower_bridge_boundaries": {
+        "outer_radius_km": 13.756653433580203,
+        "upper_radius_km": 13.532909995719626,
+        "outer_mass_geom_km": 2.0671710997086032,
+        "upper_mass_geom_km": 2.065856240959596
+      },
+      "interface_continuity": [
+        {
+          "h": 0.014259570982404941,
+          "r_jump_km": 0.0,
+          "m_jump_geom_km": 0.0,
+          "two_sided_dense_output": true,
+          "source_density_jump_fm3": 0.007319545099957435
+        }
+      ],
+      "mass_root_converged": true,
+      "mass_target_residual_msun": 1.0468792499551682e-09,
+      "wall_seconds": 3.5907653190079145
+    },
+    {
+      "id": "H_DDME2_N128__next_admissible_join_control",
+      "source_id": "H_DDME2_N128",
+      "crust": "DDME2",
+      "core": "PK1_CANONICAL",
+      "label": "next_admissible_join_control",
+      "source_row_start": 1,
+      "retained_crust_rows": 4,
+      "upper_start_density": 0.007,
+      "bridge_density_width": 0.006730979,
+      "kappa": 2.4918654790434274,
+      "min_cs2_over_c2": 0.0006845895887459407,
+      "max_cs2_over_c2": 0.0014617510705496508,
+      "contract": "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDME2_N128/next_admissible_join_control/REPRESENTATION.json",
+      "contract_sha256": "d4e854e8c332c96277dffb4fc0213b9c8c19fc7dabf0996bff313b6b1cd19ec5",
+      "known_failed_native_knots_in_closure": [
+        0.005
+      ],
+      "status": "PASS_SCOPED",
+      "sequence": [
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.08,
+          "h_c": 0.028645016002527588,
+          "h_start": 0.02864501578599325,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 0.7777092594814394,
+          "radius_km": 25.65374992572091,
+          "mass_msun": 0.13133301079698873,
+          "mass_geom_km": 0.19392961206534093,
+          "compactness": 0.007559503488840968,
+          "nfev": 5521,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014259570982404941,
+              "r_km": 9.012148252353606,
+              "m_geom_km": 0.1830106565307834,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.014009525845495105,
+              "n_low_fm3": 0.00977355894875663,
+              "n_high_fm3": 0.017093104048714065,
+              "epsilon_low_MeV_fm3": 9.20349126294342,
+              "epsilon_high_MeV_fm3": 16.10659719254103
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.16,
+          "h_c": 0.06734649328815985,
+          "h_start": 0.06734649281697268,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 5.4091401561512615,
+          "radius_km": 14.821614563948236,
+          "mass_msun": 0.521167720435705,
+          "mass_geom_km": 0.7695693050188698,
+          "compactness": 0.05192209672559918,
+          "nfev": 4327,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014259570982404941,
+              "r_km": 11.925573886433943,
+              "m_geom_km": 0.7637608672599161,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.014009525845495105,
+              "n_low_fm3": 0.00977355894875663,
+              "n_high_fm3": 0.017093104048714065,
+              "epsilon_low_MeV_fm3": 9.20349126294342,
+              "epsilon_high_MeV_fm3": 16.10659719254103
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.32,
+          "h_c": 0.19613078704909515,
+          "h_start": 0.19613078582676152,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 39.433750980163985,
+          "radius_km": 14.389590725489882,
+          "mass_msun": 1.49240403763183,
+          "mass_geom_km": 2.203721168854261,
+          "compactness": 0.15314689701011194,
+          "nfev": 4081,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014259570982404941,
+              "r_km": 13.52802445896583,
+              "m_geom_km": 2.2012718546863286,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.014009525845495105,
+              "n_low_fm3": 0.00977355894875663,
+              "n_high_fm3": 0.017093104048714065,
+              "epsilon_low_MeV_fm3": 9.20349126294342,
+              "epsilon_high_MeV_fm3": 16.10659719254103
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.5,
+          "h_c": 0.3714367954339891,
+          "h_start": 0.37143679285269726,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 128.50243961122632,
+          "radius_km": 13.763832747262036,
+          "mass_msun": 2.1286799925050817,
+          "mass_geom_km": 3.143262174929356,
+          "compactness": 0.22837113997586375,
+          "nfev": 4630,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014259570982404941,
+              "r_km": 13.318412840586625,
+              "m_geom_km": 3.1420129139471187,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.014009525845495105,
+              "n_low_fm3": 0.00977355894875663,
+              "n_high_fm3": 0.017093104048714065,
+              "epsilon_low_MeV_fm3": 9.20349126294342,
+              "epsilon_high_MeV_fm3": 16.10659719254103
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.8,
+          "h_c": 0.5886925091970023,
+          "h_start": 0.5886925035998869,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 339.322473854051,
+          "radius_km": 12.661323210182688,
+          "mass_msun": 2.312866245138013,
+          "mass_geom_km": 3.415236207231768,
+          "compactness": 0.26973770043916995,
+          "nfev": 6010,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014259570982404941,
+              "r_km": 12.364545055213105,
+              "m_geom_km": 3.414514749138695,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.014009525845495105,
+              "n_low_fm3": 0.00977355894875663,
+              "n_high_fm3": 0.017093104048714065,
+              "epsilon_low_MeV_fm3": 9.20349126294342,
+              "epsilon_high_MeV_fm3": 16.10659719254103
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 1.0,
+          "h_c": 0.6914076348049641,
+          "h_start": 0.6914076268745933,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 501.9799625187186,
+          "radius_km": 12.131522936945581,
+          "mass_msun": 2.2860375720011414,
+          "mass_geom_km": 3.3756203167402004,
+          "compactness": 0.27825198322463035,
+          "nfev": 6787,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014259570982404941,
+              "r_km": 11.865644347596223,
+              "m_geom_km": 3.3750245070751363,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.014009525845495105,
+              "n_low_fm3": 0.00977355894875663,
+              "n_high_fm3": 0.017093104048714065,
+              "epsilon_low_MeV_fm3": 9.20349126294342,
+              "epsilon_high_MeV_fm3": 16.10659719254103
+            }
+          ]
+        }
+      ],
+      "solver_calls": [
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.08,
+          "mass_msun": 0.13133301079698873,
+          "radius_km": 25.65374992572091,
+          "nfev": 5521
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.16,
+          "mass_msun": 0.521167720435705,
+          "radius_km": 14.821614563948236,
+          "nfev": 4327
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.32,
+          "mass_msun": 1.49240403763183,
+          "radius_km": 14.389590725489882,
+          "nfev": 4081
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.5,
+          "mass_msun": 2.1286799925050817,
+          "radius_km": 13.763832747262036,
+          "nfev": 4630
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.8,
+          "mass_msun": 2.312866245138013,
+          "radius_km": 12.661323210182688,
+          "nfev": 6010
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 1.0,
+          "mass_msun": 2.2860375720011414,
+          "radius_km": 12.131522936945581,
+          "nfev": 6787
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.16,
+          "mass_msun": 0.521167720435705,
+          "radius_km": 14.821614563948236,
+          "nfev": 4327
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.32,
+          "mass_msun": 1.49240403763183,
+          "radius_km": 14.389590725489882,
+          "nfev": 4081
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3047774987824026,
+          "mass_msun": 1.4054302481187606,
+          "radius_km": 14.41879894653796,
+          "nfev": 4132
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3038329115369154,
+          "mass_msun": 1.3998903239458638,
+          "radius_km": 14.42045010498535,
+          "nfev": 3454
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3038516119015123,
+          "mass_msun": 1.4000002373411575,
+          "radius_km": 14.420417539792442,
+          "nfev": 4447
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.30385157152093656,
+          "mass_msun": 1.3999999881594405,
+          "radius_km": 14.42041761475715,
+          "nfev": 4303
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.30385157343973146,
+          "mass_msun": 1.4000000024895032,
+          "radius_km": 14.420417610397076,
+          "nfev": 4177
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.30385157310638705,
+          "mass_msun": 1.40000001337777,
+          "radius_km": 14.420417604567238,
+          "nfev": 4504
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3038515722653404,
+          "mass_msun": 1.399999998622748,
+          "radius_km": 14.42041761192742,
+          "nfev": 4309
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.303851572354178,
+          "mass_msun": 1.40000000283244,
+          "radius_km": 14.420417609416083,
+          "nfev": 4225
+        },
+        {
+          "purpose": "final target-mass background",
+          "central_density_fm3": 0.3038515722653404,
+          "mass_msun": 1.399999998622748,
+          "radius_km": 14.42041761192742,
+          "nfev": 4309
+        }
+      ],
+      "selection": "first sampled ascending target-mass bracket; no stability inference",
+      "all_sampled_ascending_target_brackets": [
+        [
+          0.16,
+          0.32
+        ]
+      ],
+      "selected_mass_bracket": [
+        0.16,
+        0.32
+      ],
+      "background": {
+        "central_density_fm3": 0.3038515722653404,
+        "h_c": 0.18034072192684264,
+        "h_start": 0.180340720800746,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 33.905006791276065,
+        "radius_km": 14.42041761192742,
+        "mass_msun": 1.399999998622748,
+        "mass_geom_km": 2.06727505123649,
+        "compactness": 0.14335750231856012,
+        "nfev": 4309,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.002
+        },
+        "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+        "interfaces": [
+          {
+            "h": 0.014259570982404941,
+            "r_km": 13.477554297807423,
+            "m_geom_km": 2.0646241758335147,
+            "r_jump_km": 0.0,
+            "m_jump_km": 0.0,
+            "p_MeV_fm3": 0.014009525845495105,
+            "n_low_fm3": 0.00977355894875663,
+            "n_high_fm3": 0.017093104048714065,
+            "epsilon_low_MeV_fm3": 9.20349126294342,
+            "epsilon_high_MeV_fm3": 16.10659719254103
+          }
+        ]
+      },
+      "lower_bridge_radial_width_km": 0.24016656131992775,
+      "outer_and_surface_radial_width_km": 0.6637633336092872,
+      "sharp_crust_radial_width_km": 0.9428633141199967,
+      "lower_bridge_boundaries": {
+        "outer_radius_km": 13.756654278318132,
+        "upper_radius_km": 13.516487716998205,
+        "outer_mass_geom_km": 2.0671711068568284,
+        "upper_mass_geom_km": 2.065550463841446
+      },
+      "interface_continuity": [
+        {
+          "h": 0.014259570982404941,
+          "r_jump_km": 0.0,
+          "m_jump_geom_km": 0.0,
+          "two_sided_dense_output": true,
+          "source_density_jump_fm3": 0.007319545099957435
+        }
+      ],
+      "mass_root_converged": true,
+      "mass_target_residual_msun": -1.3772518681065549e-09,
+      "wall_seconds": 3.41567380799097
+    },
+    {
+      "id": "H_DDMEX_ORIGINAL_TABLE_RHO0_N128__primary",
+      "source_id": "H_DDMEX_ORIGINAL_TABLE_RHO0_N128",
+      "crust": "DDMEX_ORIGINAL_TABLE_RHO0",
+      "core": "GM1",
+      "label": "primary",
+      "source_row_start": 0,
+      "retained_crust_rows": 18,
+      "upper_start_density": 0.003,
+      "bridge_density_width": 0.002730979,
+      "kappa": 1.2752551528538176,
+      "min_cs2_over_c2": 0.00039099612242393065,
+      "max_cs2_over_c2": 0.001212312454381486,
+      "contract": "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDMEX_ORIGINAL_TABLE_RHO0_N128/primary/REPRESENTATION.json",
+      "contract_sha256": "4a1eead8e898d1dc764ebf2cda6605848a17174407a51866846ce2bb35562ae3",
+      "known_failed_native_knots_in_closure": [
+        0.002
+      ],
+      "status": "PASS_SCOPED",
+      "sequence": [
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.08,
+          "h_c": 0.02260598703164154,
+          "h_start": 0.02260598681779212,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 0.5239484445093192,
+          "radius_km": 67.91624787361204,
+          "mass_msun": 0.07236299190683941,
+          "mass_geom_km": 0.10685300567785763,
+          "compactness": 0.001573305490561029,
+          "nfev": 7165,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.013402135705678038,
+              "r_km": 7.135283961597369,
+              "m_geom_km": 0.09847026538313215,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.011541924902351135,
+              "n_low_fm3": 0.008596606764460788,
+              "n_high_fm3": 0.020104352588030134,
+              "epsilon_low_MeV_fm3": 8.089019667498889,
+              "epsilon_high_MeV_fm3": 18.932740496849707
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.16,
+          "h_c": 0.05770866156993762,
+          "h_start": 0.05770866110660819,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 4.755243407203186,
+          "radius_km": 13.597251452082988,
+          "mass_msun": 0.4201922031856763,
+          "mass_geom_km": 0.6204663280174151,
+          "compactness": 0.04563174625430382,
+          "nfev": 4489,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.013402135705678038,
+              "r_km": 10.761296424097084,
+              "m_geom_km": 0.6164645631928258,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.011541924902351135,
+              "n_low_fm3": 0.008596606764460788,
+              "n_high_fm3": 0.020104352588030134,
+              "epsilon_low_MeV_fm3": 8.089019667498889,
+              "epsilon_high_MeV_fm3": 18.932740496849707
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.32,
+          "h_c": 0.18098582203265703,
+          "h_start": 0.1809858208401438,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 36.776622272944515,
+          "radius_km": 13.875335295363165,
+          "mass_msun": 1.4041561636476947,
+          "mass_geom_km": 2.0734121485745947,
+          "compactness": 0.1494314987305196,
+          "nfev": 4075,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.013402135705678038,
+              "r_km": 13.06461791176742,
+              "m_geom_km": 2.0715267670616697,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.011541924902351135,
+              "n_low_fm3": 0.008596606764460788,
+              "n_high_fm3": 0.020104352588030134,
+              "epsilon_low_MeV_fm3": 8.089019667498889,
+              "epsilon_high_MeV_fm3": 18.932740496849707
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.5,
+          "h_c": 0.36298149491626486,
+          "h_start": 0.36298149234830235,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 128.93606854959012,
+          "radius_km": 13.446196338259606,
+          "mass_msun": 2.0990374952524142,
+          "mass_geom_km": 3.0994913212957353,
+          "compactness": 0.23051063983622558,
+          "nfev": 4885,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.013402135705678038,
+              "r_km": 13.04288649887992,
+              "m_geom_km": 3.09853876208263,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.011541924902351135,
+              "n_low_fm3": 0.008596606764460788,
+              "n_high_fm3": 0.020104352588030134,
+              "epsilon_low_MeV_fm3": 8.089019667498889,
+              "epsilon_high_MeV_fm3": 18.932740496849707
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.8,
+          "h_c": 0.655524191341671,
+          "h_start": 0.6555241850099516,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 425.4872981394593,
+          "radius_km": 12.23039034295747,
+          "mass_msun": 2.381488602315292,
+          "mass_geom_km": 3.5165656980097566,
+          "compactness": 0.2875268572302496,
+          "nfev": 6706,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.013402135705678038,
+              "r_km": 11.995932203057421,
+              "m_geom_km": 3.5160940120025175,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.011541924902351135,
+              "n_low_fm3": 0.008596606764460788,
+              "n_high_fm3": 0.020104352588030134,
+              "epsilon_low_MeV_fm3": 8.089019667498889,
+              "epsilon_high_MeV_fm3": 18.932740496849707
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 1.0,
+          "h_c": 0.8189079814226402,
+          "h_start": 0.8189079716299221,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 711.6118926405346,
+          "radius_km": 11.57976788472466,
+          "mass_msun": 2.3632386829029417,
+          "mass_geom_km": 3.4896174100630835,
+          "compactness": 0.3013546942220128,
+          "nfev": 7831,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.013402135705678038,
+              "r_km": 11.38134226657322,
+              "m_geom_km": 3.489257602143752,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.011541924902351135,
+              "n_low_fm3": 0.008596606764460788,
+              "n_high_fm3": 0.020104352588030134,
+              "epsilon_low_MeV_fm3": 8.089019667498889,
+              "epsilon_high_MeV_fm3": 18.932740496849707
+            }
+          ]
+        }
+      ],
+      "solver_calls": [
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.08,
+          "mass_msun": 0.07236299190683941,
+          "radius_km": 67.91624787361204,
+          "nfev": 7165
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.16,
+          "mass_msun": 0.4201922031856763,
+          "radius_km": 13.597251452082988,
+          "nfev": 4489
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.32,
+          "mass_msun": 1.4041561636476947,
+          "radius_km": 13.875335295363165,
+          "nfev": 4075
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.5,
+          "mass_msun": 2.0990374952524142,
+          "radius_km": 13.446196338259606,
+          "nfev": 4885
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.8,
+          "mass_msun": 2.381488602315292,
+          "radius_km": 12.23039034295747,
+          "nfev": 6706
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 1.0,
+          "mass_msun": 2.3632386829029417,
+          "radius_km": 11.57976788472466,
+          "nfev": 7831
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.16,
+          "mass_msun": 0.4201922031856763,
+          "radius_km": 13.597251452082988,
+          "nfev": 4489
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.32,
+          "mass_msun": 1.4041561636476947,
+          "radius_km": 13.875335295363165,
+          "nfev": 4075
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.31932417628048193,
+          "mass_msun": 1.4004426209128098,
+          "radius_km": 13.87519228024029,
+          "nfev": 4198
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.31924366054051156,
+          "mass_msun": 1.3999996897955678,
+          "radius_km": 13.875174000366439,
+          "nfev": 4027
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.31924371692927817,
+          "mass_msun": 1.400000023223887,
+          "radius_km": 13.875173995901873,
+          "nfev": 4123
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.31924371300169835,
+          "mass_msun": 1.4000000364380412,
+          "radius_km": 13.875173971535819,
+          "nfev": 3853
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.31924368677110493,
+          "mass_msun": 1.3999998374084817,
+          "radius_km": 13.875174002217875,
+          "nfev": 4393
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192437081994396,
+          "mass_msun": 1.399999953437837,
+          "radius_km": 13.875174009081897,
+          "nfev": 4201
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192437108934517,
+          "mass_msun": 1.39999996372173,
+          "radius_km": 13.875174012542399,
+          "nfev": 4189
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192437119452589,
+          "mass_msun": 1.4000000052841712,
+          "radius_km": 13.875173990041015,
+          "nfev": 3838
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192437118115341,
+          "mass_msun": 1.399999959751568,
+          "radius_km": 13.875174017656184,
+          "nfev": 4228
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192437118952588,
+          "mass_msun": 1.4000000194391127,
+          "radius_km": 13.87517398057975,
+          "nfev": 3796
+        },
+        {
+          "purpose": "final target-mass background",
+          "central_density_fm3": 0.3192437118952588,
+          "mass_msun": 1.4000000194391127,
+          "radius_km": 13.87517398057975,
+          "nfev": 3796
+        }
+      ],
+      "selection": "first sampled ascending target-mass bracket; no stability inference",
+      "all_sampled_ascending_target_brackets": [
+        [
+          0.16,
+          0.32
+        ]
+      ],
+      "selected_mass_bracket": [
+        0.16,
+        0.32
+      ],
+      "background": {
+        "central_density_fm3": 0.3192437118952588,
+        "h_c": 0.18028321922787718,
+        "h_start": 0.18028321803978006,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 36.52649405448511,
+        "radius_km": 13.87517398057975,
+        "mass_msun": 1.4000000194391127,
+        "mass_geom_km": 2.067275081974455,
+        "compactness": 0.14899093048259404,
+        "nfev": 3796,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.002
+        },
+        "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+        "interfaces": [
+          {
+            "h": 0.013402135705678038,
+            "r_km": 13.061247003248127,
+            "m_geom_km": 2.0653834295521576,
+            "r_jump_km": 0.0,
+            "m_jump_km": 0.0,
+            "p_MeV_fm3": 0.011541924902351135,
+            "n_low_fm3": 0.008596606764460788,
+            "n_high_fm3": 0.020104352588030134,
+            "epsilon_low_MeV_fm3": 8.089019667498889,
+            "epsilon_high_MeV_fm3": 18.932740496849707
+          }
+        ]
+      },
+      "lower_bridge_radial_width_km": 0.11353993172280674,
+      "outer_and_surface_radial_width_km": 0.6062894487695889,
+      "sharp_crust_radial_width_km": 0.8139269773316222,
+      "lower_bridge_boundaries": {
+        "outer_radius_km": 13.26888453181016,
+        "upper_radius_km": 13.155344600087354,
+        "outer_mass_geom_km": 2.0671866283635136,
+        "upper_mass_geom_km": 2.0667709339747047
+      },
+      "interface_continuity": [
+        {
+          "h": 0.013402135705678038,
+          "r_jump_km": 0.0,
+          "m_jump_geom_km": 0.0,
+          "two_sided_dense_output": true,
+          "source_density_jump_fm3": 0.011507745823569346
+        }
+      ],
+      "mass_root_converged": true,
+      "mass_target_residual_msun": 1.9439112763919297e-08,
+      "wall_seconds": 3.6846496319922153
+    },
+    {
+      "id": "H_DDMEX_ORIGINAL_TABLE_RHO0_N128__next_admissible_join_control",
+      "source_id": "H_DDMEX_ORIGINAL_TABLE_RHO0_N128",
+      "crust": "DDMEX_ORIGINAL_TABLE_RHO0",
+      "core": "GM1",
+      "label": "next_admissible_join_control",
+      "source_row_start": 1,
+      "retained_crust_rows": 17,
+      "upper_start_density": 0.004,
+      "bridge_density_width": 0.003730979,
+      "kappa": 1.4185597969522754,
+      "min_cs2_over_c2": 0.00037486541258411845,
+      "max_cs2_over_c2": 0.0013415820499345498,
+      "contract": "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDMEX_ORIGINAL_TABLE_RHO0_N128/next_admissible_join_control/REPRESENTATION.json",
+      "contract_sha256": "fe6fd7262d99a7ee830135ba5c13e2eed630180063440065051019c8debb148e",
+      "known_failed_native_knots_in_closure": [
+        0.002
+      ],
+      "status": "PASS_SCOPED",
+      "sequence": [
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.08,
+          "h_c": 0.02260598703164154,
+          "h_start": 0.02260598681779212,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 0.5239484445093192,
+          "radius_km": 67.90196574324966,
+          "mass_msun": 0.07236588041585983,
+          "mass_geom_km": 0.1068572709225998,
+          "compactness": 0.0015736992258316587,
+          "nfev": 6904,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.013402135705678038,
+              "r_km": 7.135283961597369,
+              "m_geom_km": 0.09847026538313215,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.011541924902351135,
+              "n_low_fm3": 0.008596606764460788,
+              "n_high_fm3": 0.020104352588030134,
+              "epsilon_low_MeV_fm3": 8.089019667498889,
+              "epsilon_high_MeV_fm3": 18.932740496849707
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.16,
+          "h_c": 0.05770866156993762,
+          "h_start": 0.05770866110660819,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 4.755243407203186,
+          "radius_km": 13.597252178558383,
+          "mass_msun": 0.4201924897110426,
+          "mass_geom_km": 0.620466751107945,
+          "compactness": 0.045631774932170785,
+          "nfev": 4462,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.013402135705678038,
+              "r_km": 10.761296424097084,
+              "m_geom_km": 0.6164645631928258,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.011541924902351135,
+              "n_low_fm3": 0.008596606764460788,
+              "n_high_fm3": 0.020104352588030134,
+              "epsilon_low_MeV_fm3": 8.089019667498889,
+              "epsilon_high_MeV_fm3": 18.932740496849707
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.32,
+          "h_c": 0.18098582203265703,
+          "h_start": 0.1809858208401438,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 36.776622272944515,
+          "radius_km": 13.87533537770635,
+          "mass_msun": 1.404156209320242,
+          "mass_geom_km": 2.0734122160158215,
+          "compactness": 0.14943150270422978,
+          "nfev": 4393,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.013402135705678038,
+              "r_km": 13.06461791176742,
+              "m_geom_km": 2.0715267670616697,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.011541924902351135,
+              "n_low_fm3": 0.008596606764460788,
+              "n_high_fm3": 0.020104352588030134,
+              "epsilon_low_MeV_fm3": 8.089019667498889,
+              "epsilon_high_MeV_fm3": 18.932740496849707
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.5,
+          "h_c": 0.36298149491626486,
+          "h_start": 0.36298149234830235,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 128.93606854959012,
+          "radius_km": 13.446196354948796,
+          "mass_msun": 2.0990375153697522,
+          "mass_geom_km": 3.0994913510015003,
+          "compactness": 0.23051064175935154,
+          "nfev": 4993,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.013402135705678038,
+              "r_km": 13.04288649887992,
+              "m_geom_km": 3.09853876208263,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.011541924902351135,
+              "n_low_fm3": 0.008596606764460788,
+              "n_high_fm3": 0.020104352588030134,
+              "epsilon_low_MeV_fm3": 8.089019667498889,
+              "epsilon_high_MeV_fm3": 18.932740496849707
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.8,
+          "h_c": 0.655524191341671,
+          "h_start": 0.6555241850099516,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 425.4872981394593,
+          "radius_km": 12.230390346105246,
+          "mass_msun": 2.381488626103214,
+          "mass_geom_km": 3.5165657331355984,
+          "compactness": 0.28752686002826106,
+          "nfev": 6655,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.013402135705678038,
+              "r_km": 11.995932203057421,
+              "m_geom_km": 3.5160940120025175,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.011541924902351135,
+              "n_low_fm3": 0.008596606764460788,
+              "n_high_fm3": 0.020104352588030134,
+              "epsilon_low_MeV_fm3": 8.089019667498889,
+              "epsilon_high_MeV_fm3": 18.932740496849707
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 1.0,
+          "h_c": 0.8189079814226402,
+          "h_start": 0.8189079716299221,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 711.6118926405346,
+          "radius_km": 11.579767888105616,
+          "mass_msun": 2.3632386858388132,
+          "mass_geom_km": 3.489617414398265,
+          "compactness": 0.30135469450840147,
+          "nfev": 7729,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.013402135705678038,
+              "r_km": 11.38134226657322,
+              "m_geom_km": 3.489257602143752,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.011541924902351135,
+              "n_low_fm3": 0.008596606764460788,
+              "n_high_fm3": 0.020104352588030134,
+              "epsilon_low_MeV_fm3": 8.089019667498889,
+              "epsilon_high_MeV_fm3": 18.932740496849707
+            }
+          ]
+        }
+      ],
+      "solver_calls": [
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.08,
+          "mass_msun": 0.07236588041585983,
+          "radius_km": 67.90196574324966,
+          "nfev": 6904
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.16,
+          "mass_msun": 0.4201924897110426,
+          "radius_km": 13.597252178558383,
+          "nfev": 4462
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.32,
+          "mass_msun": 1.404156209320242,
+          "radius_km": 13.87533537770635,
+          "nfev": 4393
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.5,
+          "mass_msun": 2.0990375153697522,
+          "radius_km": 13.446196354948796,
+          "nfev": 4993
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.8,
+          "mass_msun": 2.381488626103214,
+          "radius_km": 12.230390346105246,
+          "nfev": 6655
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 1.0,
+          "mass_msun": 2.3632386858388132,
+          "radius_km": 11.579767888105616,
+          "nfev": 7729
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.16,
+          "mass_msun": 0.4201924897110426,
+          "radius_km": 13.597252178558383,
+          "nfev": 4462
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.32,
+          "mass_msun": 1.404156209320242,
+          "radius_km": 13.87533537770635,
+          "nfev": 4393
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3193241686883508,
+          "mass_msun": 1.4004425972930281,
+          "radius_km": 13.875192378542891,
+          "nfev": 4078
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.31924365784087316,
+          "mass_msun": 1.3999997115096376,
+          "radius_km": 13.875174088807931,
+          "nfev": 4072
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192437102846508,
+          "mass_msun": 1.4000000062583102,
+          "radius_km": 13.875174092611964,
+          "nfev": 4078
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.31924370917112777,
+          "mass_msun": 1.3999999923921354,
+          "radius_km": 13.875174093568654,
+          "nfev": 4087
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192437097820773,
+          "mass_msun": 1.4000000085922744,
+          "radius_km": 13.875174088987574,
+          "nfev": 3913
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192437094580402,
+          "mass_msun": 1.3999999991322394,
+          "radius_km": 13.875174092692097,
+          "nfev": 4027
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192437095080403,
+          "mass_msun": 1.3999999956325715,
+          "radius_km": 13.875174093989388,
+          "nfev": 3856
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.31924370964505877,
+          "mass_msun": 1.4000000033476059,
+          "radius_km": 13.875174092937275,
+          "nfev": 4234
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.31924370958560555,
+          "mass_msun": 1.4000000040204703,
+          "radius_km": 13.87517409036998,
+          "nfev": 4171
+        },
+        {
+          "purpose": "final target-mass background",
+          "central_density_fm3": 0.31924370958560555,
+          "mass_msun": 1.4000000040204703,
+          "radius_km": 13.87517409036998,
+          "nfev": 4171
+        }
+      ],
+      "selection": "first sampled ascending target-mass bracket; no stability inference",
+      "all_sampled_ascending_target_brackets": [
+        [
+          0.16,
+          0.32
+        ]
+      ],
+      "selected_mass_bracket": [
+        0.16,
+        0.32
+      ],
+      "background": {
+        "central_density_fm3": 0.31924370958560555,
+        "h_c": 0.18028321708348768,
+        "h_start": 0.1802832158953906,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 36.5264932922488,
+        "radius_km": 13.87517409036998,
+        "mass_msun": 1.4000000040204703,
+        "mass_geom_km": 2.067275059206902,
+        "compactness": 0.14899092766278788,
+        "nfev": 4171,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.002
+        },
+        "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+        "interfaces": [
+          {
+            "h": 0.013402135705678038,
+            "r_km": 13.061246992853874,
+            "m_geom_km": 2.0653834111758695,
+            "r_jump_km": 0.0,
+            "m_jump_km": 0.0,
+            "p_MeV_fm3": 0.011541924902351135,
+            "n_low_fm3": 0.008596606764460788,
+            "n_high_fm3": 0.020104352588030134,
+            "epsilon_low_MeV_fm3": 8.089019667498889,
+            "epsilon_high_MeV_fm3": 18.932740496849707
+          }
+        ]
+      },
+      "lower_bridge_radial_width_km": 0.13592866976055795,
+      "outer_and_surface_radial_width_km": 0.6062894677067465,
+      "sharp_crust_radial_width_km": 0.813927097516105,
+      "lower_bridge_boundaries": {
+        "outer_radius_km": 13.268884622663233,
+        "upper_radius_km": 13.132955952902675,
+        "outer_mass_geom_km": 2.0671866593639074,
+        "upper_mass_geom_km": 2.0665602045474967
+      },
+      "interface_continuity": [
+        {
+          "h": 0.013402135705678038,
+          "r_jump_km": 0.0,
+          "m_jump_geom_km": 0.0,
+          "two_sided_dense_output": true,
+          "source_density_jump_fm3": 0.011507745823569346
+        }
+      ],
+      "mass_root_converged": true,
+      "mass_target_residual_msun": 4.020470401044918e-09,
+      "wall_seconds": 3.4156241820019204
+    },
+    {
+      "id": "H_NL3_PROVIDER_PRECISION_N128__primary",
+      "source_id": "H_NL3_PROVIDER_PRECISION_N128",
+      "crust": "NL3_PROVIDER_PRECISION",
+      "core": "GM1",
+      "label": "primary",
+      "source_row_start": 0,
+      "retained_crust_rows": 23,
+      "upper_start_density": 0.005,
+      "bridge_density_width": 0.004730979,
+      "kappa": 3.3096869584088755,
+      "min_cs2_over_c2": 0.0007447377930910311,
+      "max_cs2_over_c2": 0.0011019184845732645,
+      "contract": "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_NL3_PROVIDER_PRECISION_N128/primary/REPRESENTATION.json",
+      "contract_sha256": "e0676543eddbf145664e29c31894fc51463e050b255aebfb20e2deec9522ff3e",
+      "known_failed_native_knots_in_closure": [
+        0.004
+      ],
+      "status": "PASS_SCOPED",
+      "sequence": [
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.08,
+          "h_c": 0.022605987031651183,
+          "h_start": 0.022605986817801762,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 0.5239484445100647,
+          "radius_km": 65.72737904766211,
+          "mass_msun": 0.07271471907166892,
+          "mass_geom_km": 0.10737237481600725,
+          "compactness": 0.0016336019535808104,
+          "nfev": 7609,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.01462954289437335,
+              "r_km": 6.529956315877565,
+              "m_geom_km": 0.08456368482864739,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.048219293613915755,
+              "n_low_fm3": 0.03136030129260822,
+              "n_high_fm3": 0.03951721251204436,
+              "epsilon_low_MeV_fm3": 29.53880919997054,
+              "epsilon_high_MeV_fm3": 37.23448668780068
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.16,
+          "h_c": 0.05770866156993759,
+          "h_start": 0.05770866110660816,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 4.755243407203186,
+          "radius_km": 13.597337236697882,
+          "mass_msun": 0.42026529337583085,
+          "mass_geom_km": 0.6205742548222332,
+          "compactness": 0.045639395715461405,
+          "nfev": 4624,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.01462954289437335,
+              "r_km": 10.559476958205607,
+              "m_geom_km": 0.6051055636133322,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.048219293613915755,
+              "n_low_fm3": 0.03136030129260822,
+              "n_high_fm3": 0.03951721251204436,
+              "epsilon_low_MeV_fm3": 29.53880919997054,
+              "epsilon_high_MeV_fm3": 37.23448668780068
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.32,
+          "h_c": 0.18098582203267255,
+          "h_start": 0.18098582084015932,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 36.776622272950185,
+          "radius_km": 13.875359362339793,
+          "mass_msun": 1.404166997063918,
+          "mass_geom_km": 2.0734281454682373,
+          "compactness": 0.14943239243921078,
+          "nfev": 4195,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.01462954289437335,
+              "r_km": 12.995910615635077,
+              "m_geom_km": 2.0657387178647904,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.048219293613915755,
+              "n_low_fm3": 0.03136030129260822,
+              "n_high_fm3": 0.03951721251204436,
+              "epsilon_low_MeV_fm3": 29.53880919997054,
+              "epsilon_high_MeV_fm3": 37.23448668780068
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.5,
+          "h_c": 0.36298149491626885,
+          "h_start": 0.36298149234830634,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 128.93606854959273,
+          "radius_km": 13.44620182494147,
+          "mass_msun": 2.099040496128781,
+          "mass_geom_km": 3.0994957524649145,
+          "compactness": 0.23051087532507764,
+          "nfev": 4450,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.01462954289437335,
+              "r_km": 13.007638339364586,
+              "m_geom_km": 3.095570485550372,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.048219293613915755,
+              "n_low_fm3": 0.03136030129260822,
+              "n_high_fm3": 0.03951721251204436,
+              "epsilon_low_MeV_fm3": 29.53880919997054,
+              "epsilon_high_MeV_fm3": 37.23448668780068
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.8,
+          "h_c": 0.6555241913416645,
+          "h_start": 0.6555241850099451,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 425.48729813945005,
+          "radius_km": 12.230392063649916,
+          "mass_msun": 2.381489624019367,
+          "mass_geom_km": 3.5165672066835754,
+          "compactness": 0.28752694013262287,
+          "nfev": 6751,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.01462954289437335,
+              "r_km": 11.975202744692604,
+              "m_geom_km": 3.5146156977348544,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.048219293613915755,
+              "n_low_fm3": 0.03136030129260822,
+              "n_high_fm3": 0.03951721251204436,
+              "epsilon_low_MeV_fm3": 29.53880919997054,
+              "epsilon_high_MeV_fm3": 37.23448668780068
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 1.0,
+          "h_c": 0.8189079814226402,
+          "h_start": 0.8189079716299221,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 711.6118926405346,
+          "radius_km": 11.57976906954689,
+          "mass_msun": 2.36323939530559,
+          "mass_geom_km": 3.4896184620146715,
+          "compactness": 0.3013547542318319,
+          "nfev": 7738,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.01462954289437335,
+              "r_km": 11.363760791832373,
+              "m_geom_km": 3.488128724318724,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.048219293613915755,
+              "n_low_fm3": 0.03136030129260822,
+              "n_high_fm3": 0.03951721251204436,
+              "epsilon_low_MeV_fm3": 29.53880919997054,
+              "epsilon_high_MeV_fm3": 37.23448668780068
+            }
+          ]
+        }
+      ],
+      "solver_calls": [
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.08,
+          "mass_msun": 0.07271471907166892,
+          "radius_km": 65.72737904766211,
+          "nfev": 7609
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.16,
+          "mass_msun": 0.42026529337583085,
+          "radius_km": 13.597337236697882,
+          "nfev": 4624
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.32,
+          "mass_msun": 1.404166997063918,
+          "radius_km": 13.875359362339793,
+          "nfev": 4195
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.5,
+          "mass_msun": 2.099040496128781,
+          "radius_km": 13.44620182494147,
+          "nfev": 4450
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.8,
+          "mass_msun": 2.381489624019367,
+          "radius_km": 12.230392063649916,
+          "nfev": 6751
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 1.0,
+          "mass_msun": 2.36323939530559,
+          "radius_km": 11.57976906954689,
+          "nfev": 7738
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.16,
+          "mass_msun": 0.42026529337583085,
+          "radius_km": 13.597337236697882,
+          "nfev": 4624
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.32,
+          "mass_msun": 1.404166997063918,
+          "radius_km": 13.875359362339793,
+          "nfev": 4195
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3193223718103874,
+          "mass_msun": 1.4004436190810414,
+          "radius_km": 13.875216100216099,
+          "nfev": 4345
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192416728473602,
+          "mass_msun": 1.399999665205653,
+          "radius_km": 13.875197807486789,
+          "nfev": 4144
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.319241733704035,
+          "mass_msun": 1.4000001658908623,
+          "radius_km": 13.875197680960738,
+          "nfev": 4333
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.31924171354053493,
+          "mass_msun": 1.3999997631501242,
+          "radius_km": 13.875197923206365,
+          "nfev": 3988
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192417253985916,
+          "mass_msun": 1.3999998436568237,
+          "radius_km": 13.875197907986387,
+          "nfev": 3829
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.31924172942826956,
+          "mass_msun": 1.3999999998590074,
+          "radius_km": 13.875197795995469,
+          "nfev": 4345
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192417294782697,
+          "mass_msun": 1.3999999989106886,
+          "radius_km": 13.875197799049522,
+          "nfev": 4237
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192417315911523,
+          "mass_msun": 1.3999999073238136,
+          "radius_km": 13.87519788659761,
+          "nfev": 4000
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192417326475937,
+          "mass_msun": 1.3999999030841397,
+          "radius_km": 13.875197892103058,
+          "nfev": 4243
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192417331758144,
+          "mass_msun": 1.3999999013691173,
+          "radius_km": 13.875197899276888,
+          "nfev": 4114
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192417334399247,
+          "mass_msun": 1.3999998961612072,
+          "radius_km": 13.875197900590058,
+          "nfev": 3889
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192417335719798,
+          "mass_msun": 1.3999998926765047,
+          "radius_km": 13.875197906187045,
+          "nfev": 4108
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.31924173363800745,
+          "mass_msun": 1.4000000169562807,
+          "radius_km": 13.875197801177313,
+          "nfev": 4084
+        },
+        {
+          "purpose": "final target-mass background",
+          "central_density_fm3": 0.31924173363800745,
+          "mass_msun": 1.4000000169562807,
+          "radius_km": 13.875197801177313,
+          "nfev": 4084
+        }
+      ],
+      "selection": "first sampled ascending target-mass bracket; no stability inference",
+      "all_sampled_ascending_target_brackets": [
+        [
+          0.16,
+          0.32
+        ]
+      ],
+      "selected_mass_bracket": [
+        0.16,
+        0.32
+      ],
+      "background": {
+        "central_density_fm3": 0.31924173363800745,
+        "h_c": 0.18028138252480322,
+        "h_start": 0.18028138133671764,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 36.525841189824284,
+        "radius_km": 13.875197801177313,
+        "mass_msun": 1.4000000169562807,
+        "mass_geom_km": 2.0672750783082434,
+        "compactness": 0.1489906744344095,
+        "nfev": 4084,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.002
+        },
+        "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+        "interfaces": [
+          {
+            "h": 0.01462954289437335,
+            "r_km": 12.992275615891323,
+            "m_geom_km": 2.0595609521513283,
+            "r_jump_km": 0.0,
+            "m_jump_km": 0.0,
+            "p_MeV_fm3": 0.048219293613915755,
+            "n_low_fm3": 0.03136030129260822,
+            "n_high_fm3": 0.03951721251204436,
+            "epsilon_low_MeV_fm3": 29.53880919997054,
+            "epsilon_high_MeV_fm3": 37.23448668780068
+          }
+        ]
+      },
+      "lower_bridge_radial_width_km": 0.14035579019739508,
+      "outer_and_surface_radial_width_km": 0.6062919082205305,
+      "sharp_crust_radial_width_km": 0.8829221852859899,
+      "lower_bridge_boundaries": {
+        "outer_radius_km": 13.268905892956782,
+        "upper_radius_km": 13.128550102759387,
+        "outer_mass_geom_km": 2.067186677783291,
+        "upper_mass_geom_km": 2.0666126599499703
+      },
+      "interface_continuity": [
+        {
+          "h": 0.01462954289437335,
+          "r_jump_km": 0.0,
+          "m_jump_geom_km": 0.0,
+          "two_sided_dense_output": true,
+          "source_density_jump_fm3": 0.008156911219436139
+        }
+      ],
+      "mass_root_converged": true,
+      "mass_target_residual_msun": 1.6956280823876568e-08,
+      "wall_seconds": 3.956560620019445
+    },
+    {
+      "id": "H_NL3_PROVIDER_PRECISION_N128__next_admissible_join_control",
+      "source_id": "H_NL3_PROVIDER_PRECISION_N128",
+      "crust": "NL3_PROVIDER_PRECISION",
+      "core": "GM1",
+      "label": "next_admissible_join_control",
+      "source_row_start": 1,
+      "retained_crust_rows": 22,
+      "upper_start_density": 0.006,
+      "bridge_density_width": 0.005730979,
+      "kappa": 3.4819008235094207,
+      "min_cs2_over_c2": 0.000745596877251056,
+      "max_cs2_over_c2": 0.001092408259114252,
+      "contract": "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_NL3_PROVIDER_PRECISION_N128/next_admissible_join_control/REPRESENTATION.json",
+      "contract_sha256": "0b44daf797ae15ad7f9e85fd1e46d11933fb6aec657a45ad8f5f050503bd2bf7",
+      "known_failed_native_knots_in_closure": [
+        0.004
+      ],
+      "status": "PASS_SCOPED",
+      "sequence": [
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.08,
+          "h_c": 0.022605987031651183,
+          "h_start": 0.022605986817801762,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 0.5239484445100647,
+          "radius_km": 65.72485019941567,
+          "mass_msun": 0.07271525370640511,
+          "mass_geom_km": 0.10737316427104493,
+          "compactness": 0.001633676820034799,
+          "nfev": 6997,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.01462954289437335,
+              "r_km": 6.529956315877565,
+              "m_geom_km": 0.08456368482864739,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.048219293613915755,
+              "n_low_fm3": 0.03136030129260822,
+              "n_high_fm3": 0.03951721251204436,
+              "epsilon_low_MeV_fm3": 29.53880919997054,
+              "epsilon_high_MeV_fm3": 37.23448668780068
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.16,
+          "h_c": 0.05770866156993759,
+          "h_start": 0.05770866110660816,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 4.755243407203186,
+          "radius_km": 13.597337122358004,
+          "mass_msun": 0.4202653803617613,
+          "mass_geom_km": 0.620574383267836,
+          "compactness": 0.04563940554562187,
+          "nfev": 4555,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.01462954289437335,
+              "r_km": 10.559476958205607,
+              "m_geom_km": 0.6051055636133322,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.048219293613915755,
+              "n_low_fm3": 0.03136030129260822,
+              "n_high_fm3": 0.03951721251204436,
+              "epsilon_low_MeV_fm3": 29.53880919997054,
+              "epsilon_high_MeV_fm3": 37.23448668780068
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.32,
+          "h_c": 0.18098582203267255,
+          "h_start": 0.18098582084015932,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 36.776622272950185,
+          "radius_km": 13.875359357661617,
+          "mass_msun": 1.4041670354251239,
+          "mass_geom_km": 2.0734282021133548,
+          "compactness": 0.1494323965720182,
+          "nfev": 4024,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.01462954289437335,
+              "r_km": 12.995910615635077,
+              "m_geom_km": 2.0657387178647904,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.048219293613915755,
+              "n_low_fm3": 0.03136030129260822,
+              "n_high_fm3": 0.03951721251204436,
+              "epsilon_low_MeV_fm3": 29.53880919997054,
+              "epsilon_high_MeV_fm3": 37.23448668780068
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.5,
+          "h_c": 0.36298149491626885,
+          "h_start": 0.36298149234830634,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 128.93606854959273,
+          "radius_km": 13.446201825642273,
+          "mass_msun": 2.0990405097383396,
+          "mass_geom_km": 3.099495772561129,
+          "compactness": 0.23051087680762802,
+          "nfev": 4606,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.01462954289437335,
+              "r_km": 13.007638339364586,
+              "m_geom_km": 3.095570485550372,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.048219293613915755,
+              "n_low_fm3": 0.03136030129260822,
+              "n_high_fm3": 0.03951721251204436,
+              "epsilon_low_MeV_fm3": 29.53880919997054,
+              "epsilon_high_MeV_fm3": 37.23448668780068
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.8,
+          "h_c": 0.6555241913416645,
+          "h_start": 0.6555241850099451,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 425.48729813945005,
+          "radius_km": 12.230392064171388,
+          "mass_msun": 2.3814896308621365,
+          "mass_geom_km": 3.5165672167877804,
+          "compactness": 0.2875269409465189,
+          "nfev": 6673,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.01462954289437335,
+              "r_km": 11.975202744692604,
+              "m_geom_km": 3.5146156977348544,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.048219293613915755,
+              "n_low_fm3": 0.03136030129260822,
+              "n_high_fm3": 0.03951721251204436,
+              "epsilon_low_MeV_fm3": 29.53880919997054,
+              "epsilon_high_MeV_fm3": 37.23448668780068
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 1.0,
+          "h_c": 0.8189079814226402,
+          "h_start": 0.8189079716299221,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 711.6118926405346,
+          "radius_km": 11.579769071475699,
+          "mass_msun": 2.3632393904236237,
+          "mass_geom_km": 3.4896184548058375,
+          "compactness": 0.30135475355909913,
+          "nfev": 7816,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.01462954289437335,
+              "r_km": 11.363760791832373,
+              "m_geom_km": 3.488128724318724,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.048219293613915755,
+              "n_low_fm3": 0.03136030129260822,
+              "n_high_fm3": 0.03951721251204436,
+              "epsilon_low_MeV_fm3": 29.53880919997054,
+              "epsilon_high_MeV_fm3": 37.23448668780068
+            }
+          ]
+        }
+      ],
+      "solver_calls": [
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.08,
+          "mass_msun": 0.07271525370640511,
+          "radius_km": 65.72485019941567,
+          "nfev": 6997
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.16,
+          "mass_msun": 0.4202653803617613,
+          "radius_km": 13.597337122358004,
+          "nfev": 4555
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.32,
+          "mass_msun": 1.4041670354251239,
+          "radius_km": 13.875359357661617,
+          "nfev": 4024
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.5,
+          "mass_msun": 2.0990405097383396,
+          "radius_km": 13.446201825642273,
+          "nfev": 4606
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.8,
+          "mass_msun": 2.3814896308621365,
+          "radius_km": 12.230392064171388,
+          "nfev": 6673
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 1.0,
+          "mass_msun": 2.3632393904236237,
+          "radius_km": 11.579769071475699,
+          "nfev": 7816
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.16,
+          "mass_msun": 0.4202653803617613,
+          "radius_km": 13.597337122358004,
+          "nfev": 4555
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.32,
+          "mass_msun": 1.4041670354251239,
+          "radius_km": 13.875359357661617,
+          "nfev": 4024
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.31932236553868093,
+          "mass_msun": 1.4004435912006887,
+          "radius_km": 13.875216118486971,
+          "nfev": 4183
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.31924167233382744,
+          "mass_msun": 1.3999996533199939,
+          "radius_km": 13.875197836262538,
+          "nfev": 4054
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.31924173534877154,
+          "mass_msun": 1.3999999229441906,
+          "radius_km": 13.875197917956157,
+          "nfev": 4036
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192417533546636,
+          "mass_msun": 1.4000001134126936,
+          "radius_km": 13.87519784639912,
+          "nfev": 4168
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192417426332231,
+          "mass_msun": 1.400000078618116,
+          "radius_km": 13.875197818572904,
+          "nfev": 4177
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192417389544448,
+          "mass_msun": 1.400000049631515,
+          "radius_km": 13.875197823497691,
+          "nfev": 4234
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.31924173754187235,
+          "mass_msun": 1.400000043169504,
+          "radius_km": 13.875197821852808,
+          "nfev": 4258
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.31924173644532194,
+          "mass_msun": 1.399999897713887,
+          "radius_km": 13.875197935414088,
+          "nfev": 3943
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3192417372164292,
+          "mass_msun": 1.4000000414365243,
+          "radius_km": 13.875197820352223,
+          "nfev": 4300
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.31924173683087553,
+          "mass_msun": 1.4000000364724214,
+          "radius_km": 13.875197825331874,
+          "nfev": 4297
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.31924173663809874,
+          "mass_msun": 1.40000003698076,
+          "radius_km": 13.875197821119338,
+          "nfev": 4231
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.31924173654171034,
+          "mass_msun": 1.4000000442904355,
+          "radius_km": 13.875197819106626,
+          "nfev": 4261
+        },
+        {
+          "purpose": "final target-mass background",
+          "central_density_fm3": 0.31924173654171034,
+          "mass_msun": 1.4000000442904355,
+          "radius_km": 13.875197819106626,
+          "nfev": 4261
+        }
+      ],
+      "selection": "first sampled ascending target-mass bracket; no stability inference",
+      "all_sampled_ascending_target_brackets": [
+        [
+          0.16,
+          0.32
+        ]
+      ],
+      "selected_mass_bracket": [
+        0.16,
+        0.32
+      ],
+      "background": {
+        "central_density_fm3": 0.31924173654171034,
+        "h_c": 0.1802813852207273,
+        "h_start": 0.1802813840326417,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 36.52584214809922,
+        "radius_km": 13.875197819106626,
+        "mass_msun": 1.4000000442904355,
+        "mass_geom_km": 2.067275118670541,
+        "compactness": 0.14899067715083902,
+        "nfev": 4261,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.002
+        },
+        "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+        "interfaces": [
+          {
+            "h": 0.01462954289437335,
+            "r_km": 12.992275629973305,
+            "m_geom_km": 2.059560975345587,
+            "r_jump_km": 0.0,
+            "m_jump_km": 0.0,
+            "p_MeV_fm3": 0.048219293613915755,
+            "n_low_fm3": 0.03136030129260822,
+            "n_high_fm3": 0.03951721251204436,
+            "epsilon_low_MeV_fm3": 29.53880919997054,
+            "epsilon_high_MeV_fm3": 37.23448668780068
+          }
+        ]
+      },
+      "lower_bridge_radial_width_km": 0.14824620068807803,
+      "outer_and_surface_radial_width_km": 0.606291894736291,
+      "sharp_crust_radial_width_km": 0.8829221891333212,
+      "lower_bridge_boundaries": {
+        "outer_radius_km": 13.268905924370335,
+        "upper_radius_km": 13.120659723682257,
+        "outer_mass_geom_km": 2.0671867077313717,
+        "upper_mass_geom_km": 2.0664961168324694
+      },
+      "interface_continuity": [
+        {
+          "h": 0.01462954289437335,
+          "r_jump_km": 0.0,
+          "m_jump_geom_km": 0.0,
+          "two_sided_dense_output": true,
+          "source_density_jump_fm3": 0.008156911219436139
+        }
+      ],
+      "mass_root_converged": true,
+      "mass_target_residual_msun": 4.429043554132761e-08,
+      "wall_seconds": 3.8691313460003585
+    },
+    {
+      "id": "H_GPPVA_NL3wrL55_N128__primary",
+      "source_id": "H_GPPVA_NL3wrL55_N128",
+      "crust": "GPPVA_NL3wrL55",
+      "core": "PK1_CANONICAL",
+      "label": "primary",
+      "source_row_start": 3,
+      "retained_crust_rows": 16,
+      "upper_start_density": 0.001,
+      "bridge_density_width": 0.0007309790000000001,
+      "kappa": 7.656727519722228,
+      "min_cs2_over_c2": 0.0002269765900744852,
+      "max_cs2_over_c2": 0.11464664928272736,
+      "contract": "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_GPPVA_NL3wrL55_N128/primary/REPRESENTATION.json",
+      "contract_sha256": "8eae0a84a2fd76c592183787959a24b2f9dafbb089bac4e57734ddf5fa776312",
+      "known_failed_native_knots_in_closure": [],
+      "status": "PASS_SCOPED",
+      "sequence": [
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.08,
+          "h_c": 0.028645016002527588,
+          "h_start": 0.02864501578599325,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 0.7777092594814394,
+          "radius_km": 25.644592855877573,
+          "mass_msun": 0.13136257363713036,
+          "mass_geom_km": 0.19397326529528996,
+          "compactness": 0.0075639050456140335,
+          "nfev": 6151,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014441565616350554,
+              "r_km": 8.935031822275043,
+              "m_geom_km": 0.18123135873753674,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.017147777503688004,
+              "n_low_fm3": 0.011619307065360653,
+              "n_high_fm3": 0.019435813564131422,
+              "epsilon_low_MeV_fm3": 10.94308341133884,
+              "epsilon_high_MeV_fm3": 18.316218300855468
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.16,
+          "h_c": 0.06734649328815985,
+          "h_start": 0.06734649281697268,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 5.4091401561512615,
+          "radius_km": 14.821624801197746,
+          "mass_msun": 0.5211768181347364,
+          "mass_geom_km": 0.769582738909048,
+          "compactness": 0.051922967234122507,
+          "nfev": 4990,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014441565616350554,
+              "r_km": 11.896094850311105,
+              "m_geom_km": 0.7625623655619308,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.017147777503688004,
+              "n_low_fm3": 0.011619307065360653,
+              "n_high_fm3": 0.019435813564131422,
+              "epsilon_low_MeV_fm3": 10.94308341133884,
+              "epsilon_high_MeV_fm3": 18.316218300855468
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.32,
+          "h_c": 0.19613078704909515,
+          "h_start": 0.19613078582676152,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 39.433750980163985,
+          "radius_km": 14.389593639648922,
+          "mass_msun": 1.4924054041701091,
+          "mass_geom_km": 2.2037231867188996,
+          "compactness": 0.15314700622585936,
+          "nfev": 4432,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014441565616350554,
+              "r_km": 13.517828714577698,
+              "m_geom_km": 2.200737503714229,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.017147777503688004,
+              "n_low_fm3": 0.011619307065360653,
+              "n_high_fm3": 0.019435813564131422,
+              "epsilon_low_MeV_fm3": 10.94308341133884,
+              "epsilon_high_MeV_fm3": 18.316218300855468
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.5,
+          "h_c": 0.3714367954339891,
+          "h_start": 0.37143679285269726,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 128.50243961122632,
+          "radius_km": 13.763833476512762,
+          "mass_msun": 2.128680399635727,
+          "mass_geom_km": 3.1432627761086605,
+          "compactness": 0.22837117155423803,
+          "nfev": 5332,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014441565616350554,
+              "r_km": 13.312990030745706,
+              "m_geom_km": 3.141737349253422,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.017147777503688004,
+              "n_low_fm3": 0.011619307065360653,
+              "n_high_fm3": 0.019435813564131422,
+              "epsilon_low_MeV_fm3": 10.94308341133884,
+              "epsilon_high_MeV_fm3": 18.316218300855468
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.8,
+          "h_c": 0.5886925091970023,
+          "h_start": 0.5886925035998869,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 339.322473854051,
+          "radius_km": 12.661323509725241,
+          "mass_msun": 2.3128664364697995,
+          "mass_geom_km": 3.4152364897570746,
+          "compactness": 0.26973771637173716,
+          "nfev": 6259,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014441565616350554,
+              "r_km": 12.360899037594846,
+              "m_geom_km": 3.414355043647227,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.017147777503688004,
+              "n_low_fm3": 0.011619307065360653,
+              "n_high_fm3": 0.019435813564131422,
+              "epsilon_low_MeV_fm3": 10.94308341133884,
+              "epsilon_high_MeV_fm3": 18.316218300855468
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 1.0,
+          "h_c": 0.6914076348049641,
+          "h_start": 0.6914076268745933,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 501.9799625187186,
+          "radius_km": 12.131523174048956,
+          "mass_msun": 2.286037693743625,
+          "mass_geom_km": 3.3756204965082,
+          "compactness": 0.2782519926046162,
+          "nfev": 7078,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014441565616350554,
+              "r_km": 11.862372944244893,
+              "m_geom_km": 3.37489253830223,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.017147777503688004,
+              "n_low_fm3": 0.011619307065360653,
+              "n_high_fm3": 0.019435813564131422,
+              "epsilon_low_MeV_fm3": 10.94308341133884,
+              "epsilon_high_MeV_fm3": 18.316218300855468
+            }
+          ]
+        }
+      ],
+      "solver_calls": [
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.08,
+          "mass_msun": 0.13136257363713036,
+          "radius_km": 25.644592855877573,
+          "nfev": 6151
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.16,
+          "mass_msun": 0.5211768181347364,
+          "radius_km": 14.821624801197746,
+          "nfev": 4990
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.32,
+          "mass_msun": 1.4924054041701091,
+          "radius_km": 14.389593639648922,
+          "nfev": 4432
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.5,
+          "mass_msun": 2.128680399635727,
+          "radius_km": 13.763833476512762,
+          "nfev": 5332
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.8,
+          "mass_msun": 2.3128664364697995,
+          "radius_km": 12.661323509725241,
+          "nfev": 6259
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 1.0,
+          "mass_msun": 2.286037693743625,
+          "radius_km": 12.131523174048956,
+          "nfev": 7078
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.16,
+          "mass_msun": 0.5211768181347364,
+          "radius_km": 14.821624801197746,
+          "nfev": 4990
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.32,
+          "mass_msun": 1.4924054041701091,
+          "radius_km": 14.389593639648922,
+          "nfev": 4432
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.30477715248521425,
+          "mass_msun": 1.4054298123228433,
+          "radius_km": 14.418803012394163,
+          "nfev": 4498
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.303832638726794,
+          "mass_msun": 1.399890409179911,
+          "radius_km": 14.420454021093892,
+          "nfev": 4687
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3038513248622313,
+          "mass_msun": 1.4000001552308834,
+          "radius_km": 14.420421537824973,
+          "nfev": 4657
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.303851298431528,
+          "mass_msun": 1.400000008109705,
+          "radius_km": 14.4204215780272,
+          "nfev": 4432
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.30385129697470614,
+          "mass_msun": 1.399999992213604,
+          "radius_km": 14.420421584767391,
+          "nfev": 4585
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.303851297688302,
+          "mass_msun": 1.3999999812628472,
+          "radius_km": 14.420421590581558,
+          "nfev": 4435
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.30385129820701967,
+          "mass_msun": 1.3999999951649926,
+          "radius_km": 14.420421583665956,
+          "nfev": 4402
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.30385129829087626,
+          "mass_msun": 1.4000000011576557,
+          "radius_km": 14.420421581776258,
+          "nfev": 4543
+        },
+        {
+          "purpose": "final target-mass background",
+          "central_density_fm3": 0.30385129829087626,
+          "mass_msun": 1.4000000011576557,
+          "radius_km": 14.420421581776258,
+          "nfev": 4543
+        }
+      ],
+      "selection": "first sampled ascending target-mass bracket; no stability inference",
+      "all_sampled_ascending_target_brackets": [
+        [
+          0.16,
+          0.32
+        ]
+      ],
+      "selected_mass_bracket": [
+        0.16,
+        0.32
+      ],
+      "background": {
+        "central_density_fm3": 0.30385129829087626,
+        "h_c": 0.18034045705434873,
+        "h_start": 0.1803404559282537,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 33.90491717504616,
+        "radius_km": 14.420421581776258,
+        "mass_msun": 1.4000000011576557,
+        "mass_geom_km": 2.067275054979598,
+        "compactness": 0.14335746311273642,
+        "nfev": 4543,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.002
+        },
+        "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+        "interfaces": [
+          {
+            "h": 0.014441565616350554,
+            "r_km": 13.466459534735757,
+            "m_geom_km": 2.064044753397062,
+            "r_jump_km": 0.0,
+            "m_jump_km": 0.0,
+            "p_MeV_fm3": 0.017147777503688004,
+            "n_low_fm3": 0.011619307065360653,
+            "n_high_fm3": 0.019435813564131422,
+            "epsilon_low_MeV_fm3": 10.94308341133884,
+            "epsilon_high_MeV_fm3": 18.316218300855468
+          }
+        ]
+      },
+      "lower_bridge_radial_width_km": 0.08083784508869307,
+      "outer_and_surface_radial_width_km": 0.6637637595781314,
+      "sharp_crust_radial_width_km": 0.9539620470405019,
+      "lower_bridge_boundaries": {
+        "outer_radius_km": 13.756657822198127,
+        "upper_radius_km": 13.675819977109434,
+        "outer_mass_geom_km": 2.067171099846396,
+        "upper_mass_geom_km": 2.0670848981697234
+      },
+      "interface_continuity": [
+        {
+          "h": 0.014441565616350554,
+          "r_jump_km": 0.0,
+          "m_jump_geom_km": 0.0,
+          "two_sided_dense_output": true,
+          "source_density_jump_fm3": 0.007816506498770769
+        }
+      ],
+      "mass_root_converged": true,
+      "mass_target_residual_msun": 1.1576557490400319e-09,
+      "wall_seconds": 3.639756252989173
+    },
+    {
+      "id": "H_GPPVA_NL3wrL55_N128__next_admissible_join_control",
+      "source_id": "H_GPPVA_NL3wrL55_N128",
+      "crust": "GPPVA_NL3wrL55",
+      "core": "PK1_CANONICAL",
+      "label": "next_admissible_join_control",
+      "source_row_start": 4,
+      "retained_crust_rows": 15,
+      "upper_start_density": 0.0015,
+      "bridge_density_width": 0.001230979,
+      "kappa": 3.801794872440535,
+      "min_cs2_over_c2": 0.0005157687770373638,
+      "max_cs2_over_c2": 0.004140964084968316,
+      "contract": "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_GPPVA_NL3wrL55_N128/next_admissible_join_control/REPRESENTATION.json",
+      "contract_sha256": "5a4873e899dc8427415ab379fcb54a9602796c68630f2a292d88c1db931a5221",
+      "known_failed_native_knots_in_closure": [],
+      "status": "PASS_SCOPED",
+      "sequence": [
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.08,
+          "h_c": 0.028645016002527588,
+          "h_start": 0.02864501578599325,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 0.7777092594814394,
+          "radius_km": 25.643522400314666,
+          "mass_msun": 0.13136921566135384,
+          "mass_geom_km": 0.19398307307456167,
+          "compactness": 0.007564603257163351,
+          "nfev": 6094,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014441565616350554,
+              "r_km": 8.935031822275043,
+              "m_geom_km": 0.18123135873753674,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.017147777503688004,
+              "n_low_fm3": 0.011619307065360653,
+              "n_high_fm3": 0.019435813564131422,
+              "epsilon_low_MeV_fm3": 10.94308341133884,
+              "epsilon_high_MeV_fm3": 18.316218300855468
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.16,
+          "h_c": 0.06734649328815985,
+          "h_start": 0.06734649281697268,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 5.4091401561512615,
+          "radius_km": 14.821627138925402,
+          "mass_msun": 0.5211775828507547,
+          "mass_geom_km": 0.7695838681078677,
+          "compactness": 0.05192303523050736,
+          "nfev": 4663,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014441565616350554,
+              "r_km": 11.896094850311105,
+              "m_geom_km": 0.7625623655619308,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.017147777503688004,
+              "n_low_fm3": 0.011619307065360653,
+              "n_high_fm3": 0.019435813564131422,
+              "epsilon_low_MeV_fm3": 10.94308341133884,
+              "epsilon_high_MeV_fm3": 18.316218300855468
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.32,
+          "h_c": 0.19613078704909515,
+          "h_start": 0.19613078582676152,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 39.433750980163985,
+          "radius_km": 14.389593855384913,
+          "mass_msun": 1.4924054951650902,
+          "mass_geom_km": 2.2037233210843667,
+          "compactness": 0.1531470132674859,
+          "nfev": 4459,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014441565616350554,
+              "r_km": 13.517828714577698,
+              "m_geom_km": 2.200737503714229,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.017147777503688004,
+              "n_low_fm3": 0.011619307065360653,
+              "n_high_fm3": 0.019435813564131422,
+              "epsilon_low_MeV_fm3": 10.94308341133884,
+              "epsilon_high_MeV_fm3": 18.316218300855468
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.5,
+          "h_c": 0.3714367954339891,
+          "h_start": 0.37143679285269726,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 128.50243961122632,
+          "radius_km": 13.763833524566424,
+          "mass_msun": 2.128680431083727,
+          "mass_geom_km": 3.1432628225455645,
+          "compactness": 0.228371174130761,
+          "nfev": 5116,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014441565616350554,
+              "r_km": 13.312990030745706,
+              "m_geom_km": 3.141737349253422,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.017147777503688004,
+              "n_low_fm3": 0.011619307065360653,
+              "n_high_fm3": 0.019435813564131422,
+              "epsilon_low_MeV_fm3": 10.94308341133884,
+              "epsilon_high_MeV_fm3": 18.316218300855468
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 0.8,
+          "h_c": 0.5886925091970023,
+          "h_start": 0.5886925035998869,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 339.322473854051,
+          "radius_km": 12.661323535728684,
+          "mass_msun": 2.3128664143814883,
+          "mass_geom_km": 3.415236457140921,
+          "compactness": 0.26973771324171186,
+          "nfev": 6250,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014441565616350554,
+              "r_km": 12.360899037594846,
+              "m_geom_km": 3.414355043647227,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.017147777503688004,
+              "n_low_fm3": 0.011619307065360653,
+              "n_high_fm3": 0.019435813564131422,
+              "epsilon_low_MeV_fm3": 10.94308341133884,
+              "epsilon_high_MeV_fm3": 18.316218300855468
+            }
+          ]
+        },
+        {
+          "status": "SOLVED",
+          "central_density_fm3": 1.0,
+          "h_c": 0.6914076348049641,
+          "h_start": 0.6914076268745933,
+          "surface_h": 0.0,
+          "central_pressure_MeV_fm3": 501.9799625187186,
+          "radius_km": 12.131523190956152,
+          "mass_msun": 2.2860376974198693,
+          "mass_geom_km": 3.3756205019366345,
+          "compactness": 0.27825199266429324,
+          "nfev": 6895,
+          "config": {
+            "r0_km": 0.001,
+            "rtol": 1e-10,
+            "atol": 1e-12,
+            "surface_h": 0.0,
+            "max_step_h": 0.002
+          },
+          "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+          "interfaces": [
+            {
+              "h": 0.014441565616350554,
+              "r_km": 11.862372944244893,
+              "m_geom_km": 3.37489253830223,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.017147777503688004,
+              "n_low_fm3": 0.011619307065360653,
+              "n_high_fm3": 0.019435813564131422,
+              "epsilon_low_MeV_fm3": 10.94308341133884,
+              "epsilon_high_MeV_fm3": 18.316218300855468
+            }
+          ]
+        }
+      ],
+      "solver_calls": [
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.08,
+          "mass_msun": 0.13136921566135384,
+          "radius_km": 25.643522400314666,
+          "nfev": 6094
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.16,
+          "mass_msun": 0.5211775828507547,
+          "radius_km": 14.821627138925402,
+          "nfev": 4663
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.32,
+          "mass_msun": 1.4924054951650902,
+          "radius_km": 14.389593855384913,
+          "nfev": 4459
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.5,
+          "mass_msun": 2.128680431083727,
+          "radius_km": 13.763833524566424,
+          "nfev": 5116
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 0.8,
+          "mass_msun": 2.3128664143814883,
+          "radius_km": 12.661323535728684,
+          "nfev": 6250
+        },
+        {
+          "purpose": "fixed density bracket inventory",
+          "central_density_fm3": 1.0,
+          "mass_msun": 2.2860376974198693,
+          "radius_km": 12.131523190956152,
+          "nfev": 6895
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.16,
+          "mass_msun": 0.5211775828507547,
+          "radius_km": 14.821627138925402,
+          "nfev": 4663
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.32,
+          "mass_msun": 1.4924054951650902,
+          "radius_km": 14.389593855384913,
+          "nfev": 4459
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3047771269349296,
+          "mass_msun": 1.4054297699730152,
+          "radius_km": 14.418803317926477,
+          "nfev": 4456
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3038326203658317,
+          "mass_msun": 1.3998904027894705,
+          "radius_km": 14.420454320335454,
+          "nfev": 4360
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.30385130756995987,
+          "mass_msun": 1.4000001575725702,
+          "radius_km": 14.420421832972602,
+          "nfev": 4411
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.30385128074114476,
+          "mass_msun": 1.399999994672499,
+          "radius_km": 14.420421884372079,
+          "nfev": 4558
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3038512816185571,
+          "mass_msun": 1.399999997557738,
+          "radius_km": 14.420421882269554,
+          "nfev": 4570
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3038512823499228,
+          "mass_msun": 1.400000010278953,
+          "radius_km": 14.42042187735799,
+          "nfev": 4417
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3038512817589672,
+          "mass_msun": 1.3999999968010228,
+          "radius_km": 14.420421884170569,
+          "nfev": 4573
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.303851282054445,
+          "mass_msun": 1.4000000072514058,
+          "radius_km": 14.420421879567602,
+          "nfev": 4528
+        },
+        {
+          "purpose": "target-mass root",
+          "central_density_fm3": 0.3038512818494162,
+          "mass_msun": 1.4000000078344303,
+          "radius_km": 14.42042187815422,
+          "nfev": 4423
+        },
+        {
+          "purpose": "final target-mass background",
+          "central_density_fm3": 0.3038512817589672,
+          "mass_msun": 1.3999999968010228,
+          "radius_km": 14.420421884170569,
+          "nfev": 4573
+        }
+      ],
+      "selection": "first sampled ascending target-mass bracket; no stability inference",
+      "all_sampled_ascending_target_brackets": [
+        [
+          0.16,
+          0.32
+        ]
+      ],
+      "selected_mass_bracket": [
+        0.16,
+        0.32
+      ],
+      "background": {
+        "central_density_fm3": 0.3038512817589672,
+        "h_c": 0.18034044107166594,
+        "h_start": 0.180340439945571,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 33.904911767512715,
+        "radius_km": 14.420421884170569,
+        "mass_msun": 1.3999999968010228,
+        "mass_geom_km": 2.067275048546485,
+        "compactness": 0.14335745966043836,
+        "nfev": 4573,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.002
+        },
+        "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+        "interfaces": [
+          {
+            "h": 0.014441565616350554,
+            "r_km": 13.466459472458077,
+            "m_geom_km": 2.064044609771865,
+            "r_jump_km": 0.0,
+            "m_jump_km": 0.0,
+            "p_MeV_fm3": 0.017147777503688004,
+            "n_low_fm3": 0.011619307065360653,
+            "n_high_fm3": 0.019435813564131422,
+            "epsilon_low_MeV_fm3": 10.94308341133884,
+            "epsilon_high_MeV_fm3": 18.316218300855468
+          }
+        ]
+      },
+      "lower_bridge_radial_width_km": 0.10452873213554525,
+      "outer_and_surface_radial_width_km": 0.6637637931924569,
+      "sharp_crust_radial_width_km": 0.9539624117124923,
+      "lower_bridge_boundaries": {
+        "outer_radius_km": 13.756658090978112,
+        "upper_radius_km": 13.652129358842567,
+        "outer_mass_geom_km": 2.0671711076339916,
+        "upper_mass_geom_km": 2.0669989365930324
+      },
+      "interface_continuity": [
+        {
+          "h": 0.014441565616350554,
+          "r_jump_km": 0.0,
+          "m_jump_geom_km": 0.0,
+          "two_sided_dense_output": true,
+          "source_density_jump_fm3": 0.007816506498770769
+        }
+      ],
+      "mass_root_converged": true,
+      "mass_target_residual_msun": -3.1989770832296927e-09,
+      "wall_seconds": 3.9121769740013406
+    }
+  ],
+  "numerical_sensitivities": [
+    {
+      "source_id": "H_DDME2_N128",
+      "primary_case_id": "H_DDME2_N128__primary",
+      "fixed_central_density": true,
+      "central_density_fm3": 0.3038516328930928,
+      "settings": {
+        "r0_km": 0.0005,
+        "rtol": 2e-11,
+        "atol": 2e-13,
+        "max_step_h": 0.001
+      },
+      "background": {
+        "central_density_fm3": 0.3038516328930928,
+        "h_c": 0.1803407805404375,
+        "h_start": 0.18034078025891326,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 33.90502662245244,
+        "radius_km": 14.420416658702573,
+        "mass_msun": 1.4000000053961668,
+        "mass_geom_km": 2.06727506123829,
+        "compactness": 0.14335751248842804,
+        "nfev": 6373,
+        "config": {
+          "r0_km": 0.0005,
+          "rtol": 2e-11,
+          "atol": 2e-13,
+          "surface_h": 0.0,
+          "max_step_h": 0.001
+        },
+        "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+        "interfaces": [
+          {
+            "h": 0.014259570982404941,
+            "r_km": 13.477554520698412,
+            "m_geom_km": 2.0646247028271576,
+            "r_jump_km": 0.0,
+            "m_jump_km": 0.0,
+            "p_MeV_fm3": 0.014009525845495105,
+            "n_low_fm3": 0.00977355894875663,
+            "n_high_fm3": 0.017093104048714065,
+            "epsilon_low_MeV_fm3": 9.20349126294342,
+            "epsilon_high_MeV_fm3": 16.10659719254103
+          }
+        ]
+      },
+      "lower_bridge_radial_width_km": 0.2237434375577081,
+      "outer_and_surface_radial_width_km": 0.6637632273441465,
+      "sharp_crust_radial_width_km": 0.9428621380041609,
+      "lower_bridge_boundaries": {
+        "outer_radius_km": 13.756653431358426,
+        "upper_radius_km": 13.532909993800718,
+        "outer_mass_geom_km": 2.0671711011052967,
+        "upper_mass_geom_km": 2.0658562415514297
+      },
+      "interface_continuity": [
+        {
+          "h": 0.014259570982404941,
+          "r_jump_km": 0.0,
+          "m_jump_geom_km": 0.0,
+          "two_sided_dense_output": true,
+          "source_density_jump_fm3": 0.007319545099957435
+        }
+      ],
+      "status": "PASS_SCOPED",
+      "mass_difference_msun": 4.3492875967388045e-09,
+      "radius_difference_km": -5.492218235758628e-09,
+      "lower_bridge_width_difference_km": -3.028688411177427e-10,
+      "sharp_crust_width_difference_km": -3.617234511921197e-09,
+      "wall_seconds": 0.24300698700244538
+    },
+    {
+      "source_id": "H_DDMEX_ORIGINAL_TABLE_RHO0_N128",
+      "primary_case_id": "H_DDMEX_ORIGINAL_TABLE_RHO0_N128__primary",
+      "fixed_central_density": true,
+      "central_density_fm3": 0.3192437118952588,
+      "settings": {
+        "r0_km": 0.0005,
+        "rtol": 2e-11,
+        "atol": 2e-13,
+        "max_step_h": 0.001
+      },
+      "background": {
+        "central_density_fm3": 0.3192437118952588,
+        "h_c": 0.18028321922787718,
+        "h_start": 0.18028321893085292,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 36.52649405448511,
+        "radius_km": 13.875174018929387,
+        "mass_msun": 1.39999997157999,
+        "mass_geom_km": 2.0672750113044764,
+        "compactness": 0.1489909249775296,
+        "nfev": 6268,
+        "config": {
+          "r0_km": 0.0005,
+          "rtol": 2e-11,
+          "atol": 2e-13,
+          "surface_h": 0.0,
+          "max_step_h": 0.001
+        },
+        "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+        "interfaces": [
+          {
+            "h": 0.013402135705678038,
+            "r_km": 13.061247007663235,
+            "m_geom_km": 2.065383420485464,
+            "r_jump_km": 0.0,
+            "m_jump_km": 0.0,
+            "p_MeV_fm3": 0.011541924902351135,
+            "n_low_fm3": 0.008596606764460788,
+            "n_high_fm3": 0.020104352588030134,
+            "epsilon_low_MeV_fm3": 8.089019667498889,
+            "epsilon_high_MeV_fm3": 18.932740496849707
+          }
+        ]
+      },
+      "lower_bridge_radial_width_km": 0.11353993270051177,
+      "outer_and_surface_radial_width_km": 0.6062894809481278,
+      "sharp_crust_radial_width_km": 0.8139270112661521,
+      "lower_bridge_boundaries": {
+        "outer_radius_km": 13.26888453798126,
+        "upper_radius_km": 13.155344605280748,
+        "outer_mass_geom_km": 2.067186602709162,
+        "upper_mass_geom_km": 2.066770922905316
+      },
+      "interface_continuity": [
+        {
+          "h": 0.013402135705678038,
+          "r_jump_km": 0.0,
+          "m_jump_geom_km": 0.0,
+          "two_sided_dense_output": true,
+          "source_density_jump_fm3": 0.011507745823569346
+        }
+      ],
+      "status": "PASS_SCOPED",
+      "mass_difference_msun": -4.785912266491721e-08,
+      "radius_difference_km": 3.834963813176273e-08,
+      "lower_bridge_width_difference_km": 9.777050280490585e-10,
+      "sharp_crust_width_difference_km": 3.3934529852786e-08,
+      "wall_seconds": 0.24821437301579863
+    },
+    {
+      "source_id": "H_NL3_PROVIDER_PRECISION_N128",
+      "primary_case_id": "H_NL3_PROVIDER_PRECISION_N128__primary",
+      "fixed_central_density": true,
+      "central_density_fm3": 0.31924173363800745,
+      "settings": {
+        "r0_km": 0.0005,
+        "rtol": 2e-11,
+        "atol": 2e-13,
+        "max_step_h": 0.001
+      },
+      "background": {
+        "central_density_fm3": 0.31924173363800745,
+        "h_c": 0.18028138252480322,
+        "h_start": 0.1802813822277818,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 36.525841189824284,
+        "radius_km": 13.875197822165655,
+        "mass_msun": 1.4000000095756242,
+        "mass_geom_km": 2.0672750674097813,
+        "compactness": 0.14899067342357494,
+        "nfev": 6610,
+        "config": {
+          "r0_km": 0.0005,
+          "rtol": 2e-11,
+          "atol": 2e-13,
+          "surface_h": 0.0,
+          "max_step_h": 0.001
+        },
+        "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+        "interfaces": [
+          {
+            "h": 0.01462954289437335,
+            "r_km": 12.99227562462596,
+            "m_geom_km": 2.0595609284735317,
+            "r_jump_km": 0.0,
+            "m_jump_km": 0.0,
+            "p_MeV_fm3": 0.048219293613915755,
+            "n_low_fm3": 0.03136030129260822,
+            "n_high_fm3": 0.03951721251204436,
+            "epsilon_low_MeV_fm3": 29.53880919997054,
+            "epsilon_high_MeV_fm3": 37.23448668780068
+          }
+        ]
+      },
+      "lower_bridge_radial_width_km": 0.14035579264893805,
+      "outer_and_surface_radial_width_km": 0.6062919158030127,
+      "sharp_crust_radial_width_km": 0.8829221975396955,
+      "lower_bridge_boundaries": {
+        "outer_radius_km": 13.268905906362642,
+        "upper_radius_km": 13.128550113713704,
+        "outer_mass_geom_km": 2.0671866563221455,
+        "upper_mass_geom_km": 2.0666126384204326
+      },
+      "interface_continuity": [
+        {
+          "h": 0.01462954289437335,
+          "r_jump_km": 0.0,
+          "m_jump_geom_km": 0.0,
+          "two_sided_dense_output": true,
+          "source_density_jump_fm3": 0.008156911219436139
+        }
+      ],
+      "status": "PASS_SCOPED",
+      "mass_difference_msun": -7.3806565303868865e-09,
+      "radius_difference_km": 2.0988341731253968e-08,
+      "lower_bridge_width_difference_km": 2.451542968628928e-09,
+      "sharp_crust_width_difference_km": 1.2253705605758114e-08,
+      "wall_seconds": 0.2559303699817974
+    },
+    {
+      "source_id": "H_GPPVA_NL3wrL55_N128",
+      "primary_case_id": "H_GPPVA_NL3wrL55_N128__primary",
+      "fixed_central_density": true,
+      "central_density_fm3": 0.30385129829087626,
+      "settings": {
+        "r0_km": 0.0005,
+        "rtol": 2e-11,
+        "atol": 2e-13,
+        "max_step_h": 0.001
+      },
+      "background": {
+        "central_density_fm3": 0.30385129829087626,
+        "h_c": 0.18034045705434873,
+        "h_start": 0.18034045677282498,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 33.90491717504616,
+        "radius_km": 14.420421593778071,
+        "mass_msun": 1.399999986728296,
+        "mass_geom_km": 2.0672750336728445,
+        "compactness": 0.14335746151588274,
+        "nfev": 6721,
+        "config": {
+          "r0_km": 0.0005,
+          "rtol": 2e-11,
+          "atol": 2e-13,
+          "surface_h": 0.0,
+          "max_step_h": 0.001
+        },
+        "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+        "interfaces": [
+          {
+            "h": 0.014441565616350554,
+            "r_km": 13.46645953303608,
+            "m_geom_km": 2.0640447549976884,
+            "r_jump_km": 0.0,
+            "m_jump_km": 0.0,
+            "p_MeV_fm3": 0.017147777503688004,
+            "n_low_fm3": 0.011619307065360653,
+            "n_high_fm3": 0.019435813564131422,
+            "epsilon_low_MeV_fm3": 10.94308341133884,
+            "epsilon_high_MeV_fm3": 18.316218300855468
+          }
+        ]
+      },
+      "lower_bridge_radial_width_km": 0.08083784640197855,
+      "outer_and_surface_radial_width_km": 0.6637637698286891,
+      "sharp_crust_radial_width_km": 0.9539620607419916,
+      "lower_bridge_boundaries": {
+        "outer_radius_km": 13.756657823949382,
+        "upper_radius_km": 13.675819977547404,
+        "outer_mass_geom_km": 2.0671710763492843,
+        "upper_mass_geom_km": 2.067084881888806
+      },
+      "interface_continuity": [
+        {
+          "h": 0.014441565616350554,
+          "r_jump_km": 0.0,
+          "m_jump_geom_km": 0.0,
+          "two_sided_dense_output": true,
+          "source_density_jump_fm3": 0.007816506498770769
+        }
+      ],
+      "status": "PASS_SCOPED",
+      "mass_difference_msun": -1.4429359707079925e-08,
+      "radius_difference_km": 1.200181287686064e-08,
+      "lower_bridge_width_difference_km": 1.3132854803643568e-09,
+      "sharp_crust_width_difference_km": 1.37014897205745e-08,
+      "wall_seconds": 0.2581960120005533
+    }
+  ],
+  "radial_stability_claim": false,
+  "complete_mode_spectrum_computed": false,
+  "next_join_sensitivities": [
+    {
+      "source_id": "H_DDME2_N128",
+      "interpretation": "same target mass; different endpoint-selected phenomenological lower closure",
+      "delta_radius_km": 9.477326283757748e-07,
+      "delta_central_density_fm3": -6.062775242954288e-08,
+      "delta_bridge_width_km": 0.01642312345935082,
+      "delta_sharp_crust_width_km": 1.1724986013206262e-06
+    },
+    {
+      "source_id": "H_DDMEX_ORIGINAL_TABLE_RHO0_N128",
+      "interpretation": "same target mass; different endpoint-selected phenomenological lower closure",
+      "delta_radius_km": 1.0979023024049184e-07,
+      "delta_central_density_fm3": -2.3096532464350616e-09,
+      "delta_bridge_width_km": 0.02238873803775121,
+      "delta_sharp_crust_width_km": 1.201844828102594e-07
+    },
+    {
+      "source_id": "H_GPPVA_NL3wrL55_N128",
+      "interpretation": "same target mass; different endpoint-selected phenomenological lower closure",
+      "delta_radius_km": 3.0239431048073584e-07,
+      "delta_central_density_fm3": -1.6531909063921546e-08,
+      "delta_bridge_width_km": 0.023690887046852183,
+      "delta_sharp_crust_width_km": 3.6467199038270337e-07
+    },
+    {
+      "source_id": "H_NL3_PROVIDER_PRECISION_N128",
+      "interpretation": "same target mass; different endpoint-selected phenomenological lower closure",
+      "delta_radius_km": 1.7929313145259584e-08,
+      "delta_central_density_fm3": 2.903702889245352e-09,
+      "delta_bridge_width_km": 0.007890410490682953,
+      "delta_sharp_crust_width_km": 3.8473313423992295e-09
+    }
+  ],
+  "source_hashes_after": {
+    "python_frontend/compose_eos/whole_crust.py": "7bb94e914019045a636f2008d5ed4ce2b6e346c8f79e19f0100416c5e924b513",
+    "python_frontend/compose_eos/stellar_sharp.py": "d5d11e595a298541abe660a514d9275dc7152bf46cdd44a5078331c8f8111c82",
+    "python_frontend/compose_eos/stellar_background.py": "525f4c247b1f92b5eb31a37f44efe6630c0f979f7bd5d3575b671ea6f190dd01",
+    "python_frontend/compose_eos/stellar_cowling.py": "ecd9613d016515be2733b9a8d2761b550dff0ae31cba78de432e35ddff18af47",
+    "scripts/prepare_causal_low_density_stellar_20261117.py": "b4057f99765777d7e04088c535b54a6ee9bad58763a5760945648bd8c497a447",
+    "scripts/run_causal_low_density_backgrounds_20261117.py": "bb0e400d357a503e3369dd5fb344e8be241d2dcfbdd5e3b495773067c5fa8d99",
+    "data/low_density_crust_20261117/stellar/h_final/INPUTS.json": "2b079ae4119c2bb797033d84a4df483cb412ef827f268f19d643fb3ce3bd2263",
+    "data/stellar_extension_20261117/eos/fine/REPRESENTATION.json": "f1bd5c3c41b45a07a7299e665594173473ac790af6f519bf53085db843bd936d",
+    "data/low_density_crust_20261117/low_extension/MANIFEST.json": "e98b442907450ec21b10adc77cf79ba686947ae453beee0d1703ad559df13329",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDME2/N128/block_01/match_00_00/compose/eos.compo": "14fe3bf7835f62e32e1777364cd7f929b2491c4baebfc4ab5912a03cf6c69fde",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDME2/N128/block_01/match_00_00/compose/eos.nb": "0eb064dd8de3a3ffa73947a06acd8de9cb33d4fce3f7c3333e933edc681cb2b2",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDME2/N128/block_01/match_00_00/compose/eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDME2/N128/block_01/match_00_00/compose/eos.thermo": "153fcdb76c64558751afece35555051bb595ac2b7b4923788c4a6e27312e8660",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDME2/N128/block_01/match_00_00/compose/eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDME2/N128/block_01/match_00_00/RESULT.json": "d74adde84985e7e42b2c863c257911e1862a4e3966e562a37de0f909f878d307",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDMEX_ORIGINAL_TABLE_RHO0/N128/block_01/match_00_00/compose/eos.compo": "461b3ea1f3323230dce8f65f416f6f51c0db08016f83fd8e95415d4c84ae2e1e",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDMEX_ORIGINAL_TABLE_RHO0/N128/block_01/match_00_00/compose/eos.nb": "313cc99e9d0b73f50694ebdfa9bfdf78eaf0ca521f709721d41b4ca5eae506ee",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDMEX_ORIGINAL_TABLE_RHO0/N128/block_01/match_00_00/compose/eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDMEX_ORIGINAL_TABLE_RHO0/N128/block_01/match_00_00/compose/eos.thermo": "167e6180e5f69de85b35e306d0548e8d6143ee14fea6c11ee3e2998b4b7d9ecb",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDMEX_ORIGINAL_TABLE_RHO0/N128/block_01/match_00_00/compose/eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/DDMEX_ORIGINAL_TABLE_RHO0/N128/block_01/match_00_00/RESULT.json": "30ce22357bbf9d88935eb787a64a4229296922b0a5daba0c3666e380c20ef27e",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/NL3_PROVIDER_PRECISION/N128/block_01/match_00_00/compose/eos.compo": "ff48bd94db5baa1657fdd220f9feebd9b53391fed4444db23254ecda34c8833a",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/NL3_PROVIDER_PRECISION/N128/block_01/match_00_00/compose/eos.nb": "61d3929364cb431237cc9ed408a55f91642fcae21459e8ead66dde85239508c8",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/NL3_PROVIDER_PRECISION/N128/block_01/match_00_00/compose/eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/NL3_PROVIDER_PRECISION/N128/block_01/match_00_00/compose/eos.thermo": "a4e66e95ad5c29e829462719f135d9623129c122268dbf611f2c0b084fca39c9",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/NL3_PROVIDER_PRECISION/N128/block_01/match_00_00/compose/eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "data/low_density_crust_20261117/low_extension/repaired/tables_v2/NL3_PROVIDER_PRECISION/N128/block_01/match_00_00/RESULT.json": "57a671d4d1e37cf0788fda0388bdffd4ffd9c18053dc7ffe6a31f0befd1095f3",
+    "data/low_density_crust_20261117/support_refinement/matching/GPPVA_NL3wrL55/continued_G_lower_adjacent_branch/N128/run0_component_000__component_000/compose/eos.compo": "40ade0c55bcea1b3aeff74e4a28067967f8e3444cfe27452cc1dac2a193d078b",
+    "data/low_density_crust_20261117/support_refinement/matching/GPPVA_NL3wrL55/continued_G_lower_adjacent_branch/N128/run0_component_000__component_000/compose/eos.nb": "6d2b041259eeaf346461c3c2c3e647e0e44eb88cd71bb230f913efe53ec89f8e",
+    "data/low_density_crust_20261117/support_refinement/matching/GPPVA_NL3wrL55/continued_G_lower_adjacent_branch/N128/run0_component_000__component_000/compose/eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "data/low_density_crust_20261117/support_refinement/matching/GPPVA_NL3wrL55/continued_G_lower_adjacent_branch/N128/run0_component_000__component_000/compose/eos.thermo": "b96bbf5918163e01c1a23444cc0e94aa4844161d90f0138aed43291c54029ce9",
+    "data/low_density_crust_20261117/support_refinement/matching/GPPVA_NL3wrL55/continued_G_lower_adjacent_branch/N128/run0_component_000__component_000/compose/eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "data/low_density_crust_20261117/support_refinement/matching/GPPVA_NL3wrL55/continued_G_lower_adjacent_branch/N128/run0_component_000__component_000/RESULT.json": "1fe95cea523427690b1202bd1f116f44e0f54d4dc1b192725554d5729d5e937d",
+    "data/low_density_crust_20261117/stellar/causal_extension/TOV_PLAN.json": "42eef4c3d4cb774ae2c88cb9410ab5deb834af79b94e6394bdd6cacd8d0ab7c4",
+    "data/low_density_crust_20261117/stellar/causal_extension/FULL_CONTRACT_ADMISSION.json": "38551d8be9066908e14a3862f9ec584f11b100a730d72381e8f27dcee6d63974",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDME2_N128/primary/REPRESENTATION.json": "11d2c458fae2e837e0634f378fe34c463d88ff05c0e6a83ea8eb99f3391a6003",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDME2_N128/next_admissible_join_control/REPRESENTATION.json": "d4e854e8c332c96277dffb4fc0213b9c8c19fc7dabf0996bff313b6b1cd19ec5",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDMEX_ORIGINAL_TABLE_RHO0_N128/primary/REPRESENTATION.json": "4a1eead8e898d1dc764ebf2cda6605848a17174407a51866846ce2bb35562ae3",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDMEX_ORIGINAL_TABLE_RHO0_N128/next_admissible_join_control/REPRESENTATION.json": "fe6fd7262d99a7ee830135ba5c13e2eed630180063440065051019c8debb148e",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_NL3_PROVIDER_PRECISION_N128/primary/REPRESENTATION.json": "e0676543eddbf145664e29c31894fc51463e050b255aebfb20e2deec9522ff3e",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_NL3_PROVIDER_PRECISION_N128/next_admissible_join_control/REPRESENTATION.json": "0b44daf797ae15ad7f9e85fd1e46d11933fb6aec657a45ad8f5f050503bd2bf7",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_GPPVA_NL3wrL55_N128/primary/REPRESENTATION.json": "8eae0a84a2fd76c592183787959a24b2f9dafbb089bac4e57734ddf5fa776312",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_GPPVA_NL3wrL55_N128/next_admissible_join_control/REPRESENTATION.json": "5a4873e899dc8427415ab379fcb54a9602796c68630f2a292d88c1db931a5221"
+  },
+  "source_bytes_unchanged": true,
+  "actual_TOV_solver_calls_completed": 154,
+  "wall_seconds": 30.555003023997415
+}

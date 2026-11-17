@@ -1,0 +1,84 @@
+{
+  "phase": "FROZEN_BEFORE_OBSERVABLES",
+  "physics_root": "/home/cosmosapjw/ns_cowling_wt/crust_refinement_20261117",
+  "physics_commit": "905b845ad0f14d2f1e7f67f9eb802691144850cd",
+  "mass_msun": 1.4,
+  "scope": "Conditional electron-only TF-source + fixed E outer/surface + named Hermite lower closure; equilibrium perfect-fluid Cowling; finite frequency scan",
+  "cases": [
+    {
+      "id": "H_DDMEX_N128_primary",
+      "contract": "data/low_density_crust_20261117/stellar/h_final/contracts/H_DDMEX_ORIGINAL_TABLE_RHO0_N128/primary/REPRESENTATION.json",
+      "mesh": 128,
+      "lower_join": 0.003,
+      "role": "primary actual extended source",
+      "contract_sha256": "648dc116772df0c230f5346ac1f3d91fcea2d4b7f9c205f16a3156645bd9151a"
+    },
+    {
+      "id": "G_DDMEX_N64_primary",
+      "contract": "data/low_density_crust_20261117/stellar/g_baseline/contracts/G_DDMEX_ORIGINAL_TABLE_RHO0/primary/REPRESENTATION.json",
+      "mesh": 64,
+      "lower_join": 0.007,
+      "role": "G fixed-outer baseline",
+      "contract_sha256": "81f54a02211f20ef5685b1af8d1edbbf28e5db2aa0b9cd7db1bbe9f5827b298b"
+    },
+    {
+      "id": "H_DDMEX_N128_G_join",
+      "contract": "data/low_density_crust_20261117/stellar/ddmex_comparison/contracts/H_DDMEX_N128_G_join/REPRESENTATION.json",
+      "mesh": 128,
+      "lower_join": 0.007,
+      "role": "same join density, mesh/source refinement control",
+      "contract_sha256": "4383008d800593d0619f53d189e0e1e64be39c07b85eefeb8c769e9c9a2d9eaa"
+    },
+    {
+      "id": "H_DDMEX_N128_next_join",
+      "contract": "data/low_density_crust_20261117/stellar/h_final/contracts/H_DDMEX_ORIGINAL_TABLE_RHO0_N128/next_admissible_join_control/REPRESENTATION.json",
+      "mesh": 128,
+      "lower_join": 0.004,
+      "role": "next admissible source knot selected before observables",
+      "contract_sha256": "7e8576928a67eea97c0e139576cb34f490fd2e9ba408c68c5601b92de6211484"
+    }
+  ],
+  "frequencies_hz": [
+    50,
+    80,
+    120,
+    180,
+    250,
+    350,
+    500,
+    700,
+    1000,
+    1250,
+    1500,
+    1750,
+    2000,
+    2250,
+    2500,
+    3000,
+    3500
+  ],
+  "root_selection": {
+    "slow": "first two sign-change roots detected in fixed scan",
+    "rapid": "first one sign-change root detected in fixed scan"
+  },
+  "max_roots": {
+    "slow": 2,
+    "rapid": 1
+  },
+  "continuation": "seven points at 88%-112% of primary frequency; require exactly one bracket",
+  "acceptance": {
+    "determinant_abs": 1e-06,
+    "join_relative": 1e-06,
+    "surface_relative": 1e-10,
+    "traction_relative": 1e-10,
+    "kinematic_abs": 1e-10
+  },
+  "bounded_repair": "one tighter solve per rejected root, original retained",
+  "numerical_control": "primary at fixed central density, r0/2, tighter tolerances and surface_h*0.3",
+  "nonclaims": [
+    "complete spectrum",
+    "radial stability",
+    "global geometry minimum",
+    "crust microphysics in phenomenological bridge"
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "scope": "Wolfram symbolic cross-check of lower thermodynamic connector formulas; not a production EOS validation",
+  "context_attempt": {
+    "input": {
+      "context": "I am deriving exact endpoint feasibility criteria for a cold zero-temperature neutron-star crust barotrope P(mu) in MeV/fm^3 with mu in MeV and n=dP/dmu in fm^-3. Stability is dn/dmu>0 and causality is c_s^2/c^2=n/(mu dn/dmu)<=1. Endpoints have fixed positive n,P,epsilon and mu=(epsilon+P)/n, with no energy shifts. Need symbolic verification of cubic Hermite pressure density coefficients and necessary and sufficient causal window in mean density m=(P_R-P_L)/(mu_R-mu_L), plus a constructive smooth monotone y=n/mu family spanning all strictly admissible endpoint pressure integrals. This is mathematical support for a finite native TF continuation project; no parameter fitting."
+    },
+    "output": {
+      "isError": true,
+      "text": "tool call error: tool call failed for `codex_apps/wolfram.WolframContext`\n\nCaused by:\n    Mcp error: -32603: Internal error"
+    },
+    "classification": "connector context runtime failure; mathematical derivation does not depend on lookup"
+  },
+  "evaluation_attempts": [
+    {
+      "input": {
+        "code": "ClearAll[x,a,d,nL,nR,m,k,t]; p = pL + d nL x + d(3m-2nL-nR)x^2 + d(-2m+nL+nR)x^3; n = FullSimplify[D[p,x]/d]; susc=FullSimplify[D[n,x]/d]; causal=Expand[(a+d x)susc-n]; phi= (Exp[k x]-1)/(Exp[k]-1); J= Integrate[(a+d x)phi,{x,0,t},Assumptions -> {Element[{a,d,k,t},Reals],a>0,d>0,k!=0,0<=t<=1}]; checks={FullSimplify[n-(nL+(6m-4nL-2nR)x+(3nL+3nR-6m)x^2)]==0,FullSimplify[D[causal,x]-(a+d x)D[n,{x,2}]/d)]==0,FullSimplify[(causal/.x->0)-((a(6m-4nL-2nR)/d)-nL)]==0,FullSimplify[(causal/.x->1)-(((a+d)(-6m+2nL+4nR)/d)-nR)]==0}; <|\"density\"->n,\"susceptibility\"->susc,\"causal_polynomial\"->causal,\"symbolic_zero_checks\"->checks,\"exponential_integral\"->J,\"phi_zero_parameter_limit\"->Limit[phi,k->0],\"integral_zero_parameter_limit\"->Limit[J,k->0]|>",
+        "timeConstraint": 30
+      },
+      "output": {
+        "content": [
+          {
+            "type": "text",
+            "text": "ToExpression::sntx: Invalid syntax in or before \"                       ...                     ^\".\"\\n\"\nGeneral::messages: Messages were generated which may indicate errors.\n\nOut[1]= $Failed"
+          }
+        ],
+        "structuredContent": null,
+        "isError": false
+      },
+      "classification": "invalid submitted Wolfram syntax; productive correction follows"
+    },
+    {
+      "input": {
+        "code": "ClearAll[x,a,d,nL,nR,m,k,t,pL];\np=pL+d*nL*x+d*(3*m-2*nL-nR)*x^2+d*(-2*m+nL+nR)*x^3;\nn=Expand[D[p,x]/d];\nsusc=Expand[D[n,x]/d];\ncausal=Expand[(a+d*x)*susc-n];\nphi=(Exp[k*x]-1)/(Exp[k]-1);\nJ=Integrate[(a+d*x)*phi,{x,0,t},Assumptions->{Element[{a,d,k,t},Reals],a>0,d>0,k!=0,0<=t<=1}];\nchecks={\n FullSimplify[n-(nL+(6*m-4*nL-2*nR)*x+(3*nL+3*nR-6*m)*x^2)]===0,\n FullSimplify[D[causal,x]-(a+d*x)*D[n,{x,2}]/d]===0,\n FullSimplify[(causal/.x->0)-(a*(6*m-4*nL-2*nR)/d-nL)]===0,\n FullSimplify[(causal/.x->1)-((a+d)*(-6*m+2*nL+4*nR)/d-nR)]===0\n};\n<|\"density\"->n,\"susceptibility\"->susc,\"causal_polynomial\"->causal,\"symbolic_zero_checks\"->checks,\"exponential_integral\"->J,\"phi_zero_parameter_limit\"->Limit[phi,k->0],\"integral_zero_parameter_limit\"->Limit[J,k->0]|>",
+        "timeConstraint": 30
+      },
+      "output": {
+        "status": "fulfilled",
+        "value": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Symbol::undefined2: Warning: Global symbols \"J, J, J\" are undefined.\nPower::infy: -- Message text not found -- (1/0)\nPower::infy: -- Message text not found -- (1/0)\nInfinity::indet: -- Message text not found -- (0*Infinity)\nInfinity::indet: -- Message text not found -- (0*Infinity)\nPower::infy: -- Message text not found -- (1/0)\nPower::infy: -- Message text not found -- (0^(-2))\nInfinity::indet: -- Message text not found -- (0*Infinity*Infinity)\nInfinity::indet: -- Message text not found -- (0*Infinity*Infinity)\nGeneral::messages: Messages were generated which may indicate errors.\n\nOut[1]= <|\"density\" -> nL + 6*m*x - 4*nL*x - 2*nR*x - 6*m*x^2 + 3*nL*x^2 + 3*nR*x^2, \"susceptibility\" -> (6*m)/d - (4*nL)/d - (2*nR)/d - (12*m*x)/d + (6*nL*x)/d + (6*nR*x)/d, \"causal_polynomial\" -> (6*a*m)/d - nL - (4*a*nL)/d - (2*a*nR)/d - (12*a*m*x)/d + (6*a*nL*x)/d + (6*a*nR*x)/d - 6*m*x^2 + 3*nL*x^2 + 3*nR*x^2, \"symbolic_zero_checks\" -> {True, True, True, True}, \"exponential_integral\" -> (-2*a*k*(1 - E^(k*t) + k*t) + d*(2 - k^2*t^2 + 2*E^(k*t)*(-1 + k*t)))/(2*(-1 + E^k)*k^2), \"phi_zero_parameter_limit\" -> x, \"integral_zero_parameter_limit\" -> (t^2*(3*a + 2*d*t))/6|>"
+            }
+          ],
+          "structuredContent": null,
+          "isError": false
+        }
+      },
+      "classification": "four symbolic zero checks True; finite-limit results returned with Symbol/Power/Infinity warning messages; not a warning-free CAS run"
+    }
+  ],
+  "reported_scope": "Derived formulas independently checked by numerical quadrature in analyze_endpoints.py. CAS is corroborative; warnings and failed first input retained."
+}

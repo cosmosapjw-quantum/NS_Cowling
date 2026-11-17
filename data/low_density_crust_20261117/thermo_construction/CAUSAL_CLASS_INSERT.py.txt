@@ -1,0 +1,282 @@
+class CausalExponentialInterval:
+    """Explicit phenomenological lower bridge with monotone y=n/mu.
+
+    Endpoints fix kappa through the pressure integral. This does not regenerate
+    microscopic crust states, composition, or failed native continuation gaps.
+    The cubic Hermite representation remains the default elsewhere.
+    """
+    kind = "causal_exponential_n_over_mu"
+    representation = "causal_exponential_density_over_chemical_potential"
+
+    def __init__(self, n_left, p_left, epsilon_left, n_right, p_right, epsilon_right,
+                 *, kappa=None):
+        from numbers import Real
+        from scipy.optimize import brentq
+        values = (n_left, p_left, epsilon_left, n_right, p_right, epsilon_right)
+        if any(isinstance(v, (bool, np.bool_)) or not isinstance(v, Real) for v in values):
+            raise ValueError("real scalar thermodynamic endpoints required")
+        _positive_finite(*values)
+        self.n_left, self.p_left, self.epsilon_left = map(float, values[:3])
+        self.n_right, self.p_right, self.epsilon_right = map(float, values[3:])
+        self.mu_left = (self.epsilon_left+self.p_left)/self.n_left
+        self.mu_right = (self.epsilon_right+self.p_right)/self.n_right
+        self.width = self.mu_right-self.mu_left
+        if (self.n_right <= self.n_left or self.p_right <= self.p_left or self.width <= 0):
+            raise ValueError("bridge endpoints must increase in n, P and cold Euler mu")
+        _positive_finite(self.mu_left, self.mu_right, self.width)
+        self.y_left = self.n_left/self.mu_left
+        self.y_right = self.n_right/self.mu_right
+        self.delta_y = self.y_right-self.y_left
+        if self.delta_y < 0:
+            raise ValueError("causal endpoint order requires nondecreasing n/mu")
+        self.delta_p = self.p_right-self.p_left
+        area = self.width*(self.mu_left+self.mu_right)/2
+        self.causal_dp_lower = self.y_left*area
+        self.causal_dp_upper = self.y_right*area
+        self.pressure_roundoff_bound = 256*np.finfo(float).eps*max(
+            abs(self.delta_p), abs(self.causal_dp_lower), abs(self.causal_dp_upper), 1e-300)
+        if kappa is not None and (isinstance(kappa, (bool, np.bool_))
+                                  or not isinstance(kappa, Real) or not np.isfinite(kappa)):
+            raise ValueError("finite real kappa required")
+        self.degenerate_luminal = self.delta_y == 0
+        if self.degenerate_luminal:
+            if abs(self.delta_p-self.causal_dp_lower) > self.pressure_roundoff_bound:
+                raise ValueError("equal n/mu endpoints require the unique luminal pressure integral")
+            canonical_kappa = 0.
+            if kappa is not None and float(kappa) != 0.:
+                raise ValueError("degenerate luminal connector uses canonical kappa=0")
+        else:
+            if not self.causal_dp_lower < self.delta_p < self.causal_dp_upper:
+                raise ValueError("smooth causal connector requires strict endpoint pressure integral bounds")
+            target = (self.delta_p-self.causal_dp_lower)/(self.width*self.delta_y)
+            def residual(k):
+                f0, f1 = self._phi_integrals(1., k)
+                return float(self.mu_left*f0+self.width*f1)-target
+            lower, upper = -1., 1.
+            for _ in range(64):
+                if residual(lower) >= 0:
+                    break
+                lower *= 2
+            else:
+                raise ValueError("endpoint integral is unresolved near the upper causal bound")
+            for _ in range(64):
+                if residual(upper) <= 0:
+                    break
+                upper *= 2
+            else:
+                raise ValueError("endpoint integral is unresolved near the lower causal bound")
+            canonical_kappa = float(brentq(residual, lower, upper, xtol=2e-13,
+                                          rtol=8*np.finfo(float).eps, maxiter=200))
+            if kappa is not None and not np.isclose(float(kappa), canonical_kappa,
+                                                    rtol=64*np.finfo(float).eps, atol=5e-13):
+                raise ValueError("stored kappa differs from the endpoint-determined root")
+        self.kappa = canonical_kappa if kappa is None else float(kappa)
+        f0, f1 = self._phi_integrals(1., self.kappa)
+        predicted_dp = self.causal_dp_lower+self.width*self.delta_y*(
+            self.mu_left*float(f0)+self.width*float(f1))
+        self.pressure_integral_residual = predicted_dp-self.delta_p
+        if (not np.isfinite(self.pressure_integral_residual)
+                or abs(self.pressure_integral_residual) > self.pressure_roundoff_bound):
+            raise ValueError("exponential pressure integral cannot preserve endpoint pressure")
+
+    @classmethod
+    def from_endpoints(cls, n_left, p_left, epsilon_left, n_right, p_right, epsilon_right):
+        return cls(n_left, p_left, epsilon_left, n_right, p_right, epsilon_right)
+
+    @staticmethod
+    def _rate(k):
+        # k/expm1(k), with its finite k=0 limit and no exp(+large k).
+        if k == 0:
+            return 1.
+        if k > 0:
+            return k*np.exp(-k)/(-np.expm1(-k))
+        return k/np.expm1(k)
+
+    @staticmethod
+    def _series(z):
+        # Integral series after factoring k*x^2 or k*x^3. |z|<=1/2 here.
+        s0, s1 = np.full_like(z, .5), np.full_like(z, 1/3)
+        term = np.ones_like(z)
+        for r in range(1, 19):
+            term = term*z/(r+1)
+            s0 += term/(r+2)
+            s1 += term/(r+3)
+        return s0, s1
+
+    @classmethod
+    def _phi_integrals(cls, x, k):
+        """Return integral_0^x Phi_k and integral_0^x t*Phi_k(t) stably."""
+        original = np.asarray(x, dtype=float)
+        xx = original.reshape(-1)
+        if k == 0:
+            return (original**2/2, original**3/3)
+        z = k*xx
+        small = abs(z) <= .5
+        f0, f1 = np.empty_like(xx), np.empty_like(xx)
+        if np.any(small):
+            s0, s1 = cls._series(z[small])
+            f0[small] = cls._rate(k)*xx[small]**2*s0
+            f1[small] = cls._rate(k)*xx[small]**3*s1
+        if np.any(~small):
+            t, w = xx[~small], z[~small]
+            if k > 0:
+                base = np.exp(-k)
+                scaled = np.exp(k*(t-1))
+                denominator = -np.expm1(-k)
+                f0[~small] = (scaled*(-np.expm1(-w))/k-t*base)/denominator
+                f1[~small] = ((scaled*(w+np.expm1(-w))/k)/k
+                              -t*t*base/2)/denominator
+            else:
+                q, w = -k, -w
+                denominator = -np.expm1(-q)
+                f0[~small] = (t+np.expm1(-w)/q)/denominator
+                f1[~small] = (t*t/2-((-np.expm1(-w)-w*np.exp(-w))/q)/q)/denominator
+        return f0.reshape(original.shape), f1.reshape(original.shape)
+
+    @staticmethod
+    def _unit_argument(t):
+        values = np.asarray(t, dtype=float)
+        if np.any(~np.isfinite(values)) or np.any(values < 0) or np.any(values > 1):
+            raise ValueError("coordinate outside exponential bridge support")
+        return values
+
+    def _phi(self, t):
+        k = self.kappa
+        if k == 0:
+            return t
+        if k > 0:
+            return np.exp(k*(t-1))*(-np.expm1(-k*t))/(-np.expm1(-k))
+        return np.expm1(k*t)/np.expm1(k)
+
+    def _phi_prime(self, t):
+        k = self.kappa
+        if k == 0:
+            return np.ones_like(t)
+        if k > 0:
+            return k*np.exp(k*(t-1))/(-np.expm1(-k))
+        return k*np.exp(k*t)/np.expm1(k)
+
+    def pressure(self, t):
+        x = self._unit_argument(t)
+        f0, f1 = self._phi_integrals(x, self.kappa)
+        result = self.p_left+self.width*(
+            self.y_left*(self.mu_left*x+self.width*x*x/2)
+            +self.delta_y*(self.mu_left*f0+self.width*f1))
+        result = np.where(x == 0, self.p_left, np.where(x == 1, self.p_right, result))
+        return _scalar_or_array(result, t)
+
+    def number(self, t):
+        x = self._unit_argument(t)
+        mu = self.mu_left+self.width*x
+        result = mu*(self.y_left+self.delta_y*self._phi(x))
+        result = np.where(x == 0, self.n_left, np.where(x == 1, self.n_right, result))
+        return _scalar_or_array(result, t)
+
+    def susceptibility(self, t):
+        x = self._unit_argument(t)
+        mu = self.mu_left+self.width*x
+        y = self.y_left+self.delta_y*self._phi(x)
+        return _scalar_or_array(y+mu*self.delta_y*self._phi_prime(x)/self.width, t)
+
+    def evaluate_mu(self, chemical_potential):
+        mu = np.asarray(chemical_potential, dtype=float)
+        if (np.any(~np.isfinite(mu)) or np.any(mu < self.mu_left)
+                or np.any(mu > self.mu_right)):
+            raise ValueError("chemical potential outside exponential bridge support")
+        x = (mu-self.mu_left)/self.width
+        n, p = self.number(x), self.pressure(x)
+        epsilon = mu*n-p
+        epsilon = np.where(x == 0, self.epsilon_left,
+                           np.where(x == 1, self.epsilon_right, epsilon))
+        speed = n/(mu*self.susceptibility(x))
+        return {key: _scalar_or_array(value, chemical_potential) for key, value in
+                dict(n=n, p=p, epsilon=epsilon, mu=mu, cs2_over_c2=speed).items()}
+
+    def validate(self):
+        from scipy.optimize import brentq
+        # n''=y'*(2+kappa*mu/width). This also controls the extrema of mu^2*y'.
+        derivative_points = [0., 1.]
+        if self.kappa < 0:
+            mu0 = -2*self.width/self.kappa
+            if self.mu_left < mu0 < self.mu_right:
+                derivative_points.append((mu0-self.mu_left)/self.width)
+        speed_points = [0., 1.]
+        if self.delta_y > 0:
+            # d(cs2)/dmu has sign -[y+mu*kappa*A/width],
+            # A=y_left-delta_y/expm1(kappa); kappa*A has a finite kappa=0 limit.
+            ka = self.kappa*self.y_left-self.delta_y*self._rate(self.kappa)
+            def stationary(x):
+                return (self.y_left+self.delta_y*float(self._phi(np.asarray(x)))
+                        +(self.mu_left+self.width*x)*ka/self.width)
+            f0, f1 = stationary(0.), stationary(1.)
+            if f0*f1 < 0:
+                speed_points.append(brentq(stationary, 0., 1., xtol=5e-15,
+                                           rtol=4*np.finfo(float).eps))
+        speed = [float(self.number(x)/((self.mu_left+self.width*x)*self.susceptibility(x)))
+                 for x in speed_points]
+        minimum_susceptibility = min(float(self.susceptibility(x)) for x in derivative_points)
+        causal = [(self.mu_left+self.width*x)**2*self.delta_y
+                  *float(self._phi_prime(np.asarray(x)))/self.width for x in derivative_points]
+        finite = np.all(np.isfinite(speed+causal+[minimum_susceptibility]))
+        # The analytic construction gives 0<cs2<=1. Permit only roundoff at unity.
+        passed = bool(finite and minimum_susceptibility > 0 and min(speed) > 0
+                      and max(speed) <= 1+64*np.finfo(float).eps and min(causal) >= 0)
+        return dict(status="PASS" if passed else "FAIL", first_law="ANALYTIC_IDENTITY",
+                    construction="monotone n/mu; endpoint pressure integral fixes kappa",
+                    degenerate_luminal=self.degenerate_luminal,
+                    kappa=self.kappa, min_n_fm3=self.n_left, min_epsilon=self.epsilon_left,
+                    min_dn_dmu=minimum_susceptibility, min_causal_margin=min(causal),
+                    min_cs2_over_c2=min(speed), max_cs2_over_c2=max(speed),
+                    extrema_method="analytic derivative signs; endpoints and isolated stationary roots",
+                    extrema_candidates=dict(susceptibility=derivative_points, sound_speed=speed_points),
+                    mean_density=self.delta_p/self.width,
+                    causal_delta_p_bounds=[self.causal_dp_lower, self.causal_dp_upper],
+                    endpoint_pressure_integral_residual=self.pressure_integral_residual,
+                    pressure_roundoff_bound=self.pressure_roundoff_bound,
+                    support_n_fm3=[self.n_left, self.n_right],
+                    support_mu_MeV=[self.mu_left, self.mu_right])
+
+    def contract(self):
+        return dict(kind=self.kind, representation=self.representation, kappa=self.kappa,
+                    kappa_selection="unique endpoint pressure integral; no stellar observable input",
+                    mu_left_MeV=self.mu_left, mu_width_MeV=self.width,
+                    endpoint_states=[dict(n=self.n_left, p=self.p_left, epsilon=self.epsilon_left),
+                                     dict(n=self.n_right, p=self.p_right, epsilon=self.epsilon_right)],
+                    t_definition="(mu-mu_left)/mu_width",
+                    composition="UNSPECIFIED_PHENOMENOLOGICAL_LOWER_BRIDGE",
+                    physical_scope="declared barotropic closure, not microscopic crust regeneration",
+                    source_energy_shift="NONE",
+                    validation=self.validate())
+
+    @classmethod
+    def from_contract(cls, record):
+        if record.get("kind") != cls.kind or record.get("representation") != cls.representation:
+            raise ValueError("explicit causal exponential kind and representation required")
+        try:
+            left, right = record["endpoint_states"]
+            kappa = record["kappa"]
+            if kappa is None:
+                raise ValueError("stored kappa is required")
+            instance = cls(left["n"], left["p"], left["epsilon"],
+                           right["n"], right["p"], right["epsilon"], kappa=kappa)
+        except (KeyError, TypeError, ValueError) as error:
+            raise ValueError("malformed causal exponential contract: "+str(error)) from error
+        for key, actual in (("mu_left_MeV", instance.mu_left), ("mu_width_MeV", instance.width)):
+            if key in record:
+                value = record[key]
+                if (isinstance(value, (bool, np.bool_)) or not isinstance(value, (int, float))
+                        or not np.isfinite(value) or
+                        abs(value-actual) > 64*np.finfo(float).eps*max(abs(actual), 1e-300)):
+                    raise ValueError("exponential contract "+key+" differs from source endpoints")
+        return instance
+
+    def table(self, count: int, *, template: EOSData, phase_id: int = 901):
+        if isinstance(count, bool) or int(count) != count or count < 3:
+            raise ValueError("at least three bridge samples required")
+        if self.validate()["status"] != "PASS":
+            raise ValueError("exponential bridge failed finite causal validation")
+        values = self.evaluate_mu(np.linspace(self.mu_left, self.mu_right, int(count)))
+        return _thermo_table(template, values["n"], values["p"], values["epsilon"],
+                             values["mu"], phase_id=phase_id)
+
+

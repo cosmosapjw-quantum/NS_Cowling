@@ -23,6 +23,7 @@ Both methods are thermodynamic-only in this pipeline. Composition is explicitly
 dropped; no composition-preservation claim is made.
 """
 from __future__ import annotations
+import copy
 import csv
 import json
 import math
@@ -63,6 +64,7 @@ DEFAULT_RUN_STAMP = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 DEFAULT_OUT_ROOT = ROOT / "download" / "matched_runs" / DEFAULT_RUN_STAMP
 OUT_ROOT = Path(os.environ.get("NS_COWLING_MATCH_OUT_ROOT", str(DEFAULT_OUT_ROOT))).expanduser()
 N_BRIDGE = 8
+CURRENT_GENERATOR_ALLOWANCE_ROOT = ROOT / "data/current_generator_intake_20261117"
 
 
 def sha256_file(path: Path | str) -> str:
@@ -490,6 +492,7 @@ def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) ->
             raise NotADirectoryError(f"matching output is not a directory: {out_dir}")
         if any(out_dir.iterdir()):
             raise FileExistsError(f"matching output directory is not empty: {out_dir}")
+    kernel_state = {"invoked": False}
     marker = _source_marker(Path(crust_dir)) or _source_marker(Path(core_dir))
     if marker is not None:
         res = {"survived": False, "method": method, "stage": "source",
@@ -508,7 +511,9 @@ def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) ->
                    "missing_source_files": sorted(set(missing["crust"]) | set(missing["core"])),
                    "missing_source_detail": missing}
         else:
-            res = _run_pipeline(method, crust_dir, core_dir, out_dir)
+            res = _run_pipeline(method, crust_dir, core_dir, out_dir,
+                                kernel_state=kernel_state)
+    res.setdefault("matching_kernel_invoked", kernel_state["invoked"])
     # Preserve input identity on failures too, before the per-pair receipt is saved.
     res.setdefault("source_sha256", {"crust": _source_compose_hashes(Path(crust_dir)),
                                      "core": _source_compose_hashes(Path(core_dir))})
@@ -520,7 +525,18 @@ def run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) ->
     return res
 
 
-def _run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) -> dict:
+def _run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path,
+                  *, kernel_state: dict | None = None) -> dict:
+    if kernel_state is None:
+        kernel_state = {"invoked": False}
+    result = _run_pipeline_impl(method, crust_dir, core_dir, out_dir,
+                                kernel_state=kernel_state)
+    result.setdefault("matching_kernel_invoked", kernel_state["invoked"])
+    return result
+
+
+def _run_pipeline_impl(method: str, crust_dir: Path, core_dir: Path, out_dir: Path,
+                       *, kernel_state: dict) -> dict:
     work = out_dir / "work"
     work.mkdir(parents=True, exist_ok=False)
     (out_dir / "compose").mkdir(parents=True, exist_ok=True)
@@ -587,10 +603,12 @@ def _run_pipeline(method: str, crust_dir: Path, core_dir: Path, out_dir: Path) -
                                                for name in ("eos_data.csv", "eos_data.nml")}}
             (work / "composition_transport.json").write_text(
                 json.dumps(composition_transport, indent=2) + "\n", encoding="utf-8")
+            kernel_state["invoked"] = True
             r3 = run_native("maxwell-transition", str(views["crust"]), str(views["core"]),
                             str(matched_internal), "true")
             r3 = dict(r3, composition_dropped=composition_transport["composition_dropped"])
         else:  # css
+            kernel_state["invoked"] = True
             r3 = run_native("match-core", str(crust_internal), str(core_internal),
                             str(matched_internal), "css", str(N_BRIDGE), "true")
         if r3.get("status") != "ok":
@@ -997,5 +1015,135 @@ def main() -> int:
     return 1 if execution_failures else 0
 
 
+def execute_current_generator_manifest(manifest_path: Path, output_root: Path,
+                                       *, root: Path = ROOT) -> dict:
+    """Execute the one authorized fresh cell and preserve its raw outcome.
+
+    The input manifest is immutable. A new output directory contains a receipt
+    even if executable resolution or the matching call fails.
+    """
+    from current_generator_manifest import build_manifest, validate_manifest, validate_source
+
+    manifest_path = Path(manifest_path)
+    output_root = Path(output_root)
+    input_sha = sha256_file(manifest_path)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    validate_manifest(manifest)
+    if manifest != build_manifest(root):
+        raise ValueError("manifest differs from live sealed intake")
+    eligible = [cell for cell in manifest["cells"] if cell["eligible"]]
+    if (len(eligible) != 1 or eligible[0]["id"] != "SPG_M1__GM_GM1__css"
+            or eligible[0]["n_bridge"] != 40 or eligible[0]["attempted"]
+            or eligible[0]["admitted"]):
+        raise ValueError("exactly one eligible unattempted CSS cell is required")
+    source_by_id = {source["id"]: source for source in manifest["sources"]}
+    cell = eligible[0]
+    crust = source_by_id[cell["crust_source_id"]]
+    core = source_by_id[cell["core_source_id"]]
+    validate_source(root, crust)
+    validate_source(root, core)
+    crust_dir = root / crust["compose_path"]
+    core_dir = root / core["compose_path"]
+    allowance_root = CURRENT_GENERATOR_ALLOWANCE_ROOT
+    template = json.loads((allowance_root / "ALLOWANCE_UNUSED.json").read_text(encoding="utf-8"))
+    if template != {"schema_version": "ns-cowling.current-generator-allowance.v1",
+                    "task_id": "current_generator_intake_20261117",
+                    "status": "UNUSED", "max_pipeline_invocations": 1,
+                    "claim_path": "runtime/CLAIM.json"}:
+        raise ValueError("current-generator allowance template invalid")
+    claim_path = allowance_root / template["claim_path"]
+    output_root.mkdir(parents=True, exist_ok=False)
+    cell_dir = output_root / cell["id"]
+    cell_dir.mkdir(exist_ok=False)
+    receipt = {
+        "schema_version": "ns-cowling.current-generator-execution.v1",
+        "input_manifest_sha256": input_sha,
+        "input_manifest_path": str(manifest_path),
+        "cell_id": cell["id"],
+        "n_bridge": 40,
+        "current_executable_sha256": None,
+        "execution_started": True,
+        "source_verified": True,
+        "pipeline_invoked": False,
+        "matching_kernel_invoked": False,
+        "allowance_claim_path": str(claim_path),
+        "attempted": False,
+        "admitted": False,
+        "status": "HOLD",
+        "outcome": "NOT_STARTED",
+        "result": None,
+    }
+    global N_BRIDGE
+    old_n_bridge = N_BRIDGE
+    try:
+        receipt["current_executable_sha256"] = sha256_file(executable())
+        claim_path.parent.mkdir(parents=True, exist_ok=True)
+        with claim_path.open("x", encoding="utf-8") as stream:
+            json.dump({"schema_version": "ns-cowling.current-generator-claim.v1",
+                       "task_id": template["task_id"],
+                       "input_manifest_sha256": input_sha,
+                       "cell_id": cell["id"],
+                       "output_root": str(output_root),
+                       "current_executable_sha256": receipt["current_executable_sha256"]}, stream,
+                      indent=2)
+            stream.write("\n")
+        N_BRIDGE = 40
+        receipt["pipeline_invoked"] = True
+        result = run_pipeline("css", crust_dir, core_dir, cell_dir)
+        receipt["result"] = result
+        receipt["matching_kernel_invoked"] = result.get("matching_kernel_invoked") is True
+        receipt["attempted"] = receipt["matching_kernel_invoked"]
+        receipt["admitted"] = (receipt["attempted"] and result.get("survived") is True
+                               and result.get("admission", {}).get("status") == "ADMITTED")
+        receipt["outcome"] = "SURVIVED" if receipt["admitted"] else "FAILED"
+        receipt["status"] = "HOLD_INDEPENDENT_REVIEW" if receipt["admitted"] else "HOLD_MATCH_FAILURE"
+    except Exception as exc:
+        receipt["outcome"] = "EXCEPTION"
+        receipt["status"] = ("HOLD_ALLOWANCE_ALREADY_CLAIMED" if isinstance(exc, FileExistsError)
+                             and not receipt["pipeline_invoked"] else "HOLD_EXECUTION_EXCEPTION")
+        receipt["error"] = f"{type(exc).__name__}: {exc}"
+    finally:
+        N_BRIDGE = old_n_bridge
+        (output_root / "MATCH_EXECUTION.json").write_text(
+            json.dumps(receipt, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        census = copy.deepcopy(manifest)
+        census["schema_version"] = "ns-cowling.current-generator-result-census.v1"
+        census["execution"] = {
+            "input_manifest_sha256": input_sha,
+            "current_executable_sha256": receipt["current_executable_sha256"],
+            "cell_id": cell["id"],
+            "publication_status": "HOLD_INDEPENDENT_REVIEW",
+            "outcome": receipt["outcome"],
+        }
+        selected = next(item for item in census["cells"] if item["id"] == cell["id"])
+        selected["attempted"] = receipt["attempted"]
+        selected["admitted"] = receipt["admitted"]
+        selected["status"] = receipt["status"]
+        selected["reason_code"] = receipt["outcome"]
+        selected["evidence_refs"] = ["MATCH_EXECUTION.json"]
+        (output_root / "MATCH_RESULT_CENSUS.json").write_text(
+            json.dumps(census, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return receipt
+
+
 if __name__ == "__main__":
-    raise SystemExit(main())
+    if len(sys.argv) == 3 and sys.argv[1] == "--current-generator-manifest":
+        from current_generator_manifest import build_manifest, validate_manifest
+        target = Path(sys.argv[2]).expanduser()
+        if target.exists():
+            raise FileExistsError(f"manifest already exists: {target}")
+        manifest = build_manifest(ROOT)
+        validate_manifest(manifest)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with target.open("x", encoding="utf-8") as stream:
+            json.dump(manifest, stream, indent=2, ensure_ascii=False)
+            stream.write("\n")
+        print(f"Current-generator intake manifest: {target}")
+    elif len(sys.argv) == 4 and sys.argv[1] == "--current-generator-execute":
+        execution = execute_current_generator_manifest(Path(sys.argv[2]), Path(sys.argv[3]))
+        print(f"Current-generator execution receipt: {Path(sys.argv[3]) / 'MATCH_EXECUTION.json'}")
+        raise SystemExit(0 if execution["admitted"] else 1)
+    elif len(sys.argv) == 1:
+        raise SystemExit(main())
+    else:
+        raise SystemExit("usage: match_core_crust.py [--current-generator-manifest PATH | --current-generator-execute MANIFEST_PATH OUTPUT_ROOT]")

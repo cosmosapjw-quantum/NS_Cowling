@@ -1,0 +1,47 @@
+{
+  "schema_version": "ns-cowling.current-generator-closeout.v1",
+  "base_commit": "23b1f2099dc15470ac63a100e6b3aae0c397a36b",
+  "decision": "PASS_SCOPED",
+  "counts": {"requested": 390, "eligible": 1, "attempted": 1, "admitted": 1},
+  "execution_allowance": "CONSUMED",
+  "cell": "SPG_M1__GM_GM1__css",
+  "n_bridge": 40,
+  "rows": 252,
+  "identities": {
+    "input_manifest_sha256": "2a72a93c0fb5b00e4de67a1227d5d97aefcd789c2deee27d9fb6ebc58ccc7e1d",
+    "matching_executable_sha256": "6c5035d83da1804ab5401a96d00ddf1cbca9cccfce3962ad706d09b5ee0e649e",
+    "claim_sha256": "0f6d574abffb13bea5710d141a83176aa7819aaecdc9c529deb764b011604018",
+    "execution_receipt_sha256": "4aa35d743815ee2b7292b46974a48537f3a0b266496db1ad00d793259b68e732",
+    "result_census_sha256": "f22449d4951e39eeaf299dc3e3229b217e3a99c918a6ca1cd3dcb79f8d098a38",
+    "admission_sha256": "faaaee08b796253fe4b5669a6652f4f46dbd8afdf7d492838afc2cedea47dac9",
+    "consistency_sha256": "d31825be8ffde4a32910a98750bb00ba7b3d4202bb52eda54d8cd2c01c5a7a92"
+  },
+  "validation": {
+    "frontend_pipeline": "1242 passed, 9 skipped",
+    "generator": "142 passed",
+    "theory": "6 passed",
+    "native_controls": "four programs exit 0"
+  },
+  "commands": [
+    {"name": "e2e", "exit_code": 0, "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 python scripts/match_core_crust.py --current-generator-execute data/current_generator_intake_20261117/MANIFEST_REVIEW_REPAIR_390.json data/current_generator_intake_20261117/runtime/run_001"},
+    {"name": "frontend_pipeline", "exit_code": 0, "command": "python -m pytest -q -ra python_frontend/tests pipeline/tests", "outcome": "1242 passed, 9 skipped", "skips": "existing unstaged M0/E390 inputs only"},
+    {"name": "generator", "exit_code": 0, "command": "PYTHONPATH=eos_generator:eos_generator/compose_eos_pkg python -m pytest -q -ra eos_generator/tests", "outcome": "142 passed"},
+    {"name": "theory", "exit_code": 0, "command": "python -m pytest -q fortran_eos/tests/matching_theory_soft_barotrope.py fortran_eos/tests/matching_theory_maxwell_topology.py", "outcome": "6 passed"},
+    {"name": "native_controls", "exit_code": 0, "command": "python fortran_eos/tests/run_matching_native_adversarial.py --build-dir build/current_generator_matching_controls --log-dir build/current_generator_matching_controls/logs", "outcome": "four programs exit 0"}
+  ],
+  "physics": {
+    "construction": "css_single_speed_with_crust_density_jump",
+    "css_cs2": 0.1138059905370708,
+    "delta_nb_fm3": 0.04437293435033804,
+    "delta_epsilon_mev_fm3": 42.355867831037415,
+    "seidov_ratio": 1.1434323,
+    "small_core_stable": false
+  },
+  "holds": [
+    "HOLD_UNDECLARED_SOURCE_BOUNDARY_LAW",
+    "full_EOS390_not_established",
+    "whole_crust_support_not_established",
+    "original_author_calibration_not_established",
+    "stable_star_and_Cowling_not_admitted"
+  ]
+}

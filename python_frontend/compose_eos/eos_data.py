@@ -231,6 +231,18 @@ class EOSData:
             nadd_max=int(metadata.get("nadd_max", 0)),
             nT=int(metadata.get("naxis_t", 1)) or 1,
             nYq=int(metadata.get("naxis_yq", 1)) or 1,
+            t_first=int(metadata.get("t_first", 0)),
+            t_last=int(metadata.get("t_last", -1)),
+            yq_first=int(metadata.get("yq_first", 0)),
+            yq_last=int(metadata.get("yq_last", -1)),
+            selected_iT=int(metadata.get("selected_it", metadata["it"])),
+            selected_iYq=int(metadata.get("selected_iyq", metadata["iyq"])),
+            # A 1D axis has one exact value already carried by the scalar
+            # slice metadata.  Missing multidimensional values stay absent.
+            t_axis=(np.asarray([float(metadata["temperature_mev"])])
+                    if (int(metadata.get("naxis_t", 1)) or 1) == 1 else np.zeros(0)),
+            yq_axis=(np.asarray([float(metadata["charge_fraction_grid"])])
+                     if (int(metadata.get("naxis_yq", 1)) or 1) == 1 else np.zeros(0)),
             # M2A masks: default to 0 / False if the backend wrote a legacy 17-col CSV.
             # NOTE: the Fortran CSV header uses lowercase column names (row_status,
             # yn_present, ...) which differ from the dataclass field names. The col
@@ -487,6 +499,10 @@ class EOSData:
             f" mn={self.mn:.17e}\n mp={self.mp:.17e}\n il={self.Il}\n iT={self.iT}\n"
             f" iYq={self.iYq}\n inb_start={self.inb_start}\n nadd={self.q_extra_count}\n"
             f" naxis_t={int(self.nT)}\n naxis_yq={int(self.nYq)}\n"
+            f" t_first={self.t_first}\n t_last={self.t_last}\n"
+            f" yq_first={self.yq_first}\n yq_last={self.yq_last}\n"
+            f" selected_iT={self.iT if nT == 1 else self.selected_iT}\n"
+            f" selected_iYq={self.iYq if nYq == 1 else self.selected_iYq}\n"
             f" temperature_mev={self.temperature_mev:.17e}\n"
             f" charge_fraction_grid={self.charge_fraction_grid:.17e}\n"
             f" composition_file_present={'.true.' if self.composition_file_present else '.false.'}\n"

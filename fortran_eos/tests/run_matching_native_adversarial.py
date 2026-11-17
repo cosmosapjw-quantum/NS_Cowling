@@ -24,7 +24,7 @@ def main() -> int:
     logs.mkdir(parents=True, exist_ok=True)
     source = args.source.resolve().read_text()
     exports = ['pressure_work_integral', 'make_pressure_spline', 'spline_eval', 'construct_bridge', 'validate_bridge']
-    names = ['matching_thermodynamic_adversarial', 'matching_interval_adversarial']
+    names = ['matching_thermodynamic_adversarial', 'matching_interval_adversarial', 'matching_slice_conventions']
     if not args.baseline:
         exports += ['polynomial_minimum', 'certify_profile']
         names += ['matching_extrema_controls']

@@ -893,6 +893,18 @@ contains
        .not.ieee_is_finite(cr%charge_fraction_grid).or..not.ieee_is_finite(co%charge_fraction_grid))then
       status='native matching requires finite thermodynamic metadata';return
     endif
+    if((cr%il/=0.and.cr%il/=1).or.(co%il/=0.and.co%il/=1))then
+      status='native matching requires a supported CompOSE lepton-content flag Il=0 or Il=1';return
+    endif
+    ! Il determines which particles contribute to the thermodynamic table;
+    ! matching cannot convert a baryonic table into a lepton-inclusive one.
+    ! The physical Yq value identifies the slice; its integer index does not.
+    if(cr%il/=co%il)then
+      status='native matching requires the same CompOSE lepton-content convention Il';return
+    endif
+    if(abs(cr%charge_fraction_grid-co%charge_fraction_grid)>1.e-12_wp)then
+      status='native matching requires the same physical charge-fraction slice Yq';return
+    endif
     if(abs(cr%temperature_mev)>1.e-12_wp.or.abs(co%temperature_mev)>1.e-12_wp)then
       status='native matching currently requires cold T=0 barotropes';return
     endif
@@ -1001,7 +1013,8 @@ contains
 
     call allocate_eos(out,nout)
     out%mn=co%mn;out%mp=co%mp;out%il=co%il;out%iT=co%iT;out%iYq=co%iYq
-    out%inb_start=1;out%nadd=0;out%temperature_mev=0._wp;out%charge_fraction_grid=0._wp
+    out%inb_start=1;out%nadd=0;out%temperature_mev=0._wp
+    out%charge_fraction_grid=co%charge_fraction_grid
     ! This matcher exports one cold, selected thermodynamic slice. Record that
     ! as an explicit 1x1 (T,Yq) grid rather than leaving nT/nYq at their
     ! allocate_eos defaults of zero. The CompOSE writer serializes one value
@@ -1070,6 +1083,10 @@ contains
       out%q(3,k)=(ff+qq)/out%mn-1._wp;out%q(6,k)=ff/out%mn-1._wp
       out%q(4,k)=co%q(4,i2+j-1)*co%mn/out%mn
     enddo
+    ! The construction evolves the Euler combination (epsilon+P)/n_B.  For
+    ! Il=0, CompOSE Q3 excludes Yq*mu_q; preserve that source convention at
+    ! the retained nonzero charge fraction rather than relabelling Yq=0.
+    if(out%il==0)out%q(3,:)=out%q(3,:)-out%charge_fraction_grid*out%q(4,:)
     out%q(7,:)=out%q(6,:);out%q(2,:)=0._wp;out%q(5,:)=0._wp
     if(any(out%nb(2:)<=out%nb(:nout-1)))then;status='assembled EOS density grid is not strictly increasing';return;endif
 
@@ -1114,8 +1131,10 @@ contains
     report%dm_mass_gauge_meV=0._wp
     report%source_euler_residual_meV=0._wp
     do j=1,i1
+      ff=(cr%q(3,j)+1._wp)*cr%mn
+      if(cr%il==0)ff=ff+cr%charge_fraction_grid*cr%q(4,j)*cr%mn
       report%source_euler_residual_meV=max(report%source_euler_residual_meV, &
-        abs((cr%q(3,j)+1._wp)*cr%mn-((cr%q(6,j)+1._wp)*cr%mn+cr%q(1,j))))
+        abs(ff-((cr%q(6,j)+1._wp)*cr%mn+cr%q(1,j))))
     enddo
     report%composition_dropped=cr%composition_file_present.or.cr%composition_available.or. &
       co%composition_file_present.or.co%composition_available

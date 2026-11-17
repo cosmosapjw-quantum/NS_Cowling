@@ -1324,25 +1324,36 @@ def _matching_support_record(source_dir: str | Path | None) -> dict[str, Any]:
     if (not path.is_file() and directory.name in ("outer", "lower_source_fit")
             and (directory.parent / "crust_segments.json").is_file()):
         path = directory.parent / "SUPPORT.json"
-    expected = None
+    seals = []
     seal_path = path.parent / "RESULT.json"
     if seal_path.is_file():
-        seal = json.loads(seal_path.read_bytes())
+        seals.append(json.loads(seal_path.read_bytes()))
+    # The public dispatcher keeps the verified inventory outside native RESULT.
+    # Use the structural generated/ relationship, since archived runs may move.
+    dispatch_path = path.parent.parent / "DISPATCH.json"
+    if path.parent.name == "generated" and dispatch_path.is_file():
+        dispatch = json.loads(dispatch_path.read_bytes())
+        if not isinstance(dispatch, dict):
+            raise ValueError("matching source support dispatch seal must be an object")
+        seals.append(dispatch.get("evidence", {}))
+    expected = []
+    for seal in seals:
         if not isinstance(seal, dict):
             raise ValueError("matching source support seal must be an object")
         hashes = seal.get("output_sha256", {})
         if not isinstance(hashes, dict):
             raise ValueError("matching source support sha256 inventory is invalid")
         if "SUPPORT.json" in hashes:
-            expected = hashes["SUPPORT.json"]
-            if not isinstance(expected, str) or len(expected) != 64:
+            digest = hashes["SUPPORT.json"]
+            if not isinstance(digest, str) or len(digest) != 64:
                 raise ValueError("matching source support sha256 is invalid")
+            expected.append(digest)
             if not path.is_file():
                 raise ValueError("matching source support is missing despite its sha256 seal")
     if not path.is_file():
         return {}
     raw = path.read_bytes()
-    if expected is not None and hashlib.sha256(raw).hexdigest() != expected:
+    if any(hashlib.sha256(raw).hexdigest() != digest for digest in expected):
         raise ValueError("matching source support sha256 mismatch")
     record = json.loads(raw)
     if not isinstance(record, dict):
@@ -1395,11 +1406,13 @@ def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
                     method: str = "quintic_P", n_bridge: int = 40, *,
                     core_compo_mode: str = "strict_thermo_only",
                     drop_composition: bool = False):
-    """Join cold crust/core barotropes with the native six-method Fortran bridge.
+    """Join cold crust/core barotropes with a native smooth or CSS bridge.
 
     The native v1 implementation is deliberately strict-thermo-only. Any input
     carrying an eos.compo file or usable composition requires the caller to opt
     in to dropping that information with drop_composition=True.
+    Both inputs must describe the same lepton-content convention and actual
+    charge-fraction value. Axis indices alone do not identify physical slices.
     """
     import math
     if d_cr is None or d_co is None:
@@ -1440,6 +1453,15 @@ def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
         raise ValueError("native matching requires T=0 inputs")
     if not d_cr.beta_equilibrated or not d_co.beta_equilibrated:
         raise ValueError("native matching requires beta-equilibrated inputs")
+    if (not math.isfinite(float(d_cr.charge_fraction_grid))
+            or not math.isfinite(float(d_co.charge_fraction_grid))):
+        raise ValueError("matching charge-fraction values must be finite")
+    if (d_cr.Il not in (0, 1) or d_co.Il not in (0, 1)
+            or d_cr.Il != d_co.Il
+            or abs(float(d_cr.charge_fraction_grid) - float(d_co.charge_fraction_grid)) > 1e-12):
+        raise ValueError(
+            "matching inputs must use the same CompOSE lepton-content and charge-fraction conventions"
+        )
     source_support = {}
     for label, data in (("crust", d_cr), ("core", d_co)):
         import numpy as np

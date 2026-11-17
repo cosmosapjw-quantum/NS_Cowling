@@ -90,3 +90,36 @@ def test_sealed_support_cannot_be_removed_or_rewritten(tmp_path, monkeypatch, ch
     monkeypatch.setattr(api, "run_native", _must_not_match)
     with pytest.raises(ValueError, match="support.*sha256|support.*missing"):
         api.match_crust_core(data, data, method="css", n_bridge=8)
+
+
+@pytest.mark.parametrize("segment", [None, "outer", "lower_source_fit"])
+@pytest.mark.parametrize("change", ["unchanged", "edit", "delete"])
+def test_public_dispatch_support_seal_reaches_matching(tmp_path, monkeypatch, segment, change):
+    """The public generator stores hashes in DISPATCH, outside native RESULT."""
+    import hashlib
+    generated = tmp_path / "generated"
+    source = generated if segment is None else generated / segment
+    source.mkdir(parents=True)
+    data = _table(source, [9] * 6)
+    _support(generated)
+    path = generated / "SUPPORT.json"
+    (generated / "RESULT.json").write_text(json.dumps({
+        "backend": "fortran", "status": "REQUESTED_ROWS_NATIVE_VERIFIED"}))
+    if segment is not None:
+        (generated / "crust_segments.json").write_text('{}')
+    (tmp_path / "DISPATCH.json").write_text(json.dumps({
+        "status": "REQUESTED_ROWS_NATIVE_VERIFIED", "evidence": {
+            # Archived campaigns can move without changing their artifact bytes.
+            "native_directory": "/old/campaign/output/generated",
+            "output_sha256": {"SUPPORT.json": hashlib.sha256(path.read_bytes()).hexdigest()}}}))
+    if change == "edit":
+        path.write_text('{}')
+    elif change == "delete":
+        path.unlink()
+    monkeypatch.setattr(api, "run_native", _must_not_match)
+    if change == "unchanged":
+        with pytest.raises(RuntimeError, match="native matching entered"):
+            api.match_crust_core(data, data, method="css", n_bridge=8)
+    else:
+        with pytest.raises(ValueError, match="support.*sha256|support.*missing"):
+            api.match_crust_core(data, data, method="css", n_bridge=8)

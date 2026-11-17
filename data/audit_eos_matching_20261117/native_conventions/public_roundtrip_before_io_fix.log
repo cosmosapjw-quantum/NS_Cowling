@@ -1,0 +1,362 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+____ test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip[cubic_F] _____
+
+method = 'cubic_F'
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-418/test_il0_nonzero_charge_slice_0')
+
+    @pytest.mark.parametrize("method", ["cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    def test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip(method, tmp_path):
+        crust = quadratic_source(.01, .04, 20)
+        core = quadratic_source(.06, .15, 30)
+        reference, _ = match_crust_core(crust, core, method=method, drop_composition=True)
+        for data, index in ((crust, 3), (core, 9)):
+            data.Il = 0
+            data.iYq = index
+            data.charge_fraction_grid = .1
+            data.Q4[:] = -.01
+            data.Q3 -= data.charge_fraction_grid * data.Q4
+        matched, report = match_crust_core(crust, core, method=method, drop_composition=True)
+        assert matched.Il == 0
+        assert matched.iYq == 9
+        assert matched.charge_fraction_grid == pytest.approx(.1)
+        assert report["diagnostic_only"] is False
+        assert report["native_report"]["source_euler_residual_meV"] < 2e-10
+        np.testing.assert_allclose(matched.eps, reference.eps, rtol=2e-13, atol=2e-12)
+        np.testing.assert_allclose(matched.p, reference.p, rtol=2e-13, atol=2e-12)
+        mu_euler = (matched.eps + matched.p) / matched.nb
+        np.testing.assert_allclose(
+            matched.mub, mu_euler - .1 * matched.Q4 * matched.mn,
+            rtol=2e-13, atol=2e-12,
+        )
+        left, right = report["i1"] + 1, core.n - report["i2"]
+        np.testing.assert_allclose(matched.Q3[:left], crust.Q3[:left], rtol=2e-13, atol=2e-14)
+        np.testing.assert_allclose(matched.Q3[-right:], core.Q3[report["i2"]:], rtol=2e-13, atol=2e-14)
+        target = tmp_path / "matched"
+        write_compose(target, matched)
+>       restored = read_compose(target)
+                   ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_matching_slice_roundtrip.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:18: in read_compose
+    run_native("read", source, target)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+action = 'read'
+args = (PosixPath('/tmp/pytest-of-cosmosapjw/pytest-418/test_il0_nonzero_charge_slice_0/matched'), PosixPath('/tmp/compose-eos-read-cq12x4vl/internal'))
+
+    def run_native(action: str, *args: str | os.PathLike[str]) -> dict[str, Any]:
+        exe = executable()
+        command = [str(exe), action, *(str(a) for a in args)]
+        completed = subprocess.run(command, capture_output=True, text=True)
+        lines = [line.strip() for line in completed.stdout.splitlines() if line.strip()]
+        payload: dict[str, Any] = {}
+        for line in reversed(lines):
+            try:
+                candidate = json.loads(line)
+                if isinstance(candidate, dict):
+                    payload = candidate
+                    break
+            except json.JSONDecodeError:
+                continue
+        # the structured category the Fortran layer attaches to structured failures
+        # (e.g. maxwell-transition). None when the Fortran layer did not emit one.
+        category = payload.get("category")
+        op = payload.get("operation", action)
+        if completed.returncode:
+>           raise NativeExecutionError(
+                f"Fortran operation {action!r} failed with exit code {completed.returncode}: "
+                f"{payload.get('message', completed.stderr.strip() or completed.stdout.strip())}",
+                category=category, operation=op,
+            )
+E           compose_eos.native.NativeExecutionError: Fortran operation 'read' failed with exit code 3: cold Yq slice could not be resolved from eos.yq grid
+
+python_frontend/compose_eos/native.py:88: NativeExecutionError
+____ test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip[cubic_P] _____
+
+method = 'cubic_P'
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-418/test_il0_nonzero_charge_slice_1')
+
+    @pytest.mark.parametrize("method", ["cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    def test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip(method, tmp_path):
+        crust = quadratic_source(.01, .04, 20)
+        core = quadratic_source(.06, .15, 30)
+        reference, _ = match_crust_core(crust, core, method=method, drop_composition=True)
+        for data, index in ((crust, 3), (core, 9)):
+            data.Il = 0
+            data.iYq = index
+            data.charge_fraction_grid = .1
+            data.Q4[:] = -.01
+            data.Q3 -= data.charge_fraction_grid * data.Q4
+        matched, report = match_crust_core(crust, core, method=method, drop_composition=True)
+        assert matched.Il == 0
+        assert matched.iYq == 9
+        assert matched.charge_fraction_grid == pytest.approx(.1)
+        assert report["diagnostic_only"] is False
+        assert report["native_report"]["source_euler_residual_meV"] < 2e-10
+        np.testing.assert_allclose(matched.eps, reference.eps, rtol=2e-13, atol=2e-12)
+        np.testing.assert_allclose(matched.p, reference.p, rtol=2e-13, atol=2e-12)
+        mu_euler = (matched.eps + matched.p) / matched.nb
+        np.testing.assert_allclose(
+            matched.mub, mu_euler - .1 * matched.Q4 * matched.mn,
+            rtol=2e-13, atol=2e-12,
+        )
+        left, right = report["i1"] + 1, core.n - report["i2"]
+        np.testing.assert_allclose(matched.Q3[:left], crust.Q3[:left], rtol=2e-13, atol=2e-14)
+        np.testing.assert_allclose(matched.Q3[-right:], core.Q3[report["i2"]:], rtol=2e-13, atol=2e-14)
+        target = tmp_path / "matched"
+        write_compose(target, matched)
+>       restored = read_compose(target)
+                   ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_matching_slice_roundtrip.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:18: in read_compose
+    run_native("read", source, target)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+action = 'read'
+args = (PosixPath('/tmp/pytest-of-cosmosapjw/pytest-418/test_il0_nonzero_charge_slice_1/matched'), PosixPath('/tmp/compose-eos-read-ah79l5fv/internal'))
+
+    def run_native(action: str, *args: str | os.PathLike[str]) -> dict[str, Any]:
+        exe = executable()
+        command = [str(exe), action, *(str(a) for a in args)]
+        completed = subprocess.run(command, capture_output=True, text=True)
+        lines = [line.strip() for line in completed.stdout.splitlines() if line.strip()]
+        payload: dict[str, Any] = {}
+        for line in reversed(lines):
+            try:
+                candidate = json.loads(line)
+                if isinstance(candidate, dict):
+                    payload = candidate
+                    break
+            except json.JSONDecodeError:
+                continue
+        # the structured category the Fortran layer attaches to structured failures
+        # (e.g. maxwell-transition). None when the Fortran layer did not emit one.
+        category = payload.get("category")
+        op = payload.get("operation", action)
+        if completed.returncode:
+>           raise NativeExecutionError(
+                f"Fortran operation {action!r} failed with exit code {completed.returncode}: "
+                f"{payload.get('message', completed.stderr.strip() or completed.stdout.strip())}",
+                category=category, operation=op,
+            )
+E           compose_eos.native.NativeExecutionError: Fortran operation 'read' failed with exit code 3: cold Yq slice could not be resolved from eos.yq grid
+
+python_frontend/compose_eos/native.py:88: NativeExecutionError
+___ test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip[quintic_F] ____
+
+method = 'quintic_F'
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-418/test_il0_nonzero_charge_slice_2')
+
+    @pytest.mark.parametrize("method", ["cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    def test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip(method, tmp_path):
+        crust = quadratic_source(.01, .04, 20)
+        core = quadratic_source(.06, .15, 30)
+        reference, _ = match_crust_core(crust, core, method=method, drop_composition=True)
+        for data, index in ((crust, 3), (core, 9)):
+            data.Il = 0
+            data.iYq = index
+            data.charge_fraction_grid = .1
+            data.Q4[:] = -.01
+            data.Q3 -= data.charge_fraction_grid * data.Q4
+        matched, report = match_crust_core(crust, core, method=method, drop_composition=True)
+        assert matched.Il == 0
+        assert matched.iYq == 9
+        assert matched.charge_fraction_grid == pytest.approx(.1)
+        assert report["diagnostic_only"] is False
+        assert report["native_report"]["source_euler_residual_meV"] < 2e-10
+        np.testing.assert_allclose(matched.eps, reference.eps, rtol=2e-13, atol=2e-12)
+        np.testing.assert_allclose(matched.p, reference.p, rtol=2e-13, atol=2e-12)
+        mu_euler = (matched.eps + matched.p) / matched.nb
+        np.testing.assert_allclose(
+            matched.mub, mu_euler - .1 * matched.Q4 * matched.mn,
+            rtol=2e-13, atol=2e-12,
+        )
+        left, right = report["i1"] + 1, core.n - report["i2"]
+        np.testing.assert_allclose(matched.Q3[:left], crust.Q3[:left], rtol=2e-13, atol=2e-14)
+        np.testing.assert_allclose(matched.Q3[-right:], core.Q3[report["i2"]:], rtol=2e-13, atol=2e-14)
+        target = tmp_path / "matched"
+        write_compose(target, matched)
+>       restored = read_compose(target)
+                   ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_matching_slice_roundtrip.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:18: in read_compose
+    run_native("read", source, target)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+action = 'read'
+args = (PosixPath('/tmp/pytest-of-cosmosapjw/pytest-418/test_il0_nonzero_charge_slice_2/matched'), PosixPath('/tmp/compose-eos-read-2vr9eab7/internal'))
+
+    def run_native(action: str, *args: str | os.PathLike[str]) -> dict[str, Any]:
+        exe = executable()
+        command = [str(exe), action, *(str(a) for a in args)]
+        completed = subprocess.run(command, capture_output=True, text=True)
+        lines = [line.strip() for line in completed.stdout.splitlines() if line.strip()]
+        payload: dict[str, Any] = {}
+        for line in reversed(lines):
+            try:
+                candidate = json.loads(line)
+                if isinstance(candidate, dict):
+                    payload = candidate
+                    break
+            except json.JSONDecodeError:
+                continue
+        # the structured category the Fortran layer attaches to structured failures
+        # (e.g. maxwell-transition). None when the Fortran layer did not emit one.
+        category = payload.get("category")
+        op = payload.get("operation", action)
+        if completed.returncode:
+>           raise NativeExecutionError(
+                f"Fortran operation {action!r} failed with exit code {completed.returncode}: "
+                f"{payload.get('message', completed.stderr.strip() or completed.stdout.strip())}",
+                category=category, operation=op,
+            )
+E           compose_eos.native.NativeExecutionError: Fortran operation 'read' failed with exit code 3: cold Yq slice could not be resolved from eos.yq grid
+
+python_frontend/compose_eos/native.py:88: NativeExecutionError
+___ test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip[quintic_P] ____
+
+method = 'quintic_P'
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-418/test_il0_nonzero_charge_slice_3')
+
+    @pytest.mark.parametrize("method", ["cubic_F", "cubic_P", "quintic_F", "quintic_P"])
+    def test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip(method, tmp_path):
+        crust = quadratic_source(.01, .04, 20)
+        core = quadratic_source(.06, .15, 30)
+        reference, _ = match_crust_core(crust, core, method=method, drop_composition=True)
+        for data, index in ((crust, 3), (core, 9)):
+            data.Il = 0
+            data.iYq = index
+            data.charge_fraction_grid = .1
+            data.Q4[:] = -.01
+            data.Q3 -= data.charge_fraction_grid * data.Q4
+        matched, report = match_crust_core(crust, core, method=method, drop_composition=True)
+        assert matched.Il == 0
+        assert matched.iYq == 9
+        assert matched.charge_fraction_grid == pytest.approx(.1)
+        assert report["diagnostic_only"] is False
+        assert report["native_report"]["source_euler_residual_meV"] < 2e-10
+        np.testing.assert_allclose(matched.eps, reference.eps, rtol=2e-13, atol=2e-12)
+        np.testing.assert_allclose(matched.p, reference.p, rtol=2e-13, atol=2e-12)
+        mu_euler = (matched.eps + matched.p) / matched.nb
+        np.testing.assert_allclose(
+            matched.mub, mu_euler - .1 * matched.Q4 * matched.mn,
+            rtol=2e-13, atol=2e-12,
+        )
+        left, right = report["i1"] + 1, core.n - report["i2"]
+        np.testing.assert_allclose(matched.Q3[:left], crust.Q3[:left], rtol=2e-13, atol=2e-14)
+        np.testing.assert_allclose(matched.Q3[-right:], core.Q3[report["i2"]:], rtol=2e-13, atol=2e-14)
+        target = tmp_path / "matched"
+        write_compose(target, matched)
+>       restored = read_compose(target)
+                   ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_matching_slice_roundtrip.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:18: in read_compose
+    run_native("read", source, target)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+action = 'read'
+args = (PosixPath('/tmp/pytest-of-cosmosapjw/pytest-418/test_il0_nonzero_charge_slice_3/matched'), PosixPath('/tmp/compose-eos-read-3ly0sout/internal'))
+
+    def run_native(action: str, *args: str | os.PathLike[str]) -> dict[str, Any]:
+        exe = executable()
+        command = [str(exe), action, *(str(a) for a in args)]
+        completed = subprocess.run(command, capture_output=True, text=True)
+        lines = [line.strip() for line in completed.stdout.splitlines() if line.strip()]
+        payload: dict[str, Any] = {}
+        for line in reversed(lines):
+            try:
+                candidate = json.loads(line)
+                if isinstance(candidate, dict):
+                    payload = candidate
+                    break
+            except json.JSONDecodeError:
+                continue
+        # the structured category the Fortran layer attaches to structured failures
+        # (e.g. maxwell-transition). None when the Fortran layer did not emit one.
+        category = payload.get("category")
+        op = payload.get("operation", action)
+        if completed.returncode:
+>           raise NativeExecutionError(
+                f"Fortran operation {action!r} failed with exit code {completed.returncode}: "
+                f"{payload.get('message', completed.stderr.strip() or completed.stdout.strip())}",
+                category=category, operation=op,
+            )
+E           compose_eos.native.NativeExecutionError: Fortran operation 'read' failed with exit code 3: cold Yq slice could not be resolved from eos.yq grid
+
+python_frontend/compose_eos/native.py:88: NativeExecutionError
+____ test_maxwell_same_physical_charge_slice_accepts_different_index_labels ____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-418/test_maxwell_same_physical_cha0')
+
+    def test_maxwell_same_physical_charge_slice_accepts_different_index_labels(tmp_path):
+        low = quadratic_source(.3, 1.4, 81, stiffness=1.0)
+        high = quadratic_source(1.3, 2.8, 81, rest_energy=940.0, stiffness=.25)
+        reference, reference_report = construct_maxwell_transition(
+            low, high, assume_local_charge_neutrality=True, return_report=True,
+        )
+        low.iYq, high.iYq = 3, 9
+        matched, report = construct_maxwell_transition(
+            low, high, assume_local_charge_neutrality=True, return_report=True,
+        )
+        assert report["status"] == "ok"
+        assert matched.iYq == 3
+        assert matched.charge_fraction_grid == 0.0
+        np.testing.assert_allclose(matched.nb, reference.nb, rtol=2e-13, atol=2e-14)
+        np.testing.assert_allclose(matched.eps, reference.eps, rtol=2e-13, atol=2e-12)
+        assert report["pressure_transition"] == pytest.approx(reference_report["pressure_transition"], rel=2e-13)
+        target = tmp_path / "maxwell"
+        write_compose(target, matched)
+>       restored = read_compose(target)
+                   ^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_matching_slice_roundtrip.py:90: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:18: in read_compose
+    run_native("read", source, target)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+action = 'read'
+args = (PosixPath('/tmp/pytest-of-cosmosapjw/pytest-418/test_maxwell_same_physical_cha0/maxwell'), PosixPath('/tmp/compose-eos-read-vcabb7ob/internal'))
+
+    def run_native(action: str, *args: str | os.PathLike[str]) -> dict[str, Any]:
+        exe = executable()
+        command = [str(exe), action, *(str(a) for a in args)]
+        completed = subprocess.run(command, capture_output=True, text=True)
+        lines = [line.strip() for line in completed.stdout.splitlines() if line.strip()]
+        payload: dict[str, Any] = {}
+        for line in reversed(lines):
+            try:
+                candidate = json.loads(line)
+                if isinstance(candidate, dict):
+                    payload = candidate
+                    break
+            except json.JSONDecodeError:
+                continue
+        # the structured category the Fortran layer attaches to structured failures
+        # (e.g. maxwell-transition). None when the Fortran layer did not emit one.
+        category = payload.get("category")
+        op = payload.get("operation", action)
+        if completed.returncode:
+>           raise NativeExecutionError(
+                f"Fortran operation {action!r} failed with exit code {completed.returncode}: "
+                f"{payload.get('message', completed.stderr.strip() or completed.stdout.strip())}",
+                category=category, operation=op,
+            )
+E           compose_eos.native.NativeExecutionError: Fortran operation 'read' failed with exit code 3: cold Yq slice could not be resolved from eos.yq grid
+
+python_frontend/compose_eos/native.py:88: NativeExecutionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_matching_slice_roundtrip.py::test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip[cubic_F]
+FAILED python_frontend/tests/test_matching_slice_roundtrip.py::test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip[cubic_P]
+FAILED python_frontend/tests/test_matching_slice_roundtrip.py::test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip[quintic_F]
+FAILED python_frontend/tests/test_matching_slice_roundtrip.py::test_il0_nonzero_charge_slice_and_baryon_potential_roundtrip[quintic_P]
+FAILED python_frontend/tests/test_matching_slice_roundtrip.py::test_maxwell_same_physical_charge_slice_accepts_different_index_labels
+5 failed in 0.91s

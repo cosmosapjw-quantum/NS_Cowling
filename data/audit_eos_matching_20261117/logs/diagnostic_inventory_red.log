@@ -1,0 +1,409 @@
+FFFFFFFFFFFFFFF                                                          [100%]
+=================================== FAILURES ===================================
+________ test_native_diagnostic_is_in_the_output_inventory[states.csv] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-406/test_native_diagnostic_is_in_t0')
+name = 'states.csv'
+
+    @pytest.mark.parametrize("name", DIAGNOSTIC_NAMES)
+    def test_native_diagnostic_is_in_the_output_inventory(tmp_path, name):
+        request = core_request()
+        evidence(tmp_path, request)
+        # The contents deliberately retain a failed diagnostic. Recording bytes is
+        # independent of accepting their scientific result.
+        content = b"node,status\n1,HOLD\n"
+        (tmp_path / name).write_bytes(content)
+        checked = verify_native_generation(tmp_path, request)
+>       assert checked["output_sha256"].get(name) == hashlib.sha256(content).hexdigest()
+E       AssertionError: assert None == '81146574eb8f0712edee9074cbe2f0693a9a5f5d92fe3a1c37c5fe4fb457a568'
+E        +  where None = <built-in method get of dict object at 0x7546895fc100>('states.csv')
+E        +    where <built-in method get of dict object at 0x7546895fc100> = {'eos.nb': '756807014552392161a5f7367fe9cda22ef33567f2d1c876466f9e65852234ad', 'eos.t': '0aa7f773c5259a5cb12e14995dd7e...eb8f758a0c70b0cd91c25f3bb75d33', 'eos.thermo': '19e09f1a3355f1d13ace2e3cb9766204865d28cd7cb6e3f7b78240a19352f4d9', ...}.get
+E        +  and   '81146574eb8f0712edee9074cbe2f0693a9a5f5d92fe3a1c37c5fe4fb457a568' = <built-in method hexdigest of _hashlib.HASH object at 0x7546895d7770>()
+E        +    where <built-in method hexdigest of _hashlib.HASH object at 0x7546895d7770> = <sha256 _hashlib.HASH object @ 0x7546895d7770>.hexdigest
+E        +      where <sha256 _hashlib.HASH object @ 0x7546895d7770> = <built-in function openssl_sha256>(b'node,status\n1,HOLD\n')
+E        +        where <built-in function openssl_sha256> = hashlib.sha256
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:24: AssertionError
+_______ test_native_diagnostic_is_in_the_output_inventory[first_law.csv] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-406/test_native_diagnostic_is_in_t1')
+name = 'first_law.csv'
+
+    @pytest.mark.parametrize("name", DIAGNOSTIC_NAMES)
+    def test_native_diagnostic_is_in_the_output_inventory(tmp_path, name):
+        request = core_request()
+        evidence(tmp_path, request)
+        # The contents deliberately retain a failed diagnostic. Recording bytes is
+        # independent of accepting their scientific result.
+        content = b"node,status\n1,HOLD\n"
+        (tmp_path / name).write_bytes(content)
+        checked = verify_native_generation(tmp_path, request)
+>       assert checked["output_sha256"].get(name) == hashlib.sha256(content).hexdigest()
+E       AssertionError: assert None == '81146574eb8f0712edee9074cbe2f0693a9a5f5d92fe3a1c37c5fe4fb457a568'
+E        +  where None = <built-in method get of dict object at 0x75468951e180>('first_law.csv')
+E        +    where <built-in method get of dict object at 0x75468951e180> = {'eos.nb': '756807014552392161a5f7367fe9cda22ef33567f2d1c876466f9e65852234ad', 'eos.t': '0aa7f773c5259a5cb12e14995dd7e...eb8f758a0c70b0cd91c25f3bb75d33', 'eos.thermo': '19e09f1a3355f1d13ace2e3cb9766204865d28cd7cb6e3f7b78240a19352f4d9', ...}.get
+E        +  and   '81146574eb8f0712edee9074cbe2f0693a9a5f5d92fe3a1c37c5fe4fb457a568' = <built-in method hexdigest of _hashlib.HASH object at 0x7546895d70d0>()
+E        +    where <built-in method hexdigest of _hashlib.HASH object at 0x7546895d70d0> = <sha256 _hashlib.HASH object @ 0x7546895d70d0>.hexdigest
+E        +      where <sha256 _hashlib.HASH object @ 0x7546895d70d0> = <built-in function openssl_sha256>(b'node,status\n1,HOLD\n')
+E        +        where <built-in function openssl_sha256> = hashlib.sha256
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:24: AssertionError
+_______ test_native_diagnostic_is_in_the_output_inventory[attempts.csv] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-406/test_native_diagnostic_is_in_t2')
+name = 'attempts.csv'
+
+    @pytest.mark.parametrize("name", DIAGNOSTIC_NAMES)
+    def test_native_diagnostic_is_in_the_output_inventory(tmp_path, name):
+        request = core_request()
+        evidence(tmp_path, request)
+        # The contents deliberately retain a failed diagnostic. Recording bytes is
+        # independent of accepting their scientific result.
+        content = b"node,status\n1,HOLD\n"
+        (tmp_path / name).write_bytes(content)
+        checked = verify_native_generation(tmp_path, request)
+>       assert checked["output_sha256"].get(name) == hashlib.sha256(content).hexdigest()
+E       AssertionError: assert None == '81146574eb8f0712edee9074cbe2f0693a9a5f5d92fe3a1c37c5fe4fb457a568'
+E        +  where None = <built-in method get of dict object at 0x754689535380>('attempts.csv')
+E        +    where <built-in method get of dict object at 0x754689535380> = {'eos.nb': '756807014552392161a5f7367fe9cda22ef33567f2d1c876466f9e65852234ad', 'eos.t': '0aa7f773c5259a5cb12e14995dd7e...eb8f758a0c70b0cd91c25f3bb75d33', 'eos.thermo': '19e09f1a3355f1d13ace2e3cb9766204865d28cd7cb6e3f7b78240a19352f4d9', ...}.get
+E        +  and   '81146574eb8f0712edee9074cbe2f0693a9a5f5d92fe3a1c37c5fe4fb457a568' = <built-in method hexdigest of _hashlib.HASH object at 0x7546895d4bf0>()
+E        +    where <built-in method hexdigest of _hashlib.HASH object at 0x7546895d4bf0> = <sha256 _hashlib.HASH object @ 0x7546895d4bf0>.hexdigest
+E        +      where <sha256 _hashlib.HASH object @ 0x7546895d4bf0> = <built-in function openssl_sha256>(b'node,status\n1,HOLD\n')
+E        +        where <built-in function openssl_sha256> = hashlib.sha256
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:24: AssertionError
+_______ test_native_diagnostic_is_in_the_output_inventory[profiles.csv] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-406/test_native_diagnostic_is_in_t3')
+name = 'profiles.csv'
+
+    @pytest.mark.parametrize("name", DIAGNOSTIC_NAMES)
+    def test_native_diagnostic_is_in_the_output_inventory(tmp_path, name):
+        request = core_request()
+        evidence(tmp_path, request)
+        # The contents deliberately retain a failed diagnostic. Recording bytes is
+        # independent of accepting their scientific result.
+        content = b"node,status\n1,HOLD\n"
+        (tmp_path / name).write_bytes(content)
+        checked = verify_native_generation(tmp_path, request)
+>       assert checked["output_sha256"].get(name) == hashlib.sha256(content).hexdigest()
+E       AssertionError: assert None == '81146574eb8f0712edee9074cbe2f0693a9a5f5d92fe3a1c37c5fe4fb457a568'
+E        +  where None = <built-in method get of dict object at 0x754689588d80>('profiles.csv')
+E        +    where <built-in method get of dict object at 0x754689588d80> = {'eos.nb': '756807014552392161a5f7367fe9cda22ef33567f2d1c876466f9e65852234ad', 'eos.t': '0aa7f773c5259a5cb12e14995dd7e...eb8f758a0c70b0cd91c25f3bb75d33', 'eos.thermo': '19e09f1a3355f1d13ace2e3cb9766204865d28cd7cb6e3f7b78240a19352f4d9', ...}.get
+E        +  and   '81146574eb8f0712edee9074cbe2f0693a9a5f5d92fe3a1c37c5fe4fb457a568' = <built-in method hexdigest of _hashlib.HASH object at 0x7546895d5c70>()
+E        +    where <built-in method hexdigest of _hashlib.HASH object at 0x7546895d5c70> = <sha256 _hashlib.HASH object @ 0x7546895d5c70>.hexdigest
+E        +      where <sha256 _hashlib.HASH object @ 0x7546895d5c70> = <built-in function openssl_sha256>(b'node,status\n1,HOLD\n')
+E        +        where <built-in function openssl_sha256> = hashlib.sha256
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:24: AssertionError
+_______ test_native_diagnostic_is_in_the_output_inventory[selected.csv] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-406/test_native_diagnostic_is_in_t4')
+name = 'selected.csv'
+
+    @pytest.mark.parametrize("name", DIAGNOSTIC_NAMES)
+    def test_native_diagnostic_is_in_the_output_inventory(tmp_path, name):
+        request = core_request()
+        evidence(tmp_path, request)
+        # The contents deliberately retain a failed diagnostic. Recording bytes is
+        # independent of accepting their scientific result.
+        content = b"node,status\n1,HOLD\n"
+        (tmp_path / name).write_bytes(content)
+        checked = verify_native_generation(tmp_path, request)
+>       assert checked["output_sha256"].get(name) == hashlib.sha256(content).hexdigest()
+E       AssertionError: assert None == '81146574eb8f0712edee9074cbe2f0693a9a5f5d92fe3a1c37c5fe4fb457a568'
+E        +  where None = <built-in method get of dict object at 0x75468958a6c0>('selected.csv')
+E        +    where <built-in method get of dict object at 0x75468958a6c0> = {'eos.nb': '756807014552392161a5f7367fe9cda22ef33567f2d1c876466f9e65852234ad', 'eos.t': '0aa7f773c5259a5cb12e14995dd7e...eb8f758a0c70b0cd91c25f3bb75d33', 'eos.thermo': '19e09f1a3355f1d13ace2e3cb9766204865d28cd7cb6e3f7b78240a19352f4d9', ...}.get
+E        +  and   '81146574eb8f0712edee9074cbe2f0693a9a5f5d92fe3a1c37c5fe4fb457a568' = <built-in method hexdigest of _hashlib.HASH object at 0x7546895d5350>()
+E        +    where <built-in method hexdigest of _hashlib.HASH object at 0x7546895d5350> = <sha256 _hashlib.HASH object @ 0x7546895d5350>.hexdigest
+E        +      where <sha256 _hashlib.HASH object @ 0x7546895d5350> = <built-in function openssl_sha256>(b'node,status\n1,HOLD\n')
+E        +        where <built-in function openssl_sha256> = hashlib.sha256
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:24: AssertionError
+_____ test_sealed_native_diagnostic_change_is_rejected[changed-states.csv] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-406/test_sealed_native_diagnostic_0')
+name = 'states.csv', mutation = 'changed'
+
+    @pytest.mark.parametrize("name", DIAGNOSTIC_NAMES)
+    @pytest.mark.parametrize("mutation", ["changed", "deleted"])
+    def test_sealed_native_diagnostic_change_is_rejected(tmp_path, name, mutation):
+        request = core_request()
+        receipt = evidence(tmp_path, request)
+        path = tmp_path / name
+        content = b"node,status\n1,HOLD\n"
+        path.write_bytes(content)
+        receipt["output_sha256"] = verify_native_generation(tmp_path, request)["output_sha256"]
+        # Model a prior seal independently of whether the verifier included it.
+        # The regression is a verifier ignoring a changed or missing sealed file.
+        receipt["output_sha256"][name] = hashlib.sha256(content).hexdigest()
+        (tmp_path / "RESULT.json").write_text(json.dumps(receipt))
+        if mutation == "changed":
+            path.write_bytes(b"node,status\n1,PASS\n")
+        else:
+            path.unlink()
+>       with pytest.raises(ValueError, match="checksum mismatch|sealed native diagnostic missing"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:44: Failed
+___ test_sealed_native_diagnostic_change_is_rejected[changed-first_law.csv] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-406/test_sealed_native_diagnostic_1')
+name = 'first_law.csv', mutation = 'changed'
+
+    @pytest.mark.parametrize("name", DIAGNOSTIC_NAMES)
+    @pytest.mark.parametrize("mutation", ["changed", "deleted"])
+    def test_sealed_native_diagnostic_change_is_rejected(tmp_path, name, mutation):
+        request = core_request()
+        receipt = evidence(tmp_path, request)
+        path = tmp_path / name
+        content = b"node,status\n1,HOLD\n"
+        path.write_bytes(content)
+        receipt["output_sha256"] = verify_native_generation(tmp_path, request)["output_sha256"]
+        # Model a prior seal independently of whether the verifier included it.
+        # The regression is a verifier ignoring a changed or missing sealed file.
+        receipt["output_sha256"][name] = hashlib.sha256(content).hexdigest()
+        (tmp_path / "RESULT.json").write_text(json.dumps(receipt))
+        if mutation == "changed":
+            path.write_bytes(b"node,status\n1,PASS\n")
+        else:
+            path.unlink()
+>       with pytest.raises(ValueError, match="checksum mismatch|sealed native diagnostic missing"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:44: Failed
+____ test_sealed_native_diagnostic_change_is_rejected[changed-attempts.csv] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-406/test_sealed_native_diagnostic_2')
+name = 'attempts.csv', mutation = 'changed'
+
+    @pytest.mark.parametrize("name", DIAGNOSTIC_NAMES)
+    @pytest.mark.parametrize("mutation", ["changed", "deleted"])
+    def test_sealed_native_diagnostic_change_is_rejected(tmp_path, name, mutation):
+        request = core_request()
+        receipt = evidence(tmp_path, request)
+        path = tmp_path / name
+        content = b"node,status\n1,HOLD\n"
+        path.write_bytes(content)
+        receipt["output_sha256"] = verify_native_generation(tmp_path, request)["output_sha256"]
+        # Model a prior seal independently of whether the verifier included it.
+        # The regression is a verifier ignoring a changed or missing sealed file.
+        receipt["output_sha256"][name] = hashlib.sha256(content).hexdigest()
+        (tmp_path / "RESULT.json").write_text(json.dumps(receipt))
+        if mutation == "changed":
+            path.write_bytes(b"node,status\n1,PASS\n")
+        else:
+            path.unlink()
+>       with pytest.raises(ValueError, match="checksum mismatch|sealed native diagnostic missing"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:44: Failed
+____ test_sealed_native_diagnostic_change_is_rejected[changed-profiles.csv] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-406/test_sealed_native_diagnostic_3')
+name = 'profiles.csv', mutation = 'changed'
+
+    @pytest.mark.parametrize("name", DIAGNOSTIC_NAMES)
+    @pytest.mark.parametrize("mutation", ["changed", "deleted"])
+    def test_sealed_native_diagnostic_change_is_rejected(tmp_path, name, mutation):
+        request = core_request()
+        receipt = evidence(tmp_path, request)
+        path = tmp_path / name
+        content = b"node,status\n1,HOLD\n"
+        path.write_bytes(content)
+        receipt["output_sha256"] = verify_native_generation(tmp_path, request)["output_sha256"]
+        # Model a prior seal independently of whether the verifier included it.
+        # The regression is a verifier ignoring a changed or missing sealed file.
+        receipt["output_sha256"][name] = hashlib.sha256(content).hexdigest()
+        (tmp_path / "RESULT.json").write_text(json.dumps(receipt))
+        if mutation == "changed":
+            path.write_bytes(b"node,status\n1,PASS\n")
+        else:
+            path.unlink()
+>       with pytest.raises(ValueError, match="checksum mismatch|sealed native diagnostic missing"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:44: Failed
+____ test_sealed_native_diagnostic_change_is_rejected[changed-selected.csv] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-406/test_sealed_native_diagnostic_4')
+name = 'selected.csv', mutation = 'changed'
+
+    @pytest.mark.parametrize("name", DIAGNOSTIC_NAMES)
+    @pytest.mark.parametrize("mutation", ["changed", "deleted"])
+    def test_sealed_native_diagnostic_change_is_rejected(tmp_path, name, mutation):
+        request = core_request()
+        receipt = evidence(tmp_path, request)
+        path = tmp_path / name
+        content = b"node,status\n1,HOLD\n"
+        path.write_bytes(content)
+        receipt["output_sha256"] = verify_native_generation(tmp_path, request)["output_sha256"]
+        # Model a prior seal independently of whether the verifier included it.
+        # The regression is a verifier ignoring a changed or missing sealed file.
+        receipt["output_sha256"][name] = hashlib.sha256(content).hexdigest()
+        (tmp_path / "RESULT.json").write_text(json.dumps(receipt))
+        if mutation == "changed":
+            path.write_bytes(b"node,status\n1,PASS\n")
+        else:
+            path.unlink()
+>       with pytest.raises(ValueError, match="checksum mismatch|sealed native diagnostic missing"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:44: Failed
+_____ test_sealed_native_diagnostic_change_is_rejected[deleted-states.csv] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-406/test_sealed_native_diagnostic_5')
+name = 'states.csv', mutation = 'deleted'
+
+    @pytest.mark.parametrize("name", DIAGNOSTIC_NAMES)
+    @pytest.mark.parametrize("mutation", ["changed", "deleted"])
+    def test_sealed_native_diagnostic_change_is_rejected(tmp_path, name, mutation):
+        request = core_request()
+        receipt = evidence(tmp_path, request)
+        path = tmp_path / name
+        content = b"node,status\n1,HOLD\n"
+        path.write_bytes(content)
+        receipt["output_sha256"] = verify_native_generation(tmp_path, request)["output_sha256"]
+        # Model a prior seal independently of whether the verifier included it.
+        # The regression is a verifier ignoring a changed or missing sealed file.
+        receipt["output_sha256"][name] = hashlib.sha256(content).hexdigest()
+        (tmp_path / "RESULT.json").write_text(json.dumps(receipt))
+        if mutation == "changed":
+            path.write_bytes(b"node,status\n1,PASS\n")
+        else:
+            path.unlink()
+>       with pytest.raises(ValueError, match="checksum mismatch|sealed native diagnostic missing"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:44: Failed
+___ test_sealed_native_diagnostic_change_is_rejected[deleted-first_law.csv] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-406/test_sealed_native_diagnostic_6')
+name = 'first_law.csv', mutation = 'deleted'
+
+    @pytest.mark.parametrize("name", DIAGNOSTIC_NAMES)
+    @pytest.mark.parametrize("mutation", ["changed", "deleted"])
+    def test_sealed_native_diagnostic_change_is_rejected(tmp_path, name, mutation):
+        request = core_request()
+        receipt = evidence(tmp_path, request)
+        path = tmp_path / name
+        content = b"node,status\n1,HOLD\n"
+        path.write_bytes(content)
+        receipt["output_sha256"] = verify_native_generation(tmp_path, request)["output_sha256"]
+        # Model a prior seal independently of whether the verifier included it.
+        # The regression is a verifier ignoring a changed or missing sealed file.
+        receipt["output_sha256"][name] = hashlib.sha256(content).hexdigest()
+        (tmp_path / "RESULT.json").write_text(json.dumps(receipt))
+        if mutation == "changed":
+            path.write_bytes(b"node,status\n1,PASS\n")
+        else:
+            path.unlink()
+>       with pytest.raises(ValueError, match="checksum mismatch|sealed native diagnostic missing"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:44: Failed
+____ test_sealed_native_diagnostic_change_is_rejected[deleted-attempts.csv] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-406/test_sealed_native_diagnostic_7')
+name = 'attempts.csv', mutation = 'deleted'
+
+    @pytest.mark.parametrize("name", DIAGNOSTIC_NAMES)
+    @pytest.mark.parametrize("mutation", ["changed", "deleted"])
+    def test_sealed_native_diagnostic_change_is_rejected(tmp_path, name, mutation):
+        request = core_request()
+        receipt = evidence(tmp_path, request)
+        path = tmp_path / name
+        content = b"node,status\n1,HOLD\n"
+        path.write_bytes(content)
+        receipt["output_sha256"] = verify_native_generation(tmp_path, request)["output_sha256"]
+        # Model a prior seal independently of whether the verifier included it.
+        # The regression is a verifier ignoring a changed or missing sealed file.
+        receipt["output_sha256"][name] = hashlib.sha256(content).hexdigest()
+        (tmp_path / "RESULT.json").write_text(json.dumps(receipt))
+        if mutation == "changed":
+            path.write_bytes(b"node,status\n1,PASS\n")
+        else:
+            path.unlink()
+>       with pytest.raises(ValueError, match="checksum mismatch|sealed native diagnostic missing"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:44: Failed
+____ test_sealed_native_diagnostic_change_is_rejected[deleted-profiles.csv] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-406/test_sealed_native_diagnostic_8')
+name = 'profiles.csv', mutation = 'deleted'
+
+    @pytest.mark.parametrize("name", DIAGNOSTIC_NAMES)
+    @pytest.mark.parametrize("mutation", ["changed", "deleted"])
+    def test_sealed_native_diagnostic_change_is_rejected(tmp_path, name, mutation):
+        request = core_request()
+        receipt = evidence(tmp_path, request)
+        path = tmp_path / name
+        content = b"node,status\n1,HOLD\n"
+        path.write_bytes(content)
+        receipt["output_sha256"] = verify_native_generation(tmp_path, request)["output_sha256"]
+        # Model a prior seal independently of whether the verifier included it.
+        # The regression is a verifier ignoring a changed or missing sealed file.
+        receipt["output_sha256"][name] = hashlib.sha256(content).hexdigest()
+        (tmp_path / "RESULT.json").write_text(json.dumps(receipt))
+        if mutation == "changed":
+            path.write_bytes(b"node,status\n1,PASS\n")
+        else:
+            path.unlink()
+>       with pytest.raises(ValueError, match="checksum mismatch|sealed native diagnostic missing"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:44: Failed
+____ test_sealed_native_diagnostic_change_is_rejected[deleted-selected.csv] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-406/test_sealed_native_diagnostic_9')
+name = 'selected.csv', mutation = 'deleted'
+
+    @pytest.mark.parametrize("name", DIAGNOSTIC_NAMES)
+    @pytest.mark.parametrize("mutation", ["changed", "deleted"])
+    def test_sealed_native_diagnostic_change_is_rejected(tmp_path, name, mutation):
+        request = core_request()
+        receipt = evidence(tmp_path, request)
+        path = tmp_path / name
+        content = b"node,status\n1,HOLD\n"
+        path.write_bytes(content)
+        receipt["output_sha256"] = verify_native_generation(tmp_path, request)["output_sha256"]
+        # Model a prior seal independently of whether the verifier included it.
+        # The regression is a verifier ignoring a changed or missing sealed file.
+        receipt["output_sha256"][name] = hashlib.sha256(content).hexdigest()
+        (tmp_path / "RESULT.json").write_text(json.dumps(receipt))
+        if mutation == "changed":
+            path.write_bytes(b"node,status\n1,PASS\n")
+        else:
+            path.unlink()
+>       with pytest.raises(ValueError, match="checksum mismatch|sealed native diagnostic missing"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+python_frontend/tests/test_native_generation_diagnostic_inventory.py:44: Failed
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_native_diagnostic_is_in_the_output_inventory[states.csv]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_native_diagnostic_is_in_the_output_inventory[first_law.csv]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_native_diagnostic_is_in_the_output_inventory[attempts.csv]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_native_diagnostic_is_in_the_output_inventory[profiles.csv]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_native_diagnostic_is_in_the_output_inventory[selected.csv]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_sealed_native_diagnostic_change_is_rejected[changed-states.csv]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_sealed_native_diagnostic_change_is_rejected[changed-first_law.csv]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_sealed_native_diagnostic_change_is_rejected[changed-attempts.csv]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_sealed_native_diagnostic_change_is_rejected[changed-profiles.csv]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_sealed_native_diagnostic_change_is_rejected[changed-selected.csv]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_sealed_native_diagnostic_change_is_rejected[deleted-states.csv]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_sealed_native_diagnostic_change_is_rejected[deleted-first_law.csv]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_sealed_native_diagnostic_change_is_rejected[deleted-attempts.csv]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_sealed_native_diagnostic_change_is_rejected[deleted-profiles.csv]
+FAILED python_frontend/tests/test_native_generation_diagnostic_inventory.py::test_sealed_native_diagnostic_change_is_rejected[deleted-selected.csv]
+15 failed in 0.29s

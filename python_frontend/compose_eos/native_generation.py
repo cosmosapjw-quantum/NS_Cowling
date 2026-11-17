@@ -10,6 +10,8 @@ import math
 from pathlib import Path
 
 NATIVE_FILES=("eos.nb","eos.t","eos.yq","eos.thermo","eos.compo")
+NATIVE_DIAGNOSTICS=("sound_speed.csv", "attachment_diagnostics.json", "SUPPORT.json",
+                    "states.csv", "first_law.csv", "attempts.csv", "profiles.csv", "selected.csv")
 
 def file_sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -200,17 +202,40 @@ def verify_native_generation(output,request):
                 hashes[segment+"/"+name]=value
     # Optional native diagnostics are evidence, never a physical acceptance gate.
     # Hash them when present while keeping historical receipts readable.
-    for name in ("sound_speed.csv", "attachment_diagnostics.json", "SUPPORT.json"):
+    for name in NATIVE_DIAGNOSTICS:
         path=output/name
         if path.is_file():
             hashes[name]=file_sha(path)
-    expected_hashes=receipt.get("output_sha256")
-    if expected_hashes is not None:
-        for name in ("sound_speed.csv", "attachment_diagnostics.json", "SUPPORT.json"):
+    seals=[("RESULT.json",receipt)]
+    # Public generation seals the verified inventory in the outer dispatcher
+    # receipt. Use the structural relationship so archived runs remain movable.
+    dispatch_path=output.parent/"DISPATCH.json"
+    if output.name=="generated" and dispatch_path.is_file():
+        dispatch=json.loads(dispatch_path.read_text())
+        if not isinstance(dispatch,dict):
+            raise ValueError("native generation dispatch receipt must be an object")
+        if "evidence" in dispatch:
+            seals.append(("DISPATCH.json",dispatch["evidence"]))
+        # The first verification runs while DISPATCH is RUNNING, before the
+        # evidence field exists. Historical unsealed receipts also stay readable.
+    for seal_name,seal in seals:
+        if not isinstance(seal,dict):
+            raise ValueError("native generation seal must be an object: "+seal_name)
+        expected_hashes=seal.get("output_sha256")
+        if expected_hashes is None:
+            continue
+        if not isinstance(expected_hashes,dict):
+            raise ValueError("native generation sha256 inventory is invalid: "+seal_name)
+        for name in NATIVE_DIAGNOSTICS:
             if name in expected_hashes and name not in hashes:
                 raise ValueError("sealed native diagnostic missing: "+name)
-    if expected_hashes is not None and any(expected_hashes.get(k)!=v for k,v in hashes.items()):
-        raise ValueError("native output checksum mismatch")
+        # An older seal may predate collection of an optional diagnostic. Include
+        # its present bytes in the new inventory without treating them as an old
+        # verified hash. Required tables and previously sealed diagnostics must
+        # match every supplied seal; neither receipt overrides the other.
+        if any(expected_hashes.get(k)!=v for k,v in hashes.items()
+               if k not in NATIVE_DIAGNOSTICS or k in expected_hashes):
+            raise ValueError("native output checksum mismatch: "+seal_name)
     return {"rows":rows,"native_directory":str(output),"backend":"fortran",
             "native_result":receipt,"native_frontend_readback":readbacks,
             "output_sha256":hashes,"native_consistency":consistency}

@@ -33,7 +33,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "python_frontend"))
-from compose_eos import read_compose  # noqa: E402
+from compose_eos import read_compose, write_compose  # noqa: E402
 from compose_eos import NativeExecutionError  # noqa: E402
 
 INPUTS = ROOT / "inputs" / "raw_compose"
@@ -91,6 +91,47 @@ def test_zero_based_t_index_with_zero_based_thermo_rows_passes(tmp_path):
     eos = read_compose(d)
     assert eos.n == 3
     assert abs(eos.temperature_mev) < 1e-12
+
+
+@pytest.mark.parametrize("t_first,thermo_it", [(7, 7), (0, 1)])
+def test_single_slice_preserves_declared_axis_labels_above_point_count(tmp_path, t_first, thermo_it):
+    """CompOSE bounds identify grid labels, not local array offsets.
+
+    A slice retaining Yq label 9 has one grid point, stored at local slot 1.
+    Keep the established zero-declared/one-labelled cold-T provider case.
+    """
+    d = tmp_path / "offset-slice"
+    _write_cold_slice_dir(d, n=3, t_first=t_first, t_value=0.0,
+                          yq_first=9, yq_value=.1, thermo_iT=thermo_it,
+                          thermo_iYq=9)
+    eos = read_compose(d)
+    assert eos.nT == eos.nYq == 1
+    assert eos.iT == thermo_it
+    assert eos.iYq == eos.selected_iYq == 9
+    assert eos.yq_first == eos.yq_last == 9
+    assert eos.charge_fraction_grid == pytest.approx(.1)
+    np.testing.assert_array_equal(eos.yq_axis, [.1])
+    target = tmp_path / "offset-slice-roundtrip"
+    write_compose(target, eos)
+    restored = read_compose(target)
+    assert restored.iT == thermo_it
+    assert restored.t_first == restored.t_last == t_first
+    assert restored.iYq == restored.yq_first == restored.yq_last == 9
+    assert restored.temperature_mev == 0.0
+    assert restored.charge_fraction_grid == pytest.approx(.1)
+
+
+@pytest.mark.parametrize("thermo_it,thermo_iy,match", [
+    (7, 8, "Yq label outside the declared"),
+    (20, 9, "not a single selected T slice"),
+])
+def test_shifted_axis_still_rejects_thermo_label_outside_declared_range(tmp_path, thermo_it, thermo_iy, match):
+    d = tmp_path / "wrong-offset-slice"
+    _write_cold_slice_dir(d, n=3, t_first=7, t_value=0.0,
+                          yq_first=9, yq_value=.1, thermo_iT=thermo_it,
+                          thermo_iYq=thermo_iy)
+    with pytest.raises(NativeExecutionError, match=match):
+        read_compose(d)
 
 
 def test_multi_point_T_axis_is_accepted_phase4(tmp_path):

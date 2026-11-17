@@ -116,8 +116,11 @@ def assemble_crust(branches, *, labels, mn: float, mp: float,
         seams.append(cert)
     first=normalized[0]
     result=replace(first,source_dir=None,
-        composition_file_present=all(b.composition_file_present for b in normalized),
-        composition_available=all(b.composition_available for b in normalized),
+        # These are container-level availability flags. The concatenated row
+        # masks retain which branches actually supplied each composition field.
+        # One thermo-only branch must not suppress another branch's sidecar.
+        composition_file_present=any(b.composition_file_present for b in normalized),
+        composition_available=any(b.composition_available for b in normalized),
         beta_equilibrated=all(b.beta_equilibrated for b in normalized),
         **{name:np.concatenate([getattr(b,name) for b in normalized]) for name in ROW_FIELDS})
     _cold_slice(result)

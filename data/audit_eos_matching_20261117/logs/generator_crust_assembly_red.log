@@ -1,0 +1,93 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__________ test_assembly_preserves_partial_composition_sidecar[left] ___________
+
+sidecar_branch = 'left'
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-1/test_assembly_preserves_partia0')
+
+    @pytest.mark.parametrize("sidecar_branch", ["left", "right"])
+    def test_assembly_preserves_partial_composition_sidecar(sidecar_branch, tmp_path):
+        """A thermo-only branch must not suppress the other branch's row data."""
+        from compose_eos.api import read_compose, write_compose
+    
+        left = branch([.0001, .001], [.0001, .002], [939, 940], phase=2)
+        right = branch([.0012, .002], [.002, .003], [940, 941], phase=3)
+        for item in (left, right):
+            # Explicit, neutral free-nucleon composition, including written zeros.
+            item.Yn[:] = .9
+            item.Yp[:] = .1
+            item.Ye[:] = .1
+            item.Ymu[:] = 0.
+            item.Aav[:] = 1.
+            item.Zav[:] = 0.
+            item.Yh[:] = 0.
+        missing = right if sidecar_branch == "left" else left
+        missing.composition_file_present = False
+        missing.composition_available = False
+        missing.Iphase[:] = 0
+        for field in ("Yn", "Yp", "Ye", "Ymu", "Aav", "Zav", "Yh"):
+            getattr(missing, field)[:] = 0.
+        for field in ("Yn_present", "Yp_present", "Ye_present", "Ymu_present",
+                      "Abar_present", "Zbar_present", "Yh_present",
+                      "C3_applicable", "C4_applicable", "row_status"):
+            getattr(missing, field)[:] = 0
+    
+        merged, _ = assemble_crust([left, right], labels=["left", "right"],
+                                   mn=939., mp=938.)
+>       assert merged.composition_file_present is True
+E       assert False is True
+E        +  where False = EOSData(nb=array([0.0001, 0.001 , 0.0012, 0.002 ]), mn=939.0, mp=938.0, Q1=array([1.        , 2.        , 1.66666667, ..., yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)).composition_file_present
+
+python_frontend/tests/test_crust_assembly.py:37: AssertionError
+__________ test_assembly_preserves_partial_composition_sidecar[right] __________
+
+sidecar_branch = 'right'
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-1/test_assembly_preserves_partia1')
+
+    @pytest.mark.parametrize("sidecar_branch", ["left", "right"])
+    def test_assembly_preserves_partial_composition_sidecar(sidecar_branch, tmp_path):
+        """A thermo-only branch must not suppress the other branch's row data."""
+        from compose_eos.api import read_compose, write_compose
+    
+        left = branch([.0001, .001], [.0001, .002], [939, 940], phase=2)
+        right = branch([.0012, .002], [.002, .003], [940, 941], phase=3)
+        for item in (left, right):
+            # Explicit, neutral free-nucleon composition, including written zeros.
+            item.Yn[:] = .9
+            item.Yp[:] = .1
+            item.Ye[:] = .1
+            item.Ymu[:] = 0.
+            item.Aav[:] = 1.
+            item.Zav[:] = 0.
+            item.Yh[:] = 0.
+        missing = right if sidecar_branch == "left" else left
+        missing.composition_file_present = False
+        missing.composition_available = False
+        missing.Iphase[:] = 0
+        for field in ("Yn", "Yp", "Ye", "Ymu", "Aav", "Zav", "Yh"):
+            getattr(missing, field)[:] = 0.
+        for field in ("Yn_present", "Yp_present", "Ye_present", "Ymu_present",
+                      "Abar_present", "Zbar_present", "Yh_present",
+                      "C3_applicable", "C4_applicable", "row_status"):
+            getattr(missing, field)[:] = 0
+    
+        merged, _ = assemble_crust([left, right], labels=["left", "right"],
+                                   mn=939., mp=938.)
+>       assert merged.composition_file_present is True
+E       assert False is True
+E        +  where False = EOSData(nb=array([0.0001, 0.001 , 0.0012, 0.002 ]), mn=939.0, mp=938.0, Q1=array([1.        , 2.        , 1.66666667, ..., yq_axis=array([], dtype=float64), nadd_max=0, q_full=array([], dtype=float64), q_extra_full=array([], dtype=float64)).composition_file_present
+
+python_frontend/tests/test_crust_assembly.py:37: AssertionError
+=============================== warnings summary ===============================
+../../../../opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/anyio/pytest_plugin.py:14
+  /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/anyio/pytest_plugin.py:14: PytestRemovedIn10Warning: _pytest.python.CallSpec2 has been renamed to CallSpec.
+  The CallSpec2 alias will be removed in pytest 10.
+  Update imports to use CallSpec instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#callspec2-renamed
+    from _pytest.python import CallSpec2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_crust_assembly.py::test_assembly_preserves_partial_composition_sidecar[left]
+FAILED python_frontend/tests/test_crust_assembly.py::test_assembly_preserves_partial_composition_sidecar[right]
+2 failed, 25 deselected, 1 warning in 0.13s

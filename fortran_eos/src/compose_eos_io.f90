@@ -155,8 +155,10 @@ contains
     declared_t_idx=t0
     t_idx_resolved=.false.
     if(cold_slice) then
-      if(t0>=0.and.t0<=size(tv)) then
-        tval=tv(max(1,t0-t0+1))  ! value at the declared first index
+      ! Grid-file bounds are labels, not offsets into the allocated values.
+      ! A one-point extracted slice may retain an original label such as 7.
+      if(t0>=0) then
+        tval=tv(1)  ! value at the declared first index
         if(abs(tval)<=1.e-12_wp) then
           cold_t_idx=t0; t_idx_resolved=.true.
         endif
@@ -179,7 +181,10 @@ contains
     endif
     declared_yq_idx=y0
     yq_idx_resolved=.false.
-    if(y0>=0.and.y0<=size(yv)) then
+    ! The physical value at label y0 occupies local slot 1 even when y0 is
+    ! larger than size(yv).  Row labels are checked against the declared
+    ! [y0,y1] range below; do not confuse this origin with the point count.
+    if(y0>=0) then
       cold_yq_idx=y0; yq_idx_resolved=.true.
     endif
     if(.not.yq_idx_resolved) then
@@ -453,6 +458,9 @@ contains
       eos%composition_available=.false.
       ! M2A: no compo file -> every row NOT_AVAILABLE (0); stays at default.
     endif
+    ! The selected row keys are the labels of the materialized 1D surface.
+    ! Carry them into internal metadata rather than retaining type defaults.
+    eos%iT=eos%selected_iT;eos%iYq=eos%selected_iYq
     eos%beta_equilibrated=maxval(abs(eos%q(5,:)))<1.e-8_wp
     status='ok'
   end subroutine read_compose
@@ -578,12 +586,16 @@ contains
     integer::phase
     logical::composition_file_present,composition_available,beta_equilibrated
     integer::il,iT,iYq,inb_start,nadd,nadd_max,naxis_t,naxis_yq
+    integer::t_first,t_last,yq_first,yq_last,selected_iT,selected_iYq
     real(wp)::mn,mp,temperature_mev,charge_fraction_grid
     namelist /metadata/ mn,mp,il,iT,iYq,inb_start,nadd,nadd_max,naxis_t,naxis_yq,temperature_mev,charge_fraction_grid, &
-       composition_file_present,composition_available,beta_equilibrated
+       composition_file_present,composition_available,beta_equilibrated, &
+       t_first,t_last,yq_first,yq_last,selected_iT,selected_iYq
     open(newunit=u,file=trim(meta_path),status='old',action='read',iostat=ios)
     if(ios/=0) then;status='cannot open internal EOS metadata';return;endif
     mn=939._wp;mp=939._wp;il=1;iT=1;iYq=1;inb_start=1;nadd=0;nadd_max=0;naxis_t=1;naxis_yq=1
+    t_first=0;t_last=-1;yq_first=0;yq_last=-1
+    selected_iT=-huge(0);selected_iYq=-huge(0)
     temperature_mev=0._wp;charge_fraction_grid=0._wp
     composition_file_present=.false.;composition_available=.false.;beta_equilibrated=.false.
     read(u,nml=metadata,iostat=ios);close(u)
@@ -688,6 +700,18 @@ contains
     eos%nadd_max=max(nadd_max,nqextra)
     eos%nT=max(naxis_t,1);eos%nYq=max(naxis_yq,1)
     eos%temperature_mev=temperature_mev;eos%charge_fraction_grid=charge_fraction_grid
+    eos%t_first=t_first;eos%t_last=t_last;eos%yq_first=yq_first;eos%yq_last=yq_last
+    if(selected_iT==-huge(0))selected_iT=iT
+    if(selected_iYq==-huge(0))selected_iYq=iYq
+    eos%selected_iT=selected_iT;eos%selected_iYq=selected_iYq
+    ! A single-point axis is exactly specified by its scalar slice value.
+    ! Do not invent values for multidimensional axes absent from this format.
+    if(eos%nT==1)then
+      allocate(eos%t_axis(1));eos%t_axis(1)=temperature_mev
+    endif
+    if(eos%nYq==1)then
+      allocate(eos%yq_axis(1));eos%yq_axis(1)=charge_fraction_grid
+    endif
     eos%composition_file_present=composition_file_present;eos%composition_available=composition_available
     eos%beta_equilibrated=beta_equilibrated
     ! E390-10B phase 2/3/4: allocate q_extra_full when the table carries extra
@@ -829,6 +853,12 @@ contains
     write(u,'(a,i0)')' nadd_max=',eos%nadd_max
     write(u,'(a,i0)')' naxis_t=',eos%nT
     write(u,'(a,i0)')' naxis_yq=',eos%nYq
+    write(u,'(a,i0)')' t_first=',eos%t_first
+    write(u,'(a,i0)')' t_last=',eos%t_last
+    write(u,'(a,i0)')' yq_first=',eos%yq_first
+    write(u,'(a,i0)')' yq_last=',eos%yq_last
+    write(u,'(a,i0)')' selected_iT=',eos%selected_iT
+    write(u,'(a,i0)')' selected_iYq=',eos%selected_iYq
     write(u,'(a,es25.16e3)')' temperature_mev=',eos%temperature_mev
     write(u,'(a,es25.16e3)')' charge_fraction_grid=',eos%charge_fraction_grid
     write(u,'(a,l1)')' composition_file_present=',eos%composition_file_present
@@ -843,20 +873,38 @@ contains
     type(eos_data_t),intent(inout)::eos
     character(len=*),intent(out)::status
     integer::u,ios
-    integer::il,iT,iYq,inb_start,nadd
+    integer::il,iT,iYq,inb_start,nadd,nadd_max,naxis_t,naxis_yq
+    integer::t_first,t_last,yq_first,yq_last,selected_iT,selected_iYq
     real(wp)::mn,mp,temperature_mev,charge_fraction_grid
     logical::composition_file_present,composition_available,beta_equilibrated
-    namelist /metadata/ mn,mp,il,iT,iYq,inb_start,nadd,temperature_mev,charge_fraction_grid, &
-       composition_file_present,composition_available,beta_equilibrated
+    namelist /metadata/ mn,mp,il,iT,iYq,inb_start,nadd,nadd_max,naxis_t,naxis_yq,temperature_mev,charge_fraction_grid, &
+       composition_file_present,composition_available,beta_equilibrated, &
+       t_first,t_last,yq_first,yq_last,selected_iT,selected_iYq
     open(newunit=u,file=trim(path),status='old',action='read',iostat=ios)
     if(ios/=0)then;status='cannot open metadata';return;endif
     mn=eos%mn;mp=eos%mp;il=1;iT=1;iYq=1;inb_start=1;nadd=0
+    nadd_max=0;naxis_t=1;naxis_yq=1
+    t_first=0;t_last=-1;yq_first=0;yq_last=-1
+    selected_iT=-huge(0);selected_iYq=-huge(0)
     temperature_mev=0._wp;charge_fraction_grid=0._wp
     composition_file_present=.false.;composition_available=.false.;beta_equilibrated=.false.
     read(u,nml=metadata,iostat=ios);close(u)
     if(ios/=0)then;status='invalid metadata namelist';return;endif
     eos%mn=mn;eos%mp=mp;eos%il=il;eos%iT=iT;eos%iYq=iYq;eos%inb_start=inb_start;eos%nadd=nadd
     eos%temperature_mev=temperature_mev;eos%charge_fraction_grid=charge_fraction_grid
+    eos%nadd_max=nadd_max;eos%nT=max(naxis_t,1);eos%nYq=max(naxis_yq,1)
+    eos%t_first=t_first;eos%t_last=t_last;eos%yq_first=yq_first;eos%yq_last=yq_last
+    if(selected_iT==-huge(0))selected_iT=iT
+    if(selected_iYq==-huge(0))selected_iYq=iYq
+    eos%selected_iT=selected_iT;eos%selected_iYq=selected_iYq
+    if(eos%nT==1)then
+      if(allocated(eos%t_axis))deallocate(eos%t_axis)
+      allocate(eos%t_axis(1));eos%t_axis(1)=temperature_mev
+    endif
+    if(eos%nYq==1)then
+      if(allocated(eos%yq_axis))deallocate(eos%yq_axis)
+      allocate(eos%yq_axis(1));eos%yq_axis(1)=charge_fraction_grid
+    endif
     eos%composition_file_present=composition_file_present;eos%composition_available=composition_available
     eos%beta_equilibrated=beta_equilibrated;status='ok'
   end subroutine read_metadata

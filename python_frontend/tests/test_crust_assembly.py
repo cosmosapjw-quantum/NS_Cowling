@@ -4,6 +4,57 @@ from dataclasses import replace
 from compose_eos.eos_data import EOSData
 from compose_eos.crust_assembly import rebase_header,assemble_crust,certify_interface,select_rows
 
+
+@pytest.mark.parametrize("sidecar_branch", ["left", "right"])
+def test_assembly_preserves_partial_composition_sidecar(sidecar_branch, tmp_path):
+    """A thermo-only branch must not suppress the other branch's row data."""
+    from compose_eos.api import read_compose, write_compose
+
+    # The older branch fixture shares zero buffers between several fields;
+    # detach them before assigning independent, physical species fractions.
+    left = branch([.0001, .001], [.0001, .002], [939, 940], phase=2).copy()
+    right = branch([.0012, .002], [.002, .003], [940, 941], phase=3).copy()
+    for item in (left, right):
+        # Explicit, neutral free-nucleon composition, including written zeros.
+        item.Yn[:] = .9
+        item.Yp[:] = .1
+        item.Ye[:] = .1
+        item.Ymu[:] = 0.
+        item.Aav[:] = 1.
+        item.Zav[:] = 0.
+        item.Yh[:] = 0.
+    missing = right if sidecar_branch == "left" else left
+    missing.composition_file_present = False
+    missing.composition_available = False
+    missing.Iphase[:] = 0
+    for field in ("Yn", "Yp", "Ye", "Ymu", "Aav", "Zav", "Yh"):
+        getattr(missing, field)[:] = 0.
+    for field in ("Yn_present", "Yp_present", "Ye_present", "Ymu_present",
+                  "Abar_present", "Zbar_present", "Yh_present",
+                  "C3_applicable", "C4_applicable", "row_status"):
+        getattr(missing, field)[:] = 0
+
+    merged, _ = assemble_crust([left, right], labels=["left", "right"],
+                               mn=939., mp=938.)
+    assert merged.composition_file_present is True
+    assert merged.composition_available is True
+    expected_presence = [True, True, False, False] if sidecar_branch == "left" else [False, False, True, True]
+    np.testing.assert_array_equal(merged.Yn_present, expected_presence)
+    np.testing.assert_array_equal(merged.C3_applicable, expected_presence)
+    np.testing.assert_array_equal(merged.C4_applicable, expected_presence)
+    write_compose(tmp_path / "compose", merged)
+    back = read_compose(tmp_path / "compose")
+    for field in ("nb", "p", "eps", "mub", "Yn", "Yp", "Ye", "Ymu", "Aav", "Zav", "Yh"):
+        np.testing.assert_allclose(getattr(back, field), getattr(merged, field), rtol=2e-12, atol=2e-12)
+    for field in ("Iphase", "Yn_present", "Yp_present", "Ye_present", "Ymu_present",
+                  "Abar_present", "Zbar_present", "Yh_present", "C3_applicable", "C4_applicable"):
+        np.testing.assert_array_equal(getattr(back, field), getattr(merged, field))
+    # CompOSE writes a phase-only row for a branch with no composition data.
+    # Its readback coverage status is PARTIAL, while every presence mask stays
+    # false; this does not fabricate a zero abundance or a closure result.
+    np.testing.assert_array_equal(back.row_status,
+                                  [2, 2, 1, 1] if sidecar_branch == "left" else [1, 1, 2, 2])
+
 def branch(n,p,mu,mn=939.,phase=1,sparse=False):
     n=np.array(n);p=np.array(p);mu=np.array(mu);z=np.zeros(len(n))
     e=n*mu-p

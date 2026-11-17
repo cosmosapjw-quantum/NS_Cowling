@@ -51,8 +51,8 @@ program test_matching_thermodynamic_adversarial
   co%il=0;co%charge_fraction_grid=.1_wp;co%q(4,:)=-.01_wp
   co%q(3,:)=co%q(3,:)-co%charge_fraction_grid*co%q(4,:)
   call match_crust_core(cr,co,'quintic_P',40,.true.,out,r,status)
-  print '(a,1x,a)','IL0_EULER_DECODE',trim(status)
-  if(trim(status)/='ok'.or.r%source_euler_relative_residual>1.e-12_wp)failures=failures+1
+  print '(a,1x,a)','MIXED_LEPTON_CONTENT_REJECT',trim(status)
+  if(trim(status)=='ok')failures=failures+1
   call make_soft_source(cr,.005_wp,.04_wp,41)
   call make_soft_source(co,.045_wp,.12_wp,61)
   do k=1,4

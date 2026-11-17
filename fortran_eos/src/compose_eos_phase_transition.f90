@@ -720,7 +720,9 @@ contains
     ! Output rows below are re-encoded at low%mn with epsilon and mu_q fixed.
     ! A physical epsilon -> epsilon+n*Delta m change remains in the input
     ! curve and cannot be erased or fitted by this normalization operation.
-    if(low%il/=high%il.or.low%iyq/=high%iyq.or. &
+    ! Different integer iYq labels can encode the same physical slice.  Test
+    ! the actual Yq value and retain the low-table index for the output axis.
+    if(low%il/=high%il.or. &
        abs(low%charge_fraction_grid-high%charge_fraction_grid)>1.e-12_wp) then
       status='phase tables must use the same CompOSE lepton-content and charge-fraction conventions'
       return

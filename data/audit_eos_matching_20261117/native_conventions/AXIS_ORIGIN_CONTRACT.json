@@ -1,0 +1,25 @@
+{
+  "scope": "CompOSE scalar and sliced grid index encoding; no physical EOS or numerical tolerance change",
+  "primary_source": {
+    "title": "CompOSE Quick Guide for Providers",
+    "date": "2023-10-27",
+    "url": "https://compose.obspm.fr/download/pdf/CompOSE_Quick_Guide_for_Providers.pdf",
+    "section": "3. EoS Tables and Data Format",
+    "paraphrase": "Grid-file first and second lines contain the minimum and maximum indices. Subsequent entries give the numerical variable values in ascending index order on the provider-defined grid."
+  },
+  "existing_project_contract": "docs/E390_03A_CORE_ONLY_CONSTRUCTOR_20261113.md: preserve original eos.t/eos.yq index bounds and their one-point values",
+  "derived_index_mapping": "local_slot = serialized_label - declared_first_label + 1; number_of_points = declared_last_label - declared_first_label + 1",
+  "failure": "Reader incorrectly required declared_first_label <= number_of_points for Yq and for cold T. Writer correctly retained labels. A one-point Yq slice labelled 9 therefore serialized successfully but failed readback.",
+  "repair": "Retain the existing nonnegative-label guard; resolve first stored value at local slot 1 regardless of the magnitude of the declared origin. Keep subsequent thermo-row range checks and the existing cold-T zero/one provider compatibility behavior.",
+  "regressions": [
+    "Single cold T=0 slice labelled iT=7 and Yq=.1 slice labelled iYq=9: write/read preserves indices and values",
+    "Legacy eos.t origin 0 with thermo iT=1 plus shifted Yq origin 9 remains supported",
+    "Thermo iYq=8 outside declared Yq [9,9] is rejected",
+    "Thermo iT=20 outside declared cold-T slice [7,7] is rejected"
+  ],
+  "red_evidence": ["axis_origin_before_io_fix.log", "public_roundtrip_before_io_fix.log"],
+  "additional_forward_contract_failure": "Native read_compose retained actual labels only in selected_iT/selected_iYq while iT/iYq stayed at type defaults; the internal namelist and Python EOSData then omitted axis bounds, selected labels and one-point axis arrays.",
+  "additional_repair": "Synchronize materialized iT/iYq to selected labels; transport bounds and selected labels through native/Python internal namelist readers and writers. Recover one-point axes exactly from their scalar physical slice values. Multidimensional axis values absent from the existing internal format are not invented.",
+  "green_evidence": ["metadata_fixed/roundtrip.log", "metadata_fixed/commands.json", "metadata_fixed/IDENTITY.json"],
+  "green_result": "15 passed, 2 skipped, exit 0; all 9 new matching/axis cases executed. The two existing skips are unstaged raw RG source fixtures."
+}

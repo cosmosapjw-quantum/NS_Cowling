@@ -1,0 +1,154 @@
+{
+  "date_kst": "2026-11-17",
+  "recorded_utc": "2026-11-17T02:37:18.278251+00:00",
+  "repository": "cosmosapjw-quantum/NS_Cowling",
+  "base_sha": "80b923b7126492544643a46007b45915e7e3f3aa",
+  "audit_branch": "audit/eos-matching-20261117",
+  "baseline_ci": {
+    "run_id": 44000153338,
+    "number": 632,
+    "head_sha": "80b923b7126492544643a46007b45915e7e3f3aa",
+    "conclusion": "success"
+  },
+  "audit_status": "IMPLEMENTATION_VERIFIED_SCOPED_REPAIR",
+  "original_author_full_eos_goal": "PARTIALLY_COMPLETE",
+  "patch_remote_ci": "NOT_RUN_ON_AUDIT_BRANCH",
+  "environment": {
+    "python": "3.12.13 (main, Aug  7 2026, 02:25:39) [Clang 22.1.3 ]",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "pytest": "9.2.0",
+    "mpmath": "1.3.0",
+    "compiler": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
+  },
+  "validation": {
+    "frontend_pipeline": {
+      "passed": 1230,
+      "skipped": 9,
+      "failed": 0,
+      "exit": 0,
+      "log": "logs/final_frontend_pipeline.log"
+    },
+    "generator": {
+      "passed": 142,
+      "exit": 0,
+      "log": "logs/final_generator.log"
+    },
+    "theory": {
+      "passed": 6,
+      "exit": 0,
+      "log": "logs/final_theory.log"
+    },
+    "native_matching_controls": {
+      "programs": 4,
+      "exit": 0,
+      "record": "native_conventions/controls_green/record.json",
+      "reuse_scope": "matching/types/control source bytes unchanged by later I/O and metadata repair"
+    },
+    "symbolic": {
+      "zero_residuals": 8,
+      "record": "native_conventions/WOLFRAM_THERMODYNAMIC_CHECK.json"
+    },
+    "source_identity_unchanged_during_final_run": true
+  },
+  "execution": "EXECUTION.json",
+  "initial_full_failures": {
+    "total": 11,
+    "implementation_io": 5,
+    "environment_missing_mpmath": 6,
+    "passed": 1207,
+    "skipped": 9,
+    "log": "logs/initial_frontend_pipeline.log"
+  },
+  "skip_scope": "9 existing raw_compose staging-dependent cases; not counted as passes",
+  "repairs": [
+    {
+      "id": "A01",
+      "kind": "implementation",
+      "claim": "same physical Il/Yq slice; Il0 Euler versus baryon potential and output preservation",
+      "status": "implementation-verified"
+    },
+    {
+      "id": "A02",
+      "kind": "implementation",
+      "claim": "Maxwell accepts different integer labels for the same physical Yq",
+      "status": "implementation-verified"
+    },
+    {
+      "id": "A03",
+      "kind": "implementation",
+      "claim": "declared axis origin and scalar metadata preserved through native/internal/Python/CompOSE roundtrip",
+      "status": "implementation-verified"
+    },
+    {
+      "id": "A04",
+      "kind": "implementation",
+      "claim": "mixed composition coverage retains sidecar availability and per-row masks",
+      "status": "implementation-verified"
+    },
+    {
+      "id": "A05",
+      "kind": "implementation",
+      "claim": "diagnostic inventory and actual public DISPATCH re-verification",
+      "status": "implementation-verified"
+    },
+    {
+      "id": "A06",
+      "kind": "implementation",
+      "claim": "public DISPATCH SUPPORT seal enforced at matching intake",
+      "status": "implementation-verified"
+    },
+    {
+      "id": "A07",
+      "kind": "documentation",
+      "claim": "current native CLI and fixed-density SPG endpoint semantics",
+      "status": "source-verified"
+    }
+  ],
+  "reused_scientific_evidence": {
+    "regenerated_this_audit": false,
+    "native_routes": 18,
+    "core": 5,
+    "spg": 5,
+    "tf": 8,
+    "spg_candidate_rows": 645,
+    "prior_matching_native_readbacks": 105,
+    "prior_maxwell_attempts": 25,
+    "prior_maxwell_admitted": 0,
+    "source": "data/research_matching_20261117/CURRENT_OUTCOME.json and phase_retention_followup"
+  },
+  "remaining": [
+    {
+      "kind": "source_fidelity",
+      "item": "SPG original calibration/variation and BBB source smooth-fit identity"
+    },
+    {
+      "kind": "numerical_support",
+      "item": "lower/inner gap-overlap and unsampled TF continuous support"
+    },
+    {
+      "kind": "implementation",
+      "item": "source-boundary laws and supported stellar piecewise ingestion; labels already preserved"
+    },
+    {
+      "kind": "model_limit",
+      "item": "APR/KDE0v1/SLy4 high-density acausality not repaired"
+    },
+    {
+      "kind": "orchestration",
+      "item": "explicit current-generator input manifest; legacy default census is 80 cells"
+    },
+    {
+      "kind": "provenance",
+      "item": "public dispatcher generation/readback executable hashes"
+    }
+  ],
+  "report": "docs/audit_eos_matching_20261117/REPORT_KO.md",
+  "handoff": "docs/audit_eos_matching_20261117/HANDOFF_CODEX_KO.md",
+  "source_manifest_verification": {
+    "manifest": "SHA256SUMS_v4.txt",
+    "entries": 10102,
+    "command": "sha256sum -c --quiet SHA256SUMS_v4.txt",
+    "returncode": 0
+  }
+}

@@ -1,0 +1,57 @@
+[
+  {
+    "command": [
+      "gfortran",
+      "-std=f2018",
+      "-O2",
+      "-ffree-line-length-none",
+      "-fimplicit-none",
+      "-fcheck=all",
+      "-J/tmp/ns_matching_slice_audit_20261117/metadata_fixed",
+      "-I/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/mod",
+      "-c",
+      "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/fortran_eos/src/compose_eos_io.f90",
+      "-o",
+      "/tmp/ns_matching_slice_audit_20261117/metadata_fixed/compose_eos_io.o"
+    ],
+    "returncode": 0
+  },
+  {
+    "command": [
+      "gfortran",
+      "-std=f2018",
+      "-O2",
+      "-ffree-line-length-none",
+      "-fimplicit-none",
+      "-fcheck=all",
+      "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/obj/compose_eos_types.o",
+      "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/obj/compose_eos_rmf.o",
+      "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/obj/compose_eos_cld.o",
+      "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/obj/compose_eos_tov.o",
+      "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/obj/compose_eos_component.o",
+      "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/obj/compose_eos_css.o",
+      "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/obj/compose_eos_phase_transition.o",
+      "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/obj/compose_eos_matching.o",
+      "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/obj/compose_eos_reconstruct.o",
+      "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/obj/compose_eos_causality.o",
+      "/tmp/ns_matching_slice_audit_20261117/metadata_fixed/compose_eos_io.o",
+      "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/obj/compose_eos_verify.o",
+      "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/obj/compose_eos_wigner_seitz.o",
+      "/home/cosmosapjw/ns_cowling_wt/audit_eos_matching_20261117/build/compose_eos_fortran/obj/compose_eos_fortran.o",
+      "-o",
+      "/tmp/ns_matching_slice_audit_20261117/metadata_fixed/compose_eos_fortran"
+    ],
+    "returncode": 0
+  },
+  {
+    "command": [
+      "/home/cosmosapjw/ns_cowling_wt/.venv-gen/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "python_frontend/tests/test_matching_slice_roundtrip.py",
+      "python_frontend/tests/test_m10_generic_axes.py"
+    ],
+    "returncode": 0
+  }
+]

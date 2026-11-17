@@ -1,0 +1,250 @@
+{
+  "schema": "ns_cowling.new_model_maxwell_independent_review.v1",
+  "stage": "C9",
+  "reviewer": "/root/f_independent_review",
+  "review_passes": 1,
+  "review_started_at_utc": "2026-11-17T12:10:19.432819+00:00",
+  "base_git_head": "00bb5e1adcdbb8dfa0a0b2d5d7dd6f9037a4ddc3",
+  "worktree": "/home/cosmosapjw/ns_cowling_wt/new_model_maxwell_20261117",
+  "decision": {
+    "status": "ACCEPT_SCOPED_NUMERICAL_RESULT",
+    "block_now": false,
+    "open_current_task_blockers": [],
+    "result_validity": "NUMERICALLY_CHECKED_WITH_FINITE_SUPPORT_SCOPE",
+    "provenance_validity": "VERIFIED_WITH_EXPLICIT_SOURCE_EQUIVALENCE",
+    "publication_or_push_performed_by_reviewer": false
+  },
+  "reviewed_code": [
+    "fortran_eos/tools/rmf_candidate_driver.f90",
+    "python_frontend/compose_eos/rmf_candidate.py",
+    "scripts/generate_rmf_candidates_20261117.py",
+    "python_frontend/tests/test_rmf_candidate.py",
+    "python_frontend/compose_eos/new_model_matching.py",
+    "scripts/run_new_model_maxwell_20261117.py",
+    "python_frontend/tests/test_new_model_matching.py",
+    "data/new_model_maxwell_20261117/matching_validation/audit_success_envelopes.py"
+  ],
+  "physics_review": {
+    "status": "DERIVED_AND_NUMERICALLY_CHECKED",
+    "units": {
+      "mass_variable": "rest energy m c^2 in MeV",
+      "density": "fm^-3",
+      "pressure_and_energy_density": "MeV fm^-3",
+      "hbar_c_MeV_fm": 197.3269804
+    },
+    "source_scalar_sign": "sigma=-phi; a3=-g2*hbarc; a4=g3",
+    "rho_vertex": "code gr*tau3/2 with gr=2*Gamma_rho; isospin field sign transformed consistently",
+    "DD_rearrangement": "same Sigma_R in mu_n/mu_p; +n*Sigma_R in pressure; no additive rearrangement energy in epsilon",
+    "leptons": "zero-temperature electrons and muons with rest energies and threshold; beta and local charge neutrality",
+    "branch_scope": "detected stable positive-effective-mass roots, finite scans; no global minimum or continuum uniqueness proof"
+  },
+  "uniform_independent_subset": {
+    "status": "NUMERICALLY_CHECKED",
+    "states": 25,
+    "models_or_variants": 5,
+    "method": "source sigma sign, full Gamma_rho vertex, 192-node momentum quadrature, complex-step DD derivatives, 4096-bin scalar scan; no imports from compose_eos",
+    "max_scaled_residuals": {
+      "epsilon": 8.056473807143986e-15,
+      "pressure": 1.0640131321263269e-13,
+      "mu_n": 4.229568922834623e-15,
+      "mu_p": 5.0460949446559444e-15,
+      "mu_e": 6.20027243949358e-16,
+      "phi": 1.239614304150581e-14,
+      "omega": 7.204930121502131e-15,
+      "rho": 0,
+      "rearrangement": 1.2079226507921703e-13,
+      "Y_e": 2.220446049250313e-16,
+      "Y_mu": 2.220446049250313e-16,
+      "scalar_curvature": 4.274358644806853e-15
+    },
+    "max_abs_beta_mev": 1.4779288903810084e-12,
+    "source_ledger_file_count": 87,
+    "source_ledger_bytes_match": true,
+    "coarse_fine_common_rows_exact": true,
+    "evidence": "data/new_model_maxwell_20261117/independent_review/UNIFORM_SUBSET.json",
+    "execution": "data/new_model_maxwell_20261117/independent_review/UNIFORM_SUBSET_RUN.json"
+  },
+  "matching_readback": {
+    "status": "IMPLEMENTATION_VERIFIED_FINITE_DOMAIN",
+    "source_records": 34,
+    "public_role_projections": 9,
+    "file_identities_checked": 343,
+    "requested_and_completed_cells": 120,
+    "actual_kernel_invocations": 4197,
+    "primary_outputs": 9,
+    "coarse_outputs": 7,
+    "max_raw_interface_relative_residual": 8.93068685443592e-16,
+    "summary": {
+      "old_native_crust__new_native_core": {
+        "model_variant_pairs": 65,
+        "pairs_with_output": 6,
+        "generated_tables": 6,
+        "actual_kernel_invocations": 305,
+        "candidate_attempts": 305,
+        "pair_statuses": {
+          "NO_MATCH_ON_ADMITTED_COMPONENTS": 59,
+          "GENERATED_VERIFIED_FINITE_DOMAIN": 6
+        },
+        "candidate_rejections": {
+          "NO_COEXISTENCE_CROSSING": 269,
+          "NONPOSITIVE_DENSITY_JUMP": 2,
+          "NO_COMMON_MU_SUPPORT": 26,
+          "UNKNOWN": 2
+        }
+      },
+      "new_public_crust__old_public_GM1": {
+        "model_variant_pairs": 5,
+        "pairs_with_output": 1,
+        "generated_tables": 1,
+        "actual_kernel_invocations": 28,
+        "candidate_attempts": 28,
+        "pair_statuses": {
+          "NO_MATCH_ON_ADMITTED_COMPONENTS": 4,
+          "GENERATED_VERIFIED_FINITE_DOMAIN": 1
+        },
+        "candidate_rejections": {
+          "NO_COMMON_MU_SUPPORT": 22,
+          "NO_COEXISTENCE_CROSSING": 5
+        }
+      },
+      "new_public_crust__new_public_core": {
+        "model_variant_pairs": 20,
+        "pairs_with_output": 0,
+        "generated_tables": 0,
+        "actual_kernel_invocations": 3696,
+        "candidate_attempts": 3696,
+        "pair_statuses": {
+          "NO_MATCH_ON_ADMITTED_COMPONENTS": 20
+        },
+        "candidate_rejections": {
+          "NO_COMMON_MU_SUPPORT": 3685,
+          "NO_COEXISTENCE_CROSSING": 11
+        }
+      },
+      "reference_assisted_hybrid": {
+        "model_variant_pairs": 30,
+        "pairs_with_output": 2,
+        "generated_tables": 2,
+        "actual_kernel_invocations": 168,
+        "candidate_attempts": 168,
+        "pair_statuses": {
+          "NO_MATCH_ON_ADMITTED_COMPONENTS": 28,
+          "GENERATED_VERIFIED_FINITE_DOMAIN": 2
+        },
+        "candidate_rejections": {
+          "NO_COMMON_MU_SUPPORT": 119,
+          "NO_COEXISTENCE_CROSSING": 43,
+          "UNKNOWN": 2,
+          "MULTIPLE_COEXISTENCE_CROSSINGS": 2
+        }
+      }
+    },
+    "max_relative_fine_coarse": {
+      "mu_transition": 5.771304554410601e-12,
+      "pressure_transition": 3.4729853861927072e-09,
+      "n_low": 2.3937825590806953e-09,
+      "n_high": 2.1268697884957273e-07,
+      "epsilon_low": 2.3977670744608164e-09,
+      "epsilon_high": 2.1287257978677114e-07,
+      "density_jump": 4.484842669145583e-07,
+      "latent_energy_density": 4.4848290206858383e-07
+    },
+    "envelope": {
+      "status": "PASS",
+      "outputs": 9,
+      "max_root_difference_MeV": 3.2173375075217336e-11,
+      "scope": "Numerical polynomial root enumeration of the same finite Hermite component supports; not a global microscopic or continuum proof"
+    },
+    "evidence": "data/new_model_maxwell_20261117/independent_review/MATCHING_READBACK.json",
+    "execution": "data/new_model_maxwell_20261117/independent_review/MATCHING_READBACK_RUN.json"
+  },
+  "findings": [
+    {
+      "id": "F-C9-001",
+      "classification": "representation_issue",
+      "priority": "FIX_SOON",
+      "block_now": false,
+      "status": "CLOSED",
+      "object": "convergence relative_difference.maxwell_identity_residual",
+      "observed_defect": "A zero fine residual was used as a denominator floored at 1e-300, creating an approximately 1e284 meaningless relative residual difference.",
+      "evidence": "Initial convergence records and scripts/run_new_model_maxwell_20261117.py:convergence; exact original production runner preserved.",
+      "impact": "Could misrepresent residual roundoff as transition nonconvergence; physical states and output tables are unaffected.",
+      "minimal_fix": "Omit this secondary residual from relative comparison; preserve fine/coarse original residuals and absolute difference.",
+      "resolution": "All seven saved result pairs checked; only convergence function AST changed, production prepare/execute/run_candidate and source numerical outputs unchanged.",
+      "repair_receipt": "data/new_model_maxwell_20261117/matching_validation/CONVERGENCE_REPORTING_REPAIR.json"
+    }
+  ],
+  "clarifications": [
+    {
+      "object": "DDME-X original supplemental nuclear-matter identity",
+      "status": "UNRESOLVED",
+      "block_now": false,
+      "evidence": {
+        "n0_original_variant": 0.151832,
+        "calculated_J_MeV": 32.24299992434491,
+        "supplement_J_MeV": 32.865829,
+        "calculated_L_MeV": 49.65196879428646,
+        "supplement_L_MeV": 47.806151
+      },
+      "impact": "Current provider four-point thermodynamic agreement cannot establish reproduction of every original NMP output.",
+      "minimal_scope": "Retain named parameter variant and physical mass assumption, report residuals without attributing a cause."
+    },
+    {
+      "object": "Public/source failure categories",
+      "status": "DIAGNOSED_WITH_FINITE_SUPPORT_SCOPE",
+      "block_now": false,
+      "evidence": "data/new_model_maxwell_20261117/matching_validation/REJECTION_DIAGNOSIS.json",
+      "impact": "Three insufficient-knot cases and one C2 failure are not no-root or scientific-impossibility theorems.",
+      "minimal_scope": "Keep original raw failures and read-only diagnoses separate; no physical Q3/energy repair or widened tolerance."
+    },
+    {
+      "object": "Composition and global scope",
+      "status": "EXPLICITLY_LIMITED",
+      "block_now": false,
+      "evidence": "Actual output metadata, native report composition_scope, original component support and reviewed reports.",
+      "impact": "Matched output is thermo-only on finite inner-crust/core support; charge abundance checks C3/C4 are unavailable.",
+      "minimal_scope": "No whole-star/TOV/Cowling, microscopic global minimum or continuous TF mesh claim."
+    }
+  ],
+  "parent_primary_suite": {
+    "evidence": "data/new_model_maxwell_20261117/FRONTEND_PIPELINE.json",
+    "actual_exit_code": 0,
+    "summary_log": [
+      "1415 passed, 9 skipped, 4 subtests passed in 173.20s (0:02:53)"
+    ],
+    "source_identities_stable": 408,
+    "scope": "Parent-owned full suite before reporting-only convergence aggregation fix; no independent full-suite rerun"
+  },
+  "identity_notes": {
+    "uniform_comment_change": {
+      "/home/cosmosapjw/ns_cowling_wt/new_model_maxwell_20261117/fortran_eos/tools/rmf_candidate_driver.f90": {
+        "production_sha256": "9e7cf634acaba1fb4e962e5a1db904abe3d5fba62db25d4bc78d3971d9a185ec",
+        "current_sha256": "49d32e3d1dff0fd7479088e107d5610b0af08ee4312322e1dc77cd66bb60f6fe",
+        "required_relation": "SEMANTIC_IDENTITY",
+        "evidence": "Replacing exactly the three explanatory comments with the originally reviewed two comments reconstructs the recorded production byte hash."
+      }
+    },
+    "uniform_source_receipt": "data/new_model_maxwell_20261117/uniform_validation/SOURCE_EQUIVALENCE.json",
+    "matching_production_runner_sha256": "3e1589704a6d756b0e6cfa572ab8b626bc8015c79889c387edb523a577b3e291",
+    "matching_current_runner_sha256": "e981d1e9c913544764c3b913cc67b223492a9ff96d9477c2824cc135c5ff2599",
+    "matching_changed_function_only": "convergence",
+    "matching_convergence_sha256": "6e1873f83398d6cdeac864a04ca61f5d96a8702ddc1dad8d70603cdfdca81048"
+  },
+  "not_rerun": [
+    "120-cell Maxwell campaign",
+    "historical 195-cell campaign",
+    "full pytest suite",
+    "unchanged native executable build"
+  ],
+  "report": "docs/new_model_maxwell_20261117/INDEPENDENT_REVIEW_KO.md",
+  "evidence_sha256": {
+    "data/new_model_maxwell_20261117/independent_review/UNIFORM_SUBSET.json": "24de06cd17026f0fd66bb92d760b179d5cf578d88b42aae6af47d3ceb23b7c48",
+    "data/new_model_maxwell_20261117/independent_review/UNIFORM_SUBSET_RUN.json": "f2c080781bff85ccf693379e840278463a92cf812831bd13aacef48b23cd2d4d",
+    "data/new_model_maxwell_20261117/independent_review/MATCHING_READBACK.json": "7f9780895017c51c6ea6a229a1093056422756eb036a2192ecc7de635bc18cff",
+    "data/new_model_maxwell_20261117/independent_review/MATCHING_READBACK_RUN.json": "4c858cd86905423b8d2f668ac2a0ed4a6f327a4d7683e7b9c6a393213073681e",
+    "data/new_model_maxwell_20261117/independent_review/independent_check.py": "6802c97a2718327a29989a240084174e868d8750b8bd76693b70408c1c5ae7ea",
+    "data/new_model_maxwell_20261117/independent_review/matching_readback.py": "8dc3a1931b7033e7c0247e19adb29bc199259b873072ba91b411beb29bc4df21",
+    "data/new_model_maxwell_20261117/matching_validation/CONVERGENCE_REPORTING_REPAIR.json": "b6ffee2a4de1780eeecd037e2faa136f63ef32444685dc341decfd96cc4a40cb",
+    "docs/new_model_maxwell_20261117/INDEPENDENT_REVIEW_KO.md": "138bcaddbdf16b991528212288e348c76137c8c06c777e7287252035321080d7"
+  }
+}

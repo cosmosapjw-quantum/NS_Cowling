@@ -1,0 +1,238 @@
+{
+  "schema": "ns_cowling.maxwell_candidate_source_parameters.v1",
+  "status": "SOURCE_MAPPED_NOT_IMPLEMENTATION_VERIFIED",
+  "first_cohort": [
+    "NL3_PROVIDER_PRECISION",
+    "PK1_CANONICAL",
+    "DDMEX_PROVIDER_ROUNDED_N0"
+  ],
+  "optional_diagnostic": [
+    "TM1_CANONICAL",
+    "DDMEX_ORIGINAL_TABLE_RHO0"
+  ],
+  "reserve": [
+    "PKDD_CANONICAL"
+  ],
+  "units": {
+    "mass": "MeV",
+    "n0": "fm^-3",
+    "g2": "fm^-1",
+    "couplings": "dimensionless",
+    "HBARC": "197.3269804 MeV fm"
+  },
+  "conventions": {
+    "effective_mass_source": "M*=M+g_sigma*sigma",
+    "effective_mass_code": "M*=M-gs*phi; phi=-sigma",
+    "rho_vertex_source": "Gamma_rho*tau with |tau|=1",
+    "rho_vertex_code": "gr*tau3/2; gr=2*Gamma_rho; rho field sign follows code tau3_p=+1",
+    "scalar_potential": "U=ms^2*phi^2/2+a3*phi^3/3+a4*phi^4/4, a3=-g2*HBARC, a4=g3",
+    "vector_potential": "W=mw^2*w^2/2+mr^2*r^2/2+c3*w^4/4 (cross=0 for these models)",
+    "DD_form": "g_i=g_i(n0)*a_i*(1+b_i*(n/n0+d_i)^2)/(1+c_i*(n/n0+d_i)^2); Gamma_rho=Gamma_rho(n0)*exp(-ar*(n/n0-1)); rearrangement required",
+    "energy_adjustment": "NONE; source-comparison reference rebasing must preserve physical epsilon and mu",
+    "particles": "n,p,e,mu; cold beta equilibrium; mu_n=mu_p+mu_e; n_p=n_e+n_mu; mu_e=mu_mu if muons present"
+  },
+  "models": {
+    "NL3_PROVIDER_PRECISION": {
+      "canonical_name": "NL3",
+      "kind": "nonlinear",
+      "mn": 939,
+      "mp": 939,
+      "ms": 508.1941,
+      "mw": 782.501,
+      "mr": 763,
+      "gs": 10.2169,
+      "gw": 12.8675,
+      "Gamma_rho": 4.4744,
+      "gr": 8.9488,
+      "g2": -10.4307,
+      "g3": -28.8851,
+      "c3": 0,
+      "cross": 0,
+      "source": "Long et al nucl-th/0311031 Table I; independently same vector in Xia2208.12893 Table I; original Lalazissis nucl-th/9607039 Table2 uses rounded values",
+      "source_files": [
+        "papers/pk1_pkdd_original.pdf",
+        "papers/nl3_original.pdf",
+        "papers/xia2022.pdf"
+      ],
+      "provider_dir": "XMLSLZ_NL3",
+      "provider_compose_id": 284,
+      "nmp_controls": {
+        "n_sat_approx": 0.148,
+        "E_binding_approx": -16.25,
+        "K_approx": 271.7,
+        "J_approx": 37.4,
+        "L_approx": 118.6
+      },
+      "precision_note": "Use declared high-precision provider vector; original1997 roundedvector is distinct numeric input."
+    },
+    "PK1_CANONICAL": {
+      "canonical_name": "PK1",
+      "kind": "nonlinear",
+      "mn": 939.5731,
+      "mp": 938.2796,
+      "ms": 514.0891,
+      "mw": 784.254,
+      "mr": 763,
+      "gs": 10.3222,
+      "gw": 13.0131,
+      "Gamma_rho": 4.5297,
+      "gr": 9.0594,
+      "g2": -8.1688,
+      "g3": -9.9976,
+      "c3": 55.636,
+      "cross": 0,
+      "source": "Long et al nucl-th/0311031 Table I (parameters) and V (nuclear matter)",
+      "source_files": [
+        "papers/pk1_pkdd_original.pdf"
+      ],
+      "provider_dir": "XMLSLZ_PK1",
+      "provider_compose_id": 285,
+      "nmp_controls": {
+        "n_sat": 0.148195,
+        "E_binding": -16.268,
+        "K": 282.644,
+        "J": 37.641,
+        "effective_mass_ratio_n": 0.605525,
+        "effective_mass_ratio_p": 0.604981
+      },
+      "identity_warning": "Provider2022/2025 TableI label PK1 contains canonical TM1 vector. Current2025 archive header939.573/938.280 does not establish full model numeric identity; forwardcompare required."
+    },
+    "DDMEX_PROVIDER_ROUNDED_N0": {
+      "canonical_name": "DDME-X",
+      "kind": "density_dependent",
+      "mn": 938.5,
+      "mp": 938.5,
+      "n0": 0.152,
+      "ms": 547.332728,
+      "mw": 783,
+      "mr": 763,
+      "gs": 10.706722,
+      "gw": 13.338846,
+      "Gamma_rho": 3.61902,
+      "gr": 7.23804,
+      "sa": 1.397043,
+      "sb": 1.334964,
+      "sc": 2.067122,
+      "sd": 0.401565,
+      "wa": 1.393601,
+      "wb": 1.019082,
+      "wc": 1.605966,
+      "wd": 0.455586,
+      "ra": 0.62022,
+      "a3": 0,
+      "a4": 0,
+      "b4": 0,
+      "cross": 0,
+      "source": "Xia2208.12893 TableI+II and Niu2506.11492 TableI; core coupling constants independently confirmed original Taninah1910.13007 supplementary TableII",
+      "source_files": [
+        "papers/xia2022.pdf",
+        "papers/niu2025.pdf",
+        "papers/ddmex_suppl.pdf"
+      ],
+      "provider_dir": "XMLSLZ_DDME-X",
+      "provider_compose_id": 281,
+      "identity_warning": "Explicit provider-rounded n0=.152 variant. Original supplemental TableII rho0=.151832; retain separately, resolve by forwardevaluation, never freely optimize n0.",
+      "nmp_controls_provider_sheet": {
+        "n_sat_rounded": 0.152,
+        "E_binding": -16.06,
+        "K": 266.6,
+        "J": 32.2,
+        "L": 49.6
+      }
+    },
+    "DDMEX_ORIGINAL_TABLE_RHO0": {
+      "inherits": "DDMEX_PROVIDER_ROUNDED_N0",
+      "n0": 0.151832,
+      "source": "Original Taninah1910.13007 supplemental TableII rho0; equation6/7 main paper defines x=rho/rho0",
+      "source_files": [
+        "papers/ddmex_suppl.pdf",
+        "papers/ddmex_original.pdf"
+      ],
+      "interpretation": "Original-rho0 interpretation, not yet numerically checked against current provider; masses remain provider938.5 and must remain named assumption",
+      "nmp_controls_original_supplement": {
+        "n_sat": 0.151832,
+        "E_binding": -16.097256,
+        "K": 267.04621,
+        "J": 32.865829,
+        "L": 47.806151
+      }
+    },
+    "TM1_CANONICAL": {
+      "canonical_name": "TM1",
+      "kind": "nonlinear",
+      "mn": 938,
+      "mp": 938,
+      "ms": 511.198,
+      "mw": 783,
+      "mr": 770,
+      "gs": 10.0289,
+      "gw": 12.6139,
+      "Gamma_rho": 4.6322,
+      "gr": 9.2644,
+      "g2": -7.2325,
+      "g3": 0.6183,
+      "c3": 71.3075,
+      "cross": 0,
+      "source": "Sugahara & Toki Nucl.Phys.A579 557 (1994), independently reproduced Long nucl-th/0311031 TableI",
+      "source_files": [
+        "papers/pk1_pkdd_original.pdf"
+      ],
+      "provider_dir": "XMLSLZ_TM1",
+      "provider_compose_id": 287,
+      "nmp_controls": {
+        "n_sat": 0.145218,
+        "E_binding": -16.263,
+        "K": 281.161,
+        "J": 36.892,
+        "effective_mass_ratio": 0.634395
+      },
+      "identity_warning": "2022 provider TableI swaps TM1/PK1 labels. Current TM1 header939.5731/938.2796 differs canonical938/938; header alone is reference normalization, not proof of physical mass identity. Current raw crust has forwardcrossing promise vsGM1."
+    },
+    "PKDD_CANONICAL": {
+      "canonical_name": "PKDD",
+      "kind": "density_dependent",
+      "mn": 939.5731,
+      "mp": 938.2796,
+      "n0": 0.149552,
+      "ms": 555.5112,
+      "mw": 783,
+      "mr": 763,
+      "gs": 10.7385,
+      "gw": 13.1476,
+      "Gamma_rho": 4.2998,
+      "gr": 8.5996,
+      "sa": 1.327423,
+      "sb": 0.435126,
+      "sc": 0.691666,
+      "sd": 0.69421,
+      "wa": 1.34217,
+      "wb": 0.371167,
+      "wc": 0.611397,
+      "wd": 0.738376,
+      "ra": 0.183305,
+      "a3": 0,
+      "a4": 0,
+      "b4": 0,
+      "cross": 0,
+      "source": "Long nucl-th/0311031 TableI,II,V",
+      "source_files": [
+        "papers/pk1_pkdd_original.pdf"
+      ],
+      "provider_dir": "XMLSLZ_PKDD",
+      "provider_compose_id": 286,
+      "nmp_controls": {
+        "n_sat": 0.149552,
+        "E_binding": -16.267,
+        "K": 262.181,
+        "J": 36.79
+      },
+      "ranking_note": "Reserve; available rawcrossings with oldcrusts reverseoriented. Provider roundsn0to.150; preserveoriginalvariant."
+    }
+  },
+  "remaining_obligations": [
+    "Forwardevaluate frozen vectors against provider homogeneous P,epsilon,mu,Yp,Ye,Ymu to establish numericidentity and any mass/reference convention difference",
+    "Compare first-law and beta/charge identities; derivative refinement and physicalbranch freeze beforematching",
+    "If needed extend homogeneous metastable densitysupport below provider coreonset byactualmodel evaluation, never tableextrapolation",
+    "No currentcandidate is claimed physicallyadmitted or Maxwellconstructed"
+  ]
+}

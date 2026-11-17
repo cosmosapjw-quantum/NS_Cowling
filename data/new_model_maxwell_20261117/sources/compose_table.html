@@ -1,0 +1,1622 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    
+
+
+
+  <!-- Precarica l'immagine -->
+<link rel="preload" href="/static/ComposeDjango/images/compOSE_banner_small_2.jpg" as="image">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1">
+<link defer rel="stylesheet"
+      type="text/css"
+      href="/static/ComposeDjango/libs/font-awesome-4.6.3/css/font-awesome.min.css">
+<link rel="stylesheet"
+      type="text/css"
+      href="/static/ComposeDjango/css/w3.css?1786116381.9747152">
+<link rel="stylesheet"
+      type="text/css"
+      href="/static/ComposeDjango/css/compose.css?1790066766.089042">
+<link rel="stylesheet"
+      type="text/css"
+      href="/static/ComposeDjango/css/MMMenu.css?1747548636.5334916">
+<script src="/static/ComposeDjango/js/jquery-3.7.1.min.js"></script>
+<script src="/static/ComposeDjango/js/compose.js?1739801817.6963274"></script>
+<script defer src="/static/ComposeDjango/js/menu.js?1738674951.8743675"></script>
+<script defer src="https://unpkg.com/htmx.org@2.0.9/dist/htmx.min.js" integrity="sha384-ESlCao+z/oasnu2Uc/5K1LQTI7YCF2KKO4xakCPQCFuiHhCh8Oa/R5NwHY6guZ3m" crossorigin="anonymous"></script>
+
+<link rel="shortcut icon"
+      type="image/png"
+      href="/static/ComposeDjango/favicon.ico">
+
+
+    
+<meta name="description" content="Browse and filter the CompOSE catalogue of equation of state (EoS) tables for dense matter.">
+
+
+    
+<link rel="stylesheet" href="/static/Catalog/libs/datatables.min.css?1750261425.6075556">
+<link rel="stylesheet" href="/static/Catalog/css/table.css?1750261425.6035557">
+<script src="/static/Catalog/libs/datatables.min.js?1750261425.6085558"></script>
+<script src="/static/Catalog/js/table.js?1787584008.6616158"></script>
+
+
+    <title>
+    
+        Eos Table
+    
+ </title>
+
+  </head>
+
+  <body class="w3-white" 
+        hx-target="#containt-container"
+        hx-swap="innerHTML"
+        hx-push-url="true">
+
+    <!-- Top container -->
+    
+
+
+<div id="menu" 	class="w3-sidenav w3-theme-d5 w3-top menu_opened">
+	<div id="menu_btn_close" onclick="w3_toogle()" class="menu_opened w3-container w3-padding w3-large">
+		<span class="w3-closenav w3-center "><i class="fa fa-fw fa-bars"></i></span>
+		<!-- <div class="w3-center">&nbsp;Compose </div> -->
+	</div>
+
+	<div id="MMMenu" class="MMMenu">
+		<div>
+			
+			<a href="#"
+   class=""
+   hx-get="/home/"
+   title="Home">
+   <i class="fa fa-fw fa-home" aria-hidden="true"></i>
+   &nbsp; Home
+</a>
+
+			
+		</div>
+
+		
+
+
+
+<div class="have_sub sub_nivel_0">
+    <a href="#">
+        <i class="fa fa-fw fa-database" aria-hidden="true"></i> &nbsp; EoS <i class="w3-right"></i>
+    </a>
+    <div 
+        class="is_sub sub_nivel_0 w3-theme-d1" style="display:none">
+        <div class="only_link">
+            <a href="#" hx-get="/table/">
+                All families <i class="w3-right"></i>
+            </a>
+        </div>
+        
+            <div class="have_sub sub_nivel_1">
+                <a href="#"
+                   class="toggle-submenu"
+                   data-menu-id="family-1">
+                    Neutron Matter EoS (28) <i class="w3-right"></i>
+                </a>
+                <div class="is_sub sub_nivel_1 w3-theme-l1">
+                    <div class="only_link">
+                        <a href="#" hx-get="/table/fam/1">
+                            All <i class="w3-right"></i>
+                        </a>
+                    </div>
+                    
+                        <div class="have_sub sub_nivel_2">
+                            <a href="#"
+                               class="toggle-submenu"
+                               data-menu-id="particle-3">
+                                models with hyperons (1) <i class="w3-right"></i>
+                            </a>
+                            <div class="is_sub sub_nivel_2 w3-theme-l2">
+                                <div class="only_link">
+                                    <a href="#"
+                                       hx-get="/table/fam=1/part=3">
+                                        All <i class="w3-right"></i>
+                                    </a>
+                                </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-3">
+                                            Relativistic density functional models (1) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=1/part=3/homo=3">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=1/part=3/homo=3/inho=1">
+                                                        SNA models (1)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                            </div>
+                        </div>
+                    
+                        <div class="have_sub sub_nivel_2">
+                            <a href="#"
+                               class="toggle-submenu"
+                               data-menu-id="particle-4">
+                                nucleonic models (27) <i class="w3-right"></i>
+                            </a>
+                            <div class="is_sub sub_nivel_2 w3-theme-l2">
+                                <div class="only_link">
+                                    <a href="#"
+                                       hx-get="/table/fam=1/part=4">
+                                        All <i class="w3-right"></i>
+                                    </a>
+                                </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-2">
+                                            Microscopic calculations (2) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=1/part=4/homo=2">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=1/part=4/homo=2/inho=1">
+                                                        SNA models (2)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-3">
+                                            Relativistic density functional models (25) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=1/part=4/homo=3">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=1/part=4/homo=3/inho=1">
+                                                        SNA models (3)
+                                                    </a>
+                                                </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=1/part=4/homo=3/inho=2">
+                                                        NSE models (22)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                            </div>
+                        </div>
+                    
+                </div>
+            </div>
+        
+            <div class="have_sub sub_nivel_1">
+                <a href="#"
+                   class="toggle-submenu"
+                   data-menu-id="family-3">
+                    Cold Neutron Star EoS (164) <i class="w3-right"></i>
+                </a>
+                <div class="is_sub sub_nivel_1 w3-theme-l1">
+                    <div class="only_link">
+                        <a href="#" hx-get="/table/fam/3">
+                            All <i class="w3-right"></i>
+                        </a>
+                    </div>
+                    
+                        <div class="have_sub sub_nivel_2">
+                            <a href="#"
+                               class="toggle-submenu"
+                               data-menu-id="particle-2">
+                                hybrid (quark-hadron) model (51) <i class="w3-right"></i>
+                            </a>
+                            <div class="is_sub sub_nivel_2 w3-theme-l2">
+                                <div class="only_link">
+                                    <a href="#"
+                                       hx-get="/table/fam=3/part=2">
+                                        All <i class="w3-right"></i>
+                                    </a>
+                                </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-1">
+                                            Holographic models (3) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=3/part=2/homo=1">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=3/part=2/homo=1/inho=4">
+                                                        Non unified models (crust model matched) (3)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-2">
+                                            Microscopic calculations (13) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=3/part=2/homo=2">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=3/part=2/homo=2/inho=1">
+                                                        SNA models (13)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-3">
+                                            Relativistic density functional models (20) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=3/part=2/homo=3">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=3/part=2/homo=3/inho=2">
+                                                        NSE models (4)
+                                                    </a>
+                                                </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=3/part=2/homo=3/inho=4">
+                                                        Non unified models (crust model matched) (8)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-4">
+                                            Non-relativistic density functional models (15) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=3/part=2/homo=4">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=3/part=2/homo=4/inho=3">
+                                                        Unified models (15)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                            </div>
+                        </div>
+                    
+                        <div class="have_sub sub_nivel_2">
+                            <a href="#"
+                               class="toggle-submenu"
+                               data-menu-id="particle-3">
+                                models with hyperons (18) <i class="w3-right"></i>
+                            </a>
+                            <div class="is_sub sub_nivel_2 w3-theme-l2">
+                                <div class="only_link">
+                                    <a href="#"
+                                       hx-get="/table/fam=3/part=3">
+                                        All <i class="w3-right"></i>
+                                    </a>
+                                </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-3">
+                                            Relativistic density functional models (18) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=3/part=3/homo=3">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=3/part=3/homo=3/inho=4">
+                                                        Non unified models (crust model matched) (11)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                            </div>
+                        </div>
+                    
+                        <div class="have_sub sub_nivel_2">
+                            <a href="#"
+                               class="toggle-submenu"
+                               data-menu-id="particle-4">
+                                nucleonic models (86) <i class="w3-right"></i>
+                            </a>
+                            <div class="is_sub sub_nivel_2 w3-theme-l2">
+                                <div class="only_link">
+                                    <a href="#"
+                                       hx-get="/table/fam=3/part=4">
+                                        All <i class="w3-right"></i>
+                                    </a>
+                                </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-2">
+                                            Microscopic calculations (7) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=3/part=4/homo=2">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=3/part=4/homo=2/inho=3">
+                                                        Unified models (3)
+                                                    </a>
+                                                </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=3/part=4/homo=2/inho=4">
+                                                        Non unified models (crust model matched) (3)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-3">
+                                            Relativistic density functional models (40) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=3/part=4/homo=3">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=3/part=4/homo=3/inho=2">
+                                                        NSE models (1)
+                                                    </a>
+                                                </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=3/part=4/homo=3/inho=3">
+                                                        Unified models (30)
+                                                    </a>
+                                                </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=3/part=4/homo=3/inho=4">
+                                                        Non unified models (crust model matched) (9)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-4">
+                                            Non-relativistic density functional models (39) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=3/part=4/homo=4">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=3/part=4/homo=4/inho=3">
+                                                        Unified models (39)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                            </div>
+                        </div>
+                    
+                        <div class="have_sub sub_nivel_2">
+                            <a href="#"
+                               class="toggle-submenu"
+                               data-menu-id="particle-7">
+                                Models with hyperons and Delta-resonances (7) <i class="w3-right"></i>
+                            </a>
+                            <div class="is_sub sub_nivel_2 w3-theme-l2">
+                                <div class="only_link">
+                                    <a href="#"
+                                       hx-get="/table/fam=3/part=7">
+                                        All <i class="w3-right"></i>
+                                    </a>
+                                </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-3">
+                                            Relativistic density functional models (7) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=3/part=7/homo=3">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=3/part=7/homo=3/inho=4">
+                                                        Non unified models (crust model matched) (5)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                            </div>
+                        </div>
+                    
+                </div>
+            </div>
+        
+            <div class="have_sub sub_nivel_1">
+                <a href="#"
+                   class="toggle-submenu"
+                   data-menu-id="family-5">
+                    Neutron star crust EoS (13) <i class="w3-right"></i>
+                </a>
+                <div class="is_sub sub_nivel_1 w3-theme-l1">
+                    <div class="only_link">
+                        <a href="#" hx-get="/table/fam/5">
+                            All <i class="w3-right"></i>
+                        </a>
+                    </div>
+                    
+                        <div class="have_sub sub_nivel_2">
+                            <a href="#"
+                               class="toggle-submenu"
+                               data-menu-id="particle-4">
+                                nucleonic models (13) <i class="w3-right"></i>
+                            </a>
+                            <div class="is_sub sub_nivel_2 w3-theme-l2">
+                                <div class="only_link">
+                                    <a href="#"
+                                       hx-get="/table/fam=5/part=4">
+                                        All <i class="w3-right"></i>
+                                    </a>
+                                </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-3">
+                                            Relativistic density functional models (13) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=5/part=4/homo=3">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=5/part=4/homo=3/inho=3">
+                                                        Unified models (5)
+                                                    </a>
+                                                </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=5/part=4/homo=3/inho=5">
+                                                        Thomas-Fermi calculation (8)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                            </div>
+                        </div>
+                    
+                </div>
+            </div>
+        
+            <div class="have_sub sub_nivel_1">
+                <a href="#"
+                   class="toggle-submenu"
+                   data-menu-id="family-2">
+                    Cold Matter EoS (17) <i class="w3-right"></i>
+                </a>
+                <div class="is_sub sub_nivel_1 w3-theme-l1">
+                    <div class="only_link">
+                        <a href="#" hx-get="/table/fam/2">
+                            All <i class="w3-right"></i>
+                        </a>
+                    </div>
+                    
+                        <div class="have_sub sub_nivel_2">
+                            <a href="#"
+                               class="toggle-submenu"
+                               data-menu-id="particle-3">
+                                models with hyperons (1) <i class="w3-right"></i>
+                            </a>
+                            <div class="is_sub sub_nivel_2 w3-theme-l2">
+                                <div class="only_link">
+                                    <a href="#"
+                                       hx-get="/table/fam=2/part=3">
+                                        All <i class="w3-right"></i>
+                                    </a>
+                                </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-3">
+                                            Relativistic density functional models (1) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=2/part=3/homo=3">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=2/part=3/homo=3/inho=1">
+                                                        SNA models (1)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                            </div>
+                        </div>
+                    
+                        <div class="have_sub sub_nivel_2">
+                            <a href="#"
+                               class="toggle-submenu"
+                               data-menu-id="particle-4">
+                                nucleonic models (16) <i class="w3-right"></i>
+                            </a>
+                            <div class="is_sub sub_nivel_2 w3-theme-l2">
+                                <div class="only_link">
+                                    <a href="#"
+                                       hx-get="/table/fam=2/part=4">
+                                        All <i class="w3-right"></i>
+                                    </a>
+                                </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-2">
+                                            Microscopic calculations (2) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=2/part=4/homo=2">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=2/part=4/homo=2/inho=1">
+                                                        SNA models (2)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-3">
+                                            Relativistic density functional models (14) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=2/part=4/homo=3">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=2/part=4/homo=3/inho=1">
+                                                        SNA models (3)
+                                                    </a>
+                                                </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=2/part=4/homo=3/inho=3">
+                                                        Unified models (11)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                            </div>
+                        </div>
+                    
+                </div>
+            </div>
+        
+            <div class="have_sub sub_nivel_1">
+                <a href="#"
+                   class="toggle-submenu"
+                   data-menu-id="family-4">
+                    General Purpose EoS (132) <i class="w3-right"></i>
+                </a>
+                <div class="is_sub sub_nivel_1 w3-theme-l1">
+                    <div class="only_link">
+                        <a href="#" hx-get="/table/fam/4">
+                            All <i class="w3-right"></i>
+                        </a>
+                    </div>
+                    
+                        <div class="have_sub sub_nivel_2">
+                            <a href="#"
+                               class="toggle-submenu"
+                               data-menu-id="particle-1">
+                                quark models (3) <i class="w3-right"></i>
+                            </a>
+                            <div class="is_sub sub_nivel_2 w3-theme-l2">
+                                <div class="only_link">
+                                    <a href="#"
+                                       hx-get="/table/fam=4/part=1">
+                                        All <i class="w3-right"></i>
+                                    </a>
+                                </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-1">
+                                            Holographic models (3) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=4/part=1/homo=1">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                            </div>
+                        </div>
+                    
+                        <div class="have_sub sub_nivel_2">
+                            <a href="#"
+                               class="toggle-submenu"
+                               data-menu-id="particle-2">
+                                hybrid (quark-hadron) model (25) <i class="w3-right"></i>
+                            </a>
+                            <div class="is_sub sub_nivel_2 w3-theme-l2">
+                                <div class="only_link">
+                                    <a href="#"
+                                       hx-get="/table/fam=4/part=2">
+                                        All <i class="w3-right"></i>
+                                    </a>
+                                </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-1">
+                                            Holographic models (3) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=4/part=2/homo=1">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=4/part=2/homo=1/inho=2">
+                                                        NSE models (3)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-3">
+                                            Relativistic density functional models (22) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=4/part=2/homo=3">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=4/part=2/homo=3/inho=1">
+                                                        SNA models (4)
+                                                    </a>
+                                                </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=4/part=2/homo=3/inho=2">
+                                                        NSE models (18)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                            </div>
+                        </div>
+                    
+                        <div class="have_sub sub_nivel_2">
+                            <a href="#"
+                               class="toggle-submenu"
+                               data-menu-id="particle-3">
+                                models with hyperons (29) <i class="w3-right"></i>
+                            </a>
+                            <div class="is_sub sub_nivel_2 w3-theme-l2">
+                                <div class="only_link">
+                                    <a href="#"
+                                       hx-get="/table/fam=4/part=3">
+                                        All <i class="w3-right"></i>
+                                    </a>
+                                </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-3">
+                                            Relativistic density functional models (27) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=4/part=3/homo=3">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=4/part=3/homo=3/inho=1">
+                                                        SNA models (10)
+                                                    </a>
+                                                </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=4/part=3/homo=3/inho=2">
+                                                        NSE models (12)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-4">
+                                            Non-relativistic density functional models (2) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=4/part=3/homo=4">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=4/part=3/homo=4/inho=1">
+                                                        SNA models (2)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                            </div>
+                        </div>
+                    
+                        <div class="have_sub sub_nivel_2">
+                            <a href="#"
+                               class="toggle-submenu"
+                               data-menu-id="particle-4">
+                                nucleonic models (66) <i class="w3-right"></i>
+                            </a>
+                            <div class="is_sub sub_nivel_2 w3-theme-l2">
+                                <div class="only_link">
+                                    <a href="#"
+                                       hx-get="/table/fam=4/part=4">
+                                        All <i class="w3-right"></i>
+                                    </a>
+                                </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-2">
+                                            Microscopic calculations (7) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=4/part=4/homo=2">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=4/part=4/homo=2/inho=1">
+                                                        SNA models (3)
+                                                    </a>
+                                                </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=4/part=4/homo=2/inho=2">
+                                                        NSE models (4)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-3">
+                                            Relativistic density functional models (39) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=4/part=4/homo=3">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=4/part=4/homo=3/inho=1">
+                                                        SNA models (4)
+                                                    </a>
+                                                </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=4/part=4/homo=3/inho=2">
+                                                        NSE models (31)
+                                                    </a>
+                                                </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=4/part=4/homo=3/inho=4">
+                                                        Non unified models (crust model matched) (4)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-4">
+                                            Non-relativistic density functional models (20) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=4/part=4/homo=4">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=4/part=4/homo=4/inho=1">
+                                                        SNA models (8)
+                                                    </a>
+                                                </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=4/part=4/homo=4/inho=2">
+                                                        NSE models (12)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                            </div>
+                        </div>
+                    
+                        <div class="have_sub sub_nivel_2">
+                            <a href="#"
+                               class="toggle-submenu"
+                               data-menu-id="particle-6">
+                                Models with kaon condensate (3) <i class="w3-right"></i>
+                            </a>
+                            <div class="is_sub sub_nivel_2 w3-theme-l2">
+                                <div class="only_link">
+                                    <a href="#"
+                                       hx-get="/table/fam=4/part=6">
+                                        All <i class="w3-right"></i>
+                                    </a>
+                                </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-3">
+                                            Relativistic density functional models (3) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=4/part=6/homo=3">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=4/part=6/homo=3/inho=2">
+                                                        NSE models (3)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                            </div>
+                        </div>
+                    
+                        <div class="have_sub sub_nivel_2">
+                            <a href="#"
+                               class="toggle-submenu"
+                               data-menu-id="particle-7">
+                                Models with hyperons and Delta-resonances (6) <i class="w3-right"></i>
+                            </a>
+                            <div class="is_sub sub_nivel_2 w3-theme-l2">
+                                <div class="only_link">
+                                    <a href="#"
+                                       hx-get="/table/fam=4/part=7">
+                                        All <i class="w3-right"></i>
+                                    </a>
+                                </div>
+                                
+                                    <div class="have_sub sub_nivel_3">
+                                        <a href="#"
+                                           class="toggle-submenu"
+                                           data-menu-id="calc-homo-3">
+                                            Relativistic density functional models (6) <i class="w3-right"></i>
+                                        </a>
+                                        <div class="is_sub sub_nivel_3 w3-theme-l3">
+                                            <div class="only_link">
+                                                <a href="#"
+                                                   hx-get="/table/fam=4/part=7/homo=3">
+                                                    All <i class="w3-right"></i>
+                                                </a>
+                                            </div>
+                                            
+                                                <div class="only_link">
+                                                    <a href="#"
+                                                       hx-get="/table/fam=4/part=7/homo=3/inho=2">
+                                                        NSE models (6)
+                                                    </a>
+                                                </div>
+                                            
+                                        </div>
+                                    </div>
+                                
+                            </div>
+                        </div>
+                    
+                </div>
+            </div>
+        
+    </div>
+</div>
+
+
+
+		<div>
+			<a href="#"
+   class=""
+   hx-get="/articles"
+   title="Bibliography">
+   <i class="fa fa-fw fa-book" aria-hidden="true"></i>
+   &nbsp; Bibliography
+</a>
+
+		</div>
+
+		<div class="have_sub sub_nivel_0">
+			<a href="#">
+				<i class="fa fa-fw fa-download" aria-hidden="true"> </i>
+				&nbsp; Downloads
+				<i class="w3-right"></i>
+			</a>
+			<div class=" is_sub sub_nivel_1 " style="display:none">
+
+				<div class="only_link">
+					<a href="#"
+   class=""
+   hx-get="/software/"
+   title="Software">
+   <i class="fa fa-fw fa-file-code-o" aria-hidden="true"></i>
+   &nbsp; Software
+</a>
+
+				</div>
+
+				<div class="only_link">
+					<a href="#"
+   class=""
+   hx-get="/tools/"
+   title="Tools">
+   <i class="fa fa-fw fa-file-code-o" aria-hidden="true"></i>
+   &nbsp; Tools
+</a>
+
+				</div>
+
+
+				<div class="only_link">
+					<a href="#"
+   class=""
+   hx-get="/manual/"
+   title="Manual">
+   <i class="fa fa-fw fa-book" aria-hidden="true"></i>
+   &nbsp; Manual
+</a>
+
+				</div>
+
+				<div class="only_link">
+					<a href="#"
+   class=""
+   hx-get="/resources/"
+   title="Resources">
+   <i class="fa fa-fw fa-book" aria-hidden="true"></i>
+   &nbsp; Resources
+</a>
+
+				</div>
+
+
+				<div class="only_link">
+					<div></div>
+					<a href="#"
+   class=""
+   hx-get="/table_selection"
+   title="Select and Download EoS (JSon)">
+   <i class="fa fa-fw fa-shopping-cart" aria-hidden="true"></i>
+   &nbsp; Select EoS
+</a>
+
+				</div>
+
+				
+			</div>
+		</div>
+
+		
+		<div class="">
+			<a href="#"
+   class=""
+   hx-get="/login/"
+   title="Log In">
+   <i class="fa fa-fw fa-sign-in" aria-hidden="true"></i>
+   &nbsp; Log In
+</a>
+
+		</div>
+		
+		<div class="">
+			<a href="#"
+   class=""
+   hx-get="/newsletters/"
+   title="Newsletters">
+   <i class="fa fa-fw fa-envelope-o" aria-hidden="true"></i>
+   &nbsp; Newsletters
+</a>
+
+		</div>
+
+
+		<div class="">
+			<a href="#"
+   class=""
+   hx-get="/external_links/"
+   title="External Links">
+   <i class="fa fa-fw fa-external-link-square" aria-hidden="true"></i>
+   &nbsp; External Links
+</a>
+
+		</div>
+		<div class="">
+			<a href="#"
+   class=""
+   hx-get="/contacts/"
+   title="Contacts">
+   <i class="fa fa-fw fa-phone" aria-hidden="true"></i>
+   &nbsp; Contacts
+</a>
+
+		</div>
+		<div class="">
+			<a href="#"
+   class=""
+   hx-get="/about/"
+   title="About Compose">
+   <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
+   &nbsp; About
+</a>
+
+		</div>
+
+
+
+	</div>
+
+
+	<div class="menu_bottom">
+		<a href="#"
+   class=""
+   hx-get="/legal_notice/"
+   title="Legal Notice">
+   <i class="fa fa-fw fa-balance-scale" aria-hidden="true"></i>
+   &nbsp; Legal Notice
+</a>
+
+	</div>
+
+
+</div>
+
+
+
+    <div id="wrapper">
+
+
+      <!-- <header class="w3-container w3-top" id="high_strip">
+      </header> -->
+
+      <header class="w3-container w3-top" id="high_strip">
+        <img src="/static/ComposeDjango/images/compOSE_banner_small_2.jpg" alt="CompOSE Banner" fetchpriority="high" width="1000" height="192">
+      </header>
+
+      <div id="container" class="menu_opened">
+
+        <main id="containt-container">
+          	
+    <!-- eos_table_content.html -->
+
+
+<div class="title_table" class="w3-col">
+    EoS
+    <div>
+        
+        
+        
+        
+        
+        
+    </div>
+</div>
+
+
+
+<div class="table-container">
+    
+        <table id="table_eos" class="dataTable row-border hover order-column all_eos_table">
+            
+
+<div  id="custom-colvis"></div>
+<thead>
+  <tr id="eos_table_tr_name">
+    
+    <th class="orderable">
+      <div class="eos_header_th">nparam</div>
+    </th>
+    
+    <th class="orderable">
+      <div class="eos_header_th">name</div>
+    </th>
+    
+    <th class="orderable">
+      <div class="eos_header_th">family</div>
+    </th>
+    
+    <th class="orderable">
+      <div class="eos_header_th">particles</div>
+    </th>
+    
+    <th class="orderable">
+      <div class="eos_header_th">calcmethodhomo</div>
+    </th>
+    
+    <th class="orderable">
+      <div class="eos_header_th">calcmethodinho</div>
+    </th>
+    
+    <th class="orderable">
+      <div class="eos_header_th">npart</div>
+    </th>
+    
+    <th class="orderable">
+      <div class="eos_header_th">t_min</div>
+    </th>
+    
+    <th class="orderable">
+      <div class="eos_header_th">t_max</div>
+    </th>
+    
+    <th class="orderable">
+      <div class="eos_header_th">t_pts</div>
+    </th>
+    
+    <th class="orderable">
+      <div class="eos_header_th">n_min</div>
+    </th>
+    
+    <th class="orderable">
+      <div class="eos_header_th">n_max</div>
+    </th>
+    
+    <th class="orderable">
+      <div class="eos_header_th">n_pts</div>
+    </th>
+    
+    <th class="orderable">
+      <div class="eos_header_th">y_min</div>
+    </th>
+    
+    <th class="orderable">
+      <div class="eos_header_th">y_max</div>
+    </th>
+    
+    <th class="orderable">
+      <div class="eos_header_th">y_pts</div>
+    </th>
+    
+    <th class="orderable">
+      <div class="eos_header_th">created_at</div>
+    </th>
+    
+    <th >
+      <div class="eos_header_th">detail</div>
+    </th>
+    
+  </tr>
+
+</thead>
+
+
+
+
+            
+                <tbody >
+                
+                    
+                
+                </tbody>
+            
+            
+            
+            
+        </table>
+    
+
+    
+        
+    
+</div>
+
+
+<div class="w3-container w3-margin-bottom"><input type="button"
+       class="w3-btn w3-round- w3-margin-top"
+       onclick="document.getElementById('LegendId').style.display='block'"
+       value="Abbreviations">
+
+<div id="LegendId" class="w3-modal">
+  <div class="w3-modal-content w3-card-8 w3-animate-zoom" style="max-width:600px">
+    <div class="w3-center"><br> <h2>Abbreviations</h2>   </div>
+
+    <!-- <div class="w3-center"><br> -->
+    <!--   <span onclick="document.getElementById('LegendId').style.display='none'" class="w3-closebtn w3-hover-red w3-container w3-padding-8 w3-display-topright" title="Close Modal">&times;</span> -->
+    <!-- </div> -->
+
+
+    <div class=" w3-container" >
+
+      <table class=" w3-table w3-striped w3-small">
+	<caption class=" w3-large w3-padding">Table Head</caption>
+	<tr>
+	  <th>T</th> <td>: <b>min</b>imum and <b>max</b>imum of available temperatures in units of MeV </td>
+	</tr>
+	<tr>
+	  <th>n</th> <td>: <b>min</b>imum and <b>max</b>imum of available baryon densities in units of fm<sup>-3</sup> </td>
+	</tr>
+	<tr>
+	  <th>Y</th> <td>: <b>min</b>imum and <b>max</b>imum of hadronic charge fraction</td>
+	</tr>
+	<tr>
+	  <th>pts</th> <td>: number of grid points </td>
+	</tr>
+
+      </table>
+
+    </div>
+
+    <div class=" w3-container" >
+
+      <table class=" w3-table w3-striped w3-small">
+	<caption class=" w3-large w3-padding">Particles</caption>
+	<tr><th>L </th><td>: Leptons					    </td></tr>
+	<tr><th>M </th><td>: Mesons					    </td></tr>
+	<tr><th>B </th><td>: Baryons consisting of u and d quarks, only	    </td></tr>
+	<tr><th>Bs</th><td>: Hyperons					    </td></tr>
+	<tr><th>Bh</th><td>: Baryons including c- and heavier quarks	    </td></tr>
+	<tr><th>Q </th><td>: u-, d-quarks, explicitly no s-quarks	    </td></tr>
+	<tr><th>Qs</th><td>: s-quarks					    </td></tr>
+	<tr><th>Qh</th><td>: c-, b-, or t-quarks			    </td></tr>
+	<tr><th>N </th><td>: nuclear clusters				    </td></tr>
+	<tr><th>NR</th><td>: representative (usually heavy) nuclear clusters</td></tr>
+
+
+      </table>
+
+    </div>
+
+    <div class=" w3-container" >
+
+
+      <p>
+	If only particles of the following species are considered, they are mentioned explicitly:
+      </p>
+
+      <table class=" w3-table w3-striped w3-small">
+	<tr>
+	  <th>Leptons</th>
+	  <th>Hadrons</th>
+	  <th>NuclearClusters</th>
+	  <th>Quarks</th>
+	</tr>
+	<tr>
+	  <td><b>e</b>-electron</td>
+	  <td><b>n</b>-neutron</td>
+	  <td><b>a</b>-alpha</td>
+	  <td><b>u</b>-up</td>
+	</tr>
+	<tr>
+	  <td><b>m</b>-muon</td>
+	  <td><b>p</b>-proton</td>
+	  <td><b></b></td>
+	  <td><b>d</b>-down</td>
+	</tr>
+	<tr>
+	  <td><b></b></td>
+	  <td><b></b></td>
+	  <td><b></b></td>
+	  <td><b>s</b>-strange</td>
+	</tr>
+      </table>
+
+
+    </div>
+
+    <div class="w3-container w3-border-top w3-padding-16 w3-light-grey">
+      <button onclick="document.getElementById('LegendId').style.display='none'"
+	      type="button" class="w3-btn w3-round w3-teal">Close</button>
+    </div>
+
+  </div>
+</div>
+</div>
+<div style="display:none" id="eos_headers">{&quot;selected_eos&quot;: {&quot;id&quot;: &quot;export_button&quot;, &quot;title&quot;: &quot;select Eos&quot;, &quot;header&quot;: &quot;Select&quot;, &quot;symbol&quot;: &quot;&quot;, &quot;unit&quot;: &quot;&quot;}, &quot;nparam&quot;: {&quot;title&quot;: &quot;Number of parameters&quot;, &quot;header&quot;: &quot;Nparam&quot;, &quot;symbol&quot;: &quot;Nparam&quot;, &quot;unit&quot;: &quot;&quot;, &quot;uni2&quot;: &quot;&quot;}, &quot;name&quot;: {&quot;title&quot;: &quot;Eos name&quot;, &quot;header&quot;: &quot;Name&quot;, &quot;symbol&quot;: &quot;Eos&quot;, &quot;unit&quot;: &quot;&quot;, &quot;uni2&quot;: &quot;&quot;}, &quot;family&quot;: {&quot;title&quot;: &quot;Family&quot;, &quot;header&quot;: &quot;Family&quot;, &quot;symbol&quot;: &quot;Family&quot;, &quot;unit&quot;: &quot;&quot;, &quot;uni2&quot;: &quot;&quot;}, &quot;particles&quot;: {&quot;title&quot;: &quot;Particles Content&quot;, &quot;header&quot;: &quot;Particles Content&quot;, &quot;symbol&quot;: &quot;&quot;, &quot;unit&quot;: &quot;&quot;, &quot;uni2&quot;: &quot;&quot;}, &quot;calcmethodhomo&quot;: {&quot;title&quot;: &quot;Calculation Method Homogeneous matter&quot;, &quot;header&quot;: &quot;C.M. Homogeneous&quot;, &quot;symbol&quot;: &quot;&quot;, &quot;unit&quot;: &quot;&quot;, &quot;uni2&quot;: &quot;&quot;}, &quot;calcmethodinho&quot;: {&quot;title&quot;: &quot;Calculation Method Inhomogeneous matter&quot;, &quot;header&quot;: &quot;C.M. Inomogeneous&quot;, &quot;symbol&quot;: &quot;&quot;, &quot;unit&quot;: &quot;&quot;, &quot;uni2&quot;: &quot;&quot;}, &quot;npart&quot;: {&quot;title&quot;: &quot;Number of particles&quot;, &quot;header&quot;: &quot;Particles&quot;, &quot;symbol&quot;: &quot;N&lt;sub&gt;part&lt;/sub&gt;&quot;, &quot;unit&quot;: &quot;&quot;, &quot;uni2&quot;: &quot;&quot;}, &quot;t_min&quot;: {&quot;title&quot;: &quot;Minimum of the Temperature&quot;, &quot;header&quot;: &quot;T min&quot;, &quot;symbol&quot;: &quot;T&lt;sub&gt;min&lt;/sub&gt;&quot;, &quot;unit&quot;: &quot;MeV&quot;, &quot;uni2&quot;: &quot;Mev&quot;}, &quot;t_max&quot;: {&quot;title&quot;: &quot;Maximum of the Temperature&quot;, &quot;header&quot;: &quot;T max&quot;, &quot;symbol&quot;: &quot;T&lt;sub&gt;max&lt;/sub&gt;&quot;, &quot;unit&quot;: &quot;MeV&quot;, &quot;uni2&quot;: &quot;Mev&quot;}, &quot;t_pts&quot;: {&quot;title&quot;: &quot;Temperature points&quot;, &quot;header&quot;: &quot;T pts&quot;, &quot;symbol&quot;: &quot;T&lt;sub&gt;pts&lt;/sub&gt;&quot;, &quot;unit&quot;: &quot;&quot;, &quot;uni2&quot;: &quot;&quot;}, &quot;n_min&quot;: {&quot;title&quot;: &quot;Minimum of the Density&quot;, &quot;header&quot;: &quot;nb min&quot;, &quot;symbol&quot;: &quot;n&lt;sub&gt;min&lt;/sub&gt;&quot;, &quot;unit&quot;: &quot;fm-3&quot;, &quot;uni2&quot;: &quot;fm&lt;sup&gt;-3&lt;/sup&gt;&quot;}, &quot;n_max&quot;: {&quot;title&quot;: &quot;Maximum of the Density&quot;, &quot;header&quot;: &quot;nb max&quot;, &quot;symbol&quot;: &quot;n&lt;sub&gt;max&lt;/sub&gt;&quot;, &quot;unit&quot;: &quot;fm-3&quot;, &quot;uni2&quot;: &quot;fm&lt;sup&gt;-3&lt;/sup&gt;&quot;}, &quot;n_pts&quot;: {&quot;title&quot;: &quot;Density points&quot;, &quot;header&quot;: &quot;nb pts&quot;, &quot;symbol&quot;: &quot;n&lt;sub&gt;pts&lt;/sub&gt;&quot;, &quot;unit&quot;: &quot;&quot;, &quot;uni2&quot;: &quot;&quot;}, &quot;y_min&quot;: {&quot;title&quot;: &quot;Minimum of the hadronic charge fraction&quot;, &quot;header&quot;: &quot;Y min&quot;, &quot;symbol&quot;: &quot;Y&lt;sub&gt;min&lt;/sub&gt;&quot;, &quot;unit&quot;: &quot;&quot;, &quot;uni2&quot;: &quot;&quot;}, &quot;y_max&quot;: {&quot;title&quot;: &quot;Maximum of the hadronic charge fraction&quot;, &quot;header&quot;: &quot;Y max&quot;, &quot;symbol&quot;: &quot;Y&lt;sub&gt;max&lt;/sub&gt;&quot;, &quot;unit&quot;: &quot;&quot;, &quot;uni2&quot;: &quot;&quot;}, &quot;y_pts&quot;: {&quot;title&quot;: &quot;Points for the hadronic charge fraction&quot;, &quot;header&quot;: &quot;Y pts&quot;, &quot;symbol&quot;: &quot;Y&lt;sub&gt;pts&lt;/sub&gt;&quot;, &quot;unit&quot;: &quot;&quot;, &quot;uni2&quot;: &quot;&quot;}, &quot;ns_NMP&quot;: {&quot;title&quot;: &quot;Saturation density in symmetric matter&quot;, &quot;header&quot;: &quot;n_s&quot;, &quot;symbol&quot;: &quot;n&lt;sub&gt;s&lt;/sub&gt;&quot;, &quot;unit&quot;: &quot;fm-3&quot;, &quot;uni2&quot;: &quot;fm&lt;sup&gt;-3&lt;/sup&gt;&quot;}, &quot;E0_NMP&quot;: {&quot;title&quot;: &quot;Binding energy per baryon at saturation&quot;, &quot;header&quot;: &quot;E_0&quot;, &quot;symbol&quot;: &quot;E&lt;sub&gt;0&lt;/sub&gt;&quot;, &quot;unit&quot;: &quot;MeV&quot;, &quot;uni2&quot;: &quot;Mev&quot;}, &quot;K_NMP&quot;: {&quot;title&quot;: &quot;Incompressibility&quot;, &quot;header&quot;: &quot;K&quot;, &quot;symbol&quot;: &quot;K&quot;, &quot;unit&quot;: &quot;MeV&quot;, &quot;uni2&quot;: &quot;Mev&quot;}, &quot;Kprime_NMP&quot;: {&quot;title&quot;: &quot;Skewness&quot;, &quot;header&quot;: &quot;K&#x27;&quot;, &quot;symbol&quot;: &quot;K&#x27;&quot;, &quot;unit&quot;: &quot;MeV&quot;, &quot;uni2&quot;: &quot;Mev&quot;}, &quot;J_NMP&quot;: {&quot;title&quot;: &quot;Symmetry energy&quot;, &quot;header&quot;: &quot;J&quot;, &quot;symbol&quot;: &quot;J&quot;, &quot;unit&quot;: &quot;MeV&quot;, &quot;uni2&quot;: &quot;Mev&quot;}, &quot;L_NMP&quot;: {&quot;title&quot;: &quot;Symmetry energy slope parameter&quot;, &quot;header&quot;: &quot;L&quot;, &quot;symbol&quot;: &quot;L&quot;, &quot;unit&quot;: &quot;MeV&quot;, &quot;uni2&quot;: &quot;Mev&quot;}, &quot;Ksym_NMP&quot;: {&quot;title&quot;: &quot;Symmetry incompressibility&quot;, &quot;header&quot;: &quot;Ksym&quot;, &quot;symbol&quot;: &quot;K&lt;sub&gt;sym&lt;/sub&gt;&quot;, &quot;unit&quot;: &quot;MeV&quot;, &quot;uni2&quot;: &quot;MeV&quot;}, &quot;Mmax_NSP&quot;: {&quot;title&quot;: &quot;Maximum mass&quot;, &quot;header&quot;: &quot;M_max&quot;, &quot;symbol&quot;: &quot;M&lt;sub&gt;max&lt;/sub&gt;&quot;, &quot;unit&quot;: &quot;Msun&quot;, &quot;uni2&quot;: &quot;M&lt;sub&gt;sun&lt;/sub&gt;&quot;}, &quot;MDUe_NSP&quot;: {&quot;title&quot;: &quot;Mass at DUrca threshold with mu^-&quot;, &quot;header&quot;: &quot;MDU,e&quot;, &quot;symbol&quot;: &quot;MDU,e&lt;sub&gt;&lt;/sub&gt;&quot;, &quot;unit&quot;: &quot;Msun&quot;, &quot;uni2&quot;: &quot;M&lt;sub&gt;sun&lt;/sub&gt;&quot;}, &quot;RMmax_NSP&quot;: {&quot;title&quot;: &quot;Radius at maximum NS mass&quot;, &quot;header&quot;: &quot;RMmax&quot;, &quot;symbol&quot;: &quot;R&lt;sub&gt;Mmax&lt;/sub&gt;&quot;, &quot;unit&quot;: &quot;km&quot;, &quot;uni2&quot;: &quot;km&quot;}, &quot;R14_NSP&quot;: {&quot;title&quot;: &quot;Radius at 1.4 M_sun NS mass&quot;, &quot;header&quot;: &quot;R_1.4&quot;, &quot;symbol&quot;: &quot;R&lt;sub&gt;1.4&lt;/sub&gt;&quot;, &quot;unit&quot;: &quot;km&quot;, &quot;uni2&quot;: &quot;km&quot;}, &quot;created_at&quot;: {&quot;title&quot;: &quot;Created at&quot;, &quot;header&quot;: &quot;Created at&quot;, &quot;symbol&quot;: &quot;Created at&quot;, &quot;unit&quot;: &quot;&quot;, &quot;uni2&quot;: &quot;&quot;}}</div>
+<div id="dt-config" data-filter-context='{&quot;fam&quot;: null, &quot;parts&quot;: null, &quot;homo&quot;: null, &quot;inho&quot;: null, &quot;keyword&quot;: &quot;&quot;, &quot;query&quot;: null}' data-columns='[{&quot;name&quot;: &quot;nparam&quot;, &quot;orderable&quot;: true, &quot;searchable&quot;: false}, {&quot;name&quot;: &quot;name&quot;, &quot;orderable&quot;: true, &quot;searchable&quot;: true}, {&quot;name&quot;: &quot;family&quot;, &quot;orderable&quot;: true, &quot;searchable&quot;: true}, {&quot;name&quot;: &quot;particles&quot;, &quot;orderable&quot;: true, &quot;searchable&quot;: true}, {&quot;name&quot;: &quot;calcmethodhomo&quot;, &quot;orderable&quot;: true, &quot;searchable&quot;: true}, {&quot;name&quot;: &quot;calcmethodinho&quot;, &quot;orderable&quot;: true, &quot;searchable&quot;: true}, {&quot;name&quot;: &quot;npart&quot;, &quot;orderable&quot;: true, &quot;searchable&quot;: false}, {&quot;name&quot;: &quot;t_min&quot;, &quot;orderable&quot;: true, &quot;searchable&quot;: false}, {&quot;name&quot;: &quot;t_max&quot;, &quot;orderable&quot;: true, &quot;searchable&quot;: false}, {&quot;name&quot;: &quot;t_pts&quot;, &quot;orderable&quot;: true, &quot;searchable&quot;: false}, {&quot;name&quot;: &quot;n_min&quot;, &quot;orderable&quot;: true, &quot;searchable&quot;: false}, {&quot;name&quot;: &quot;n_max&quot;, &quot;orderable&quot;: true, &quot;searchable&quot;: false}, {&quot;name&quot;: &quot;n_pts&quot;, &quot;orderable&quot;: true, &quot;searchable&quot;: false}, {&quot;name&quot;: &quot;y_min&quot;, &quot;orderable&quot;: true, &quot;searchable&quot;: false}, {&quot;name&quot;: &quot;y_max&quot;, &quot;orderable&quot;: true, &quot;searchable&quot;: false}, {&quot;name&quot;: &quot;y_pts&quot;, &quot;orderable&quot;: true, &quot;searchable&quot;: false}, {&quot;name&quot;: &quot;created_at&quot;, &quot;orderable&quot;: true, &quot;searchable&quot;: false}, {&quot;name&quot;: &quot;detail&quot;, &quot;orderable&quot;: false, &quot;searchable&quot;: false}]' style="display:none"></div>
+
+
+        </main>
+
+
+      <footer class="w3-container w3-teal">
+  
+  <div style="float:left">
+    <a target="_blank" href="https://www.cnn.com/2024/12/05/style/pantone-color-of-year-2025-scli-intl">Why this color?</a>
+  </div>
+
+</footer>
+
+
+      </div>
+
+    </div>
+    
+
+    <script>
+      document.body.addEventListener("htmx:afterRequest", function(event) {
+        const newTitle = event.detail.xhr.getResponseHeader("HX-Title");
+        if (newTitle) {
+            document.title = newTitle;
+        }
+    });
+  </script>
+
+  <script>
+    // DataTables (css+js, ~260KB) is only needed on /table/ and /table_selection.
+    // Those pages already load it directly when hit with a full page load; this
+    // handles landing on them via an htmx nav from elsewhere in the site, where
+    // only #containt-container is swapped and the <head> statics never run.
+    (function () {
+      var DT_CSS = [
+        "/static/Catalog/libs/datatables.min.css?1750261425.6075556",
+        "/static/Catalog/css/table.css?1750261425.6035557"
+      ];
+      var DT_JS = "/static/Catalog/libs/datatables.min.js?1750261425.6085558";
+      var TABLE_JS = "/static/Catalog/js/table.js?1787584008.6616158";
+      var TABLE_SELECTION_JS = "/static/Catalog/js/table_selection.js?1787668248.0414815";
+
+      function ensureCss(href) {
+        if (document.querySelector('link[href="' + href + '"]')) { return; }
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        document.head.appendChild(link);
+      }
+
+      function ensureScript(src, onload) {
+        if (document.querySelector('script[src="' + src + '"]')) { onload(); return; }
+        var script = document.createElement('script');
+        script.src = src;
+        script.onload = onload;
+        document.head.appendChild(script);
+      }
+
+      function loadDataTables(pageScriptSrc) {
+        DT_CSS.forEach(ensureCss);
+        ensureScript(DT_JS, function () { ensureScript(pageScriptSrc, function () {}); });
+      }
+
+      document.body.addEventListener("htmx:afterSwap", function (event) {
+        if (event.target.id !== "containt-container") { return; }
+        if (window.jQuery && jQuery.fn.DataTable) { return; }
+        if (document.getElementById('dt-config')) {
+          loadDataTables(TABLE_JS);
+        } else if (document.getElementById('table_eos')) {
+          loadDataTables(TABLE_SELECTION_JS);
+        }
+      });
+    })();
+  </script>
+  </body>
+</html>

@@ -1,0 +1,305 @@
+#!/usr/bin/env python3
+"""Bounded 120-cell new-model sharp Maxwell campaign; frozen source components."""
+from __future__ import annotations
+import argparse
+from collections import Counter
+from datetime import datetime, timezone
+import itertools
+import json
+from pathlib import Path
+import subprocess
+import sys
+import time
+import numpy as np
+
+ROOT=Path(__file__).resolve().parents[1]
+sys.path[:0]=[str(ROOT/"python_frontend"),str(ROOT/"scripts")]
+from compose_eos.api import read_compose, write_compose, diagnose_maxwell_phase, _thermo_only_view
+from compose_eos.maxwell_v2 import construct_maxwell_transition_v2, _segment_eosdata
+from compose_eos.native import executable, run_native
+from compose_eos.new_model_matching import (NEW_NATIVE, NEW_PUBLIC, NEW_PUBLIC_CORES,
+    OLD_CRUSTS, check_origin_policy, project_provider)
+from maxwell_three_family_campaign import (sha,rel,plain,save,load,safe_path,
+    read_prepared,valid_components,observe_kernel)
+from match_report_admission import admit_match_report
+from match_core_crust import verify_internal_readback,verify_internal_metadata_readback
+BASE=ROOT/"data/new_model_maxwell_20261117"
+OLD=ROOT/"data/maxwell_three_families_20261117/prepared_v2/MANIFEST.json"
+EXE_SHA="3893fbe061c2564ed4138211f7ea379a973851eb6e785fad22edcec0875152b1"
+SUCCESS="GENERATED_VERIFIED_FINITE_DOMAIN"
+
+
+def check_executable():
+    if sha(executable())!=EXE_SHA:
+        raise ValueError("campaign native executable hash mismatch")
+
+
+def prepare_record(data,record,target):
+    data=_thermo_only_view(data)
+    data.beta_equilibrated=bool(np.max(np.abs(data.Q5))<=1e-8)
+    target.mkdir(parents=True,exist_ok=True)
+    data.write_internal_directory(target/"internal")
+    record["internal_path"]=rel(target/"internal")
+    record["internal_sha256"]={n:sha(target/"internal"/n) for n in ("eos_data.csv","eos_data.nml")}
+    diagnostic=diagnose_maxwell_phase(data)
+    save(target/"NATIVE_INTERVAL_DIAGNOSTIC.json",diagnostic)
+    record["diagnostic_path"]=rel(target/"NATIVE_INTERVAL_DIAGNOSTIC.json")
+    record["diagnostic_sha256"]=sha(target/"NATIVE_INTERVAL_DIAGNOSTIC.json")
+    record["interval_failures_by_category"]=dict(Counter(x["category"] for x in diagnostic["intervals"] if not x["valid"]))
+    record["whole_selected_domain_admissible"]=not record["interval_failures_by_category"]
+    record["components"]=[]
+    offset=record.get("selection",{}).get("source_start_zero_based",0)
+    for i,(a,b) in enumerate(valid_components(diagnostic["intervals"],data.n)):
+        record["components"].append({"id":f"component_{i:03d}","start_zero_based":a,"stop_exclusive":b,
+            "original_source_rows_zero_based":[offset+a,offset+b-1],"rows":b-a,
+            "phase_id":int(data.Iphase[a]),"density_fm3":[data.nb[a],data.nb[b-1]],
+            "mu_E_MeV":[(data.eps[a]+data.p[a])/data.nb[a],(data.eps[b-1]+data.p[b-1])/data.nb[b-1]]})
+    record["state"]="FINITE_COMPONENTS_AVAILABLE" if record["components"] else "NO_ADMISSIBLE_THREE_KNOT_COMPONENT"
+    record["matching_binary_sha256"]=sha(executable())
+    record["scope"]="finite partner-independent source components; no global ground-state claim"
+    save(target/"SOURCE.json",record)
+    print(json.dumps({"prepared":record["id"],"components":len(record["components"]),
+        "interval_failures":record["interval_failures_by_category"]}),flush=True)
+    return plain(record)
+
+
+def prepare():
+    check_executable()
+    output=BASE/"prepared"
+    output.mkdir(exist_ok=False)
+    records=[]
+    old=load(OLD)
+    for prior in old["source_records"]:
+        if not ((prior["family"]=="native_generated" and (prior["model"] in OLD_CRUSTS or prior["model"]=="GM_GM1"))
+                or (prior["family"]=="public_original" and prior["model"]=="GM_GM1")):
+            continue
+        data=read_prepared(prior) # verifies immutable raw AND prior internal hashes
+        record={k:prior[k] for k in ("id","model","family","role","source_path","source_table_sha256","selection")}
+        record.update(origin=prior["family"],resolution="fixed_old_source",
+            prior_prepared_manifest=rel(OLD),prior_manifest_sha256=sha(OLD),
+            prior_components=prior["components"],prior_matching_binary_sha256=prior["matching_binary_sha256"])
+        records.append(prepare_record(data,record,output/record["origin"]/record["model"]))
+    for model,level in itertools.product(NEW_NATIVE,("fine","coarse")):
+        parent=BASE/"generated"/model/level
+        receipt=load(parent/"GENERATION.json")
+        if receipt["status"]!="IMPLEMENTATION_VERIFIED":
+            raise ValueError("generated native source not implementation verified")
+        for name,h in receipt["table_sha256"].items():
+            if sha(parent/"compose"/name)!=h:raise ValueError("generated source hash mismatch")
+        data=read_compose(parent/"compose")
+        record={"id":f"new_native:{model}:{level}","origin":"new_native","family":"new_native",
+            "model":model,"role":"core","resolution":level,"source_path":rel(parent/"compose"),
+            "source_table_sha256":receipt["table_sha256"],"generation_receipt":rel(parent/"GENERATION.json"),
+            "generation_receipt_sha256":sha(parent/"GENERATION.json"),
+            "selection":{"source_start_zero_based":0,"source_stop_exclusive":data.n,"basis":"entire generated homogeneous finite domain"}}
+        records.append(prepare_record(data,record,output/"new_native"/model/level))
+    for model in NEW_PUBLIC:
+        source=BASE/"sources"/model
+        provenance=load(source/"PROVENANCE.json")
+        hashes={name:item["sha256"] for name,item in provenance["files"].items()
+                if name in ("eos.nb","eos.t","eos.yq","eos.thermo","eos.compo")}
+        for name,h in hashes.items():
+            if sha(source/name)!=h:raise ValueError("public source hash mismatch")
+        for role in (("crust","core") if model in NEW_PUBLIC_CORES else ("crust",)):
+            target=output/"new_public"/model/role
+            data,selection=project_provider(source,target,role)
+            record={"id":f"new_public:{model}:{role}","origin":"new_public","family":"new_public",
+                "model":model,"role":role,"resolution":"fixed_public_precision","source_path":rel(source),
+                "source_table_sha256":hashes,"selection":selection,
+                "provenance_path":rel(source/"PROVENANCE.json"),"provenance_sha256":sha(source/"PROVENANCE.json")}
+            records.append(prepare_record(data,record,target))
+    manifest={"schema":"ns_cowling.new_model_maxwell_preparation.v1",
+        "created_at_utc":datetime.now(timezone.utc).isoformat(),"source_records":records,
+        "matching_executable_sha256":sha(executable()),"old_prepared_manifest_sha256":sha(OLD),
+        "policy":"every maximal connected native-diagnosed stable causal component with at least3rows; no cross-geometry interpolation"}
+    save(output/"MANIFEST.json",manifest)
+    return manifest
+
+
+# run_candidate is copied from the immutable historical runner with only its
+# origin-policy call replaced. Its native/admission/readback gates are unchanged.
+def run_candidate(crust, core, low, high, lc, hc, destination):
+    check_origin_policy(crust, core)
+    destination.mkdir(parents=True, exist_ok=False)
+    result = {"crust_component": lc, "core_component": hc, "status": "STARTED", "kernel_invoked": False}
+    try:
+        ldata = _segment_eosdata(low, (lc["phase_id"], lc["start_zero_based"], lc["stop_exclusive"]))
+        hdata = _segment_eosdata(high, (hc["phase_id"], hc["start_zero_based"], hc["stop_exclusive"]))
+        # Local recomputation of metadata only; Q5 values remain untouched.
+        for d in (ldata, hdata):
+            d.beta_equilibrated = bool(np.max(np.abs(d.Q5)) <= 1e-8)
+        with observe_kernel(result):
+            matched, report = construct_maxwell_transition_v2(ldata, hdata,
+                assume_local_charge_neutrality=True, return_report=True)
+        native = report.native_report
+        result["v2_report"] = plain(report)
+        matched.write_internal_directory(destination / "expected_internal")
+        write_compose(destination / "compose", matched)
+        back = read_compose(destination / "compose")
+        back.write_internal_directory(destination / "readback_internal")
+        numerical = verify_internal_readback(destination / "expected_internal/eos_data.csv",
+            destination / "readback_internal/eos_data.csv", expected_n=matched.n, actual_n=back.n)
+        metadata = verify_internal_metadata_readback(destination / "expected_internal/eos_data.nml",
+            destination / "readback_internal/eos_data.nml")
+        result["readback"] = {"numerical": numerical, "metadata": metadata}
+        if numerical["status"] != "PASS" or metadata["status"] != "PASS":
+            raise ValueError("serialized matched EOS failed lossless readback")
+        result["admission"] = admit_match_report("maxwell", native,
+            destination / "readback_internal/eos_data.csv", destination / "readback_internal/eos_data.nml")
+        if result["admission"]["status"] != "ADMITTED":
+            raise ValueError("independent serialized-interface admission rejected")
+        # The v1 API already checked its internal output; independently invoke
+        # the verifier on the actual delivered CompOSE bytes as well.
+        verification = run_native("verify", destination / "compose", destination / "CONSISTENCY.json")
+        result["serialized_native_verification"] = verification
+        if verification.get("overall") != "PASS":
+            raise ValueError("native serialized consistency verification rejected")
+        result["status"] = "GENERATED_VERIFIED_FINITE_DOMAIN"
+        result["output_path"] = rel(destination / "compose")
+        result["output_sha256"] = {p.name: sha(p) for p in (destination / "compose").glob("eos.*")}
+        result["density_fm3"] = [matched.nb[0], matched.nb[-1]]
+        result["transition"] = {k: native[k] for k in ("mu_transition", "pressure_transition", "n_low", "n_high", "epsilon_low", "epsilon_high", "density_jump", "latent_energy_density", "maxwell_identity_residual")}
+        result["scope"] = "two admitted original connected components joined by one native sharp Maxwell transition; finite inner-crust/core support; no whole-star or source-microphysics equivalence claim"
+        result["source_exclusions"] = {"crust_before_component": lc["start_zero_based"], "core_after_component": high.n-hc["stop_exclusive"],
+                                       "excluded_intervals_not_interpolated": True}
+    except Exception as exc:
+        result["status"] = "REJECTED"
+        result["exception_type"] = type(exc).__name__
+        result["error"] = str(exc)
+        result["category"] = getattr(exc, "category", None) or "EXECUTION_OR_VALIDATION_FAILURE"
+        if hasattr(exc, "report"):
+            result["v2_report"] = plain(exc.report)
+    save(destination / "RESULT.json", result)
+    return plain(result)
+
+
+
+
+def make_pairs(records):
+    index={(r["origin"],r["model"],r["role"],r["resolution"]):r for r in records}
+    get=lambda origin,model,role,level:index[(origin,model,role,level)]
+    oldc=[get("native_generated",m,"crust","fixed_old_source") for m in OLD_CRUSTS]
+    newc=[get("new_public",m,"crust","fixed_public_precision") for m in NEW_PUBLIC]
+    nat=[get("new_native",m,"core","fine") for m in NEW_NATIVE]
+    pub=[get("new_public",m,"core","fixed_public_precision") for m in NEW_PUBLIC_CORES]
+    oldpub=get("public_original","GM_GM1","core","fixed_old_source")
+    oldnat=get("native_generated","GM_GM1","core","fixed_old_source")
+    pairs=list(itertools.product(oldc,nat))+[(c,oldpub) for c in newc]+list(itertools.product(newc,pub))+list(itertools.product(newc,nat+[oldnat]))
+    assert len(pairs)==120 and len({(c["id"],k["id"]) for c,k in pairs})==120
+    return [(check_origin_policy(c,k),c,k) for c,k in pairs]
+
+
+def summary(cells):
+    return {cat:{"model_variant_pairs":len(cs),"pairs_with_output":sum(c["generated_count"]>0 for c in cs),
+        "generated_tables":sum(c["generated_count"] for c in cs),
+        "actual_kernel_invocations":sum(c["kernel_invocations"] for c in cs),
+        "candidate_attempts":sum(len(c["candidate_results"]) for c in cs),
+        "pair_statuses":dict(Counter(c["status"] for c in cs)),
+        "candidate_rejections":dict(Counter(r["category"] for c in cs for r in c["candidate_results"] if r["status"]=="REJECTED"))}
+        for cat in sorted({c["category"] for c in cells}) for cs in [[c for c in cells if c["category"]==cat]]}
+
+
+def execute():
+    check_executable()
+    manifest_path=BASE/"prepared/MANIFEST.json"
+    manifest=load(manifest_path)
+    if manifest["matching_executable_sha256"]!=sha(executable()):raise ValueError("prepared executable changed")
+    output=BASE/"campaign"
+    output.mkdir(exist_ok=True)
+    records=manifest["source_records"]
+    data={r["id"]:read_prepared(r) for r in records}
+    cells=[]
+    start=time.monotonic()
+    for category,crust,core in make_pairs(records):
+        cell_id=f'{crust["model"]}__{core["model"]}'
+        dest=output/category/cell_id
+        saved=dest/"CELL.json"
+        if saved.exists():
+            cell=load(saved)
+            if cell["prepared_manifest_sha256"]!=sha(manifest_path):
+                raise ValueError("checkpoint belongs to different input snapshot")
+            cells.append(cell);continue
+        dest.mkdir(parents=True,exist_ok=True)
+        cell={"id":cell_id,"category":category,"crust":crust["model"],"core":core["model"],
+            "crust_source_id":crust["id"],"core_source_id":core["id"],
+            "prepared_manifest_sha256":sha(manifest_path),"candidate_results":[],
+            "source_states":{"crust":crust["state"],"core":core["state"]},
+            "source_interval_failures":{"crust":crust["interval_failures_by_category"],"core":core["interval_failures_by_category"]}}
+        for i,(lc,hc) in enumerate(itertools.product(crust["components"],core["components"])):
+            candidate=dest/f"candidate_{i:03d}"
+            result=load(candidate/"RESULT.json") if (candidate/"RESULT.json").exists() else run_candidate(
+                crust,core,data[crust["id"]],data[core["id"]],lc,hc,candidate)
+            cell["candidate_results"].append(result)
+        cell["generated_count"]=sum(r["status"]==SUCCESS for r in cell["candidate_results"])
+        cell["kernel_invocations"]=sum(r["kernel_invoked"] for r in cell["candidate_results"])
+        cell["status"]=SUCCESS if cell["generated_count"] else ("NO_MATCH_ON_ADMITTED_COMPONENTS" if cell["candidate_results"] else "SOURCE_HAS_NO_ADMITTED_COMPONENT_PAIR")
+        save(saved,cell)
+        cells.append(cell)
+        save(output/"PROGRESS.json",{"completed_cells":len(cells),"requested_cells":120,"summary":summary(cells),"last_cell":cell_id})
+        print(json.dumps({"completed":len(cells),"category":category,"cell":cell_id,"status":cell["status"],"generated":cell["generated_count"],"kernel_calls":cell["kernel_invocations"]}),flush=True)
+    for r in records:read_prepared(r)
+    receipt={"schema":"ns_cowling.new_model_maxwell_campaign.v1","created_at_utc":datetime.now(timezone.utc).isoformat(),
+        "requested_cells":120,"completed_cells":len(cells),"summary":summary(cells),"cells":cells,
+        "prepared_manifest":rel(manifest_path),"prepared_manifest_sha256":sha(manifest_path),
+        "matching_executable_sha256":sha(executable()),"campaign_script_sha256":sha(__file__),
+        "adapter_sha256":sha(ROOT/"python_frontend/compose_eos/new_model_matching.py"),
+        "git_base_head":subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip(),
+        "wall_seconds":time.monotonic()-start,"source_snapshot_rechecked":True,
+        "physical_model_count_new_native":4,"native_variant_count":5,"old_195_cells_repeated":False,
+        "historical_three_family_policy_modified":False,
+        "hybrid_scope":"reference-assisted public crust and native homogeneous core; explicit model/origin labels",
+        "public_precision":"raw source printed precision retained; no source grid refinement asserted",
+        "global_ground_state":"NOT_CLAIMED"}
+    save(output/"CAMPAIGN.json",receipt)
+    return receipt
+
+
+def convergence():
+    manifest=load(BASE/"prepared/MANIFEST.json")
+    records={r["id"]:r for r in manifest["source_records"]}
+    campaign=load(BASE/"campaign/CAMPAIGN.json")
+    output=BASE/"matching_validation/convergence"
+    output.mkdir(parents=True,exist_ok=True)
+    results=[]
+    for cell in campaign["cells"]:
+        core=records[cell["core_source_id"]]
+        if core["origin"]!="new_native":continue
+        coarse=records[f'new_native:{core["model"]}:coarse']
+        crust=records[cell["crust_source_id"]]
+        for i,fine in enumerate(cell["candidate_results"]):
+            if fine["status"]!=SUCCESS:continue
+            fc=fine["core_component"]
+            # Same physical component is identified by matching complete domain,
+            # phase and ordered connected-component index, never by a root cut.
+            matches=[c for c in coarse["components"] if c["phase_id"]==fc["phase_id"] and
+                np.allclose(c["density_fm3"],fc["density_fm3"],rtol=2e-12,atol=0)]
+            item={"cell":cell["id"],"category":cell["category"],"fine_candidate_index":i,
+                "crust_component":fine["crust_component"],"fine_core_component":fc,
+                "status":"COMPONENT_SUPPORT_DIFFERS" if len(matches)!=1 else "STARTED"}
+            if len(matches)==1:
+                dest=output/cell["category"]/cell["id"]/f"candidate_{i:03d}"
+                result=load(dest/"RESULT.json") if (dest/"RESULT.json").exists() else run_candidate(
+                    crust,coarse,read_prepared(crust),read_prepared(coarse),fine["crust_component"],matches[0],dest)
+                item["coarse_result"]=result
+                if result["status"]==SUCCESS:
+                    item["status"]="SAME_COMPONENT_TRANSITION_COMPARED"
+                    item["fine_transition"]=fine["transition"]
+                    item["coarse_transition"]=result["transition"]
+                    item["absolute_difference"]={k:abs(v-result["transition"][k]) for k,v in fine["transition"].items()}
+                    item["relative_difference"]={k:abs(v-result["transition"][k])/max(abs(v),1e-300) for k,v in fine["transition"].items()}
+                else:item["status"]="COARSE_COMPONENT_REJECTED"
+            results.append(item)
+            save(output/"CONVERGENCE.json",{"results":results,"status_counts":dict(Counter(r["status"] for r in results)),
+                "interpretation":"two independently generated nested density grids; transition differences are numerical diagnostics, not new physical models or asymptotic error bounds",
+                "public_crust_refinement":"NOT_AVAILABLE; same immutable public crust retained when applicable"})
+    return {"results":results}
+
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument("command",choices=("prepare","execute","convergence"))
+    args=p.parse_args()
+    result=globals()[args.command]()
+    print(json.dumps(result.get("summary",{"records":len(result.get("source_records",result.get("results",[])))})),flush=True)
+
+if __name__=="__main__":main()

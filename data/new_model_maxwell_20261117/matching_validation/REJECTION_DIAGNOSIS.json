@@ -1,0 +1,69 @@
+{
+  "campaign_sha256": "0e4d57943b8255fbd1b95d5052b678ff4d17b67d9009662c29414aeeb1816074",
+  "actual_kernel_invocations": 4197,
+  "successful_outputs": 9,
+  "rejected_component_pairs": 4188,
+  "diagnosed_rejection_counts": {
+    "NO_COEXISTENCE_CROSSING": 328,
+    "NONPOSITIVE_DENSITY_JUMP": 2,
+    "NO_COMMON_MU_SUPPORT": 3852,
+    "INSUFFICIENT_RETAINED_SOURCE_KNOTS": 3,
+    "OUTPUT_THERMODYNAMIC_C2_REJECTION": 1,
+    "MULTIPLE_COEXISTENCE_CROSSINGS": 2
+  },
+  "unknown_category_details": [
+    {
+      "cell": "GPPVA_NL3wrL55__PK1_CANONICAL",
+      "category": "old_native_crust__new_native_core",
+      "candidate_index": 1,
+      "raw_category": "UNKNOWN",
+      "raw_error": "v2: native boundary-segment construction rejected: Fortran operation 'maxwell-transition' failed with exit code 3: fewer than two retained source knots remain on one side of the coexistence point",
+      "diagnosed_category": "INSUFFICIENT_RETAINED_SOURCE_KNOTS",
+      "failure_class": "finite_support_or_resolution_limit",
+      "scientific_impossibility": false,
+      "raw_result_modified": false
+    },
+    {
+      "cell": "GPPVA_TM1e__PK1_CANONICAL",
+      "category": "old_native_crust__new_native_core",
+      "candidate_index": 1,
+      "raw_category": "UNKNOWN",
+      "raw_error": "v2: native boundary-segment construction rejected: Fortran operation 'maxwell-transition' failed with exit code 3: fewer than two retained source knots remain on one side of the coexistence point",
+      "diagnosed_category": "INSUFFICIENT_RETAINED_SOURCE_KNOTS",
+      "failure_class": "finite_support_or_resolution_limit",
+      "scientific_impossibility": false,
+      "raw_result_modified": false
+    },
+    {
+      "cell": "XMLSLZ_NL3__GM_GM1",
+      "category": "reference_assisted_hybrid",
+      "candidate_index": 8,
+      "raw_category": "UNKNOWN",
+      "raw_error": "v2: native boundary-segment construction rejected: Fortran operation 'maxwell-transition' failed with exit code 3: fewer than two retained source knots remain on one side of the coexistence point",
+      "diagnosed_category": "INSUFFICIENT_RETAINED_SOURCE_KNOTS",
+      "failure_class": "finite_support_or_resolution_limit",
+      "scientific_impossibility": false,
+      "raw_result_modified": false
+    },
+    {
+      "cell": "XMLSLZ_DDME-X__GM_GM1",
+      "category": "reference_assisted_hybrid",
+      "candidate_index": 4,
+      "raw_category": "UNKNOWN",
+      "raw_error": "v2: native boundary-segment construction rejected: Fortran Maxwell output failed the independent C1-C6/C10-C11 verifier: C2",
+      "diagnosed_category": "OUTPUT_THERMODYNAMIC_C2_REJECTION",
+      "failure_class": "numerical_thermodynamic_consistency_failure",
+      "scientific_impossibility": false,
+      "raw_result_modified": false,
+      "crust_component_C2": {
+        "applicable": true,
+        "max_rel": 4.4023901957042855e-06,
+        "pass_": false,
+        "basis": "Fortran CompOSE thermodynamic closure"
+      },
+      "crust_component_max_muQ_muE_abs_MeV": 0.004137318499942921,
+      "interpretation": "Original public crust has an Euler/Q3 discrepancy that exceeds strict C2 serialized-consistency tolerance; native phase Euler gate alone is not final admission. No Q3 or energy correction is applied."
+    }
+  ],
+  "scope": "message-based diagnosis plus read-only original-input C2 check; no Maxwell rerun; raw production results preserved"
+}

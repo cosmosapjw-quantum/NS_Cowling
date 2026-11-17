@@ -1,0 +1,146 @@
+{
+  "schema": "ns-cowling.independent-review.v1",
+  "reviewer": "/root/d_independent_review",
+  "date_utc": "2026-11-17",
+  "base_commit": "539e6bd8de73f8654d121c0bc30023fb868dc05b",
+  "scope": "D APR consumer, exact-contract TOV and equilibrium-perfect-fluid ell=2 Cowling; one bounded fresh-context review; no recursive agent",
+  "skill_context_used": {
+    "package": "c43/physmath-research-loop",
+    "version": "1.3.0",
+    "read": [
+      "SKILL.md",
+      "references/POLICY_INTEGRATION.md",
+      "references/SUBAGENT_MODE.md",
+      "references/CODING_LOOP.md:C9"
+    ],
+    "project_authority": [
+      "data/tf_pair_expansion_20261117/NEXT_STEP_D.json",
+      "docs/matched_eos_reference_20261117/PLAN_KO.md"
+    ],
+    "application": "Only concrete science/code/artifact risks, one metadata repair and selective readback, byte versus numerical identity separated."
+  },
+  "assessment": "NO_OPEN_BLOCKING_FINDINGS_IN_REVIEWED_SCOPE",
+  "findings": [
+    {
+      "id": "F1",
+      "classification": "representation/provenance",
+      "status": "CLOSED_AFTER_SELECTIVE_READBACK",
+      "object": "native Cowling interpolation label",
+      "defect": "Runner and NATIVE_COMPARISON claimed Hermite P(mu); actual compiled solutions provider is PCHIP(epsilon-P)(lnP) with first-law n/mu reconstruction.",
+      "reproduction": "Trace _compile_solver in pipeline/compose_cowling/solver.py to solutions/app/cell_solve.f90 init_table_eos and solutions/src/eos/ns_table_eos.f90 construct_pchip/eos_table_at_pressure.",
+      "impact": "Misstates interpolation and independence from native TOV; numerical outputs remain attributable.",
+      "repair": "Owner corrected runner/receipt descriptions, bound provider source/hash and preserved original erroneous log under explicit correction.",
+      "provider": "oscillation_source/solutions/src/eos/ns_table_eos.f90",
+      "provider_sha256": "466d9a548f6b0282b0f9d938d41f1069d5e726d80e6de450de06ac95f518682c",
+      "rerun_required": false
+    }
+  ],
+  "reviewed_code_sha256": {
+    "python_frontend/compose_eos/apr_phase_consumer.py": "a03d8508153e3a39bd5889faa9c5e0aada9852eaad500f0ad3c5c52f4eccd02b",
+    "python_frontend/compose_eos/stellar_background.py": "525f4c247b1f92b5eb31a37f44efe6630c0f979f7bd5d3575b671ea6f190dd01",
+    "python_frontend/compose_eos/stellar_cowling.py": "ecd9613d016515be2733b9a8d2761b550dff0ae31cba78de432e35ddff18af47"
+  },
+  "independent_execution": {
+    "focused_tests": {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=python_frontend:pipeline:/tmp/ns_cowling_audit_20261117_pydeps /home/cosmosapjw/ns_cowling_wt/.venv-gen/bin/python -m pytest -p no:cacheprovider -q python_frontend/tests/test_apr_phase_consumer.py python_frontend/tests/test_stellar_background.py python_frontend/tests/test_stellar_cowling.py",
+      "remote_pid": 1964180,
+      "exit_code": 0,
+      "passed": 19,
+      "seconds": 1.19
+    },
+    "artifact_recount_pid": 1973356,
+    "apr_source_files_receipt_byte_equal": 55,
+    "apr_cells_recount": 25,
+    "retained_core_physical_max_absolute_difference": 0,
+    "retained_core_masks_phases_exact": true,
+    "bridge_composition_unavailable": true,
+    "B_primary_equal_base_commit_bytes": true,
+    "B_primary_sha256": "591ac27aa99448512e291684c98f8273efc729d17c63be88e331c20e83bd2653",
+    "tov_sequence_rows": 37,
+    "tov_density_range_fm3": [
+      0.1,
+      1
+    ],
+    "tov_all_sampled_mass_slopes_positive": true,
+    "native_executable_table_hashes_match_receipts": true,
+    "redshifted_mu_profile_relative_spread": 4.555863675740162e-16,
+    "baseline_center_V_over_minus_W_div_ell_r": [
+      1,
+      1
+    ]
+  },
+  "math_review": {
+    "status": "DERIVATIONS_AND_IMPLEMENTATION_CHECKED",
+    "items": [
+      "TOV SI-to-geometric-km conversion, rest energy, nominal solar GM",
+      "h=ln(mu/mu_vac), dr/dh, center expansion and actual surface time normalization",
+      "Cowling scaled/unscaled ODEs, V=-W/(ell*r), surface Q=0, matching determinant/root/join/node admission",
+      "APR continuous n/P/epsilon/mu and one-sided epsilon second derivatives",
+      "Positive compressibility and causal endpoint criterion valid on positive-density cubic intervals; binary64 check not interval proof",
+      "Gamma1=Gammaeq yields N2=0 only in selected closure"
+    ]
+  },
+  "cowling_convergence_readback": {
+    "summary": "data/stellar_consumers_20261117/cowling/SUMMARY.json",
+    "complete": true,
+    "configurations": 12,
+    "profile_recount_pid": 1988932,
+    "profiles_recounted": 24,
+    "all_f_WV_nodes": [
+      0,
+      0
+    ],
+    "all_p1_WV_nodes": [
+      1,
+      1
+    ],
+    "rejected_diagnostic": {
+      "label": "ode_loose",
+      "mode": "f",
+      "matching_residual": -0.000003869541218783429,
+      "criterion": 0.000002,
+      "residual_accepted": false
+    },
+    "max_abs_frequency_shift_excluding_ode_loose_hz": [
+      0.000537006247213867,
+      0.002611511507893738
+    ],
+    "native_sub1_minus_exact_cutoff_hz": [
+      0.0010137351105186099,
+      0.08487318890092865
+    ],
+    "native_sub4_minus_exact_cutoff_hz": [
+      0.00020534711575237452,
+      0.007416953015308536
+    ],
+    "interpretation": "Measured sensitivity for tested configurations, not rigorous global error bound; native TOV and Cowling share EOS provider."
+  },
+  "parent_final_regression_separate_evidence": {
+    "receipt": "data/stellar_consumers_20261117/FRONTEND_PIPELINE.json",
+    "log": "data/stellar_consumers_20261117/FRONTEND_PIPELINE.log",
+    "observed_exit_code": 0,
+    "observed_source_tests_unchanged": true,
+    "observed_log_summary": "1397 passed, 9 skipped in 117.40s",
+    "reviewer_reran_full_suite": false
+  },
+  "limitations": [
+    "No maximum-mass turning point in nc<=1 fm^-3; endpoint is not Mmax",
+    "APR consumer and 25 matching cells distinct from B hybrid stellar outputs",
+    "No frozen-species buoyancy, elasticity, superfluid, rotation, magnetic or full-GR mode claim",
+    "Loose f diagnostic rejected; do not describe all 12 configurations as accepted",
+    "Review is bounded assessment, not global proof of model or code correctness"
+  ],
+  "pending_obligations": [],
+  "reviewer_mutations": [
+    "docs/stellar_consumers_20261117/INDEPENDENT_REVIEW_KO.md",
+    "data/stellar_consumers_20261117/INDEPENDENT_REVIEW.json"
+  ],
+  "reviewer_committed_or_pushed": false,
+  "tool_error_preserved": {
+    "remote_pid": 1987350,
+    "type": "SyntaxError",
+    "cause": "Report-writing Python triple-quoted text collided with an epsilon third-derivative apostrophe sequence.",
+    "effect": "Parser rejected entire script before any file write; no scientific calculation affected.",
+    "repair": "Used structured text-write arguments."
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "schema": "ns-cowling.source-ledger.v1",
+  "checked_date_kst": "2026-11-17",
+  "scope": "D equations and closure; A/B/C model source evidence reused by exact base commit",
+  "sources": [
+    {
+      "id": "APR_PROVIDER_20250314",
+      "url": "https://compose.obspm.fr/download/1D/NS/Classical/APR/eos.pdf",
+      "kind": "primary provider data sheet",
+      "version": "2025-03-14",
+      "local_reused": "data/receipts/generator_research_20261116/apr_uniform/sources/APR_provider_20250314.pdf",
+      "supports": "Cold beta-equilibrium A18+delta-v+UIX*; Gibbs pion-condensed mixed phase; public table lacks composition.",
+      "not_supporting": "Not a numerical certification of newly assembled APR consumer or stars."
+    },
+    {
+      "id": "COWLING_1983",
+      "url": "https://adsabs.harvard.edu/pdf/1983ApJ...268..837M",
+      "doi": "10.1086/161006",
+      "authors": "McDermott, Van Horn, Scholl",
+      "supports": "Relativistic Cowling sets metric perturbations to zero; regular centre and vanishing Lagrangian pressure; frequency interpreted at infinity."
+    },
+    {
+      "id": "FROZEN_EQ_2025",
+      "url": "https://arxiv.org/html/2410.08008v2",
+      "doi": "10.1051/0004-6361/202452727",
+      "authors": "Montefusco, Antonelli, Gulminelli",
+      "version": "arXiv v2 2025-02-26; A&A 694 A150 (2025)",
+      "supports": "Equilibrium and frozen composition are distinct thermodynamic response limits; Eq10 barotropic W,V and Eq11 surface condition used as equation cross-check.",
+      "source_caution": "Centre prose gives same coefficient for W and V; direct leading-order substitution in Eq10 instead requires V=-W/(ell*r). We use derived W~r^(ell+1), V~-r^ell/ell.",
+      "not_supporting": "No transfer of their model-dependent fractional frequency differences into this hybrid EOS."
+    },
+    {
+      "id": "TOV_1939",
+      "url": "https://doi.org/10.1103/PhysRev.55.374",
+      "authors": "Oppenheimer and Volkoff",
+      "supports": "Primary cold relativistic hydrostatic equilibrium formulation; enthalpy transformation derived in this work."
+    },
+    {
+      "id": "IAU_B3_2015",
+      "url": "https://arxiv.org/pdf/1510.07674",
+      "supports": "Nominal solar mass parameter (GM)_sun^N=1.3271244e20 m^3 s^-2, exact conversion convention rather than true solar mass."
+    }
+  ],
+  "discovery": {
+    "Exa": "Original Cowling article located and read via indexed primary text.",
+    "SciSpace": "Located frozen/equilibrium paper; equations verified in primary arXiv full text.",
+    "Parallel": "Located APR literature; SRO finite-temperature Maxwell construction distinguished from this provider's beta-equilibrium Gibbs prescription."
+  },
+  "failed_retrievals": [
+    {
+      "url": "https://www.aanda.org/articles/aa/full_html/2025/02/aa52727-24/aa52727-24.html",
+      "status": "403; used primary arXiv v2"
+    },
+    {
+      "url": "https://compose.obspm.fr/download//1D/NS/Classical/APR/eos.pdf",
+      "status": "502 double-slash link; normalized primary URL succeeded"
+    }
+  ],
+  "physical_boundaries": [
+    "APR continuous Gibbs endpoints are not sharp density jumps.",
+    "The B primary is reference-assisted hybrid, not a fully native unified crust.",
+    "Composition fractions along equilibrium alone would not supply fixed-species off-equilibrium derivatives."
+  ]
+}

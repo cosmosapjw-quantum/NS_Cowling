@@ -1,0 +1,958 @@
+{
+  "schema": "ns-cowling.stellar-cowling.v1",
+  "backend": "Python exact-contract enthalpy DOP853 reference",
+  "closure": "equilibrium-barotropic perfect fluid: Gamma1=Gamma_eq",
+  "convention": "(-+++), geometric km, Phi=half temporal metric, frequency at infinity",
+  "interface": "continuous EOS knots: W,V continuous; no sharp Maxwell jump",
+  "source": "data/core_support_20261117/primary_v1/REPRESENTATION.json",
+  "source_sha256": "591ac27aa99448512e291684c98f8273efc729d17c63be88e331c20e83bd2653",
+  "central_density_fm3": 0.5377339866073595,
+  "background": {
+    "central_density_fm3": 0.5377339866073595,
+    "h_c": 0.24177275039830382,
+    "h_start": 0.24177274816355615,
+    "surface_h": 0.0,
+    "central_pressure_MeV_fm3": 84.65083223068301,
+    "radius_km": 11.756410674298603,
+    "mass_msun": 1.4000000647778903,
+    "mass_geom_km": 2.0672751489228296,
+    "compactness": 0.17584237282916837,
+    "nfev": 3719,
+    "config": {
+      "r0_km": 0.001,
+      "rtol": 1e-10,
+      "atol": 1e-12,
+      "surface_h": 0.0,
+      "max_step_h": 0.005
+    },
+    "backend": "Python exact-contract enthalpy DOP853 reference"
+  },
+  "configurations": [
+    {
+      "label": "baseline",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-08,
+        "atol": 1e-11,
+        "surface_h": 1e-09,
+        "match_h_fraction": 0.15,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 0.5377339866073595,
+        "h_c": 0.24177275039830382,
+        "h_start": 0.24177274816355615,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 84.65083223068301,
+        "radius_km": 11.756410674298603,
+        "mass_msun": 1.4000000647778903,
+        "mass_geom_km": 2.0672751489228296,
+        "compactness": 0.17584237282916837,
+        "nfev": 3719,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2401.3817898742695,
+          "ell": 2,
+          "bracket_hz": [
+            2250.0,
+            2500.0
+          ],
+          "root_converged": true,
+          "root_iterations": 8,
+          "matching_residual": -1.209011873768656e-08,
+          "relative_join_mismatch": 1.2090118701344489e-08,
+          "surface_BC_relative": 1.0013291006210133e-16,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 11.75641063095376,
+          "nfev": 21709,
+          "name": "f",
+          "residual_accepted": true
+        },
+        {
+          "frequency_hz": 6721.9576305563,
+          "ell": 2,
+          "bracket_hz": [
+            6500.0,
+            6750.0
+          ],
+          "root_converged": true,
+          "root_iterations": 7,
+          "matching_residual": -1.9761072466708166e-08,
+          "relative_join_mismatch": 1.9761072469462145e-08,
+          "surface_BC_relative": 7.285935166024077e-17,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 11.75641063095376,
+          "nfev": 37084,
+          "name": "p1",
+          "residual_accepted": true
+        }
+      ],
+      "wall_seconds": 31.782248878007522,
+      "frequency_shifts_hz": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "ode_loose",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-06,
+        "atol": 1e-09,
+        "surface_h": 1e-09,
+        "match_h_fraction": 0.15,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 0.5377339866073595,
+        "h_c": 0.24177275039830382,
+        "h_start": 0.24177274816355615,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 84.65083223068301,
+        "radius_km": 11.756410674298603,
+        "mass_msun": 1.4000000647778903,
+        "mass_geom_km": 2.0672751489228296,
+        "compactness": 0.17584237282916837,
+        "nfev": 3719,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2401.380070390976,
+          "ell": 2,
+          "bracket_hz": [
+            2250.0,
+            2500.0
+          ],
+          "root_converged": true,
+          "root_iterations": 13,
+          "matching_residual": -3.869541218783429e-06,
+          "relative_join_mismatch": 3.869541218783092e-06,
+          "surface_BC_relative": 1.0012374170721306e-16,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 11.75641063095376,
+          "nfev": 6670,
+          "name": "f",
+          "residual_accepted": false
+        },
+        {
+          "frequency_hz": 6721.933133141695,
+          "ell": 2,
+          "bracket_hz": [
+            6500.0,
+            6750.0
+          ],
+          "root_converged": true,
+          "root_iterations": 12,
+          "matching_residual": 9.12452962267012e-08,
+          "relative_join_mismatch": 9.124529622572464e-08,
+          "surface_BC_relative": 7.269300782253046e-17,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 11.75641063095376,
+          "nfev": 12037,
+          "name": "p1",
+          "residual_accepted": true
+        }
+      ],
+      "wall_seconds": 14.689769608987262,
+      "frequency_shifts_hz": [
+        -0.0017194832935274462,
+        -0.02449741460441146
+      ]
+    },
+    {
+      "label": "ode_tight",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-09,
+        "atol": 1e-12,
+        "surface_h": 1e-09,
+        "match_h_fraction": 0.15,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 0.5377339866073595,
+        "h_c": 0.24177275039830382,
+        "h_start": 0.24177274816355615,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 84.65083223068301,
+        "radius_km": 11.756410674298603,
+        "mass_msun": 1.4000000647778903,
+        "mass_geom_km": 2.0672751489228296,
+        "compactness": 0.17584237282916837,
+        "nfev": 3719,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2401.381839494117,
+          "ell": 2,
+          "bracket_hz": [
+            2250.0,
+            2500.0
+          ],
+          "root_converged": true,
+          "root_iterations": 11,
+          "matching_residual": 2.3894192713699887e-08,
+          "relative_join_mismatch": 2.3894192766207495e-08,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 11.75641063095376,
+          "nfev": 35776,
+          "name": "f",
+          "residual_accepted": true
+        },
+        {
+          "frequency_hz": 6721.957071698971,
+          "ell": 2,
+          "bracket_hz": [
+            6500.0,
+            6750.0
+          ],
+          "root_converged": true,
+          "root_iterations": 8,
+          "matching_residual": -2.208417913145675e-09,
+          "relative_join_mismatch": 2.208417911464159e-09,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 11.75641063095376,
+          "nfev": 60883,
+          "name": "p1",
+          "residual_accepted": true
+        }
+      ],
+      "wall_seconds": 57.78293266898254,
+      "frequency_shifts_hz": [
+        4.961984723195201e-05,
+        -0.0005588573285422171
+      ]
+    },
+    {
+      "label": "surface_h1e-6",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-08,
+        "atol": 1e-11,
+        "surface_h": 1e-06,
+        "match_h_fraction": 0.15,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 0.5377339866073595,
+        "h_c": 0.24177275039830382,
+        "h_start": 0.24177274816355615,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 84.65083223068301,
+        "radius_km": 11.756410674298603,
+        "mass_msun": 1.4000000647778903,
+        "mass_geom_km": 2.0672751489228296,
+        "compactness": 0.17584237282916837,
+        "nfev": 3719,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2401.38197937702,
+          "ell": 2,
+          "bracket_hz": [
+            2250.0,
+            2500.0
+          ],
+          "root_converged": true,
+          "root_iterations": 15,
+          "matching_residual": 2.8821359676686518e-08,
+          "relative_join_mismatch": 2.8821359635873836e-08,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 11.756367329656863,
+          "nfev": 21484,
+          "name": "f",
+          "residual_accepted": true
+        },
+        {
+          "frequency_hz": 6721.957396873747,
+          "ell": 2,
+          "bracket_hz": [
+            6500.0,
+            6750.0
+          ],
+          "root_converged": true,
+          "root_iterations": 11,
+          "matching_residual": 1.0557401736657929e-08,
+          "relative_join_mismatch": 1.0557401736553704e-08,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 11.756367329656863,
+          "nfev": 37621,
+          "name": "p1",
+          "residual_accepted": true
+        }
+      ],
+      "wall_seconds": 48.01694514800329,
+      "frequency_shifts_hz": [
+        0.00018950275034512742,
+        -0.0002336825527891051
+      ]
+    },
+    {
+      "label": "surface_h1e-7",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-08,
+        "atol": 1e-11,
+        "surface_h": 1e-07,
+        "match_h_fraction": 0.15,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 0.5377339866073595,
+        "h_c": 0.24177275039830382,
+        "h_start": 0.24177274816355615,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 84.65083223068301,
+        "radius_km": 11.756410674298603,
+        "mass_msun": 1.4000000647778903,
+        "mass_geom_km": 2.0672751489228296,
+        "compactness": 0.17584237282916837,
+        "nfev": 3719,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2401.3820439247784,
+          "ell": 2,
+          "bracket_hz": [
+            2250.0,
+            2500.0
+          ],
+          "root_converged": true,
+          "root_iterations": 8,
+          "matching_residual": 2.478833392459319e-08,
+          "relative_join_mismatch": 2.4788333920980436e-08,
+          "surface_BC_relative": 1.0013176342747082e-16,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 11.756406339816145,
+          "nfev": 21670,
+          "name": "f",
+          "residual_accepted": true
+        },
+        {
+          "frequency_hz": 6721.957402899936,
+          "ell": 2,
+          "bracket_hz": [
+            6500.0,
+            6750.0
+          ],
+          "root_converged": true,
+          "root_iterations": 7,
+          "matching_residual": -1.0450563667529267e-08,
+          "relative_join_mismatch": 1.0450563667623278e-08,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 11.756406339816145,
+          "nfev": 37198,
+          "name": "p1",
+          "residual_accepted": true
+        }
+      ],
+      "wall_seconds": 31.606234652979765,
+      "frequency_shifts_hz": [
+        0.00025405050882909563,
+        -0.00022765636367694242
+      ]
+    },
+    {
+      "label": "surface_h1e-8",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-08,
+        "atol": 1e-11,
+        "surface_h": 1e-08,
+        "match_h_fraction": 0.15,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 0.5377339866073595,
+        "h_c": 0.24177275039830382,
+        "h_start": 0.24177274816355615,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 84.65083223068301,
+        "radius_km": 11.756410674298603,
+        "mass_msun": 1.4000000647778903,
+        "mass_geom_km": 2.0672751489228296,
+        "compactness": 0.17584237282916837,
+        "nfev": 3719,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2401.3819321096994,
+          "ell": 2,
+          "bracket_hz": [
+            2250.0,
+            2500.0
+          ],
+          "root_converged": true,
+          "root_iterations": 11,
+          "matching_residual": -3.167100327667554e-08,
+          "relative_join_mismatch": 3.167100334840747e-08,
+          "surface_BC_relative": 1.0013293875813227e-16,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 11.756410240850174,
+          "nfev": 20707,
+          "name": "f",
+          "residual_accepted": true
+        },
+        {
+          "frequency_hz": 6721.95760525249,
+          "ell": 2,
+          "bracket_hz": [
+            6500.0,
+            6750.0
+          ],
+          "root_converged": true,
+          "root_iterations": 8,
+          "matching_residual": -1.9541402479438636e-08,
+          "relative_join_mismatch": 1.9541402479385058e-08,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 11.756410240850174,
+          "nfev": 37588,
+          "name": "p1",
+          "residual_accepted": true
+        }
+      ],
+      "wall_seconds": 41.764601812988985,
+      "frequency_shifts_hz": [
+        0.00014223542984836968,
+        -2.5303809707111213e-05
+      ]
+    },
+    {
+      "label": "match_h007",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-08,
+        "atol": 1e-11,
+        "surface_h": 1e-09,
+        "match_h_fraction": 0.07,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 0.5377339866073595,
+        "h_c": 0.24177275039830382,
+        "h_start": 0.24177274816355615,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 84.65083223068301,
+        "radius_km": 11.756410674298603,
+        "mass_msun": 1.4000000647778903,
+        "mass_geom_km": 2.0672751489228296,
+        "compactness": 0.17584237282916837,
+        "nfev": 3719,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2401.382092049833,
+          "ell": 2,
+          "bracket_hz": [
+            2250.0,
+            2500.0
+          ],
+          "root_converged": true,
+          "root_iterations": 12,
+          "matching_residual": -4.728707230606743e-07,
+          "relative_join_mismatch": 4.7287072303638864e-07,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 11.75641063095376,
+          "nfev": 21409,
+          "name": "f",
+          "residual_accepted": true
+        },
+        {
+          "frequency_hz": 6721.9578128344065,
+          "ell": 2,
+          "bracket_hz": [
+            6500.0,
+            6750.0
+          ],
+          "root_converged": true,
+          "root_iterations": 11,
+          "matching_residual": -5.814392200715867e-09,
+          "relative_join_mismatch": 5.8143922056614624e-09,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 11.75641063095376,
+          "nfev": 38452,
+          "name": "p1",
+          "residual_accepted": true
+        }
+      ],
+      "wall_seconds": 39.35314775799634,
+      "frequency_shifts_hz": [
+        0.00030217556331990636,
+        0.00018227810687676538
+      ]
+    },
+    {
+      "label": "match_h030",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-08,
+        "atol": 1e-11,
+        "surface_h": 1e-09,
+        "match_h_fraction": 0.3,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 0.5377339866073595,
+        "h_c": 0.24177275039830382,
+        "h_start": 0.24177274816355615,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 84.65083223068301,
+        "radius_km": 11.756410674298603,
+        "mass_msun": 1.4000000647778903,
+        "mass_geom_km": 2.0672751489228296,
+        "compactness": 0.17584237282916837,
+        "nfev": 3719,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2401.3813507211353,
+          "ell": 2,
+          "bracket_hz": [
+            2250.0,
+            2500.0
+          ],
+          "root_converged": true,
+          "root_iterations": 14,
+          "matching_residual": -1.5374511992177562e-08,
+          "relative_join_mismatch": 1.5374512002998954e-08,
+          "surface_BC_relative": 1.0013296289176761e-16,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 11.75641063095376,
+          "nfev": 21298,
+          "name": "f",
+          "residual_accepted": true
+        },
+        {
+          "frequency_hz": 6721.957386810314,
+          "ell": 2,
+          "bracket_hz": [
+            6500.0,
+            6750.0
+          ],
+          "root_converged": true,
+          "root_iterations": 16,
+          "matching_residual": -3.5081036655801184e-08,
+          "relative_join_mismatch": 3.5081036620388536e-08,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 11.75641063095376,
+          "nfev": 38257,
+          "name": "p1",
+          "residual_accepted": true
+        }
+      ],
+      "wall_seconds": 58.94331597702694,
+      "frequency_shifts_hz": [
+        -0.0004391531342662347,
+        -0.000243745985244459
+      ]
+    },
+    {
+      "label": "step_h1e-3",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-08,
+        "atol": 1e-11,
+        "surface_h": 1e-09,
+        "match_h_fraction": 0.15,
+        "max_step_h": 0.001,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 0.5377339866073595,
+        "h_c": 0.24177275039830382,
+        "h_start": 0.24177274816355615,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 84.65083223068301,
+        "radius_km": 11.756410674298603,
+        "mass_msun": 1.4000000647778903,
+        "mass_geom_km": 2.0672751489228296,
+        "compactness": 0.17584237282916837,
+        "nfev": 3719,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2401.3823255881553,
+          "ell": 2,
+          "bracket_hz": [
+            2250.0,
+            2500.0
+          ],
+          "root_converged": true,
+          "root_iterations": 13,
+          "matching_residual": 1.0356862475990096e-07,
+          "relative_join_mismatch": 1.035686247415695e-07,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 11.75641063095376,
+          "nfev": 22807,
+          "name": "f",
+          "residual_accepted": true
+        },
+        {
+          "frequency_hz": 6721.957359276045,
+          "ell": 2,
+          "bracket_hz": [
+            6500.0,
+            6750.0
+          ],
+          "root_converged": true,
+          "root_iterations": 9,
+          "matching_residual": -2.3155636175600173e-08,
+          "relative_join_mismatch": 2.3155636174583568e-08,
+          "surface_BC_relative": 7.28587909325077e-17,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 11.75641063095376,
+          "nfev": 37627,
+          "name": "p1",
+          "residual_accepted": true
+        }
+      ],
+      "wall_seconds": 39.279438620986184,
+      "frequency_shifts_hz": [
+        0.0005357138857107202,
+        -0.0002712802543101134
+      ]
+    },
+    {
+      "label": "center_10m",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-08,
+        "atol": 1e-11,
+        "surface_h": 1e-09,
+        "match_h_fraction": 0.15,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 0.5377339866073595,
+        "h_c": 0.24177275039830382,
+        "h_start": 0.24177252692353787,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 84.65083223068301,
+        "radius_km": 11.75641074231629,
+        "mass_msun": 1.400000028604304,
+        "mass_geom_km": 2.0672750955080064,
+        "compactness": 0.17584236726835428,
+        "nfev": 3404,
+        "config": {
+          "r0_km": 0.01,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2401.3823268805168,
+          "ell": 2,
+          "bracket_hz": [
+            2250.0,
+            2500.0
+          ],
+          "root_converged": true,
+          "root_iterations": 15,
+          "matching_residual": 7.2665403752988125e-09,
+          "relative_join_mismatch": 7.26654044078694e-09,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 11.756410698971441,
+          "nfev": 21736,
+          "name": "f",
+          "residual_accepted": true
+        },
+        {
+          "frequency_hz": 6721.957070990844,
+          "ell": 2,
+          "bracket_hz": [
+            6500.0,
+            6750.0
+          ],
+          "root_converged": true,
+          "root_iterations": 14,
+          "matching_residual": 8.737454146217088e-08,
+          "relative_join_mismatch": 8.737454146255105e-08,
+          "surface_BC_relative": 7.285865853114436e-17,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 11.756410698971441,
+          "nfev": 37525,
+          "name": "p1",
+          "residual_accepted": true
+        }
+      ],
+      "wall_seconds": 51.51843928100425,
+      "frequency_shifts_hz": [
+        0.000537006247213867,
+        -0.0005595654556600493
+      ]
+    },
+    {
+      "label": "center_01m",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-08,
+        "atol": 1e-11,
+        "surface_h": 1e-09,
+        "match_h_fraction": 0.15,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 0.5377339866073595,
+        "h_c": 0.24177275039830382,
+        "h_start": 0.24177275037595633,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 84.65083223068301,
+        "radius_km": 11.756410810953483,
+        "mass_msun": 1.4000000328302522,
+        "mass_geom_km": 2.067275101748147,
+        "compactness": 0.17584236677252388,
+        "nfev": 3818,
+        "config": {
+          "r0_km": 0.0001,
+          "rtol": 1e-10,
+          "atol": 1e-12,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2401.381585015236,
+          "ell": 2,
+          "bracket_hz": [
+            2250.0,
+            2500.0
+          ],
+          "root_converged": true,
+          "root_iterations": 13,
+          "matching_residual": 2.2659017987481233e-07,
+          "relative_join_mismatch": 2.2659017981688253e-07,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 11.756410767608635,
+          "nfev": 21076,
+          "name": "f",
+          "residual_accepted": true
+        },
+        {
+          "frequency_hz": 6721.957226756403,
+          "ell": 2,
+          "bracket_hz": [
+            6500.0,
+            6750.0
+          ],
+          "root_converged": true,
+          "root_iterations": 7,
+          "matching_residual": -3.882798994050398e-08,
+          "relative_join_mismatch": 3.88279899407043e-08,
+          "surface_BC_relative": 7.285867465092024e-17,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 11.756410767608635,
+          "nfev": 38449,
+          "name": "p1",
+          "residual_accepted": true
+        }
+      ],
+      "wall_seconds": 30.259681524999905,
+      "frequency_shifts_hz": [
+        -0.00020485903360167868,
+        -0.00040379989695793483
+      ]
+    },
+    {
+      "label": "background_loose",
+      "settings": {
+        "ell": 2,
+        "rtol": 1e-08,
+        "atol": 1e-11,
+        "surface_h": 1e-09,
+        "match_h_fraction": 0.15,
+        "max_step_h": 0.002,
+        "root_xtol_hz": 1e-05
+      },
+      "background": {
+        "central_density_fm3": 0.5377339866073595,
+        "h_c": 0.24177275039830382,
+        "h_start": 0.24177274816355615,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 84.65083223068301,
+        "radius_km": 11.756414689758063,
+        "mass_msun": 1.399997383411785,
+        "mass_geom_km": 2.0672711895505023,
+        "compactness": 0.17584197598537116,
+        "nfev": 1757,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-08,
+          "atol": 1e-10,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python exact-contract enthalpy DOP853 reference"
+      },
+      "modes": [
+        {
+          "frequency_hz": 2401.381810271517,
+          "ell": 2,
+          "bracket_hz": [
+            2250.0,
+            2500.0
+          ],
+          "root_converged": true,
+          "root_iterations": 11,
+          "matching_residual": -1.2029290410038516e-07,
+          "relative_join_mismatch": 1.2029290406293314e-07,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "r_surface_mode_km": 11.756414646413052,
+          "nfev": 20650,
+          "name": "f",
+          "residual_accepted": true
+        },
+        {
+          "frequency_hz": 6721.955019044792,
+          "ell": 2,
+          "bracket_hz": [
+            6500.0,
+            6750.0
+          ],
+          "root_converged": true,
+          "root_iterations": 11,
+          "matching_residual": 4.878632392824625e-08,
+          "relative_join_mismatch": 4.8786323929729434e-08,
+          "surface_BC_relative": 0.0,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "r_surface_mode_km": 11.756414646413052,
+          "nfev": 37882,
+          "name": "p1",
+          "residual_accepted": true
+        }
+      ],
+      "wall_seconds": 43.85582054799306,
+      "frequency_shifts_hz": [
+        2.039724768110318e-05,
+        -0.002611511507893738
+      ]
+    }
+  ],
+  "scope": "nonrotating, unmagnetized, no metric perturbation, no elasticity, no superfluid relative motion",
+  "unresolved": "Frozen composition and composition buoyancy require missing off-equilibrium input; no full-GR mode claim"
+}

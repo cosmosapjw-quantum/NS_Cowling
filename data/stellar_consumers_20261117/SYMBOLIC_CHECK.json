@@ -1,0 +1,42 @@
+{
+  "schema": "ns-cowling.symbolic-check.v1",
+  "topic": "D TOV enthalpy, Cowling centre/scaling, APR thermodynamics",
+  "context_tool": {
+    "content": [
+      {
+        "type": "text",
+        "text": "tool call error: tool call failed for `codex_apps/wolfram.WolframContext`\n\nCaused by:\n    Mcp error: -32603: Internal error"
+      }
+    ],
+    "isError": true
+  },
+  "initial_attempt": {
+    "code": "nfun[mu_]:=D[pfun[mu],mu];\neps[mu_]:=mu nfun[mu]-pfun[mu];\nenthalpyIdentity=FullSimplify[D[pfun[mu],mu]/D[Log[mu/mu0],mu]-(eps[mu]+pfun[mu]),Assumptions->mu>0&&mu0>0];\nrh=-r(r-2m)/(m+4Pi r^3 p); mh=4Pi r^2 e rh;\ndu=FullSimplify[2r rh/.m->v r/.r^2->u];\ndv=FullSimplify[(mh/r-m rh/r^2)/.m->v r/.r^2->u];\nduCheck=FullSimplify[du+2u(1-2v)/(v+4Pi u p)];\ndvCheck=FullSimplify[dv+(1-2v)(4Pi u e-v)/(v+4Pi u p)];\ncenterCoeff=FullSimplify[Limit[((m+4Pi r^3 p)/(r(r-2m))/r)/.m->4Pi e r^3/3,r->0]];\ncenterCheck=FullSimplify[centerCoeff/2-2Pi(e+3p)/3];\ncm={{-(l+1),-l(l+1)},{-1,-l}}; regularCenter=Simplify[cm.{1,-1/l},Assumptions->l>0]; charPoly=Factor[Det[z IdentityMatrix[2]-cm]];\nscaledW=FullSimplify[((k^2 r^2 Exp[la-2nu]r^l vv+np r^(l+1)ww)/chi-l(l+1)Exp[la]r^l vv-(l+1)r^l ww)/r^(l+1),Assumptions->r>0];\nscaledWCheck=FullSimplify[scaledW-((np/chi-(l+1)/r)ww+(k^2 r Exp[la-2nu]/chi-l(l+1)Exp[la]/r)vv),Assumptions->r>0];\nscaledVCheck=FullSimplify[(2np r^l vv-Exp[la]r^(l+1)ww/r^2-l r^(l-1)vv)/r^l-(-Exp[la]ww/r+(2np-l/r)vv),Assumptions->r>0];\naprP=n D[en[n],n]-en[n]; aprCheck=FullSimplify[D[aprP,n]/D[en[n],n]-n D[en[n],{n,2}]/D[en[n],n]];\naa=-np(1/chieq-1/chiad); n2=-c^2 Exp[2(nu-la)]np aa; buoyancyEq=Simplify[n2/.chiad->chieq];\n<|\"enthalpy_identity_residual\"->enthalpyIdentity,\"TOV_u_residual\"->duCheck,\"TOV_v_residual\"->dvCheck,\"TOV_center_residual\"->centerCheck,\"Cowling_regular_center_residual\"->regularCenter,\"Cowling_center_characteristic\"->charPoly,\"Cowling_scaled_W_residual\"->scaledWCheck,\"Cowling_scaled_V_residual\"->scaledVCheck,\"APR_sound_speed_residual\"->aprCheck,\"equilibrium_buoyancy_N2\"->buoyancyEq|>",
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Power::infy: -- Message text not found -- (0^(-2))\nGeneral::messages: Messages were generated which may indicate errors.\n\nOut[1]= <|\"enthalpy_identity_residual\" -> 0, \"TOV_u_residual\" -> 2*u*((1 - 2*v)/(4*p*Pi*u + v) + (-1 + 2*v)/(4*p*Pi*r^2 + v)), \"TOV_v_residual\" -> (-4*p*Pi*(r^2 - u)*(4*e*Pi*u - v)*(-1 + 2*v))/((4*p*Pi*r^2 + v)*(4*p*Pi*u + v)), \"TOV_center_residual\" -> 0, \"Cowling_regular_center_residual\" -> {0, 0}, \"Cowling_center_characteristic\" -> z*(1 + 2*l + z), \"Cowling_scaled_W_residual\" -> 0, \"Cowling_scaled_V_residual\" -> 0, \"APR_sound_speed_residual\" -> 0, \"equilibrium_buoyancy_N2\" -> 0|>"
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    },
+    "classification": "symbolic substitution ordering defect: unexpanded r powers survived r^2->u replacement; initial Limit generated Power::infy despite final residual0; not a physics failure"
+  },
+  "repaired": {
+    "code": "rh=-rr(rr-2mm)/(mm+4Pi rr^3 pp); mh=4Pi rr^2 ee rh;\ndu=FullSimplify[(2rr rh)/.{mm->vv Sqrt[uu],rr->Sqrt[uu]},Assumptions->uu>0];\ndv=FullSimplify[(mh/rr-mm rh/rr^2)/.{mm->vv Sqrt[uu],rr->Sqrt[uu]},Assumptions->uu>0];\nduCheck=FullSimplify[du+2uu(1-2vv)/(vv+4Pi uu pp),Assumptions->uu>0];\ndvCheck=FullSimplify[dv+(1-2vv)(4Pi uu ee-vv)/(vv+4Pi uu pp),Assumptions->uu>0];\ncenterCoeff=Limit[Cancel[((mm+4Pi rr^3 pp)/(rr^2(rr-2mm)))/.mm->4Pi ee rr^3/3],rr->0];\ncenterCheck=FullSimplify[centerCoeff/2-2Pi(ee+3pp)/3];\nenthalpyCheck=FullSimplify[mu D[f[mu],mu]-(mu D[f[mu],mu]-f[mu]+f[mu])];\ncm={{-(ll+1),-ll(ll+1)},{-1,-ll}};\ncw=((kk^2 rr^2 Exp[la-2nu]rr^ll v0+np rr^(ll+1)w0)/chi-ll(ll+1)Exp[la]rr^ll v0-(ll+1)rr^ll w0)/rr^(ll+1);\ncwCheck=FullSimplify[cw-((np/chi-(ll+1)/rr)w0+(kk^2 rr Exp[la-2nu]/chi-ll(ll+1)Exp[la]/rr)v0),Assumptions->rr>0];\ncvCheck=FullSimplify[(2np rr^ll v0-Exp[la]rr^(ll+1)w0/rr^2-ll rr^(ll-1)v0)/rr^ll-(-Exp[la]w0/rr+(2np-ll/rr)v0),Assumptions->rr>0];\naprCheck=FullSimplify[D[n D[ef[n],n]-ef[n],n]/D[ef[n],n]-n D[ef[n],{n,2}]/D[ef[n],n]];\nbuoyancyEq=Simplify[c^2 Exp[2(nu-la)]np^2(1/chieq-1/chiad)/.chiad->chieq];\n<|\"enthalpy_identity_residual\"->enthalpyCheck,\"TOV_u_residual\"->duCheck,\"TOV_v_residual\"->dvCheck,\"TOV_center_residual\"->centerCheck,\"Cowling_regular_center_residual\"->Simplify[cm.{1,-1/ll},Assumptions->ll>0],\"Cowling_center_characteristic\"->Factor[Det[z IdentityMatrix[2]-cm]],\"Cowling_scaled_W_residual\"->cwCheck,\"Cowling_scaled_V_residual\"->cvCheck,\"APR_sound_speed_residual\"->aprCheck,\"equilibrium_buoyancy_N2\"->buoyancyEq|>",
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Out[1]= <|\"enthalpy_identity_residual\" -> 0, \"TOV_u_residual\" -> 0, \"TOV_v_residual\" -> 0, \"TOV_center_residual\" -> 0, \"Cowling_regular_center_residual\" -> {0, 0}, \"Cowling_center_characteristic\" -> z*(1 + 2*ll + z), \"Cowling_scaled_W_residual\" -> 0, \"Cowling_scaled_V_residual\" -> 0, \"APR_sound_speed_residual\" -> 0, \"equilibrium_buoyancy_N2\" -> 0|>"
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    },
+    "status": "ALL_EQUATION_RESIDUALS_EXACT_ZERO",
+    "interpretation": "Algebraic equivalence only; numerical and physical-source validation require separate evidence."
+  }
+}

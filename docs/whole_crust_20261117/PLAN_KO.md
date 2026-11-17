@@ -47,3 +47,11 @@ Python의 독립적인 해석적 표현은 연속 평가, 구간 극값, first l
 다음 원래 순서는 **B. 필요한 core 지원 확장과 source-variant 정책**이다.
 B는 앞선 세 core의 0.02–1.0 fm^-3 생성 결과를 재사용하고, A baseline에 실제 필요한
 core support와 source variant를 구분해 평가한다. A의 최초 baseline 상단은 기존0.5다.
+
+## 2026-11-17 완료 상태
+
+`production_v2`에서 주 baseline 1개와 구성 민감도 7개, 8개 표/5,638행을 생성했다.
+62개 집중 회귀, native readback 8개, 독립 검토자의 실제 5,638행 consumer 평가 및
+68개 hash 확인을 통과했다. 상세 완료 범위와 수치적 한계는 `RESULTS_KO.md`,
+최종 독립 판정은 `FINAL_REVIEW_KO.md`다. 다음 실행은 B이며 그 준비 상태는
+`data/whole_crust_20261117/NEXT_STEP_B.json`에 고정했다.

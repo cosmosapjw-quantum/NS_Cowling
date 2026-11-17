@@ -1,0 +1,179 @@
+{
+  "schema": "ns-cowling.research-execution.v1",
+  "status": "COMPLETE_A_READY_B",
+  "code_commit": "5c0e94649cd586d63323a9ec3fe908fd91586d6c",
+  "production_checkpoint_commit": "f7a4037bb089a167098265f4c7f3820c734b9dec",
+  "scope": "One explicit reference-assisted whole-crust baseline plus seven construction sensitivities; no stellar observable or microscopic isotope coexistence claim.",
+  "theory_loop": [
+    {
+      "id": "R1",
+      "title": "연구 위치·계약",
+      "status": "COMPLETED",
+      "evidence": "docs/whole_crust_20261117/PLAN_KO.md"
+    },
+    {
+      "id": "R2",
+      "title": "근거·재사용",
+      "status": "REUSED_AND_EXTENDED",
+      "evidence": "docs/whole_crust_20261117/SOURCE_AUDIT_KO.md"
+    },
+    {
+      "id": "R3",
+      "title": "주장·전제 정렬",
+      "status": "COMPLETED",
+      "evidence": "docs/whole_crust_20261117/PHYSICS_REVIEW_KO.md"
+    },
+    {
+      "id": "R4",
+      "title": "가설·표현 탐색",
+      "status": "COMPLETED",
+      "evidence": "data/whole_crust_20261117/source_audit/SOURCE_AUDIT.json"
+    },
+    {
+      "id": "R5",
+      "title": "구성적 유도",
+      "status": "COMPLETED",
+      "evidence": "docs/whole_crust_20261117/PHYSICS_REVIEW_KO.md"
+    },
+    {
+      "id": "R6",
+      "title": "독립 검증",
+      "status": "COMPLETED",
+      "evidence": "data/whole_crust_20261117/SYMBOLIC_SURFACE.json"
+    },
+    {
+      "id": "R7",
+      "title": "판별 검증",
+      "status": "COMPLETED",
+      "evidence": "data/whole_crust_20261117/validation/FOCUSED_FINAL.json"
+    },
+    {
+      "id": "R8",
+      "title": "결과 판정",
+      "status": "COMPLETED_WITH_DECLARED_SCOPE",
+      "evidence": "data/whole_crust_20261117/SUMMARY.json"
+    },
+    {
+      "id": "R9",
+      "title": "정식 결과·코딩 연결",
+      "status": "COMPLETED",
+      "evidence": "docs/whole_crust_20261117/RESULTS_KO.md"
+    },
+    {
+      "id": "R10",
+      "title": "종료·재개",
+      "status": "COMPLETE_A_READY_B",
+      "evidence": "data/whole_crust_20261117/NEXT_STEP_B.json"
+    }
+  ],
+  "coding_loop": [
+    {
+      "id": "C1",
+      "title": "목표·baseline",
+      "status": "COMPLETED",
+      "evidence": "docs/whole_crust_20261117/PLAN_KO.md"
+    },
+    {
+      "id": "C2",
+      "title": "식–데이터–코드",
+      "status": "COMPLETED",
+      "evidence": "python_frontend/compose_eos/whole_crust.py"
+    },
+    {
+      "id": "C3",
+      "title": "수치 설계",
+      "status": "COMPLETED",
+      "evidence": "docs/whole_crust_20261117/PHYSICS_REVIEW_KO.md"
+    },
+    {
+      "id": "C4",
+      "title": "실행 DAG·자원",
+      "status": "COMPLETED",
+      "evidence": "scripts/build_whole_crust_20261117.py"
+    },
+    {
+      "id": "C5",
+      "title": "구현",
+      "status": "COMPLETED",
+      "evidence": "fortran_eos/app/whole_crust_kernel.f90"
+    },
+    {
+      "id": "C6",
+      "title": "구현 검증",
+      "status": "COMPLETED",
+      "evidence": "data/whole_crust_20261117/validation/FOCUSED_FINAL.json"
+    },
+    {
+      "id": "C7",
+      "title": "과학 검증",
+      "status": "COMPLETED_WITH_DECLARED_SCOPE",
+      "evidence": "data/whole_crust_20261117/production_v2/CAMPAIGN.json"
+    },
+    {
+      "id": "C8",
+      "title": "수치·재현성",
+      "status": "COMPLETED",
+      "evidence": "data/whole_crust_20261117/production_v2/OUTER_RECONSTRUCTION.json"
+    },
+    {
+      "id": "C9",
+      "title": "독립 검토",
+      "status": "COMPLETED",
+      "evidence": "docs/whole_crust_20261117/FINAL_REVIEW_KO.md"
+    },
+    {
+      "id": "C10",
+      "title": "판정·인계",
+      "status": "COMPLETE_A_READY_B",
+      "evidence": "data/whole_crust_20261117/NEXT_STEP_B.json"
+    }
+  ],
+  "evidence_states": {
+    "derived": [
+      "pressure-primary first-law integral",
+      "cubic P(mu) identities and extrema",
+      "analytic surface closure and cutoff scaling"
+    ],
+    "numerically_checked": [
+      "native/Python agreement",
+      "eight serialized tables and 5638 consumer rows",
+      "actual CSS one-sided latent identity"
+    ],
+    "implementation_verified": [
+      "62 focused tests using actual gfortran",
+      "native readback and masks",
+      "independent review of 68 hashes and 5638 actual source rows"
+    ],
+    "unresolved_or_scoped": [
+      "microscopic interpretation inside17 isotope tabulation gaps",
+      "source SPG calibration fidelity inherited from prior ledger",
+      "composition-dependent perturbation closure",
+      "TOV/Cowling stability and convergence not yet executed",
+      "higher density whole-crust contract is next step B"
+    ]
+  },
+  "failure_preservation": [
+    {
+      "class": "NUMERICAL_REPRESENTATION",
+      "evidence": "source_audit/SOURCE_AUDIT.json",
+      "description": "40 raw public intervals fail the all-knot-preserving cubic P(mu_E) convexity test; not a physical no-go claim."
+    },
+    {
+      "class": "SOURCE_FORMAT",
+      "evidence": "production/CAMPAIGN.json",
+      "description": "Initial production rejected raw public nuclear-group normalization; raw data and native piece receipts preserved."
+    },
+    {
+      "class": "NUMERICAL_ROUNDOFF",
+      "evidence": "validation/native_controls_red.log",
+      "description": "Exactly luminal analytic control initially rejected; pre-cancellation roundoff bound repaired and green controls preserved."
+    },
+    {
+      "class": "IMPLEMENTATION",
+      "evidence": "docs/whole_crust_20261117/FINAL_REVIEW_KO.md",
+      "description": "Admitted signed CSS endpoint pressure band previously sent out-of-bracket pressure to smooth inversion; repaired with one-sided state selection."
+    }
+  ],
+  "packaging_completion_evidence": "data/whole_crust_20261117/deliverable_v2/PACKAGING_RECEIPT.json",
+  "next": "B: core support and explicit source variants"
+}

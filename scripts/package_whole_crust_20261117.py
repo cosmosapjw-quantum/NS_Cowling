@@ -282,8 +282,13 @@ def bundle(campaign_path, campaign, models, output, *, primary_only):
             copy_file(source, staging, "code/python_frontend/compose_eos/"+source.name)
         for relative in ("fortran_eos/app/whole_crust_kernel.f90", "scripts/build_whole_crust_20261117.py",
                          "scripts/package_whole_crust_20261117.py", "scripts/diagnose_whole_crust_sources_20261117.py",
+                         "python_frontend/tests/test_whole_crust.py",
                          "python_frontend/tests/test_whole_crust_native.py"):
             copy_file(ROOT/relative, staging, "code/"+relative)
+        for name in ("SUMMARY.json", "NEXT_STEP_B.json", "RUN_RECORD.json"):
+            source = ROOT/"data/whole_crust_20261117"/name
+            if source.is_file():
+                copy_file(source, staging, "provenance/"+name)
         for source in sorted((ROOT/"docs/whole_crust_20261117").glob("*.md")):
             if not primary_only or source.name == "USAGE_KO.md":
                 copy_file(source, staging, "docs/"+source.name)

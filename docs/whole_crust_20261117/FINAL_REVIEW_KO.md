@@ -54,7 +54,7 @@ low/high density 차는 1이고 latent identity 잔차는 -5.329070518200751e-15
 
 ### R1: 허용된 CSS pressure mismatch 내부에서 consumer가 실패함
 
-**initially implementation-verified failure; 수정 확인 대기.**
+**initially implementation-verified failure; 아래 후속 검토에서 해결 확인.**
 `from_contract`는 doublet의 압력 상대차를 2e-12까지 허용하고,
 `_upper_search_pressure`에서는 high row의 search pressure를 low pressure로 바꾼다.
 그러나 `_state_one`의 transition 판단 폭은 8*machine epsilon뿐이며 high interval의
@@ -121,3 +121,115 @@ WholeCrustBarotrope를 함께 사용하거나 같은 piece laws를 구현해야 
 buoyancy/frozen composition closure, Seidov flag로부터 실제 mode 안정성, TOV/Cowling
 수렴을 주장할 수 없다. A에서 surface와 하단 연결을 만들고 B에서 core support를
 확장하며 D에서 stellar consumer를 검증하는 기존 순서와 일치한다.
+
+
+## 후속 독립 검토: R1과 composition adapter
+
+**R1 resolved / implementation-verified.** 수정본은 admission을 통과한 doublet의 실제
+압력 encoding band `[min(P0,P1),max(P0,P1)]`와 8 epsilon 여유를 명시적으로 보존한다.
+band 안에서는 source one-sided n/epsilon를 선택하고 smooth root solver를 호출하지 않는다.
+원본 배열은 바꾸지 않는다. 이는 유한 폭의 물리적 mixed phase를 추가하는 규약이 아니라
+동일 전이압의 수치 encoding 차이를 처리하는 규약이다. 이 band 안에서 반환한 값으로
+finite-difference first law를 검사하거나 물리적 compressibility를 추론해서는 안 된다.
+
+검토자가 수정본에 대해 다음 선별 실행을 직접 수행했다.
+
+```text
+pytest python_frontend/tests/test_whole_crust.py -q \
+  -k 'encoding_band or provider_outer or phase_only'
+14 passed, 19 deselected
+```
+
+이는 signed band 2개, phase-only canonical metadata 1개, adapter 정상 1개,
+모호하거나 혼합된 source 거절 10개다. 추가로 band 경계의 바로 바깥 `nextafter`
+압력을 직접 평가했다. 양의/음의 1e-12 상대 discrepancy 모두 아래쪽 smooth branch는
+n<4, 위쪽 smooth branch는 n>5였고, band 경계·중간에서는 low/high가 정확히 n=4/5를
+반환했다. 최초 midpoint bracket 실패는 재현되지 않았다.
+
+adapter는 모든 일곱 composition presence mask, phase0, 정확한 free-nucleon/muon
+zero, 양의 정수 A/Z, Z<=A, 기존 decoded Yh=A, printed charge closure를 검사한다.
+runner는 앞서 raw NP=4, species IDs={10,11,0,1}, 하나의 group, raw group value=1,
+실제 source hash 및 217개 행을 확인한다. 따라서 public whole table 전체를 임의로
+재해석하는 경로가 아니다. accepted correction ledger는 원본 row_status=3과
+새 status=2를 함께 보존한다. thermo-only derived 행은 PARTIAL=1이며 species masks는
+false여서 missing composition을 관측된 zero abundance로 바꾸지 않는다.
+
+runner는 `implementation_sha256`도 추가하여 생산 source identity를 보강했다.
+후속 검토 파일 SHA256은 다음과 같다. 이 값은 이후 production receipt에 있는 값과
+직접 비교해야 하며, commit 또는 실행 성공 자체를 대신하지 않는다.
+
+| 파일 | SHA256 |
+|---|---|
+| whole_crust.py | f1bfdfbd5615733e7f2636b2b2ad826805d1ce8b5d84e37ac4f0ee868ca046be |
+| build_whole_crust_20261117.py | cfa6988b7cbd23c21a423dbc45531af0308671fbd2a18d5ade2d8bfb62803e11 |
+| test_whole_crust.py | 0d982d97aba3741e6f4c8207b07cd22242214ada5fd83db614e1c9111f34d31b |
+
+**이 시점 판정:** 발견된 R1은 해결되었고 adapter와 canonical metadata는 확인했다.
+최종 native production/write/readback artifact 확인만 남아 있으므로 전체 A의 최종 PASS는
+아직 선언하지 않는다.
+
+## 최종 생산 artifact 독립 확인과 A 판정
+
+**최종 판정: A 범위 적합, implementation-verified.**
+`data/whole_crust_20261117/production_v2/`의 실제 파일을 확인했다.
+생산 source commit은 `5c0e94649cd586d63323a9ec3fe908fd91586d6c`, artifact checkpoint는
+`f7a4037bb089a167098265f4c7f3820c734b9dec`다. 위 초기·후속 검토의 pending 상태는
+실패를 감추지 않기 위한 이력이며 이 최종 판정으로 갱신한다.
+
+검토자가 생산 receipt를 읽는 것 외에 독립적으로 수행한 검증은 다음과 같다.
+
+- 구현 파일, public source snapshot, 기존 두 upper table snapshot과 PAIR receipt,
+  8개 output table의 SHA256 **68개를 실제 파일에서 다시 계산하여 일치**를 확인했다.
+  production의 public source는 재다운로드 snapshot이며 앞선 PHYSICS_REVIEW의
+  `eos_generator/eos_data/SPG_M1` 진단 파일과 byte identity가 같다는 뜻은 아니다.
+  생산의 권위 있는 입력 hash는 CAMPAIGN 및 복사된 PROVENANCE.json이다.
+- native output `eos.nb`와 `eos.thermo`를 직접 읽어 n/P/epsilon을 복원하고, 각
+  REPRESENTATION.json에서 새 consumer를 생성하여 **8개, 총 5638행**을 재평가했다.
+  source doublet의 low/high를 구분했으며 n과 epsilon의 최대 상대 오차는 각각
+  **3.1086244689504383e-15**였다. 이 검사는 생산 runner의 저장된 PASS를 반복해서
+  읽는 것이 아니라 저장된 실제 수치와 연속 consumer를 다시 대조한 것이다.
+- 8개 consumer 모두 P=0에서 n=P=epsilon=h=0을 반환했다. 모든 RESULT의
+  native write/readback, upper exact-interval certification 및 native hard gate가
+  PASS인 기록과 row provenance 길이를 확인했다.
+- CSS 4개 variant의 실제 transition에서 delta n은
+  **0.00012336473282301141 fm^-3**이며
+  `abs(delta epsilon-mu_low*delta n)`은 모두
+  **1.942890293094024e-16 MeV fm^-3**였다. sharp gap 보간 없이 양쪽 상태를 재평가했다.
+- `validation/FOCUSED_FINAL.json`은 실제 원격 pytest의 returncode=0,
+  **62 passed** stdout을 보존한다. 이 62개는 root 실행 기록이고, 앞서 검토자가 직접
+  수행한 14개 회귀 및 위 artifact 수치 대조와 근거의 출처를 구분한다.
+
+| construction | baseline | lower row36 | lower row37 | surface gamma4/3 |
+|---|---:|---:|---:|---:|
+| quintic_P source knots | 704행 | 708행 | 707행 | 704행 |
+| CSS source knots | 702행 | 706행 | 705행 | 702행 |
+
+과학적 baseline은 quintic_P/row40/gamma5/3 하나다. 나머지 일곱 표는 endpoint,
+upper construction, surface closure 민감도 조합이다. 8개 독립 microscopic EOS를
+생성한 결과로 세면 안 된다. 모든 표의 실제 core upper support는 0.5 fm^-3다.
+
+생산 outer의 최대 energy-per-baryon 보정은 0.004915606957638374 MeV,
+outer cs2/c2 범위는 6.7299963573426004e-6–0.0026519594679298157이며,
+17 isotope gap label이 보존되어 있다. lower bridge의 최대 cs2/c2는 row40에서
+0.006974341835140935, row36에서 0.0338087582965788, row37에서
+0.016125555528160033이다. 이는 임의 에너지 이동 없이 선택한 endpoint 민감도다.
+표면 export cutoff n/n0=1e-8에서 생략 h는 gamma5/3의
+2.400330294743814e-10, gamma4/3의 1.7826705611459798e-7로 기록되어 있다.
+
+별도의 `OUTER_COMPOSITION_NORMALIZATION.json`은 217개 source-specific 변환을
+보존하며 실제 printed-charge closure 최대 잔차는 4.7619047593983055e-9다.
+`OUTER_RECONSTRUCTION.json`의 composition unchanged는 **이미 명시적으로
+normalize한 입력에서 pressure reconstruction이 추가로 composition을 바꾸지 않는다**는
+뜻으로 읽어야 한다. raw provider tuple 전체를 그대로 보존했다는 뜻은 아니다.
+
+native overall PASS는 C1–C6/C10/C11 hard gate의 의미다. C7/C8 finite-difference
+최대 상대 잔차 약 **5.27475% / 1.88479%**는 그대로 남아 있으며 이를 zero로
+인용하거나 모든 수치 미분 항등식이 동일 정밀도로 만족한다고 주장하면 안 된다.
+생산 interval law의 first law는 analytic construction 및 exact interval certification으로
+검증했고, 여러 piece/phase를 가진 유한 표의 별도 finite-difference diagnostic과
+구분한다. generic tabulated consumer를 사용할 때의 재보간 오차까지 인증한 것은 아니다.
+
+이 증거는 원래 A의 최소 종료조건인 source-labeled surface/outer/inner/core 후보,
+명시적인 boundary law, continuous stability/causality, source-preserving energy policy,
+실제 native 생산과 CoMPOSE 왕복을 충족한다. B의 필요한 core support 확장 및
+D의 TOV/Cowling·composition closure 검증은 완료 범위에 포함되지 않는다.

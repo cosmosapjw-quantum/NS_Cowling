@@ -1,0 +1,62 @@
+{
+  "runtime": "/home/cosmosapjw/ns_cowling_wt/.venv-gen/bin/python",
+  "runs": [
+    {
+      "name": "comparison",
+      "command": [
+        "/home/cosmosapjw/ns_cowling_wt/.venv-gen/bin/python",
+        "scripts/compare_generated_reference.py",
+        "--reference-root",
+        "data/matched_eos_reference_20261117/references",
+        "--retained-reference-root",
+        "eos_generator/eos_data",
+        "--output",
+        "data/matched_eos_reference_20261117/comparison",
+        "--plots"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 4.708946704864502
+    },
+    {
+      "name": "diagnosis",
+      "command": [
+        "/home/cosmosapjw/ns_cowling_wt/.venv-gen/bin/python",
+        "scripts/diagnose_reference_differences_20261117.py",
+        "--source-root",
+        "data/matched_eos_reference_20261117/references",
+        "--output",
+        "data/matched_eos_reference_20261117/diagnosis"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 1.5310523509979248
+    },
+    {
+      "name": "reference_support",
+      "command": [
+        "/home/cosmosapjw/ns_cowling_wt/.venv-gen/bin/python",
+        "scripts/build_reference_seed_catalog_20261117.py",
+        "--references",
+        "data/matched_eos_reference_20261117/references",
+        "--out",
+        "data/matched_eos_reference_20261117/reference_support"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.501894474029541
+    },
+    {
+      "name": "frontend_pipeline",
+      "command": [
+        "/home/cosmosapjw/ns_cowling_wt/.venv-gen/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-ra",
+        "python_frontend/tests",
+        "pipeline/tests"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 106.52481079101562
+    }
+  ],
+  "all_passed": true
+}

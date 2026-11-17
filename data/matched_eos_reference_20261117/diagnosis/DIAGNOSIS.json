@@ -1,0 +1,3683 @@
+{
+  "schema_version": 1,
+  "source_head": "3590e517292a0b8156c0cf85e3f17293beeb0161",
+  "calculation_role": "independent Python diagnostic; native production EOS are not modified",
+  "source_root": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/matched_eos_reference_20261117/references",
+  "source_sha256": {
+    "RG_SLY4": {
+      "eos.nb": "2aaa0129e05fa57a5c5e5f52adf5fdb66e5f1ab5c46c3bc25284f27109ad175f",
+      "eos.thermo": "2bd6548281a66938e87b24db83555deb89cdbcbf61f2bf9dbf909e63cc376f5d",
+      "eos.compo": "e6560ef6f76929b754d3235891c6590fbc5243d8ff0c7ac3c46883b01034709f"
+    },
+    "GM_GM1": {
+      "eos.nb": "2d4b75a2020673a6a3ca0cc2671efb333283152b13c675cb7c7d01f2834590eb",
+      "eos.thermo": "665c9d9d75be58c5e4306c29bc7bb3e98bdecb8c5e436f61f048395d61b1caf1",
+      "eos.compo": "368679992bae0780d41822c630483a8eb21ae7bd8a84836408d51e976fbcb664"
+    }
+  },
+  "implementation_sha256": {
+    "scripts/diagnose_reference_differences_20261117.py": "b710031af8d43d180188fccaa0bc0e2f975b0653582dbffb8873316ba1f0f2f3",
+    "python_frontend/compose_eos/skyrme_uniform.py": "ddbf21bb0f4af460c88219a715da63924f36f132c50f70b25e7743737a2fdfe3",
+    "python_frontend/compose_eos/gm1_uniform.py": "b301f918ec8bc8ccd574ce7ce69a9d8e32c6bf61f4896d0f72b107b99e8a8b83",
+    "python_frontend/compose_eos/cold_leptons.py": "ac995eb2504560da1569190a2f95bbbe266961dab0498dc0665951afca4c2ded"
+  },
+  "analytic_control": {
+    "identity": "delta P = n^2*d(delta epsilon/n)/dn = (2/3)*delta epsilon at fixed composition",
+    "density_composition_points": 4,
+    "max_relative_residual": 3.408543854797655e-11,
+    "status": "NUMERICALLY_CHECKED"
+  },
+  "RG_SLY4": {
+    "status": "CONTROL_EXECUTED_PROVIDER_ATTRIBUTION_UNRESOLVED",
+    "scope": "exact public density nodes; explicit homogeneous phase=3; no interpolation",
+    "kinetic_coefficients_mev_fm2": {
+      "common": 20.73553,
+      "split_neutron": 20.72124899117293,
+      "split_proton": 20.74981305729148
+    },
+    "control_definition": "Only nuclear kinetic K is split by species; the published interaction, rest masses and lepton prescription are unchanged.",
+    "source_composition_beta_definition": "mu_n(model,n,Yp_source)-mu_p(model,n,Yp_source)-mu_e(Ye_source*n); rounded source fractions limit accuracy",
+    "constant_energy_shift_diagnostic": {
+      "source_minus_model_sign_changes": 0,
+      "range_mev": 0.057749541321413744,
+      "statement": "A constant energy-per-baryon offset cannot remove a varying residual and changes no pressure. No offset was applied."
+    },
+    "summaries": {
+      "full_public_homogeneous": {
+        "rows": 54,
+        "density_range_fm3": [
+          0.05248075,
+          1.21
+        ],
+        "common_K": {
+          "Yp_difference": {
+            "max_abs": 0.00013082288539846554,
+            "rms": 9.597968365730995e-05,
+            "min_signed": 2.269163255971124e-05,
+            "max_signed": 0.00013082288539846554
+          },
+          "pressure_difference_mev_fm3": {
+            "max_abs": 0.05006874448747567,
+            "rms": 0.015967154226667755,
+            "min_signed": -0.05006874448747567,
+            "max_signed": 0.0280344396751957,
+            "relative_nonzero_reference": {
+              "max_abs": 0.0023502162067125265,
+              "rms": 0.00090468381261917,
+              "min_signed": -6.070917867055352e-05,
+              "max_signed": 0.0023502162067125265
+            }
+          },
+          "energy_per_baryon_difference_mev": {
+            "max_abs": 0.06950652884620467,
+            "rms": 0.04312575218629944,
+            "min_signed": 0.01175698752479093,
+            "max_signed": 0.06950652884620467
+          },
+          "source_composition_beta_residual_mev": {
+            "max_abs": 0.187547252904551,
+            "rms": 0.1273510367169564,
+            "min_signed": 0.022935336766465753,
+            "max_signed": 0.187547252904551
+          }
+        },
+        "split_K": {
+          "Yp_difference": {
+            "max_abs": 6.543123810015539e-06,
+            "rms": 4.721199108484953e-06,
+            "min_signed": 2.1904049472207254e-06,
+            "max_signed": 6.543123810015539e-06
+          },
+          "pressure_difference_mev_fm3": {
+            "max_abs": 0.0810723757776941,
+            "rms": 0.03049973439993333,
+            "min_signed": -0.0810723757776941,
+            "max_signed": 0.0008626387576384786,
+            "relative_nonzero_reference": {
+              "max_abs": 0.00012691250723701505,
+              "rms": 6.434548651646096e-05,
+              "min_signed": -9.908633780527364e-05,
+              "max_signed": 0.00012691250723701505
+            }
+          },
+          "energy_per_baryon_difference_mev": {
+            "max_abs": 0.03524616432241601,
+            "rms": 0.01311498756116893,
+            "min_signed": -0.03524616432241601,
+            "max_signed": 0.004062800843030345
+          },
+          "source_composition_beta_residual_mev": {
+            "max_abs": 0.009009674398669176,
+            "rms": 0.005732733191753496,
+            "min_signed": 0.0023876423852584594,
+            "max_signed": 0.009009674398669176
+          }
+        }
+      },
+      "campaign_0p08_to_0p5": {
+        "rows": 20,
+        "density_range_fm3": [
+          0.08317638,
+          0.4786301
+        ],
+        "common_K": {
+          "Yp_difference": {
+            "max_abs": 8.940441194263404e-05,
+            "rms": 6.365811938681596e-05,
+            "min_signed": 3.123690857517042e-05,
+            "max_signed": 8.940441194263404e-05
+          },
+          "pressure_difference_mev_fm3": {
+            "max_abs": 0.010429388534809902,
+            "rms": 0.004807879381739415,
+            "min_signed": 0.000724001335996427,
+            "max_signed": 0.010429388534809902,
+            "relative_nonzero_reference": {
+              "max_abs": 0.0018277475850111034,
+              "rms": 0.0010073156903487273,
+              "min_signed": 0.00017367250033620743,
+              "max_signed": 0.0018277475850111034
+            }
+          },
+          "energy_per_baryon_difference_mev": {
+            "max_abs": 0.04301500749375009,
+            "rms": 0.02885573487372262,
+            "min_signed": 0.01532277743206123,
+            "max_signed": 0.04301500749375009
+          },
+          "source_composition_beta_residual_mev": {
+            "max_abs": 0.10053488814818934,
+            "rms": 0.06328293318614302,
+            "min_signed": 0.03201551567086369,
+            "max_signed": 0.10053488814818934
+          }
+        },
+        "split_K": {
+          "Yp_difference": {
+            "max_abs": 5.755931473561127e-06,
+            "rms": 4.652196431354069e-06,
+            "min_signed": 2.1904049472207254e-06,
+            "max_signed": 5.755931473561127e-06
+          },
+          "pressure_difference_mev_fm3": {
+            "max_abs": 0.0029063850214186004,
+            "rms": 0.0011505077377643364,
+            "min_signed": -0.0029063850214186004,
+            "max_signed": 0.0004517825474135151,
+            "relative_nonzero_reference": {
+              "max_abs": 0.00011266918517206675,
+              "rms": 6.171659407917565e-05,
+              "min_signed": -9.908633780527364e-05,
+              "max_signed": 0.00011266918517206675
+            }
+          },
+          "energy_per_baryon_difference_mev": {
+            "max_abs": 0.002886292969265014,
+            "rms": 0.0015315323582941879,
+            "min_signed": -0.0005809700699046516,
+            "max_signed": 0.002886292969265014
+          },
+          "source_composition_beta_residual_mev": {
+            "max_abs": 0.006276931317046319,
+            "rms": 0.004537687791950364,
+            "min_signed": 0.003014658618170074,
+            "max_signed": 0.006276931317046319
+          }
+        }
+      }
+    },
+    "rows": [
+      {
+        "n_b_fm3": 0.05248075,
+        "source_Yp": 0.027357,
+        "source_pressure_mev_fm3": 0.16280940382175002,
+        "source_energy_per_baryon_mev": 947.2124823892876,
+        "common_K": {
+          "Yp_difference": 2.269163255971124e-05,
+          "pressure_difference_mev_fm3": 0.00038263729946708125,
+          "energy_per_baryon_difference_mev": 0.01175698752479093,
+          "source_composition_beta_residual_mev": 0.022935336766465753
+        },
+        "split_K": {
+          "Yp_difference": 2.3616988748149936e-06,
+          "pressure_difference_mev_fm3": 2.0662549640781958e-05,
+          "energy_per_baryon_difference_mev": 0.0008097378248521636,
+          "source_composition_beta_residual_mev": 0.0023876423852584594
+        }
+      },
+      {
+        "n_b_fm3": 0.05754399,
+        "source_Yp": 0.02917394,
+        "source_pressure_mev_fm3": 0.18987122870016,
+        "source_energy_per_baryon_mev": 947.5069807078291,
+        "common_K": {
+          "Yp_difference": 2.4407248469880682e-05,
+          "pressure_difference_mev_fm3": 0.00043447080006392413,
+          "energy_per_baryon_difference_mev": 0.012407542882328926,
+          "source_composition_beta_residual_mev": 0.024640491852167656
+        },
+        "split_K": {
+          "Yp_difference": 2.7089219299739065e-06,
+          "pressure_difference_mev_fm3": 1.4584097101755233e-05,
+          "energy_per_baryon_difference_mev": 0.0008068151732913975,
+          "source_composition_beta_residual_mev": 0.002735470783207461
+        }
+      },
+      {
+        "n_b_fm3": 0.06309573,
+        "source_Yp": 0.03102663,
+        "source_pressure_mev_fm3": 0.22390857419976,
+        "source_energy_per_baryon_mev": 947.8219361838246,
+        "common_K": {
+          "Yp_difference": 2.6140291813241123e-05,
+          "pressure_difference_mev_fm3": 0.0004924174808905724,
+          "energy_per_baryon_difference_mev": 0.013087341221307724,
+          "source_composition_beta_residual_mev": 0.02641180444250324
+        },
+        "split_K": {
+          "Yp_difference": 3.02841894179659e-06,
+          "pressure_difference_mev_fm3": 5.248948199476633e-06,
+          "energy_per_baryon_difference_mev": 0.0007952121472953877,
+          "source_composition_beta_residual_mev": 0.003060612602055812
+        }
+      },
+      {
+        "n_b_fm3": 0.0691831,
+        "source_Yp": 0.03290455,
+        "source_pressure_mev_fm3": 0.2672989383995,
+        "source_energy_per_baryon_mev": 948.1628170879026,
+        "common_K": {
+          "Yp_difference": 2.788135072930714e-05,
+          "pressure_difference_mev_fm3": 0.0005577773918911677,
+          "energy_per_baryon_difference_mev": 0.013723425887064877,
+          "source_composition_beta_residual_mev": 0.028250109192853756
+        },
+        "split_K": {
+          "Yp_difference": 3.313795299338118e-06,
+          "pressure_difference_mev_fm3": -7.612258414391171e-06,
+          "energy_per_baryon_difference_mev": 0.0006995904557243193,
+          "source_composition_beta_residual_mev": 0.0033584320357107345
+        }
+      },
+      {
+        "n_b_fm3": 0.07585776,
+        "source_Yp": 0.03479613,
+        "source_pressure_mev_fm3": 0.32325714829583996,
+        "source_energy_per_baryon_mev": 948.5361731304661,
+        "common_K": {
+          "Yp_difference": 2.9578941691456306e-05,
+          "pressure_difference_mev_fm3": 0.0006334568082785874,
+          "energy_per_baryon_difference_mev": 0.014584393647169236,
+          "source_composition_beta_residual_mev": 0.030113485438633347
+        },
+        "split_K": {
+          "Yp_difference": 3.5168301406596214e-06,
+          "pressure_difference_mev_fm3": -2.293992534557754e-05,
+          "energy_per_baryon_difference_mev": 0.0007859570297341634,
+          "source_composition_beta_residual_mev": 0.003581246666058746
+        }
+      },
+      {
+        "n_b_fm3": 0.08317638,
+        "source_Yp": 0.03668877,
+        "source_pressure_mev_fm3": 0.39611669682059997,
+        "source_energy_per_baryon_mev": 948.9508963584605,
+        "common_K": {
+          "Yp_difference": 3.123690857517042e-05,
+          "pressure_difference_mev_fm3": 0.000724001335996427,
+          "energy_per_baryon_difference_mev": 0.01532277743206123,
+          "source_composition_beta_residual_mev": 0.03201551567086369
+        },
+        "split_K": {
+          "Yp_difference": 3.644815725074857e-06,
+          "pressure_difference_mev_fm3": -3.8364170843629974e-05,
+          "energy_per_baryon_difference_mev": 0.000704018673104656,
+          "source_composition_beta_residual_mev": 0.0037365642904063634
+        }
+      },
+      {
+        "n_b_fm3": 0.09120108,
+        "source_Yp": 0.03856907,
+        "source_pressure_mev_fm3": 0.4916976722666401,
+        "source_energy_per_baryon_mev": 949.4172975625861,
+        "common_K": {
+          "Yp_difference": 3.280713420437953e-05,
+          "pressure_difference_mev_fm3": 0.0008371402232804082,
+          "energy_per_baryon_difference_mev": 0.016251672114890425,
+          "source_composition_beta_residual_mev": 0.03391580458085741
+        },
+        "split_K": {
+          "Yp_difference": 3.653228359615235e-06,
+          "pressure_difference_mev_fm3": -4.8720521652279025e-05,
+          "energy_per_baryon_difference_mev": 0.000763788067843052,
+          "source_composition_beta_residual_mev": 0.0037775930165082627
+        }
+      },
+      {
+        "n_b_fm3": 0.1,
+        "source_Yp": 0.0404229,
+        "source_pressure_mev_fm3": 0.6177917,
+        "source_energy_per_baryon_mev": 949.9486311919401,
+        "common_K": {
+          "Yp_difference": 3.429528013927652e-05,
+          "pressure_difference_mev_fm3": 0.000984675780936306,
+          "energy_per_baryon_difference_mev": 0.01724112197746308,
+          "source_composition_beta_residual_mev": 0.03582776197852411
+        },
+        "split_K": {
+          "Yp_difference": 3.551411423267925e-06,
+          "pressure_difference_mev_fm3": -4.523246248344659e-05,
+          "energy_per_baryon_difference_mev": 0.0008319407888848218,
+          "source_composition_beta_residual_mev": 0.0037110007576330872
+        }
+      },
+      {
+        "n_b_fm3": 0.1096478,
+        "source_Yp": 0.04223609,
+        "source_pressure_mev_fm3": 0.7847160813166001,
+        "source_energy_per_baryon_mev": 950.5601097499139,
+        "common_K": {
+          "Yp_difference": 3.525050605170804e-05,
+          "pressure_difference_mev_fm3": 0.0012628243721846122,
+          "energy_per_baryon_difference_mev": 0.01919194957633863,
+          "source_composition_beta_residual_mev": 0.037281340108577865
+        },
+        "split_K": {
+          "Yp_difference": 2.8922642788600794e-06,
+          "pressure_difference_mev_fm3": 6.474713400783649e-05,
+          "energy_per_baryon_difference_mev": 0.0018056259297054567,
+          "source_composition_beta_residual_mev": 0.0030596321305011998
+        }
+      },
+      {
+        "n_b_fm3": 0.1202264,
+        "source_Yp": 0.04404229,
+        "source_pressure_mev_fm3": 1.006095993308,
+        "source_energy_per_baryon_mev": 951.273427801594,
+        "common_K": {
+          "Yp_difference": 3.9038351387313264e-05,
+          "pressure_difference_mev_fm3": 0.0014849075552139102,
+          "energy_per_baryon_difference_mev": 0.020077415531659426,
+          "source_composition_beta_residual_mev": 0.03947715254419393
+        },
+        "split_K": {
+          "Yp_difference": 2.1904049472207254e-06,
+          "pressure_difference_mev_fm3": 0.00011335601577089349,
+          "energy_per_baryon_difference_mev": 0.0016559276602947648,
+          "source_composition_beta_residual_mev": 0.003014658618170074
+        }
+      },
+      {
+        "n_b_fm3": 0.1318257,
+        "source_Yp": 0.04660109,
+        "source_pressure_mev_fm3": 1.2934173470004,
+        "source_energy_per_baryon_mev": 952.1085699030378,
+        "common_K": {
+          "Yp_difference": 4.628851814573315e-05,
+          "pressure_difference_mev_fm3": 0.0016542823816900754,
+          "energy_per_baryon_difference_mev": 0.021196066698394134,
+          "source_composition_beta_residual_mev": 0.04214146902403115
+        },
+        "split_K": {
+          "Yp_difference": 3.2843156375431115e-06,
+          "pressure_difference_mev_fm3": 9.576182620518736e-05,
+          "energy_per_baryon_difference_mev": 0.0017075140201541217,
+          "source_composition_beta_residual_mev": 0.0032618272713165197
+        }
+      },
+      {
+        "n_b_fm3": 0.144544,
+        "source_Yp": 0.04945349,
+        "source_pressure_mev_fm3": 1.6733699881600002,
+        "source_energy_per_baryon_mev": 953.090941902662,
+        "common_K": {
+          "Yp_difference": 5.108323087789357e-05,
+          "pressure_difference_mev_fm3": 0.0018094228050880012,
+          "energy_per_baryon_difference_mev": 0.022146205262629337,
+          "source_composition_beta_residual_mev": 0.04518786622654147
+        },
+        "split_K": {
+          "Yp_difference": 4.002358396711092e-06,
+          "pressure_difference_mev_fm3": 1.3025919313180978e-05,
+          "energy_per_baryon_difference_mev": 0.0015417286095953386,
+          "source_composition_beta_residual_mev": 0.0037219017978884494
+        }
+      },
+      {
+        "n_b_fm3": 0.1584893,
+        "source_Yp": 0.05236086,
+        "source_pressure_mev_fm3": 2.179219950535,
+        "source_energy_per_baryon_mev": 954.25371985474,
+        "common_K": {
+          "Yp_difference": 5.4944361907838246e-05,
+          "pressure_difference_mev_fm3": 0.002082471834242927,
+          "energy_per_baryon_difference_mev": 0.023421287276278235,
+          "source_composition_beta_residual_mev": 0.048073465633109436
+        },
+        "split_K": {
+          "Yp_difference": 4.368989904107723e-06,
+          "pressure_difference_mev_fm3": 1.492096363797657e-06,
+          "energy_per_baryon_difference_mev": 0.001640482855236769,
+          "source_composition_beta_residual_mev": 0.003851176616393559
+        }
+      },
+      {
+        "n_b_fm3": 0.1737801,
+        "source_Yp": 0.05521437,
+        "source_pressure_mev_fm3": 2.8536673513140003,
+        "source_energy_per_baryon_mev": 955.638188262948,
+        "common_K": {
+          "Yp_difference": 5.794697157212453e-05,
+          "pressure_difference_mev_fm3": 0.0025888071101065613,
+          "energy_per_baryon_difference_mev": 0.025469724158142526,
+          "source_composition_beta_residual_mev": 0.050804912630241006
+        },
+        "split_K": {
+          "Yp_difference": 4.17821992202555e-06,
+          "pressure_difference_mev_fm3": 0.0001706085503299093,
+          "energy_per_baryon_difference_mev": 0.00244405209798515,
+          "source_composition_beta_residual_mev": 0.0036501024436290663
+        }
+      },
+      {
+        "n_b_fm3": 0.1905461,
+        "source_Yp": 0.05794586,
+        "source_pressure_mev_fm3": 3.753085542267,
+        "source_energy_per_baryon_mev": 957.297141307112,
+        "common_K": {
+          "Yp_difference": 6.141841700119804e-05,
+          "pressure_difference_mev_fm3": 0.002857851481205209,
+          "energy_per_baryon_difference_mev": 0.026114048512113186,
+          "source_composition_beta_residual_mev": 0.054303630679811477
+        },
+        "split_K": {
+          "Yp_difference": 4.643705949269883e-06,
+          "pressure_difference_mev_fm3": 4.138276778853367e-05,
+          "energy_per_baryon_difference_mev": 0.0017674806252898634,
+          "source_composition_beta_residual_mev": 0.004031977761002281
+        }
+      },
+      {
+        "n_b_fm3": 0.2089296,
+        "source_Yp": 0.06051137,
+        "source_pressure_mev_fm3": 4.950407192544,
+        "source_energy_per_baryon_mev": 959.2891890768839,
+        "common_K": {
+          "Yp_difference": 6.484346518854239e-05,
+          "pressure_difference_mev_fm3": 0.003095123926526,
+          "energy_per_baryon_difference_mev": 0.027599230532814545,
+          "source_composition_beta_residual_mev": 0.05808330275559115
+        },
+        "split_K": {
+          "Yp_difference": 5.190621640872861e-06,
+          "pressure_difference_mev_fm3": -0.000190959149079184,
+          "energy_per_baryon_difference_mev": 0.001848295838726699,
+          "source_composition_beta_residual_mev": 0.004500931227227056
+        }
+      },
+      {
+        "n_b_fm3": 0.2290868,
+        "source_Yp": 0.06288184,
+        "source_pressure_mev_fm3": 6.54098940266,
+        "source_energy_per_baryon_mev": 961.6883317431682,
+        "common_K": {
+          "Yp_difference": 6.770655831975225e-05,
+          "pressure_difference_mev_fm3": 0.003577317282923431,
+          "energy_per_baryon_difference_mev": 0.028704236980729547,
+          "source_composition_beta_residual_mev": 0.06172966862888529
+        },
+        "split_K": {
+          "Yp_difference": 5.2671310152574424e-06,
+          "pressure_difference_mev_fm3": -0.0002618685883755134,
+          "energy_per_baryon_difference_mev": 0.0014578722692704105,
+          "source_composition_beta_residual_mev": 0.00463201210058628
+        }
+      },
+      {
+        "n_b_fm3": 0.2511886,
+        "source_Yp": 0.06503901,
+        "source_pressure_mev_fm3": 8.649533751612001,
+        "source_energy_per_baryon_mev": 964.5797597007821,
+        "common_K": {
+          "Yp_difference": 7.021827577514961e-05,
+          "pressure_difference_mev_fm3": 0.004451051627153646,
+          "energy_per_baryon_difference_mev": 0.03089438444510506,
+          "source_composition_beta_residual_mev": 0.06544088059223441
+        },
+        "split_K": {
+          "Yp_difference": 5.059283220879007e-06,
+          "pressure_difference_mev_fm3": -3.8789594807298045e-05,
+          "energy_per_baryon_difference_mev": 0.002053775824265358,
+          "source_composition_beta_residual_mev": 0.004611729992518576
+        }
+      },
+      {
+        "n_b_fm3": 0.2754229,
+        "source_Yp": 0.06697473,
+        "source_pressure_mev_fm3": 11.438918967380001,
+        "source_energy_per_baryon_mev": 968.067247948156,
+        "common_K": {
+          "Yp_difference": 7.267680711088575e-05,
+          "pressure_difference_mev_fm3": 0.005705916946533662,
+          "energy_per_baryon_difference_mev": 0.03342789730231743,
+          "source_composition_beta_residual_mev": 0.06940153336995536
+        },
+        "split_K": {
+          "Yp_difference": 4.846964366089779e-06,
+          "pressure_difference_mev_fm3": 0.0004517825474135151,
+          "energy_per_baryon_difference_mev": 0.002886292969265014,
+          "source_composition_beta_residual_mev": 0.0046118707203959275
+        }
+      },
+      {
+        "n_b_fm3": 0.3019952,
+        "source_Yp": 0.06869016,
+        "source_pressure_mev_fm3": 15.122717675104001,
+        "source_energy_per_baryon_mev": 972.2751385703259,
+        "common_K": {
+          "Yp_difference": 7.580514443189523e-05,
+          "pressure_difference_mev_fm3": 0.005850247490759131,
+          "energy_per_baryon_difference_mev": 0.034076810964961624,
+          "source_composition_beta_residual_mev": 0.07407561484629355
+        },
+        "split_K": {
+          "Yp_difference": 5.338210921412845e-06,
+          "pressure_difference_mev_fm3": -0.00029989857622325644,
+          "energy_per_baryon_difference_mev": 0.0017195074307210234,
+          "source_composition_beta_residual_mev": 0.00508252392970121
+        }
+      },
+      {
+        "n_b_fm3": 0.3311311,
+        "source_Yp": 0.07019824,
+        "source_pressure_mev_fm3": 19.975619371251,
+        "source_energy_per_baryon_mev": 977.3461327602438,
+        "common_K": {
+          "Yp_difference": 7.868990327260239e-05,
+          "pressure_difference_mev_fm3": 0.006151267176690567,
+          "energy_per_baryon_difference_mev": 0.03477827002006961,
+          "source_composition_beta_residual_mev": 0.07887735361100567
+        },
+        "split_K": {
+          "Yp_difference": 5.605919745035881e-06,
+          "pressure_difference_mev_fm3": -0.0010465645949437885,
+          "energy_per_baryon_difference_mev": 0.0004827185932754219,
+          "source_composition_beta_residual_mev": 0.005422503900149422
+        }
+      },
+      {
+        "n_b_fm3": 0.3630781,
+        "source_Yp": 0.0715219,
+        "source_pressure_mev_fm3": 26.356235034129,
+        "source_energy_per_baryon_mev": 983.4506207031999,
+        "common_K": {
+          "Yp_difference": 8.143063478262269e-05,
+          "pressure_difference_mev_fm3": 0.006683746389327894,
+          "energy_per_baryon_difference_mev": 0.03623844128082965,
+          "source_composition_beta_residual_mev": 0.08387144033301297
+        },
+        "split_K": {
+          "Yp_difference": 5.735510229698537e-06,
+          "pressure_difference_mev_fm3": -0.00173488707709879,
+          "energy_per_baryon_difference_mev": -0.000125375520497073,
+          "source_composition_beta_residual_mev": 0.005679481777264073
+        }
+      },
+      {
+        "n_b_fm3": 0.3981072,
+        "source_Yp": 0.07269646,
+        "source_pressure_mev_fm3": 34.730167478256,
+        "source_energy_per_baryon_mev": 990.791097534202,
+        "common_K": {
+          "Yp_difference": 8.40724402305787e-05,
+          "pressure_difference_mev_fm3": 0.007474231246497709,
+          "energy_per_baryon_difference_mev": 0.038050225084703015,
+          "source_composition_beta_residual_mev": 0.0890981861740272
+        },
+        "split_K": {
+          "Yp_difference": 5.755931473561127e-06,
+          "pressure_difference_mev_fm3": -0.002360460388985075,
+          "energy_per_baryon_difference_mev": -0.0005185679528949549,
+          "source_composition_beta_residual_mev": 0.005874810292056054
+        }
+      },
+      {
+        "n_b_fm3": 0.4365158,
+        "source_Yp": 0.07377135,
+        "source_pressure_mev_fm3": 45.70128359048,
+        "source_energy_per_baryon_mev": 999.6060625343861,
+        "common_K": {
+          "Yp_difference": 8.671253075669128e-05,
+          "pressure_difference_mev_fm3": 0.008659369753509338,
+          "energy_per_baryon_difference_mev": 0.04033496620763799,
+          "source_composition_beta_residual_mev": 0.09463672960748681
+        },
+        "split_K": {
+          "Yp_difference": 5.744372027480238e-06,
+          "pressure_difference_mev_fm3": -0.002808148184541892,
+          "energy_per_baryon_difference_mev": -0.0005809700699046516,
+          "source_composition_beta_residual_mev": 0.006066187037731652
+        }
+      },
+      {
+        "n_b_fm3": 0.4786301,
+        "source_Yp": 0.07481245,
+        "source_pressure_mev_fm3": 60.05204344165,
+        "source_energy_per_baryon_mev": 1010.1770940584778,
+        "common_K": {
+          "Yp_difference": 8.940441194263404e-05,
+          "pressure_difference_mev_fm3": 0.010429388534809902,
+          "energy_per_baryon_difference_mev": 0.04301500749375009,
+          "source_composition_beta_residual_mev": 0.10053488814818934
+        },
+        "split_K": {
+          "Yp_difference": 5.728436388616198e-06,
+          "pressure_difference_mev_fm3": -0.0029063850214186004,
+          "energy_per_baryon_difference_mev": -0.00039377650034566614,
+          "source_composition_beta_residual_mev": 0.006276931317046319
+        }
+      },
+      {
+        "n_b_fm3": 0.5248075,
+        "source_Yp": 0.07590472,
+        "source_pressure_mev_fm3": 78.79459804999999,
+        "source_energy_per_baryon_mev": 1022.8350130838181,
+        "common_K": {
+          "Yp_difference": 9.22645467847788e-05,
+          "pressure_difference_mev_fm3": 0.01341067381146388,
+          "energy_per_baryon_difference_mev": 0.04696770138684769,
+          "source_composition_beta_residual_mev": 0.10692756402127657
+        },
+        "split_K": {
+          "Yp_difference": 5.790627994897712e-06,
+          "pressure_difference_mev_fm3": -0.002041072198167626,
+          "energy_per_baryon_difference_mev": 0.0009196592210400922,
+          "source_composition_beta_residual_mev": 0.006613707658431167
+        }
+      },
+      {
+        "n_b_fm3": 0.5754399,
+        "source_Yp": 0.07715561,
+        "source_pressure_mev_fm3": 103.23668017151999,
+        "source_energy_per_baryon_mev": 1037.96965469052,
+        "common_K": {
+          "Yp_difference": 9.536785873180686e-05,
+          "pressure_difference_mev_fm3": 0.018678593322206893,
+          "energy_per_baryon_difference_mev": 0.05289322958833509,
+          "source_composition_beta_residual_mev": 0.11386748602231478
+        },
+        "split_K": {
+          "Yp_difference": 5.961662888812058e-06,
+          "pressure_difference_mev_fm3": 0.0008626387576384786,
+          "energy_per_baryon_difference_mev": 0.004062800843030345,
+          "source_composition_beta_residual_mev": 0.007096322813509914
+        }
+      },
+      {
+        "n_b_fm3": 0.6309573,
+        "source_Yp": 0.0786993,
+        "source_pressure_mev_fm3": 135.07584354984002,
+        "source_energy_per_baryon_mev": 1056.04867816078,
+        "common_K": {
+          "Yp_difference": 9.845298157930282e-05,
+          "pressure_difference_mev_fm3": 0.01725356531372313,
+          "energy_per_baryon_difference_mev": 0.052472179964752286,
+          "source_composition_beta_residual_mev": 0.12086172983973142
+        },
+        "split_K": {
+          "Yp_difference": 5.924043903787757e-06,
+          "pressure_difference_mev_fm3": -0.0031554143616290276,
+          "energy_per_baryon_difference_mev": 0.000725032170976192,
+          "source_composition_beta_residual_mev": 0.007193133866309154
+        }
+      },
+      {
+        "n_b_fm3": 0.691831,
+        "source_Yp": 0.0807008,
+        "source_pressure_mev_fm3": 176.4830440436,
+        "source_energy_per_baryon_mev": 1077.6077579161,
+        "common_K": {
+          "Yp_difference": 0.00010147831781520678,
+          "pressure_difference_mev_fm3": 0.011620082022801625,
+          "energy_per_baryon_difference_mev": 0.04928767512183185,
+          "source_composition_beta_residual_mev": 0.1278949276807566
+        },
+        "split_K": {
+          "Yp_difference": 5.567864394234734e-06,
+          "pressure_difference_mev_fm3": -0.011559168856706492,
+          "energy_per_baryon_difference_mev": -0.00549417458660173,
+          "source_composition_beta_residual_mev": 0.006843193425140726
+        }
+      },
+      {
+        "n_b_fm3": 0.7585776,
+        "source_Yp": 0.08336108,
+        "source_pressure_mev_fm3": 230.24195599679996,
+        "source_energy_per_baryon_mev": 1103.2734901217398,
+        "common_K": {
+          "Yp_difference": 0.0001048821989555887,
+          "pressure_difference_mev_fm3": 0.0076944468711701575,
+          "energy_per_baryon_difference_mev": 0.04850369424411838,
+          "source_composition_beta_residual_mev": 0.13558230091854284
+        },
+        "split_K": {
+          "Yp_difference": 5.253515243663909e-06,
+          "pressure_difference_mev_fm3": -0.018330812111599926,
+          "energy_per_baryon_difference_mev": -0.00940432170045824,
+          "source_composition_beta_residual_mev": 0.006608125934064901
+        }
+      },
+      {
+        "n_b_fm3": 0.8317638,
+        "source_Yp": 0.08692268,
+        "source_pressure_mev_fm3": 299.90449866510005,
+        "source_energy_per_baryon_mev": 1133.7739440061598,
+        "common_K": {
+          "Yp_difference": 0.00010982658574096305,
+          "pressure_difference_mev_fm3": 0.021480339021252348,
+          "energy_per_baryon_difference_mev": 0.06033550525580722,
+          "source_composition_beta_residual_mev": 0.1454717917263224
+        },
+        "split_K": {
+          "Yp_difference": 6.0629564449105056e-06,
+          "pressure_difference_mev_fm3": -0.0072901284318049875,
+          "energy_per_baryon_difference_mev": -0.000750129549032863,
+          "source_composition_beta_residual_mev": 0.007973232985250434
+        }
+      },
+      {
+        "n_b_fm3": 0.9120108,
+        "source_Yp": 0.09168005,
+        "source_pressure_mev_fm3": 390.06537754056,
+        "source_energy_per_baryon_mev": 1170.00302209092,
+        "common_K": {
+          "Yp_difference": 0.00011316642372347085,
+          "pressure_difference_mev_fm3": 0.0006617195439844181,
+          "energy_per_baryon_difference_mev": 0.050397744444580894,
+          "source_composition_beta_residual_mev": 0.15302411240068636
+        },
+        "split_K": {
+          "Yp_difference": 4.784828443404887e-06,
+          "pressure_difference_mev_fm3": -0.030468158841415516,
+          "energy_per_baryon_difference_mev": -0.013859319516768664,
+          "source_composition_beta_residual_mev": 0.006326586336314222
+        }
+      },
+      {
+        "n_b_fm3": 1.0,
+        "source_Yp": 0.09796947,
+        "source_pressure_mev_fm3": 506.3933,
+        "source_energy_per_baryon_mev": 1212.90620903804,
+        "common_K": {
+          "Yp_difference": 0.00012005080661321721,
+          "pressure_difference_mev_fm3": 0.0280344396751957,
+          "energy_per_baryon_difference_mev": 0.06950652884620467,
+          "source_composition_beta_residual_mev": 0.16566165152590884
+        },
+        "split_K": {
+          "Yp_difference": 6.543123810015539e-06,
+          "pressure_difference_mev_fm3": -0.004635815336143878,
+          "energy_per_baryon_difference_mev": 0.0021641749053742387,
+          "source_composition_beta_residual_mev": 0.009009674398669176
+        }
+      },
+      {
+        "n_b_fm3": 1.01,
+        "source_Yp": 0.09875809,
+        "source_pressure_mev_fm3": 520.841446,
+        "source_energy_per_baryon_mev": 1218.00316341996,
+        "common_K": {
+          "Yp_difference": 0.00011947144797250231,
+          "pressure_difference_mev_fm3": 0.00788744744397718,
+          "energy_per_baryon_difference_mev": 0.05760715943370087,
+          "source_composition_beta_residual_mev": 0.1651406024635378
+        },
+        "split_K": {
+          "Yp_difference": 5.380923272985116e-06,
+          "pressure_difference_mev_fm3": -0.02487607636874145,
+          "energy_per_baryon_difference_mev": -0.010059137394819118,
+          "source_composition_beta_residual_mev": 0.007364161000253944
+        }
+      },
+      {
+        "n_b_fm3": 1.02,
+        "source_Yp": 0.09956163,
+        "source_pressure_mev_fm3": 535.541616,
+        "source_energy_per_baryon_mev": 1223.14136472294,
+        "common_K": {
+          "Yp_difference": 0.00011879089214060501,
+          "pressure_difference_mev_fm3": -0.01339055452217508,
+          "energy_per_baryon_difference_mev": 0.046019250273729995,
+          "source_composition_beta_residual_mev": 0.16448678964502506
+        },
+        "split_K": {
+          "Yp_difference": 4.118112596304679e-06,
+          "pressure_difference_mev_fm3": -0.04622918780171403,
+          "energy_per_baryon_difference_mev": -0.02196545545302797,
+          "source_composition_beta_residual_mev": 0.005587135635323648
+        }
+      },
+      {
+        "n_b_fm3": 1.03,
+        "source_Yp": 0.1003787,
+        "source_pressure_mev_fm3": 550.4737150000001,
+        "source_energy_per_baryon_mev": 1228.3088804663998,
+        "common_K": {
+          "Yp_difference": 0.00011938659639523785,
+          "pressure_difference_mev_fm3": -0.014351684367056805,
+          "energy_per_baryon_difference_mev": 0.04648789640623363,
+          "source_composition_beta_residual_mev": 0.16561421046102964
+        },
+        "split_K": {
+          "Yp_difference": 4.132351056507222e-06,
+          "pressure_difference_mev_fm3": -0.047246881882529124,
+          "energy_per_baryon_difference_mev": -0.02180966278319829,
+          "source_composition_beta_residual_mev": 0.005592699568381931
+        }
+      },
+      {
+        "n_b_fm3": 1.04,
+        "source_Yp": 0.1012091,
+        "source_pressure_mev_fm3": 565.633848,
+        "source_energy_per_baryon_mev": 1233.50345569338,
+        "common_K": {
+          "Yp_difference": 0.00012143915836457242,
+          "pressure_difference_mev_fm3": 0.010229192894257721,
+          "energy_per_baryon_difference_mev": 0.061080725618012366,
+          "source_composition_beta_residual_mev": 0.1688677612704339
+        },
+        "split_K": {
+          "Yp_difference": 5.604445551088411e-06,
+          "pressure_difference_mev_fm3": -0.02270364635808164,
+          "energy_per_baryon_difference_mev": -0.0075241109245780535,
+          "source_composition_beta_residual_mev": 0.007725731618705822
+        }
+      },
+      {
+        "n_b_fm3": 1.05,
+        "source_Yp": 0.1020555,
+        "source_pressure_mev_fm3": 581.06958,
+        "source_energy_per_baryon_mev": 1238.751210322,
+        "common_K": {
+          "Yp_difference": 0.00012225234144391806,
+          "pressure_difference_mev_fm3": 0.014094608828827404,
+          "energy_per_baryon_difference_mev": 0.0634905409365274,
+          "source_composition_beta_residual_mev": 0.17032658882095575
+        },
+        "split_K": {
+          "Yp_difference": 5.838375658359651e-06,
+          "pressure_difference_mev_fm3": -0.0188565816317805,
+          "energy_per_baryon_difference_mev": -0.005415976999529448,
+          "source_composition_beta_residual_mev": 0.008065064372033248
+        }
+      },
+      {
+        "n_b_fm3": 1.06,
+        "source_Yp": 0.1029187,
+        "source_pressure_mev_fm3": 596.7983380000001,
+        "source_energy_per_baryon_mev": 1244.0600367016198,
+        "common_K": {
+          "Yp_difference": 0.00012099309754905196,
+          "pressure_difference_mev_fm3": -0.018897346185212882,
+          "energy_per_baryon_difference_mev": 0.0456377602770317,
+          "source_composition_beta_residual_mev": 0.16883969217391837
+        },
+        "split_K": {
+          "Yp_difference": 4.001315988863552e-06,
+          "pressure_difference_mev_fm3": -0.051847239138510304,
+          "energy_per_baryon_difference_mev": -0.023564824108916582,
+          "source_composition_beta_residual_mev": 0.005459577891400613
+        }
+      },
+      {
+        "n_b_fm3": 1.07,
+        "source_Yp": 0.1037948,
+        "source_pressure_mev_fm3": 612.7524060000001,
+        "source_energy_per_baryon_mev": 1249.3914126508398,
+        "common_K": {
+          "Yp_difference": 0.00012152158801004287,
+          "pressure_difference_mev_fm3": -0.019767841692669208,
+          "energy_per_baryon_difference_mev": 0.04585737605293616,
+          "source_composition_beta_residual_mev": 0.1699491933186721
+        },
+        "split_K": {
+          "Yp_difference": 3.953656692465279e-06,
+          "pressure_difference_mev_fm3": -0.05269644069028345,
+          "energy_per_baryon_difference_mev": -0.023635641764713,
+          "source_composition_beta_residual_mev": 0.005451765392336938
+        }
+      },
+      {
+        "n_b_fm3": 1.08,
+        "source_Yp": 0.1046833,
+        "source_pressure_mev_fm3": 628.925688,
+        "source_energy_per_baryon_mev": 1254.7416738646,
+        "common_K": {
+          "Yp_difference": 0.00012429120343093736,
+          "pressure_difference_mev_fm3": 0.0188198933011563,
+          "energy_per_baryon_difference_mev": 0.06762654749354624,
+          "source_composition_beta_residual_mev": 0.17421942626162945
+        },
+        "split_K": {
+          "Yp_difference": 6.14902291450059e-06,
+          "pressure_difference_mev_fm3": -0.014067078619973472,
+          "energy_per_baryon_difference_mev": -0.002151253623651428,
+          "source_composition_beta_residual_mev": 0.008605980545212333
+        }
+      },
+      {
+        "n_b_fm3": 1.09,
+        "source_Yp": 0.1055899,
+        "source_pressure_mev_fm3": 645.4214820000001,
+        "source_energy_per_baryon_mev": 1260.1662547014998,
+        "common_K": {
+          "Yp_difference": 0.00012354858325656914,
+          "pressure_difference_mev_fm3": -0.005213209866496982,
+          "energy_per_baryon_difference_mev": 0.055323814497114654,
+          "source_composition_beta_residual_mev": 0.17341625024502605
+        },
+        "split_K": {
+          "Yp_difference": 4.834293951413993e-06,
+          "pressure_difference_mev_fm3": -0.03803789657501966,
+          "energy_per_baryon_difference_mev": -0.014733103674188897,
+          "source_composition_beta_residual_mev": 0.006687458460163498
+        }
+      },
+      {
+        "n_b_fm3": 1.1,
+        "source_Yp": 0.1065111,
+        "source_pressure_mev_fm3": 662.1789900000001,
+        "source_energy_per_baryon_mev": 1265.6317066333,
+        "common_K": {
+          "Yp_difference": 0.00012273363578826912,
+          "pressure_difference_mev_fm3": -0.02987182029573887,
+          "energy_per_baryon_difference_mev": 0.042210651039113145,
+          "source_composition_beta_residual_mev": 0.1726238868354244
+        },
+        "split_K": {
+          "Yp_difference": 3.449622837645161e-06,
+          "pressure_difference_mev_fm3": -0.06261325089485581,
+          "energy_per_baryon_difference_mev": -0.02811970287643817,
+          "source_composition_beta_residual_mev": 0.004780754913042529
+        }
+      },
+      {
+        "n_b_fm3": 1.11,
+        "source_Yp": 0.107444,
+        "source_pressure_mev_fm3": 679.1503920000001,
+        "source_energy_per_baryon_mev": 1271.11134600264,
+        "common_K": {
+          "Yp_difference": 0.00012467955932073116,
+          "pressure_difference_mev_fm3": -0.006159948846516272,
+          "energy_per_baryon_difference_mev": 0.05478371206709198,
+          "source_composition_beta_residual_mev": 0.1757268375284866
+        },
+        "split_K": {
+          "Yp_difference": 4.828457058930757e-06,
+          "pressure_difference_mev_fm3": -0.03879685252195486,
+          "energy_per_baryon_difference_mev": -0.01581438230277854,
+          "source_composition_beta_residual_mev": 0.006770644695620831
+        }
+      },
+      {
+        "n_b_fm3": 1.12,
+        "source_Yp": 0.108392,
+        "source_pressure_mev_fm3": 696.396736,
+        "source_energy_per_baryon_mev": 1276.6358965980999,
+        "common_K": {
+          "Yp_difference": 0.00012591286505658772,
+          "pressure_difference_mev_fm3": 0.006029329947750739,
+          "energy_per_baryon_difference_mev": 0.062132264729370945,
+          "source_composition_beta_residual_mev": 0.1778216612194683
+        },
+        "split_K": {
+          "Yp_difference": 5.497561034406573e-06,
+          "pressure_difference_mev_fm3": -0.026481489494017296,
+          "energy_per_baryon_difference_mev": -0.008727861960323935,
+          "source_composition_beta_residual_mev": 0.007753305673304567
+        }
+      },
+      {
+        "n_b_fm3": 1.13,
+        "source_Yp": 0.1093572,
+        "source_pressure_mev_fm3": 713.9616849999999,
+        "source_energy_per_baryon_mev": 1282.22875359814,
+        "common_K": {
+          "Yp_difference": 0.00012425340243134297,
+          "pressure_difference_mev_fm3": -0.03583282469378446,
+          "energy_per_baryon_difference_mev": 0.040674252350754614,
+          "source_composition_beta_residual_mev": 0.17572546499417285
+        },
+        "split_K": {
+          "Yp_difference": 3.2770409923305044e-06,
+          "pressure_difference_mev_fm3": -0.06819573007931012,
+          "energy_per_baryon_difference_mev": -0.030442186851132647,
+          "source_composition_beta_residual_mev": 0.0045456005458959226
+        }
+      },
+      {
+        "n_b_fm3": 1.14,
+        "source_Yp": 0.1103333,
+        "source_pressure_mev_fm3": 731.7314579999999,
+        "source_energy_per_baryon_mev": 1287.8291271213798,
+        "common_K": {
+          "Yp_difference": 0.00012591438739717464,
+          "pressure_difference_mev_fm3": -0.01685170318580731,
+          "energy_per_baryon_difference_mev": 0.05101275367474045,
+          "source_composition_beta_residual_mev": 0.17841456255206367
+        },
+        "split_K": {
+          "Yp_difference": 4.380372807727406e-06,
+          "pressure_difference_mev_fm3": -0.04904460671252764,
+          "energy_per_baryon_difference_mev": -0.020354267775019252,
+          "source_composition_beta_residual_mev": 0.006124473525289886
+        }
+      },
+      {
+        "n_b_fm3": 1.15,
+        "source_Yp": 0.1113234,
+        "source_pressure_mev_fm3": 749.7648099999999,
+        "source_energy_per_baryon_mev": 1293.46717721716,
+        "common_K": {
+          "Yp_difference": 0.00012770243422852157,
+          "pressure_difference_mev_fm3": 0.005311290035706406,
+          "energy_per_baryon_difference_mev": 0.06280100337971817,
+          "source_composition_beta_residual_mev": 0.181349951406645
+        },
+        "split_K": {
+          "Yp_difference": 5.6144333505092625e-06,
+          "pressure_difference_mev_fm3": -0.026689280925438652,
+          "energy_per_baryon_difference_mev": -0.008810860845414936,
+          "source_composition_beta_residual_mev": 0.00795057591400905
+        }
+      },
+      {
+        "n_b_fm3": 1.16,
+        "source_Yp": 0.1123313,
+        "source_pressure_mev_fm3": 768.13634,
+        "source_energy_per_baryon_mev": 1299.1798288056998,
+        "common_K": {
+          "Yp_difference": 0.00012571759135539262,
+          "pressure_difference_mev_fm3": -0.04286900915906244,
+          "energy_per_baryon_difference_mev": 0.038927464514245,
+          "source_composition_beta_residual_mev": 0.1788374233225909
+        },
+        "split_K": {
+          "Yp_difference": 3.0795358634122527e-06,
+          "pressure_difference_mev_fm3": -0.07465468952602805,
+          "energy_per_baryon_difference_mev": -0.03292349509661108,
+          "source_composition_beta_residual_mev": 0.004329282259448064
+        }
+      },
+      {
+        "n_b_fm3": 1.17,
+        "source_Yp": 0.113349,
+        "source_pressure_mev_fm3": 786.6995759999999,
+        "source_energy_per_baryon_mev": 1304.891916655,
+        "common_K": {
+          "Yp_difference": 0.0001278533816771732,
+          "pressure_difference_mev_fm3": -0.013866151841739338,
+          "energy_per_baryon_difference_mev": 0.05437086567121696,
+          "source_composition_beta_residual_mev": 0.18220701442623977
+        },
+        "split_K": {
+          "Yp_difference": 4.669469807774829e-06,
+          "pressure_difference_mev_fm3": -0.045414172351911475,
+          "energy_per_baryon_difference_mev": -0.017713435349833162,
+          "source_composition_beta_residual_mev": 0.006591438217128598
+        }
+      },
+      {
+        "n_b_fm3": 1.18,
+        "source_Yp": 0.1143819,
+        "source_pressure_mev_fm3": 805.559804,
+        "source_energy_per_baryon_mev": 1310.6567141232401,
+        "common_K": {
+          "Yp_difference": 0.000128596847799603,
+          "pressure_difference_mev_fm3": -0.011930685265610919,
+          "energy_per_baryon_difference_mev": 0.055671474082373607,
+          "source_composition_beta_residual_mev": 0.18360353350061587
+        },
+        "split_K": {
+          "Yp_difference": 4.871545642798347e-06,
+          "pressure_difference_mev_fm3": -0.043218081972440814,
+          "energy_per_baryon_difference_mev": -0.01664040914783982,
+          "source_composition_beta_residual_mev": 0.006881271247664245
+        }
+      },
+      {
+        "n_b_fm3": 1.19,
+        "source_Yp": 0.1154306,
+        "source_pressure_mev_fm3": 824.7310469999999,
+        "source_energy_per_baryon_mev": 1316.4795767332,
+        "common_K": {
+          "Yp_difference": 0.00012722860259127555,
+          "pressure_difference_mev_fm3": -0.05006874448747567,
+          "energy_per_baryon_difference_mev": 0.03728753808172769,
+          "source_composition_beta_residual_mev": 0.1820230750799965
+        },
+        "split_K": {
+          "Yp_difference": 2.9666449032489384e-06,
+          "pressure_difference_mev_fm3": -0.0810723757776941,
+          "energy_per_baryon_difference_mev": -0.03524616432241601,
+          "source_composition_beta_residual_mev": 0.004194794635623111
+        }
+      },
+      {
+        "n_b_fm3": 1.2,
+        "source_Yp": 0.1164879,
+        "source_pressure_mev_fm3": 844.0764,
+        "source_energy_per_baryon_mev": 1322.2917282976,
+        "common_K": {
+          "Yp_difference": 0.00013082288539846554,
+          "pressure_difference_mev_fm3": 0.009623373067825014,
+          "energy_per_baryon_difference_mev": 0.06780917997912184,
+          "source_composition_beta_residual_mev": 0.187547252904551
+        },
+        "split_K": {
+          "Yp_difference": 6.029275951641155e-06,
+          "pressure_difference_mev_fm3": -0.02107319095114235,
+          "energy_per_baryon_difference_mev": -0.004940576165381572,
+          "source_composition_beta_residual_mev": 0.008614349379286068
+        }
+      },
+      {
+        "n_b_fm3": 1.21,
+        "source_Yp": 0.1175643,
+        "source_pressure_mev_fm3": 863.806658,
+        "source_energy_per_baryon_mev": 1328.19802431508,
+        "common_K": {
+          "Yp_difference": 0.00012874762424658348,
+          "pressure_difference_mev_fm3": -0.04266835038595218,
+          "energy_per_baryon_difference_mev": 0.04219501957572902,
+          "source_composition_beta_residual_mev": 0.1849138421312091
+        },
+        "split_K": {
+          "Yp_difference": 3.4276357076118424e-06,
+          "pressure_difference_mev_fm3": -0.07303440286864316,
+          "energy_per_baryon_difference_mev": -0.030765023926733193,
+          "source_composition_beta_residual_mev": 0.00487660600288109
+        }
+      }
+    ],
+    "remaining_issue": "A kinetic prescription can be tested and its composition effect measured; this does not identify the provider prescription or explain every pressure/energy residual."
+  },
+  "GM_GM1": {
+    "status": "TESTED_CONVENTION_AND_ROUNDING_CONTROLS_SOURCE_DIFFERENCE_UNRESOLVED",
+    "density_range_fm3": [
+      0.08290666666666666,
+      0.4986133333333333
+    ],
+    "rows_count": 132,
+    "species": "npe in every control; public provider specifies npe",
+    "kernel_masses_mev": {
+      "baseline_common": 939.0,
+      "control_common": 939.56533
+    },
+    "rounding_control": {
+      "definition": "A linearized least-squares search within each printed Table II half-digit interval, followed by a full nonlinear evaluation at its result. This is a diagnostic, not an adopted retuning or a global impossibility proof.",
+      "weight_definition": "Residual E/A divided by 1 MeV and P divided by 1 MeV fm^-3 have equal numerical weights; deterministic every-eighth training rows plus final row; remaining rows held out.",
+      "parameters": {
+        "C_SIGMA": {
+          "published": 11.79,
+          "half_last_digit": 0.005,
+          "controlled_value": 11.784999999999998,
+          "scaled_change": -0.9999999999999817
+        },
+        "C_OMEGA": {
+          "published": 7.149,
+          "half_last_digit": 0.0005,
+          "controlled_value": 7.1495,
+          "scaled_change": 0.9999999999999997
+        },
+        "C_RHO": {
+          "published": 4.411,
+          "half_last_digit": 0.0005,
+          "controlled_value": 4.411499999999999,
+          "scaled_change": 0.9999999999999926
+        },
+        "B": {
+          "published": 0.002947,
+          "half_last_digit": 5e-07,
+          "controlled_value": 0.0029475,
+          "scaled_change": 0.9999999999999984
+        },
+        "C": {
+          "published": -0.00107,
+          "half_last_digit": 5e-07,
+          "controlled_value": -0.0010695,
+          "scaled_change": 0.9999999999999994
+        }
+      },
+      "training_rows": 18,
+      "heldout_rows": 114,
+      "linearized_residual_norm_ratio": 0.6750255189004012,
+      "active_bounds": [
+        -1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "summaries": {
+      "published_rounded": {
+        "pressure_difference_mev_fm3": {
+          "max_abs": 0.24137847082539565,
+          "rms": 0.10246443835672996,
+          "min_signed": -0.24137847082539565,
+          "max_signed": -0.0028846962125675946,
+          "relative_nonzero_reference": {
+            "max_abs": 0.004863857320205183,
+            "rms": 0.0021437212122047216,
+            "min_signed": -0.004863857320205183,
+            "max_signed": -0.0017281756066071568
+          }
+        },
+        "energy_per_baryon_difference_mev": {
+          "max_abs": 0.298580014108893,
+          "rms": 0.16555926533680354,
+          "min_signed": -0.298580014108893,
+          "max_signed": -0.04377438476944917
+        },
+        "heldout_energy_per_baryon_difference_mev": {
+          "max_abs": 0.295506084562021,
+          "rms": 0.16412666942414156,
+          "min_signed": -0.295506084562021,
+          "max_signed": -0.04509979914530504
+        }
+      },
+      "header_mass_as_kernel_control": {
+        "pressure_difference_mev_fm3": {
+          "max_abs": 0.33277500866876153,
+          "rms": 0.14429011022940577,
+          "min_signed": -0.33277500866876153,
+          "max_signed": -0.0037638695070069117,
+          "relative_nonzero_reference": {
+            "max_abs": 0.0063462225846159775,
+            "rms": 0.002982493013346172,
+            "min_signed": -0.0063462225846159775,
+            "max_signed": -0.002520955165906752
+          }
+        },
+        "energy_per_baryon_difference_mev": {
+          "max_abs": 0.5072529788815245,
+          "rms": 0.37406153753685406,
+          "min_signed": 0.14577813032133236,
+          "max_signed": 0.5072529788815245
+        },
+        "heldout_energy_per_baryon_difference_mev": {
+          "max_abs": 0.5055216754680032,
+          "rms": 0.374919289288195,
+          "min_signed": 0.1500185198976851,
+          "max_signed": 0.5055216754680032
+        }
+      },
+      "bounded_rounding_control": {
+        "pressure_difference_mev_fm3": {
+          "max_abs": 0.2293965195669614,
+          "rms": 0.09297890781713652,
+          "min_signed": -0.2293965195669614,
+          "max_signed": -0.0004306000674999533,
+          "relative_nonzero_reference": {
+            "max_abs": 0.001789194728016395,
+            "rms": 0.0012800531849637216,
+            "min_signed": -0.001789194728016395,
+            "max_signed": -0.0005960319245028273
+          }
+        },
+        "energy_per_baryon_difference_mev": {
+          "max_abs": 0.19024630681133203,
+          "rms": 0.08529702172027849,
+          "min_signed": -0.19024630681133203,
+          "max_signed": -0.007477818493043742
+        },
+        "heldout_energy_per_baryon_difference_mev": {
+          "max_abs": 0.1873269650172915,
+          "rms": 0.08388442823414577,
+          "min_signed": -0.1873269650172915,
+          "max_signed": -0.007677442237081777
+        }
+      }
+    },
+    "rows": [
+      {
+        "n_b_fm3": 0.08290666666666666,
+        "rounding_fit_train": true,
+        "source_pressure_mev_fm3": 0.5930881649394072,
+        "source_energy_per_baryon_mev": 944.7485541671035,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.0028846962125675946,
+          "energy_per_baryon_difference_mev": -0.04377438476944917
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.0037638695070069117,
+          "energy_per_baryon_difference_mev": 0.5072529788815245
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0004306000674999533,
+          "energy_per_baryon_difference_mev": -0.007477818493043742
+        }
+      },
+      {
+        "n_b_fm3": 0.08607999999999999,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 0.6716454291628732,
+        "source_energy_per_baryon_mev": 945.0292838677668,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.0030803727189487873,
+          "energy_per_baryon_difference_mev": -0.04509979914530504
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.004028279109757005,
+          "energy_per_baryon_difference_mev": 0.5055216754680032
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.00046832515601080704,
+          "energy_per_baryon_difference_mev": -0.007677442237081777
+        }
+      },
+      {
+        "n_b_fm3": 0.08925333333333332,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 0.7567139667657766,
+        "source_energy_per_baryon_mev": 945.3238267425735,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.0032826121722916435,
+          "energy_per_baryon_difference_mev": -0.04641313940692271
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.004302853184993127,
+          "energy_per_baryon_difference_mev": 0.5038021833173616
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0005095813584399256,
+          "energy_per_baryon_difference_mev": -0.007879167300757217
+        }
+      },
+      {
+        "n_b_fm3": 0.09242666666666666,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 0.8485085071614072,
+        "source_energy_per_baryon_mev": 945.6321466389362,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.003491658148095822,
+          "energy_per_baryon_difference_mev": -0.04771539720547935
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.004587999721696656,
+          "energy_per_baryon_difference_mev": 0.5020931211629431
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0005547461240870133,
+          "energy_per_baryon_difference_mev": -0.00808364681142848
+        }
+      },
+      {
+        "n_b_fm3": 0.09559999999999999,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 0.9472400738433873,
+        "source_energy_per_baryon_mev": 945.9541965907343,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.003707712077104741,
+          "energy_per_baryon_difference_mev": -0.04900752823687071
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.004884090270654395,
+          "energy_per_baryon_difference_mev": 0.5003931630054694
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0006041522402815414,
+          "energy_per_baryon_difference_mev": -0.008291516035001223
+        }
+      },
+      {
+        "n_b_fm3": 0.09877333333333332,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 1.053116364283251,
+        "source_energy_per_baryon_mev": 946.2899208832996,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.003931026772060919,
+          "energy_per_baryon_difference_mev": -0.05029045479614069
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.005191553288522055,
+          "energy_per_baryon_difference_mev": 0.49870103369232766
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0006581817045456795,
+          "energy_per_baryon_difference_mev": -0.008503393827481887
+        }
+      },
+      {
+        "n_b_fm3": 0.10194666666666666,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 1.1663419889731146,
+        "source_energy_per_baryon_mev": 946.6392567793472,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.004161875976794516,
+          "energy_per_baryon_difference_mev": -0.05156506804871697
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.0055108435074973094,
+          "energy_per_baryon_difference_mev": 0.49701550503300496
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0007172355872175906,
+          "energy_per_baryon_difference_mev": -0.008719883887124524
+        }
+      },
+      {
+        "n_b_fm3": 0.10511999999999999,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 1.2871186990898493,
+        "source_energy_per_baryon_mev": 947.0021359656645,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.004400528793200076,
+          "energy_per_baryon_difference_mev": -0.05283223017727323
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.005842416184998145,
+          "energy_per_baryon_difference_mev": 0.49533539225126333
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0007817087447712368,
+          "energy_per_baryon_difference_mev": -0.008941575958488102
+        }
+      },
+      {
+        "n_b_fm3": 0.10829333333333332,
+        "rounding_fit_train": true,
+        "source_pressure_mev_fm3": 1.415645660406393,
+        "source_energy_per_baryon_mev": 947.3784857684284,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.004647285999296535,
+          "energy_per_baryon_difference_mev": -0.05409277632145404
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.006186763243559268,
+          "energy_per_baryon_difference_mev": 0.49365955082885193
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0008520263992664034,
+          "energy_per_baryon_difference_mev": -0.00916904689893272
+        }
+      },
+      {
+        "n_b_fm3": 0.11146666666666666,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 1.5521196511904982,
+        "source_energy_per_baryon_mev": 947.7682301759666,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.004902455366829983,
+          "energy_per_baryon_difference_mev": -0.055347516336723857
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.006544388408619595,
+          "energy_per_baryon_difference_mev": 0.4919868736706121
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.000928619692553756,
+          "energy_per_baryon_difference_mev": -0.00940286163051951
+        }
+      },
+      {
+        "n_b_fm3": 0.11463999999999999,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 1.6967352910047284,
+        "source_energy_per_baryon_mev": 948.1712907005888,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.005166372269712616,
+          "energy_per_baryon_difference_mev": -0.05659723645715076
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.0069158276348455505,
+          "energy_per_baryon_difference_mev": 0.4903162885175334
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.001011946510711459,
+          "energy_per_baryon_difference_mev": -0.009643574046094727
+        }
+      },
+      {
+        "n_b_fm3": 0.11781333333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 1.849685214856621,
+        "source_energy_per_baryon_mev": 948.5875871052614,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.005439379443704873,
+          "energy_per_baryon_difference_mev": -0.05784270078049758
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.007301628677337746,
+          "energy_per_baryon_difference_mev": 0.48864675563163473
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0011024714383354173,
+          "energy_per_baryon_difference_mev": -0.009891727800891204
+        }
+      },
+      {
+        "n_b_fm3": 0.12098666666666667,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 2.0111602536010134,
+        "source_energy_per_baryon_mev": 949.0170380164229,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.005721826208125336,
+          "energy_per_baryon_difference_mev": -0.05908465264201368
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.007702350120678325,
+          "energy_per_baryon_difference_mev": 0.48697726570469513
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0012006651576794702,
+          "energy_per_baryon_difference_mev": -0.010147857024094264
+        }
+      },
+      {
+        "n_b_fm3": 0.12415999999999999,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 2.1813496255851796,
+        "source_energy_per_baryon_mev": 949.459561440516,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.006014091586263426,
+          "energy_per_baryon_difference_mev": -0.06032381591126068
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.008118584300838005,
+          "energy_per_baryon_difference_mev": 0.48530683792489526
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.001307027726574983,
+          "energy_per_baryon_difference_mev": -0.010412487012558813
+        }
+      },
+      {
+        "n_b_fm3": 0.12733333333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 2.360441088202794,
+        "source_energy_per_baryon_mev": 949.9150751988217,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.006316579461485894,
+          "energy_per_baryon_difference_mev": -0.06156089611374682
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.00855095225391711,
+          "energy_per_baryon_difference_mev": 0.4836345182977766
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0014220838771628053,
+          "energy_per_baryon_difference_mev": -0.010686134777301959
+        }
+      },
+      {
+        "n_b_fm3": 0.13050666666666666,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 2.548621034614549,
+        "source_energy_per_baryon_mev": 950.3834972927672,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.006629670524247455,
+          "energy_per_baryon_difference_mev": -0.06279658151129297
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.009000055449115862,
+          "energy_per_baryon_difference_mev": 0.48195937807190603
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0015463350894302508,
+          "energy_per_baryon_difference_mev": -0.010969309587153475
+        }
+      },
+      {
+        "n_b_fm3": 0.13368000000000002,
+        "rounding_fit_train": true,
+        "source_pressure_mev_fm3": 2.746074689125173,
+        "source_energy_per_baryon_mev": 950.864746209954,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.0069537840101912,
+          "energy_per_baryon_difference_mev": -0.06403154409088074
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.009466537302740718,
+          "energy_per_baryon_difference_mev": 0.4802805123155167
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0016803214393426025,
+          "energy_per_baryon_difference_mev": -0.011262513459769252
+        }
+      },
+      {
+        "n_b_fm3": 0.13685333333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 2.952986213949538,
+        "source_energy_per_baryon_mev": 951.3587411794174,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.007289361519408288,
+          "energy_per_baryon_difference_mev": -0.06526644044458862
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.009951066766909378,
+          "energy_per_baryon_difference_mev": 0.47859703865788106
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.001824605516253186,
+          "energy_per_baryon_difference_mev": -0.011566241561808965
+        }
+      },
+      {
+        "n_b_fm3": 0.14002666666666666,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 3.1695387962062473,
+        "source_energy_per_baryon_mev": 951.8654023834093,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.007636841324408117,
+          "energy_per_baryon_difference_mev": -0.06650191259689109
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.0104543123938865,
+          "energy_per_baryon_difference_mev": 0.4769080961244754
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0019797468139417518,
+          "energy_per_baryon_difference_mev": -0.011880982594561829
+        }
+      },
+      {
+        "n_b_fm3": 0.1432,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 3.3959147695365273,
+        "source_energy_per_baryon_mev": 952.3846511318017,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.007996677149574083,
+          "energy_per_baryon_difference_mev": -0.06773858874726102
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.010976960864590435,
+          "energy_per_baryon_difference_mev": 0.47521284410038334
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0021463205802962904,
+          "energy_per_baryon_difference_mev": -0.012207219113520296
+        }
+      },
+      {
+        "n_b_fm3": 0.14637333333333336,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 3.6322957222625236,
+        "source_energy_per_baryon_mev": 952.9164100043309,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.008369352964933352,
+          "energy_per_baryon_difference_mev": -0.06897708395831614
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.011519731520281074,
+          "energy_per_baryon_difference_mev": 0.473510461387491
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0023249326683663085,
+          "energy_per_baryon_difference_mev": -0.012545427822260535
+        }
+      },
+      {
+        "n_b_fm3": 0.14954666666666666,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 3.878862542846473,
+        "source_energy_per_baryon_mev": 953.4606029651053,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.008755344191759384,
+          "energy_per_baryon_difference_mev": -0.07021800077382068
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.012083337294714003,
+          "energy_per_baryon_difference_mev": 0.4718001453633178
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0025161807880151876,
+          "energy_per_baryon_difference_mev": -0.012896079807205751
+        }
+      },
+      {
+        "n_b_fm3": 0.15272,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 4.135795509811536,
+        "source_energy_per_baryon_mev": 954.0171554531838,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.009155132128425336,
+          "energy_per_baryon_difference_mev": -0.07146192978598265
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.012668498857004273,
+          "energy_per_baryon_difference_mev": 0.4700811112146539
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0027206689654111216,
+          "energy_per_baryon_difference_mev": -0.013259640756587032
+        }
+      },
+      {
+        "n_b_fm3": 0.15589333333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 4.403274402812006,
+        "source_energy_per_baryon_mev": 954.5859944524504,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.009569247970834027,
+          "energy_per_baryon_difference_mev": -0.07270945015238794
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.013275988338697253,
+          "energy_per_baryon_difference_mev": 0.46835259126032724
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0029390515858240818,
+          "energy_per_baryon_difference_mev": -0.013636571131087294
+        }
+      },
+      {
+        "n_b_fm3": 0.15906666666666666,
+        "rounding_fit_train": true,
+        "source_pressure_mev_fm3": 4.6814784846646225,
+        "source_energy_per_baryon_mev": 955.1670485435835,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.00999819593212603,
+          "energy_per_baryon_difference_mev": -0.07396113005324878
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.013906552146482731,
+          "energy_per_baryon_difference_mev": 0.46661383434536674
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.003171956524810504,
+          "energy_per_baryon_difference_mev": -0.014027326302198162
+        }
+      },
+      {
+        "n_b_fm3": 0.16224,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 4.970586603588307,
+        "source_energy_per_baryon_mev": 955.7602480139394,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.010442504402765174,
+          "energy_per_baryon_difference_mev": -0.07521760052941318
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.01456096180811084,
+          "energy_per_baryon_difference_mev": 0.4648640318849857
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0034200363084186947,
+          "energy_per_baryon_difference_mev": -0.014432430083274994
+        }
+      },
+      {
+        "n_b_fm3": 0.16541333333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 5.270777235551109,
+        "source_energy_per_baryon_mev": 956.3655245134916,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.010902724791749918,
+          "energy_per_baryon_difference_mev": -0.07647918876864424
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.015240012486452237,
+          "energy_per_baryon_difference_mev": 0.46310268447621183
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0036839669453438972,
+          "energy_per_baryon_difference_mev": -0.014852107721480934
+        }
+      },
+      {
+        "n_b_fm3": 0.16858666666666666,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 5.582228487859963,
+        "source_energy_per_baryon_mev": 956.9828118003983,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.011379398902057858,
+          "energy_per_baryon_difference_mev": -0.07774665261842983
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.015944490017553825,
+          "energy_per_baryon_difference_mev": 0.46132886729844813
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.00396441528180258,
+          "energy_per_baryon_difference_mev": -0.015287020130131168
+        }
+      },
+      {
+        "n_b_fm3": 0.17176,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 5.905118176759892,
+        "source_energy_per_baryon_mev": 957.6120450081202,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.011873107358381318,
+          "energy_per_baryon_difference_mev": -0.07902044670458963
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.016675218990760854,
+          "energy_per_baryon_difference_mev": 0.45954196392870017
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.004262087399339087,
+          "energy_per_baryon_difference_mev": -0.015737529744569656
+        }
+      },
+      {
+        "n_b_fm3": 0.17493333333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 6.239623783509217,
+        "source_energy_per_baryon_mev": 958.2531610050585,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.012384403315798487,
+          "energy_per_baryon_difference_mev": -0.08030108977811778
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.017432996101131693,
+          "energy_per_baryon_difference_mev": 0.45774129894323323
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.004577662284170891,
+          "energy_per_baryon_difference_mev": -0.016204067604576267
+        }
+      },
+      {
+        "n_b_fm3": 0.17810666666666664,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 6.585922532787223,
+        "source_energy_per_baryon_mev": 958.906098232918,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.012913875055929225,
+          "energy_per_baryon_difference_mev": -0.0815890183174588
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.018218652376734923,
+          "energy_per_baryon_difference_mev": 0.4559262842692533
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.004911854374673119,
+          "energy_per_baryon_difference_mev": -0.01668698671880975
+        }
+      },
+      {
+        "n_b_fm3": 0.18128,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 6.944191353686618,
+        "source_energy_per_baryon_mev": 959.5707970512157,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.013462097510024584,
+          "energy_per_baryon_difference_mev": -0.08288495279452945
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.019033004327109637,
+          "energy_per_baryon_difference_mev": 0.45409605289592037
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0052653650256280216,
+          "energy_per_baryon_difference_mev": -0.017186928090495712
+        }
+      },
+      {
+        "n_b_fm3": 0.18445333333333336,
+        "rounding_fit_train": true,
+        "source_pressure_mev_fm3": 7.314606930993085,
+        "source_energy_per_baryon_mev": 960.2471989779299,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.014029680167216618,
+          "energy_per_baryon_difference_mev": -0.08418916570076362
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.01987690146455634,
+          "energy_per_baryon_difference_mev": 0.45225019082488416
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.005638930350322369,
+          "energy_per_baryon_difference_mev": -0.01770408851700722
+        }
+      },
+      {
+        "n_b_fm3": 0.18762666666666666,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 7.697345666888631,
+        "source_energy_per_baryon_mev": 960.9352473895675,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.01461723132313164,
+          "energy_per_baryon_difference_mev": -0.0855022138351842
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.020751190161956146,
+          "energy_per_baryon_difference_mev": 0.4503880047780058
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.006033285393685972,
+          "energy_per_baryon_difference_mev": -0.01823895265954434
+        }
+      },
+      {
+        "n_b_fm3": 0.19079999999999997,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 8.092583676796437,
+        "source_energy_per_baryon_mev": 961.6348871188274,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.015225362133513443,
+          "energy_per_baryon_difference_mev": -0.0868245723399923
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.021656717302938944,
+          "energy_per_baryon_difference_mev": 0.4485088881540378
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.006449168101497094,
+          "energy_per_baryon_difference_mev": -0.018791926872040676
+        }
+      },
+      {
+        "n_b_fm3": 0.19397333333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 8.500496766635871,
+        "source_energy_per_baryon_mev": 962.3460644879823,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.01585467755449166,
+          "energy_per_baryon_difference_mev": -0.0881567080205059
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.02259432081753232,
+          "energy_per_baryon_difference_mev": 0.44661224772437436
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.006887310170219152,
+          "energy_per_baryon_difference_mev": -0.01936341231123606
+        }
+      },
+      {
+        "n_b_fm3": 0.1971466666666667,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 8.921260454095622,
+        "source_energy_per_baryon_mev": 963.0687272659808,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.016505816577325305,
+          "energy_per_baryon_difference_mev": -0.08949907940439061
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.0235648695014401,
+          "energy_per_baryon_difference_mev": 0.4446975035800733
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.007348477181304602,
+          "energy_per_baryon_difference_mev": -0.01995380480809672
+        }
+      },
+      {
+        "n_b_fm3": 0.20032,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 9.35504990082227,
+        "source_energy_per_baryon_mev": 963.8028246229826,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.017179408424176756,
+          "energy_per_baryon_difference_mev": -0.09085213679884419
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.024569218793789815,
+          "energy_per_baryon_difference_mev": 0.4427640890952489
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.007833424690687707,
+          "energy_per_baryon_difference_mev": -0.020563494731391074
+        }
+      },
+      {
+        "n_b_fm3": 0.2034933333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 9.80203987968135,
+        "source_energy_per_baryon_mev": 964.5483070827125,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.017876068682328494,
+          "energy_per_baryon_difference_mev": -0.09221632232015509
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.02560820648970008,
+          "energy_per_baryon_difference_mev": 0.44081145092627594
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.008342894250530364,
+          "energy_per_baryon_difference_mev": -0.02119286683239352
+        }
+      },
+      {
+        "n_b_fm3": 0.20666666666666667,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 10.262404774582079,
+        "source_energy_per_baryon_mev": 965.3051264730209,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.018596432639270688,
+          "energy_per_baryon_difference_mev": -0.09359206990347957
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.026682685647086757,
+          "energy_per_baryon_difference_mev": 0.4388390490208849
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.008877646622110547,
+          "energy_per_baryon_difference_mev": -0.021842300085268107
+        }
+      },
+      {
+        "n_b_fm3": 0.20984000000000003,
+        "rounding_fit_train": true,
+        "source_pressure_mev_fm3": 10.736318565013493,
+        "source_energy_per_baryon_mev": 966.073235874958,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.019341177791783792,
+          "energy_per_baryon_difference_mev": -0.09497980530318273
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.027793546669323987,
+          "energy_per_baryon_difference_mev": 0.43684635665761107
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.009438484160229521,
+          "energy_per_baryon_difference_mev": -0.022512167510399195
+        }
+      },
+      {
+        "n_b_fm3": 0.21301333333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 11.223954661741958,
+        "source_energy_per_baryon_mev": 966.8525895706686,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.02011090173754404,
+          "energy_per_baryon_difference_mev": -0.0963799460764676
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.028941594766367373,
+          "energy_per_baryon_difference_mev": 0.43483286049058734
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.010026128571919202,
+          "energy_per_baryon_difference_mev": -0.023202835995107307
+        }
+      },
+      {
+        "n_b_fm3": 0.21618666666666664,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 11.725486015240314,
+        "source_energy_per_baryon_mev": 967.6431429903386,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.020906276830052306,
+          "energy_per_baryon_difference_mev": -0.09779290154233422
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.030127704180685555,
+          "energy_per_baryon_difference_mev": 0.4327980606306028
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.010641375434406797,
+          "energy_per_baryon_difference_mev": -0.023914666091513936
+        }
+      },
+      {
+        "n_b_fm3": 0.21936,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 12.241084954186194,
+        "source_energy_per_baryon_mev": 968.4448526031066,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.02172793873278067,
+          "energy_per_baryon_difference_mev": -0.09921901739426175
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.031352706312747,
+          "energy_per_baryon_difference_mev": 0.43074152606607186
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.011284982606399652,
+          "energy_per_baryon_difference_mev": -0.0246479564746096
+        }
+      },
+      {
+        "n_b_fm3": 0.2225333333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 12.770923147619085,
+        "source_energy_per_baryon_mev": 969.2576761395813,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.022576502220253758,
+          "energy_per_baryon_difference_mev": -0.1006588524056724
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.032617405097431273,
+          "energy_per_baryon_difference_mev": 0.42866261800247685
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.011957685883162483,
+          "energy_per_baryon_difference_mev": -0.02540322049549104
+        }
+      },
+      {
+        "n_b_fm3": 0.22570666666666667,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 13.315171641411517,
+        "source_energy_per_baryon_mev": 970.0815719837555,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.023452654696900055,
+          "energy_per_baryon_difference_mev": -0.10211262482664551
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.03392267009695615,
+          "energy_per_baryon_difference_mev": 0.4265610434966902
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.012660292363532832,
+          "energy_per_baryon_difference_mev": -0.026180632437672102
+        }
+      },
+      {
+        "n_b_fm3": 0.22887999999999997,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 13.87400064628873,
+        "source_energy_per_baryon_mev": 970.9164996718403,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.024357004418520845,
+          "energy_per_baryon_difference_mev": -0.10358076584532228
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.03526928431615062,
+          "energy_per_baryon_difference_mev": 0.42443630204036253
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.013393528518166775,
+          "energy_per_baryon_difference_mev": -0.026980580831718726
+        }
+      },
+      {
+        "n_b_fm3": 0.23205333333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 14.447579622329501,
+        "source_energy_per_baryon_mev": 971.7624195608116,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.025290228165191664,
+          "energy_per_baryon_difference_mev": -0.10506364273987856
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.036658091445746166,
+          "energy_per_baryon_difference_mev": 0.4222879624409188
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.014158187705833214,
+          "energy_per_baryon_difference_mev": -0.027803391473185002
+        }
+      },
+      {
+        "n_b_fm3": 0.23522666666666664,
+        "rounding_fit_train": true,
+        "source_pressure_mev_fm3": 15.03607704214995,
+        "source_energy_per_baryon_mev": 972.6192928292047,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.02625290029762617,
+          "energy_per_baryon_difference_mev": -0.10656161413430709
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.03808982453341514,
+          "energy_per_baryon_difference_mev": 0.4201156076071584
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.014954959069017448,
+          "energy_per_baryon_difference_mev": -0.02864938254685967
+        }
+      },
+      {
+        "n_b_fm3": 0.2384,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 15.639660540596054,
+        "source_energy_per_baryon_mev": 973.4870814228316,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.027245710832481507,
+          "energy_per_baryon_difference_mev": -0.1080750299055353
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.039565323658063534,
+          "energy_per_baryon_difference_mev": 0.41791883467431035
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.015784645450384716,
+          "energy_per_baryon_difference_mev": -0.029518864404280976
+        }
+      },
+      {
+        "n_b_fm3": 0.2415733333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 16.258496629905853,
+        "source_energy_per_baryon_mev": 974.3657480008789,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.028269251235350623,
+          "energy_per_baryon_difference_mev": -0.1096042310817893
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.04108532133909293,
+          "energy_per_baryon_difference_mev": 0.415697255137502
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.01664794902137956,
+          "energy_per_baryon_difference_mev": -0.030412139341933653
+        }
+      },
+      {
+        "n_b_fm3": 0.24474666666666667,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 16.892750746678676,
+        "source_energy_per_baryon_mev": 975.2552558824776,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.02932413407048884,
+          "energy_per_baryon_difference_mev": -0.11114954973459135
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.04265056181619897,
+          "energy_per_baryon_difference_mev": 0.41345049499113884
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.017545590771412378,
+          "energy_per_baryon_difference_mev": -0.03132950136932777
+        }
+      },
+      {
+        "n_b_fm3": 0.24791999999999997,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 17.542587166022994,
+        "source_energy_per_baryon_mev": 976.1555689938555,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.03041098159787836,
+          "energy_per_baryon_difference_mev": -0.1127113088709848
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.0442617892884023,
+          "energy_per_baryon_difference_mev": 0.41117819486510143
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.018478298940713955,
+          "energy_per_baryon_difference_mev": -0.032271235987877844
+        }
+      },
+      {
+        "n_b_fm3": 0.25109333333333334,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 18.208168911907304,
+        "source_energy_per_baryon_mev": 977.0666518161539,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.031530412143229825,
+          "energy_per_baryon_difference_mev": -0.1142898223223483
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.045919733939705054,
+          "energy_per_baryon_difference_mev": 0.40888001015468944
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.019446795228528657,
+          "energy_per_baryon_difference_mev": -0.033237619972737775
+        }
+      },
+      {
+        "n_b_fm3": 0.25426666666666664,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 18.889657639105483,
+        "source_energy_per_baryon_mev": 977.9884693339803,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.03268299935292518,
+          "energy_per_baryon_difference_mev": -0.11588539463423331
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.047625070867479025,
+          "energy_per_baryon_difference_mev": 0.40655561115556793
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.020451753888821145,
+          "energy_per_baryon_difference_mev": -0.03422892114701881
+        }
+      },
+      {
+        "n_b_fm3": 0.25744,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 19.58721362238837,
+        "source_energy_per_baryon_mev": 978.9209869847821,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.033869339787511166,
+          "energy_per_baryon_difference_mev": -0.1174983209509719
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.04937848736707906,
+          "energy_per_baryon_difference_mev": 0.40420468319302927
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.021493869163279555,
+          "energy_per_baryon_difference_mev": -0.03524539817101413
+        }
+      },
+      {
+        "n_b_fm3": 0.2606133333333333,
+        "rounding_fit_train": true,
+        "source_pressure_mev_fm3": 20.30099562185651,
+        "source_energy_per_baryon_mev": 979.8641706091031,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.035089997454413435,
+          "energy_per_baryon_difference_mev": -0.11912888690596901
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.05118062717073357,
+          "energy_per_baryon_difference_mev": 0.40182692673931797
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.022573799658680116,
+          "energy_per_baryon_difference_mev": -0.036287300330059225
+        }
+      },
+      {
+        "n_b_fm3": 0.2637866666666666,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 21.031160838477362,
+        "source_energy_per_baryon_mev": 980.8179864017904,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.0363455391396883,
+          "energy_per_baryon_difference_mev": -0.12077736851585996
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.053032125510871,
+          "energy_per_baryon_difference_mev": 0.399422057531865
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.02369220352550272,
+          "energy_per_baryon_difference_mev": -0.03735486733455673
+        }
+      },
+      {
+        "n_b_fm3": 0.26696000000000003,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 21.7778648114274,
+        "source_energy_per_baryon_mev": 981.7824008641969,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.03763651185787609,
+          "energy_per_baryon_difference_mev": -0.12244403206386778
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.054933586317009286,
+          "energy_per_baryon_difference_mev": 0.3969898066852693
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.02484971575837136,
+          "energy_per_baryon_difference_mev": -0.03844832911238427
+        }
+      },
+      {
+        "n_b_fm3": 0.27013333333333334,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 22.541261372441493,
+        "source_energy_per_baryon_mev": 982.757380757456,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.038963477421631865,
+          "energy_per_baryon_difference_mev": -0.12412913400373782
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.05688561656016233,
+          "energy_per_baryon_difference_mev": 0.3945299207862263
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.02604698262113203,
+          "energy_per_baryon_difference_mev": -0.03956790562676815
+        }
+      },
+      {
+        "n_b_fm3": 0.27330666666666664,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 23.321502463312918,
+        "source_energy_per_baryon_mev": 983.7428931291947,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.040326909979555126,
+          "energy_per_baryon_difference_mev": -0.12583299319283014
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.05888872358406161,
+          "energy_per_baryon_difference_mev": 0.39204208964997633
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.02728455904493643,
+          "energy_per_baryon_difference_mev": -0.04071387902581591
+        }
+      },
+      {
+        "n_b_fm3": 0.27648,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 24.118738237304587,
+        "source_energy_per_baryon_mev": 984.7389049074029,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.041727377086647977,
+          "energy_per_baryon_difference_mev": -0.12755562912252572
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.06094349599513649,
+          "energy_per_baryon_difference_mev": 0.3895263080718223
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.028563089563419908,
+          "energy_per_baryon_difference_mev": -0.04188623179652495
+        }
+      },
+      {
+        "n_b_fm3": 0.2796533333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 24.933116773528962,
+        "source_energy_per_baryon_mev": 985.7453835804915,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.04316533309047088,
+          "energy_per_baryon_difference_mev": -0.1292974851838835
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.06305039689444314,
+          "energy_per_baryon_difference_mev": 0.38698215254282786
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.029883101571510196,
+          "energy_per_baryon_difference_mev": -0.043085369953018926
+        }
+      },
+      {
+        "n_b_fm3": 0.28282666666666667,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 25.764784153609916,
+        "source_energy_per_baryon_mev": 986.7622964319485,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.04464127393863393,
+          "energy_per_baryon_difference_mev": -0.13105870520644203
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.06520991855328617,
+          "energy_per_baryon_difference_mev": 0.38440950468964274
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.031245160011877715,
+          "energy_per_baryon_difference_mev": -0.04431139950611396
+        }
+      },
+      {
+        "n_b_fm3": 0.286,
+        "rounding_fit_train": true,
+        "source_pressure_mev_fm3": 26.61388429293297,
+        "source_energy_per_baryon_mev": 987.789610861246,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.04615564546314488,
+          "energy_per_baryon_difference_mev": -0.13283949509730064
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.06742249060023298,
+          "energy_per_baryon_difference_mev": 0.3818081895796013
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.03264977554390924,
+          "energy_per_baryon_difference_mev": -0.045564488036689
+        }
+      },
+      {
+        "n_b_fm3": 0.28917333333333334,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 27.480558937293623,
+        "source_energy_per_baryon_mev": 988.8272942720699,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.0477089157351287,
+          "energy_per_baryon_difference_mev": -0.13464005040918892
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.06968855229080972,
+          "energy_per_baryon_difference_mev": 0.3791780481344631
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.03409747678956876,
+          "energy_per_baryon_difference_mev": -0.046844792203273755
+        }
+      },
+      {
+        "n_b_fm3": 0.2923466666666667,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 28.36494748350439,
+        "source_energy_per_baryon_mev": 989.8753140342179,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.049301469813176624,
+          "energy_per_baryon_difference_mev": -0.13646055629249076
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.07200844722480682,
+          "energy_per_baryon_difference_mev": 0.3765189371249562
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.03558870499541911,
+          "energy_per_baryon_difference_mev": -0.04815245763006715
+        }
+      },
+      {
+        "n_b_fm3": 0.29552,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 29.26718704418675,
+        "source_energy_per_baryon_mev": 990.9336374468637,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.050933746931704604,
+          "energy_per_baryon_difference_mev": -0.13830118743044295
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.07438256048881442,
+          "energy_per_baryon_difference_mev": 0.37383072917612026
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.037123951107211894,
+          "energy_per_baryon_difference_mev": -0.049487618797570576
+        }
+      },
+      {
+        "n_b_fm3": 0.2986933333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 30.18741226846812,
+        "source_energy_per_baryon_mev": 992.0022317032174,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.05260613159477501,
+          "energy_per_baryon_difference_mev": -0.14016210800514273
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.07681120978396194,
+          "energy_per_baryon_difference_mev": 0.37111331274741133
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.03870364680654248,
+          "energy_per_baryon_difference_mev": -0.05085039894879628
+        }
+      },
+      {
+        "n_b_fm3": 0.3018666666666666,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 31.12575530717424,
+        "source_energy_per_baryon_mev": 993.0810638565993,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.0543189870012597,
+          "energy_per_baryon_difference_mev": -0.14204347166173648
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.07929467887459651,
+          "energy_per_baryon_difference_mev": 0.3683665921009833
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.040328197851177805,
+          "energy_per_baryon_difference_mev": -0.05224091001491615
+        }
+      },
+      {
+        "n_b_fm3": 0.30504,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 32.08234575266512,
+        "source_energy_per_baryon_mev": 994.1701007879415,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.056072660749634906,
+          "energy_per_baryon_difference_mev": -0.14394542147931588
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.08183322336197563,
+          "energy_per_baryon_difference_mev": 0.3655904872547353
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.04199798972158675,
+          "energy_per_baryon_difference_mev": -0.05365925254091053
+        }
+      },
+      {
+        "n_b_fm3": 0.30821333333333334,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 33.0573105838689,
+        "source_energy_per_baryon_mev": 995.2693091747468,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.057867493172956586,
+          "energy_per_baryon_difference_mev": -0.14586808996114087
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.08442707911272151,
+          "energy_per_baryon_difference_mev": 0.3627849339167142
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.04371339590184675,
+          "energy_per_baryon_difference_mev": -0.055105515639297664
+        }
+      },
+      {
+        "n_b_fm3": 0.31138666666666664,
+        "rounding_fit_train": true,
+        "source_pressure_mev_fm3": 34.05077403978404,
+        "source_energy_per_baryon_mev": 996.3786554615051,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.05970375144967477,
+          "energy_per_baryon_difference_mev": -0.14781159902952368
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.08707639649192345,
+          "energy_per_baryon_difference_mev": 0.359949883400418
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.04547471194941011,
+          "energy_per_baryon_difference_mev": -0.05657977695113914
+        }
+      },
+      {
+        "n_b_fm3": 0.31455999999999995,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 35.062857697733364,
+        "source_energy_per_baryon_mev": 997.498105831585,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.06158176555334194,
+          "energy_per_baryon_difference_mev": -0.1497760600299216
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.08978137646263207,
+          "energy_per_baryon_difference_mev": 0.3570853025313454
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.047282291411917754,
+          "energy_per_baryon_difference_mev": -0.05808210262046032
+        }
+      },
+      {
+        "n_b_fm3": 0.3177333333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 36.09368026130698,
+        "source_energy_per_baryon_mev": 998.627626180613,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.0635017708724277,
+          "energy_per_baryon_difference_mev": -0.15176157375481125
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.09254211338288343,
+          "energy_per_baryon_difference_mev": 0.3541911735241001
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.04913638842570123,
+          "energy_per_baryon_difference_mev": -0.059612547290498696
+        }
+      },
+      {
+        "n_b_fm3": 0.3209066666666667,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 37.143357626341405,
+        "source_energy_per_baryon_mev": 999.7671820913318,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.06546402569266263,
+          "energy_per_baryon_difference_mev": -0.15376823046813115
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.09535871269191887,
+          "energy_per_baryon_difference_mev": 0.35126749385563016
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.05103727518597623,
+          "energy_per_baryon_difference_mev": -0.061171154108023984
+        }
+      },
+      {
+        "n_b_fm3": 0.32408,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 38.21200277146034,
+        "source_energy_per_baryon_mev": 1000.9167388099562,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.06746874992069252,
+          "energy_per_baryon_difference_mev": -0.15579610994313953
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.09823122986352928,
+          "energy_per_baryon_difference_mev": 0.34831427611038634
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.05298518066970104,
+          "energy_per_baryon_difference_mev": -0.06275795474607548
+        }
+      },
+      {
+        "n_b_fm3": 0.3272533333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 39.29972572032224,
+        "source_energy_per_baryon_mev": 1002.0762612240189,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.06951613213001906,
+          "energy_per_baryon_difference_mev": -0.15784528152255461
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.1011596777072512,
+          "energy_per_baryon_difference_mev": 0.3453315478141121
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.05498029769190538,
+          "energy_per_baryon_difference_mev": -0.06437296944113768
+        }
+      },
+      {
+        "n_b_fm3": 0.33042666666666665,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 40.406633505140306,
+        "source_energy_per_baryon_mev": 1003.245713841701,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.07160633432627606,
+          "energy_per_baryon_difference_mev": -0.1599158041725559
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.10414403141502504,
+          "energy_per_baryon_difference_mev": 0.34231935125217205
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.057022787690179655,
+          "energy_per_baryon_difference_mev": -0.0660162070454362
+        }
+      },
+      {
+        "n_b_fm3": 0.33359999999999995,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 41.53283017927353,
+        "source_energy_per_baryon_mev": 1004.42506077265,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.07373954219911383,
+          "energy_per_baryon_difference_mev": -0.16200772656134177
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.10718427911216821,
+          "energy_per_baryon_difference_mev": 0.339277743267985
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.05911283100637377,
+          "energy_per_baryon_difference_mev": -0.06768766509219404
+        }
+      },
+      {
+        "n_b_fm3": 0.3367733333333333,
+        "rounding_fit_train": true,
+        "source_pressure_mev_fm3": 42.67841669451563,
+        "source_energy_per_baryon_mev": 1005.614265710271,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.07591587636457575,
+          "energy_per_baryon_difference_mev": -0.16412108714371243
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.1102803334282001,
+          "energy_per_baryon_difference_mev": 0.3362067950470191
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.06125053816976589,
+          "energy_per_baryon_difference_mev": -0.0693873298790777
+        }
+      },
+      {
+        "n_b_fm3": 0.3399466666666667,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 43.84349091217652,
+        "source_energy_per_baryon_mev": 1006.8132919154842,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.07813543367360154,
+          "energy_per_baryon_difference_mev": -0.1662559142577038
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.11343207315019299,
+          "energy_per_baryon_difference_mev": 0.3331065918837339
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.0634359912561564,
+          "energy_per_baryon_difference_mev": -0.07111517656380784
+        }
+      },
+      {
+        "n_b_fm3": 0.34312,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 45.02814760197078,
+        "source_energy_per_baryon_mev": 1008.0221022019335,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.08039831251401353,
+          "energy_per_baryon_difference_mev": -0.16841222622974783
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.11663936888989923,
+          "energy_per_baryon_difference_mev": 0.32997723293703984
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.06566926924850236,
+          "energy_per_baryon_difference_mev": -0.07287116927295756
+        }
+      },
+      {
+        "n_b_fm3": 0.34629333333333334,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 46.232478375089684,
+        "source_energy_per_baryon_mev": 1009.2406589226368,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.08270456845855279,
+          "energy_per_baryon_difference_mev": -0.1705900314967721
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.1199020391174841,
+          "energy_per_baryon_difference_mev": 0.3268188309658626
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.06795040375593686,
+          "energy_per_baryon_difference_mev": -0.07465526122871324
+        }
+      },
+      {
+        "n_b_fm3": 0.3494666666666666,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 47.45657170036053,
+        "source_energy_per_baryon_mev": 1010.4689239447742,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.08505424915133375,
+          "energy_per_baryon_difference_mev": -0.17278931545774867
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.12321988544785256,
+          "energy_per_baryon_difference_mev": 0.323631525327869
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.07027941397760173,
+          "energy_per_baryon_difference_mev": -0.0764673816109962
+        }
+      },
+      {
+        "n_b_fm3": 0.35263999999999995,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 48.700512872177576,
+        "source_energy_per_baryon_mev": 1011.7068587055277,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.08744737707989003,
+          "energy_per_baryon_difference_mev": -0.17501010698128994
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.12659267582905187,
+          "energy_per_baryon_difference_mev": 0.32041541532294104
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.07265628956158565,
+          "energy_per_baryon_difference_mev": -0.07830750207801884
+        }
+      },
+      {
+        "n_b_fm3": 0.3558133333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 49.96438401266119,
+        "source_energy_per_baryon_mev": 1012.9544240701861,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.08988396273625199,
+          "energy_per_baryon_difference_mev": -0.17725234581928362
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.13002015813640355,
+          "energy_per_baryon_difference_mev": 0.3171706926254956
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.07508100386247918,
+          "energy_per_baryon_difference_mev": -0.08017550419162944
+        }
+      },
+      {
+        "n_b_fm3": 0.3589866666666666,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 51.24826403463184,
+        "source_energy_per_baryon_mev": 1014.2115804570825,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.09236397470075275,
+          "energy_per_baryon_difference_mev": -0.17951601552704233
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.13350203069707334,
+          "energy_per_baryon_difference_mev": 0.31389750820744666
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.07755348412906216,
+          "energy_per_baryon_difference_mev": -0.082071312358039
+        }
+      },
+      {
+        "n_b_fm3": 0.36216,
+        "rounding_fit_train": true,
+        "source_pressure_mev_fm3": 52.55222867562173,
+        "source_energy_per_baryon_mev": 1015.47828776475,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.09488737695636473,
+          "energy_per_baryon_difference_mev": -0.1818010771602303
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.13703798005922607,
+          "energy_per_baryon_difference_mev": 0.3105960384820037
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.08007364892770852,
+          "energy_per_baryon_difference_mev": -0.08399482754578003
+        }
+      },
+      {
+        "n_b_fm3": 0.3653333333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 53.87635046336516,
+        "source_energy_per_baryon_mev": 1016.7545053800177,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.09745409391849336,
+          "energy_per_baryon_difference_mev": -0.18410748288727063
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.1406276464865428,
+          "energy_per_baryon_difference_mev": 0.3072664715328983
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.08264137329285148,
+          "energy_per_baryon_difference_mev": -0.08594594091744057
+        }
+      },
+      {
+        "n_b_fm3": 0.36850666666666665,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 55.220698760756925,
+        "source_energy_per_baryon_mev": 1018.040192232435,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.1000640511530051,
+          "energy_per_baryon_difference_mev": -0.18643523437140175
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.14427066514553388,
+          "energy_per_baryon_difference_mev": 0.303908948566459
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.08525652956738838,
+          "energy_per_baryon_difference_mev": -0.08792459224036975
+        }
+      },
+      {
+        "n_b_fm3": 0.37168,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 56.58533978987472,
+        "source_energy_per_baryon_mev": 1019.3353064999642,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.10271719150139091,
+          "energy_per_baryon_difference_mev": -0.18878409138267216
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.14796668270942348,
+          "energy_per_baryon_difference_mev": 0.3005238551418188
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.08791900366018979,
+          "energy_per_baryon_difference_mev": -0.08993047852266045
+        }
+      },
+      {
+        "n_b_fm3": 0.3748533333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 57.97033651734913,
+        "source_energy_per_baryon_mev": 1020.6398061907842,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.10541334895383159,
+          "energy_per_baryon_difference_mev": -0.1911541552556173
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.15171523171231627,
+          "energy_per_baryon_difference_mev": 0.29711123754134405
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.09062856905465111,
+          "energy_per_baryon_difference_mev": -0.09196363750322689
+        }
+      },
+      {
+        "n_b_fm3": 0.3780266666666666,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 59.375748798716174,
+        "source_energy_per_baryon_mev": 1021.9536485597239,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.10815237798109933,
+          "energy_per_baryon_difference_mev": -0.19354528582982766
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.1555158603672524,
+          "energy_per_baryon_difference_mev": 0.2936713856731785
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.09338501628315754,
+          "energy_per_baryon_difference_mev": -0.09402386462045342
+        }
+      },
+      {
+        "n_b_fm3": 0.3812,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 60.8016334106102,
+        "source_energy_per_baryon_mev": 1023.2767904007292,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.11093416725954341,
+          "energy_per_baryon_difference_mev": -0.19595739329611206
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.15936814677633748,
+          "energy_per_baryon_difference_mev": 0.2902045410538676
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.09618816679552111,
+          "energy_per_baryon_difference_mev": -0.09611100489541968
+        }
+      },
+      {
+        "n_b_fm3": 0.3843733333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 62.248043955200174,
+        "source_energy_per_baryon_mev": 1024.6091879904657,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.11375852232222883,
+          "energy_per_baryon_difference_mev": -0.1983903800914959
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.16327158206861014,
+          "energy_per_baryon_difference_mev": 0.2867109547523796
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.09903775576225371,
+          "energy_per_baryon_difference_mev": -0.0982248948553206
+        }
+      },
+      {
+        "n_b_fm3": 0.3875466666666666,
+        "rounding_fit_train": true,
+        "source_pressure_mev_fm3": 63.715030985338984,
+        "source_energy_per_baryon_mev": 1025.9507970840832,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.11662526567983633,
+          "energy_per_baryon_difference_mev": -0.20084413390191003
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.16722567100609353,
+          "energy_per_baryon_difference_mev": 0.28319089421893295
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.10193353234792113,
+          "energy_per_baryon_difference_mev": -0.10036535557833304
+        }
+      },
+      {
+        "n_b_fm3": 0.39072,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 65.20264197017924,
+        "source_energy_per_baryon_mev": 1027.301572955314,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.11953417431517721,
+          "energy_per_baryon_difference_mev": -0.20331856399570825
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.1712298699573438,
+          "energy_per_baryon_difference_mev": 0.2796446067943634
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.10487519736028617,
+          "energy_per_baryon_difference_mev": -0.1025322290593067
+        }
+      },
+      {
+        "n_b_fm3": 0.3938933333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 66.71092141080165,
+        "source_energy_per_baryon_mev": 1028.661470293106,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.12248506416959515,
+          "energy_per_baryon_difference_mev": -0.20581349311191843
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.17528367187559013,
+          "energy_per_baryon_difference_mev": 0.27607242765247975
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.1078624878986858,
+          "energy_per_baryon_difference_mev": -0.10472527014167099
+        }
+      },
+      {
+        "n_b_fm3": 0.3970666666666667,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 68.23991074562888,
+        "source_energy_per_baryon_mev": 1030.0304434604384,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.12547766158195373,
+          "energy_per_baryon_difference_mev": -0.20832891060877046
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.1793864781804757,
+          "energy_per_baryon_difference_mev": 0.27247452649476145
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.11089504894796676,
+          "energy_per_baryon_difference_mev": -0.10694439969870473
+        }
+      },
+      {
+        "n_b_fm3": 0.40024,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 69.78964851281718,
+        "source_energy_per_baryon_mev": 1031.408446103608,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.12851172893613239,
+          "energy_per_baryon_difference_mev": -0.21086457519118085
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.18353772490101505,
+          "energy_per_baryon_difference_mev": 0.26885130466371265
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.1139725591922911,
+          "energy_per_baryon_difference_mev": -0.10918930740649557
+        }
+      },
+      {
+        "n_b_fm3": 0.4034133333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 71.36017036324786,
+        "source_energy_per_baryon_mev": 1032.7954315285099,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.13158703833502727,
+          "energy_per_baryon_difference_mev": -0.21342038378725192
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.1877368567910338,
+          "energy_per_baryon_difference_mev": 0.26520302610742874
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.11709470484792917,
+          "energy_per_baryon_difference_mev": -0.11145982066113902
+        }
+      },
+      {
+        "n_b_fm3": 0.40658666666666665,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 72.95150903863552,
+        "source_energy_per_baryon_mev": 1034.1913525283874,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.13470330791332685,
+          "energy_per_baryon_difference_mev": -0.21599619108837942
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.19198326409251365,
+          "energy_per_baryon_difference_mev": 0.2615299976830556
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.12026111614062529,
+          "energy_per_baryon_difference_mev": -0.11375572415795432
+        }
+      },
+      {
+        "n_b_fm3": 0.40975999999999996,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 74.56369443843886,
+        "source_energy_per_baryon_mev": 1035.5961614291887,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.1378602246481222,
+          "energy_per_baryon_difference_mev": -0.218591845940864
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.19627630578517596,
+          "energy_per_baryon_difference_mev": 0.25783253261920436
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.12347139027725973,
+          "energy_per_baryon_difference_mev": -0.1160767963260696
+        }
+      },
+      {
+        "n_b_fm3": 0.41293333333333326,
+        "rounding_fit_train": true,
+        "source_pressure_mev_fm3": 76.19675374175335,
+        "source_energy_per_baryon_mev": 1037.0098100995046,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.14105751997314542,
+          "energy_per_baryon_difference_mev": -0.22120719159124747
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.2006153856255679,
+          "energy_per_baryon_difference_mev": 0.25411095011418183
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.12672516722143712,
+          "energy_per_baryon_difference_mev": -0.11842280961786855
+        }
+      },
+      {
+        "n_b_fm3": 0.4161066666666666,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 77.85071137627008,
+        "source_energy_per_baryon_mev": 1038.432249924993,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.14429489042591115,
+          "energy_per_baryon_difference_mev": -0.2238420297508128
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.20499987321107938,
+          "energy_per_baryon_difference_mev": 0.25036561112938216
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.13002205050229065,
+          "energy_per_baryon_difference_mev": -0.12079349461419042
+        }
+      },
+      {
+        "n_b_fm3": 0.41928,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 79.52558906518735,
+        "source_energy_per_baryon_mev": 1039.8634320005747,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.14757199438425062,
+          "energy_per_baryon_difference_mev": -0.22649630179353153
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.20942910111676838,
+          "energy_per_baryon_difference_mev": 0.24659673704559282
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.13336160410892717,
+          "energy_per_baryon_difference_mev": -0.12318872126456881
+        }
+      },
+      {
+        "n_b_fm3": 0.4224533333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 81.22140595590545,
+        "source_energy_per_baryon_mev": 1041.3033067803708,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.15088852883965842,
+          "energy_per_baryon_difference_mev": -0.22916972710595473
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.21390244205683473,
+          "energy_per_baryon_difference_mev": 0.24280477117486043
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.13674342942000806,
+          "energy_per_baryon_difference_mev": -0.1256081372848712
+        }
+      },
+      {
+        "n_b_fm3": 0.4256266666666667,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 82.93817861915346,
+        "source_energy_per_baryon_mev": 1042.751824451989,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.1542441750240755,
+          "energy_per_baryon_difference_mev": -0.23186216523777148
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.21841925488456582,
+          "energy_per_baryon_difference_mev": 0.23899001647146179
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.14016711098648216,
+          "energy_per_baryon_difference_mev": -0.12805153034287287
+        }
+      },
+      {
+        "n_b_fm3": 0.42879999999999996,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 84.67592105973476,
+        "source_energy_per_baryon_mev": 1044.2089347684616,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.15763855422198958,
+          "energy_per_baryon_difference_mev": -0.23457343519885399
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.22297884076729702,
+          "energy_per_baryon_difference_mev": 0.23515281610684724
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.14363217249487548,
+          "energy_per_baryon_difference_mev": -0.13051864740373276
+        }
+      },
+      {
+        "n_b_fm3": 0.4319733333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 86.43464492122133,
+        "source_energy_per_baryon_mev": 1045.6745870977945,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.16107137623413337,
+          "energy_per_baryon_difference_mev": -0.23730335189657126
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.22758059198980618,
+          "energy_per_baryon_difference_mev": 0.23129351689863142
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.14713822537977705,
+          "energy_per_baryon_difference_mev": -0.13300923120732477
+        }
+      },
+      {
+        "n_b_fm3": 0.4351466666666666,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 88.21435933733413,
+        "source_energy_per_baryon_mev": 1047.1487304367429,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.16454223338583063,
+          "energy_per_baryon_difference_mev": -0.2400517263790789
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.23222378629142781,
+          "energy_per_baryon_difference_mev": 0.22741246894406686
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.15068476297686573,
+          "energy_per_baryon_difference_mev": -0.13552302055381915
+        }
+      },
+      {
+        "n_b_fm3": 0.43831999999999993,
+        "rounding_fit_train": true,
+        "source_pressure_mev_fm3": 90.01507116698724,
+        "source_energy_per_baryon_mev": 1048.6313134249735,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.16805077718018424,
+          "energy_per_baryon_difference_mev": -0.24281836607883633
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.23690776383689638,
+          "energy_per_baryon_difference_mev": 0.22351002526079355
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.15427133732059417,
+          "energy_per_baryon_difference_mev": -0.13805975058676268
+        }
+      },
+      {
+        "n_b_fm3": 0.4414933333333334,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 91.83678502231996,
+        "source_energy_per_baryon_mev": 1050.1222843595717,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.1715966870900445,
+          "energy_per_baryon_difference_mev": -0.24560307505157652
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.24163189629761916,
+          "energy_per_baryon_difference_mev": 0.21958654142486012
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.15789752807211244,
+          "energy_per_baryon_difference_mev": -0.1406191530745673
+        }
+      },
+      {
+        "n_b_fm3": 0.44466666666666665,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 93.67950319649917,
+        "source_energy_per_baryon_mev": 1051.6215912098507,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.17517953837575817,
+          "energy_per_baryon_difference_mev": -0.24840565421231986
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.24639545495234927,
+          "energy_per_baryon_difference_mev": 0.215642375228299
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.16156281047048537,
+          "energy_per_baryon_difference_mev": -0.14320095668654176
+        }
+      },
+      {
+        "n_b_fm3": 0.44784,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 95.54322591130371,
+        "source_energy_per_baryon_mev": 1053.129181632432,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.17879898908140035,
+          "energy_per_baryon_difference_mev": -0.2512259015688869
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.2511977979474693,
+          "energy_per_baryon_difference_mev": 0.21167788633465534
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.16526674246142647,
+          "energy_per_baryon_difference_mev": -0.14580488726414842
+        }
+      },
+      {
+        "n_b_fm3": 0.4510133333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 97.42795127753803,
+        "source_energy_per_baryon_mev": 1054.6450029865507,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.1824546794041879,
+          "energy_per_baryon_difference_mev": -0.25406361244904474
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.25603826991142853,
+          "energy_per_baryon_difference_mev": 0.20769343595293321
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.1690088641889247,
+          "energy_per_baryon_difference_mev": -0.14843066808771255
+        }
+      },
+      {
+        "n_b_fm3": 0.4541866666666666,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 99.33367532531165,
+        "source_energy_per_baryon_mev": 1056.1690023495664,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.18614620056901288,
+          "energy_per_baryon_difference_mev": -0.2569185797276532
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.26091617105990395,
+          "energy_per_baryon_difference_mev": 0.20368938650676682
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.1727886669931138,
+          "energy_per_baryon_difference_mev": -0.15107802014063054
+        }
+      },
+      {
+        "n_b_fm3": 0.45736,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 101.2603921546413,
+        "source_energy_per_baryon_mev": 1057.7011265326244,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.1898731838059149,
+          "energy_per_baryon_difference_mev": -0.259790594045171
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.2658308463877006,
+          "energy_per_baryon_difference_mev": 0.19966610132769347
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.17660568250182962,
+          "energy_per_baryon_difference_mev": -0.15374666236607482
+        }
+      },
+      {
+        "n_b_fm3": 0.46053333333333335,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 103.20809394388054,
+        "source_energy_per_baryon_mev": 1059.2413221327731,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.1936352470375482,
+          "energy_per_baryon_difference_mev": -0.26267948034615074
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.27078163255119136,
+          "energy_per_baryon_difference_mev": 0.19562390802320806
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.18045942942924853,
+          "energy_per_baryon_difference_mev": -0.15643634823959474
+        }
+      },
+      {
+        "n_b_fm3": 0.4637066666666666,
+        "rounding_fit_train": true,
+        "source_pressure_mev_fm3": 105.17677106191736,
+        "source_energy_per_baryon_mev": 1060.7895353672552,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.1974320453442857,
+          "energy_per_baryon_difference_mev": -0.2655849164927986
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.27576790851895794,
+          "energy_per_baryon_difference_mev": 0.19156327978134868
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.18434946414986086,
+          "energy_per_baryon_difference_mev": -0.1591466844158731
+        }
+      },
+      {
+        "n_b_fm3": 0.46687999999999996,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 107.16641198789378,
+        "source_energy_per_baryon_mev": 1062.3457124889953,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.201263129045131,
+          "energy_per_baryon_difference_mev": -0.2685068330026752
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.2807889538118502,
+          "energy_per_baryon_difference_mev": 0.1874844355506866
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.18827523887706832,
+          "energy_per_baryon_difference_mev": -0.16187753050439824
+        }
+      },
+      {
+        "n_b_fm3": 0.4700533333333333,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 109.17700363455725,
+        "source_energy_per_baryon_mev": 1063.909799221347,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.20512820562170475,
+          "energy_per_baryon_difference_mev": -0.27144483200822833
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.2858442105824537,
+          "energy_per_baryon_difference_mev": 0.18338792100666979
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.19223636368563746,
+          "energy_per_baryon_difference_mev": -0.16462841805901007
+        }
+      },
+      {
+        "n_b_fm3": 0.47322666666666663,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 111.20853106195531,
+        "source_energy_per_baryon_mev": 1065.4817415008392,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.2090267922793032,
+          "energy_per_baryon_difference_mev": -0.27439891416884166
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.29093293630634776,
+          "energy_per_baryon_difference_mev": 0.17927388156704183
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.19623225916383547,
+          "energy_per_baryon_difference_mev": -0.1673992775199622
+        }
+      },
+      {
+        "n_b_fm3": 0.47639999999999993,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 113.26097788867071,
+        "source_energy_per_baryon_mev": 1067.0614847299257,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.2129585664872451,
+          "energy_per_baryon_difference_mev": -0.2773687157728091
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.29605455444263384,
+          "energy_per_baryon_difference_mev": 0.17514282522597568
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.2002625070385875,
+          "energy_per_baryon_difference_mev": -0.17018967534886542
+        }
+      },
+      {
+        "n_b_fm3": 0.47957333333333324,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 115.33432613464606,
+        "source_energy_per_baryon_mev": 1068.6489743381226,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.21692314848742456,
+          "energy_per_baryon_difference_mev": -0.2803540539134701
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.3012084370487145,
+          "energy_per_baryon_difference_mev": 0.17099507730858932
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.20432663276795893,
+          "energy_per_baryon_difference_mev": -0.17299935923301746
+        }
+      },
+      {
+        "n_b_fm3": 0.48274666666666666,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 117.42855631693362,
+        "source_energy_per_baryon_mev": 1070.244155579774,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.22092013739262484,
+          "energy_per_baryon_difference_mev": -0.28335470873139457
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.30639394096647266,
+          "energy_per_baryon_difference_mev": 0.1668309981823768
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.2084241417119017,
+          "energy_per_baryon_difference_mev": -0.17582804035555455
+        }
+      },
+      {
+        "n_b_fm3": 0.48592,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 119.54364758259612,
+        "source_energy_per_baryon_mev": 1071.8469735861675,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.22494918500771632,
+          "energy_per_baryon_difference_mev": -0.2863704598978529
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.31161048172057804,
+          "energy_per_baryon_difference_mev": 0.16265094670961844
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.2125545930283863,
+          "energy_per_baryon_difference_mev": -0.17867542990370566
+        }
+      },
+      {
+        "n_b_fm3": 0.4890933333333333,
+        "rounding_fit_train": true,
+        "source_pressure_mev_fm3": 121.6795776972226,
+        "source_energy_per_baryon_mev": 1073.4573733811822,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.22900992599093684,
+          "energy_per_baryon_difference_mev": -0.2894010867751149
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.31685746374596135,
+          "energy_per_baryon_difference_mev": 0.15845528004092557
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.21671752989918502,
+          "energy_per_baryon_difference_mev": -0.18154123925910426
+        }
+      },
+      {
+        "n_b_fm3": 0.49226666666666663,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 123.83632309075044,
+        "source_energy_per_baryon_mev": 1075.0752998603737,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.23310196608086642,
+          "energy_per_baryon_difference_mev": -0.2924463321553503
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.32213426865970973,
+          "energy_per_baryon_difference_mev": 0.15424438983109212
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.22091246781778295,
+          "energy_per_baryon_difference_mev": -0.18442514375919927
+        }
+      },
+      {
+        "n_b_fm3": 0.49544,
+        "rounding_fit_train": false,
+        "source_pressure_mev_fm3": 126.0138589628042,
+        "source_energy_per_baryon_mev": 1076.7006979884698,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.23722493066726713,
+          "energy_per_baryon_difference_mev": -0.295506084562021
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.32744030387807754,
+          "energy_per_baryon_difference_mev": 0.1500185198976851
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.22513894321988914,
+          "energy_per_baryon_difference_mev": -0.1873269650172915
+        }
+      },
+      {
+        "n_b_fm3": 0.4986133333333333,
+        "rounding_fit_train": true,
+        "source_pressure_mev_fm3": 128.21215934460284,
+        "source_energy_per_baryon_mev": 1078.3335124502676,
+        "published_rounded": {
+          "pressure_difference_mev_fm3": -0.24137847082539565,
+          "energy_per_baryon_difference_mev": -0.298580014108893
+        },
+        "header_mass_as_kernel_control": {
+          "pressure_difference_mev_fm3": -0.33277500866876153,
+          "energy_per_baryon_difference_mev": 0.14577813032133236
+        },
+        "bounded_rounding_control": {
+          "pressure_difference_mev_fm3": -0.2293965195669614,
+          "energy_per_baryon_difference_mev": -0.19024630681133203
+        }
+      }
+    ],
+    "conclusion_scope": "Header masses do not establish kernel masses. A tested rounding box is not evidence that all source differences are explained by published precision."
+  }
+}

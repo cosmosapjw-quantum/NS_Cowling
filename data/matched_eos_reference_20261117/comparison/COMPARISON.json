@@ -1,0 +1,4614 @@
+{
+  "schema": "generated-public-eos-comparison-v1",
+  "status": "COMPLETE_MEASURED_COMPARISON",
+  "created_utc": "2026-11-17T04:42:20.577764+00:00",
+  "environment": {
+    "python": "3.12.13",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1"
+  },
+  "script_sha256": "67ec84f34c9b6f65326482ce5b14bfa6f4ae356fb4a55b322944bf20cf5f56a5",
+  "units": {
+    "n_b": "fm^-3",
+    "pressure": "MeV fm^-3",
+    "epsilon": "MeV fm^-3",
+    "mu_b": "MeV",
+    "enthalpy_b": "MeV",
+    "energy_per_baryon": "MeV",
+    "y_n_free": "1",
+    "y_p_free": "1",
+    "y_e": "1",
+    "y_mu": "1"
+  },
+  "models": {
+    "GM_GM1": {
+      "generated": {
+        "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/research_matching_20261117/integration/real_pairs_v2/core/GM_GM1/generated",
+        "rows": 129,
+        "density_fm3": [
+          0.08,
+          0.5
+        ],
+        "axis_origins": {
+          "t": 1,
+          "nb": 1,
+          "yq": 1
+        },
+        "actual_scalar_row_labels": {
+          "t": 1,
+          "yq": 1
+        },
+        "temperature_MeV": 0.0,
+        "charge_fraction_axis": 0.0,
+        "mn_reference_MeV": 939.0,
+        "mp_reference_MeV": 939.0,
+        "Il": 1,
+        "max_abs_mu_l_MeV": 0.0,
+        "max_abs_enthalpy_minus_mu_b_MeV": 3.410605131648481e-13,
+        "file_sha256": {
+          "eos.nb": "68b8087eafd788eebde549d83c939fa2561538394f41e0cbd2e42a7a63c95b51",
+          "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+          "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+          "eos.thermo": "10b331fc8ee63efa55e45a4891f406361a79615fc23353f801ffe0f4750dc24b",
+          "eos.compo": "5e1dbddfc6be17fe8ccf65b798748a502dce4a68caa8a8622e8877f9a00475a6"
+        }
+      },
+      "reference": {
+        "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/matched_eos_reference_20261117/references/GM_GM1",
+        "rows": 349,
+        "density_fm3": [
+          7.92405959867008e-15,
+          0.9999999999999999
+        ],
+        "axis_origins": {
+          "t": 0,
+          "nb": 1,
+          "yq": 1
+        },
+        "actual_scalar_row_labels": {
+          "t": 0,
+          "yq": 1
+        },
+        "temperature_MeV": 0.0,
+        "charge_fraction_axis": 0.0,
+        "mn_reference_MeV": 939.56533,
+        "mp_reference_MeV": 938.272,
+        "Il": 1,
+        "max_abs_mu_l_MeV": 9.786811006051721e-08,
+        "max_abs_enthalpy_minus_mu_b_MeV": 1.5347268345067278e-08,
+        "file_sha256": {
+          "eos.nb": "2d4b75a2020673a6a3ca0cc2671efb333283152b13c675cb7c7d01f2834590eb",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "665c9d9d75be58c5e4306c29bc7bb3e98bdecb8c5e436f61f048395d61b1caf1",
+          "eos.compo": "368679992bae0780d41822c630483a8eb21ae7bd8a84836408d51e976fbcb664"
+        }
+      },
+      "selected_generated_phases": [
+        6
+      ],
+      "selected_reference_phases": [
+        3
+      ],
+      "requested_density_fm3": [
+        0.08,
+        0.5
+      ],
+      "overlaps": [
+        {
+          "generated_phase": 6,
+          "reference_phase": 3,
+          "support_fm3": [
+            0.08,
+            0.5
+          ],
+          "reference_nodes": 132
+        }
+      ],
+      "interpolation": "generated PCHIP in n_B at exact reference nodes; linear control; no extrapolation",
+      "interpolation_control_is_error_bound": false,
+      "mu_b_definition": "mn_reference*(1+Q3); compared separately from (epsilon+P)/n_B",
+      "energy_convention": "epsilon includes rest energy, recovered using each file's mn header",
+      "composition": {
+        "compared": [
+          "y_p_free"
+        ],
+        "missing_values": "unavailable; never filled with zero",
+        "nuclear_group_tuples": "excluded: public/native semantics not assumed identical"
+      },
+      "metrics": {
+        "pressure": {
+          "compared_rows": 132,
+          "density_fm3": [
+            0.08290666666666666,
+            0.4986133333333333
+          ],
+          "max_abs_difference": 0.24140135572993415,
+          "max_abs_difference_at_n_fm3": 0.4986133333333333,
+          "signed_difference_range": [
+            -0.24140135572993415,
+            -0.0028847009431280934
+          ],
+          "rms_abs_difference": 0.10246564952892903,
+          "relative_denominator_floor": 1.2821215934460282e-10,
+          "relative_defined_rows": 132,
+          "interpolation_control_max_abs": 0.012580373893683827,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.004863865296355743,
+          "max_abs_relative_difference_at_n_fm3": 0.08290666666666666,
+          "median_signed_relative_difference": -0.0018477467885854451,
+          "interpolation_control_max_relative": 0.00018538284449113457
+        },
+        "epsilon": {
+          "compared_rows": 132,
+          "density_fm3": [
+            0.08290666666666666,
+            0.4986133333333333
+          ],
+          "max_abs_difference": 0.14885193069062552,
+          "max_abs_difference_at_n_fm3": 0.4986133333333333,
+          "signed_difference_range": [
+            -0.14885193069062552,
+            -0.003629185844999938
+          ],
+          "rms_abs_difference": 0.06660387721960777,
+          "relative_denominator_floor": 5.376714670878694e-10,
+          "relative_defined_rows": 132,
+          "interpolation_control_max_abs": 0.008408365639525073,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.0002768455084604653,
+          "max_abs_relative_difference_at_n_fm3": 0.4986133333333333,
+          "median_signed_relative_difference": -0.00013701917408851148,
+          "interpolation_control_max_relative": 1.6015298669739607e-05
+        },
+        "mu_b": {
+          "compared_rows": 132,
+          "density_fm3": [
+            0.08290666666666666,
+            0.4986133333333333
+          ],
+          "max_abs_difference": 0.7827982488022371,
+          "max_abs_difference_at_n_fm3": 0.4986133333333333,
+          "signed_difference_range": [
+            -0.7827982488022371,
+            -0.07856894994461072
+          ],
+          "rms_abs_difference": 0.40800490923683697,
+          "relative_denominator_floor": 1.335470958990697e-09,
+          "relative_defined_rows": 132,
+          "interpolation_control_max_abs": 0.008541363053836903,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.0005861589453011012,
+          "max_abs_relative_difference_at_n_fm3": 0.4986133333333333,
+          "median_signed_relative_difference": -0.00027857057742123887,
+          "interpolation_control_max_relative": 7.041473168546873e-06
+        },
+        "enthalpy_b": {
+          "compared_rows": 132,
+          "density_fm3": [
+            0.08290666666666666,
+            0.4986133333333333
+          ],
+          "max_abs_difference": 0.7827982493186028,
+          "max_abs_difference_at_n_fm3": 0.4986133333333333,
+          "signed_difference_range": [
+            -0.7827982493186028,
+            -0.0785689497453177
+          ],
+          "rms_abs_difference": 0.40800490939330186,
+          "relative_denominator_floor": 1.3354709589912134e-09,
+          "relative_defined_rows": 132,
+          "interpolation_control_max_abs": 0.00854136305360953,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.0005861589456875289,
+          "max_abs_relative_difference_at_n_fm3": 0.4986133333333333,
+          "median_signed_relative_difference": -0.000278570577006093,
+          "interpolation_control_max_relative": 7.041473168538979e-06
+        },
+        "energy_per_baryon": {
+          "compared_rows": 132,
+          "density_fm3": [
+            0.08290666666666666,
+            0.4986133333333333
+          ],
+          "max_abs_difference": 0.29860916365328194,
+          "max_abs_difference_at_n_fm3": 0.4986133333333333,
+          "signed_difference_range": [
+            -0.29860916365328194,
+            -0.04377439619793222
+          ],
+          "rms_abs_difference": 0.16556009588600648,
+          "relative_denominator_floor": 1.0783335124502674e-09,
+          "relative_defined_rows": 132,
+          "interpolation_control_max_abs": 0.004544842141513072,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.000276917261872684,
+          "max_abs_relative_difference_at_n_fm3": 0.4986133333333333,
+          "median_signed_relative_difference": -0.00013700741218056634,
+          "interpolation_control_max_relative": 4.233835692234059e-06
+        },
+        "y_p_free": {
+          "compared_rows": 132,
+          "density_fm3": [
+            0.08290666666666666,
+            0.4986133333333333
+          ],
+          "max_abs_difference": 0.00012770792280533683,
+          "max_abs_difference_at_n_fm3": 0.4224533333333333,
+          "signed_difference_range": [
+            -0.00012770792280533683,
+            -2.1468692548022583e-05
+          ],
+          "rms_abs_difference": 0.00010149765152122284,
+          "relative_denominator_floor": 1.7828078289730605e-13,
+          "relative_defined_rows": 132,
+          "interpolation_control_max_abs": 4.198789001375047e-06,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.001024149285840823,
+          "max_abs_relative_difference_at_n_fm3": 0.18128,
+          "median_signed_relative_difference": -0.0009684193634020797,
+          "interpolation_control_max_relative": 2.3909052123063255e-05
+        }
+      },
+      "first_law_diagnostic": {
+        "generated": {
+          "compared_rows": 127,
+          "density_fm3": [
+            0.08290666666666666,
+            0.48274666666666666
+          ],
+          "max_abs_difference": 3.071379846630862e-05,
+          "max_abs_difference_at_n_fm3": 0.46687999999999996,
+          "signed_difference_range": [
+            -2.9904814709880156e-05,
+            3.071379846630862e-05
+          ],
+          "rms_abs_difference": 1.2209488421594759e-05,
+          "relative_denominator_floor": 1.1720764436622707e-10,
+          "relative_defined_rows": 127,
+          "interpolation_control_max_abs": 0.001762213979674243,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 3.943596862101534e-07,
+          "max_abs_relative_difference_at_n_fm3": 0.09877333333333332,
+          "median_signed_relative_difference": 5.347105604187488e-08,
+          "interpolation_control_max_relative": 3.046092931630731e-05
+        },
+        "reference": {
+          "compared_rows": 132,
+          "density_fm3": [
+            0.08290666666666666,
+            0.4986133333333333
+          ],
+          "max_abs_difference": 2.644210724156437e-06,
+          "max_abs_difference_at_n_fm3": 0.47322666666666663,
+          "signed_difference_range": [
+            -2.223173538595802e-06,
+            2.644210724156437e-06
+          ],
+          "rms_abs_difference": 6.54045453051468e-07,
+          "relative_denominator_floor": 1.2821215934460282e-10,
+          "relative_defined_rows": 132,
+          "interpolation_control_max_abs": 0.001369604018947257,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 1.5646383738310263e-06,
+          "max_abs_relative_difference_at_n_fm3": 0.08290666666666666,
+          "median_signed_relative_difference": -7.578977308304868e-11,
+          "interpolation_control_max_relative": 0.0006492750651458667
+        },
+        "pressure_difference_after_reference_energy_derivative_diagnostic": {
+          "compared_rows": 132,
+          "density_fm3": [
+            0.08290666666666666,
+            0.4986133333333333
+          ],
+          "max_abs_difference": 0.2414007429168663,
+          "max_abs_difference_at_n_fm3": 0.4986133333333333,
+          "signed_difference_range": [
+            -0.2414007429168663,
+            -0.0028856289116300227
+          ],
+          "rms_abs_difference": 0.1024656468903022,
+          "relative_denominator_floor": 1.2821215934460282e-10,
+          "relative_defined_rows": 132,
+          "interpolation_control_max_abs": 0.001369604018947257,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.004865429934729574,
+          "max_abs_relative_difference_at_n_fm3": 0.08290666666666666,
+          "median_signed_relative_difference": -0.0018477485609684698,
+          "interpolation_control_max_relative": 0.0006492750651458667
+        },
+        "definition": "P_energy=n_B^2*d(epsilon/n_B)/dn_B; CubicSpline and PCHIP, separately within each phase",
+        "edge_policy": "omit first/last two knots of each full phase segment from derivative comparisons",
+        "residual_definition": "(P_generated-P_reference)-(P_reference_energy_derivative-P_reference) = P_generated-P_reference_energy_derivative",
+        "interpretation": "finite-grid diagnostic; interpolation-control spread is not a rigorous uncertainty bound; no source-kernel causal attribution"
+      },
+      "status": "UNRESOLVED_SOURCE_DIFFERENCE",
+      "model": "GM_GM1",
+      "retained_vs_current_reference": {
+        "generated": {
+          "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/eos_generator/eos_data/GM_GM1",
+          "rows": 349,
+          "density_fm3": [
+            7.9240595987e-15,
+            1.0
+          ],
+          "axis_origins": {
+            "t": 0,
+            "nb": 1,
+            "yq": 1
+          },
+          "actual_scalar_row_labels": {
+            "t": 0,
+            "yq": 1
+          },
+          "temperature_MeV": 0.0,
+          "charge_fraction_axis": 0.0,
+          "mn_reference_MeV": 939.56533,
+          "mp_reference_MeV": 938.272,
+          "Il": 1,
+          "max_abs_mu_l_MeV": 0.0,
+          "max_abs_enthalpy_minus_mu_b_MeV": 5.5136069931904785e-08,
+          "file_sha256": {
+            "eos.nb": "c9b75e311addfd6038672818293ce444f9bf2e882a47b53d7d5583050cbe1e76",
+            "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+            "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+            "eos.thermo": "b8428aa5f255957d8eca867c6140ceb069070927066917fd708796423025f906",
+            "eos.compo": "6f75f1e31663b72224336e53c539203028a72d0901bedd322624c123549ea9c0"
+          }
+        },
+        "reference": {
+          "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/matched_eos_reference_20261117/references/GM_GM1",
+          "rows": 349,
+          "density_fm3": [
+            7.92405959867008e-15,
+            0.9999999999999999
+          ],
+          "axis_origins": {
+            "t": 0,
+            "nb": 1,
+            "yq": 1
+          },
+          "actual_scalar_row_labels": {
+            "t": 0,
+            "yq": 1
+          },
+          "temperature_MeV": 0.0,
+          "charge_fraction_axis": 0.0,
+          "mn_reference_MeV": 939.56533,
+          "mp_reference_MeV": 938.272,
+          "Il": 1,
+          "max_abs_mu_l_MeV": 9.786811006051721e-08,
+          "max_abs_enthalpy_minus_mu_b_MeV": 1.5347268345067278e-08,
+          "file_sha256": {
+            "eos.nb": "2d4b75a2020673a6a3ca0cc2671efb333283152b13c675cb7c7d01f2834590eb",
+            "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+            "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+            "eos.thermo": "665c9d9d75be58c5e4306c29bc7bb3e98bdecb8c5e436f61f048395d61b1caf1",
+            "eos.compo": "368679992bae0780d41822c630483a8eb21ae7bd8a84836408d51e976fbcb664"
+          }
+        },
+        "selected_generated_phases": [
+          3
+        ],
+        "selected_reference_phases": [
+          3
+        ],
+        "requested_density_fm3": [
+          0.08,
+          0.5
+        ],
+        "overlaps": [
+          {
+            "generated_phase": 3,
+            "reference_phase": 3,
+            "support_fm3": [
+              0.08,
+              0.5
+            ],
+            "reference_nodes": 132
+          }
+        ],
+        "interpolation": "generated PCHIP in n_B at exact reference nodes; linear control; no extrapolation",
+        "interpolation_control_is_error_bound": false,
+        "mu_b_definition": "mn_reference*(1+Q3); compared separately from (epsilon+P)/n_B",
+        "energy_convention": "epsilon includes rest energy, recovered using each file's mn header",
+        "composition": {
+          "compared": [
+            "y_p_free"
+          ],
+          "missing_values": "unavailable; never filled with zero",
+          "nuclear_group_tuples": "excluded: public/native semantics not assumed identical"
+        },
+        "metrics": {
+          "pressure": {
+            "compared_rows": 132,
+            "density_fm3": [
+              0.08290666666666666,
+              0.4986133333333333
+            ],
+            "max_abs_difference": 2.865832016141212e-09,
+            "max_abs_difference_at_n_fm3": 0.4700533333333333,
+            "signed_difference_range": [
+              -2.7482940367917763e-09,
+              2.865832016141212e-09
+            ],
+            "rms_abs_difference": 9.385801612335372e-10,
+            "relative_denominator_floor": 1.2821215934460282e-10,
+            "relative_defined_rows": 132,
+            "interpolation_control_max_abs": 1.1098677532572765e-11,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 1.0271863304106938e-10,
+            "max_abs_relative_difference_at_n_fm3": 0.10194666666666666,
+            "median_signed_relative_difference": -1.3530498885218695e-12,
+            "interpolation_control_max_relative": 3.2904748245436845e-12
+          },
+          "epsilon": {
+            "compared_rows": 132,
+            "density_fm3": [
+              0.08290666666666666,
+              0.4986133333333333
+            ],
+            "max_abs_difference": 2.8685462893918157e-09,
+            "max_abs_difference_at_n_fm3": 0.4890933333333333,
+            "signed_difference_range": [
+              -2.771628260234138e-09,
+              2.8685462893918157e-09
+            ],
+            "rms_abs_difference": 8.153579602425096e-10,
+            "relative_denominator_floor": 5.376714670878694e-10,
+            "relative_defined_rows": 132,
+            "interpolation_control_max_abs": 7.389644451905042e-12,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 5.634591221576811e-12,
+            "max_abs_relative_difference_at_n_fm3": 0.4637066666666666,
+            "median_signed_relative_difference": -1.7543211653396692e-15,
+            "interpolation_control_max_relative": 1.996401882613248e-14
+          },
+          "mu_b": {
+            "compared_rows": 132,
+            "density_fm3": [
+              0.08290666666666666,
+              0.4986133333333333
+            ],
+            "max_abs_difference": 8.833012543618679e-09,
+            "max_abs_difference_at_n_fm3": 0.4224533333333333,
+            "signed_difference_range": [
+              -8.523102223989554e-09,
+              8.833012543618679e-09
+            ],
+            "rms_abs_difference": 3.3434528950894036e-09,
+            "relative_denominator_floor": 1.335470958990697e-09,
+            "relative_defined_rows": 132,
+            "interpolation_control_max_abs": 2.000888343900442e-11,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 7.160559611317828e-12,
+            "max_abs_relative_difference_at_n_fm3": 0.4224533333333333,
+            "median_signed_relative_difference": 1.5893292964489998e-13,
+            "interpolation_control_max_relative": 2.083280394207187e-14
+          },
+          "enthalpy_b": {
+            "compared_rows": 132,
+            "density_fm3": [
+              0.08290666666666666,
+              0.4986133333333333
+            ],
+            "max_abs_difference": 1.0723169907578267e-08,
+            "max_abs_difference_at_n_fm3": 0.49226666666666663,
+            "signed_difference_range": [
+              -1.0723169907578267e-08,
+              9.744553608470596e-09
+            ],
+            "rms_abs_difference": 3.6782704815571187e-09,
+            "relative_denominator_floor": 1.3354709589912134e-09,
+            "relative_defined_rows": 132,
+            "interpolation_control_max_abs": 2.000888343900442e-11,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 8.082961202332125e-12,
+            "max_abs_relative_difference_at_n_fm3": 0.49226666666666663,
+            "median_signed_relative_difference": 2.419742716074773e-14,
+            "interpolation_control_max_relative": 2.083280394207537e-14
+          },
+          "energy_per_baryon": {
+            "compared_rows": 132,
+            "density_fm3": [
+              0.08290666666666666,
+              0.4986133333333333
+            ],
+            "max_abs_difference": 5.976971806376241e-09,
+            "max_abs_difference_at_n_fm3": 0.4637066666666666,
+            "signed_difference_range": [
+              -5.976971806376241e-09,
+              5.865103958058171e-09
+            ],
+            "rms_abs_difference": 1.8537786088399282e-09,
+            "relative_denominator_floor": 1.0783335124502674e-09,
+            "relative_defined_rows": 132,
+            "interpolation_control_max_abs": 7.16227077646181e-12,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 5.634455853023623e-12,
+            "max_abs_relative_difference_at_n_fm3": 0.4637066666666666,
+            "median_signed_relative_difference": -1.743628639717782e-15,
+            "interpolation_control_max_relative": 7.560094391052609e-15
+          },
+          "y_p_free": {
+            "compared_rows": 132,
+            "density_fm3": [
+              0.08290666666666666,
+              0.4986133333333333
+            ],
+            "max_abs_difference": 4.93735444873078e-06,
+            "max_abs_difference_at_n_fm3": 0.4414933333333334,
+            "signed_difference_range": [
+              -4.669778766425159e-06,
+              4.93735444873078e-06
+            ],
+            "rms_abs_difference": 2.642168173824054e-06,
+            "relative_denominator_floor": 1.7828078289730605e-13,
+            "relative_defined_rows": 132,
+            "interpolation_control_max_abs": 1.0602629885170245e-14,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0001694454457488825,
+            "max_abs_relative_difference_at_n_fm3": 0.09559999999999999,
+            "median_signed_relative_difference": 2.393710877811099e-06,
+            "interpolation_control_max_relative": 3.49616682716894e-13
+          }
+        },
+        "first_law_diagnostic": {
+          "generated": {
+            "compared_rows": 132,
+            "density_fm3": [
+              0.08290666666666666,
+              0.4986133333333333
+            ],
+            "max_abs_difference": 3.010370605238677e-06,
+            "max_abs_difference_at_n_fm3": 0.49544,
+            "signed_difference_range": [
+              -2.4265402345236e-06,
+              3.010370605238677e-06
+            ],
+            "rms_abs_difference": 6.964159918027844e-07,
+            "relative_denominator_floor": 1.2821215934559402e-10,
+            "relative_defined_rows": 132,
+            "interpolation_control_max_abs": 0.0013695541352376495,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 9.932621582723703e-08,
+            "max_abs_relative_difference_at_n_fm3": 0.15906666666666666,
+            "median_signed_relative_difference": -9.035575019119228e-10,
+            "interpolation_control_max_relative": 0.0006476376859123826
+          },
+          "reference": {
+            "compared_rows": 132,
+            "density_fm3": [
+              0.08290666666666666,
+              0.4986133333333333
+            ],
+            "max_abs_difference": 2.644210724156437e-06,
+            "max_abs_difference_at_n_fm3": 0.47322666666666663,
+            "signed_difference_range": [
+              -2.223173538595802e-06,
+              2.644210724156437e-06
+            ],
+            "rms_abs_difference": 6.54045453051468e-07,
+            "relative_denominator_floor": 1.2821215934460282e-10,
+            "relative_defined_rows": 132,
+            "interpolation_control_max_abs": 0.001369604018947257,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 1.5646383738310263e-06,
+            "max_abs_relative_difference_at_n_fm3": 0.08290666666666666,
+            "median_signed_relative_difference": -7.578977308304868e-11,
+            "interpolation_control_max_relative": 0.0006492750651458667
+          },
+          "pressure_difference_after_reference_energy_derivative_diagnostic": {
+            "compared_rows": 132,
+            "density_fm3": [
+              0.08290666666666666,
+              0.4986133333333333
+            ],
+            "max_abs_difference": 2.644390008299524e-06,
+            "max_abs_difference_at_n_fm3": 0.47322666666666663,
+            "signed_difference_range": [
+              -2.644390008299524e-06,
+              2.222242827087939e-06
+            ],
+            "rms_abs_difference": 6.539983804523085e-07,
+            "relative_denominator_floor": 1.2821215934460282e-10,
+            "relative_defined_rows": 132,
+            "interpolation_control_max_abs": 0.001369604018947257,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 1.564645279776929e-06,
+            "max_abs_relative_difference_at_n_fm3": 0.08290666666666666,
+            "median_signed_relative_difference": 1.0266235739836426e-10,
+            "interpolation_control_max_relative": 0.0006492750651458667
+          },
+          "definition": "P_energy=n_B^2*d(epsilon/n_B)/dn_B; CubicSpline and PCHIP, separately within each phase",
+          "edge_policy": "omit first/last two knots of each full phase segment from derivative comparisons",
+          "residual_definition": "(P_generated-P_reference)-(P_reference_energy_derivative-P_reference) = P_generated-P_reference_energy_derivative",
+          "interpretation": "finite-grid diagnostic; interpolation-control spread is not a rigorous uncertainty bound; no source-kernel causal attribution"
+        },
+        "status": "UNRESOLVED_SOURCE_DIFFERENCE",
+        "meaning": "generated labels denote older retained reference in this subsection only",
+        "byte_identity": {
+          "eos.nb": false,
+          "eos.t": true,
+          "eos.yq": true,
+          "eos.thermo": false,
+          "eos.compo": false
+        }
+      }
+    },
+    "RG_SLY4": {
+      "generated": {
+        "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/research_matching_20261117/integration/real_pairs_v2/core/RG_SLY4/generated",
+        "rows": 129,
+        "density_fm3": [
+          0.08,
+          0.5
+        ],
+        "axis_origins": {
+          "t": 1,
+          "nb": 1,
+          "yq": 1
+        },
+        "actual_scalar_row_labels": {
+          "t": 1,
+          "yq": 1
+        },
+        "temperature_MeV": 0.0,
+        "charge_fraction_axis": 0.0,
+        "mn_reference_MeV": 939.5654,
+        "mp_reference_MeV": 938.272,
+        "Il": 1,
+        "max_abs_mu_l_MeV": 0.0,
+        "max_abs_enthalpy_minus_mu_b_MeV": 4.547473508864641e-13,
+        "file_sha256": {
+          "eos.nb": "68b8087eafd788eebde549d83c939fa2561538394f41e0cbd2e42a7a63c95b51",
+          "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+          "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+          "eos.thermo": "aa80448debbbc1822cf1d28d06ccbf252c78d69dce4daa1f2ed51c3ba5d2ce1d",
+          "eos.compo": "a5d9774f3c7fdbe556233c8e9893283b435dc0d646c7593bab1c3308a513f07b"
+        }
+      },
+      "reference": {
+        "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/matched_eos_reference_20261117/references/RG_SLY4",
+        "rows": 197,
+        "density_fm3": [
+          1e-07,
+          1.21
+        ],
+        "axis_origins": {
+          "t": 0,
+          "nb": 0,
+          "yq": 1
+        },
+        "actual_scalar_row_labels": {
+          "t": 0,
+          "yq": 1
+        },
+        "temperature_MeV": 0.0,
+        "charge_fraction_axis": 0.0,
+        "mn_reference_MeV": 939.5654,
+        "mp_reference_MeV": 938.272,
+        "Il": 1,
+        "max_abs_mu_l_MeV": 1.2996284712842,
+        "max_abs_enthalpy_minus_mu_b_MeV": 0.10721510355404007,
+        "file_sha256": {
+          "eos.nb": "2aaa0129e05fa57a5c5e5f52adf5fdb66e5f1ab5c46c3bc25284f27109ad175f",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "2bd6548281a66938e87b24db83555deb89cdbcbf61f2bf9dbf909e63cc376f5d",
+          "eos.compo": "e6560ef6f76929b754d3235891c6590fbc5243d8ff0c7ac3c46883b01034709f"
+        }
+      },
+      "selected_generated_phases": [
+        6
+      ],
+      "selected_reference_phases": [
+        3
+      ],
+      "requested_density_fm3": [
+        0.08,
+        0.5
+      ],
+      "overlaps": [
+        {
+          "generated_phase": 6,
+          "reference_phase": 3,
+          "support_fm3": [
+            0.08,
+            0.5
+          ],
+          "reference_nodes": 20
+        }
+      ],
+      "interpolation": "generated PCHIP in n_B at exact reference nodes; linear control; no extrapolation",
+      "interpolation_control_is_error_bound": false,
+      "mu_b_definition": "mn_reference*(1+Q3); compared separately from (epsilon+P)/n_B",
+      "energy_convention": "epsilon includes rest energy, recovered using each file's mn header",
+      "composition": {
+        "compared": [
+          "y_p_free",
+          "y_e",
+          "y_mu"
+        ],
+        "missing_values": "unavailable; never filled with zero",
+        "nuclear_group_tuples": "excluded: public/native semantics not assumed identical"
+      },
+      "metrics": {
+        "pressure": {
+          "compared_rows": 20,
+          "density_fm3": [
+            0.08317638,
+            0.4786301
+          ],
+          "max_abs_difference": 0.010436862881654463,
+          "max_abs_difference_at_n_fm3": 0.4786301,
+          "signed_difference_range": [
+            0.0007240479392120469,
+            0.010436862881654463
+          ],
+          "rms_abs_difference": 0.004808643423001027,
+          "relative_denominator_floor": 6.005204344165e-11,
+          "relative_defined_rows": 20,
+          "interpolation_control_max_abs": 0.006660241496376784,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.0018278652352288144,
+          "max_abs_relative_difference_at_n_fm3": 0.08317638,
+          "median_signed_relative_difference": 0.0006933729205157806,
+          "interpolation_control_max_relative": 0.00016014825674544886
+        },
+        "epsilon": {
+          "compared_rows": 20,
+          "density_fm3": [
+            0.08317638,
+            0.4786301
+          ],
+          "max_abs_difference": 0.020582957816941416,
+          "max_abs_difference_at_n_fm3": 0.4786301,
+          "signed_difference_range": [
+            0.0012744157326238792,
+            0.020582957816941416
+          ],
+          "rms_abs_difference": 0.009191118881760064,
+          "relative_denominator_floor": 4.835011635469187e-10,
+          "relative_defined_rows": 20,
+          "interpolation_control_max_abs": 0.003477645904467863,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 4.2570647950351957e-05,
+          "max_abs_relative_difference_at_n_fm3": 0.4786301,
+          "median_signed_relative_difference": 2.802452249906878e-05,
+          "interpolation_control_max_relative": 7.969966767248614e-06
+        },
+        "mu_b": {
+          "compared_rows": 20,
+          "density_fm3": [
+            0.08317638,
+            0.4786301
+          ],
+          "max_abs_difference": 0.07430812575057644,
+          "max_abs_difference_at_n_fm3": 0.4786301,
+          "signed_difference_range": [
+            0.025477296889448553,
+            0.07430812575057644
+          ],
+          "rms_abs_difference": 0.048179871517536305,
+          "relative_denominator_floor": 1.13563409558508e-09,
+          "relative_defined_rows": 20,
+          "interpolation_control_max_abs": 0.0072964527055319195,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 6.543315847900181e-05,
+          "max_abs_relative_difference_at_n_fm3": 0.4786301,
+          "median_signed_relative_difference": 4.425978380195242e-05,
+          "interpolation_control_max_relative": 6.607356552227102e-06
+        },
+        "enthalpy_b": {
+          "compared_rows": 20,
+          "density_fm3": [
+            0.08317638,
+            0.4786301
+          ],
+          "max_abs_difference": 0.06480965235255098,
+          "max_abs_difference_at_n_fm3": 0.4786301,
+          "signed_difference_range": [
+            0.024027053064855863,
+            0.06480965235255098
+          ],
+          "rms_abs_difference": 0.044582110484537765,
+          "relative_denominator_floor": 1.1356435940584776e-09,
+          "relative_defined_rows": 20,
+          "interpolation_control_max_abs": 0.0072964527055319195,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 5.706865489456875e-05,
+          "max_abs_relative_difference_at_n_fm3": 0.4786301,
+          "median_signed_relative_difference": 4.261406987126255e-05,
+          "interpolation_control_max_relative": 6.607300299436723e-06
+        },
+        "energy_per_baryon": {
+          "compared_rows": 20,
+          "density_fm3": [
+            0.08317638,
+            0.4786301
+          ],
+          "max_abs_difference": 0.04301668032803718,
+          "max_abs_difference_at_n_fm3": 0.4786301,
+          "signed_difference_range": [
+            0.015322474946628972,
+            0.04301668032803718
+          ],
+          "rms_abs_difference": 0.028855794573836344,
+          "relative_denominator_floor": 1.0101770940584777e-09,
+          "relative_defined_rows": 20,
+          "interpolation_control_max_abs": 0.0026060555840103916,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 4.258330601737739e-05,
+          "max_abs_relative_difference_at_n_fm3": 0.4786301,
+          "median_signed_relative_difference": 2.8024698040039096e-05,
+          "interpolation_control_max_relative": 2.6070826115270228e-06
+        },
+        "y_p_free": {
+          "compared_rows": 20,
+          "density_fm3": [
+            0.08317638,
+            0.4786301
+          ],
+          "max_abs_difference": 8.940191129741537e-05,
+          "max_abs_difference_at_n_fm3": 0.4786301,
+          "signed_difference_range": [
+            3.123818573708831e-05,
+            8.940191129741537e-05
+          ],
+          "rms_abs_difference": 6.362137491786685e-05,
+          "relative_denominator_floor": 7.481245e-14,
+          "relative_defined_rows": 20,
+          "interpolation_control_max_abs": 4.6842054136006506e-06,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.0011950138151793634,
+          "max_abs_relative_difference_at_n_fm3": 0.4786301,
+          "median_signed_relative_difference": 0.0010657646484520202,
+          "interpolation_control_max_relative": 0.00010635699037449348
+        },
+        "y_e": {
+          "compared_rows": 20,
+          "density_fm3": [
+            0.08317638,
+            0.4786301
+          ],
+          "max_abs_difference": 4.956034605425874e-05,
+          "max_abs_difference_at_n_fm3": 0.4786301,
+          "signed_difference_range": [
+            3.1238185737123e-05,
+            4.956034605425874e-05
+          ],
+          "rms_abs_difference": 4.0521645190546355e-05,
+          "relative_denominator_floor": 5.0290439999999996e-14,
+          "relative_defined_rows": 20,
+          "interpolation_control_max_abs": 2.3773536604113077e-06,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.000999478606028668,
+          "max_abs_relative_difference_at_n_fm3": 0.4786301,
+          "median_signed_relative_difference": 0.0008431455615727196,
+          "interpolation_control_max_relative": 5.406000655834992e-05
+        },
+        "y_mu": {
+          "compared_rows": 20,
+          "density_fm3": [
+            0.08317638,
+            0.4786301
+          ],
+          "max_abs_difference": 3.98403863072945e-05,
+          "max_abs_difference_at_n_fm3": 0.4786301,
+          "signed_difference_range": [
+            -7.70838314712144e-07,
+            3.98403863072945e-05
+          ],
+          "rms_abs_difference": 2.4801171193964548e-05,
+          "relative_denominator_floor": 2.5226249999999997e-14,
+          "relative_defined_rows": 16,
+          "interpolation_control_max_abs": 9.3173199087977e-06,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.011663830768348345,
+          "max_abs_relative_difference_at_n_fm3": 0.1202264,
+          "median_signed_relative_difference": 0.0018353347679877755,
+          "interpolation_control_max_relative": 0.14098370638382476
+        }
+      },
+      "first_law_diagnostic": {
+        "generated": {
+          "compared_rows": 20,
+          "density_fm3": [
+            0.08317638,
+            0.4786301
+          ],
+          "max_abs_difference": 7.857877383443679e-06,
+          "max_abs_difference_at_n_fm3": 0.1202264,
+          "signed_difference_range": [
+            -7.857877383443679e-06,
+            6.655182509973656e-06
+          ],
+          "rms_abs_difference": 3.7052679186161277e-06,
+          "relative_denominator_floor": 6.006248030453165e-11,
+          "relative_defined_rows": 20,
+          "interpolation_control_max_abs": 0.0009140561065876796,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 7.798693231749815e-06,
+          "max_abs_relative_difference_at_n_fm3": 0.1202264,
+          "median_signed_relative_difference": -4.647974352000349e-08,
+          "interpolation_control_max_relative": 2.805597602965123e-05
+        },
+        "reference": {
+          "compared_rows": 20,
+          "density_fm3": [
+            0.08317638,
+            0.4786301
+          ],
+          "max_abs_difference": 0.0049234109239222335,
+          "max_abs_difference_at_n_fm3": 0.4786301,
+          "signed_difference_range": [
+            -0.0049234109239222335,
+            0.0048935988326626045
+          ],
+          "rms_abs_difference": 0.0019708264014948436,
+          "relative_denominator_floor": 6.005204344165e-11,
+          "relative_defined_rows": 20,
+          "interpolation_control_max_abs": 0.05469473786272516,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.0011931098943248986,
+          "max_abs_relative_difference_at_n_fm3": 0.1,
+          "median_signed_relative_difference": -3.082304183477593e-05,
+          "interpolation_control_max_relative": 0.0020872664903413825
+        },
+        "pressure_difference_after_reference_energy_derivative_diagnostic": {
+          "compared_rows": 20,
+          "density_fm3": [
+            0.08317638,
+            0.4786301
+          ],
+          "max_abs_difference": 0.015360273805576696,
+          "max_abs_difference_at_n_fm3": 0.4786301,
+          "signed_difference_range": [
+            0.0007403686929626785,
+            0.015360273805576696
+          ],
+          "rms_abs_difference": 0.00570758883814725,
+          "relative_denominator_floor": 6.005204344165e-11,
+          "relative_defined_rows": 20,
+          "interpolation_control_max_abs": 0.05469473786272516,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.0027870741941821435,
+          "max_abs_relative_difference_at_n_fm3": 0.1,
+          "median_signed_relative_difference": 0.0007659301169151581,
+          "interpolation_control_max_relative": 0.0020872664903413825
+        },
+        "definition": "P_energy=n_B^2*d(epsilon/n_B)/dn_B; CubicSpline and PCHIP, separately within each phase",
+        "edge_policy": "omit first/last two knots of each full phase segment from derivative comparisons",
+        "residual_definition": "(P_generated-P_reference)-(P_reference_energy_derivative-P_reference) = P_generated-P_reference_energy_derivative",
+        "interpretation": "finite-grid diagnostic; interpolation-control spread is not a rigorous uncertainty bound; no source-kernel causal attribution"
+      },
+      "status": "UNRESOLVED_SOURCE_DIFFERENCE",
+      "model": "RG_SLY4",
+      "retained_vs_current_reference": {
+        "generated": {
+          "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/eos_generator/eos_data/RG_SLY4",
+          "rows": 197,
+          "density_fm3": [
+            1e-07,
+            1.21
+          ],
+          "axis_origins": {
+            "t": 0,
+            "nb": 1,
+            "yq": 1
+          },
+          "actual_scalar_row_labels": {
+            "t": 1,
+            "yq": 1
+          },
+          "temperature_MeV": 0.0,
+          "charge_fraction_axis": 0.0,
+          "mn_reference_MeV": 939.5654,
+          "mp_reference_MeV": 938.272,
+          "Il": 1,
+          "max_abs_mu_l_MeV": 1.2996284712842,
+          "max_abs_enthalpy_minus_mu_b_MeV": 0.10642653835077454,
+          "file_sha256": {
+            "eos.nb": "e8fa40bd55e0b6ab5e2fd3a536ce162b755afce32011c97f19aa290b5bbc402e",
+            "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+            "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+            "eos.thermo": "454aab2370ba7e5ee11ef3fd00801489222cdb2ce9ad416ccfa8821456c65e3f",
+            "eos.compo": "39ef13e075c5225a8a838e7015052263d038a16d0303398f427fbbee34e30d65"
+          }
+        },
+        "reference": {
+          "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/matched_eos_reference_20261117/references/RG_SLY4",
+          "rows": 197,
+          "density_fm3": [
+            1e-07,
+            1.21
+          ],
+          "axis_origins": {
+            "t": 0,
+            "nb": 0,
+            "yq": 1
+          },
+          "actual_scalar_row_labels": {
+            "t": 0,
+            "yq": 1
+          },
+          "temperature_MeV": 0.0,
+          "charge_fraction_axis": 0.0,
+          "mn_reference_MeV": 939.5654,
+          "mp_reference_MeV": 938.272,
+          "Il": 1,
+          "max_abs_mu_l_MeV": 1.2996284712842,
+          "max_abs_enthalpy_minus_mu_b_MeV": 0.10721510355404007,
+          "file_sha256": {
+            "eos.nb": "2aaa0129e05fa57a5c5e5f52adf5fdb66e5f1ab5c46c3bc25284f27109ad175f",
+            "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+            "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+            "eos.thermo": "2bd6548281a66938e87b24db83555deb89cdbcbf61f2bf9dbf909e63cc376f5d",
+            "eos.compo": "e6560ef6f76929b754d3235891c6590fbc5243d8ff0c7ac3c46883b01034709f"
+          }
+        },
+        "selected_generated_phases": [
+          3
+        ],
+        "selected_reference_phases": [
+          3
+        ],
+        "requested_density_fm3": [
+          0.08,
+          0.5
+        ],
+        "overlaps": [
+          {
+            "generated_phase": 3,
+            "reference_phase": 3,
+            "support_fm3": [
+              0.08,
+              0.5
+            ],
+            "reference_nodes": 20
+          }
+        ],
+        "interpolation": "generated PCHIP in n_B at exact reference nodes; linear control; no extrapolation",
+        "interpolation_control_is_error_bound": false,
+        "mu_b_definition": "mn_reference*(1+Q3); compared separately from (epsilon+P)/n_B",
+        "energy_convention": "epsilon includes rest energy, recovered using each file's mn header",
+        "composition": {
+          "compared": [
+            "y_p_free",
+            "y_e",
+            "y_mu"
+          ],
+          "missing_values": "unavailable; never filled with zero",
+          "nuclear_group_tuples": "excluded: public/native semantics not assumed identical"
+        },
+        "metrics": {
+          "pressure": {
+            "compared_rows": 20,
+            "density_fm3": [
+              0.08317638,
+              0.4786301
+            ],
+            "max_abs_difference": 0.12628721923262987,
+            "max_abs_difference_at_n_fm3": 0.3981072,
+            "signed_difference_range": [
+              -0.09842460829831623,
+              0.12628721923262987
+            ],
+            "rms_abs_difference": 0.0649172214257548,
+            "relative_denominator_floor": 6.005204344165e-11,
+            "relative_defined_rows": 20,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.06718566570846027,
+            "max_abs_relative_difference_at_n_fm3": 0.08317638,
+            "median_signed_relative_difference": 2.2272316155277894e-05,
+            "interpolation_control_max_relative": 0.0
+          },
+          "epsilon": {
+            "compared_rows": 20,
+            "density_fm3": [
+              0.08317638,
+              0.4786301
+            ],
+            "max_abs_difference": 0.04555449596188055,
+            "max_abs_difference_at_n_fm3": 0.4786301,
+            "signed_difference_range": [
+              -0.017603784091591024,
+              0.04555449596188055
+            ],
+            "rms_abs_difference": 0.018031889809913156,
+            "relative_denominator_floor": 4.835011635469187e-10,
+            "relative_defined_rows": 20,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.00011946708430448478,
+            "max_abs_relative_difference_at_n_fm3": 0.1,
+            "median_signed_relative_difference": 2.8584530196020814e-05,
+            "interpolation_control_max_relative": 0.0
+          },
+          "mu_b": {
+            "compared_rows": 20,
+            "density_fm3": [
+              0.08317638,
+              0.4786301
+            ],
+            "max_abs_difference": 0.43966094452707694,
+            "max_abs_difference_at_n_fm3": 0.08317638,
+            "signed_difference_range": [
+              -0.32762278127916034,
+              0.43966094452707694
+            ],
+            "rms_abs_difference": 0.2747257522901107,
+            "relative_denominator_floor": 1.13563409558508e-09,
+            "relative_defined_rows": 20,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.00046099978746014594,
+            "max_abs_relative_difference_at_n_fm3": 0.08317638,
+            "median_signed_relative_difference": 0.00011394997321354574,
+            "interpolation_control_max_relative": 0.0
+          },
+          "enthalpy_b": {
+            "compared_rows": 20,
+            "density_fm3": [
+              0.08317638,
+              0.4786301
+            ],
+            "max_abs_difference": 0.40443393268810723,
+            "max_abs_difference_at_n_fm3": 0.08317638,
+            "signed_difference_range": [
+              -0.37008177406789855,
+              0.40443393268810723
+            ],
+            "rms_abs_difference": 0.2702827424113258,
+            "relative_denominator_floor": 1.1356435940584776e-09,
+            "relative_defined_rows": 20,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.00042406239585231654,
+            "max_abs_relative_difference_at_n_fm3": 0.08317638,
+            "median_signed_relative_difference": 7.315541002735559e-05,
+            "interpolation_control_max_relative": 0.0
+          },
+          "energy_per_baryon": {
+            "compared_rows": 20,
+            "density_fm3": [
+              0.08317638,
+              0.4786301
+            ],
+            "max_abs_difference": 0.11348759320753743,
+            "max_abs_difference_at_n_fm3": 0.1,
+            "signed_difference_range": [
+              -0.08035566656224091,
+              0.11348759320753743
+            ],
+            "rms_abs_difference": 0.07118780049897247,
+            "relative_denominator_floor": 1.0101770940584777e-09,
+            "relative_defined_rows": 20,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.00011946708430448478,
+            "max_abs_relative_difference_at_n_fm3": 0.1,
+            "median_signed_relative_difference": 2.8584530196064084e-05,
+            "interpolation_control_max_relative": 0.0
+          },
+          "y_p_free": {
+            "compared_rows": 20,
+            "density_fm3": [
+              0.08317638,
+              0.4786301
+            ],
+            "max_abs_difference": 4.729999999994461e-06,
+            "max_abs_difference_at_n_fm3": 0.2754229,
+            "signed_difference_range": [
+              -4.729999999994461e-06,
+              4.1399999999996995e-06
+            ],
+            "rms_abs_difference": 2.6207785102892738e-06,
+            "relative_denominator_floor": 7.481245e-14,
+            "relative_defined_rows": 20,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 9.257485718973514e-05,
+            "max_abs_relative_difference_at_n_fm3": 0.1096478,
+            "median_signed_relative_difference": -2.0470080159171183e-05,
+            "interpolation_control_max_relative": 0.0
+          },
+          "y_e": {
+            "compared_rows": 20,
+            "density_fm3": [
+              0.08317638,
+              0.4786301
+            ],
+            "max_abs_difference": 4.6400000000001995e-06,
+            "max_abs_difference_at_n_fm3": 0.144544,
+            "signed_difference_range": [
+              -3.7999999999982492e-06,
+              4.6400000000001995e-06
+            ],
+            "rms_abs_difference": 2.419595007434931e-06,
+            "relative_denominator_floor": 5.0290439999999996e-14,
+            "relative_defined_rows": 20,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 9.977344546951576e-05,
+            "max_abs_relative_difference_at_n_fm3": 0.144544,
+            "median_signed_relative_difference": 1.437897892564974e-06,
+            "interpolation_control_max_relative": 0.0
+          },
+          "y_mu": {
+            "compared_rows": 20,
+            "density_fm3": [
+              0.08317638,
+              0.4786301
+            ],
+            "max_abs_difference": 4.850000000000687e-06,
+            "max_abs_difference_at_n_fm3": 0.2290868,
+            "signed_difference_range": [
+              -4.850000000000687e-06,
+              4.560000000000675e-06
+            ],
+            "rms_abs_difference": 2.602638112823111e-06,
+            "relative_denominator_floor": 2.5226249999999997e-14,
+            "relative_defined_rows": 16,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.05919508436640147,
+            "max_abs_relative_difference_at_n_fm3": 0.1202264,
+            "median_signed_relative_difference": -1.0358989100653843e-06,
+            "interpolation_control_max_relative": 0.0
+          }
+        },
+        "first_law_diagnostic": {
+          "generated": {
+            "compared_rows": 20,
+            "density_fm3": [
+              0.08317638,
+              0.4786301
+            ],
+            "max_abs_difference": 0.002673642763042494,
+            "max_abs_difference_at_n_fm3": 0.4365158,
+            "signed_difference_range": [
+              -0.002673642763042494,
+              0.0019346714707850765
+            ],
+            "rms_abs_difference": 0.0007626789778548503,
+            "relative_denominator_floor": 5.995361883335168e-11,
+            "relative_defined_rows": 20,
+            "interpolation_control_max_abs": 0.04839078920373652,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 7.496198258154478e-05,
+            "max_abs_relative_difference_at_n_fm3": 0.08317638,
+            "median_signed_relative_difference": 5.138524710017142e-06,
+            "interpolation_control_max_relative": 0.003216448803903906
+          },
+          "reference": {
+            "compared_rows": 20,
+            "density_fm3": [
+              0.08317638,
+              0.4786301
+            ],
+            "max_abs_difference": 0.0049234109239222335,
+            "max_abs_difference_at_n_fm3": 0.4786301,
+            "signed_difference_range": [
+              -0.0049234109239222335,
+              0.0048935988326626045
+            ],
+            "rms_abs_difference": 0.0019708264014948436,
+            "relative_denominator_floor": 6.005204344165e-11,
+            "relative_defined_rows": 20,
+            "interpolation_control_max_abs": 0.05469473786272516,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0011931098943248986,
+            "max_abs_relative_difference_at_n_fm3": 0.1,
+            "median_signed_relative_difference": -3.082304183477593e-05,
+            "interpolation_control_max_relative": 0.0020872664903413825
+          },
+          "pressure_difference_after_reference_energy_derivative_diagnostic": {
+            "compared_rows": 20,
+            "density_fm3": [
+              0.08317638,
+              0.4786301
+            ],
+            "max_abs_difference": 0.12759517318951197,
+            "max_abs_difference_at_n_fm3": 0.3981072,
+            "signed_difference_range": [
+              -0.093501197374394,
+              0.12759517318951197
+            ],
+            "rms_abs_difference": 0.06451563150315369,
+            "relative_denominator_floor": 6.005204344165e-11,
+            "relative_defined_rows": 20,
+            "interpolation_control_max_abs": 0.05469473786272516,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.06722686759134384,
+            "max_abs_relative_difference_at_n_fm3": 0.08317638,
+            "median_signed_relative_difference": 0.0002744891237880172,
+            "interpolation_control_max_relative": 0.0020872664903413825
+          },
+          "definition": "P_energy=n_B^2*d(epsilon/n_B)/dn_B; CubicSpline and PCHIP, separately within each phase",
+          "edge_policy": "omit first/last two knots of each full phase segment from derivative comparisons",
+          "residual_definition": "(P_generated-P_reference)-(P_reference_energy_derivative-P_reference) = P_generated-P_reference_energy_derivative",
+          "interpretation": "finite-grid diagnostic; interpolation-control spread is not a rigorous uncertainty bound; no source-kernel causal attribution"
+        },
+        "status": "UNRESOLVED_SOURCE_DIFFERENCE",
+        "meaning": "generated labels denote older retained reference in this subsection only",
+        "byte_identity": {
+          "eos.nb": false,
+          "eos.t": true,
+          "eos.yq": true,
+          "eos.thermo": false,
+          "eos.compo": false
+        }
+      }
+    },
+    "SPG_M1": {
+      "generated": {
+        "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/research_matching_20261117/spg/native_129_repaired/SPG_M1/generated",
+        "rows": 129,
+        "density_fm3": [
+          0.0002331736909363899,
+          0.0765391794443131
+        ],
+        "axis_origins": {
+          "t": 1,
+          "nb": 1,
+          "yq": 1
+        },
+        "actual_scalar_row_labels": {
+          "t": 1,
+          "yq": 1
+        },
+        "temperature_MeV": 0.0,
+        "charge_fraction_axis": 0.0,
+        "mn_reference_MeV": 938.9,
+        "mp_reference_MeV": 938.9,
+        "Il": 1,
+        "max_abs_mu_l_MeV": 0.0,
+        "max_abs_enthalpy_minus_mu_b_MeV": 3.410605131648481e-13,
+        "file_sha256": {
+          "eos.nb": "4ada40f9afeac3f5e41b546145bdb924a954c581a925813b07c57bacb2d73e04",
+          "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+          "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+          "eos.thermo": "492da9325404c66557da4c5f88777985d1ae366bfdd47156b14398607aaf0f04",
+          "eos.compo": "f00efaa6ed9dfc2e072d7a2488b6111a90f09e2bd38b42a8eaca7a9f57235a2d"
+        }
+      },
+      "reference": {
+        "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/matched_eos_reference_20261117/references/SPG_M1",
+        "rows": 365,
+        "density_fm3": [
+          4.67962e-10,
+          0.07413102413
+        ],
+        "axis_origins": {
+          "t": 0,
+          "nb": 1,
+          "yq": 1
+        },
+        "actual_scalar_row_labels": {
+          "t": 0,
+          "yq": 1
+        },
+        "temperature_MeV": 0.0,
+        "charge_fraction_axis": 0.0,
+        "mn_reference_MeV": 938.9,
+        "mp_reference_MeV": 938.9,
+        "Il": 1,
+        "max_abs_mu_l_MeV": 0.0,
+        "max_abs_enthalpy_minus_mu_b_MeV": 0.0013242294995734483,
+        "file_sha256": {
+          "eos.nb": "7a2cf219a6fd9149eb8549454e3b7874c195b196633f38aadd369753b979c498",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "4de6d31f719a40b1cdd8ef362e826b75010efff37d5824096d1c97a83953d5ce",
+          "eos.compo": "edc41a10c9bd9bd0d0a1488ef9c0d97485809474e37ebb575245ad9fcd1475e9"
+        }
+      },
+      "selected_generated_phases": [
+        1
+      ],
+      "selected_reference_phases": [
+        7
+      ],
+      "requested_density_fm3": [
+        0.002,
+        0.2
+      ],
+      "overlaps": [
+        {
+          "generated_phase": 1,
+          "reference_phase": 7,
+          "support_fm3": [
+            0.002511886432,
+            0.07413102413
+          ],
+          "reference_nodes": 148
+        }
+      ],
+      "interpolation": "generated PCHIP in n_B at exact reference nodes; linear control; no extrapolation",
+      "interpolation_control_is_error_bound": false,
+      "mu_b_definition": "mn_reference*(1+Q3); compared separately from (epsilon+P)/n_B",
+      "energy_convention": "epsilon includes rest energy, recovered using each file's mn header",
+      "composition": {
+        "compared": [
+          "y_e",
+          "y_mu"
+        ],
+        "missing_values": "unavailable; never filled with zero",
+        "nuclear_group_tuples": "excluded: public/native semantics not assumed identical"
+      },
+      "metrics": {
+        "pressure": {
+          "compared_rows": 148,
+          "density_fm3": [
+            0.002511886432,
+            0.07413102413
+          ],
+          "max_abs_difference": 0.0012894374134194142,
+          "max_abs_difference_at_n_fm3": 0.03548133892,
+          "signed_difference_range": [
+            -0.0012894374134194142,
+            0.0004046149125368492
+          ],
+          "rms_abs_difference": 0.0008693660282936088,
+          "relative_denominator_floor": 4.81250995766437e-13,
+          "relative_defined_rows": 148,
+          "interpolation_control_max_abs": 0.0001613012066893904,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.1566483113032779,
+          "max_abs_relative_difference_at_n_fm3": 0.002511886432,
+          "median_signed_relative_difference": -0.03789254951782853,
+          "interpolation_control_max_relative": 0.0005064564156359268
+        },
+        "epsilon": {
+          "compared_rows": 148,
+          "density_fm3": [
+            0.002511886432,
+            0.07413102413
+          ],
+          "max_abs_difference": 8.884795022368053e-06,
+          "max_abs_difference_at_n_fm3": 0.06025595861,
+          "signed_difference_range": [
+            -8.884795022368053e-06,
+            -1.7862066670204513e-07
+          ],
+          "rms_abs_difference": 2.728489386456497e-06,
+          "relative_denominator_floor": 7.024895679032158e-11,
+          "relative_defined_rows": 148,
+          "interpolation_control_max_abs": 0.00020352362584219463,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 1.731124040863332e-07,
+          "max_abs_relative_difference_at_n_fm3": 0.002511886432,
+          "median_signed_relative_difference": -8.010116976519372e-08,
+          "interpolation_control_max_relative": 2.8971764869002965e-06
+        },
+        "mu_b": {
+          "compared_rows": 148,
+          "density_fm3": [
+            0.002511886432,
+            0.07413102413
+          ],
+          "max_abs_difference": 0.19347845755464732,
+          "max_abs_difference_at_n_fm3": 0.002511886432,
+          "signed_difference_range": [
+            -0.19347845755464732,
+            0.005543637857272188
+          ],
+          "rms_abs_difference": 0.09160467674175314,
+          "relative_denominator_floor": 9.54124249810838e-10,
+          "relative_defined_rows": 148,
+          "interpolation_control_max_abs": 0.001098100708304628,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.00020558245439440342,
+          "max_abs_relative_difference_at_n_fm3": 0.002511886432,
+          "median_signed_relative_difference": -7.001992692065513e-05,
+          "interpolation_control_max_relative": 1.1508990663661826e-06
+        },
+        "enthalpy_b": {
+          "compared_rows": 148,
+          "density_fm3": [
+            0.002511886432,
+            0.07413102413
+          ],
+          "max_abs_difference": 0.1934784578285189,
+          "max_abs_difference_at_n_fm3": 0.002511886432,
+          "signed_difference_range": [
+            -0.1934784578285189,
+            0.005543634305013256
+          ],
+          "rms_abs_difference": 0.09160467669494271,
+          "relative_denominator_floor": 9.5412424981546e-10,
+          "relative_defined_rows": 148,
+          "interpolation_control_max_abs": 0.001098100708190941,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.00020558245468534856,
+          "max_abs_relative_difference_at_n_fm3": 0.002511886432,
+          "median_signed_relative_difference": -7.001992679659111e-05,
+          "interpolation_control_max_relative": 1.1508990662414542e-06
+        },
+        "energy_per_baryon": {
+          "compared_rows": 148,
+          "density_fm3": [
+            0.002511886432,
+            0.07413102413
+          ],
+          "max_abs_difference": 0.00016258284369996545,
+          "max_abs_difference_at_n_fm3": 0.002511886432,
+          "signed_difference_range": [
+            -0.00016258284369996545,
+            -2.6798173507813772e-05
+          ],
+          "rms_abs_difference": 9.032524711346526e-05,
+          "relative_denominator_floor": 9.476323525104602e-10,
+          "relative_defined_rows": 148,
+          "interpolation_control_max_abs": 0.00023675513330090325,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 1.7298083957246375e-07,
+          "max_abs_relative_difference_at_n_fm3": 0.002511886432,
+          "median_signed_relative_difference": -8.014250019222321e-08,
+          "interpolation_control_max_relative": 2.514754024363237e-07
+        },
+        "y_e": {
+          "compared_rows": 148,
+          "density_fm3": [
+            0.002511886432,
+            0.07413102413
+          ],
+          "max_abs_difference": 0.0005905641611703774,
+          "max_abs_difference_at_n_fm3": 0.06025595861,
+          "signed_difference_range": [
+            -0.0005905641611703774,
+            -0.00021204851120439766
+          ],
+          "rms_abs_difference": 0.0003228512165681794,
+          "relative_denominator_floor": 6.086943950999999e-14,
+          "relative_defined_rows": 148,
+          "interpolation_control_max_abs": 1.7322063260605258e-05,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.021115013722844116,
+          "max_abs_relative_difference_at_n_fm3": 0.05495408739,
+          "median_signed_relative_difference": -0.008810634871294503,
+          "interpolation_control_max_relative": 0.0002845773412741789
+        },
+        "y_mu": {
+          "compared_rows": 148,
+          "density_fm3": [
+            0.002511886432,
+            0.07413102413
+          ],
+          "max_abs_difference": 0.0,
+          "max_abs_difference_at_n_fm3": 0.002511886432,
+          "signed_difference_range": [
+            0.0,
+            0.0
+          ],
+          "rms_abs_difference": 0.0,
+          "relative_denominator_floor": 2.2253e-320,
+          "relative_defined_rows": 0,
+          "interpolation_control_max_abs": 0.0,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION"
+        }
+      },
+      "first_law_diagnostic": {
+        "generated": {
+          "compared_rows": 145,
+          "density_fm3": [
+            0.002511886432,
+            0.06918309709
+          ],
+          "max_abs_difference": 2.9675967752051946e-06,
+          "max_abs_difference_at_n_fm3": 0.0660693448,
+          "signed_difference_range": [
+            -2.9675967752051946e-06,
+            1.8499985814934838e-06
+          ],
+          "rms_abs_difference": 4.5181066520445475e-07,
+          "relative_denominator_floor": 4.1947883767454413e-13,
+          "relative_defined_rows": 145,
+          "interpolation_control_max_abs": 1.2208973636351761e-05,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 7.759782248522395e-06,
+          "max_abs_relative_difference_at_n_fm3": 0.0660693448,
+          "median_signed_relative_difference": -1.248498572053826e-07,
+          "interpolation_control_max_relative": 0.000117293366157165
+        },
+        "reference": {
+          "compared_rows": 144,
+          "density_fm3": [
+            0.002630267992,
+            0.07079457844
+          ],
+          "max_abs_difference": 0.0012860073369955344,
+          "max_abs_difference_at_n_fm3": 0.03548133892,
+          "signed_difference_range": [
+            -0.0012860073369955344,
+            0.00024365722857239147
+          ],
+          "rms_abs_difference": 0.0008769810548086318,
+          "relative_denominator_floor": 4.3900268299028176e-13,
+          "relative_defined_rows": 144,
+          "interpolation_control_max_abs": 7.043774123416391e-06,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.1517948124183608,
+          "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+          "median_signed_relative_difference": -0.03790672750064857,
+          "interpolation_control_max_relative": 3.655683097777138e-05
+        },
+        "pressure_difference_after_reference_energy_derivative_diagnostic": {
+          "compared_rows": 144,
+          "density_fm3": [
+            0.002630267992,
+            0.07079457844
+          ],
+          "max_abs_difference": 7.125906177379848e-05,
+          "max_abs_difference_at_n_fm3": 0.07079457844,
+          "signed_difference_range": [
+            -8.796371342184583e-06,
+            7.125906177379848e-05
+          ],
+          "rms_abs_difference": 9.594631563695105e-06,
+          "relative_denominator_floor": 4.3900268299028176e-13,
+          "relative_defined_rows": 144,
+          "interpolation_control_max_abs": 7.043774123416391e-06,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.00016232033318888838,
+          "max_abs_relative_difference_at_n_fm3": 0.07079457844,
+          "median_signed_relative_difference": 2.0299139011209102e-05,
+          "interpolation_control_max_relative": 3.655683097777138e-05
+        },
+        "definition": "P_energy=n_B^2*d(epsilon/n_B)/dn_B; CubicSpline and PCHIP, separately within each phase",
+        "edge_policy": "omit first/last two knots of each full phase segment from derivative comparisons",
+        "residual_definition": "(P_generated-P_reference)-(P_reference_energy_derivative-P_reference) = P_generated-P_reference_energy_derivative",
+        "interpretation": "finite-grid diagnostic; interpolation-control spread is not a rigorous uncertainty bound; no source-kernel causal attribution"
+      },
+      "status": "UNRESOLVED_SOURCE_DIFFERENCE",
+      "model": "SPG_M1",
+      "retained_vs_current_reference": {
+        "generated": {
+          "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/eos_generator/eos_data/SPG_M1",
+          "rows": 365,
+          "density_fm3": [
+            4.67962e-10,
+            0.07413102413
+          ],
+          "axis_origins": {
+            "t": 0,
+            "nb": 1,
+            "yq": 1
+          },
+          "actual_scalar_row_labels": {
+            "t": 0,
+            "yq": 1
+          },
+          "temperature_MeV": 0.0,
+          "charge_fraction_axis": 0.0,
+          "mn_reference_MeV": 938.9,
+          "mp_reference_MeV": 938.9,
+          "Il": 1,
+          "max_abs_mu_l_MeV": 0.0,
+          "max_abs_enthalpy_minus_mu_b_MeV": 0.0013242294995734483,
+          "file_sha256": {
+            "eos.nb": "46e5fb4504d3e53a6d61f210c1627234e34f8ed993fd54921299203756b0818c",
+            "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+            "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+            "eos.thermo": "20ef365b0fc9ff66b3b268c7f319d2d8dca0b782bd44a32612d3c4a82c8641e5",
+            "eos.compo": "8ce704b9af8a3a7a74e6985d9edc5481a8dc7a8b03e50f7b4d39c3d292dfec27"
+          }
+        },
+        "reference": {
+          "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/matched_eos_reference_20261117/references/SPG_M1",
+          "rows": 365,
+          "density_fm3": [
+            4.67962e-10,
+            0.07413102413
+          ],
+          "axis_origins": {
+            "t": 0,
+            "nb": 1,
+            "yq": 1
+          },
+          "actual_scalar_row_labels": {
+            "t": 0,
+            "yq": 1
+          },
+          "temperature_MeV": 0.0,
+          "charge_fraction_axis": 0.0,
+          "mn_reference_MeV": 938.9,
+          "mp_reference_MeV": 938.9,
+          "Il": 1,
+          "max_abs_mu_l_MeV": 0.0,
+          "max_abs_enthalpy_minus_mu_b_MeV": 0.0013242294995734483,
+          "file_sha256": {
+            "eos.nb": "7a2cf219a6fd9149eb8549454e3b7874c195b196633f38aadd369753b979c498",
+            "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+            "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+            "eos.thermo": "4de6d31f719a40b1cdd8ef362e826b75010efff37d5824096d1c97a83953d5ce",
+            "eos.compo": "edc41a10c9bd9bd0d0a1488ef9c0d97485809474e37ebb575245ad9fcd1475e9"
+          }
+        },
+        "selected_generated_phases": [
+          7
+        ],
+        "selected_reference_phases": [
+          7
+        ],
+        "requested_density_fm3": [
+          0.002,
+          0.2
+        ],
+        "overlaps": [
+          {
+            "generated_phase": 7,
+            "reference_phase": 7,
+            "support_fm3": [
+              0.002511886432,
+              0.07413102413
+            ],
+            "reference_nodes": 148
+          }
+        ],
+        "interpolation": "generated PCHIP in n_B at exact reference nodes; linear control; no extrapolation",
+        "interpolation_control_is_error_bound": false,
+        "mu_b_definition": "mn_reference*(1+Q3); compared separately from (epsilon+P)/n_B",
+        "energy_convention": "epsilon includes rest energy, recovered using each file's mn header",
+        "composition": {
+          "compared": [
+            "y_e",
+            "y_mu"
+          ],
+          "missing_values": "unavailable; never filled with zero",
+          "nuclear_group_tuples": "excluded: public/native semantics not assumed identical"
+        },
+        "metrics": {
+          "pressure": {
+            "compared_rows": 148,
+            "density_fm3": [
+              0.002511886432,
+              0.07413102413
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002511886432,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 4.81250995766437e-13,
+            "relative_defined_rows": 148,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002511886432,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "epsilon": {
+            "compared_rows": 148,
+            "density_fm3": [
+              0.002511886432,
+              0.07413102413
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002511886432,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 7.024895679032158e-11,
+            "relative_defined_rows": 148,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002511886432,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "mu_b": {
+            "compared_rows": 148,
+            "density_fm3": [
+              0.002511886432,
+              0.07413102413
+            ],
+            "max_abs_difference": 1.1368683772161603e-13,
+            "max_abs_difference_at_n_fm3": 0.07413102413,
+            "signed_difference_range": [
+              0.0,
+              1.1368683772161603e-13
+            ],
+            "rms_abs_difference": 9.345000495691084e-15,
+            "relative_denominator_floor": 9.54124249810838e-10,
+            "relative_defined_rows": 148,
+            "interpolation_control_max_abs": 1.1368683772161603e-13,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 1.1915307439691974e-16,
+            "max_abs_relative_difference_at_n_fm3": 0.07413102413,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 1.1915307439691974e-16
+          },
+          "enthalpy_b": {
+            "compared_rows": 148,
+            "density_fm3": [
+              0.002511886432,
+              0.07413102413
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002511886432,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 9.5412424981546e-10,
+            "relative_defined_rows": 148,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002511886432,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "energy_per_baryon": {
+            "compared_rows": 148,
+            "density_fm3": [
+              0.002511886432,
+              0.07413102413
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002511886432,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 9.476323525104602e-10,
+            "relative_defined_rows": 148,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002511886432,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "y_e": {
+            "compared_rows": 148,
+            "density_fm3": [
+              0.002511886432,
+              0.07413102413
+            ],
+            "max_abs_difference": 4.853469999999832e-06,
+            "max_abs_difference_at_n_fm3": 0.01,
+            "signed_difference_range": [
+              -4.853469999999832e-06,
+              4.839860000001306e-06
+            ],
+            "rms_abs_difference": 2.7024492868341653e-06,
+            "relative_denominator_floor": 6.086943950999999e-14,
+            "relative_defined_rows": 148,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.00020845490496864435,
+            "max_abs_relative_difference_at_n_fm3": 0.03801893963,
+            "median_signed_relative_difference": 7.422508449289543e-06,
+            "interpolation_control_max_relative": 0.0
+          },
+          "y_mu": {
+            "compared_rows": 148,
+            "density_fm3": [
+              0.002511886432,
+              0.07413102413
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002511886432,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 2.2253e-320,
+            "relative_defined_rows": 0,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION"
+          }
+        },
+        "first_law_diagnostic": {
+          "generated": {
+            "compared_rows": 144,
+            "density_fm3": [
+              0.002630267992,
+              0.07079457844
+            ],
+            "max_abs_difference": 0.0012860073369955344,
+            "max_abs_difference_at_n_fm3": 0.03548133892,
+            "signed_difference_range": [
+              -0.0012860073369955344,
+              0.00024365722857239147
+            ],
+            "rms_abs_difference": 0.0008769810548086318,
+            "relative_denominator_floor": 4.3900268299028176e-13,
+            "relative_defined_rows": 144,
+            "interpolation_control_max_abs": 7.043774123416391e-06,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.1517948124183608,
+            "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+            "median_signed_relative_difference": -0.03790672750064857,
+            "interpolation_control_max_relative": 3.655683097777138e-05
+          },
+          "reference": {
+            "compared_rows": 144,
+            "density_fm3": [
+              0.002630267992,
+              0.07079457844
+            ],
+            "max_abs_difference": 0.0012860073369955344,
+            "max_abs_difference_at_n_fm3": 0.03548133892,
+            "signed_difference_range": [
+              -0.0012860073369955344,
+              0.00024365722857239147
+            ],
+            "rms_abs_difference": 0.0008769810548086318,
+            "relative_denominator_floor": 4.3900268299028176e-13,
+            "relative_defined_rows": 144,
+            "interpolation_control_max_abs": 7.043774123416391e-06,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.1517948124183608,
+            "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+            "median_signed_relative_difference": -0.03790672750064857,
+            "interpolation_control_max_relative": 3.655683097777138e-05
+          },
+          "pressure_difference_after_reference_energy_derivative_diagnostic": {
+            "compared_rows": 144,
+            "density_fm3": [
+              0.002630267992,
+              0.07079457844
+            ],
+            "max_abs_difference": 0.0012860073369955344,
+            "max_abs_difference_at_n_fm3": 0.03548133892,
+            "signed_difference_range": [
+              -0.00024365722857239147,
+              0.0012860073369955344
+            ],
+            "rms_abs_difference": 0.0008769810548086317,
+            "relative_denominator_floor": 4.3900268299028176e-13,
+            "relative_defined_rows": 144,
+            "interpolation_control_max_abs": 7.043774123416391e-06,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.1517948124183608,
+            "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+            "median_signed_relative_difference": 0.03790672750064857,
+            "interpolation_control_max_relative": 3.655683097777138e-05
+          },
+          "definition": "P_energy=n_B^2*d(epsilon/n_B)/dn_B; CubicSpline and PCHIP, separately within each phase",
+          "edge_policy": "omit first/last two knots of each full phase segment from derivative comparisons",
+          "residual_definition": "(P_generated-P_reference)-(P_reference_energy_derivative-P_reference) = P_generated-P_reference_energy_derivative",
+          "interpretation": "finite-grid diagnostic; interpolation-control spread is not a rigorous uncertainty bound; no source-kernel causal attribution"
+        },
+        "status": "UNRESOLVED_SOURCE_DIFFERENCE",
+        "meaning": "generated labels denote older retained reference in this subsection only",
+        "byte_identity": {
+          "eos.nb": false,
+          "eos.t": true,
+          "eos.yq": true,
+          "eos.thermo": false,
+          "eos.compo": false
+        }
+      }
+    },
+    "SPG_M2": {
+      "generated": {
+        "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/research_matching_20261117/spg/native_129_repaired/SPG_M2/generated",
+        "rows": 129,
+        "density_fm3": [
+          0.00024162193293382727,
+          0.0892191511392594
+        ],
+        "axis_origins": {
+          "t": 1,
+          "nb": 1,
+          "yq": 1
+        },
+        "actual_scalar_row_labels": {
+          "t": 1,
+          "yq": 1
+        },
+        "temperature_MeV": 0.0,
+        "charge_fraction_axis": 0.0,
+        "mn_reference_MeV": 938.9,
+        "mp_reference_MeV": 938.9,
+        "Il": 1,
+        "max_abs_mu_l_MeV": 0.0,
+        "max_abs_enthalpy_minus_mu_b_MeV": 3.410605131648481e-13,
+        "file_sha256": {
+          "eos.nb": "d735c4f802679b93848d1af6591c9aa109879720219466509519924251ca72ce",
+          "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+          "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+          "eos.thermo": "dec4ca369e2ee7a8d3a6789d17bf99794d92c0c172efaedc3201cfddada01c1c",
+          "eos.compo": "b2c53fae451186b80ac2e4fd97ae9c38f7ebd0073e4b78337376c671888b7792"
+        }
+      },
+      "reference": {
+        "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/matched_eos_reference_20261117/references/SPG_M2",
+        "rows": 377,
+        "density_fm3": [
+          4.67962e-10,
+          0.08912509381
+        ],
+        "axis_origins": {
+          "t": 0,
+          "nb": 1,
+          "yq": 1
+        },
+        "actual_scalar_row_labels": {
+          "t": 0,
+          "yq": 1
+        },
+        "temperature_MeV": 0.0,
+        "charge_fraction_axis": 0.0,
+        "mn_reference_MeV": 938.9,
+        "mp_reference_MeV": 938.9,
+        "Il": 1,
+        "max_abs_mu_l_MeV": 0.0,
+        "max_abs_enthalpy_minus_mu_b_MeV": 0.0013242294995734483,
+        "file_sha256": {
+          "eos.nb": "0a3c5f29cde919379f8eb417b69e7bc547b2253d52419652e1d5093a667a5061",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "1dd1ca70965160188eb48fa7bf406df5033975f6e7a578949f46387ff2e3d05c",
+          "eos.compo": "63a188ce1db6ab5f14286af5d216ba7b59be1ef7996e4df3ad139553a9dccc59"
+        }
+      },
+      "selected_generated_phases": [
+        1
+      ],
+      "selected_reference_phases": [
+        7
+      ],
+      "requested_density_fm3": [
+        0.002,
+        0.2
+      ],
+      "overlaps": [
+        {
+          "generated_phase": 1,
+          "reference_phase": 7,
+          "support_fm3": [
+            0.002290867653,
+            0.08912509381
+          ],
+          "reference_nodes": 160
+        }
+      ],
+      "interpolation": "generated PCHIP in n_B at exact reference nodes; linear control; no extrapolation",
+      "interpolation_control_is_error_bound": false,
+      "mu_b_definition": "mn_reference*(1+Q3); compared separately from (epsilon+P)/n_B",
+      "energy_convention": "epsilon includes rest energy, recovered using each file's mn header",
+      "composition": {
+        "compared": [
+          "y_e",
+          "y_mu"
+        ],
+        "missing_values": "unavailable; never filled with zero",
+        "nuclear_group_tuples": "excluded: public/native semantics not assumed identical"
+      },
+      "metrics": {
+        "pressure": {
+          "compared_rows": 160,
+          "density_fm3": [
+            0.002290867653,
+            0.08912509381
+          ],
+          "max_abs_difference": 0.0016757430634916082,
+          "max_abs_difference_at_n_fm3": 0.03548133892,
+          "signed_difference_range": [
+            -0.0016757430634916082,
+            3.3554453234996284e-05
+          ],
+          "rms_abs_difference": 0.0011267547565034929,
+          "relative_denominator_floor": 4.4504588277182245e-13,
+          "relative_defined_rows": 160,
+          "interpolation_control_max_abs": 8.491928204945598e-05,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.18660016907655722,
+          "max_abs_relative_difference_at_n_fm3": 0.002290867653,
+          "median_signed_relative_difference": -0.04252018760325375,
+          "interpolation_control_max_relative": 0.00025307500973505425
+        },
+        "epsilon": {
+          "compared_rows": 160,
+          "density_fm3": [
+            0.002290867653,
+            0.08912509381
+          ],
+          "max_abs_difference": 1.8125037783534026e-05,
+          "max_abs_difference_at_n_fm3": 0.0645654229,
+          "signed_difference_range": [
+            -1.8125037783534026e-05,
+            4.119108737654642e-06
+          ],
+          "rms_abs_difference": 6.762642976320889e-06,
+          "relative_denominator_floor": 8.451731290664015e-11,
+          "relative_defined_rows": 160,
+          "interpolation_control_max_abs": 0.00016979813064210703,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 3.1173094444322326e-07,
+          "max_abs_relative_difference_at_n_fm3": 0.05754399373,
+          "median_signed_relative_difference": -1.3758556818321253e-07,
+          "interpolation_control_max_relative": 2.0560781720944947e-06
+        },
+        "mu_b": {
+          "compared_rows": 160,
+          "density_fm3": [
+            0.002290867653,
+            0.08912509381
+          ],
+          "max_abs_difference": 0.24318369611978596,
+          "max_abs_difference_at_n_fm3": 0.002290867653,
+          "signed_difference_range": [
+            -0.24318369611978596,
+            0.0004381525252483698
+          ],
+          "rms_abs_difference": 0.11515546918129824,
+          "relative_denominator_floor": 9.53293344858593e-10,
+          "relative_defined_rows": 160,
+          "interpolation_control_max_abs": 0.0019224146625447247,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.0002584011031722568,
+          "max_abs_relative_difference_at_n_fm3": 0.002290867653,
+          "median_signed_relative_difference": -9.019462285863531e-05,
+          "interpolation_control_max_relative": 2.01694990931299e-06
+        },
+        "enthalpy_b": {
+          "compared_rows": 160,
+          "density_fm3": [
+            0.002290867653,
+            0.08912509381
+          ],
+          "max_abs_difference": 0.24318369551872365,
+          "max_abs_difference_at_n_fm3": 0.002290867653,
+          "signed_difference_range": [
+            -0.24318369551872365,
+            0.0004381475750960817
+          ],
+          "rms_abs_difference": 0.11515546913370499,
+          "relative_denominator_floor": 9.532933448635432e-10,
+          "relative_defined_rows": 160,
+          "interpolation_control_max_abs": 0.0019224146625447247,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.00025840110253374756,
+          "max_abs_relative_difference_at_n_fm3": 0.002290867653,
+          "median_signed_relative_difference": -9.019462245704797e-05,
+          "interpolation_control_max_relative": 2.0169499093109604e-06
+        },
+        "energy_per_baryon": {
+          "compared_rows": 160,
+          "density_fm3": [
+            0.002290867653,
+            0.08912509381
+          ],
+          "max_abs_difference": 0.0002949759177681699,
+          "max_abs_difference_at_n_fm3": 0.05754399373,
+          "signed_difference_range": [
+            -0.0002949759177681699,
+            5.182426946248597e-05
+          ],
+          "rms_abs_difference": 0.00016186507183201345,
+          "relative_denominator_floor": 9.482998479285432e-10,
+          "relative_defined_rows": 160,
+          "interpolation_control_max_abs": 0.0007047084573059692,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 3.1170707946048747e-07,
+          "max_abs_relative_difference_at_n_fm3": 0.05754399373,
+          "median_signed_relative_difference": -1.3664067499035123e-07,
+          "interpolation_control_max_relative": 7.432179694412803e-07
+        },
+        "y_e": {
+          "compared_rows": 160,
+          "density_fm3": [
+            0.002290867653,
+            0.08912509381
+          ],
+          "max_abs_difference": 0.0008488279504218557,
+          "max_abs_difference_at_n_fm3": 0.05888436554,
+          "signed_difference_range": [
+            -0.0008488279504218557,
+            -0.0002621493415584583
+          ],
+          "rms_abs_difference": 0.0004947204937822282,
+          "relative_denominator_floor": 6.749484101e-14,
+          "relative_defined_rows": 160,
+          "interpolation_control_max_abs": 1.5902178509441534e-05,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.024999113706288854,
+          "max_abs_relative_difference_at_n_fm3": 0.05370317964,
+          "median_signed_relative_difference": -0.011281061652288838,
+          "interpolation_control_max_relative": 0.00023560583700146022
+        },
+        "y_mu": {
+          "compared_rows": 160,
+          "density_fm3": [
+            0.002290867653,
+            0.08912509381
+          ],
+          "max_abs_difference": 0.0,
+          "max_abs_difference_at_n_fm3": 0.002290867653,
+          "signed_difference_range": [
+            0.0,
+            0.0
+          ],
+          "rms_abs_difference": 0.0,
+          "relative_denominator_floor": 2.2253e-320,
+          "relative_defined_rows": 0,
+          "interpolation_control_max_abs": 0.0,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION"
+        }
+      },
+      "first_law_diagnostic": {
+        "generated": {
+          "compared_rows": 156,
+          "density_fm3": [
+            0.002290867653,
+            0.08128305162
+          ],
+          "max_abs_difference": 1.1751481835964306e-05,
+          "max_abs_difference_at_n_fm3": 0.08128305162,
+          "signed_difference_range": [
+            -5.516437740993307e-06,
+            1.1751481835964306e-05
+          ],
+          "rms_abs_difference": 1.0628008344196202e-06,
+          "relative_denominator_floor": 3.8882977633221334e-13,
+          "relative_defined_rows": 156,
+          "interpolation_control_max_abs": 2.4654767185161575e-05,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 3.02226901108621e-05,
+          "max_abs_relative_difference_at_n_fm3": 0.08128305162,
+          "median_signed_relative_difference": 1.6843765959174582e-07,
+          "interpolation_control_max_relative": 0.00010958678026001005
+        },
+        "reference": {
+          "compared_rows": 156,
+          "density_fm3": [
+            0.002398832919,
+            0.08511380382
+          ],
+          "max_abs_difference": 0.0016673086641562779,
+          "max_abs_difference_at_n_fm3": 0.03467368505,
+          "signed_difference_range": [
+            -0.0016673086641562779,
+            -0.0001189233526430189
+          ],
+          "rms_abs_difference": 0.0011384927682696186,
+          "relative_denominator_floor": 4.162810311779116e-13,
+          "relative_defined_rows": 156,
+          "interpolation_control_max_abs": 2.182507849290971e-05,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.18114250524189685,
+          "max_abs_relative_difference_at_n_fm3": 0.002398832919,
+          "median_signed_relative_difference": -0.042518745284912104,
+          "interpolation_control_max_relative": 5.242871247616862e-05
+        },
+        "pressure_difference_after_reference_energy_derivative_diagnostic": {
+          "compared_rows": 156,
+          "density_fm3": [
+            0.002398832919,
+            0.08511380382
+          ],
+          "max_abs_difference": 0.0001585642825649991,
+          "max_abs_difference_at_n_fm3": 0.08317637711,
+          "signed_difference_range": [
+            -1.2953582842617495e-05,
+            0.0001585642825649991
+          ],
+          "rms_abs_difference": 2.508759937716286e-05,
+          "relative_denominator_floor": 4.162810311779116e-13,
+          "relative_defined_rows": 156,
+          "interpolation_control_max_abs": 2.182507849290971e-05,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.00039406956017470267,
+          "max_abs_relative_difference_at_n_fm3": 0.08317637711,
+          "median_signed_relative_difference": 1.8104147613308765e-05,
+          "interpolation_control_max_relative": 5.242871247616862e-05
+        },
+        "definition": "P_energy=n_B^2*d(epsilon/n_B)/dn_B; CubicSpline and PCHIP, separately within each phase",
+        "edge_policy": "omit first/last two knots of each full phase segment from derivative comparisons",
+        "residual_definition": "(P_generated-P_reference)-(P_reference_energy_derivative-P_reference) = P_generated-P_reference_energy_derivative",
+        "interpretation": "finite-grid diagnostic; interpolation-control spread is not a rigorous uncertainty bound; no source-kernel causal attribution"
+      },
+      "status": "UNRESOLVED_SOURCE_DIFFERENCE",
+      "model": "SPG_M2",
+      "retained_vs_current_reference": {
+        "generated": {
+          "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/eos_generator/eos_data/SPG_M2",
+          "rows": 377,
+          "density_fm3": [
+            4.67962e-10,
+            0.08912509381
+          ],
+          "axis_origins": {
+            "t": 0,
+            "nb": 1,
+            "yq": 1
+          },
+          "actual_scalar_row_labels": {
+            "t": 0,
+            "yq": 1
+          },
+          "temperature_MeV": 0.0,
+          "charge_fraction_axis": 0.0,
+          "mn_reference_MeV": 938.9,
+          "mp_reference_MeV": 938.9,
+          "Il": 1,
+          "max_abs_mu_l_MeV": 0.0,
+          "max_abs_enthalpy_minus_mu_b_MeV": 0.0013242294995734483,
+          "file_sha256": {
+            "eos.nb": "41351b355baac019927a66ca745ba2d4c90dbb6720c8aaed34a94cc9ab2307aa",
+            "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+            "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+            "eos.thermo": "0a90ad4fca400d66c8b86842adf45bb214ee335e34922ff47bdf5bafb8041221",
+            "eos.compo": "b3e1d5aae1d7103817586b710ac8837e582d03f9d2a445acf994c3ba81e79a5f"
+          }
+        },
+        "reference": {
+          "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/matched_eos_reference_20261117/references/SPG_M2",
+          "rows": 377,
+          "density_fm3": [
+            4.67962e-10,
+            0.08912509381
+          ],
+          "axis_origins": {
+            "t": 0,
+            "nb": 1,
+            "yq": 1
+          },
+          "actual_scalar_row_labels": {
+            "t": 0,
+            "yq": 1
+          },
+          "temperature_MeV": 0.0,
+          "charge_fraction_axis": 0.0,
+          "mn_reference_MeV": 938.9,
+          "mp_reference_MeV": 938.9,
+          "Il": 1,
+          "max_abs_mu_l_MeV": 0.0,
+          "max_abs_enthalpy_minus_mu_b_MeV": 0.0013242294995734483,
+          "file_sha256": {
+            "eos.nb": "0a3c5f29cde919379f8eb417b69e7bc547b2253d52419652e1d5093a667a5061",
+            "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+            "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+            "eos.thermo": "1dd1ca70965160188eb48fa7bf406df5033975f6e7a578949f46387ff2e3d05c",
+            "eos.compo": "63a188ce1db6ab5f14286af5d216ba7b59be1ef7996e4df3ad139553a9dccc59"
+          }
+        },
+        "selected_generated_phases": [
+          7
+        ],
+        "selected_reference_phases": [
+          7
+        ],
+        "requested_density_fm3": [
+          0.002,
+          0.2
+        ],
+        "overlaps": [
+          {
+            "generated_phase": 7,
+            "reference_phase": 7,
+            "support_fm3": [
+              0.002290867653,
+              0.08912509381
+            ],
+            "reference_nodes": 160
+          }
+        ],
+        "interpolation": "generated PCHIP in n_B at exact reference nodes; linear control; no extrapolation",
+        "interpolation_control_is_error_bound": false,
+        "mu_b_definition": "mn_reference*(1+Q3); compared separately from (epsilon+P)/n_B",
+        "energy_convention": "epsilon includes rest energy, recovered using each file's mn header",
+        "composition": {
+          "compared": [
+            "y_e",
+            "y_mu"
+          ],
+          "missing_values": "unavailable; never filled with zero",
+          "nuclear_group_tuples": "excluded: public/native semantics not assumed identical"
+        },
+        "metrics": {
+          "pressure": {
+            "compared_rows": 160,
+            "density_fm3": [
+              0.002290867653,
+              0.08912509381
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002290867653,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 4.4504588277182245e-13,
+            "relative_defined_rows": 160,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002290867653,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "epsilon": {
+            "compared_rows": 160,
+            "density_fm3": [
+              0.002290867653,
+              0.08912509381
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002290867653,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 8.451731290664015e-11,
+            "relative_defined_rows": 160,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002290867653,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "mu_b": {
+            "compared_rows": 160,
+            "density_fm3": [
+              0.002290867653,
+              0.08912509381
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002290867653,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 9.53293344858593e-10,
+            "relative_defined_rows": 160,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002290867653,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "enthalpy_b": {
+            "compared_rows": 160,
+            "density_fm3": [
+              0.002290867653,
+              0.08912509381
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002290867653,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 9.532933448635432e-10,
+            "relative_defined_rows": 160,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002290867653,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "energy_per_baryon": {
+            "compared_rows": 160,
+            "density_fm3": [
+              0.002290867653,
+              0.08912509381
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002290867653,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 9.482998479285432e-10,
+            "relative_defined_rows": 160,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002290867653,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "y_e": {
+            "compared_rows": 160,
+            "density_fm3": [
+              0.002290867653,
+              0.08912509381
+            ],
+            "max_abs_difference": 4.992420000002329e-06,
+            "max_abs_difference_at_n_fm3": 0.008511380382,
+            "signed_difference_range": [
+              -4.960960000001402e-06,
+              4.992420000002329e-06
+            ],
+            "rms_abs_difference": 2.8555885438249117e-06,
+            "relative_denominator_floor": 6.749484101e-14,
+            "relative_defined_rows": 160,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.00016445090933568275,
+            "max_abs_relative_difference_at_n_fm3": 0.02884031503,
+            "median_signed_relative_difference": 2.4089401386293146e-05,
+            "interpolation_control_max_relative": 0.0
+          },
+          "y_mu": {
+            "compared_rows": 160,
+            "density_fm3": [
+              0.002290867653,
+              0.08912509381
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002290867653,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 2.2253e-320,
+            "relative_defined_rows": 0,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION"
+          }
+        },
+        "first_law_diagnostic": {
+          "generated": {
+            "compared_rows": 156,
+            "density_fm3": [
+              0.002398832919,
+              0.08511380382
+            ],
+            "max_abs_difference": 0.0016673086641562779,
+            "max_abs_difference_at_n_fm3": 0.03467368505,
+            "signed_difference_range": [
+              -0.0016673086641562779,
+              -0.0001189233526430189
+            ],
+            "rms_abs_difference": 0.0011384927682696186,
+            "relative_denominator_floor": 4.162810311779116e-13,
+            "relative_defined_rows": 156,
+            "interpolation_control_max_abs": 2.182507849290971e-05,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.18114250524189685,
+            "max_abs_relative_difference_at_n_fm3": 0.002398832919,
+            "median_signed_relative_difference": -0.042518745284912104,
+            "interpolation_control_max_relative": 5.242871247616862e-05
+          },
+          "reference": {
+            "compared_rows": 156,
+            "density_fm3": [
+              0.002398832919,
+              0.08511380382
+            ],
+            "max_abs_difference": 0.0016673086641562779,
+            "max_abs_difference_at_n_fm3": 0.03467368505,
+            "signed_difference_range": [
+              -0.0016673086641562779,
+              -0.0001189233526430189
+            ],
+            "rms_abs_difference": 0.0011384927682696186,
+            "relative_denominator_floor": 4.162810311779116e-13,
+            "relative_defined_rows": 156,
+            "interpolation_control_max_abs": 2.182507849290971e-05,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.18114250524189685,
+            "max_abs_relative_difference_at_n_fm3": 0.002398832919,
+            "median_signed_relative_difference": -0.042518745284912104,
+            "interpolation_control_max_relative": 5.242871247616862e-05
+          },
+          "pressure_difference_after_reference_energy_derivative_diagnostic": {
+            "compared_rows": 156,
+            "density_fm3": [
+              0.002398832919,
+              0.08511380382
+            ],
+            "max_abs_difference": 0.0016673086641562779,
+            "max_abs_difference_at_n_fm3": 0.03467368505,
+            "signed_difference_range": [
+              0.0001189233526430189,
+              0.0016673086641562779
+            ],
+            "rms_abs_difference": 0.0011384927682696181,
+            "relative_denominator_floor": 4.162810311779116e-13,
+            "relative_defined_rows": 156,
+            "interpolation_control_max_abs": 2.182507849290971e-05,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.18114250524189685,
+            "max_abs_relative_difference_at_n_fm3": 0.002398832919,
+            "median_signed_relative_difference": 0.042518745284912104,
+            "interpolation_control_max_relative": 5.242871247616862e-05
+          },
+          "definition": "P_energy=n_B^2*d(epsilon/n_B)/dn_B; CubicSpline and PCHIP, separately within each phase",
+          "edge_policy": "omit first/last two knots of each full phase segment from derivative comparisons",
+          "residual_definition": "(P_generated-P_reference)-(P_reference_energy_derivative-P_reference) = P_generated-P_reference_energy_derivative",
+          "interpretation": "finite-grid diagnostic; interpolation-control spread is not a rigorous uncertainty bound; no source-kernel causal attribution"
+        },
+        "status": "UNRESOLVED_SOURCE_DIFFERENCE",
+        "meaning": "generated labels denote older retained reference in this subsection only",
+        "byte_identity": {
+          "eos.nb": false,
+          "eos.t": true,
+          "eos.yq": true,
+          "eos.thermo": false,
+          "eos.compo": false
+        }
+      }
+    },
+    "SPG_M3": {
+      "generated": {
+        "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/research_matching_20261117/spg/native_129_repaired/SPG_M3/generated",
+        "rows": 129,
+        "density_fm3": [
+          0.00023554102994837015,
+          0.08115016114711766
+        ],
+        "axis_origins": {
+          "t": 1,
+          "nb": 1,
+          "yq": 1
+        },
+        "actual_scalar_row_labels": {
+          "t": 1,
+          "yq": 1
+        },
+        "temperature_MeV": 0.0,
+        "charge_fraction_axis": 0.0,
+        "mn_reference_MeV": 938.9,
+        "mp_reference_MeV": 938.9,
+        "Il": 1,
+        "max_abs_mu_l_MeV": 0.0,
+        "max_abs_enthalpy_minus_mu_b_MeV": 3.410605131648481e-13,
+        "file_sha256": {
+          "eos.nb": "b553cc2d08926ca4b1ef4949b209644111324711a5095b6fac16dfda5180223e",
+          "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+          "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+          "eos.thermo": "95425a9db6df4866cc171377ba331c03d851cbfd9ef33a62ec60a87ce5356761",
+          "eos.compo": "b390a3207de5f5a686991354b7754ff03bfda6d887a83b9df35eee3a47d0f411"
+        }
+      },
+      "reference": {
+        "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/matched_eos_reference_20261117/references/SPG_M3",
+        "rows": 366,
+        "density_fm3": [
+          4.67962e-10,
+          0.07943282347
+        ],
+        "axis_origins": {
+          "t": 0,
+          "nb": 1,
+          "yq": 1
+        },
+        "actual_scalar_row_labels": {
+          "t": 0,
+          "yq": 1
+        },
+        "temperature_MeV": 0.0,
+        "charge_fraction_axis": 0.0,
+        "mn_reference_MeV": 938.9,
+        "mp_reference_MeV": 938.9,
+        "Il": 1,
+        "max_abs_mu_l_MeV": 0.0,
+        "max_abs_enthalpy_minus_mu_b_MeV": 0.0013242294995734483,
+        "file_sha256": {
+          "eos.nb": "e43df5e7c4c005197702136b7db326aeae5d6e08b87d43cc69e0a12cb9794e0e",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "73bb8cc1d82ae4934c4fc6f9261ba43801301acf11f2a309c35d0704ae89b062",
+          "eos.compo": "9fb524782c886ab18474ecf4808a8ca3f26d8543676c8abe0eac8dbd6cfc26cd"
+        }
+      },
+      "selected_generated_phases": [
+        1
+      ],
+      "selected_reference_phases": [
+        7
+      ],
+      "requested_density_fm3": [
+        0.002,
+        0.2
+      ],
+      "overlaps": [
+        {
+          "generated_phase": 1,
+          "reference_phase": 7,
+          "support_fm3": [
+            0.002630267992,
+            0.07943282347
+          ],
+          "reference_nodes": 149
+        }
+      ],
+      "interpolation": "generated PCHIP in n_B at exact reference nodes; linear control; no extrapolation",
+      "interpolation_control_is_error_bound": false,
+      "mu_b_definition": "mn_reference*(1+Q3); compared separately from (epsilon+P)/n_B",
+      "energy_convention": "epsilon includes rest energy, recovered using each file's mn header",
+      "composition": {
+        "compared": [
+          "y_e",
+          "y_mu"
+        ],
+        "missing_values": "unavailable; never filled with zero",
+        "nuclear_group_tuples": "excluded: public/native semantics not assumed identical"
+      },
+      "metrics": {
+        "pressure": {
+          "compared_rows": 149,
+          "density_fm3": [
+            0.002630267992,
+            0.07943282347
+          ],
+          "max_abs_difference": 0.0013619705480598376,
+          "max_abs_difference_at_n_fm3": 0.03801893963,
+          "signed_difference_range": [
+            -0.0013619705480598376,
+            0.0004308006166118261
+          ],
+          "rms_abs_difference": 0.0009036938302585379,
+          "relative_denominator_floor": 5.427720384206785e-13,
+          "relative_defined_rows": 149,
+          "interpolation_control_max_abs": 0.0002157396327976957,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.15372682170564697,
+          "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+          "median_signed_relative_difference": -0.03597053229920197,
+          "interpolation_control_max_relative": 0.0005096833496045618
+        },
+        "epsilon": {
+          "compared_rows": 149,
+          "density_fm3": [
+            0.002630267992,
+            0.07943282347
+          ],
+          "max_abs_difference": 8.594985445142811e-06,
+          "max_abs_difference_at_n_fm3": 0.0645654229,
+          "signed_difference_range": [
+            -8.594985445142811e-06,
+            -3.500284435631329e-07
+          ],
+          "rms_abs_difference": 2.9101874462041346e-06,
+          "relative_denominator_floor": 7.530964535501343e-11,
+          "relative_defined_rows": 149,
+          "interpolation_control_max_abs": 0.0002713244074641352,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 1.7174361220147804e-07,
+          "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+          "median_signed_relative_difference": -7.81683068209992e-08,
+          "interpolation_control_max_relative": 3.6027842938988546e-06
+        },
+        "mu_b": {
+          "compared_rows": 149,
+          "density_fm3": [
+            0.002630267992,
+            0.07943282347
+          ],
+          "max_abs_difference": 0.18848347147195454,
+          "max_abs_difference_at_n_fm3": 0.002630267992,
+          "signed_difference_range": [
+            -0.18848347147195454,
+            0.005534133002811359
+          ],
+          "rms_abs_difference": 0.0891337152081298,
+          "relative_denominator_floor": 9.54925358058019e-10,
+          "relative_defined_rows": 149,
+          "interpolation_control_max_abs": 0.0016000502055248944,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.00020027042038228858,
+          "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+          "median_signed_relative_difference": -6.837414571880363e-05,
+          "interpolation_control_max_relative": 1.675576202917924e-06
+        },
+        "enthalpy_b": {
+          "compared_rows": 149,
+          "density_fm3": [
+            0.002630267992,
+            0.07943282347
+          ],
+          "max_abs_difference": 0.18848347127664056,
+          "max_abs_difference_at_n_fm3": 0.002630267992,
+          "signed_difference_range": [
+            -0.18848347127664056,
+            0.005534128905765101
+          ],
+          "rms_abs_difference": 0.08913371519021764,
+          "relative_denominator_floor": 9.549253580553118e-10,
+          "relative_defined_rows": 149,
+          "interpolation_control_max_abs": 0.0016000502056385812,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.00020027042017480207,
+          "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+          "median_signed_relative_difference": -6.837414547251367e-05,
+          "interpolation_control_max_relative": 1.6755762030417275e-06
+        },
+        "energy_per_baryon": {
+          "compared_rows": 149,
+          "density_fm3": [
+            0.002630267992,
+            0.07943282347
+          ],
+          "max_abs_difference": 0.00016068380932665605,
+          "max_abs_difference_at_n_fm3": 0.002630267992,
+          "signed_difference_range": [
+            -0.00016068380932665605,
+            -1.830896985666186e-05
+          ],
+          "rms_abs_difference": 8.882501774706362e-05,
+          "relative_denominator_floor": 9.480922629353115e-10,
+          "relative_defined_rows": 149,
+          "interpolation_control_max_abs": 0.00023044909335112607,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 1.7095481113691304e-07,
+          "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+          "median_signed_relative_difference": -7.750991498846528e-08,
+          "interpolation_control_max_relative": 2.44944822782074e-07
+        },
+        "y_e": {
+          "compared_rows": 149,
+          "density_fm3": [
+            0.002630267992,
+            0.07943282347
+          ],
+          "max_abs_difference": 0.0006040254334181601,
+          "max_abs_difference_at_n_fm3": 0.06309573445,
+          "signed_difference_range": [
+            -0.0006040254334181601,
+            -0.00019756093169353423
+          ],
+          "rms_abs_difference": 0.00032200521813002364,
+          "relative_denominator_floor": 5.904796659e-14,
+          "relative_defined_rows": 149,
+          "interpolation_control_max_abs": 1.56422597154815e-05,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.02097382959209703,
+          "max_abs_relative_difference_at_n_fm3": 0.05754399373,
+          "median_signed_relative_difference": -0.008591230330582218,
+          "interpolation_control_max_relative": 0.00026964949679935757
+        },
+        "y_mu": {
+          "compared_rows": 149,
+          "density_fm3": [
+            0.002630267992,
+            0.07943282347
+          ],
+          "max_abs_difference": 0.0,
+          "max_abs_difference_at_n_fm3": 0.002630267992,
+          "signed_difference_range": [
+            0.0,
+            0.0
+          ],
+          "rms_abs_difference": 0.0,
+          "relative_denominator_floor": 2.2253e-320,
+          "relative_defined_rows": 0,
+          "interpolation_control_max_abs": 0.0,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION"
+        }
+      },
+      "first_law_diagnostic": {
+        "generated": {
+          "compared_rows": 145,
+          "density_fm3": [
+            0.002630267992,
+            0.07244359601
+          ],
+          "max_abs_difference": 5.554849600741818e-06,
+          "max_abs_difference_at_n_fm3": 0.07244359601,
+          "signed_difference_range": [
+            -5.554849600741818e-06,
+            7.420010793568466e-07
+          ],
+          "rms_abs_difference": 5.215325554006756e-07,
+          "relative_denominator_floor": 4.5399761263851693e-13,
+          "relative_defined_rows": 145,
+          "interpolation_control_max_abs": 1.3525273391656878e-05,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 1.2235415883485523e-05,
+          "max_abs_relative_difference_at_n_fm3": 0.07244359601,
+          "median_signed_relative_difference": -1.7654761371105486e-07,
+          "interpolation_control_max_relative": 3.917201728059849e-05
+        },
+        "reference": {
+          "compared_rows": 145,
+          "density_fm3": [
+            0.002754228703,
+            0.0758577575
+          ],
+          "max_abs_difference": 0.00135802571373142,
+          "max_abs_difference_at_n_fm3": 0.03715352291,
+          "signed_difference_range": [
+            -0.00135802571373142,
+            0.0003055031231755101
+          ],
+          "rms_abs_difference": 0.0009113510295408704,
+          "relative_denominator_floor": 4.963866569659304e-13,
+          "relative_defined_rows": 145,
+          "interpolation_control_max_abs": 1.2620596846812937e-05,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.1489433130464859,
+          "max_abs_relative_difference_at_n_fm3": 0.002754228703,
+          "median_signed_relative_difference": -0.03598408714768393,
+          "interpolation_control_max_relative": 3.149497799507881e-05
+        },
+        "pressure_difference_after_reference_energy_derivative_diagnostic": {
+          "compared_rows": 145,
+          "density_fm3": [
+            0.002754228703,
+            0.0758577575
+          ],
+          "max_abs_difference": 0.00010640963896824118,
+          "max_abs_difference_at_n_fm3": 0.0758577575,
+          "signed_difference_range": [
+            -9.178722248648352e-06,
+            0.00010640963896824118
+          ],
+          "rms_abs_difference": 1.2785259583455016e-05,
+          "relative_denominator_floor": 4.963866569659304e-13,
+          "relative_defined_rows": 145,
+          "interpolation_control_max_abs": 1.2620596846812937e-05,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.00021436845143793748,
+          "max_abs_relative_difference_at_n_fm3": 0.0758577575,
+          "median_signed_relative_difference": 1.981051009339566e-05,
+          "interpolation_control_max_relative": 3.149497799507881e-05
+        },
+        "definition": "P_energy=n_B^2*d(epsilon/n_B)/dn_B; CubicSpline and PCHIP, separately within each phase",
+        "edge_policy": "omit first/last two knots of each full phase segment from derivative comparisons",
+        "residual_definition": "(P_generated-P_reference)-(P_reference_energy_derivative-P_reference) = P_generated-P_reference_energy_derivative",
+        "interpretation": "finite-grid diagnostic; interpolation-control spread is not a rigorous uncertainty bound; no source-kernel causal attribution"
+      },
+      "status": "UNRESOLVED_SOURCE_DIFFERENCE",
+      "model": "SPG_M3",
+      "retained_vs_current_reference": {
+        "generated": {
+          "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/eos_generator/eos_data/SPG_M3",
+          "rows": 366,
+          "density_fm3": [
+            4.67962e-10,
+            0.07943282347
+          ],
+          "axis_origins": {
+            "t": 0,
+            "nb": 1,
+            "yq": 1
+          },
+          "actual_scalar_row_labels": {
+            "t": 0,
+            "yq": 1
+          },
+          "temperature_MeV": 0.0,
+          "charge_fraction_axis": 0.0,
+          "mn_reference_MeV": 938.9,
+          "mp_reference_MeV": 938.9,
+          "Il": 1,
+          "max_abs_mu_l_MeV": 0.0,
+          "max_abs_enthalpy_minus_mu_b_MeV": 0.0013242294995734483,
+          "file_sha256": {
+            "eos.nb": "d3eb5d66c2127f9a0a0879d27264187a847546bc8d60fc8ab69ee7bfe2e8924a",
+            "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+            "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+            "eos.thermo": "a73d22c35513224673b233a9e0349305868420a9d30f05efbd6d3e0daa81276e",
+            "eos.compo": "809a5540b1cc2a3a2c1623190258dbde73a491248ae37601f09b6a8ad7c02111"
+          }
+        },
+        "reference": {
+          "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/matched_eos_reference_20261117/references/SPG_M3",
+          "rows": 366,
+          "density_fm3": [
+            4.67962e-10,
+            0.07943282347
+          ],
+          "axis_origins": {
+            "t": 0,
+            "nb": 1,
+            "yq": 1
+          },
+          "actual_scalar_row_labels": {
+            "t": 0,
+            "yq": 1
+          },
+          "temperature_MeV": 0.0,
+          "charge_fraction_axis": 0.0,
+          "mn_reference_MeV": 938.9,
+          "mp_reference_MeV": 938.9,
+          "Il": 1,
+          "max_abs_mu_l_MeV": 0.0,
+          "max_abs_enthalpy_minus_mu_b_MeV": 0.0013242294995734483,
+          "file_sha256": {
+            "eos.nb": "e43df5e7c4c005197702136b7db326aeae5d6e08b87d43cc69e0a12cb9794e0e",
+            "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+            "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+            "eos.thermo": "73bb8cc1d82ae4934c4fc6f9261ba43801301acf11f2a309c35d0704ae89b062",
+            "eos.compo": "9fb524782c886ab18474ecf4808a8ca3f26d8543676c8abe0eac8dbd6cfc26cd"
+          }
+        },
+        "selected_generated_phases": [
+          7
+        ],
+        "selected_reference_phases": [
+          7
+        ],
+        "requested_density_fm3": [
+          0.002,
+          0.2
+        ],
+        "overlaps": [
+          {
+            "generated_phase": 7,
+            "reference_phase": 7,
+            "support_fm3": [
+              0.002630267992,
+              0.07943282347
+            ],
+            "reference_nodes": 149
+          }
+        ],
+        "interpolation": "generated PCHIP in n_B at exact reference nodes; linear control; no extrapolation",
+        "interpolation_control_is_error_bound": false,
+        "mu_b_definition": "mn_reference*(1+Q3); compared separately from (epsilon+P)/n_B",
+        "energy_convention": "epsilon includes rest energy, recovered using each file's mn header",
+        "composition": {
+          "compared": [
+            "y_e",
+            "y_mu"
+          ],
+          "missing_values": "unavailable; never filled with zero",
+          "nuclear_group_tuples": "excluded: public/native semantics not assumed identical"
+        },
+        "metrics": {
+          "pressure": {
+            "compared_rows": 149,
+            "density_fm3": [
+              0.002630267992,
+              0.07943282347
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002630267992,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 5.427720384206785e-13,
+            "relative_defined_rows": 149,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "epsilon": {
+            "compared_rows": 149,
+            "density_fm3": [
+              0.002630267992,
+              0.07943282347
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002630267992,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 7.530964535501343e-11,
+            "relative_defined_rows": 149,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "mu_b": {
+            "compared_rows": 149,
+            "density_fm3": [
+              0.002630267992,
+              0.07943282347
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002630267992,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 9.54925358058019e-10,
+            "relative_defined_rows": 149,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "enthalpy_b": {
+            "compared_rows": 149,
+            "density_fm3": [
+              0.002630267992,
+              0.07943282347
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002630267992,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 9.549253580553118e-10,
+            "relative_defined_rows": 149,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "energy_per_baryon": {
+            "compared_rows": 149,
+            "density_fm3": [
+              0.002630267992,
+              0.07943282347
+            ],
+            "max_abs_difference": 1.1368683772161603e-13,
+            "max_abs_difference_at_n_fm3": 0.07943282347,
+            "signed_difference_range": [
+              -1.1368683772161603e-13,
+              0.0
+            ],
+            "rms_abs_difference": 9.313588640441599e-15,
+            "relative_denominator_floor": 9.480922629353115e-10,
+            "relative_defined_rows": 149,
+            "interpolation_control_max_abs": 1.1368683772161603e-13,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 1.1991115439507905e-16,
+            "max_abs_relative_difference_at_n_fm3": 0.07943282347,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 1.1991115439507905e-16
+          },
+          "y_e": {
+            "compared_rows": 149,
+            "density_fm3": [
+              0.002630267992,
+              0.07943282347
+            ],
+            "max_abs_difference": 4.936899999998662e-06,
+            "max_abs_difference_at_n_fm3": 0.02041737945,
+            "signed_difference_range": [
+              -4.914200000000896e-06,
+              4.936899999998662e-06
+            ],
+            "rms_abs_difference": 2.9852727794382473e-06,
+            "relative_denominator_floor": 5.904796659e-14,
+            "relative_defined_rows": 149,
+            "interpolation_control_max_abs": 6.938893903907228e-18,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.00022161077854366155,
+            "max_abs_relative_difference_at_n_fm3": 0.02511886432,
+            "median_signed_relative_difference": 3.44365795712617e-05,
+            "interpolation_control_max_relative": 2.0206837673565938e-16
+          },
+          "y_mu": {
+            "compared_rows": 149,
+            "density_fm3": [
+              0.002630267992,
+              0.07943282347
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002630267992,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 2.2253e-320,
+            "relative_defined_rows": 0,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION"
+          }
+        },
+        "first_law_diagnostic": {
+          "generated": {
+            "compared_rows": 145,
+            "density_fm3": [
+              0.002754228703,
+              0.0758577575
+            ],
+            "max_abs_difference": 0.00135802571373142,
+            "max_abs_difference_at_n_fm3": 0.03715352291,
+            "signed_difference_range": [
+              -0.00135802571373142,
+              0.0003055031231755101
+            ],
+            "rms_abs_difference": 0.0009113510295408704,
+            "relative_denominator_floor": 4.963866569659304e-13,
+            "relative_defined_rows": 145,
+            "interpolation_control_max_abs": 1.2620596846812937e-05,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.1489433130464859,
+            "max_abs_relative_difference_at_n_fm3": 0.002754228703,
+            "median_signed_relative_difference": -0.03598408714768393,
+            "interpolation_control_max_relative": 3.149497799507881e-05
+          },
+          "reference": {
+            "compared_rows": 145,
+            "density_fm3": [
+              0.002754228703,
+              0.0758577575
+            ],
+            "max_abs_difference": 0.00135802571373142,
+            "max_abs_difference_at_n_fm3": 0.03715352291,
+            "signed_difference_range": [
+              -0.00135802571373142,
+              0.0003055031231755101
+            ],
+            "rms_abs_difference": 0.0009113510295408704,
+            "relative_denominator_floor": 4.963866569659304e-13,
+            "relative_defined_rows": 145,
+            "interpolation_control_max_abs": 1.2620596846812937e-05,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.1489433130464859,
+            "max_abs_relative_difference_at_n_fm3": 0.002754228703,
+            "median_signed_relative_difference": -0.03598408714768393,
+            "interpolation_control_max_relative": 3.149497799507881e-05
+          },
+          "pressure_difference_after_reference_energy_derivative_diagnostic": {
+            "compared_rows": 145,
+            "density_fm3": [
+              0.002754228703,
+              0.0758577575
+            ],
+            "max_abs_difference": 0.00135802571373142,
+            "max_abs_difference_at_n_fm3": 0.03715352291,
+            "signed_difference_range": [
+              -0.0003055031231755101,
+              0.00135802571373142
+            ],
+            "rms_abs_difference": 0.0009113510295408704,
+            "relative_denominator_floor": 4.963866569659304e-13,
+            "relative_defined_rows": 145,
+            "interpolation_control_max_abs": 1.2620596846812937e-05,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.1489433130464859,
+            "max_abs_relative_difference_at_n_fm3": 0.002754228703,
+            "median_signed_relative_difference": 0.03598408714768393,
+            "interpolation_control_max_relative": 3.149497799507881e-05
+          },
+          "definition": "P_energy=n_B^2*d(epsilon/n_B)/dn_B; CubicSpline and PCHIP, separately within each phase",
+          "edge_policy": "omit first/last two knots of each full phase segment from derivative comparisons",
+          "residual_definition": "(P_generated-P_reference)-(P_reference_energy_derivative-P_reference) = P_generated-P_reference_energy_derivative",
+          "interpretation": "finite-grid diagnostic; interpolation-control spread is not a rigorous uncertainty bound; no source-kernel causal attribution"
+        },
+        "status": "UNRESOLVED_SOURCE_DIFFERENCE",
+        "meaning": "generated labels denote older retained reference in this subsection only",
+        "byte_identity": {
+          "eos.nb": false,
+          "eos.t": true,
+          "eos.yq": true,
+          "eos.thermo": false,
+          "eos.compo": false
+        }
+      }
+    },
+    "SPG_M4": {
+      "generated": {
+        "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/research_matching_20261117/spg/native_129_repaired/SPG_M4/generated",
+        "rows": 129,
+        "density_fm3": [
+          0.0002475602850151845,
+          0.09882555854320535
+        ],
+        "axis_origins": {
+          "t": 1,
+          "nb": 1,
+          "yq": 1
+        },
+        "actual_scalar_row_labels": {
+          "t": 1,
+          "yq": 1
+        },
+        "temperature_MeV": 0.0,
+        "charge_fraction_axis": 0.0,
+        "mn_reference_MeV": 938.9,
+        "mp_reference_MeV": 938.9,
+        "Il": 1,
+        "max_abs_mu_l_MeV": 0.0,
+        "max_abs_enthalpy_minus_mu_b_MeV": 3.410605131648481e-13,
+        "file_sha256": {
+          "eos.nb": "d2f5814812cdc3625da2cf613c59356c0fe4c4dca12464df58c2b1b4741a8fe5",
+          "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+          "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+          "eos.thermo": "b9dc4fd1d8e07921aa8c0d57157ca0816b6fb5d0f2f6ad27f398028880b76e33",
+          "eos.compo": "58de630e4be854c7d5ed689c9a4de16dd9adab3c3966eea33cef9de972b90efe"
+        }
+      },
+      "reference": {
+        "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/matched_eos_reference_20261117/references/SPG_M4",
+        "rows": 375,
+        "density_fm3": [
+          4.67962e-10,
+          0.0977237221
+        ],
+        "axis_origins": {
+          "t": 0,
+          "nb": 1,
+          "yq": 1
+        },
+        "actual_scalar_row_labels": {
+          "t": 0,
+          "yq": 1
+        },
+        "temperature_MeV": 0.0,
+        "charge_fraction_axis": 0.0,
+        "mn_reference_MeV": 938.9,
+        "mp_reference_MeV": 938.9,
+        "Il": 1,
+        "max_abs_mu_l_MeV": 0.0,
+        "max_abs_enthalpy_minus_mu_b_MeV": 0.0013242294995734483,
+        "file_sha256": {
+          "eos.nb": "da899544e4ff45e4d5d7945aa581a0e879edf8450876c887bbc3a40045ca626e",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "44c7c36f91fabef8f18ababba6b175e13bd7b05a1eaace6e94cf900d40d93dc4",
+          "eos.compo": "1c0eb034e9154517992a47d6504dccce78fc27c0e5db230b894bf128b28cf91f"
+        }
+      },
+      "selected_generated_phases": [
+        1
+      ],
+      "selected_reference_phases": [
+        7
+      ],
+      "requested_density_fm3": [
+        0.002,
+        0.2
+      ],
+      "overlaps": [
+        {
+          "generated_phase": 1,
+          "reference_phase": 7,
+          "support_fm3": [
+            0.002630267992,
+            0.0977237221
+          ],
+          "reference_nodes": 158
+        }
+      ],
+      "interpolation": "generated PCHIP in n_B at exact reference nodes; linear control; no extrapolation",
+      "interpolation_control_is_error_bound": false,
+      "mu_b_definition": "mn_reference*(1+Q3); compared separately from (epsilon+P)/n_B",
+      "energy_convention": "epsilon includes rest energy, recovered using each file's mn header",
+      "composition": {
+        "compared": [
+          "y_e",
+          "y_mu"
+        ],
+        "missing_values": "unavailable; never filled with zero",
+        "nuclear_group_tuples": "excluded: public/native semantics not assumed identical"
+      },
+      "metrics": {
+        "pressure": {
+          "compared_rows": 158,
+          "density_fm3": [
+            0.002630267992,
+            0.0977237221
+          ],
+          "max_abs_difference": 0.0016477585405357265,
+          "max_abs_difference_at_n_fm3": 0.0389045145,
+          "signed_difference_range": [
+            -0.0016477585405357265,
+            0.00010880185845685286
+          ],
+          "rms_abs_difference": 0.0010837600171175667,
+          "relative_denominator_floor": 5.720703290674541e-13,
+          "relative_defined_rows": 158,
+          "interpolation_control_max_abs": 7.340319733267764e-05,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.1650830255637779,
+          "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+          "median_signed_relative_difference": -0.035451744766828316,
+          "interpolation_control_max_relative": 0.0003314554816575822
+        },
+        "epsilon": {
+          "compared_rows": 158,
+          "density_fm3": [
+            0.002630267992,
+            0.0977237221
+          ],
+          "max_abs_difference": 1.5037992938005118e-05,
+          "max_abs_difference_at_n_fm3": 0.07079457844,
+          "signed_difference_range": [
+            -1.5037992938005118e-05,
+            1.1229981140559175e-06
+          ],
+          "rms_abs_difference": 5.414274656214159e-06,
+          "relative_denominator_floor": 9.274620102745553e-11,
+          "relative_defined_rows": 158,
+          "interpolation_control_max_abs": 0.0001720761352999034,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 2.326339778014395e-07,
+          "max_abs_relative_difference_at_n_fm3": 0.0645654229,
+          "median_signed_relative_difference": -1.0322070090221057e-07,
+          "interpolation_control_max_relative": 2.0231176242714623e-06
+        },
+        "mu_b": {
+          "compared_rows": 158,
+          "density_fm3": [
+            0.002630267992,
+            0.0977237221
+          ],
+          "max_abs_difference": 0.20722642821795034,
+          "max_abs_difference_at_n_fm3": 0.002630267992,
+          "signed_difference_range": [
+            -0.20722642821795034,
+            0.0011639542957482263
+          ],
+          "rms_abs_difference": 0.09733821409226263,
+          "relative_denominator_floor": 9.54919331258919e-10,
+          "relative_defined_rows": 158,
+          "interpolation_control_max_abs": 0.0019681609461486005,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.00022018317018009174,
+          "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+          "median_signed_relative_difference": -7.56825227655939e-05,
+          "interpolation_control_max_relative": 2.0614865116870906e-06
+        },
+        "enthalpy_b": {
+          "compared_rows": 158,
+          "density_fm3": [
+            0.002630267992,
+            0.0977237221
+          ],
+          "max_abs_difference": 0.20722642767611887,
+          "max_abs_difference_at_n_fm3": 0.002630267992,
+          "signed_difference_range": [
+            -0.20722642767611887,
+            0.0011639548506536812
+          ],
+          "rms_abs_difference": 0.09733821401258635,
+          "relative_denominator_floor": 9.54919331265658e-10,
+          "relative_defined_rows": 158,
+          "interpolation_control_max_abs": 0.0019681609461486005,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.00022018316960450925,
+          "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+          "median_signed_relative_difference": -7.568252201054594e-05,
+          "interpolation_control_max_relative": 2.061486511689604e-06
+        },
+        "energy_per_baryon": {
+          "compared_rows": 158,
+          "density_fm3": [
+            0.002630267992,
+            0.0977237221
+          ],
+          "max_abs_difference": 0.00022016462185092678,
+          "max_abs_difference_at_n_fm3": 0.0660693448,
+          "signed_difference_range": [
+            -0.00022016462185092678,
+            5.184406757052784e-05
+          ],
+          "rms_abs_difference": 0.00012099221099842055,
+          "relative_denominator_floor": 9.490653756776579e-10,
+          "relative_defined_rows": 158,
+          "interpolation_control_max_abs": 0.0007128885088150128,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 2.3249564479996833e-07,
+          "max_abs_relative_difference_at_n_fm3": 0.0660693448,
+          "median_signed_relative_difference": -1.0365181510453818e-07,
+          "interpolation_control_max_relative": 7.519485150597772e-07
+        },
+        "y_e": {
+          "compared_rows": 158,
+          "density_fm3": [
+            0.002630267992,
+            0.0977237221
+          ],
+          "max_abs_difference": 0.0007395947771117878,
+          "max_abs_difference_at_n_fm3": 0.0660693448,
+          "signed_difference_range": [
+            -0.0007395947771117878,
+            -0.00021549535534658854
+          ],
+          "rms_abs_difference": 0.0004075718980276542,
+          "relative_denominator_floor": 6.130419197e-14,
+          "relative_defined_rows": 158,
+          "interpolation_control_max_abs": 1.822088095042307e-05,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.021862508065813798,
+          "max_abs_relative_difference_at_n_fm3": 0.06025595861,
+          "median_signed_relative_difference": -0.00955921006240409,
+          "interpolation_control_max_relative": 0.0002972207995064953
+        },
+        "y_mu": {
+          "compared_rows": 158,
+          "density_fm3": [
+            0.002630267992,
+            0.0977237221
+          ],
+          "max_abs_difference": 0.0,
+          "max_abs_difference_at_n_fm3": 0.002630267992,
+          "signed_difference_range": [
+            0.0,
+            0.0
+          ],
+          "rms_abs_difference": 0.0,
+          "relative_denominator_floor": 2.2253e-320,
+          "relative_defined_rows": 0,
+          "interpolation_control_max_abs": 0.0,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION"
+        }
+      },
+      "first_law_diagnostic": {
+        "generated": {
+          "compared_rows": 154,
+          "density_fm3": [
+            0.002630267992,
+            0.08912509381
+          ],
+          "max_abs_difference": 7.1250227787755804e-06,
+          "max_abs_difference_at_n_fm3": 0.087096359,
+          "signed_difference_range": [
+            -7.1250227787755804e-06,
+            1.5749339492554526e-06
+          ],
+          "rms_abs_difference": 6.303915887265051e-07,
+          "relative_denominator_floor": 5.011835828912666e-13,
+          "relative_defined_rows": 154,
+          "interpolation_control_max_abs": 3.4401688440266476e-05,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 1.4697849661948734e-05,
+          "max_abs_relative_difference_at_n_fm3": 0.087096359,
+          "median_signed_relative_difference": 1.80095270706728e-07,
+          "interpolation_control_max_relative": 0.0001668659857159946
+        },
+        "reference": {
+          "compared_rows": 154,
+          "density_fm3": [
+            0.002754228703,
+            0.09332543008
+          ],
+          "max_abs_difference": 0.0016401895004377054,
+          "max_abs_difference_at_n_fm3": 0.0389045145,
+          "signed_difference_range": [
+            -0.0016401895004377054,
+            -6.206897120664134e-05
+          ],
+          "rms_abs_difference": 0.0010948857048177424,
+          "relative_denominator_floor": 5.356509768851774e-13,
+          "relative_defined_rows": 154,
+          "interpolation_control_max_abs": 2.0956193786503263e-05,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.16008096814360492,
+          "max_abs_relative_difference_at_n_fm3": 0.002754228703,
+          "median_signed_relative_difference": -0.035455857525584986,
+          "interpolation_control_max_relative": 4.4202124786867425e-05
+        },
+        "pressure_difference_after_reference_energy_derivative_diagnostic": {
+          "compared_rows": 154,
+          "density_fm3": [
+            0.002754228703,
+            0.09332543008
+          ],
+          "max_abs_difference": 0.0001708708296634942,
+          "max_abs_difference_at_n_fm3": 0.09332543008,
+          "signed_difference_range": [
+            -1.2067248569586075e-05,
+            0.0001708708296634942
+          ],
+          "rms_abs_difference": 2.4239881079901664e-05,
+          "relative_denominator_floor": 5.356509768851774e-13,
+          "relative_defined_rows": 154,
+          "interpolation_control_max_abs": 2.0956193786503263e-05,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.0003189965799317905,
+          "max_abs_relative_difference_at_n_fm3": 0.09332543008,
+          "median_signed_relative_difference": 1.782172978472701e-05,
+          "interpolation_control_max_relative": 4.4202124786867425e-05
+        },
+        "definition": "P_energy=n_B^2*d(epsilon/n_B)/dn_B; CubicSpline and PCHIP, separately within each phase",
+        "edge_policy": "omit first/last two knots of each full phase segment from derivative comparisons",
+        "residual_definition": "(P_generated-P_reference)-(P_reference_energy_derivative-P_reference) = P_generated-P_reference_energy_derivative",
+        "interpretation": "finite-grid diagnostic; interpolation-control spread is not a rigorous uncertainty bound; no source-kernel causal attribution"
+      },
+      "status": "UNRESOLVED_SOURCE_DIFFERENCE",
+      "model": "SPG_M4",
+      "retained_vs_current_reference": {
+        "generated": {
+          "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/eos_generator/eos_data/SPG_M4",
+          "rows": 375,
+          "density_fm3": [
+            4.67962e-10,
+            0.0977237221
+          ],
+          "axis_origins": {
+            "t": 0,
+            "nb": 1,
+            "yq": 1
+          },
+          "actual_scalar_row_labels": {
+            "t": 0,
+            "yq": 1
+          },
+          "temperature_MeV": 0.0,
+          "charge_fraction_axis": 0.0,
+          "mn_reference_MeV": 938.9,
+          "mp_reference_MeV": 938.9,
+          "Il": 1,
+          "max_abs_mu_l_MeV": 0.0,
+          "max_abs_enthalpy_minus_mu_b_MeV": 0.0013242294995734483,
+          "file_sha256": {
+            "eos.nb": "2c80615495ce6cd1837b84651e35ad160b8f749abd981115a124b211aa8c2cc9",
+            "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+            "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+            "eos.thermo": "9da4c2a40b478f64a4c06abb50881be23dd4060ff60bc9f69118be0636114517",
+            "eos.compo": "37f2e38debd22a77f0e938b87da7f4067cecd7faee3b80fc02f3b2bfdb595377"
+          }
+        },
+        "reference": {
+          "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/matched_eos_reference_20261117/references/SPG_M4",
+          "rows": 375,
+          "density_fm3": [
+            4.67962e-10,
+            0.0977237221
+          ],
+          "axis_origins": {
+            "t": 0,
+            "nb": 1,
+            "yq": 1
+          },
+          "actual_scalar_row_labels": {
+            "t": 0,
+            "yq": 1
+          },
+          "temperature_MeV": 0.0,
+          "charge_fraction_axis": 0.0,
+          "mn_reference_MeV": 938.9,
+          "mp_reference_MeV": 938.9,
+          "Il": 1,
+          "max_abs_mu_l_MeV": 0.0,
+          "max_abs_enthalpy_minus_mu_b_MeV": 0.0013242294995734483,
+          "file_sha256": {
+            "eos.nb": "da899544e4ff45e4d5d7945aa581a0e879edf8450876c887bbc3a40045ca626e",
+            "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+            "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+            "eos.thermo": "44c7c36f91fabef8f18ababba6b175e13bd7b05a1eaace6e94cf900d40d93dc4",
+            "eos.compo": "1c0eb034e9154517992a47d6504dccce78fc27c0e5db230b894bf128b28cf91f"
+          }
+        },
+        "selected_generated_phases": [
+          7
+        ],
+        "selected_reference_phases": [
+          7
+        ],
+        "requested_density_fm3": [
+          0.002,
+          0.2
+        ],
+        "overlaps": [
+          {
+            "generated_phase": 7,
+            "reference_phase": 7,
+            "support_fm3": [
+              0.002630267992,
+              0.0977237221
+            ],
+            "reference_nodes": 158
+          }
+        ],
+        "interpolation": "generated PCHIP in n_B at exact reference nodes; linear control; no extrapolation",
+        "interpolation_control_is_error_bound": false,
+        "mu_b_definition": "mn_reference*(1+Q3); compared separately from (epsilon+P)/n_B",
+        "energy_convention": "epsilon includes rest energy, recovered using each file's mn header",
+        "composition": {
+          "compared": [
+            "y_e",
+            "y_mu"
+          ],
+          "missing_values": "unavailable; never filled with zero",
+          "nuclear_group_tuples": "excluded: public/native semantics not assumed identical"
+        },
+        "metrics": {
+          "pressure": {
+            "compared_rows": 158,
+            "density_fm3": [
+              0.002630267992,
+              0.0977237221
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002630267992,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 5.720703290674541e-13,
+            "relative_defined_rows": 158,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "epsilon": {
+            "compared_rows": 158,
+            "density_fm3": [
+              0.002630267992,
+              0.0977237221
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002630267992,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 9.274620102745553e-11,
+            "relative_defined_rows": 158,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "mu_b": {
+            "compared_rows": 158,
+            "density_fm3": [
+              0.002630267992,
+              0.0977237221
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002630267992,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 9.54919331258919e-10,
+            "relative_defined_rows": 158,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "enthalpy_b": {
+            "compared_rows": 158,
+            "density_fm3": [
+              0.002630267992,
+              0.0977237221
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002630267992,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 9.54919331265658e-10,
+            "relative_defined_rows": 158,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "energy_per_baryon": {
+            "compared_rows": 158,
+            "density_fm3": [
+              0.002630267992,
+              0.0977237221
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002630267992,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 9.490653756776579e-10,
+            "relative_defined_rows": 158,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "y_e": {
+            "compared_rows": 158,
+            "density_fm3": [
+              0.002630267992,
+              0.0977237221
+            ],
+            "max_abs_difference": 4.963250000000058e-06,
+            "max_abs_difference_at_n_fm3": 0.02630267992,
+            "signed_difference_range": [
+              -4.963250000000058e-06,
+              4.945329999998804e-06
+            ],
+            "rms_abs_difference": 3.0204505101553268e-06,
+            "relative_denominator_floor": 6.130419197e-14,
+            "relative_defined_rows": 158,
+            "interpolation_control_max_abs": 6.938893903907228e-18,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.00018683443877905826,
+            "max_abs_relative_difference_at_n_fm3": 0.02630267992,
+            "median_signed_relative_difference": 9.54937779676087e-07,
+            "interpolation_control_max_relative": 1.822897235366317e-16
+          },
+          "y_mu": {
+            "compared_rows": 158,
+            "density_fm3": [
+              0.002630267992,
+              0.0977237221
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002630267992,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 2.2253e-320,
+            "relative_defined_rows": 0,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION"
+          }
+        },
+        "first_law_diagnostic": {
+          "generated": {
+            "compared_rows": 154,
+            "density_fm3": [
+              0.002754228703,
+              0.09332543008
+            ],
+            "max_abs_difference": 0.0016401895004377054,
+            "max_abs_difference_at_n_fm3": 0.0389045145,
+            "signed_difference_range": [
+              -0.0016401895004377054,
+              -6.206897120664134e-05
+            ],
+            "rms_abs_difference": 0.0010948857048177424,
+            "relative_denominator_floor": 5.356509768851774e-13,
+            "relative_defined_rows": 154,
+            "interpolation_control_max_abs": 2.0956193786503263e-05,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.16008096814360492,
+            "max_abs_relative_difference_at_n_fm3": 0.002754228703,
+            "median_signed_relative_difference": -0.035455857525584986,
+            "interpolation_control_max_relative": 4.4202124786867425e-05
+          },
+          "reference": {
+            "compared_rows": 154,
+            "density_fm3": [
+              0.002754228703,
+              0.09332543008
+            ],
+            "max_abs_difference": 0.0016401895004377054,
+            "max_abs_difference_at_n_fm3": 0.0389045145,
+            "signed_difference_range": [
+              -0.0016401895004377054,
+              -6.206897120664134e-05
+            ],
+            "rms_abs_difference": 0.0010948857048177424,
+            "relative_denominator_floor": 5.356509768851774e-13,
+            "relative_defined_rows": 154,
+            "interpolation_control_max_abs": 2.0956193786503263e-05,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.16008096814360492,
+            "max_abs_relative_difference_at_n_fm3": 0.002754228703,
+            "median_signed_relative_difference": -0.035455857525584986,
+            "interpolation_control_max_relative": 4.4202124786867425e-05
+          },
+          "pressure_difference_after_reference_energy_derivative_diagnostic": {
+            "compared_rows": 154,
+            "density_fm3": [
+              0.002754228703,
+              0.09332543008
+            ],
+            "max_abs_difference": 0.0016401895004377054,
+            "max_abs_difference_at_n_fm3": 0.0389045145,
+            "signed_difference_range": [
+              6.206897120664134e-05,
+              0.0016401895004377054
+            ],
+            "rms_abs_difference": 0.0010948857048177422,
+            "relative_denominator_floor": 5.356509768851774e-13,
+            "relative_defined_rows": 154,
+            "interpolation_control_max_abs": 2.0956193786503263e-05,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.1600809681436048,
+            "max_abs_relative_difference_at_n_fm3": 0.002754228703,
+            "median_signed_relative_difference": 0.035455857525584986,
+            "interpolation_control_max_relative": 4.4202124786867425e-05
+          },
+          "definition": "P_energy=n_B^2*d(epsilon/n_B)/dn_B; CubicSpline and PCHIP, separately within each phase",
+          "edge_policy": "omit first/last two knots of each full phase segment from derivative comparisons",
+          "residual_definition": "(P_generated-P_reference)-(P_reference_energy_derivative-P_reference) = P_generated-P_reference_energy_derivative",
+          "interpretation": "finite-grid diagnostic; interpolation-control spread is not a rigorous uncertainty bound; no source-kernel causal attribution"
+        },
+        "status": "UNRESOLVED_SOURCE_DIFFERENCE",
+        "meaning": "generated labels denote older retained reference in this subsection only",
+        "byte_identity": {
+          "eos.nb": false,
+          "eos.t": true,
+          "eos.yq": true,
+          "eos.thermo": false,
+          "eos.compo": false
+        }
+      }
+    },
+    "SPG_M5": {
+      "generated": {
+        "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/research_matching_20261117/spg/native_129_repaired/SPG_M5/generated",
+        "rows": 129,
+        "density_fm3": [
+          0.0002361127426874518,
+          0.073036796450615
+        ],
+        "axis_origins": {
+          "t": 1,
+          "nb": 1,
+          "yq": 1
+        },
+        "actual_scalar_row_labels": {
+          "t": 1,
+          "yq": 1
+        },
+        "temperature_MeV": 0.0,
+        "charge_fraction_axis": 0.0,
+        "mn_reference_MeV": 938.9,
+        "mp_reference_MeV": 938.9,
+        "Il": 1,
+        "max_abs_mu_l_MeV": 0.0,
+        "max_abs_enthalpy_minus_mu_b_MeV": 2.2737367544323206e-13,
+        "file_sha256": {
+          "eos.nb": "9be91c20819e748e38d360ffaf4b359a1593bc11f180c4ad1de66bf7e89d62fe",
+          "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+          "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+          "eos.thermo": "f3190d5e688fbfb2094fc2000449c3e0bc7e1bbd1ffdf3aa913b5d246b08babd",
+          "eos.compo": "46ff630d665efdddc269b32fcb6b2c09654a9f200c898d1381ab9ff2a80957e6"
+        }
+      },
+      "reference": {
+        "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/matched_eos_reference_20261117/references/SPG_M5",
+        "rows": 363,
+        "density_fm3": [
+          4.67962e-10,
+          0.07079457844
+        ],
+        "axis_origins": {
+          "t": 0,
+          "nb": 1,
+          "yq": 1
+        },
+        "actual_scalar_row_labels": {
+          "t": 0,
+          "yq": 1
+        },
+        "temperature_MeV": 0.0,
+        "charge_fraction_axis": 0.0,
+        "mn_reference_MeV": 938.9,
+        "mp_reference_MeV": 938.9,
+        "Il": 1,
+        "max_abs_mu_l_MeV": 0.0,
+        "max_abs_enthalpy_minus_mu_b_MeV": 0.0013242294995734483,
+        "file_sha256": {
+          "eos.nb": "1640c22788bc3091b8285ab939c41aa0a7d2f09f76412f6e281cfc8f2391e76a",
+          "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+          "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+          "eos.thermo": "d0c958284d7b801c650d37dbce8151ff0a558d805772d75a5afd2d0ebd4d0e6a",
+          "eos.compo": "1f4adf1e3bc5b1a7a95c12a64bce6aca8d5279887437c7fda4c05eaccb7e3b42"
+        }
+      },
+      "selected_generated_phases": [
+        1
+      ],
+      "selected_reference_phases": [
+        7
+      ],
+      "requested_density_fm3": [
+        0.002,
+        0.2
+      ],
+      "overlaps": [
+        {
+          "generated_phase": 1,
+          "reference_phase": 7,
+          "support_fm3": [
+            0.002511886432,
+            0.07079457844
+          ],
+          "reference_nodes": 146
+        }
+      ],
+      "interpolation": "generated PCHIP in n_B at exact reference nodes; linear control; no extrapolation",
+      "interpolation_control_is_error_bound": false,
+      "mu_b_definition": "mn_reference*(1+Q3); compared separately from (epsilon+P)/n_B",
+      "energy_convention": "epsilon includes rest energy, recovered using each file's mn header",
+      "composition": {
+        "compared": [
+          "y_e",
+          "y_mu"
+        ],
+        "missing_values": "unavailable; never filled with zero",
+        "nuclear_group_tuples": "excluded: public/native semantics not assumed identical"
+      },
+      "metrics": {
+        "pressure": {
+          "compared_rows": 146,
+          "density_fm3": [
+            0.002511886432,
+            0.07079457844
+          ],
+          "max_abs_difference": 0.0012736979970361662,
+          "max_abs_difference_at_n_fm3": 0.0316227766,
+          "signed_difference_range": [
+            -0.0012736979970361662,
+            0.0002926370997095029
+          ],
+          "rms_abs_difference": 0.0008945866190418915,
+          "relative_denominator_floor": 3.6872677302943504e-13,
+          "relative_defined_rows": 146,
+          "interpolation_control_max_abs": 0.0001471552598674708,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.16918489862760497,
+          "max_abs_relative_difference_at_n_fm3": 0.002511886432,
+          "median_signed_relative_difference": -0.04261202559318407,
+          "interpolation_control_max_relative": 0.0004956578940028167
+        },
+        "epsilon": {
+          "compared_rows": 146,
+          "density_fm3": [
+            0.002511886432,
+            0.07079457844
+          ],
+          "max_abs_difference": 1.0481140392926136e-05,
+          "max_abs_difference_at_n_fm3": 0.05754399373,
+          "signed_difference_range": [
+            -1.0481140392926136e-05,
+            4.97843672064846e-07
+          ],
+          "rms_abs_difference": 3.595074708472703e-06,
+          "relative_denominator_floor": 6.702397730715444e-11,
+          "relative_defined_rows": 146,
+          "interpolation_control_max_abs": 0.00015623648137363944,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 1.9879834590565264e-07,
+          "max_abs_relative_difference_at_n_fm3": 0.05495408739,
+          "median_signed_relative_difference": -1.026638140466818e-07,
+          "interpolation_control_max_relative": 2.3310535669592685e-06
+        },
+        "mu_b": {
+          "compared_rows": 146,
+          "density_fm3": [
+            0.002511886432,
+            0.07079457844
+          ],
+          "max_abs_difference": 0.2077965106773263,
+          "max_abs_difference_at_n_fm3": 0.002511886432,
+          "signed_difference_range": [
+            -0.2077965106773263,
+            0.004182426107718129
+          ],
+          "rms_abs_difference": 0.09926715076520708,
+          "relative_denominator_floor": 9.51947247449468e-10,
+          "relative_defined_rows": 146,
+          "interpolation_control_max_abs": 0.00039987197283153364,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.0002208012300474537,
+          "max_abs_relative_difference_at_n_fm3": 0.002511886432,
+          "median_signed_relative_difference": -7.698653369683252e-05,
+          "interpolation_control_max_relative": 4.2055304464852937e-07
+        },
+        "enthalpy_b": {
+          "compared_rows": 146,
+          "density_fm3": [
+            0.002511886432,
+            0.07079457844
+          ],
+          "max_abs_difference": 0.20779651058978743,
+          "max_abs_difference_at_n_fm3": 0.002511886432,
+          "signed_difference_range": [
+            -0.20779651058978743,
+            0.0041824289698979555
+          ],
+          "rms_abs_difference": 0.09926715072208954,
+          "relative_denominator_floor": 9.519472474477788e-10,
+          "relative_defined_rows": 146,
+          "interpolation_control_max_abs": 0.00039987197283153364,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.00022080122995445691,
+          "max_abs_relative_difference_at_n_fm3": 0.002511886432,
+          "median_signed_relative_difference": -7.698653334928715e-05,
+          "interpolation_control_max_relative": 4.2055304465046897e-07
+        },
+        "energy_per_baryon": {
+          "compared_rows": 146,
+          "density_fm3": [
+            0.002511886432,
+            0.07079457844
+          ],
+          "max_abs_difference": 0.0001815614838278634,
+          "max_abs_difference_at_n_fm3": 0.05248074602,
+          "signed_difference_range": [
+            -0.0001815614838278634,
+            -1.5236648664540553e-05
+          ],
+          "rms_abs_difference": 0.00011197430925553354,
+          "relative_denominator_floor": 9.467388433417788e-10,
+          "relative_defined_rows": 146,
+          "interpolation_control_max_abs": 0.00022709151153321727,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 1.9205037121456326e-07,
+          "max_abs_relative_difference_at_n_fm3": 0.05248074602,
+          "median_signed_relative_difference": -1.0118156048433733e-07,
+          "interpolation_control_max_relative": 2.4126242198426284e-07
+        },
+        "y_e": {
+          "compared_rows": 146,
+          "density_fm3": [
+            0.002511886432,
+            0.07079457844
+          ],
+          "max_abs_difference": 0.0006585393052594736,
+          "max_abs_difference_at_n_fm3": 0.05370317964,
+          "signed_difference_range": [
+            -0.0006585393052594736,
+            -0.000266520230205923
+          ],
+          "rms_abs_difference": 0.00039490153280693764,
+          "relative_denominator_floor": 6.107996814999999e-14,
+          "relative_defined_rows": 146,
+          "interpolation_control_max_abs": 1.3483493971407079e-05,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.02455299869355753,
+          "max_abs_relative_difference_at_n_fm3": 0.05011872336,
+          "median_signed_relative_difference": -0.01109627732929922,
+          "interpolation_control_max_relative": 0.00025074414940797613
+        },
+        "y_mu": {
+          "compared_rows": 146,
+          "density_fm3": [
+            0.002511886432,
+            0.07079457844
+          ],
+          "max_abs_difference": 0.0,
+          "max_abs_difference_at_n_fm3": 0.002511886432,
+          "signed_difference_range": [
+            0.0,
+            0.0
+          ],
+          "rms_abs_difference": 0.0,
+          "relative_denominator_floor": 2.2253e-320,
+          "relative_defined_rows": 0,
+          "interpolation_control_max_abs": 0.0,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION"
+        }
+      },
+      "first_law_diagnostic": {
+        "generated": {
+          "compared_rows": 143,
+          "density_fm3": [
+            0.002511886432,
+            0.0660693448
+          ],
+          "max_abs_difference": 2.1806819603953365e-06,
+          "max_abs_difference_at_n_fm3": 0.0660693448,
+          "signed_difference_range": [
+            -2.1806819603953365e-06,
+            1.242824284042321e-06
+          ],
+          "rms_abs_difference": 3.377760946796495e-07,
+          "relative_denominator_floor": 3.214753349825661e-13,
+          "relative_defined_rows": 143,
+          "interpolation_control_max_abs": 1.5895061499626717e-05,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 7.30475372140918e-06,
+          "max_abs_relative_difference_at_n_fm3": 0.06309573445,
+          "median_signed_relative_difference": 1.7566872596160866e-08,
+          "interpolation_control_max_relative": 0.0001096304390409189
+        },
+        "reference": {
+          "compared_rows": 142,
+          "density_fm3": [
+            0.002630267992,
+            0.06760829754
+          ],
+          "max_abs_difference": 0.0012696430230273448,
+          "max_abs_difference_at_n_fm3": 0.0316227766,
+          "signed_difference_range": [
+            -0.0012696430230273448,
+            0.00013807011322014562
+          ],
+          "rms_abs_difference": 0.0009030437130128217,
+          "relative_denominator_floor": 3.3634872291003725e-13,
+          "relative_defined_rows": 142,
+          "interpolation_control_max_abs": 1.3445126275990482e-05,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.1640530430347911,
+          "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+          "median_signed_relative_difference": -0.042620112689915016,
+          "interpolation_control_max_relative": 4.7569240317673176e-05
+        },
+        "pressure_difference_after_reference_energy_derivative_diagnostic": {
+          "compared_rows": 142,
+          "density_fm3": [
+            0.002630267992,
+            0.06760829754
+          ],
+          "max_abs_difference": 8.011327629703358e-05,
+          "max_abs_difference_at_n_fm3": 0.06760829754,
+          "signed_difference_range": [
+            -8.249756863615287e-06,
+            8.011327629703358e-05
+          ],
+          "rms_abs_difference": 1.1716335387030273e-05,
+          "relative_denominator_floor": 3.3634872291003725e-13,
+          "relative_defined_rows": 142,
+          "interpolation_control_max_abs": 1.3445126275990482e-05,
+          "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+          "max_abs_relative_difference": 0.00023818516569323013,
+          "max_abs_relative_difference_at_n_fm3": 0.06760829754,
+          "median_signed_relative_difference": 1.831398656783291e-05,
+          "interpolation_control_max_relative": 4.7569240317673176e-05
+        },
+        "definition": "P_energy=n_B^2*d(epsilon/n_B)/dn_B; CubicSpline and PCHIP, separately within each phase",
+        "edge_policy": "omit first/last two knots of each full phase segment from derivative comparisons",
+        "residual_definition": "(P_generated-P_reference)-(P_reference_energy_derivative-P_reference) = P_generated-P_reference_energy_derivative",
+        "interpretation": "finite-grid diagnostic; interpolation-control spread is not a rigorous uncertainty bound; no source-kernel causal attribution"
+      },
+      "status": "UNRESOLVED_SOURCE_DIFFERENCE",
+      "model": "SPG_M5",
+      "retained_vs_current_reference": {
+        "generated": {
+          "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/eos_generator/eos_data/SPG_M5",
+          "rows": 363,
+          "density_fm3": [
+            4.67962e-10,
+            0.07079457844
+          ],
+          "axis_origins": {
+            "t": 0,
+            "nb": 1,
+            "yq": 1
+          },
+          "actual_scalar_row_labels": {
+            "t": 0,
+            "yq": 1
+          },
+          "temperature_MeV": 0.0,
+          "charge_fraction_axis": 0.0,
+          "mn_reference_MeV": 938.9,
+          "mp_reference_MeV": 938.9,
+          "Il": 1,
+          "max_abs_mu_l_MeV": 0.0,
+          "max_abs_enthalpy_minus_mu_b_MeV": 0.0013242294995734483,
+          "file_sha256": {
+            "eos.nb": "e5c832b3f326885838ef1830c9d3e5f2389d106ca1b3a6398bb12d570599d12a",
+            "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+            "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+            "eos.thermo": "ce749823d0c6f5e48f046e4bd992507f1f384e2068ae93590aa3a953700aaabc",
+            "eos.compo": "c70fd7a101298ca363a4c928ce531b9f2dd33ca747209a3a994fb74747bef1b1"
+          }
+        },
+        "reference": {
+          "path": "/home/cosmosapjw/ns_cowling_wt/matched_eos_reference_20261117/data/matched_eos_reference_20261117/references/SPG_M5",
+          "rows": 363,
+          "density_fm3": [
+            4.67962e-10,
+            0.07079457844
+          ],
+          "axis_origins": {
+            "t": 0,
+            "nb": 1,
+            "yq": 1
+          },
+          "actual_scalar_row_labels": {
+            "t": 0,
+            "yq": 1
+          },
+          "temperature_MeV": 0.0,
+          "charge_fraction_axis": 0.0,
+          "mn_reference_MeV": 938.9,
+          "mp_reference_MeV": 938.9,
+          "Il": 1,
+          "max_abs_mu_l_MeV": 0.0,
+          "max_abs_enthalpy_minus_mu_b_MeV": 0.0013242294995734483,
+          "file_sha256": {
+            "eos.nb": "1640c22788bc3091b8285ab939c41aa0a7d2f09f76412f6e281cfc8f2391e76a",
+            "eos.t": "5fa22f861097c3aa7becf2480adfe981726144c8e4029df34751e2802e7e3835",
+            "eos.yq": "6d94b4b46e6a9ce1c02b581166cda0e13681bbdc31d7ab340bba5cec53075554",
+            "eos.thermo": "d0c958284d7b801c650d37dbce8151ff0a558d805772d75a5afd2d0ebd4d0e6a",
+            "eos.compo": "1f4adf1e3bc5b1a7a95c12a64bce6aca8d5279887437c7fda4c05eaccb7e3b42"
+          }
+        },
+        "selected_generated_phases": [
+          7
+        ],
+        "selected_reference_phases": [
+          7
+        ],
+        "requested_density_fm3": [
+          0.002,
+          0.2
+        ],
+        "overlaps": [
+          {
+            "generated_phase": 7,
+            "reference_phase": 7,
+            "support_fm3": [
+              0.002511886432,
+              0.07079457844
+            ],
+            "reference_nodes": 146
+          }
+        ],
+        "interpolation": "generated PCHIP in n_B at exact reference nodes; linear control; no extrapolation",
+        "interpolation_control_is_error_bound": false,
+        "mu_b_definition": "mn_reference*(1+Q3); compared separately from (epsilon+P)/n_B",
+        "energy_convention": "epsilon includes rest energy, recovered using each file's mn header",
+        "composition": {
+          "compared": [
+            "y_e",
+            "y_mu"
+          ],
+          "missing_values": "unavailable; never filled with zero",
+          "nuclear_group_tuples": "excluded: public/native semantics not assumed identical"
+        },
+        "metrics": {
+          "pressure": {
+            "compared_rows": 146,
+            "density_fm3": [
+              0.002511886432,
+              0.07079457844
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002511886432,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 3.6872677302943504e-13,
+            "relative_defined_rows": 146,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002511886432,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "epsilon": {
+            "compared_rows": 146,
+            "density_fm3": [
+              0.002511886432,
+              0.07079457844
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002511886432,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 6.702397730715444e-11,
+            "relative_defined_rows": 146,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002511886432,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "mu_b": {
+            "compared_rows": 146,
+            "density_fm3": [
+              0.002511886432,
+              0.07079457844
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002511886432,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 9.51947247449468e-10,
+            "relative_defined_rows": 146,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002511886432,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "enthalpy_b": {
+            "compared_rows": 146,
+            "density_fm3": [
+              0.002511886432,
+              0.07079457844
+            ],
+            "max_abs_difference": 1.1368683772161603e-13,
+            "max_abs_difference_at_n_fm3": 0.07079457844,
+            "signed_difference_range": [
+              -1.1368683772161603e-13,
+              0.0
+            ],
+            "rms_abs_difference": 9.408789635499124e-15,
+            "relative_denominator_floor": 9.519472474477788e-10,
+            "relative_defined_rows": 146,
+            "interpolation_control_max_abs": 1.1368683772161603e-13,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 1.1942556483714458e-16,
+            "max_abs_relative_difference_at_n_fm3": 0.07079457844,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 1.1942556483714458e-16
+          },
+          "energy_per_baryon": {
+            "compared_rows": 146,
+            "density_fm3": [
+              0.002511886432,
+              0.07079457844
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002511886432,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 9.467388433417788e-10,
+            "relative_defined_rows": 146,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0,
+            "max_abs_relative_difference_at_n_fm3": 0.002511886432,
+            "median_signed_relative_difference": 0.0,
+            "interpolation_control_max_relative": 0.0
+          },
+          "y_e": {
+            "compared_rows": 146,
+            "density_fm3": [
+              0.002511886432,
+              0.07079457844
+            ],
+            "max_abs_difference": 4.991669999999254e-06,
+            "max_abs_difference_at_n_fm3": 0.02187761624,
+            "signed_difference_range": [
+              -4.991669999999254e-06,
+              4.796950000000161e-06
+            ],
+            "rms_abs_difference": 2.7951661203929135e-06,
+            "relative_denominator_floor": 6.107996814999999e-14,
+            "relative_defined_rows": 146,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.0002071662886779182,
+            "max_abs_relative_difference_at_n_fm3": 0.02187761624,
+            "median_signed_relative_difference": 6.409822965468579e-06,
+            "interpolation_control_max_relative": 0.0
+          },
+          "y_mu": {
+            "compared_rows": 146,
+            "density_fm3": [
+              0.002511886432,
+              0.07079457844
+            ],
+            "max_abs_difference": 0.0,
+            "max_abs_difference_at_n_fm3": 0.002511886432,
+            "signed_difference_range": [
+              0.0,
+              0.0
+            ],
+            "rms_abs_difference": 0.0,
+            "relative_denominator_floor": 2.2253e-320,
+            "relative_defined_rows": 0,
+            "interpolation_control_max_abs": 0.0,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION"
+          }
+        },
+        "first_law_diagnostic": {
+          "generated": {
+            "compared_rows": 142,
+            "density_fm3": [
+              0.002630267992,
+              0.06760829754
+            ],
+            "max_abs_difference": 0.0012696430230273448,
+            "max_abs_difference_at_n_fm3": 0.0316227766,
+            "signed_difference_range": [
+              -0.0012696430230273448,
+              0.00013807011322014562
+            ],
+            "rms_abs_difference": 0.0009030437130128217,
+            "relative_denominator_floor": 3.3634872291003725e-13,
+            "relative_defined_rows": 142,
+            "interpolation_control_max_abs": 1.3445126275990482e-05,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.1640530430347911,
+            "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+            "median_signed_relative_difference": -0.042620112689915016,
+            "interpolation_control_max_relative": 4.7569240317673176e-05
+          },
+          "reference": {
+            "compared_rows": 142,
+            "density_fm3": [
+              0.002630267992,
+              0.06760829754
+            ],
+            "max_abs_difference": 0.0012696430230273448,
+            "max_abs_difference_at_n_fm3": 0.0316227766,
+            "signed_difference_range": [
+              -0.0012696430230273448,
+              0.00013807011322014562
+            ],
+            "rms_abs_difference": 0.0009030437130128217,
+            "relative_denominator_floor": 3.3634872291003725e-13,
+            "relative_defined_rows": 142,
+            "interpolation_control_max_abs": 1.3445126275990482e-05,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.1640530430347911,
+            "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+            "median_signed_relative_difference": -0.042620112689915016,
+            "interpolation_control_max_relative": 4.7569240317673176e-05
+          },
+          "pressure_difference_after_reference_energy_derivative_diagnostic": {
+            "compared_rows": 142,
+            "density_fm3": [
+              0.002630267992,
+              0.06760829754
+            ],
+            "max_abs_difference": 0.0012696430230273448,
+            "max_abs_difference_at_n_fm3": 0.0316227766,
+            "signed_difference_range": [
+              -0.00013807011322014562,
+              0.0012696430230273448
+            ],
+            "rms_abs_difference": 0.0009030437130128217,
+            "relative_denominator_floor": 3.3634872291003725e-13,
+            "relative_defined_rows": 142,
+            "interpolation_control_max_abs": 1.3445126275990482e-05,
+            "status": "MEASURED_DIFFERENCE_NOT_CAUSAL_ATTRIBUTION",
+            "max_abs_relative_difference": 0.1640530430347911,
+            "max_abs_relative_difference_at_n_fm3": 0.002630267992,
+            "median_signed_relative_difference": 0.042620112689915016,
+            "interpolation_control_max_relative": 4.7569240317673176e-05
+          },
+          "definition": "P_energy=n_B^2*d(epsilon/n_B)/dn_B; CubicSpline and PCHIP, separately within each phase",
+          "edge_policy": "omit first/last two knots of each full phase segment from derivative comparisons",
+          "residual_definition": "(P_generated-P_reference)-(P_reference_energy_derivative-P_reference) = P_generated-P_reference_energy_derivative",
+          "interpretation": "finite-grid diagnostic; interpolation-control spread is not a rigorous uncertainty bound; no source-kernel causal attribution"
+        },
+        "status": "UNRESOLVED_SOURCE_DIFFERENCE",
+        "meaning": "generated labels denote older retained reference in this subsection only",
+        "byte_identity": {
+          "eos.nb": false,
+          "eos.t": true,
+          "eos.yq": true,
+          "eos.thermo": false,
+          "eos.compo": false
+        }
+      }
+    }
+  },
+  "scope": "finite tabulated same-phase support; neither source equivalence nor thermodynamic admission",
+  "scientific_source_equivalence": "UNRESOLVED; see model-specific difference ledger"
+}

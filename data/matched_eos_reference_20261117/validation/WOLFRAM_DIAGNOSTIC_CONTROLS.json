@@ -1,0 +1,29 @@
+{
+  "purpose": "algebraic controls for reference-difference diagnostics; not provider attribution",
+  "first_call_with_protected_symbol_warning": {
+    "code": "Clear[nn,np,n,dkn,dkp,C,e]; de=(3/5)(3 Pi^2)^(2/3)(dkn nn^(5/3)+dkp np^(5/3)); checks=<|\"kinetic_pressure_residual\"->FullSimplify[nn D[de,nn]+np D[de,np]-de-(2/3)de,nn>0&&np>0],\"neutron_mu_residual\"->FullSimplify[D[de,nn]-dkn(3 Pi^2)^(2/3)nn^(2/3),nn>0],\"proton_mu_residual\"->FullSimplify[D[de,np]-dkp(3 Pi^2)^(2/3)np^(2/3),np>0],\"cold_pressure_difference_residual\"->FullSimplify[n D[n e[n],n]-n e[n]-n^2 e'[n]],\"cold_mu_difference_residual\"->FullSimplify[D[n e[n],n]-(e[n]+n e'[n])],\"constant_shift_pressure\"->FullSimplify[n D[n C,n]-n C],\"constant_shift_mu_residual\"->FullSimplify[D[n C,n]-C]|>; ExportString[checks,\"RawJSON\"]",
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Clear::wrsym: Symbol C is Protected.\nGeneral::messages: Messages were generated which may indicate errors.\n\nOut[1]= \"{\\n\\t\\\"kinetic_pressure_residual\\\":0,\\n\\t\\\"neutron_mu_residual\\\":0,\\n\\t\\\"proton_mu_residual\\\":0,\\n\\t\\\"cold_pressure_difference_residual\\\":0,\\n\\t\\\"cold_mu_difference_residual\\\":0,\\n\\t\\\"constant_shift_pressure\\\":0,\\n\\t\\\"constant_shift_mu_residual\\\":0\\n}\""
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    }
+  },
+  "successful_call": {
+    "code": "Clear[wNn,wNp,wN,wDKn,wDKp,wOffset,wEnergy]; wDelta=(3/5)(3 Pi^2)^(2/3)(wDKn wNn^(5/3)+wDKp wNp^(5/3)); wChecks=<|\"kinetic_pressure_residual\"->FullSimplify[wNn D[wDelta,wNn]+wNp D[wDelta,wNp]-wDelta-(2/3)wDelta,wNn>0&&wNp>0],\"neutron_mu_residual\"->FullSimplify[D[wDelta,wNn]-wDKn(3 Pi^2)^(2/3)wNn^(2/3),wNn>0],\"proton_mu_residual\"->FullSimplify[D[wDelta,wNp]-wDKp(3 Pi^2)^(2/3)wNp^(2/3),wNp>0],\"cold_pressure_difference_residual\"->FullSimplify[wN D[wN wEnergy[wN],wN]-wN wEnergy[wN]-wN^2 wEnergy'[wN]],\"cold_mu_difference_residual\"->FullSimplify[D[wN wEnergy[wN],wN]-(wEnergy[wN]+wN wEnergy'[wN])],\"constant_shift_pressure\"->FullSimplify[wN D[wN wOffset,wN]-wN wOffset],\"constant_shift_mu_residual\"->FullSimplify[D[wN wOffset,wN]-wOffset]|>; ExportString[wChecks,\"RawJSON\"]",
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Out[1]= \"{\\n\\t\\\"kinetic_pressure_residual\\\":0,\\n\\t\\\"neutron_mu_residual\\\":0,\\n\\t\\\"proton_mu_residual\\\":0,\\n\\t\\\"cold_pressure_difference_residual\\\":0,\\n\\t\\\"cold_mu_difference_residual\\\":0,\\n\\t\\\"constant_shift_pressure\\\":0,\\n\\t\\\"constant_shift_mu_residual\\\":0\\n}\""
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    }
+  }
+}

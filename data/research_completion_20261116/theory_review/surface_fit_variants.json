@@ -1,0 +1,1845 @@
+{
+  "claim": "CONTROLLED_FIT_SENSITIVITY_NOT_ORIGINAL_SCURTO_CALIBRATION",
+  "ame_sha256": "2167f57a2a98331e4649b2dd2b658a9006ed4fba1975729ebfe52a42b4b9218a",
+  "nuclei": [
+    {
+      "A": 40,
+      "Z": 20,
+      "N": 20,
+      "binding_MeV": 342.05212,
+      "source_line": 341,
+      "estimated_mass": false,
+      "raw_line": "   0   20   20   40 Ca       -34846.384      0.021     8551.303    0.001 B- -14323.050    2.828  39 962590.865      0.022"
+    },
+    {
+      "A": 48,
+      "Z": 20,
+      "N": 28,
+      "binding_MeV": 416.00092799999993,
+      "source_line": 434,
+      "estimated_mass": false,
+      "raw_line": "   8   28   20   48 Ca       -44224.629      0.096     8666.686    0.002 B-    279.213    4.950  47 952522.904      0.103"
+    },
+    {
+      "A": 48,
+      "Z": 28,
+      "N": 20,
+      "binding_MeV": 348.72,
+      "source_line": 442,
+      "estimated_mass": true,
+      "raw_line": "  -8   20   28   48 Ni  -pp   16793#       502#        7265#      10#    B-      *               48 018028#       538#"
+    },
+    {
+      "A": 58,
+      "Z": 28,
+      "N": 30,
+      "binding_MeV": 506.45942199999996,
+      "source_line": 561,
+      "estimated_mass": false,
+      "raw_line": "   2   30   28   58 Ni       -60228.744      0.373     8732.059    0.006 B-  -8561.019    0.443  57 935341.780      0.400"
+    },
+    {
+      "A": 88,
+      "Z": 38,
+      "N": 50,
+      "binding_MeV": 768.46836,
+      "source_line": 955,
+      "estimated_mass": false,
+      "raw_line": "  12   50   38   88 Sr       -87921.61793    0.00558   8732.595    0.000 B-  -3622.600    1.500  87 905612.25561    0.00599"
+    },
+    {
+      "A": 90,
+      "Z": 40,
+      "N": 50,
+      "binding_MeV": 783.89721,
+      "source_line": 985,
+      "estimated_mass": false,
+      "raw_line": "  10   50   40   90 Zr       -88772.535      0.118     8709.969    0.001 B-  -6111.016    3.316  89 904698.758      0.126"
+    },
+    {
+      "A": 114,
+      "Z": 50,
+      "N": 64,
+      "binding_MeV": 971.572524,
+      "source_line": 1347,
+      "estimated_mass": false,
+      "raw_line": "  14   64   50  114 Sn       -90559.723      0.029     8522.566    0.000 B-  -6063.149   21.838 113 902780.132      0.031"
+    },
+    {
+      "A": 132,
+      "Z": 50,
+      "N": 82,
+      "binding_MeV": 1102.8431039999998,
+      "source_line": 1637,
+      "estimated_mass": false,
+      "raw_line": "  32   82   50  132 Sn       -76546.542      1.976     8354.872    0.015 B-   3088.729    3.161 131 917823.902      2.121"
+    },
+    {
+      "A": 208,
+      "Z": 82,
+      "N": 126,
+      "binding_MeV": 1636.4302240000002,
+      "source_line": 2796,
+      "estimated_mass": false,
+      "raw_line": "  44  126   82  208 Pb       -21748.598      1.148     7867.453    0.006 B-  -2878.375    2.013 207 976651.918      1.231"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://arxiv.org/html/1902.07032",
+      "basis": "II.2 defines symmetric n_sat; Eq18 fixed r_sat surface area; II.3 literal nine isotopes"
+    },
+    {
+      "url": "https://arxiv.org/html/2402.15548v1",
+      "basis": "Eqs22-25 geometric cell surface; Eq31 N=2408 and2%mass score"
+    }
+  ],
+  "assumptions": [
+    "same GDFM bulk, vacuum Coulomb, no shell/pairing/curvature/exchange/electron corrections",
+    "density minimized for each nucleus over [.04,.24] fm^-3 with local quadratic refinement",
+    "fixed_symmetric_area uses symmetric model rho0 in Carreau Eq18; geometric_area uses actual variational nucleus radius",
+    "mass_2percent kept for controlled comparison; Carreau2019 fit weights not specified",
+    "nine fit includes AME2016 estimated48Ni; eight fit excludes it and reports its heldout residual",
+    "neither cohort/area variant authenticates Scurto source coefficients"
+  ],
+  "density_points": 161,
+  "density_bounds_fm3": [
+    0.04,
+    0.24
+  ],
+  "sigma_probe_y": [
+    0.01,
+    0.03,
+    0.05,
+    0.1,
+    0.3,
+    0.5
+  ],
+  "software": {
+    "python": "3.12.3",
+    "numpy": "2.4.2",
+    "scipy": "1.17.0"
+  },
+  "models": {
+    "SPG_M1": {
+      "rho0_fm3": 0.1572,
+      "variants": {
+        "geometric_area__nine": {
+          "sigma0_MeV_fm2": 1.0603704946625856,
+          "b": 6.095022143295573,
+          "weighting": "mass_2percent",
+          "training": {
+            "n": 9,
+            "rms_mass_residual_MeV": 10.05541987660596,
+            "rms_binding_per_baryon_residual_MeV": 0.09158077086044447,
+            "max_absolute_mass_residual_MeV": 27.371791686997312,
+            "mean_scaled_square": 2.4211386749369525e-05
+          },
+          "heldout": null,
+          "all": {
+            "n": 9,
+            "rms_mass_residual_MeV": 10.05541987660596,
+            "rms_binding_per_baryon_residual_MeV": 0.09158077086044447,
+            "max_absolute_mass_residual_MeV": 27.371791686997312,
+            "mean_scaled_square": 2.4211386749369525e-05
+          },
+          "density_min_fm3": 0.15378159263818195,
+          "density_max_fm3": 0.17128259014758185,
+          "density_boundary_hits": 0,
+          "parameter_bounds_active": [
+            false,
+            false
+          ],
+          "optimizer_success": true,
+          "optimizer_message": "`ftol` termination condition is satisfied.",
+          "nfev": 9,
+          "jacobian_condition_number": 15.657776438043879,
+          "locally_identifiable_two_parameters": true,
+          "multistart_scaled_sumsquares": [
+            0.0002179024807443263,
+            0.00021790248074432574,
+            0.00021790248074432577
+          ],
+          "parameter_search_bounds": {
+            "sigma0": [
+              0.01,
+              10.0
+            ],
+            "b_plus_16": [
+              0.01,
+              1000000.0
+            ]
+          },
+          "prediction_binding_MeV": [
+            342.4923219590165,
+            426.5724254730479,
+            345.8114703909704,
+            503.0810609870398,
+            770.7922016111199,
+            782.329274594571,
+            967.9062957262004,
+            1100.0745042339531,
+            1609.0584323130029
+          ],
+          "optimized_density_fm3": [
+            0.17128259014758185,
+            0.1667583942963729,
+            0.1638230486385571,
+            0.16849314945846314,
+            0.1636171248630222,
+            0.16411900912343555,
+            0.16195138075067464,
+            0.15568426022566373,
+            0.15378159263818195
+          ],
+          "sigma_probe_MeV_fm2": [
+            2.3428742615062095e-05,
+            0.0006324577670488525,
+            0.0029259578860373428,
+            0.023255267956133707,
+            0.508798608491906,
+            1.0603704946625856
+          ]
+        },
+        "geometric_area__eight_measured": {
+          "sigma0_MeV_fm2": 1.0610885797037508,
+          "b": 6.65553826353068,
+          "weighting": "mass_2percent",
+          "training": {
+            "n": 8,
+            "rms_mass_residual_MeV": 11.533090384279468,
+            "rms_binding_per_baryon_residual_MeV": 0.09416025230280453,
+            "max_absolute_mass_residual_MeV": 30.01287954923805,
+            "mean_scaled_square": 2.5594454059056805e-05
+          },
+          "heldout": {
+            "n": 1,
+            "rms_mass_residual_MeV": 3.614281280124942,
+            "rms_binding_per_baryon_residual_MeV": 0.07529752666926963,
+            "max_absolute_mass_residual_MeV": 3.614281280124942,
+            "mean_scaled_square": 1.6334012998370734e-05
+          },
+          "all": {
+            "n": 9,
+            "rms_mass_residual_MeV": 10.940040725434748,
+            "rms_binding_per_baryon_residual_MeV": 0.09225504649390419,
+            "max_absolute_mass_residual_MeV": 30.01287954923805,
+            "mean_scaled_square": 2.456551616342502e-05
+          },
+          "density_min_fm3": 0.15383224341846571,
+          "density_max_fm3": 0.17129328845498765,
+          "density_boundary_hits": 0,
+          "parameter_bounds_active": [
+            false,
+            false
+          ],
+          "optimizer_success": true,
+          "optimizer_message": "`ftol` termination condition is satisfied.",
+          "nfev": 9,
+          "jacobian_condition_number": 15.344788296056244,
+          "locally_identifiable_two_parameters": true,
+          "multistart_scaled_sumsquares": [
+            0.00020475563247245666,
+            0.00020475563247245444,
+            0.00020475563247245913
+          ],
+          "parameter_search_bounds": {
+            "sigma0": [
+              0.01,
+              10.0
+            ],
+            "b_plus_16": [
+              0.01,
+              1000000.0
+            ]
+          },
+          "prediction_binding_MeV": [
+            342.3606331693891,
+            425.87497647196994,
+            345.1057187198751,
+            502.87939669557073,
+            769.9750178097477,
+            781.6857068696706,
+            967.0486720159873,
+            1097.8142019079557,
+            1606.4173444507621
+          ],
+          "optimized_density_fm3": [
+            0.17129328845498765,
+            0.16680845356329746,
+            0.16387490449767417,
+            0.16850484463551912,
+            0.16365030800436886,
+            0.16414434749759094,
+            0.16197876203829095,
+            0.15575159262693933,
+            0.15383224341846571
+          ],
+          "sigma_probe_MeV_fm2": [
+            2.403934814847607e-05,
+            0.0006489315784736309,
+            0.003002006444644473,
+            0.023848097552981444,
+            0.5157809580221254,
+            1.0610885797037508
+          ]
+        },
+        "fixed_symmetric_area__nine": {
+          "sigma0_MeV_fm2": 1.0427579329381853,
+          "b": 12.033583204890537,
+          "weighting": "mass_2percent",
+          "training": {
+            "n": 9,
+            "rms_mass_residual_MeV": 7.092448168962809,
+            "rms_binding_per_baryon_residual_MeV": 0.06796205471424716,
+            "max_absolute_mass_residual_MeV": 18.873835388940506,
+            "mean_scaled_square": 1.333252419265689e-05
+          },
+          "heldout": null,
+          "all": {
+            "n": 9,
+            "rms_mass_residual_MeV": 7.092448168962809,
+            "rms_binding_per_baryon_residual_MeV": 0.06796205471424716,
+            "max_absolute_mass_residual_MeV": 18.873835388940506,
+            "mean_scaled_square": 1.333252419265689e-05
+          },
+          "density_min_fm3": 0.142854973784475,
+          "density_max_fm3": 0.15265337187995429,
+          "density_boundary_hits": 0,
+          "parameter_bounds_active": [
+            false,
+            false
+          ],
+          "optimizer_success": true,
+          "optimizer_message": "`ftol` termination condition is satisfied.",
+          "nfev": 8,
+          "jacobian_condition_number": 19.07349977961079,
+          "locally_identifiable_two_parameters": true,
+          "multistart_scaled_sumsquares": [
+            0.00011999271773391275,
+            0.00011999271773391203,
+            0.00011999271773391234
+          ],
+          "parameter_search_bounds": {
+            "sigma0": [
+              0.01,
+              10.0
+            ],
+            "b_plus_16": [
+              0.01,
+              1000000.0
+            ]
+          },
+          "prediction_binding_MeV": [
+            341.531652512623,
+            423.54916303704636,
+            345.62469489779846,
+            503.6902297652742,
+            771.6105899248827,
+            784.4247395976824,
+            972.2791844863714,
+            1099.4731806081047,
+            1617.5563886110597
+          ],
+          "optimized_density_fm3": [
+            0.15265337187995429,
+            0.15028046939427983,
+            0.1466742320775748,
+            0.15160783903438016,
+            0.14915310873174198,
+            0.14947761648292954,
+            0.1482320351831228,
+            0.1439585321454379,
+            0.142854973784475
+          ],
+          "sigma_probe_MeV_fm2": [
+            2.9231859384919105e-05,
+            0.0007889908249420112,
+            0.003648010971447878,
+            0.028845557197390365,
+            0.5623090969166139,
+            1.0427579329381853
+          ]
+        },
+        "fixed_symmetric_area__eight_measured": {
+          "sigma0_MeV_fm2": 1.0435433927647877,
+          "b": 12.924710505470856,
+          "weighting": "mass_2percent",
+          "training": {
+            "n": 8,
+            "rms_mass_residual_MeV": 8.380225409373931,
+            "rms_binding_per_baryon_residual_MeV": 0.0674629595158902,
+            "max_absolute_mass_residual_MeV": 21.62086357758335,
+            "mean_scaled_square": 1.3138133762620594e-05
+          },
+          "heldout": {
+            "n": 1,
+            "rms_mass_residual_MeV": 3.845848857754163,
+            "rms_binding_per_baryon_residual_MeV": 0.08012185120321173,
+            "max_absolute_mass_residual_MeV": 3.845848857754163,
+            "mean_scaled_square": 1.8494109513922686e-05
+          },
+          "all": {
+            "n": 9,
+            "rms_mass_residual_MeV": 8.00427647318066,
+            "rms_binding_per_baryon_residual_MeV": 0.06898431246254529,
+            "max_absolute_mass_residual_MeV": 21.62086357758335,
+            "mean_scaled_square": 1.3733242179431937e-05
+          },
+          "density_min_fm3": 0.142854973784475,
+          "density_max_fm3": 0.15265337187995429,
+          "density_boundary_hits": 0,
+          "parameter_bounds_active": [
+            false,
+            false
+          ],
+          "optimizer_success": true,
+          "optimizer_message": "`ftol` termination condition is satisfied.",
+          "nfev": 12,
+          "jacobian_condition_number": 18.785734328366182,
+          "locally_identifiable_two_parameters": true,
+          "multistart_scaled_sumsquares": [
+            0.00010510507010096605,
+            0.00010510507010096567,
+            0.00010510507010096475
+          ],
+          "parameter_search_bounds": {
+            "sigma0": [
+              0.01,
+              10.0
+            ],
+            "b_plus_16": [
+              0.01,
+              1000000.0
+            ]
+          },
+          "prediction_binding_MeV": [
+            341.37912562738046,
+            422.79861928149376,
+            344.87415114224586,
+            503.46322130955065,
+            770.7481212016339,
+            783.7439642012502,
+            971.3807714253047,
+            1097.058005017949,
+            1614.8093604224168
+          ],
+          "optimized_density_fm3": [
+            0.15265337187995429,
+            0.15028046939427983,
+            0.1466742320775748,
+            0.15160783903438016,
+            0.14915310873174198,
+            0.14947761648292707,
+            0.1482320351831228,
+            0.1439585321454379,
+            0.142854973784475
+          ],
+          "sigma_probe_MeV_fm2": [
+            3.0183769311438964e-05,
+            0.0008146647526177187,
+            0.0037663897633297893,
+            0.029758746032988025,
+            0.570835650463412,
+            1.0435433927647877
+          ]
+        }
+      },
+      "previous_2408_geometric": {
+        "sigma0_MeV_fm2": 1.0415982475887464,
+        "b": 14.084751850892523,
+        "training": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 21.291959336655452,
+          "rms_binding_per_baryon_residual_MeV": 0.15312703317917478,
+          "max_absolute_mass_residual_MeV": 59.21230230960646,
+          "mean_scaled_square": 6.761520615931885e-05
+        },
+        "sigma_probe_MeV_fm2": [
+          3.13357511558096e-05,
+          0.0008457314283841864,
+          0.003909574934807256,
+          0.03085924901097945,
+          0.5799005343904559,
+          1.0415982475887464
+        ]
+      }
+    },
+    "SPG_M2": {
+      "rho0_fm3": 0.1551,
+      "variants": {
+        "geometric_area__nine": {
+          "sigma0_MeV_fm2": 1.0763204385191985,
+          "b": 18.33771187638508,
+          "weighting": "mass_2percent",
+          "training": {
+            "n": 9,
+            "rms_mass_residual_MeV": 6.387594801089116,
+            "rms_binding_per_baryon_residual_MeV": 0.07457192284494063,
+            "max_absolute_mass_residual_MeV": 16.026008996419705,
+            "mean_scaled_square": 1.604846524759141e-05
+          },
+          "heldout": null,
+          "all": {
+            "n": 9,
+            "rms_mass_residual_MeV": 6.387594801089116,
+            "rms_binding_per_baryon_residual_MeV": 0.07457192284494063,
+            "max_absolute_mass_residual_MeV": 16.026008996419705,
+            "mean_scaled_square": 1.604846524759141e-05
+          },
+          "density_min_fm3": 0.1539943113231791,
+          "density_max_fm3": 0.1698300489357764,
+          "density_boundary_hits": 0,
+          "parameter_bounds_active": [
+            false,
+            false
+          ],
+          "optimizer_success": true,
+          "optimizer_message": "`ftol` termination condition is satisfied.",
+          "nfev": 6,
+          "jacobian_condition_number": 22.26039921212866,
+          "locally_identifiable_two_parameters": true,
+          "multistart_scaled_sumsquares": [
+            0.0001444361872283227,
+            0.00014443618722832964,
+            0.00014443618722832563
+          ],
+          "parameter_search_bounds": {
+            "sigma0": [
+              0.01,
+              10.0
+            ],
+            "b_plus_16": [
+              0.01,
+              1000000.0
+            ]
+          },
+          "prediction_binding_MeV": [
+            342.6466283041307,
+            424.12536562957825,
+            343.4128132176621,
+            503.903239122822,
+            771.1063965767138,
+            783.4470034049551,
+            970.3756006395768,
+            1103.69431718068,
+            1620.4042150035805
+          ],
+          "optimized_density_fm3": [
+            0.1698300489357764,
+            0.1664507958354306,
+            0.1635390460095321,
+            0.16699421932108685,
+            0.1627815513113422,
+            0.16300674571526783,
+            0.16091440737353807,
+            0.15656895995689174,
+            0.1539943113231791
+          ],
+          "sigma_probe_MeV_fm2": [
+            3.69576652965738e-05,
+            0.0009973529770667352,
+            0.004608561927992162,
+            0.036244031042336644,
+            0.6340410667991553,
+            1.0763204385191985
+          ]
+        },
+        "geometric_area__eight_measured": {
+          "sigma0_MeV_fm2": 1.0779753959146272,
+          "b": 20.32430823951224,
+          "weighting": "mass_2percent",
+          "training": {
+            "n": 8,
+            "rms_mass_residual_MeV": 7.951286872924622,
+            "rms_binding_per_baryon_residual_MeV": 0.06615776540260779,
+            "max_absolute_mass_residual_MeV": 20.668342490986788,
+            "mean_scaled_square": 1.2635324179783326e-05
+          },
+          "heldout": {
+            "n": 1,
+            "rms_mass_residual_MeV": 6.531216622671195,
+            "rms_binding_per_baryon_residual_MeV": 0.13606701297231658,
+            "max_absolute_mass_residual_MeV": 6.531216622671195,
+            "mean_scaled_square": 5.333805524807863e-05
+          },
+          "all": {
+            "n": 9,
+            "rms_mass_residual_MeV": 7.8062688060914205,
+            "rms_binding_per_baryon_residual_MeV": 0.07712113948828274,
+            "max_absolute_mass_residual_MeV": 20.668342490986788,
+            "mean_scaled_square": 1.7157849854038358e-05
+          },
+          "density_min_fm3": 0.15408114214900104,
+          "density_max_fm3": 0.16985545781352182,
+          "density_boundary_hits": 0,
+          "parameter_bounds_active": [
+            false,
+            false
+          ],
+          "optimizer_success": true,
+          "optimizer_message": "`ftol` termination condition is satisfied.",
+          "nfev": 7,
+          "jacobian_condition_number": 22.222314741427397,
+          "locally_identifiable_two_parameters": true,
+          "multistart_scaled_sumsquares": [
+            0.00010108259343826835,
+            0.0001010825934382666,
+            0.00010108259343826777
+          ],
+          "parameter_search_bounds": {
+            "sigma0": [
+              0.01,
+              10.0
+            ],
+            "b_plus_16": [
+              0.01,
+              1000000.0
+            ]
+          },
+          "prediction_binding_MeV": [
+            342.3414083439192,
+            422.9156419265461,
+            342.18878337732883,
+            503.4624622185974,
+            769.6730995873066,
+            782.2887606380447,
+            968.8534573905479,
+            1099.6348696341004,
+            1615.7618815090134
+          ],
+          "optimized_density_fm3": [
+            0.16985545781352182,
+            0.16653714500821054,
+            0.1636282049733221,
+            0.16702031082662103,
+            0.1628396472418094,
+            0.16305254271322137,
+            0.16096306264313562,
+            0.15668524904989894,
+            0.15408114214900104
+          ],
+          "sigma_probe_MeV_fm2": [
+            3.9155874385311125e-05,
+            0.0010566200995975655,
+            0.004881475553647208,
+            0.03832520497884168,
+            0.6496149827659847,
+            1.0779753959146272
+          ]
+        },
+        "fixed_symmetric_area__nine": {
+          "sigma0_MeV_fm2": 1.0575585234004938,
+          "b": 29.680601752095548,
+          "weighting": "mass_2percent",
+          "training": {
+            "n": 9,
+            "rms_mass_residual_MeV": 3.8830036171894475,
+            "rms_binding_per_baryon_residual_MeV": 0.05710515090374888,
+            "max_absolute_mass_residual_MeV": 6.754210086455487,
+            "mean_scaled_square": 9.407689024098992e-06
+          },
+          "heldout": null,
+          "all": {
+            "n": 9,
+            "rms_mass_residual_MeV": 3.8830036171894475,
+            "rms_binding_per_baryon_residual_MeV": 0.05710515090374888,
+            "max_absolute_mass_residual_MeV": 6.754210086455487,
+            "mean_scaled_square": 9.407689024098992e-06
+          },
+          "density_min_fm3": 0.14232261032343477,
+          "density_max_fm3": 0.15043628060030254,
+          "density_boundary_hits": 0,
+          "parameter_bounds_active": [
+            false,
+            false
+          ],
+          "optimizer_success": true,
+          "optimizer_message": "`ftol` termination condition is satisfied.",
+          "nfev": 12,
+          "jacobian_condition_number": 28.638298436234642,
+          "locally_identifiable_two_parameters": true,
+          "multistart_scaled_sumsquares": [
+            8.466920121689147e-05,
+            8.466920121689106e-05,
+            8.466920121689091e-05
+          ],
+          "parameter_search_bounds": {
+            "sigma0": [
+              0.01,
+              10.0
+            ],
+            "b_plus_16": [
+              0.01,
+              1000000.0
+            ]
+          },
+          "prediction_binding_MeV": [
+            341.54677949680826,
+            420.981186091346,
+            343.2705403733616,
+            504.477225830591,
+            772.1929324788379,
+            785.8348280809973,
+            975.2710749046183,
+            1102.5431613404182,
+            1629.6760139135447
+          ],
+          "optimized_density_fm3": [
+            0.15043628060030254,
+            0.1490582733582418,
+            0.14545657152656818,
+            0.14942014109568522,
+            0.14758927377134198,
+            0.14768127453360974,
+            0.14653080626258652,
+            0.14398261938121393,
+            0.14232261032343477
+          ],
+          "sigma_probe_MeV_fm2": [
+            4.8308426126680666e-05,
+            0.001303284585956674,
+            0.006015543568758991,
+            0.04685495360586403,
+            0.6937780480849789,
+            1.0575585234004938
+          ]
+        },
+        "fixed_symmetric_area__eight_measured": {
+          "sigma0_MeV_fm2": 1.0592581359035051,
+          "b": 33.082502268470215,
+          "weighting": "mass_2percent",
+          "training": {
+            "n": 8,
+            "rms_mass_residual_MeV": 4.75904577392584,
+            "rms_binding_per_baryon_residual_MeV": 0.04106393027286843,
+            "max_absolute_mass_residual_MeV": 11.41061769728185,
+            "mean_scaled_square": 4.868307227480232e-06
+          },
+          "heldout": {
+            "n": 1,
+            "rms_mass_residual_MeV": 6.708287759702785,
+            "rms_binding_per_baryon_residual_MeV": 0.139755994993808,
+            "max_absolute_mass_residual_MeV": 6.708287759702785,
+            "mean_scaled_square": 5.626941083734664e-05
+          },
+          "all": {
+            "n": 9,
+            "rms_mass_residual_MeV": 5.013196563887372,
+            "rms_binding_per_baryon_residual_MeV": 0.06057292124405764,
+            "max_absolute_mass_residual_MeV": 11.41061769728185,
+            "mean_scaled_square": 1.0579540961909831e-05
+          },
+          "density_min_fm3": 0.14232261032343477,
+          "density_max_fm3": 0.15043628060030254,
+          "density_boundary_hits": 0,
+          "parameter_bounds_active": [
+            false,
+            false
+          ],
+          "optimizer_success": true,
+          "optimizer_message": "`ftol` termination condition is satisfied.",
+          "nfev": 6,
+          "jacobian_condition_number": 29.009879693642734,
+          "locally_identifiable_two_parameters": true,
+          "multistart_scaled_sumsquares": [
+            3.894645781984185e-05,
+            3.8946457819842776e-05,
+            3.894645781984431e-05
+          ],
+          "parameter_search_bounds": {
+            "sigma0": [
+              0.01,
+              10.0
+            ],
+            "b_plus_16": [
+              0.01,
+              1000000.0
+            ]
+          },
+          "prediction_binding_MeV": [
+            341.2137626757524,
+            419.72235795828175,
+            342.01171224029724,
+            504.00570376358246,
+            770.7294854437014,
+            784.6497077573321,
+            973.7287013451597,
+            1098.3614437963386,
+            1625.0196063027183
+          ],
+          "optimized_density_fm3": [
+            0.15043628060030254,
+            0.1490582733582418,
+            0.14545657152656818,
+            0.14942014109568522,
+            0.14758927377134198,
+            0.14768127453360974,
+            0.14653080626258652,
+            0.14398261938121437,
+            0.14232261032343477
+          ],
+          "sigma_probe_MeV_fm2": [
+            5.1989266342691927e-05,
+            0.0014024638671014836,
+            0.006471176187012448,
+            0.050259390534467034,
+            0.7118648062216387,
+            1.0592581359035051
+          ]
+        }
+      },
+      "previous_2408_geometric": {
+        "sigma0_MeV_fm2": 1.0656369049972167,
+        "b": 34.855328455223194,
+        "training": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 15.327841599237392,
+          "rms_binding_per_baryon_residual_MeV": 0.11220375314976332,
+          "max_absolute_mass_residual_MeV": 43.15224283390762,
+          "mean_scaled_square": 3.630876489288599e-05
+        },
+        "sigma_probe_MeV_fm2": [
+          5.4191370109460146e-05,
+          0.0014618005634512237,
+          0.00674379898173675,
+          0.052298686607319234,
+          0.7244338454237319,
+          1.0656369049972167
+        ]
+      }
+    },
+    "SPG_M3": {
+      "rho0_fm3": 0.1612,
+      "variants": {
+        "geometric_area__nine": {
+          "sigma0_MeV_fm2": 1.0820686595699553,
+          "b": 6.347493912706248,
+          "weighting": "mass_2percent",
+          "training": {
+            "n": 9,
+            "rms_mass_residual_MeV": 10.55588853028581,
+            "rms_binding_per_baryon_residual_MeV": 0.09588952958854585,
+            "max_absolute_mass_residual_MeV": 28.780796324874018,
+            "mean_scaled_square": 2.6542758330998918e-05
+          },
+          "heldout": null,
+          "all": {
+            "n": 9,
+            "rms_mass_residual_MeV": 10.55588853028581,
+            "rms_binding_per_baryon_residual_MeV": 0.09588952958854585,
+            "max_absolute_mass_residual_MeV": 28.780796324874018,
+            "mean_scaled_square": 2.6542758330998918e-05
+          },
+          "density_min_fm3": 0.1580104354760986,
+          "density_max_fm3": 0.1759730360816779,
+          "density_boundary_hits": 0,
+          "parameter_bounds_active": [
+            false,
+            false
+          ],
+          "optimizer_success": true,
+          "optimizer_message": "`ftol` termination condition is satisfied.",
+          "nfev": 15,
+          "jacobian_condition_number": 15.797039945147377,
+          "locally_identifiable_two_parameters": true,
+          "multistart_scaled_sumsquares": [
+            0.0002388848249789959,
+            0.0002388848249789941,
+            0.00023888482497899026
+          ],
+          "parameter_search_bounds": {
+            "sigma0": [
+              0.01,
+              10.0
+            ],
+            "b_plus_16": [
+              0.01,
+              1000000.0
+            ]
+          },
+          "prediction_binding_MeV": [
+            342.5684062256844,
+            427.0320908130493,
+            345.5088684189725,
+            503.04946018116095,
+            770.8925786098325,
+            782.2242927613225,
+            967.466123970966,
+            1100.5899977852657,
+            1607.6494276751262
+          ],
+          "optimized_density_fm3": [
+            0.1759730360816779,
+            0.17158152611314031,
+            0.16844954395706213,
+            0.17304062981189372,
+            0.1681175605819131,
+            0.16856472973100262,
+            0.16630349160606359,
+            0.1602088409538017,
+            0.1580104354760986
+          ],
+          "sigma_probe_MeV_fm2": [
+            2.41813443703946e-05,
+            0.0006527699307269995,
+            0.003019854008606809,
+            0.023996289758495135,
+            0.5222793032976775,
+            1.0820686595699553
+          ]
+        },
+        "geometric_area__eight_measured": {
+          "sigma0_MeV_fm2": 1.0828815321610057,
+          "b": 6.976849786706989,
+          "weighting": "mass_2percent",
+          "training": {
+            "n": 8,
+            "rms_mass_residual_MeV": 12.14150070945872,
+            "rms_binding_per_baryon_residual_MeV": 0.09823657407831277,
+            "max_absolute_mass_residual_MeV": 31.69538930452086,
+            "mean_scaled_square": 2.7858131818023378e-05
+          },
+          "heldout": {
+            "n": 1,
+            "rms_mass_residual_MeV": 3.988979371512812,
+            "rms_binding_per_baryon_residual_MeV": 0.08310373690651691,
+            "max_absolute_mass_residual_MeV": 3.988979371512812,
+            "mean_scaled_square": 1.9896311925677833e-05
+          },
+          "all": {
+            "n": 9,
+            "rms_mass_residual_MeV": 11.524082379707904,
+            "rms_binding_per_baryon_residual_MeV": 0.09667219925603007,
+            "max_absolute_mass_residual_MeV": 31.69538930452086,
+            "mean_scaled_square": 2.697348516331832e-05
+          },
+          "density_min_fm3": 0.158069220942729,
+          "density_max_fm3": 0.17598556154784936,
+          "density_boundary_hits": 0,
+          "parameter_bounds_active": [
+            false,
+            false
+          ],
+          "optimizer_success": true,
+          "optimizer_message": "`ftol` termination condition is satisfied.",
+          "nfev": 6,
+          "jacobian_condition_number": 15.510602891716392,
+          "locally_identifiable_two_parameters": true,
+          "multistart_scaled_sumsquares": [
+            0.00022286505454418703,
+            0.0002228650545441874,
+            0.00022286505454419323
+          ],
+          "parameter_search_bounds": {
+            "sigma0": [
+              0.01,
+              10.0
+            ],
+            "b_plus_16": [
+              0.01,
+              1000000.0
+            ]
+          },
+          "prediction_binding_MeV": [
+            342.42199572508156,
+            426.2637329487684,
+            344.7310206284872,
+            502.82564714720263,
+            769.9914149672613,
+            781.5140902672498,
+            966.5198539800892,
+            1098.0959059754978,
+            1604.7348346954793
+          ],
+          "optimized_density_fm3": [
+            0.17598556154784936,
+            0.17163984181683112,
+            0.16850999421962914,
+            0.17305427365554174,
+            0.1681562013754376,
+            0.16859425252411578,
+            0.16633528831692726,
+            0.1602872680400538,
+            0.158069220942729
+          ],
+          "sigma_probe_MeV_fm2": [
+            2.4881007067595215e-05,
+            0.0006716461792231871,
+            0.003106988184165063,
+            0.024675203100546456,
+            0.5301844641442083,
+            1.0828815321610057
+          ]
+        },
+        "fixed_symmetric_area__nine": {
+          "sigma0_MeV_fm2": 1.0640006697051847,
+          "b": 12.220611544552565,
+          "weighting": "mass_2percent",
+          "training": {
+            "n": 9,
+            "rms_mass_residual_MeV": 7.46516961122078,
+            "rms_binding_per_baryon_residual_MeV": 0.07124759997852882,
+            "max_absolute_mass_residual_MeV": 20.001028768470178,
+            "mean_scaled_square": 1.4652332567109915e-05
+          },
+          "heldout": null,
+          "all": {
+            "n": 9,
+            "rms_mass_residual_MeV": 7.46516961122078,
+            "rms_binding_per_baryon_residual_MeV": 0.07124759997852882,
+            "max_absolute_mass_residual_MeV": 20.001028768470178,
+            "mean_scaled_square": 1.4652332567109915e-05
+          },
+          "density_min_fm3": 0.14650176780460897,
+          "density_max_fm3": 0.15632722369686256,
+          "density_boundary_hits": 0,
+          "parameter_bounds_active": [
+            false,
+            false
+          ],
+          "optimizer_success": true,
+          "optimizer_message": "`ftol` termination condition is satisfied.",
+          "nfev": 9,
+          "jacobian_condition_number": 19.175176902035275,
+          "locally_identifiable_two_parameters": true,
+          "multistart_scaled_sumsquares": [
+            0.00013187099310399107,
+            0.00013187099310398923,
+            0.00013187099310398966
+          ],
+          "parameter_search_bounds": {
+            "sigma0": [
+              0.01,
+              10.0
+            ],
+            "b_plus_16": [
+              0.01,
+              1000000.0
+            ]
+          },
+          "prediction_binding_MeV": [
+            341.5732682267784,
+            423.89726162380464,
+            345.3198657545837,
+            503.677453823531,
+            771.7411465003026,
+            784.3947900202475,
+            971.9955837413355,
+            1099.927915552791,
+            1616.42919523153
+          ],
+          "optimized_density_fm3": [
+            0.15632722369686256,
+            0.15414457950976598,
+            0.15034081882584052,
+            0.15523947800550789,
+            0.15285069786583483,
+            0.1531224190714687,
+            0.15184205449470936,
+            0.14780586663467823,
+            0.14650176780460897
+          ],
+          "sigma_probe_MeV_fm2": [
+            3.002635169705072e-05,
+            0.0008104308564732958,
+            0.0037470734564631,
+            0.02962408849529839,
+            0.5755216636270604,
+            1.0640006697051847
+          ]
+        },
+        "fixed_symmetric_area__eight_measured": {
+          "sigma0_MeV_fm2": 1.0648820736911928,
+          "b": 13.208237099293498,
+          "weighting": "mass_2percent",
+          "training": {
+            "n": 8,
+            "rms_mass_residual_MeV": 8.847257869853655,
+            "rms_binding_per_baryon_residual_MeV": 0.07023247375880692,
+            "max_absolute_mass_residual_MeV": 23.016664656534886,
+            "mean_scaled_square": 1.4238697894855802e-05
+          },
+          "heldout": {
+            "n": 1,
+            "rms_mass_residual_MeV": 4.223830281536266,
+            "rms_binding_per_baryon_residual_MeV": 0.0879964641986722,
+            "max_absolute_mass_residual_MeV": 4.223830281536266,
+            "mean_scaled_square": 2.2308065911268997e-05
+          },
+          "all": {
+            "n": 9,
+            "rms_mass_residual_MeV": 8.459265247662024,
+            "rms_binding_per_baryon_residual_MeV": 0.07242174372208038,
+            "max_absolute_mass_residual_MeV": 23.016664656534886,
+            "mean_scaled_square": 1.5135294341123935e-05
+          },
+          "density_min_fm3": 0.14650176780460897,
+          "density_max_fm3": 0.1563272236968632,
+          "density_boundary_hits": 0,
+          "parameter_bounds_active": [
+            false,
+            false
+          ],
+          "optimizer_success": true,
+          "optimizer_message": "`ftol` termination condition is satisfied.",
+          "nfev": 12,
+          "jacobian_condition_number": 18.92970217629257,
+          "locally_identifiable_two_parameters": true,
+          "multistart_scaled_sumsquares": [
+            0.00011390958315884682,
+            0.00011390958315884972,
+            0.00011390958315884642
+          ],
+          "parameter_search_bounds": {
+            "sigma0": [
+              0.01,
+              10.0
+            ],
+            "b_plus_16": [
+              0.01,
+              1000000.0
+            ]
+          },
+          "prediction_binding_MeV": [
+            341.4049533756628,
+            423.0735655876846,
+            344.49616971846376,
+            503.427245677207,
+            770.7944701148757,
+            783.6472136970245,
+            971.0092593609955,
+            1097.2754070970027,
+            1613.4135593434653
+          ],
+          "optimized_density_fm3": [
+            0.1563272236968632,
+            0.15414457950976598,
+            0.15034081882584052,
+            0.15523947800550789,
+            0.15285069786583483,
+            0.1531224190714687,
+            0.15184205449470936,
+            0.14780586663467823,
+            0.14650176780460897
+          ],
+          "sigma_probe_MeV_fm2": [
+            3.110288522192795e-05,
+            0.000839465651929025,
+            0.003880942642511303,
+            0.030656359014026434,
+            0.585080950038252,
+            1.0648820736911928
+          ]
+        }
+      },
+      "previous_2408_geometric": {
+        "sigma0_MeV_fm2": 1.0611255669569737,
+        "b": 14.90680675349753,
+        "training": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 22.44423838760107,
+          "rms_binding_per_baryon_residual_MeV": 0.16011236827368158,
+          "max_absolute_mass_residual_MeV": 63.259505595293604,
+          "mean_scaled_square": 7.392552268178896e-05
+        },
+        "sigma_probe_MeV_fm2": [
+          3.2795480163894716e-05,
+          0.0008851096497955049,
+          0.004091280380632885,
+          0.032270682949797846,
+          0.59782034073318,
+          1.0611255669569737
+        ]
+      }
+    },
+    "SPG_M4": {
+      "rho0_fm3": 0.1621,
+      "variants": {
+        "geometric_area__nine": {
+          "sigma0_MeV_fm2": 1.0851695628748728,
+          "b": 13.556237010642445,
+          "weighting": "mass_2percent",
+          "training": {
+            "n": 9,
+            "rms_mass_residual_MeV": 9.049778928963855,
+            "rms_binding_per_baryon_residual_MeV": 0.0884568271417599,
+            "max_absolute_mass_residual_MeV": 24.22051336445338,
+            "mean_scaled_square": 2.2585109112925382e-05
+          },
+          "heldout": null,
+          "all": {
+            "n": 9,
+            "rms_mass_residual_MeV": 9.049778928963855,
+            "rms_binding_per_baryon_residual_MeV": 0.0884568271417599,
+            "max_absolute_mass_residual_MeV": 24.22051336445338,
+            "mean_scaled_square": 2.2585109112925382e-05
+          },
+          "density_min_fm3": 0.1605130169368504,
+          "density_max_fm3": 0.17594402131625544,
+          "density_boundary_hits": 0,
+          "parameter_bounds_active": [
+            false,
+            false
+          ],
+          "optimizer_success": true,
+          "optimizer_message": "`ftol` termination condition is satisfied.",
+          "nfev": 12,
+          "jacobian_condition_number": 19.711515724541556,
+          "locally_identifiable_two_parameters": true,
+          "multistart_scaled_sumsquares": [
+            0.00020326598201632885,
+            0.00020326598201632858,
+            0.00020326598201632847
+          ],
+          "parameter_search_bounds": {
+            "sigma0": [
+              0.01,
+              10.0
+            ],
+            "b_plus_16": [
+              0.01,
+              1000000.0
+            ]
+          },
+          "prediction_binding_MeV": [
+            342.8845959837938,
+            425.97890450530383,
+            344.27781722091527,
+            503.5000690281139,
+            770.765663559941,
+            782.3657470506112,
+            967.8594252473339,
+            1103.390229499754,
+            1612.2097106355468
+          ],
+          "optimized_density_fm3": [
+            0.17594402131625544,
+            0.17257798176017106,
+            0.16968714064766832,
+            0.1731889111718994,
+            0.16906450886517768,
+            0.16929989469499665,
+            0.16727123689894832,
+            0.16295077536266855,
+            0.1605130169368504
+          ],
+          "sigma_probe_MeV_fm2": [
+            3.207306095222686e-05,
+            0.0008656428276325554,
+            0.004001826444489137,
+            0.03160177811313843,
+            0.5994074467666661,
+            1.0851695628748728
+          ]
+        },
+        "geometric_area__eight_measured": {
+          "sigma0_MeV_fm2": 1.0864859486277436,
+          "b": 14.897169381228736,
+          "weighting": "mass_2percent",
+          "training": {
+            "n": 8,
+            "rms_mass_residual_MeV": 10.752191217654106,
+            "rms_binding_per_baryon_residual_MeV": 0.08649822029112521,
+            "max_absolute_mass_residual_MeV": 28.1578153993089,
+            "mean_scaled_square": 2.159825368444534e-05
+          },
+          "heldout": {
+            "n": 1,
+            "rms_mass_residual_MeV": 5.486072465300026,
+            "rms_binding_per_baryon_residual_MeV": 0.1142931763604172,
+            "max_absolute_mass_residual_MeV": 5.486072465300026,
+            "mean_scaled_square": 3.7633280710168614e-05
+          },
+          "all": {
+            "n": 9,
+            "rms_mass_residual_MeV": 10.300884098747748,
+            "rms_binding_per_baryon_residual_MeV": 0.09001139870458977,
+            "max_absolute_mass_residual_MeV": 28.1578153993089,
+            "mean_scaled_square": 2.3379923353970148e-05
+          },
+          "density_min_fm3": 0.16058447784271915,
+          "density_max_fm3": 0.175963377535892,
+          "density_boundary_hits": 0,
+          "parameter_bounds_active": [
+            false,
+            false
+          ],
+          "optimizer_success": true,
+          "optimizer_message": "`ftol` termination condition is satisfied.",
+          "nfev": 12,
+          "jacobian_condition_number": 19.526999149765548,
+          "locally_identifiable_two_parameters": true,
+          "multistart_scaled_sumsquares": [
+            0.0001727860294755648,
+            0.00017278602947556272,
+            0.00017278602947556497
+          ],
+          "parameter_search_bounds": {
+            "sigma0": [
+              0.01,
+              10.0
+            ],
+            "b_plus_16": [
+              0.01,
+              1000000.0
+            ]
+          },
+          "prediction_binding_MeV": [
+            342.6474722416021,
+            424.9466983271261,
+            343.2339275347,
+            503.1519897943586,
+            769.5500520490464,
+            781.3928606963284,
+            966.574962309003,
+            1099.9662037627393,
+            1608.2724086006913
+          ],
+          "optimized_density_fm3": [
+            0.175963377535892,
+            0.17265038318816142,
+            0.16976166041352847,
+            0.1732090303327148,
+            0.1691125166246768,
+            0.16933731869640528,
+            0.1673111059170595,
+            0.16304660171807644,
+            0.16058447784271915
+          ],
+          "sigma_probe_MeV_fm2": [
+            3.3568805708539865e-05,
+            0.0009059809814622407,
+            0.004187758779686067,
+            0.033031946569866216,
+            0.6120246035685992,
+            1.0864859486277436
+          ]
+        },
+        "fixed_symmetric_area__nine": {
+          "sigma0_MeV_fm2": 1.0686300502904,
+          "b": 21.173592047976165,
+          "weighting": "mass_2percent",
+          "training": {
+            "n": 9,
+            "rms_mass_residual_MeV": 6.216413378905033,
+            "rms_binding_per_baryon_residual_MeV": 0.0668756720482857,
+            "max_absolute_mass_residual_MeV": 16.093671779198303,
+            "mean_scaled_square": 1.2906840272417098e-05
+          },
+          "heldout": null,
+          "all": {
+            "n": 9,
+            "rms_mass_residual_MeV": 6.216413378905033,
+            "rms_binding_per_baryon_residual_MeV": 0.0668756720482857,
+            "max_absolute_mass_residual_MeV": 16.093671779198303,
+            "mean_scaled_square": 1.2906840272417098e-05
+          },
+          "density_min_fm3": 0.14974991434031704,
+          "density_max_fm3": 0.15760038874280138,
+          "density_boundary_hits": 0,
+          "parameter_bounds_active": [
+            false,
+            false
+          ],
+          "optimizer_success": true,
+          "optimizer_message": "`ftol` termination condition is satisfied.",
+          "nfev": 11,
+          "jacobian_condition_number": 24.032908027806627,
+          "locally_identifiable_two_parameters": true,
+          "multistart_scaled_sumsquares": [
+            0.00011616156245175505,
+            0.00011616156245175579,
+            0.00011616156245175386
+          ],
+          "parameter_search_bounds": {
+            "sigma0": [
+              0.01,
+              10.0
+            ],
+            "b_plus_16": [
+              0.01,
+              1000000.0
+            ]
+          },
+          "prediction_binding_MeV": [
+            341.8987638550869,
+            423.12688584781984,
+            344.15636308678853,
+            504.0311838944404,
+            771.6843468164301,
+            784.4749272034258,
+            972.1994148609713,
+            1102.4041845436766,
+            1620.3365522208019
+          ],
+          "optimized_density_fm3": [
+            0.15760038874280138,
+            0.15627752651320173,
+            0.15279662921784237,
+            0.15662297787483873,
+            0.15485879130629074,
+            0.15494865086630755,
+            0.15383933456387883,
+            0.15134508012877684,
+            0.14974991434031704
+          ],
+          "sigma_probe_MeV_fm2": [
+            3.972393550140754e-05,
+            0.0010719255564449334,
+            0.004951774397844838,
+            0.038848954870366575,
+            0.6498832724555701,
+            1.0686300502904
+          ]
+        },
+        "fixed_symmetric_area__eight_measured": {
+          "sigma0_MeV_fm2": 1.069988665871655,
+          "b": 23.229480385667912,
+          "weighting": "mass_2percent",
+          "training": {
+            "n": 8,
+            "rms_mass_residual_MeV": 7.640841798201961,
+            "rms_binding_per_baryon_residual_MeV": 0.060305815300141986,
+            "max_absolute_mass_residual_MeV": 20.05349032534218,
+            "mean_scaled_square": 1.0498127945465637e-05
+          },
+          "heldout": {
+            "n": 1,
+            "rms_mass_residual_MeV": 5.637296202858465,
+            "rms_binding_per_baryon_residual_MeV": 0.1174436708928847,
+            "max_absolute_mass_residual_MeV": 5.637296202858465,
+            "mean_scaled_square": 3.9736600457638466e-05
+          },
+          "all": {
+            "n": 9,
+            "rms_mass_residual_MeV": 7.44489993634691,
+            "rms_binding_per_baryon_residual_MeV": 0.06903086805908315,
+            "max_absolute_mass_residual_MeV": 20.05349032534218,
+            "mean_scaled_square": 1.374684711348484e-05
+          },
+          "density_min_fm3": 0.14974991434031704,
+          "density_max_fm3": 0.15760038874280138,
+          "density_boundary_hits": 0,
+          "parameter_bounds_active": [
+            false,
+            false
+          ],
+          "optimizer_success": true,
+          "optimizer_message": "`ftol` termination condition is satisfied.",
+          "nfev": 7,
+          "jacobian_condition_number": 24.01429230500619,
+          "locally_identifiable_two_parameters": true,
+          "multistart_scaled_sumsquares": [
+            8.398502356372518e-05,
+            8.39850235637251e-05,
+            8.398502356372514e-05
+          ],
+          "parameter_search_bounds": {
+            "sigma0": [
+              0.01,
+              10.0
+            ],
+            "b_plus_16": [
+              0.01,
+              1000000.0
+            ]
+          },
+          "prediction_binding_MeV": [
+            341.64028082676685,
+            422.05322655817287,
+            343.08270379714156,
+            503.65921941250036,
+            770.4426390069199,
+            783.4795521337265,
+            970.89691012167,
+            1098.8747921200336,
+            1616.376733674658
+          ],
+          "optimized_density_fm3": [
+            0.15760038874280138,
+            0.15627752651320173,
+            0.15279662921784237,
+            0.15662297787483873,
+            0.15485879130628988,
+            0.1549486508663068,
+            0.15383933456387824,
+            0.15134508012877684,
+            0.14974991434031704
+          ],
+          "sigma_probe_MeV_fm2": [
+            4.1974081085691704e-05,
+            0.0011325838255502926,
+            0.005230935794277929,
+            0.0409672548295001,
+            0.6643525017335553,
+            1.069988665871655
+          ]
+        }
+      },
+      "previous_2408_geometric": {
+        "sigma0_MeV_fm2": 1.0658722919396697,
+        "b": 28.963036108351936,
+        "training": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 20.555939175318887,
+          "rms_binding_per_baryon_residual_MeV": 0.14595481617877484,
+          "max_absolute_mass_residual_MeV": 59.155360687518396,
+          "mean_scaled_square": 6.143393448396985e-05
+        },
+        "sigma_probe_MeV_fm2": [
+          4.792341695135959e-05,
+          0.0012929217510071974,
+          0.005968129782270661,
+          0.046513866524170965,
+          0.6954144849256784,
+          1.0658722919396697
+        ]
+      }
+    },
+    "SPG_M5": {
+      "rho0_fm3": 0.1483,
+      "variants": {
+        "geometric_area__nine": {
+          "sigma0_MeV_fm2": 1.0279750977497077,
+          "b": 13.135784192009456,
+          "weighting": "mass_2percent",
+          "training": {
+            "n": 9,
+            "rms_mass_residual_MeV": 6.547069358249853,
+            "rms_binding_per_baryon_residual_MeV": 0.07087933930948169,
+            "max_absolute_mass_residual_MeV": 16.976657246704008,
+            "mean_scaled_square": 1.4501243913380268e-05
+          },
+          "heldout": null,
+          "all": {
+            "n": 9,
+            "rms_mass_residual_MeV": 6.547069358249853,
+            "rms_binding_per_baryon_residual_MeV": 0.07087933930948169,
+            "max_absolute_mass_residual_MeV": 16.976657246704008,
+            "mean_scaled_square": 1.4501243913380268e-05
+          },
+          "density_min_fm3": 0.14602922863586656,
+          "density_max_fm3": 0.16170409286254897,
+          "density_boundary_hits": 0,
+          "parameter_bounds_active": [
+            false,
+            false
+          ],
+          "optimizer_success": true,
+          "optimizer_message": "`ftol` termination condition is satisfied.",
+          "nfev": 6,
+          "jacobian_condition_number": 19.449215306712976,
+          "locally_identifiable_two_parameters": true,
+          "multistart_scaled_sumsquares": [
+            0.00013051119522042244,
+            0.0001305111952204245,
+            0.00013051119522042328
+          ],
+          "parameter_search_bounds": {
+            "sigma0": [
+              0.01,
+              10.0
+            ],
+            "b_plus_16": [
+              0.01,
+              1000000.0
+            ]
+          },
+          "prediction_binding_MeV": [
+            342.5092131886404,
+            424.09541693737765,
+            344.76608671250244,
+            503.69339108620346,
+            770.7101367759935,
+            783.1530113208843,
+            970.1959368646117,
+            1101.8030396782958,
+            1619.4535667532962
+          ],
+          "optimized_density_fm3": [
+            0.16170409286254897,
+            0.157981586795342,
+            0.1553253278148027,
+            0.15914911728699893,
+            0.15489065193309867,
+            0.1552605731055099,
+            0.15327593985292431,
+            0.14805197473496443,
+            0.14602922863586656
+          ],
+          "sigma_probe_MeV_fm2": [
+            2.995043631310373e-05,
+            0.0008083626232563171,
+            0.0037371763752328166,
+            0.029522561268614897,
+            0.5641709334335892,
+            1.0279750977497077
+          ]
+        },
+        "geometric_area__eight_measured": {
+          "sigma0_MeV_fm2": 1.0290859460732866,
+          "b": 14.281991072233748,
+          "weighting": "mass_2percent",
+          "training": {
+            "n": 8,
+            "rms_mass_residual_MeV": 7.964240281084262,
+            "rms_binding_per_baryon_residual_MeV": 0.06786653031038022,
+            "max_absolute_mass_residual_MeV": 20.479774214333702,
+            "mean_scaled_square": 1.3296820623507154e-05
+          },
+          "heldout": {
+            "n": 1,
+            "rms_mass_residual_MeV": 4.880982570088236,
+            "rms_binding_per_baryon_residual_MeV": 0.10168713687683824,
+            "max_absolute_mass_residual_MeV": 4.880982570088236,
+            "mean_scaled_square": 2.9789520569020276e-05
+          },
+          "all": {
+            "n": 9,
+            "rms_mass_residual_MeV": 7.683004164230625,
+            "rms_binding_per_baryon_residual_MeV": 0.07240871747484467,
+            "max_absolute_mass_residual_MeV": 20.479774214333702,
+            "mean_scaled_square": 1.5129342839675276e-05
+          },
+          "density_min_fm3": 0.14609236776391726,
+          "density_max_fm3": 0.1617199230822986,
+          "density_boundary_hits": 0,
+          "parameter_bounds_active": [
+            false,
+            false
+          ],
+          "optimizer_success": true,
+          "optimizer_message": "`ftol` termination condition is satisfied.",
+          "nfev": 8,
+          "jacobian_condition_number": 19.17142872240545,
+          "locally_identifiable_two_parameters": true,
+          "multistart_scaled_sumsquares": [
+            0.00010637456498805754,
+            0.00010637456498805724,
+            0.0001063745649880574
+          ],
+          "parameter_search_bounds": {
+            "sigma0": [
+              0.01,
+              10.0
+            ],
+            "b_plus_16": [
+              0.01,
+              1000000.0
+            ]
+          },
+          "prediction_binding_MeV": [
+            342.29753115278083,
+            423.17876176075225,
+            343.8390174299118,
+            503.3829112608146,
+            769.6295921522201,
+            782.2876941318349,
+            969.0535598364999,
+            1098.7588403195768,
+            1615.9504497856665
+          ],
+          "optimized_density_fm3": [
+            0.1617199230822986,
+            0.15804206177713834,
+            0.15538829710059296,
+            0.1591657974671989,
+            0.15493145089607346,
+            0.1552923539107331,
+            0.1533100213402143,
+            0.14813608276963514,
+            0.14609236776391726
+          ],
+          "sigma_probe_MeV_fm2": [
+            3.116229425576732e-05,
+            0.000841045628869012,
+            0.003887838845999138,
+            0.030682476136662737,
+            0.5745933477941226,
+            1.0290859460732866
+          ]
+        },
+        "fixed_symmetric_area__nine": {
+          "sigma0_MeV_fm2": 1.0104746732135252,
+          "b": 22.730739710711333,
+          "weighting": "mass_2percent",
+          "training": {
+            "n": 9,
+            "rms_mass_residual_MeV": 3.917183029581697,
+            "rms_binding_per_baryon_residual_MeV": 0.05178765320815546,
+            "max_absolute_mass_residual_MeV": 8.021268998449159,
+            "mean_scaled_square": 7.739468689152037e-06
+          },
+          "heldout": null,
+          "all": {
+            "n": 9,
+            "rms_mass_residual_MeV": 3.917183029581697,
+            "rms_binding_per_baryon_residual_MeV": 0.05178765320815546,
+            "max_absolute_mass_residual_MeV": 8.021268998449159,
+            "mean_scaled_square": 7.739468689152037e-06
+          },
+          "density_min_fm3": 0.13512344185981695,
+          "density_max_fm3": 0.14400158530563026,
+          "density_boundary_hits": 0,
+          "parameter_bounds_active": [
+            false,
+            false
+          ],
+          "optimizer_success": true,
+          "optimizer_message": "`ftol` termination condition is satisfied.",
+          "nfev": 6,
+          "jacobian_condition_number": 24.876439195240092,
+          "locally_identifiable_two_parameters": true,
+          "multistart_scaled_sumsquares": [
+            6.965521820236833e-05,
+            6.965521820236858e-05,
+            6.965521820236886e-05
+          ],
+          "parameter_search_bounds": {
+            "sigma0": [
+              0.01,
+              10.0
+            ],
+            "b_plus_16": [
+              0.01,
+              1000000.0
+            ]
+          },
+          "prediction_binding_MeV": [
+            341.513656650583,
+            421.0529736393272,
+            344.5914850228648,
+            504.2707070126832,
+            771.6581476077895,
+            785.3605727328345,
+            974.7682536878041,
+            1100.9507327893518,
+            1628.408955001551
+          ],
+          "optimized_density_fm3": [
+            0.14400158530563026,
+            0.14196961122483379,
+            0.13856921581478523,
+            0.14302063054410583,
+            0.14083356893765936,
+            0.14109027728580867,
+            0.13993362864275719,
+            0.13629698023004674,
+            0.13512344185981695
+          ],
+          "sigma_probe_MeV_fm2": [
+            3.9135501640152625e-05,
+            0.0010560043101894264,
+            0.004877484233799628,
+            0.03821534684968749,
+            0.6243525166121034,
+            1.0104746732135252
+          ]
+        },
+        "fixed_symmetric_area__eight_measured": {
+          "sigma0_MeV_fm2": 1.0116514530461287,
+          "b": 24.701552446154984,
+          "weighting": "mass_2percent",
+          "training": {
+            "n": 8,
+            "rms_mass_residual_MeV": 4.906044230410453,
+            "rms_binding_per_baryon_residual_MeV": 0.04331843817452915,
+            "max_absolute_mass_residual_MeV": 11.592525441095859,
+            "mean_scaled_square": 5.41762867640484e-06
+          },
+          "heldout": {
+            "n": 1,
+            "rms_mass_residual_MeV": 5.0962504049994095,
+            "rms_binding_per_baryon_residual_MeV": 0.1061718834374877,
+            "max_absolute_mass_residual_MeV": 5.0962504049994095,
+            "mean_scaled_square": 3.247510157348405e-05
+          },
+          "all": {
+            "n": 9,
+            "rms_mass_residual_MeV": 4.927540834899361,
+            "rms_binding_per_baryon_residual_MeV": 0.05404151235619964,
+            "max_absolute_mass_residual_MeV": 11.592525441095859,
+            "mean_scaled_square": 8.424014553858084e-06
+          },
+          "density_min_fm3": 0.13512344185981695,
+          "density_max_fm3": 0.14400158530563026,
+          "density_boundary_hits": 0,
+          "parameter_bounds_active": [
+            false,
+            false
+          ],
+          "optimizer_success": true,
+          "optimizer_message": "`ftol` termination condition is satisfied.",
+          "nfev": 7,
+          "jacobian_condition_number": 24.760789721824793,
+          "locally_identifiable_two_parameters": true,
+          "multistart_scaled_sumsquares": [
+            4.334102941123872e-05,
+            4.33410294112394e-05,
+            4.334102941123889e-05
+          ],
+          "parameter_search_bounds": {
+            "sigma0": [
+              0.01,
+              10.0
+            ],
+            "b_plus_16": [
+              0.01,
+              1000000.0
+            ]
+          },
+          "prediction_binding_MeV": [
+            341.27608648431976,
+            420.085238211463,
+            343.6237495950006,
+            503.9300210428566,
+            770.537801937632,
+            784.4606593078908,
+            973.591949196124,
+            1097.7629776706608,
+            1624.8376985589043
+          ],
+          "optimized_density_fm3": [
+            0.14400158530563026,
+            0.14196961122483387,
+            0.13856921581478523,
+            0.14302063054410583,
+            0.14083356893765936,
+            0.14109027728580867,
+            0.13993362864275719,
+            0.13629698023004674,
+            0.13512344185981695
+          ],
+          "sigma_probe_MeV_fm2": [
+            4.1174725158663195e-05,
+            0.001110972365767238,
+            0.005130384049410345,
+            0.04012947699910418,
+            0.6368632771538819,
+            1.0116514530461287
+          ]
+        }
+      },
+      "previous_2408_geometric": {
+        "sigma0_MeV_fm2": 1.0177640770912677,
+        "b": 24.759981549859276,
+        "training": {
+          "n": 2408,
+          "rms_mass_residual_MeV": 15.218433033815872,
+          "rms_binding_per_baryon_residual_MeV": 0.11342524425433469,
+          "max_absolute_mass_residual_MeV": 40.94052997746576,
+          "mean_scaled_square": 3.7101330651023654e-05
+        },
+        "sigma_probe_MeV_fm2": [
+          4.148297513387538e-05,
+          0.0011192878369941667,
+          0.0051687547688102405,
+          0.04042760207850305,
+          0.6410517894835585,
+          1.0177640770912677
+        ]
+      }
+    }
+  }
+}

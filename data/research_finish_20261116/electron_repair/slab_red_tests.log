@@ -1,0 +1,601 @@
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+______________ test_saved_slab_flux_cancellation_trial[warm0-TW] _______________
+
+model = 'TW', seed = 'warm0'
+
+    @pytest.mark.parametrize('model',['TW','DDME2'])
+    @pytest.mark.parametrize('seed',['warm0','warm1','cold'])
+    def test_saved_slab_flux_cancellation_trial(model,seed):
+        case=json.loads((FIXTURES/f'GPPVA_{model}_{seed}_slab_failure_input.json').read_text())
+        grid=RadialGrid(case['points'],case['dimension']);p=np.asarray(case['protons'])
+        initial=(np.asarray(case['initial_v']),case['initial_mu']) if case['initial_v'] is not None else None
+>       ne,v,mu,res=screened_electrons(grid,p,case['radius'],initial=initial)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_screened_electron_vacuum_trials.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+grid = RadialGrid(points=192, dimension=1)
+protons = array([9.76783045e-03, 9.75947744e-03, 9.74279099e-03, 9.71773941e-03,
+       9.68437859e-03, 9.64266295e-03, 9.592630...6.61029252e-17, 6.69570130e-17, 5.80227577e-17,
+       6.14616476e-17, 5.15482890e-17, 5.76057779e-17, 4.19485058e-17])
+radius = 15.87169869454705, initial = None
+
+    def screened_electrons(grid,protons,radius,initial=None):
+        """Solve local zero-T electron equilibrium, global neutrality and Poisson.
+    
+        Pin one potential component during Newton, then restore the mean-zero gauge.
+        The pinned Laplacian block remains nonsingular as the electron susceptibility
+        tends to zero. Scalar neutrality is enforced at every trial potential, so an
+        almost-empty outer optimizer trial cannot enter a zero-susceptibility branch.
+        """
+        np_=np.asarray(protons,float)
+        if np_.shape!=grid.weights.shape or not np.all(np.isfinite(np_)) or np.any(np_<0):
+            raise ValueError('finite nonnegative proton profile matching the grid required')
+        if not math.isfinite(radius) or radius<=0:
+            raise ValueError('finite positive cell radius required')
+        average=grid.mean(np_)
+        if average==0:return np.zeros_like(np_),np.zeros_like(np_),ELECTRON_MASS,0.
+        lap=grid.minus_laplacian/radius**2
+        if initial is None:v=grid.poisson(np_-average,radius)
+        else:
+            v=np.asarray(initial[0],float).copy()
+            if v.shape!=np_.shape or not np.all(np.isfinite(v)) or not math.isfinite(float(initial[1])):
+                raise ValueError('finite electron initial guess matching the grid required')
+        v-=v[-1]
+        coupling=4*np.pi*E2
+        weights=grid.weights
+        def densities(v,mu):
+            chemical=mu+v
+            # Product form avoids cancellation of two nearly equal rest-energy squares.
+            kinetic=np.maximum(chemical-ELECTRON_MASS,0.)
+            k=np.sqrt(kinetic*np.maximum(chemical+ELECTRON_MASS,0.))
+            ne=(k/HBARC)**3/(3*np.pi**2)
+            derivative=np.where(chemical>ELECTRON_MASS,chemical*k/(np.pi**2*HBARC**3),0.)
+            return ne,derivative
+        def neutral_mu(potential):
+            lower=ELECTRON_MASS-float(max(potential))
+            upper=math.hypot(HBARC*(3*np.pi**2*average)**(1/3),ELECTRON_MASS)-float(min(potential))
+            upper+=max(1e-10,1e-12*abs(upper))
+            return brentq(lambda q:grid.mean(densities(potential,q)[0])-average,
+                          lower,upper,xtol=1e-15,rtol=4*np.finfo(float).eps)
+        def terms(v,mu):
+            ne,d=densities(v,mu)
+            return ne,d,lap@v-coupling*(np_-ne)
+        mu=neutral_mu(v)
+        # Resolve tiny positive charge instead of accepting an absolute-residual
+        # floor inherited from a dense cached potential. This only tightens Newton.
+        target=min(2e-12,coupling*average*1e-6)
+        for _ in range(60):
+            ne,d,res=terms(v,mu)
+            error=float(np.max(abs(res)))
+            if error<target:break
+            # Newton for first N-1 Poisson equations plus global neutrality, V[-1]=0.
+            # Its Schur complement has positive susceptibility without inverting
+            # the singular constant-potential mode of the Neumann Laplacian.
+            jac=lap[:-1,:-1]+np.diag(coupling*d[:-1])
+            solved=_band_solve(jac,np.column_stack((-res[:-1],coupling*d[:-1])))
+            z,u=solved[:,0],solved[:,1]
+            weighted=weights[:-1]*d[:-1]
+            denominator=float(weighted@(1-u)+weights[-1]*d[-1])
+            if not math.isfinite(denominator) or denominator<=0:
+                raise RuntimeError('screened electron susceptibility outside numerical support')
+            dmu=(-grid.mean(ne-np_)-weighted@z)/denominator
+            dv=np.r_[z-u*dmu,0.]
+            before=float(np.linalg.norm(res))
+            for power in range(32):
+                scale=2.**(-power)
+                trial=v+scale*dv
+                trial_mu=neutral_mu(trial)
+                trial_res=terms(trial,trial_mu)[2]
+                if float(np.linalg.norm(trial_res))<before:
+                    v,mu=trial,trial_mu
+                    break
+>           else:raise RuntimeError('screened-electron Newton line search failed')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           RuntimeError: screened-electron Newton line search failed
+
+python_frontend/compose_eos/spatial_tf_equilibrium.py:84: RuntimeError
+_____________ test_saved_slab_flux_cancellation_trial[warm0-DDME2] _____________
+
+model = 'DDME2', seed = 'warm0'
+
+    @pytest.mark.parametrize('model',['TW','DDME2'])
+    @pytest.mark.parametrize('seed',['warm0','warm1','cold'])
+    def test_saved_slab_flux_cancellation_trial(model,seed):
+        case=json.loads((FIXTURES/f'GPPVA_{model}_{seed}_slab_failure_input.json').read_text())
+        grid=RadialGrid(case['points'],case['dimension']);p=np.asarray(case['protons'])
+        initial=(np.asarray(case['initial_v']),case['initial_mu']) if case['initial_v'] is not None else None
+>       ne,v,mu,res=screened_electrons(grid,p,case['radius'],initial=initial)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_screened_electron_vacuum_trials.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+grid = RadialGrid(points=192, dimension=1)
+protons = array([8.60122711e-03, 8.59540344e-03, 8.58374879e-03, 8.56629187e-03,
+       8.54302230e-03, 8.51397747e-03, 8.479168...2.65123949e-17, 1.86848244e-17, 2.27083143e-17,
+       2.55982761e-17, 2.79950480e-17, 2.26995074e-17, 2.30544455e-17])
+radius = 14.28698399028845
+initial = (array([ 1.45406277,  1.45339673,  1.45206521,  1.45006937,  1.44741096,
+        1.44409228,  1.44011622,  1.43548623,... -1.01964747, -1.02071124, -1.02159771, -1.02230687, -1.02283874,
+       -1.02319332, -1.02337061]), 74.86200585141339)
+
+    def screened_electrons(grid,protons,radius,initial=None):
+        """Solve local zero-T electron equilibrium, global neutrality and Poisson.
+    
+        Pin one potential component during Newton, then restore the mean-zero gauge.
+        The pinned Laplacian block remains nonsingular as the electron susceptibility
+        tends to zero. Scalar neutrality is enforced at every trial potential, so an
+        almost-empty outer optimizer trial cannot enter a zero-susceptibility branch.
+        """
+        np_=np.asarray(protons,float)
+        if np_.shape!=grid.weights.shape or not np.all(np.isfinite(np_)) or np.any(np_<0):
+            raise ValueError('finite nonnegative proton profile matching the grid required')
+        if not math.isfinite(radius) or radius<=0:
+            raise ValueError('finite positive cell radius required')
+        average=grid.mean(np_)
+        if average==0:return np.zeros_like(np_),np.zeros_like(np_),ELECTRON_MASS,0.
+        lap=grid.minus_laplacian/radius**2
+        if initial is None:v=grid.poisson(np_-average,radius)
+        else:
+            v=np.asarray(initial[0],float).copy()
+            if v.shape!=np_.shape or not np.all(np.isfinite(v)) or not math.isfinite(float(initial[1])):
+                raise ValueError('finite electron initial guess matching the grid required')
+        v-=v[-1]
+        coupling=4*np.pi*E2
+        weights=grid.weights
+        def densities(v,mu):
+            chemical=mu+v
+            # Product form avoids cancellation of two nearly equal rest-energy squares.
+            kinetic=np.maximum(chemical-ELECTRON_MASS,0.)
+            k=np.sqrt(kinetic*np.maximum(chemical+ELECTRON_MASS,0.))
+            ne=(k/HBARC)**3/(3*np.pi**2)
+            derivative=np.where(chemical>ELECTRON_MASS,chemical*k/(np.pi**2*HBARC**3),0.)
+            return ne,derivative
+        def neutral_mu(potential):
+            lower=ELECTRON_MASS-float(max(potential))
+            upper=math.hypot(HBARC*(3*np.pi**2*average)**(1/3),ELECTRON_MASS)-float(min(potential))
+            upper+=max(1e-10,1e-12*abs(upper))
+            return brentq(lambda q:grid.mean(densities(potential,q)[0])-average,
+                          lower,upper,xtol=1e-15,rtol=4*np.finfo(float).eps)
+        def terms(v,mu):
+            ne,d=densities(v,mu)
+            return ne,d,lap@v-coupling*(np_-ne)
+        mu=neutral_mu(v)
+        # Resolve tiny positive charge instead of accepting an absolute-residual
+        # floor inherited from a dense cached potential. This only tightens Newton.
+        target=min(2e-12,coupling*average*1e-6)
+        for _ in range(60):
+            ne,d,res=terms(v,mu)
+            error=float(np.max(abs(res)))
+            if error<target:break
+            # Newton for first N-1 Poisson equations plus global neutrality, V[-1]=0.
+            # Its Schur complement has positive susceptibility without inverting
+            # the singular constant-potential mode of the Neumann Laplacian.
+            jac=lap[:-1,:-1]+np.diag(coupling*d[:-1])
+            solved=_band_solve(jac,np.column_stack((-res[:-1],coupling*d[:-1])))
+            z,u=solved[:,0],solved[:,1]
+            weighted=weights[:-1]*d[:-1]
+            denominator=float(weighted@(1-u)+weights[-1]*d[-1])
+            if not math.isfinite(denominator) or denominator<=0:
+                raise RuntimeError('screened electron susceptibility outside numerical support')
+            dmu=(-grid.mean(ne-np_)-weighted@z)/denominator
+            dv=np.r_[z-u*dmu,0.]
+            before=float(np.linalg.norm(res))
+            for power in range(32):
+                scale=2.**(-power)
+                trial=v+scale*dv
+                trial_mu=neutral_mu(trial)
+                trial_res=terms(trial,trial_mu)[2]
+                if float(np.linalg.norm(trial_res))<before:
+                    v,mu=trial,trial_mu
+                    break
+>           else:raise RuntimeError('screened-electron Newton line search failed')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           RuntimeError: screened-electron Newton line search failed
+
+python_frontend/compose_eos/spatial_tf_equilibrium.py:84: RuntimeError
+______________ test_saved_slab_flux_cancellation_trial[warm1-TW] _______________
+
+model = 'TW', seed = 'warm1'
+
+    @pytest.mark.parametrize('model',['TW','DDME2'])
+    @pytest.mark.parametrize('seed',['warm0','warm1','cold'])
+    def test_saved_slab_flux_cancellation_trial(model,seed):
+        case=json.loads((FIXTURES/f'GPPVA_{model}_{seed}_slab_failure_input.json').read_text())
+        grid=RadialGrid(case['points'],case['dimension']);p=np.asarray(case['protons'])
+        initial=(np.asarray(case['initial_v']),case['initial_mu']) if case['initial_v'] is not None else None
+>       ne,v,mu,res=screened_electrons(grid,p,case['radius'],initial=initial)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_screened_electron_vacuum_trials.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+grid = RadialGrid(points=192, dimension=1)
+protons = array([9.14431906e-03, 9.12477716e-03, 9.08869563e-03, 9.04154844e-03,
+       8.99006572e-03, 8.94097613e-03, 8.899199...1.24601577e-16, 8.30714543e-17, 4.43161521e-17,
+       5.50902115e-17, 1.01556574e-16, 8.67113067e-17, 5.54236537e-17])
+radius = 14.683461894338429
+initial = (array([ 1.826797  ,  1.82578837,  1.82379597,  1.82086404,  1.81704615,
+        1.81239274,  1.80693838,  1.80069206,... -1.27650179, -1.2778242 , -1.27892618, -1.27980776, -1.28046893,
+       -1.28090971, -1.2811301 ]), 72.47789869113825)
+
+    def screened_electrons(grid,protons,radius,initial=None):
+        """Solve local zero-T electron equilibrium, global neutrality and Poisson.
+    
+        Pin one potential component during Newton, then restore the mean-zero gauge.
+        The pinned Laplacian block remains nonsingular as the electron susceptibility
+        tends to zero. Scalar neutrality is enforced at every trial potential, so an
+        almost-empty outer optimizer trial cannot enter a zero-susceptibility branch.
+        """
+        np_=np.asarray(protons,float)
+        if np_.shape!=grid.weights.shape or not np.all(np.isfinite(np_)) or np.any(np_<0):
+            raise ValueError('finite nonnegative proton profile matching the grid required')
+        if not math.isfinite(radius) or radius<=0:
+            raise ValueError('finite positive cell radius required')
+        average=grid.mean(np_)
+        if average==0:return np.zeros_like(np_),np.zeros_like(np_),ELECTRON_MASS,0.
+        lap=grid.minus_laplacian/radius**2
+        if initial is None:v=grid.poisson(np_-average,radius)
+        else:
+            v=np.asarray(initial[0],float).copy()
+            if v.shape!=np_.shape or not np.all(np.isfinite(v)) or not math.isfinite(float(initial[1])):
+                raise ValueError('finite electron initial guess matching the grid required')
+        v-=v[-1]
+        coupling=4*np.pi*E2
+        weights=grid.weights
+        def densities(v,mu):
+            chemical=mu+v
+            # Product form avoids cancellation of two nearly equal rest-energy squares.
+            kinetic=np.maximum(chemical-ELECTRON_MASS,0.)
+            k=np.sqrt(kinetic*np.maximum(chemical+ELECTRON_MASS,0.))
+            ne=(k/HBARC)**3/(3*np.pi**2)
+            derivative=np.where(chemical>ELECTRON_MASS,chemical*k/(np.pi**2*HBARC**3),0.)
+            return ne,derivative
+        def neutral_mu(potential):
+            lower=ELECTRON_MASS-float(max(potential))
+            upper=math.hypot(HBARC*(3*np.pi**2*average)**(1/3),ELECTRON_MASS)-float(min(potential))
+            upper+=max(1e-10,1e-12*abs(upper))
+            return brentq(lambda q:grid.mean(densities(potential,q)[0])-average,
+                          lower,upper,xtol=1e-15,rtol=4*np.finfo(float).eps)
+        def terms(v,mu):
+            ne,d=densities(v,mu)
+            return ne,d,lap@v-coupling*(np_-ne)
+        mu=neutral_mu(v)
+        # Resolve tiny positive charge instead of accepting an absolute-residual
+        # floor inherited from a dense cached potential. This only tightens Newton.
+        target=min(2e-12,coupling*average*1e-6)
+        for _ in range(60):
+            ne,d,res=terms(v,mu)
+            error=float(np.max(abs(res)))
+            if error<target:break
+            # Newton for first N-1 Poisson equations plus global neutrality, V[-1]=0.
+            # Its Schur complement has positive susceptibility without inverting
+            # the singular constant-potential mode of the Neumann Laplacian.
+            jac=lap[:-1,:-1]+np.diag(coupling*d[:-1])
+            solved=_band_solve(jac,np.column_stack((-res[:-1],coupling*d[:-1])))
+            z,u=solved[:,0],solved[:,1]
+            weighted=weights[:-1]*d[:-1]
+            denominator=float(weighted@(1-u)+weights[-1]*d[-1])
+            if not math.isfinite(denominator) or denominator<=0:
+                raise RuntimeError('screened electron susceptibility outside numerical support')
+            dmu=(-grid.mean(ne-np_)-weighted@z)/denominator
+            dv=np.r_[z-u*dmu,0.]
+            before=float(np.linalg.norm(res))
+            for power in range(32):
+                scale=2.**(-power)
+                trial=v+scale*dv
+                trial_mu=neutral_mu(trial)
+                trial_res=terms(trial,trial_mu)[2]
+                if float(np.linalg.norm(trial_res))<before:
+                    v,mu=trial,trial_mu
+                    break
+>           else:raise RuntimeError('screened-electron Newton line search failed')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           RuntimeError: screened-electron Newton line search failed
+
+python_frontend/compose_eos/spatial_tf_equilibrium.py:84: RuntimeError
+_____________ test_saved_slab_flux_cancellation_trial[warm1-DDME2] _____________
+
+model = 'DDME2', seed = 'warm1'
+
+    @pytest.mark.parametrize('model',['TW','DDME2'])
+    @pytest.mark.parametrize('seed',['warm0','warm1','cold'])
+    def test_saved_slab_flux_cancellation_trial(model,seed):
+        case=json.loads((FIXTURES/f'GPPVA_{model}_{seed}_slab_failure_input.json').read_text())
+        grid=RadialGrid(case['points'],case['dimension']);p=np.asarray(case['protons'])
+        initial=(np.asarray(case['initial_v']),case['initial_mu']) if case['initial_v'] is not None else None
+>       ne,v,mu,res=screened_electrons(grid,p,case['radius'],initial=initial)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_screened_electron_vacuum_trials.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+grid = RadialGrid(points=192, dimension=1)
+protons = array([1.39785955e-02, 1.39478459e-02, 1.38866348e-02, 1.37947531e-02,
+       1.36725533e-02, 1.35200627e-02, 1.333799...0.00000000e+00, 1.08786934e-16, 8.16521482e-17,
+       0.00000000e+00, 2.09286868e-17, 9.66986899e-17, 8.32301067e-18])
+radius = 12.610612744058573
+initial = (array([ 9.71491505e-01,  9.71109913e-01,  9.70346952e-01,  9.69203067e-01,
+        9.67678926e-01,  9.65775418e-01,  ...2e-01, -7.38233272e-01,
+       -7.38773348e-01, -7.39178403e-01, -7.39448438e-01, -7.39583455e-01]), 74.64955149307086)
+
+    def screened_electrons(grid,protons,radius,initial=None):
+        """Solve local zero-T electron equilibrium, global neutrality and Poisson.
+    
+        Pin one potential component during Newton, then restore the mean-zero gauge.
+        The pinned Laplacian block remains nonsingular as the electron susceptibility
+        tends to zero. Scalar neutrality is enforced at every trial potential, so an
+        almost-empty outer optimizer trial cannot enter a zero-susceptibility branch.
+        """
+        np_=np.asarray(protons,float)
+        if np_.shape!=grid.weights.shape or not np.all(np.isfinite(np_)) or np.any(np_<0):
+            raise ValueError('finite nonnegative proton profile matching the grid required')
+        if not math.isfinite(radius) or radius<=0:
+            raise ValueError('finite positive cell radius required')
+        average=grid.mean(np_)
+        if average==0:return np.zeros_like(np_),np.zeros_like(np_),ELECTRON_MASS,0.
+        lap=grid.minus_laplacian/radius**2
+        if initial is None:v=grid.poisson(np_-average,radius)
+        else:
+            v=np.asarray(initial[0],float).copy()
+            if v.shape!=np_.shape or not np.all(np.isfinite(v)) or not math.isfinite(float(initial[1])):
+                raise ValueError('finite electron initial guess matching the grid required')
+        v-=v[-1]
+        coupling=4*np.pi*E2
+        weights=grid.weights
+        def densities(v,mu):
+            chemical=mu+v
+            # Product form avoids cancellation of two nearly equal rest-energy squares.
+            kinetic=np.maximum(chemical-ELECTRON_MASS,0.)
+            k=np.sqrt(kinetic*np.maximum(chemical+ELECTRON_MASS,0.))
+            ne=(k/HBARC)**3/(3*np.pi**2)
+            derivative=np.where(chemical>ELECTRON_MASS,chemical*k/(np.pi**2*HBARC**3),0.)
+            return ne,derivative
+        def neutral_mu(potential):
+            lower=ELECTRON_MASS-float(max(potential))
+            upper=math.hypot(HBARC*(3*np.pi**2*average)**(1/3),ELECTRON_MASS)-float(min(potential))
+            upper+=max(1e-10,1e-12*abs(upper))
+            return brentq(lambda q:grid.mean(densities(potential,q)[0])-average,
+                          lower,upper,xtol=1e-15,rtol=4*np.finfo(float).eps)
+        def terms(v,mu):
+            ne,d=densities(v,mu)
+            return ne,d,lap@v-coupling*(np_-ne)
+        mu=neutral_mu(v)
+        # Resolve tiny positive charge instead of accepting an absolute-residual
+        # floor inherited from a dense cached potential. This only tightens Newton.
+        target=min(2e-12,coupling*average*1e-6)
+        for _ in range(60):
+            ne,d,res=terms(v,mu)
+            error=float(np.max(abs(res)))
+            if error<target:break
+            # Newton for first N-1 Poisson equations plus global neutrality, V[-1]=0.
+            # Its Schur complement has positive susceptibility without inverting
+            # the singular constant-potential mode of the Neumann Laplacian.
+            jac=lap[:-1,:-1]+np.diag(coupling*d[:-1])
+            solved=_band_solve(jac,np.column_stack((-res[:-1],coupling*d[:-1])))
+            z,u=solved[:,0],solved[:,1]
+            weighted=weights[:-1]*d[:-1]
+            denominator=float(weighted@(1-u)+weights[-1]*d[-1])
+            if not math.isfinite(denominator) or denominator<=0:
+                raise RuntimeError('screened electron susceptibility outside numerical support')
+            dmu=(-grid.mean(ne-np_)-weighted@z)/denominator
+            dv=np.r_[z-u*dmu,0.]
+            before=float(np.linalg.norm(res))
+            for power in range(32):
+                scale=2.**(-power)
+                trial=v+scale*dv
+                trial_mu=neutral_mu(trial)
+                trial_res=terms(trial,trial_mu)[2]
+                if float(np.linalg.norm(trial_res))<before:
+                    v,mu=trial,trial_mu
+                    break
+>           else:raise RuntimeError('screened-electron Newton line search failed')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           RuntimeError: screened-electron Newton line search failed
+
+python_frontend/compose_eos/spatial_tf_equilibrium.py:84: RuntimeError
+_______________ test_saved_slab_flux_cancellation_trial[cold-TW] _______________
+
+model = 'TW', seed = 'cold'
+
+    @pytest.mark.parametrize('model',['TW','DDME2'])
+    @pytest.mark.parametrize('seed',['warm0','warm1','cold'])
+    def test_saved_slab_flux_cancellation_trial(model,seed):
+        case=json.loads((FIXTURES/f'GPPVA_{model}_{seed}_slab_failure_input.json').read_text())
+        grid=RadialGrid(case['points'],case['dimension']);p=np.asarray(case['protons'])
+        initial=(np.asarray(case['initial_v']),case['initial_mu']) if case['initial_v'] is not None else None
+>       ne,v,mu,res=screened_electrons(grid,p,case['radius'],initial=initial)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_screened_electron_vacuum_trials.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+grid = RadialGrid(points=192, dimension=1)
+protons = array([2.88840479e-02, 2.88829478e-02, 2.88815726e-02, 2.88798538e-02,
+       2.88777054e-02, 2.88750201e-02, 2.887166...2.20758000e-16, 1.76593908e-16, 1.41265134e-16,
+       1.13004113e-16, 9.03968963e-17, 7.23124019e-17, 5.78458297e-17])
+radius = 30.000000000000004, initial = None
+
+    def screened_electrons(grid,protons,radius,initial=None):
+        """Solve local zero-T electron equilibrium, global neutrality and Poisson.
+    
+        Pin one potential component during Newton, then restore the mean-zero gauge.
+        The pinned Laplacian block remains nonsingular as the electron susceptibility
+        tends to zero. Scalar neutrality is enforced at every trial potential, so an
+        almost-empty outer optimizer trial cannot enter a zero-susceptibility branch.
+        """
+        np_=np.asarray(protons,float)
+        if np_.shape!=grid.weights.shape or not np.all(np.isfinite(np_)) or np.any(np_<0):
+            raise ValueError('finite nonnegative proton profile matching the grid required')
+        if not math.isfinite(radius) or radius<=0:
+            raise ValueError('finite positive cell radius required')
+        average=grid.mean(np_)
+        if average==0:return np.zeros_like(np_),np.zeros_like(np_),ELECTRON_MASS,0.
+        lap=grid.minus_laplacian/radius**2
+        if initial is None:v=grid.poisson(np_-average,radius)
+        else:
+            v=np.asarray(initial[0],float).copy()
+            if v.shape!=np_.shape or not np.all(np.isfinite(v)) or not math.isfinite(float(initial[1])):
+                raise ValueError('finite electron initial guess matching the grid required')
+        v-=v[-1]
+        coupling=4*np.pi*E2
+        weights=grid.weights
+        def densities(v,mu):
+            chemical=mu+v
+            # Product form avoids cancellation of two nearly equal rest-energy squares.
+            kinetic=np.maximum(chemical-ELECTRON_MASS,0.)
+            k=np.sqrt(kinetic*np.maximum(chemical+ELECTRON_MASS,0.))
+            ne=(k/HBARC)**3/(3*np.pi**2)
+            derivative=np.where(chemical>ELECTRON_MASS,chemical*k/(np.pi**2*HBARC**3),0.)
+            return ne,derivative
+        def neutral_mu(potential):
+            lower=ELECTRON_MASS-float(max(potential))
+            upper=math.hypot(HBARC*(3*np.pi**2*average)**(1/3),ELECTRON_MASS)-float(min(potential))
+            upper+=max(1e-10,1e-12*abs(upper))
+            return brentq(lambda q:grid.mean(densities(potential,q)[0])-average,
+                          lower,upper,xtol=1e-15,rtol=4*np.finfo(float).eps)
+        def terms(v,mu):
+            ne,d=densities(v,mu)
+            return ne,d,lap@v-coupling*(np_-ne)
+        mu=neutral_mu(v)
+        # Resolve tiny positive charge instead of accepting an absolute-residual
+        # floor inherited from a dense cached potential. This only tightens Newton.
+        target=min(2e-12,coupling*average*1e-6)
+        for _ in range(60):
+            ne,d,res=terms(v,mu)
+            error=float(np.max(abs(res)))
+            if error<target:break
+            # Newton for first N-1 Poisson equations plus global neutrality, V[-1]=0.
+            # Its Schur complement has positive susceptibility without inverting
+            # the singular constant-potential mode of the Neumann Laplacian.
+            jac=lap[:-1,:-1]+np.diag(coupling*d[:-1])
+            solved=_band_solve(jac,np.column_stack((-res[:-1],coupling*d[:-1])))
+            z,u=solved[:,0],solved[:,1]
+            weighted=weights[:-1]*d[:-1]
+            denominator=float(weighted@(1-u)+weights[-1]*d[-1])
+            if not math.isfinite(denominator) or denominator<=0:
+                raise RuntimeError('screened electron susceptibility outside numerical support')
+            dmu=(-grid.mean(ne-np_)-weighted@z)/denominator
+            dv=np.r_[z-u*dmu,0.]
+            before=float(np.linalg.norm(res))
+            for power in range(32):
+                scale=2.**(-power)
+                trial=v+scale*dv
+                trial_mu=neutral_mu(trial)
+                trial_res=terms(trial,trial_mu)[2]
+                if float(np.linalg.norm(trial_res))<before:
+                    v,mu=trial,trial_mu
+                    break
+>           else:raise RuntimeError('screened-electron Newton line search failed')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           RuntimeError: screened-electron Newton line search failed
+
+python_frontend/compose_eos/spatial_tf_equilibrium.py:84: RuntimeError
+_____________ test_saved_slab_flux_cancellation_trial[cold-DDME2] ______________
+
+model = 'DDME2', seed = 'cold'
+
+    @pytest.mark.parametrize('model',['TW','DDME2'])
+    @pytest.mark.parametrize('seed',['warm0','warm1','cold'])
+    def test_saved_slab_flux_cancellation_trial(model,seed):
+        case=json.loads((FIXTURES/f'GPPVA_{model}_{seed}_slab_failure_input.json').read_text())
+        grid=RadialGrid(case['points'],case['dimension']);p=np.asarray(case['protons'])
+        initial=(np.asarray(case['initial_v']),case['initial_mu']) if case['initial_v'] is not None else None
+>       ne,v,mu,res=screened_electrons(grid,p,case['radius'],initial=initial)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_screened_electron_vacuum_trials.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+grid = RadialGrid(points=192, dimension=1)
+protons = array([2.88840479e-02, 2.88829478e-02, 2.88815726e-02, 2.88798538e-02,
+       2.88777054e-02, 2.88750201e-02, 2.887166...2.20758000e-16, 1.76593908e-16, 1.41265134e-16,
+       1.13004113e-16, 9.03968963e-17, 7.23124019e-17, 5.78458297e-17])
+radius = 30.000000000000004, initial = None
+
+    def screened_electrons(grid,protons,radius,initial=None):
+        """Solve local zero-T electron equilibrium, global neutrality and Poisson.
+    
+        Pin one potential component during Newton, then restore the mean-zero gauge.
+        The pinned Laplacian block remains nonsingular as the electron susceptibility
+        tends to zero. Scalar neutrality is enforced at every trial potential, so an
+        almost-empty outer optimizer trial cannot enter a zero-susceptibility branch.
+        """
+        np_=np.asarray(protons,float)
+        if np_.shape!=grid.weights.shape or not np.all(np.isfinite(np_)) or np.any(np_<0):
+            raise ValueError('finite nonnegative proton profile matching the grid required')
+        if not math.isfinite(radius) or radius<=0:
+            raise ValueError('finite positive cell radius required')
+        average=grid.mean(np_)
+        if average==0:return np.zeros_like(np_),np.zeros_like(np_),ELECTRON_MASS,0.
+        lap=grid.minus_laplacian/radius**2
+        if initial is None:v=grid.poisson(np_-average,radius)
+        else:
+            v=np.asarray(initial[0],float).copy()
+            if v.shape!=np_.shape or not np.all(np.isfinite(v)) or not math.isfinite(float(initial[1])):
+                raise ValueError('finite electron initial guess matching the grid required')
+        v-=v[-1]
+        coupling=4*np.pi*E2
+        weights=grid.weights
+        def densities(v,mu):
+            chemical=mu+v
+            # Product form avoids cancellation of two nearly equal rest-energy squares.
+            kinetic=np.maximum(chemical-ELECTRON_MASS,0.)
+            k=np.sqrt(kinetic*np.maximum(chemical+ELECTRON_MASS,0.))
+            ne=(k/HBARC)**3/(3*np.pi**2)
+            derivative=np.where(chemical>ELECTRON_MASS,chemical*k/(np.pi**2*HBARC**3),0.)
+            return ne,derivative
+        def neutral_mu(potential):
+            lower=ELECTRON_MASS-float(max(potential))
+            upper=math.hypot(HBARC*(3*np.pi**2*average)**(1/3),ELECTRON_MASS)-float(min(potential))
+            upper+=max(1e-10,1e-12*abs(upper))
+            return brentq(lambda q:grid.mean(densities(potential,q)[0])-average,
+                          lower,upper,xtol=1e-15,rtol=4*np.finfo(float).eps)
+        def terms(v,mu):
+            ne,d=densities(v,mu)
+            return ne,d,lap@v-coupling*(np_-ne)
+        mu=neutral_mu(v)
+        # Resolve tiny positive charge instead of accepting an absolute-residual
+        # floor inherited from a dense cached potential. This only tightens Newton.
+        target=min(2e-12,coupling*average*1e-6)
+        for _ in range(60):
+            ne,d,res=terms(v,mu)
+            error=float(np.max(abs(res)))
+            if error<target:break
+            # Newton for first N-1 Poisson equations plus global neutrality, V[-1]=0.
+            # Its Schur complement has positive susceptibility without inverting
+            # the singular constant-potential mode of the Neumann Laplacian.
+            jac=lap[:-1,:-1]+np.diag(coupling*d[:-1])
+            solved=_band_solve(jac,np.column_stack((-res[:-1],coupling*d[:-1])))
+            z,u=solved[:,0],solved[:,1]
+            weighted=weights[:-1]*d[:-1]
+            denominator=float(weighted@(1-u)+weights[-1]*d[-1])
+            if not math.isfinite(denominator) or denominator<=0:
+                raise RuntimeError('screened electron susceptibility outside numerical support')
+            dmu=(-grid.mean(ne-np_)-weighted@z)/denominator
+            dv=np.r_[z-u*dmu,0.]
+            before=float(np.linalg.norm(res))
+            for power in range(32):
+                scale=2.**(-power)
+                trial=v+scale*dv
+                trial_mu=neutral_mu(trial)
+                trial_res=terms(trial,trial_mu)[2]
+                if float(np.linalg.norm(trial_res))<before:
+                    v,mu=trial,trial_mu
+                    break
+>           else:raise RuntimeError('screened-electron Newton line search failed')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           RuntimeError: screened-electron Newton line search failed
+
+python_frontend/compose_eos/spatial_tf_equilibrium.py:84: RuntimeError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_screened_electron_vacuum_trials.py::test_saved_slab_flux_cancellation_trial[warm0-TW]
+FAILED python_frontend/tests/test_screened_electron_vacuum_trials.py::test_saved_slab_flux_cancellation_trial[warm0-DDME2]
+FAILED python_frontend/tests/test_screened_electron_vacuum_trials.py::test_saved_slab_flux_cancellation_trial[warm1-TW]
+FAILED python_frontend/tests/test_screened_electron_vacuum_trials.py::test_saved_slab_flux_cancellation_trial[warm1-DDME2]
+FAILED python_frontend/tests/test_screened_electron_vacuum_trials.py::test_saved_slab_flux_cancellation_trial[cold-TW]
+FAILED python_frontend/tests/test_screened_electron_vacuum_trials.py::test_saved_slab_flux_cancellation_trial[cold-DDME2]
+6 failed, 12 deselected in 0.52s

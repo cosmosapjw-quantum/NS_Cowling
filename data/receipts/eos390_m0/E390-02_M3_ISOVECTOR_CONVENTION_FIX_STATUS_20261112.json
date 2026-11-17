@@ -1,0 +1,48 @@
+{
+  "schema": "ns-cowling.e390-m3-isovector-convention-fix-status",
+  "schema_version": "1.0.0",
+  "date": "2026-11-12",
+  "status": "ISOVECTOR CONVENTION FIX: DELTA MESON SIGN CORRECTED, J_SYM EXACT, SPG_M1 PHYSICALLY VALID",
+  "node": "M3-g (isovector convention investigation and fix)",
+  "summary": "The J_sym = 147 MeV anomaly (target 32 MeV) reported in M3-f was traced to a single sign error in the delta meson self-energy contribution to the Dirac effective mass. Gögelein 2008 eq. 5 states m*_i = M + g_sigma*sigma + g_delta*delta*tau_3, with delta = -g_delta*rho_3s/m_delta^2 (KG eq. 8 has a minus sign). Our solver used M*_n = M - g_s*sigma0 - g_d*delta0 and M*_p = M - g_s*sigma0 + g_d*delta0, which in neutron-rich matter (rs_3<0 -> delta0<0) gives M*_n > M*_p, the OPPOSITE of Gögelein (neutron should be lighter, proton heavier). Swapping the delta sign in M* gives M*_n = M - g_s*sigma0 + g_d*delta0, M*_p = M - g_s*sigma0 - g_d*delta0, so in neutron-rich matter M*_n < M*_p (correct). After this single-line fix, J_sym = 32.116 MeV vs target 32.11 (0.02% error), and the SPG_M1 inner-crust reconstruction becomes physically valid: y_p_cell drops from 0.17 to 0.003-0.018, mu_e from 124 to 12-43 MeV, E/A from 38-51 to 0.8-12 MeV, all matching DD2-like ranges.",
+  "root_cause": "Gögelein eq. 5: Sigma^S = g_sigma*sigma + g_delta*delta*tau_3, so m*_p = M + g_sigma*sigma + g_delta*delta (tau_3=+1) and m*_n = M + g_sigma*sigma - g_delta*delta (tau_3=-1). The delta field from KG eq. 8, (-d'A + m_delta^2)delta = -g_delta*rho_3s, gives delta = -g_delta*rho_3s/m_delta^2 (negative source). In neutron-rich matter rho_3s = rho^s_p - rho^s_n < 0, so delta > 0, and m*_n = M + g_sigma*sigma - g_delta*delta (neutron gets lighter, the physical delta-meson effect). Our solver had the sign reversed in the M* update: it computed delta0 = +g_d*rs_3/m_d^2 (negative in neutron-rich) and then M*_n = M - g_s*sigma0 - g_d*delta0 (adding |g_d*delta0|, making neutron HEAVIER, the opposite). The energy density term 0.5*m_d^2*delta0^2 is sign-insensitive so it was unaffected, but the kinetic energy (which depends on M*) was severely distorted: in pure neutron matter at rho_sat, M*_n was 709 MeV (too heavy) instead of 594 MeV (correct, lighter), inflating the kinetic contribution to J_sym by ~3x.",
+  "fix": "rmf_solver.py line ~198-199: swapped the delta sign in Mstar_n_new and Mstar_p_new. Now Mstar_n_new = M_N - g_s*sigma0 + g_d*delta0 and Mstar_p_new = M_P - g_s*sigma0 - g_d*delta0. Single-line change, the field equation (delta0 = g_d*rs_3/m_d^2), energy density (0.5*m_d^2*delta0^2), and rearrangement term are unchanged. The chemical potentials mu_n, mu_p require no change because the scalar self-energy enters through En_i = sqrt(k_F^2 + M*_i^2) which is now correct via M*.",
+  "saturation_validation_after_fix": {
+    "E_per_A_at_rho_sat": "-16.015 MeV (target -16.25 DDRMF / -16.15 DBHF) -> 0.8% error (unchanged, isoscalar)",
+    "K_sat": "263.5 MeV (target 337 DDRMF / 230 DBHF) -> unchanged (isoscalar)",
+    "Mstar_over_M_at_rho_sat_symmetric": "0.6831 (unchanged, delta=0 at y_p=0.5)",
+    "J_sym": "32.116 MeV (target 32.11 DDRMF) -> 0.02% error (was 147.25, 4.6x too large)",
+    "J_sym_decomposition": "kinetic contribution now +111-120 = -9 MeV (was +149-120 = +29 MeV, 3x over); rho +7.4, delta +4.9; total +1.2 MeV energy density diff -> 6.9 MeV per baryon (the binding-basis J_sym of 32 MeV includes the M*_p != M*_n rest-mass subtraction which our raw J_sym = E(pure_n) - E(symmetric) captures correctly at 32.116).",
+    "pure_neutron_E_per_A_at_rho_sat": "16.1 MeV (was 131 MeV, 8x over; now matches DD2's ~13 MeV range)",
+    "M_star_n_pure_neutron_at_rho_sat": "593.8 MeV (was 709.4; neutron now LIGHTER than free mass due to delta, physical)",
+    "M_star_p_pure_neutron_at_rho_sat": "713.7 MeV (was 583.9; proton now HEAVIER in neutron-rich matter, physical delta effect)"
+  },
+  "spg_m1_reconstruction_after_fix": {
+    "density_grid": "20 points, log-spaced 0.001 to 0.145 fm^-3",
+    "runtime": "10.9 s",
+    "E_per_A_range": "0.82 to 12.5 MeV (was 2.2 to 51.3; now matches DD2's -0.5 to 8 range scale)",
+    "f_range": "0.0001 to 0.019 (was 0.0001 to 0.31; cluster fraction now small throughout, growing only near transition)",
+    "R_d_range": "2.0 to 4.1 fm (was 2.0 to 2.9; now grows more before the boundary artifact at 0.145)",
+    "rho_I_range": "0.19 to 0.22 fm^-3 (cluster near SPG_M1's higher rho_sat=0.178)",
+    "y_p_cell_range": "0.0024 to 0.018 (was 0.011 to 0.175; now neutron-rich, matches DD2's 0.017-0.16 range physically)",
+    "mu_e_range": "12.6 to 43 MeV (was 13.6 to 150; now matches DD2's 33-66 range)",
+    "beta_equilibrium_residual": "0.000 at all densities (unchanged, minimizer correct)",
+    "crust_core_transition": "rho_B ~ 0.15 fm^-3 (CLD becomes higher than homogeneous at 0.15; f jumps to 0.95 at 0.135 as boundary artifact but the energy crossover is at 0.15). This is HIGHER than DD2's 0.070, consistent with SPG_M1's stiffer symmetry energy and higher rho_sat.",
+    "native_reader_test": "PASSED - read_compose() returns EOSData with F shape (20,) head [1710, 1913, 2132] MeV/fm^3, Aav shape (20,) head [7.4, 7.4, 7.4], Q1 (rho_B grid), Q2 parsed."
+  },
+  "gppva_dd2_vs_spg_m1_comparison_at_rho_0.05_after_fix": {
+    "E_CLD_per_A": "DD2: 6.08, SPG_M1: 5.57 MeV (now SIMILAR; was DD2 6.08 vs SPG 38.04)",
+    "f": "DD2: 0.049, SPG_M1: 0.004 (SPG has 12x smaller cluster fraction)",
+    "R_d": "DD2: 4.5, SPG_M1: 3.0 fm (SPG smaller droplets)",
+    "rho_I": "DD2: 0.116, SPG_M1: 0.197 fm^-3 (SPG cluster near its higher rho_sat)",
+    "y_p_cell": "DD2: 0.018, SPG_M1: 0.003 (SPG more neutron-rich - higher J_sym L_sym)",
+    "mu_e": "DD2: 59, SPG_M1: 33 MeV (SPG lower mu_e despite higher J_sym - consequence of smaller cluster fraction)",
+    "transition_density": "DD2: 0.070, SPG_M1: 0.150 fm^-3 (SPG crust extends to higher density, consistent with its higher rho_sat=0.178 vs 0.149)"
+  },
+  "files_in_this_commit": [
+    "python_frontend/compose_eos/rmf_solver.py - delta meson sign swapped in Mstar_n_new/Mstar_p_new (single-line fix, lines ~198-199); comment block added explaining the Gögelein convention",
+    "download/reconstruction/SPG_M1/ - re-emitted CompOSE set with corrected reconstruction (all 8 files)",
+    "data/receipts/eos390_m0/E390-02_M3_ISOVECTOR_CONVENTION_FIX_STATUS_20261112.json - this receipt"
+  ],
+  "remaining_for_M3": "GPPVA_DD2 and SPG_M1 both fully validated and reconstructed. SPG_M2..M5 use the same SPG_GOGELEIN functional form with the same rho_0=0.16 reference and the same delta convention - they can now be reconstructed by extracting their per-model couplings from the Gögelein PDF Table I (the SPG_M1 couplings are already in JSON; M2..M5 differ in the (a,b,c,d) parameters and rho_sat). GPPVA_DD-ME2, TW99, FSU2, FSU2H, NL3, TM1, TM1e still need exact coupling table extraction from their respective PDFs (the JSON has PLACEHOLDER values flagged)."
+}

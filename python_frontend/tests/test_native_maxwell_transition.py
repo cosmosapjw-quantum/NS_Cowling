@@ -109,8 +109,10 @@ def test_native_maxwell_transition_recovers_exact_analytic_coexistence():
     assert np.all(np.diff(out.nb) > 0.0)
     assert np.all(np.diff(out.p) >= -1e-12)
     assert np.all(np.diff(out.eps) > 0.0)
-    assert out.composition_file_present is False
+    assert out.composition_file_present is True  # phase-only eos.compo sidecar
     assert out.composition_available is False
+    assert report["compose_export_allowed"] is True
+    assert report["composition_scope"] == "thermo_only_phase_labels_no_abundances"
     assert np.all(out.Q2 == 0.0)
     assert np.all(out.Q5 == 0.0)
     assert np.all(out.Q6 == out.Q7)
@@ -178,6 +180,9 @@ def test_maxwell_phase_barotrope_cannot_be_written_as_complete_compose_without_c
     out = construct_maxwell_transition(
         low, high, assume_local_charge_neutrality=True
     )
+    # Deliberately remove the required phase-sidecar declaration.  Export
+    # must still fail rather than silently discard the transition labels.
+    out.composition_file_present = False
     with pytest.raises(NativeFeatureUnavailable, match="phase composition"):
         write_compose(tmp_path / "bad-compose-export", out)
 
@@ -191,6 +196,7 @@ def test_native_cli_writer_rejects_phase_barotrope_without_composition(tmp_path)
     out = construct_maxwell_transition(
         low, high, assume_local_charge_neutrality=True
     )
+    out.composition_file_present = False  # invalid: nonzero phases need sidecar
     internal = tmp_path / "internal"
     destination = tmp_path / "compose"
     internal.mkdir()

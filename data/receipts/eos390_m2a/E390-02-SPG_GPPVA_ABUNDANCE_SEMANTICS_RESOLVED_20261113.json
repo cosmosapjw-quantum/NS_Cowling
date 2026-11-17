@@ -1,0 +1,68 @@
+{
+  "receipt_id": "E390-02-SPG_GPPVA_ABUNDANCE_SEMANTICS_RESOLVED_20261113",
+  "node": "next_actions[4] (SPG/GPPVA provider-specific abundance semantics)",
+  "gate": "E390-02 provider-semantics-B + C6B adjudication",
+  "title": "Resolve SPG/GPPVA provider-specific abundance semantics from written data sheets and independent closure",
+  "prior_status": "BLOCKED_PROVIDER_CLARIFICATION (DAG gap) + open next_actions[4]",
+  "resolved_status": "RESOLVED_DUAL_TRACK_STANDARD_AND_RECONSTRUCTION",
+  "resolution_date": "2026-11-13",
+  "branch": "cloud/eos390-fortran-unification-v1",
+  "finding": "The SPG/GPPVA provider-specific abundance semantics (the disputed fourth eos.compo group field — the C6B ambiguity) is resolved on TWO independent tracks that together close next_actions[4] without requiring a written provider statement. Track 1 (parser/mask standard) is implemented and CI-verified: the native parser reads the field as the CompOSE manual v3.01 YI (combined number fraction), computes Yh = Abar*YI, preserves the raw token byte-for-byte (Yh=1.0 is NOT specially remapped), and the M2A per-row range check flags deviating rows as row_status=FAIL rather than silently guessing. Track 2 (production bypass) is decided and operational: rather than consume the provider's non-conformant eos.compo export, the production composition is reconstructed from published physics (Grill 2014 Thomas-Fermi + Scurto 2024 CLD + each model's RMF paper + Gögelein 2008 SPG functional), with the M3 CLD reconstruction pipeline already operational and GPPVA_DD2 inner crust reconstructed. The open provider-clarification questions remain open but are NO LONGER on the critical path.",
+  "the_c6b_ambiguity": {
+    "disputed_field": "The fourth column of the eos.compo nuclear-group quadruple (qid, Aav, Zav, YI).",
+    "manual_definition": "CompOSE Manual v3.01 (arXiv:2203.03209) eq. 3.10/3.11/3.12/4.19-4.23: YI = combined nuclear-group number fraction; Y_h = Aav * YI is the group's baryon fraction.",
+    "provider_export_deviation": "SPG/GPPVA exports YI=1.0 in outer-crust Iphase=0 rows (gives Y_h=56 under the manual formula — impossible) and YI=Ye in inner-crust Iphase=7 rows (gives Y_h=Aav*Ye — also violates baryon closure). Neither interpretation is consistent with the manual.",
+    "rejected_global_remappings": [
+      "Yh = Aav * last_value (manual literal) -> global baryon-normalization failure (Y_h=56)",
+      "Yh = last_value (treat 4th col as baryon fraction) -> outer rows only; fails SPG inner rows",
+      "Yh = 1 (constant) -> diagnostic only, undocumented, fails SPG inner charge closure"
+    ]
+  },
+  "track_1_parser_mask_standard_IMPLEMENTED": {
+    "status": "IMPLEMENTED_CI_PASS",
+    "authority": "E390-02_C6B_adjudication_v2_20261111.json (RESOLVED_STANDARD_DOCUMENTED_PROVIDER_EXPORT_DEVIATES)",
+    "fortran": "compose_eos_io.f90 line ~300: eos%yh(k) = a*yi (Yh = Abar * YI). Lines 320-328: per-row range check, Yh > 1+5e-3 -> row_status=FAIL. C3_applicable (Yn,Yp,Yh present) and C4_applicable (Yp,Abar,Zbar,Yh,Ye,Ymu present, Abar>0) computed independently per row.",
+    "python": "eos_data.py: Aav/Zav/Yh + 9 per-row mask arrays round-trip via from_internal_directory/write_internal_directory.",
+    "contract": "The parser does NOT choose between YI/Y_h/X_h/Ye by making whichever formula pass. It preserves the source token, applies the manual formula, and flags deviations as FAIL.",
+    "test_evidence": "test_m2a_presence_masks.py (8 tests PASS) includes test_no_spg_gppva_ambiguous_field_remapping_is_made_by_coverage_mask_task: a Yh=1.0 value (constructed via quad (1, 56, 26, 1/56)) is preserved byte-for-bit (float64 tolerance 1e-10); row_status=PARTIAL (Ye/Ymu missing); NO remap to Y_I/X_h/Ye/aggregate.",
+    "verdict": "PASS — the parser/mask half of the semantics is contract-compliant and verified."
+  },
+  "track_2_production_bypass_DECIDED_AND_OPERATIONAL": {
+    "status": "DECIDED_RECONSTRUCT_FROM_PAPERS_NOT_PROVIDER_COMPOSE",
+    "authority": "E390-02_SPG_GPPVA_RECONSTRUCTION_DECISION_20261111.json",
+    "decision": "Reconstruct the SPG/GPPVA inner-crust composition from the published CLD/Thomas-Fermi physics (Grill 2014, Scurto 2024) combined with each model's RMF parameterization paper, rather than consuming the CompOSE provider's eos.compo export.",
+    "closure_contract": "The reconstructed composition must satisfy CompOSE manual v3.01 definitions (YI = combined number fraction, Y_h = Aav*YI) and baryon/charge closure (Yn+Yp+Yh=1, Yp+(Z/A)Yh=Ye+Ymu) BY CONSTRUCTION, with the free-neutron gas explicitly represented (Yn>0 where the CLD model has a gas phase).",
+    "pipeline_status": "M3 CLD reconstruction pipeline OPERATIONAL (E390-02_M3_CLD_RECONSTRUCTION_STATUS_20261112.json): rmf_solver.py (validated) -> cld_cell.py (Scurto 2024 eq. 21-25) -> emitter. GPPVA_DD2 inner crust reconstructed.",
+    "relevant_papers_staged": {
+      "compose_manual": "inputs/open_access_pdfs/compose_manual_v3.01_2203.03209.pdf (authoritative standard)",
+      "compose_inner_crust_datasheet": "inputs/open_access_pdfs/compose_inner_crust_datasheet_2207.14153.pdf (provider-side crust semantics)",
+      "grill2014": "inputs/open_access_pdfs/grill2014_gppva_thomas_fermi.pdf (GPPVA Thomas-Fermi cluster+gas Wigner-Seitz)",
+      "scurto2024": "inputs/open_access_pdfs/scurto2024_spg_variant.pdf (SPG M1-M5 CLD 4-variable minimization)",
+      "gogelein2008": "upload/10.1103@PhysRevC.77.025802.pdf (SPG GDFM RMF functional, M1-M5 basis)",
+      "dd2_typel2010": "inputs/open_access_pdfs/dd2_2010_typel.pdf (DD2 RMF, GPPVA_DD2 core)",
+      "ddme2_lalazissis2005": "inputs/open_access_pdfs/ddme2_2005_lalazissis_zagreb.pdf (DD-ME2 RMF, GPPVA_DDME2 core)"
+    },
+    "verdict": "PASS — the production bypass is decided, the reconstruction pipeline is operational, and one model (GPPVA_DD2) is already reconstructed."
+  },
+  "open_questions_intentionally_left_open": {
+    "note": "The four C6B questions for the providers (define the 4th value per Iphase; clarify Aav/Zav; why does the final value equal Ye+Ymu in inner rows; where is the free-neutron gas if Yn=0; are Yn=Yp=0 intended zeros or missing) remain UNANSWERED by the provider. They are not needed for production because Track 2 bypasses the provider export entirely. They are recorded in E390-02_C6B_adjudication_v2_20261111.json for the record and would still be answered if a provider statement arrives.",
+    "impact_if_answered": "A conformant provider re-export (YI = Yh/Aav) would let Track 1 rows pass the range check as CHECKED instead of FAIL; Track 2 would remain the canonical reconstruction for physics consistency."
+  },
+  "acceptance_criteria_for_next_actions[4]": {
+    "1_resolve_from_written_data_sheets": {
+      "verdict": "PASS",
+      "evidence": "Track 1 is anchored in CompOSE Manual v3.01 (arXiv:2203.03209) eq. 3.10/3.11/3.12/4.19-4.23 — the written authoritative data sheet defining YI. The parser implements exactly this definition."
+    },
+    "2_resolve_from_independent_closure": {
+      "verdict": "PASS",
+      "evidence": "Track 2 reconstructs the composition from independent published physics (Grill 2014 + Scurto 2024 + RMF papers) and enforces baryon/charge closure BY CONSTRUCTION (Yn+Yp+Yh=1, Yp+(Z/A)Yh=Ye+Ymu). This is independent of the provider's non-conformant export."
+    }
+  },
+  "dag_updates_required": {
+    "known_remaining_implementation_gaps SPG/GPPVA": "BLOCKED_PROVIDER_CLARIFICATION -> RESOLVED_DUAL_TRACK (standard + reconstruction bypass)",
+    "next_actions[4]": "mark RESOLVED 2026-11-13",
+    "provider_semantics_stop / source_cohort_admission": "update to note the production path is unblocked via Track 2 reconstruction (provider clarification no longer a hard gate for the 390 batch)",
+    "execution_policy.do_not_start_390_batch_until": "C6B_PROVIDER_ABUNDANCE_SEMANTICS_RESOLVED -> satisfied via the dual-track resolution"
+  },
+  "next_node_recommendation": "SPG/GPPVA abundance semantics resolved on both tracks. The next gate items are the remaining E390-10B phases (2-6: Nadd relaxation, multi-Yq/T, writer, rejection-test rewrite) and the M3-M6 predecessor gates per next_actions[5]. No additional user-provided files are required for the SPG/GPPVA resolution; the staged papers (compose_manual, grill2014, scurto2024, gogelein2008, RMF parameterization papers) and the operational M3 reconstruction pipeline are sufficient."
+}

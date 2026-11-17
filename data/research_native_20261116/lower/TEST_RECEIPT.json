@@ -1,0 +1,79 @@
+{
+  "baseline_commit": "4de49430560930be84d9a4147d71c3c9841da2db",
+  "utc": "2026-11-16T11:40:37.919285+00:00",
+  "compiler": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "flags": [
+    "-std=f2018",
+    "-O2",
+    "-ffree-line-length-none",
+    "-fimplicit-none",
+    "-fcheck=all"
+  ],
+  "python_for_validation_only": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "platform": "Linux-7.0.0-43-generic-x86_64-with-glibc2.39",
+  "command": "PYTHONPATH=python_frontend python3 fortran_eos/tests/record_native_core_lower.py",
+  "backend": "fortran",
+  "status": "IMPLEMENTATION_VERIFIED",
+  "mass_catalogue_rows": 8481,
+  "outer_rows": 99,
+  "lower_source_fit_rows": 17,
+  "outer_seed_points": 65,
+  "lower_interval_fm3": [
+    0.000269403,
+    0.002
+  ],
+  "outer_interval_fm3": [
+    1.0000000000002728e-09,
+    0.0002694320064010902
+  ],
+  "equal_pressure_nuclear_transition_pairs": 17,
+  "max_nuclear_transition_mu_residual_MeV": 2.1600499167107046e-12,
+  "max_baryon_residual": 0.0,
+  "max_charge_residual": 5.551115123125783e-17,
+  "max_Euler_residual_MeV_fm3": 1.0587911840678754e-22,
+  "source_seam": {
+    "difference_convention": "lower-first minus outer-last",
+    "delta_nb_fm3": -2.9006401090238536e-08,
+    "delta_epsilon_MeV_fm3": -3.7593386157774855e-05,
+    "delta_pressure_MeV_fm3": -3.34991421748268e-06,
+    "delta_mu_b_MeV": -0.05081565141108513,
+    "density_overlap": true,
+    "thermodynamically_joined": false,
+    "cross_seam_interpolation_supported": false
+  },
+  "max_lower_composition_mu_residual_MeV": 0.08691297046402724,
+  "source_sha256": {
+    "fortran_eos/src/compose_eos_types.f90": "26fb4fb7b9482ca238ff41e504c75b090a42d902d7946a4c0612ece4e8729d44",
+    "fortran_eos/src/compose_eos_lower_crust_native.f90": "56056c76bfcd66a6b36ae5bdd5e016494547d955f296030237fd9705540ba6b5",
+    "fortran_eos/tests/native_lower_crust_driver.f90": "ac71c8625c6ce56bbd4affc11b9c666dc37688538c4e9853a360187db47de5e0",
+    "fortran_eos/tests/record_native_core_lower.py": "41ec585c2b13280babad7d0ad0be80a536d8c730b635db886ca0516930dd9718",
+    "python_frontend/tests/test_native_lower_crust.py": "b3145ac123504fa1b88cb7a3df766d007481305bf93df0d4b4ea1d4af4f2f744",
+    "data/outer_crust/hfb22_ame2016_cu.csv": "bb32d8cd2f45aa10168234d94091dad66401fbe94185e8051ce51739866ebd24",
+    "python_frontend/compose_eos/outer_crust.py": "9f583fbc3f086dd5ffb4d4c126087febb029bd7014c8a58f5577420bd7814547",
+    "python_frontend/compose_eos/bsk22_analytic.py": "7a1b7d0150216dfa4f7cd4a12ef15ca10d224b681f65a73f77969d19b645bcd4",
+    "python_frontend/compose_eos/bsk22_extended_representation.py": "036ca8c43ed86d36961154760b92b211c5ab489e6be1c9e9298f51253a170dc4",
+    "python_frontend/compose_eos/bsk22_thermodynamic_reconstruction.py": "3f5bf28bd20b4e107c3e85c22e5a244a302794470249c05aa28a4aa09592918c",
+    "python_frontend/tests/test_outer_crust.py": "432326c02898cb27e8337485a967c37f999a95d86688b1c2e9025832324dfb83"
+  },
+  "output_sha256": {
+    "source_segments.csv": "65663782770e8aaecc7fa7fc287038fab05b267d7fadcf831d1b91c6e1a07e11"
+  },
+  "independent_checks": [
+    "60-digit differentiation of nuclear+electron+lattice energy for pressure",
+    "fixed-pressure global catalogue minimization",
+    "outer isotope transition Gibbs equality",
+    "anchored-branch finite-difference first law"
+  ],
+  "scope_limitations": [
+    "BSk22 is the published analytic representation, not a new ETF/Strutinsky minimization",
+    "source-fit pressure and energy are distinct fitted quantities; their mismatch is retained",
+    "Regenerated outer and BSk analytic source drips overlap; they are exported as separate segments",
+    "Outer-anchored extension through .01 is explicitly a different thermodynamic representation"
+  ],
+  "pytest_evidence": {
+    "path": "data/research_native_20261116/lower/FINAL_COMBINED_PYTEST.log",
+    "sha256": "0acef374c4f28ec546e509e2f6c56307d8e6a81e786e78d3f27fff03b0fc10f7",
+    "summary": "29 passed in 27.24s",
+    "scope": "test_core_native_backend.py and test_native_lower_crust.py"
+  }
+}

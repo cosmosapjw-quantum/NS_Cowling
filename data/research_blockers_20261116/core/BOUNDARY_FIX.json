@@ -1,0 +1,19 @@
+{
+  "classification": "implementation API boundary bug repaired; physical functional and derivative formulas unchanged",
+  "previous_module_sha256": "acec428c5283d86d1015ed4f8ecc695f29eb9d87350c6cb2088b6bd3665cc03f",
+  "current_module_sha256": "683ef46c86fe72a9b535dc22d0511e15c93905b3879311ef8abc3e9658930c50",
+  "change": "Use core_model_bounds for finite center validation in FD, analytic, Gibbs; FD requires the complete symmetric four-point stencil to stay inside declared bounds. Bracket inherits validated FD.",
+  "validation": {
+    "scope": "one targeted standalone boundary driver; no broad campaign repeat",
+    "checks": 20,
+    "failures": 0,
+    "exit_code": 0,
+    "test": "fortran_eos/tests/core_domain_bounds.f90",
+    "test_sha256": "87bb1369ada285da293c1df15d63d3f24668ddbafd97067c22d8642d705a520d",
+    "log": "bounds_run.log",
+    "compile_log": "bounds_compile.log"
+  },
+  "command": "gfortran -std=f2018 -O2 -Wall -Wextra -ffree-line-length-none -fcheck=all -Jdata/research_blockers_20261116/core/build -Idata/research_blockers_20261116/core/build fortran_eos/src/compose_eos_types.f90 fortran_eos/src/compose_eos_core_native.f90 fortran_eos/src/compose_eos_core_domain.f90 fortran_eos/tests/core_domain_bounds.f90 -o data/research_blockers_20261116/core/build/core_domain_bounds; data/research_blockers_20261116/core/build/core_domain_bounds",
+  "resource_contract": "one process; OMP/OPENBLAS/MKL_NUM_THREADS=1",
+  "unchanged_science_evidence": "Prior broad-suite outputs retained with previous source identity; formula body is unchanged. Targeted APR analytic/FD and SLy4 crossing verify interior preservation."
+}

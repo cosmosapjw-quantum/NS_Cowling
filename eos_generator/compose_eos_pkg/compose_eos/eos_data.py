@@ -194,7 +194,7 @@ class EOSData:
         ]
         # CompOSE Iphase identifiers are provider/model-specific; never attach
         # universal physical labels to integer codes.
-        if self.composition_available and self.Iphase.size == self.n:
+        if self.Iphase.shape == self.nb.shape:
             for ip in np.unique(self.Iphase):
                 m = self.Iphase == ip
                 lines.append(f"  phase ID {int(ip)}: {m.sum()} pts, "
@@ -202,7 +202,17 @@ class EOSData:
         return "\n".join(lines)
 
     def _cs2_max(self) -> float:
-        deps = np.gradient(self.eps, self.nb)
-        dP = np.gradient(self.p, self.nb)
-        cs2 = np.where(np.abs(deps) > 0, dP / deps, 0.0)
-        return float(np.nanmax(cs2))
+        """Return a knot-level c_s^2 estimate without crossing Iphase edges."""
+        edges = (np.flatnonzero(np.diff(self.Iphase) != 0) + 1).tolist() if self.Iphase.shape == self.nb.shape else []
+        bounds = [0] + edges + [self.n]
+        values = []
+        for lo, hi in zip(bounds[:-1], bounds[1:]):
+            if hi - lo < 2:
+                continue
+            n, p, eps = self.nb[lo:hi], self.p[lo:hi], self.eps[lo:hi]
+            order = 2 if hi - lo >= 3 else 1
+            deps = np.gradient(eps, n, edge_order=order)
+            dp = np.gradient(p, n, edge_order=order)
+            cs2 = np.divide(dp, deps, out=np.full_like(dp, np.nan), where=deps > 0)
+            values.extend(cs2[np.isfinite(cs2)].tolist())
+        return float(np.max(values)) if values else float("nan")

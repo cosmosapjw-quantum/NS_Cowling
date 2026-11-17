@@ -1,0 +1,23 @@
+............F.                                                           [100%]
+=================================== FAILURES ===================================
+___ test_maxwell_pressure_roundoff_has_separate_machine_precision_allowance ____
+
+    def test_maxwell_pressure_roundoff_has_separate_machine_precision_allowance():
+        data = table()
+        data.p = np.array([1., 1., np.nextafter(1., 0.), 1.])
+        data.eps = 3 * data.nb - data.p
+        data.f = data.eps.copy()
+        data.mub = (data.eps + data.p) / data.nb
+        data.Iphase[:] = [6, 6, 7, 7]
+        report = physical_domain_report(data)
+        jump = report["intervals"][1]
+>       assert jump["physical_findings"] == []
+E       AssertionError: assert ['MECHANICAL_INSTABILITY'] == []
+E         
+E         Left contains one more item: 'MECHANICAL_INSTABILITY'
+E         Use -v to get more diff
+
+python_frontend/tests/test_physical_domain.py:136: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_physical_domain.py::test_maxwell_pressure_roundoff_has_separate_machine_precision_allowance
+1 failed, 13 passed in 0.11s

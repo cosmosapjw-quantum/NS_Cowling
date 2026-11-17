@@ -1,0 +1,63 @@
+{
+  "baseline": true,
+  "scope": "Native matching scientific controls; not a CompOSE census or end-to-end pipeline claim",
+  "threads": 1,
+  "source_sha256": {
+    "data/research_matching_20261117/native_matching/compose_eos_matching.before.f90": "b89c376ddd6874c6ff80beca26d962c1ea74797983fb086b226deb987c98432c",
+    "fortran_eos/src/compose_eos_types.f90": "26fb4fb7b9482ca238ff41e504c75b090a42d902d7946a4c0612ece4e8729d44",
+    "fortran_eos/tests/test_matching_thermodynamic_adversarial.f90": "44ed8039b169b6e93130ecfef69e9ebe259416abe0b234267c0edfd266e6fc45",
+    "fortran_eos/tests/test_matching_interval_adversarial.f90": "a2287d173f98c380309323a29ef43e4dd71ca62462b1b4024e3deaecddca83b5"
+  },
+  "commands": [
+    {
+      "command": [
+        "gfortran",
+        "-O1",
+        "-g",
+        "-fcheck=all",
+        "-ffree-line-length-none",
+        "-J",
+        "/tmp/ns_match_478c7b5_20261117/build/matching_native/baseline",
+        "-I",
+        "/tmp/ns_match_478c7b5_20261117/build/matching_native/baseline",
+        "/tmp/ns_match_478c7b5_20261117/fortran_eos/src/compose_eos_types.f90",
+        "/tmp/ns_match_478c7b5_20261117/build/matching_native/baseline/compose_eos_matching_probe.f90",
+        "/tmp/ns_match_478c7b5_20261117/fortran_eos/tests/test_matching_thermodynamic_adversarial.f90",
+        "-o",
+        "/tmp/ns_match_478c7b5_20261117/build/matching_native/baseline/matching_thermodynamic_adversarial"
+      ],
+      "returncode": 0
+    },
+    {
+      "command": [
+        "/tmp/ns_match_478c7b5_20261117/build/matching_native/baseline/matching_thermodynamic_adversarial"
+      ],
+      "returncode": 1
+    },
+    {
+      "command": [
+        "gfortran",
+        "-O1",
+        "-g",
+        "-fcheck=all",
+        "-ffree-line-length-none",
+        "-J",
+        "/tmp/ns_match_478c7b5_20261117/build/matching_native/baseline",
+        "-I",
+        "/tmp/ns_match_478c7b5_20261117/build/matching_native/baseline",
+        "/tmp/ns_match_478c7b5_20261117/fortran_eos/src/compose_eos_types.f90",
+        "/tmp/ns_match_478c7b5_20261117/build/matching_native/baseline/compose_eos_matching_probe.f90",
+        "/tmp/ns_match_478c7b5_20261117/fortran_eos/tests/test_matching_interval_adversarial.f90",
+        "-o",
+        "/tmp/ns_match_478c7b5_20261117/build/matching_native/baseline/matching_interval_adversarial"
+      ],
+      "returncode": 0
+    },
+    {
+      "command": [
+        "/tmp/ns_match_478c7b5_20261117/build/matching_native/baseline/matching_interval_adversarial"
+      ],
+      "returncode": 1
+    }
+  ]
+}

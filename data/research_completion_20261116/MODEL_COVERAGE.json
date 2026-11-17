@@ -1,0 +1,953 @@
+{
+  "schema": "ns-cowling.independent-generation-coverage.v2",
+  "base_commit": "c8ff2d6c97a93f1ccf621051861d3091bfe94d81",
+  "objective": "Original five core and thirteen crust models independently regenerable with composition",
+  "status": "PARTIALLY_COMPLETE",
+  "executed_declared_generation_routes": 18,
+  "route_breakdown": {
+    "core": 5,
+    "SPG_candidate_CLD": 5,
+    "GPPVA_spatial_TF": 8
+  },
+  "scope_of_count": "Counts executed declared representations, including explicit candidates/analytic approximations; not 18 exact original microscopic calibrations or complete joined crusts.",
+  "acceptance_policy": {
+    "independent_physics": "Functional equations, constraints, first law, source inputs and numerical support",
+    "CompOSE_match": "Comparison diagnostic; never unconditional pass gate",
+    "high_density_acausality": "Restricts physical use by density; does not block the whole model",
+    "native_production_port": "Separate engineering work; not a generation-availability gate"
+  },
+  "common_crust_components": {
+    "outer": {
+      "status": "INDEPENDENT_MASS_CATALOGUE_MINIMIZATION_EXECUTED",
+      "rows": 547,
+      "layers": 18,
+      "evidence": "outer_crust/generated/RECEIPT.json"
+    },
+    "BSk22_lower_inner": {
+      "status": "PUBLISHED_ANALYTIC_REPRESENTATION_EXECUTED",
+      "rows_per_mode": 129,
+      "modes": [
+        "source_fit",
+        "energy_derivative"
+      ],
+      "evidence": "bsk22_lower_inner/generated/RECEIPT.json",
+      "chemical_consistency": "Independent thermodynamic/composition fits have quantified residuals; full ETFSI minimization not performed"
+    },
+    "BSk22_boundary_anchored": {
+      "status": "EXPLICIT_THERMODYNAMIC_RECONSTRUCTION_EXECUTED",
+      "rows": [
+        129,
+        257
+      ],
+      "evidence": "bsk22_reconstruction/generated/RECEIPT.json",
+      "remaining_composition_mu_residual_MeV": [
+        -0.021495,
+        0.02563
+      ],
+      "interpretation": "Pressure/Gibbs-consistent outer boundary and first-law-integrated energy; not newly solved neutron-drip or ETFSI equilibrium"
+    }
+  },
+  "models": [
+    {
+      "model_id": "APR_APR",
+      "component": "core",
+      "generation_status": "EXECUTED_NATIVE_COMPOSITION_READBACK",
+      "representation": {
+        "default_interval_fm3": [
+          0.085,
+          1.34
+        ],
+        "species": "npemu",
+        "representation": "Published21parameterAPRfunctional; bulk two-charge Gibbs",
+        "paper_implementation": "AUTHOR_FUNCTIONAL_WITH_EXPLICIT_BULK_GIBBS_ASSUMPTION",
+        "source": {
+          "hamiltonian": "https://arxiv.org/html/1901.09652v2",
+          "original": "https://doi.org/10.1103/PhysRevC.58.1804",
+          "author_code": "https://bitbucket.org/andschn/apreos"
+        }
+      },
+      "rows": 163,
+      "max_first_law_error_MeV": 5.183994744584197e-08,
+      "pointwise_causal_boundary": {
+        "roots": [
+          {
+            "relative_difference_step": 0.0002,
+            "n_fm3": 0.8689531516040347,
+            "cs2_over_c2": 0.9999999999997604,
+            "cs2_below": 0.9987781527300911,
+            "cs2_above": 1.0012204934557778
+          },
+          {
+            "relative_difference_step": 0.0001,
+            "n_fm3": 0.8689531516044193,
+            "cs2_over_c2": 1.000000000000852,
+            "cs2_below": 0.9987781527308445,
+            "cs2_above": 1.0012204934584008
+          },
+          {
+            "relative_difference_step": 5e-05,
+            "n_fm3": 0.8689531516055278,
+            "cs2_over_c2": 0.9999999999993494,
+            "cs2_below": 0.9987781527294581,
+            "cs2_above": 1.0012204934558728
+          }
+        ],
+        "root_spread_fm3": 1.4930279235159105e-12
+      },
+      "evidence": "core/generated/APR_APR/RECEIPT.json",
+      "source_agreement": "Separate prior comparison; not an unconditional rejection criterion",
+      "remaining_science": [
+        "Distinguish model/phase/input conventions from provider differences; BBB is a published-energy reconstruction, not a new BHF-kernel solve."
+      ]
+    },
+    {
+      "model_id": "BBB_BHF2",
+      "component": "core",
+      "generation_status": "EXECUTED_NATIVE_COMPOSITION_READBACK",
+      "representation": {
+        "default_interval_fm3": [
+          0.08,
+          1.5
+        ],
+        "species": "npemu",
+        "representation": "PublishedParis+UrbanaSNM/PNMenergies; parabolic isospin; PCHIP energy derivative",
+        "paper_implementation": "PUBLISHED_ENERGY_TABLE_RECONSTRUCTION; original BHF kernel is not re-solved",
+        "microscopic_support_max_fm3": 0.8,
+        "source": "https://arxiv.org/pdf/astro-ph/9707277"
+      },
+      "rows": 161,
+      "max_first_law_error_MeV": 1.231683199875988e-09,
+      "pointwise_causal_boundary": null,
+      "evidence": "core/generated/BBB_BHF2/RECEIPT.json",
+      "source_agreement": "Separate prior comparison; not an unconditional rejection criterion",
+      "remaining_science": [
+        "Distinguish model/phase/input conventions from provider differences; BBB is a published-energy reconstruction, not a new BHF-kernel solve."
+      ]
+    },
+    {
+      "model_id": "GM_GM1",
+      "component": "core",
+      "generation_status": "EXECUTED_NATIVE_COMPOSITION_READBACK",
+      "representation": {
+        "default_interval_fm3": [
+          0.08,
+          1.0
+        ],
+        "species": "npe",
+        "representation": "Original rounded nonlinear RMF couplings; common nucleon rest energy939MeV",
+        "paper_implementation": "PUBLISHED_PARAMETER_FUNCTIONAL",
+        "source": "https://escholarship.org/uc/item/6sw424k1"
+      },
+      "rows": 161,
+      "max_first_law_error_MeV": 5.852143658557907e-09,
+      "pointwise_causal_boundary": null,
+      "evidence": "core/generated/GM_GM1/RECEIPT.json",
+      "source_agreement": "Separate prior comparison; not an unconditional rejection criterion",
+      "remaining_science": [
+        "Distinguish model/phase/input conventions from provider differences; BBB is a published-energy reconstruction, not a new BHF-kernel solve."
+      ]
+    },
+    {
+      "model_id": "RG_KDE0v1",
+      "component": "core",
+      "generation_status": "EXECUTED_NATIVE_COMPOSITION_READBACK",
+      "representation": {
+        "default_interval_fm3": [
+          0.08,
+          1.8
+        ],
+        "species": "npemu",
+        "representation": "Published full asymmetric Skyrme functional",
+        "paper_implementation": "PUBLISHED_PARAMETER_FUNCTIONAL",
+        "source": {
+          "model_id": "RG_KDE0v1",
+          "t0": -2553.08,
+          "t1": 411.7,
+          "t2": -419.87,
+          "t3": 14603.6,
+          "x0": 0.6483,
+          "x1": -0.3472,
+          "x2": -0.9268,
+          "x3": 0.9475,
+          "alpha": 0.1673,
+          "source": "https://arxiv.org/abs/nucl-th/0505071 Table 3",
+          "parameter_precision": "Published Table 3 precision; alpha=0.1673",
+          "kinetic_coefficient_mev_fm2": 20.73553,
+          "kinetic_convention_source": "https://www.fuw.edu.pl/~dobaczew/hfodd/pb208-a.out.txt",
+          "neutron_rest_mass_mev": 939.5654,
+          "proton_rest_mass_mev": 938.272,
+          "electron_mass_mev": 0.51099895,
+          "muon_mass_mev": 105.6583755,
+          "hbar_c_mev_fm": 197.3269804
+        }
+      },
+      "rows": 161,
+      "max_first_law_error_MeV": 2.103661245200783e-09,
+      "pointwise_causal_boundary": {
+        "roots": [
+          {
+            "relative_difference_step": 0.0002,
+            "n_fm3": 1.4109658933468028,
+            "cs2_over_c2": 1.0000000000004063,
+            "cs2_below": 0.999310400817239,
+            "cs2_above": 1.0006885038825757
+          },
+          {
+            "relative_difference_step": 0.0001,
+            "n_fm3": 1.4109658933441354,
+            "cs2_over_c2": 1.0000000000005769,
+            "cs2_below": 0.99931040082016,
+            "cs2_above": 1.0006885038814615
+          },
+          {
+            "relative_difference_step": 5e-05,
+            "n_fm3": 1.4109658933452471,
+            "cs2_over_c2": 1.000000000004089,
+            "cs2_below": 0.9993104008173065,
+            "cs2_above": 1.000688503876892
+          }
+        ],
+        "root_spread_fm3": 2.667421838964401e-12
+      },
+      "evidence": "core/generated/RG_KDE0v1/RECEIPT.json",
+      "source_agreement": "Separate prior comparison; not an unconditional rejection criterion",
+      "remaining_science": [
+        "Distinguish model/phase/input conventions from provider differences; BBB is a published-energy reconstruction, not a new BHF-kernel solve."
+      ]
+    },
+    {
+      "model_id": "RG_SLY4",
+      "component": "core",
+      "generation_status": "EXECUTED_NATIVE_COMPOSITION_READBACK",
+      "representation": {
+        "default_interval_fm3": [
+          0.08,
+          1.4
+        ],
+        "species": "npemu",
+        "representation": "Published full asymmetric Skyrme functional",
+        "paper_implementation": "PUBLISHED_PARAMETER_FUNCTIONAL",
+        "source": {
+          "model_id": "RG_SLY4",
+          "t0": -2488.91,
+          "t1": 486.82,
+          "t2": -546.39,
+          "t3": 13777.0,
+          "x0": 0.834,
+          "x1": -0.344,
+          "x2": -1.0,
+          "x3": 1.354,
+          "alpha": 0.16666666666666666,
+          "source": "https://arxiv.org/abs/astro-ph/0006135 Table 1",
+          "parameter_precision": "Published Douchin-Haensel Table 1 rounded coefficients",
+          "kinetic_coefficient_mev_fm2": 20.73553,
+          "kinetic_convention_source": "https://www.fuw.edu.pl/~dobaczew/hfodd/pb208-a.out.txt",
+          "neutron_rest_mass_mev": 939.5654,
+          "proton_rest_mass_mev": 938.272,
+          "electron_mass_mev": 0.51099895,
+          "muon_mass_mev": 105.6583755,
+          "hbar_c_mev_fm": 197.3269804
+        }
+      },
+      "rows": 161,
+      "max_first_law_error_MeV": 2.921751729445532e-09,
+      "pointwise_causal_boundary": {
+        "roots": [
+          {
+            "relative_difference_step": 0.0002,
+            "n_fm3": 1.2650056715193643,
+            "cs2_over_c2": 1.000000000001167,
+            "cs2_below": 0.9993456978849121,
+            "cs2_above": 1.0006529940702336
+          },
+          {
+            "relative_difference_step": 0.0001,
+            "n_fm3": 1.2650056715174274,
+            "cs2_over_c2": 1.000000000000567,
+            "cs2_below": 0.999345697882352,
+            "cs2_above": 1.0006529940747826
+          },
+          {
+            "relative_difference_step": 5e-05,
+            "n_fm3": 1.2650056715114033,
+            "cs2_over_c2": 1.0000000000010665,
+            "cs2_below": 0.9993456978732398,
+            "cs2_above": 1.0006529940736957
+          }
+        ],
+        "root_spread_fm3": 7.960965220377147e-12
+      },
+      "evidence": "core/generated/RG_SLY4/RECEIPT.json",
+      "source_agreement": "Separate prior comparison; not an unconditional rejection criterion",
+      "remaining_science": [
+        "Distinguish model/phase/input conventions from provider differences; BBB is a published-energy reconstruction, not a new BHF-kernel solve."
+      ]
+    },
+    {
+      "model_id": "SPG_M1",
+      "component": "crust",
+      "generation_status": "CANDIDATE_CLD_EXECUTED_NATIVE_COMPOSITION_READBACK",
+      "representation": "Source GDFM + declared AME2408 surface-fit candidate; complete spherical CLD with gas protons",
+      "rows": 513,
+      "density_support_fm3": [
+        0.00019402064119231825,
+        0.07448996085934398
+      ],
+      "composition": "Free n,p,e,mu and bound-nucleus A,Z,Yh; native availability masks verified",
+      "max_projected_gradient": 8.504514873832904e-12,
+      "density_interpolation_refinement": {
+        "half_grid_to_coarse": {
+          "pressure_MeV_fm3": {
+            "max_absolute": 5.512297929516352e-05,
+            "max_relative": 0.0013071811088852098
+          },
+          "energy": {
+            "max_absolute": 5.664930709770033e-05,
+            "max_relative": 9.200223775479519e-07
+          },
+          "mu_B_MeV": {
+            "max_absolute": 0.002530432632056545,
+            "max_relative": 2.6949958646219783e-06
+          },
+          "Ye": {
+            "max_absolute": 0.00035760779371107887
+          },
+          "Yn": {
+            "max_absolute": 0.0012348461490530975
+          },
+          "Yp": {
+            "max_absolute": 4.705875630587111e-07
+          },
+          "Yh": {
+            "max_absolute": 0.0012348461490531148
+          },
+          "Aav": {
+            "max_absolute": 1.1012927948564197
+          },
+          "Zav": {
+            "max_absolute": 0.04693280412197609
+          }
+        },
+        "coarse_to_fine": {
+          "pressure_MeV_fm3": {
+            "max_absolute": 1.4221679138837207e-05,
+            "max_relative": 0.0006188440661097633
+          },
+          "energy": {
+            "max_absolute": 1.4254253748902102e-05,
+            "max_relative": 2.279805356313963e-07
+          },
+          "mu_B_MeV": {
+            "max_absolute": 0.0011858295432602972,
+            "max_relative": 1.2629702830944178e-06
+          },
+          "Ye": {
+            "max_absolute": 0.0001730081409996309
+          },
+          "Yn": {
+            "max_absolute": 0.0005980676827394924
+          },
+          "Yp": {
+            "max_absolute": 1.814219936284456e-07
+          },
+          "Yh": {
+            "max_absolute": 0.0005980676827394005
+          },
+          "Aav": {
+            "max_absolute": 0.32505751620715273
+          },
+          "Zav": {
+            "max_absolute": 0.020176283085294955
+          }
+        },
+        "row_counts": [
+          129,
+          257,
+          513
+        ]
+      },
+      "evidence": "spg/SPG_M1/",
+      "source_calibration_equivalent": false,
+      "remaining_science": [
+        "Identify original mass-fit protocol/coefficients and low-Yp uncertainty; existing candidate remains usable under its declared inputs.",
+        "Construct a declared compatible lower-piece interface; original common-mass, physical-restored and anchored-analytic variants must not be conflated."
+      ]
+    },
+    {
+      "model_id": "SPG_M2",
+      "component": "crust",
+      "generation_status": "CANDIDATE_CLD_EXECUTED_NATIVE_COMPOSITION_READBACK",
+      "representation": "Source GDFM + declared AME2408 surface-fit candidate; complete spherical CLD with gas protons",
+      "rows": 513,
+      "density_support_fm3": [
+        0.00020500148877928708,
+        0.0874137415362419
+      ],
+      "composition": "Free n,p,e,mu and bound-nucleus A,Z,Yh; native availability masks verified",
+      "max_projected_gradient": 6.176991375002919e-12,
+      "density_interpolation_refinement": {
+        "half_grid_to_coarse": {
+          "pressure_MeV_fm3": {
+            "max_absolute": 2.5505169986561604e-05,
+            "max_relative": 0.0012914510441579905
+          },
+          "energy": {
+            "max_absolute": 3.972410925712211e-05,
+            "max_relative": 5.496497356732757e-07
+          },
+          "mu_B_MeV": {
+            "max_absolute": 0.0024222179094977037,
+            "max_relative": 2.5797424331918455e-06
+          },
+          "Ye": {
+            "max_absolute": 0.00034144139389935546
+          },
+          "Yn": {
+            "max_absolute": 0.0012514035467587944
+          },
+          "Yp": {
+            "max_absolute": 0.0
+          },
+          "Yh": {
+            "max_absolute": 0.0012514035467587892
+          },
+          "Aav": {
+            "max_absolute": 4.631523383081799
+          },
+          "Zav": {
+            "max_absolute": 0.18852582561847697
+          }
+        },
+        "coarse_to_fine": {
+          "pressure_MeV_fm3": {
+            "max_absolute": 6.221608457035455e-06,
+            "max_relative": 0.0006005688428536743
+          },
+          "energy": {
+            "max_absolute": 1.0116924016756457e-05,
+            "max_relative": 1.3782187048028942e-07
+          },
+          "mu_B_MeV": {
+            "max_absolute": 0.001114075098257672,
+            "max_relative": 1.186547960517295e-06
+          },
+          "Ye": {
+            "max_absolute": 0.00016228991543915106
+          },
+          "Yn": {
+            "max_absolute": 0.0005958348457867019
+          },
+          "Yp": {
+            "max_absolute": 0.0
+          },
+          "Yh": {
+            "max_absolute": 0.0005958348457867357
+          },
+          "Aav": {
+            "max_absolute": 1.401170290587629
+          },
+          "Zav": {
+            "max_absolute": 0.05791590243604361
+          }
+        },
+        "row_counts": [
+          129,
+          257,
+          513
+        ]
+      },
+      "evidence": "spg/SPG_M2/",
+      "source_calibration_equivalent": false,
+      "remaining_science": [
+        "Identify original mass-fit protocol/coefficients and low-Yp uncertainty; existing candidate remains usable under its declared inputs.",
+        "Construct a declared compatible lower-piece interface; original common-mass, physical-restored and anchored-analytic variants must not be conflated."
+      ]
+    },
+    {
+      "model_id": "SPG_M3",
+      "component": "crust",
+      "generation_status": "CANDIDATE_CLD_EXECUTED_NATIVE_COMPOSITION_READBACK",
+      "representation": "Source GDFM + declared AME2408 surface-fit candidate; complete spherical CLD with gas protons",
+      "rows": 513,
+      "density_support_fm3": [
+        0.00019386210630486478,
+        0.07892887683755762
+      ],
+      "composition": "Free n,p,e,mu and bound-nucleus A,Z,Yh; native availability masks verified",
+      "max_projected_gradient": 6.455825004558282e-12,
+      "density_interpolation_refinement": {
+        "half_grid_to_coarse": {
+          "pressure_MeV_fm3": {
+            "max_absolute": 5.7945845028162246e-05,
+            "max_relative": 0.0013245563429062914
+          },
+          "energy": {
+            "max_absolute": 6.236639413259581e-05,
+            "max_relative": 9.55850776155716e-07
+          },
+          "mu_B_MeV": {
+            "max_absolute": 0.0025713264572004846,
+            "max_relative": 2.738548188452866e-06
+          },
+          "Ye": {
+            "max_absolute": 0.00036308077654179094
+          },
+          "Yn": {
+            "max_absolute": 0.0012490926336322615
+          },
+          "Yp": {
+            "max_absolute": 2.0196231566194346e-07
+          },
+          "Yh": {
+            "max_absolute": 0.001249092633632376
+          },
+          "Aav": {
+            "max_absolute": 1.2260430159030875
+          },
+          "Zav": {
+            "max_absolute": 0.060814207180264646
+          }
+        },
+        "coarse_to_fine": {
+          "pressure_MeV_fm3": {
+            "max_absolute": 1.4900595634359526e-05,
+            "max_relative": 0.0006279114294235162
+          },
+          "energy": {
+            "max_absolute": 1.570972145259475e-05,
+            "max_relative": 2.3707662857228238e-07
+          },
+          "mu_B_MeV": {
+            "max_absolute": 0.0012065411780213253,
+            "max_relative": 1.2850289706177058e-06
+          },
+          "Ye": {
+            "max_absolute": 0.0001759432967377017
+          },
+          "Yn": {
+            "max_absolute": 0.0006058913678812566
+          },
+          "Yp": {
+            "max_absolute": 1.3572142740381927e-07
+          },
+          "Yh": {
+            "max_absolute": 0.0006058913678813616
+          },
+          "Aav": {
+            "max_absolute": 0.3632635039127763
+          },
+          "Zav": {
+            "max_absolute": 0.010815769099057349
+          }
+        },
+        "row_counts": [
+          129,
+          257,
+          513
+        ]
+      },
+      "evidence": "spg/SPG_M3/",
+      "source_calibration_equivalent": false,
+      "remaining_science": [
+        "Identify original mass-fit protocol/coefficients and low-Yp uncertainty; existing candidate remains usable under its declared inputs.",
+        "Construct a declared compatible lower-piece interface; original common-mass, physical-restored and anchored-analytic variants must not be conflated."
+      ]
+    },
+    {
+      "model_id": "SPG_M4",
+      "component": "crust",
+      "generation_status": "CANDIDATE_CLD_EXECUTED_NATIVE_COMPOSITION_READBACK",
+      "representation": "Source GDFM + declared AME2408 surface-fit candidate; complete spherical CLD with gas protons",
+      "rows": 513,
+      "density_support_fm3": [
+        0.00020210860011093815,
+        0.09680891995665059
+      ],
+      "composition": "Free n,p,e,mu and bound-nucleus A,Z,Yh; native availability masks verified",
+      "max_projected_gradient": 1.329035182562943e-08,
+      "density_interpolation_refinement": {
+        "half_grid_to_coarse": {
+          "pressure_MeV_fm3": {
+            "max_absolute": 2.7860002523139027e-05,
+            "max_relative": 0.0013401916112038416
+          },
+          "energy": {
+            "max_absolute": 5.274944929567482e-05,
+            "max_relative": 6.589654153906759e-07
+          },
+          "mu_B_MeV": {
+            "max_absolute": 0.002550501872633504,
+            "max_relative": 2.7163669281504973e-06
+          },
+          "Ye": {
+            "max_absolute": 0.000358655607319347
+          },
+          "Yn": {
+            "max_absolute": 0.0012847090199345594
+          },
+          "Yp": {
+            "max_absolute": 0.0
+          },
+          "Yh": {
+            "max_absolute": 0.0012847090199346045
+          },
+          "Aav": {
+            "max_absolute": 3.9319984088064075
+          },
+          "Zav": {
+            "max_absolute": 0.16259126840854066
+          }
+        },
+        "coarse_to_fine": {
+          "pressure_MeV_fm3": {
+            "max_absolute": 6.699079884597836e-06,
+            "max_relative": 0.0006279864113270861
+          },
+          "energy": {
+            "max_absolute": 1.347629526549099e-05,
+            "max_relative": 1.656970377285649e-07
+          },
+          "mu_B_MeV": {
+            "max_absolute": 0.0011820847029184733,
+            "max_relative": 1.2589810506265782e-06
+          },
+          "Ye": {
+            "max_absolute": 0.00017187723419637146
+          },
+          "Yn": {
+            "max_absolute": 0.0006164384422058418
+          },
+          "Yp": {
+            "max_absolute": 0.0
+          },
+          "Yh": {
+            "max_absolute": 0.0006164384422059355
+          },
+          "Aav": {
+            "max_absolute": 1.1998270547741186
+          },
+          "Zav": {
+            "max_absolute": 0.0506262801646713
+          }
+        },
+        "row_counts": [
+          129,
+          257,
+          513
+        ]
+      },
+      "evidence": "spg/SPG_M4/",
+      "source_calibration_equivalent": false,
+      "remaining_science": [
+        "Identify original mass-fit protocol/coefficients and low-Yp uncertainty; existing candidate remains usable under its declared inputs.",
+        "Construct a declared compatible lower-piece interface; original common-mass, physical-restored and anchored-analytic variants must not be conflated."
+      ]
+    },
+    {
+      "model_id": "SPG_M5",
+      "component": "crust",
+      "generation_status": "CANDIDATE_CLD_EXECUTED_NATIVE_COMPOSITION_READBACK",
+      "representation": "Source GDFM + declared AME2408 surface-fit candidate; complete spherical CLD with gas protons",
+      "rows": 513,
+      "density_support_fm3": [
+        0.0002029589415999115,
+        0.07159598587605229
+      ],
+      "composition": "Free n,p,e,mu and bound-nucleus A,Z,Yh; native availability masks verified",
+      "max_projected_gradient": 2.695262877320626e-10,
+      "density_interpolation_refinement": {
+        "half_grid_to_coarse": {
+          "pressure_MeV_fm3": {
+            "max_absolute": 4.981601222620036e-05,
+            "max_relative": 0.0012546212736553165
+          },
+          "energy": {
+            "max_absolute": 4.228133789752064e-05,
+            "max_relative": 7.146512388585423e-07
+          },
+          "mu_B_MeV": {
+            "max_absolute": 0.002357577655402565,
+            "max_relative": 2.5109014708310804e-06
+          },
+          "Ye": {
+            "max_absolute": 0.0003337460807797954
+          },
+          "Yn": {
+            "max_absolute": 0.0012173888592661736
+          },
+          "Yp": {
+            "max_absolute": 0.0
+          },
+          "Yh": {
+            "max_absolute": 0.0012173888592661442
+          },
+          "Aav": {
+            "max_absolute": 1.8825660390736516
+          },
+          "Zav": {
+            "max_absolute": 0.045953702721647005
+          }
+        },
+        "coarse_to_fine": {
+          "pressure_MeV_fm3": {
+            "max_absolute": 1.2721021429129564e-05,
+            "max_relative": 0.0005834370553397707
+          },
+          "energy": {
+            "max_absolute": 1.0620301146957445e-05,
+            "max_relative": 1.7682169677031397e-07
+          },
+          "mu_B_MeV": {
+            "max_absolute": 0.0010847405740150862,
+            "max_relative": 1.155305931805814e-06
+          },
+          "Ye": {
+            "max_absolute": 0.0001584101650538572
+          },
+          "Yn": {
+            "max_absolute": 0.0005789526930078783
+          },
+          "Yp": {
+            "max_absolute": 0.0
+          },
+          "Yh": {
+            "max_absolute": 0.0005789526930078948
+          },
+          "Aav": {
+            "max_absolute": 0.5602732044334857
+          },
+          "Zav": {
+            "max_absolute": 0.01713457250844641
+          }
+        },
+        "row_counts": [
+          129,
+          257,
+          513
+        ]
+      },
+      "evidence": "spg/SPG_M5/",
+      "source_calibration_equivalent": false,
+      "remaining_science": [
+        "Identify original mass-fit protocol/coefficients and low-Yp uncertainty; existing candidate remains usable under its declared inputs.",
+        "Construct a declared compatible lower-piece interface; original common-mass, physical-restored and anchored-analytic variants must not be conflated."
+      ]
+    },
+    {
+      "model_id": "GPPVA_DD2",
+      "component": "crust",
+      "generation_status": "SPATIAL_TF_EXECUTED_NATIVE_WITH_COMPOSITION_PROFILES",
+      "representation": "Published finite-range RMF TF functional; local n,p,e and meson/Coulomb fields; six finite geometry/uniform seed families",
+      "rows": 28,
+      "source_interval_requested_rows": 23,
+      "source_interval_selected_rows": 23,
+      "source_interval_sampled_support_fm3": [
+        0.002,
+        0.1
+      ],
+      "last_clustered_density_fm3": 0.07,
+      "first_uniform_density_fm3": 0.075,
+      "maximum_source_mesh_pressure_change": 0.0019218288503186857,
+      "maximum_chemical_KKT_residual_MeV": 0.00352224510936594,
+      "held_diagnostic_extension_densities": [
+        0.0002
+      ],
+      "composition": "Spatial n,p,e profiles and total means; discrete A/Z and bound/free decomposition unavailable where undefined, never fabricated",
+      "density_grid_accuracy": "Separate midpoint/quarter-point comparison in tf_density_review; radial-mesh agreement is not density-interpolation convergence",
+      "evidence": "gppva_tf/final/GPPVA_DD2/",
+      "remaining_science": [
+        "Refine density/geometry transition locations to the intended interpolation accuracy; finite multi-start does not prove a global minimum.",
+        "Resolve a physically stated common lower-piece interface/mass convention before calling a complete continuous original crust table."
+      ]
+    },
+    {
+      "model_id": "GPPVA_DDME2",
+      "component": "crust",
+      "generation_status": "SPATIAL_TF_EXECUTED_NATIVE_WITH_COMPOSITION_PROFILES",
+      "representation": "Published finite-range RMF TF functional; local n,p,e and meson/Coulomb fields; six finite geometry/uniform seed families",
+      "rows": 27,
+      "source_interval_requested_rows": 23,
+      "source_interval_selected_rows": 23,
+      "source_interval_sampled_support_fm3": [
+        0.002,
+        0.1
+      ],
+      "last_clustered_density_fm3": 0.07,
+      "first_uniform_density_fm3": 0.075,
+      "maximum_source_mesh_pressure_change": 0.0017291502504927319,
+      "maximum_chemical_KKT_residual_MeV": 0.0003642278908273511,
+      "held_diagnostic_extension_densities": [
+        0.0002,
+        0.00035
+      ],
+      "composition": "Spatial n,p,e profiles and total means; discrete A/Z and bound/free decomposition unavailable where undefined, never fabricated",
+      "density_grid_accuracy": "Separate midpoint/quarter-point comparison in tf_density_review; radial-mesh agreement is not density-interpolation convergence",
+      "evidence": "gppva_tf/final/GPPVA_DDME2/",
+      "remaining_science": [
+        "Refine density/geometry transition locations to the intended interpolation accuracy; finite multi-start does not prove a global minimum.",
+        "Resolve a physically stated common lower-piece interface/mass convention before calling a complete continuous original crust table."
+      ]
+    },
+    {
+      "model_id": "GPPVA_TW",
+      "component": "crust",
+      "generation_status": "SPATIAL_TF_EXECUTED_NATIVE_WITH_COMPOSITION_PROFILES",
+      "representation": "Published finite-range RMF TF functional; local n,p,e and meson/Coulomb fields; six finite geometry/uniform seed families",
+      "rows": 28,
+      "source_interval_requested_rows": 23,
+      "source_interval_selected_rows": 23,
+      "source_interval_sampled_support_fm3": [
+        0.002,
+        0.1
+      ],
+      "last_clustered_density_fm3": 0.075,
+      "first_uniform_density_fm3": 0.08,
+      "maximum_source_mesh_pressure_change": 0.0017239199318801399,
+      "maximum_chemical_KKT_residual_MeV": 0.0006709327066118931,
+      "held_diagnostic_extension_densities": [
+        0.0015
+      ],
+      "composition": "Spatial n,p,e profiles and total means; discrete A/Z and bound/free decomposition unavailable where undefined, never fabricated",
+      "density_grid_accuracy": "Separate midpoint/quarter-point comparison in tf_density_review; radial-mesh agreement is not density-interpolation convergence",
+      "evidence": "gppva_tf/final/GPPVA_TW/",
+      "remaining_science": [
+        "Refine density/geometry transition locations to the intended interpolation accuracy; finite multi-start does not prove a global minimum.",
+        "Resolve a physically stated common lower-piece interface/mass convention before calling a complete continuous original crust table."
+      ]
+    },
+    {
+      "model_id": "GPPVA_FSU2",
+      "component": "crust",
+      "generation_status": "SPATIAL_TF_EXECUTED_NATIVE_WITH_COMPOSITION_PROFILES",
+      "representation": "Published finite-range RMF TF functional; local n,p,e and meson/Coulomb fields; six finite geometry/uniform seed families",
+      "rows": 28,
+      "source_interval_requested_rows": 23,
+      "source_interval_selected_rows": 23,
+      "source_interval_sampled_support_fm3": [
+        0.002,
+        0.1
+      ],
+      "last_clustered_density_fm3": 0.05,
+      "first_uniform_density_fm3": 0.055,
+      "maximum_source_mesh_pressure_change": 0.001780189383491448,
+      "maximum_chemical_KKT_residual_MeV": 0.0002711065201310703,
+      "held_diagnostic_extension_densities": [
+        0.0002
+      ],
+      "composition": "Spatial n,p,e profiles and total means; discrete A/Z and bound/free decomposition unavailable where undefined, never fabricated",
+      "density_grid_accuracy": "Separate midpoint/quarter-point comparison in tf_density_review; radial-mesh agreement is not density-interpolation convergence",
+      "evidence": "gppva_tf/final/GPPVA_FSU2/",
+      "remaining_science": [
+        "Refine density/geometry transition locations to the intended interpolation accuracy; finite multi-start does not prove a global minimum.",
+        "Resolve a physically stated common lower-piece interface/mass convention before calling a complete continuous original crust table."
+      ]
+    },
+    {
+      "model_id": "GPPVA_FSU2R",
+      "component": "crust",
+      "generation_status": "SPATIAL_TF_EXECUTED_NATIVE_WITH_COMPOSITION_PROFILES",
+      "representation": "Published finite-range RMF TF functional; local n,p,e and meson/Coulomb fields; six finite geometry/uniform seed families",
+      "rows": 29,
+      "source_interval_requested_rows": 23,
+      "source_interval_selected_rows": 23,
+      "source_interval_sampled_support_fm3": [
+        0.002,
+        0.1
+      ],
+      "last_clustered_density_fm3": 0.09,
+      "first_uniform_density_fm3": 0.095,
+      "maximum_source_mesh_pressure_change": 0.003384927127113533,
+      "maximum_chemical_KKT_residual_MeV": 0.0072568890727779944,
+      "held_diagnostic_extension_densities": [],
+      "composition": "Spatial n,p,e profiles and total means; discrete A/Z and bound/free decomposition unavailable where undefined, never fabricated",
+      "density_grid_accuracy": "Separate midpoint/quarter-point comparison in tf_density_review; radial-mesh agreement is not density-interpolation convergence",
+      "evidence": "gppva_tf/final/GPPVA_FSU2R/",
+      "remaining_science": [
+        "Refine density/geometry transition locations to the intended interpolation accuracy; finite multi-start does not prove a global minimum.",
+        "Resolve a physically stated common lower-piece interface/mass convention before calling a complete continuous original crust table."
+      ]
+    },
+    {
+      "model_id": "GPPVA_FSU2H",
+      "component": "crust",
+      "generation_status": "SPATIAL_TF_EXECUTED_NATIVE_WITH_COMPOSITION_PROFILES",
+      "representation": "Published finite-range RMF TF functional; local n,p,e and meson/Coulomb fields; six finite geometry/uniform seed families",
+      "rows": 29,
+      "source_interval_requested_rows": 23,
+      "source_interval_selected_rows": 23,
+      "source_interval_sampled_support_fm3": [
+        0.002,
+        0.1
+      ],
+      "last_clustered_density_fm3": 0.095,
+      "first_uniform_density_fm3": 0.1,
+      "maximum_source_mesh_pressure_change": 0.0017042065899160277,
+      "maximum_chemical_KKT_residual_MeV": 0.0007623222626307324,
+      "held_diagnostic_extension_densities": [],
+      "composition": "Spatial n,p,e profiles and total means; discrete A/Z and bound/free decomposition unavailable where undefined, never fabricated",
+      "density_grid_accuracy": "Separate midpoint/quarter-point comparison in tf_density_review; radial-mesh agreement is not density-interpolation convergence",
+      "evidence": "gppva_tf/final/GPPVA_FSU2H/",
+      "remaining_science": [
+        "Refine density/geometry transition locations to the intended interpolation accuracy; finite multi-start does not prove a global minimum.",
+        "Resolve a physically stated common lower-piece interface/mass convention before calling a complete continuous original crust table."
+      ]
+    },
+    {
+      "model_id": "GPPVA_NL3wrL55",
+      "component": "crust",
+      "generation_status": "SPATIAL_TF_EXECUTED_NATIVE_WITH_COMPOSITION_PROFILES",
+      "representation": "Published finite-range RMF TF functional; local n,p,e and meson/Coulomb fields; six finite geometry/uniform seed families",
+      "rows": 29,
+      "source_interval_requested_rows": 23,
+      "source_interval_selected_rows": 23,
+      "source_interval_sampled_support_fm3": [
+        0.002,
+        0.1
+      ],
+      "last_clustered_density_fm3": 0.08,
+      "first_uniform_density_fm3": 0.085,
+      "maximum_source_mesh_pressure_change": 0.000999885390654816,
+      "maximum_chemical_KKT_residual_MeV": 0.00046353937841558945,
+      "held_diagnostic_extension_densities": [],
+      "composition": "Spatial n,p,e profiles and total means; discrete A/Z and bound/free decomposition unavailable where undefined, never fabricated",
+      "density_grid_accuracy": "Separate midpoint/quarter-point comparison in tf_density_review; radial-mesh agreement is not density-interpolation convergence",
+      "evidence": "gppva_tf/final/GPPVA_NL3wrL55/",
+      "remaining_science": [
+        "Refine density/geometry transition locations to the intended interpolation accuracy; finite multi-start does not prove a global minimum.",
+        "Resolve a physically stated common lower-piece interface/mass convention before calling a complete continuous original crust table."
+      ]
+    },
+    {
+      "model_id": "GPPVA_TM1e",
+      "component": "crust",
+      "generation_status": "SPATIAL_TF_EXECUTED_NATIVE_WITH_COMPOSITION_PROFILES",
+      "representation": "Published finite-range RMF TF functional; local n,p,e and meson/Coulomb fields; six finite geometry/uniform seed families",
+      "rows": 28,
+      "source_interval_requested_rows": 23,
+      "source_interval_selected_rows": 23,
+      "source_interval_sampled_support_fm3": [
+        0.002,
+        0.1
+      ],
+      "last_clustered_density_fm3": 0.095,
+      "first_uniform_density_fm3": 0.1,
+      "maximum_source_mesh_pressure_change": 0.002101462213050045,
+      "maximum_chemical_KKT_residual_MeV": 0.002350195262579291,
+      "held_diagnostic_extension_densities": [
+        0.00075
+      ],
+      "composition": "Spatial n,p,e profiles and total means; discrete A/Z and bound/free decomposition unavailable where undefined, never fabricated",
+      "density_grid_accuracy": "Separate midpoint/quarter-point comparison in tf_density_review; radial-mesh agreement is not density-interpolation convergence",
+      "evidence": "gppva_tf/final/GPPVA_TM1e/",
+      "remaining_science": [
+        "Refine density/geometry transition locations to the intended interpolation accuracy; finite multi-start does not prove a global minimum.",
+        "Resolve a physically stated common lower-piece interface/mass convention before calling a complete continuous original crust table."
+      ]
+    }
+  ],
+  "not_performed": [
+    "New core-crust matching",
+    "New stellar or mode calculation",
+    "Silent promotion of historical v6 proxy outputs"
+  ]
+}

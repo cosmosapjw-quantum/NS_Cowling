@@ -202,3 +202,83 @@ def test_unknown_nuclear_group_id_is_rejected(tmp_path):
     (tmp_path/'eos.compo').write_text('\n'.join(compo)+'\n')
     with pytest.raises(NotImplementedError, match='nuclear group id 9'):
         read_compose(str(tmp_path))
+
+
+def test_phase_boundary_mask_is_independent_of_composition_presence():
+    # A sharp Maxwell EOS may legitimately omit eos.compo while retaining Iphase.
+    d = make_data(composition=False)
+    report = check_consistency(d, verbose=False)
+    assert report["grid"]["phase_boundary_indices"] == [1]
+    assert np.array_equal(report["derivative_mask"][1:3], np.array([False, False]))
+
+
+def test_gap_crossing_phase_requires_explicit_label_without_composition():
+    nb = np.array([1e-3, 2e-3, 1e-2, 2e-2])
+    F = np.full(4, 930.0); Q1 = np.full(4, 5.0)
+    mu = F + Q1; Q6 = F/MN-1
+    d = EOSData(nb=nb, mn=MN, mp=938., Q1=Q1, Q2=np.zeros(4),
+        Q3=mu/MN-1, Q4=np.zeros(4), Q5=np.zeros(4), Q6=Q6, Q7=Q6.copy(),
+        q_extra=np.zeros(4), Iphase=np.array([0,0,7,7]), Yn=np.zeros(4),
+        Yp=np.zeros(4), Ye=np.zeros(4), Ymu=np.zeros(4), Aav=np.zeros(4),
+        Zav=np.zeros(4), Yh=np.zeros(4), composition_available=False)
+    with pytest.raises(ValueError, match='pass gap_phase explicitly'):
+        fill_density_gap(d, n_fill=4)
+
+
+def test_summary_reports_phase_ids_even_without_composition():
+    d = make_data(composition=False)
+    summary = d.summary()
+    assert "phase ID 1:" in summary and "phase ID 2:" in summary
+
+
+def test_reader_rejects_single_nonzero_temperature_slice(tmp_path):
+    data=make_data()
+    write_compose(str(tmp_path),data)
+    (tmp_path/"eos.t").write_text("0\n0\n0.5\n",encoding="utf-8")
+    with pytest.raises(NotImplementedError,match="cold T=0"):
+        read_compose(str(tmp_path))
+
+
+def test_reader_does_not_infer_beta_equilibrium_when_leptons_are_absent(tmp_path):
+    data=make_data(composition=False); data.Il=0
+    write_compose(str(tmp_path),data)
+    loaded=read_compose(str(tmp_path))
+    assert loaded.Il==0
+    assert loaded.beta_equilibrated is False
+
+
+def test_staged_write_readback_mismatch_refuses_publish_and_preserves_failure_receipt(tmp_path):
+    from compose_eos.io import verify_compose_readback
+    import json
+
+    initial = make_data(composition=True)
+    write_compose(str(tmp_path), initial)
+    original_thermo = (tmp_path / "eos.thermo").read_bytes()
+
+    updated = make_data(composition=True)
+    updated.Q1 = updated.Q1 * 1.1
+
+    def _corrupt_staged_thermo(stage_dir: str) -> None:
+        p = __import__("pathlib").Path(stage_dir) / "eos.thermo"
+        lines = p.read_text(encoding="utf-8").splitlines()
+        cols = lines[2].split()
+        cols[3] = f"{float(cols[3]) * 1.25:.16E}"
+        lines[2] = " " + " ".join(cols)
+        p.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="readback verification failed"):
+        write_compose(str(tmp_path), updated, _post_stage_hook=_corrupt_staged_thermo)
+
+    # Atomic promotion did NOT overwrite existing published output
+    assert (tmp_path / "eos.thermo").read_bytes() == original_thermo
+    # Failure receipt preserved with FAIL status and non-empty errors
+    receipt_path = tmp_path / "eos.readback_failure_receipt.json"
+    assert receipt_path.is_file()
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    assert receipt["status"] == "FAIL"
+    assert any("Q1" in err or "p" in err for err in receipt["errors"])
+
+    # Direct verify_compose_readback also catches Nadd and composition presence mismatches
+    mismatch_data = make_data(composition=False)
+    with pytest.raises(ValueError, match="composition_available mismatch"):
+        verify_compose_readback(str(tmp_path), mismatch_data)

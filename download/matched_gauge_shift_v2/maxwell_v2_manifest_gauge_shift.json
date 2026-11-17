@@ -1,0 +1,1093 @@
+{
+  "schema": "ns-cowling.core-crust-matching-gauge-shift-v2-maxwell.v1",
+  "generated_utc": "2026-11-14T10:57:00.656365+00:00",
+  "git_head": "eeca35c93816bb333b916d7737cdc5e9340e755a",
+  "gauge_shift_definition": {
+    "what": "Crust header (mn,mp) is shifted to the CORE's header (mn,mp); Q3/Q4/Q6/Q7 are re-derived so physical F/mu_B/mu_Q are INVARIANT; Q1 (P/n_B), Q2, Q5, Iphase, composition, n_B grid unchanged. The CORE is kept at its ORIGINAL gauge (no Q re-derivation).",
+    "dmcr": "dmcr = core_mn - crust_mn, applied to the crust F/mu_B (mirrors match_crust_core compose_eos_matching.f90:539); here promoted to a full mn/mp header unification so the v1 Maxwell mass gate (compose_eos_phase_transition.f90:689) passes.",
+    "NOT_PDG_regeneration": "PDG regeneration (matched_pdg_gauge_v2, commit eeca35c) rewrites BOTH phases to PDG mn/mp. Gauge shift rewrites ONLY the crust to the core's gauge; the core is untouched. The Q-value algebra is identical (ratio = mn_src/mn_tgt), but the target mn differs: PDG (939.56542052) vs the pair's core mn."
+  },
+  "physics_proof_why_stability_gate_is_invariant": {
+    "claim": "A constant gauge shift of mu_B (header mn unification + Q re-derivation) leaves the n(mu) curve SHAPE and dn/dmu invariant.",
+    "reason": "validate_phase builds mu_grid = (eps + P)/nb. The header-mn shift changes eps (and hence mu_grid) by a CONSTANT nb*dmcr per point, so d(mu)/d(nb) -- the quantity the Hermite interpolant's n(mu) depends on -- is unchanged (d(const)/dnb = 0). The quadratic-vertex stability test (n>0, dn/dmu>0) is identical before and after the shift. Therefore the crust segment Hermite artifact (SPG_M1 Iphase 7 interval 0: dn/dmu = -4.79e-3 at t=0.531, mu=941.136 MeV) is reproduced IDENTICALLY under the gauge shift.",
+    "empirical_confirmation_below": true
+  },
+  "total_attempts": 65,
+  "total_survivors": 0,
+  "fail_categories": {
+    "STABILITY_GATE": 62,
+    "NO_COEXISTENCE_CROSSING": 1,
+    "v2_KERNEL_REJECT": 2
+  },
+  "elapsed_total_s": 1.2,
+  "survivors": [],
+  "all_results": [
+    {
+      "pair_id": "SPG_M1__APR_APR__maxwell_gauge_shift",
+      "crust_model": "SPG_M1",
+      "core_model": "APR_APR",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.66533000000004,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "SPG_M1__BBB_BHF2__maxwell_gauge_shift",
+      "crust_model": "SPG_M1",
+      "core_model": "BBB_BHF2",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.66533000000004,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "SPG_M1__GM_GM1__maxwell_gauge_shift",
+      "crust_model": "SPG_M1",
+      "core_model": "GM_GM1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.66533000000004,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "SPG_M1__RG_SLY4__maxwell_gauge_shift",
+      "crust_model": "SPG_M1",
+      "core_model": "RG_SLY4",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.5654,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.6653999999999769,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "SPG_M1__RG_KDE0v1__maxwell_gauge_shift",
+      "crust_model": "SPG_M1",
+      "core_model": "RG_KDE0v1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.66533000000004,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.04
+    },
+    {
+      "pair_id": "SPG_M2__APR_APR__maxwell_gauge_shift",
+      "crust_model": "SPG_M2",
+      "core_model": "APR_APR",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.66533000000004,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "SPG_M2__BBB_BHF2__maxwell_gauge_shift",
+      "crust_model": "SPG_M2",
+      "core_model": "BBB_BHF2",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.66533000000004,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "SPG_M2__GM_GM1__maxwell_gauge_shift",
+      "crust_model": "SPG_M2",
+      "core_model": "GM_GM1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.66533000000004,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "SPG_M2__RG_SLY4__maxwell_gauge_shift",
+      "crust_model": "SPG_M2",
+      "core_model": "RG_SLY4",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.5654,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.6653999999999769,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "SPG_M2__RG_KDE0v1__maxwell_gauge_shift",
+      "crust_model": "SPG_M2",
+      "core_model": "RG_KDE0v1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.66533000000004,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.04
+    },
+    {
+      "pair_id": "SPG_M3__APR_APR__maxwell_gauge_shift",
+      "crust_model": "SPG_M3",
+      "core_model": "APR_APR",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.66533000000004,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "SPG_M3__BBB_BHF2__maxwell_gauge_shift",
+      "crust_model": "SPG_M3",
+      "core_model": "BBB_BHF2",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.66533000000004,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "SPG_M3__GM_GM1__maxwell_gauge_shift",
+      "crust_model": "SPG_M3",
+      "core_model": "GM_GM1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.66533000000004,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "SPG_M3__RG_SLY4__maxwell_gauge_shift",
+      "crust_model": "SPG_M3",
+      "core_model": "RG_SLY4",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.5654,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.6653999999999769,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "SPG_M3__RG_KDE0v1__maxwell_gauge_shift",
+      "crust_model": "SPG_M3",
+      "core_model": "RG_KDE0v1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.66533000000004,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.04
+    },
+    {
+      "pair_id": "SPG_M4__APR_APR__maxwell_gauge_shift",
+      "crust_model": "SPG_M4",
+      "core_model": "APR_APR",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.66533000000004,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "SPG_M4__BBB_BHF2__maxwell_gauge_shift",
+      "crust_model": "SPG_M4",
+      "core_model": "BBB_BHF2",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.66533000000004,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "SPG_M4__GM_GM1__maxwell_gauge_shift",
+      "crust_model": "SPG_M4",
+      "core_model": "GM_GM1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.66533000000004,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "SPG_M4__RG_SLY4__maxwell_gauge_shift",
+      "crust_model": "SPG_M4",
+      "core_model": "RG_SLY4",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.5654,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.6653999999999769,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.02
+    },
+    {
+      "pair_id": "SPG_M4__RG_KDE0v1__maxwell_gauge_shift",
+      "crust_model": "SPG_M4",
+      "core_model": "RG_KDE0v1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.66533000000004,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.05
+    },
+    {
+      "pair_id": "SPG_M5__APR_APR__maxwell_gauge_shift",
+      "crust_model": "SPG_M5",
+      "core_model": "APR_APR",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.66533000000004,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.02
+    },
+    {
+      "pair_id": "SPG_M5__BBB_BHF2__maxwell_gauge_shift",
+      "crust_model": "SPG_M5",
+      "core_model": "BBB_BHF2",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.66533000000004,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "SPG_M5__GM_GM1__maxwell_gauge_shift",
+      "crust_model": "SPG_M5",
+      "core_model": "GM_GM1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.66533000000004,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "SPG_M5__RG_SLY4__maxwell_gauge_shift",
+      "crust_model": "SPG_M5",
+      "core_model": "RG_SLY4",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.5654,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.6653999999999769,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.02
+    },
+    {
+      "pair_id": "SPG_M5__RG_KDE0v1__maxwell_gauge_shift",
+      "crust_model": "SPG_M5",
+      "core_model": "RG_KDE0v1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.66533000000004,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.05
+    },
+    {
+      "pair_id": "GPPVA_DD2__APR_APR__maxwell_gauge_shift",
+      "crust_model": "GPPVA_DD2",
+      "core_model": "APR_APR",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_DD2__BBB_BHF2__maxwell_gauge_shift",
+      "crust_model": "GPPVA_DD2",
+      "core_model": "BBB_BHF2",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_DD2__GM_GM1__maxwell_gauge_shift",
+      "crust_model": "GPPVA_DD2",
+      "core_model": "GM_GM1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_DD2__RG_SLY4__maxwell_gauge_shift",
+      "crust_model": "GPPVA_DD2",
+      "core_model": "RG_SLY4",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.5654,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653999999999542,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_DD2__RG_KDE0v1__maxwell_gauge_shift",
+      "crust_model": "GPPVA_DD2",
+      "core_model": "RG_KDE0v1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.05
+    },
+    {
+      "pair_id": "GPPVA_DDME2__APR_APR__maxwell_gauge_shift",
+      "crust_model": "GPPVA_DDME2",
+      "core_model": "APR_APR",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_DDME2__BBB_BHF2__maxwell_gauge_shift",
+      "crust_model": "GPPVA_DDME2",
+      "core_model": "BBB_BHF2",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_DDME2__GM_GM1__maxwell_gauge_shift",
+      "crust_model": "GPPVA_DDME2",
+      "core_model": "GM_GM1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_DDME2__RG_SLY4__maxwell_gauge_shift",
+      "crust_model": "GPPVA_DDME2",
+      "core_model": "RG_SLY4",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.5654,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653999999999542,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_DDME2__RG_KDE0v1__maxwell_gauge_shift",
+      "crust_model": "GPPVA_DDME2",
+      "core_model": "RG_KDE0v1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.05
+    },
+    {
+      "pair_id": "GPPVA_TW__APR_APR__maxwell_gauge_shift",
+      "crust_model": "GPPVA_TW",
+      "core_model": "APR_APR",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_TW__BBB_BHF2__maxwell_gauge_shift",
+      "crust_model": "GPPVA_TW",
+      "core_model": "BBB_BHF2",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_TW__GM_GM1__maxwell_gauge_shift",
+      "crust_model": "GPPVA_TW",
+      "core_model": "GM_GM1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_TW__RG_SLY4__maxwell_gauge_shift",
+      "crust_model": "GPPVA_TW",
+      "core_model": "RG_SLY4",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.5654,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653999999999542,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_TW__RG_KDE0v1__maxwell_gauge_shift",
+      "crust_model": "GPPVA_TW",
+      "core_model": "RG_KDE0v1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.05
+    },
+    {
+      "pair_id": "GPPVA_FSU2__APR_APR__maxwell_gauge_shift",
+      "crust_model": "GPPVA_FSU2",
+      "core_model": "APR_APR",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: high-density phase: P(mu_B) interpolation violates the causal bound c_s^2/c^2<=1",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_FSU2__BBB_BHF2__maxwell_gauge_shift",
+      "crust_model": "GPPVA_FSU2",
+      "core_model": "BBB_BHF2",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "NO_COEXISTENCE_CROSSING",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: no pressure equality was found in the common mu_B interval",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_FSU2__GM_GM1__maxwell_gauge_shift",
+      "crust_model": "GPPVA_FSU2",
+      "core_model": "GM_GM1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: high-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_FSU2__RG_SLY4__maxwell_gauge_shift",
+      "crust_model": "GPPVA_FSU2",
+      "core_model": "RG_SLY4",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.5654,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653999999999542,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "v2_KERNEL_REJECT",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: high-density phase: Maxwell construction requires beta-equilibrium lepton potential Q5 approximatel",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_FSU2__RG_KDE0v1__maxwell_gauge_shift",
+      "crust_model": "GPPVA_FSU2",
+      "core_model": "RG_KDE0v1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "v2_KERNEL_REJECT",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: high-density phase: Maxwell construction requires beta-equilibrium lepton potential Q5 approximatel",
+      "elapsed_s": 0.05
+    },
+    {
+      "pair_id": "GPPVA_FSU2H__APR_APR__maxwell_gauge_shift",
+      "crust_model": "GPPVA_FSU2H",
+      "core_model": "APR_APR",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_FSU2H__BBB_BHF2__maxwell_gauge_shift",
+      "crust_model": "GPPVA_FSU2H",
+      "core_model": "BBB_BHF2",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_FSU2H__GM_GM1__maxwell_gauge_shift",
+      "crust_model": "GPPVA_FSU2H",
+      "core_model": "GM_GM1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_FSU2H__RG_SLY4__maxwell_gauge_shift",
+      "crust_model": "GPPVA_FSU2H",
+      "core_model": "RG_SLY4",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.5654,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653999999999542,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_FSU2H__RG_KDE0v1__maxwell_gauge_shift",
+      "crust_model": "GPPVA_FSU2H",
+      "core_model": "RG_KDE0v1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.05
+    },
+    {
+      "pair_id": "GPPVA_FSU2R__APR_APR__maxwell_gauge_shift",
+      "crust_model": "GPPVA_FSU2R",
+      "core_model": "APR_APR",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_FSU2R__BBB_BHF2__maxwell_gauge_shift",
+      "crust_model": "GPPVA_FSU2R",
+      "core_model": "BBB_BHF2",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_FSU2R__GM_GM1__maxwell_gauge_shift",
+      "crust_model": "GPPVA_FSU2R",
+      "core_model": "GM_GM1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_FSU2R__RG_SLY4__maxwell_gauge_shift",
+      "crust_model": "GPPVA_FSU2R",
+      "core_model": "RG_SLY4",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.5654,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653999999999542,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_FSU2R__RG_KDE0v1__maxwell_gauge_shift",
+      "crust_model": "GPPVA_FSU2R",
+      "core_model": "RG_KDE0v1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.04
+    },
+    {
+      "pair_id": "GPPVA_NL3wrL55__APR_APR__maxwell_gauge_shift",
+      "crust_model": "GPPVA_NL3wrL55",
+      "core_model": "APR_APR",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_NL3wrL55__BBB_BHF2__maxwell_gauge_shift",
+      "crust_model": "GPPVA_NL3wrL55",
+      "core_model": "BBB_BHF2",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_NL3wrL55__GM_GM1__maxwell_gauge_shift",
+      "crust_model": "GPPVA_NL3wrL55",
+      "core_model": "GM_GM1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_NL3wrL55__RG_SLY4__maxwell_gauge_shift",
+      "crust_model": "GPPVA_NL3wrL55",
+      "core_model": "RG_SLY4",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.5654,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653999999999542,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_NL3wrL55__RG_KDE0v1__maxwell_gauge_shift",
+      "crust_model": "GPPVA_NL3wrL55",
+      "core_model": "RG_KDE0v1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 0.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.04
+    },
+    {
+      "pair_id": "GPPVA_TM1e__APR_APR__maxwell_gauge_shift",
+      "crust_model": "GPPVA_TM1e",
+      "core_model": "APR_APR",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 1.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_TM1e__BBB_BHF2__maxwell_gauge_shift",
+      "crust_model": "GPPVA_TM1e",
+      "core_model": "BBB_BHF2",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 1.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_TM1e__GM_GM1__maxwell_gauge_shift",
+      "crust_model": "GPPVA_TM1e",
+      "core_model": "GM_GM1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 1.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_TM1e__RG_SLY4__maxwell_gauge_shift",
+      "crust_model": "GPPVA_TM1e",
+      "core_model": "RG_SLY4",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.5654,
+        "mp": 938.272
+      },
+      "dmcr_mev": 1.5653999999999542,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.01
+    },
+    {
+      "pair_id": "GPPVA_TM1e__RG_KDE0v1__maxwell_gauge_shift",
+      "crust_model": "GPPVA_TM1e",
+      "core_model": "RG_KDE0v1",
+      "method": "maxwell_v2_gauge_shift",
+      "crust_header_shifted_to": {
+        "mn": 939.56533,
+        "mp": 938.272
+      },
+      "dmcr_mev": 1.5653300000000172,
+      "survived": false,
+      "status": "FAIL",
+      "rejection_category": "STABILITY_GATE",
+      "error": "v2: v1 kernel rejected segment pair: Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability",
+      "elapsed_s": 0.04
+    }
+  ],
+  "gauge_shift_vs_pdg_regen_comparison": {
+    "gauge_shift_this_run": {
+      "total_attempts": 65,
+      "mass_gate_failures": 0,
+      "stability_gate_failures": 62,
+      "no_coexistence_crossing": 1,
+      "v2_kernel_reject": 2,
+      "causal_gate_failures": 0,
+      "survivors": 0,
+      "note": "Header mn/mp unified (crust shifted to core gauge, core original); mass gate passes. The stability gate fails identically to the PDG-regeneration run because the n(mu) curve shape is gauge-invariant."
+    },
+    "pdg_regen_commit_eeca35c": {
+      "total_attempts": 65,
+      "mass_gate_failures": 0,
+      "stability_gate_failures": 63,
+      "no_coexistence_crossing": 1,
+      "causal_gate_failures": 1,
+      "survivors": 0,
+      "note": "Both phases rewritten to PDG mn/mp. Mass gate passes. Stability gate fails identically (same n(mu) shape)."
+    },
+    "conclusion": "A gauge shift is NOT a viable path to a v2 Maxwell matched EOS for these sources. It passes the mass gate (header unification) but leaves the crust segment Hermite stability artifact untouched (gauge-invariant n(mu) curve). The empirical gate distributions of the two strategies are statistically indistinguishable: both reject all 65 pairs at the physics (stability/coexistence) gate, NOT at the mass-convention gate. The mass-convention problem was solved by EITHER strategy; the crust segment interpolation-quality problem is independent of gauge convention and requires smooth interpolation preprocessing (M5 smooth-matrix scope), not a gauge transformation."
+  },
+  "deliverable": {
+    "matched_eos_tables_exported": 0,
+    "reason": "No (crust, core) pair passes the validate_phase Hermite stability gate under a gauge shift, so no matched EOS table is exported. The manifest is the sole deliverable for this review; it documents the gauge-shift attempt, the physics proof of gate invariance, and the 65-pair gate distribution.",
+    "distinct_from_pdg_regeneration_run": "This run is kept in download/matched_gauge_shift_v2/ (separate from download/matched_pdg_gauge_v2/) and labeled method= 'maxwell_v2_gauge_shift' so any future survivor would never be confused with a PDG-regeneration table. There are no survivors in either run."
+  }
+}

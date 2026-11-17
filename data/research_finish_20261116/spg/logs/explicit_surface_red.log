@@ -1,0 +1,95 @@
+FFFFFFFF                                                                 [100%]
+=================================== FAILURES ===================================
+___________ test_surface_parameters_are_immutable_and_model_specific ___________
+
+    def test_surface_parameters_are_immutable_and_model_specific():
+>       p=cld.SurfaceParameters('SPG_M1',1.03,12.,'explicit_test','a'*64)
+          ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'compose_eos.candidate_gdfm_cld' has no attribute 'SurfaceParameters'. Did you mean: 'surface_parameters'?
+
+python_frontend/tests/test_spg_surface_prescriptions.py:10: AttributeError
+______________ test_default_surface_cache_tracks_content_identity ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-189/test_default_surface_cache_tra0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7a306ed1b6e0>
+
+    def test_default_surface_cache_tracks_content_identity(tmp_path,monkeypatch):
+        path=tmp_path/'data/research_generator_20261116/candidate_surface/candidate_surface_fit.json'
+        path.parent.mkdir(parents=True)
+        data={'models':{'SPG_M1':{'all_mass':{'sigma0_MeV_fm2':1.1,'b':13.}}}}
+        path.write_text(json.dumps(data));monkeypatch.setattr(cld,'project_root',lambda:tmp_path)
+>       first=cld.default_surface_parameters('SPG_M1')
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'compose_eos.candidate_gdfm_cld' has no attribute 'default_surface_parameters'
+
+python_frontend/tests/test_spg_surface_prescriptions.py:20: AttributeError
+_____ test_explicit_default_preserves_functional_and_alternative_gradient ______
+
+    def test_explicit_default_preserves_functional_and_alternative_gradient():
+>       p=cld.default_surface_parameters('SPG_M3')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'compose_eos.candidate_gdfm_cld' has no attribute 'default_surface_parameters'
+
+python_frontend/tests/test_spg_surface_prescriptions.py:28: AttributeError
+__________ test_surface_change_reoptimizes_composition_and_first_law ___________
+
+    def test_surface_change_reoptimizes_composition_and_first_law():
+>       p=cld.SurfaceParameters('SPG_M2',1.04,14.,'explicit_test','c'*64)
+          ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'compose_eos.candidate_gdfm_cld' has no attribute 'SurfaceParameters'. Did you mean: 'surface_parameters'?
+
+python_frontend/tests/test_spg_surface_prescriptions.py:42: AttributeError
+_________________ test_invalid_explicit_surface_rejected[0-5] __________________
+
+sigma = 0, b = 5
+
+    @pytest.mark.parametrize('sigma,b',[(0,5),(float('nan'),5),(1,-16),(1,float('inf'))])
+    def test_invalid_explicit_surface_rejected(sigma,b):
+>       with pytest.raises(ValueError):cld.SurfaceParameters('SPG_M1',sigma,b,'test','e'*64)
+                                       ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'compose_eos.candidate_gdfm_cld' has no attribute 'SurfaceParameters'. Did you mean: 'surface_parameters'?
+
+python_frontend/tests/test_spg_surface_prescriptions.py:57: AttributeError
+________________ test_invalid_explicit_surface_rejected[nan-5] _________________
+
+sigma = nan, b = 5
+
+    @pytest.mark.parametrize('sigma,b',[(0,5),(float('nan'),5),(1,-16),(1,float('inf'))])
+    def test_invalid_explicit_surface_rejected(sigma,b):
+>       with pytest.raises(ValueError):cld.SurfaceParameters('SPG_M1',sigma,b,'test','e'*64)
+                                       ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'compose_eos.candidate_gdfm_cld' has no attribute 'SurfaceParameters'. Did you mean: 'surface_parameters'?
+
+python_frontend/tests/test_spg_surface_prescriptions.py:57: AttributeError
+________________ test_invalid_explicit_surface_rejected[1--16] _________________
+
+sigma = 1, b = -16
+
+    @pytest.mark.parametrize('sigma,b',[(0,5),(float('nan'),5),(1,-16),(1,float('inf'))])
+    def test_invalid_explicit_surface_rejected(sigma,b):
+>       with pytest.raises(ValueError):cld.SurfaceParameters('SPG_M1',sigma,b,'test','e'*64)
+                                       ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'compose_eos.candidate_gdfm_cld' has no attribute 'SurfaceParameters'. Did you mean: 'surface_parameters'?
+
+python_frontend/tests/test_spg_surface_prescriptions.py:57: AttributeError
+________________ test_invalid_explicit_surface_rejected[1-inf] _________________
+
+sigma = 1, b = inf
+
+    @pytest.mark.parametrize('sigma,b',[(0,5),(float('nan'),5),(1,-16),(1,float('inf'))])
+    def test_invalid_explicit_surface_rejected(sigma,b):
+>       with pytest.raises(ValueError):cld.SurfaceParameters('SPG_M1',sigma,b,'test','e'*64)
+                                       ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'compose_eos.candidate_gdfm_cld' has no attribute 'SurfaceParameters'. Did you mean: 'surface_parameters'?
+
+python_frontend/tests/test_spg_surface_prescriptions.py:57: AttributeError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_spg_surface_prescriptions.py::test_surface_parameters_are_immutable_and_model_specific
+FAILED python_frontend/tests/test_spg_surface_prescriptions.py::test_default_surface_cache_tracks_content_identity
+FAILED python_frontend/tests/test_spg_surface_prescriptions.py::test_explicit_default_preserves_functional_and_alternative_gradient
+FAILED python_frontend/tests/test_spg_surface_prescriptions.py::test_surface_change_reoptimizes_composition_and_first_law
+FAILED python_frontend/tests/test_spg_surface_prescriptions.py::test_invalid_explicit_surface_rejected[0-5]
+FAILED python_frontend/tests/test_spg_surface_prescriptions.py::test_invalid_explicit_surface_rejected[nan-5]
+FAILED python_frontend/tests/test_spg_surface_prescriptions.py::test_invalid_explicit_surface_rejected[1--16]
+FAILED python_frontend/tests/test_spg_surface_prescriptions.py::test_invalid_explicit_surface_rejected[1-inf]
+8 failed in 0.43s

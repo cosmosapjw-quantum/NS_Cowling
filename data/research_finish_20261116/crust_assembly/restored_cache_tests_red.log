@@ -1,0 +1,86 @@
+..........FFFFF.                                                         [100%]
+=================================== FAILURES ===================================
+_____________ test_cached_configuration_cannot_be_mutated[surface] _____________
+
+field = 'surface'
+
+    @pytest.mark.parametrize("field",["surface","mn","mp","difference"])
+    def test_cached_configuration_cannot_be_mutated(field):
+        from dataclasses import FrozenInstanceError
+        c=RestoredSPGCandidate('SPG_M1')
+        c.state(.002)
+        replacement=default_surface_parameters('SPG_M2') if field=="surface" else 1.
+>       with pytest.raises(FrozenInstanceError):
+E       Failed: DID NOT RAISE FrozenInstanceError
+
+python_frontend/tests/test_restored_spg_candidate.py:48: Failed
+_______________ test_cached_configuration_cannot_be_mutated[mn] ________________
+
+field = 'mn'
+
+    @pytest.mark.parametrize("field",["surface","mn","mp","difference"])
+    def test_cached_configuration_cannot_be_mutated(field):
+        from dataclasses import FrozenInstanceError
+        c=RestoredSPGCandidate('SPG_M1')
+        c.state(.002)
+        replacement=default_surface_parameters('SPG_M2') if field=="surface" else 1.
+>       with pytest.raises(FrozenInstanceError):
+E       Failed: DID NOT RAISE FrozenInstanceError
+
+python_frontend/tests/test_restored_spg_candidate.py:48: Failed
+_______________ test_cached_configuration_cannot_be_mutated[mp] ________________
+
+field = 'mp'
+
+    @pytest.mark.parametrize("field",["surface","mn","mp","difference"])
+    def test_cached_configuration_cannot_be_mutated(field):
+        from dataclasses import FrozenInstanceError
+        c=RestoredSPGCandidate('SPG_M1')
+        c.state(.002)
+        replacement=default_surface_parameters('SPG_M2') if field=="surface" else 1.
+>       with pytest.raises(FrozenInstanceError):
+E       Failed: DID NOT RAISE FrozenInstanceError
+
+python_frontend/tests/test_restored_spg_candidate.py:48: Failed
+___________ test_cached_configuration_cannot_be_mutated[difference] ____________
+
+field = 'difference'
+
+    @pytest.mark.parametrize("field",["surface","mn","mp","difference"])
+    def test_cached_configuration_cannot_be_mutated(field):
+        from dataclasses import FrozenInstanceError
+        c=RestoredSPGCandidate('SPG_M1')
+        c.state(.002)
+        replacement=default_surface_parameters('SPG_M2') if field=="surface" else 1.
+>       with pytest.raises(FrozenInstanceError):
+E       Failed: DID NOT RAISE FrozenInstanceError
+
+python_frontend/tests/test_restored_spg_candidate.py:48: Failed
+________________ test_returned_nested_state_cannot_poison_cache ________________
+
+    def test_returned_nested_state_cannot_poison_cache():
+        from copy import deepcopy
+        c=RestoredSPGCandidate('SPG_M1')
+        result=c.state(.002);expected=deepcopy(result)
+        result["epsilon"]=-1234.
+        result["surface_parameters"]["label"]="POISON"
+        result["all_three_attempts"][0]["coordinates"][0]=-9.
+>       assert c.state(.002)==expected
+E       AssertionError: assert {'n_B': 0.002... -1234.0, ...} == {'n_B': 0.002...6606019), ...}
+E         
+E         Omitting 14 identical items, use -vv to show
+E         Differing items:
+E         {'surface_parameters': {'model_id': 'SPG_M1', 'sigma0_MeV_fm2': 1.0415982475887464, 'b': 14.084751850892523, 'label': 'POISON', ...}} != {'surface_parameters': {'model_id': 'SPG_M1', 'sigma0_MeV_fm2': 1.0415982475887464, 'b': 14.084751850892523, 'label': 'AME2408_candidate', ...}}
+E         {'coordinates': [-9.0, 0.14355103151228604, 0.29854482255828896]} != {'coordinates': [0.23175182811887168, 0.14355103151228604, 0.29854482255828896]}
+E         {'all_three_attempts': [{'n_B': 0.002, 'coordinates': [-9.0, 0.14355103151228604, 0.29...
+E         
+E         ...Full output truncated (3 lines hidden), use '-vv' to show
+
+python_frontend/tests/test_restored_spg_candidate.py:58: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_restored_spg_candidate.py::test_cached_configuration_cannot_be_mutated[surface]
+FAILED python_frontend/tests/test_restored_spg_candidate.py::test_cached_configuration_cannot_be_mutated[mn]
+FAILED python_frontend/tests/test_restored_spg_candidate.py::test_cached_configuration_cannot_be_mutated[mp]
+FAILED python_frontend/tests/test_restored_spg_candidate.py::test_cached_configuration_cannot_be_mutated[difference]
+FAILED python_frontend/tests/test_restored_spg_candidate.py::test_returned_nested_state_cannot_poison_cache
+5 failed, 11 passed in 0.85s

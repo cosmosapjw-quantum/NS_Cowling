@@ -1,0 +1,16 @@
+{
+  "task_id": "1ed17d97b810",
+  "crust_model": "GPPVA_TM1e",
+  "core_model": "RG_KDE0v1",
+  "method": "cubic_P",
+  "method_kind": "smooth_crossover",
+  "method_reference": "Project-defined Hermite interpolation of the corresponding pressure/chemical-potential representation; no literature attribution implied",
+  "acceptance_node": "E390-02C",
+  "output_folder": "download/m7_batch_v2_20261114_full/1ed17d97b810_GPPVA_TM1e_RG_KDE0v1_cubic_P",
+  "started_utc": "2026-11-14T10:10:36Z",
+  "status": "FAIL",
+  "error_type": "NativeExecutionError",
+  "error_message": "Fortran operation 'match-core' failed with exit code 3: native smooth matching requires beta-equilibrated cold barotropes",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/z/my-project/repos/NS_Cowling_eos390/scripts/m7/m7_batch_orchestrator.py\", line 228, in run_task\n    result = run_smooth_task(method, crust_dir, core_dir, str(out_dir))\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/z/my-project/repos/NS_Cowling_eos390/scripts/m7/m7_batch_orchestrator.py\", line 176, in run_smooth_task\n    return _native_pipeline(method, crust_dir, core_dir, output_dir)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/z/my-project/repos/NS_Cowling_eos390/scripts/m7/m7_batch_orchestrator.py\", line 87, in _native_pipeline\n    r3 = _run(\"match-core\", str(crust_internal), str(core_internal),\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/z/my-project/repos/NS_Cowling_eos390/python_frontend/compose_eos/native.py\", line 73, in run_native\n    raise NativeExecutionError(\ncompose_eos.native.NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: native smooth matching requires beta-equilibrated cold barotropes\n",
+  "completed_utc": "2026-11-14T10:10:36Z"
+}

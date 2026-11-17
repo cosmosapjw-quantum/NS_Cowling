@@ -1,0 +1,360 @@
+{
+  "schema": "ns-cowling.compose-composition-source-reconciliation",
+  "schema_version": "1.0.0",
+  "receipt_id": "E390-02-COMPOSITION-CLOSURE-SOURCE-RECONCILIATION-20261113",
+  "date": "2026-11-13",
+  "repository": "cosmosapjw-quantum/NS_Cowling",
+  "release": "EoS_core_crust_release_v3_2_20261106",
+  "status": "BLOCKED_PROVIDER_SEMANTICS_UNRESOLVED_NORMALIZED_CLOSURE_IS_RECONSTRUCTION",
+  "normative_reference": {
+    "citation": "CompOSE Core Team, S. Typel et al., CompOSE Reference Manual v3.01 (2022), Eur. Phys. J. A 58, 221",
+    "url": "https://arxiv.org/abs/2203.03209",
+    "doi": "10.1140/epja/s10050-022-00847-y",
+    "section": "4.2.3",
+    "equations": [
+      "4.20",
+      "4.21",
+      "4.22"
+    ],
+    "YI": "combined number fraction of the group of nuclei",
+    "Xh": "Abar*YI, group baryon fraction",
+    "Iphase": "provider-defined categorical index; mapping belongs in the model-specific data sheet",
+    "version_note": "Package normalizer manifest cites v3.00; this audit uses v3.01 for current field definitions."
+  },
+  "audit_scope": {
+    "models": 13,
+    "rows": 4172,
+    "malformed_rows": 0,
+    "required_particle_ids_present": 4172,
+    "particle_ids": {
+      "0": "electron",
+      "1": "muon",
+      "10": "neutron",
+      "11": "proton"
+    },
+    "Npairs": 4,
+    "Nquad": 1,
+    "group_id": 1,
+    "Iphase_counts": {
+      "0": 2821,
+      "7": 1351
+    }
+  },
+  "closure_definitions": {
+    "C3_YI": "Yn+Yp+Abar*YI-1",
+    "C4_YI": "Yp+Zbar*YI-Ye-Ymu",
+    "C3_Xh": "Yn+Yp+Xh-1",
+    "C4_Xh": "Yp+(Zbar/Abar)*Xh-Ye-Ymu",
+    "comparison_threshold": 0.002
+  },
+  "aggregate_findings": {
+    "Iphase_0": {
+      "rows": 2821,
+      "raw_group_value": [
+        1,
+        1
+      ],
+      "Abar": [
+        56,
+        128
+      ],
+      "raw_as_YI": {
+        "max_abs_C3": 127,
+        "max_abs_C4": 41.66129,
+        "fail_C3": 2821,
+        "fail_C4": 2821
+      },
+      "raw_as_Xh": {
+        "max_abs_C3": 0,
+        "max_abs_C4": 0.000005,
+        "fail_C3": 0,
+        "fail_C4": 0
+      }
+    },
+    "Iphase_7": {
+      "rows": 1351,
+      "raw_group_value": [
+        0.01144,
+        0.07297
+      ],
+      "Abar": [
+        80.703,
+        4641.074
+      ],
+      "raw_as_YI": {
+        "max_abs_C3": 171.83359576,
+        "max_abs_C4": 7.61729304,
+        "fail_C3": 1351,
+        "fail_C4": 1351
+      },
+      "raw_as_Xh": {
+        "max_abs_C3": 0.98856,
+        "max_abs_C4": 0.06764548922056385,
+        "fail_C3": 1351,
+        "fail_C4": 1351
+      }
+    },
+    "conclusion": "Iphase=0 is closure-compatible with the raw field interpreted as Xh, not standard CompOSE YI. Iphase=7 is compatible with neither direct YI nor Xh using the available n/p/e/mu fractions. Do not infer physical phase names."
+  },
+  "normalizer": {
+    "script": "scripts/normalize_compose_composition.py",
+    "tolerance": 0.002,
+    "raw_group_field": "retained in a local record but not used to construct Yh or YI",
+    "algorithm": "Yh=1-Yn-Yp; accept if in range and charge closure passes. Otherwise, if Yp<=tol, infer Yh=(Ye+Ymu-Yp)*Abar/Zbar and reconstruct Yn. Write YI=Yh/Abar.",
+    "rows_reconstructed_total": 761,
+    "SPG_reconstructed": {
+      "SPG_M1": 148,
+      "SPG_M2": 160,
+      "SPG_M3": 149,
+      "SPG_M4": 158,
+      "SPG_M5": 146
+    },
+    "GPPVA_reconstructed": 0,
+    "normalized_residual_maxima": {
+      "C3": 1.1102230246251565e-16,
+      "C4": 0.000005
+    },
+    "interpretation": "Normalized closure is an output of the reconstruction procedure, not independent validation of raw provider composition."
+  },
+  "models": [
+    {
+      "model": "SPG_M1",
+      "rows": 365,
+      "phase7": 148,
+      "reconstructed": 148,
+      "raw": [
+        0.02209,
+        0.06087
+      ],
+      "Abar": [
+        82.107,
+        452.669
+      ],
+      "source": "8ce704b9af8a3a7a74e6985d9edc5481a8dc7a8b03e50f7b4d39c3d292dfec27",
+      "normalized": "2e00888c5d0d0d2acc833561b4f23a6e048964197857a5a11ff23012f3f6d774"
+    },
+    {
+      "model": "SPG_M2",
+      "rows": 377,
+      "phase7": 160,
+      "reconstructed": 160,
+      "raw": [
+        0.02974,
+        0.06749
+      ],
+      "Abar": [
+        111.683,
+        4641.074
+      ],
+      "source": "b3e1d5aae1d7103817586b710ac8837e582d03f9d2a445acf994c3ba81e79a5f",
+      "normalized": "d29ee5026fac859588dadcbd8926774905743dc65e25743a7e2300b225747585"
+    },
+    {
+      "model": "SPG_M3",
+      "rows": 366,
+      "phase7": 149,
+      "reconstructed": 149,
+      "raw": [
+        0.02217,
+        0.05905
+      ],
+      "Abar": [
+        80.703,
+        559.472
+      ],
+      "source": "809a5540b1cc2a3a2c1623190258dbde73a491248ae37601f09b6a8ad7c02111",
+      "normalized": "5f0bcf72eb018376a2fde81d6b3a893ad897de8a96c171db7b5a3591860ac740"
+    },
+    {
+      "model": "SPG_M4",
+      "rows": 375,
+      "phase7": 158,
+      "reconstructed": 158,
+      "raw": [
+        0.02629,
+        0.0613
+      ],
+      "Abar": [
+        94.048,
+        2332.288
+      ],
+      "source": "37f2e38debd22a77f0e938b87da7f4067cecd7faee3b80fc02f3b2bfdb595377",
+      "normalized": "cf80705e90ab57ac098a15ee726c6956e7c7dc4aace968defa69d89e30c4652e"
+    },
+    {
+      "model": "SPG_M5",
+      "rows": 363,
+      "phase7": 146,
+      "reconstructed": 146,
+      "raw": [
+        0.02377,
+        0.06108
+      ],
+      "Abar": [
+        106.408,
+        772.587
+      ],
+      "source": "c70fd7a101298ca363a4c928ce531b9f2dd33ca747209a3a994fb74747bef1b1",
+      "normalized": "f19c9dde684d6cb88b9c5ea70abe5f3f28e2c06dd1c84b8e348208db783359c3"
+    },
+    {
+      "model": "GPPVA_DD2",
+      "rows": 283,
+      "phase7": 66,
+      "reconstructed": 0,
+      "raw": [
+        0.02341,
+        0.06988
+      ],
+      "Abar": [
+        644,
+        1624
+      ],
+      "source": "8812f119fb3821a618414336dc4b4153dcee65b29fbda0663587bd10be863184",
+      "normalized": "6054d6f1d4d4c97ad2086f3f2fb9be67c2f6d512853022b4a3f1f67b98ce7932"
+    },
+    {
+      "model": "GPPVA_DDME2",
+      "rows": 288,
+      "phase7": 71,
+      "reconstructed": 0,
+      "raw": [
+        0.02545,
+        0.07107
+      ],
+      "Abar": [
+        605,
+        1520
+      ],
+      "source": "c9afb0c026201ea267e979ed937593794b694a1a485b3026a698c3d3da6502cc",
+      "normalized": "6e3c6693582dc992b59b5d07730bad8c193790fef14fbceb3d54abb9a3f8e340"
+    },
+    {
+      "model": "GPPVA_FSU2",
+      "rows": 269,
+      "phase7": 52,
+      "reconstructed": 0,
+      "raw": [
+        0.01144,
+        0.04865
+      ],
+      "Abar": [
+        740,
+        2143
+      ],
+      "source": "0250865a4848a855727b18b6d312450a2d8e3d972bb52a811fe14fee5adfc5d8",
+      "normalized": "e3e24d97c7faeb69a56cc196507553c24bc42a24abee30539980703c9b4cbda8"
+    },
+    {
+      "model": "GPPVA_FSU2H",
+      "rows": 300,
+      "phase7": 83,
+      "reconstructed": 0,
+      "raw": [
+        0.04048,
+        0.06649
+      ],
+      "Abar": [
+        737,
+        1599
+      ],
+      "source": "cd2bc3eed25639b38cfb0a4d16962f6c4511dcd063f9bf92a28209e3cdaa08b4",
+      "normalized": "51a85599bc2f10bb1e5433fd6cd417cea6895913d8c5338e83640d2f0d87b2d1"
+    },
+    {
+      "model": "GPPVA_FSU2R",
+      "rows": 296,
+      "phase7": 79,
+      "reconstructed": 0,
+      "raw": [
+        0.04307,
+        0.06684
+      ],
+      "Abar": [
+        748,
+        1538
+      ],
+      "source": "2e777888095cc36737d793993f52c5cd5e33c85d0f32bcf994c3ba81e79a5f",
+      "normalized": "af578b638015b86a2aed4524ec644c94d60b1f4711271d257f226333d70e194d"
+    },
+    {
+      "model": "GPPVA_NL3wrL55",
+      "rows": 298,
+      "phase7": 81,
+      "reconstructed": 0,
+      "raw": [
+        0.02547,
+        0.07297
+      ],
+      "Abar": [
+        603,
+        1733
+      ],
+      "source": "469d0b29aea5ae9404107d4dd1447920ae32d152da183f0be957a898cedf3242",
+      "normalized": "c1eae31d14690e20993b4d8de6099ce886aa737a918295186a43ad3fbe422727"
+    },
+    {
+      "model": "GPPVA_TM1e",
+      "rows": 303,
+      "phase7": 86,
+      "reconstructed": 0,
+      "raw": [
+        0.0429,
+        0.06753
+      ],
+      "Abar": [
+        696,
+        1476
+      ],
+      "source": "ad37b9bbc51c4fcba16a1ed9425121d439a4230ec2ee9a1c6a6eac420c5a1f6a",
+      "normalized": "33f265778e30a28fda4afaa41abe4d9efcd0aaf07683bc76b268e5b24be506b9"
+    },
+    {
+      "model": "GPPVA_TW",
+      "rows": 289,
+      "phase7": 72,
+      "reconstructed": 0,
+      "raw": [
+        0.02801,
+        0.0564
+      ],
+      "Abar": [
+        851,
+        1557
+      ],
+      "source": "df43bf65190dacd23cec46f7a19b8a7bf2eaa473e756a302a22b27f7d6a8b387",
+      "normalized": "61f202d33042d136291b2d78f9975967dea956189a8d99f4c0e357fa1422832c"
+    }
+  ],
+  "other_models": {
+    "GM_GM1": {
+      "status": "composition_omitted_unresolved_rows",
+      "rows": 349,
+      "reason": "row 49 homogeneous fractions fail charge closure with 1.001e-2 residual; normalized eos.compo omitted as a whole"
+    },
+    "RG_SLY4": {
+      "status": "normalized",
+      "rows": 197,
+      "rows_reconstructed": 1,
+      "source_sha256_declared": "39ef13e075c5225a8a838e7015052263d038a16d0303398f427fbbee34e30d65",
+      "normalized_sha256_declared": "9323feabc40a28c22496d3f902060b01445ef0c554c63f61b9dfaace9e280827"
+    },
+    "RG_KDE0v1": {
+      "status": "normalized",
+      "rows": 1240,
+      "rows_reconstructed": 0,
+      "source_sha256_declared": "488e95274a7b2c6c84aeed589c1e8b4d5dcb06c4b83b0919b9d07396e50f0966e",
+      "normalized_sha256_declared": "0c1298fbffd630a57a3f2ade782a09bdd6d985193d860a9e43a5058fda02eb8b"
+    }
+  },
+  "byte_identity": {
+    "status": "MANIFEST_DECLARED_HASHES_ONLY",
+    "note": "Dropbox text fetch returned text representations, not the original byte streams. In three spot-check raw/normalized file pairs, fetched text was one byte longer than file listing size and its text SHA-256 did not match the manifest-declared hash; no independent raw byte-identity claim is made."
+  },
+  "limitations": [
+    "No provider-authored Iphase or nuclear-group mapping was retrieved.",
+    "No raw source files were modified.",
+    "No normalized EOS file or historical 390 output was overwritten.",
+    "The normalization manifest omits row-level adjustment provenance."
+  ]
+}

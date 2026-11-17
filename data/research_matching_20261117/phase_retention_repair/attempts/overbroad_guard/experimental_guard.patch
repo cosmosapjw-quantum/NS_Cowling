@@ -1,0 +1,49 @@
+diff --git a/fortran_eos/src/compose_eos_matching.f90 b/fortran_eos/src/compose_eos_matching.f90
+index e52c46cd..07cd5a72 100644
+--- a/fortran_eos/src/compose_eos_matching.f90
++++ b/fortran_eos/src/compose_eos_matching.f90
+@@ -872,6 +872,15 @@ contains
+     endif
+     call validate_eos(cr,ok1,msg);if(.not.ok1)then;status='invalid crust EOS: '//trim(msg);return;endif
+     call validate_eos(co,ok1,msg);if(.not.ok1)then;status='invalid core EOS: '//trim(msg);return;endif
++    ! This assembly currently writes no source Iphase sidecar.  Reject any
++    ! internal boundary before searching a window or sampling endpoint
++    ! derivatives: neither discarded nor retained boundaries may be erased.
++    ! Iphase values are provider-local opaque labels, not transition types.
++    if(any(cr%iphase(2:)/=cr%iphase(:cr%n-1)).or. &
++       any(co%iphase(2:)/=co%iphase(:co%n-1)))then
++      status='native matching cannot preserve source Iphase boundaries; select a supported contiguous branch'
++      return
++    endif
+     if(.not.ieee_is_finite(cr%temperature_mev).or..not.ieee_is_finite(co%temperature_mev).or. &
+        .not.ieee_is_finite(cr%charge_fraction_grid).or..not.ieee_is_finite(co%charge_fraction_grid))then
+       status='native matching requires finite thermodynamic metadata';return
+diff --git a/python_frontend/tests/test_native_matching_admission.py b/python_frontend/tests/test_native_matching_admission.py
+index 9b00d37a..d7af92a4 100644
+--- a/python_frontend/tests/test_native_matching_admission.py
++++ b/python_frontend/tests/test_native_matching_admission.py
+@@ -11,6 +11,24 @@ CRUST = ROOT / "eos_generator/eos_data_normalized/GPPVA_FSU2H"
+ CORE = ROOT / "eos_generator/eos_data_normalized/GM_GM1"
+ 
+ 
++@pytest.mark.parametrize("side", ["crust", "core"])
++def test_native_matching_refuses_to_erase_source_phase_boundary(tmp_path, side):
++    """Bypass the Python support guard and exercise the native contract."""
++    crust, core = read_compose(CRUST), read_compose(CORE)
++    data = crust if side == "crust" else core
++    # Opaque provider-local labels: even a single boundary must not disappear.
++    data.Iphase[:] = 23
++    data.Iphase[data.n // 2:] = 41
++    paths = [tmp_path / name for name in ("crust", "core", "output")]
++    for path in paths:
++        path.mkdir()
++    crust.write_internal_directory(paths[0])
++    core.write_internal_directory(paths[1])
++    with pytest.raises(NativeExecutionError, match="cannot preserve source Iphase boundaries"):
++        run_native("match-core", *paths, "css", "8", "true")
++    assert not (paths[2] / "eos_data.csv").exists()
++
++
+ @pytest.mark.parametrize("side", ["crust", "core"])
+ @pytest.mark.parametrize("invalid", ["temperature", "charge_fraction", "lepton_potential"])
+ def test_native_matching_rejects_invalid_cold_metadata(tmp_path, side, invalid):

@@ -42,7 +42,10 @@ def _finite_difference_mask(data: EOSData, max_log_step: float) -> tuple:
     for i in gap_edges:
         mask[i:i + 2] = False
     phase_edges = np.array([], dtype=int)
-    if data.composition_available and data.Iphase.size == n:
+    # Iphase is thermodynamic phase metadata and is independent of the
+    # optional eos.compo species-abundance file. Sharp Maxwell tables normally
+    # have Iphase labels even when composition_available is False.
+    if np.asarray(data.Iphase).shape == (n,):
         phase_edges = np.where(np.diff(data.Iphase) != 0)[0]
         for i in phase_edges:
             mask[i:i + 2] = False

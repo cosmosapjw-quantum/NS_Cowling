@@ -1,0 +1,13 @@
+Preserved setup attempts; each stopped before compiling or running native physics.
+
+Attempt 1:
+Command: python3 fortran_eos/tests/spg_residual_run.py data/research_coexistence_20261116/spg/native_fd
+Output: unexpected source inventory: rows=880 eligible=880
+Classification: INPUT_SELECTION_COUNT_MISMATCH. inverse.csv contains the 760 source rows plus 120 rounding probes.
+
+Attempt 2:
+Command: python3 fortran_eos/tests/spg_residual_run.py data/research_coexistence_20261116/spg/native_fd
+Output: unexpected source inventory: baseline=880 eligible=880
+Classification: INPUT_SELECTION_COUNT_MISMATCH. inputs.txt also includes the 120 rounding probes.
+
+Correction: retain original input rows with row id below 100000, then join them by (model,row) to inverse.csv. The corrected input contains exactly 760 eligible source rows and does not include rounding probes.

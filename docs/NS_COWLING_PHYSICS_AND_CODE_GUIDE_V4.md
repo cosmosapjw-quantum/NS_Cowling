@@ -98,12 +98,28 @@ Thus F, mu_H and mu_H-D are quartic; Q1 and D are cubic. Quartic minima occur at
 
 Composition is processed only with eos.compo provenance and finite required arrays; composition-free input does not receive invented fractions. Supplied nuclei determine Y_q=Y_p+(Z/A)Y_h, with charge neutrality Y_e+Y_mu=Y_q. Lepton partition above muon threshold is solved by scalar bisection. Optional dissolution repair is a bounded legacy-data heuristic, not a dynamical or microscopic free-energy calculation.
 
-The six match_crust_core methods are smooth bridges. The separate Maxwell kernel assumes local charge neutrality in each supplied phase and one globally conserved baryon charge:
+The native `match_crust_core` methods are not all topologically equivalent. The cubic/quintic free-energy and pressure bridges, and the first-law-constrained Hermite pressure bridge, remain continuous-density smooth matchers. The `css` method is now a separate one-speed construction: a constant-(c_s^2) high-density bridge is joined continuously in (n_B,P,\epsilon,\mu_B) to the selected core endpoint, while its crust-side boundary is a sharp first-order transition with common (P_t,\mu_t) and a positive density/energy jump. The CSS matcher solves (c_s^2\in(0,1]) from the core endpoint pressure integral; it does not use two independent sound speeds.
+
+For crust-side density (n_c), core endpoint ((n_2,P_2,\mu_2)), and transition chemical potential (mu_t), the bridge-side transition density is
 \[
-P_L(\mu_t)=P_H(\mu_t),\quad \mu_B^L=\mu_B^H=\mu_t,\quad
-n_B=dP/d\mu_B,\quad \epsilon=\mu_Bn_B-P.
+n_b=n_2\left(\frac{\mu_t}{\mu_2}\right)^{1/c_s^2},
 \]
-Therefore Delta epsilon=mu_t Delta n_B. Gibbs mixed phase requires global neutrality, an independent charge chemical potential, phase charge densities and a volume fraction; those are not available from a generic one-dimensional barotrope. Gibbs, Seidov onset stability and phase-interface TOV/Love/mode conditions are not implemented. See https://arxiv.org/abs/0907.2680.
+and the single-speed pressure integral is
+\[
+P_2-P_t=n_2\mu_t\frac{c_s^2}{1+c_s^2}
+\left[\frac{\mu_2}{\mu_t}
+-\left(\frac{\mu_t}{\mu_2}\right)^{1/c_s^2}\right].
+\]
+The branch uses (n_B(\mu)=n_b(\mu/\mu_t)^{1/c_s^2}), with (P(\mu)) integrated analytically and (\epsilon=\mu n_B-P). It is admitted only when (0<c_s^2\leq1), (n_b>n_c), and the endpoint pressure/chemical potential match. At the crust interface,
+\[
+\Delta n=n_b-n_c>0,\qquad
+\Delta\epsilon=\mu_t\Delta n.
+\]
+This is a Maxwell-type crust-to-CSS transition; Seidov's criterion is reported only as the small-core onset criterion, not as a full radial-mode stability result. The CSS bridge is thermo-only because the native matcher still requires explicit composition dropping. At the core-side join the thermodynamic state variables are continuous, but (c_s^2) need not equal the core source endpoint derivative, so C1 regularity is not claimed.
+
+This is a chosen hybrid architecture, not a universal prescription used by every paper. Constant-sound-speed high-density phases attached through a first-order jump are standard in hybrid-star parameterizations (Alford, Han & Prakash 2013, https://arxiv.org/abs/1302.4732). Microscopic crust calculations can also give a weak first-order crust-core transition (Douchin & Haensel 2001, https://arxiv.org/abs/astro-ph/0111092; Haensel et al. 2013, https://doi.org/10.1088/0004-637X/773/1/11). Other interpolation approaches deliberately impose continuity at both ends of a bridge, e.g. the GPP bridge construction of Servignat et al. (2024, https://doi.org/10.1103/PhysRevD.109.103022). The current code's `css` contract follows the single-speed-plus-crust-jump choice above; the older two-segment smooth CSS artifact remains historical evidence for the previous implementation.
+
+Gibbs mixed phase requires global neutrality, an independent charge chemical potential, phase charge densities and a volume fraction; those are not available from a generic one-dimensional barotrope. See https://arxiv.org/abs/0907.2680.
 
 ## TOV and Cowling solver
 

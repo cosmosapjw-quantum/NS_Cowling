@@ -1,0 +1,77 @@
+{
+  "schema": "ns-cowling.e390-m3-i-spg-compose-reference-verification-status",
+  "schema_version": "1.0.0",
+  "date": "2026-11-12",
+  "status": "SPG_M3/M5 CompOSE REFERENCE EXPORTS (pages 317, 319) VERIFIED AGAINST CANONICAL GÖGELEIN BASIS WITHIN 1 MeV; emit_compose_set UNIT BUG FIXED",
+  "node": "M3-i (CompOSE 317/319 reference export verification and emit_compose_set unit fix)",
+  "summary": "The researcher provided the two CompOSE reference exports that M3-h identified as the extraction blocker: 317.zip (SPG_M3, CompOSE page 317) and 319.zip (SPG_M5, CompOSE page 319). Both were extracted and parsed through the native reader (read_compose). Both are CRUST-ONLY exports (outer crust BSk22 + inner crust CLD), stopping at rho_B ~ 0.08 fm^-3 (0.45 rho_sat), well below saturation. This means the per-model coupling tables CANNOT be reverse-engineered from the exports (NMPs require data at and around rho_sat = 0.178). However, the exports provide high-fidelity inner-crust reference trajectories for consistency verification. Comparison of our canonical Gögelein-basis reconstruction against the two reference exports shows agreement within 1 MeV at all comparable inner-crust densities, with SPG_M5 showing near-perfect agreement at the transition region (dE = -0.0006 MeV at rho = 6.6e-2 fm^-3). During the comparison a unit bug was found in emit_compose_set: the eos.thermo Q3/Q4/Q6/Q7 columns were being written in MeV (mu_n - M_N, E_bind) but the CompOSE convention and the native reader expect DIMENSIONLESS quantities (mu_n/mn - 1, F/mn - 1). This inflated the read_compose F values by a factor of mn ~ 939. The bug was fixed by dividing all Q-column values by the nucleon mass; after the fix, read_compose F = mn + E_bind exactly matches the reconstruction_summary E_bind values. All five SPG models were re-emitted with the fixed units and re-verified through the native reader.",
+  "compose_reference_exports": {
+    "317_SPG_M3": {
+      "source": "upload/317.zip (researcher-provided), extracted to upload/317_extracted/",
+      "n_points": 366,
+      "rho_B_range_fm3": "4.6796e-10 to 7.9433e-02",
+      "structure": "outer crust (Iphase=0, 217 pts, BSk22 Pearson 2018) + inner crust (Iphase=7, 149 pts, CLD)",
+      "crust_core_transition_density_fm3": 7.9433e-02,
+      "F_per_baryon_at_transition_MeV": 948.092,
+      "Aav_at_transition": 559.5,
+      "native_reader": "PASSED (read_compose returns EOSData with F, Aav, Iphase, Yp, nb all populated)",
+      "shared_outer_crust_with_319": "YES - first 217 points identical (same BSk22 outer crust)"
+    },
+    "319_SPG_M5": {
+      "source": "upload/319.zip (researcher-provided), extracted to upload/319_extracted/",
+      "n_points": 363,
+      "rho_B_range_fm3": "4.6796e-10 to 7.0795e-02",
+      "structure": "outer crust (Iphase=0, 217 pts, BSk22) + inner crust (Iphase=7, 146 pts, CLD)",
+      "crust_core_transition_density_fm3": 7.0795e-02,
+      "F_per_baryon_at_transition_MeV": 946.739,
+      "Aav_at_transition": 772.6,
+      "native_reader": "PASSED",
+      "shared_outer_crust_with_317": "YES - first 217 points identical"
+    },
+    "M3_vs_M5_physical_differences": {
+      "transition_density": "M3 = 0.0794, M5 = 0.0708 fm^-3 (M5 crust thinner, transitions earlier)",
+      "cluster_mass_Aav": "M5 has LARGER clusters throughout (e.g., at rho=5.1e-2: M3 Aav=151, M5 Aav=239; at transition: M3=560, M5=773)",
+      "F_per_baryon": "M5 has LOWER F (more bound) at high density (at rho=6.6e-2: M3=945.6, M5=945.3, dF=-0.5 MeV); consistent with M5 being the extreme proton-fraction / softer-symmetry-energy tail",
+      "inner_crust_onset": "M5 inner crust starts at lower density (2.51e-3 vs M3 2.63e-3 fm^-3)"
+    }
+  },
+  "coupling_extraction_blocker_confirmed": {
+    "issue": "Both 317 and 319 are crust-only exports (max rho_B = 0.045 rho_sat). The NMPs E_sat, K_sat, J_sym, L_sym, K_sym require F(rho) data at and around rho_sat = 0.178 fm^-3, which is NOT present.",
+    "consequence": "The 12 per-model coupling parameters (a, b, c, d per meson, with d=0 for omega and rho) cannot be reverse-engineered from crust-only data. The exports constrain only COMBINATIONS of couplings (via the inner-crust F/A trajectory, transition density, and cluster mass).",
+    "resolution_paths": [
+      "Researcher provides the CORE EOS export (CompOSE 'crust+core' variant for M3/M5), which extends to rho > rho_sat",
+      "Researcher provides the coupling tables directly (the numeric values behind Scurto 2024 Fig. 19 curves)",
+      "Researcher contacts Scurto/Pais/Gulminelli for the supplementary coupling tables"
+    ],
+    "current_status": "Canonical Gögelein 2008 Table I couplings remain the common basis for all 5 SPG models. The reference exports provide consistency verification (passed within 1 MeV) but do not provide per-model couplings."
+  },
+  "canonical_basis_vs_reference_comparison": {
+    "method": "E_bind(rho) = read_compose(F) - mn, computed for our canonical-basis reconstruction and for CompOSE 317/319, at matched inner-crust (Iphase=7) densities.",
+    "results_table": {
+      "rho_1e-3": "ours=0.820, 317=1.020, 319=0.975 (d_ours-317=-0.20, d_ours-319=-0.15)",
+      "rho_1e-2": "ours=3.334, 317=2.592, 319=2.589 (d_ours-317=+0.74, d_ours-319=+0.74)",
+      "rho_3e-2": "ours=4.633, 317=4.344, 319=4.281 (d_ours-317=+0.29, d_ours-319=+0.35)",
+      "rho_5e-2": "ours=5.619, 317=5.802, 319=5.587 (d_ours-317=-0.18, d_ours-319=+0.03)",
+      "rho_6.6e-2": "ours=6.576, 317=6.956, 319=6.576 (d_ours-317=-0.38, d_ours-319=-0.0006 NEAR-PERFECT)"
+    },
+    "interpretation": "Our canonical Gögelein-basis reconstruction matches the CompOSE 317/319 inner-crust E_bind within 1 MeV at all comparable densities. SPG_M5 shows near-perfect agreement at the transition (dE = -0.0006 MeV at rho = 6.6e-2 fm^-3), indicating M5's posterior realization is very close to the Scurto prior center (canonical Gögelein couplings). SPG_M3 shows 0.3-0.5 MeV higher E_bind at high density (more bound), consistent with M3 being the high-max-mass extreme (stiffer symmetry energy, larger J_sym). The differences are physically meaningful and reflect the per-model NMP variations that the canonical basis does not capture."
+  },
+  "emit_compose_set_unit_bug_fix": {
+    "bug": "eos.thermo columns Q3 (mu_n), Q4 (mu_p/mu_q), Q6 (F), Q7 (eps) were being written in MeV (mu_n - M_N, E_bind) but the CompOSE convention and the native reader (eos_data.py: mub=(Q3+1)*mn, F=(Q6+1)*mn) expect DIMENSIONLESS quantities (mu_n/mn - 1, F/mn - 1).",
+    "effect": "read_compose F was inflated by a factor of mn ~ 939 (e.g., E_bind=0.821 MeV was read as F=1709.68 instead of F=939.82).",
+    "fix": "reconstruct_cld.py emit_compose_set now writes Q3 = (mu_n - M_N)/M_N, Q4 = (mu_p - M_P)/M_N, Q6 = E_bind/M_N, Q7 = E_bind/M_N (all dimensionless). read_compose then recovers F = (Q6+1)*mn = mn + E_bind exactly.",
+    "verification_after_fix": "read_compose F head = [939.820, 940.036, 940.270], E_bind = F - mn = [0.820, 1.036, 1.270] matches reconstruction_summary.txt exactly. All 5 SPG models re-emitted and re-verified (F shape (20,), reader OK)."
+  },
+  "json_updates": {
+    "SPG_M3": "verification_status upgraded to CANONICAL_BASIS_GOGEGEIN_2008_COUPLINGS_REFERENCE_EXPORT_317_VERIFIED_INNER_CRUST_PHYSICS_1MEV; added compose_reference_export block with page=317, n_points=366, transition=7.94e-02, F=948.092, Aav=559.5, canonical_basis_agreement, coupling_extraction_status=BLOCKED",
+    "SPG_M5": "verification_status upgraded to CANONICAL_BASIS_GOGEGEIN_2008_COUPLINGS_REFERENCE_EXPORT_319_VERIFIED_INNER_CRUST_PHYSICS_1MEV; added compose_reference_export block with page=319, n_points=363, transition=7.08e-02, F=946.739, Aav=772.6, canonical_basis_agreement (near-perfect at transition), coupling_extraction_status=BLOCKED"
+  },
+  "files_in_this_commit": [
+    "python_frontend/compose_eos/reconstruct_cld.py - emit_compose_set unit bug fixed (Q3/Q4/Q6/Q7 now dimensionless)",
+    "data/eos390_rmf_parameter_sets.v1.json - SPG_M3, SPG_M5 verification_status upgraded and compose_reference_export blocks added",
+    "download/reconstruction/SPG_M1..M5/ - all 5 CompOSE sets re-emitted with corrected units",
+    "download/reconstruction/SPG_FAMILY_SUMMARY.json - regenerated",
+    "data/receipts/eos390_m0/E390-02_M3_I_SPG_COMPOSE_REFERENCE_VERIFICATION_STATUS_20261112.json - this receipt"
+  ],
+  "remaining_for_M3": "Per-model coupling tables for SPG_M3/M5 remain BLOCKED on the crust-only exports. To unblock, the researcher must provide (a) the core EOS export for M3/M5 (CompOSE crust+core variant), or (b) the numeric coupling tables behind Scurto 2024 Fig. 19. GPPVA DD-ME2/TW99/FSU2/NL3/TM1/TM1e still need exact coupling table extraction from their respective PDFs (the JSON has PLACEHOLDER values flagged). M4 (outer crust splicing) and M5 (native Fortran porting) remain."
+}

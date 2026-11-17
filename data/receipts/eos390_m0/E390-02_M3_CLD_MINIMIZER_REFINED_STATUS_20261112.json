@@ -1,0 +1,48 @@
+{
+  "schema": "ns-cowling.e390-m3-cld-minimizer-refinement-status",
+  "schema_version": "1.0.0",
+  "date": "2026-11-12",
+  "status": "CLD MINIMIZER REFINED: BETA-EQUILIBRIUM EXACT, CRUST-CORE TRANSITION FOUND, NATIVE READER STILL PASSES",
+  "node": "M3 (CLD reconstruction - minimizer refinement sub-node)",
+  "summary": "The CLD minimizer was substantially improved. Three key upgrades: (1) cluster-phase beta-equilibrium root-find (bisection) now solves rho_Ip from mu_n(I) - mu_p(I) = mu_e exactly, with the gas treated as pure neutron (low-density inner-crust approximation); beta-equilibrium residual is now 0.000 at all densities (was 30 MeV before). (2) Nelder-Mead simplex refinement (no scipy dependency) starting from the coarse-grid best, in 3 free variables (f, log R_d, rho_I); the f=0.01 grid-sticking problem is resolved (f now ranges 0.004-0.667 smoothly). (3) eos.thermo now carries real mu_n/mu_p (per-baryon, rest mass subtracted) from the CLD cell, not the zero placeholder.",
+  "what_was_fixed": {
+    "beta_equilibrium": "Replaced the gas-phase beta-equilibrium (which had no sign change because mu_n - mu_p < mu_e at all rho_IIp in the gas, since the cluster grabbed all the protons) with a CLUSTER-phase beta-equilibrium: solve rho_Ip from mu_n(I) - mu_p(I) = mu_e where mu_e = electron_chemical_potential(f*rho_Ip + (1-f)*rho_IIp) with rho_IIp = 0 (pure neutron gas). This is the standard low-density inner-crust approximation. Bisection in [0, rho_I] finds the root in 60 iterations; residual is 0.000 at all tested densities (was 30 MeV with the old gas-phase formulation).",
+    "minimizer": "Replaced the pure 5-variable coarse grid (f, R_d, rho_I, yI, rho_IIp = 5*7*4*5*4 = 2800 evaluations, no refinement) with a 3-variable coarse grid + Nelder-Mead refinement. The 3 free variables are (f, log R_d, rho_I); rho_Ip is solved from beta-equil (not free). Nelder-Mead: 120 iterations max, simplex in 3D, standard alpha=1/gamma=2/rho=0.5/sigma=0.5 coefficients. Total cost: ~175 coarse evaluations + ~120 simplex = ~300 per density point; runtime ~0.3-0.8 s per point (was ~2 s with the larger grid).",
+    "f_grid_sticking_resolved": "Previously f stuck at 0.01 (the smallest grid value) for most densities because the coarse grid was too coarse and the minimum was at the boundary. Now f ranges smoothly from 0.004 (low density) to 0.667 (near transition), with R_d from 2.9 to 5.5 fm, matching the physical picture of small clusters growing as the crust-core transition is approached.",
+    "eos_thermo_mu": "eos.thermo now writes mu_n_per = r.mu_n - M_N and mu_p_per = r.mu_p - M_P (per-baryon, rest mass subtracted, matching the FSU2 column convention where mu_n ~ -9.69e-3 MeV). Previously both were 0."
+  },
+  "GPPVA_DD2_refined_reconstruction": {
+    "density_grid": "20 points, log-spaced 0.001 to 0.075 fm^-3",
+    "runtime_per_point": "0.3-0.8 s (was ~2 s)",
+    "physical_results": {
+      "E_per_A_range": "-0.54 to 8.0 MeV (smooth monotonic increase)",
+      "f_range": "0.004 to 0.667 (small clusters growing toward transition)",
+      "R_d_range": "2.9 to 5.5 fm (nuclear-scale droplets; 40 fm at 0.075 is a boundary artifact)",
+      "rho_I_range": "0.079 to 0.140 fm^-3 (near saturation, decreasing slightly as f grows)",
+      "y_p_cell_range": "0.017 to 0.16 (neutron-rich, decreasing with density)",
+      "mu_e_range": "33 to 66 MeV (beta-equilibrium, monotonic increase)",
+      "beta_equilibrium_residual": "0.000 at all densities (was 30 MeV before)"
+    },
+    "crust_core_transition": "rho_B ~ 0.070 fm^-3 (CLD energy becomes HIGHER than homogeneous beta-equil matter). This matches the known DD2 inner-crust/crust-core transition density (~0.07-0.08 fm^-3).",
+    "native_reader_test": "PASSED - compose_eos.read_compose() returns EOSData with F shape (20,), Aav shape (20,) head [14.5, 15.1, 14.7], Iphase, Q1 (rho_B grid), Q2 parsed correctly."
+  },
+  "CLD_vs_homogeneous_at_transition": {
+    "rho_0.001": "CLD -0.541 vs hom 0.933 -> CLD lower by 1.47 MeV (cluster favored)",
+    "rho_0.05": "CLD 6.077 vs hom 6.125 -> CLD lower by 0.05 MeV (cluster still favored)",
+    "rho_0.07": "CLD 7.661 vs hom 7.527 -> CLD HIGHER by 0.13 MeV (cluster dissolves)",
+    "rho_0.08": "CLD 8.401 vs hom 8.340 -> CLD higher by 0.06 MeV (homogeneous stable)",
+    "transition_density": "~0.070 fm^-3"
+  },
+  "remaining_issues": {
+    "f_jump_at_transition": "At rho_B = 0.075 the minimizer returns f=0.667, R_d=40 fm (grid upper bound) rather than f->1 (homogeneous). This is a boundary artifact of the R_d grid cap at 40 fm and the f cap at 0.95. The transition DENSITY is still correctly identified at 0.070; the post-transition cluster properties are not physical but the E/A is still correct (matches homogeneous).",
+    "pure_neutron_gas_approximation": "rho_IIp is fixed at 0 (pure neutron gas). At higher inner-crust densities this becomes less accurate; a full two-phase beta-equilibrium (mu_n(I) = mu_n(II), mu_p(I) = mu_p(II)) would refine rho_IIp > 0. The current approximation is the standard low-density limit and is adequate for the reconstruction demonstration.",
+    "SPG_M1_deep_binding": "Still unresolved (E/A = -45.76 vs target -16.14); needs separate investigation of the Gögelein Table I rho_sat or convention.",
+    "DD-ME2/TW99/FSU2": "Only GPPVA_DD2 reconstructed; the other 6 models need exact coupling-table extraction from their PDFs."
+  },
+  "files_in_this_commit": [
+    "python_frontend/compose_eos/cld_cell.py - added solve_beta_equilibrium_cluster, _cld_objective (3-var), _nelder_mead (3D), rewrote minimize_cld_cell",
+    "python_frontend/compose_eos/reconstruct_cld.py - eos.thermo now writes real mu_n/mu_p (per-baryon)",
+    "download/reconstruction/GPPVA_DD2/ - re-emitted CompOSE set with refined reconstruction",
+    "data/receipts/eos390_m0/E390-02_M3_CLD_MINIMIZER_REFINED_STATUS_20261112.json - this receipt"
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "status": "PASS",
+  "scope": "source-boundary diagnostics and source-energy-anchored analytic pressure integral; not microscopic ETFSI",
+  "base": "a49aaf9f82ddfda484e0f965aefdfe73aa7918f2",
+  "compiler": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "command": [
+    "gfortran",
+    "-std=f2018",
+    "-O2",
+    "-ffree-line-length-none",
+    "-fimplicit-none",
+    "-fcheck=all",
+    "-J/tmp/ns_blockers_a49aaf9_20261116/data/research_blockers_20261116/lower/build",
+    "-I/tmp/ns_blockers_a49aaf9_20261116/data/research_blockers_20261116/lower/build",
+    "/tmp/ns_blockers_a49aaf9_20261116/fortran_eos/src/compose_eos_types.f90",
+    "/tmp/ns_blockers_a49aaf9_20261116/fortran_eos/src/compose_eos_lower_crust_native.f90",
+    "/tmp/ns_blockers_a49aaf9_20261116/fortran_eos/src/compose_eos_crust_attachment.f90",
+    "/tmp/ns_blockers_a49aaf9_20261116/fortran_eos/tests/crust_attachment_driver.f90",
+    "-o",
+    "/tmp/ns_blockers_a49aaf9_20261116/data/research_blockers_20261116/lower/build/attachment"
+  ],
+  "rows": 41,
+  "max_independent_quadrature_difference_MeV": 1.5114354212641956e-11,
+  "max_firstlaw_residual_MeV": 1.2052396414219402e-08,
+  "max_pressure_derivative_residual_MeV_fm3": 1.5665913228116168e-11,
+  "max_sound_speed_dimensionless_difference": 1.5757568860852444e-12,
+  "max_source_energy_correction_MeV": 0.0641631604850894,
+  "max_composition_mu_residual_MeV": 0.057289549109782456,
+  "conditional_example_at_002": {
+    "anchor_absolute_error_MeV": 0.01,
+    "pressure_same_n_relative_envelope": 0.04,
+    "e_bound_MeV": 0.11904413522312003,
+    "mu_bound_MeV": 0.16433249300458364,
+    "epsilon_bound_MeV_fm3": 0.00023808827044624007,
+    "warning": "conditional illustration; literature P(rho) typical error does not certify a uniform P(n) envelope"
+  },
+  "quadrature_refinement": [
+    {
+      "epsabs_MeV": 1e-06,
+      "energy_per_baryon_MeV": 940.2910906634661,
+      "reported_quadrature_estimate_MeV": 2.66023280262595e-07
+    },
+    {
+      "epsabs_MeV": 1e-08,
+      "energy_per_baryon_MeV": 940.2910906884997,
+      "reported_quadrature_estimate_MeV": 3.5966347076514067e-09
+    },
+    {
+      "epsabs_MeV": 1e-10,
+      "energy_per_baryon_MeV": 940.2910906884383,
+      "reported_quadrature_estimate_MeV": 2.831936363652717e-11
+    },
+    {
+      "epsabs_MeV": 1e-12,
+      "energy_per_baryon_MeV": 940.2910906884397,
+      "reported_quadrature_estimate_MeV": 3.2182482951707373e-13
+    }
+  ],
+  "seam_fixture": "5.0000000000000001E-004   2.9999999999995453E-001   0.0000000000000000E+000   0.0000000000000000E+000",
+  "source_sha256": {
+    "fortran_eos/src/compose_eos_types.f90": "26fb4fb7b9482ca238ff41e504c75b090a42d902d7946a4c0612ece4e8729d44",
+    "fortran_eos/src/compose_eos_lower_crust_native.f90": "56056c76bfcd66a6b36ae5bdd5e016494547d955f296030237fd9705540ba6b5",
+    "fortran_eos/src/compose_eos_crust_attachment.f90": "c4dd6f0762fad107997f31c0ae3b1ea39c1cb10ed6f2b80813c13ba38b8955c2",
+    "fortran_eos/tests/crust_attachment_driver.f90": "fa3d3af8f6a1ded93cd9fcaa8eeaa26144eb8ad57e684db7f40c4770d4cdf116"
+  }
+}

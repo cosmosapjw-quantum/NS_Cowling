@@ -1,0 +1,39 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_unresolved_density_splits_native_exports _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-202/test_unresolved_density_splits0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x79a711ecd520>
+
+    def test_unresolved_density_splits_native_exports(tmp_path, monkeypatch):
+        path=Path(__file__).resolve().parents[2]/"scripts/build_gppva_tf.py"
+        spec=importlib.util.spec_from_file_location("tf_gap_builder",path)
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        def solve(model,n,**kw):
+            if n==.04 and (kw['dimension'],kw['seed'])==(2,'droplet'):
+                raise RuntimeError('unresolved electron field')
+            return dict(n_b=n,epsilon=n*940.,energy_per_baryon=940.,
+                points=kw['points'],dimension=kw['dimension'],seed=kw['seed'],
+                numerical_status='STATIONARY',muon_threshold_crossed=False,
+                baryon_constraint_error=0.,charge_constraint_error=0.,
+                scalar_pde_residual=0.,vector_pde_residual=0.,electron_pde_residual=0.)
+        exported=[]
+        def export(model,states,out):
+            exported.append([s['n_b'] for s in states])
+            return {'status':'EXPORTED_NATIVE_READBACK_VERIFIED','row_count':len(states)}
+        monkeypatch.setattr(module,'solve_cell',solve)
+        monkeypatch.setattr(module,'physical_geometry',lambda row:'droplet')
+        monkeypatch.setattr(module,'export',export)
+        result=module.run_model('GPPVA_DD2',[.01,.02,.03,.04,.05,.06,.07],[16],tmp_path)
+>       assert exported==[[.01,.02,.03],[.05,.06,.07]], 'HOLD density was bridged by one native table'
+E       AssertionError: HOLD density was bridged by one native table
+E       assert [[0.01, 0.02,..., 0.06, 0.07]] == [[0.01, 0.02,..., 0.06, 0.07]]
+E         
+E         At index 0 diff: [0.01, 0.02, 0.03, 0.05, 0.06, 0.07] != [0.01, 0.02, 0.03]
+E         Right contains one more item: [0.05, 0.06, 0.07]
+E         Use -v to get more diff
+
+python_frontend/tests/test_tf_generation_gaps.py:26: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_tf_generation_gaps.py::test_unresolved_density_splits_native_exports
+1 failed in 0.41s

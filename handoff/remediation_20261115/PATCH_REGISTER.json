@@ -1,0 +1,286 @@
+{
+  "schema_version": "1.0.0",
+  "repository": "cosmosapjw-quantum/NS_Cowling",
+  "branch": "remediation/2026-11-15-m5a-maxwell-eos-contracts",
+  "base_sha": "772e85910afb40aea37c292680be24b363586a54",
+  "patches": [
+    {
+      "id": "TEST-FIRST-M5A",
+      "commit": "292450976e297dc48be449c2faf48cdf4857eead",
+      "files": [
+        "python_frontend/tests/test_m5a_provenance_correction.py"
+      ],
+      "purpose": "Pin receipt-level versus per-case native verification scope."
+    },
+    {
+      "id": "TEST-FIRST-MAXWELL-V2",
+      "commit": "e071268098922f766262c02ae391f9ddc51a336a",
+      "files": [
+        "python_frontend/tests/test_maxwell_v2_composition.py"
+      ],
+      "purpose": "Require explicit rejection of composition-bearing v2 input."
+    },
+    {
+      "id": "TEST-FIRST-APR-CSS",
+      "commit": "ee0b4d12f5c8cf034e65d06c3989d4865f77ce46",
+      "files": [
+        "python_frontend/tests/test_apr_css_maxwell_audit.py"
+      ],
+      "purpose": "Require exact PCHIP derivative audit and fail-closed admission."
+    },
+    {
+      "id": "M5A-READBACK",
+      "commit": "4163c83715d1d3f07836875e850f922807049d45",
+      "files": [
+        "scripts/maxwell_audit/m5a_native_readback_verify.py"
+      ],
+      "purpose": "Compare n_B, mu_B, P and epsilon values after native read-back."
+    },
+    {
+      "id": "MAXWELL-V2-GUARD",
+      "commit": "786bd34a0bba93b55687c03d1abe17c90511b1f4",
+      "files": [
+        "python_frontend/compose_eos/maxwell_v2.py"
+      ],
+      "purpose": "Make composition-bearing input fail closed and stop claiming composition preservation."
+    },
+    {
+      "id": "APR-EXACT-DERIVATIVE",
+      "commit": "1025caa0e55a92ea59a224cfce74f7068e34186a",
+      "files": [
+        "scripts/maxwell_audit/audit_apr_css_maxwell.py"
+      ],
+      "purpose": "Use analytic PCHIP derivative and require branch-interior differential consistency for admission."
+    },
+    {
+      "id": "APR-TEST-VERDICT",
+      "commit": "55e14b2043e5eb85949dec66912f8655771e7a64",
+      "files": [
+        "python_frontend/tests/test_apr_css_maxwell_audit.py"
+      ],
+      "purpose": "Make verdict regression test conditional on the measured differential gate."
+    },
+    {
+      "id": "M5A-TEST-READBACK",
+      "commit": "620f47356c14526e0fd274555eb78c420287601e",
+      "files": [
+        "python_frontend/tests/test_m5a_provenance_correction.py"
+      ],
+      "purpose": "Assert full-array read-back residuals and per-case evidence scope."
+    },
+    {
+      "id": "M5A-RECEIPT",
+      "commit": "551168d838d1bc09e03927db4863ceaf260951b8",
+      "files": [
+        "download/m5a_real_css/E390-05A_M5A_REAL_CSS_RECEIPT_20261114.json"
+      ],
+      "purpose": "Keep headline evidence at receipt scope and all 27 per-case native flags false."
+    },
+    {
+      "id": "REMOVE-MISNAMED-DUPLICATE",
+      "commit": "50a52f65769c0c86312ad8951624e8e3ab705887",
+      "files": [
+        "download/m5a_real_css/GPPVA_DD2_m5a_real_css.json"
+      ],
+      "purpose": "Remove duplicate file incorrectly attributed to GPPVA_DD2; it was byte-identical to BBB_BHF2 artifact."
+    },
+    {
+      "id": "MAXWELL-V2-PORTABLE-ROOT",
+      "commit": "b5895f1a050295486fe81e605cc2c37ebd59e588",
+      "files": [
+        "python_frontend/compose_eos/maxwell_v2.py"
+      ],
+      "purpose": "Remove hard-coded developer home directory."
+    },
+    {
+      "id": "APR-TEST-GATE-CONSISTENCY",
+      "commit": "82cc20e75d444caaeeade9d60a86a1715a774f14",
+      "files": [
+        "python_frontend/tests/test_apr_css_maxwell_audit.py"
+      ],
+      "purpose": "Bind test expectation to the measured derivative threshold instead of hard-coding a physical verdict."
+    },
+    {
+      "id": "CSS-TEST-FIRST",
+      "commit": "5ec4052cd9c93bf2df1d176e4ca739b568a75cf0",
+      "files": [
+        "python_frontend/tests/test_native_crust_core_matching.py"
+      ],
+      "purpose": "Pin one-speed CSS, crust-side density jump, exact jump identity and continuous core endpoint."
+    },
+    {
+      "id": "CSS-SINGLE-SPEED-PRIMITIVE",
+      "commit": "c1d0db43a877351f54bf61f129fd03607dc1fe13",
+      "files": [
+        "fortran_eos/src/compose_eos_matching.f90"
+      ],
+      "purpose": "Add analytic one-speed CSS pressure integral/root solver and replace two-speed CSS bridge equation."
+    },
+    {
+      "id": "CSS-WINDOW-GATE",
+      "commit": "eecf6f1e9ac94c816e5eb65e782ec36673e145c2",
+      "files": [
+        "fortran_eos/src/compose_eos_matching.f90"
+      ],
+      "purpose": "Only select CSS endpoints admitting a causal single-speed solution and positive crust-side jump."
+    },
+    {
+      "id": "CSS-JUMP-ASSEMBLY",
+      "commit": "991cf40a4747039703090111f5b141ef589db154",
+      "files": [
+        "fortran_eos/src/compose_eos_matching.f90"
+      ],
+      "purpose": "Assemble adjacent equal-P/equal-mu transition rows, CSS interior and continuous core rows; report indices and Seidov diagnostics."
+    },
+    {
+      "id": "CSS-NONCSS-ENDPOINT-RESTORE",
+      "commit": "6e0e4ff3b323610ef3b7c92c9ae25c84e638c3b0",
+      "files": [
+        "fortran_eos/src/compose_eos_matching.f90"
+      ],
+      "purpose": "Preserve non-CSS construction metadata and separate source endpoint speeds."
+    },
+    {
+      "id": "CSS-EULER-ENDPOINT",
+      "commit": "2bbb391cf2c35003074bf6cc7631ee9c46410c17",
+      "files": [
+        "fortran_eos/src/compose_eos_matching.f90"
+      ],
+      "purpose": "Use Euler-consistent F+P/n chemical potential at the core endpoint."
+    },
+    {
+      "id": "CSS-API-REPORT",
+      "commit": "bd7fb5b7a92dddfb310a9d2d20ac22f00c688b5b",
+      "files": [
+        "python_frontend/compose_eos/api.py"
+      ],
+      "purpose": "Expose first-order CSS transition and Seidov fields to Python."
+    },
+    {
+      "id": "CSS-CLI-REPORT",
+      "commit": "5061ce3e5f33dc1ac382701a1a3ce0e96059e906",
+      "files": [
+        "fortran_eos/app/compose_eos_fortran.f90"
+      ],
+      "purpose": "Emit CSS transition fields and row indices in native JSON."
+    },
+    {
+      "id": "CSS-TRANSITION-EPS",
+      "commit": "9596eaa6a718854cebd84a1374835625e0b8d4d5",
+      "files": [
+        "fortran_eos/src/compose_eos_matching.f90"
+      ],
+      "purpose": "Report the low/high energy densities on the two sides of the crust-side jump."
+    },
+    {
+      "id": "CSS-CLI-TRANSITION-EPS",
+      "commit": "ef4ed2f028aae252a2cc9983c8cee26ff91213ba",
+      "files": [
+        "fortran_eos/app/compose_eos_fortran.f90"
+      ],
+      "purpose": "Serialize low/high transition energy densities."
+    },
+    {
+      "id": "CSS-API-TRANSITION-EPS",
+      "commit": "48826c6b081581ded38d68b54fc08004a4413fce",
+      "files": [
+        "python_frontend/compose_eos/api.py"
+      ],
+      "purpose": "Expose explicit low/high transition energy densities without deriving from possibly absent fields."
+    },
+    {
+      "id": "CSS-M7-DOC-TEST",
+      "commit": "8601bbb59554ee06a2f5956677ed00d096a56860",
+      "files": [
+        "scripts/m7/m7_batch_orchestrator.py"
+      ],
+      "purpose": "Describe M7 CSS as a one-speed crust-jump bridge."
+    },
+    {
+      "id": "CSS-REGRESSION-DETAIL",
+      "commit": "cdf0f1c94d75eb21bb4ea522f2a8441ac9b7766b",
+      "files": [
+        "python_frontend/tests/test_native_crust_core_matching.py"
+      ],
+      "purpose": "Assert transition-side epsilon and Seidov report values."
+    },
+    {
+      "id": "CSS-SCIENCE-GUIDE",
+      "commit": "bffb5e271a5acd965515f727d7497ad68887e4a3",
+      "files": [
+        "docs/NS_COWLING_PHYSICS_AND_CODE_GUIDE_V4.md"
+      ],
+      "purpose": "Document the one-speed CSS plus crust-side first-order jump architecture and literature alternatives."
+    },
+    {
+      "id": "CSS-CONTRACT-DOC",
+      "commit": "577ab265d4b346434ff95cc7b5242259806e1d7c",
+      "files": [
+        "docs/CSS_SINGLE_SPEED_CRUST_JUMP_CONTRACT_20261115.md"
+      ],
+      "purpose": "Derivation, evidence scope, numerical example and explicit verification plan."
+    },
+    {
+      "id": "CSS-INTERIOR-GRID-ENDPOINT",
+      "commit": "b07cf7e85606c2af924ac48f77d74bcb10e75f0a",
+      "files": [
+        "fortran_eos/src/compose_eos_matching.f90"
+      ],
+      "purpose": "Restrict the CSS endpoint equality test to grids that actually include u=1; restore composition_dropped report and preserve smooth-method source Q3 endpoint."
+    },
+    {
+      "id": "CSS-SHARP-SEAM-DERIVATIVE-SEMANTICS",
+      "commit": "5a97f5a722739f8a23a1fe38ab2e8cf1b6a55417",
+      "files": [
+        "python_frontend/compose_eos/api.py"
+      ],
+      "purpose": "Set the left derivative mismatch diagnostic to not-applicable across the first-order crust-side jump."
+    },
+    {
+      "id": "CSS-EULER-CORE-REGRESSION",
+      "commit": "654bdc513b6f3c77f80d828898f81f213b12d02e",
+      "files": [
+        "python_frontend/tests/test_native_crust_core_matching.py"
+      ],
+      "purpose": "Check the continuous CSS/core endpoint against Euler-consistent mu=F+P/n and assert derivative comparison is not applicable across the sharp jump."
+    },
+    {
+      "id": "CSS-CONSTRUCTION-KIND-REPORT-LENGTH",
+      "commit": "ce66b88a83d9934b63e9c3fe8e7c6ad8c06983ad",
+      "files": [
+        "fortran_eos/src/compose_eos_matching.f90"
+      ],
+      "purpose": "Increase only match_report_t%construction_kind to 64 characters; preserve complete css_single_speed_with_crust_density_jump identity in native JSON. CI 43678512196 confirms the CSS integration test passes."
+    }
+  ],
+  "verification": {
+    "tests_executed_on_this_branch": false,
+    "ci_executed_on_this_branch": false,
+    "reason": "Latest previous successful workflow predates the new CSS branch behavior; exact final HEAD must be rebuilt and tested.",
+    "ci_executed_on_css_head": false,
+    "tests_executed_on_current_exact_head": false,
+    "latest_failed_run": {
+      "run_id": 43677499924,
+      "head_sha": "4d95ee6a3f7a52b3a3c75d5d58c87e1d128136b5",
+      "pytest_passed": 248,
+      "pytest_skipped": 9,
+      "pytest_failed": 15,
+      "fortran_build": "PASS"
+    },
+    "latest_code_fix_attempt": {
+      "run_id": 43678164119,
+      "head_sha": "654bdc513b6f3c77f80d828898f81f213b12d02e",
+      "status": "IN_PROGRESS"
+    },
+    "final_docs_head_requires_run": true,
+    "latest_test_run": {
+      "run_id": 43678512196,
+      "head_sha": "ce66b88a83d9934b63e9c3fe8e7c6ad8c06983ad",
+      "pytest_passed": 263,
+      "pytest_skipped": 9,
+      "pytest_failed": 0,
+      "fortran_build": "PASS",
+      "checksum_status": "ONE_ENTRY_MISMATCH"
+    }
+  }
+}

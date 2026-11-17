@@ -1,0 +1,199 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": 43676024772,
+  "run_url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43676024772",
+  "verified_code_head": "5d31b41eacf267bface4c1097287b3b705887",
+  "conclusion": "success",
+  "job": {
+    "id": 132696243405,
+    "name": "native",
+    "conclusion": "success"
+  },
+  "build": {
+    "command": "bash fortran_eos/build.sh build/compose_eos_fortran",
+    "exit_code": 0
+  },
+  "pytest": {
+    "command": "python -m pytest -q python_frontend/tests pipeline/tests",
+    "passed": 263,
+    "skipped": 9,
+    "failed": 0
+  },
+  "additional": {
+    "wigner_seitz_raw_source_tests": {
+      "status": "SKIPPED",
+      "count": 2,
+      "reason": "M0 raw source inputs were not staged in CI."
+    },
+    "cowling_end_to_end_tests": {
+      "status": "SKIPPED",
+      "count": 3,
+      "reason": "M0 raw source inputs were not staged in CI."
+    },
+    "sha256_manifest": {
+      "status": "PASS"
+    }
+  },
+  "warnings": [
+    "Node.js 20 deprecation warning for GitHub Actions checkout/setup-python/upload-artifact actions.",
+    "Fortran array-temporary runtime warnings were emitted by CLD objective calls."
+  ],
+  "scientific_validation": {
+    "meaning": "Construction/readback artifacts generated successfully; physical validation is tracked per EOS and is not implied by workflow success.",
+    "core_only": {
+      "APR_APR": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C10"
+        ]
+      },
+      "BBB_BHF2": {
+        "status": "PASS",
+        "failed_checks": []
+      },
+      "GM_GM1": {
+        "status": "PASS",
+        "failed_checks": []
+      },
+      "RG_KDE0v1": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C2",
+          "C10"
+        ]
+      },
+      "RG_SLY4": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C2"
+        ]
+      }
+    },
+    "crust_only": {
+      "GPPVA_DD2": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C2"
+        ]
+      },
+      "GPPVA_DDME2": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C2"
+        ]
+      },
+      "GPPVA_FSU2": {
+        "status": "PASS",
+        "failed_checks": []
+      },
+      "GPPVA_FSU2H": {
+        "status": "PASS",
+        "failed_checks": []
+      },
+      "GPPVA_FSU2R": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C2"
+        ]
+      },
+      "GPPVA_NL3wrL55": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C2"
+        ]
+      },
+      "GPPVA_TM1e": {
+        "status": "FAIL",
+        "failed_checks": [
+          "C2"
+        ]
+      },
+      "SPG_M1": {
+        "status": "PASS",
+        "failed_checks": []
+      },
+      "SPG_M2": {
+        "status": "PASS",
+        "failed_checks": []
+      },
+      "SPG_M3": {
+        "status": "PASS",
+        "failed_checks": []
+      },
+      "SPG_M4": {
+        "status": "PASS",
+        "failed_checks": []
+      },
+      "SPG_M5": {
+        "status": "PASS",
+        "failed_checks": []
+      },
+      "GPPVA_TW": {
+        "status": "BLOCKED",
+        "reason": "CompOSE live page and linked PDF conflict on crust prescription; no provider choice inferred."
+      }
+    }
+  },
+  "note": "This run verified the code-patch HEAD before the subsequent docs-only commit. A new CI run is required for the exact final handoff HEAD.",
+  "css_single_speed_change": {
+    "status": "PATCHED_CI_RUNNING",
+    "previous_attempt": {
+      "run_id": 43677499924,
+      "head_sha": "4d95ee6a3f7a52b3a3c75d5d58c87e1d128136b5",
+      "fortran_build": "PASS",
+      "pytest_passed": 248,
+      "pytest_skipped": 9,
+      "pytest_failed": 15,
+      "findings": [
+        "A false endpoint check compared the final interior sample u=n_bridge/(n_bridge+1) against the core endpoint u=1.",
+        "report%composition_dropped was not populated after the common matcher rewrite.",
+        "SHA256SUMS_v4.txt was not yet synchronized for six modified paths."
+      ],
+      "status": "FAIL_EXPECTED_REGRESSIONS_IDENTIFIED"
+    },
+    "correction_commits": [
+      {
+        "sha": "b07cf7e85606c2af924ac48f77d74bcb10e75f0a",
+        "purpose": "Check the CSS endpoint only when the supplied grid actually contains u=1; restore composition_dropped and preserve smooth-method Q3 endpoint semantics."
+      },
+      {
+        "sha": "5a97f5a722739f8a23a1fe38ab2e8cf1b6a55417",
+        "purpose": "Do not report a smooth derivative mismatch across the first-order crust-side jump."
+      },
+      {
+        "sha": "654bdc513b6f3c77f80d828898f81f213b12d02e",
+        "purpose": "Test sharp-interface derivative semantics and compare the continuous core endpoint using the Euler-consistent chemical potential."
+      }
+    ],
+    "current_attempt": {
+      "run_id": 43678164119,
+      "head_sha": "654bdc513b6f3c77f80d828898f81f213b12d02e",
+      "status": "cancelled",
+      "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43678164119",
+      "cancelled_reason": "Workflow concurrency cancelled the in-progress run after subsequent handoff commits changed the PR head."
+    },
+    "note": "No PASS claim is made until the current attempt completes against the exact final HEAD.",
+    "final_verification": {
+      "status": "PENDING_AFTER_HASH_SYNC"
+    },
+    "latest_completed_attempt": {
+      "run_id": 43678512196,
+      "head_sha": "ce66b88a83d9934b63e9c3fe8e7c6ad8c06983ad",
+      "status": "BUILD_AND_TEST_PASS_CHECKSUM_ONLY_FAILURE",
+      "fortran_build": "PASS",
+      "pytest_passed": 263,
+      "pytest_skipped": 9,
+      "pytest_failed": 0,
+      "native_fortran_unit_tests": "PASS",
+      "tov_love": "PASS",
+      "cowling_runtime_compile": "PASS",
+      "e390_component_builds": "PASS",
+      "checksum_mismatch": {
+        "path": "fortran_eos/src/compose_eos_matching.f90",
+        "expected": "c27cb44b3f81e37719f0d6532a4c40f8e0c9d57975e15dcbcf9f344fc8729e9e",
+        "actual": "b6c677a23b886896a5439bd5de6436bd4764d7354f7b3ebb3e5dcdd6a19cf9d4"
+      },
+      "interpretation": "The only pytest regression is fixed, and the single-speed CSS integration test passes. The remaining failure is the one stale checksum entry."
+    }
+  }
+}

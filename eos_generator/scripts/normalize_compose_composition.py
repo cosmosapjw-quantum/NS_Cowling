@@ -15,6 +15,7 @@ import hashlib
 import json
 import os
 import shutil
+import sys
 import tempfile
 from pathlib import Path
 
@@ -338,6 +339,32 @@ def normalize_tree(input_root: Path, output_root: Path) -> dict:
                         if repair:
                             repair["model"] = source_model.name
                             grid_repairs.append(repair)
+
+            required_files = [target_model / fn for fn in ("eos.nb", "eos.t", "eos.yq", "eos.thermo")]
+            if all(p.is_file() for p in required_files):
+                pkg_dir = Path(__file__).resolve().parents[1] / "compose_eos_pkg"
+                if str(pkg_dir) not in sys.path:
+                    sys.path.insert(0, str(pkg_dir))
+                from compose_eos.io import read_compose, verify_compose_readback
+                from compose_eos.consistency import check_consistency
+
+                reloaded = read_compose(str(target_model))
+                receipt = verify_compose_readback(
+                    str(target_model),
+                    reloaded,
+                    source_dir=str(source_model),
+                    failure_receipt_path=str(output_root.parent / f".{output_root.name}_{source_model.name}_readback_failure.json"),
+                )
+                gate = check_consistency(reloaded, verbose=False)
+                receipt["consistency"] = {
+                    "overall": gate["overall"],
+                    "C3_status": gate["C3"]["status"],
+                    "C4_status": gate["C4"]["status"],
+                }
+                (target_model / "eos.readback_receipt.json").write_text(
+                    json.dumps(receipt, indent=2, sort_keys=True) + "\n",
+                    encoding="utf-8",
+                )
 
         manifest = {
             "schema": "compose-eos-composition-normalization-v1",

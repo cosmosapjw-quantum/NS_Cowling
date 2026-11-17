@@ -1,0 +1,198 @@
+{
+  "schema": "ns-cowling.eos390-legacy-behavior-audit",
+  "schema_version": "1.0.0",
+  "receipt_id": "E390-01-LEGACY-BEHAVIOR-AUDIT-20261113",
+  "date": "2026-11-13",
+  "node": "E390-01",
+  "gate": "M1",
+  "status": "SOURCE_AUDIT_COMPLETE_STATIC_SOURCE_REVIEW",
+  "repository": "cosmosapjw-quantum/NS_Cowling",
+  "branch": "cloud/eos390-fortran-unification-v1",
+  "parent_commit": "3fc18026a4d648f9a71965c81a8970461827b283",
+  "backup_branch": "backup/e390-01-pre-20261113",
+  "scope": "Read-only characterization of the legacy EOS reconstruction, core-crust matcher, CompOSE composition/Nadd semantics, sharp Maxwell/Gibbs paths, and phase-aware TOV/Love implementation. No source code or raw input was modified.",
+  "source_files": [
+    {
+      "path": "eos_generator/compose_eos_pkg/compose_eos/matching.py",
+      "blob_sha": "292228a6edab13f7c2dc3a584b6628ffcb3bc216"
+    },
+    {
+      "path": "eos_generator/compose_eos_pkg/compose_eos/phase_transitions.py",
+      "blob_sha": "93477911f655130bd30079daf21b1a3a77644d43"
+    },
+    {
+      "path": "eos_generator/compose_eos_pkg/compose_eos/reconstruct.py",
+      "blob_sha": "e7284330425983a91d74056a74ffc5ee0f1a4954"
+    },
+    {
+      "path": "eos_generator/compose_eos_pkg/compose_eos/consistency.py",
+      "blob_sha": "cdc75e4f36ff8ca50b970331392ac5d789373dc8"
+    },
+    {
+      "path": "eos_generator/compose_eos_pkg/compose_eos/io.py",
+      "blob_sha": "baa0ebef359aeedd8c9aeebd3d75873c75da42a7"
+    },
+    {
+      "path": "eos_generator/compose_eos_pkg/compose_eos/tov.py",
+      "blob_sha": "f7fb4caacb301e48067bdbcf8aac3096db00238e"
+    },
+    {
+      "path": "data/eos390_source_bibliography.v1.json",
+      "blob_sha": "b51df34b39c8734af57edb24235cedac68bec189"
+    },
+    {
+      "path": "data/eos390_reconstructed_source_inventory.v1.json",
+      "blob_sha": "dcffe50495b30cc6e8c64cf266d1e77b9ee07be2"
+    },
+    {
+      "path": "data/receipts/eos390_m0/E390-02_COMPOSITION_CLOSURE_SOURCE_RECONCILIATION_20261113.json",
+      "blob_sha": "419c00b3bf75bf13a41a58ce8edd99b91caaafaf"
+    }
+  ],
+  "thermodynamic_contract": {
+    "units": {
+      "n_b": "fm^-3",
+      "pressure": "MeV fm^-3",
+      "energy_density": "MeV fm^-3",
+      "mu_B": "MeV",
+      "cs2": "c_s^2/c^2"
+    },
+    "cold_master": {
+      "x": "ln(n_B)",
+      "F": "epsilon/n_B",
+      "Q1": "dF/dx = P/n_B",
+      "pressure": "P = n_B Q1",
+      "euler_mu": "mu_B = F + Q1",
+      "sound_speed": "c_s^2/c^2 = (Q1 + dQ1/dx)/(F + Q1)",
+      "cold_equality": "Q6 = Q7"
+    },
+    "rest_mass_alignment": "Only shift the crust energy-per-baryon zero by delta_m = m_n(core)-m_n(crust); do not apply the historical empirical +4.96005 MeV GM1 or +2.45 MeV FSU2 offsets whose provenance is unestablished.",
+    "candidate_window": "The legacy two-plane secant inequalities are a screening heuristic, not a theorem for convexity, causality or stability. The historical fallback core locator uses n_B >= 0.045 fm^-3 when composition is unavailable; this is not a provider-independent physical phase boundary."
+  },
+  "legacy_methods": [
+    {
+      "id": "maxwell",
+      "actual_name": "Legacy Near-Pressure-Plateau Hermite Bridge (NPPHB)",
+      "construction": "Hermite P(u) on u in [0,1], internal knots u={0.22,0.78}, pressure offset dP=0.015*(P2-P1), endpoint slopes bounded relative to secants; solve Pt from Delta x*integral_0^1[P(u)/n(u)]du=F2-F1.",
+      "physics": "A smooth single-valued barotrope with continuous n_B; no exact common-pressure/common-mu coexistence and no latent heat. Delta n_B=0. It is not a first-order Maxwell transition.",
+      "numerical_limit": "Historical root uses 64-point whole-interval Gauss-Legendre quadrature; F(u) uses 16-point whole-interval quadrature without splitting at u=0.22 and 0.78. Endpoint first-law closure does not certify the interior F profile. Keep only as immutable legacy parity until knot-split/adaptive or analytic quadrature is validated.",
+      "production_name_policy": "Preserve under legacy_npphb. Never use the historical maxwell token as a sharp Maxwell label; sharp_maxwell is a separate operation."
+    },
+    {
+      "id": "css",
+      "construction": "Two-segment constant-sound-speed bridge in (mu_B,n_B). The internal knot is chosen by a scalar root so the analytic integral of n_B dmu_B reproduces P2-P1. Each segment has constant c_s^2=Delta ln(mu_B)/Delta ln(n_B); generally the two segment values differ.",
+      "regularity": "Piecewise constant c_s^2, with a possible change at the internal knot; not a density-jump phase transition."
+    },
+    {
+      "id": "cubic_F",
+      "construction": "Use x=ln(n_B), interpolate Q1=P/n_B with a cubic Hermite bridge, impose the average Q1 integral (F2-F1)/Delta x, then F=F1+Delta x*integral(Q1 du), P=n_B Q1, mu_B=F+Q1.",
+      "regularity": "Cubic Hermite/free-energy bridge; endpoint derivative/sound-speed equality is not enforced exactly."
+    },
+    {
+      "id": "quintic_F",
+      "construction": "Same thermodynamic variable and integral constraint as cubic_F, but a fifth-order potential or adaptive boundary-layer C2 Hermite bridge preserves the exact endpoint derivatives of Q1.",
+      "regularity": "C2 endpoint slope matching; the bridge remains a continuous-density barotrope."
+    },
+    {
+      "id": "cubic_P",
+      "construction": "Use mu_B as the independent variable, interpolate n_B(mu_B) with a cubic Hermite bridge and impose integral n_B dmu_B=P2-P1. Recover P, Q1=P/n_B, F=mu_B-Q1.",
+      "regularity": "Cubic Hermite density-vs-chemical-potential bridge; endpoint sound-speed equality is not enforced exactly."
+    },
+    {
+      "id": "quintic_P",
+      "construction": "Same n_B(mu_B) integral constraint as cubic_P, with fifth-order potential or adaptive C2 Hermite bridge preserving exact endpoint derivatives.",
+      "regularity": "C2 endpoint slope matching; still a continuous-density barotrope."
+    }
+  ],
+  "component_construction_findings": {
+    "legacy_api": "The audited legacy path has no separate explicit standalone core_only/crust_only constructor. match_crust_core slices the chosen source tables at i1/i2 and constructs the bridge; reconstruct_master transforms the full supplied table.",
+    "core_selection": "If composition is available, first is_homogeneous row with n_B>=0.03 fm^-3; otherwise first n_B>=0.045 fm^-3. Treat both as legacy selection heuristics pending a source/provider-specific component boundary contract.",
+    "reconstruction_is_not_raw_copy": "reconstruct_master may clip Yp/Ymu/Yh; repair the last crust remnant/dissolution row; reconstruct Yn and charge closure; recompute electron/muon beta equilibrium; spline-smooth F=(Q6+1)m_n against ln(n_B); add an outer-crust electron plus Wigner-Seitz lattice pressure patch; recompute Q3/Q4/Q6/Q7 and optional q_extra=c_s^2. Its output must be a distinct versioned reconstructed artifact, never overwrite raw source.",
+    "core_composition_mode": "strict_thermo_only is default and leaves absent/unusable core composition absent. literature_beta_eq is an explicit parabolic-symmetry-energy opt-in only for APR_APR and BBB_BHF2; do not silently apply it to other cores.",
+    "bridge_composition": "When enabled, composition fields are bridged with a quintic smootherstep sigma=6u^5-15u^4+10u^3; cluster abundance/charge are faded from the crust boundary and lepton fractions solved with electron-muon equilibrium. Iphase bridge labels inherit the crust-end category, not a universal phase meaning."
+  },
+  "compose_semantics": {
+    "group_abundance": "CompOSE Y_I is the group number abundance; internal Y_h=Abar*Y_I is the group baryon fraction.",
+    "closure": [
+      "Y_n + Y_p + Y_h = 1",
+      "Y_p + (Zbar/Abar)*Y_h = Y_e + Y_mu"
+    ],
+    "phase": "Iphase is a provider-defined categorical field; numeric IDs are not universal phase names.",
+    "missingness": "An absent field/record is not a measured zero. Use row/species/group presence masks and separate NOT_AVAILABLE/PARTIAL/CHECKED/FAIL.",
+    "provider_deviation": "SPG/GPPVA raw group tuple values do not satisfy the literal CompOSE Y_I interpretation consistently. The resolved dual-track decision is: preserve raw tokens and apply the standard parser/mask rule (flag inconsistent rows); for production reconstruct composition from published CLD/Thomas-Fermi plus model RMF physics rather than globally remapping the provider field.",
+    "production_reconstruction": "The M3 CLD reconstruction pipeline is reported operational, with GPPVA_DD2 inner crust reconstructed. This is a Python/reference workstream, not proof that the full native Fortran production path or all 13 crusts are complete."
+  },
+  "nadd": {
+    "meaning": "Nadd counts provider-defined eos.thermo extension columns.",
+    "legacy_python": "The inspected legacy EOSData/CompOSE writer supports only Nadd=0 or 1.",
+    "current_native": "The Fortran M10B work supports arbitrary Nadd>=0 in the internal representation/thermo export stages; full multi-axis composition and writer/readback remain pending.",
+    "categorical_warning": "Categorical q_extra values (e.g. pasta geometry) are not continuous interpolation variables; do not interpolate them as scalars."
+  },
+  "q3_il": {
+    "Il_1": "On the supported cold beta-equilibrium branch, mu_B=(Q3+1)*m_n and Q5 is approximately zero.",
+    "Il_0": "The Euler baryon chemical potential includes the charge term: mu_Euler=(Q3+1)*m_n + Yq*Q4*m_n.",
+    "tolerance": "Keep source/reconstruction algebraic tolerances distinct from sharp-interface coexistence tolerances."
+  },
+  "phase_and_stellar_semantics": {
+    "sharp_maxwell": "Two locally charge-neutral phase barotropes require a common mu_B interval and solve P_low(mu_B)=P_high(mu_B). At coexistence P and mu_B agree, n_high>n_low>0, epsilon_i=mu_t*n_i-P_t and Delta epsilon=mu_t*Delta n_B>0. Multiple roots must be surfaced, not selected silently.",
+    "gibbs": "Global-neutrality mixed phase requires P(mu_B,mu_Q) surfaces, pressure equality and a volume-fraction neutrality root; a one-dimensional beta-equilibrated barotrope is insufficient.",
+    "tidal": "The legacy sharp-transition Love solver integrates the high branch to Pt, applies Delta y=-4*pi*r_t^3*Delta epsilon/(m_t+4*pi*r_t^3*P_t), then integrates the low branch. The reported Seidov result is only a small-core onset diagnostic, not a full radial-mode stability calculation.",
+    "smooth_methods": "All six historical matcher outputs are continuous-density single-valued barotropes; Seidov is not applicable."
+  },
+  "historical_baseline": {
+    "source": "Dropbox EOS core-crust release v3.2 (2026-11-06), as recorded in DAG baseline; these are historical records, not newly re-executed results.",
+    "total_tasks": 390,
+    "full_table_pass": 234,
+    "diagnostic_only": 156,
+    "causal_domain_pass": 390,
+    "known_full_table_failures": "APR_APR and RG_KDE0v1 high-density C10 acausality. Preserve these failures; do not clip or relabel them as repaired microscopic EOS.",
+    "source_matrix": "13 crust models x 5 core models x 6 legacy methods."
+  },
+  "bibliography_and_source_inventory": {
+    "bibliography_path": "data/eos390_source_bibliography.v1.json",
+    "bibliography_blob_sha": "b51df34b39c8734af57edb24235cedac68bec189",
+    "source_inventory_path": "data/eos390_reconstructed_source_inventory.v1.json",
+    "source_inventory_blob_sha": "dcffe50495b30cc6e8c64cf266d1e77b9ee07be2",
+    "core_models": [
+      "APR_APR",
+      "BBB_BHF2",
+      "GM_GM1",
+      "RG_SLY4",
+      "RG_KDE0v1"
+    ],
+    "crust_models": [
+      "SPG_M1",
+      "SPG_M2",
+      "SPG_M3",
+      "SPG_M4",
+      "SPG_M5",
+      "GPPVA_DD2",
+      "GPPVA_DDME2",
+      "GPPVA_FSU2",
+      "GPPVA_FSU2H",
+      "GPPVA_FSU2R",
+      "GPPVA_NL3wrL55",
+      "GPPVA_TM1e",
+      "GPPVA_TW"
+    ]
+  },
+  "acceptance": {
+    "six_method_ids_characterized": true,
+    "historical_maxwell_classified_as_smooth_no_jump": true,
+    "composition_and_missingness_semantics_recorded": true,
+    "nadd_policy_recorded": true,
+    "q3_il_semantics_recorded": true,
+    "phase_and_tidal_behavior_recorded": true,
+    "historical_390_baseline_recorded": true,
+    "standalone_component_builders_implemented": false
+  },
+  "limitations": [
+    "This is a static source audit and literature/schema reconciliation; it does not assert a fresh executable test or numerical replay.",
+    "The remote development device was Offline; no local compiler or pytest run was possible in this turn.",
+    "The six legacy Python methods are characterized, not yet ported into the native Fortran production matcher.",
+    "Standalone core-only and crust-only builder contracts and native builders are not explicit in the audited legacy API; they are added as a dedicated next DAG node.",
+    "The E390-00 source archive and historical outputs are preserved; no raw input or existing v3.2 output was modified."
+  ],
+  "next_node": "E390-01A",
+  "next_node_title": "Specify standalone core-only and crust-only EOS construction contracts before native builder implementation"
+}

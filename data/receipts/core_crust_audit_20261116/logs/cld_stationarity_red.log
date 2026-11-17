@@ -1,0 +1,54 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____ test_cell_beta_equilibrium_is_stationary_for_total_cell_energy[SPG_M1] ____
+
+name = 'SPG_M1'
+
+    @pytest.mark.parametrize("name", ["SPG_M1", "GPPVA_DD2"])
+    def test_cell_beta_equilibrium_is_stationary_for_total_cell_energy(name):
+        from pathlib import Path
+        from compose_eos.cld_cell import minimize_cld_cell, cld_cell_energy
+        from compose_eos.rmf_solver import load_models
+        root=Path(__file__).resolve().parents[2]
+        model=load_models(root/"data/eos390_rmf_parameter_sets.v1.json")[name]
+        c=minimize_cld_cell(model,.01,1.,1.)
+        assert c.converged
+        h=1e-5*c.rho_Ip
+        def total(p):
+            e,_=cld_cell_energy(model,c.rho_B,c.f,c.R_d,c.rho_I,p,c.rho_II,0.,1.,1.)
+            return e+model.mn*c.rho_B+(model.mp-model.mn)*c.f*p
+        residual=(total(c.rho_Ip+h)-total(c.rho_Ip-h))/(2*h*c.f)
+>       assert abs(residual)<2e-4, residual
+E       AssertionError: 7.374755036758973
+E       assert 7.374755036758973 < 0.0002
+E        +  where 7.374755036758973 = abs(7.374755036758973)
+
+python_frontend/tests/test_cld_adversarial_reaudit.py:73: AssertionError
+__ test_cell_beta_equilibrium_is_stationary_for_total_cell_energy[GPPVA_DD2] ___
+
+name = 'GPPVA_DD2'
+
+    @pytest.mark.parametrize("name", ["SPG_M1", "GPPVA_DD2"])
+    def test_cell_beta_equilibrium_is_stationary_for_total_cell_energy(name):
+        from pathlib import Path
+        from compose_eos.cld_cell import minimize_cld_cell, cld_cell_energy
+        from compose_eos.rmf_solver import load_models
+        root=Path(__file__).resolve().parents[2]
+        model=load_models(root/"data/eos390_rmf_parameter_sets.v1.json")[name]
+        c=minimize_cld_cell(model,.01,1.,1.)
+        assert c.converged
+        h=1e-5*c.rho_Ip
+        def total(p):
+            e,_=cld_cell_energy(model,c.rho_B,c.f,c.R_d,c.rho_I,p,c.rho_II,0.,1.,1.)
+            return e+model.mn*c.rho_B+(model.mp-model.mn)*c.f*p
+        residual=(total(c.rho_Ip+h)-total(c.rho_Ip-h))/(2*h*c.f)
+>       assert abs(residual)<2e-4, residual
+E       AssertionError: 7.650241392588207
+E       assert 7.650241392588207 < 0.0002
+E        +  where 7.650241392588207 = abs(7.650241392588207)
+
+python_frontend/tests/test_cld_adversarial_reaudit.py:73: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_cld_adversarial_reaudit.py::test_cell_beta_equilibrium_is_stationary_for_total_cell_energy[SPG_M1]
+FAILED python_frontend/tests/test_cld_adversarial_reaudit.py::test_cell_beta_equilibrium_is_stationary_for_total_cell_energy[GPPVA_DD2]
+2 failed, 13 deselected in 0.95s

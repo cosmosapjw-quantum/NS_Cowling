@@ -1,0 +1,69 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+____ test_invalid_geometry_is_not_accepted_as_unconstrained_minimum[f-nan] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-85/test_invalid_geometry_is_not_a0')
+field = 'f', value = nan
+
+    @pytest.mark.parametrize('field,value',[('f',float('nan')),('R_d',float('nan')),('rho_I',float('nan')),('R_d',-1.),('f',1.1)])
+    def test_invalid_geometry_is_not_accepted_as_unconstrained_minimum(tmp_path,field,value):
+        rows=cells();rows[1]=replace(rows[1],**{field:value})
+>       with pytest.raises(CLDThermodynamicsError):
+E       Failed: DID NOT RAISE CLDThermodynamicsError
+
+python_frontend/tests/test_cld_adversarial_reaudit.py:93: Failed
+___ test_invalid_geometry_is_not_accepted_as_unconstrained_minimum[R_d-nan] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-85/test_invalid_geometry_is_not_a1')
+field = 'R_d', value = nan
+
+    @pytest.mark.parametrize('field,value',[('f',float('nan')),('R_d',float('nan')),('rho_I',float('nan')),('R_d',-1.),('f',1.1)])
+    def test_invalid_geometry_is_not_accepted_as_unconstrained_minimum(tmp_path,field,value):
+        rows=cells();rows[1]=replace(rows[1],**{field:value})
+>       with pytest.raises(CLDThermodynamicsError):
+E       Failed: DID NOT RAISE CLDThermodynamicsError
+
+python_frontend/tests/test_cld_adversarial_reaudit.py:93: Failed
+__ test_invalid_geometry_is_not_accepted_as_unconstrained_minimum[rho_I-nan] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-85/test_invalid_geometry_is_not_a2')
+field = 'rho_I', value = nan
+
+    @pytest.mark.parametrize('field,value',[('f',float('nan')),('R_d',float('nan')),('rho_I',float('nan')),('R_d',-1.),('f',1.1)])
+    def test_invalid_geometry_is_not_accepted_as_unconstrained_minimum(tmp_path,field,value):
+        rows=cells();rows[1]=replace(rows[1],**{field:value})
+>       with pytest.raises(CLDThermodynamicsError):
+E       Failed: DID NOT RAISE CLDThermodynamicsError
+
+python_frontend/tests/test_cld_adversarial_reaudit.py:93: Failed
+___ test_invalid_geometry_is_not_accepted_as_unconstrained_minimum[R_d--1.0] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-85/test_invalid_geometry_is_not_a3')
+field = 'R_d', value = -1.0
+
+    @pytest.mark.parametrize('field,value',[('f',float('nan')),('R_d',float('nan')),('rho_I',float('nan')),('R_d',-1.),('f',1.1)])
+    def test_invalid_geometry_is_not_accepted_as_unconstrained_minimum(tmp_path,field,value):
+        rows=cells();rows[1]=replace(rows[1],**{field:value})
+>       with pytest.raises(CLDThermodynamicsError):
+E       Failed: DID NOT RAISE CLDThermodynamicsError
+
+python_frontend/tests/test_cld_adversarial_reaudit.py:93: Failed
+____ test_invalid_geometry_is_not_accepted_as_unconstrained_minimum[f-1.1] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-85/test_invalid_geometry_is_not_a4')
+field = 'f', value = 1.1
+
+    @pytest.mark.parametrize('field,value',[('f',float('nan')),('R_d',float('nan')),('rho_I',float('nan')),('R_d',-1.),('f',1.1)])
+    def test_invalid_geometry_is_not_accepted_as_unconstrained_minimum(tmp_path,field,value):
+        rows=cells();rows[1]=replace(rows[1],**{field:value})
+>       with pytest.raises(CLDThermodynamicsError):
+E       Failed: DID NOT RAISE CLDThermodynamicsError
+
+python_frontend/tests/test_cld_adversarial_reaudit.py:93: Failed
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_cld_adversarial_reaudit.py::test_invalid_geometry_is_not_accepted_as_unconstrained_minimum[f-nan]
+FAILED python_frontend/tests/test_cld_adversarial_reaudit.py::test_invalid_geometry_is_not_accepted_as_unconstrained_minimum[R_d-nan]
+FAILED python_frontend/tests/test_cld_adversarial_reaudit.py::test_invalid_geometry_is_not_accepted_as_unconstrained_minimum[rho_I-nan]
+FAILED python_frontend/tests/test_cld_adversarial_reaudit.py::test_invalid_geometry_is_not_accepted_as_unconstrained_minimum[R_d--1.0]
+FAILED python_frontend/tests/test_cld_adversarial_reaudit.py::test_invalid_geometry_is_not_accepted_as_unconstrained_minimum[f-1.1]
+5 failed, 16 deselected in 0.39s

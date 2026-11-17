@@ -1,0 +1,31 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___________ test_marginal_zero_gas_boundary_inward_saddle_is_refused ___________
+
+    def test_marginal_zero_gas_boundary_inward_saddle_is_refused():
+        from compose_eos.restored_spg_candidate import _local_minimum_check
+        z=np.array([1.,.14,.2]);lo=np.array([1e-7,.035,.001]);hi=np.array([1.,.25,.499])
+        # Gradient vanishes at t=1 but inward t displacement lowers E.
+        gradient=lambda q:np.array([-(q[0]-1.),q[1]-.14,q[2]-.2])
+>       with pytest.raises(RuntimeError,match="negative local curvature"):
+E       Failed: DID NOT RAISE RuntimeError
+
+python_frontend/tests/test_restored_spg_candidate.py:95: Failed
+__________ test_marginal_zero_gas_boundary_checks_inward_t_curvature ___________
+
+    def test_marginal_zero_gas_boundary_checks_inward_t_curvature():
+        from compose_eos.restored_spg_candidate import _local_minimum_check
+        z=np.array([1.,.14,.2]);lo=np.array([1e-7,.035,.001]);hi=np.array([1.,.25,.499])
+        result=_local_minimum_check(lambda q:q-z,z,lo,hi)
+>       assert result["curvature_free_coordinates"]==[0,1,2]
+E       assert [1, 2] == [0, 1, 2]
+E         
+E         At index 0 diff: 1 != 0
+E         Right contains one more item: 2
+E         Use -v to get more diff
+
+python_frontend/tests/test_restored_spg_candidate.py:102: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_restored_spg_candidate.py::test_marginal_zero_gas_boundary_inward_saddle_is_refused
+FAILED python_frontend/tests/test_restored_spg_candidate.py::test_marginal_zero_gas_boundary_checks_inward_t_curvature
+2 failed, 19 deselected in 0.52s

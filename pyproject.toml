@@ -10,7 +10,7 @@ requires-python = ">=3.10"
 dependencies = ["numpy>=1.23", "scipy>=1.7"]
 
 [project.optional-dependencies]
-test = ["pytest>=7"]
+test = ["pytest>=7", "mpmath>=1.3"]
 plot = ["matplotlib>=3.6"]
 
 [project.scripts]
@@ -25,9 +25,10 @@ where = ["python_frontend"]
 include = ["compose_eos*", "compose_cowling*"]
 
 [tool.setuptools.data-files]
-"share/compose-eos/fortran_eos" = ["fortran_eos/build.sh"]
+"share/compose-eos/fortran_eos" = ["fortran_eos/build.sh", "fortran_eos/run-generator.sh"]
 "share/compose-eos/fortran_eos/src" = ["fortran_eos/src/*.f90"]
 "share/compose-eos/fortran_eos/app" = ["fortran_eos/app/*.f90"]
+"share/compose-eos/fortran_eos/vendor/slsqp" = ["fortran_eos/vendor/slsqp/slsqp_optmz.f", "fortran_eos/vendor/slsqp/SCIPY_LICENSE.txt", "fortran_eos/vendor/slsqp/PROVENANCE.json", "fortran_eos/vendor/slsqp/README.md"]
 "share/compose-eos/oscillation_source/support/src" = ["oscillation_source/support/src/*.f90"]
 "share/compose-eos/oscillation_source/solutions/src" = ["oscillation_source/solutions/src/*.f90"]
 "share/compose-eos/oscillation_source/solutions/app" = ["oscillation_source/solutions/app/*.f90"]

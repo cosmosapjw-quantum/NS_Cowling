@@ -1,0 +1,68 @@
+{
+ "node": "E390-04",
+ "subscope": "m4_quality_splice_python",
+ "date": "2026-11-14",
+ "method": "pure_python_real_data_splice (gfortran unavailable; native verify-csv not runnable on stale build)",
+ "low_phase": {
+  "source": "eos_generator/eos_data/GPPVA_DD2",
+  "mn_table": 939.0,
+  "points": 283,
+  "kept": 282
+ },
+ "high_phase": {
+  "source": "eos_generator/eos_data/BBB_BHF2",
+  "mn_table": 939.56533,
+  "points": 84,
+  "kept": 16
+ },
+ "unified_M_N_mev": 939.56536,
+ "n_cut_fm3": 0.067,
+ "n_total": 287,
+ "n_B_range": [
+  4.67962e-10,
+  1.5
+ ],
+ "mu_B_range": [
+  929.9001072426001,
+  2172.4299434047994
+ ],
+ "P_range": [
+  9.000000079422e-12,
+  1163.4174163769483
+ ],
+ "eps_range": [
+  4.3514891398538223e-07,
+  2095.2274987302508
+ ],
+ "eps_enforcement": {
+  "method": "eps := mu_B*n_B - P (first law enforced exactly; table eps kept as diagnostic)",
+  "eps_table_raw_vs_enforced_max_resid": 0.0053725145825893605,
+  "note": "GPPVA_DD2 source table carries a ~5e-3 MeV first-law residual from CompOSE thermo rounding; enforcing eps=mu_B*n_B-P makes the spliced barotrope first-law exact, which is required for a self-consistent Maxwell construction."
+ },
+ "python_consistency": {
+  "C1_finite": true,
+  "C2_first_law": {
+   "max_resid": 0.0,
+   "pass_": true
+  },
+  "C6_dPdn_positive": {
+   "min_dPdn": 0.07271411151104125,
+   "pass_": true
+  },
+  "C10_causality": {
+   "min_cs2": 7.818866497536956e-05,
+   "max_cs2": 0.8518620806233869,
+   "pass_": true
+  },
+  "C11_dmudn_positive": {
+   "min_dmudn": 129.06395369989332,
+   "pass_": true
+  },
+  "overall_pass": true,
+  "monotone_n": true,
+  "monotone_mu": true,
+  "monotone_P": true,
+  "monotone_eps": true
+ },
+ "status": "M4_QUALITY_SPLICED_PYTHON_CONSISTENCY_PASS"
+}

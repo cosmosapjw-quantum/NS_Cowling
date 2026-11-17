@@ -1,0 +1,41 @@
+............FF.......................................................... [ 85%]
+............                                                             [100%]
+=================================== FAILURES ===================================
+________ test_physical_energy_offset_is_not_removed_by_normalization[0] ________
+
+il = 0
+
+    @pytest.mark.parametrize("il", [0, 1])
+    def test_physical_energy_offset_is_not_removed_by_normalization(il):
+        low, high = physical_pair(il)
+        shifted = high.copy()
+        for name in ("Q3", "Q6", "Q7"):
+            setattr(shifted, name, getattr(high, name)+100./high.mn)
+        np.testing.assert_allclose(shifted.eps-high.eps, 100.*high.nb, atol=2e-11, rtol=0.)
+>       with pytest.raises(NativeExecutionError, match="common chemical-potential"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'common chemical-potential'
+E         Actual message: "Fortran operation 'maxwell-transition' failed with exit code 3: the two phases have no overlapping baryon-chemical-potential interval"
+
+python_frontend/tests/test_maxwell_mass_gate.py:91: AssertionError
+________ test_physical_energy_offset_is_not_removed_by_normalization[1] ________
+
+il = 1
+
+    @pytest.mark.parametrize("il", [0, 1])
+    def test_physical_energy_offset_is_not_removed_by_normalization(il):
+        low, high = physical_pair(il)
+        shifted = high.copy()
+        for name in ("Q3", "Q6", "Q7"):
+            setattr(shifted, name, getattr(high, name)+100./high.mn)
+        np.testing.assert_allclose(shifted.eps-high.eps, 100.*high.nb, atol=2e-11, rtol=0.)
+>       with pytest.raises(NativeExecutionError, match="common chemical-potential"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'common chemical-potential'
+E         Actual message: "Fortran operation 'maxwell-transition' failed with exit code 3: the two phases have no overlapping baryon-chemical-potential interval"
+
+python_frontend/tests/test_maxwell_mass_gate.py:91: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_maxwell_mass_gate.py::test_physical_energy_offset_is_not_removed_by_normalization[0]
+FAILED python_frontend/tests/test_maxwell_mass_gate.py::test_physical_energy_offset_is_not_removed_by_normalization[1]
+2 failed, 82 passed in 4.39s

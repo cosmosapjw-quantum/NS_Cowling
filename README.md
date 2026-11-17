@@ -2,6 +2,8 @@
 
 The default numerical path is Fortran. The Python frontend exposes CompOSE reading/writing, EOS thermodynamic verification, normalized EOS export, TOV solves and relativistic Cowling f/p1 calculations. See docs/FORTRAN_PYTHON_FRONTEND_V4.md and docs/FORTRAN_EOS_FEATURE_PARITY.md.
 
+Current native EOS generation and matching work is documented in [the latest research report](docs/research_matching_20261117/REPORT_KO.md), [the 18-model closure matrix](data/research_matching_20261117/generator/RETAINED_COHORT_MATRIX.json), and [reproduction and handoff instructions](docs/research_matching_20261117/HANDOFF_KO.md). Production model evaluation, minimization and matching run in Fortran; Python validates requests, transports data and decodes reports. Independent research oracles and the legacy Python implementation remain explicitly separate. Original-source fidelity, independent physical validation, numerical support and CompOSE comparison are separate judgments; exact CompOSE agreement is not an unconditional pass criterion.
+
 Install and test:
 
     python -m pip install -e .
@@ -10,27 +12,36 @@ Install and test:
 Native EOS executable:
 
     bash fortran_eos/build.sh build/compose_eos_fortran
-    build/compose_eos_fortran read path/to/compose path/to/internal
-    build/compose_eos_fortran verify path/to/compose report.json
+    build/compose_eos_fortran/compose_eos_fortran read path/to/compose path/to/internal
+    build/compose_eos_fortran/compose_eos_fortran verify path/to/compose report.json
+
+Source-checkout EOS generation (fresh output directories):
+
+    PYTHONPATH=python_frontend python3 -m compose_eos.cli generators
+    PYTHONPATH=python_frontend python3 -m compose_eos.cli generate GM_GM1 build/gm1_run --points 161
+    PYTHONPATH=python_frontend python3 -m compose_eos.cli generate SPG_M1 build/spg_m1_run --points 257 --variant AME2408_candidate
+    PYTHONPATH=python_frontend python3 -m compose_eos.cli generate SPG_M5 build/spg_m5_inferred --points 129 --variant public_composition_inferred_20261116
+
+The catalog exposes five core models, five SPG candidate inner-crust models and eight GPPVA spatial-TF models. TF generation requires explicit density and radial-resolution grids. Generation success is limited to requested rows and their native output verification; it does not certify original SPG calibration, a global minimum, a complete joined crust, or arbitrary interpolation across phase boundaries. Density-dependent physical support and composition availability accompany the outputs. The conditional inferred SPG variant uses a versioned public-composition reconstruction; the default remains AME2408_candidate, and neither variant asserts the missing original calibration. Explicit unsupported phase/segment boundaries are enforced when matching. All 18 declared native generation routes have execution evidence; the overall original-model fidelity and continuous full-crust goal remains **PARTIALLY_COMPLETE**.
 
 Python API:
 
     from compose_eos import read_compose, write_compose, check_consistency
     from compose_cowling import solve_tov_star, solve_tov_sequence, solve_cowling_spectrum
 
-The legacy Python implementation in eos_generator/compose_eos_pkg/ is preserved as a read-only characterization and differential reference; it is not a production calculation path. The target architecture is one Fortran-owned calculation backend with a Python frontend limited to input validation, data transport, native invocation, report decoding and presentation. Native smooth crust-core matching currently exposes css, cubic_F, cubic_P, quintic_F and quintic_P in thermo-only mode. The historical maxwell plateau alias is fail-closed because it has zero density jump. The separate sharp Maxwell kernel is currently restricted to composition-free branch inputs; full CompOSE composition, literature-derived beta-equilibrium, true Maxwell pair matching, and native TOV/tidal/Cowling integration into the EOS390 pipeline remain active migration tasks. See docs/EOS390_NATIVE_FORTRAN_UNIFICATION_CONTRACT_20261111.md.
+The legacy Python implementation in eos_generator/compose_eos_pkg/ is preserved as a read-only characterization and differential reference; it is not a production calculation path. The target architecture is one Fortran-owned calculation backend with a Python frontend limited to input validation, data transport, native invocation, report decoding and presentation. Native smooth crust-core matching currently exposes css, cubic_F, cubic_P, quintic_F and quintic_P in thermo-only mode. The historical maxwell plateau alias is fail-closed because it has zero density jump. The separate sharp Maxwell kernel consumes composition-free branch inputs; the public frontend can create explicit thermo-only views with drop_composition=True while preserving physical columns and phase labels. Output abundances are not reconstructed. Preserving multiple retained source phase boundaries, composition-aware transition output and the corresponding stellar integration remain incomplete. See docs/EOS390_NATIVE_FORTRAN_UNIFICATION_CONTRACT_20261111.md.
 
 The stellar solver is nonrotating, spherical, perfect-fluid ell=2 polar modes in the relativistic Cowling approximation, with cold barotropic perturbations and a finite positive pressure surface cutoff. It is not a full-GR metric-perturbation calculation and does not compute gravitational-wave damping.
 
 
-## Native smooth crust-core matching
+## Native crust-core matching
 
-The native smooth matching API currently exposes five methods: css, cubic_F, cubic_P, quintic_F and quintic_P. The old Python `maxwell` plateau remains only in the read-only legacy package. The public native matcher rejects `method='maxwell'` until a branch-selected sharp transition with nonzero density jump and full CompOSE composition is routed into the same API. The native CompOSE writer now supports phase-only sidecars (`Npairs=0`, `Nquad=0`) so Iphase labels are not erased when abundance values are absent. See [the EOS390 native Fortran contract](docs/EOS390_NATIVE_FORTRAN_UNIFICATION_CONTRACT_20261111.md).
+The native matching API exposes four smooth methods (cubic_F, cubic_P, quintic_F, quintic_P) and css, which has an explicit crust-side density jump. Smooth polynomial pieces are checked at their floating-point extrema as well as diagnostic nodes; this is not rigorous interval arithmetic. The old Python `maxwell` plateau remains only in the read-only legacy package. The public native matcher rejects `method='maxwell'` until a branch-selected sharp transition with nonzero density jump and full CompOSE composition is routed into the same API. The native CompOSE writer now supports phase-only sidecars (`Npairs=0`, `Nquad=0`) so Iphase labels are not erased when abundance values are absent. See [the EOS390 native Fortran contract](docs/EOS390_NATIVE_FORTRAN_UNIFICATION_CONTRACT_20261111.md).
 
 
 ## Native first-order Maxwell transition
 
-The separate native `maxwell-transition` kernel is a genuine one-conserved-baryon-charge construction for two locally neutral cold branches. Its current v1 scope rejects composition-bearing inputs and nonzero Nadd, so it is not yet the EOS390 production path. The repository contains phase-segmented Fortran TOV/Cowling solvers for sharp jumps, but their integration with CompOSE-generated Maxwell outputs must be verified on source EOS pairs. The EOS390 contract makes branch selection, composition-preserving transition output, and interface validation explicit prerequisites.
+The separate native `maxwell-transition` kernel is a genuine one-conserved-baryon-charge construction for two locally neutral cold branches. The native kernel rejects composition-bearing inputs and nonzero Nadd. The frontend opt-in drops only abundance information on copied inputs, records that transport, and preserves the original sources; the kernel still owns all physical calculations. The repository contains phase-segmented Fortran TOV/Cowling solvers for sharp jumps, but their integration with CompOSE-generated Maxwell outputs must be verified on source EOS pairs. The EOS390 contract makes branch selection, composition-preserving transition output, and interface validation explicit prerequisites.
 
 
 ## Native master-function reconstruction v1
@@ -61,3 +72,7 @@ The sharp-interface follow-up is implemented on the `research/maxwell-reference-
 **Implementation boundary (updated 2026-11-09):** the phase-segmented stellar TOV/Cowling reference solver remains available in Python/SciPy, and native Fortran now exposes production generic `solve_tov_star` and `solve_cowling_spectrum` entry points for both smooth and one-sharp-Maxwell backgrounds. The native Maxwell route accepts two already-coexisting phase EOS providers and preserves separate core/envelope backgrounds. Its Cowling spectrum route performs a bounded frequency-grid scan and bracket refinement for slow or rapid conversion; it does not yet assign `f`, `p1`, or interface-mode identities. No realistic CompOSE hybrid-EOS result, stable-branch, maximum-mass, twin-star or full-GR claim is made. The strong-jump analytic fixture is for interface-condition testing only; its rapid-onset Seidov diagnostic is unstable. The small-jump fixture validates convergence toward the smooth-EOS solution.
 
 See [the interface derivation](docs/MAXWELL_TOV_COWLING_INTERFACE_V1.md), [the independent validation record](docs/MAXWELL_REFERENCE_VALIDATION_V1_20261109.md), and [the final adversarial audit](docs/ADVERSARIAL_AUDIT_MAXWELL_TOV_COWLING_20261109.md).
+
+## Native physical EOS generation (2026-11-16)
+
+The public generator now runs core5, SPG5 and spatial TF8 physics in Fortran, with a Python frontend. See [native regeneration and limits](docs/research_native_20261116/REPRODUCE.md), [scientific report](docs/research_native_20261116/REPORT_KO.md), and [local handoff](docs/research_native_20261116/HANDOFF_KO.md). Native execution for all18 models does not certify unresolved author surface fits, full microscopic BHF/ETFSI reproduction, or continuous mesh-converged crust support.

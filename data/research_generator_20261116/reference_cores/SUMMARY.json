@@ -1,0 +1,42 @@
+{
+  "GM1": {
+    "source_grid_points_compared": 290,
+    "max_pressure_relative_difference": 0.004863857313215703,
+    "max_energy_relative_difference": 0.0006160856330820197,
+    "max_Yp_absolute_difference": 0.00013245047704624202,
+    "saturation": {
+      "density_fm3": 0.15321152175831437,
+      "binding_mev": -16.358176602372055,
+      "mass_ratio": 0.6999113317712207,
+      "K_mev": 300.64404095484684
+    },
+    "interpretation": "Rounded original couplings, common nucleon mass939MeV. Pointwise source discrepancies retained."
+  },
+  "BBB2": {
+    "representation": "SNM/PNM Table1 PCHIP and parabolic asymmetry, npemu",
+    "composition_table3_max_absolute_difference": 0.0009779435088558275,
+    "pressure_table3_max_relative_difference": 0.6517540537331303,
+    "source_reproduction_status": "PRESSURE_MISMATCH_REQUIRES_ORIGINAL_FIT",
+    "transcription_independent_check": "Table1 Paris columns and Table3 Paris EOS values rechecked against original PDF by core_literature agent; units conversion verified",
+    "microscopic_support_upper_fm3": 0.8,
+    "published_extrapolated_support_upper_fm3": 1.5,
+    "followup": {
+      "assessment": "SOURCE_COMPOSITION_PATH_PRESSURE_HYPOTHESIS_NUMERICALLY_SUPPORTED",
+      "provider_pressure_matches_table3_relative": 1.0735396771544004e-07,
+      "cubic_spline_path_pressure_max_relative_on_provider_nodes": 0.006412914437035067,
+      "cubic_spline_thermodynamic_pressure_max_relative": 0.683010358984693,
+      "preserved_generator_pressure": "total thermodynamic equilibrium pressure",
+      "remaining_dependency": "Author differentiation convention and smooth fit coefficients",
+      "record": "pressure_followup.json",
+      "reproducer": "diagnose_bbb_pressure.py"
+    }
+  },
+  "verification": {
+    "targeted_tests_passed": 21,
+    "native_composition_readback": "81 rows per model passed",
+    "commands": [
+      "PYTHONPATH=python_frontend python3 -m pytest -q python_frontend/tests/test_reference_core_regeneration.py",
+      "COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran PYTHONPATH=python_frontend python3 scripts/build_reference_cores.py build/reference_cores_review/campaign_final"
+    ]
+  }
+}

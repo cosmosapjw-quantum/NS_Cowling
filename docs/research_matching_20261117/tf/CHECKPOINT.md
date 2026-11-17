@@ -1,0 +1,3 @@
+TF lane is complete and frozen. See REPORT_KO.md and data/research_matching_20261117/tf/{SUMMARY.json,EXECUTION.json}.
+
+The exact original N256 FSU2R failure was reproduced (30 STATE rows byte-identical), its mode8 constraint-termination cause was instrumented, and an actual unchanged-tolerance warm restart enabled ten stationary chord samples. Both FSU2R and retained TM1e finite common-tangent candidates were exported/read back natively. No production physics source changed. All lane worker processes have finished. The finite two-branch result does not certify a global phase optimum or continuum mesh limit.

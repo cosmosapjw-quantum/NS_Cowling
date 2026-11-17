@@ -1,0 +1,104 @@
+{
+  "status": "PASS_SCOPED",
+  "project_status": "PARTIALLY_COMPLETE",
+  "scope": "Spherical interface helpers only; no CLD wiring, mass fit, or calibrated EOS.",
+  "tested_head": "594552d7a597dd150be14b9a860a8f5eaa571d7f",
+  "tested_tree": "a1cb0526e797ad4d64baf312bbd0691aa91384b2",
+  "source_sha256": "66b2d8be5396cbddee20a91f43dee1169ae65e38e9fee5ebdae61b2c143ad8f3",
+  "environment": {
+    "python": "3.12.3",
+    "numpy": "2.4.2",
+    "scipy": "1.17.0",
+    "gfortran": "13.3.0"
+  },
+  "local_runs": [
+    {
+      "command": "bash fortran_eos/build.sh build/compose_eos_fortran",
+      "exit_code": 0,
+      "log": "build.log"
+    },
+    {
+      "command": "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python3 -m pytest -q python_frontend/tests pipeline/tests",
+      "exit_code": 0,
+      "passed": 477,
+      "skipped": 9,
+      "seconds": 38.71,
+      "log": "frontend_pipeline.log"
+    },
+    {
+      "command": "PYTHONPATH=eos_generator:eos_generator/compose_eos_pkg python3 -m pytest -q eos_generator/tests",
+      "exit_code": 0,
+      "passed": 142,
+      "warnings": 1,
+      "seconds": 14.53,
+      "log": "generator.log",
+      "warning": "Existing Matplotlib Axes3D import warning"
+    },
+    {
+      "command": "PYTHONPATH=python_frontend python3 -m pytest -q python_frontend/tests/test_scurto_interface_functions.py",
+      "exit_code": 0,
+      "passed": 17,
+      "seconds": 0.1,
+      "log": "targeted_after_tolerance_fix.log",
+      "state": "after abs=0.0 test repair; helper source unchanged"
+    }
+  ],
+  "test_repair": {
+    "file": "python_frontend/tests/test_scurto_interface_functions.py",
+    "change": "Add abs=0.0 to near-f=1 geometry accuracy assertion",
+    "counterexample": "old pytest.approx default absolute tolerance accepts 100 times expected; repaired assertion rejects it",
+    "log": "endpoint_tolerance_counterexample.log"
+  },
+  "decimal_oracle": {
+    "script": "decimal_check.py",
+    "results": "decimal_results.json.gz",
+    "summary": "decimal_summary.log",
+    "precision": 400,
+    "parameter_tuples": 855,
+    "scalar_outputs": 1722,
+    "failed": 0,
+    "max_normal_relative_error": 1.0180684467550535e-15,
+    "max_subnormal_ulp_error": 1.0,
+    "scope": "Finite sampled comparisons; not a proof for every float. Subnormal results can round to zero."
+  },
+  "ci614": {
+    "run_id": 43786808560,
+    "job_id": 133036190088,
+    "conclusion": "success",
+    "url": "https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/43786808560",
+    "head_sha": "594552d7a597dd150be14b9a860a8f5eaa571d7f",
+    "merge_sha": "3bf8b045271e752eb4cb705a0111a0ca97665a16",
+    "base_sha": "b12ba451b6755bf8f13d22c882075a23eae800a7",
+    "frontend_pipeline": {
+      "passed": 477,
+      "skipped": 9
+    },
+    "generator": {
+      "passed": 142
+    },
+    "census_step": "success; existing proxy campaign only",
+    "source_archive": {
+      "artifact_id": 14190214509,
+      "bytes": 70480207,
+      "sha256": "996a9505cbc6de2df93498d1dc2e0b1e13214f8897d0adb30eb054653271dfe2"
+    },
+    "census_archive": {
+      "artifact_id": 14190597944,
+      "bytes": 3764620,
+      "sha256": "def4669fcc72081af14e3532012da052ad0dcafb2b6c6b628de761318e0253cb"
+    }
+  },
+  "preservation": {
+    "v6_proxy_and_previous_receipts_unchanged_against": "4df4d36a18fb7e3ba7b1cfe2d7bbcc659a56ec07",
+    "original_followup_log_hashes": "9/9 verified",
+    "new_stellar_run": false,
+    "raw_AME2016_reacquired_or_rehashed_in_this_check": false
+  },
+  "unresolved": [
+    "Exact source bulk-model inputs and identity",
+    "Selected 2408 mass rows",
+    "Mass-fit implementation, weighting and coefficients",
+    "Complete calibrated energy functional and derivatives",
+    "Previously recorded CLD/outer-crust/stellar/matching obligations"
+  ]
+}

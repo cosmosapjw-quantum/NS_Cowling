@@ -1,0 +1,112 @@
+FF.                                                                      [100%]
+=================================== FAILURES ===================================
+________ test_decreasing_pressure_per_baryon_has_causal_bridge[cubic_F] ________
+
+method = 'cubic_F'
+
+    @pytest.mark.parametrize("method", ["cubic_F", "quintic_F", "cubic_P"])
+    def test_decreasing_pressure_per_baryon_has_causal_bridge(method):
+        crust = soft_branch(np.geomspace(0.005, 0.04, 41))
+        core = soft_branch(np.linspace(0.045, 0.12, 61))
+        # Independently known analytic stiffness is positive despite dq/dx=-1 MeV.
+        for source in (crust, core):
+            s = (source.Q1 - 1.0) / ((source.Q6 + 1.0) * source.mn + source.Q1)
+            assert np.all((0.0 < s) & (s < 1.0))
+            assert np.all(np.diff(source.Q1) < 0.0)
+>       matched, info = match_crust_core(
+            crust, core, method=method, n_bridge=40, drop_composition=True
+        )
+
+fortran_eos/tests/matching_theory_soft_barotrope.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1345: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+action = 'match-core'
+args = (PosixPath('/tmp/compose-eos-match-core-h4t0xqax/crust'), PosixPath('/tmp/compose-eos-match-core-h4t0xqax/core'), PosixPath('/tmp/compose-eos-match-core-h4t0xqax/matched'), 'cubic_F', '40', 'true')
+
+    def run_native(action: str, *args: str | os.PathLike[str]) -> dict[str, Any]:
+        exe = executable()
+        command = [str(exe), action, *(str(a) for a in args)]
+        completed = subprocess.run(command, capture_output=True, text=True)
+        lines = [line.strip() for line in completed.stdout.splitlines() if line.strip()]
+        payload: dict[str, Any] = {}
+        for line in reversed(lines):
+            try:
+                candidate = json.loads(line)
+                if isinstance(candidate, dict):
+                    payload = candidate
+                    break
+            except json.JSONDecodeError:
+                continue
+        # the structured category the Fortran layer attaches to structured failures
+        # (e.g. maxwell-transition). None when the Fortran layer did not emit one.
+        category = payload.get("category")
+        op = payload.get("operation", action)
+        if completed.returncode:
+>           raise NativeExecutionError(
+                f"Fortran operation {action!r} failed with exit code {completed.returncode}: "
+                f"{payload.get('message', completed.stderr.strip() or completed.stdout.strip())}",
+                category=category, operation=op,
+            )
+E           compose_eos.native.NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: matching construction failed: bridge endpoints must be finite and strictly increasing
+
+python_frontend/compose_eos/native.py:88: NativeExecutionError
+_______ test_decreasing_pressure_per_baryon_has_causal_bridge[quintic_F] _______
+
+method = 'quintic_F'
+
+    @pytest.mark.parametrize("method", ["cubic_F", "quintic_F", "cubic_P"])
+    def test_decreasing_pressure_per_baryon_has_causal_bridge(method):
+        crust = soft_branch(np.geomspace(0.005, 0.04, 41))
+        core = soft_branch(np.linspace(0.045, 0.12, 61))
+        # Independently known analytic stiffness is positive despite dq/dx=-1 MeV.
+        for source in (crust, core):
+            s = (source.Q1 - 1.0) / ((source.Q6 + 1.0) * source.mn + source.Q1)
+            assert np.all((0.0 < s) & (s < 1.0))
+            assert np.all(np.diff(source.Q1) < 0.0)
+>       matched, info = match_crust_core(
+            crust, core, method=method, n_bridge=40, drop_composition=True
+        )
+
+fortran_eos/tests/matching_theory_soft_barotrope.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/api.py:1345: in match_crust_core
+    payload = run_native(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+action = 'match-core'
+args = (PosixPath('/tmp/compose-eos-match-core-5zhrjt2z/crust'), PosixPath('/tmp/compose-eos-match-core-5zhrjt2z/core'), PosixPath('/tmp/compose-eos-match-core-5zhrjt2z/matched'), 'quintic_F', '40', 'true')
+
+    def run_native(action: str, *args: str | os.PathLike[str]) -> dict[str, Any]:
+        exe = executable()
+        command = [str(exe), action, *(str(a) for a in args)]
+        completed = subprocess.run(command, capture_output=True, text=True)
+        lines = [line.strip() for line in completed.stdout.splitlines() if line.strip()]
+        payload: dict[str, Any] = {}
+        for line in reversed(lines):
+            try:
+                candidate = json.loads(line)
+                if isinstance(candidate, dict):
+                    payload = candidate
+                    break
+            except json.JSONDecodeError:
+                continue
+        # the structured category the Fortran layer attaches to structured failures
+        # (e.g. maxwell-transition). None when the Fortran layer did not emit one.
+        category = payload.get("category")
+        op = payload.get("operation", action)
+        if completed.returncode:
+>           raise NativeExecutionError(
+                f"Fortran operation {action!r} failed with exit code {completed.returncode}: "
+                f"{payload.get('message', completed.stderr.strip() or completed.stdout.strip())}",
+                category=category, operation=op,
+            )
+E           compose_eos.native.NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: matching construction failed: bridge endpoints must be finite and strictly increasing
+
+python_frontend/compose_eos/native.py:88: NativeExecutionError
+=========================== short test summary info ============================
+FAILED fortran_eos/tests/matching_theory_soft_barotrope.py::test_decreasing_pressure_per_baryon_has_causal_bridge[cubic_F]
+FAILED fortran_eos/tests/matching_theory_soft_barotrope.py::test_decreasing_pressure_per_baryon_has_causal_bridge[quintic_F]
+2 failed, 1 passed in 0.26s

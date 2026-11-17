@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "native_cases": 10,
+  "build_command": [
+    "gfortran",
+    "-std=legacy",
+    "-O2",
+    "-ffree-line-length-none",
+    "-ffixed-line-length-none",
+    "-fcheck=all",
+    "-Jbuild/native_optimizer_test",
+    "-Ibuild/native_optimizer_test",
+    "fortran_eos/src/compose_eos_types.f90",
+    "fortran_eos/vendor/slsqp/slsqp_optmz.f",
+    "fortran_eos/src/compose_eos_optimize_native.f90",
+    "fortran_eos/tests/test_native_optimizer.f90",
+    "-o",
+    "build/native_optimizer_test/test"
+  ],
+  "test_command": [
+    "build/native_optimizer_test/test"
+  ],
+  "exit_code": 0,
+  "source_sha256": {
+    "fortran_eos/src/compose_eos_optimize_native.f90": "ac9f7e1cedd3a0cc5823a9f5e85ea82a5a06549a715d2f8d619b167bbb6a78f5",
+    "fortran_eos/tests/test_native_optimizer.f90": "65e67b6b2e25c5e38a5cc37cb45eaa1794fd8b10dfde692f49d88d7ffd46c5ef",
+    "fortran_eos/vendor/slsqp/slsqp_optmz.f": "bb1b489a87bc6137fee6132166c8a04cdb838d9042de809179d7f4f6ef9e43ae",
+    "fortran_eos/vendor/slsqp/PROVENANCE.json": "0e606dcf4c29fe04f2249e837d52ebdac6b35fa0e59bc9a6e4d113e981f8561e"
+  },
+  "warning": "Internal callback closure in native test requires executable stack under this gfortran. No test failures."
+}

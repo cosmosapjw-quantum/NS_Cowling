@@ -1,0 +1,234 @@
+{
+  "date": "2026-11-16",
+  "base_commit": "677585947e4d126bc27cc3d8f30c265c407a7773",
+  "scope": "Core independent regeneration and composition research",
+  "sources": [
+    {
+      "id": "APR1998",
+      "url": "https://doi.org/10.1103/PhysRevC.58.1804",
+      "title": "Akmal, Pandharipande, Ravenhall (1998)",
+      "role": "A18+delta-v+UIX* microscopic model"
+    },
+    {
+      "id": "APR2019",
+      "url": "https://arxiv.org/abs/1901.09652",
+      "title": "Schneider, Constantinou, Muccioli, Prakash (2019)",
+      "role": "APR Hamiltonian, Table I p1..p21 and public Fortran implementation"
+    },
+    {
+      "id": "APREOS",
+      "url": "https://stellarcollapse.org/APREOS.html",
+      "repository": "https://bitbucket.org/andschn/apreos",
+      "license": "GPLv3",
+      "role": "Author-maintained source access"
+    },
+    {
+      "id": "BBB1997",
+      "url": "https://arxiv.org/pdf/astro-ph/9707277",
+      "title": "Baldo, Bombaci, Burgio (1997)",
+      "role": "Paris+TBF Table1 and3, Eqs16-22 composition, Eq29 extrapolation"
+    },
+    {
+      "id": "GM1991",
+      "url": "https://escholarship.org/uc/item/6sw424k1",
+      "doi": "10.1103/PhysRevLett.67.2414",
+      "role": "Original GM1 scalar self-interaction and coupling ratios"
+    },
+    {
+      "id": "KDE2005",
+      "url": "https://arxiv.org/abs/nucl-th/0505071",
+      "doi": "10.1103/PhysRevC.72.014310",
+      "role": "Table3 KDE0(v1) exact published parameters"
+    },
+    {
+      "id": "SLY1998",
+      "url": "https://doi.org/10.1016/S0375-9474(98)00180-8",
+      "role": "Original SLy4 interaction"
+    },
+    {
+      "id": "DH2000",
+      "url": "https://ar5iv.labs.arxiv.org/html/astro-ph/0006135",
+      "role": "Primary SLy4 coefficient table confirmed by implementation reviewer"
+    },
+    {
+      "id": "HFODD",
+      "url": "https://www.fuw.edu.pl/~dobaczew/hfodd/pb208-a.out.txt",
+      "role": "Author code output, SLy4 and hbar2/2m=20.73553"
+    },
+    {
+      "id": "RG2015",
+      "url": "https://arxiv.org/abs/1504.04493",
+      "doi": "10.1103/PhysRevC.92.055803",
+      "role": "Provider unified cold model composition framework"
+    },
+    {
+      "id": "DD2",
+      "url": "https://arxiv.org/abs/0908.2344",
+      "doi": "10.1103/PhysRevC.81.015803",
+      "role": "DD2 primary interaction"
+    },
+    {
+      "id": "DDME2",
+      "url": "https://doi.org/10.1103/PhysRevC.71.024312",
+      "role": "DDME2 primary interaction"
+    },
+    {
+      "id": "TW",
+      "url": "https://doi.org/10.1016/S0375-9474(99)00310-3",
+      "role": "TW density dependent interaction"
+    }
+  ],
+  "models": [
+    {
+      "id": "APR_APR",
+      "provider": "https://compose.obspm.fr/eos/68",
+      "particles": [
+        "n",
+        "p",
+        "e",
+        "mu"
+      ],
+      "provider_nb_max_fm3": 1.34,
+      "route": "APR Hamiltonian with published p1..p21, LDP/HDP and phase coexistence, beta equilibrium with leptons",
+      "inputs": "Available in APR2019 and APREOS",
+      "remaining": "Provider data/functional/convention provenance mismatch remains despite independently reproduced author kernels; phase prescription is identified",
+      "provider_phase_prescription": "Gibbs inhomogeneous mixture, official datasheet2025-03-14; downloaded thermo byte-identical to repository",
+      "provider_phase_evidence": {
+        "retrieved_date": "2026-11-16",
+        "pdf_url": "https://compose.obspm.fr/download/1D/NS/Classical/APR/eos.pdf",
+        "pdf_sha256": "f4d5f27e88d9f5752a95c39062f487cbe762e2e28aa7ee7f889196c26dd612af",
+        "thermo_url": "https://compose.obspm.fr/download/1D/NS/Classical/APR/eos.thermo",
+        "new_thermo_sha256": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a",
+        "repository_thermo_sha256": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a",
+        "phase_description": "Gibbs inhomogeneous mixed phase",
+        "metadata_version": "2025-03-14",
+        "repository_pdf_version": "2015-01-13",
+        "source_equivalence": "thermo byte identity; metadata clarification adds phase prescription"
+      },
+      "implementation": "apr_uniform.py low/high and Maxwell; apr_gibbs.py bulk two-charge Gibbs, actual source comparisons retained"
+    },
+    {
+      "id": "BBB_BHF2",
+      "provider": "https://compose.obspm.fr/eos/69",
+      "provider_nb_max_fm3": 1.5,
+      "particles_paper": [
+        "n",
+        "p",
+        "e",
+        "mu"
+      ],
+      "provider_particles_label": [
+        "n",
+        "p",
+        "e"
+      ],
+      "route": "First use published SNM/PNM energies and parabolic functional to generate composition; full microscopic BBG requires separate reaction-matrix kernel",
+      "inputs": "Table1 energies and Table3 beta EOS/proton fractions captured in bbb2_published_tables.json",
+      "remaining": "Reconcile provider species label with npemu primary paper; interpolation and missing Eq29 fitted coefficients limit exact table parity",
+      "literature_support_fm3": {
+        "microscopic_max": 0.8,
+        "published_table_max": 1.5
+      }
+    },
+    {
+      "id": "GM_GM1",
+      "provider": "https://compose.obspm.fr/eos/54",
+      "particles": [
+        "n",
+        "p",
+        "e"
+      ],
+      "provider_nb_max_fm3": 0.999,
+      "route": "Nonlinear sigma-omega-rho mean field plus ideal electrons",
+      "parameters_original": {
+        "C_sigma_fm2": 11.79,
+        "C_omega_fm2": 7.149,
+        "C_rho_fm2": 4.411,
+        "b": 0.002947,
+        "c": -0.00107
+      },
+      "remaining": "Original and later rounded parameter variants differ slightly; select and record provider convention"
+    },
+    {
+      "id": "RG_KDE0v1",
+      "provider": "https://compose.obspm.fr/eos/92",
+      "particles": [
+        "n",
+        "p",
+        "e",
+        "mu"
+      ],
+      "provider_nb_max_fm3": 1.791349,
+      "route": "Uniform spin-saturated Skyrme functional with npemu beta equilibrium",
+      "parameters": {
+        "t0": -2553.08,
+        "t1": 411.7,
+        "t2": -419.87,
+        "t3": 14603.6,
+        "x0": 0.6483,
+        "x1": -0.3472,
+        "x2": -0.9268,
+        "x3": 0.9475,
+        "W0": 124.41,
+        "alpha": 0.1673
+      },
+      "remaining": "Compare source phase3 and mass/kinetic conventions; source Q5 identity requires composition checks"
+    },
+    {
+      "id": "RG_SLY4",
+      "provider": "https://compose.obspm.fr/eos/134",
+      "particles": [
+        "n",
+        "p",
+        "e",
+        "mu"
+      ],
+      "provider_nb_max_fm3": 1.21,
+      "route": "Uniform spin-saturated Skyrme functional with npemu beta equilibrium",
+      "parameters": {
+        "t0": -2488.91,
+        "t1": 486.82,
+        "t2": -546.39,
+        "t3": 13777,
+        "x0": 0.834,
+        "x1": -0.344,
+        "x2": -1,
+        "x3": 1.354,
+        "W0": 123,
+        "alpha": 0.16666666666666666
+      },
+      "remaining": "Use cold provider134; provider123 is finite-temperature NSE. Explicit coefficient precision and kinetic convention."
+    },
+    {
+      "id": "GPPVA_DD2",
+      "route": "Existing uniform DD-RMF field equations with rearrangement self-energy; export actual beta-equilibrium species",
+      "particles": "Inspect configured lepton species then preserve as provenance",
+      "remaining": "Mass conventions and same model homogeneous reference data; crust-only GPPVA tables do not supply high-density uniform benchmark"
+    },
+    {
+      "id": "GPPVA_DDME2",
+      "route": "Existing uniform DD-RMF field equations with rearrangement self-energy; export actual beta-equilibrium species",
+      "particles": "Inspect configured lepton species then preserve as provenance",
+      "remaining": "Mass conventions and same model homogeneous reference data; crust-only GPPVA tables do not supply high-density uniform benchmark"
+    },
+    {
+      "id": "GPPVA_TW",
+      "route": "Existing uniform DD-RMF field equations with rearrangement self-energy; export actual beta-equilibrium species",
+      "particles": "Inspect configured lepton species then preserve as provenance",
+      "remaining": "Mass conventions and same model homogeneous reference data; crust-only GPPVA tables do not supply high-density uniform benchmark"
+    }
+  ],
+  "domain_policy": {
+    "tabulation": "Report provider support separately from validated density intervals.",
+    "physical": "Locate density segments with finite equilibrium solution, positive chemical-potential/thermodynamic derivatives and 0<=dP/depsilon<=1; keep first crossing bracket and disconnected intervals.",
+    "numerical": "State derivative scheme, knot/phase treatment and refinement. An acausal upper interval does not reject every lower interval.",
+    "calibration": "Distinguish nuclear-fit/empirical support from causal domain. Tabulated maximum density is not an empirical validity guarantee."
+  },
+  "equations": {
+    "beta": "mu_n-mu_p=mu_e=mu_mu (when muons populated), n_p=n_e+n_mu",
+    "leptons": "n_l(mu)=(mu^2-m_l^2 c^4)^(3/2)/(3 pi^2 (hbar c)^3), mu>=m_l c^2; otherwise0",
+    "sound_speed": "Along converged neutral beta branch atT=0: cs2/c2=(dP/dn)/(depsilon/dn)=n epsilon''/epsilon', P=n epsilon'-epsilon",
+    "composition_derivative": "For energy density E(n,x) minimized over independent composition x: d\u00b2Eeq/dn\u00b2=E_nn-E_nx (E_xx)^(-1) E_xn on a stable smooth interior branch; thresholds and phase changes treated piecewise."
+  },
+  "evidence_status": "literature-supported; independent numerical regeneration requires actual execution"
+}

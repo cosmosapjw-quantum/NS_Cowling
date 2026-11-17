@@ -1,0 +1,31 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_malformed_source_veto_remains_a_veto ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-82/test_malformed_source_veto_rem0')
+
+    def test_malformed_source_veto_remains_a_veto(tmp_path):
+        (tmp_path / 'REJECTED.json').write_text('[]')
+>       category, reason = pipeline._source_marker(tmp_path)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+pipeline/tests/test_census_execution_contract.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+directory = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-82/test_malformed_source_veto_rem0')
+
+    def _source_marker(directory: Path) -> tuple[str, str] | None:
+        """(failure_category, reason) recorded by a reconstruction that wrote no table."""
+        for name, category in (("REJECTED.json", "source_reconstruction_rejected"),
+                               ("NOT_GENERATED.json", "data_provenance")):
+            path = directory / name
+            if path.is_file():
+                try:
+>                   reason = str(json.loads(path.read_text(encoding="utf-8")).get("reason", ""))
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E                   AttributeError: 'list' object has no attribute 'get'
+
+scripts/match_core_crust.py:403: AttributeError
+=========================== short test summary info ============================
+FAILED pipeline/tests/test_census_execution_contract.py::test_malformed_source_veto_remains_a_veto
+1 failed, 5 deselected in 0.13s

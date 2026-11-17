@@ -1,0 +1,175 @@
+{
+  "status": "PASS_SCOPED",
+  "base_commit": "573a31485bc9af30915e01fe74f259e4fa5ac54f",
+  "source_sha256": {
+    "python_frontend/compose_eos/spatial_tf_equilibrium.py": "8be3c6756f1b04a38cb59fdeeacb5c0aed5c98d8337c8ed14c64e7091501bdca",
+    "python_frontend/compose_eos/spatial_tf.py": "d0c027c4c388a9b37cbfae6ecae753354fce0ae83bbfa1867aad88227a47a826",
+    "python_frontend/compose_eos/gppva_rmf.py": "b08bc009f6cfed81680603dc20b3e426be4548eee3e44c9f4b16f3ffa64540a9"
+  },
+  "seed_sha256": {
+    "data/research_completion_20261116/gppva_tf/final/GPPVA_DD2/selected_states.json.gz": "5b607c6e0d5945ac01a0534291b0e42f4c56ab2f035b2808005ac38609992aef",
+    "data/research_completion_20261116/gppva_tf/final/GPPVA_DD2/attempts.json.gz": "1fae3ef200eac2a1c18776c806c0b4f195a715a3b5d206209c03cd37fe775c81",
+    "data/research_completion_20261116/gppva_tf/final/GPPVA_TW/selected_states.json.gz": "d3b11a7d8e5b3843a719826f97820488d96d66ace07d4e87b491098cf15fe3c6",
+    "data/research_completion_20261116/gppva_tf/final/GPPVA_TW/attempts.json.gz": "79970b016ce209f253f5253b558521c0f77607935322199cd2fe25d862cd74af",
+    "data/research_completion_20261116/gppva_tf/final/GPPVA_DDME2/selected_states.json.gz": "67d9a03edb2cb5c582210493114e60d408eb55e01c3f87d3b99f418ca18785ab",
+    "data/research_completion_20261116/gppva_tf/final/GPPVA_DDME2/attempts.json.gz": "8d5dfed8845148b4202a08c435f7c0e673fc0d6dbb3d6e670b52f63ef2748051"
+  },
+  "tests": {
+    "command": "PYTHONPATH=python_frontend OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -m pytest -q python_frontend/tests/test_screened_electron_vacuum_trials.py python_frontend/tests/test_spatial_tf_equilibrium.py python_frontend/tests/test_spatial_tf.py",
+    "passed": 53,
+    "failed": 0,
+    "seconds": 4.43,
+    "log": "green_tests.log"
+  },
+  "actual_cell_replays": [
+    {
+      "model_id": "GPPVA_DD2",
+      "n_b": 0.0625,
+      "points": 192,
+      "geometry": "rod",
+      "label": "warm",
+      "numerical_status": "STATIONARY",
+      "energy_per_baryon": 946.4372194893654,
+      "pressure": 0.289831406932457,
+      "Y_p": 0.029219569555072916,
+      "max_chemical_KKT_residual_MeV": 0.00018079676226534502,
+      "electron_pde_residual": 6.852851619498779e-14,
+      "charge_constraint_error": 3.7947076036992655e-19,
+      "baryon_constraint_error": 0.0,
+      "radius_stationarity_MeV": 5.257907373379389e-10
+    },
+    {
+      "model_id": "GPPVA_DD2",
+      "n_b": 0.0625,
+      "points": 192,
+      "geometry": "rod",
+      "label": "cold",
+      "numerical_status": "STATIONARY",
+      "energy_per_baryon": 946.4372194893638,
+      "pressure": 0.2898314300589675,
+      "Y_p": 0.029219570723498796,
+      "max_chemical_KKT_residual_MeV": 0.00011402424331663497,
+      "electron_pde_residual": 5.411227022023013e-13,
+      "charge_constraint_error": 5.590417451878382e-19,
+      "baryon_constraint_error": 0.0,
+      "radius_stationarity_MeV": 1.1398264797291002e-08
+    },
+    {
+      "label": "GPPVA_TW_warm0",
+      "model_id": "GPPVA_TW",
+      "n_b": 0.06,
+      "points": 192,
+      "geometry": "slab",
+      "numerical_status": "STATIONARY",
+      "energy_per_baryon": 946.5044605671562,
+      "pressure": 0.24448879613850494,
+      "Y_p": 0.029576345981280006,
+      "max_chemical_KKT_residual_MeV": 7.690690745221218e-05,
+      "electron_pde_residual": 5.372646771917289e-13,
+      "charge_constraint_error": 5.149960319306146e-19,
+      "baryon_constraint_error": 0.0,
+      "radius_stationarity_MeV": 1.2849564882897366e-07
+    },
+    {
+      "label": "GPPVA_TW_warm1",
+      "model_id": "GPPVA_TW",
+      "n_b": 0.06,
+      "points": 192,
+      "geometry": "slab",
+      "numerical_status": "STATIONARY",
+      "energy_per_baryon": 946.5044605671554,
+      "pressure": 0.24448885914586782,
+      "Y_p": 0.029576347648672837,
+      "max_chemical_KKT_residual_MeV": 3.645209335445543e-05,
+      "electron_pde_residual": 1.449756981131145e-12,
+      "charge_constraint_error": 3.3881317890172014e-19,
+      "baryon_constraint_error": 6.938893903907228e-17,
+      "radius_stationarity_MeV": 9.661842528298215e-09
+    },
+    {
+      "label": "GPPVA_TW_cold",
+      "model_id": "GPPVA_TW",
+      "n_b": 0.06,
+      "points": 192,
+      "geometry": "slab",
+      "numerical_status": "STATIONARY",
+      "energy_per_baryon": 946.5044605671555,
+      "pressure": 0.2444888593238943,
+      "Y_p": 0.02957634780053687,
+      "max_chemical_KKT_residual_MeV": 6.044783958714106e-06,
+      "electron_pde_residual": 5.620504062164855e-14,
+      "charge_constraint_error": 5.082197683525802e-19,
+      "baryon_constraint_error": 4.163336342344337e-17,
+      "radius_stationarity_MeV": 6.343726253211595e-10
+    },
+    {
+      "label": "GPPVA_DDME2_warm0",
+      "model_id": "GPPVA_DDME2",
+      "n_b": 0.06,
+      "points": 192,
+      "geometry": "slab",
+      "numerical_status": "STATIONARY",
+      "energy_per_baryon": 946.3293724885261,
+      "pressure": 0.2903692835797358,
+      "Y_p": 0.030746342302070333,
+      "max_chemical_KKT_residual_MeV": 0.002546470697325276,
+      "electron_pde_residual": 6.55586696041155e-14,
+      "charge_constraint_error": 6.437450399132683e-19,
+      "baryon_constraint_error": 0.0,
+      "radius_stationarity_MeV": 6.147485009109013e-07
+    },
+    {
+      "label": "GPPVA_DDME2_warm1",
+      "model_id": "GPPVA_DDME2",
+      "n_b": 0.06,
+      "points": 192,
+      "geometry": "slab",
+      "numerical_status": "STATIONARY",
+      "energy_per_baryon": 946.329372488522,
+      "pressure": 0.2903690910979293,
+      "Y_p": 0.03074635656182109,
+      "max_chemical_KKT_residual_MeV": 6.1875613255324424e-06,
+      "electron_pde_residual": 6.102063299096017e-14,
+      "charge_constraint_error": 1.1993986533120893e-18,
+      "baryon_constraint_error": 2.0816681711721685e-17,
+      "radius_stationarity_MeV": 4.5587169022337504e-10
+    },
+    {
+      "label": "GPPVA_DDME2_cold",
+      "model_id": "GPPVA_DDME2",
+      "n_b": 0.06,
+      "points": 192,
+      "geometry": "slab",
+      "numerical_status": "STATIONARY",
+      "energy_per_baryon": 946.3293724885219,
+      "pressure": 0.29036909056305404,
+      "Y_p": 0.030746356386273096,
+      "max_chemical_KKT_residual_MeV": 7.980129794304958e-06,
+      "electron_pde_residual": 5.102862576933376e-14,
+      "charge_constraint_error": 5.488773498207866e-19,
+      "baryon_constraint_error": 2.7755575615628914e-17,
+      "radius_stationarity_MeV": 1.6440400111885264e-10
+    }
+  ],
+  "independent_review": {
+    "final_70digit_dense_max_pde": 2.733e-13,
+    "final_70digit_dense_max_relative_neutrality": 6.205e-16,
+    "references": [
+      "../independent_review/ELECTRON_ORACLE.json",
+      "../independent_review/FINAL_DENSE_ELECTRON_ORACLE.json"
+    ]
+  },
+  "scope": "Electron reduction and finite starts/grids only; no global minimum, continuum convergence or complete EOS claim.",
+  "report_sha256": "d48bb2f4cb64234582568c56f5f11925185a89102e9fba89efcb385f41616f4f",
+  "environment": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "numpy": "2.4.2",
+    "scipy": "1.17.0",
+    "float64_epsilon": 2.220446049250313e-16,
+    "longdouble_epsilon": 1.0842021724855044e-19,
+    "threads": {
+      "OPENBLAS_NUM_THREADS": 1,
+      "OMP_NUM_THREADS": 1
+    }
+  }
+}

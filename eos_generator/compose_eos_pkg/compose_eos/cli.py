@@ -1,4 +1,4 @@
-r"""Command-line interface for the ``compose_eos`` package (v3.1.0).
+r"""Command-line interface for the ``compose_eos`` package (v3.3.1).
 
 Supports:
   - ``compose-eos check <dir>`` (or ``compose-eos audit <dir>``)
@@ -9,11 +9,13 @@ Supports:
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 
+from . import __version__
 from .eos_data import EOSData
-from .io import read_compose, write_compose
+from .io import read_compose, verify_compose_readback, write_compose, write_compose_verified
 from .consistency import check_consistency
 from .reconstruct import fill_density_gap
 from .matching import METHODS, match_crust_core, solve_star_at_target_mass
@@ -40,8 +42,8 @@ def _cmd_reconstruct(args) -> int:
     if not report["overall"]["pass_"]:
         print("\nrefusing to write a reconstructed EOS that fails hard consistency gates", file=sys.stderr)
         return 2
-    write_compose(args.output, rec, copy_from=args.input)
-    print(f"\nreconstructed table written to {args.output}")
+    write_compose_verified(args.output, rec, copy_from=args.input)
+    print(f"\nreconstructed table written and readback-verified in {args.output}")
 
     if args.figures:
         from .plotting import make_figures
@@ -65,8 +67,8 @@ def _cmd_rebuild(args) -> int:
     if not report["overall"]["pass_"]:
         print("\nrefusing to write a rebuilt EOS that fails hard consistency gates", file=sys.stderr)
         return 2
-    write_compose(args.output, rec, copy_from=args.input)
-    print(f"\nrebuilt table written to {args.output}")
+    write_compose_verified(args.output, rec, copy_from=args.input)
+    print(f"\nrebuilt table written and readback-verified in {args.output}")
 
     if args.figures:
         from .plotting import make_figures
@@ -91,8 +93,16 @@ def _cmd_match(args) -> int:
         if not rep["overall"]["pass_"] and not args.allow_failed:
             print(f"[{m}] hard consistency gate failed; refusing to write. Use --allow-failed only for an explicitly diagnostic export.", file=sys.stderr)
             return 2
+        if args.tov and info.get("phase_transition_order") is not None:
+            print(
+                f"[{m}] TOV not run: this construction contains a finite density jump, "
+                "while match --tov currently supports only smooth barotropes. "
+                "Use a phase-interface-aware TOV export/solver path.",
+                file=sys.stderr,
+            )
+            return 2
         out_sub = os.path.join(args.out, f"{cr_name}__{co_name}__{m}") if len(methods) > 1 else args.out
-        write_compose(out_sub, eos_m, copy_from=args.crust)
+        write_compose_verified(out_sub, eos_m, copy_from=args.crust)
         msg = (
             f"[{m:10s}] construction={info['construction_kind']} | "
             f"dcs2_L={info['dcs2_left']:.2e}, dcs2_R={info['dcs2_right']:.2e} | "
@@ -107,17 +117,39 @@ def _cmd_match(args) -> int:
     return 0
 
 
+def _cmd_verify_readback(args) -> int:
+    data = read_compose(args.input)
+    receipt = verify_compose_readback(
+        args.input,
+        data,
+        source_dir=args.source,
+        failure_receipt_path=os.path.join(args.input, "eos.readback_failure_receipt.json"),
+    )
+    report = check_consistency(data, verbose=False)
+    receipt["consistency_overall"] = report["overall"]
+    receipt["C3"] = {"status": report["C3"]["status"], "pass_": report["C3"].get("pass_")}
+    receipt["C4"] = {"status": report["C4"]["status"], "pass_": report["C4"].get("pass_")}
+    print(json.dumps(receipt, indent=2, sort_keys=True))
+    return 0 if report["overall"]["pass_"] else 2
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="compose-eos",
         description="Parse, check, reconstruct, match, and plot a CompOSE EOS table.",
     )
+    p.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     sub = p.add_subparsers(dest="command", required=True)
 
     for cmd_name in ("check", "audit"):
         pc = sub.add_parser(cmd_name, help="run thermodynamic consistency checks")
         pc.add_argument("input", help="CompOSE table directory")
         pc.set_defaults(func=_cmd_check)
+
+    pv = sub.add_parser("verify-readback", help="verify CompOSE table readback, C3/C4, and SHA256 hashes")
+    pv.add_argument("input", help="CompOSE table directory")
+    pv.add_argument("--source", default=None, help="optional source CompOSE directory for source SHA256 tracking")
+    pv.set_defaults(func=_cmd_verify_readback)
 
     pr = sub.add_parser("reconstruct", help="fill the density gap and write a new table")
     pr.add_argument("input", help="source CompOSE table directory")
@@ -160,7 +192,11 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv=None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    return args.func(args)
+    try:
+        return int(args.func(args))
+    except Exception as exc:
+        print(f"compose-eos error: {exc}", file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":

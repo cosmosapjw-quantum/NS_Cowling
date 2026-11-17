@@ -1,0 +1,990 @@
+{
+  "git_head": "abc504d855f6be4bea175bcc9215b83c896fa1c5",
+  "git_tracked_tree_dirty": false,
+  "fortran_executable_sha256": "ac7d94eedc3c14946d146b42899ea73dc2139a1ea58be0fd012f74b6fee0e59d",
+  "configured_attempts": 80,
+  "evaluated_attempts": 50,
+  "not_evaluated_source_incomplete": 30,
+  "total_survivors": 10,
+  "survivors_css": 10,
+  "survivors_maxwell": 0,
+  "distinct_source_survivors": 10,
+  "source_duplicate_groups": {
+    "crust": [],
+    "core": []
+  },
+  "source_identity_sha256": {
+    "crust": {
+      "SPG_M1": "b5b14aefcbc380d8c5d026585e5584e9994bce4ef02ca51084fc591f31c353a3",
+      "SPG_M2": null,
+      "SPG_M3": null,
+      "SPG_M4": null,
+      "SPG_M5": "f121c7bc39c4bf698be61edd31c4b361f7d2c7f5169438f4cfb11ed134c4b570",
+      "GPPVA_DD2": "5c269f0387a46cff3ca97a378a4eae11277d5ec39368450c8578278d2d822abf",
+      "GPPVA_DDME2": "a1607b7e2477c89912f2bd7d67b279fe8d70782bffd19e6dc916feb7c653a1dd",
+      "GPPVA_TW": "a4e0662abef0156c383e4a951c94656b2300c5b49fe2321c61f7640d88ec9e94"
+    },
+    "core": {
+      "APR_APR": "0db09795f2832fab7b40c73dc338f772037154731131c431d584e63327263b09",
+      "BBB_BHF2": "59dfedba7acefb7479621d094a67494409add20e044b08de864bed5ab907c3df",
+      "GM_GM1": "e03a3fbac24d9a98964827f8ea736f1aaa170ba549d12407b2858a8369c24d39",
+      "RG_SLY4": "1a4e9cd42ff6e57169f5d83b55709fe3ec0f08760641ab8751f484d6bf619f1a",
+      "RG_KDE0v1": "51d4a000c9eb510e6cc8f5f987eb2bf26727cab47de0ac52cf094574f06d1509"
+    }
+  },
+  "failures_by_category": {
+    "implementation_convention": 25,
+    "native_consistency_gate": 5,
+    "input_contract": 10,
+    "data_provenance": 20,
+    "source_reconstruction_rejected": 10
+  },
+  "by_method": {
+    "maxwell": {
+      "configured": 40,
+      "evaluated": 25,
+      "survivors": 0,
+      "failures_by_category": {
+        "implementation_convention": 25,
+        "data_provenance": 10,
+        "source_reconstruction_rejected": 5
+      }
+    },
+    "css": {
+      "configured": 40,
+      "evaluated": 25,
+      "survivors": 10,
+      "failures_by_category": {
+        "native_consistency_gate": 5,
+        "input_contract": 10,
+        "data_provenance": 10,
+        "source_reconstruction_rejected": 5
+      }
+    }
+  },
+  "built_at_utc": "2026-11-16T00:07:32.061223+00:00",
+  "crust_root": "download/reconstruction_v4",
+  "core_root": "eos_generator/eos_data",
+  "schema": "ns-cowling.corrected-census-receipt.v1",
+  "manifest_sha256": "d4ea65574e07b84857b9221c17877cac9fafecd771599f544ca2f60c4c3e2f03",
+  "runtime_python": "3.12.3",
+  "command": "NS_COWLING_MATCH_OUT_ROOT=download/matched_runs/20261116_headabc504d_v4crust_census python3 scripts/match_core_crust.py",
+  "root": "download/matched_runs/20261116_headabc504d_v4crust_census",
+  "parent_baseline": "e434bee2b0a39bee0c5f7f52824f3a31879aa1bf",
+  "supersedes": "CENSUS_e434bee.json (SPG crusts used physical nucleon masses)",
+  "crust_regeneration_index_sha256": "c39d90220f8c10ca69d32130caaaf9e6e961e62f3d04db1ef5109204307acd74",
+  "pairs": [
+    {
+      "pair_id": "SPG_M1__APR_APR__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "205d940eddf7f8a8089235fbcfca658de982efe035322dbf127910a005ec8739",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "SPG_M1__APR_APR__css",
+      "outcome": "FAILED",
+      "stage": "consistency",
+      "failure_category": "native_consistency_gate",
+      "native_category": null,
+      "pair_report_sha256": "9070ad754fdf7e4e67926cdb06775e4989cb8cc49b1915e7980c22424743d222",
+      "error": "native consistency overall=FAIL; failed_checks=C10"
+    },
+    {
+      "pair_id": "SPG_M1__BBB_BHF2__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "6c2cc73c68e634b25065693387dfc4f553d7b6b7795d1af0969a70252c1fdfc9",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "SPG_M1__BBB_BHF2__css",
+      "outcome": "SURVIVED",
+      "stage": "complete",
+      "failure_category": null,
+      "native_category": null,
+      "pair_report_sha256": "08bcdc82b813a1cfca4b772f5ef504644b1b513c43519ec4b71c3d5087dc1776",
+      "error": null
+    },
+    {
+      "pair_id": "SPG_M1__GM_GM1__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "05b26a260bedb34c2e3ac85f664b4a3b4a533cdd04631de0a19f059f7a9509b0",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "SPG_M1__GM_GM1__css",
+      "outcome": "SURVIVED",
+      "stage": "complete",
+      "failure_category": null,
+      "native_category": null,
+      "pair_report_sha256": "3effd19c235b85ca8bf975acca55fd7d124fc019c4ed30f7ee0f8040f9fc926b",
+      "error": null
+    },
+    {
+      "pair_id": "SPG_M1__RG_SLY4__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "addf1f76e7973a1953edaa451b6bb13c500d23295ee908c3ddf47e2499c916dc",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "SPG_M1__RG_SLY4__css",
+      "outcome": "FAILED",
+      "stage": "css",
+      "failure_category": "input_contract",
+      "native_category": null,
+      "pair_report_sha256": "bba268813d0519e0a1c12dfb1f9279827923006b5849d6e3e73e6c3087965278",
+      "error": "NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: native matching requires beta-equilibrated cold barotropes"
+    },
+    {
+      "pair_id": "SPG_M1__RG_KDE0v1__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "20841ed0a6a6223bde38024a065cdfeb6e07b4eab4f8cdb056a3960becb28b8b",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "SPG_M1__RG_KDE0v1__css",
+      "outcome": "FAILED",
+      "stage": "css",
+      "failure_category": "input_contract",
+      "native_category": null,
+      "pair_report_sha256": "67796812b91cfa3a5f3bc46305dcd8fc1319e9ca0d2e8b6284da4d75891fc029",
+      "error": "NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: native matching requires beta-equilibrated cold barotropes"
+    },
+    {
+      "pair_id": "SPG_M2__APR_APR__maxwell",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "data_provenance",
+      "native_category": null,
+      "pair_report_sha256": "7fdd0056f40505ed1038e7a184be7cda34147710a120d92c774c88411c4b27c7",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)"
+    },
+    {
+      "pair_id": "SPG_M2__APR_APR__css",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "data_provenance",
+      "native_category": null,
+      "pair_report_sha256": "e7be91e70abe655df7939db379c5419de5bed4dd0ed4189e5b9e1d7964959216",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)"
+    },
+    {
+      "pair_id": "SPG_M2__BBB_BHF2__maxwell",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "data_provenance",
+      "native_category": null,
+      "pair_report_sha256": "978ba1cb9aab8a7b8b961c0b95c04409dc325a76995b59a5a67e3eb45c289559",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)"
+    },
+    {
+      "pair_id": "SPG_M2__BBB_BHF2__css",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "data_provenance",
+      "native_category": null,
+      "pair_report_sha256": "d19bfbf60c7864722f55f97b285f610a1130a7668baf5cf8854eaefaea9666d3",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)"
+    },
+    {
+      "pair_id": "SPG_M2__GM_GM1__maxwell",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "data_provenance",
+      "native_category": null,
+      "pair_report_sha256": "44177e2c007ff65637f0df197dee8fd2272ec0d8a8aa55b9011063b2d8232464",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)"
+    },
+    {
+      "pair_id": "SPG_M2__GM_GM1__css",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "data_provenance",
+      "native_category": null,
+      "pair_report_sha256": "d0bcf26f3211f375427b01f6a4135f34e18f551653aa353664b90039d7b168ac",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)"
+    },
+    {
+      "pair_id": "SPG_M2__RG_SLY4__maxwell",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "data_provenance",
+      "native_category": null,
+      "pair_report_sha256": "287428fac7ff098176792377dde3621413a5da29fc55a236497060a25200cb13",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)"
+    },
+    {
+      "pair_id": "SPG_M2__RG_SLY4__css",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "data_provenance",
+      "native_category": null,
+      "pair_report_sha256": "5aae0f0a20033ead16b25fa405d1e8150712f6fed5ccfd88c47761cecaa7e692",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)"
+    },
+    {
+      "pair_id": "SPG_M2__RG_KDE0v1__maxwell",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "data_provenance",
+      "native_category": null,
+      "pair_report_sha256": "83b3e01fbdad6b1a8f21c9bfdcbbbf3f8307f7abf84af3d1882aa0b34adcf024",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)"
+    },
+    {
+      "pair_id": "SPG_M2__RG_KDE0v1__css",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "data_provenance",
+      "native_category": null,
+      "pair_report_sha256": "ff09c75b9d9aac996a40f2e5e0a67b182d5dfcebfe3caeca9cc3ac2fe86008f8",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)"
+    },
+    {
+      "pair_id": "SPG_M3__APR_APR__maxwell",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "source_reconstruction_rejected",
+      "native_category": null,
+      "pair_report_sha256": "7506baa5b9599eee6418de81722d172484ea8fa66ae94e775f090c2a5d3ecb7c",
+      "error": "REJECTED: optimizer box-bound minimum inside the table at rows [1, 2]"
+    },
+    {
+      "pair_id": "SPG_M3__APR_APR__css",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "source_reconstruction_rejected",
+      "native_category": null,
+      "pair_report_sha256": "0ced0a9fb11d0b9c540adc0a1f3b5ecf58b743e296c95a77242e40e1c03f1b37",
+      "error": "REJECTED: optimizer box-bound minimum inside the table at rows [1, 2]"
+    },
+    {
+      "pair_id": "SPG_M3__BBB_BHF2__maxwell",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "source_reconstruction_rejected",
+      "native_category": null,
+      "pair_report_sha256": "5ade057d47b84dfd783da17761cc507d46b489b3c1b1514da61108ebf64e985c",
+      "error": "REJECTED: optimizer box-bound minimum inside the table at rows [1, 2]"
+    },
+    {
+      "pair_id": "SPG_M3__BBB_BHF2__css",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "source_reconstruction_rejected",
+      "native_category": null,
+      "pair_report_sha256": "285677e4a967755098316aac69f9a092a65eeb598402aab5925b5a729e3d1392",
+      "error": "REJECTED: optimizer box-bound minimum inside the table at rows [1, 2]"
+    },
+    {
+      "pair_id": "SPG_M3__GM_GM1__maxwell",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "source_reconstruction_rejected",
+      "native_category": null,
+      "pair_report_sha256": "9041d08c2cbd4cfbf2bb110f264f11fb7fd83af402a6bd44f564fdd8aa8d6c0a",
+      "error": "REJECTED: optimizer box-bound minimum inside the table at rows [1, 2]"
+    },
+    {
+      "pair_id": "SPG_M3__GM_GM1__css",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "source_reconstruction_rejected",
+      "native_category": null,
+      "pair_report_sha256": "3d5e8b6a64cc8a11c423d0001d268908d978a9c94e21b7b38ee999a788ccb7e0",
+      "error": "REJECTED: optimizer box-bound minimum inside the table at rows [1, 2]"
+    },
+    {
+      "pair_id": "SPG_M3__RG_SLY4__maxwell",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "source_reconstruction_rejected",
+      "native_category": null,
+      "pair_report_sha256": "7989ca71a754fe4aa1ad082228edf8844e43a1e78c601e241d0b633ad483e26a",
+      "error": "REJECTED: optimizer box-bound minimum inside the table at rows [1, 2]"
+    },
+    {
+      "pair_id": "SPG_M3__RG_SLY4__css",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "source_reconstruction_rejected",
+      "native_category": null,
+      "pair_report_sha256": "ce4a692216b7f05dae80f12f78fac2d85dd87e4234806f6a7c44379a03f4b87d",
+      "error": "REJECTED: optimizer box-bound minimum inside the table at rows [1, 2]"
+    },
+    {
+      "pair_id": "SPG_M3__RG_KDE0v1__maxwell",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "source_reconstruction_rejected",
+      "native_category": null,
+      "pair_report_sha256": "b7921afd062fdd13a5149014662707eab3f23bb2de09a65d4f1a19f7cdde51d6",
+      "error": "REJECTED: optimizer box-bound minimum inside the table at rows [1, 2]"
+    },
+    {
+      "pair_id": "SPG_M3__RG_KDE0v1__css",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "source_reconstruction_rejected",
+      "native_category": null,
+      "pair_report_sha256": "5b1ef82ac62b1c6c52220e66187679de4772f7bc7312c836705fe03199b0fd35",
+      "error": "REJECTED: optimizer box-bound minimum inside the table at rows [1, 2]"
+    },
+    {
+      "pair_id": "SPG_M4__APR_APR__maxwell",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "data_provenance",
+      "native_category": null,
+      "pair_report_sha256": "a7e22ffee98da651f29c20fc38e3f9a26a7a2105273524ace29456ed04060190",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)"
+    },
+    {
+      "pair_id": "SPG_M4__APR_APR__css",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "data_provenance",
+      "native_category": null,
+      "pair_report_sha256": "89a7252030caccb9b1926fb6cef7763bf20490c3ce3b725357319f87102cd80c",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)"
+    },
+    {
+      "pair_id": "SPG_M4__BBB_BHF2__maxwell",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "data_provenance",
+      "native_category": null,
+      "pair_report_sha256": "c38f7ae42a7beeca0e18fdf4c54cc285331ad72768a582280f0f046d5c082c81",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)"
+    },
+    {
+      "pair_id": "SPG_M4__BBB_BHF2__css",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "data_provenance",
+      "native_category": null,
+      "pair_report_sha256": "cb5488d95d6c83fee3fb29573ec61f37e5bf4899e8198e6caff362d191ceb428",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)"
+    },
+    {
+      "pair_id": "SPG_M4__GM_GM1__maxwell",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "data_provenance",
+      "native_category": null,
+      "pair_report_sha256": "87acbd31ca5c9d32e9b1d35b45722338978bb4e3137770b7859d5ce75d3056fe",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)"
+    },
+    {
+      "pair_id": "SPG_M4__GM_GM1__css",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "data_provenance",
+      "native_category": null,
+      "pair_report_sha256": "4dd3e2920bddfe3d37dc83df967e7dd151c6748b0b69ac48e08eb51194a9038f",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)"
+    },
+    {
+      "pair_id": "SPG_M4__RG_SLY4__maxwell",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "data_provenance",
+      "native_category": null,
+      "pair_report_sha256": "d8eb44462c3c414f027ae88f085520ff71c03c6e19c54fd1b47181938910d48e",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)"
+    },
+    {
+      "pair_id": "SPG_M4__RG_SLY4__css",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "data_provenance",
+      "native_category": null,
+      "pair_report_sha256": "3c1b6fef83ccf71bca260fe8fb57fc8cf4ec2a3b6f43472d3ca59b80982ab867",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)"
+    },
+    {
+      "pair_id": "SPG_M4__RG_KDE0v1__maxwell",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "data_provenance",
+      "native_category": null,
+      "pair_report_sha256": "d706b30d0362ff74a3aefd3b7200d024b3972e5e44e370816728d609cf938d49",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)"
+    },
+    {
+      "pair_id": "SPG_M4__RG_KDE0v1__css",
+      "outcome": "NOT_EVALUATED_SOURCE_INCOMPLETE",
+      "stage": "source",
+      "failure_category": "data_provenance",
+      "native_category": null,
+      "pair_report_sha256": "45540818016e2227ca71b0a32c002a3bd045d1d5f969ffb11099838fbd83850c",
+      "error": "NOT_GENERATED: parameter set is a placeholder identical to SPG_M1 (Scurto 2024 publishes M1..M5 couplings only as curves)"
+    },
+    {
+      "pair_id": "SPG_M5__APR_APR__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "cd853997beeedad7db4f2ef9d1328087f0c449ad71c4e58545d84724711d14bd",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "SPG_M5__APR_APR__css",
+      "outcome": "FAILED",
+      "stage": "consistency",
+      "failure_category": "native_consistency_gate",
+      "native_category": null,
+      "pair_report_sha256": "cd0fbb0dbf25220f995b265d6f60ac51430f477cf64446084013046341dd4ba1",
+      "error": "native consistency overall=FAIL; failed_checks=C10"
+    },
+    {
+      "pair_id": "SPG_M5__BBB_BHF2__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "62d3b53e628045045f5de58baab6d0b00a245e31c67097a8a42789f0e80be249",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "SPG_M5__BBB_BHF2__css",
+      "outcome": "SURVIVED",
+      "stage": "complete",
+      "failure_category": null,
+      "native_category": null,
+      "pair_report_sha256": "3323d15c5de7be993e66314c5c9126afc5eccf60f56d431f8b6ce5666c876124",
+      "error": null
+    },
+    {
+      "pair_id": "SPG_M5__GM_GM1__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "02550d659e8410634225b55f82db49de3b08e24ed7a467648993c874780c841c",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "SPG_M5__GM_GM1__css",
+      "outcome": "SURVIVED",
+      "stage": "complete",
+      "failure_category": null,
+      "native_category": null,
+      "pair_report_sha256": "d9059863dd70f45ce4c4ac9c8f529eca9e176ddc47e24271c68dcdc1fc7ca026",
+      "error": null
+    },
+    {
+      "pair_id": "SPG_M5__RG_SLY4__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "0038f598e6b7cab951a66443170b73faf545010586ea1ccc6fd97654b9fbc674",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "SPG_M5__RG_SLY4__css",
+      "outcome": "FAILED",
+      "stage": "css",
+      "failure_category": "input_contract",
+      "native_category": null,
+      "pair_report_sha256": "1d43f56e11f151586a193b6a29c67f2521a3f2fd6f7037c0f455249cac793a53",
+      "error": "NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: native matching requires beta-equilibrated cold barotropes"
+    },
+    {
+      "pair_id": "SPG_M5__RG_KDE0v1__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "82122690c5609c812fbd68f1660893d29306c0a26f67b949131d7e93be8dfd3d",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "SPG_M5__RG_KDE0v1__css",
+      "outcome": "FAILED",
+      "stage": "css",
+      "failure_category": "input_contract",
+      "native_category": null,
+      "pair_report_sha256": "f3e84972059e503da0d6be2d806d765083a3b166385aa088306292add1015147",
+      "error": "NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: native matching requires beta-equilibrated cold barotropes"
+    },
+    {
+      "pair_id": "GPPVA_DD2__APR_APR__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "14307efabe0a6a4b0921d107a2659fc41fefc5e457e939f4a478c3246ff3aeb8",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "GPPVA_DD2__APR_APR__css",
+      "outcome": "FAILED",
+      "stage": "consistency",
+      "failure_category": "native_consistency_gate",
+      "native_category": null,
+      "pair_report_sha256": "65136f40e7b9c2fbed13a5715a94ad7f5dd9ff344def7a27116d441ebd54b8db",
+      "error": "native consistency overall=FAIL; failed_checks=C10"
+    },
+    {
+      "pair_id": "GPPVA_DD2__BBB_BHF2__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "1c0316d0167eddf221239dcaede6d112c122b9e6318270bdb3a5550a62596c28",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "GPPVA_DD2__BBB_BHF2__css",
+      "outcome": "SURVIVED",
+      "stage": "complete",
+      "failure_category": null,
+      "native_category": null,
+      "pair_report_sha256": "69d00485be6cf3e800ee9ef9607bb0251e0854117d0a75845ab0bea240b5908f",
+      "error": null
+    },
+    {
+      "pair_id": "GPPVA_DD2__GM_GM1__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "53c344458cf2cd837906e39fc45d4bf6691b8af42fc0792376e84fee4904fdf1",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "GPPVA_DD2__GM_GM1__css",
+      "outcome": "SURVIVED",
+      "stage": "complete",
+      "failure_category": null,
+      "native_category": null,
+      "pair_report_sha256": "a18bd27f896aa7217a47311f3e7061d4bee4a61a543419d056fd8e739c600f9a",
+      "error": null
+    },
+    {
+      "pair_id": "GPPVA_DD2__RG_SLY4__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "7e7c9632347554ff1a42871063031baaf83e6e7769af6fe3a83d3c15e6ecef99",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "GPPVA_DD2__RG_SLY4__css",
+      "outcome": "FAILED",
+      "stage": "css",
+      "failure_category": "input_contract",
+      "native_category": null,
+      "pair_report_sha256": "021773fa162cecef243c558867e10e670c18440a8fcf41b75c9e6ed061ee9821",
+      "error": "NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: native matching requires beta-equilibrated cold barotropes"
+    },
+    {
+      "pair_id": "GPPVA_DD2__RG_KDE0v1__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "0a8a6017326fc097ee9e81be4c9d63ea5279b7193a07797fb68a615b4726f02c",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "GPPVA_DD2__RG_KDE0v1__css",
+      "outcome": "FAILED",
+      "stage": "css",
+      "failure_category": "input_contract",
+      "native_category": null,
+      "pair_report_sha256": "ae6590b2e57eb8603b0a232d7cc88df77c3a499bbc91b048c492dd1e627e25e1",
+      "error": "NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: native matching requires beta-equilibrated cold barotropes"
+    },
+    {
+      "pair_id": "GPPVA_DDME2__APR_APR__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "0ca67eae0ee5cc0c6802cd6d0c4275b1f664c1a32908a9fba0aec0f350f537f5",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "GPPVA_DDME2__APR_APR__css",
+      "outcome": "FAILED",
+      "stage": "consistency",
+      "failure_category": "native_consistency_gate",
+      "native_category": null,
+      "pair_report_sha256": "78858104a3df17d532cb7aca86ec0dcd82102b675ab44b7fc0fbb08ac812e184",
+      "error": "native consistency overall=FAIL; failed_checks=C10"
+    },
+    {
+      "pair_id": "GPPVA_DDME2__BBB_BHF2__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "0257dd312905be72e42cb6becb91e3b3fc91fc8018258bc9db66f5962490728b",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "GPPVA_DDME2__BBB_BHF2__css",
+      "outcome": "SURVIVED",
+      "stage": "complete",
+      "failure_category": null,
+      "native_category": null,
+      "pair_report_sha256": "cde2993cafe9d4cb79f1271640c946c3dcd4e8352411784b3e493894d83b4d2f",
+      "error": null
+    },
+    {
+      "pair_id": "GPPVA_DDME2__GM_GM1__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "214880d822691b9c2634004e0e3daa1e0cbd41f66bc961a3cea536100cd3ba0b",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "GPPVA_DDME2__GM_GM1__css",
+      "outcome": "SURVIVED",
+      "stage": "complete",
+      "failure_category": null,
+      "native_category": null,
+      "pair_report_sha256": "47d35b705a25b16be5b2769ee038da07d8a6514c5dc94e5125c03b7ee5abffd6",
+      "error": null
+    },
+    {
+      "pair_id": "GPPVA_DDME2__RG_SLY4__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "5544a03c2ec582347a8fe3fce117986b5c8ac9719d7b478d8bc48fcae1487bc8",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "GPPVA_DDME2__RG_SLY4__css",
+      "outcome": "FAILED",
+      "stage": "css",
+      "failure_category": "input_contract",
+      "native_category": null,
+      "pair_report_sha256": "5dc3e93551be027db59e1b073517a8de27d65b1967edc2bf44e83e41aa6ac433",
+      "error": "NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: native matching requires beta-equilibrated cold barotropes"
+    },
+    {
+      "pair_id": "GPPVA_DDME2__RG_KDE0v1__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "54378ced35121802304def63d4e5ab2c1d94b10bb82b753aaf13425ec7d4297b",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "GPPVA_DDME2__RG_KDE0v1__css",
+      "outcome": "FAILED",
+      "stage": "css",
+      "failure_category": "input_contract",
+      "native_category": null,
+      "pair_report_sha256": "9733c45e331c73040a64bfb06f20e781dfd2f8dce9bf4bd34b59ef50a6ff92f3",
+      "error": "NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: native matching requires beta-equilibrated cold barotropes"
+    },
+    {
+      "pair_id": "GPPVA_TW__APR_APR__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "fe0c71072c8071c3cfb4c8837fb9988ff62fcbb08ab0cdf7a30070343293600d",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "GPPVA_TW__APR_APR__css",
+      "outcome": "FAILED",
+      "stage": "consistency",
+      "failure_category": "native_consistency_gate",
+      "native_category": null,
+      "pair_report_sha256": "e72b034b9ae4deaf286c8e185dbbb6a729e635d2999d0de83bb56171c8951852",
+      "error": "native consistency overall=FAIL; failed_checks=C10"
+    },
+    {
+      "pair_id": "GPPVA_TW__BBB_BHF2__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "df893e054be8b18d67180572002cad3b093cc6c4170f1d98f2cbec849682ecd9",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "GPPVA_TW__BBB_BHF2__css",
+      "outcome": "SURVIVED",
+      "stage": "complete",
+      "failure_category": null,
+      "native_category": null,
+      "pair_report_sha256": "f89c6540fcb35b6c93c32ea53ecfe47689ab01dd0837da050e34b60e979864d4",
+      "error": null
+    },
+    {
+      "pair_id": "GPPVA_TW__GM_GM1__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "5d65fedfa184d02f4c90bf5bedd9a2d46f0d3c6782eb8c3c53734ba7af63152d",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "GPPVA_TW__GM_GM1__css",
+      "outcome": "SURVIVED",
+      "stage": "complete",
+      "failure_category": null,
+      "native_category": null,
+      "pair_report_sha256": "c6d355ea34b2484e6c7c29695d6c6e2d1adc1eb083237d9fefbf7ad2834a649e",
+      "error": null
+    },
+    {
+      "pair_id": "GPPVA_TW__RG_SLY4__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "075792638f820a9130c94133a66f838034decf0daa3305de96045241e03d01fe",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "GPPVA_TW__RG_SLY4__css",
+      "outcome": "FAILED",
+      "stage": "css",
+      "failure_category": "input_contract",
+      "native_category": null,
+      "pair_report_sha256": "8050f8f6c97cfba4a3cdfb000821ec2032e39902e4a61f8acbb26e33f56a90f4",
+      "error": "NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: native matching requires beta-equilibrated cold barotropes"
+    },
+    {
+      "pair_id": "GPPVA_TW__RG_KDE0v1__maxwell",
+      "outcome": "FAILED",
+      "stage": "maxwell",
+      "failure_category": "implementation_convention",
+      "native_category": "MASS_CONVENTION_FAIL",
+      "pair_report_sha256": "113306c28328a9efcd47293c41aa41959575f40fc21cea6130042860a544986d",
+      "error": "NativeExecutionError: Fortran operation 'maxwell-transition' failed with exit code 3: phase tables must use the same neutron and proton rest-mass conventions"
+    },
+    {
+      "pair_id": "GPPVA_TW__RG_KDE0v1__css",
+      "outcome": "FAILED",
+      "stage": "css",
+      "failure_category": "input_contract",
+      "native_category": null,
+      "pair_report_sha256": "a551c0b78ebcb6221422ef908f8c2208f813995bab392fd55de360580465f543",
+      "error": "NativeExecutionError: Fortran operation 'match-core' failed with exit code 3: native matching requires beta-equilibrated cold barotropes"
+    }
+  ],
+  "survivors": [
+    {
+      "pair_id": "SPG_M1__BBB_BHF2__css",
+      "output_sha256": {
+        "eos.nb": "1d23c9ac2cb7b78ad82f3b74fbd61f8123afcd1503875ade43c8dff02f62954a",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "c6d2f22780d54d7680bbe8f0ee4a30d0a5ecf9b9491a698da8cf7d62f430f6f1"
+      },
+      "crust_row_i1": 10,
+      "n_t_fm3": 0.11158653489,
+      "P_t_MeV_fm3": 0.9277826798418546,
+      "mu_t_MeV": 957.1497202991441,
+      "cs2": 0.08376522809844278,
+      "delta_nb_fm3": 0.04337936004701931,
+      "delta_eps_MeV_fm3": 41.520542335760396,
+      "seidov_ratio": 0.7642245244025738,
+      "source_euler_relative_residual": 3.6206782185295305e-16,
+      "admission": "ADMITTED"
+    },
+    {
+      "pair_id": "SPG_M1__GM_GM1__css",
+      "output_sha256": {
+        "eos.nb": "fc15575950935b86f01e09950bf3bf130caea8b221538777dc8f26ce5db7b727",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "603a27440ac37e23146c9d39bb106d6d05cd249ffdc1ad283985aa2211954bb8"
+      },
+      "crust_row_i1": 10,
+      "n_t_fm3": 0.11158653489,
+      "P_t_MeV_fm3": 0.9277826798418546,
+      "mu_t_MeV": 957.1497202991441,
+      "cs2": 0.24155092290549063,
+      "delta_nb_fm3": 0.011956346002133758,
+      "delta_eps_MeV_fm3": 11.444013231742115,
+      "seidov_ratio": 0.21063779703456303,
+      "source_euler_relative_residual": 2.730133217957746e-11,
+      "admission": "ADMITTED"
+    },
+    {
+      "pair_id": "SPG_M5__BBB_BHF2__css",
+      "output_sha256": {
+        "eos.nb": "c68085875064d1245a3d3f8fb5b545feb93d22d7b1fdeebc621fa12251b7511a",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "3295ba6f74ebd1dbb151b718441c16790cd216498cdece88348e0384a2a7c601"
+      },
+      "crust_row_i1": 14,
+      "n_t_fm3": 0.039136947439,
+      "P_t_MeV_fm3": 0.041170517159976334,
+      "mu_t_MeV": 949.7121636210155,
+      "cs2": 0.015753523593619305,
+      "delta_nb_fm3": 0.023085648588226718,
+      "delta_eps_MeV_fm3": 21.92472126931924,
+      "seidov_ratio": 1.1771290781033,
+      "source_euler_relative_residual": 3.6206782185295305e-16,
+      "admission": "ADMITTED"
+    },
+    {
+      "pair_id": "SPG_M5__GM_GM1__css",
+      "output_sha256": {
+        "eos.nb": "8df12b97c87faeb964576ffdb6ab63fc1169dd9f4948b481b2cbb50c6d123257",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "559f9aac8fa6681f6d1ac32771d834efd9542b2f57d00fa3cf628082c5565f00"
+      },
+      "crust_row_i1": 14,
+      "n_t_fm3": 0.039136947439,
+      "P_t_MeV_fm3": 0.041170517159976334,
+      "mu_t_MeV": 949.7121636210155,
+      "cs2": 0.09711876920507956,
+      "delta_nb_fm3": 0.07057701563500926,
+      "delta_eps_MeV_fm3": 67.02785022063888,
+      "seidov_ratio": 3.5986971313463165,
+      "source_euler_relative_residual": 2.730133217957746e-11,
+      "admission": "ADMITTED"
+    },
+    {
+      "pair_id": "GPPVA_DD2__BBB_BHF2__css",
+      "output_sha256": {
+        "eos.nb": "8f5b4b4dbe2add192d3b011d772fc452c82cdae9213324000dd4a4a8a4512039",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "f3fa891047b42fb781cbc120754a6cf5612bb295345ad8153d99363f21059d28"
+      },
+      "crust_row_i1": 18,
+      "n_t_fm3": 0.059754941901,
+      "P_t_MeV_fm3": 0.28083151479660984,
+      "mu_t_MeV": 951.0782331420694,
+      "cs2": 0.026749743737619167,
+      "delta_nb_fm3": 0.02286117123212006,
+      "delta_eps_MeV_fm3": 21.74276234300305,
+      "seidov_ratio": 0.7576761413876968,
+      "source_euler_relative_residual": 3.6206782185295305e-16,
+      "admission": "ADMITTED"
+    },
+    {
+      "pair_id": "GPPVA_DD2__GM_GM1__css",
+      "output_sha256": {
+        "eos.nb": "54b86da440b2a164c2c03163b6318fe94c84fe3e2a4fe4e5fc7503aba957c151",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "4417ff8e6d823f30d18727b58e3875591403c5b2ac3cc2a73ac71a8cb5e6a94f"
+      },
+      "crust_row_i1": 18,
+      "n_t_fm3": 0.059754941901,
+      "P_t_MeV_fm3": 0.28083151479660984,
+      "mu_t_MeV": 951.0782331420694,
+      "cs2": 0.08816896989704501,
+      "delta_nb_fm3": 0.0472294740425354,
+      "delta_eps_MeV_fm3": 44.9189247246038,
+      "seidov_ratio": 1.5653023761985128,
+      "source_euler_relative_residual": 2.730133217957746e-11,
+      "admission": "ADMITTED"
+    },
+    {
+      "pair_id": "GPPVA_DDME2__BBB_BHF2__css",
+      "output_sha256": {
+        "eos.nb": "f26f507eb954f14a6cd0fbc2a535a3041abe31547526832276301bc191653b10",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "16c729c2b1aead711aaeb7f0172fbb7c5e729dd97188563128b4c8d4adaa74ff"
+      },
+      "crust_row_i1": 13,
+      "n_t_fm3": 0.055778877,
+      "P_t_MeV_fm3": 0.2714483837138104,
+      "mu_t_MeV": 950.9665590310968,
+      "cs2": 0.026753879825999208,
+      "delta_nb_fm3": 0.026486664192639904,
+      "delta_eps_MeV_fm3": 25.187931907486934,
+      "seidov_ratio": 0.9400807089522444,
+      "source_euler_relative_residual": 3.6206782185295305e-16,
+      "admission": "ADMITTED"
+    },
+    {
+      "pair_id": "GPPVA_DDME2__GM_GM1__css",
+      "output_sha256": {
+        "eos.nb": "4b4b13f9ed7775aace2ee59712d88c278be8fe8bdaf8fb60ec867c5323142b16",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "89654b9a772ab628d41a6bd4a25ca512008141f125f3220b7baf41f2bf7c9b80"
+      },
+      "crust_row_i1": 13,
+      "n_t_fm3": 0.055778877,
+      "P_t_MeV_fm3": 0.2714483837138104,
+      "mu_t_MeV": 950.9665590310968,
+      "cs2": 0.08664213243519908,
+      "delta_nb_fm3": 0.05066283359666119,
+      "delta_eps_MeV_fm3": 48.17866053618194,
+      "seidov_ratio": 1.7981559391051378,
+      "source_euler_relative_residual": 2.730133217957746e-11,
+      "admission": "ADMITTED"
+    },
+    {
+      "pair_id": "GPPVA_TW__BBB_BHF2__css",
+      "output_sha256": {
+        "eos.nb": "c5dc3f241dfe5a5814dcf3f163eb6e1089076d1ebd4e2902b3ccf26a128b5296",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "7c6308bc9da3a998e57e11671a7e0eff8e36aa83433607fead4171d215105304"
+      },
+      "crust_row_i1": 13,
+      "n_t_fm3": 0.056119551,
+      "P_t_MeV_fm3": 0.23001302291035583,
+      "mu_t_MeV": 950.4446274007694,
+      "cs2": 0.026729864700926843,
+      "delta_nb_fm3": 0.024409305212852027,
+      "delta_eps_MeV_fm3": 23.1996929981408,
+      "seidov_ratio": 0.8624653351436521,
+      "source_euler_relative_residual": 3.6206782185295305e-16,
+      "admission": "ADMITTED"
+    },
+    {
+      "pair_id": "GPPVA_TW__GM_GM1__css",
+      "output_sha256": {
+        "eos.nb": "48b1bdd50a639e8ec6c90eec6683962d1fe43f15e42879ed943f2913ca14d9e4",
+        "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+        "eos.thermo": "b80768c464da0482b44b4126cc9e4e0de9d0b33122271e55af671ea7ce2337d3"
+      },
+      "crust_row_i1": 13,
+      "n_t_fm3": 0.056119551,
+      "P_t_MeV_fm3": 0.23001302291035583,
+      "mu_t_MeV": 950.4446274007694,
+      "cs2": 0.08539874005396883,
+      "delta_nb_fm3": 0.048959269810761825,
+      "delta_eps_MeV_fm3": 46.53307495310326,
+      "seidov_ratio": 1.7299006537676649,
+      "source_euler_relative_residual": 2.730133217957746e-11,
+      "admission": "ADMITTED"
+    }
+  ]
+}

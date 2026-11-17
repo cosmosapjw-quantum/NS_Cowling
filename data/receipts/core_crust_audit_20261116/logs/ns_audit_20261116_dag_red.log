@@ -1,0 +1,33 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_historical_updater_preserves_later_audit _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-cosmosapjw/pytest-110/test_historical_updater_preser0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7b8c19ebeed0>
+capsys = <_pytest.capture.CaptureFixture object at 0x7b8bd83b8050>
+
+    def test_historical_updater_preserves_later_audit(tmp_path, monkeypatch, capsys):
+        source = Path(__file__).resolve().parents[2] / 'scripts/update_dags_20261116.py'
+        spec = importlib.util.spec_from_file_location('historical_dag_update', source)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        monkeypatch.setattr(module, 'ROOT', tmp_path)
+        data = tmp_path / 'data'
+        data.mkdir()
+        files = [data / 'ns_cowling_cloud_agent_dag.v1.json',
+                 data / 'eos390_native_fortran_unification_dag.v1.json']
+        payload = json.dumps({'nodes': [{'id': 'EOS-04', 'status': 'AUDITED_PROXY_ONLY'}], 'adversarial_reaudit_20261116': {'status': 'newer'}})
+        for path in files:
+            path.write_text(payload)
+        assert module.main() == 0
+>       assert all(path.read_text() == payload for path in files)
+E       assert False
+E        +  where False = all(<generator object test_historical_updater_preserves_later_audit.<locals>.<genexpr> at 0x7b8bd8399e50>)
+
+pipeline/tests/test_historical_dag_update.py:21: AssertionError
+----------------------------- Captured stdout call -----------------------------
+['EOS-04']
+[]
+=========================== short test summary info ============================
+FAILED pipeline/tests/test_historical_dag_update.py::test_historical_updater_preserves_later_audit
+1 failed in 0.11s

@@ -1,0 +1,50 @@
+{
+  "schema": "ns-cowling.e390-spg-family-basis-status",
+  "schema_version": "1.0.0",
+  "date": "2026-11-12",
+  "status": "SPG FAMILY (M1-M5) RECONSTRUCTED UNDER CANONICAL GÖGELEIN 2008 BASIS; PER-MODEL NMP VARIATIONS PENDING",
+  "node": "M3-h (SPG family M1-M5 reconstruction under canonical basis)",
+  "summary": "The SPG_M1..M5 family was resolved and reconstructed. Investigation of Scurto, Pais & Gulminelli PRD 109 103015 (2024) (arXiv:2402.15548) and the reconstruction design established that all five SPG_Mx models share the SAME Gögelein 2008 PRC 77 025802 GDFM functional form (eq. 40: g_kappa = a + (b + d*x^3)*exp(-c*x), x = rho_B/0.16, 4 mesons sigma/omega/delta/rho). The five models are posterior REALIZATIONS from Scurto 2024's Bayesian inference, differing in their 12 coupling parameters (and resulting NMPs E_sat, K_sat, J_sym, L_sym, K_sym, M*/M), not in the functional form. Scurto's text (line 3542-3544) defines M1 = highest absolute likelihood in the full posterior; M2, M3 = highest weight around the extremes of the 68% CI for the maximum NS mass; M4, M5 = realizations from the high-density / direct-Urca-onset and extreme-proton-fraction tails. Scurto publishes the M1-M5 couplings only as GRAPH CURVES (Fig. 19) and NMPs as FIGURES (Table IX), not as numeric tables, so the exact per-model coupling values cannot be extracted from the PDF text. CompOSE pages 317 (M3) and 319 (M5) are the only verified export pages (bibliography note). The canonical Gögelein 2008 Table I couplings (the Scurto prior center) were therefore used as the common basis for all five models. SPG_M2..M5 were added to the parameter set JSON with the canonical couplings, per-model Scurto role labels, and a clear verification_status flag (CANONICAL_BASIS_GOGEGEIN_2008_COUPLINGS_NMP_VARIANT_PENDING_EXTRACTION). All five models were then reconstructed through the validated CLD pipeline and emitted as separate CompOSE sets; all pass the native reader.",
+  "spg_family_resolution": {
+    "shared_functional_form": "Gögelein 2008 PRC 77 025802 eq. 40: g_kappa(rho_B) = a_kappa + (b_kappa + d_kappa*x^3)*exp(-c_kappa*x), x = rho_B/rho_0, rho_0 = 0.16 fm^-3 (fixed reference, NOT the model's rho_sat)",
+    "mesons": "sigma (isoscalar scalar), omega (isoscalar vector), delta (isovector scalar), rho (isovector vector) - all 4 use the same functional form",
+    "model_distinction": "Scurto 2024 posterior realizations differing in the 12 coupling parameters (a,b,c,d per meson, with d=0 for omega and rho) and resulting NMPs. NOT different functional forms.",
+    "scurto_role_definitions": {
+      "M1": "highest absolute likelihood in the full posterior (Scurto line 3542)",
+      "M2": "highest weight around the LOW extreme of the 68% CI for the maximum NS mass (line 3542-3544)",
+      "M3": "highest weight around the HIGH extreme of the 68% CI for the maximum NS mass (line 3542-3544); CompOSE page 317",
+      "M4": "realization from the high-density / direct-Urca-onset tail (line 3837)",
+      "M5": "realization showing extreme proton-fraction behavior (line 3740); CompOSE page 319"
+    },
+    "extraction_blocker": "Scurto 2024 Fig. 19 plots g_sigma, g_omega, g_rho as functions of rho/rho_0 for M1-M5 but gives NO numeric coupling table. Table IX lists NMPs as figures only. CompOSE pages 317 (M3) and 319 (M5) are the only verified export URLs; the other three models' CompOSE page IDs are NOT confirmed (bibliography note: 'do not infer other EOS page IDs')."
+  },
+  "canonical_basis_choice": "The Gögelein 2008 Table I couplings (already validated in M3-f/M3-g, reproducing E/A=-16.015, K_sat=263.5, J_sym=32.116) are the Scurto prior center (Scurto line 713: 'intervals are centered on the original values of the GDFM model [47]'). These are used as the common basis for SPG_M1..M5 until the per-model coupling tables are extracted from CompOSE pages 317/319 or supplied by the researcher.",
+  "json_updates": {
+    "added_models": ["SPG_M2", "SPG_M3", "SPG_M4", "SPG_M5"],
+    "shared_with_SPG_M1": "meson_masses, rho_sat=0.178, coupling_params (Gögelein Table I), spg_rho_ref_fm3=0.16, saturation_targets (DDRMF Table II)",
+    "per_model_metadata": "reference (Scurto 2024), companion_pdf, verification_status=CANONICAL_BASIS_GOGEGEIN_2008_COUPLINGS_NMP_VARIANT_PENDING_EXTRACTION, scuurto_role, note documenting the caveat"
+  },
+  "saturation_verification_under_canonical_basis": {
+    "all_5_models": "E/A = -16.015 MeV (target -16.25 DDRMF), K_sat = 263.5 MeV, J_sym = 32.116 MeV (target 32.11), M*/M = 0.6831. Identical because couplings are identical. These match the validated SPG_M1 result from M3-g."
+  },
+  "reconstruction_results_under_canonical_basis": {
+    "density_grid": "20 points, log-spaced 0.001 to 0.145 fm^-3, ~10.9 s per model",
+    "all_5_models_identical": {
+      "E_per_A_range": "0.82 to 12.5 MeV (positive throughout, smooth growth)",
+      "f_range": "0.0001 to 0.95 (small clusters; 0.95 at 0.145 is the R_d=40 fm boundary artifact near transition)",
+      "R_d_range": "2.0 to 40.0 fm (40 = boundary cap)",
+      "y_p_cell_range": "0.0024 to 0.018 (neutron-rich, physical, matches DD2 scale)",
+      "mu_e_range": "12.6 to 42.9 MeV (physical, DD2-like)",
+      "beta_equilibrium_residual": "0.0000 at all densities (minimizer correct)",
+      "native_reader": "PASSED for all 5 (read_compose returns EOSData, F shape (20,))"
+    },
+    "crust_core_transition": "~0.15 fm^-3 (established in M3-g for the canonical basis)"
+  },
+  "files_in_this_commit": [
+    "data/eos390_rmf_parameter_sets.v1.json - added SPG_M2, SPG_M3, SPG_M4, SPG_M5 with canonical Gögelein couplings, Scurto role labels, and verification_status flag",
+    "download/reconstruction/SPG_M1/ through SPG_M5/ - 5 separate CompOSE sets (eos.compo, eos.thermo, eos.nb, eos.t, eos.yq, eos.init, eos.mr, reconstruction_summary.txt each)",
+    "download/reconstruction/SPG_FAMILY_SUMMARY.json - per-model reconstruction stats and the canonical-basis caveat",
+    "data/receipts/eos390_m0/E390-02_M3_SPG_FAMILY_BASIS_STATUS_20261112.json - this receipt"
+  ],
+  "remaining_for_M3": "The per-model NMP variations of SPG_M2..M5 are NOT yet captured; under the canonical basis all five reconstructions are physically identical. To capture the Scurto posterior spread one must extract the per-model coupling tables (a,b,c,d per meson) from CompOSE pages 317 (M3) and 319 (M5) or request them from the researcher (the Scurto PDF only plots them as curves). GPPVA DD-ME2/TW99/FSU2/NL3/TM1/TM1e still need exact coupling table extraction from their respective PDFs (the JSON has PLACEHOLDER values flagged)."
+}

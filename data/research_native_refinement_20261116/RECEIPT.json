@@ -1,0 +1,75 @@
+{
+  "schema": "ns-cowling.native-tf-refinement.v1",
+  "base_head": "3f59e3a555fdeac07c3436ed2a17ee243945fa20",
+  "project_status": "PARTIALLY_COMPLETE",
+  "producer": "Fortran native generator and native_tf_driver; Python orchestration and presentation only",
+  "python": "3.12.3",
+  "source_sha256": {
+    "fortran_eos/src/compose_eos_spatial_tf.f90": "32f89d3597c5d5a966e5ec6f17e6455f8666dd79910c5e5ad3d241f3701f3711",
+    "fortran_eos/src/compose_eos_tf_models.f90": "0712f95176d6cc53d77efff9602bae32e15b8c5502d30d69556b0a8dc90d49fe",
+    "fortran_eos/src/compose_eos_optimize_native.f90": "ac9f7e1cedd3a0cc5823a9f5e85ea82a5a06549a715d2f8d619b167bbb6a78f5",
+    "fortran_eos/app/compose_eos_generate.f90": "50c18c8df2066a2b3c0e13bf9a05ed1675e5b7477049762201bdfe7d3dbe750f",
+    "fortran_eos/tests/native_tf_driver.f90": "f760a820f3bd30908fb352d3a14bc37ddb719547c263f72a10caf3db0b181345",
+    "fortran_eos/vendor/slsqp/slsqp_optmz.f": "bb1b489a87bc6137fee6132166c8a04cdb838d9042de809179d7f4f6ef9e43ae",
+    "scripts/run_native_tf_branch_probe.py": "9bf0aa7338907f3b64bdd0ab064dbe59498e9a5b428d4da6fcc9b42029232942",
+    "scripts/summarize_native_tf_branch_probe.py": "ca2fecebb0ccff5cef5044df0d926f00383a61f16559d8804afe62f13dbe734e",
+    "scripts/audit_native_tf_refinement.py": "920da1e33a38f30184069f622646ed875dfa49a8c42179e287b45ae7e9df931d"
+  },
+  "native_generate_executable_sha256": "7dc2ebb386a29b611ef0c20b14c4493f631eb003977c9a6e663c78df72f41512",
+  "native_tf_driver_sha256": "9b5662b9c9e292d0213cba15ce93898d23807e80419800f44a5e167f41051f62",
+  "previous_producer": "SOURCE_IDENTITY.json",
+  "output_archives": {
+    "native_mesh_runs.tar.gz": "3f1d5c637f8f283fe2feea9393a97db567f37c951e8317b03268cbbf7b836fd1",
+    "native_branch_probe.tar.gz": "2c50fb4320c9a59f6d89b0ac1c8cae10e5c4d40c602a504ff7aa13bfb6774879"
+  },
+  "independent_review_sha256": "61376ec23bc84d08357562f05d2ed66b1b755fa53b672f2805da7856c93682da",
+  "sample_counts": {
+    "models": 3,
+    "density_points_per_model": 3,
+    "meshes": [
+      16,
+      32,
+      64,
+      128
+    ],
+    "mesh_density_executions": 36,
+    "generator_attempts": 224,
+    "evaluation_failures": 7,
+    "requires_refinement": 1,
+    "independent_branch_trials": 54,
+    "native_readback_tables": 18,
+    "distinct_mesh_tables": 12,
+    "top_level_alias_tables": 6
+  },
+  "limitations": [
+    "three worst N16 intervals only",
+    "phase9 lumps distinct noncanonical structures",
+    "N32 N64 N128 three-point positive ordering does not certify continuum support",
+    "neither original SPG calibration nor full original crust is established"
+  ],
+  "tests": {
+    "native_target_tests_passed": 88,
+    "generator_passed": 142,
+    "generator_warning": "existing Matplotlib Axes3D import",
+    "native_selection_checks_passed": 4,
+    "baseline_root_checksum_entries": 7231,
+    "whole_frontend_suite_repeated": false,
+    "diagnostic_replays": "native audit and branch summary byte-identical"
+  },
+  "commands": [
+    "bash fortran_eos/build.sh",
+    "bash fortran_eos/tests/build_native_tf_test.sh build/native_tf_test",
+    "PYTHONPATH=python_frontend python3 -m compose_eos.cli generate GPPVA_FSU2R build/native_refine_FSU2R --repository-root . --densities 0.048 0.0484999995 0.048999999 --resolutions 16 32 64",
+    "PYTHONPATH=python_frontend python3 -m compose_eos.cli generate GPPVA_FSU2H build/native_refine_FSU2H --repository-root . --densities 0.050999999 0.0515 0.052000001 --resolutions 16 32 64",
+    "PYTHONPATH=python_frontend python3 -m compose_eos.cli generate GPPVA_TM1e build/native_refine_TM1e --repository-root . --densities 0.052000001 0.0525 0.052999999 --resolutions 16 32 64",
+    "Repeat each model with corresponding densities and --resolutions 128 to distinct *_N128 directory",
+    "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python3 scripts/run_native_tf_branch_probe.py build/native_branch_probe --workers 3",
+    "python3 scripts/summarize_native_tf_branch_probe.py build/native_branch_probe build/native_branch_summary.json",
+    "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran python3 scripts/audit_native_tf_refinement.py build build/native_tf_refinement_audit.json",
+    "PYTHONPATH=python_frontend COMPOSE_EOS_FORTRAN_ROOT=. COMPOSE_EOS_FORTRAN_EXE=build/compose_eos_fortran/compose_eos_fortran OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -m pytest -q python_frontend/tests/test_native_spatial_tf.py python_frontend/tests/test_native_generation_receipts.py python_frontend/tests/test_generation_dispatch.py python_frontend/tests/test_native_generation_architecture.py",
+    "PYTHONPATH=eos_generator:eos_generator/compose_eos_pkg OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -m pytest -q eos_generator/tests",
+    "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 build/native_tf_test/native_tf_selection_test",
+    "sha256sum -c SHA256SUMS_v4.txt"
+  ],
+  "execution_environment": "All 6 CLI generation jobs set OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1; no lower-crust generation"
+}

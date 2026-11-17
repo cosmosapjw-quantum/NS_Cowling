@@ -4,7 +4,50 @@ module compose_eos_phase_transition
   implicit none
   private
   public :: maxwell_transition_report_t, construct_maxwell_transition
+  public :: maxwell_status_category
+  character(len=*), parameter, public :: MAXWELL_METHOD_ID = 'maxwell'
 
+  ! Structured terminal-outcome identifiers for the Maxwell construction. The
+  ! v2 Python layer consumes this stable category directly instead of inferring
+  ! a category from free-form exception text. Each identifier is a fixed
+  ! constant; the mapping from a v1 kernel status string to a category is
+  ! implemented in maxwell_status_category and is independent of the model
+  ! name. The §3/§4 audit requires this so that the same underlying failure
+  ! receives the same status in every transformation and every run.
+  !
+  ! The category set (§3):
+  !   PASS, MASS_CONVENTION_FAIL, BETA_EQUILIBRIUM_FAIL,
+  !   SOURCE_TABLE_CONVEXITY_FAIL, INTERPOLANT_SHAPE_FAIL, CAUSALITY_FAIL,
+  !   NO_COMMON_MU_SUPPORT, NO_COEXISTENCE_CROSSING,
+  !   MULTIPLE_COEXISTENCE_CROSSINGS, NONPOSITIVE_DENSITY_JUMP,
+  !   FIRST_LAW_IDENTITY_FAIL, COMPOSITION_UNSUPPORTED, NO_COMMON_MU_SUPPORT
+  character(len=*), parameter, public :: MAXWELL_STATUS_UNKNOWN = 'UNKNOWN'
+
+  ! Euler-relation tolerance for the provider Q3 chemical potential check
+  ! (validate_phase, line ~242). max_euler = max over rows of
+  ! |mu_source - mu_Euler| / |mu_Euler|, with mu_Euler = (eps+P)/n_B.
+  !
+  ! Empirical basis (E390 audit B3, 2026-11-14): the largest observed
+  ! source-table Euler residual across the 18-model corpus is 1.15e-4
+  ! (RG_KDE0v1); GPPVA crusts ~9e-5; core tables (BBB/APR/GM) pass at
+  ! machine precision (~1e-16) because their providers print Q3 to 17 sig
+  ! figs and computed it algebraically self-consistent with Q1/Q7. The
+  ! crust providers (GPPVA/RG/SPG) print Q3 to 10 sig figs and carry a
+  ! ~0.02-0.1 MeV systematic offset. 5e-4 = ~4.3x the worst-case observed
+  ! residual, so every source table in the corpus passes with a small
+  ! safety margin while a genuine thermodynamic inconsistency (which
+  ! would be O(1e-1) or larger) is still rejected.
+  !
+  ! NOT derivable from 10-sig-fig source precision: the rounding floor for
+  ! Q3 alone is ~5e-11, and the finite-difference derivative floor is
+  ! ~1e-9. The observed residual (1e-4) is five orders of magnitude above
+  ! the rounding floor, so tightening to the rounding-floor value would
+  ! falsely reject all 13 GPPVA/SPG crust tables and RG_SLY4/RG_KDE0v1.
+  ! Loosening above ~1e-3 would erase the 4x safety margin.
+  !
+  ! Value left unchanged; this comment documents the empirical derivation.
+  ! See docs/MAXWELL_MASS_AUDIT_20261114.md section 6.3 (B3) and the v2
+  ! receipt download/eos390_maxwell_v2/E390_B3_EULER_TOLERANCE_20261114.json.
   real(wp), parameter :: euler_tolerance = 5.e-4_wp
   real(wp), parameter :: algebraic_tolerance = 2.e-6_wp
   real(wp), parameter :: entropy_tolerance = 2.e-8_wp
@@ -414,6 +457,13 @@ contains
       mid=0.5_wp*(a+b)
       call evaluate_difference(low,high,mu_low,p_low,mu_high,p_high,mid,fmid,dn,scale,valid)
       if(.not.valid) return
+      ! Keep an exactly represented root.  Assigning fa=0 below would destroy
+      ! the strict sign bracket and make later iterations drift toward b.
+      if(fmid==0._wp) then
+        root=mid
+        ok=.true.
+        return
+      endif
       if((b-a)<=1.e-13_wp*max(1._wp,abs(mid))) then
         root=mid
         ok=abs(fmid)<=10._wp*pressure_relative_tolerance*scale
@@ -613,7 +663,7 @@ contains
     out%q(1,k)=pressure/n_transition
     out%q(2,k)=0._wp
     out%q(3,k)=mu_t/out%mn-1._wp
-    out%q(4,k)=q4
+    out%q(4,k)=q4*eos%mn/out%mn
     if(eos%il==0)out%q(3,k)=out%q(3,k)-eos%charge_fraction_grid*out%q(4,k)
     out%q(5,k)=0._wp
     eps=mu_t*n_transition-pressure
@@ -630,12 +680,16 @@ contains
     real(wp),intent(in) :: mu_euler
     out%nb(k)=eos%nb(i)
     out%q(:,k)=eos%q(:,i)
+    ! CompOSE Q4 and Q6/Q7 depend on the source normalization mass.
+    ! Decode with that source's mass and re-encode with the output reference;
+    ! no additive rest-energy-per-baryon shift is applied.
+    out%q(4,k)=eos%q(4,i)*eos%mn/out%mn
     out%q(2,k)=0._wp
     out%q(5,k)=0._wp
     out%q(3,k)=mu_euler/out%mn-1._wp
     if(eos%il==0)out%q(3,k)=out%q(3,k)-eos%charge_fraction_grid*out%q(4,k)
-    out%q(6,k)=eos%q(7,i)
-    out%q(7,k)=eos%q(7,i)
+    out%q(6,k)=(1._wp+eos%q(7,i))*eos%mn/out%mn-1._wp
+    out%q(7,k)=out%q(6,k)
     out%q_extra(k)=0._wp
     out%iphase(k)=phase_id
   end subroutine copy_source_row
@@ -660,11 +714,12 @@ contains
       status='caller must explicitly confirm that both input branches are locally charge neutral'
       return
     endif
-    if(abs(low%mn-high%mn)>1.e-12_wp*max(low%mn,high%mn).or. &
-       abs(low%mp-high%mp)>1.e-12_wp*max(low%mp,high%mp)) then
-      status='phase tables must use the same neutron and proton rest-mass conventions'
-      return
-    endif
+    ! Header masses are encoding references, not permission to alter a
+    ! source EOS's absolute gravitating energy. validate_phase decodes each
+    ! input with its own mass; coexistence is solved in physical P and mu.
+    ! Output rows below are re-encoded at low%mn with epsilon and mu_q fixed.
+    ! A physical epsilon -> epsilon+n*Delta m change remains in the input
+    ! curve and cannot be erased or fitted by this normalization operation.
     if(low%il/=high%il.or.low%iyq/=high%iyq.or. &
        abs(low%charge_fraction_grid-high%charge_fraction_grid)>1.e-12_wp) then
       status='phase tables must use the same CompOSE lepton-content and charge-fraction conventions'
@@ -724,9 +779,22 @@ contains
     out%nadd=0
     out%temperature_mev=0._wp
     out%charge_fraction_grid=low%charge_fraction_grid
-    out%composition_file_present=.false.
+    ! The output is one cold thermodynamic slice.  Preserve its actual axis
+    ! values and labels in the native metadata before CompOSE serialization.
+    out%nT=1;out%nYq=1
+    out%t_first=out%iT;out%t_last=out%iT
+    out%yq_first=out%iYq;out%yq_last=out%iYq
+    out%selected_iT=out%iT;out%selected_iYq=out%iYq
+    allocate(out%t_axis(1),out%yq_axis(1))
+    out%t_axis(1)=out%temperature_mev
+    out%yq_axis(1)=out%charge_fraction_grid
+    ! CompOSE stores Iphase in eos.compo.  Emit phase-only rows with
+    ! Npairs=Nquad=0, as supported by the existing native writer/reader.
+    ! No abundance is invented: all allocate_eos presence masks stay false.
+    out%composition_file_present=.true.
     out%composition_available=.false.
     out%beta_equilibrated=.true.
+    out%row_status=1  ! PARTIAL: a phase-only row, with no abundance inventory
 
     k=0
     do i=1,low%n
@@ -799,5 +867,119 @@ contains
     endif
     status='ok'
   end subroutine construct_maxwell_transition
+
+  pure function maxwell_status_category(status) result(category)
+    !! Map a v1 kernel status string to a stable structured terminal-outcome
+    !! identifier. The mapping is data-driven from the status string only; it
+    !! does NOT branch on the model name or on any caller-provided label. This
+    !! is the single source of truth for the §3/§4 structured-status taxonomy.
+    !!
+    !! Ordering rule: the FIRST matching clause wins. Clauses are ordered so
+    !! that the most specific physical category is matched before more generic
+    !! ones (e.g. a "low-density phase: ..." prefix must not hide the underlying
+    !! beta-equilibrium or convexity category).
+    !!
+    !! Returns MAXWELL_STATUS_UNKNOWN if no clause matches (the caller must
+    !! treat UNKNOWN as a rejection -- it never means PASS).
+    character(len=*), intent(in) :: status
+    character(len=40) :: category
+    character(len=len_trim(status)) :: s
+    s = trim(status)
+    ! strip the "low-density phase: " / "high-density phase: " prefixes so the
+    ! category reflects the underlying cause, not which phase failed.
+    if(index(s,'low-density phase: ')==1)  s = s(len('low-density phase: ')+1:)
+    if(index(s,'high-density phase: ')==1) s = s(len('high-density phase: ')+1:)
+
+    if(len_trim(s)==0 .or. trim(s)=='uninitialized') then
+      category = MAXWELL_STATUS_UNKNOWN; return
+    endif
+
+    ! composition / layout
+    if(index(s,'composition-bearing')==1 .or. index(s,'Nadd')>0 .or. &
+       index(s,'composition')>0) then
+      category = 'COMPOSITION_UNSUPPORTED'; return
+    endif
+
+    ! mass convention (neutron/proton rest-mass mismatch)
+    if(index(s,'rest-mass')>0 .or. index(s,'mass conventions')>0 .or. &
+       index(s,'nucleon masses')>0) then
+      category = 'MASS_CONVENTION_FAIL'; return
+    endif
+
+    ! beta-equilibrium / lepton-potential / entropy / T=0
+    if(index(s,'beta-equilibrated')>0 .or. index(s,'beta-equilibrium')>0 .or. &
+       index(s,'Q5')>0 .or. index(s,'Q2')>0 .or. index(s,'Q6=Q7')>0 .or. &
+       index(s,'T=0')>0 .or. index(s,'lepton')>0) then
+      category = 'BETA_EQUILIBRIUM_FAIL'; return
+    endif
+
+    ! thermodynamic identity (Q3/Euler, first-law at the coexistence identity)
+    if(index(s,'Q3 chemical potential')>0 .or. index(s,'Euler')>0 .or. &
+       index(s,'latent-energy identity')>0 .or. index(s,'first-law')>0 .or. &
+       index(s,'Maxwell latent-energy')>0) then
+      category = 'FIRST_LAW_IDENTITY_FAIL'; return
+    endif
+
+    ! phase layout: Iphase boundary inside one input
+    if(index(s,'Iphase')>0 .or. index(s,'smooth phase')>0) then
+      category = 'COMPOSITION_UNSUPPORTED'; return
+    endif
+
+    ! causality
+    if(index(s,'causal')>0 .or. index(s,'c_s^2')>0) then
+      category = 'CAUSALITY_FAIL'; return
+    endif
+
+    ! NO_COMMON_MU_SUPPORT: no overlapping mu_B interval
+    if(index(s,'no overlapping')>0 .or. index(s,'common chemical-potential')>0 .or. &
+       index(s,'insufficient common')>0) then
+      category = 'NO_COMMON_MU_SUPPORT'; return
+    endif
+
+    ! coexistence root count: 0 or >1
+    if(index(s,'no pressure equality')>0 .or. index(s,'no root')>0 .or. &
+       index(s,'no coexistence')>0) then
+      category = 'NO_COEXISTENCE_CROSSING'; return
+    endif
+    if(index(s,'multiple')>0 .or. index(s,'exactly one')>0) then
+      category = 'MULTIPLE_COEXISTENCE_CROSSINGS'; return
+    endif
+
+    ! mechanical-stability / interpolation-shape. This is the §1 distinction:
+    ! the v1 kernel currently emits "P(mu_B) interpolation violates positive
+    ! density or mechanical stability" for both source-level and interpolant-
+    ! level failures. We cannot distinguish them from the status string alone,
+    ! so this is the catch-all INTERPOLANT_SHAPE_FAIL. The §1 source-convexity
+    ! pre-check is the authoritative classifier and lives in the Python audit,
+    ! not in this function. NOTE: this must be matched BEFORE the
+    ! NONPOSITIVE_DENSITY_JUMP clause because the interpolation message
+    ! contains the word "density" ("positive density"), which would otherwise
+    ! mis-bucket 61 of 65 pairs.
+    if(index(s,'interpolation')>0 .or. index(s,'mechanical stability')>0 .or. &
+       index(s,'positive density')>0 .or. index(s,'strictly increasing')>0 .or. &
+       index(s,'nonfinite')>0) then
+      category = 'INTERPOLANT_SHAPE_FAIL'; return
+    endif
+
+    ! density jump / energy ordering at the coexistence point
+    if(index(s,'denser high-density')>0 .or. index(s,'nonpositive')>0 .or. &
+       index(s,'not ordered')>0 .or. index(s,'nondecreasing pressure')>0) then
+      category = 'NONPOSITIVE_DENSITY_JUMP'; return
+    endif
+
+    ! lepton-content / charge-fraction axis mismatch
+    if(index(s,'lepton-content')>0 .or. index(s,'charge_fraction_grid')>0 .or. &
+       index(s,'charge-fraction')>0) then
+      category = 'NO_COMMON_MU_SUPPORT'; return
+    endif
+
+    ! caller did not confirm local charge neutrality
+    if(index(s,'locally charge neutral')>0) then
+      category = 'COMPOSITION_UNSUPPORTED'; return
+    endif
+
+    ! everything else: unknown (treated as rejection, never PASS)
+    category = MAXWELL_STATUS_UNKNOWN
+  end function maxwell_status_category
 
 end module compose_eos_phase_transition

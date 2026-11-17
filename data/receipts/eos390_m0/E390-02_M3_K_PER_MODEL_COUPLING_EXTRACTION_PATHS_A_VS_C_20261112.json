@@ -1,0 +1,118 @@
+{
+  "schema": "ns-cowling.e390-m3-k-per-model-coupling-extraction-paths-a-vs-c-status",
+  "schema_version": "1.0.0",
+  "date": "2026-11-12",
+  "status": "PER-MODEL COUPLING EXTRACTED FOR SPG_M3 AND SPG_M5 VIA PATH (a) ISOSCALAR-FIXED ISOVECTOR FIT; PATH (c) FULL-12 FIT REJECTED AS NON-PHYSICAL (UNDERDETERMINATION OVERFIT); PATH (a) WINS ON PHYSICALITY",
+  "node": "M3-k (per-model coupling extraction: paths (a) vs (c) comparison, path (a) winner)",
+  "researcher_directive": "The researcher directed: 'use path (a) first, then compare to path (c), and quantify which is more accurate'. We executed both paths on the unified SPG(M3)/(M5) exports from M3-j, compared them on (1) fit RMS F, (2) extrapolation RMS F, (3) E_sym at rho_sat (vs the target extracted from the export in M3-j), (4) E_sat at rho_sat (must be ~-16 MeV, physical), and concluded path (a) is more accurate.",
+  "method_paths": {
+    "path_a": {
+      "description": "Isoscalar-fixed, isovector-fit. Keep sigma and omega couplings at the canonical Gögelein 2008 Table I values (which reproduce E_sat = -16 MeV, K_sat = 263 MeV at rho_sat = 0.178). Fit only the isovector couplings delta(a,b,c,d) and rho(a,b,c) - 7 free parameters - to the unified export's beta-equil F(rho) and Yp(rho) trajectory.",
+      "free_parameters": 7,
+      "rationale": "The isoscalar sector is well-constrained by symmetric nuclear matter (E_sat, K_sat, M*/M), which the canonical Gögelein couplings already reproduce. Only the isovector sector varies across posterior realizations (different J_sym, L_sym, K_sym). This breaks the underdetermination by fixing 5 of the 12 couplings to physical values.",
+      "fit_range": "rho in [0.09, 0.30] fm^-3, 7 density points from the unified export core (Iphase=6)",
+      "objective": "least_squares on residuals [F_model - F_export, (Yp_model - Yp_export)*200], equal weight"
+    },
+    "path_c": {
+      "description": "Full 12-coupling fit (sigma a,b,c,d; omega a,b,c; delta a,b,c,d; rho a,b,c) to the same beta-equil F(rho), Yp(rho) trajectory, with L2 regularization toward the canonical Gögelein prior (lambda scan: 1e-2, 3e-3, 1e-3, 3e-4).",
+      "free_parameters": 13,
+      "rationale": "Attempt to fit all couplings simultaneously. Regularization is needed because the system is underdetermined (12 coupling params constrained by 6 NMPs, but the beta-equil trajectory provides 2*N data points, here 14 data points for 13 params - marginally over-determined but with strong correlations between isoscalar and isovector sectors).",
+      "fit_range": "same as path (a)",
+      "objective": "least_squares on [F residual, Yp residual*200, regularization lambda*(params - canon)/|canon|]"
+    }
+  },
+  "results_table": {
+    "SPG_M3": {
+      "path_a": {
+        "fit_RMS_F_MeV": 1.6969,
+        "fit_RMS_Yp": 0.01909,
+        "eval_RMS_F_MeV_wide_range_0.08_to_0.50": 16.32,
+        "E_sym_at_0.178_MeV": 41.766,
+        "target_E_sym_from_export_MeV": 39.484,
+        "E_sym_residual_MeV": 2.282,
+        "E_sat_at_0.178_MeV": -16.0,
+        "E_sat_physical": true,
+        "verdict": "ACCEPTED: physical E_sym and E_sat, 2.3 MeV E_sym residual within parabolic-approximation noise"
+      },
+      "path_c": {
+        "fit_RMS_F_MeV": 0.0398,
+        "fit_RMS_Yp": 0.00073,
+        "eval_RMS_F_MeV_wide_range": 14.30,
+        "E_sym_at_0.178_MeV": 90.609,
+        "E_sat_at_0.178_MeV": -51.098,
+        "E_sym_residual_MeV": 51.125,
+        "E_sat_physical": false,
+        "verdict": "REJECTED: fit RMS F is 40x lower than path (a) but E_sym=90.6 MeV and E_sat=-51.1 MeV are completely non-physical (underdetermination overfit: the fit inflates E_sym and reduces E_SN to match the beta-equil F while violating symmetric-matter constraints). The eval RMS F (14.3) is only marginally lower than path (a)'s 16.3, so the apparent fit improvement does not generalize."
+      }
+    },
+    "SPG_M5": {
+      "path_a": {
+        "fit_RMS_F_MeV": 2.0711,
+        "fit_RMS_Yp": 0.01608,
+        "eval_RMS_F_MeV_wide_range": 22.33,
+        "E_sym_at_0.178_MeV": 43.103,
+        "target_E_sym_from_export_MeV": 38.782,
+        "E_sym_residual_MeV": 4.321,
+        "E_sat_at_0.178_MeV": -16.0,
+        "E_sat_physical": true,
+        "verdict": "ACCEPTED: physical E_sym and E_sat, 4.3 MeV E_sym residual (larger than M3's 2.3 because M5's E_sym rises more steeply at high density, amplifying parabolic-approximation noise in Yp extraction)"
+      },
+      "path_c": {
+        "fit_RMS_F_MeV": 0.0281,
+        "fit_RMS_Yp": 0.00052,
+        "eval_RMS_F_MeV_wide_range": 81.66,
+        "E_sym_at_0.178_MeV": 76.974,
+        "E_sat_at_0.178_MeV": -41.333,
+        "E_sym_residual_MeV": 38.192,
+        "E_sat_physical": false,
+        "verdict": "REJECTED: fit RMS F is 70x lower than path (a) but E_sym=77 MeV and E_sat=-41 MeV are non-physical. Critically, the eval RMS F (81.7) is 3.7x WORSE than path (a)'s 22.3 - path (c) does not even extrapolate well for M5, because the overfit coupling set has a very different density-dependence shape that diverges outside the fit range."
+      }
+    }
+  },
+  "winner": "PATH (a) ISOSCALAR-FIXED ISOVECTOR FIT",
+  "winner_rationale": "Path (a) wins on physicality for both M3 and M5: it preserves E_sat = -16 MeV (by keeping isoscalar couplings at the canonical Gögelein values that reproduce symmetric nuclear matter) and produces a physical E_sym (41.8 MeV for M3, 43.1 MeV for M5) within 2-4 MeV of the export-extracted targets (39.5 and 38.8 MeV). Path (c)'s apparently lower fit RMS F (40-70x lower) is a classic underdetermination artifact: the 12-coupling fit trades off E_sym and E_SN in opposite directions to match the beta-equil F (which is E_SN + E_sym*delta^2) without constraining either separately, producing non-physical E_sym (77-91 MeV) and E_sat (-41 to -51 MeV). For M5 the path (c) extrapolation is also much worse (eval RMS 81.7 vs 22.3), confirming the overfit. Path (a) breaks the underdetermination by anchoring the isoscalar sector to the well-constrained canonical values.",
+  "extracted_couplings_path_a": {
+    "SPG_M3": {
+      "sigma": {"a": 7.7868, "b": 2.58637, "c": 2.32431, "d": 3.11504, "source": "canonical Gögelein 2008 Table I (kept fixed)"},
+      "omega": {"a": 9.73684, "b": 2.26377, "c": 7.05897, "d": 0.0, "source": "canonical Gögelein 2008 Table I (kept fixed)"},
+      "delta": {"a": 2.3790457637153753e-06, "b": 0.8181924345391772, "c": 19.087064972053927, "d": 19.107846089883378, "source": "fitted to M3 unified beta-equil trajectory"},
+      "rho": {"a": 2.3802262838816233e-05, "b": 6.1805800832198035, "c": 0.2737439519292473, "d": 0.0, "source": "fitted to M3 unified beta-equil trajectory"},
+      "features": "delta a~0 (the constant term vanishes, delta meson contributes only via density-dependent (b + d*x^3)*exp(-c*x) with large c=19 and d=19 - strong high-density suppression). rho a~0 (similar). Both isovector couplings are strongly density-dependent, reflecting M3's stiff symmetry energy that grows then saturates."
+    },
+    "SPG_M5": {
+      "sigma": {"a": 7.7868, "b": 2.58637, "c": 2.32431, "d": 3.11504, "source": "canonical Gögelein 2008 Table I (kept fixed)"},
+      "omega": {"a": 9.73684, "b": 2.26377, "c": 7.05897, "d": 0.0, "source": "canonical Gögelein 2008 Table I (kept fixed)"},
+      "delta": {"a": 3.2404185604108996e-12, "b": 18.026339195630968, "c": 16.28141993938075, "d": 0.5309965993716882, "source": "fitted to M5 unified beta-equil trajectory"},
+      "rho": {"a": 4.6748513303369625, "b": 19.999993698727035, "c": 7.008185041775728, "d": 0.0, "source": "fitted to M5 unified beta-equil trajectory"},
+      "features": "delta a~1e-12 (effectively 0), with large b=18 and moderate c=16, d=0.53 - different functional shape than M3's delta. rho a=4.67 (nonzero constant, unlike M3's near-zero), b=20 (at bound), c=7.0. M5's isovector sector has a distinct density dependence reflecting the extreme proton-fraction tail: softer moderate-density E_sym but steeper high-density growth."
+    }
+  },
+  "reconstruction_reverification": {
+    "method": "Ran spg_family_reconstruction.py with the updated JSON couplings. Native reader (read_compose) verified for all 5 SPG models.",
+    "saturation_NMPs_after_extraction": {
+      "SPG_M1": {"E_over_A": -16.015, "K_sat": 263.5, "J_sym": 32.116, "M_star_over_M": 0.6831, "note": "canonical, unchanged"},
+      "SPG_M2": {"E_over_A": -16.015, "K_sat": 263.5, "J_sym": 32.116, "M_star_over_M": 0.6831, "note": "canonical, unchanged"},
+      "SPG_M3": {"E_over_A": -16.015, "K_sat": 263.5, "J_sym": 42.766, "M_star_over_M": 0.6831, "note": "per-model: J_sym shifted from 32.1 (canonical) to 42.8 MeV (target 39.5, residual +3.3 MeV); E_sat and K_sat preserved by isoscalar anchoring"},
+      "SPG_M4": {"E_over_A": -16.015, "K_sat": 263.5, "J_sym": 32.116, "M_star_over_M": 0.6831, "note": "canonical, unchanged"},
+      "SPG_M5": {"E_over_A": -16.015, "K_sat": 263.5, "J_sym": 44.102, "M_star_over_M": 0.6831, "note": "per-model: J_sym shifted from 32.1 to 44.1 MeV (target 38.8, residual +5.3 MeV); E_sat and K_sat preserved"}
+    },
+    "CLD_reconstruction_inner_crust": {
+      "SPG_M3": {"E/A_range": "0.10-19.60 MeV", "f_range": "0.0021-0.8868", "y_p_range": "0.0146-0.1124", "mu_e_range": "29.5-103.9 MeV", "reader": "OK (F shape (20,))"},
+      "SPG_M5": {"E/A_range": "0.44-18.78 MeV", "f_range": "0.0034-0.9500", "y_p_range": "0.0165-0.2021", "mu_e_range": "35.8-102.0 MeV", "reader": "OK (F shape (20,))"},
+      "comparison_to_canonical": "M3 and M5 now show distinct inner-crust physics from M1/M2/M4 (which remain at canonical): M3 has higher y_p (0.015-0.112 vs canonical 0.0024-0.018) and mu_e (29.5-104 vs 12.6-43), reflecting the stiffer E_sym. M5 has even higher y_p (up to 0.20) and mu_e (up to 102), reflecting the extreme proton-fraction tail. The per-model couplings produce physically distinguishable CLD reconstructions."
+    }
+  },
+  "json_updates": {
+    "SPG_M3": "coupling_params.delta and coupling_params.rho updated to path (a) fitted values; added per_model_coupling_extraction block (method, free_parameters, fit/eval RMS, reproduced/target E_sym, E_sat_preserved, competing_path_c_verdict, interpretation); verification_status upgraded to PER_MODEL_COUPLING_EXTRACTED_PATH_A_ISOSCALAR_FIXED_ISOVECTOR_FIT_VERIFIED_PHYSICAL_ESYM_41_8MEV_ESAT_MINUS16_PATH_C_REJECTED_NONPHYSICAL",
+    "SPG_M5": "coupling_params.delta and coupling_params.rho updated to path (a) fitted values; added per_model_coupling_extraction block (with M5-specific note that path (c) extrapolation is 3.7x worse than path (a), confirming overfit); verification_status upgraded to PER_MODEL_COUPLING_EXTRACTED_PATH_A_ISOSCALAR_FIXED_ISOVECTOR_FIT_VERIFIED_PHYSICAL_ESYM_43_1MEV_ESAT_MINUS16_PATH_C_REJECTED_NONPHYSICAL"
+  },
+  "remaining_residuals": "The path (a) E_sym residuals are 2.3 MeV (M3) and 4.3 MeV (M5) - the fit reproduces the export E_sym to within parabolic-approximation noise (the E_sym extraction itself in M3-j used the parabolic beta-equil approximation E_sym = mu_e / (4*(1-2*Yp)), which has ~2-4 MeV systematic uncertainty at these densities due to higher-order terms in the asymmetry expansion). A more precise per-model coupling would require the symmetric-matter cut (resolution path (b) from M3-j) or a direct numeric coupling table from Scurto 2024 Fig. 19. The current path (a) coupling is the best that can be extracted from the available data and reproduces the export within physical constraints.",
+  "files_in_this_commit": [
+    "data/eos390_rmf_parameter_sets.v1.json - SPG_M3, SPG_M5 coupling_params updated to path (a) fitted values; per_model_coupling_extraction blocks added; verification_status upgraded",
+    "download/reconstruction/SPG_M3/eos.thermo, eos.compo - re-emitted with per-model couplings (J_sym=42.8)",
+    "download/reconstruction/SPG_M5/eos.thermo, eos.compo - re-emitted with per-model couplings (J_sym=44.1)",
+    "download/reconstruction/SPG_FAMILY_SUMMARY.json - regenerated with per-model NMPs",
+    "data/receipts/eos390_m0/E390-02_M3_K_PER_MODEL_COUPLING_EXTRACTION_PATHS_A_VS_C_20261112.json - this receipt"
+  ],
+  "remaining_for_M3": "SPG_M3/M5 per-model couplings EXTRACTED via path (a) and verified physical. GPPVA DD-ME2/TW99/FSU2/NL3/TM1/TM1e still need exact coupling table extraction from their respective PDFs (PLACEHOLDER values flagged). M4 (outer crust splicing) and M5 (native Fortran porting) remain. If the researcher later provides the Scurto 2024 Fig. 19 numeric coupling tables (resolution path (b)), the path (a) coupling can be cross-validated and refined."
+}

@@ -1,0 +1,67 @@
+FFF.                                                                     [100%]
+=================================== FAILURES ===================================
+______ test_full_energy_gradient_matches_independent_differences[SPG_M1] _______
+
+model = 'SPG_M1'
+
+    @pytest.mark.parametrize('model', ['SPG_M1', 'SPG_M3', 'SPG_M5'])
+    def test_full_energy_gradient_matches_independent_differences(model):
+        x = np.array([0.12, 8.0, 0.15, 0.14])
+        energy, grad, state = cell(model, .03, x)
+        assert np.isfinite(energy)
+        for i, step in enumerate([1e-6, 1e-4, 1e-6, 1e-6]):
+            plus=x.copy(); minus=x.copy(); plus[i]+=step; minus[i]-=step
+            numeric=(cell(model,.03,plus)[0]-cell(model,.03,minus)[0])/(2*step)
+>           assert grad[i] == pytest.approx(numeric, abs=2e-6, rel=2e-6)
+E           assert np.float64(2.013334123239055) == 2.0844277539566747 ± 4.2e-06
+E             
+E             comparison failed
+E             Obtained: 2.013334123239055
+E             Expected: 2.0844277539566747 ± 4.2e-06
+
+python_frontend/tests/test_candidate_gdfm_cld.py:13: AssertionError
+______ test_full_energy_gradient_matches_independent_differences[SPG_M3] _______
+
+model = 'SPG_M3'
+
+    @pytest.mark.parametrize('model', ['SPG_M1', 'SPG_M3', 'SPG_M5'])
+    def test_full_energy_gradient_matches_independent_differences(model):
+        x = np.array([0.12, 8.0, 0.15, 0.14])
+        energy, grad, state = cell(model, .03, x)
+        assert np.isfinite(energy)
+        for i, step in enumerate([1e-6, 1e-4, 1e-6, 1e-6]):
+            plus=x.copy(); minus=x.copy(); plus[i]+=step; minus[i]-=step
+            numeric=(cell(model,.03,plus)[0]-cell(model,.03,minus)[0])/(2*step)
+>           assert grad[i] == pytest.approx(numeric, abs=2e-6, rel=2e-6)
+E           assert np.float64(1.8379535689950126) == 1.9120382397375124 ± 3.8e-06
+E             
+E             comparison failed
+E             Obtained: 1.8379535689950126
+E             Expected: 1.9120382397375124 ± 3.8e-06
+
+python_frontend/tests/test_candidate_gdfm_cld.py:13: AssertionError
+______ test_full_energy_gradient_matches_independent_differences[SPG_M5] _______
+
+model = 'SPG_M5'
+
+    @pytest.mark.parametrize('model', ['SPG_M1', 'SPG_M3', 'SPG_M5'])
+    def test_full_energy_gradient_matches_independent_differences(model):
+        x = np.array([0.12, 8.0, 0.15, 0.14])
+        energy, grad, state = cell(model, .03, x)
+        assert np.isfinite(energy)
+        for i, step in enumerate([1e-6, 1e-4, 1e-6, 1e-6]):
+            plus=x.copy(); minus=x.copy(); plus[i]+=step; minus[i]-=step
+            numeric=(cell(model,.03,plus)[0]-cell(model,.03,minus)[0])/(2*step)
+>           assert grad[i] == pytest.approx(numeric, abs=2e-6, rel=2e-6)
+E           assert np.float64(2.0031475393183986) == 2.0921918277849727 ± 4.2e-06
+E             
+E             comparison failed
+E             Obtained: 2.0031475393183986
+E             Expected: 2.0921918277849727 ± 4.2e-06
+
+python_frontend/tests/test_candidate_gdfm_cld.py:13: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_candidate_gdfm_cld.py::test_full_energy_gradient_matches_independent_differences[SPG_M1]
+FAILED python_frontend/tests/test_candidate_gdfm_cld.py::test_full_energy_gradient_matches_independent_differences[SPG_M3]
+FAILED python_frontend/tests/test_candidate_gdfm_cld.py::test_full_energy_gradient_matches_independent_differences[SPG_M5]
+3 failed, 1 passed in 0.49s

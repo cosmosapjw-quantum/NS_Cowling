@@ -1,0 +1,35 @@
+Traceback (most recent call last):
+  File "/home/cosmosapjw/ns_cowling_wt/native_dense_interp_20261118/scripts/benchmark_tf_native_holdout_20261118.py", line 124, in <module>
+    rows.append(f.result())
+                ^^^^^^^^^^
+  File "/home/cosmosapjw/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/cosmosapjw/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/cosmosapjw/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cosmosapjw/ns_cowling_wt/native_dense_interp_20261118/scripts/benchmark_tf_native_holdout_20261118.py", line 112, in run
+    save(OUTPUT/f"{case}.json",detail)
+  File "/home/cosmosapjw/ns_cowling_wt/native_dense_interp_20261118/scripts/run_dense_tf_20261118.py", line 54, in save
+    path.write_text(json.dumps(x,indent=2,allow_nan=False)+"\n")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cosmosapjw/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/json/__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "/home/cosmosapjw/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/json/encoder.py", line 202, in encode
+    chunks = list(chunks)
+             ^^^^^^^^^^^^
+  File "/home/cosmosapjw/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/json/encoder.py", line 432, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+  File "/home/cosmosapjw/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/json/encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "/home/cosmosapjw/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/json/encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "/home/cosmosapjw/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/json/encoder.py", line 439, in _iterencode
+    o = _default(o)
+        ^^^^^^^^^^^
+  File "/home/cosmosapjw/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/json/encoder.py", line 180, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type ndarray is not JSON serializable

@@ -1,0 +1,190 @@
+{
+  "tier": "original",
+  "crust": "XMLSLZ_TM1",
+  "core": "GM_GM1",
+  "original_source_ids": [
+    "public_original:XMLSLZ_TM1:crust",
+    "public_original:GM_GM1:core"
+  ],
+  "source_nuclear_functionals_different": true,
+  "source_origin_never_mixed": true,
+  "methods": [
+    "maxwell",
+    "css"
+  ],
+  "interpolations": [
+    "cubic",
+    "quintic"
+  ],
+  "source_matched_native_CSS": {
+    "status": "PASS",
+    "P_t": 0.3250764,
+    "n_low": 0.06,
+    "n_high": 0.0820725434211057,
+    "latent_heat": 20.94514667768203,
+    "cs2": 0.04355427361357764,
+    "source_rows": [
+      108,
+      301
+    ],
+    "output_rows": 431,
+    "actual_fortran_invoked": true,
+    "elapsed_seconds": 0.15783614496467635
+  },
+  "original_legacy_maxwell": {
+    "status": "PASS_NEW_NATIVE_FINITE",
+    "admitted_component_output_count": 1,
+    "admitted": [
+      {
+        "low_component": "component_001",
+        "high_component": "component_000",
+        "P_t": 0.14094052714912172,
+        "mu_t": 945.4332266614732,
+        "n_low": 0.04496277449037869,
+        "n_high": 0.05429182580330941,
+        "jump_n": 0.009329051312930714,
+        "latent_energy": 8.819995084474535,
+        "rows": 334,
+        "reported_by": "native Fortran single-conserved-charge Maxwell"
+      }
+    ],
+    "native_rejected": [],
+    "native_invoked": 1,
+    "preliminary_positive_crossings": 1
+  },
+  "interpolation_pair_results": {
+    "cubic+maxwell": {
+      "status": "PASS_SCOPED_LOCAL_MAXWELL_ROOT",
+      "input_interpolation_order": "cubic",
+      "matching": "maxwell",
+      "roots": [
+        {
+          "mu_t": 945.433251332759,
+          "p_t": 0.140941866602381,
+          "n_low": 0.04496308188370002,
+          "n_high": 0.05429197613336011,
+          "density_jump": 0.009328894249660095,
+          "latent_heat": 8.819846821795624,
+          "c2_sides": [
+            0.009575142817101206,
+            0.009424344766464273
+          ],
+          "source_components": [
+            "component_001",
+            "component_000"
+          ],
+          "P_abs_residual": 2.942091015256665e-15
+        }
+      ],
+      "limitation": "local source root; independent native Fortran Maxwell remains admission authority"
+    },
+    "cubic+css": {
+      "status": "PASS_DERIVED_INTERPOLATED_SOURCE",
+      "matching": "css",
+      "input_interpolation_order": "cubic",
+      "source_crust_interpolant": {
+        "original_rows": 108,
+        "interpolated_rows": 208,
+        "inserted_rows": 100,
+        "rejected_intermediate_rows": 7,
+        "unfilled_source_phase_intervals": 7,
+        "method": "cubic",
+        "matches_only_original_source_rows": true,
+        "derived_input_representation": true,
+        "not_provider_original_rows": true,
+        "physical_law": "P(mu), n=dP/dmu, epsilon=mu*n-P at inserted rows",
+        "physical_scope": "strict same-phase causal interpolation at new midpoints only"
+      },
+      "source_core_interpolant": {
+        "original_rows": 301,
+        "interpolated_rows": 601,
+        "inserted_rows": 300,
+        "rejected_intermediate_rows": 0,
+        "unfilled_source_phase_intervals": 0,
+        "method": "cubic",
+        "matches_only_original_source_rows": true,
+        "derived_input_representation": true,
+        "not_provider_original_rows": true,
+        "physical_law": "P(mu), n=dP/dmu, epsilon=mu*n-P at inserted rows",
+        "physical_scope": "strict same-phase causal interpolation at new midpoints only"
+      },
+      "P_t": 0.3250764,
+      "density_jump": 0.022095341657406023,
+      "delta_epsilon": 20.966780451107798,
+      "cs2_css": 0.04364077789762044,
+      "output_n": 813,
+      "source_remained_immutable": true,
+      "source_provenance_tier": "original",
+      "source_representation": "thermodynamically derived interpolation from same-tier original knots; NOT raw original provider numerical data",
+      "actual_native_matching": "css",
+      "serialized_readback_abs": 0.0
+    },
+    "quintic+maxwell": {
+      "status": "PASS_SCOPED_LOCAL_MAXWELL_ROOT",
+      "input_interpolation_order": "quintic",
+      "matching": "maxwell",
+      "roots": [
+        {
+          "mu_t": 945.433254325341,
+          "p_t": 0.14094202972408626,
+          "n_low": 0.0449629355434237,
+          "n_high": 0.05429185242548958,
+          "density_jump": 0.009328916882065885,
+          "latent_heat": 8.819868247142162,
+          "c2_sides": [
+            0.009581223873260105,
+            0.00940121650559524
+          ],
+          "source_components": [
+            "component_001",
+            "component_000"
+          ],
+          "P_abs_residual": 2.1371793224034263e-15
+        }
+      ],
+      "limitation": "local source root; independent native Fortran Maxwell remains admission authority"
+    },
+    "quintic+css": {
+      "status": "PASS_DERIVED_INTERPOLATED_SOURCE",
+      "matching": "css",
+      "input_interpolation_order": "quintic",
+      "source_crust_interpolant": {
+        "original_rows": 108,
+        "interpolated_rows": 205,
+        "inserted_rows": 97,
+        "rejected_intermediate_rows": 10,
+        "unfilled_source_phase_intervals": 10,
+        "method": "quintic",
+        "matches_only_original_source_rows": true,
+        "derived_input_representation": true,
+        "not_provider_original_rows": true,
+        "physical_law": "P(mu), n=dP/dmu, epsilon=mu*n-P at inserted rows",
+        "physical_scope": "strict same-phase causal interpolation at new midpoints only"
+      },
+      "source_core_interpolant": {
+        "original_rows": 301,
+        "interpolated_rows": 601,
+        "inserted_rows": 300,
+        "rejected_intermediate_rows": 0,
+        "unfilled_source_phase_intervals": 0,
+        "method": "quintic",
+        "matches_only_original_source_rows": true,
+        "derived_input_representation": true,
+        "not_provider_original_rows": true,
+        "physical_law": "P(mu), n=dP/dmu, epsilon=mu*n-P at inserted rows",
+        "physical_scope": "strict same-phase causal interpolation at new midpoints only"
+      },
+      "P_t": 0.3250764,
+      "density_jump": 0.02209535194394191,
+      "delta_epsilon": 20.96679021223948,
+      "cs2_css": 0.04364080254864565,
+      "output_n": 810,
+      "source_remained_immutable": true,
+      "source_provenance_tier": "original",
+      "source_representation": "thermodynamically derived interpolation from same-tier original knots; NOT raw original provider numerical data",
+      "actual_native_matching": "css",
+      "serialized_readback_abs": 0.0
+    }
+  },
+  "status": "COMPLETED_WITH_PRESERVED_REJECTIONS"
+}

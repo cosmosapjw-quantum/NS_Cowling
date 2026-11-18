@@ -1,0 +1,298 @@
+{
+  "status": "PASS_NATIVE_MAXWELL_MATCHED",
+  "tier": "reconstructed",
+  "crust": "SPG_M1",
+  "core": "PK1_CANONICAL",
+  "order": "quintic",
+  "matching": "maxwell",
+  "source_ids": [
+    "native_reconstructed:SPG_M1:crust",
+    "native_reconstructed:PK1_CANONICAL:core"
+  ],
+  "source_interpolants_are_derived": true,
+  "never_cross_tier": true,
+  "raw_source_rows_not_overwritten": true,
+  "source_component_names": [
+    "component_000",
+    "full_phase_0_769"
+  ],
+  "transition_P": 0.017444210968619065,
+  "mu_t": 943.29269811569,
+  "n_low": 0.011298560712959933,
+  "n_high": 0.019632545439358974,
+  "density_jump": 0.00833398472639904,
+  "latent_energy": 7.861386938619901,
+  "fortran_maxwell_identity": 0.0,
+  "from_cubic_quintic_local_root_P": 0.017444210899235188,
+  "local_root_pressure_difference": 6.938387711596938e-11,
+  "raw_source_Crust_sha256": "492da9325404c66557da4c5f88777985d1ae366bfdd47156b14398607aaf0f04",
+  "raw_source_Core_sha256": "e822a7bd9e1f0cd7c166167a4dcbae15d81dc43967bf656fe8a73bc7a91884d3",
+  "interpolated_source_component_rows": [
+    {
+      "component": "component_000",
+      "original_n_min": 0.0002331736909363899,
+      "original_n_max": 0.0765391794443131,
+      "original_rows": 129,
+      "interpolated_rows": 257
+    },
+    {
+      "component": "full_phase_0_769",
+      "original_n_min": 0.015,
+      "original_n_max": 1.0,
+      "original_rows": 769,
+      "interpolated_rows": 1537
+    }
+  ],
+  "source_interpolation_diagnostics": [
+    {
+      "original_rows": 129,
+      "interpolated_rows": 257,
+      "inserted_rows": 128,
+      "rejected_intermediate_rows": 0,
+      "unfilled_source_phase_intervals": 0,
+      "method": "quintic",
+      "matches_only_original_source_rows": true,
+      "derived_input_representation": true,
+      "not_provider_original_rows": true,
+      "physical_law": "P(mu), n=dP/dmu, epsilon=mu*n-P at inserted rows",
+      "physical_scope": "strict same-phase causal interpolation at new midpoints only"
+    },
+    {
+      "original_rows": 769,
+      "interpolated_rows": 1537,
+      "inserted_rows": 768,
+      "rejected_intermediate_rows": 0,
+      "unfilled_source_phase_intervals": 0,
+      "method": "quintic",
+      "matches_only_original_source_rows": true,
+      "derived_input_representation": true,
+      "not_provider_original_rows": true,
+      "physical_law": "P(mu), n=dP/dmu, epsilon=mu*n-P at inserted rows",
+      "physical_scope": "strict same-phase causal interpolation at new midpoints only"
+    }
+  ],
+  "matched_rows": 1678,
+  "serialized_readback_abs": 0.0,
+  "output_hashes": {
+    "eos.compo": "6d19e4bdefd20d85001b72bf5139798518cff21256388d9b70266ca17bd9dce2",
+    "eos.nb": "d3757e1ea7a6e02a11d99e8b51419bf9979a2db2abbb98f0f380742da389baa4",
+    "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "eos.thermo": "581130dca197183e278d86c081419a6ae682b4966b0af981ed1e6727c665f847"
+  },
+  "native_report": {
+    "status": "ok",
+    "operation": "maxwell-transition",
+    "n": 1678,
+    "mass_normalization_semantics": "physical_energy_preserving_Q_reencoding",
+    "physical_energy_shift_mev": 0.0,
+    "retained_thermodynamic_rows": "physical_columns_preserved_without_reconstruction",
+    "rest_energy_reference_mev": {
+      "low": [
+        938.9,
+        938.9
+      ],
+      "high": [
+        939.5731,
+        938.2796
+      ],
+      "output": [
+        938.9,
+        938.9
+      ]
+    },
+    "pressure_crossings": 1,
+    "low_phase_rows": 173,
+    "high_phase_rows": 1505,
+    "mu_transition": 943.29269811569,
+    "pressure_transition": 0.017444210968619065,
+    "n_low": 0.011298560712959933,
+    "n_high": 0.019632545439358974,
+    "epsilon_low": 10.64040560878329,
+    "epsilon_high": 18.50179254740319,
+    "density_jump": 0.00833398472639904,
+    "latent_energy_density": 7.861386938619901,
+    "maxwell_identity_residual": 0.0,
+    "interface_pressure_encoding_difference": 0.0,
+    "interface_pressure_roundoff_bound": 2.4789714769637875e-16,
+    "max_euler_residual_low": 4.840431764670225e-16,
+    "max_euler_residual_high": 6.933881411200094e-16,
+    "min_cs2_low": 0.0007172248375356119,
+    "max_cs2_low": 0.013596594253498918,
+    "min_cs2_high": 0.0010617214473666971,
+    "max_cs2_high": 0.46666301078342887,
+    "min_cs2": 0.0007172248375356119,
+    "max_cs2": 0.46666301078342887,
+    "source_support": {
+      "low": {
+        "status": "NOT_DECLARED"
+      },
+      "high": {
+        "status": "NOT_DECLARED"
+      }
+    },
+    "construction": "single_conserved_charge_local_neutrality_maxwell",
+    "local_charge_neutrality": "caller_confirmed",
+    "composition_preserved": false,
+    "drop_composition_requested": false,
+    "composition_dropped": false,
+    "composition_input_present": {
+      "low": false,
+      "high": false
+    },
+    "compose_export_allowed": true,
+    "composition_scope": "thermo_only_phase_labels_no_abundances",
+    "consistency": {
+      "C1": {
+        "temperature_mev": 0.0,
+        "maxQ2": 0.0,
+        "maxQ6mQ7": 0.0,
+        "maxmul": 0.0,
+        "pass_": true
+      },
+      "C2": {
+        "applicable": true,
+        "max_rel": 7.230292582696888e-16,
+        "pass_": true,
+        "basis": "Fortran CompOSE thermodynamic closure"
+      },
+      "C3": {
+        "status": "NOT_AVAILABLE",
+        "max_abs": 0.0,
+        "pass_": null
+      },
+      "C4": {
+        "status": "NOT_AVAILABLE",
+        "max_abs": 0.0,
+        "pass_": null
+      },
+      "C5": {
+        "maxmul": 0.0,
+        "applicable": true,
+        "pass_": true
+      },
+      "C6": {
+        "min_dPdnb": 0.0,
+        "min_delta_p": 0.0,
+        "pass_": true
+      },
+      "C7": {
+        "max_rel": 0.0029303382564089585,
+        "n_points": 1676,
+        "status": "FINITE_DIFFERENCE_DIAGNOSTIC"
+      },
+      "C8": {
+        "max_rel": 0.0010810512764579693,
+        "n_points": 1676,
+        "status": "FINITE_DIFFERENCE_DIAGNOSTIC"
+      },
+      "C9": {
+        "max_rel": 3.6038698777339386e-06,
+        "n_points": 1676,
+        "status": "FINITE_DIFFERENCE_DIAGNOSTIC"
+      },
+      "C10": {
+        "min_cs2": 0.0007174340399125898,
+        "max_cs2": 0.4666621050880307,
+        "min_cs2_first_law": 0.0007174339959116811,
+        "max_cs2_first_law": 0.466661857241206,
+        "acausal_point_count": 0,
+        "acausal_point_count_first_law": 0,
+        "n_points": 1676,
+        "pass_": true
+      },
+      "C11": {
+        "min_dmubdnb": 77.60530214500614,
+        "n_points": 1676,
+        "pass_": true
+      },
+      "overall": {
+        "status": "PASS",
+        "pass_": true,
+        "failed_checks": [],
+        "finite_primary_arrays": true,
+        "note": "C7-C9 are diagnostics; the native hard gate is C1-C6/C10/C11."
+      },
+      "native_report": {
+        "schema": "compose-eos-fortran-verification-v1",
+        "n": 1678,
+        "temperature_mev": 0.0,
+        "C1": {
+          "pass": true
+        },
+        "C2": {
+          "applicable": true,
+          "pass": true
+        },
+        "C3": {
+          "status": "NOT_AVAILABLE",
+          "pass": null
+        },
+        "C4": {
+          "status": "NOT_AVAILABLE",
+          "pass": null
+        },
+        "C5": {
+          "applicable": true,
+          "pass": true
+        },
+        "C6": {
+          "pass": true
+        },
+        "C7": {
+          "status": "FINITE_DIFFERENCE_DIAGNOSTIC",
+          "max_rel": 0.0029303382564089585,
+          "n_points": 1676
+        },
+        "C8": {
+          "status": "FINITE_DIFFERENCE_DIAGNOSTIC",
+          "max_rel": 0.0010810512764579693,
+          "n_points": 1676
+        },
+        "C9": {
+          "status": "FINITE_DIFFERENCE_DIAGNOSTIC",
+          "max_rel": 3.6038698777339386e-06,
+          "n_points": 1676
+        },
+        "C10": {
+          "pass": true
+        },
+        "C11": {
+          "pass": true
+        },
+        "C3_applicable_points": 0,
+        "C3_masked_points": 1678,
+        "C4_applicable_points": 0,
+        "C4_masked_points": 1678,
+        "derivative_points": 1676,
+        "derivative_masked_points": 2,
+        "C1_max_Q2": 0.0,
+        "C1_max_Q6_minus_Q7": 0.0,
+        "C1_max_mu_l": 0.0,
+        "C2_max_relative_residual": 7.230292582696888e-16,
+        "C3_max_absolute_residual": 0.0,
+        "C4_max_absolute_residual": 0.0,
+        "C7_max_relative_residual": 0.0029303382564089585,
+        "C8_max_relative_residual": 0.0010810512764579693,
+        "C9_max_relative_residual": 3.6038698777339386e-06,
+        "min_cs2": 0.0007174340399125898,
+        "max_cs2": 0.4666621050880307,
+        "min_cs2_first_law": 0.0007174339959116811,
+        "max_cs2_first_law": 0.466661857241206,
+        "min_dmu_b_dnb": 77.60530214500614,
+        "acausal_point_count": 0,
+        "acausal_point_count_first_law": 0,
+        "min_dP_dnb": 0.0,
+        "min_delta_P": 0.0,
+        "failed_checks": "",
+        "overall": {
+          "status": "PASS",
+          "pass": true
+        }
+      }
+    },
+    "is_exact_maxwell": true,
+    "seidov_criterion_evaluated": false,
+    "tov_interface_support": "not_verified"
+  }
+}

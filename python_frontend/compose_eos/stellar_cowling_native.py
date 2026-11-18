@@ -25,6 +25,7 @@ _ROOT = Path(__file__).resolve().parents[2]
 _FORTRAN = _ROOT / "fortran_eos"
 _SOURCES = [
     _FORTRAN / "src/compose_eos_cowling_dvode.f90",
+    _FORTRAN / "src/compose_eos_cowling_tov_dvode.f90",
     _FORTRAN / "vendor/odepack/vode.f",
     _FORTRAN / "vendor/odepack/dgefa.f",
     _FORTRAN / "vendor/odepack/dgesl.f",
@@ -70,6 +71,13 @@ def _native_library():
         _FORTRAN_ARRAY, _FORTRAN_ARRAY,
         ct.POINTER(ct.c_double), ct.POINTER(ct.c_int), ct.POINTER(ct.c_int)]
     dll.cowling_native_shot.restype = None
+    dll.tov_native_profile.argtypes = [
+        ct.c_int, _DOUBLE_ARRAY, _DOUBLE_ARRAY, _DOUBLE_ARRAY,
+        _DOUBLE_ARRAY, _DOUBLE_ARRAY,
+        ct.c_double, ct.c_double, ct.c_double, ct.c_double,
+        ct.c_double, ct.c_double, ct.c_int, _FORTRAN_ARRAY,
+        ct.POINTER(ct.c_int), ct.POINTER(ct.c_int)]
+    dll.tov_native_profile.restype = None
     _DLL = dll
     return dll
 
@@ -110,6 +118,13 @@ class NativeCowlingDVODE:
         self.match_s = float(np.sqrt(background.h_start
                                      -settings.match_h_fraction*background.h_c))
         base_s = np.linspace(0, self.surface_s, samples)
+        # Log-enthalpy clustering resolves the near-surface sound-speed
+        # behavior without needing O(h_start/surface_h) uniform s knots.
+        if settings.surface_h > 0.:
+            hg=np.geomspace(settings.surface_h, background.h_start,
+                             max(1025, samples//2))
+            base_s=np.unique(np.r_[base_s,
+                                    np.sqrt(np.maximum(background.h_start-hg,0.))])
         self.break_s = np.array([], dtype=float)
         if hasattr(background, "break_h"):
             break_h = np.asarray(background.break_h, dtype=float)
@@ -132,15 +147,19 @@ class NativeCowlingDVODE:
         hvalues[0] = background.h_start
         hvalues[-1] = settings.surface_h
         records = []
-        for h in hvalues:
-            st = background.state_at_enthalpy(float(h))
-            cs = float(st["cs2_over_c2"])
-            # Incompressible acausal Kelvin limit is a numerical control only.
-            if np.isposinf(cs):
-                cs = 1e100
-            records.append([st["r_km"], st["Phi"],
-                            st["lambda_metric"], st["dPhi_dr_km"], cs])
-        vals = np.asarray(records, dtype=np.float64)
+        if hasattr(background, "coefficients_on_s"):
+            vals = np.asarray(background.coefficients_on_s(self.s), dtype=np.float64)
+            if vals.shape != (len(self.s), 5):
+                raise ValueError("native background coefficient shape mismatch")
+        else:
+            for h in hvalues:
+                st = background.state_at_enthalpy(float(h))
+                cs = float(st["cs2_over_c2"])
+                if np.isposinf(cs):
+                    cs = 1e100
+                records.append([st["r_km"], st["Phi"],
+                                st["lambda_metric"], st["dPhi_dr_km"], cs])
+            vals = np.asarray(records, dtype=np.float64)
         if not np.all(np.isfinite(vals)):
             raise ValueError("nonfinite background coefficients")
         self._pchip = PchipInterpolator(self.s, vals, axis=0, extrapolate=False)

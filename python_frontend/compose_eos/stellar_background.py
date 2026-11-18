@@ -145,12 +145,21 @@ class StellarBackground:
                     backend="Python exact-contract enthalpy DOP853 reference")
 
 def solve_background(eos, central_density_fm3, *, r0_km=.001,rtol=1e-9,
-                     atol=1e-11,surface_h=0.,max_step_h=.005):
+                     atol=1e-11,surface_h=0.,max_step_h=.005,
+                     backend="python",native_samples=8193,native_method="adams"):
     """Integrate smooth beta-barotropic TOV within the declared source support.
 
     m0=4 pi epsilon_c r0³/3, hc-h0=2 pi (epsilon_c/3+Pc)r0².
     O(r0^4) and O(r0^5) omitted terms are controlled by center-radius convergence.
     """
+    if backend == "fortran_dvode":
+        from .stellar_cowling_tov_native import solve_background_native
+        return solve_background_native(eos,central_density_fm3,r0_km=r0_km,
+                   rtol=rtol,atol=atol,surface_h=surface_h,
+                   max_step_h=max_step_h,native_samples=native_samples,
+                   method=native_method)
+    if backend != "python":
+        raise ValueError("unsupported TOV backend")
     if not (np.isfinite(r0_km) and r0_km > 0 and rtol > 0 and atol > 0
             and max_step_h > 0 and surface_h >= 0):
         raise ValueError("positive finite solver controls required")

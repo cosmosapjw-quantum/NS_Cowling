@@ -1,0 +1,711 @@
+{
+  "schema": "ns_cowling.native_tov_cowling_parity.v1",
+  "parent_commit": "e0f481178b327ff344b15152679a5b192c16ad90",
+  "source_sha256": {
+    "python_frontend/compose_eos/stellar_background.py": "fe74d31ae9ee2a5895af366b58c6561ddf62341afc8c035f7d27efcbca5acb35",
+    "python_frontend/compose_eos/stellar_cowling.py": "b6dd007c908f2e4119d114101e7c714986b50a49110e760d20923dc0d2bdb4c5",
+    "python_frontend/compose_eos/stellar_cowling_tov_native.py": "5147501dc94d760ec642766433b33ce80220c92791ee4fc7506776fdc78810ca",
+    "python_frontend/compose_eos/stellar_cowling_native.py": "6dff0f52f4ac38611a3b61b66fceec83173c46a039456487a0439aa609a18218",
+    "fortran_eos/src/compose_eos_cowling_tov_dvode.f90": "b77bae46eef66fcae7d9cd1eddc05ade531e2551e461680fa3cd12ea8ce72d6a",
+    "fortran_eos/src/compose_eos_cowling_dvode.f90": "bf30cfa6e37c7e727a106e51a62f41616217477a75d62db29b99e563fbb28a9b"
+  },
+  "platform": "Linux-7.0.0-43-generic-x86_64-with-glibc2.39",
+  "compiler": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "python": "3.12.3",
+  "threads": {
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1"
+  },
+  "definitions": {
+    "metric": "(-,+,+,+) with r,m in geometric km",
+    "background": "TOV h-sqrt(hstart-h) center, surface_h=1e-4",
+    "mode": "equilibrium barotropic ell=2, matched determinant roots",
+    "python_ref": "DOP853 with exact EOS at every RHS evaluation",
+    "native": "PCHIP-sampled exact EOS; both ODEs with native Netlib DVODE Adams",
+    "scope": "no Maxwell sharp interfaces, no full-native EOS generator",
+    "TOV_controls": {
+      "surface_h": 0.0001,
+      "rtol": 1e-10,
+      "atol": 1e-12,
+      "max_step_h": 0.002
+    },
+    "mode_controls": {
+      "ell": 2,
+      "rtol": 1e-09,
+      "atol": 1e-12,
+      "surface_h": 0.0001,
+      "match_h_fraction": 0.15,
+      "max_step_h": 0.002,
+      "root_xtol_hz": 1e-05
+    },
+    "reference_timing": "one Python invocation per mode",
+    "native_timing": "seven warm invocations per mode after native TOV sampling"
+  },
+  "cases": [
+    {
+      "case_id": "primary_n035",
+      "source_path": "data/core_support_20261117/primary_v1/REPRESENTATION.json",
+      "source_sha256": "591ac27aa99448512e291684c98f8273efc729d17c63be88e331c20e83bd2653",
+      "central_density_fm3": 0.35,
+      "eos_max_density": 1.0,
+      "python_background_seconds": 0.1589409540174529,
+      "native_background_seconds_including_python_eos_sampling": 0.27647187002003193,
+      "background": {
+        "python": {
+          "mass_msun": 0.7686502489187028,
+          "radius_km": 12.02829024173062
+        },
+        "native": {
+          "mass_msun": 0.7686502614787432,
+          "radius_km": 12.028290222934857,
+          "ode_rhs_calls": 1753,
+          "profile_points": 9450
+        },
+        "delta_mass_msun": 1.2560040341114131e-08,
+        "delta_radius_km": -1.8795763168100166e-08
+      },
+      "modes": {
+        "f": {
+          "root_bracket_hz": [
+            2000.0,
+            2142.857142857143
+          ],
+          "python_exact_dop853": {
+            "frequency_hz": 2068.5287606052007,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "matching_residual": 9.16528452436049e-08,
+            "relative_join_mismatch": 9.165284526607151e-08,
+            "surface_BC_relative": 5.882772997806394e-17,
+            "nfev": 41350
+          },
+          "native_tov_native_cowling": {
+            "frequency_hz": 2068.52741576333,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "matching_residual": 5.369643479273075e-08,
+            "relative_join_mismatch": 5.369643481266726e-08,
+            "surface_BC_relative": 0.0,
+            "nfev": 11345
+          },
+          "frequency_difference_hz": -0.0013448418708321697,
+          "python_solve_seconds": 20.508188747044187,
+          "native_warm_solve_median_seconds": 0.020663532020989805,
+          "native_warm_seconds": [
+            0.020953898027073592,
+            0.020663532020989805,
+            0.020666016032919288,
+            0.020719836989883333,
+            0.0205627009854652,
+            0.020636489964090288,
+            0.0206416699802503
+          ],
+          "speedup_warm_shooting": 992.4822497050445
+        },
+        "p1": {
+          "root_bracket_hz": [
+            5142.857142857143,
+            5285.714285714286
+          ],
+          "python_exact_dop853": {
+            "frequency_hz": 5225.5789830864815,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "matching_residual": 1.2912689569708485e-10,
+            "relative_join_mismatch": 1.2912689722271991e-10,
+            "surface_BC_relative": 0.0,
+            "nfev": 65641
+          },
+          "native_tov_native_cowling": {
+            "frequency_hz": 5225.6673556500455,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "matching_residual": -7.166268571639239e-08,
+            "relative_join_mismatch": 7.166268571430948e-08,
+            "surface_BC_relative": 8.36489005965217e-17,
+            "nfev": 16871
+          },
+          "frequency_difference_hz": 0.08837256356400758,
+          "python_solve_seconds": 37.10189893498318,
+          "native_warm_solve_median_seconds": 0.03456190100405365,
+          "native_warm_seconds": [
+            0.03532697301125154,
+            0.0346125970245339,
+            0.03463791502872482,
+            0.03455518902046606,
+            0.034519021050073206,
+            0.03456190100405365,
+            0.03405323298648
+          ],
+          "speedup_warm_shooting": 1073.491268047774
+        }
+      },
+      "resolution_convergence": {
+        "4097": {
+          "M_msun": 0.7686502873954058,
+          "R_km": 12.028290172704967,
+          "modes": {
+            "f": {
+              "frequency_hz": 2068.5242213882407,
+              "W_nodes": 0,
+              "V_nodes": 0
+            },
+            "p1": {
+              "frequency_hz": 5225.724158379704,
+              "W_nodes": 1,
+              "V_nodes": 1
+            }
+          }
+        },
+        "16385": {
+          "M_msun": 0.7686502618063272,
+          "R_km": 12.028290227137946,
+          "modes": {
+            "f": {
+              "frequency_hz": 2068.528194015473,
+              "W_nodes": 0,
+              "V_nodes": 0
+            },
+            "p1": {
+              "frequency_hz": 5225.650921981515,
+              "W_nodes": 1,
+              "V_nodes": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "case_id": "primary_n1p4",
+      "source_path": "data/core_support_20261117/primary_v1/REPRESENTATION.json",
+      "source_sha256": "591ac27aa99448512e291684c98f8273efc729d17c63be88e331c20e83bd2653",
+      "central_density_fm3": 0.5377339776363226,
+      "eos_max_density": 1.0,
+      "python_background_seconds": 0.16591184004209936,
+      "native_background_seconds_including_python_eos_sampling": 0.27560422202805057,
+      "background": {
+        "python": {
+          "mass_msun": 1.3999999756903614,
+          "radius_km": 11.752078353190377
+        },
+        "native": {
+          "mass_msun": 1.4000000296500585,
+          "radius_km": 11.752078301193656,
+          "ode_rhs_calls": 1679,
+          "profile_points": 9549
+        },
+        "delta_mass_msun": 5.39596971549372e-08,
+        "delta_radius_km": -5.199672159506008e-08
+      },
+      "modes": {
+        "f": {
+          "root_bracket_hz": [
+            2285.714285714286,
+            2428.5714285714284
+          ],
+          "python_exact_dop853": {
+            "frequency_hz": 2401.3819613608553,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "matching_residual": 5.948704884497996e-09,
+            "relative_join_mismatch": 5.9487049156576566e-09,
+            "surface_BC_relative": 0.0,
+            "nfev": 36874
+          },
+          "native_tov_native_cowling": {
+            "frequency_hz": 2401.3773727030716,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "matching_residual": -4.2961344740445094e-08,
+            "relative_join_mismatch": 4.2961344763680426e-08,
+            "surface_BC_relative": 0.0,
+            "nfev": 10502
+          },
+          "frequency_difference_hz": -0.004588657783642702,
+          "python_solve_seconds": 12.343890481977724,
+          "native_warm_solve_median_seconds": 0.023063726956024766,
+          "native_warm_seconds": [
+            0.022812384006101638,
+            0.022982524998951703,
+            0.023070088995154947,
+            0.023341831983998418,
+            0.022637324000243098,
+            0.02323810604866594,
+            0.023063726956024766
+          ],
+          "speedup_warm_shooting": 535.2079698790061
+        },
+        "p1": {
+          "root_bracket_hz": [
+            6714.285714285715,
+            6857.142857142857
+          ],
+          "python_exact_dop853": {
+            "frequency_hz": 6721.956990187701,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "matching_residual": -1.2655646245283984e-09,
+            "relative_join_mismatch": 1.2655646215774314e-09,
+            "surface_BC_relative": 0.0,
+            "nfev": 60175
+          },
+          "native_tov_native_cowling": {
+            "frequency_hz": 6721.959720833763,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "matching_residual": -3.2845466585744272e-09,
+            "relative_join_mismatch": 3.284546657608515e-09,
+            "surface_BC_relative": 0.0,
+            "nfev": 15835
+          },
+          "frequency_difference_hz": 0.0027306460615363903,
+          "python_solve_seconds": 32.1844631319982,
+          "native_warm_solve_median_seconds": 0.023528937017545104,
+          "native_warm_seconds": [
+            0.02378445799695328,
+            0.023588698997627944,
+            0.023522083007264882,
+            0.023528937017545104,
+            0.023515079985372722,
+            0.02350919897435233,
+            0.023611972981598228
+          ],
+          "speedup_warm_shooting": 1367.8672822320373
+        }
+      },
+      "resolution_convergence": {
+        "4097": {
+          "M_msun": 1.4000000382056748,
+          "R_km": 11.75207830337322,
+          "modes": {
+            "f": {
+              "frequency_hz": 2401.3695468338774,
+              "W_nodes": 0,
+              "V_nodes": 0
+            },
+            "p1": {
+              "frequency_hz": 6721.939402623714,
+              "W_nodes": 1,
+              "V_nodes": 1
+            }
+          }
+        },
+        "16385": {
+          "M_msun": 1.400000021133655,
+          "R_km": 11.752078305494514,
+          "modes": {
+            "f": {
+              "frequency_hz": 2401.381361509819,
+              "W_nodes": 0,
+              "V_nodes": 0
+            },
+            "p1": {
+              "frequency_hz": 6721.959545306013,
+              "W_nodes": 1,
+              "V_nodes": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "case_id": "primary_n070",
+      "source_path": "data/core_support_20261117/primary_v1/REPRESENTATION.json",
+      "source_sha256": "591ac27aa99448512e291684c98f8273efc729d17c63be88e331c20e83bd2653",
+      "central_density_fm3": 0.7,
+      "eos_max_density": 1.0,
+      "python_background_seconds": 0.20293257402954623,
+      "native_background_seconds_including_python_eos_sampling": 0.271370954986196,
+      "background": {
+        "python": {
+          "mass_msun": 1.7517946459876865,
+          "radius_km": 11.378430217893316
+        },
+        "native": {
+          "mass_msun": 1.7517946450294064,
+          "radius_km": 11.378430237267228,
+          "ode_rhs_calls": 1616,
+          "profile_points": 9624
+        },
+        "delta_mass_msun": -9.582801219210069e-10,
+        "delta_radius_km": 1.9373912252262926e-08
+      },
+      "modes": {
+        "f": {
+          "root_bracket_hz": [
+            2428.5714285714284,
+            2571.4285714285716
+          ],
+          "python_exact_dop853": {
+            "frequency_hz": 2569.8534319188047,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "matching_residual": 4.5868807237291817e-10,
+            "relative_join_mismatch": 4.5868803920949606e-10,
+            "surface_BC_relative": 0.0,
+            "nfev": 31663
+          },
+          "native_tov_native_cowling": {
+            "frequency_hz": 2569.841744327043,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "matching_residual": -4.4704471231566144e-08,
+            "relative_join_mismatch": 4.470447118834524e-08,
+            "surface_BC_relative": 0.0,
+            "nfev": 10102
+          },
+          "frequency_difference_hz": -0.011687591761528893,
+          "python_solve_seconds": 16.662568516971078,
+          "native_warm_solve_median_seconds": 0.018460327002685517,
+          "native_warm_seconds": [
+            0.01887253299355507,
+            0.018473010044544935,
+            0.018457069993019104,
+            0.018460327002685517,
+            0.018396505969576538,
+            0.01849711500108242,
+            0.018388781987596303
+          ],
+          "speedup_warm_shooting": 902.6150248880797
+        },
+        "p1": {
+          "root_bracket_hz": [
+            7000.0,
+            7142.857142857143
+          ],
+          "python_exact_dop853": {
+            "frequency_hz": 7142.4024427703125,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "matching_residual": -3.142168780105151e-08,
+            "relative_join_mismatch": 3.1421687798004925e-08,
+            "surface_BC_relative": 0.0,
+            "nfev": 55498
+          },
+          "native_tov_native_cowling": {
+            "frequency_hz": 7142.3037199914115,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "matching_residual": -1.1018986093105916e-07,
+            "relative_join_mismatch": 1.1018986093794951e-07,
+            "surface_BC_relative": 0.0,
+            "nfev": 15805
+          },
+          "frequency_difference_hz": -0.09872277890099213,
+          "python_solve_seconds": 32.11678408802254,
+          "native_warm_solve_median_seconds": 0.04699196602450684,
+          "native_warm_seconds": [
+            0.0473142130067572,
+            0.047159011010080576,
+            0.046922934998292476,
+            0.04710478795459494,
+            0.04695700900629163,
+            0.04699196602450684,
+            0.046956537989899516
+          ],
+          "speedup_warm_shooting": 683.4526580835814
+        }
+      },
+      "resolution_convergence": {
+        "4097": {
+          "M_msun": 1.7517946250128578,
+          "R_km": 11.378430252181314,
+          "modes": {
+            "f": {
+              "frequency_hz": 2569.827780334248,
+              "W_nodes": 0,
+              "V_nodes": 0
+            },
+            "p1": {
+              "frequency_hz": 7142.222365360737,
+              "W_nodes": 1,
+              "V_nodes": 1
+            }
+          }
+        },
+        "16385": {
+          "M_msun": 1.751794645798055,
+          "R_km": 11.378430235186654,
+          "modes": {
+            "f": {
+              "frequency_hz": 2569.851184790299,
+              "W_nodes": 0,
+              "V_nodes": 0
+            },
+            "p1": {
+              "frequency_hz": 7142.385577260151,
+              "W_nodes": 1,
+              "V_nodes": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "case_id": "extension_medium_n115",
+      "source_path": "data/stellar_extension_20261117/eos/medium/REPRESENTATION.json",
+      "source_sha256": "9ead5ff4548c23fba16c01600439175fff165a4f423ad0e13b9bd635d1950eef",
+      "central_density_fm3": 1.15,
+      "eos_max_density": 1.2649856715193053,
+      "python_background_seconds": 0.31225979002192616,
+      "native_background_seconds_including_python_eos_sampling": 0.2847306210314855,
+      "background": {
+        "python": {
+          "mass_msun": 2.0484564181192457,
+          "radius_km": 10.141741782024976
+        },
+        "native": {
+          "mass_msun": 2.048456412105625,
+          "radius_km": 10.14174179809283,
+          "ode_rhs_calls": 1686,
+          "profile_points": 9960
+        },
+        "delta_mass_msun": -6.0136207125083274e-09,
+        "delta_radius_km": 1.6067854602397347e-08
+      },
+      "modes": {
+        "f": {
+          "root_bracket_hz": [
+            2857.142857142857,
+            3000.0
+          ],
+          "python_exact_dop853": {
+            "frequency_hz": 2868.4734160570124,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "matching_residual": -3.700296748948371e-08,
+            "relative_join_mismatch": 3.7002967496851326e-08,
+            "surface_BC_relative": 0.0,
+            "nfev": 30307
+          },
+          "native_tov_native_cowling": {
+            "frequency_hz": 2868.4729913971264,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "matching_residual": -1.1154402661579755e-08,
+            "relative_join_mismatch": 1.1154402663311965e-08,
+            "surface_BC_relative": 0.0,
+            "nfev": 9318
+          },
+          "frequency_difference_hz": -0.0004246598859936057,
+          "python_solve_seconds": 11.246475074032787,
+          "native_warm_solve_median_seconds": 0.013733610976487398,
+          "native_warm_seconds": [
+            0.014237971976399422,
+            0.01385610195575282,
+            0.013761973998043686,
+            0.013729153026361018,
+            0.013733610976487398,
+            0.013715396984480321,
+            0.01372061698930338
+          ],
+          "speedup_warm_shooting": 818.9015324001308
+        },
+        "p1": {
+          "root_bracket_hz": [
+            7428.571428571428,
+            7571.428571428572
+          ],
+          "python_exact_dop853": {
+            "frequency_hz": 7480.127176344198,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "matching_residual": -1.4955668416488843e-09,
+            "relative_join_mismatch": 1.4955668425360448e-09,
+            "surface_BC_relative": 6.190477447104502e-17,
+            "nfev": 53281
+          },
+          "native_tov_native_cowling": {
+            "frequency_hz": 7480.135561488932,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "matching_residual": 5.350133756160459e-08,
+            "relative_join_mismatch": 5.3501337561396347e-08,
+            "surface_BC_relative": 0.0,
+            "nfev": 15680
+          },
+          "frequency_difference_hz": 0.00838514473343821,
+          "python_solve_seconds": 37.038438881980255,
+          "native_warm_solve_median_seconds": 0.04034402297111228,
+          "native_warm_seconds": [
+            0.040800924005452543,
+            0.04287172696786001,
+            0.04018631496001035,
+            0.04020753502845764,
+            0.04034402297111228,
+            0.04031275399029255,
+            0.0403730480466038
+          ],
+          "speedup_warm_shooting": 918.0650850933002
+        }
+      },
+      "resolution_convergence": {
+        "4097": {
+          "M_msun": 2.048456357158635,
+          "R_km": 10.141741820912413,
+          "modes": {
+            "f": {
+              "frequency_hz": 2868.4749369000465,
+              "W_nodes": 0,
+              "V_nodes": 0
+            },
+            "p1": {
+              "frequency_hz": 7480.164077116501,
+              "W_nodes": 1,
+              "V_nodes": 1
+            }
+          }
+        },
+        "16385": {
+          "M_msun": 2.048456406172813,
+          "R_km": 10.141741794201728,
+          "modes": {
+            "f": {
+              "frequency_hz": 2868.4721346034057,
+              "W_nodes": 0,
+              "V_nodes": 0
+            },
+            "p1": {
+              "frequency_hz": 7480.114745353164,
+              "W_nodes": 1,
+              "V_nodes": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "case_id": "extension_fine_n115",
+      "source_path": "data/stellar_extension_20261117/eos/fine/REPRESENTATION.json",
+      "source_sha256": "f1bd5c3c41b45a07a7299e665594173473ac790af6f519bf53085db843bd936d",
+      "central_density_fm3": 1.15,
+      "eos_max_density": 1.2649856715193053,
+      "python_background_seconds": 0.3130490680341609,
+      "native_background_seconds_including_python_eos_sampling": 0.28769563598325476,
+      "background": {
+        "python": {
+          "mass_msun": 2.0484564204725824,
+          "radius_km": 10.141741781181302
+        },
+        "native": {
+          "mass_msun": 2.0484564109865557,
+          "radius_km": 10.141741796910273,
+          "ode_rhs_calls": 1688,
+          "profile_points": 10188
+        },
+        "delta_mass_msun": -9.486026630867173e-09,
+        "delta_radius_km": 1.5728970126360764e-08
+      },
+      "modes": {
+        "f": {
+          "root_bracket_hz": [
+            2857.142857142857,
+            3000.0
+          ],
+          "python_exact_dop853": {
+            "frequency_hz": 2868.4733617072025,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "matching_residual": -5.624131640784783e-08,
+            "relative_join_mismatch": 5.6241316478296876e-08,
+            "surface_BC_relative": 0.0,
+            "nfev": 29458
+          },
+          "native_tov_native_cowling": {
+            "frequency_hz": 2868.4687880311567,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "matching_residual": 2.7546158315884938e-08,
+            "relative_join_mismatch": 2.7546158313293944e-08,
+            "surface_BC_relative": 1.0377646524255068e-16,
+            "nfev": 9011
+          },
+          "frequency_difference_hz": -0.004573676045765751,
+          "python_solve_seconds": 26.229960754979402,
+          "native_warm_solve_median_seconds": 0.021338707010727376,
+          "native_warm_seconds": [
+            0.021379153011366725,
+            0.020962237031199038,
+            0.02072573098121211,
+            0.022802816005423665,
+            0.021406353975180537,
+            0.021338707010727376,
+            0.020711074001155794
+          ],
+          "speedup_warm_shooting": 1229.2197808326953
+        },
+        "p1": {
+          "root_bracket_hz": [
+            7428.571428571428,
+            7571.428571428572
+          ],
+          "python_exact_dop853": {
+            "frequency_hz": 7480.127071624914,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "matching_residual": -8.540490103741253e-09,
+            "relative_join_mismatch": 8.540490103209866e-09,
+            "surface_BC_relative": 0.0,
+            "nfev": 53926
+          },
+          "native_tov_native_cowling": {
+            "frequency_hz": 7480.083939295287,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "matching_residual": 1.2853017131173829e-07,
+            "relative_join_mismatch": 1.2853017130666008e-07,
+            "surface_BC_relative": 0.0,
+            "nfev": 15447
+          },
+          "frequency_difference_hz": -0.043132329627042054,
+          "python_solve_seconds": 29.769931688031647,
+          "native_warm_solve_median_seconds": 0.037865868012886494,
+          "native_warm_seconds": [
+            0.03817971900571138,
+            0.037865868012886494,
+            0.037807166983839124,
+            0.03781010303646326,
+            0.03808174503501505,
+            0.03792334598256275,
+            0.03782776597654447
+          ],
+          "speedup_warm_shooting": 786.194355240988
+        }
+      },
+      "resolution_convergence": {
+        "4097": {
+          "M_msun": 2.048456372705064,
+          "R_km": 10.141741814766956,
+          "modes": {
+            "f": {
+              "frequency_hz": 2868.469194808083,
+              "W_nodes": 0,
+              "V_nodes": 0
+            },
+            "p1": {
+              "frequency_hz": 7480.089159340117,
+              "W_nodes": 1,
+              "V_nodes": 1
+            }
+          }
+        },
+        "16385": {
+          "M_msun": 2.048456447756669,
+          "R_km": 10.141741770272173,
+          "modes": {
+            "f": {
+              "frequency_hz": 2868.4701361672455,
+              "W_nodes": 0,
+              "V_nodes": 0
+            },
+            "p1": {
+              "frequency_hz": 7480.090430859795,
+              "W_nodes": 1,
+              "V_nodes": 1
+            }
+          }
+        }
+      }
+    }
+  ]
+}

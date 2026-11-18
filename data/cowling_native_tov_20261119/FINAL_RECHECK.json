@@ -1,0 +1,632 @@
+{
+  "schema": "ns_cowling.native_tov_cowling_final_recheck.v1",
+  "original_reference_sha256": "382289e95e073f5440eaef20c00fba3ed841b0f46f9499ba0c8770fef0c4924b",
+  "reference_type": "Python DOP853 exact-contract baseline copied from immutable original run by matching source+inputs",
+  "current_commit_at_run": "e0f481178b327ff344b15152679a5b192c16ad90",
+  "compiler": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "hardware": "Linux-7.0.0-43-generic-x86_64-with-glibc2.39",
+  "current_source_sha256": {
+    "fortran_eos/src/compose_eos_cowling_tov_dvode.f90": "2f6c66d8a40ae342b754e400dfbc951cf2aaa0c36a7a72c2296b7021a5d313bc",
+    "fortran_eos/src/compose_eos_cowling_dvode.f90": "bf30cfa6e37c7e727a106e51a62f41616217477a75d62db29b99e563fbb28a9b",
+    "python_frontend/compose_eos/stellar_cowling_tov_native.py": "d8e3bf34c1a5de10ba96687f3896e4da1e3531d5484b06f07c8fec3395d20f51",
+    "python_frontend/compose_eos/stellar_cowling_native.py": "5bdb81cfec17f0401847ed484db19c1556d6c7e56b6d23d5d2695a1246eec97f"
+  },
+  "controls": {
+    "background": {
+      "surface_h": 0.0001,
+      "rtol": 1e-10,
+      "atol": 1e-12,
+      "max_step_h": 0.002
+    },
+    "mode": {
+      "ell": 2,
+      "rtol": 1e-09,
+      "atol": 1e-12,
+      "surface_h": 0.0001,
+      "match_h_fraction": 0.15,
+      "max_step_h": 0.002,
+      "root_xtol_hz": 1e-05
+    },
+    "native_samples": 8193,
+    "native_method": "DVODE Adams",
+    "source_contract": "Original exact piece laws evaluated once in Python; no sharp interfaces",
+    "timing": "No JIT/recompile cost; background EOS sampling and native ODE included in measured background time"
+  },
+  "cases": [
+    {
+      "case_id": "primary_n035",
+      "eos_sha256": "591ac27aa99448512e291684c98f8273efc729d17c63be88e331c20e83bd2653",
+      "central_density_fm3": 0.35,
+      "native_background": {
+        "M_msun": 0.7686502630509434,
+        "R_km": 12.028290228016251,
+        "source_knots": 13544,
+        "tov_nfev": 1844
+      },
+      "exact_python_background": {
+        "mass_msun": 0.7686502489187028,
+        "radius_km": 12.02829024173062
+      },
+      "native_background_setup_seconds": 0.3433961839764379,
+      "native_mode_setup_seconds": 0.005760890955571085,
+      "modes": {
+        "f": {
+          "bracket_hz": [
+            2000.0,
+            2142.857142857143
+          ],
+          "python_original": {
+            "frequency_hz": 2068.5287606052007,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "matching_residual": 9.16528452436049e-08,
+            "relative_join_mismatch": 9.165284526607151e-08,
+            "surface_BC_relative": 5.882772997806394e-17,
+            "nfev": 41350
+          },
+          "native_current": {
+            "frequency_hz": 2068.5270526110353,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "nfev": 10145,
+            "matching_residual": 3.0778446038091425e-08,
+            "relative_join_mismatch": 3.077844605705615e-08,
+            "surface_BC_relative": 5.882807616492931e-17
+          },
+          "delta_hz": -0.0017079941653719288,
+          "relative_frequency_error": 8.25704818758339e-07,
+          "native_seven_wall_seconds": [
+            0.024686971039045602,
+            0.023556680011097342,
+            0.023320242995396256,
+            0.0233567520044744,
+            0.03085045999614522,
+            0.0231013810262084,
+            0.02276282396633178
+          ],
+          "native_warm_median_seconds": 0.0233567520044744,
+          "python_original_wall_seconds": 20.508188747044187,
+          "speedup_warm_vs_python": 878.0411224606692
+        },
+        "p1": {
+          "bracket_hz": [
+            5142.857142857143,
+            5285.714285714286
+          ],
+          "python_original": {
+            "frequency_hz": 5225.5789830864815,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "matching_residual": 1.2912689569708485e-10,
+            "relative_join_mismatch": 1.2912689722271991e-10,
+            "surface_BC_relative": 0.0,
+            "nfev": 65641
+          },
+          "native_current": {
+            "frequency_hz": 5225.659317996174,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "nfev": 16697,
+            "matching_residual": -1.989915685276735e-09,
+            "relative_join_mismatch": 1.989915688062741e-09,
+            "surface_BC_relative": 0.0
+          },
+          "delta_hz": 0.08033490969228296,
+          "relative_frequency_error": 1.537339880466858e-05,
+          "native_seven_wall_seconds": [
+            0.03414041199721396,
+            0.03419616702012718,
+            0.034878832986578345,
+            0.0341958369826898,
+            0.03475232602795586,
+            0.03494406695244834,
+            0.035024457960389555
+          ],
+          "native_warm_median_seconds": 0.03475232602795586,
+          "python_original_wall_seconds": 37.10189893498318,
+          "speedup_warm_vs_python": 1067.6090833499102
+        }
+      },
+      "full_pipeline": {
+        "python_original_seconds": 57.76902863604482,
+        "native_current_seconds": 0.40726615296443924,
+        "speedup_python_over_native": 141.8458868127177,
+        "note": "Two modes per source with preidentified brackets; native setup includes Python EOS sampling, not compilation"
+      },
+      "sample_convergence": {
+        "4097": {
+          "M_msun": 0.7686502678185122,
+          "R_km": 12.028290260920837,
+          "modes": {
+            "f": 2068.524003614135,
+            "p1": 5225.716973582868
+          }
+        },
+        "16385": {
+          "M_msun": 0.7686502653372762,
+          "R_km": 12.028290227086753,
+          "modes": {
+            "f": 2068.5280623296717,
+            "p1": 5225.624377306817
+          }
+        }
+      }
+    },
+    {
+      "case_id": "primary_n1p4",
+      "eos_sha256": "591ac27aa99448512e291684c98f8273efc729d17c63be88e331c20e83bd2653",
+      "central_density_fm3": 0.5377339776363226,
+      "native_background": {
+        "M_msun": 1.4000000236376446,
+        "R_km": 11.752078305439584,
+        "source_knots": 13643,
+        "tov_nfev": 1810
+      },
+      "exact_python_background": {
+        "mass_msun": 1.3999999756903614,
+        "radius_km": 11.752078353190377
+      },
+      "native_background_setup_seconds": 0.34898623399203643,
+      "native_mode_setup_seconds": 0.004077487043105066,
+      "modes": {
+        "f": {
+          "bracket_hz": [
+            2285.714285714286,
+            2428.5714285714284
+          ],
+          "python_original": {
+            "frequency_hz": 2401.3819613608553,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "matching_residual": 5.948704884497996e-09,
+            "relative_join_mismatch": 5.9487049156576566e-09,
+            "surface_BC_relative": 0.0,
+            "nfev": 36874
+          },
+          "native_current": {
+            "frequency_hz": 2401.3769284723944,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "nfev": 8712,
+            "matching_residual": -2.258889078270096e-08,
+            "relative_join_mismatch": 2.25888908061851e-08,
+            "surface_BC_relative": 1.0019983137089585e-16
+          },
+          "delta_hz": -0.005032888460846152,
+          "relative_frequency_error": 2.0958300436278913e-06,
+          "native_seven_wall_seconds": [
+            0.01964772999053821,
+            0.019084377971012145,
+            0.019308700982946903,
+            0.019315725017804652,
+            0.019364024978131056,
+            0.01964216894702986,
+            0.01933247601846233
+          ],
+          "native_warm_median_seconds": 0.01933247601846233,
+          "python_original_wall_seconds": 12.343890481977724,
+          "speedup_warm_vs_python": 638.5054076978772
+        },
+        "p1": {
+          "bracket_hz": [
+            6714.285714285715,
+            6857.142857142857
+          ],
+          "python_original": {
+            "frequency_hz": 6721.956990187701,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "matching_residual": -1.2655646245283984e-09,
+            "relative_join_mismatch": 1.2655646215774314e-09,
+            "surface_BC_relative": 0.0,
+            "nfev": 60175
+          },
+          "native_current": {
+            "frequency_hz": 6721.948711898199,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "nfev": 14997,
+            "matching_residual": 1.5643090809819759e-09,
+            "relative_join_mismatch": 1.56430907839481e-09,
+            "surface_BC_relative": 0.0
+          },
+          "delta_hz": -0.008278289502413827,
+          "relative_frequency_error": 1.2315296742448612e-06,
+          "native_seven_wall_seconds": [
+            0.028215902973897755,
+            0.027984906977508217,
+            0.02851781202480197,
+            0.028014534036628902,
+            0.029120196995791048,
+            0.0287052359781228,
+            0.028289291018154472
+          ],
+          "native_warm_median_seconds": 0.028289291018154472,
+          "python_original_wall_seconds": 32.1844631319982,
+          "speedup_warm_vs_python": 1137.690694027787
+        }
+      },
+      "full_pipeline": {
+        "python_original_seconds": 44.69426545401802,
+        "native_current_seconds": 0.4006854880717583,
+        "speedup_python_over_native": 111.5445075615361,
+        "note": "Two modes per source with preidentified brackets; native setup includes Python EOS sampling, not compilation"
+      },
+      "sample_convergence": {
+        "4097": {
+          "M_msun": 1.4000000333092002,
+          "R_km": 11.752078302430546,
+          "modes": {
+            "f": 2401.3737617874035,
+            "p1": 6721.948783711222
+          }
+        },
+        "16385": {
+          "M_msun": 1.4000000152939,
+          "R_km": 11.752078317522818,
+          "modes": {
+            "f": 2401.3813097266975,
+            "p1": 6721.956495606951
+          }
+        }
+      }
+    },
+    {
+      "case_id": "primary_n070",
+      "eos_sha256": "591ac27aa99448512e291684c98f8273efc729d17c63be88e331c20e83bd2653",
+      "central_density_fm3": 0.7,
+      "native_background": {
+        "M_msun": 1.751794643972197,
+        "R_km": 11.37843023844793,
+        "source_knots": 13718,
+        "tov_nfev": 1536
+      },
+      "exact_python_background": {
+        "mass_msun": 1.7517946459876865,
+        "radius_km": 11.378430217893316
+      },
+      "native_background_setup_seconds": 0.3437774349586107,
+      "native_mode_setup_seconds": 0.0037689950549975038,
+      "modes": {
+        "f": {
+          "bracket_hz": [
+            2428.5714285714284,
+            2571.4285714285716
+          ],
+          "python_original": {
+            "frequency_hz": 2569.8534319188047,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "matching_residual": 4.5868807237291817e-10,
+            "relative_join_mismatch": 4.5868803920949606e-10,
+            "surface_BC_relative": 0.0,
+            "nfev": 31663
+          },
+          "native_current": {
+            "frequency_hz": 2569.8505764071606,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "nfev": 8032,
+            "matching_residual": 2.2981670816522292e-08,
+            "relative_join_mismatch": 2.2981670771411193e-08,
+            "surface_BC_relative": 0.0
+          },
+          "delta_hz": -0.0028555116441566497,
+          "relative_frequency_error": 1.111157394694123e-06,
+          "native_seven_wall_seconds": [
+            0.012062410998623818,
+            0.011871309019625187,
+            0.011926494014915079,
+            0.012097486003767699,
+            0.012403333035763353,
+            0.012007065990474075,
+            0.011791640019509941
+          ],
+          "native_warm_median_seconds": 0.012007065990474075,
+          "python_original_wall_seconds": 16.662568516971078,
+          "speedup_warm_vs_python": 1387.7302356954224
+        },
+        "p1": {
+          "bracket_hz": [
+            7000.0,
+            7142.857142857143
+          ],
+          "python_original": {
+            "frequency_hz": 7142.4024427703125,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "matching_residual": -3.142168780105151e-08,
+            "relative_join_mismatch": 3.1421687798004925e-08,
+            "surface_BC_relative": 0.0,
+            "nfev": 55498
+          },
+          "native_current": {
+            "frequency_hz": 7142.376311658711,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "nfev": 14276,
+            "matching_residual": 7.538387919177688e-09,
+            "relative_join_mismatch": 7.538387915554315e-09,
+            "surface_BC_relative": 0.0
+          },
+          "delta_hz": -0.026131111601898738,
+          "relative_frequency_error": 3.6585885227384786e-06,
+          "native_seven_wall_seconds": [
+            0.02996099297888577,
+            0.02894060901599005,
+            0.02933635504450649,
+            0.028968352009542286,
+            0.029220376978628337,
+            0.02899490197887644,
+            0.029170141962822527
+          ],
+          "native_warm_median_seconds": 0.029170141962822527,
+          "python_original_wall_seconds": 32.11678408802254,
+          "speedup_warm_vs_python": 1101.0156936827912
+        }
+      },
+      "full_pipeline": {
+        "python_original_seconds": 48.982285179023165,
+        "native_current_seconds": 0.3887236379669048,
+        "speedup_python_over_native": 126.00799229810004,
+        "note": "Two modes per source with preidentified brackets; native setup includes Python EOS sampling, not compilation"
+      },
+      "sample_convergence": {
+        "4097": {
+          "M_msun": 1.7517946231291204,
+          "R_km": 11.378430261760604,
+          "modes": {
+            "f": 2569.842374522253,
+            "p1": 7142.309912711
+          }
+        },
+        "16385": {
+          "M_msun": 1.7517946475887576,
+          "R_km": 11.378430228364639,
+          "modes": {
+            "f": 2569.8529934990966,
+            "p1": 7142.398014424017
+          }
+        }
+      }
+    },
+    {
+      "case_id": "extension_medium_n115",
+      "eos_sha256": "9ead5ff4548c23fba16c01600439175fff165a4f423ad0e13b9bd635d1950eef",
+      "central_density_fm3": 1.15,
+      "native_background": {
+        "M_msun": 2.0484564089418864,
+        "R_km": 10.141741798970612,
+        "source_knots": 14054,
+        "tov_nfev": 1641
+      },
+      "exact_python_background": {
+        "mass_msun": 2.0484564181192457,
+        "radius_km": 10.141741782024976
+      },
+      "native_background_setup_seconds": 0.3616647470043972,
+      "native_mode_setup_seconds": 0.004198123991955072,
+      "modes": {
+        "f": {
+          "bracket_hz": [
+            2857.142857142857,
+            3000.0
+          ],
+          "python_original": {
+            "frequency_hz": 2868.4734160570124,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "matching_residual": -3.700296748948371e-08,
+            "relative_join_mismatch": 3.7002967496851326e-08,
+            "surface_BC_relative": 0.0,
+            "nfev": 30307
+          },
+          "native_current": {
+            "frequency_hz": 2868.473075638444,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "nfev": 7104,
+            "matching_residual": -1.0392116575707345e-08,
+            "relative_join_mismatch": 1.0392116603834558e-08,
+            "surface_BC_relative": 0.0
+          },
+          "delta_hz": -0.00034041856861222186,
+          "relative_frequency_error": 1.1867586664971061e-07,
+          "native_seven_wall_seconds": [
+            0.015188111981842667,
+            0.015078586991876364,
+            0.015004806977231055,
+            0.01507462898734957,
+            0.015054691000841558,
+            0.015173233987297863,
+            0.01646913803415373
+          ],
+          "native_warm_median_seconds": 0.015078586991876364,
+          "python_original_wall_seconds": 11.246475074032787,
+          "speedup_warm_vs_python": 745.8573591870287
+        },
+        "p1": {
+          "bracket_hz": [
+            7428.571428571428,
+            7571.428571428572
+          ],
+          "python_original": {
+            "frequency_hz": 7480.127176344198,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "matching_residual": -1.4955668416488843e-09,
+            "relative_join_mismatch": 1.4955668425360448e-09,
+            "surface_BC_relative": 6.190477447104502e-17,
+            "nfev": 53281
+          },
+          "native_current": {
+            "frequency_hz": 7480.126263733717,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "nfev": 14291,
+            "matching_residual": 3.24663601247253e-09,
+            "relative_join_mismatch": 3.2466360172876e-09,
+            "surface_BC_relative": 6.190505164265975e-17
+          },
+          "delta_hz": -0.0009126104814640712,
+          "relative_frequency_error": 1.2200467451277963e-07,
+          "native_seven_wall_seconds": [
+            0.035101463028695434,
+            0.031897053006105125,
+            0.03225086000747979,
+            0.032283261010888964,
+            0.03183531598187983,
+            0.03189073101384565,
+            0.03206022101221606
+          ],
+          "native_warm_median_seconds": 0.03206022101221606,
+          "python_original_wall_seconds": 37.038438881980255,
+          "speedup_warm_vs_python": 1155.2770914419873
+        }
+      },
+      "full_pipeline": {
+        "python_original_seconds": 48.59717374603497,
+        "native_current_seconds": 0.4130016790004447,
+        "speedup_python_over_native": 117.66822319863411,
+        "note": "Two modes per source with preidentified brackets; native setup includes Python EOS sampling, not compilation"
+      },
+      "sample_convergence": {
+        "4097": {
+          "M_msun": 2.0484563656124077,
+          "R_km": 10.141741819783318,
+          "modes": {
+            "f": 2868.4722560726677,
+            "p1": 7480.1218290687875
+          }
+        },
+        "16385": {
+          "M_msun": 2.048456405062003,
+          "R_km": 10.141741792213322,
+          "modes": {
+            "f": 2868.472997665181,
+            "p1": 7480.123933015059
+          }
+        }
+      }
+    },
+    {
+      "case_id": "extension_fine_n115",
+      "eos_sha256": "f1bd5c3c41b45a07a7299e665594173473ac790af6f519bf53085db843bd936d",
+      "central_density_fm3": 1.15,
+      "native_background": {
+        "M_msun": 2.048456383539214,
+        "R_km": 10.141741807423115,
+        "source_knots": 14282,
+        "tov_nfev": 1597
+      },
+      "exact_python_background": {
+        "mass_msun": 2.0484564204725824,
+        "radius_km": 10.141741781181302
+      },
+      "native_background_setup_seconds": 0.3859741559717804,
+      "native_mode_setup_seconds": 0.0030997740104794502,
+      "modes": {
+        "f": {
+          "bracket_hz": [
+            2857.142857142857,
+            3000.0
+          ],
+          "python_original": {
+            "frequency_hz": 2868.4733617072025,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "matching_residual": -5.624131640784783e-08,
+            "relative_join_mismatch": 5.6241316478296876e-08,
+            "surface_BC_relative": 0.0,
+            "nfev": 29458
+          },
+          "native_current": {
+            "frequency_hz": 2868.472442190616,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "nfev": 7178,
+            "matching_residual": 1.8571545850831668e-08,
+            "relative_join_mismatch": 1.8571545851582973e-08,
+            "surface_BC_relative": 0.0
+          },
+          "delta_hz": -0.0009195165862365684,
+          "relative_frequency_error": 3.205595695995267e-07,
+          "native_seven_wall_seconds": [
+            0.011145501979626715,
+            0.01077707699732855,
+            0.010965361958369613,
+            0.011164537980221212,
+            0.010975310986395925,
+            0.011008283006958663,
+            0.01085573498858139
+          ],
+          "native_warm_median_seconds": 0.010975310986395925,
+          "python_original_wall_seconds": 26.229960754979402,
+          "speedup_warm_vs_python": 2389.9059249885368
+        },
+        "p1": {
+          "bracket_hz": [
+            7428.571428571428,
+            7571.428571428572
+          ],
+          "python_original": {
+            "frequency_hz": 7480.127071624914,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "matching_residual": -8.540490103741253e-09,
+            "relative_join_mismatch": 8.540490103209866e-09,
+            "surface_BC_relative": 0.0,
+            "nfev": 53926
+          },
+          "native_current": {
+            "frequency_hz": 7480.117993531924,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "nfev": 14313,
+            "matching_residual": -3.096045780380729e-09,
+            "relative_join_mismatch": 3.0960457850696284e-09,
+            "surface_BC_relative": 0.0
+          },
+          "delta_hz": -0.009078092989511788,
+          "relative_frequency_error": 1.2136281780490858e-06,
+          "native_seven_wall_seconds": [
+            0.024064606986939907,
+            0.023857666994445026,
+            0.023708364984486252,
+            0.023719606979284436,
+            0.0236092489794828,
+            0.023940462968312204,
+            0.02446509199216962
+          ],
+          "native_warm_median_seconds": 0.023857666994445026,
+          "python_original_wall_seconds": 29.769931688031647,
+          "speedup_warm_vs_python": 1247.8140337428308
+        }
+      },
+      "full_pipeline": {
+        "python_original_seconds": 56.31294151104521,
+        "native_current_seconds": 0.4239069079631008,
+        "speedup_python_over_native": 132.84270780495748,
+        "note": "Two modes per source with preidentified brackets; native setup includes Python EOS sampling, not compilation"
+      },
+      "sample_convergence": {
+        "4097": {
+          "M_msun": 2.048456383137751,
+          "R_km": 10.141741818178957,
+          "modes": {
+            "f": 2868.469988048611,
+            "p1": 7480.094113093329
+          }
+        },
+        "16385": {
+          "M_msun": 2.0484563932309787,
+          "R_km": 10.141741794643437,
+          "modes": {
+            "f": 2868.472743533604,
+            "p1": 7480.120687421154
+          }
+        }
+      }
+    }
+  ]
+}

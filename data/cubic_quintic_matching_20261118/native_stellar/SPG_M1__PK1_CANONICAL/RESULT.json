@@ -1,0 +1,542 @@
+{
+  "pair": "SPG_M1__PK1_CANONICAL",
+  "status": "COMPLETED",
+  "fixed_source_sha256": {
+    "crust": {
+      "eos.compo": "f00efaa6ed9dfc2e072d7a2488b6111a90f09e2bd38b42a8eaca7a9f57235a2d",
+      "eos.nb": "4ada40f9afeac3f5e41b546145bdb924a954c581a925813b07c57bacb2d73e04",
+      "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+      "eos.thermo": "492da9325404c66557da4c5f88777985d1ae366bfdd47156b14398607aaf0f04",
+      "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+    },
+    "core": {
+      "eos.compo": "d30012a952b08b472444ac92c55d7dca016574e74feb7c25e731c6a05db69160",
+      "eos.nb": "90a8d4aa6bc670f7cb914cce74e981970f2217b58839fa69be6ccc9e7a69e11d",
+      "eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+      "eos.thermo": "d3a6f8937aeeb73f7d61e0a1c16a7e9d744ee9d87ab400d19eba28a491d0baad",
+      "eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e"
+    }
+  },
+  "actual_native_methods": [
+    "cubic_F",
+    "quintic_F",
+    "cubic_P",
+    "quintic_P",
+    "css",
+    "native_maxwell"
+  ],
+  "outer_reference_sha256": "f1bd5c3c41b45a07a7299e665594173473ac790af6f519bf53085db843bd936d",
+  "lower_join_source_index": 15,
+  "smooth_vs_sharp_not_same_physics": true,
+  "mass_target_msun": 1.4,
+  "closure": "equilibrium perfect fluid Gamma1_eq, l2 Cowling",
+  "method_results": {
+    "cubic_F": {
+      "status": "COMPLETED_WITH_MODE_STATUSES",
+      "constructed_full_eos": {
+        "source_rows": 3036,
+        "sharp_transition_index": null,
+        "n_join": 0.00045977699062012067,
+        "p_join": 0.0006400458617728533,
+        "source_whole_upper_n": [
+          0.00045977699062012067,
+          0.00048106646021650807
+        ],
+        "contract_hash": "2130b6268bd2b0e4aeb86d55cf7339518f653af24d40c9079937b294bedc6b13",
+        "native_method": "cubic_F"
+      },
+      "background": {
+        "central_density_fm3": 0.30423828928944874,
+        "h_c": 0.1807147093193419,
+        "h_start": 0.18071470819099777,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 34.03164494447385,
+        "radius_km": 14.415552276025826,
+        "mass_msun": 1.399999965327656,
+        "mass_geom_km": 2.067275002072124,
+        "compactness": 0.14340588293035164,
+        "nfev": 2675,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-09,
+          "atol": 1e-11,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+        "interfaces": []
+      },
+      "modes": {
+        "slow_f": {
+          "frequency_hz": 1851.8974190896768,
+          "ell": 2,
+          "conversion": "slow",
+          "bracket_hz": [
+            1844.48784387298,
+            1859.303007277582
+          ],
+          "root_converged": true,
+          "root_iterations": 9,
+          "matching_residual": 1.687469474905337e-08,
+          "relative_join_mismatch": 1.6874694775661672e-08,
+          "surface_BC_relative": 0.0,
+          "W_sign_changes_including_interfaces": 0,
+          "V_sign_changes_including_interfaces": 0,
+          "interface_junctions": [],
+          "nfev": 28282,
+          "status": "PASS_SCOPED",
+          "method": "cubic_F",
+          "frequency_window": [
+            1550.0,
+            2900.0
+          ],
+          "frequency_control_delta_hz": 0.001993514395735474,
+          "requested_mode_family": "f"
+        },
+        "slow_p1": {
+          "status": "BLOCKED",
+          "type": "ValueError",
+          "error": "frequency root not unique in prescribed p1 window"
+        }
+      }
+    },
+    "quintic_F": {
+      "status": "REJECTED_OR_BLOCKED",
+      "type": "ValueError",
+      "error": "upper smooth interval 148 is not causal and stable",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/cosmosapjw/ns_cowling_wt/hermite_cubic_quintic_20261118/scripts/run_native_matching_stellar_20261118.py\", line 129, in run_one\n    physics,contract=whole_from_match(crust,matched,transition,method)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cosmosapjw/ns_cowling_wt/hermite_cubic_quintic_20261118/scripts/run_native_matching_stellar_20261118.py\", line 48, in whole_from_match\n    physics=WholeCrustBarotrope.from_contract(c)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cosmosapjw/ns_cowling_wt/hermite_cubic_quintic_20261118/python_frontend/compose_eos/whole_crust.py\", line 877, in from_contract\n    raise ValueError(f\"upper smooth interval {i} is not causal and stable\")\nValueError: upper smooth interval 148 is not causal and stable\n"
+    },
+    "cubic_P": {
+      "status": "COMPLETED_WITH_MODE_STATUSES",
+      "constructed_full_eos": {
+        "source_rows": 3036,
+        "sharp_transition_index": null,
+        "n_join": 0.00045977699062012067,
+        "p_join": 0.0006400458617728533,
+        "source_whole_upper_n": [
+          0.00045977699062012067,
+          0.00048106646021650807
+        ],
+        "contract_hash": "0508f6b19fff4f788d9478feecbbee523ceffc66e055ed894ac3388313d38a4b",
+        "native_method": "cubic_P"
+      },
+      "background": {
+        "central_density_fm3": 0.30423603070868865,
+        "h_c": 0.18071252443792163,
+        "h_start": 0.18071252330959064,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 34.03090450314716,
+        "radius_km": 14.415578043796963,
+        "mass_msun": 1.400000053938221,
+        "mass_geom_km": 2.0672751329167025,
+        "compactness": 0.14340563566968811,
+        "nfev": 2399,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-09,
+          "atol": 1e-11,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+        "interfaces": []
+      },
+      "modes": {
+        "slow_f": {
+          "frequency_hz": 1851.863104537498,
+          "ell": 2,
+          "conversion": "slow",
+          "bracket_hz": [
+            1844.4570830659425,
+            1859.2719993957896
+          ],
+          "root_converged": true,
+          "root_iterations": 15,
+          "matching_residual": -1.2836883771156047e-08,
+          "relative_join_mismatch": 1.2836883747010064e-08,
+          "surface_BC_relative": 0.0,
+          "W_sign_changes_including_interfaces": 0,
+          "V_sign_changes_including_interfaces": 0,
+          "interface_junctions": [],
+          "nfev": 28885,
+          "status": "PASS_SCOPED",
+          "method": "cubic_P",
+          "frequency_window": [
+            1550.0,
+            2900.0
+          ],
+          "frequency_control_delta_hz": -0.0014366933680776128,
+          "requested_mode_family": "f"
+        },
+        "slow_p1": {
+          "status": "BLOCKED",
+          "type": "ValueError",
+          "error": "frequency root not unique in prescribed p1 window"
+        }
+      }
+    },
+    "quintic_P": {
+      "status": "COMPLETED_WITH_MODE_STATUSES",
+      "constructed_full_eos": {
+        "source_rows": 3036,
+        "sharp_transition_index": null,
+        "n_join": 0.00045977699062012067,
+        "p_join": 0.0006400458617728533,
+        "source_whole_upper_n": [
+          0.00045977699062012067,
+          0.00048106646021650807
+        ],
+        "contract_hash": "43fc5155cb76da2979c0e4fb1aa20bc1e3941929cf8cebfefcec5cc0b75f3cf8",
+        "native_method": "quintic_P"
+      },
+      "background": {
+        "central_density_fm3": 0.30423399740608226,
+        "h_c": 0.1807105574902074,
+        "h_start": 0.18071055636188824,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 34.03023792414419,
+        "radius_km": 14.415599925899455,
+        "mass_msun": 1.3999999707607167,
+        "mass_geom_km": 2.067275010094717,
+        "compactness": 0.1434054094676001,
+        "nfev": 2909,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-09,
+          "atol": 1e-11,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+        "interfaces": []
+      },
+      "modes": {
+        "slow_f": {
+          "frequency_hz": 1851.8576740426847,
+          "ell": 2,
+          "conversion": "slow",
+          "bracket_hz": [
+            1844.446964887405,
+            1859.2617999467416
+          ],
+          "root_converged": true,
+          "root_iterations": 17,
+          "matching_residual": 5.404955041640686e-08,
+          "relative_join_mismatch": 5.404955045962666e-08,
+          "surface_BC_relative": 0.0,
+          "W_sign_changes_including_interfaces": 0,
+          "V_sign_changes_including_interfaces": 0,
+          "interface_junctions": [],
+          "nfev": 29980,
+          "status": "PASS_SCOPED",
+          "method": "quintic_P",
+          "frequency_window": [
+            1550.0,
+            2900.0
+          ],
+          "frequency_control_delta_hz": 0.0032916256113821873,
+          "requested_mode_family": "f"
+        },
+        "slow_p1": {
+          "status": "BLOCKED",
+          "type": "ValueError",
+          "error": "frequency root not unique in prescribed p1 window"
+        }
+      }
+    },
+    "css": {
+      "status": "COMPLETED_WITH_MODE_STATUSES",
+      "constructed_full_eos": {
+        "source_rows": 3037,
+        "sharp_transition_index": 128,
+        "n_join": 0.00045977699062012067,
+        "p_join": 0.0006400458617728533,
+        "source_whole_upper_n": [
+          0.00045977699062012067,
+          0.00048106646021650807
+        ],
+        "contract_hash": "593c49d90e04ef12f7d094c322e52292c63fe5840f74191bae035d5b55afc4f3",
+        "native_method": "css"
+      },
+      "background": {
+        "central_density_fm3": 0.30421521157876974,
+        "h_c": 0.18069238501457885,
+        "h_start": 0.18069238388636893,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 34.024079725753076,
+        "radius_km": 14.415816519815783,
+        "mass_msun": 1.3999999972298232,
+        "mass_geom_km": 2.0672750491796625,
+        "compactness": 0.14340325754965144,
+        "nfev": 2368,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-09,
+          "atol": 1e-11,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+        "interfaces": [
+          {
+            "h": 0.02631357743481382,
+            "r_km": 12.772244512979363,
+            "m_geom_km": 1.9838324503559581,
+            "r_jump_km": 0.0,
+            "m_jump_km": 0.0,
+            "p_MeV_fm3": 0.512778571976412,
+            "n_low_fm3": 0.0765391794443131,
+            "n_high_fm3": 0.09192363913860245,
+            "epsilon_low_MeV_fm3": 72.54714896952241,
+            "epsilon_high_MeV_fm3": 87.2322751844913
+          }
+        ]
+      },
+      "modes": {
+        "slow_f": {
+          "frequency_hz": 1852.1043704024385,
+          "ell": 2,
+          "conversion": "slow",
+          "bracket_hz": [
+            1844.6944529195066,
+            1859.5112758345226
+          ],
+          "root_converged": true,
+          "root_iterations": 13,
+          "matching_residual": -4.7922154102509264e-08,
+          "relative_join_mismatch": 4.792215409678068e-08,
+          "surface_BC_relative": 9.428126899942699e-17,
+          "W_sign_changes_including_interfaces": 0,
+          "V_sign_changes_including_interfaces": 0,
+          "interface_junctions": [
+            {
+              "h": 0.02631357743481382,
+              "r_km": 12.772244512979363,
+              "source_side": "low",
+              "target_side": "high",
+              "before": [
+                0.6992652207951714,
+                -0.3354951686961525
+              ],
+              "after": [
+                0.6992652207951714,
+                -0.3401535492776025
+              ],
+              "traction_relative_residual": 5.976380627168801e-16,
+              "kinematic_residual": 0.0
+            }
+          ],
+          "nfev": 26763,
+          "status": "PASS_SCOPED",
+          "method": "css",
+          "frequency_window": [
+            1550.0,
+            2900.0
+          ],
+          "frequency_control_delta_hz": 0.0015060254238505877,
+          "requested_mode_family": "f"
+        },
+        "slow_p1": {
+          "status": "BLOCKED",
+          "type": "ValueError",
+          "error": "frequency root not unique in prescribed p1 window"
+        },
+        "rapid_f": {
+          "frequency_hz": 1851.598778509825,
+          "ell": 2,
+          "conversion": "rapid",
+          "bracket_hz": [
+            1844.192416652879,
+            1859.005207148083
+          ],
+          "root_converged": true,
+          "root_iterations": 15,
+          "matching_residual": -6.729145143231593e-09,
+          "relative_join_mismatch": 6.72914514905306e-09,
+          "surface_BC_relative": 0.0,
+          "W_sign_changes_including_interfaces": 0,
+          "V_sign_changes_including_interfaces": 0,
+          "interface_junctions": [
+            {
+              "h": 0.02631357743481382,
+              "r_km": 12.772244512979363,
+              "source_side": "low",
+              "target_side": "high",
+              "before": [
+                0.6993171545725108,
+                -0.3357434466663863
+              ],
+              "after": [
+                0.690363862427157,
+                -0.3357434466663863
+              ],
+              "traction_relative_residual": 3.989702700103847e-16,
+              "kinematic_residual": 0.0
+            }
+          ],
+          "nfev": 25947,
+          "status": "PASS_SCOPED",
+          "method": "css",
+          "frequency_window": [
+            1550.0,
+            2900.0
+          ],
+          "frequency_control_delta_hz": -3.33906559717434e-05,
+          "requested_mode_family": "f"
+        },
+        "rapid_p1": {
+          "status": "BLOCKED",
+          "type": "ValueError",
+          "error": "frequency root not unique in prescribed p1 window"
+        }
+      }
+    },
+    "native_maxwell": {
+      "status": "COMPLETED_WITH_MODE_STATUSES",
+      "constructed_full_eos": {
+        "source_rows": 4119,
+        "sharp_transition_index": 86,
+        "n_join": 0.00045977699062012067,
+        "p_join": 0.0006400458617728533,
+        "source_whole_upper_n": [
+          0.00045977699062012067,
+          0.00048106646021650807
+        ],
+        "contract_hash": "ba78d7c9496aa63b6fb60d68f8454d453a12eb0fbbfa3dbb197becffff9f1622",
+        "native_method": "native_maxwell"
+      },
+      "background": {
+        "central_density_fm3": 0.3038508388139805,
+        "h_c": 0.18034001445528872,
+        "h_start": 0.18034001332919636,
+        "surface_h": 0.0,
+        "central_pressure_MeV_fm3": 33.90476743006676,
+        "radius_km": 14.420429376371564,
+        "mass_msun": 1.4000000247531272,
+        "mass_geom_km": 2.0672750898212624,
+        "compactness": 0.14335738804064832,
+        "nfev": 2152,
+        "config": {
+          "r0_km": 0.001,
+          "rtol": 1e-09,
+          "atol": 1e-11,
+          "surface_h": 0.0,
+          "max_step_h": 0.005
+        },
+        "backend": "Python piece-contract sharp enthalpy DOP853 reference",
+        "interfaces": [
+          {
+            "h": 0.014457653051653007,
+            "r_km": 13.46547836277162,
+            "m_geom_km": 2.063986166420967,
+            "r_jump_km": 0.0,
+            "m_jump_km": 0.0,
+            "p_MeV_fm3": 0.0174442115713763,
+            "n_low_fm3": 0.01129854659823658,
+            "n_high_fm3": 0.01963254684160227,
+            "epsilon_low_MeV_fm3": 10.640392294207555,
+            "epsilon_high_MeV_fm3": 18.501793870121432
+          }
+        ]
+      },
+      "modes": {
+        "slow_f": {
+          "frequency_hz": 1842.3116755896754,
+          "ell": 2,
+          "conversion": "slow",
+          "bracket_hz": [
+            1834.940810868773,
+            1849.6792912773576
+          ],
+          "root_converged": true,
+          "root_iterations": 13,
+          "matching_residual": 2.4744125512181702e-08,
+          "relative_join_mismatch": 2.474412550319831e-08,
+          "surface_BC_relative": 9.49678224322948e-17,
+          "W_sign_changes_including_interfaces": 0,
+          "V_sign_changes_including_interfaces": 0,
+          "interface_junctions": [
+            {
+              "h": 0.014457653051653007,
+              "r_km": 13.46547836277162,
+              "source_side": "low",
+              "target_side": "high",
+              "before": [
+                0.778899001885101,
+                -0.35810387173136154
+              ],
+              "after": [
+                0.778899001885101,
+                -0.3621538366569617
+              ],
+              "traction_relative_residual": 0.0,
+              "kinematic_residual": 0.0
+            }
+          ],
+          "nfev": 25863,
+          "status": "PASS_SCOPED",
+          "method": "native_maxwell",
+          "frequency_window": [
+            1550.0,
+            2900.0
+          ],
+          "frequency_control_delta_hz": 0.001624516610036153,
+          "requested_mode_family": "f"
+        },
+        "slow_p1": {
+          "status": "BLOCKED",
+          "type": "ValueError",
+          "error": "frequency root not unique in prescribed p1 window"
+        },
+        "rapid_f": {
+          "frequency_hz": 1842.2815478482237,
+          "ell": 2,
+          "conversion": "rapid",
+          "bracket_hz": [
+            1834.9110679916187,
+            1849.6493095015915
+          ],
+          "root_converged": true,
+          "root_iterations": 11,
+          "matching_residual": 1.009037288646595e-08,
+          "relative_join_mismatch": 1.0090372901693594e-08,
+          "surface_BC_relative": 0.0,
+          "W_sign_changes_including_interfaces": 0,
+          "V_sign_changes_including_interfaces": 0,
+          "interface_junctions": [
+            {
+              "h": 0.014457653051653007,
+              "r_km": 13.46547836277162,
+              "source_side": "low",
+              "target_side": "high",
+              "before": [
+                0.7789029112414223,
+                -0.3581179396165547
+              ],
+              "after": [
+                0.7703230317522516,
+                -0.3581179396165547
+              ],
+              "traction_relative_residual": 6.6204496659149325e-15,
+              "kinematic_residual": 0.0
+            }
+          ],
+          "nfev": 25917,
+          "status": "PASS_SCOPED",
+          "method": "native_maxwell",
+          "frequency_window": [
+            1550.0,
+            2900.0
+          ],
+          "frequency_control_delta_hz": 0.001359101618618297,
+          "requested_mode_family": "f"
+        },
+        "rapid_p1": {
+          "status": "BLOCKED",
+          "type": "ValueError",
+          "error": "frequency root not unique in prescribed p1 window"
+        }
+      }
+    }
+  }
+}

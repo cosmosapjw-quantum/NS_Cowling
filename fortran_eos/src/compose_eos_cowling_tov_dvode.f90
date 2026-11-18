@@ -106,7 +106,7 @@ contains
        .or..not.all(ieee_is_finite(de)))return
     if(.not.all(ieee_is_finite([r0,m0,rtol,atol_r,atol_m,ds_max])))return
     if(r0<=0._c_double.or.m0<=0._c_double.or.2*m0>=r0)return
-    if(abs(s(1))>1.e-15_c_double.or.any(s(2:n)<=s(1:n-1)))return
+    if(s(1)<0._c_double.or.any(s(2:n)<=s(1:n-1)))return
     if(any(p<0._c_double).or.any(e<0._c_double))return
     if(any(p(2:n)>=p(1:n-1)).or.any(e(2:n)>e(1:n-1)*(1._c_double+1.e-10_c_double)))return
     if(rtol<1.e-13_c_double.or.rtol>1.e-3_c_double &

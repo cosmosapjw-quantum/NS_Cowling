@@ -1,0 +1,415 @@
+"""Native Fortran DVODE TOV/Cowling for equilibrium-barotropic sharp Maxwell stars.
+
+Fortran integrates every TOV and Cowling ODE segment on its own physical EOS
+branch. The original Python contract supplies one-sided thermodynamic samples
+and phase identity. No interpolation takes place across a density jump.
+
+Slow conversion: continuous radial displacement and Lagrangian pressure.
+Rapid conversion: continuous isobar displacement and Lagrangian pressure.
+Both share the Tonetto-Lugones convention; this is NOT a general g-mode
+or full-GR gravitational radiation solver.
+"""
+from __future__ import annotations
+import ctypes as ct
+from dataclasses import dataclass
+from math import pi
+
+import numpy as np
+from scipy.interpolate import PchipInterpolator
+from scipy.optimize import brentq
+
+from .stellar_background import MEV_FM3_TO_GEOM_KM2
+from .stellar_cowling import CowlingSettings, C_KM_S
+from . import stellar_cowling_native as native
+from .stellar_sharp import SharpContractEnthalpyEOS, SharpStellarBackground, _PiecewiseSolution
+
+
+def _one_phase_grid(hstart, surface_h, start, end, break_h, samples, *, extras=False):
+    """One-sided s samples on descending h interval, including exact endpoints."""
+    assert start > end
+    slo=np.sqrt(max(hstart-start,0.))
+    shi=np.sqrt(max(hstart-end,0.))
+    global_ds=np.sqrt(hstart-surface_h)/(samples-1)
+    n=max(33,int((shi-slo)/global_ds)+1)
+    grid=np.linspace(slo,shi,n)
+    cuts=np.asarray(break_h,dtype=float)
+    cuts=cuts[(cuts>end)&(cuts<start)]
+    if len(cuts):
+        marks=np.sqrt(np.maximum(hstart-cuts,0.))
+        widths=np.minimum(0.01*global_ds,
+             np.maximum(1e-10,2e-12/np.maximum(marks,1e-4)))
+        close=np.r_[marks-widths,marks,marks+widths]
+        grid=np.r_[grid,close[(close>slo)&(close<shi)]]
+    if extras and surface_h>0:
+        hs=np.geomspace(surface_h,start,max(1025,n//2))
+        additional=np.sqrt(np.maximum(hstart-hs,0.))
+        grid=np.r_[grid,additional[(additional>slo)&(additional<shi)]]
+    grid=np.unique(np.r_[grid,slo,shi])
+    if len(grid)<4:
+        raise ValueError("not enough one-sided support samples")
+    return grid
+
+
+class _NativePhase:
+    """Lightweight exact-endpoint native phase compatible with _PiecewiseSolution."""
+    def __init__(self,hstart, h0,h1, sgrid, profile, nfev):
+        self.t=np.asarray([h0,h1],float)
+        self.y=np.asarray(profile,dtype=float).T
+        self.nfev=int(nfev)
+        self.success=True
+        self._hstart=hstart
+        self._interp=PchipInterpolator(sgrid,np.asarray(profile),axis=0,
+                                       extrapolate=False)
+    def sol(self,h):
+        z=np.asarray(h,dtype=float)
+        s=np.sqrt(np.maximum(self._hstart-z,0))
+        out=self._interp(s)
+        return np.moveaxis(out,-1,0)
+
+
+def solve_sharp_background_native(eos,central_density_fm3, *,
+         r0_km=.001,rtol=1e-9,atol=1e-11,surface_h=0.,
+         max_step_h=.005,native_samples=8193,method="adams"):
+    if not isinstance(eos,SharpContractEnthalpyEOS):
+        raise TypeError("native sharp TOV requires SharpContractEnthalpyEOS")
+    if not eos.transitions:
+        raise ValueError("sharp native TOV requires at least one validated transition")
+    if method not in ("adams","bdf"):
+        raise ValueError("method must be adams or bdf")
+    if not isinstance(native_samples,int) or native_samples<129:
+        raise ValueError("native_samples must be >=129")
+    opts=[central_density_fm3,r0_km,rtol,atol,surface_h,max_step_h]
+    if not np.all(np.isfinite(opts)) or central_density_fm3<=0 or r0_km<=0 or min(rtol,atol,max_step_h)<=0 or surface_h<0:
+        raise ValueError("invalid native TOV configuration")
+    hc=float(eos.enthalpy_at_density(central_density_fm3))
+    if eos._transition(hc) is not None:
+        raise ValueError("central state must lie outside transition bands")
+    center=eos.state_at_enthalpy(hc,"high")
+    pc=center["p"]*MEV_FM3_TO_GEOM_KM2
+    ec=center["epsilon"]*MEV_FM3_TO_GEOM_KM2
+    h0=hc-2*pi*(ec/3+pc)*r0_km**2
+    if not surface_h<h0<hc:
+        raise ValueError("center expansion leaves physical support")
+    trans=sorted([t["h"] for t in eos.transitions if surface_h<t["h"]<h0],
+                 reverse=True)
+    if not trans:
+        raise ValueError("central pressure does not admit a resolved sharp interface")
+    smax=np.sqrt(h0-surface_h)
+    prev=[float(r0_km),4*pi*ec*r0_km**3/3]
+    pieces=[];interfaces=[];bounds=[h0,*trans,float(surface_h)]
+    mf={"adams":10,"bdf":22}[method]
+    with native._LOCK:
+        lib=native._native_library()
+        for h_begin,h_end in zip(bounds[:-1],bounds[1:]):
+            grid=_one_phase_grid(h0,surface_h,h_begin,h_end,eos.break_h,
+                                 native_samples,extras=h_end==surface_h)
+            midpoint=(h_begin+h_end)/2.
+            therm=np.empty((len(grid),2),float)
+            for i,s in enumerate(grid):
+                h=h0-s*s
+                # Preserve the exact one-sided state at phase edges.
+                h = h_begin if i==0 else h_end if i==len(grid)-1 else h
+                side=eos.side_for_segment(h,midpoint)
+                st=eos.state_at_enthalpy(h,side=side)
+                therm[i,:]=[st["p"],st["epsilon"]]
+            if not np.all(np.isfinite(therm)) or np.any(therm<=0):
+                raise ValueError("one-sided sharp EOS contains invalid thermodynamics")
+            phys=therm*MEV_FM3_TO_GEOM_KM2
+            pchip=PchipInterpolator(grid,phys,axis=0,extrapolate=False)
+            slope=pchip(grid,nu=1)
+            yout=np.empty((2,len(grid)),order="F",dtype=float)
+            nfev,status=ct.c_int(),ct.c_int()
+            max_ds=min(smax/200.,max_step_h/(2*smax))
+            lib.tov_native_profile(len(grid),np.ascontiguousarray(grid),
+                np.ascontiguousarray(phys[:,0]),np.ascontiguousarray(phys[:,1]),
+                np.ascontiguousarray(slope[:,0]),np.ascontiguousarray(slope[:,1]),
+                float(prev[0]),float(prev[1]),rtol,atol,
+                min(1.e-15,atol*1.e-3),max_ds,mf,
+                yout,ct.byref(nfev),ct.byref(status))
+            if status.value:
+                raise RuntimeError(f"native sharp TOV phase [{h_begin},{h_end}] status={status.value}")
+            prev=list(map(float,yout[:,-1]))
+            phase=_NativePhase(h0,h_begin,h_end,grid,yout.T.copy(),nfev.value)
+            pieces.append(phase)
+            if h_end in trans:
+                low=eos.state_at_enthalpy(h_end,"low")
+                high=eos.state_at_enthalpy(h_end,"high")
+                interfaces.append(dict(h=float(h_end),r_km=prev[0],
+                    m_geom_km=prev[1],r_jump_km=0.,m_jump_km=0.,
+                    p_MeV_fm3=float(low["p"]),
+                    n_low_fm3=float(low["n"]),n_high_fm3=float(high["n"]),
+                    epsilon_low_MeV_fm3=float(low["epsilon"]),
+                    epsilon_high_MeV_fm3=float(high["epsilon"])))
+    r,m=prev
+    if not (r>2*m>0 and r>r0_km):
+        raise RuntimeError("native sharp TOV endpoint is nonphysical")
+    solution=_PiecewiseSolution(pieces)
+    cfg=dict(r0_km=r0_km,rtol=rtol,atol=atol,surface_h=surface_h,
+             max_step_h=max_step_h,native_samples=native_samples,
+             native_fortran_tov=True,original_python_eos_source=True,method=method,
+             no_phase_interpolation=True)
+    star=SharpStellarBackground(eos,float(central_density_fm3),hc,h0,
+                     float(surface_h),float(r),float(m),solution,cfg,interfaces)
+    # Unlike SharpStellarBackground.summary, the native path is explicit.
+    star.config["backend"]="Fortran DVODE phasewise TOV"
+    return star
+
+
+def native_interface_transfer(y,source,target,omega,conversion):
+    """Native Fortran transfer with independent reconstructed physical residuals."""
+    if conversion not in ("slow","rapid"):
+        raise ValueError("conversion must be explicitly slow or rapid")
+    y=np.ascontiguousarray(np.asarray(y,dtype=float))
+    if y.shape!=(2,) or not np.all(np.isfinite(y)):
+        raise ValueError("two finite mode components required")
+    if not np.isfinite(omega) or omega<=0:
+        raise ValueError("positive frequency required")
+    for k in ("r_km","Phi","lambda_metric","dPhi_dr_km","p"):
+        if not np.isclose(source[k],target[k],rtol=4e-12,atol=1e-14):
+            raise ValueError(f"interface must share geometry/pressure: {k}")
+    after=np.empty(2,float)
+    traction,kinematic,status=ct.c_double(),ct.c_double(),ct.c_int()
+    with native._LOCK:
+        lib=native._native_library()
+        lib.cowling_native_interface_transfer(float(omega),
+             float(source["r_km"]),float(source["Phi"]),
+             float(source["lambda_metric"]),float(source["dPhi_dr_km"]),
+             float(source["p"]),float(source["epsilon"]),float(target["epsilon"]),
+             {"slow":1,"rapid":2}[conversion],y,after,
+             ct.byref(traction),ct.byref(kinematic),ct.byref(status))
+    if status.value:
+        raise RuntimeError(f"native Maxwell interface transfer status {status.value}")
+    r=source["r_km"]
+    a=omega**2*np.exp(source["lambda_metric"]-2*source["Phi"])*r
+    b=source["dPhi_dr_km"]
+    qi=a*y[1]+b*y[0]
+    qo=a*after[1]+b*after[0]
+    hi=source["epsilon"]+source["p"]
+    ho=target["epsilon"]+target["p"]
+    tri=hi*qi;tro=ho*qo
+    resid=abs(tri-tro)/max(abs(tri),abs(tro),1e-300)
+    mode_index=0 if conversion=="slow" else 1
+    kinematic_resid=abs(y[mode_index]-after[mode_index])/max(
+        abs(y[mode_index]),abs(after[mode_index]),1e-300)
+    diag=dict(traction_relative_residual=float(resid),
+        kinematic_relative_residual=float(kinematic_resid),
+        native_traction_relative_residual=float(traction.value),
+        native_kinematic_relative_residual=float(kinematic.value),
+        before=y.tolist(),after=after.tolist(),conversion=conversion,
+        h_ratio=float(hi/ho))
+    if resid>1e-9 or kinematic_resid>1e-9:
+        raise RuntimeError("independent Maxwell junction invariant failed")
+    return after,diag
+
+
+def _nodes(values):
+    a=np.asarray(values,float)
+    peak=np.max(abs(a))
+    if peak==0:
+        return 0
+    a=a[abs(a)>1e-9*peak]
+    return int(np.count_nonzero(a[:-1]*a[1:]<0))
+
+
+class NativeSharpCowlingDVODE:
+    """One-sided native forward shooting through phase interfaces.
+
+    An input profile is constructed only at initialization. Every frequency
+    shot uses Fortran DVODE on each phase, then native interface transfer.
+    No interpolation or node count spans the density jump.
+    """
+    def __init__(self,background,settings=CowlingSettings(),*,samples=8193,
+                 method="adams"):
+        if not isinstance(background,SharpStellarBackground) or not background.interfaces:
+            raise ValueError("native sharp Cowling needs a sharp stellar background")
+        settings.validate(background)
+        if settings.surface_h<background.surface_h:
+            raise ValueError("Cowling surface outside integrated TOV domain")
+        if method not in ("adams","bdf"):
+            raise ValueError("native Cowling method must be adams or bdf")
+        if samples<129:
+            raise ValueError("at least 129 one-sided samples required")
+        self.background=background
+        self.settings=settings
+        self.method=method
+        self.samples=samples
+        self.max_interface_residual=0.
+        h0=background.h_start; hsurface=settings.surface_h
+        bounds=[h0,*sorted([x["h"] for x in background.interfaces
+                           if hsurface<x["h"]<h0],reverse=True),hsurface]
+        self._phases=[]
+        for h_begin,h_end in zip(bounds[:-1],bounds[1:]):
+            mid=(h_begin+h_end)/2.
+            x=_one_phase_grid(h0,hsurface,h_begin,h_end,background.eos.break_h,
+                              samples,extras=h_end==hsurface)
+            values=np.empty((len(x),5),float)
+            for i,s in enumerate(x):
+                h=h0-s*s
+                h=h_begin if i==0 else h_end if i==len(x)-1 else h
+                st=background.state_at_enthalpy(h,background.eos.side_for_segment(h,mid))
+                cs=st["cs2_over_c2"]
+                if not np.isfinite(cs) or cs<=0:
+                    raise ValueError("sharp EOS must have positive finite cs²")
+                values[i]=[st["r_km"],st["Phi"],st["lambda_metric"],
+                           st["dPhi_dr_km"],cs]
+            pchip=PchipInterpolator(x,values,axis=0,extrapolate=False)
+            slopes=pchip(x,nu=1)
+            self._phases.append(dict(h0=h_begin,h1=h_end,mid=mid,
+                s=np.ascontiguousarray(x),vals=np.asfortranarray(values.T),
+                slopes=np.asfortranarray(slopes.T),pchip=pchip))
+        self._smax=float(np.sqrt(h0-hsurface))
+
+    def _integrate_phase(self, phase, targets, y, omega, lib):
+        x=phase["s"]
+        status=ct.c_int()
+        lib.cowling_native_setup(len(x),x,phase["vals"],phase["slopes"],
+                                  ct.byref(status))
+        if status.value:
+            raise RuntimeError("native one-sided phase setup rejected: "+str(status.value))
+        native._ACTIVE=None
+        targets=np.ascontiguousarray(targets,dtype=float)
+        out=np.empty((2,len(targets)),dtype=float,order="F")
+        calls=ct.c_int()
+        max_ds=min(self._smax/200,
+                   self.settings.max_step_h/(2*self._smax))
+        lib.cowling_native_segment(omega,self.settings.ell,
+                self.settings.rtol,self.settings.atol,max_ds,
+                {"adams":10,"bdf":22}[self.method],
+                len(targets),targets,np.ascontiguousarray(y),
+                out,ct.byref(calls),ct.byref(status))
+        if status.value:
+            raise RuntimeError("native one-sided phase DVODE rejected: "
+                               +str(status.value))
+        return out,int(calls.value)
+
+    def _matched_shot(self,frequency_hz,conversion,profile_points=0):
+        if conversion not in ("slow","rapid"):
+            raise ValueError("conversion must be slow or rapid")
+        if not np.isfinite(frequency_hz) or frequency_hz<=0:
+            raise ValueError("finite positive frequency_hz required")
+        if not self._phases:
+            raise ValueError("empty native sharp background")
+        omega=2*pi*float(frequency_hz)/C_KM_S
+        # Keep match strictly inside the high-density phase. The mode
+        # eigenvalue is independent of this arbitrary numerical separation.
+        smatch=0.5*self._phases[0]["s"][-1]
+        count=max(2,profile_points//(len(self._phases)+1))
+        traces=[];junctions=[];nfev=0
+        with native._LOCK:
+            lib=native._native_library()
+            phase=self._phases[0]
+            x_inner=np.linspace(phase["s"][0],smatch,count)
+            inner,calls=self._integrate_phase(phase,x_inner,[1.,-1./self.settings.ell],omega,lib)
+            nfev+=calls
+            ui=inner[:,-1].copy()
+            # The surface starting state imposes DeltaP=0 exactly.
+            sdata=self.background.state_at_enthalpy(self.settings.surface_h)
+            asurf=omega**2*np.exp(sdata["lambda_metric"]-2*sdata["Phi"])*sdata["r_km"]
+            bsurf=sdata["dPhi_dr_km"]
+            if asurf<=0 or bsurf<=0:
+                raise RuntimeError("nonpositive native surface coefficients")
+            y=np.ascontiguousarray([1.,-bsurf/asurf],dtype=float)
+            surface_bc=(asurf*y[1]+bsurf*y[0])/(
+                np.hypot(asurf,bsurf)*np.linalg.norm(y))
+            # Outward -> inward: integrate each one-sided physical phase
+            # BACKWARD from the surface, crossing a junction exactly.
+            for j in range(len(self._phases)-1,-1,-1):
+                phase=self._phases[j]
+                start=phase["s"][-1]
+                stop=smatch if j==0 else phase["s"][0]
+                xs_back=np.linspace(start,stop,count)
+                yy,calls=self._integrate_phase(phase,xs_back,y,omega,lib)
+                nfev+=calls
+                traces.append((j,xs_back,yy.copy(),phase["pchip"]))
+                y=np.ascontiguousarray(yy[:,-1])
+                if j>0:
+                    ht=phase["h0"]
+                    low=self.background.state_at_enthalpy(ht,"low")
+                    high=self.background.state_at_enthalpy(ht,"high")
+                    y,diag=native_interface_transfer(y,low,high,omega,conversion)
+                    diag["h"]=float(ht)
+                    diag["r_km"]=float(low["r_km"])
+                    diag["direction"]="outer_to_inner"
+                    junctions.append(diag)
+                    self.max_interface_residual=max(
+                        self.max_interface_residual,
+                        diag["traction_relative_residual"],
+                        diag["kinematic_relative_residual"])
+            uo=y.copy()
+        den=np.linalg.norm(ui)*np.linalg.norm(uo)
+        if den==0 or not np.isfinite(den):
+            raise RuntimeError("singular matched native Cowling state")
+        determinant=(ui[0]*uo[1]-ui[1]*uo[0])/den
+        scale=float(np.dot(ui,uo)/np.dot(uo,uo))
+        reljoin=float(np.linalg.norm(ui-scale*uo)/np.linalg.norm(ui))
+        return dict(residual=float(determinant),ui=ui,uo=uo,
+            scale=scale,join_relative=reljoin,inside=(x_inner,inner,self._phases[0]["pchip"]),
+            backwards=traces,junctions=junctions,nfev=nfev,
+            surface_bc_relative=abs(float(surface_bc)))
+
+    def matching_residual(self,frequency_hz,*,conversion):
+        return self._matched_shot(frequency_hz,conversion,0)["residual"]
+
+    def scan_brackets(self,frequencies_hz,*,conversion):
+        fs=np.asarray(frequencies_hz,float)
+        if fs.ndim!=1 or len(fs)<2 or np.any(~np.isfinite(fs)) or np.any(np.diff(fs)<=0) or fs[0]<=0:
+            raise ValueError("strict positive monotone frequency scan required")
+        vals=[self.matching_residual(f,conversion=conversion) for f in fs]
+        return ([(float(fs[i]),float(fs[i+1])) for i in range(len(fs)-1)
+                 if vals[i]*vals[i+1]<0],
+                [dict(frequency_hz=float(f),residual=float(v))
+                 for f,v in zip(fs,vals)])
+
+    def solve_mode(self,bracket_hz,*,conversion,profile_points=600):
+        lo,hi=map(float,bracket_hz)
+        if not 0<lo<hi or profile_points<40:
+            raise ValueError("positive bracket and >=40 profile points required")
+        root,info=brentq(lambda f:self.matching_residual(f,conversion=conversion),
+                        lo,hi,xtol=self.settings.root_xtol_hz,
+                        rtol=4*np.finfo(float).eps,full_output=True)
+        shot=self._matched_shot(root,conversion,profile_points)
+        residual=float(shot["residual"])
+        if abs(residual)>1e-5 or shot["join_relative"]>1e-5:
+            raise RuntimeError("mode root not physically admitted: "+
+                f"matching={residual} join={shot['join_relative']}")
+        ell=self.settings.ell
+        x0,y0,i0=shot["inside"]
+        segments=[(0,x0,y0,i0)]
+        # Reverse every backpropagated segment to normal center->surface
+        for j,xs,ys,interp in reversed(shot["backwards"]):
+            segments.append((j,xs[::-1],(ys*shot["scale"])[:,::-1],interp))
+        # Merge segments sharing the same physical phase, not across a jump.
+        byphase={}
+        for j,xs,ys,interp in segments:
+            byphase.setdefault(j,[]).append((xs,ys,interp))
+        profile=[];wcount=vcount=0;norm=0.
+        for j in sorted(byphase):
+            data=byphase[j]
+            xs=np.concatenate([x for x,y,interp in data])
+            ys=np.hstack([y for x,y,interp in data])
+            interp=data[0][2]
+            r=interp(xs)[:,0]
+            W=r**(ell+1)*ys[0]
+            V=r**ell*ys[1]
+            wcount+=_nodes(W);vcount+=_nodes(V)
+            norm=max(norm,float(np.max(abs(W))))
+            for s,radius,w,v in zip(xs,r,W,V):
+                profile.append(dict(h=float(self.background.h_start-s*s),
+                    r_km=float(radius),W=float(w),V_km_inverse=float(v),
+                    phase_index=j))
+        if norm<=0 or not np.isfinite(norm):
+            raise RuntimeError("invalid native matched eigenfunction amplitude")
+        for row in profile:
+            row["W"]/=norm;row["V_km_inverse"]/=norm
+        return dict(frequency_hz=float(root),bracket_hz=[lo,hi],
+                    conversion=conversion,ell=ell,
+                    root_converged=bool(info.converged),root_iterations=int(info.iterations),
+                    matching_residual=float(residual),
+                    relative_join_mismatch=shot["join_relative"],
+                    surface_BC_relative=shot["surface_bc_relative"],
+                    interface_junctions=shot["junctions"],
+                    W_nodes_per_phase=wcount,V_nodes_per_phase=vcount,
+                    profile=profile,nfev=shot["nfev"],
+                    backend="Fortran DVODE sharp "+self.method.capitalize(),
+                    background_backend=self.background.config.get("backend",
+                       "Python sharp reference"))

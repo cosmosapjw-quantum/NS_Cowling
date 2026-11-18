@@ -1,0 +1,563 @@
+{
+  "schema": "ns_cowling.official_unified_original_compare.v1",
+  "status": "BOUNDED_EXPERIMENT_RECORDED",
+  "scope": "bounded source-original split + optional first-law corrected controls",
+  "nuclear_matter": "original GPPVA full-source EOS from official provider zip",
+  "source_checksum_policy": "Official ZIP checksum mismatch is never silently ignored; member EOS bytes independently checked when available",
+  "models": {
+    "FSU2": {
+      "model": "FSU2",
+      "official_source_url": "https://compose.obspm.fr/download/1D/NS/RMF/FSU2/eos.zip",
+      "provider_eos_zip_sha256": "b38d2051add071fc43df39d636147ec2d11332f545dca49d76cf1c318e7027e3",
+      "provider_checksum_recorded": "4f282b1704394afb57bd5fc81f4bbd33d696f87cec92eaf13a5cad7bd7428914",
+      "provider_zip_checksum_matches": false,
+      "source_file_hashes": {
+        "eos.init": "e78306deb4c48f6d7b2275921c098db4bea1476b3d5c3bd2eab1dfdf7ac2e538",
+        "eos.compo": "a57a6f58e9080c2f501cd5b4d9f9f45ded0833df27eb107bacf36fe55dbf5df1",
+        "eos.mr": "20c2efaaf6a26551b0e424f3af8801acc48ae6569aa07cbc2919bac699e35d4e",
+        "eos.nb": "e9830c27b25fefd93e7e170eb9ad9df66e113da5ee5680b865e818e5b3667f3e",
+        "eos.pdf": "672e15e05b0a73641f611891f59f7b0e9007e520ca27a94ce4611477b8317525",
+        "eos.yq": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad",
+        "eos.t": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad",
+        "eos.thermo": "c5ab88b45f63643e4fba0de15add754d5ea052da493d947c47c5416455b0171b"
+      },
+      "comparison_central_density_fm3": 0.3,
+      "comparison_upper_density_cutoff_fm3": 0.49,
+      "states": {},
+      "independent_thermo_download_sha256": "c5ab88b45f63643e4fba0de15add754d5ea052da493d947c47c5416455b0171b",
+      "independent_thermo_matches_zip_member": true,
+      "original_layout": {
+        "total_rows": 426,
+        "outer_rows": 217,
+        "inner_rows": 52,
+        "core_rows": 157,
+        "original_seams": [
+          {
+            "left_n": 0.00026902099,
+            "right_n": 0.003,
+            "left_p": 0.000498190986079934,
+            "right_p": 0.0023499999,
+            "left_mu": 938.9962296393096,
+            "right_mu": 940.740404574
+          },
+          {
+            "left_n": 0.054000001,
+            "right_n": 0.057862874,
+            "left_p": 0.2546799995162962,
+            "right_p": 0.2941949182607032,
+            "left_mu": 948.0125376813,
+            "right_mu": 948.6640527840001
+          }
+        ]
+      },
+      "original_split_mu_overlap": [
+        948.6640527840001,
+        948.0125376813
+      ],
+      "original_split_has_mu_overlap": false,
+      "raw_original_split_methods": {
+        "maxwell": {
+          "status": "NATIVE_REJECTED",
+          "failure": {
+            "type": "NativeExecutionError",
+            "message": "Fortran operation 'maxwell-transition' failed with exit code 3: high-density phase: provider Q3 chemical potential disagrees with the Euler value (relative tolerance 5e-4)"
+          }
+        },
+        "css": {
+          "status": "NATIVE_REJECTED",
+          "failure": {
+            "type": "NativeExecutionError",
+            "message": "Fortran operation 'match-core' failed with exit code 3: source rows violate the provider Q3 Euler relation mu_B = F + P/n_B (relative tolerance 5e-4)"
+          }
+        }
+      },
+      "first_law_corrections": {
+        "outer_max_abs_dF_MeV": 0.0041420897656507805,
+        "upper_max_abs_dF_MeV": 0.9221569736328092,
+        "upper_max_abs_relative_de": 0.0008959510047937795,
+        "density_pressure_source_knots_preserved": true,
+        "anchor_each_region_original_first_eps_over_n": true,
+        "source_upper_truncated_to_support_n_leq": 0.49,
+        "global_energy_offset_fitted": false
+      },
+      "first_law_corrected_split_methods": {
+        "maxwell": {
+          "status": "NATIVE_REJECTED",
+          "failure": {
+            "type": "NativeExecutionError",
+            "message": "Fortran operation 'maxwell-transition' failed with exit code 3: the two phases have no overlapping baryon-chemical-potential interval"
+          }
+        },
+        "css": {
+          "status": "PASS_NATIVE_FINITE",
+          "transition_pressure": 0.2546799995162962,
+          "density_low": 0.054000001,
+          "density_high": 0.05482925946405593
+        }
+      },
+      "raw_hermite_whole_star_status": "REJECTED:upper smooth interval 51 is not causal and stable",
+      "corrected_smooth_native": {
+        "status": "PASS",
+        "source_is_original_unified_pressure_primary_first_law_corrected": true,
+        "not_exact_raw_thermodynamic_eos": true,
+        "lower_gap_has_explicit_causal_connector": true,
+        "center_density_fm3": 0.3,
+        "mass_msun": 1.1638852265392525,
+        "radius_km": 14.012872679204172,
+        "modes": [
+          {
+            "label": "f",
+            "frequency_hz": 1815.7592459855719,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "matching_residual": 9.200084486913752e-08,
+            "bracket_hz": [
+              1800.0,
+              1900.0
+            ]
+          },
+          {
+            "label": "p1",
+            "frequency_hz": 4936.723393652042,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "matching_residual": -9.212648812308393e-09,
+            "bracket_hz": [
+              4900.0,
+              5000.0
+            ]
+          }
+        ],
+        "report_contract": "data/cowling_maxwell_native_20261119/provider_original_unified/FSU2/thermodynamically_corrected_smooth/REPRESENTATION.json",
+        "first_law_bridge_validation": {
+          "status": "PASS",
+          "first_law": "ANALYTIC_IDENTITY",
+          "construction": "monotone n/mu; endpoint pressure integral fixes kappa",
+          "degenerate_luminal": false,
+          "kappa": 2.814132973955634,
+          "min_n_fm3": 0.00026902099,
+          "min_epsilon": 0.2521129180960036,
+          "min_dn_dmu": 0.0002816292967474245,
+          "min_causal_margin": 0.2641813068501218,
+          "min_cs2_over_c2": 0.000677883992241505,
+          "max_cs2_over_c2": 0.0010172836320423905,
+          "extrema_method": "analytic derivative signs; endpoints and isolated stationary roots",
+          "extrema_candidates": {
+            "susceptibility": [
+              0.0,
+              1.0
+            ],
+            "sound_speed": [
+              0.0,
+              1.0
+            ]
+          },
+          "mean_density": 0.0010650302588620891,
+          "causal_delta_p_bounds": [
+            0.00046819017213113747,
+            0.005211394457552611
+          ],
+          "endpoint_pressure_integral_residual": 4.336808689942018e-19,
+          "pressure_roundoff_bound": 2.962334779995564e-16,
+          "support_n_fm3": [
+            0.00026902099,
+            0.003
+          ],
+          "support_mu_MeV": [
+            939.0014849104657,
+            940.7402232218998
+          ]
+        }
+      },
+      "difference_from_same_rmf_reconstructed_sharp": {
+        "maxwell": {
+          "delta_M_msun": 0.013310471875344287,
+          "delta_R_km": 0.07282803304966734,
+          "delta_frequency_hz": {
+            "slow": {
+              "f": -6.227762545405085,
+              "p1": -38.719005477788414
+            },
+            "rapid": {
+              "f": -6.244264350043068,
+              "p1": -40.392324172301414
+            }
+          },
+          "effects_not_isolated": "different original source branch, thermodynamic corrections, finite Maxwell/CSS jump and connector"
+        },
+        "css": {
+          "delta_M_msun": 0.013308293663085502,
+          "delta_R_km": 0.07282313552677167,
+          "delta_frequency_hz": {
+            "slow": {
+              "f": -6.185983408217226,
+              "p1": -35.40205151239843
+            },
+            "rapid": {
+              "f": -6.232989561678551,
+              "p1": -40.21448311083259
+            }
+          },
+          "effects_not_isolated": "different original source branch, thermodynamic corrections, finite Maxwell/CSS jump and connector"
+        }
+      },
+      "status": "ORIGINAL_UNIFIED_SPLIT_AND_CORRECTED_STELLAR_CONTROL_VERIFIED"
+    },
+    "TM1e": {
+      "model": "TM1e",
+      "official_source_url": "https://compose.obspm.fr/download/1D/NS/RMF/TM1e/eos.zip",
+      "provider_eos_zip_sha256": "5da4f5b0d39585dfd33a673028e1574e0ca6329aca161fefc6dad9eac187ec0d",
+      "provider_checksum_recorded": "f3caad4ff7565119f17bfac106ed6bb02b90b842563d2e03c09269a86eaf4ab6",
+      "provider_zip_checksum_matches": false,
+      "source_file_hashes": {
+        "eos.init": "5849259a8b0abdc12645eda6537789b7467073cd2af411a8be0e81015cfbe1d7",
+        "eos.compo": "35d521e4118e392098c81a2dde4c9ad1f0c3bc07d451076da3fde409a79c0641",
+        "eos.mr": "c5ca8da6185f408b304ab62c98040e6236e5c69bf353ddd74c2e07a422982f5c",
+        "eos.nb": "a00ee6c8f77a38d488fc6982a08d59c9142e72150d020078a8cee2188cbc7312",
+        "eos.pdf": "624fb45b1efb7bc2347cc9b01ad6b5cc7e2f045a203d47f84c7c665d39817d02",
+        "eos.yq": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad",
+        "eos.t": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad",
+        "eos.thermo": "b3e19e143d926add524e8af2e1884647d6ea5b0f38b5ec64616dc9620497fc73"
+      },
+      "comparison_central_density_fm3": 0.3,
+      "comparison_upper_density_cutoff_fm3": 0.49,
+      "states": {},
+      "independent_thermo_download_sha256": "b3e19e143d926add524e8af2e1884647d6ea5b0f38b5ec64616dc9620497fc73",
+      "independent_thermo_matches_zip_member": true,
+      "original_layout": {
+        "total_rows": 455,
+        "outer_rows": 217,
+        "inner_rows": 86,
+        "core_rows": 152,
+        "original_seams": [
+          {
+            "left_n": 0.00026902099,
+            "right_n": 0.0020000001,
+            "left_p": 0.000498190986079934,
+            "right_p": 0.0022700001135,
+            "left_mu": 937.9962336546032,
+            "right_mu": 940.1687162196
+          },
+          {
+            "left_n": 0.089000002,
+            "right_n": 0.10700153,
+            "left_p": 0.345589989266067,
+            "right_p": 0.427015446334495,
+            "left_mu": 953.390560486,
+            "right_mu": 954.43026126
+          }
+        ]
+      },
+      "original_split_mu_overlap": [
+        954.43026126,
+        953.390560486
+      ],
+      "original_split_has_mu_overlap": false,
+      "raw_original_split_methods": {
+        "maxwell": {
+          "status": "NATIVE_REJECTED",
+          "failure": {
+            "type": "NativeExecutionError",
+            "message": "Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability"
+          }
+        },
+        "css": {
+          "status": "NATIVE_REJECTED",
+          "failure": {
+            "type": "NativeExecutionError",
+            "message": "Fortran operation 'match-core' failed with exit code 3: source rows violate the provider Q3 Euler relation mu_B = F + P/n_B (relative tolerance 5e-4)"
+          }
+        }
+      },
+      "first_law_corrections": {
+        "outer_max_abs_dF_MeV": 0.011878604365620049,
+        "upper_max_abs_dF_MeV": 0.7184744527135081,
+        "upper_max_abs_relative_de": 0.0007567208649649855,
+        "density_pressure_source_knots_preserved": true,
+        "anchor_each_region_original_first_eps_over_n": true,
+        "source_upper_truncated_to_support_n_leq": 0.49,
+        "global_energy_offset_fitted": false
+      },
+      "first_law_corrected_split_methods": {
+        "maxwell": {
+          "status": "NATIVE_REJECTED",
+          "failure": {
+            "type": "NativeExecutionError",
+            "message": "Fortran operation 'maxwell-transition' failed with exit code 3: the two phases have no overlapping baryon-chemical-potential interval"
+          }
+        },
+        "css": {
+          "status": "PASS_NATIVE_FINITE",
+          "transition_pressure": 0.345589989266067,
+          "density_low": 0.089000002,
+          "density_high": 0.08907465066236535
+        }
+      },
+      "raw_hermite_whole_star_status": "REJECTED:upper smooth interval 34 is not causal and stable",
+      "corrected_smooth_native": {
+        "status": "PASS",
+        "source_is_original_unified_pressure_primary_first_law_corrected": true,
+        "not_exact_raw_thermodynamic_eos": true,
+        "lower_gap_has_explicit_causal_connector": true,
+        "center_density_fm3": 0.3,
+        "mass_msun": 1.034416844349067,
+        "radius_km": 13.06020224352475,
+        "modes": [
+          {
+            "label": "f",
+            "frequency_hz": 1986.5441322956567,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "matching_residual": -1.3747516300838018e-08,
+            "bracket_hz": [
+              1900.0,
+              2000.0
+            ]
+          },
+          {
+            "label": "p1",
+            "frequency_hz": 5652.847590743701,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "matching_residual": -6.731124784622481e-09,
+            "bracket_hz": [
+              5600.0,
+              5700.0
+            ]
+          }
+        ],
+        "report_contract": "data/cowling_maxwell_native_20261119/provider_original_unified/TM1e/thermodynamically_corrected_smooth/REPRESENTATION.json",
+        "first_law_bridge_validation": {
+          "status": "PASS",
+          "first_law": "ANALYTIC_IDENTITY",
+          "construction": "monotone n/mu; endpoint pressure integral fixes kappa",
+          "degenerate_luminal": false,
+          "kappa": 2.3708139371573504,
+          "min_n_fm3": 0.00026902099,
+          "min_epsilon": 0.251846509706926,
+          "min_dn_dmu": 0.000195584379428582,
+          "min_causal_margin": 0.18319131675960398,
+          "min_cs2_over_c2": 0.001014042139630015,
+          "max_cs2_over_c2": 0.0014663713874067627,
+          "extrema_method": "analytic derivative signs; endpoints and isolated stationary roots",
+          "extrema_candidates": {
+            "susceptibility": [
+              0.0,
+              1.0
+            ],
+            "sound_speed": [
+              0.0,
+              1.0
+            ]
+          },
+          "mean_density": 0.000820584548310415,
+          "causal_delta_p_bounds": [
+            0.0005815396477666184,
+            0.004313448610091765
+          ],
+          "endpoint_pressure_integral_residual": 2.168404344971009e-19,
+          "pressure_roundoff_bound": 2.4519116607801637e-16,
+          "support_n_fm3": [
+            0.00026902099,
+            0.0020000001
+          ],
+          "support_mu_MeV": [
+            938.0111964237658,
+            940.170400044
+          ]
+        }
+      },
+      "status": "ORIGINAL_UNIFIED_SPLIT_AND_CORRECTED_STELLAR_CONTROL_VERIFIED"
+    },
+    "DDME2": {
+      "model": "DDME2",
+      "official_source_url": "https://compose.obspm.fr/download/1D/NS/RMF/DDME2/eos.zip",
+      "provider_eos_zip_sha256": "9415d3bcfa124377c6007b2ff5e4af165901c903b86e8346b13cf42cc5a280a0",
+      "provider_checksum_recorded": "821b091bfeddf8005a372f3fd1af64ec47ad1704506875090c36d91b8a1c7375",
+      "provider_zip_checksum_matches": false,
+      "source_file_hashes": {
+        "eos.init": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "eos.compo": "b32ea3a121b18982fe4d883660f615d6c7ece0eec0be7a7f15a6e3a81a3e71a3",
+        "eos.mr": "d19a955eb5f01c3936da28464af6e1672e5d68646928a07f4819478fd3486fec",
+        "eos.nb": "55e0ce53d64dc07ad5ff6d520af61cc14ad482b85f3b9648471a83e2cbe0ccff",
+        "eos.pdf": "4e3799fcdc4b230bf5ff18d1a9b463bb900aa9736f0686fe03919ae6af35b1d7",
+        "eos.yq": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad",
+        "eos.t": "f0714e3794e527803c3d4eb7dcdfd7a5c09cfbe4c1938fff83ea9950720e72ad",
+        "eos.thermo": "5181c53e5afaeb5e53e5677f8ceedde567cb790e6548a4128ec816c5e8f94195"
+      },
+      "comparison_central_density_fm3": 0.3,
+      "comparison_upper_density_cutoff_fm3": 0.49,
+      "states": {},
+      "independent_thermo_download_sha256": "5181c53e5afaeb5e53e5677f8ceedde567cb790e6548a4128ec816c5e8f94195",
+      "independent_thermo_matches_zip_member": true,
+      "source_full_read_failure": {
+        "type": "NativeExecutionError",
+        "message": "Fortran operation 'read' failed with exit code 3: eos.nb must contain at least three positive strictly increasing values"
+      },
+      "n_rows_source": 415,
+      "density_nonmonotone_source_indices": [
+        412,
+        413
+      ],
+      "exact_original_not_overwritten": true,
+      "source_projection": {
+        "kind": "VALIDATED_UNCHANGED_PREFIX_NOT_ORIGINAL_COMPLETE",
+        "retained_source_rows": 413,
+        "original_rows": 415,
+        "rejected_tail_source_rows": [
+          414,
+          415
+        ],
+        "physical_density_support_up_to_fm3": 1.3191743,
+        "projection_path": "data/cowling_maxwell_native_20261119/provider_original_unified/DDME2/validated_monotone_prefix_projection",
+        "projected_eos_thermo_sha256": "0c67c20740c5b189cd35990f2cc478f5bf57cbe9f3a1a0636e9bb60f7b9f4606",
+        "truncation_reason": "density inversion in last source rows: no extrapolation or sorting",
+        "raw_eos_thermo_sha256": "5181c53e5afaeb5e53e5677f8ceedde567cb790e6548a4128ec816c5e8f94195"
+      },
+      "original_layout": {
+        "total_rows": 413,
+        "outer_rows": 217,
+        "inner_rows": 71,
+        "core_rows": 125,
+        "original_seams": [
+          {
+            "left_n": 0.00026902099,
+            "right_n": 0.0020000001,
+            "left_p": 0.000498190986079934,
+            "right_p": 0.0020000001,
+            "left_mu": 938.9962296393096,
+            "right_mu": 941.3246065226999
+          },
+          {
+            "left_n": 0.071999997,
+            "right_n": 0.077143617,
+            "left_p": 0.40675999425166615,
+            "right_p": 0.465226462435518,
+            "left_mu": 953.4388208339999,
+            "right_mu": 953.7225058800001
+          }
+        ]
+      },
+      "original_split_mu_overlap": [
+        953.7225058800001,
+        953.4388208339999
+      ],
+      "original_split_has_mu_overlap": false,
+      "raw_original_split_methods": {
+        "maxwell": {
+          "status": "NATIVE_REJECTED",
+          "failure": {
+            "type": "NativeExecutionError",
+            "message": "Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability"
+          }
+        },
+        "css": {
+          "status": "NATIVE_REJECTED",
+          "failure": {
+            "type": "NativeExecutionError",
+            "message": "Fortran operation 'match-core' failed with exit code 3: source rows violate the provider Q3 Euler relation mu_B = F + P/n_B (relative tolerance 5e-4)"
+          }
+        }
+      },
+      "first_law_corrections": {
+        "outer_max_abs_dF_MeV": 0.0041420897656507805,
+        "upper_max_abs_dF_MeV": 0.5844645599805744,
+        "upper_max_abs_relative_de": 0.0006154584614385942,
+        "density_pressure_source_knots_preserved": true,
+        "anchor_each_region_original_first_eps_over_n": true,
+        "source_upper_truncated_to_support_n_leq": 0.49,
+        "global_energy_offset_fitted": false
+      },
+      "first_law_corrected_split_methods": {
+        "maxwell": {
+          "status": "NATIVE_REJECTED",
+          "failure": {
+            "type": "NativeExecutionError",
+            "message": "Fortran operation 'maxwell-transition' failed with exit code 3: the two phases have no overlapping baryon-chemical-potential interval"
+          }
+        },
+        "css": {
+          "status": "PASS_NATIVE_FINITE",
+          "transition_pressure": 0.40675999425166615,
+          "density_low": 0.071999997,
+          "density_high": 0.07221589791065382
+        }
+      },
+      "raw_hermite_whole_star_status": "REJECTED:upper smooth interval 68 is not causal and stable",
+      "corrected_smooth_native": {
+        "status": "PASS",
+        "source_is_original_unified_pressure_primary_first_law_corrected": true,
+        "not_exact_raw_thermodynamic_eos": true,
+        "lower_gap_has_explicit_causal_connector": true,
+        "center_density_fm3": 0.3,
+        "mass_msun": 1.0857988225098156,
+        "radius_km": 13.116632931253214,
+        "modes": [
+          {
+            "label": "f",
+            "frequency_hz": 1984.0132269183514,
+            "W_nodes": 0,
+            "V_nodes": 0,
+            "matching_residual": 5.774544821491802e-09,
+            "bracket_hz": [
+              1900.0,
+              2000.0
+            ]
+          },
+          {
+            "label": "p1",
+            "frequency_hz": 5747.620645102723,
+            "W_nodes": 1,
+            "V_nodes": 1,
+            "matching_residual": -7.159906320778869e-09,
+            "bracket_hz": [
+              5700.0,
+              5800.0
+            ]
+          }
+        ],
+        "report_contract": "data/cowling_maxwell_native_20261119/provider_original_unified/DDME2/thermodynamically_corrected_smooth/REPRESENTATION.json",
+        "first_law_bridge_validation": {
+          "status": "PASS",
+          "first_law": "ANALYTIC_IDENTITY",
+          "construction": "monotone n/mu; endpoint pressure integral fixes kappa",
+          "degenerate_luminal": false,
+          "kappa": 4.663115296468954,
+          "min_n_fm3": 0.00026902099,
+          "min_epsilon": 0.2521129180960036,
+          "min_dn_dmu": 3.213162174323479e-05,
+          "min_causal_margin": 0.029902619539478877,
+          "min_cs2_over_c2": 0.0006275649115138768,
+          "max_cs2_over_c2": 0.008916352749766985,
+          "extrema_method": "analytic derivative signs; endpoints and isolated stationary roots",
+          "extrema_candidates": {
+            "susceptibility": [
+              0.0,
+              1.0
+            ],
+            "sound_speed": [
+              0.0,
+              1.0
+            ]
+          },
+          "mean_density": 0.0006237668234325887,
+          "causal_delta_p_bounds": [
+            0.00064853743491484,
+            0.004809132839940625
+          ],
+          "endpoint_pressure_integral_residual": 2.168404344971009e-19,
+          "pressure_roundoff_bound": 2.733675523780121e-16,
+          "support_n_fm3": [
+            0.00026902099,
+            0.0020000001
+          ],
+          "support_mu_MeV": [
+            939.0014849104657,
+            941.4091299751
+          ]
+        }
+      },
+      "status": "ORIGINAL_UNIFIED_SPLIT_AND_CORRECTED_STELLAR_CONTROL_VERIFIED"
+    }
+  }
+}

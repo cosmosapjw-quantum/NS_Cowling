@@ -1,0 +1,903 @@
+{
+  "schema": "ns_cowling.bbp_bps_original_source_and_corrected.v1",
+  "source": {
+    "source_kind": "SECONDARY_LITERATURE_DIGITIZATION_FROM_BBP_REFERENCE",
+    "source": "Diener, arXiv:0806.0747v2, Table 10.4 p97, referencing original Baym-Bethe-Pethick EOS",
+    "source_url": "https://arxiv.org/abs/0806.0747",
+    "source_pdf_sha256": "2f12c3c6208709ace642e30b484cb56d1b86b7de48bd6540598165a1f8f3803d",
+    "original_primary_BBP_bytes": "NOT_IN_HAND",
+    "numeric_rows": 35,
+    "precision": "published ~3 significant digits",
+    "mass_density_g_cm3_to_MeV_fm3": 5.609588603804452e-13,
+    "dyn_cm2_to_MeV_fm3": 6.241509074460763e-34
+  },
+  "bps_source": {
+    "compose_APR_eos_path": "data/maxwell_three_families_20261117/intake/references/APR_APR",
+    "original_thermo_sha256": "45011d7e94607825b6f00f9e70ba48470aa21652a138aafaaa6b31bc0f2f291a",
+    "BPS_outside_unified_apr": "BPS outer + SLy4 inner pre-attached; only n<=neutron drip used"
+  },
+  "BBP_selection": {
+    "BBP_inner_crust_source_rows": 26,
+    "n_max_fm3": 0.07469999999999999,
+    "selection": "fixed n<=0.08 fm^-3 independent of chosen core"
+  },
+  "BBP_BPS_transition_contract": {
+    "status": "ROUNDED_FIRST_N_WITHIN_PUBLISHED_PRECISION_AND_CAUSAL",
+    "original_first_n": 0.000267,
+    "effective_first_n": 0.00026658388851786197,
+    "delta_n_fm3": -4.16111482138019e-07,
+    "max_rounding_half_width_n_fm3": 5e-07,
+    "published_first_p_epsilon_unchanged": true,
+    "bps_last_source_index": 48,
+    "bps_last_n": 0.000257211369324703,
+    "bps_last_p": 0.00048714983555912453,
+    "bps_source_selected_rows": 49,
+    "first_bbP_pressure": 0.0004924550659749542,
+    "effective_mu_BBP": 940.3422997142497,
+    "source_first_mu_BBP": 938.876804478103,
+    "causal_bridge_certificate": {
+      "status": "PASS",
+      "first_law": "ANALYTIC_IDENTITY",
+      "construction": "monotone n/mu; endpoint pressure integral fixes kappa",
+      "degenerate_luminal": false,
+      "kappa": -4.3083421912188144e-05,
+      "min_n_fm3": 0.000257211369324703,
+      "min_epsilon": 0.24137437040649398,
+      "min_dn_dmu": 0.00046268311830967876,
+      "min_causal_margin": 0.4348139236217716,
+      "min_cs2_over_c2": 0.0005911938270277727,
+      "max_cs2_over_c2": 0.0006127231250774087,
+      "extrema_method": "analytic derivative signs; endpoints and isolated stationary roots",
+      "extrema_candidates": {
+        "susceptibility": [
+          0.0,
+          1.0
+        ],
+        "sound_speed": [
+          0.0,
+          1.0
+        ]
+      },
+      "mean_density": 0.00026189762892041556,
+      "causal_delta_p_bounds": [
+        5.2103575108314996e-06,
+        5.400101277107527e-06
+      ],
+      "endpoint_pressure_integral_residual": 0.0,
+      "pressure_roundoff_bound": 3.0696021878540745e-19,
+      "support_n_fm3": [
+        0.000257211369324703,
+        0.00026658388851786197
+      ],
+      "support_mu_MeV": [
+        940.3220428282378,
+        940.3422997142497
+      ]
+    }
+  },
+  "source_reconstruction": {
+    "max_abs_delta_energy_per_baryon_MeV": 5.346908467686603,
+    "max_abs_delta_energy_density_MeV_fm3": 0.1800232160390749,
+    "original_P_unchanged": true,
+    "all_original_n_unchanged_except_first_within_rounding": true,
+    "original_energies_unchanged_in_raw_branch": true,
+    "reconstructed_thermo_status": "FIRST_LAW_ANALYTIC_PIECEWISE_PRESSURE",
+    "max_cs2": 0.008377002756981099
+  },
+  "combinations": [
+    {
+      "branch": "raw_BBP",
+      "core": "GPPVA_FSU2",
+      "source_compose": "data/cowling_maxwell_native_20261119/same_rmf/generated_core/GPPVA_FSU2",
+      "source_sha256": "218b7b7682448ceb656127a66bcebacc72bc4c9eeb1ab7484a1015155359e8d9",
+      "status": "FINITE_TEST_RECORDED",
+      "screen_cubic": {
+        "status": "SCREEN_NOT_ADMISSIBLE",
+        "error": {
+          "type": "ValueError",
+          "error": "nonmonotone original mu_E or pressure; cannot fit P(mu)"
+        }
+      },
+      "screen_quintic": {
+        "status": "SCREEN_NOT_ADMISSIBLE",
+        "error": {
+          "type": "ValueError",
+          "error": "nonmonotone original mu_E or pressure; cannot fit P(mu)"
+        }
+      },
+      "maxwell": {
+        "status": "REJECTED",
+        "error": {
+          "type": "NativeExecutionError",
+          "error": "Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: each phase must have strictly increasing Euler-derived mu_B"
+        }
+      },
+      "css": {
+        "status": "REJECTED",
+        "error": {
+          "type": "ValueError",
+          "error": "native consistency gate failed"
+        }
+      }
+    },
+    {
+      "branch": "raw_BBP",
+      "core": "GPPVA_TM1e",
+      "source_compose": "data/cowling_maxwell_native_20261119/same_rmf/generated_core/GPPVA_TM1e",
+      "source_sha256": "7436f51c14c288b8502a05149f7a167b477d90bcd166e55717f01c027a22102d",
+      "status": "FINITE_TEST_RECORDED",
+      "screen_cubic": {
+        "status": "SCREEN_NOT_ADMISSIBLE",
+        "error": {
+          "type": "ValueError",
+          "error": "nonmonotone original mu_E or pressure; cannot fit P(mu)"
+        }
+      },
+      "screen_quintic": {
+        "status": "SCREEN_NOT_ADMISSIBLE",
+        "error": {
+          "type": "ValueError",
+          "error": "nonmonotone original mu_E or pressure; cannot fit P(mu)"
+        }
+      },
+      "maxwell": {
+        "status": "REJECTED",
+        "error": {
+          "type": "NativeExecutionError",
+          "error": "Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: each phase must have strictly increasing Euler-derived mu_B"
+        }
+      },
+      "css": {
+        "status": "REJECTED",
+        "error": {
+          "type": "ValueError",
+          "error": "native consistency gate failed"
+        }
+      }
+    },
+    {
+      "branch": "raw_BBP",
+      "core": "GPPVA_DDME2",
+      "source_compose": "data/cowling_maxwell_native_20261119/same_rmf/generated_core/GPPVA_DDME2",
+      "source_sha256": "c684ee88dd496b0da2e891312e5d7577540afd23e079f39d78c9424f7c1fc246",
+      "status": "FINITE_TEST_RECORDED",
+      "screen_cubic": {
+        "status": "SCREEN_NOT_ADMISSIBLE",
+        "error": {
+          "type": "ValueError",
+          "error": "nonmonotone original mu_E or pressure; cannot fit P(mu)"
+        }
+      },
+      "screen_quintic": {
+        "status": "SCREEN_NOT_ADMISSIBLE",
+        "error": {
+          "type": "ValueError",
+          "error": "nonmonotone original mu_E or pressure; cannot fit P(mu)"
+        }
+      },
+      "maxwell": {
+        "status": "REJECTED",
+        "error": {
+          "type": "NativeExecutionError",
+          "error": "Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: each phase must have strictly increasing Euler-derived mu_B"
+        }
+      },
+      "css": {
+        "status": "REJECTED",
+        "error": {
+          "type": "ValueError",
+          "error": "native consistency gate failed"
+        }
+      }
+    },
+    {
+      "branch": "raw_BBP",
+      "core": "GM_GM1",
+      "source_compose": "data/maxwell_three_families_20261117/native_core_extended_v2/GM_GM1/generated",
+      "source_sha256": "66badc351f9be7dc857aec6b1f3e8f1ad28c84345a4ec81cf8492dea7ecd8a90",
+      "status": "FINITE_TEST_RECORDED",
+      "screen_cubic": {
+        "status": "SCREEN_NOT_ADMISSIBLE",
+        "error": {
+          "type": "ValueError",
+          "error": "nonmonotone original mu_E or pressure; cannot fit P(mu)"
+        }
+      },
+      "screen_quintic": {
+        "status": "SCREEN_NOT_ADMISSIBLE",
+        "error": {
+          "type": "ValueError",
+          "error": "nonmonotone original mu_E or pressure; cannot fit P(mu)"
+        }
+      },
+      "maxwell": {
+        "status": "REJECTED",
+        "error": {
+          "type": "NativeExecutionError",
+          "error": "Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: each phase must have strictly increasing Euler-derived mu_B"
+        }
+      },
+      "css": {
+        "status": "REJECTED",
+        "error": {
+          "type": "ValueError",
+          "error": "native consistency gate failed"
+        }
+      }
+    },
+    {
+      "branch": "raw_BBP",
+      "core": "PK1_CANONICAL",
+      "source_compose": "data/new_model_maxwell_20261117/generated/PK1_CANONICAL/fine/compose",
+      "source_sha256": "e822a7bd9e1f0cd7c166167a4dcbae15d81dc43967bf656fe8a73bc7a91884d3",
+      "status": "FINITE_TEST_RECORDED",
+      "screen_cubic": {
+        "status": "SCREEN_NOT_ADMISSIBLE",
+        "error": {
+          "type": "ValueError",
+          "error": "nonmonotone original mu_E or pressure; cannot fit P(mu)"
+        }
+      },
+      "screen_quintic": {
+        "status": "SCREEN_NOT_ADMISSIBLE",
+        "error": {
+          "type": "ValueError",
+          "error": "nonmonotone original mu_E or pressure; cannot fit P(mu)"
+        }
+      },
+      "maxwell": {
+        "status": "REJECTED",
+        "error": {
+          "type": "NativeExecutionError",
+          "error": "Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: each phase must have strictly increasing Euler-derived mu_B"
+        }
+      },
+      "css": {
+        "status": "REJECTED",
+        "error": {
+          "type": "ValueError",
+          "error": "native consistency gate failed"
+        }
+      }
+    },
+    {
+      "branch": "pressure_primary_first_law_BBP",
+      "core": "GPPVA_FSU2",
+      "source_compose": "data/cowling_maxwell_native_20261119/same_rmf/generated_core/GPPVA_FSU2",
+      "source_sha256": "218b7b7682448ceb656127a66bcebacc72bc4c9eeb1ab7484a1015155359e8d9",
+      "status": "FINITE_TEST_RECORDED",
+      "screen_cubic": {
+        "status": "SCREEN_NEGATIVE_NOT_NO_GO",
+        "roots": [],
+        "common_mu": [
+          941.2992443074465,
+          953.5019016832473
+        ],
+        "test_points": 603
+      },
+      "screen_quintic": {
+        "status": "SCREEN_NEGATIVE_NOT_NO_GO",
+        "roots": [],
+        "common_mu": [
+          941.2992443074465,
+          953.5019016832473
+        ],
+        "test_points": 603
+      },
+      "maxwell": {
+        "status": "REJECTED",
+        "error": {
+          "type": "NativeExecutionError",
+          "error": "Fortran operation 'maxwell-transition' failed with exit code 3: no pressure equality was found in the common mu_B interval"
+        }
+      },
+      "css": {
+        "status": "PASS_NATIVE_FINITE",
+        "P_t": 0.3657524317634008,
+        "n_low": 0.07469999999999999,
+        "n_high": 0.10054445003185371,
+        "transition_index": 25,
+        "rows": 215
+      },
+      "css_three_layer": {
+        "status": "THREE_LAYER_NATIVE_TOV_F_P1_BOTH_CONVERSIONS_VERIFIED",
+        "stellar": {
+          "native_tov": {
+            "mass_msun": 1.1690340449510934,
+            "R_km": 13.947097159476069,
+            "interfaces": [
+              {
+                "h": 0.02367620389634611,
+                "r_km": 12.21711842698141,
+                "m_geom_km": 1.6634341892140987,
+                "r_jump_km": 0.0,
+                "m_jump_km": 0.0,
+                "p_MeV_fm3": 0.3657524317634008,
+                "n_low_fm3": 0.07469999999999999,
+                "n_high_fm3": 0.10054445003185371,
+                "epsilon_low_MeV_fm3": 70.86083962397517,
+                "epsilon_high_MeV_fm3": 95.50357187730535
+              }
+            ],
+            "seconds": 0.16563822602620348
+          },
+          "independent_python_tov": {
+            "mass_msun": 1.169034121659387,
+            "R_km": 13.947097053792422
+          },
+          "mass_delta_msun": -7.670829349493147e-08,
+          "radius_delta_km": 1.056836467228095e-07,
+          "modes": {
+            "slow": {
+              "status": "NATIVE_MODES_VERIFIED",
+              "modes": [
+                {
+                  "label": "f",
+                  "frequency_hz": 1845.228785819484,
+                  "matched_relative": -5.026546040769743e-07,
+                  "join_relative": 5.026546039978054e-07,
+                  "surface_BC_relative": 0.0,
+                  "interface_count": 1,
+                  "interface_max_traction": 9.506457126861169e-16,
+                  "W_nodes": 0,
+                  "V_nodes": 0
+                },
+                {
+                  "label": "p1",
+                  "frequency_hz": 5380.499594855489,
+                  "matched_relative": 7.476670183967056e-07,
+                  "join_relative": 7.476670184270934e-07,
+                  "surface_BC_relative": 0.0,
+                  "interface_count": 1,
+                  "interface_max_traction": 0.0,
+                  "W_nodes": 1,
+                  "V_nodes": 1
+                }
+              ],
+              "detected_brackets": 6
+            },
+            "rapid": {
+              "status": "NATIVE_MODES_VERIFIED",
+              "modes": [
+                {
+                  "label": "f",
+                  "frequency_hz": 1844.5850338490643,
+                  "matched_relative": -2.3724060038852054e-07,
+                  "join_relative": 2.3724060041888996e-07,
+                  "surface_BC_relative": 0.0,
+                  "interface_count": 1,
+                  "interface_max_traction": 1.3602359283634624e-16,
+                  "W_nodes": 0,
+                  "V_nodes": 0
+                },
+                {
+                  "label": "p1",
+                  "frequency_hz": 5301.235874164138,
+                  "matched_relative": 1.5881017476846787e-06,
+                  "join_relative": 1.5881017476832494e-06,
+                  "surface_BC_relative": 0.0,
+                  "interface_count": 1,
+                  "interface_max_traction": 1.4904035644565344e-16,
+                  "W_nodes": 1,
+                  "V_nodes": 1
+                }
+              ],
+              "detected_brackets": 6
+            }
+          },
+          "source": "BBP_BPS_SECONDARY",
+          "matching": "css"
+        },
+        "contract": "data/cowling_maxwell_native_20261119/bbp_bps/whole_models/GPPVA_FSU2/css/REPRESENTATION.json",
+        "admission_note": "A computed TOV is not full f/p1 validation if mode IDs are missing"
+      }
+    },
+    {
+      "branch": "pressure_primary_first_law_BBP",
+      "core": "GPPVA_TM1e",
+      "source_compose": "data/cowling_maxwell_native_20261119/same_rmf/generated_core/GPPVA_TM1e",
+      "source_sha256": "7436f51c14c288b8502a05149f7a167b477d90bcd166e55717f01c027a22102d",
+      "status": "FINITE_TEST_RECORDED",
+      "screen_cubic": {
+        "status": "SCREEN_NEGATIVE_NOT_NO_GO",
+        "roots": [],
+        "common_mu": [
+          942.8624748888866,
+          953.5019016832473
+        ],
+        "test_points": 632
+      },
+      "screen_quintic": {
+        "status": "SCREEN_NEGATIVE_NOT_NO_GO",
+        "roots": [],
+        "common_mu": [
+          942.8624748888866,
+          953.5019016832473
+        ],
+        "test_points": 632
+      },
+      "maxwell": {
+        "status": "REJECTED",
+        "error": {
+          "type": "NativeExecutionError",
+          "error": "Fortran operation 'maxwell-transition' failed with exit code 3: pressure equality does not connect a distinct denser high-density phase"
+        }
+      },
+      "css": {
+        "status": "PASS_NATIVE_FINITE",
+        "P_t": 0.3657524317634008,
+        "n_low": 0.07469999999999999,
+        "n_high": 0.07615475914070373,
+        "transition_index": 25,
+        "rows": 233
+      },
+      "css_three_layer": {
+        "status": "THREE_LAYER_NATIVE_TOV_F_P1_BOTH_CONVERSIONS_VERIFIED",
+        "stellar": {
+          "native_tov": {
+            "mass_msun": 1.0420108353536255,
+            "R_km": 12.899646406396837,
+            "interfaces": [
+              {
+                "h": 0.02367620389634611,
+                "r_km": 11.230887013109527,
+                "m_geom_km": 1.4876776376104754,
+                "r_jump_km": 0.0,
+                "m_jump_km": 0.0,
+                "p_MeV_fm3": 0.3657524317634008,
+                "n_low_fm3": 0.07469999999999999,
+                "n_high_fm3": 0.07615475914070373,
+                "epsilon_low_MeV_fm3": 70.86083962397517,
+                "epsilon_high_MeV_fm3": 72.24795523112726
+              }
+            ],
+            "seconds": 0.15988360700430349
+          },
+          "independent_python_tov": {
+            "mass_msun": 1.042010789972713,
+            "R_km": 12.899646180695964
+          },
+          "mass_delta_msun": 4.5380912583325994e-08,
+          "radius_delta_km": 2.2570087310214149e-07,
+          "modes": {
+            "slow": {
+              "status": "NATIVE_MODES_VERIFIED",
+              "modes": [
+                {
+                  "label": "f",
+                  "frequency_hz": 1981.9643427286196,
+                  "matched_relative": -7.962233282891603e-07,
+                  "join_relative": 7.962233282933869e-07,
+                  "surface_BC_relative": 0.0,
+                  "interface_count": 1,
+                  "interface_max_traction": 6.057011010581742e-16,
+                  "W_nodes": 0,
+                  "V_nodes": 0
+                },
+                {
+                  "label": "p1",
+                  "frequency_hz": 6096.2824846502135,
+                  "matched_relative": -8.839696018452324e-07,
+                  "join_relative": 8.839696018171448e-07,
+                  "surface_BC_relative": 0.0,
+                  "interface_count": 1,
+                  "interface_max_traction": 0.0,
+                  "W_nodes": 1,
+                  "V_nodes": 1
+                }
+              ],
+              "detected_brackets": 6
+            },
+            "rapid": {
+              "status": "NATIVE_MODES_VERIFIED",
+              "modes": [
+                {
+                  "label": "f",
+                  "frequency_hz": 1981.9119179003233,
+                  "matched_relative": -1.081312876401164e-06,
+                  "join_relative": 1.0813128764400898e-06,
+                  "surface_BC_relative": 0.0,
+                  "interface_count": 1,
+                  "interface_max_traction": 4.846163268344978e-16,
+                  "W_nodes": 0,
+                  "V_nodes": 0
+                },
+                {
+                  "label": "p1",
+                  "frequency_hz": 6075.393772214114,
+                  "matched_relative": 2.5852875136044105e-06,
+                  "join_relative": 2.585287513546096e-06,
+                  "surface_BC_relative": 5.502933439095053e-18,
+                  "interface_count": 1,
+                  "interface_max_traction": 0.0,
+                  "W_nodes": 1,
+                  "V_nodes": 1
+                }
+              ],
+              "detected_brackets": 6
+            }
+          },
+          "source": "BBP_BPS_SECONDARY",
+          "matching": "css"
+        },
+        "contract": "data/cowling_maxwell_native_20261119/bbp_bps/whole_models/GPPVA_TM1e/css/REPRESENTATION.json",
+        "admission_note": "A computed TOV is not full f/p1 validation if mode IDs are missing"
+      }
+    },
+    {
+      "branch": "pressure_primary_first_law_BBP",
+      "core": "GPPVA_DDME2",
+      "source_compose": "data/cowling_maxwell_native_20261119/same_rmf/generated_core/GPPVA_DDME2",
+      "source_sha256": "c684ee88dd496b0da2e891312e5d7577540afd23e079f39d78c9424f7c1fc246",
+      "status": "FINITE_TEST_RECORDED",
+      "screen_cubic": {
+        "status": "SCREEN_NEGATIVE_NOT_NO_GO",
+        "roots": [],
+        "common_mu": [
+          942.4760717945877,
+          953.5019016832473
+        ],
+        "test_points": 604
+      },
+      "screen_quintic": {
+        "status": "SCREEN_NEGATIVE_NOT_NO_GO",
+        "roots": [],
+        "common_mu": [
+          942.4760717945877,
+          953.5019016832473
+        ],
+        "test_points": 604
+      },
+      "maxwell": {
+        "status": "REJECTED",
+        "error": {
+          "type": "NativeExecutionError",
+          "error": "Fortran operation 'maxwell-transition' failed with exit code 3: no pressure equality was found in the common mu_B interval"
+        }
+      },
+      "css": {
+        "status": "PASS_NATIVE_FINITE",
+        "P_t": 0.3657524317634008,
+        "n_low": 0.07469999999999999,
+        "n_high": 0.0988816529180733,
+        "transition_index": 25,
+        "rows": 206
+      },
+      "css_three_layer": {
+        "status": "THREE_LAYER_NATIVE_TOV_PARTIAL_MODE_IDENTITY",
+        "stellar": {
+          "native_tov": {
+            "mass_msun": 1.0853207496738118,
+            "R_km": 12.955333627700652,
+            "interfaces": [
+              {
+                "h": 0.02367620389634611,
+                "r_km": 11.348783468213721,
+                "m_geom_km": 1.5524083540213482,
+                "r_jump_km": 0.0,
+                "m_jump_km": 0.0,
+                "p_MeV_fm3": 0.3657524317634008,
+                "n_low_fm3": 0.07469999999999999,
+                "n_high_fm3": 0.0988816529180733,
+                "epsilon_low_MeV_fm3": 70.86083962397517,
+                "epsilon_high_MeV_fm3": 93.91809166720232
+              }
+            ],
+            "seconds": 0.15791759203420952
+          },
+          "independent_python_tov": {
+            "mass_msun": 1.0853206738302001,
+            "R_km": 12.955333558283728
+          },
+          "mass_delta_msun": 7.58436116132799e-08,
+          "radius_delta_km": 6.94169237647202e-08,
+          "modes": {
+            "slow": {
+              "status": "PARTIAL_MODE_SET",
+              "modes": [
+                {
+                  "label": "f",
+                  "frequency_hz": 1994.1242491554617,
+                  "matched_relative": 5.312726329978464e-07,
+                  "join_relative": 5.312726329326911e-07,
+                  "surface_BC_relative": 0.0,
+                  "interface_count": 1,
+                  "interface_max_traction": 4.762443430470283e-16,
+                  "W_nodes": 0,
+                  "V_nodes": 0
+                }
+              ],
+              "detected_brackets": 6
+            },
+            "rapid": {
+              "status": "NATIVE_MODES_VERIFIED",
+              "modes": [
+                {
+                  "label": "f",
+                  "frequency_hz": 1993.494631160453,
+                  "matched_relative": -7.308775368883421e-08,
+                  "join_relative": 7.308775370430096e-08,
+                  "surface_BC_relative": 0.0,
+                  "interface_count": 1,
+                  "interface_max_traction": 0.0,
+                  "W_nodes": 0,
+                  "V_nodes": 0
+                },
+                {
+                  "label": "p1",
+                  "frequency_hz": 6022.493820955536,
+                  "matched_relative": 2.0826431015805315e-06,
+                  "join_relative": 2.0826431015403055e-06,
+                  "surface_BC_relative": 0.0,
+                  "interface_count": 1,
+                  "interface_max_traction": 0.0,
+                  "W_nodes": 1,
+                  "V_nodes": 1
+                }
+              ],
+              "detected_brackets": 6
+            }
+          },
+          "source": "BBP_BPS_SECONDARY",
+          "matching": "css"
+        },
+        "contract": "data/cowling_maxwell_native_20261119/bbp_bps/whole_models/GPPVA_DDME2/css/REPRESENTATION.json",
+        "admission_note": "A computed TOV is not full f/p1 validation if mode IDs are missing"
+      }
+    },
+    {
+      "branch": "pressure_primary_first_law_BBP",
+      "core": "GM_GM1",
+      "source_compose": "data/maxwell_three_families_20261117/native_core_extended_v2/GM_GM1/generated",
+      "source_sha256": "66badc351f9be7dc857aec6b1f3e8f1ad28c84345a4ec81cf8492dea7ecd8a90",
+      "status": "FINITE_TEST_RECORDED",
+      "screen_cubic": {
+        "status": "SCREEN_NEGATIVE_NOT_NO_GO",
+        "roots": [],
+        "common_mu": [
+          942.2944395003478,
+          953.5019016832473
+        ],
+        "test_points": 660
+      },
+      "screen_quintic": {
+        "status": "SCREEN_NEGATIVE_NOT_NO_GO",
+        "roots": [],
+        "common_mu": [
+          942.2944395003478,
+          953.5019016832473
+        ],
+        "test_points": 660
+      },
+      "maxwell": {
+        "status": "REJECTED",
+        "error": {
+          "type": "NativeExecutionError",
+          "error": "Fortran operation 'maxwell-transition' failed with exit code 3: no pressure equality was found in the common mu_B interval"
+        }
+      },
+      "css": {
+        "status": "PASS_NATIVE_FINITE",
+        "P_t": 0.3657524317634008,
+        "n_low": 0.07469999999999999,
+        "n_high": 0.12193933387470088,
+        "transition_index": 25,
+        "rows": 252
+      },
+      "css_three_layer": {
+        "status": "THREE_LAYER_NATIVE_TOV_PARTIAL_MODE_IDENTITY",
+        "stellar": {
+          "native_tov": {
+            "mass_msun": 1.2806633855778926,
+            "R_km": 13.731400187458949,
+            "interfaces": [
+              {
+                "h": 0.02367620389634611,
+                "r_km": 12.234269662085293,
+                "m_geom_km": 1.836367815788193,
+                "r_jump_km": 0.0,
+                "m_jump_km": 0.0,
+                "p_MeV_fm3": 0.3657524317634008,
+                "n_low_fm3": 0.07469999999999999,
+                "n_high_fm3": 0.12193933387470088,
+                "epsilon_low_MeV_fm3": 70.86083962397517,
+                "epsilon_high_MeV_fm3": 115.90363430775233
+              }
+            ],
+            "seconds": 0.1557334330282174
+          },
+          "independent_python_tov": {
+            "mass_msun": 1.280663375081597,
+            "R_km": 13.731400228064892
+          },
+          "mass_delta_msun": 1.0496295610451511e-08,
+          "radius_delta_km": -4.060594349653002e-08,
+          "modes": {
+            "slow": {
+              "status": "PARTIAL_MODE_SET",
+              "modes": [
+                {
+                  "label": "f",
+                  "frequency_hz": 1908.6959959172011,
+                  "matched_relative": -4.846179576340069e-07,
+                  "join_relative": 4.846179576956011e-07,
+                  "surface_BC_relative": 0.0,
+                  "interface_count": 1,
+                  "interface_max_traction": 1.4384774985491756e-15,
+                  "W_nodes": 0,
+                  "V_nodes": 0
+                }
+              ],
+              "detected_brackets": 5
+            },
+            "rapid": {
+              "status": "NATIVE_MODES_VERIFIED",
+              "modes": [
+                {
+                  "label": "f",
+                  "frequency_hz": 1908.0516899875086,
+                  "matched_relative": 1.3867751900382684e-07,
+                  "join_relative": 1.3867751891065694e-07,
+                  "surface_BC_relative": 0.0,
+                  "interface_count": 1,
+                  "interface_max_traction": 1.571774889848335e-15,
+                  "W_nodes": 0,
+                  "V_nodes": 0
+                },
+                {
+                  "label": "p1",
+                  "frequency_hz": 6040.422560974983,
+                  "matched_relative": -1.4538444666611817e-07,
+                  "join_relative": 1.4538444674936621e-07,
+                  "surface_BC_relative": 0.0,
+                  "interface_count": 1,
+                  "interface_max_traction": 0.0,
+                  "W_nodes": 1,
+                  "V_nodes": 1
+                }
+              ],
+              "detected_brackets": 6
+            }
+          },
+          "source": "BBP_BPS_SECONDARY",
+          "matching": "css"
+        },
+        "contract": "data/cowling_maxwell_native_20261119/bbp_bps/whole_models/GM_GM1/css/REPRESENTATION.json",
+        "admission_note": "A computed TOV is not full f/p1 validation if mode IDs are missing"
+      }
+    },
+    {
+      "branch": "pressure_primary_first_law_BBP",
+      "core": "PK1_CANONICAL",
+      "source_compose": "data/new_model_maxwell_20261117/generated/PK1_CANONICAL/fine/compose",
+      "source_sha256": "e822a7bd9e1f0cd7c166167a4dcbae15d81dc43967bf656fe8a73bc7a91884d3",
+      "status": "FINITE_TEST_RECORDED",
+      "screen_cubic": {
+        "status": "SCREEN_NEGATIVE_NOT_NO_GO",
+        "roots": [],
+        "common_mu": [
+          942.9630991710202,
+          953.5019016832473
+        ],
+        "test_points": 707
+      },
+      "screen_quintic": {
+        "status": "SCREEN_NEGATIVE_NOT_NO_GO",
+        "roots": [],
+        "common_mu": [
+          942.9630991710202,
+          953.5019016832473
+        ],
+        "test_points": 707
+      },
+      "maxwell": {
+        "status": "REJECTED",
+        "error": {
+          "type": "NativeExecutionError",
+          "error": "Fortran operation 'maxwell-transition' failed with exit code 3: no pressure equality was found in the common mu_B interval"
+        }
+      },
+      "css": {
+        "status": "PASS_NATIVE_FINITE",
+        "P_t": 0.3657524317634008,
+        "n_low": 0.07469999999999999,
+        "n_high": 0.09545814609669077,
+        "transition_index": 25,
+        "rows": 509
+      },
+      "css_three_layer": {
+        "status": "THREE_LAYER_NATIVE_TOV_F_P1_BOTH_CONVERSIONS_VERIFIED",
+        "stellar": {
+          "native_tov": {
+            "mass_msun": 1.373198285889351,
+            "R_km": 14.306526398315192,
+            "interfaces": [
+              {
+                "h": 0.02367620389634611,
+                "r_km": 12.800983924684163,
+                "m_geom_km": 1.967358008187982,
+                "r_jump_km": 0.0,
+                "m_jump_km": 0.0,
+                "p_MeV_fm3": 0.3657524317634008,
+                "n_low_fm3": 0.07469999999999999,
+                "n_high_fm3": 0.09545814609669077,
+                "epsilon_low_MeV_fm3": 70.86083962397517,
+                "epsilon_high_MeV_fm3": 90.65377140258852
+              }
+            ],
+            "seconds": 0.1770658070454374
+          },
+          "independent_python_tov": {
+            "mass_msun": 1.37319810631865,
+            "R_km": 14.306526695539352
+          },
+          "mass_delta_msun": 1.7957070097551764e-07,
+          "radius_delta_km": -2.972241599508152e-07,
+          "modes": {
+            "slow": {
+              "status": "NATIVE_MODES_VERIFIED",
+              "modes": [
+                {
+                  "label": "f",
+                  "frequency_hz": 1852.278864547919,
+                  "matched_relative": -7.878239696611442e-07,
+                  "join_relative": 7.878239696778952e-07,
+                  "surface_BC_relative": 0.0,
+                  "interface_count": 1,
+                  "interface_max_traction": 6.757736281860253e-16,
+                  "W_nodes": 0,
+                  "V_nodes": 0
+                },
+                {
+                  "label": "p1",
+                  "frequency_hz": 5430.114999615752,
+                  "matched_relative": 1.1186761580272913e-06,
+                  "join_relative": 1.1186761580009784e-06,
+                  "surface_BC_relative": 0.0,
+                  "interface_count": 1,
+                  "interface_max_traction": 0.0,
+                  "W_nodes": 1,
+                  "V_nodes": 1
+                }
+              ],
+              "detected_brackets": 6
+            },
+            "rapid": {
+              "status": "NATIVE_MODES_VERIFIED",
+              "modes": [
+                {
+                  "label": "f",
+                  "frequency_hz": 1851.899623716666,
+                  "matched_relative": 5.781715772877376e-07,
+                  "join_relative": 5.781715772994517e-07,
+                  "surface_BC_relative": 0.0,
+                  "interface_count": 1,
+                  "interface_max_traction": 1.4881567816164313e-15,
+                  "W_nodes": 0,
+                  "V_nodes": 0
+                },
+                {
+                  "label": "p1",
+                  "frequency_hz": 5377.2609228908495,
+                  "matched_relative": 3.0273298441912554e-06,
+                  "join_relative": 3.0273298441770664e-06,
+                  "surface_BC_relative": 0.0,
+                  "interface_count": 1,
+                  "interface_max_traction": 1.8041445774086773e-16,
+                  "W_nodes": 1,
+                  "V_nodes": 1
+                }
+              ],
+              "detected_brackets": 6
+            }
+          },
+          "source": "BBP_BPS_SECONDARY",
+          "matching": "css"
+        },
+        "contract": "data/cowling_maxwell_native_20261119/bbp_bps/whole_models/PK1_CANONICAL/css/REPRESENTATION.json",
+        "admission_note": "A computed TOV is not full f/p1 validation if mode IDs are missing"
+      }
+    }
+  ],
+  "status": "EXECUTED_WITH_SOURCE_LEVEL_AND_STELLAR_GATES"
+}

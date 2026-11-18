@@ -11,7 +11,7 @@ module compose_eos_cowling_dvode
   private
   real(c_double), allocatable, save :: knots(:), coeff(:,:), slopes(:,:)
   integer, save :: ntab=0, rhs_failed=0
-  public :: cowling_native_setup, cowling_native_shot
+  public :: cowling_native_setup, cowling_native_shot, cowling_native_segment, cowling_native_interface_transfer
 contains
   subroutine cowling_native_setup(n,s,values,derivatives,status) bind(c)
     integer(c_int),value::n
@@ -26,7 +26,7 @@ contains
     if(n<4)return
     if(.not.all(ieee_is_finite(s)))return
     if(.not.all(ieee_is_finite(values)).or..not.all(ieee_is_finite(derivatives)))return
-    if(abs(s(1))>1.e-14_c_double.or.s(n)<=0._c_double)return
+    if(s(1)<0._c_double.or.s(n)<=s(1))return
     if(any(s(2:n)<=s(1:n-1)))return
     ! r, dPhi/dr and sound-speed squared must be physically positive.
     if(any(values(1,:)<=0._c_double).or.any(values(4,:)<=0._c_double) &
@@ -122,7 +122,8 @@ contains
     if(any((targets(2:npts)-targets(1:npts-1))*delta<=0._c_double))return
     y=y0;t=s0;work=0._c_double;iwork=0
     rpar(1)=om2;ipar(1)=ell;abs_tol=atol
-    itol=2;itask=1;istate=1;iopt=1
+    itol=2;itask=4;istate=1;iopt=1
+    work(1)=targets(npts)
     work(5)=sign(min(1.e-5_c_double,0.1_c_double*hmax),delta)
     work(6)=hmax;iwork(6)=100000
     output(:,1)=y
@@ -188,5 +189,74 @@ contains
       status=31;return
     endif
     nfev=i1+i2;status=0
+  end subroutine
+
+  ! One native integration segment on current one-sided background.
+  ! Source providers, branch choice, interface transfer remain explicit.
+  subroutine cowling_native_segment(omega,ell,rtol,atol,max_ds,mf,npts,targets,initial, &
+                                     output,nfev,status) bind(c)
+    real(c_double),value :: omega,rtol,atol,max_ds
+    integer(c_int),value :: ell,mf,npts
+    real(c_double),intent(in) :: targets(npts),initial(2)
+    real(c_double),intent(out) :: output(2,npts)
+    integer(c_int),intent(out) :: nfev,status
+    status=1;nfev=0
+    if(ntab<4.or.npts<2.or.ell<2)return
+    if(mf/=10.and.mf/=22)return
+    if(.not.all(ieee_is_finite([omega,rtol,atol,max_ds])))return
+    if(omega<=0._c_double.or.rtol<=0._c_double.or.atol<=0._c_double.or.max_ds<=0._c_double)return
+    if(targets(1)<knots(1)-1.e-10_c_double.or.targets(npts)>knots(ntab)+1.e-10_c_double)return
+    if(.not.all(ieee_is_finite(initial)))return
+    call integrate_shot(targets(1),targets,npts,initial,omega*omega,ell, &
+                        rtol,atol,max_ds,mf,output,nfev,status)
+  end subroutine
+
+  ! Scaled w = W/r^(ell+1), v = V/r^ell. Traction ∆P is proportional to
+  ! H [omega² exp(lambda-2Phi) r v + Phi' w].
+  ! Mode 1 (slow): [w]=0; mode 2 (rapid): [v]=0, both with [∆P]=0.
+  subroutine cowling_native_interface_transfer(omega,r,phi,lambda,phi_prime, &
+      p,epsilon_in,epsilon_out,conversion,y_before,y_after, &
+      traction_relative,kinematic_relative,status) bind(c)
+    real(c_double),value :: omega,r,phi,lambda,phi_prime,p,epsilon_in,epsilon_out
+    integer(c_int),value :: conversion
+    real(c_double),intent(in) :: y_before(2)
+    real(c_double),intent(out) :: y_after(2),traction_relative,kinematic_relative
+    integer(c_int),intent(out) :: status
+    real(c_double) :: a,b,h1,h2,q1,q2,check1,check2
+    status=1;y_after=0._c_double;traction_relative=0._c_double
+    kinematic_relative=0._c_double
+    if(conversion/=1.and.conversion/=2)return
+    if(.not.all(ieee_is_finite([omega,r,phi,lambda,phi_prime,p,epsilon_in,epsilon_out])))return
+    if(.not.all(ieee_is_finite(y_before)))return
+    if(r<=0._c_double.or.omega<=0._c_double.or.phi_prime<=0._c_double.or.p<0._c_double)return
+    h1=epsilon_in+p;h2=epsilon_out+p
+    if(h1<=0._c_double.or.h2<=0._c_double)return
+    if(lambda-2._c_double*phi>600._c_double.or.lambda>600._c_double)return
+    a=omega*omega*exp(lambda-2._c_double*phi)*r;b=phi_prime
+    if(a<=tiny(a))return
+    q1=a*y_before(2)+b*y_before(1)
+    q2=(h1/h2)*q1
+    if(conversion==1)then
+      y_after(1)=y_before(1)
+      y_after(2)=(q2-b*y_after(1))/a
+    else
+      y_after(2)=y_before(2)
+      y_after(1)=(q2-a*y_after(2))/b
+    endif
+    if(.not.all(ieee_is_finite(y_after)))return
+    check1=h1*q1;check2=h2*(a*y_after(2)+b*y_after(1))
+    traction_relative=abs(check1-check2)/max(abs(check1),abs(check2),tiny(1._c_double))
+    if(conversion==1)then
+      kinematic_relative=abs(y_after(1)-y_before(1))/ &
+          max(abs(y_after(1)),abs(y_before(1)),tiny(1._c_double))
+    else
+      kinematic_relative=abs(y_after(2)-y_before(2))/ &
+          max(abs(y_after(2)),abs(y_before(2)),tiny(1._c_double))
+    endif
+    if(.not.all(ieee_is_finite([traction_relative,kinematic_relative])))return
+    if(traction_relative>1.e-9_c_double.or.kinematic_relative>1.e-9_c_double)then
+      status=2;return
+    endif
+    status=0
   end subroutine
 end module compose_eos_cowling_dvode

@@ -71,6 +71,17 @@ def _native_library():
         _FORTRAN_ARRAY, _FORTRAN_ARRAY,
         ct.POINTER(ct.c_double), ct.POINTER(ct.c_int), ct.POINTER(ct.c_int)]
     dll.cowling_native_shot.restype = None
+    dll.cowling_native_segment.argtypes = [
+        ct.c_double,ct.c_int,ct.c_double,ct.c_double,ct.c_double,
+        ct.c_int,ct.c_int,_DOUBLE_ARRAY,_DOUBLE_ARRAY,_FORTRAN_ARRAY,
+        ct.POINTER(ct.c_int),ct.POINTER(ct.c_int)]
+    dll.cowling_native_segment.restype = None
+    dll.cowling_native_interface_transfer.argtypes = [
+        ct.c_double,ct.c_double,ct.c_double,ct.c_double,ct.c_double,
+        ct.c_double,ct.c_double,ct.c_double,ct.c_int,_DOUBLE_ARRAY,
+        _DOUBLE_ARRAY,ct.POINTER(ct.c_double),ct.POINTER(ct.c_double),
+        ct.POINTER(ct.c_int)]
+    dll.cowling_native_interface_transfer.restype = None
     dll.tov_native_profile.argtypes = [
         ct.c_int, _DOUBLE_ARRAY, _DOUBLE_ARRAY, _DOUBLE_ARRAY,
         _DOUBLE_ARRAY, _DOUBLE_ARRAY,

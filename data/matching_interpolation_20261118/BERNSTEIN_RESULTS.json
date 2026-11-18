@@ -1,0 +1,1115 @@
+{
+  "status": "PASS_SCOPED",
+  "source_commit": "634a586fdd0c214bf7fa9718b02ebafa3e927008",
+  "scope": "Only lower phenomenological bridge; exact source upper rows and Maxwell interface are fixed",
+  "degree_selection": "smallest feasible Bernstein derivative degree among 4,6,8,12,16,24,32; optional roughness minimization",
+  "side_derivatives": "fixed from previous E outer final polytrope and first source upper Hermite interval",
+  "cases": [
+    {
+      "id": "H_DDME2_N128__primary",
+      "source_contract": "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDME2_N128/primary/REPRESENTATION.json",
+      "input_sha256": "11d2c458fae2e837e0634f378fe34c463d88ff05c0e6a83ea8eb99f3391a6003",
+      "n_bridge_right": 0.006,
+      "degree": 4,
+      "selection": "minimum discrete derivative roughness, SLSQP after LP feasibility",
+      "LP_attempts": [
+        {
+          "degree": 4,
+          "feasible": true
+        }
+      ],
+      "bernstein_coefficients": [
+        0.06372460859979587,
+        0.23525502241314644,
+        0.8698367159100363,
+        1.634615591935189,
+        2.196568061141832
+      ],
+      "side_cs2_reference": [
+        0.0026327463709396723,
+        0.001692973569636138
+      ],
+      "validation": {
+        "status": "PASS",
+        "family": "bernstein_slope_matched",
+        "parameter": 4,
+        "min_cs2_over_c2": 0.0008795310939982108,
+        "max_cs2_over_c2": 0.0026327463709396723,
+        "endpoint_pressure_residual": 8.673617379884035e-19,
+        "endpoint_pressure_bound": 2.0076211854625693e-11,
+        "first_law": "ANALYTIC_BY_CONSTRUCTION; FINITE_DIFFERENCE_TESTED",
+        "causal_margin": "mu^2*delta_y*Phi_prime / width >=0",
+        "degree": 4,
+        "bernstein_coefficients": [
+          0.06372460859979587,
+          0.23525502241314644,
+          0.8698367159100363,
+          1.634615591935189,
+          2.196568061141832
+        ],
+        "endpoint_cs2_expected": [
+          0.0026327463709396723,
+          0.001692973569636138
+        ],
+        "endpoint_cs2_found": [
+          0.0026327463709396723,
+          0.0016929735696361375
+        ],
+        "endpoint_derivative_g": [
+          0.06372460859979587,
+          2.196568061141832
+        ],
+        "area_constraint_max_abs_residual": 0.0,
+        "selected_basis": "minimum discrete derivative roughness, SLSQP after LP feasibility",
+        "lp_attempts": [
+          {
+            "degree": 4,
+            "feasible": true
+          }
+        ]
+      },
+      "physics": {
+        "max_abs_delta_P_MeV_fm3": 0.0001972349804330734,
+        "max_abs_delta_epsilon_MeV_fm3": 0.20034697616410257,
+        "max_abs_delta_n_fm3": 0.00021266378217539182,
+        "max_abs_delta_cs2_over_c2": 0.0018859146569036305,
+        "min_cs2_over_c2": 0.0008795324459267596,
+        "max_cs2_over_c2": 0.0026327463709396723,
+        "cs2_left": 0.0026327463709396723,
+        "cs2_right": 0.0016929735696361375,
+        "independent_pressure_area_error_MeV_fm3": -1.1275702593849246e-16,
+        "independent_positive_n": true,
+        "phase_boundary_values_modified": false
+      },
+      "star": {
+        "fixed_central": {
+          "mass_msun": 1.399999071696374,
+          "radius_km": 14.4204144621935,
+          "central_density_fm3": 0.3038516328930928,
+          "compactness": 0.14335743871534626,
+          "interfaces": [
+            {
+              "h": 0.014259570982404941,
+              "r_km": 13.477554522573396,
+              "m_geom_km": 2.0646247023805344,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.014009525845495105,
+              "n_low_fm3": 0.00977355894875663,
+              "n_high_fm3": 0.017093104048714065,
+              "epsilon_low_MeV_fm3": 9.20349126294342,
+              "epsilon_high_MeV_fm3": 16.10659719254103
+            }
+          ],
+          "nfev": 3814
+        },
+        "target_mass": {
+          "mass_msun": 1.3999999971288648,
+          "radius_km": 14.420414188445166,
+          "central_density_fm3": 0.30385179130250717,
+          "compactness": 0.14335753619941496,
+          "interfaces": [
+            {
+              "h": 0.014259570982404941,
+              "r_km": 13.477555109845639,
+              "m_geom_km": 2.064626078149726,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.014009525845495105,
+              "n_low_fm3": 0.00977355894875663,
+              "n_high_fm3": 0.017093104048714065,
+              "epsilon_low_MeV_fm3": 9.20349126294342,
+              "epsilon_high_MeV_fm3": 16.10659719254103
+            }
+          ],
+          "nfev": 3889
+        },
+        "tighter_control": {
+          "same_central_density": true,
+          "delta_R_km": -9.228795505578091e-09,
+          "delta_M_msun": 1.0988312038051617e-08
+        }
+      },
+      "delta_R_from_H_exponential_km": -2.4757496248639654e-06,
+      "source_sharp_interface_preserved": true
+    },
+    {
+      "id": "H_DDME2_N128__next_admissible_join_control",
+      "source_contract": "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDME2_N128/next_admissible_join_control/REPRESENTATION.json",
+      "input_sha256": "d4e854e8c332c96277dffb4fc0213b9c8c19fc7dabf0996bff313b6b1cd19ec5",
+      "n_bridge_right": 0.007,
+      "degree": 4,
+      "selection": "minimum discrete derivative roughness, SLSQP after LP feasibility",
+      "LP_attempts": [
+        {
+          "degree": 4,
+          "feasible": true
+        }
+      ],
+      "bernstein_coefficients": [
+        0.05834582851104947,
+        0.2578999480946573,
+        0.8609031708286411,
+        1.6030321615250525,
+        2.2198188910405996
+      ],
+      "side_cs2_reference": [
+        0.0026327463709396723,
+        0.0017883530349655623
+      ],
+      "validation": {
+        "status": "PASS",
+        "family": "bernstein_slope_matched",
+        "parameter": 4,
+        "min_cs2_over_c2": 0.0008869109540425352,
+        "max_cs2_over_c2": 0.002632746370939672,
+        "endpoint_pressure_residual": 1.734723475976807e-18,
+        "endpoint_pressure_bound": 2.5177517208468713e-11,
+        "first_law": "ANALYTIC_BY_CONSTRUCTION; FINITE_DIFFERENCE_TESTED",
+        "causal_margin": "mu^2*delta_y*Phi_prime / width >=0",
+        "degree": 4,
+        "bernstein_coefficients": [
+          0.05834582851104947,
+          0.2578999480946573,
+          0.8609031708286411,
+          1.6030321615250525,
+          2.2198188910405996
+        ],
+        "endpoint_cs2_expected": [
+          0.0026327463709396723,
+          0.0017883530349655623
+        ],
+        "endpoint_cs2_found": [
+          0.002632746370939672,
+          0.0017883530349655627
+        ],
+        "endpoint_derivative_g": [
+          0.05834582851104947,
+          2.2198188910405996
+        ],
+        "area_constraint_max_abs_residual": 5.684341886080802e-14,
+        "selected_basis": "minimum discrete derivative roughness, SLSQP after LP feasibility",
+        "lp_attempts": [
+          {
+            "degree": 4,
+            "feasible": true
+          }
+        ]
+      },
+      "physics": {
+        "max_abs_delta_P_MeV_fm3": 0.00024157630372098225,
+        "max_abs_delta_epsilon_MeV_fm3": 0.22676930199398715,
+        "max_abs_delta_n_fm3": 0.00024064977333943926,
+        "max_abs_delta_cs2_over_c2": 0.0019481567821937312,
+        "min_cs2_over_c2": 0.000886914054467384,
+        "max_cs2_over_c2": 0.002632746370939672,
+        "cs2_left": 0.002632746370939672,
+        "cs2_right": 0.0017883530349655627,
+        "independent_pressure_area_error_MeV_fm3": -3.122502256758253e-17,
+        "independent_positive_n": true,
+        "phase_boundary_values_modified": false
+      },
+      "star": {
+        "fixed_central": {
+          "mass_msun": 1.3999987866797179,
+          "radius_km": 14.420414714244044,
+          "central_density_fm3": 0.3038515722653404,
+          "compactness": 0.14335740702443722,
+          "interfaces": [
+            {
+              "h": 0.014259570982404941,
+              "r_km": 13.477554297807423,
+              "m_geom_km": 2.0646241758335147,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.014009525845495105,
+              "n_low_fm3": 0.00977355894875663,
+              "n_high_fm3": 0.017093104048714065,
+              "epsilon_low_MeV_fm3": 9.20349126294342,
+              "epsilon_high_MeV_fm3": 16.10659719254103
+            }
+          ],
+          "nfev": 4321
+        },
+        "target_mass": {
+          "mass_msun": 1.4000000015176521,
+          "radius_km": 14.420414353890026,
+          "central_density_fm3": 0.3038517805266464,
+          "compactness": 0.14335753500408352,
+          "interfaces": [
+            {
+              "h": 0.014259570982404941,
+              "r_km": 13.477555069896194,
+              "m_geom_km": 2.064625984562983,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.014009525845495105,
+              "n_low_fm3": 0.00977355894875663,
+              "n_high_fm3": 0.017093104048714065,
+              "epsilon_low_MeV_fm3": 9.20349126294342,
+              "epsilon_high_MeV_fm3": 16.10659719254103
+            }
+          ],
+          "nfev": 3991
+        },
+        "tighter_control": null
+      },
+      "delta_R_from_H_exponential_km": -3.2580373936497153e-06,
+      "source_sharp_interface_preserved": true
+    },
+    {
+      "id": "H_DDMEX_ORIGINAL_TABLE_RHO0_N128__primary",
+      "source_contract": "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDMEX_ORIGINAL_TABLE_RHO0_N128/primary/REPRESENTATION.json",
+      "input_sha256": "4a1eead8e898d1dc764ebf2cda6605848a17174407a51866846ce2bb35562ae3",
+      "n_bridge_right": 0.003,
+      "degree": 4,
+      "selection": "minimum discrete derivative roughness, SLSQP after LP feasibility",
+      "LP_attempts": [
+        {
+          "degree": 4,
+          "feasible": true
+        }
+      ],
+      "bernstein_coefficients": [
+        0.07325387902945808,
+        1.1011960186398984,
+        1.1331475848932338,
+        1.031903321975709,
+        1.6604991954617008
+      ],
+      "side_cs2_reference": [
+        0.0026327463709396723,
+        0.0012918730271910873
+      ],
+      "validation": {
+        "status": "PASS",
+        "family": "bernstein_slope_matched",
+        "parameter": 4,
+        "min_cs2_over_c2": 0.0005127361136471149,
+        "max_cs2_over_c2": 0.0026327463709396723,
+        "endpoint_pressure_residual": 0.0,
+        "endpoint_pressure_bound": 5.511884120892643e-12,
+        "first_law": "ANALYTIC_BY_CONSTRUCTION; FINITE_DIFFERENCE_TESTED",
+        "causal_margin": "mu^2*delta_y*Phi_prime / width >=0",
+        "degree": 4,
+        "bernstein_coefficients": [
+          0.07325387902945808,
+          1.1011960186398984,
+          1.1331475848932338,
+          1.031903321975709,
+          1.6604991954617008
+        ],
+        "endpoint_cs2_expected": [
+          0.0026327463709396723,
+          0.0012918730271910873
+        ],
+        "endpoint_cs2_found": [
+          0.0026327463709396723,
+          0.0012918730271910873
+        ],
+        "endpoint_derivative_g": [
+          0.07325387902945808,
+          1.6604991954617008
+        ],
+        "area_constraint_max_abs_residual": 0.0,
+        "selected_basis": "minimum discrete derivative roughness, SLSQP after LP feasibility",
+        "lp_attempts": [
+          {
+            "degree": 4,
+            "feasible": true
+          }
+        ]
+      },
+      "physics": {
+        "max_abs_delta_P_MeV_fm3": 4.297602743951563e-05,
+        "max_abs_delta_epsilon_MeV_fm3": 0.07946458374934462,
+        "max_abs_delta_n_fm3": 8.462694569722623e-05,
+        "max_abs_delta_cs2_over_c2": 0.0022417502485157417,
+        "min_cs2_over_c2": 0.0005127536559364399,
+        "max_cs2_over_c2": 0.0026327463709396723,
+        "cs2_left": 0.0026327463709396723,
+        "cs2_right": 0.0012918730271910873,
+        "independent_pressure_area_error_MeV_fm3": 4.336808689942018e-19,
+        "independent_positive_n": true,
+        "phase_boundary_values_modified": false
+      },
+      "star": {
+        "fixed_central": {
+          "mass_msun": 1.3999998799676405,
+          "radius_km": 13.875173793006486,
+          "central_density_fm3": 0.3192437118952588,
+          "compactness": 0.1489909176539005,
+          "interfaces": [
+            {
+              "h": 0.013402135705678038,
+              "r_km": 13.061247003248127,
+              "m_geom_km": 2.0653834295521576,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.011541924902351135,
+              "n_low_fm3": 0.008596606764460788,
+              "n_high_fm3": 0.020104352588030134,
+              "epsilon_low_MeV_fm3": 8.089019667498889,
+              "epsilon_high_MeV_fm3": 18.932740496849707
+            }
+          ],
+          "nfev": 4021
+        },
+        "target_mass": {
+          "mass_msun": 1.4000000009641225,
+          "radius_km": 13.875173799746982,
+          "central_density_fm3": 0.3192437338071622,
+          "compactness": 0.14899093045822026,
+          "interfaces": [
+            {
+              "h": 0.013402135705678038,
+              "r_km": 13.06124710201128,
+              "m_geom_km": 2.065383600546842,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.011541924902351135,
+              "n_low_fm3": 0.008596606764460788,
+              "n_high_fm3": 0.020104352588030134,
+              "epsilon_low_MeV_fm3": 8.089019667498889,
+              "epsilon_high_MeV_fm3": 18.932740496849707
+            }
+          ],
+          "nfev": 4261
+        },
+        "tighter_control": {
+          "same_central_density": true,
+          "delta_R_km": 3.5635636663755577e-09,
+          "delta_M_msun": 1.805600113868877e-09
+        }
+      },
+      "delta_R_from_H_exponential_km": -1.8083276742686394e-07,
+      "source_sharp_interface_preserved": true
+    },
+    {
+      "id": "H_DDMEX_ORIGINAL_TABLE_RHO0_N128__next_admissible_join_control",
+      "source_contract": "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDMEX_ORIGINAL_TABLE_RHO0_N128/next_admissible_join_control/REPRESENTATION.json",
+      "input_sha256": "fe6fd7262d99a7ee830135ba5c13e2eed630180063440065051019c8debb148e",
+      "n_bridge_right": 0.004,
+      "degree": 4,
+      "selection": "minimum discrete derivative roughness, SLSQP after LP feasibility",
+      "LP_attempts": [
+        {
+          "degree": 4,
+          "feasible": true
+        }
+      ],
+      "bernstein_coefficients": [
+        0.06436144423040864,
+        1.0191234528176003,
+        1.0903940787152913,
+        1.071217420587241,
+        1.7549036036494607
+      ],
+      "side_cs2_reference": [
+        0.0026327463709396723,
+        0.0014306698196073179
+      ],
+      "validation": {
+        "status": "PASS",
+        "family": "bernstein_slope_matched",
+        "parameter": 4,
+        "min_cs2_over_c2": 0.000529831322563332,
+        "max_cs2_over_c2": 0.0026327463709396723,
+        "endpoint_pressure_residual": 2.6020852139652106e-18,
+        "endpoint_pressure_bound": 8.816459043469956e-12,
+        "first_law": "ANALYTIC_BY_CONSTRUCTION; FINITE_DIFFERENCE_TESTED",
+        "causal_margin": "mu^2*delta_y*Phi_prime / width >=0",
+        "degree": 4,
+        "bernstein_coefficients": [
+          0.06436144423040864,
+          1.0191234528176003,
+          1.0903940787152913,
+          1.071217420587241,
+          1.7549036036494607
+        ],
+        "endpoint_cs2_expected": [
+          0.0026327463709396723,
+          0.0014306698196073179
+        ],
+        "endpoint_cs2_found": [
+          0.0026327463709396723,
+          0.0014306698196073176
+        ],
+        "endpoint_derivative_g": [
+          0.06436144423040864,
+          1.7549036036494607
+        ],
+        "area_constraint_max_abs_residual": 2.8421709430404007e-13,
+        "selected_basis": "minimum discrete derivative roughness, SLSQP after LP feasibility",
+        "lp_attempts": [
+          {
+            "degree": 4,
+            "feasible": true
+          }
+        ]
+      },
+      "physics": {
+        "max_abs_delta_P_MeV_fm3": 6.648718589204595e-05,
+        "max_abs_delta_epsilon_MeV_fm3": 0.10135113282888392,
+        "max_abs_delta_n_fm3": 0.0001079329732240578,
+        "max_abs_delta_cs2_over_c2": 0.0022578809583555536,
+        "min_cs2_over_c2": 0.0005298435814984454,
+        "max_cs2_over_c2": 0.0026327463709396723,
+        "cs2_left": 0.0026327463709396723,
+        "cs2_right": 0.0014306698196073176,
+        "independent_pressure_area_error_MeV_fm3": 2.42861286636753e-17,
+        "independent_positive_n": true,
+        "phase_boundary_values_modified": false
+      },
+      "star": {
+        "fixed_central": {
+          "mass_msun": 1.3999998118429589,
+          "radius_km": 13.875173703514449,
+          "central_density_fm3": 0.31924370958560555,
+          "compactness": 0.14899091136489023,
+          "interfaces": [
+            {
+              "h": 0.013402135705678038,
+              "r_km": 13.061246992853874,
+              "m_geom_km": 2.0653834111758695,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.011541924902351135,
+              "n_low_fm3": 0.008596606764460788,
+              "n_high_fm3": 0.020104352588030134,
+              "epsilon_low_MeV_fm3": 8.089019667498889,
+              "epsilon_high_MeV_fm3": 18.932740496849707
+            }
+          ],
+          "nfev": 3937
+        },
+        "target_mass": {
+          "mass_msun": 1.3999999964811412,
+          "radius_km": 13.875173718196674,
+          "central_density_fm3": 0.31924374407471406,
+          "compactness": 0.14899093085681517,
+          "interfaces": [
+            {
+              "h": 0.013402135705678038,
+              "r_km": 13.061247148196532,
+              "m_geom_km": 2.065383682734204,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.011541924902351135,
+              "n_low_fm3": 0.008596606764460788,
+              "n_high_fm3": 0.020104352588030134,
+              "epsilon_low_MeV_fm3": 8.089019667498889,
+              "epsilon_high_MeV_fm3": 18.932740496849707
+            }
+          ],
+          "nfev": 4015
+        },
+        "tighter_control": null
+      },
+      "delta_R_from_H_exponential_km": -3.721733055073173e-07,
+      "source_sharp_interface_preserved": true
+    },
+    {
+      "id": "H_NL3_PROVIDER_PRECISION_N128__primary",
+      "source_contract": "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_NL3_PROVIDER_PRECISION_N128/primary/REPRESENTATION.json",
+      "input_sha256": "e0676543eddbf145664e29c31894fc51463e050b255aebfb20e2deec9522ff3e",
+      "n_bridge_right": 0.005,
+      "degree": 4,
+      "selection": "minimum discrete derivative roughness, SLSQP after LP feasibility",
+      "LP_attempts": [
+        {
+          "degree": 4,
+          "feasible": true
+        }
+      ],
+      "bernstein_coefficients": [
+        0.05243765140540143,
+        0.37157679606142135,
+        0.32467812321013656,
+        0.9530291686877711,
+        3.2982782606352696
+      ],
+      "side_cs2_reference": [
+        0.0026327463709396723,
+        0.0007756223614055508
+      ],
+      "validation": {
+        "status": "PASS",
+        "family": "bernstein_slope_matched",
+        "parameter": 4,
+        "min_cs2_over_c2": 0.0007518025021229157,
+        "max_cs2_over_c2": 0.0026327463709396723,
+        "endpoint_pressure_residual": 0.0,
+        "endpoint_pressure_bound": 1.1384475770512762e-11,
+        "first_law": "ANALYTIC_BY_CONSTRUCTION; FINITE_DIFFERENCE_TESTED",
+        "causal_margin": "mu^2*delta_y*Phi_prime / width >=0",
+        "degree": 4,
+        "bernstein_coefficients": [
+          0.05243765140540143,
+          0.37157679606142135,
+          0.32467812321013656,
+          0.9530291686877711,
+          3.2982782606352696
+        ],
+        "endpoint_cs2_expected": [
+          0.0026327463709396723,
+          0.0007756223614055508
+        ],
+        "endpoint_cs2_found": [
+          0.0026327463709396723,
+          0.0007756223614055508
+        ],
+        "endpoint_derivative_g": [
+          0.05243765140540143,
+          3.2982782606352696
+        ],
+        "area_constraint_max_abs_residual": 2.842170943040401e-14,
+        "selected_basis": "minimum discrete derivative roughness, SLSQP after LP feasibility",
+        "lp_attempts": [
+          {
+            "degree": 4,
+            "feasible": true
+          }
+        ]
+      },
+      "physics": {
+        "max_abs_delta_P_MeV_fm3": 1.4832789051855534e-05,
+        "max_abs_delta_epsilon_MeV_fm3": 0.02782189960191328,
+        "max_abs_delta_n_fm3": 2.9562985535008975e-05,
+        "max_abs_delta_cs2_over_c2": 0.0015308278863664078,
+        "min_cs2_over_c2": 0.0007518026568502841,
+        "max_cs2_over_c2": 0.0026327463709396723,
+        "cs2_left": 0.0026327463709396723,
+        "cs2_right": 0.0007756223614055508,
+        "independent_pressure_area_error_MeV_fm3": 2.719179048593645e-16,
+        "independent_positive_n": true,
+        "phase_boundary_values_modified": false
+      },
+      "star": {
+        "fixed_central": {
+          "mass_msun": 1.3999999634627256,
+          "radius_km": 13.875197697612359,
+          "central_density_fm3": 0.31924173363800745,
+          "compactness": 0.14899066985359474,
+          "interfaces": [
+            {
+              "h": 0.01462954289437335,
+              "r_km": 12.992275615891323,
+              "m_geom_km": 2.0595609521513283,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.048219293613915755,
+              "n_low_fm3": 0.03136030129260822,
+              "n_high_fm3": 0.03951721251204436,
+              "epsilon_low_MeV_fm3": 29.53880919997054,
+              "epsilon_high_MeV_fm3": 37.23448668780068
+            }
+          ],
+          "nfev": 4138
+        },
+        "target_mass": {
+          "mass_msun": 1.4000000083229756,
+          "radius_km": 13.875197692541391,
+          "central_density_fm3": 0.3192417398412803,
+          "compactness": 0.14899067468215982,
+          "interfaces": [
+            {
+              "h": 0.01462954289437335,
+              "r_km": 12.992275645957886,
+              "m_geom_km": 2.059561001851697,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.048219293613915755,
+              "n_low_fm3": 0.03136030129260822,
+              "n_high_fm3": 0.03951721251204436,
+              "epsilon_low_MeV_fm3": 29.53880919997054,
+              "epsilon_high_MeV_fm3": 37.23448668780068
+            }
+          ],
+          "nfev": 4318
+        },
+        "tighter_control": {
+          "same_central_density": true,
+          "delta_R_km": 2.103853802282174e-08,
+          "delta_M_msun": -9.144962120899436e-09
+        }
+      },
+      "delta_R_from_H_exponential_km": -1.0863592159182645e-07,
+      "source_sharp_interface_preserved": true
+    },
+    {
+      "id": "H_NL3_PROVIDER_PRECISION_N128__next_admissible_join_control",
+      "source_contract": "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_NL3_PROVIDER_PRECISION_N128/next_admissible_join_control/REPRESENTATION.json",
+      "input_sha256": "0b44daf797ae15ad7f9e85fd1e46d11933fb6aec657a45ad8f5f050503bd2bf7",
+      "n_bridge_right": 0.006,
+      "degree": 4,
+      "selection": "minimum discrete derivative roughness, SLSQP after LP feasibility",
+      "LP_attempts": [
+        {
+          "degree": 4,
+          "feasible": true
+        }
+      ],
+      "bernstein_coefficients": [
+        0.045763109551438017,
+        0.4769911242033597,
+        0.175793153143796,
+        0.6986880127271229,
+        3.6027646003742833
+      ],
+      "side_cs2_reference": [
+        0.0026327463709396723,
+        0.000743445652169378
+      ],
+      "validation": {
+        "status": "PASS",
+        "family": "bernstein_slope_matched",
+        "parameter": 4,
+        "min_cs2_over_c2": 0.0007347844068628964,
+        "max_cs2_over_c2": 0.0026327463709396723,
+        "endpoint_pressure_residual": 0.0,
+        "endpoint_pressure_bound": 1.4439828381269854e-11,
+        "first_law": "ANALYTIC_BY_CONSTRUCTION; FINITE_DIFFERENCE_TESTED",
+        "causal_margin": "mu^2*delta_y*Phi_prime / width >=0",
+        "degree": 4,
+        "bernstein_coefficients": [
+          0.045763109551438017,
+          0.4769911242033597,
+          0.175793153143796,
+          0.6986880127271229,
+          3.6027646003742833
+        ],
+        "endpoint_cs2_expected": [
+          0.0026327463709396723,
+          0.000743445652169378
+        ],
+        "endpoint_cs2_found": [
+          0.0026327463709396723,
+          0.0007434456521693779
+        ],
+        "endpoint_derivative_g": [
+          0.045763109551438017,
+          3.6027646003742833
+        ],
+        "area_constraint_max_abs_residual": 0.0,
+        "selected_basis": "minimum discrete derivative roughness, SLSQP after LP feasibility",
+        "lp_attempts": [
+          {
+            "degree": 4,
+            "feasible": true
+          }
+        ]
+      },
+      "physics": {
+        "max_abs_delta_P_MeV_fm3": 2.265255985480375e-05,
+        "max_abs_delta_epsilon_MeV_fm3": 0.03578922248032068,
+        "max_abs_delta_n_fm3": 3.8093660919812046e-05,
+        "max_abs_delta_cs2_over_c2": 0.0015403381118254203,
+        "min_cs2_over_c2": 0.0007347847106071167,
+        "max_cs2_over_c2": 0.0026327463709396723,
+        "cs2_left": 0.0026327463709396723,
+        "cs2_right": 0.0007434456521693779,
+        "independent_pressure_area_error_MeV_fm3": 4.189357194483989e-16,
+        "independent_positive_n": true,
+        "phase_boundary_values_modified": false
+      },
+      "star": {
+        "fixed_central": {
+          "mass_msun": 1.4000000923613913,
+          "radius_km": 13.87519792118918,
+          "central_density_fm3": 0.31924173654171034,
+          "compactness": 0.14899068117048822,
+          "interfaces": [
+            {
+              "h": 0.01462954289437335,
+              "r_km": 12.992275629973305,
+              "m_geom_km": 2.059560975345587,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.048219293613915755,
+              "n_low_fm3": 0.03136030129260822,
+              "n_high_fm3": 0.03951721251204436,
+              "epsilon_low_MeV_fm3": 29.53880919997054,
+              "epsilon_high_MeV_fm3": 37.23448668780068
+            }
+          ],
+          "nfev": 3991
+        },
+        "target_mass": {
+          "mass_msun": 1.40000000151212,
+          "radius_km": 13.875197931715174,
+          "central_density_fm3": 0.3192417216451649,
+          "compactness": 0.14899067138910815,
+          "interfaces": [
+            {
+              "h": 0.01462954289437335,
+              "r_km": 12.992275559141174,
+              "m_geom_km": 2.0595608481858743,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.048219293613915755,
+              "n_low_fm3": 0.03136030129260822,
+              "n_high_fm3": 0.03951721251204436,
+              "epsilon_low_MeV_fm3": 29.53880919997054,
+              "epsilon_high_MeV_fm3": 37.23448668780068
+            }
+          ],
+          "nfev": 4324
+        },
+        "tighter_control": null
+      },
+      "delta_R_from_H_exponential_km": 1.1260854826389277e-07,
+      "source_sharp_interface_preserved": true
+    },
+    {
+      "id": "H_GPPVA_NL3wrL55_N128__primary",
+      "source_contract": "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_GPPVA_NL3wrL55_N128/primary/REPRESENTATION.json",
+      "input_sha256": "8eae0a84a2fd76c592183787959a24b2f9dafbb089bac4e57734ddf5fa776312",
+      "n_bridge_right": 0.001,
+      "degree": 16,
+      "selection": "nonnegative LP feasible certificate",
+      "LP_attempts": [
+        {
+          "degree": 4,
+          "feasible": false
+        },
+        {
+          "degree": 6,
+          "feasible": false
+        },
+        {
+          "degree": 8,
+          "feasible": false
+        },
+        {
+          "degree": 12,
+          "feasible": false
+        },
+        {
+          "degree": 16,
+          "feasible": true
+        }
+      ],
+      "bernstein_coefficients": [
+        0.1776907824981151,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.6549066640651098,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        14.08355628754747,
+        2.083846265889305
+      ],
+      "side_cs2_reference": [
+        0.0026327463709396723,
+        0.0008338737007622298
+      ],
+      "validation": {
+        "status": "PASS",
+        "family": "bernstein_slope_matched",
+        "parameter": 16,
+        "min_cs2_over_c2": 0.00020955810370451306,
+        "max_cs2_over_c2": 0.031613134469785475,
+        "endpoint_pressure_residual": 2.168404344971009e-19,
+        "endpoint_pressure_bound": 1.1937858063856024e-12,
+        "first_law": "ANALYTIC_BY_CONSTRUCTION; FINITE_DIFFERENCE_TESTED",
+        "causal_margin": "mu^2*delta_y*Phi_prime / width >=0",
+        "degree": 16,
+        "bernstein_coefficients": [
+          0.1776907824981151,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.6549066640651098,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          14.08355628754747,
+          2.083846265889305
+        ],
+        "endpoint_cs2_expected": [
+          0.0026327463709396723,
+          0.0008338737007622298
+        ],
+        "endpoint_cs2_found": [
+          0.0026327463709396727,
+          0.00083387370076223
+        ],
+        "endpoint_derivative_g": [
+          0.1776907824981151,
+          2.083846265889305
+        ],
+        "area_constraint_max_abs_residual": 0.0,
+        "selected_basis": "nonnegative LP feasible certificate",
+        "lp_attempts": [
+          {
+            "degree": 4,
+            "feasible": false
+          },
+          {
+            "degree": 6,
+            "feasible": false
+          },
+          {
+            "degree": 8,
+            "feasible": false
+          },
+          {
+            "degree": 12,
+            "feasible": false
+          },
+          {
+            "degree": 16,
+            "feasible": true
+          }
+        ]
+      },
+      "physics": {
+        "max_abs_delta_P_MeV_fm3": 5.379452383893818e-06,
+        "max_abs_delta_epsilon_MeV_fm3": 0.05624346912436651,
+        "max_abs_delta_n_fm3": 5.982811815400475e-05,
+        "max_abs_delta_cs2_over_c2": 0.11201390291178769,
+        "min_cs2_over_c2": 0.00020956046725396926,
+        "max_cs2_over_c2": 0.031613134469785475,
+        "cs2_left": 0.0026327463709396727,
+        "cs2_right": 0.00083387370076223,
+        "independent_pressure_area_error_MeV_fm3": -5.421010862427522e-20,
+        "independent_positive_n": true,
+        "phase_boundary_values_modified": false
+      },
+      "star": {
+        "fixed_central": {
+          "mass_msun": 1.3999999913232053,
+          "radius_km": 14.420421606162957,
+          "central_density_fm3": 0.30385129829087626,
+          "compactness": 0.1433574618632715,
+          "interfaces": [
+            {
+              "h": 0.014441565616350554,
+              "r_km": 13.466459534735757,
+              "m_geom_km": 2.064044753397062,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.017147777503688004,
+              "n_low_fm3": 0.011619307065360653,
+              "n_high_fm3": 0.019435813564131422,
+              "epsilon_low_MeV_fm3": 10.94308341133884,
+              "epsilon_high_MeV_fm3": 18.316218300855468
+            }
+          ],
+          "nfev": 4768
+        },
+        "target_mass": {
+          "mass_msun": 1.4000000005724826,
+          "radius_km": 14.420421599880553,
+          "central_density_fm3": 0.30385129907187514,
+          "compactness": 0.14335746287283588,
+          "interfaces": [
+            {
+              "h": 0.014441565616350554,
+              "r_km": 13.46645953767793,
+              "m_geom_km": 2.0640447601820466,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.017147777503688004,
+              "n_low_fm3": 0.011619307065360653,
+              "n_high_fm3": 0.019435813564131422,
+              "epsilon_low_MeV_fm3": 10.94308341133884,
+              "epsilon_high_MeV_fm3": 18.316218300855468
+            }
+          ],
+          "nfev": 4822
+        },
+        "tighter_control": {
+          "same_central_density": true,
+          "delta_R_km": 9.812081813720397e-09,
+          "delta_M_msun": -1.04223152330718e-08
+        }
+      },
+      "delta_R_from_H_exponential_km": 1.8104294952081545e-08,
+      "source_sharp_interface_preserved": true
+    },
+    {
+      "id": "H_GPPVA_NL3wrL55_N128__next_admissible_join_control",
+      "source_contract": "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_GPPVA_NL3wrL55_N128/next_admissible_join_control/REPRESENTATION.json",
+      "input_sha256": "5a4873e899dc8427415ab379fcb54a9602796c68630f2a292d88c1db931a5221",
+      "n_bridge_right": 0.0015,
+      "degree": 6,
+      "selection": "minimum discrete derivative roughness, SLSQP after LP feasibility",
+      "LP_attempts": [
+        {
+          "degree": 4,
+          "feasible": false
+        },
+        {
+          "degree": 6,
+          "feasible": true
+        }
+      ],
+      "bernstein_coefficients": [
+        0.13678794529064248,
+        1.092201958198635e-16,
+        5.578121895788287e-15,
+        1.920584360070108e-14,
+        0.8400934652662538,
+        3.94928819875215,
+        2.0738303906909556
+      ],
+      "side_cs2_reference": [
+        0.0026327463709396723,
+        0.0009666795309490504
+      ],
+      "validation": {
+        "status": "PASS",
+        "family": "bernstein_slope_matched",
+        "parameter": 6,
+        "min_cs2_over_c2": 0.0005027348660114626,
+        "max_cs2_over_c2": 0.00708403580241731,
+        "endpoint_pressure_residual": 5.421010862427522e-18,
+        "endpoint_pressure_bound": 2.3203221258364613e-12,
+        "first_law": "ANALYTIC_BY_CONSTRUCTION; FINITE_DIFFERENCE_TESTED",
+        "causal_margin": "mu^2*delta_y*Phi_prime / width >=0",
+        "degree": 6,
+        "bernstein_coefficients": [
+          0.13678794529064248,
+          1.092201958198635e-16,
+          5.578121895788287e-15,
+          1.920584360070108e-14,
+          0.8400934652662538,
+          3.94928819875215,
+          2.0738303906909556
+        ],
+        "endpoint_cs2_expected": [
+          0.0026327463709396723,
+          0.0009666795309490504
+        ],
+        "endpoint_cs2_found": [
+          0.002632746370939672,
+          0.0009666795309490504
+        ],
+        "endpoint_derivative_g": [
+          0.13678794529064248,
+          2.0738303906909556
+        ],
+        "area_constraint_max_abs_residual": 2.7000623958883807e-12,
+        "selected_basis": "minimum discrete derivative roughness, SLSQP after LP feasibility",
+        "lp_attempts": [
+          {
+            "degree": 4,
+            "feasible": false
+          },
+          {
+            "degree": 6,
+            "feasible": true
+          }
+        ]
+      },
+      "physics": {
+        "max_abs_delta_P_MeV_fm3": 2.9692907286603702e-05,
+        "max_abs_delta_epsilon_MeV_fm3": 0.09448244053686072,
+        "max_abs_delta_n_fm3": 0.00010047046102703953,
+        "max_abs_delta_cs2_over_c2": 0.0048493835150894326,
+        "min_cs2_over_c2": 0.000502737950532809,
+        "max_cs2_over_c2": 0.007084006392127677,
+        "cs2_left": 0.002632746370939672,
+        "cs2_right": 0.0009666795309490504,
+        "independent_pressure_area_error_MeV_fm3": -6.895525817007808e-17,
+        "independent_positive_n": true,
+        "phase_boundary_values_modified": false
+      },
+      "star": {
+        "fixed_central": {
+          "mass_msun": 1.3999999483804602,
+          "radius_km": 14.420421751066419,
+          "central_density_fm3": 0.3038512817589672,
+          "compactness": 0.14335745602548627,
+          "interfaces": [
+            {
+              "h": 0.014441565616350554,
+              "r_km": 13.466459472458077,
+              "m_geom_km": 2.064044609771865,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.017147777503688004,
+              "n_low_fm3": 0.011619307065360653,
+              "n_high_fm3": 0.019435813564131422,
+              "epsilon_low_MeV_fm3": 10.94308341133884,
+              "epsilon_high_MeV_fm3": 18.316218300855468
+            }
+          ],
+          "nfev": 4336
+        },
+        "target_mass": {
+          "mass_msun": 1.400000001086946,
+          "radius_km": 14.420421735889995,
+          "central_density_fm3": 0.3038512901708654,
+          "compactness": 0.14335746157340792,
+          "interfaces": [
+            {
+              "h": 0.014441565616350554,
+              "r_km": 13.46645950414675,
+              "m_geom_km": 2.0640446828523245,
+              "r_jump_km": 0.0,
+              "m_jump_km": 0.0,
+              "p_MeV_fm3": 0.017147777503688004,
+              "n_low_fm3": 0.011619307065360653,
+              "n_high_fm3": 0.019435813564131422,
+              "epsilon_low_MeV_fm3": 10.94308341133884,
+              "epsilon_high_MeV_fm3": 18.316218300855468
+            }
+          ],
+          "nfev": 4393
+        },
+        "tighter_control": null
+      },
+      "delta_R_from_H_exponential_km": -1.4828057359750346e-07,
+      "source_sharp_interface_preserved": true
+    }
+  ],
+  "source_hashes_before": {
+    "scripts/matching_interpolation_shapes_20261118.py": "aa7332d8c1cdd2b654c16aed089f473f661909f99c83a18f2e902ab45d0651bd",
+    "scripts/run_slope_matched_bernstein_20261118.py": "a138a574bfa8b9dc7f7d9a64d2e30f00f962801ff4b3c9ae01393b3d3f8c9773",
+    "data/low_density_crust_20261117/stellar/causal_extension/TOV_PLAN.json": "42eef4c3d4cb774ae2c88cb9410ab5deb834af79b94e6394bdd6cacd8d0ab7c4",
+    "data/low_density_crust_20261117/stellar/causal_extension/TOV_RESULTS.json": "f8d2ab4398a8333f19410605b7f4d4739e0c7af5bbddfd5749ec96c650eafe1b",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDME2_N128/primary/REPRESENTATION.json": "11d2c458fae2e837e0634f378fe34c463d88ff05c0e6a83ea8eb99f3391a6003",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDME2_N128/next_admissible_join_control/REPRESENTATION.json": "d4e854e8c332c96277dffb4fc0213b9c8c19fc7dabf0996bff313b6b1cd19ec5",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDMEX_ORIGINAL_TABLE_RHO0_N128/primary/REPRESENTATION.json": "4a1eead8e898d1dc764ebf2cda6605848a17174407a51866846ce2bb35562ae3",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDMEX_ORIGINAL_TABLE_RHO0_N128/next_admissible_join_control/REPRESENTATION.json": "fe6fd7262d99a7ee830135ba5c13e2eed630180063440065051019c8debb148e",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_NL3_PROVIDER_PRECISION_N128/primary/REPRESENTATION.json": "e0676543eddbf145664e29c31894fc51463e050b255aebfb20e2deec9522ff3e",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_NL3_PROVIDER_PRECISION_N128/next_admissible_join_control/REPRESENTATION.json": "0b44daf797ae15ad7f9e85fd1e46d11933fb6aec657a45ad8f5f050503bd2bf7",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_GPPVA_NL3wrL55_N128/primary/REPRESENTATION.json": "8eae0a84a2fd76c592183787959a24b2f9dafbb089bac4e57734ddf5fa776312",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_GPPVA_NL3wrL55_N128/next_admissible_join_control/REPRESENTATION.json": "5a4873e899dc8427415ab379fcb54a9602796c68630f2a292d88c1db931a5221"
+  },
+  "source_hashes_after": {
+    "scripts/matching_interpolation_shapes_20261118.py": "aa7332d8c1cdd2b654c16aed089f473f661909f99c83a18f2e902ab45d0651bd",
+    "scripts/run_slope_matched_bernstein_20261118.py": "a138a574bfa8b9dc7f7d9a64d2e30f00f962801ff4b3c9ae01393b3d3f8c9773",
+    "data/low_density_crust_20261117/stellar/causal_extension/TOV_PLAN.json": "42eef4c3d4cb774ae2c88cb9410ab5deb834af79b94e6394bdd6cacd8d0ab7c4",
+    "data/low_density_crust_20261117/stellar/causal_extension/TOV_RESULTS.json": "f8d2ab4398a8333f19410605b7f4d4739e0c7af5bbddfd5749ec96c650eafe1b",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDME2_N128/primary/REPRESENTATION.json": "11d2c458fae2e837e0634f378fe34c463d88ff05c0e6a83ea8eb99f3391a6003",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDME2_N128/next_admissible_join_control/REPRESENTATION.json": "d4e854e8c332c96277dffb4fc0213b9c8c19fc7dabf0996bff313b6b1cd19ec5",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDMEX_ORIGINAL_TABLE_RHO0_N128/primary/REPRESENTATION.json": "4a1eead8e898d1dc764ebf2cda6605848a17174407a51866846ce2bb35562ae3",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_DDMEX_ORIGINAL_TABLE_RHO0_N128/next_admissible_join_control/REPRESENTATION.json": "fe6fd7262d99a7ee830135ba5c13e2eed630180063440065051019c8debb148e",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_NL3_PROVIDER_PRECISION_N128/primary/REPRESENTATION.json": "e0676543eddbf145664e29c31894fc51463e050b255aebfb20e2deec9522ff3e",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_NL3_PROVIDER_PRECISION_N128/next_admissible_join_control/REPRESENTATION.json": "0b44daf797ae15ad7f9e85fd1e46d11933fb6aec657a45ad8f5f050503bd2bf7",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_GPPVA_NL3wrL55_N128/primary/REPRESENTATION.json": "8eae0a84a2fd76c592183787959a24b2f9dafbb089bac4e57734ddf5fa776312",
+    "data/low_density_crust_20261117/stellar/causal_extension/contracts/H_GPPVA_NL3wrL55_N128/next_admissible_join_control/REPRESENTATION.json": "5a4873e899dc8427415ab379fcb54a9602796c68630f2a292d88c1db931a5221"
+  },
+  "source_bytes_unchanged": true,
+  "runtime_seconds": 21.35398840904236
+}

@@ -1,0 +1,47 @@
+TOV H_DDME2_N128__primary exponential R 14.4204166642 cs2_max 0.00137
+Traceback (most recent call last):
+  File "/home/cosmosapjw/ns_cowling_wt/interpolation_matching_20261118/scripts/run_matching_interpolation_crosscheck_20261118.py", line 163, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/cosmosapjw/ns_cowling_wt/interpolation_matching_20261118/scripts/run_matching_interpolation_crosscheck_20261118.py", line 131, in main
+    st=star_case(bar,by_id[case["id"]],setting,
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cosmosapjw/ns_cowling_wt/interpolation_matching_20261118/scripts/run_matching_interpolation_crosscheck_20261118.py", line 43, in star_case
+    fixed=tsolve(eos,n_ref,settings)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cosmosapjw/ns_cowling_wt/interpolation_matching_20261118/scripts/run_matching_interpolation_crosscheck_20261118.py", line 39, in tsolve
+    return solve_sharp_background(eos,n,**setting)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cosmosapjw/ns_cowling_wt/interpolation_matching_20261118/python_frontend/compose_eos/stellar_sharp.py", line 165, in solve_sharp_background
+    sol=solve_ivp(rhs,(start,end),y,method="DOP853",rtol=rtol,atol=atol,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cosmosapjw/ns_cowling_wt/.venv-gen/lib/python3.12/site-packages/scipy/integrate/_ivp/ivp.py", line 626, in solve_ivp
+    solver = method(fun, t0, y0, tf, vectorized=vectorized, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cosmosapjw/ns_cowling_wt/.venv-gen/lib/python3.12/site-packages/scipy/integrate/_ivp/rk.py", line 668, in __init__
+    super().__init__(fun, t0, y0, t_bound, max_step, rtol, atol,
+  File "/home/cosmosapjw/ns_cowling_wt/.venv-gen/lib/python3.12/site-packages/scipy/integrate/_ivp/rk.py", line 96, in __init__
+    self.h_abs = select_initial_step(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "/home/cosmosapjw/ns_cowling_wt/.venv-gen/lib/python3.12/site-packages/scipy/integrate/_ivp/common.py", line 126, in select_initial_step
+    f1 = fun(t0 + h0 * direction, y1)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cosmosapjw/ns_cowling_wt/.venv-gen/lib/python3.12/site-packages/scipy/integrate/_ivp/base.py", line 158, in fun
+    return self.fun_single(t, y)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cosmosapjw/ns_cowling_wt/.venv-gen/lib/python3.12/site-packages/scipy/integrate/_ivp/base.py", line 24, in fun_wrapped
+    return np.asarray(fun(t, y), dtype=dtype)
+                      ^^^^^^^^^
+  File "/home/cosmosapjw/ns_cowling_wt/interpolation_matching_20261118/python_frontend/compose_eos/stellar_sharp.py", line 159, in rhs
+    s=eos.state_at_enthalpy(float(np.clip(h,0.,hc)),eos.side_for_segment(h,midpoint))
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cosmosapjw/ns_cowling_wt/interpolation_matching_20261118/python_frontend/compose_eos/stellar_sharp.py", line 56, in state_at_enthalpy
+    return ContractEnthalpyEOS.state_at_enthalpy(self,h)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cosmosapjw/ns_cowling_wt/interpolation_matching_20261118/python_frontend/compose_eos/stellar_background.py", line 82, in state_at_enthalpy
+    state = interval.evaluate_mu(mu)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cosmosapjw/ns_cowling_wt/interpolation_matching_20261118/scripts/matching_interpolation_shapes_20261118.py", line 123, in evaluate_mu
+    return {key: (val.item() if np.asarray(val).ndim==0 else val) for key,val in
+                  ^^^^^^^^
+AttributeError: 'float' object has no attribute 'item'

@@ -1,0 +1,135 @@
+{
+  "schema": "ns_cowling.cowling_dvode_smooth_parity.v1",
+  "git_head": "61a78673db57497da1cf991c74cce99a6c2c2c87",
+  "dirty_status": [
+    " M python_frontend/compose_eos/stellar_cowling.py",
+    "?? data/cowling_native_dvode_20261118/",
+    "?? docs/COWLING_NATIVE_DVODE_20261118.md",
+    "?? fortran_eos/src/compose_eos_cowling_dvode.f90",
+    "?? python_frontend/compose_eos/stellar_cowling_native.py",
+    "?? python_frontend/tests/test_native_cowling_dvode_20261118.py",
+    "?? scripts/benchmark_native_cowling_dvode_20261118.py"
+  ],
+  "machine": "Linux-7.0.0-43-generic-x86_64-with-glibc2.39",
+  "processor": "x86_64",
+  "compiler": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "python": "3.12.3",
+  "numpy_thread_env": {
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1"
+  },
+  "eos_contract_sha256": "591ac27aa99448512e291684c98f8273efc729d17c63be88e331c20e83bd2653",
+  "central_configuration_sha256": "9579b055b4af9263adfe880eaed8159d60da5405dace8cf0014527ab80722f83",
+  "fortran_source_sha256": "bf30cfa6e37c7e727a106e51a62f41616217477a75d62db29b99e563fbb28a9b",
+  "background": {
+    "mass_msun": 1.3999999756903614,
+    "radius_km": 11.752078353190377,
+    "h_start": 0.24177274164857035,
+    "h_c": 0.24177274388331796,
+    "seconds": 0.16586003999691457
+  },
+  "settings": {
+    "ell": 2,
+    "rtol": 1e-09,
+    "atol": 1e-12,
+    "surface_h": 0.0001,
+    "match_h_fraction": 0.15,
+    "max_step_h": 0.002,
+    "root_xtol_hz": 1e-05
+  },
+  "run_condition": "single CPU process; identical physical target and mode brackets",
+  "scope": "smooth equilibrium barotrope; Maxwell interfaces unsupported",
+  "cases": {
+    "f": {
+      "bracket_hz": [
+        2250.0,
+        2500.0
+      ],
+      "python_exact_dop853": {
+        "seconds_single_run": 19.68038717698073,
+        "output": {
+          "frequency_hz": 2401.381874932175,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "nfev": 34840,
+          "matching_residual": 2.534545762756888e-08,
+          "relative_join_mismatch": 2.5345457644785292e-08,
+          "surface_BC_relative": 0.0
+        }
+      },
+      "fortran_dvode_adams": {
+        "seconds_7_runs": [
+          0.026564072002656758,
+          0.026517132995650172,
+          0.026458353037014604,
+          0.02639875002205372,
+          0.026365888013970107,
+          0.026392487983684987,
+          0.02639621600974351
+        ],
+        "median_seconds": 0.02639875002205372,
+        "output": {
+          "frequency_hz": 2401.377371448396,
+          "W_nodes": 0,
+          "V_nodes": 0,
+          "nfev": 10150,
+          "matching_residual": -1.215150807704656e-07,
+          "relative_join_mismatch": 1.2151508078149815e-07,
+          "surface_BC_relative": 0.0
+        },
+        "frequency_minus_reference_hz": -0.004503483778989903,
+        "speedup_warm_shooting_vs_python_single_run": 745.5045091354547
+      }
+    },
+    "p1": {
+      "bracket_hz": [
+        6500.0,
+        6750.0
+      ],
+      "python_exact_dop853": {
+        "seconds_single_run": 28.44444922695402,
+        "output": {
+          "frequency_hz": 6721.957056883109,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "nfev": 60067,
+          "matching_residual": 2.4969337457892585e-09,
+          "relative_join_mismatch": 2.4969337478352108e-09,
+          "surface_BC_relative": 0.0
+        }
+      },
+      "fortran_dvode_adams": {
+        "seconds_7_runs": [
+          0.03272016899427399,
+          0.03265834297053516,
+          0.03265841299435124,
+          0.03268091502832249,
+          0.0327356579946354,
+          0.03282484703231603,
+          0.032806953007820994
+        ],
+        "median_seconds": 0.03272016899427399,
+        "output": {
+          "frequency_hz": 6721.958837881455,
+          "W_nodes": 1,
+          "V_nodes": 1,
+          "nfev": 15882,
+          "matching_residual": -5.428483017769438e-08,
+          "relative_join_mismatch": 5.428483017989601e-08,
+          "surface_BC_relative": 7.348652364231163e-17
+        },
+        "frequency_minus_reference_hz": 0.0017809983464758261,
+        "speedup_warm_shooting_vs_python_single_run": 869.3246429115871
+      }
+    }
+  },
+  "native_setup": {
+    "sample_construction_seconds": 0.49710853496799245,
+    "compile_and_first_solve_included_separately": true,
+    "compiled_lib_sha256": "813893173449d5d2410d58f727de33eec2de61440c7543e874adec2194328062",
+    "requested_samples": 8193,
+    "actual_samples": 9549,
+    "source_breakpoint_count": 452,
+    "library_path": "/tmp/ns_cowling_native_dvode/libcowling_0a437734b7d8dfa5a0.so"
+  }
+}

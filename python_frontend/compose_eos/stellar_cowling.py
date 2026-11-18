@@ -64,13 +64,27 @@ def _integrations(background,frequency_hz,settings,dense=False):
     return inside,outside
 
 
-def matching_residual(background,frequency_hz,settings=CowlingSettings()):
+def matching_residual(background,frequency_hz,settings=CowlingSettings(), *,
+                      backend="python", native_samples=8193, native_method="adams"):
+    if backend == "fortran_dvode":
+        from .stellar_cowling_native import NativeCowlingDVODE
+        return NativeCowlingDVODE(background, settings, samples=native_samples,
+                                 method=native_method).matching_residual(frequency_hz)
+    if backend != "python":
+        raise ValueError("unsupported Cowling backend")
     a,b=_integrations(background,frequency_hz,settings)
     u=a.y[:,-1]; v=b.y[:,-1]
     return float((u[0]*v[1]-u[1]*v[0])/(np.linalg.norm(u)*np.linalg.norm(v)))
 
 
-def scan_brackets(background,frequencies_hz,settings=CowlingSettings()):
+def scan_brackets(background,frequencies_hz,settings=CowlingSettings(), *,
+                  backend="python", native_samples=8193, native_method="adams"):
+    if backend == "fortran_dvode":
+        from .stellar_cowling_native import NativeCowlingDVODE
+        return NativeCowlingDVODE(background, settings, samples=native_samples,
+                                 method=native_method).scan_brackets(frequencies_hz)
+    if backend != "python":
+        raise ValueError("unsupported Cowling backend")
     fs=np.asarray(frequencies_hz,dtype=float)
     if fs.ndim != 1 or len(fs)<2 or np.any(np.diff(fs)<=0) or fs[0]<=0:
         raise ValueError("scan frequencies must be strictly increasing and positive")
@@ -86,7 +100,14 @@ def _nodes(a):
     return int(np.count_nonzero(valid[:-1]*valid[1:]<0))
 
 
-def solve_mode(background,bracket_hz,settings=CowlingSettings(),profile_points=1200):
+def solve_mode(background,bracket_hz,settings=CowlingSettings(),profile_points=1200, *,
+               backend="python", native_samples=8193, native_method="adams"):
+    if backend == "fortran_dvode":
+        from .stellar_cowling_native import NativeCowlingDVODE
+        return NativeCowlingDVODE(background, settings, samples=native_samples,
+                                 method=native_method).solve_mode(bracket_hz,profile_points)
+    if backend != "python":
+        raise ValueError("unsupported Cowling backend")
     lo,hi=map(float,bracket_hz)
     if not 0 < lo < hi:
         raise ValueError("positive ordered frequency bracket required")

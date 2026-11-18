@@ -60,7 +60,14 @@ for name in "${OLD_MODULES[@]}"; do
   OLD_OBJECTS+=("$STAGE/obj/$name.o")
 done
 compile compose_eos_fortran app
-"$FC" "${FARGS[@]}" "${OLD_OBJECTS[@]}" "$STAGE/obj/compose_eos_fortran.o" "${LINK_ARGS[@]}" -o "$STAGE/compose_eos_fortran"
+# Original Netlib DVODE, separate-process legacy COMMON workspace (not thread safe).
+"$FC" "${LEGACY_ARGS[@]}" -c "$SRC/vendor/odepack/vode.f" -o "$STAGE/obj/vode.o"
+LINPACK_OBJECTS=()
+for name in dgefa dgesl dgbfa dgbsl; do
+  "$FC" "${LEGACY_ARGS[@]}" -c "$SRC/vendor/odepack/$name.f" -o "$STAGE/obj/$name.o"
+  LINPACK_OBJECTS+=("$STAGE/obj/$name.o")
+done
+"$FC" "${FARGS[@]}" "${OLD_OBJECTS[@]}" "$STAGE/obj/compose_eos_fortran.o" "$STAGE/obj/vode.o" "${LINPACK_OBJECTS[@]}" "${LINK_ARGS[@]}" "${LIB_ARGS[@]}" -o "$STAGE/compose_eos_fortran"
 "$FC" "${LEGACY_ARGS[@]}" -c "$SRC/vendor/slsqp/slsqp_optmz.f" -o "$STAGE/obj/slsqp_optmz.o"
 NATIVE_MODULES=(
   compose_eos_optimize_native compose_eos_core_native compose_eos_core_domain compose_eos_gdfm_native

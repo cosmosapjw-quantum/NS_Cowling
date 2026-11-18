@@ -1,0 +1,3178 @@
+{
+  "schema": "ns_cowling.native_dvode_perf_accuracy.v1",
+  "method": "7 independent executable invocations per condition, native numerical computation only",
+  "cpu_affinity": "unrestricted 24 logical cores; one native process per benchmark at a time",
+  "compiler": "gfortran 13.3.0 -O2 -fcheck=all; original Netlib DVODE",
+  "original_physics_error": "legacy k2 and Love Q invalid; compare old speed only, not old physics accuracy",
+  "numeric_source_identity": "same direct model PK1 table density subsamples",
+  "cases": [
+    {
+      "model": "PK1_CANONICAL",
+      "source_density_range_fm3": [
+        0.015,
+        1.0
+      ],
+      "surface_status": "UNIFORM_CORE_ONLY_TRUNCATED_SOURCE; not a complete neutron star",
+      "source_table_rows": 257,
+      "source_table_sha256": "fba53822a7046cc824d7f3b4f79538f3c02d2bbb2db6b2b13d6f035ab46e7aee",
+      "backend_label": "legacy_binary",
+      "actual_binary_sha256": "ce484b7648c2bc759fb89029f79e7a0b3c21459decc16277cf0fa56b8e381275",
+      "native_mode": "rk45",
+      "wall_median_seconds": 0.085845766,
+      "wall_min_seconds": 0.084807856,
+      "wall_max_seconds": 0.087834314,
+      "n_steps": 84584,
+      "result": {
+        "M_msun": 1.861390646789054,
+        "R_km": 13.562320672496773,
+        "compactness": 0.20266266405604094,
+        "k2": 0.00329458150409771,
+        "Lambda": 6.424513714335736,
+        "y_surface": 2.2154609175806033
+      },
+      "measurements": [
+        {
+          "seconds": 0.087834314,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562320672496773,
+            "M_msun": 1.861390646789054,
+            "compactness": 0.20266266405604094,
+            "k2": 0.00329458150409771,
+            "Lambda": 6.424513714335736,
+            "y_surface": 2.2154609175806033,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 0
+        },
+        {
+          "seconds": 0.086739335,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562320672496773,
+            "M_msun": 1.861390646789054,
+            "compactness": 0.20266266405604094,
+            "k2": 0.00329458150409771,
+            "Lambda": 6.424513714335736,
+            "y_surface": 2.2154609175806033,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 1
+        },
+        {
+          "seconds": 0.084982906,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562320672496773,
+            "M_msun": 1.861390646789054,
+            "compactness": 0.20266266405604094,
+            "k2": 0.00329458150409771,
+            "Lambda": 6.424513714335736,
+            "y_surface": 2.2154609175806033,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 2
+        },
+        {
+          "seconds": 0.087422094,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562320672496773,
+            "M_msun": 1.861390646789054,
+            "compactness": 0.20266266405604094,
+            "k2": 0.00329458150409771,
+            "Lambda": 6.424513714335736,
+            "y_surface": 2.2154609175806033,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 3
+        },
+        {
+          "seconds": 0.085845766,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562320672496773,
+            "M_msun": 1.861390646789054,
+            "compactness": 0.20266266405604094,
+            "k2": 0.00329458150409771,
+            "Lambda": 6.424513714335736,
+            "y_surface": 2.2154609175806033,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 4
+        },
+        {
+          "seconds": 0.084807856,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562320672496773,
+            "M_msun": 1.861390646789054,
+            "compactness": 0.20266266405604094,
+            "k2": 0.00329458150409771,
+            "Lambda": 6.424513714335736,
+            "y_surface": 2.2154609175806033,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 5
+        },
+        {
+          "seconds": 0.085014356,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562320672496773,
+            "M_msun": 1.861390646789054,
+            "compactness": 0.20266266405604094,
+            "k2": 0.00329458150409771,
+            "Lambda": 6.424513714335736,
+            "y_surface": 2.2154609175806033,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 6
+        }
+      ],
+      "one_warmup_seconds": 0.087628414
+    },
+    {
+      "model": "PK1_CANONICAL",
+      "source_density_range_fm3": [
+        0.015,
+        1.0
+      ],
+      "surface_status": "UNIFORM_CORE_ONLY_TRUNCATED_SOURCE; not a complete neutron star",
+      "source_table_rows": 257,
+      "source_table_sha256": "fba53822a7046cc824d7f3b4f79538f3c02d2bbb2db6b2b13d6f035ab46e7aee",
+      "backend_label": "corrected_dvode_adams",
+      "actual_binary_sha256": "e280d7c1800015ad8cc534b085384836fd044fd2395c167dcee31b9c202485c7",
+      "native_mode": "dvode_adams",
+      "wall_median_seconds": 0.004509288,
+      "wall_min_seconds": 0.004379193,
+      "wall_max_seconds": 0.005035022,
+      "n_steps": 3110,
+      "result": {
+        "M_msun": 1.8614877992385148,
+        "R_km": 13.562242751915196,
+        "compactness": 0.2026744061650071,
+        "k2": 0.07433293540175452,
+        "Lambda": 144.909039653485,
+        "y_surface": 0.3745924067546521
+      },
+      "measurements": [
+        {
+          "seconds": 0.004384443,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562242751915196,
+            "M_msun": 1.8614877992385148,
+            "compactness": 0.2026744061650071,
+            "k2": 0.07433293540175452,
+            "Lambda": 144.909039653485,
+            "y_surface": 0.3745924067546521,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 3110,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 0
+        },
+        {
+          "seconds": 0.005035022,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562242751915196,
+            "M_msun": 1.8614877992385148,
+            "compactness": 0.2026744061650071,
+            "k2": 0.07433293540175452,
+            "Lambda": 144.909039653485,
+            "y_surface": 0.3745924067546521,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 3110,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 1
+        },
+        {
+          "seconds": 0.004602976,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562242751915196,
+            "M_msun": 1.8614877992385148,
+            "compactness": 0.2026744061650071,
+            "k2": 0.07433293540175452,
+            "Lambda": 144.909039653485,
+            "y_surface": 0.3745924067546521,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 3110,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 2
+        },
+        {
+          "seconds": 0.004599649,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562242751915196,
+            "M_msun": 1.8614877992385148,
+            "compactness": 0.2026744061650071,
+            "k2": 0.07433293540175452,
+            "Lambda": 144.909039653485,
+            "y_surface": 0.3745924067546521,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 3110,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 3
+        },
+        {
+          "seconds": 0.004441361,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562242751915196,
+            "M_msun": 1.8614877992385148,
+            "compactness": 0.2026744061650071,
+            "k2": 0.07433293540175452,
+            "Lambda": 144.909039653485,
+            "y_surface": 0.3745924067546521,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 3110,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 4
+        },
+        {
+          "seconds": 0.004379193,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562242751915196,
+            "M_msun": 1.8614877992385148,
+            "compactness": 0.2026744061650071,
+            "k2": 0.07433293540175452,
+            "Lambda": 144.909039653485,
+            "y_surface": 0.3745924067546521,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 3110,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 5
+        },
+        {
+          "seconds": 0.004509288,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562242751915196,
+            "M_msun": 1.8614877992385148,
+            "compactness": 0.2026744061650071,
+            "k2": 0.07433293540175452,
+            "Lambda": 144.909039653485,
+            "y_surface": 0.3745924067546521,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 3110,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 6
+        }
+      ],
+      "one_warmup_seconds": 0.005200685,
+      "speedups_at_same_fixed_source": {
+        "vs_corrected_rk45": 1.700451601228398,
+        "vs_legacy_unfixed_UNFAIR_PHYSICS": 19.037543399312707
+      },
+      "relative_difference_vs_dvode_bdf": {
+        "M_msun": -1.0976982328389682e-07,
+        "R_km": -1.425984978090873e-07,
+        "compactness": 3.282867916143464e-08,
+        "k2": -1.3155732487102065e-06,
+        "Lambda": -1.4797164118964096e-06,
+        "y_surface": 5.090191447203565e-06
+      },
+      "relative_difference_vs_tight_rk45": {
+        "M_msun": 6.754843265235023e-09,
+        "R_km": 1.9361032535055685e-08,
+        "compactness": -1.2606189073581196e-08,
+        "k2": 1.3296187059003986e-08,
+        "Lambda": 7.632713609604842e-08,
+        "y_surface": 2.248072916329303e-08
+      }
+    },
+    {
+      "model": "PK1_CANONICAL",
+      "source_density_range_fm3": [
+        0.015,
+        1.0
+      ],
+      "surface_status": "UNIFORM_CORE_ONLY_TRUNCATED_SOURCE; not a complete neutron star",
+      "source_table_rows": 257,
+      "source_table_sha256": "fba53822a7046cc824d7f3b4f79538f3c02d2bbb2db6b2b13d6f035ab46e7aee",
+      "backend_label": "corrected_dvode_bdf",
+      "actual_binary_sha256": "e280d7c1800015ad8cc534b085384836fd044fd2395c167dcee31b9c202485c7",
+      "native_mode": "dvode_bdf",
+      "wall_median_seconds": 0.005845793,
+      "wall_min_seconds": 0.00559507,
+      "wall_max_seconds": 0.006316393,
+      "n_steps": 5629,
+      "result": {
+        "M_msun": 1.861488003573724,
+        "R_km": 13.562244685870915,
+        "compactness": 0.20267439951147426,
+        "k2": 0.07433303319230448,
+        "Lambda": 144.9092540780865,
+        "y_surface": 0.3745905000172927
+      },
+      "measurements": [
+        {
+          "seconds": 0.005845793,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562244685870915,
+            "M_msun": 1.861488003573724,
+            "compactness": 0.20267439951147426,
+            "k2": 0.07433303319230448,
+            "Lambda": 144.9092540780865,
+            "y_surface": 0.3745905000172927,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 5629,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 0
+        },
+        {
+          "seconds": 0.00559507,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562244685870915,
+            "M_msun": 1.861488003573724,
+            "compactness": 0.20267439951147426,
+            "k2": 0.07433303319230448,
+            "Lambda": 144.9092540780865,
+            "y_surface": 0.3745905000172927,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 5629,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 1
+        },
+        {
+          "seconds": 0.00600281,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562244685870915,
+            "M_msun": 1.861488003573724,
+            "compactness": 0.20267439951147426,
+            "k2": 0.07433303319230448,
+            "Lambda": 144.9092540780865,
+            "y_surface": 0.3745905000172927,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 5629,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 2
+        },
+        {
+          "seconds": 0.006117286,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562244685870915,
+            "M_msun": 1.861488003573724,
+            "compactness": 0.20267439951147426,
+            "k2": 0.07433303319230448,
+            "Lambda": 144.9092540780865,
+            "y_surface": 0.3745905000172927,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 5629,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 3
+        },
+        {
+          "seconds": 0.006316393,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562244685870915,
+            "M_msun": 1.861488003573724,
+            "compactness": 0.20267439951147426,
+            "k2": 0.07433303319230448,
+            "Lambda": 144.9092540780865,
+            "y_surface": 0.3745905000172927,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 5629,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 4
+        },
+        {
+          "seconds": 0.005733401,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562244685870915,
+            "M_msun": 1.861488003573724,
+            "compactness": 0.20267439951147426,
+            "k2": 0.07433303319230448,
+            "Lambda": 144.9092540780865,
+            "y_surface": 0.3745905000172927,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 5629,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 5
+        },
+        {
+          "seconds": 0.005736376,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562244685870915,
+            "M_msun": 1.861488003573724,
+            "compactness": 0.20267439951147426,
+            "k2": 0.07433303319230448,
+            "Lambda": 144.9092540780865,
+            "y_surface": 0.3745905000172927,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 5629,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 6
+        }
+      ],
+      "one_warmup_seconds": 0.005836035
+    },
+    {
+      "model": "PK1_CANONICAL",
+      "source_density_range_fm3": [
+        0.015,
+        1.0
+      ],
+      "surface_status": "UNIFORM_CORE_ONLY_TRUNCATED_SOURCE; not a complete neutron star",
+      "source_table_rows": 257,
+      "source_table_sha256": "fba53822a7046cc824d7f3b4f79538f3c02d2bbb2db6b2b13d6f035ab46e7aee",
+      "backend_label": "corrected_rk45",
+      "actual_binary_sha256": "e280d7c1800015ad8cc534b085384836fd044fd2395c167dcee31b9c202485c7",
+      "native_mode": "rk45",
+      "wall_median_seconds": 0.007667826,
+      "wall_min_seconds": 0.007549472,
+      "wall_max_seconds": 0.007945932,
+      "n_steps": 3253,
+      "result": {
+        "M_msun": 1.8614877866644566,
+        "R_km": 13.562242489336178,
+        "compactness": 0.202674408719959,
+        "k2": 0.07433293441340992,
+        "Lambda": 144.90902859299385,
+        "y_surface": 0.37459239833354185
+      },
+      "measurements": [
+        {
+          "seconds": 0.007557537,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562242489336178,
+            "M_msun": 1.8614877866644566,
+            "compactness": 0.202674408719959,
+            "k2": 0.07433293441340992,
+            "Lambda": 144.90902859299385,
+            "y_surface": 0.37459239833354185,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 3253,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 0
+        },
+        {
+          "seconds": 0.007667826,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562242489336178,
+            "M_msun": 1.8614877866644566,
+            "compactness": 0.202674408719959,
+            "k2": 0.07433293441340992,
+            "Lambda": 144.90902859299385,
+            "y_surface": 0.37459239833354185,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 3253,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 1
+        },
+        {
+          "seconds": 0.00765423,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562242489336178,
+            "M_msun": 1.8614877866644566,
+            "compactness": 0.202674408719959,
+            "k2": 0.07433293441340992,
+            "Lambda": 144.90902859299385,
+            "y_surface": 0.37459239833354185,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 3253,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 2
+        },
+        {
+          "seconds": 0.007549472,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562242489336178,
+            "M_msun": 1.8614877866644566,
+            "compactness": 0.202674408719959,
+            "k2": 0.07433293441340992,
+            "Lambda": 144.90902859299385,
+            "y_surface": 0.37459239833354185,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 3253,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 3
+        },
+        {
+          "seconds": 0.00786548,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562242489336178,
+            "M_msun": 1.8614877866644566,
+            "compactness": 0.202674408719959,
+            "k2": 0.07433293441340992,
+            "Lambda": 144.90902859299385,
+            "y_surface": 0.37459239833354185,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 3253,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 4
+        },
+        {
+          "seconds": 0.007780128,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562242489336178,
+            "M_msun": 1.8614877866644566,
+            "compactness": 0.202674408719959,
+            "k2": 0.07433293441340992,
+            "Lambda": 144.90902859299385,
+            "y_surface": 0.37459239833354185,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 3253,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 5
+        },
+        {
+          "seconds": 0.007945932,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562242489336178,
+            "M_msun": 1.8614877866644566,
+            "compactness": 0.202674408719959,
+            "k2": 0.07433293441340992,
+            "Lambda": 144.90902859299385,
+            "y_surface": 0.37459239833354185,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 3253,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_257.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 6
+        }
+      ],
+      "one_warmup_seconds": 0.007396974
+    },
+    {
+      "model": "PK1_CANONICAL",
+      "source_density_range_fm3": [
+        0.015,
+        1.0
+      ],
+      "surface_status": "UNIFORM_CORE_ONLY_TRUNCATED_SOURCE; not a complete neutron star",
+      "source_table_rows": 1025,
+      "source_table_sha256": "a63659f249a9a96038b3fa2dd941fc9efa1cb5c3ad6c2f68e8a6e973ad8b132b",
+      "backend_label": "legacy_binary",
+      "actual_binary_sha256": "ce484b7648c2bc759fb89029f79e7a0b3c21459decc16277cf0fa56b8e381275",
+      "native_mode": "rk45",
+      "wall_median_seconds": 0.234275895,
+      "wall_min_seconds": 0.226940357,
+      "wall_max_seconds": 0.236291122,
+      "n_steps": 84584,
+      "result": {
+        "M_msun": 1.8614077408562806,
+        "R_km": 13.562321252448706,
+        "compactness": 0.20266451654077647,
+        "k2": 0.003294569336294639,
+        "Lambda": 6.424196372228202,
+        "y_surface": 2.215464773536258
+      },
+      "measurements": [
+        {
+          "seconds": 0.22900655,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562321252448706,
+            "M_msun": 1.8614077408562806,
+            "compactness": 0.20266451654077647,
+            "k2": 0.003294569336294639,
+            "Lambda": 6.424196372228202,
+            "y_surface": 2.215464773536258,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 0
+        },
+        {
+          "seconds": 0.226940357,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562321252448706,
+            "M_msun": 1.8614077408562806,
+            "compactness": 0.20266451654077647,
+            "k2": 0.003294569336294639,
+            "Lambda": 6.424196372228202,
+            "y_surface": 2.215464773536258,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 1
+        },
+        {
+          "seconds": 0.235447909,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562321252448706,
+            "M_msun": 1.8614077408562806,
+            "compactness": 0.20266451654077647,
+            "k2": 0.003294569336294639,
+            "Lambda": 6.424196372228202,
+            "y_surface": 2.215464773536258,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 2
+        },
+        {
+          "seconds": 0.234184833,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562321252448706,
+            "M_msun": 1.8614077408562806,
+            "compactness": 0.20266451654077647,
+            "k2": 0.003294569336294639,
+            "Lambda": 6.424196372228202,
+            "y_surface": 2.215464773536258,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 3
+        },
+        {
+          "seconds": 0.235224537,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562321252448706,
+            "M_msun": 1.8614077408562806,
+            "compactness": 0.20266451654077647,
+            "k2": 0.003294569336294639,
+            "Lambda": 6.424196372228202,
+            "y_surface": 2.215464773536258,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 4
+        },
+        {
+          "seconds": 0.236291122,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562321252448706,
+            "M_msun": 1.8614077408562806,
+            "compactness": 0.20266451654077647,
+            "k2": 0.003294569336294639,
+            "Lambda": 6.424196372228202,
+            "y_surface": 2.215464773536258,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 5
+        },
+        {
+          "seconds": 0.234275895,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562321252448706,
+            "M_msun": 1.8614077408562806,
+            "compactness": 0.20266451654077647,
+            "k2": 0.003294569336294639,
+            "Lambda": 6.424196372228202,
+            "y_surface": 2.215464773536258,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 6
+        }
+      ],
+      "one_warmup_seconds": 0.235366867
+    },
+    {
+      "model": "PK1_CANONICAL",
+      "source_density_range_fm3": [
+        0.015,
+        1.0
+      ],
+      "surface_status": "UNIFORM_CORE_ONLY_TRUNCATED_SOURCE; not a complete neutron star",
+      "source_table_rows": 1025,
+      "source_table_sha256": "a63659f249a9a96038b3fa2dd941fc9efa1cb5c3ad6c2f68e8a6e973ad8b132b",
+      "backend_label": "corrected_rk45",
+      "actual_binary_sha256": "e280d7c1800015ad8cc534b085384836fd044fd2395c167dcee31b9c202485c7",
+      "native_mode": "rk45",
+      "wall_median_seconds": 0.018525959,
+      "wall_min_seconds": 0.018236923,
+      "wall_max_seconds": 0.018689477,
+      "n_steps": 7621,
+      "result": {
+        "M_msun": 1.8615036622703856,
+        "R_km": 13.56226268154648,
+        "compactness": 0.20267583546366766,
+        "k2": 0.07433304930172142,
+        "Lambda": 144.904152165857,
+        "y_surface": 0.3745741892522547
+      },
+      "measurements": [
+        {
+          "seconds": 0.018583597,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226268154648,
+            "M_msun": 1.8615036622703856,
+            "compactness": 0.20267583546366766,
+            "k2": 0.07433304930172142,
+            "Lambda": 144.904152165857,
+            "y_surface": 0.3745741892522547,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 7621,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 0
+        },
+        {
+          "seconds": 0.018236923,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226268154648,
+            "M_msun": 1.8615036622703856,
+            "compactness": 0.20267583546366766,
+            "k2": 0.07433304930172142,
+            "Lambda": 144.904152165857,
+            "y_surface": 0.3745741892522547,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 7621,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 1
+        },
+        {
+          "seconds": 0.018379341,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226268154648,
+            "M_msun": 1.8615036622703856,
+            "compactness": 0.20267583546366766,
+            "k2": 0.07433304930172142,
+            "Lambda": 144.904152165857,
+            "y_surface": 0.3745741892522547,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 7621,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 2
+        },
+        {
+          "seconds": 0.018689477,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226268154648,
+            "M_msun": 1.8615036622703856,
+            "compactness": 0.20267583546366766,
+            "k2": 0.07433304930172142,
+            "Lambda": 144.904152165857,
+            "y_surface": 0.3745741892522547,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 7621,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 3
+        },
+        {
+          "seconds": 0.018525959,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226268154648,
+            "M_msun": 1.8615036622703856,
+            "compactness": 0.20267583546366766,
+            "k2": 0.07433304930172142,
+            "Lambda": 144.904152165857,
+            "y_surface": 0.3745741892522547,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 7621,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 4
+        },
+        {
+          "seconds": 0.018544673,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226268154648,
+            "M_msun": 1.8615036622703856,
+            "compactness": 0.20267583546366766,
+            "k2": 0.07433304930172142,
+            "Lambda": 144.904152165857,
+            "y_surface": 0.3745741892522547,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 7621,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 5
+        },
+        {
+          "seconds": 0.018312375,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226268154648,
+            "M_msun": 1.8615036622703856,
+            "compactness": 0.20267583546366766,
+            "k2": 0.07433304930172142,
+            "Lambda": 144.904152165857,
+            "y_surface": 0.3745741892522547,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 7621,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 6
+        }
+      ],
+      "one_warmup_seconds": 0.018826767
+    },
+    {
+      "model": "PK1_CANONICAL",
+      "source_density_range_fm3": [
+        0.015,
+        1.0
+      ],
+      "surface_status": "UNIFORM_CORE_ONLY_TRUNCATED_SOURCE; not a complete neutron star",
+      "source_table_rows": 1025,
+      "source_table_sha256": "a63659f249a9a96038b3fa2dd941fc9efa1cb5c3ad6c2f68e8a6e973ad8b132b",
+      "backend_label": "corrected_dvode_adams",
+      "actual_binary_sha256": "e280d7c1800015ad8cc534b085384836fd044fd2395c167dcee31b9c202485c7",
+      "native_mode": "dvode_adams",
+      "wall_median_seconds": 0.008399177,
+      "wall_min_seconds": 0.008023659,
+      "wall_max_seconds": 0.008774697,
+      "n_steps": 7340,
+      "result": {
+        "M_msun": 1.8615037661438154,
+        "R_km": 13.562263159435956,
+        "compactness": 0.20267583963151622,
+        "k2": 0.0743330427148161,
+        "Lambda": 144.9041244262815,
+        "y_surface": 0.37457427627910045
+      },
+      "measurements": [
+        {
+          "seconds": 0.008207856,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562263159435956,
+            "M_msun": 1.8615037661438154,
+            "compactness": 0.20267583963151622,
+            "k2": 0.0743330427148161,
+            "Lambda": 144.9041244262815,
+            "y_surface": 0.37457427627910045,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 7340,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 0
+        },
+        {
+          "seconds": 0.008452759,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562263159435956,
+            "M_msun": 1.8615037661438154,
+            "compactness": 0.20267583963151622,
+            "k2": 0.0743330427148161,
+            "Lambda": 144.9041244262815,
+            "y_surface": 0.37457427627910045,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 7340,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 1
+        },
+        {
+          "seconds": 0.008423443,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562263159435956,
+            "M_msun": 1.8615037661438154,
+            "compactness": 0.20267583963151622,
+            "k2": 0.0743330427148161,
+            "Lambda": 144.9041244262815,
+            "y_surface": 0.37457427627910045,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 7340,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 2
+        },
+        {
+          "seconds": 0.008774697,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562263159435956,
+            "M_msun": 1.8615037661438154,
+            "compactness": 0.20267583963151622,
+            "k2": 0.0743330427148161,
+            "Lambda": 144.9041244262815,
+            "y_surface": 0.37457427627910045,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 7340,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 3
+        },
+        {
+          "seconds": 0.008023659,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562263159435956,
+            "M_msun": 1.8615037661438154,
+            "compactness": 0.20267583963151622,
+            "k2": 0.0743330427148161,
+            "Lambda": 144.9041244262815,
+            "y_surface": 0.37457427627910045,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 7340,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 4
+        },
+        {
+          "seconds": 0.008399177,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562263159435956,
+            "M_msun": 1.8615037661438154,
+            "compactness": 0.20267583963151622,
+            "k2": 0.0743330427148161,
+            "Lambda": 144.9041244262815,
+            "y_surface": 0.37457427627910045,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 7340,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 5
+        },
+        {
+          "seconds": 0.008172339,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562263159435956,
+            "M_msun": 1.8615037661438154,
+            "compactness": 0.20267583963151622,
+            "k2": 0.0743330427148161,
+            "Lambda": 144.9041244262815,
+            "y_surface": 0.37457427627910045,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 7340,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 6
+        }
+      ],
+      "one_warmup_seconds": 0.00870232,
+      "speedups_at_same_fixed_source": {
+        "vs_corrected_rk45": 2.2056874143740512,
+        "vs_legacy_unfixed_UNFAIR_PHYSICS": 27.892720322479214
+      },
+      "relative_difference_vs_dvode_bdf": {
+        "M_msun": -2.6260826130104963e-07,
+        "R_km": -3.051393396514888e-07,
+        "compactness": 4.253109145990134e-08,
+        "k2": -2.905306887916264e-06,
+        "Lambda": -3.1179617001722484e-06,
+        "y_surface": 1.142235894499907e-05
+      },
+      "relative_difference_vs_tight_rk45": {
+        "M_msun": 5.5800819500309576e-08,
+        "R_km": 3.5236706939597964e-08,
+        "compactness": 2.0564111931436012e-08,
+        "k2": -8.861341474095259e-08,
+        "Lambda": -1.9143395883416487e-07,
+        "y_surface": 2.323354043788689e-07
+      }
+    },
+    {
+      "model": "PK1_CANONICAL",
+      "source_density_range_fm3": [
+        0.015,
+        1.0
+      ],
+      "surface_status": "UNIFORM_CORE_ONLY_TRUNCATED_SOURCE; not a complete neutron star",
+      "source_table_rows": 1025,
+      "source_table_sha256": "a63659f249a9a96038b3fa2dd941fc9efa1cb5c3ad6c2f68e8a6e973ad8b132b",
+      "backend_label": "corrected_dvode_bdf",
+      "actual_binary_sha256": "e280d7c1800015ad8cc534b085384836fd044fd2395c167dcee31b9c202485c7",
+      "native_mode": "dvode_bdf",
+      "wall_median_seconds": 0.011342698,
+      "wall_min_seconds": 0.011055305,
+      "wall_max_seconds": 0.011774203,
+      "n_steps": 13329,
+      "result": {
+        "M_msun": 1.8615042549902112,
+        "R_km": 13.562267297817243,
+        "compactness": 0.20267583101149192,
+        "k2": 0.07433325867574453,
+        "Lambda": 144.90457623320037,
+        "y_surface": 0.3745699978061355
+      },
+      "measurements": [
+        {
+          "seconds": 0.011055305,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562267297817243,
+            "M_msun": 1.8615042549902112,
+            "compactness": 0.20267583101149192,
+            "k2": 0.07433325867574453,
+            "Lambda": 144.90457623320037,
+            "y_surface": 0.3745699978061355,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 13329,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 0
+        },
+        {
+          "seconds": 0.011774203,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562267297817243,
+            "M_msun": 1.8615042549902112,
+            "compactness": 0.20267583101149192,
+            "k2": 0.07433325867574453,
+            "Lambda": 144.90457623320037,
+            "y_surface": 0.3745699978061355,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 13329,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 1
+        },
+        {
+          "seconds": 0.011258428,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562267297817243,
+            "M_msun": 1.8615042549902112,
+            "compactness": 0.20267583101149192,
+            "k2": 0.07433325867574453,
+            "Lambda": 144.90457623320037,
+            "y_surface": 0.3745699978061355,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 13329,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 2
+        },
+        {
+          "seconds": 0.011453588,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562267297817243,
+            "M_msun": 1.8615042549902112,
+            "compactness": 0.20267583101149192,
+            "k2": 0.07433325867574453,
+            "Lambda": 144.90457623320037,
+            "y_surface": 0.3745699978061355,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 13329,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 3
+        },
+        {
+          "seconds": 0.01115831,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562267297817243,
+            "M_msun": 1.8615042549902112,
+            "compactness": 0.20267583101149192,
+            "k2": 0.07433325867574453,
+            "Lambda": 144.90457623320037,
+            "y_surface": 0.3745699978061355,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 13329,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 4
+        },
+        {
+          "seconds": 0.011377604,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562267297817243,
+            "M_msun": 1.8615042549902112,
+            "compactness": 0.20267583101149192,
+            "k2": 0.07433325867574453,
+            "Lambda": 144.90457623320037,
+            "y_surface": 0.3745699978061355,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 13329,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 5
+        },
+        {
+          "seconds": 0.011342698,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562267297817243,
+            "M_msun": 1.8615042549902112,
+            "compactness": 0.20267583101149192,
+            "k2": 0.07433325867574453,
+            "Lambda": 144.90457623320037,
+            "y_surface": 0.3745699978061355,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 13329,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_1025.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 6
+        }
+      ],
+      "one_warmup_seconds": 0.011509995
+    },
+    {
+      "model": "PK1_CANONICAL",
+      "source_density_range_fm3": [
+        0.015,
+        1.0
+      ],
+      "surface_status": "UNIFORM_CORE_ONLY_TRUNCATED_SOURCE; not a complete neutron star",
+      "source_table_rows": 4097,
+      "source_table_sha256": "a70fa51fb7ee312a96c1e2acd96c2de015a6aa316a7989a43c0d93c87ea7af94",
+      "backend_label": "corrected_rk45",
+      "actual_binary_sha256": "e280d7c1800015ad8cc534b085384836fd044fd2395c167dcee31b9c202485c7",
+      "native_mode": "rk45",
+      "wall_median_seconds": 0.046866258,
+      "wall_min_seconds": 0.045524462,
+      "wall_max_seconds": 0.047510435,
+      "n_steps": 16057,
+      "result": {
+        "M_msun": 1.861504654258418,
+        "R_km": 13.56226394356223,
+        "compactness": 0.20267592460912867,
+        "k2": 0.07433304338638022,
+        "Lambda": 144.90382195991617,
+        "y_surface": 0.3745733167317183
+      },
+      "measurements": [
+        {
+          "seconds": 0.045524462,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226394356223,
+            "M_msun": 1.861504654258418,
+            "compactness": 0.20267592460912867,
+            "k2": 0.07433304338638022,
+            "Lambda": 144.90382195991617,
+            "y_surface": 0.3745733167317183,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 16057,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 0
+        },
+        {
+          "seconds": 0.046574347,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226394356223,
+            "M_msun": 1.861504654258418,
+            "compactness": 0.20267592460912867,
+            "k2": 0.07433304338638022,
+            "Lambda": 144.90382195991617,
+            "y_surface": 0.3745733167317183,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 16057,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 1
+        },
+        {
+          "seconds": 0.046866258,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226394356223,
+            "M_msun": 1.861504654258418,
+            "compactness": 0.20267592460912867,
+            "k2": 0.07433304338638022,
+            "Lambda": 144.90382195991617,
+            "y_surface": 0.3745733167317183,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 16057,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 2
+        },
+        {
+          "seconds": 0.04700471,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226394356223,
+            "M_msun": 1.861504654258418,
+            "compactness": 0.20267592460912867,
+            "k2": 0.07433304338638022,
+            "Lambda": 144.90382195991617,
+            "y_surface": 0.3745733167317183,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 16057,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 3
+        },
+        {
+          "seconds": 0.046100562,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226394356223,
+            "M_msun": 1.861504654258418,
+            "compactness": 0.20267592460912867,
+            "k2": 0.07433304338638022,
+            "Lambda": 144.90382195991617,
+            "y_surface": 0.3745733167317183,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 16057,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 4
+        },
+        {
+          "seconds": 0.047510435,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226394356223,
+            "M_msun": 1.861504654258418,
+            "compactness": 0.20267592460912867,
+            "k2": 0.07433304338638022,
+            "Lambda": 144.90382195991617,
+            "y_surface": 0.3745733167317183,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 16057,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 5
+        },
+        {
+          "seconds": 0.046937702,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226394356223,
+            "M_msun": 1.861504654258418,
+            "compactness": 0.20267592460912867,
+            "k2": 0.07433304338638022,
+            "Lambda": 144.90382195991617,
+            "y_surface": 0.3745733167317183,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 16057,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 6
+        }
+      ],
+      "one_warmup_seconds": 0.046029648
+    },
+    {
+      "model": "PK1_CANONICAL",
+      "source_density_range_fm3": [
+        0.015,
+        1.0
+      ],
+      "surface_status": "UNIFORM_CORE_ONLY_TRUNCATED_SOURCE; not a complete neutron star",
+      "source_table_rows": 4097,
+      "source_table_sha256": "a70fa51fb7ee312a96c1e2acd96c2de015a6aa316a7989a43c0d93c87ea7af94",
+      "backend_label": "corrected_dvode_adams",
+      "actual_binary_sha256": "e280d7c1800015ad8cc534b085384836fd044fd2395c167dcee31b9c202485c7",
+      "native_mode": "dvode_adams",
+      "wall_median_seconds": 0.016683648,
+      "wall_min_seconds": 0.016454957,
+      "wall_max_seconds": 0.017541429,
+      "n_steps": 12799,
+      "result": {
+        "M_msun": 1.8615046855219421,
+        "R_km": 13.56226418606159,
+        "compactness": 0.2026759243890858,
+        "k2": 0.0743330831484789,
+        "Lambda": 144.90390025821188,
+        "y_surface": 0.3745725137729507
+      },
+      "measurements": [
+        {
+          "seconds": 0.017541429,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226418606159,
+            "M_msun": 1.8615046855219421,
+            "compactness": 0.2026759243890858,
+            "k2": 0.0743330831484789,
+            "Lambda": 144.90390025821188,
+            "y_surface": 0.3745725137729507,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 12799,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 0
+        },
+        {
+          "seconds": 0.01664244,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226418606159,
+            "M_msun": 1.8615046855219421,
+            "compactness": 0.2026759243890858,
+            "k2": 0.0743330831484789,
+            "Lambda": 144.90390025821188,
+            "y_surface": 0.3745725137729507,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 12799,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 1
+        },
+        {
+          "seconds": 0.016454957,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226418606159,
+            "M_msun": 1.8615046855219421,
+            "compactness": 0.2026759243890858,
+            "k2": 0.0743330831484789,
+            "Lambda": 144.90390025821188,
+            "y_surface": 0.3745725137729507,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 12799,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 2
+        },
+        {
+          "seconds": 0.016729225,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226418606159,
+            "M_msun": 1.8615046855219421,
+            "compactness": 0.2026759243890858,
+            "k2": 0.0743330831484789,
+            "Lambda": 144.90390025821188,
+            "y_surface": 0.3745725137729507,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 12799,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 3
+        },
+        {
+          "seconds": 0.016683648,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226418606159,
+            "M_msun": 1.8615046855219421,
+            "compactness": 0.2026759243890858,
+            "k2": 0.0743330831484789,
+            "Lambda": 144.90390025821188,
+            "y_surface": 0.3745725137729507,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 12799,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 4
+        },
+        {
+          "seconds": 0.017425439,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226418606159,
+            "M_msun": 1.8615046855219421,
+            "compactness": 0.2026759243890858,
+            "k2": 0.0743330831484789,
+            "Lambda": 144.90390025821188,
+            "y_surface": 0.3745725137729507,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 12799,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 5
+        },
+        {
+          "seconds": 0.016682205,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.56226418606159,
+            "M_msun": 1.8615046855219421,
+            "compactness": 0.2026759243890858,
+            "k2": 0.0743330831484789,
+            "Lambda": 144.90390025821188,
+            "y_surface": 0.3745725137729507,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 12799,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_adams",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 6
+        }
+      ],
+      "one_warmup_seconds": 0.017152594,
+      "speedups_at_same_fixed_source": {
+        "vs_corrected_rk45": 2.8091133306097085,
+        "vs_legacy_unfixed_UNFAIR_PHYSICS": 49.3766384306358
+      },
+      "relative_difference_vs_dvode_bdf": {
+        "M_msun": -5.6262094065731273e-08,
+        "R_km": -1.2143752019023766e-07,
+        "compactness": 6.51754340059214e-08,
+        "k2": -1.7214492611824634e-06,
+        "Lambda": -2.0473258062947697e-06,
+        "y_surface": 6.5271809330304705e-06
+      },
+      "relative_difference_vs_tight_rk45": {
+        "M_msun": 1.6794760164783367e-08,
+        "R_km": 1.788044829896604e-08,
+        "compactness": -1.0856882643362629e-09,
+        "k2": 5.349182122999949e-07,
+        "Lambda": 5.403466564635218e-07,
+        "y_surface": -2.143662486675198e-06
+      }
+    },
+    {
+      "model": "PK1_CANONICAL",
+      "source_density_range_fm3": [
+        0.015,
+        1.0
+      ],
+      "surface_status": "UNIFORM_CORE_ONLY_TRUNCATED_SOURCE; not a complete neutron star",
+      "source_table_rows": 4097,
+      "source_table_sha256": "a70fa51fb7ee312a96c1e2acd96c2de015a6aa316a7989a43c0d93c87ea7af94",
+      "backend_label": "legacy_binary",
+      "actual_binary_sha256": "ce484b7648c2bc759fb89029f79e7a0b3c21459decc16277cf0fa56b8e381275",
+      "native_mode": "rk45",
+      "wall_median_seconds": 0.823782455,
+      "wall_min_seconds": 0.805748075,
+      "wall_max_seconds": 0.833497389,
+      "n_steps": 84584,
+      "result": {
+        "M_msun": 1.8614087115102154,
+        "R_km": 13.562322006144168,
+        "compactness": 0.2026646109600491,
+        "k2": 0.0032945714419691688,
+        "Lambda": 6.424185513339666,
+        "y_surface": 2.215464611467228
+      },
+      "measurements": [
+        {
+          "seconds": 0.825369865,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562322006144168,
+            "M_msun": 1.8614087115102154,
+            "compactness": 0.2026646109600491,
+            "k2": 0.0032945714419691688,
+            "Lambda": 6.424185513339666,
+            "y_surface": 2.215464611467228,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 0
+        },
+        {
+          "seconds": 0.833497389,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562322006144168,
+            "M_msun": 1.8614087115102154,
+            "compactness": 0.2026646109600491,
+            "k2": 0.0032945714419691688,
+            "Lambda": 6.424185513339666,
+            "y_surface": 2.215464611467228,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 1
+        },
+        {
+          "seconds": 0.816738459,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562322006144168,
+            "M_msun": 1.8614087115102154,
+            "compactness": 0.2026646109600491,
+            "k2": 0.0032945714419691688,
+            "Lambda": 6.424185513339666,
+            "y_surface": 2.215464611467228,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 2
+        },
+        {
+          "seconds": 0.805748075,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562322006144168,
+            "M_msun": 1.8614087115102154,
+            "compactness": 0.2026646109600491,
+            "k2": 0.0032945714419691688,
+            "Lambda": 6.424185513339666,
+            "y_surface": 2.215464611467228,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 3
+        },
+        {
+          "seconds": 0.823782455,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562322006144168,
+            "M_msun": 1.8614087115102154,
+            "compactness": 0.2026646109600491,
+            "k2": 0.0032945714419691688,
+            "Lambda": 6.424185513339666,
+            "y_surface": 2.215464611467228,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 4
+        },
+        {
+          "seconds": 0.816911484,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562322006144168,
+            "M_msun": 1.8614087115102154,
+            "compactness": 0.2026646109600491,
+            "k2": 0.0032945714419691688,
+            "Lambda": 6.424185513339666,
+            "y_surface": 2.215464611467228,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 5
+        },
+        {
+          "seconds": 0.832155693,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562322006144168,
+            "M_msun": 1.8614087115102154,
+            "compactness": 0.2026646109600491,
+            "k2": 0.0032945714419691688,
+            "Lambda": 6.424185513339666,
+            "y_surface": 2.215464611467228,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 84584,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "rk45",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 6
+        }
+      ],
+      "one_warmup_seconds": 0.849649094
+    },
+    {
+      "model": "PK1_CANONICAL",
+      "source_density_range_fm3": [
+        0.015,
+        1.0
+      ],
+      "surface_status": "UNIFORM_CORE_ONLY_TRUNCATED_SOURCE; not a complete neutron star",
+      "source_table_rows": 4097,
+      "source_table_sha256": "a70fa51fb7ee312a96c1e2acd96c2de015a6aa316a7989a43c0d93c87ea7af94",
+      "backend_label": "corrected_dvode_bdf",
+      "actual_binary_sha256": "e280d7c1800015ad8cc534b085384836fd044fd2395c167dcee31b9c202485c7",
+      "native_mode": "dvode_bdf",
+      "wall_median_seconds": 0.021335617,
+      "wall_min_seconds": 0.020952653,
+      "wall_max_seconds": 0.02261299,
+      "n_steps": 22293,
+      "result": {
+        "M_msun": 1.8615047902540998,
+        "R_km": 13.562265833029521,
+        "compactness": 0.20267591117959532,
+        "k2": 0.07433321110933025,
+        "Lambda": 144.90419692431368,
+        "y_surface": 0.374570068886339
+      },
+      "measurements": [
+        {
+          "seconds": 0.020952653,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562265833029521,
+            "M_msun": 1.8615047902540998,
+            "compactness": 0.20267591117959532,
+            "k2": 0.07433321110933025,
+            "Lambda": 144.90419692431368,
+            "y_surface": 0.374570068886339,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 22293,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 0
+        },
+        {
+          "seconds": 0.021566933,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562265833029521,
+            "M_msun": 1.8615047902540998,
+            "compactness": 0.20267591117959532,
+            "k2": 0.07433321110933025,
+            "Lambda": 144.90419692431368,
+            "y_surface": 0.374570068886339,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 22293,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 1
+        },
+        {
+          "seconds": 0.021163191,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562265833029521,
+            "M_msun": 1.8615047902540998,
+            "compactness": 0.20267591117959532,
+            "k2": 0.07433321110933025,
+            "Lambda": 144.90419692431368,
+            "y_surface": 0.374570068886339,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 22293,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 2
+        },
+        {
+          "seconds": 0.021168762,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562265833029521,
+            "M_msun": 1.8615047902540998,
+            "compactness": 0.20267591117959532,
+            "k2": 0.07433321110933025,
+            "Lambda": 144.90419692431368,
+            "y_surface": 0.374570068886339,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 22293,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 3
+        },
+        {
+          "seconds": 0.02261299,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562265833029521,
+            "M_msun": 1.8615047902540998,
+            "compactness": 0.20267591117959532,
+            "k2": 0.07433321110933025,
+            "Lambda": 144.90419692431368,
+            "y_surface": 0.374570068886339,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 22293,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 4
+        },
+        {
+          "seconds": 0.021335617,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562265833029521,
+            "M_msun": 1.8615047902540998,
+            "compactness": 0.20267591117959532,
+            "k2": 0.07433321110933025,
+            "Lambda": 144.90419692431368,
+            "y_surface": 0.374570068886339,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 22293,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 5
+        },
+        {
+          "seconds": 0.022200881,
+          "reported": {
+            "status": "ok",
+            "operation": "tov-love",
+            "mode": "smooth",
+            "converged": true,
+            "R_km": 13.562265833029521,
+            "M_msun": 1.8615047902540998,
+            "compactness": 0.20267591117959532,
+            "k2": 0.07433321110933025,
+            "Lambda": 144.90419692431368,
+            "y_surface": 0.374570068886339,
+            "central_pressure_MeV_fm3": 73.52922470749803,
+            "central_eps_MeV_fm3": 416.780315428768,
+            "n_steps": 22293,
+            "status_msg": "ok",
+            "has_transition": false
+          },
+          "command": [
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/dvode/build/compose_eos_fortran",
+            "tov-love",
+            "smooth",
+            "/home/cosmosapjw/ns_cowling_wt/scratch/fortran_dvode_perf_20261118/baseline/PK1_native_4097.csv",
+            "73.52922470749803"
+          ],
+          "environment": {
+            "NS_COWLING_TOV_INTEGRATOR": "dvode_bdf",
+            "NS_COWLING_TOV_RTOL": "2e-9",
+            "OMP_NUM_THREADS": "1"
+          },
+          "repeat": 6
+        }
+      ],
+      "one_warmup_seconds": 0.021792038
+    }
+  ]
+}

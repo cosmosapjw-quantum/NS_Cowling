@@ -1,0 +1,52 @@
+{
+  "status": "BENCHMARK_COMPLETED",
+  "model": "PK1_CANONICAL",
+  "source_state_count": 4097,
+  "central_pressures": 32,
+  "physics_scope": "uniform PK1 homogeneous source truncated at n=.015 fm^-3; not a complete NS",
+  "fixed_numerical_controls": {
+    "integrator": "dvode_adams",
+    "rtol": 2e-09
+  },
+  "python_role": "input specification and subprocess/json wall-clock only",
+  "serial_vs_batch_all_32_states_exact": true,
+  "numeric_fields_compared": [
+    "R_km",
+    "M_msun",
+    "k2",
+    "Lambda",
+    "y_surface",
+    "n_steps"
+  ],
+  "rows": [
+    {
+      "mode": "32 individual native process invocations",
+      "seconds": [
+        0.529974633,
+        0.532925646,
+        0.533143884
+      ],
+      "median_seconds": 0.532925646,
+      "result_checksums": [
+        "a70fa51fb7ee312a96c1e2acd96c2de015a6aa316a7989a43c0d93c87ea7af94",
+        "8b411acb10cd522ad2899f9b579a4f3093fdb5e6761a2052196e533ef5d334d3"
+      ],
+      "valid_solutions": 32
+    },
+    {
+      "mode": "batch",
+      "seconds": [
+        0.192631353,
+        0.194822436,
+        0.191112344
+      ],
+      "median_seconds": 0.192631353,
+      "result_checksums": [
+        "a70fa51fb7ee312a96c1e2acd96c2de015a6aa316a7989a43c0d93c87ea7af94",
+        "8b411acb10cd522ad2899f9b579a4f3093fdb5e6761a2052196e533ef5d334d3"
+      ],
+      "valid_solutions": 32
+    }
+  ],
+  "measured_batch_speedup": 2.766557145035471
+}

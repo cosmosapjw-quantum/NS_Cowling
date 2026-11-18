@@ -1,4 +1,5 @@
 program compose_eos_fortran
+  use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
   use compose_eos_types
   use compose_eos_component, only: extract_core_rows, extract_crust_rows, verify_core_roundtrip
   use compose_eos_rmf, only: ddrmf_diagnostic_t, evaluate_ddrmf
@@ -31,7 +32,7 @@ program compose_eos_fortran
   integer::narg,ios,n_fill,fit_points,gap_phase,n_points,n_bridge
   integer::core_first,core_last,expected_source_n,expected_phase
   integer::crust_outer_last,expected_outer_phase,expected_inner_phase
-  integer::tov_n_high,tov_n_low,tov_mode
+  integer::tov_n_high,tov_n_low,tov_mode,tov_n_pc,i_pc
   integer::ws_n_valid,ws_reconstructed_rows,ws_receipt_u,ws_receipt_ios
   real(wp)::ws_max_baryon_res,ws_max_charge_res
   character(len=16)::ws_hash_hex
@@ -39,7 +40,7 @@ program compose_eos_fortran
   real(wp)::cs2_extension,n_max_requested,smooth_sigma,dissolution_tol
   real(wp)::min_ratio_local,best_sel
   real(wp)::cld_sigma_0,cld_b,cld_rho_min,cld_rho_max
-  real(wp),allocatable::tov_p_high(:),tov_e_high(:),tov_p_low(:),tov_e_low(:)
+  real(wp),allocatable::tov_p_high(:),tov_e_high(:),tov_p_low(:),tov_e_low(:),tov_pc_list(:)
   real(wp)::tov_pc,tov_ptrans,tov_deps,tov_p,tov_e
   integer::cld_n_points
   integer::igap_sel
@@ -530,6 +531,27 @@ program compose_eos_fortran
         call emit_failure('tov-love smooth did not converge: '//trim(tov_result%status));stop 3
       endif
       call emit_tov_json('smooth',tov_result)
+    case('batch-smooth')
+      ! Reuse the exact source table in native memory for an entire central-
+      ! pressure sequence. Python only passes filenames; all TOV+Love numerical
+      ! computation is performed here in Fortran, one solver instance at a time.
+      if(narg/=4)then
+        call emit_failure('tov-love batch-smooth requires <P_eps.csv> <central_pressures.txt>')
+        stop 2
+      endif
+      call read_peps_csv(trim(arg2),tov_p_high,tov_e_high,tov_n_high,status)
+      if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+      call read_tov_pc_list(trim(arg3),tov_pc_list,tov_n_pc,status)
+      if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+      do i_pc=1,tov_n_pc
+        call solve_tov_love_smooth(tov_n_high,tov_p_high,tov_e_high,tov_pc_list(i_pc),tov_result)
+        if(.not.tov_result%converged)then
+          call emit_failure('tov-love batch index '//trim(integer_text(i_pc))// &
+              ' did not converge: '//trim(tov_result%status))
+          stop 3
+        endif
+        call emit_tov_json('smooth',tov_result)
+      enddo
     case('maxwell')
       if(narg/=7)then;call emit_failure('tov-love maxwell requires <high.csv> <low.csv> <P_trans> <delta_eps> <central_pressure>');stop 2;endif
       read(arg4,*,iostat=ios)tov_ptrans
@@ -718,6 +740,60 @@ contains
     end do
     status = 'ok'
   end subroutine read_peps_csv
+
+  ! Read a central-pressure vector once; fail closed on malformed input.
+  ! No numerical EOS physics is evaluated in the frontend.
+  subroutine read_tov_pc_list(path,values,n,status)
+    character(len=*),intent(in)::path
+    real(wp),allocatable,intent(out)::values(:)
+    integer,intent(out)::n
+    character(len=*),intent(out)::status
+    integer::u,ios,i
+    character(len=4096)::line
+    real(wp)::value
+    n=0;status='batch central-pressure file not accessible'
+    open(newunit=u,file=trim(path),status='old',action='read',iostat=ios)
+    if(ios/=0)return
+    do
+      read(u,'(a)',iostat=ios)line
+      if(ios<0)exit
+      if(ios>0)then
+        close(u);status='batch pressure read error';return
+      endif
+      if(len_trim(line)==0)then
+        close(u);status='batch pressure blank line forbidden';return
+      endif
+      n=n+1
+      if(n>10000)then
+        close(u);status='batch pressure count exceeds 10000';return
+      endif
+    enddo
+    close(u)
+    if(n<1)then
+      status='batch pressure file has no states';return
+    endif
+    allocate(values(n))
+    open(newunit=u,file=trim(path),status='old',action='read',iostat=ios)
+    if(ios/=0)then
+      status='batch pressure file reopen failure';return
+    endif
+    do i=1,n
+      read(u,'(a)',iostat=ios)line
+      if(ios/=0)then
+        close(u);status='batch unexpected EOF';return
+      endif
+      read(line,*,iostat=ios)value
+      if(ios/=0)then
+        close(u);status='batch invalid pressure numeric token';return
+      endif
+      if(.not.ieee_is_finite(value).or.value<=0._wp)then
+        close(u);status='batch pressure must be positive and finite';return
+      endif
+      values(i)=value
+    enddo
+    close(u)
+    status='ok'
+  end subroutine read_tov_pc_list
 
   ! Emit the TOV+Love result as a JSON object to stdout.
   subroutine emit_tov_json(mode, r)

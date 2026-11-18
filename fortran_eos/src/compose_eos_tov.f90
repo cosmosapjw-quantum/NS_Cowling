@@ -25,6 +25,8 @@ module compose_eos_tov
   public :: tov_love_result_t
   public :: solve_tov_love_smooth
   public :: solve_tov_love_maxwell
+  ! Read-only low-level scientific validation seam for tidal RHS.
+  public :: tov_rhs
 
   ! Geometric unit conversion: MeV/fm^3 -> km^-2 in G=c=1.
   ! _MEVFM3_TO_KM2 = G * MeV / (1e-45 fm^3->m^3 * c^4) * 1e6 (m^2->km^2)
@@ -80,13 +82,21 @@ contains
       eps_out = eps_arr(n); dedp_out = (eps_arr(n) - eps_arr(n-1))/(P_arr(n) - P_arr(n-1))
       ok = .true.; return
     endif
-    ! find bracket
-    j = 1
-    do i = 1, n-1
-      if (P_arr(i) <= P_mev .and. P_mev < P_arr(i+1)) then
-        j = i; exit
-      endif
-    end do
+    ! Find the strictly monotone EOS pressure bracket in O(log n).
+    ! This preserves the previous right-side convention when P==P_arr(j).
+    block
+      integer :: lo, hi, mid
+      lo = 1; hi = n
+      do while(hi-lo>1)
+        mid = lo + (hi-lo)/2
+        if (P_mev < P_arr(mid)) then
+          hi = mid
+        else
+          lo = mid
+        endif
+      enddo
+      j = lo
+    end block
     lp = log(P_mev)
     le_l = log(eps_arr(j)); le_r = log(eps_arr(j+1))
     lr_l = log(P_arr(j));   lr_r = log(P_arr(j+1))
@@ -171,7 +181,8 @@ contains
     elam = 1._wp/fac
     nu_prime = 2._wp*(m + 4._wp*pi*r**3*pg)/(r*(r - 2._wp*m))
     cs2 = 1._wp/dedp_v
-    Q = (4._wp*pi*elam*(5._wp*eg + 9._wp*pg + (eg + pg)*cs2) &
+    ! Hinderer tidal Q contains d(epsilon)/dP = 1/c_s^2, not c_s^2.
+    Q = (4._wp*pi*elam*(5._wp*eg + 9._wp*pg + (eg + pg)*dedp_v) &
          - 6._wp*elam/(r*r) - nu_prime**2)
     dpdr = -(eg + pg)*(m + 4._wp*pi*r**3*pg)/(r*(r - 2._wp*m))
     dmdr = 4._wp*pi*r*r*eg
@@ -211,7 +222,8 @@ contains
     t3 = 3._wp*(1._wp - 2._wp*b)**2 * (2._wp*b*(yR - 1._wp) - yR + 2._wp)*log(1._wp - 2._wp*b)
     den = t2 + t3
     if (abs(den) < 1.0e-30_wp) return
-    k2 = (t1/2._wp)/den
+    ! Hinderer 2008 Eq. (23): (8/5) C^5 (1-2C)^2 (...) / denominator.
+    k2 = (8._wp/5._wp)*t1/den
     lambda_tidal = (2._wp/3._wp)*k2/b**5
     ok = ieee_is_finite(k2 + lambda_tidal)
   end subroutine love_number_k2
@@ -241,39 +253,54 @@ contains
     real(wp), parameter :: b1=35._wp/384._wp, b3=500._wp/1113._wp, b4=125._wp/192._wp, &
                           b5=-2187._wp/6784._wp, b6=11._wp/84._wp
     real(wp), parameter :: e1=71._wp/57600._wp, e3=-71._wp/16695._wp, e4=71._wp/1920._wp, &
-                          e5=-17253._wp/339200._wp, e6=22._wp/525._wp
-    real(wp) :: r, p, m, y, h, dp, dm, dy, r2, p2, m2, y2
+                          e5=-17253._wp/339200._wp, e6=22._wp/525._wp, e7=-1._wp/40._wp
+    real(wp) :: r, p, m, y, h, r2, p2, m2, y2
     real(wp) :: k1p, k1m, k1y, k2p, k2m, k2y, k3p, k3m, k3y
-    real(wp) :: k4p, k4m, k4y, k5p, k5m, k5y, k6p, k6m, k6y
-    real(wp) :: err, tol, h_new
+    real(wp) :: k4p, k4m, k4y, k5p, k5m, k5y, k6p, k6m, k6y, k7p, k7m, k7y
+    real(wp) :: err, tol, h_new, errp, errm, erry, fraction
+    character(len=32) :: native_integrator
+    integer :: env_status
     logical :: step_ok
     integer :: i
     integer, parameter :: max_steps = 200000
 
+    ! Corrected DVODE Adams is the production default; RK45 remains
+    ! independently available with genuine trial-step rejection.
+    native_integrator='dvode_adams'
+    call get_environment_variable('NS_COWLING_TOV_INTEGRATOR',native_integrator,status=env_status)
+    if(env_status==1)native_integrator='dvode_adams'
+    if(trim(native_integrator)=='dvode_adams'.or.trim(native_integrator)=='dvode_bdf')then
+      call integrate_branch_dvode(r0,p0,m0,y0,P_arr,eps_arr,n,dr_max,p_surface, &
+                                  trim(native_integrator),r_out,m_out,y_out,n_steps,ok,status)
+      return
+    else if(trim(native_integrator)/='rk45')then
+      ok=.false.;status='unsupported NS_COWLING_TOV_INTEGRATOR';return
+    endif
     ok = .false.; status = ''
     r = r0; p = p0; m = m0; y = y0; n_steps = 0
-    tol = 1.0e-6_wp
+    tol = 1._wp  ! normalized embedded error threshold; trial steps may be rejected
     h = min(dr_max, 5.0e-3_wp)
     do i = 1, max_steps
       ! k1
       call tov_rhs(r, p, m, y, P_arr, eps_arr, n, p_surface, k1p, k1m, k1y, step_ok)
       if (.not. step_ok) exit
       ! k2
-      call tov_rhs(r + 0.5_wp*h, p + 0.5_wp*h*k1p, m + 0.5_wp*h*k1m, &
-                   y + 0.5_wp*h*k1y, P_arr, eps_arr, n, p_surface, k2p, k2m, k2y, step_ok)
+      ! DOPRI c2=1/5, NOT 1/2: stage-time errors invalidate the tableau.
+      call tov_rhs(r + a21*h, p + a21*h*k1p, m + a21*h*k1m, &
+                   y + a21*h*k1y, P_arr, eps_arr, n, p_surface, k2p, k2m, k2y, step_ok)
       if (.not. step_ok) exit
       ! k3
-      call tov_rhs(r + 0.5_wp*h, p + h*(a31*k1p + a32*k2p), m + h*(a31*k1m + a32*k2m), &
+      call tov_rhs(r + (a31+a32)*h, p + h*(a31*k1p + a32*k2p), m + h*(a31*k1m + a32*k2m), &
                    y + h*(a31*k1y + a32*k2y), P_arr, eps_arr, n, p_surface, k3p, k3m, k3y, step_ok)
       if (.not. step_ok) exit
       ! k4
-      call tov_rhs(r + h, p + h*(a41*k1p + a42*k2p + a43*k3p), &
+      call tov_rhs(r + (a41+a42+a43)*h, p + h*(a41*k1p + a42*k2p + a43*k3p), &
                    m + h*(a41*k1m + a42*k2m + a43*k3m), &
                    y + h*(a41*k1y + a42*k2y + a43*k3y), P_arr, eps_arr, n, p_surface, &
                    k4p, k4m, k4y, step_ok)
       if (.not. step_ok) exit
-      ! k5
-      call tov_rhs(r + h, p + h*(a51*k1p + a52*k2p + a53*k3p + a54*k4p), &
+      ! k5: DOPRI c5=8/9; previously evaluated at t+h in error.
+      call tov_rhs(r + (a51+a52+a53+a54)*h, p + h*(a51*k1p + a52*k2p + a53*k3p + a54*k4p), &
                    m + h*(a51*k1m + a52*k2m + a53*k3m + a54*k4m), &
                    y + h*(a51*k1y + a52*k2y + a53*k3y + a54*k4y), &
                    P_arr, eps_arr, n, p_surface, k5p, k5m, k5y, step_ok)
@@ -289,30 +316,209 @@ contains
       p2 = p + h*(b1*k1p + b3*k3p + b4*k4p + b5*k5p + b6*k6p)
       m2 = m + h*(b1*k1m + b3*k3m + b4*k4m + b5*k5m + b6*k6m)
       y2 = y + h*(b1*k1y + b3*k3y + b4*k4y + b5*k5y + b6*k6y)
-      ! embedded error estimate (4th vs 5th order)
-      err = abs(h*(e1*k1p + e3*k3p + e4*k4p + e5*k5p + e6*k6p))
-      err = err + abs(h*(e1*k1m + e3*k3m + e4*k4m + e5*k5m + e6*k6m))
-      err = err + abs(h*(e1*k1y + e3*k3y + e4*k4y + e5*k5y + e6*k6y))
-      if (err < 1.0e-30_wp) err = 1.0e-30_wp
-      ! accept the step
-      r = r2; p = p2; m = m2; y = y2
-      n_steps = i
-      ! adapt: increase or decrease h within [dr_max/1000, dr_max]
-      h_new = h*0.9_wp*(tol/err)**0.2_wp
-      h = min(dr_max, max(h_new, dr_max/1000._wp))
-      ! surface reached?
-      if (p <= p_surface .or. p <= 0._wp) then
-        ok = .true.; exit
+      ! The true Dormand-Prince 5(4) embedded estimate includes k7.
+      ! Local error is normalized by separately scaled pressure, mass and y.
+      call tov_rhs(r2,p2,m2,y2,P_arr,eps_arr,n,p_surface,k7p,k7m,k7y,step_ok)
+      if (.not.step_ok) then
+        h=max(h/2._wp,1.e-10_wp)
+        if (h<=1.e-10_wp) then
+          status='RK45 stage invalid at minimum step';exit
+        endif
+        cycle
       endif
-      ! trapped surface?
-      if (1._wp - 2._wp*m/r <= 0._wp) then
-        status = 'trapped surface'; ok = .false.; exit
+      errp=abs(h*(e1*k1p+e3*k3p+e4*k4p+e5*k5p+e6*k6p+e7*k7p))/ &
+           (1.e-15_wp+2.e-11_wp*max(abs(p),abs(p2)))
+      errm=abs(h*(e1*k1m+e3*k3m+e4*k4m+e5*k5m+e6*k6m+e7*k7m))/ &
+           (1.e-13_wp+2.e-11_wp*max(abs(m),abs(m2)))
+      erry=abs(h*(e1*k1y+e3*k3y+e4*k4y+e5*k5y+e6*k6y+e7*k7y))/ &
+           (1.e-12_wp+2.e-11_wp*max(abs(y),abs(y2)))
+      err=max(errp,errm,erry)
+      if (.not.ieee_is_finite(err)) then
+        status='nonfinite native RK45 local error';exit
+      endif
+      h_new=h*min(4._wp,max(.2_wp,.9_wp/max(err,1.e-12_wp)**.2_wp))
+      if (err>tol) then
+        ! Reject the trial in ALL state components. Old code accepted here.
+        h=max(1.e-10_wp,min(dr_max,h_new))
+        if(h<=1.e-10_wp) then
+          status='RK45 tolerance unattainable at minimum step';exit
+        endif
+        cycle
+      endif
+      if(p2<=p_surface)then
+        ! Interpolate the pressure-defined endpoint within the accepted step.
+        ! Do not apply an O(h) endpoint overshoot to M, R or tidal y.
+        fraction=max(0._wp,min(1._wp,(p-p_surface)/(p-p2)))
+        m=m+fraction*(m2-m)
+        y=y+fraction*(y2-y)
+        r=r+fraction*h
+        p=p_surface
+        n_steps=n_steps+1
+        ok=.true.;exit
+      endif
+      r=r2;p=p2;m=m2;y=y2
+      n_steps=n_steps+1
+      h=max(1.e-10_wp,min(dr_max,h_new))
+      if (1._wp-2._wp*m/r<=0._wp) then
+        status='trapped surface';ok=.false.;exit
       endif
     end do
     r_out = r; m_out = m; y_out = y
     if (i >= max_steps .and. .not. ok) status = 'max steps reached'
     if (ok .and. len_trim(status) == 0) status = 'ok'
   end subroutine integrate_branch
+
+  ! The DVODE package has internal COMMON workspace. Each solver process uses
+  ! one instance at a time. Never call concurrently from OpenMP threads.
+  ! RK45 and DVODE use the same physical tov_rhs and source EOS arrays.
+  subroutine dvode_rhs(neq,t,y,ydot,rpar,ipar)
+    integer,intent(in)::neq
+    real(wp),intent(in)::t,y(neq),rpar(*)
+    real(wp),intent(out)::ydot(neq)
+    integer,intent(inout)::ipar(*)
+    integer::n
+    logical::valid
+    n=ipar(1)
+    ydot=0._wp
+    if(neq/=3.or.n<2)then
+      ipar(2)=1
+      return
+    endif
+    call tov_rhs(t,y(1),y(2),y(3),rpar(2:1+n),rpar(2+n:1+2*n),n,rpar(1), &
+                 ydot(1),ydot(2),ydot(3),valid)
+    if(.not.valid)then
+      ipar(2)=1
+      ydot=0._wp
+    endif
+  end subroutine dvode_rhs
+
+  subroutine dvode_jac(neq,t,y,ml,mu,pd,nrowpd,rpar,ipar)
+    integer,intent(in)::neq,ml,mu,nrowpd
+    real(wp),intent(in)::t,y(neq),rpar(*)
+    integer,intent(in)::ipar(*)
+    real(wp),intent(out)::pd(nrowpd,neq)
+    ! Only MF=10 (Adams) or MF=22 (BDF internal Jacobian) is supported.
+    ! DVODE never calls this user callback under those method flags.
+    pd=0._wp
+  end subroutine dvode_jac
+
+  subroutine integrate_branch_dvode(r0,p0,m0,y0,P_arr,eps_arr,n, &
+                                    dr_max,p_surface,algorithm, &
+                                    r_out,m_out,y_out,n_steps,ok,status)
+    integer,intent(in)::n
+    real(wp),intent(in)::r0,p0,m0,y0,P_arr(n),eps_arr(n),dr_max,p_surface
+    character(len=*),intent(in)::algorithm
+    real(wp),intent(out)::r_out,m_out,y_out
+    integer,intent(out)::n_steps
+    logical,intent(out)::ok
+    character(len=*),intent(out)::status
+
+    integer,parameter::neq=3,lrw=200,liw=70,max_steps=200000
+    real(wp)::y(neq),old_y(neq),t,t_old,tout,atol(neq),rtol
+    real(wp)::rwork(lrw),rpar(1+2*n),dky(neq),mid,left,right
+    integer::iwork(liw),ipar(2),istate,iopt,itol,itask,mf,iflag,i
+    integer::step_counter,env_status,ios
+    character(len=48)::rtol_text
+    external::dvode,dvindy
+
+    ok=.false.;status='dvode not started'
+    r_out=r0;m_out=m0;y_out=y0;n_steps=0
+    if(n<2.or.dr_max<=0._wp.or.p_surface<=0._wp.or.p0<=p_surface)return
+    select case(trim(algorithm))
+    case('dvode_adams')
+      mf=10
+    case('dvode_bdf')
+      mf=22
+    case default
+      status='unknown native DVODE method';return
+    end select
+    y=[p0,m0,y0];t=r0
+    rpar(1)=p_surface
+    rpar(2:1+n)=P_arr
+    rpar(2+n:1+2*n)=eps_arr
+    ipar=[n,0];iwork=0;rwork=0._wp
+    rtol=2.e-9_wp
+    rtol_text=''
+    call get_environment_variable('NS_COWLING_TOV_RTOL',rtol_text,status=env_status)
+    if(env_status==0)then
+      read(rtol_text,*,iostat=ios)rtol
+      if(ios/=0)then
+        status='DVODE invalid relative tolerance text';return
+      endif
+      if(.not.ieee_is_finite(rtol).or.rtol<1.e-12_wp.or.rtol>1.e-5_wp)then
+        status='DVODE relative tolerance out of [1e-12,1e-5]';return
+      endif
+    else if(env_status/=1)then
+      status='DVODE environment tolerance unavailable';return
+    endif
+    ! Pressure, mass and tidal-y component tolerances are all scaled with
+    ! the same requested relative target, not silently frozen at baseline.
+    atol=[5.e-5_wp,5.e-3_wp,5.e-2_wp]*rtol
+    istate=1;itol=2;itask=2;iopt=1
+    rwork(6)=dr_max
+    rwork(5)=min(0.005_wp,dr_max)
+    iwork(6)=100000
+    do i=1,max_steps
+      t_old=t;old_y=y
+      tout=t+dr_max
+      call dvode(dvode_rhs,neq,y,t,tout,itol,rtol,atol,itask, &
+          istate,iopt,rwork,lrw,iwork,liw,dvode_jac,mf,rpar,ipar)
+      if(ipar(2)/=0)then
+        status='DVODE physical RHS left admissible state';exit
+      endif
+      if(istate/=2)then
+        write(status,'(a,i0)')'DVODE ISTATE failure ',istate
+        exit
+      endif
+      if(.not.all(ieee_is_finite(y)).or..not.ieee_is_finite(t))then
+        status='DVODE nonfinite state';exit
+      endif
+      if(t<=t_old.or.t>50._wp)then
+        status='DVODE nonmonotone/out-of-range stellar radius';exit
+      endif
+      if(y(2)<=0._wp.or.2._wp*y(2)>=t)then
+        status='DVODE trapped star or nonpositive mass';exit
+      endif
+      n_steps=i
+      if(y(1)<=p_surface)then
+        if(old_y(1)<=p_surface)then
+          status='DVODE crossing was not bracketed';exit
+        endif
+        ! DVINDY evaluates the dense output from DVODE's *accepted* last
+        ! internal step. Pressure-defined surface root, no O(h) overshoot.
+        left=t_old;right=t
+        do step_counter=1,60
+          mid=0.5_wp*(left+right)
+          call dvindy(mid,0,rwork(21),neq,dky,iflag)
+          if(iflag/=0.or..not.all(ieee_is_finite(dky)))then
+            status='DVODE dense surface interpolation failed'
+            return
+          endif
+          if(dky(1)>p_surface)then
+            left=mid
+          else
+            right=mid
+          endif
+          if(right-left<1.e-12_wp*max(1._wp,abs(mid)))exit
+        enddo
+        mid=0.5_wp*(left+right)
+        call dvindy(mid,0,rwork(21),neq,dky,iflag)
+        if(iflag/=0)then
+          status='DVODE final surface interpolation failed';return
+        endif
+        if(abs(dky(1)-p_surface)>1.e-5_wp*max(p_surface,1.e-14_wp))then
+          status='DVODE surface residual outside tolerance';return
+        endif
+        r_out=mid;m_out=dky(2);y_out=dky(3)
+        ok=.true.;status='ok'
+        return
+      endif
+      if(istate/=2)exit
+    enddo
+    r_out=t;m_out=y(2);y_out=y(3)
+    if(i>=max_steps.and..not.ok)status='DVODE maximum step count'
+  end subroutine integrate_branch_dvode
+
 
   !------------------------------------------------------------------
   ! Solve TOV + l=2 Love on a smooth (single-phase) barotrope.

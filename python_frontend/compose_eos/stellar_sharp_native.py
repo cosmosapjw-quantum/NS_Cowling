@@ -265,8 +265,8 @@ class NativeSharpCowlingDVODE:
         self.settings=settings
         self.method=method
         self.samples=samples
-        if coefficient_backend not in ("pchip","direct_source"):
-            raise ValueError("coefficient_backend must be pchip or direct_source")
+        if coefficient_backend not in ("pchip","direct_source","hybrid_cs2"):
+            raise ValueError("coefficient_backend must be pchip, direct_source or hybrid_cs2")
         self.coefficient_backend=coefficient_backend
         if source_restart_relative_jump is not None:
             if (not isinstance(source_restart_relative_jump,
@@ -312,7 +312,8 @@ class NativeSharpCowlingDVODE:
             source_breaks=source_breaks[(source_breaks>h_end)&(source_breaks<h_begin)]
             source_break_s=np.sqrt(np.maximum(h0-source_breaks,0.))
             source_restart_s=[]
-            if self.coefficient_backend=="direct_source" and                self.source_restart_relative_jump is not None:
+            if self.coefficient_backend in ("direct_source","hybrid_cs2") and \
+                    self.source_restart_relative_jump is not None:
                 # Only restart at demonstrated strong EOS sound-speed jumps,
                 # not every source table knot (often >1000 per star).
                 # Evaluate strictly inside the same physical phase on either
@@ -341,6 +342,24 @@ class NativeSharpCowlingDVODE:
         self.source_break_count=sum(len(q["source_break_s"]) for q in self._phases)
         self.source_restart_count=sum(len(q["source_restart_s"]) for q in self._phases)
 
+    def _source_coefficients(self,phase,svalue):
+        """One original-EOS c_s² with phase-local PCHIP geometry only.
+
+        Never interpolate thermodynamic derivatives across EOS derivative
+        knots; the native integrator restarts at sufficiently strong jumps.
+        Original physical Maxwell interfaces remain separate phases.
+        """
+        if self.coefficient_backend!="hybrid_cs2":
+            raise ValueError("source coefficients require hybrid_cs2 backend")
+        s=float(np.clip(svalue,phase["s"][0],phase["s"][-1]))
+        h=float(np.clip(self.background.h_start-s*s,
+                        phase["h1"],phase["h0"]))
+        geom=phase["pchip"](s)
+        cs=self.background.eos.state_at_enthalpy(
+            h,self.background.eos.side_for_segment(h,phase["mid"]))["cs2_over_c2"]
+        return (float(geom[0]),float(geom[1]),float(geom[2]),
+                float(geom[3]),float(cs))
+
     def _integrate_phase(self, phase, targets, y, omega, lib):
         x=phase["s"]
         status=ct.c_int()
@@ -352,7 +371,7 @@ class NativeSharpCowlingDVODE:
         targets=np.ascontiguousarray(targets,dtype=float)
         # Physical source discontinuity stops are stronger than ordinary
         # output waypoints: DVODE is restarted at each selected cs² jump.
-        if self.coefficient_backend=="direct_source":
+        if self.coefficient_backend in ("direct_source","hybrid_cs2"):
             cut_s=(phase["source_break_s"] if self.knot_waypoints
                    else phase["source_restart_s"])
         elif self.knot_waypoints:
@@ -374,7 +393,7 @@ class NativeSharpCowlingDVODE:
         callback=None
         cb_errors=[]
         cb_status=ct.c_int()
-        if self.coefficient_backend=="direct_source":
+        if self.coefficient_backend in ("direct_source","hybrid_cs2"):
             # The function pointer is held strongly until Fortran returns.
             # Fortran and source EOS callbacks are process-local and always
             # serialized by native._LOCK in the calling matched-shot path.
@@ -386,10 +405,13 @@ class NativeSharpCowlingDVODE:
                     svalue=float(np.clip(svalue,x[0],x[-1]))
                     h=self.background.h_start-svalue*svalue
                     h=float(np.clip(h,phase["h1"],phase["h0"]))
-                    st=self.background.state_at_enthalpy(
-                        h,self.background.eos.side_for_segment(h,phase["mid"]))
-                    values=(st["r_km"],st["Phi"],st["lambda_metric"],
-                            st["dPhi_dr_km"],st["cs2_over_c2"])
+                    if self.coefficient_backend=="hybrid_cs2":
+                        values=self._source_coefficients(phase,svalue)
+                    else:
+                        st=self.background.state_at_enthalpy(
+                            h,self.background.eos.side_for_segment(h,phase["mid"]))
+                        values=(st["r_km"],st["Phi"],st["lambda_metric"],
+                                st["dPhi_dr_km"],st["cs2_over_c2"])
                     if (not np.all(np.isfinite(values)) or
                          values[0]<=0 or values[3]<=0 or values[4]<=0):
                         raise ValueError("source background has nonphysical coefficients")
@@ -404,7 +426,7 @@ class NativeSharpCowlingDVODE:
             if cb_status.value:
                 raise RuntimeError("native EOS callback registration failed")
         try:
-            if self.coefficient_backend=="direct_source" and len(restart_indices):
+            if self.coefficient_backend in ("direct_source","hybrid_cs2") and len(restart_indices):
                 lib.cowling_native_segment_restarts(
                     omega,self.settings.ell,self.settings.rtol,
                     self.settings.atol,max_ds,

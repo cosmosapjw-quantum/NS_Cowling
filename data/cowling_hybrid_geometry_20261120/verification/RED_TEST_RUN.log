@@ -1,0 +1,49 @@
+F
+=================================== FAILURES ===================================
+________ test_hybrid_accepts_new_backend_and_no_cross_phase_source_data ________
+
+    def test_hybrid_accepts_new_backend_and_no_cross_phase_source_data():
+        eos=load_eos("SPG_M3","css")
+        bg=solve_sharp_background_native(eos,.192510767556007,
+            surface_h=3e-8,rtol=3e-10,atol=3e-11,
+            max_step_h=.004,native_samples=1025)
+        settings=CowlingSettings(surface_h=3e-8,rtol=1e-9,
+            atol=1e-12,max_step_h=.002)
+>       mode=NativeSharpCowlingDVODE(bg,settings,samples=1025,
+            coefficient_backend="hybrid_cs2",
+            source_restart_relative_jump=.01)
+
+python_frontend/tests/test_sharp_cowling_hybrid_cs2_20261120.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <compose_eos.stellar_sharp_native.NativeSharpCowlingDVODE object at 0x7de843acc710>
+background = SharpStellarBackground(eos=<compose_eos.stellar_sharp.SharpContractEnthalpyEOS object at 0x7de8449faf00>, central_dens...n_high_fm3': 0.0941272199725073, 'epsilon_low_MeV_fm3': 76.94982713409907, 'epsilon_high_MeV_fm3': 89.34565739599732}])
+settings = CowlingSettings(ell=2, rtol=1e-09, atol=1e-12, surface_h=3e-08, match_h_fraction=0.15, max_step_h=0.002, root_xtol_hz=1e-05)
+samples = 1025, method = 'adams', knot_waypoints = False
+coefficient_backend = 'hybrid_cs2', source_restart_relative_jump = 0.01
+
+    def __init__(self,background,settings=CowlingSettings(),*,samples=8193,
+                 method="adams",knot_waypoints=False,coefficient_backend="pchip",
+                 source_restart_relative_jump=.01):
+        if not isinstance(background,SharpStellarBackground) or not background.interfaces:
+            raise ValueError("native sharp Cowling needs a sharp stellar background")
+        settings.validate(background)
+        if settings.surface_h<background.surface_h:
+            raise ValueError("Cowling surface outside integrated TOV domain")
+        if method not in ("adams","bdf"):
+            raise ValueError("native Cowling method must be adams or bdf")
+        if samples<129:
+            raise ValueError("at least 129 one-sided samples required")
+        self.background=background
+        self.settings=settings
+        self.method=method
+        self.samples=samples
+        if coefficient_backend not in ("pchip","direct_source"):
+>           raise ValueError("coefficient_backend must be pchip or direct_source")
+E           ValueError: coefficient_backend must be pchip or direct_source
+
+python_frontend/compose_eos/stellar_sharp_native.py:269: ValueError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_sharp_cowling_hybrid_cs2_20261120.py::test_hybrid_accepts_new_backend_and_no_cross_phase_source_data
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 2 deselected in 3.43s

@@ -1,0 +1,246 @@
+{
+  "schema": "ns_cowling.source_hybrid_cs2_native_benchmark.v1",
+  "baseline_commit": "6253dc40eee188ea207450ae13a5d4588aa6d398",
+  "frozen_EOS_bundle_sha256": "299de43bb4f0a87ebfc4f1139ab3c8b51c344937ec3637cdff644e9ca8ab2c04",
+  "test_settings": {
+    "ell": 2,
+    "rtol": 1e-09,
+    "atol": 1e-12,
+    "surface_h": 3e-08,
+    "match_h_fraction": 0.15,
+    "max_step_h": 0.002,
+    "root_xtol_hz": 1e-05
+  },
+  "reference_method": "SOURCE_EOS_PYTHON_DOP853_PARITY_PREVIOUS_STAGES",
+  "oracle_from": "data/cowling_direct_source_callback_20261119/RESULT.json plus RAPID.json",
+  "measurement": "single process, OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1",
+  "tolerance_hz": 0.05,
+  "maximum_join": 1e-05,
+  "cases": {
+    "M3_CSS_0p7_SLOW_P1": {
+      "model": "SPG_M3",
+      "join": "css",
+      "n_c_fm3": 0.192510767556007,
+      "conversion": "slow",
+      "reference_hz": 3736.2088951581254,
+      "source_contract_SHA256": "f23fb7020c9de1b65c99ac37690840f7a4d6611f3372409b015d8c3bd7e32f3b",
+      "backend_variants": {
+        "PCHIP_8193": {
+          "samples": 8193,
+          "backend": "pchip",
+          "status": "NATIVE_ROOT_REJECTED",
+          "error_type": "RuntimeError",
+          "error": "mode root not physically admitted: matching=-1.2270079155596656e-05 join=1.2270079155525289e-05",
+          "total_seconds": 0.8814838899997994
+        },
+        "PCHIP_16385": {
+          "samples": 16385,
+          "backend": "pchip",
+          "status": "NATIVE_ROOT_REJECTED",
+          "error_type": "RuntimeError",
+          "error": "mode root not physically admitted: matching=5.429188234022143e-05 join=5.429188234013189e-05",
+          "total_seconds": 1.411638053000388
+        },
+        "PCHIP_32769": {
+          "samples": 32769,
+          "backend": "pchip",
+          "status": "NATIVE_ROOT_REJECTED",
+          "error_type": "RuntimeError",
+          "error": "mode root not physically admitted: matching=1.1693900018981907e-05 join=1.169390001894371e-05",
+          "total_seconds": 2.5435835449998194
+        },
+        "DIRECT_SOURCE_129": {
+          "samples": 129,
+          "backend": "direct_source",
+          "status": "MATCHED_REFERENCE_PASS",
+          "frequency_hz": 3736.2104759296394,
+          "reference_delta_hz": 0.0015807715139999345,
+          "join_relative": 9.578842168778933e-06,
+          "nodes": [
+            1,
+            1
+          ],
+          "source_restart_count": 40,
+          "source_callback_calls": 154758,
+          "setup_seconds": 0.17495170999973197,
+          "total_seconds": 10.16933555200012
+        },
+        "HYBRID_CS2_2049": {
+          "samples": 2049,
+          "backend": "hybrid_cs2",
+          "status": "MATCHED_REFERENCE_PASS",
+          "frequency_hz": 3736.2106011633127,
+          "reference_delta_hz": 0.0017060051873158955,
+          "join_relative": 4.9961451703408135e-06,
+          "nodes": [
+            1,
+            1
+          ],
+          "source_restart_count": 40,
+          "source_callback_calls": 105630,
+          "setup_seconds": 0.5941180740001073,
+          "total_seconds": 5.555206534999343
+        },
+        "HYBRID_CS2_4097": {
+          "samples": 4097,
+          "backend": "hybrid_cs2",
+          "status": "MATCHED_REFERENCE_PASS",
+          "frequency_hz": 3736.210673257724,
+          "reference_delta_hz": 0.0017780995985958725,
+          "join_relative": 1.5160473837356939e-06,
+          "nodes": [
+            1,
+            1
+          ],
+          "source_restart_count": 40,
+          "source_callback_calls": 124232,
+          "setup_seconds": 0.7265748809995785,
+          "total_seconds": 6.608269470999403
+        }
+      },
+      "native_TOV": {
+        "M_msun": 0.7000000086373105,
+        "R_km": 14.59794179069283,
+        "setup_seconds": 0.2109252070004004
+      },
+      "fastest_hybrid_accepted": {
+        "label": "HYBRID_CS2_2049",
+        "speedup_source_callback_vs_hybrid": 1.8305954041367292,
+        "frequency_error_hz": 0.0017060051873158955,
+        "reference_tolerance_hz": 0.05
+      },
+      "fastest_matched_5mHz": {
+        "label": "HYBRID_CS2_2049",
+        "backend": "hybrid_cs2",
+        "frequency_hz": 3736.2106011633127,
+        "signed_reference_error_hz": 0.0017060051873158955,
+        "elapsed_seconds": 5.555206534999343
+      }
+    },
+    "M2_MAXWELL_1p4_RAPID_P1": {
+      "model": "SPG_M2",
+      "join": "maxwell",
+      "n_c_fm3": 0.30385128926615257,
+      "conversion": "rapid",
+      "reference_hz": 5143.719721563306,
+      "source_contract_SHA256": "59b7cb4671347c33c25133e6497e8be346b4e5b4f871eece9bcaf59155fd8765",
+      "backend_variants": {
+        "PCHIP_8193": {
+          "samples": 8193,
+          "backend": "pchip",
+          "status": "MATCHED_REFERENCE_PASS",
+          "frequency_hz": 5143.704238767763,
+          "reference_delta_hz": -0.0154827955429937,
+          "join_relative": 4.352036670974325e-06,
+          "nodes": [
+            1,
+            1
+          ],
+          "source_restart_count": 0,
+          "source_callback_calls": 0,
+          "setup_seconds": 1.1683607320001101,
+          "total_seconds": 1.2950254689994836
+        },
+        "PCHIP_16385": {
+          "samples": 16385,
+          "backend": "pchip",
+          "status": "MATCHED_REFERENCE_PASS",
+          "frequency_hz": 5143.723232833891,
+          "reference_delta_hz": 0.0035112705854771775,
+          "join_relative": 1.6335109632949232e-07,
+          "nodes": [
+            1,
+            1
+          ],
+          "source_restart_count": 0,
+          "source_callback_calls": 0,
+          "setup_seconds": 1.6953233050007839,
+          "total_seconds": 1.7427635520007243
+        },
+        "PCHIP_32769": {
+          "samples": 32769,
+          "backend": "pchip",
+          "status": "MATCHED_REFERENCE_PASS",
+          "frequency_hz": 5143.722432365285,
+          "reference_delta_hz": 0.002710801979446842,
+          "join_relative": 7.546934724135197e-08,
+          "nodes": [
+            1,
+            1
+          ],
+          "source_restart_count": 0,
+          "source_callback_calls": 0,
+          "setup_seconds": 2.7619325480000043,
+          "total_seconds": 2.800574140000208
+        },
+        "DIRECT_SOURCE_129": {
+          "samples": 129,
+          "backend": "direct_source",
+          "status": "MATCHED_REFERENCE_PASS",
+          "frequency_hz": 5143.719700941703,
+          "reference_delta_hz": -2.062160274363123e-05,
+          "join_relative": 3.508950969550757e-07,
+          "nodes": [
+            1,
+            1
+          ],
+          "source_restart_count": 39,
+          "source_callback_calls": 84361,
+          "setup_seconds": 0.38099242099997355,
+          "total_seconds": 6.2092486990004545
+        },
+        "HYBRID_CS2_2049": {
+          "samples": 2049,
+          "backend": "hybrid_cs2",
+          "status": "MATCHED_REFERENCE_PASS",
+          "frequency_hz": 5143.71962185878,
+          "reference_delta_hz": -9.970452629204374e-05,
+          "join_relative": 1.45535000188912e-07,
+          "nodes": [
+            1,
+            1
+          ],
+          "source_restart_count": 39,
+          "source_callback_calls": 85749,
+          "setup_seconds": 1.2652955789999396,
+          "total_seconds": 5.5274482860004355
+        },
+        "HYBRID_CS2_4097": {
+          "samples": 4097,
+          "backend": "hybrid_cs2",
+          "status": "MATCHED_REFERENCE_PASS",
+          "frequency_hz": 5143.719666720863,
+          "reference_delta_hz": -5.48424432054162e-05,
+          "join_relative": 5.936409014833588e-08,
+          "nodes": [
+            1,
+            1
+          ],
+          "source_restart_count": 39,
+          "source_callback_calls": 77116,
+          "setup_seconds": 1.3293885519997275,
+          "total_seconds": 5.139610762000302
+        }
+      },
+      "native_TOV": {
+        "M_msun": 1.3999999857354968,
+        "R_km": 14.420419623651872,
+        "setup_seconds": 0.3550164289999884
+      },
+      "fastest_hybrid_accepted": {
+        "label": "HYBRID_CS2_4097",
+        "speedup_source_callback_vs_hybrid": 1.2081165260428897,
+        "frequency_error_hz": -5.48424432054162e-05,
+        "reference_tolerance_hz": 0.05
+      },
+      "fastest_matched_5mHz": {
+        "label": "PCHIP_16385",
+        "backend": "pchip",
+        "frequency_hz": 5143.723232833891,
+        "signed_reference_error_hz": 0.0035112705854771775,
+        "elapsed_seconds": 1.7427635520007243
+      }
+    }
+  },
+  "status": "BOUNDED_BENCHMARK_RECORDED_NOT_GENERAL_PERFORMANCE_PROOF"
+}

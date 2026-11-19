@@ -1,0 +1,78 @@
+{
+  "schema": "ns_cowling.source_coefficient_hybrid_accuracy_selection.v1",
+  "input_benchmark_sha256": "2aa52252bbdc83d738bb1c0048a53cf0ae0adcf497a830b4c5586a13c161258a",
+  "original_source_zip_sha256": "299de43bb4f0a87ebfc4f1139ab3c8b51c344937ec3637cdff644e9ca8ab2c04",
+  "criteria": "observed reference |df|, physical join <1e-5, strict W/V mode and measured wall time",
+  "method_selection_is_empirical_not_global_or_proven_optimal": true,
+  "target_errors_hz": [
+    0.05,
+    0.005,
+    0.001
+  ],
+  "cases": {
+    "M3_CSS_0p7_SLOW_P1": {
+      "0.05 Hz": {
+        "status": "EMPIRICAL_CANDIDATE_SELECTED",
+        "selected": "HYBRID_CS2_2049",
+        "backend": "hybrid_cs2",
+        "sample_count": 2049,
+        "frequency_hz": 3736.2106011633127,
+        "reference_difference_hz": 0.0017060051873158955,
+        "elapsed_seconds": 5.555206534999343,
+        "requested_abs_error_hz": 0.05,
+        "total_eligible_candidates": 3
+      },
+      "0.005 Hz": {
+        "status": "EMPIRICAL_CANDIDATE_SELECTED",
+        "selected": "HYBRID_CS2_2049",
+        "backend": "hybrid_cs2",
+        "sample_count": 2049,
+        "frequency_hz": 3736.2106011633127,
+        "reference_difference_hz": 0.0017060051873158955,
+        "elapsed_seconds": 5.555206534999343,
+        "requested_abs_error_hz": 0.005,
+        "total_eligible_candidates": 3
+      },
+      "0.001 Hz": {
+        "status": "NO_VERIFIED_CANDIDATE_AT_REQUESTED_FREQUENCY_TOLERANCE",
+        "requested_abs_error_hz": 0.001,
+        "selected": null
+      }
+    },
+    "M2_MAXWELL_1p4_RAPID_P1": {
+      "0.05 Hz": {
+        "status": "EMPIRICAL_CANDIDATE_SELECTED",
+        "selected": "PCHIP_8193",
+        "backend": "pchip",
+        "sample_count": 8193,
+        "frequency_hz": 5143.704238767763,
+        "reference_difference_hz": -0.0154827955429937,
+        "elapsed_seconds": 1.2950254689994836,
+        "requested_abs_error_hz": 0.05,
+        "total_eligible_candidates": 6
+      },
+      "0.005 Hz": {
+        "status": "EMPIRICAL_CANDIDATE_SELECTED",
+        "selected": "PCHIP_16385",
+        "backend": "pchip",
+        "sample_count": 16385,
+        "frequency_hz": 5143.723232833891,
+        "reference_difference_hz": 0.0035112705854771775,
+        "elapsed_seconds": 1.7427635520007243,
+        "requested_abs_error_hz": 0.005,
+        "total_eligible_candidates": 5
+      },
+      "0.001 Hz": {
+        "status": "EMPIRICAL_CANDIDATE_SELECTED",
+        "selected": "HYBRID_CS2_4097",
+        "backend": "hybrid_cs2",
+        "sample_count": 4097,
+        "frequency_hz": 5143.719666720863,
+        "reference_difference_hz": -5.48424432054162e-05,
+        "elapsed_seconds": 5.139610762000302,
+        "requested_abs_error_hz": 0.001,
+        "total_eligible_candidates": 3
+      }
+    }
+  }
+}

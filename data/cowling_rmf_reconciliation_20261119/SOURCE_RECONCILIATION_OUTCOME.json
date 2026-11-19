@@ -1,0 +1,379 @@
+{
+  "schema": "ns_cowling.source_calibration05.original_rmf_reconciliation.v1",
+  "parent_04_commit": "f191abe843d81c6a1e5797dd9edc9a1558f095fa",
+  "original_archive_from_04_Zenodo_independently_byte_verified": true,
+  "source_previous_stage_sha256": "f27991013902a9ca8cf6c6c21893f141265f23563cec5498cb80c38035dcc236",
+  "numerical_scope_n_fm3": [
+    0.08,
+    0.45
+  ],
+  "source_immutable": true,
+  "code_and_model_claim": "same-named beta equilibrium fractions need not imply same bulk stress-energy EOS",
+  "original_beta_and_output_convention": "cold npe(mu), CompOSE Q3=mub/mn-1, Q4=muq/mn, Q5=mul/mn; mu_e=mn(Q5-Q4)",
+  "source_schema_citation": "https://link.springer.com/article/10.1140/epja/s10050-022-00847-y",
+  "no_new_physical_unification_claim": true,
+  "provider_chemical_potential_issue_diagnosed_not_repaired_in_original": true,
+  "provider_eos_mr_is_reused_crust_only_not_independent_unified_TOV_reference": true,
+  "source_equivalent_homogeneous_core_for_FSU2_TM1e": false,
+  "record_receipts": {
+    "original_vs_generated_composition_and_pressure": {
+      "relative_path": "data/cowling_rmf_reconciliation_20261119/EXACT_DENSITY_AUDIT.json",
+      "sha256": "50ac216042b0de63057d98cdc1496d15f3447f439c32f4da0cc0c6a20e0b2766"
+    },
+    "original_CompOSE_Q4_independent_electron_test": {
+      "relative_path": "data/cowling_rmf_reconciliation_20261119/charge_chemical_potentials/RESULT.json",
+      "sha256": "c22d5c087355e8bb044bc7e5c48a6377f77150926fbbf45ff9291be2d02f2332"
+    },
+    "fixed_original_fraction_control": {
+      "relative_path": "data/cowling_rmf_reconciliation_20261119/fixed_composition/RESULT.json",
+      "sha256": "82c3f20718da37f528682805772b9fe92b03615c369a71bc3ccbad3a29d8c53b"
+    },
+    "paired_same_crust_1p4_stellar": {
+      "relative_path": "data/cowling_rmf_reconciliation_20261119/paired_core/RESULT.json",
+      "sha256": "b9612db637a508edcfa9b27fa382ea570463491bb9a877af7c16da4dc516cdb0"
+    },
+    "unified_vs_crust_only_provider_eos_mr": {
+      "relative_path": "data/cowling_rmf_reconciliation_20261119/provider_mr/RESULT.json",
+      "sha256": "0530f10703581f32ad015f5820a9765a66b7905fa34906487ee57b0e9f7367b5"
+    }
+  },
+  "models": {
+    "FSU2": {
+      "phase6_provider_source_sha256": "c5ab88b45f63643e4fba0de15add754d5ea052da493d947c47c5416455b0171b",
+      "independent_same_density_rows": 75,
+      "composition_fraction_max_abs_deviation": 5.9210580466637075e-06,
+      "provider_5_digit_printed_Yp_not_all_strictly_rounding_equal": true,
+      "pressure_max_abs_relative_mismatch": 0.04221256277543341,
+      "pressure_median_abs_relative_mismatch": 0.01579881702966533,
+      "provider_energy_derivative_pressure_med_abs_relative_error": 0.010351740015155505,
+      "local_RMF_energy_derivative_pressure_med_abs_relative_error": 1.6887467113088316e-08,
+      "provider_Q3_minus_Euler_max_abs_MeV": 6.2714619700000185,
+      "pressure_gap_energy_and_identity_decomposition": {
+        "max_abs_balance_error_MeV_fm3": 3.4561242756581123e-12,
+        "rms_model_source_pressure_difference_MeV_fm3": 0.19165398590924282,
+        "rms_energy_density_functional_term_MeV_fm3": 0.24603102263969506,
+        "rms_provider_identity_residual_MeV_fm3": 0.0662009108444388,
+        "rms_model_identity_residual_MeV_fm3": 9.30168977230837e-06,
+        "rms_energy_term_over_observed": 1.2837250499773187,
+        "rms_provider_identity_over_observed": 0.34541890965830496,
+        "rms_model_identity_over_observed": 4.853376635074607e-05,
+        "source_eos_unchanged": true,
+        "caveat": "CubicSpline sampled density derivative; algebraic identity is not a unique diagnosis of provider-generation implementation"
+      },
+      "provider_Q4_Q5_minus_electron_mu_max_abs_MeV": 2.3693255275412923,
+      "provider_Q4_rounding_compatible_rows": 0,
+      "provider_Q4_electron_check_rows": 75,
+      "literature_saturation_check": {
+        "n0_fm3": 0.15040186458353533,
+        "E_bind_MeV": -16.26488225007597,
+        "K_MeV": 237.6851971546373,
+        "effective_mass_over_rest": 0.5931383192074043,
+        "published_saturation": {
+          "n0": 0.1505,
+          "E_bind_MeV": -16.28,
+          "K_MeV": 238.0,
+          "source_url": "https://compose.obspm.fr/eos/215"
+        },
+        "compared_convention": "symmetric cold matter Yp=0.5 without leptons"
+      },
+      "high_precision_TM1_isoscalar_control": null,
+      "provider_mr_provenance": {
+        "duplicate_of_crust_only": true,
+        "source_thermo_differs_from_crust_only": true,
+        "original_unified_number_of_rows": 426,
+        "crust_only_number_of_rows": 269,
+        "original_eos_mr_sha256": "20c2efaaf6a26551b0e424f3af8801acc48ae6569aa07cbc2919bac699e35d4e",
+        "model_status": "BLOCKED_REUSED_CRUST_ONLY_MR_NOT_AN_INDEPENDENT_UNIFIED_TOV_ORACLE"
+      },
+      "independent_fixed_original_proton_fraction_control": {
+        "maximum_pressure_change_due_to_fixed_provider_Yp": 0.00022678248986096605,
+        "min_original_provider_vs_model_pressure_gap": 0.05143476875919939,
+        "max_composition_roundoff_effect_over_P_gap_ratio": 0.0007498170217408815
+      },
+      "common_crust_phase_local_css_replacement": {
+        "status": "FIXED_1P4_NATIVE_TOV_F_P1_BOTH_CONVERSIONS_VERIFIED",
+        "same_outer_inner_crust_samples": 52,
+        "identical_surface_outer_bridge": true,
+        "transition_pressure_MeV_fm3": 0.2546799995162962,
+        "provider_M1p4": 1.399999995931819,
+        "local_RMF_M1p4": 1.3999999849461284,
+        "delta_R1p4_km": 0.0912179605024992,
+        "original_R1p4_km": 13.849156765986981,
+        "local_RMF_R1p4_km": 13.94037472648948,
+        "mode_comparisons": {
+          "slow": {
+            "f": {
+              "source_provider_frequency_hz": 1929.607470266385,
+              "newly_computed_RMF_frequency_hz": 1916.9914809062395,
+              "delta_hz": -12.615989360145477
+            },
+            "p1": {
+              "source_provider_frequency_hz": 5232.102818166331,
+              "newly_computed_RMF_frequency_hz": 5131.179157394765,
+              "delta_hz": -100.92366077156657
+            }
+          },
+          "rapid": {
+            "f": {
+              "source_provider_frequency_hz": 1929.3666775371532,
+              "newly_computed_RMF_frequency_hz": 1916.9631594601299,
+              "delta_hz": -12.403518077023364
+            },
+            "p1": {
+              "source_provider_frequency_hz": 5207.876689018745,
+              "newly_computed_RMF_frequency_hz": 5128.204762340634,
+              "delta_hz": -79.67192667811105
+            }
+          }
+        },
+        "transition_density": [
+          0.054000001,
+          0.055007854655122056
+        ],
+        "original_source_core_thermo_sha256": "c5ab88b45f63643e4fba0de15add754d5ea052da493d947c47c5416455b0171b",
+        "local_generated_core_thermo_sha256": "218b7b7682448ceb656127a66bcebacc72bc4c9eeb1ab7484a1015155359e8d9"
+      },
+      "generated_RMF_plus_original_inner_crust_Maxwell_test": {
+        "status": "PAIRED_THREE_LAYER_RUN",
+        "transition_pressure": 0.1865666580898943,
+        "original_provider_phase6_Maxwell_not_verified": true
+      },
+      "physical_cause_status": "SOURCE_BULK_OUTPUT_MISMATCH_MEASURED_EXACT_CAUSE_NOT_YET_UNIQUELY_IDENTIFIED",
+      "numerical_source_equivalence": "FAIL_SOURCE_BULK_EQUIVALENCE"
+    },
+    "TM1e": {
+      "phase6_provider_source_sha256": "b3e19e143d926add524e8af2e1884647d6ea5b0f38b5ec64616dc9620497fc73",
+      "independent_same_density_rows": 63,
+      "composition_fraction_max_abs_deviation": 5.7204056905652e-06,
+      "provider_5_digit_printed_Yp_not_all_strictly_rounding_equal": true,
+      "pressure_max_abs_relative_mismatch": 0.1551819453626729,
+      "pressure_median_abs_relative_mismatch": 0.012288221127548151,
+      "provider_energy_derivative_pressure_med_abs_relative_error": 0.006751123227008974,
+      "local_RMF_energy_derivative_pressure_med_abs_relative_error": 1.528804071194567e-08,
+      "provider_Q3_minus_Euler_max_abs_MeV": 8.544884141999773,
+      "pressure_gap_energy_and_identity_decomposition": {
+        "max_abs_balance_error_MeV_fm3": 1.8346990593443024e-12,
+        "rms_model_source_pressure_difference_MeV_fm3": 0.12231696531180072,
+        "rms_energy_density_functional_term_MeV_fm3": 0.08105777175270666,
+        "rms_provider_identity_residual_MeV_fm3": 0.061747365768915395,
+        "rms_model_identity_residual_MeV_fm3": 3.953057643928161e-06,
+        "rms_energy_term_over_observed": 0.6626862557134295,
+        "rms_provider_identity_over_observed": 0.5048144025770579,
+        "rms_model_identity_over_observed": 3.2318146823307294e-05,
+        "source_eos_unchanged": true,
+        "caveat": "CubicSpline sampled density derivative; algebraic identity is not a unique diagnosis of provider-generation implementation"
+      },
+      "provider_Q4_Q5_minus_electron_mu_max_abs_MeV": 1.9774565477046622,
+      "provider_Q4_rounding_compatible_rows": 0,
+      "provider_Q4_electron_check_rows": 63,
+      "literature_saturation_check": {
+        "n0_fm3": 0.14522293925455715,
+        "E_bind_MeV": -16.263117683551627,
+        "K_MeV": 281.16451933725415,
+        "effective_mass_over_rest": 0.6343924795618185,
+        "published_saturation": {
+          "n0": 0.145,
+          "E_bind_MeV": -16.3,
+          "K_MeV": 281.0,
+          "source_url": "https://compose.obspm.fr/eos/221"
+        },
+        "compared_convention": "symmetric cold matter Yp=0.5 without leptons"
+      },
+      "high_precision_TM1_isoscalar_control": {
+        "source_precision_reference_url": "https://user.numazu-ct.ac.jp/~sumi/eos/table2/guide_EOS1.pdf",
+        "high_precision_isoscalar_parameter_fields": {
+          "ms": 511.19777,
+          "gs": 10.02892,
+          "gw": 12.61394,
+          "g2": -7.23247,
+          "g3": 0.61833,
+          "c3": 71.30747
+        },
+        "no_parameter_fitting": true,
+        "densities": [
+          0.10700153,
+          0.21846908,
+          0.44605663
+        ],
+        "baseline_pressure_error": [
+          0.06626508766209699,
+          0.10929774896932187,
+          0.2065683220414627
+        ],
+        "high_precision_pressure_error": [
+          0.06626928445613361,
+          0.10942726992091778,
+          0.20733240708629808
+        ],
+        "baseline_energy_error": [
+          0.0795935455168717,
+          0.17208264234903936,
+          0.4617266327649645
+        ],
+        "high_precision_energy_error": [
+          0.07958619065402672,
+          0.17210937037441454,
+          0.46214170859781234
+        ]
+      },
+      "provider_mr_provenance": {
+        "duplicate_of_crust_only": true,
+        "source_thermo_differs_from_crust_only": true,
+        "original_unified_number_of_rows": 455,
+        "crust_only_number_of_rows": 303,
+        "original_eos_mr_sha256": "c5ca8da6185f408b304ab62c98040e6236e5c69bf353ddd74c2e07a422982f5c",
+        "model_status": "BLOCKED_REUSED_CRUST_ONLY_MR_NOT_AN_INDEPENDENT_UNIFIED_TOV_ORACLE"
+      },
+      "independent_fixed_original_proton_fraction_control": {
+        "maximum_pressure_change_due_to_fixed_provider_Yp": 0.00012747917341471293,
+        "min_original_provider_vs_model_pressure_gap": 0.06626508766209699,
+        "max_composition_roundoff_effect_over_P_gap_ratio": 0.0006971925314835063
+      },
+      "common_crust_phase_local_css_replacement": {
+        "status": "FIXED_1P4_NATIVE_TOV_F_P1_BOTH_CONVERSIONS_VERIFIED",
+        "same_outer_inner_crust_samples": 86,
+        "identical_surface_outer_bridge": true,
+        "transition_pressure_MeV_fm3": 0.345589989266067,
+        "provider_M1p4": 1.3999999812678159,
+        "local_RMF_M1p4": 1.4000000027289818,
+        "delta_R1p4_km": 0.07404550719770064,
+        "original_R1p4_km": 13.12670681879774,
+        "local_RMF_R1p4_km": 13.20075232599544,
+        "mode_comparisons": {
+          "slow": {
+            "f": {
+              "source_provider_frequency_hz": 2087.6342459344964,
+              "newly_computed_RMF_frequency_hz": 2078.247483306881,
+              "delta_hz": -9.386762627615553
+            }
+          },
+          "rapid": {
+            "f": {
+              "source_provider_frequency_hz": 2087.363863850723,
+              "newly_computed_RMF_frequency_hz": 2078.2466383235055,
+              "delta_hz": -9.11722552721767
+            },
+            "p1": {
+              "source_provider_frequency_hz": 6577.809591162382,
+              "newly_computed_RMF_frequency_hz": 6446.637743237747,
+              "delta_hz": -131.17184792463559
+            }
+          }
+        },
+        "transition_density": [
+          0.089000002,
+          0.08906356916307694
+        ],
+        "original_source_core_thermo_sha256": "b3e19e143d926add524e8af2e1884647d6ea5b0f38b5ec64616dc9620497fc73",
+        "local_generated_core_thermo_sha256": "7436f51c14c288b8502a05149f7a167b477d90bcd166e55717f01c027a22102d"
+      },
+      "generated_RMF_plus_original_inner_crust_Maxwell_test": {
+        "status": "NATIVE_OR_STELLAR_REJECTED",
+        "transition_pressure": null,
+        "original_provider_phase6_Maxwell_not_verified": true
+      },
+      "physical_cause_status": "SOURCE_BULK_OUTPUT_MISMATCH_MEASURED_EXACT_CAUSE_NOT_YET_UNIQUELY_IDENTIFIED",
+      "numerical_source_equivalence": "FAIL_SOURCE_BULK_EQUIVALENCE"
+    },
+    "DDME2": {
+      "phase6_provider_source_sha256": "5181c53e5afaeb5e53e5677f8ceedde567cb790e6548a4128ec816c5e8f94195",
+      "independent_same_density_rows": 75,
+      "composition_fraction_max_abs_deviation": 7.2840354184283695e-06,
+      "provider_5_digit_printed_Yp_not_all_strictly_rounding_equal": true,
+      "pressure_max_abs_relative_mismatch": 5.155921929353791e-05,
+      "pressure_median_abs_relative_mismatch": 4.3852229279462996e-05,
+      "provider_energy_derivative_pressure_med_abs_relative_error": 1.8249542271683194e-06,
+      "local_RMF_energy_derivative_pressure_med_abs_relative_error": 2.5925494893246437e-08,
+      "provider_Q3_minus_Euler_max_abs_MeV": 3.71829999039619e-05,
+      "pressure_gap_energy_and_identity_decomposition": {
+        "max_abs_balance_error_MeV_fm3": 6.39059942117437e-12,
+        "rms_model_source_pressure_difference_MeV_fm3": 0.0009866482191183397,
+        "rms_energy_density_functional_term_MeV_fm3": 0.0009875620778534487,
+        "rms_provider_identity_residual_MeV_fm3": 3.736319393733322e-05,
+        "rms_model_identity_residual_MeV_fm3": 1.0283006662617574e-05,
+        "rms_energy_term_over_observed": 1.000926225494965,
+        "rms_provider_identity_over_observed": 0.03786880999057663,
+        "rms_model_identity_over_observed": 0.010422161073585456,
+        "source_eos_unchanged": true,
+        "caveat": "CubicSpline sampled density derivative; algebraic identity is not a unique diagnosis of provider-generation implementation"
+      },
+      "provider_Q4_Q5_minus_electron_mu_max_abs_MeV": 0.005136245863525346,
+      "provider_Q4_rounding_compatible_rows": 64,
+      "provider_Q4_electron_check_rows": 75,
+      "literature_saturation_check": {
+        "n0_fm3": 0.15194724167373314,
+        "E_bind_MeV": -16.141735374758127,
+        "K_MeV": 250.90207379574386,
+        "effective_mass_over_rest": 0.5719322002019896,
+        "published_saturation": {
+          "n0": 0.152,
+          "E_bind_MeV": -16.14,
+          "K_MeV": 251.0,
+          "source_url": "https://compose.obspm.fr/eos/218"
+        },
+        "compared_convention": "symmetric cold matter Yp=0.5 without leptons"
+      },
+      "high_precision_TM1_isoscalar_control": null,
+      "provider_mr_provenance": {
+        "duplicate_of_crust_only": true,
+        "source_thermo_differs_from_crust_only": true,
+        "original_unified_number_of_rows": 415,
+        "crust_only_number_of_rows": 288,
+        "original_eos_mr_sha256": "d19a955eb5f01c3936da28464af6e1672e5d68646928a07f4819478fd3486fec",
+        "model_status": "BLOCKED_REUSED_CRUST_ONLY_MR_NOT_AN_INDEPENDENT_UNIFIED_TOV_ORACLE"
+      },
+      "independent_fixed_original_proton_fraction_control": null,
+      "common_crust_phase_local_css_replacement": {
+        "status": "FIXED_1P4_NATIVE_TOV_F_P1_BOTH_CONVERSIONS_VERIFIED",
+        "same_outer_inner_crust_samples": 71,
+        "identical_surface_outer_bridge": true,
+        "transition_pressure_MeV_fm3": 0.40675999425166615,
+        "provider_M1p4": 1.4000000330023903,
+        "local_RMF_M1p4": 1.399999974461751,
+        "delta_R1p4_km": 0.00010573084890452833,
+        "original_R1p4_km": 13.230834141106351,
+        "local_RMF_R1p4_km": 13.230939871955256,
+        "mode_comparisons": {
+          "slow": {
+            "f": {
+              "source_provider_frequency_hz": 2061.47487002441,
+              "newly_computed_RMF_frequency_hz": 2061.452171239994,
+              "delta_hz": -0.022698784415752016
+            },
+            "p1": {
+              "source_provider_frequency_hz": 6510.928265869705,
+              "newly_computed_RMF_frequency_hz": 6510.943152321917,
+              "delta_hz": 0.014886452212522272
+            }
+          },
+          "rapid": {
+            "f": {
+              "source_provider_frequency_hz": 2061.1224374510125,
+              "newly_computed_RMF_frequency_hz": 2061.1002901898905,
+              "delta_hz": -0.022147261121972406
+            },
+            "p1": {
+              "source_provider_frequency_hz": 6385.538414411117,
+              "newly_computed_RMF_frequency_hz": 6385.62226786491,
+              "delta_hz": 0.08385345379338105
+            }
+          }
+        },
+        "transition_density": [
+          0.071999997,
+          0.09096281872671305
+        ],
+        "original_source_core_thermo_sha256": "5181c53e5afaeb5e53e5677f8ceedde567cb790e6548a4128ec816c5e8f94195",
+        "local_generated_core_thermo_sha256": "c684ee88dd496b0da2e891312e5d7577540afd23e079f39d78c9424f7c1fc246"
+      },
+      "generated_RMF_plus_original_inner_crust_Maxwell_test": {
+        "status": "NATIVE_OR_STELLAR_REJECTED",
+        "transition_pressure": null,
+        "original_provider_phase6_Maxwell_not_verified": true
+      },
+      "physical_cause_status": "SOURCE_BULK_OUTPUT_MISMATCH_MEASURED_EXACT_CAUSE_NOT_YET_UNIQUELY_IDENTIFIED",
+      "numerical_source_equivalence": "HIGH_AGREEMENT_NOT_BYTE_EQUAL"
+    }
+  },
+  "status": "BOUNDED_SOURCE_RECONCILIATION_COMPARISON_VERIFIED_BY_EXECUTED_SOURCES"
+}

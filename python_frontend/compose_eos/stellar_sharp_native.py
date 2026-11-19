@@ -50,6 +50,37 @@ def _one_phase_grid(hstart, surface_h, start, end, break_h, samples, *, extras=F
     return grid
 
 
+def native_shoot_waypoints(targets, source_break_s):
+    """Merge physical one-sided EOS breakpoints into a monotone DVODE path.
+
+    Return (path, selected output indices) without leaving the same phase or
+    changing the caller's requested output points. No midpoint across a
+    Maxwell jump is ever introduced; phase segmentation is upstream.
+    """
+    wanted=np.asarray(targets,dtype=float)
+    cuts=np.asarray(source_break_s,dtype=float)
+    if (wanted.ndim!=1 or cuts.ndim!=1 or len(wanted)<2 or
+        not np.all(np.isfinite(wanted)) or not np.all(np.isfinite(cuts))):
+        raise ValueError("finite 1-D requested targets and source cuts required")
+    delta=np.diff(wanted)
+    asc=bool(np.all(delta>0))
+    desc=bool(np.all(delta<0))
+    if not (asc or desc):
+        raise ValueError("requested source targets must be strictly monotone")
+    lo=float(min(wanted[0],wanted[-1]));hi=float(max(wanted[0],wanted[-1]))
+    interior=cuts[(cuts>lo)&(cuts<hi)]
+    increasing=np.unique(np.r_[wanted,interior])
+    if asc:
+        ix=np.searchsorted(increasing,wanted)
+        out=increasing
+    else:
+        ix=len(increasing)-1-np.searchsorted(increasing,wanted)
+        out=increasing[::-1]
+    if not np.array_equal(out[ix],wanted):
+        raise RuntimeError("original shooting output points not preserved")
+    return np.ascontiguousarray(out),np.asarray(ix,dtype=int)
+
+
 class _NativePhase:
     """Lightweight exact-endpoint native phase compatible with _PiecewiseSolution."""
     def __init__(self,hstart, h0,h1, sgrid, profile, nfev):
@@ -219,7 +250,7 @@ class NativeSharpCowlingDVODE:
     No interpolation or node count spans the density jump.
     """
     def __init__(self,background,settings=CowlingSettings(),*,samples=8193,
-                 method="adams"):
+                 method="adams",knot_waypoints=False):
         if not isinstance(background,SharpStellarBackground) or not background.interfaces:
             raise ValueError("native sharp Cowling needs a sharp stellar background")
         settings.validate(background)
@@ -233,6 +264,9 @@ class NativeSharpCowlingDVODE:
         self.settings=settings
         self.method=method
         self.samples=samples
+        if not isinstance(knot_waypoints,bool):
+            raise ValueError("knot_waypoints must be bool")
+        self.knot_waypoints=knot_waypoints
         self.max_interface_residual=0.
         h0=background.h_start; hsurface=settings.surface_h
         bounds=[h0,*sorted([x["h"] for x in background.interfaces
@@ -254,9 +288,13 @@ class NativeSharpCowlingDVODE:
                            st["dPhi_dr_km"],cs]
             pchip=PchipInterpolator(x,values,axis=0,extrapolate=False)
             slopes=pchip(x,nu=1)
+            source_breaks=np.asarray(background.eos.break_h,dtype=float)
+            source_breaks=source_breaks[(source_breaks>h_end)&(source_breaks<h_begin)]
+            source_break_s=np.sqrt(np.maximum(h0-source_breaks,0.))
             self._phases.append(dict(h0=h_begin,h1=h_end,mid=mid,
                 s=np.ascontiguousarray(x),vals=np.asfortranarray(values.T),
-                slopes=np.asfortranarray(slopes.T),pchip=pchip))
+                slopes=np.asfortranarray(slopes.T),pchip=pchip,
+                source_break_s=np.unique(source_break_s)))
         self._smax=float(np.sqrt(h0-hsurface))
 
     def _integrate_phase(self, phase, targets, y, omega, lib):
@@ -268,19 +306,23 @@ class NativeSharpCowlingDVODE:
             raise RuntimeError("native one-sided phase setup rejected: "+str(status.value))
         native._ACTIVE=None
         targets=np.ascontiguousarray(targets,dtype=float)
-        out=np.empty((2,len(targets)),dtype=float,order="F")
+        if self.knot_waypoints:
+            all_targets,wanted_indices=native_shoot_waypoints(targets,phase["source_break_s"])
+        else:
+            all_targets=targets;wanted_indices=np.arange(len(targets))
+        out=np.empty((2,len(all_targets)),dtype=float,order="F")
         calls=ct.c_int()
         max_ds=min(self._smax/200,
                    self.settings.max_step_h/(2*self._smax))
         lib.cowling_native_segment(omega,self.settings.ell,
                 self.settings.rtol,self.settings.atol,max_ds,
                 {"adams":10,"bdf":22}[self.method],
-                len(targets),targets,np.ascontiguousarray(y),
+                len(all_targets),all_targets,np.ascontiguousarray(y),
                 out,ct.byref(calls),ct.byref(status))
         if status.value:
             raise RuntimeError("native one-sided phase DVODE rejected: "
                                +str(status.value))
-        return out,int(calls.value)
+        return np.asfortranarray(out[:,wanted_indices]),int(calls.value)
 
     def _matched_shot(self,frequency_hz,conversion,profile_points=0):
         if conversion not in ("slow","rapid"):
@@ -411,5 +453,8 @@ class NativeSharpCowlingDVODE:
                     W_nodes_per_phase=wcount,V_nodes_per_phase=vcount,
                     profile=profile,nfev=shot["nfev"],
                     backend="Fortran DVODE sharp "+self.method.capitalize(),
+                    knot_waypoints_used=self.knot_waypoints,
+                    source_break_waypoint_count=sum(len(p["source_break_s"])
+                          for p in self._phases) if self.knot_waypoints else 0,
                     background_backend=self.background.config.get("backend",
                        "Python sharp reference"))

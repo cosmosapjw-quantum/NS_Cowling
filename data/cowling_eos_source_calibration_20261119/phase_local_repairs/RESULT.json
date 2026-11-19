@@ -1,0 +1,570 @@
+{
+  "schema": "ns_cowling.original_unified_phase_local_repair.v1",
+  "reference_source_sha256": "31e7b1d14587c45cef4371b94a5766c0bbbc5056b210272d7480b4b46a77f55b",
+  "success_means": "finite matching and actual same-phase causal stellar acceptance separately",
+  "physical_phase_prohibition": "no first-law smoothing through original Iphase7->6 seam",
+  "cases": {
+    "FSU2": {
+      "model": "FSU2",
+      "source_hash": "c5ab88b45f63643e4fba0de15add754d5ea052da493d947c47c5416455b0171b",
+      "physical_tiers": {
+        "source_original": "P,n,epsilon,Q3 unmodified; only explicit thermo-only projection",
+        "euler_q3_only": "P,n,epsilon original, Q3 replaced by algebraic (epsilon+P)/n",
+        "phasewise_firstlaw_integrated": "P,n original, epsilon/Q3 re-integrated *within each original phase* anchored separately, source phase seam unbridged"
+      },
+      "original_phase_layout": {
+        "Iphase7": [
+          217,
+          269
+        ],
+        "Iphase6": [
+          269,
+          362
+        ]
+      },
+      "original_mu_gap_MeV": 0.6515151027000456,
+      "variants": {
+        "raw_q3_original": {
+          "status": "READ_ONLY_METHOD_ATTEMPT",
+          "original_density_pressure_preserved": true,
+          "raw_epsilon_preserved": true,
+          "mu_gap_MeV": 0.6515151027000456,
+          "firstlaw_changes_low_maxabs_MeV": 0.0,
+          "firstlaw_changes_high_maxabs_MeV": 0.0,
+          "maxwell": {
+            "status": "NATIVE_REJECTED",
+            "error": {
+              "type": "NativeExecutionError",
+              "error": "Fortran operation 'maxwell-transition' failed with exit code 3: high-density phase: provider Q3 chemical potential disagrees with the Euler value (relative tolerance 5e-4)"
+            }
+          },
+          "css": {
+            "status": "NATIVE_REJECTED",
+            "error": {
+              "type": "NativeExecutionError",
+              "error": "Fortran operation 'match-core' failed with exit code 3: source rows violate the provider Q3 Euler relation mu_B = F + P/n_B (relative tolerance 5e-4)"
+            }
+          }
+        },
+        "euler_q3_only": {
+          "status": "READ_ONLY_METHOD_ATTEMPT",
+          "original_density_pressure_preserved": true,
+          "raw_epsilon_preserved": true,
+          "mu_gap_MeV": 0.34011563169997316,
+          "firstlaw_changes_low_maxabs_MeV": 0.0,
+          "firstlaw_changes_high_maxabs_MeV": 0.0,
+          "maxwell": {
+            "status": "NATIVE_REJECTED",
+            "error": {
+              "type": "NativeExecutionError",
+              "error": "Fortran operation 'maxwell-transition' failed with exit code 3: high-density phase: P(mu_B) interpolation violates positive density or mechanical stability"
+            }
+          },
+          "css": {
+            "status": "PASS_NATIVE_FINITE",
+            "transition_pressure_MeV_fm3": 0.2546799995162962,
+            "n_low": 0.054000001,
+            "n_high": 0.06476371328405575,
+            "energy_jump_MeV_fm3": 10.204135578510936,
+            "native_consistency": true,
+            "stellar": {
+              "status": "THREE_LAYER_BLOCKED",
+              "error": {
+                "type": "ValueError",
+                "error": "upper smooth interval 93 is not causal and stable"
+              }
+            }
+          }
+        },
+        "phasewise_firstlaw_integrated": {
+          "status": "READ_ONLY_METHOD_ATTEMPT",
+          "original_density_pressure_preserved": true,
+          "raw_epsilon_preserved": false,
+          "mu_gap_MeV": 0.3411920009406231,
+          "firstlaw_changes_low_maxabs_MeV": 0.0010782708935023907,
+          "firstlaw_changes_high_maxabs_MeV": 0.5568850485556022,
+          "maxwell": {
+            "status": "NATIVE_REJECTED",
+            "error": {
+              "type": "NativeExecutionError",
+              "error": "Fortran operation 'maxwell-transition' failed with exit code 3: the two phases have no overlapping baryon-chemical-potential interval"
+            }
+          },
+          "css": {
+            "status": "PASS_NATIVE_FINITE",
+            "transition_pressure_MeV_fm3": 0.2546799995162962,
+            "n_low": 0.054000001,
+            "n_high": 0.06472236979105538,
+            "energy_jump_MeV_fm3": 10.164929882261752,
+            "native_consistency": true,
+            "stellar": {
+              "status": "NATIVE_TOV_AND_COWLING_ATTEMPTED",
+              "evidence": {
+                "native_tov": {
+                  "mass_msun": 1.164166433808427,
+                  "R_km": 13.982780083921172,
+                  "interfaces": [
+                    {
+                      "h": 0.01934125026422084,
+                      "r_km": 12.518248170414786,
+                      "m_geom_km": 1.6711438188543002,
+                      "r_jump_km": 0.0,
+                      "m_jump_km": 0.0,
+                      "p_MeV_fm3": 0.2546799995162962,
+                      "n_low_fm3": 0.054000001,
+                      "n_high_fm3": 0.06472236979105538,
+                      "epsilon_low_MeV_fm3": 50.9379467887885,
+                      "epsilon_high_MeV_fm3": 61.102876671050254
+                    }
+                  ],
+                  "seconds": 0.17778289201669395
+                },
+                "independent_python_tov": {
+                  "mass_msun": 1.1641659892450669,
+                  "R_km": 13.98278018214479
+                },
+                "mass_delta_msun": 4.4456336012466124e-07,
+                "radius_delta_km": -9.82236176838569e-08,
+                "modes": {
+                  "slow": {
+                    "status": "NATIVE_MODES_VERIFIED",
+                    "modes": [
+                      {
+                        "label": "f",
+                        "frequency_hz": 1818.2171280009838,
+                        "matched_relative": -4.146542534930405e-08,
+                        "join_relative": 4.146542536738051e-08,
+                        "surface_BC_relative": 0.0,
+                        "interface_count": 1,
+                        "interface_max_traction": 5.341802764120747e-16,
+                        "W_nodes": 0,
+                        "V_nodes": 0
+                      },
+                      {
+                        "label": "p1",
+                        "frequency_hz": 5012.311812483831,
+                        "matched_relative": -2.016612031364262e-06,
+                        "join_relative": 2.016612031330835e-06,
+                        "surface_BC_relative": 0.0,
+                        "interface_count": 1,
+                        "interface_max_traction": 0.0,
+                        "W_nodes": 1,
+                        "V_nodes": 1
+                      }
+                    ],
+                    "detected_brackets": 6
+                  },
+                  "rapid": {
+                    "status": "NATIVE_MODES_VERIFIED",
+                    "modes": [
+                      {
+                        "label": "f",
+                        "frequency_hz": 1817.8336624168119,
+                        "matched_relative": -5.968273404796952e-07,
+                        "join_relative": 5.968273404716119e-07,
+                        "surface_BC_relative": 0.0,
+                        "interface_count": 1,
+                        "interface_max_traction": 3.5643919790440646e-16,
+                        "W_nodes": 0,
+                        "V_nodes": 0
+                      },
+                      {
+                        "label": "p1",
+                        "frequency_hz": 4974.883161055554,
+                        "matched_relative": 1.0433966780887172e-06,
+                        "join_relative": 1.0433966781121286e-06,
+                        "surface_BC_relative": 0.0,
+                        "interface_count": 1,
+                        "interface_max_traction": 1.1973119005143364e-16,
+                        "W_nodes": 1,
+                        "V_nodes": 1
+                      }
+                    ],
+                    "detected_brackets": 6
+                  }
+                },
+                "source": "FSU2",
+                "matching": "phasewise_firstlaw_integrated_css"
+              },
+              "contract_path": "data/cowling_eos_source_calibration_20261119/phase_local_repairs/whole/FSU2/phasewise_firstlaw_integrated/css/REPRESENTATION.json"
+            }
+          }
+        }
+      }
+    },
+    "TM1e": {
+      "model": "TM1e",
+      "source_hash": "b3e19e143d926add524e8af2e1884647d6ea5b0f38b5ec64616dc9620497fc73",
+      "physical_tiers": {
+        "source_original": "P,n,epsilon,Q3 unmodified; only explicit thermo-only projection",
+        "euler_q3_only": "P,n,epsilon original, Q3 replaced by algebraic (epsilon+P)/n",
+        "phasewise_firstlaw_integrated": "P,n original, epsilon/Q3 re-integrated *within each original phase* anchored separately, source phase seam unbridged"
+      },
+      "original_phase_layout": {
+        "Iphase7": [
+          217,
+          303
+        ],
+        "Iphase6": [
+          303,
+          370
+        ]
+      },
+      "original_mu_gap_MeV": 1.0397007739999253,
+      "variants": {
+        "raw_q3_original": {
+          "status": "READ_ONLY_METHOD_ATTEMPT",
+          "original_density_pressure_preserved": true,
+          "raw_epsilon_preserved": true,
+          "mu_gap_MeV": 1.0397007739999253,
+          "firstlaw_changes_low_maxabs_MeV": 0.0,
+          "firstlaw_changes_high_maxabs_MeV": 0.0,
+          "maxwell": {
+            "status": "NATIVE_REJECTED",
+            "error": {
+              "type": "NativeExecutionError",
+              "error": "Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability"
+            }
+          },
+          "css": {
+            "status": "NATIVE_REJECTED",
+            "error": {
+              "type": "NativeExecutionError",
+              "error": "Fortran operation 'match-core' failed with exit code 3: source rows violate the provider Q3 Euler relation mu_B = F + P/n_B (relative tolerance 5e-4)"
+            }
+          }
+        },
+        "euler_q3_only": {
+          "status": "READ_ONLY_METHOD_ATTEMPT",
+          "original_density_pressure_preserved": true,
+          "raw_epsilon_preserved": true,
+          "mu_gap_MeV": 0.05820880199985368,
+          "firstlaw_changes_low_maxabs_MeV": 0.0,
+          "firstlaw_changes_high_maxabs_MeV": 0.0,
+          "maxwell": {
+            "status": "NATIVE_REJECTED",
+            "error": {
+              "type": "NativeExecutionError",
+              "error": "Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability"
+            }
+          },
+          "css": {
+            "status": "PASS_NATIVE_FINITE",
+            "transition_pressure_MeV_fm3": 0.345589989266067,
+            "n_low": 0.089000002,
+            "n_high": 0.12229719856656412,
+            "energy_jump_MeV_fm3": 31.745222014553164,
+            "native_consistency": true,
+            "stellar": {
+              "status": "THREE_LAYER_BLOCKED",
+              "error": {
+                "type": "ValueError",
+                "error": "upper smooth interval 34 is not causal and stable"
+              }
+            }
+          }
+        },
+        "phasewise_firstlaw_integrated": {
+          "status": "READ_ONLY_METHOD_ATTEMPT",
+          "original_density_pressure_preserved": true,
+          "raw_epsilon_preserved": false,
+          "mu_gap_MeV": 0.11438952772891753,
+          "firstlaw_changes_low_maxabs_MeV": 0.056180725729039864,
+          "firstlaw_changes_high_maxabs_MeV": 0.4750309732619948,
+          "maxwell": {
+            "status": "NATIVE_REJECTED",
+            "error": {
+              "type": "NativeExecutionError",
+              "error": "Fortran operation 'maxwell-transition' failed with exit code 3: the two phases have no overlapping baryon-chemical-potential interval"
+            }
+          },
+          "css": {
+            "status": "PASS_NATIVE_FINITE",
+            "transition_pressure_MeV_fm3": 0.345589989266067,
+            "n_low": 0.089000002,
+            "n_high": 0.1248967519639553,
+            "energy_jump_MeV_fm3": 34.22159413001852,
+            "native_consistency": true,
+            "stellar": {
+              "status": "NATIVE_TOV_AND_COWLING_ATTEMPTED",
+              "evidence": {
+                "native_tov": {
+                  "mass_msun": 1.034577923025783,
+                  "R_km": 13.001027410159496,
+                  "interfaces": [
+                    {
+                      "h": 0.026005455971304856,
+                      "r_km": 11.150658016678257,
+                      "m_geom_km": 1.4803958366214904,
+                      "r_jump_km": 0.0,
+                      "m_jump_km": 0.0,
+                      "p_MeV_fm3": 0.345589989266067,
+                      "n_low_fm3": 0.089000002,
+                      "n_high_fm3": 0.1248967519639553,
+                      "epsilon_low_MeV_fm3": 84.50114262784015,
+                      "epsilon_high_MeV_fm3": 118.72273675785867
+                    }
+                  ],
+                  "seconds": 0.19076283904723823
+                },
+                "independent_python_tov": {
+                  "mass_msun": 1.0345776279514436,
+                  "R_km": 13.001029433729379
+                },
+                "mass_delta_msun": 2.950743394070088e-07,
+                "radius_delta_km": -2.02356988232566e-06,
+                "modes": {
+                  "slow": {
+                    "status": "NATIVE_MODES_VERIFIED",
+                    "modes": [
+                      {
+                        "label": "f",
+                        "frequency_hz": 1993.928330367541,
+                        "matched_relative": -1.824208635542564e-06,
+                        "join_relative": 1.824208635519973e-06,
+                        "surface_BC_relative": 0.0,
+                        "interface_count": 1,
+                        "interface_max_traction": 0.0,
+                        "W_nodes": 0,
+                        "V_nodes": 0
+                      },
+                      {
+                        "label": "p1",
+                        "frequency_hz": 5936.434970729994,
+                        "matched_relative": -4.58741691076176e-06,
+                        "join_relative": 4.5874169107559295e-06,
+                        "surface_BC_relative": 0.0,
+                        "interface_count": 1,
+                        "interface_max_traction": 1.2108171259366836e-16,
+                        "W_nodes": 1,
+                        "V_nodes": 1
+                      }
+                    ],
+                    "detected_brackets": 6
+                  },
+                  "rapid": {
+                    "status": "PARTIAL_MODE_SET",
+                    "modes": [
+                      {
+                        "label": "f",
+                        "frequency_hz": 1993.3069636588846,
+                        "matched_relative": 2.9661082621173776e-06,
+                        "join_relative": 2.9661082621163658e-06,
+                        "surface_BC_relative": 0.0,
+                        "interface_count": 1,
+                        "interface_max_traction": 1.3051878970352913e-15,
+                        "W_nodes": 0,
+                        "V_nodes": 0
+                      }
+                    ],
+                    "detected_brackets": 6
+                  }
+                },
+                "source": "TM1e",
+                "matching": "phasewise_firstlaw_integrated_css"
+              },
+              "contract_path": "data/cowling_eos_source_calibration_20261119/phase_local_repairs/whole/TM1e/phasewise_firstlaw_integrated/css/REPRESENTATION.json"
+            }
+          }
+        }
+      }
+    },
+    "DDME2": {
+      "model": "DDME2",
+      "source_hash": "5181c53e5afaeb5e53e5677f8ceedde567cb790e6548a4128ec816c5e8f94195",
+      "physical_tiers": {
+        "source_original": "P,n,epsilon,Q3 unmodified; only explicit thermo-only projection",
+        "euler_q3_only": "P,n,epsilon original, Q3 replaced by algebraic (epsilon+P)/n",
+        "phasewise_firstlaw_integrated": "P,n original, epsilon/Q3 re-integrated *within each original phase* anchored separately, source phase seam unbridged"
+      },
+      "original_phase_layout": {
+        "Iphase7": [
+          217,
+          288
+        ],
+        "Iphase6": [
+          288,
+          369
+        ]
+      },
+      "original_mu_gap_MeV": 0.28368504600018696,
+      "variants": {
+        "raw_q3_original": {
+          "status": "READ_ONLY_METHOD_ATTEMPT",
+          "original_density_pressure_preserved": true,
+          "raw_epsilon_preserved": true,
+          "mu_gap_MeV": 0.28368504600018696,
+          "firstlaw_changes_low_maxabs_MeV": 0.0,
+          "firstlaw_changes_high_maxabs_MeV": 0.0,
+          "maxwell": {
+            "status": "NATIVE_REJECTED",
+            "error": {
+              "type": "NativeExecutionError",
+              "error": "Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability"
+            }
+          },
+          "css": {
+            "status": "PASS_NATIVE_FINITE",
+            "transition_pressure_MeV_fm3": 0.40675999425166615,
+            "n_low": 0.071999997,
+            "n_high": 0.09096856823196578,
+            "energy_jump_MeV_fm3": 18.086930521189004,
+            "native_consistency": true,
+            "stellar": {
+              "status": "THREE_LAYER_BLOCKED",
+              "error": {
+                "type": "ValueError",
+                "error": "upper smooth interval 68 is not causal and stable"
+              }
+            }
+          }
+        },
+        "euler_q3_only": {
+          "status": "READ_ONLY_METHOD_ATTEMPT",
+          "original_density_pressure_preserved": true,
+          "raw_epsilon_preserved": true,
+          "mu_gap_MeV": 0.2015304354001728,
+          "firstlaw_changes_low_maxabs_MeV": 0.0,
+          "firstlaw_changes_high_maxabs_MeV": 0.0,
+          "maxwell": {
+            "status": "NATIVE_REJECTED",
+            "error": {
+              "type": "NativeExecutionError",
+              "error": "Fortran operation 'maxwell-transition' failed with exit code 3: low-density phase: P(mu_B) interpolation violates positive density or mechanical stability"
+            }
+          },
+          "css": {
+            "status": "PASS_NATIVE_FINITE",
+            "transition_pressure_MeV_fm3": 0.40675999425166615,
+            "n_low": 0.071999997,
+            "n_high": 0.09096856823196578,
+            "energy_jump_MeV_fm3": 18.086930521189004,
+            "native_consistency": true,
+            "stellar": {
+              "status": "THREE_LAYER_BLOCKED",
+              "error": {
+                "type": "ValueError",
+                "error": "upper smooth interval 68 is not causal and stable"
+              }
+            }
+          }
+        },
+        "phasewise_firstlaw_integrated": {
+          "status": "READ_ONLY_METHOD_ATTEMPT",
+          "original_density_pressure_preserved": true,
+          "raw_epsilon_preserved": false,
+          "mu_gap_MeV": 0.20078084376530114,
+          "firstlaw_changes_low_maxabs_MeV": 0.002718674866369572,
+          "firstlaw_changes_high_maxabs_MeV": 0.004847733046430458,
+          "maxwell": {
+            "status": "NATIVE_REJECTED",
+            "error": {
+              "type": "NativeExecutionError",
+              "error": "Fortran operation 'maxwell-transition' failed with exit code 3: the two phases have no overlapping baryon-chemical-potential interval"
+            }
+          },
+          "css": {
+            "status": "PASS_NATIVE_FINITE",
+            "transition_pressure_MeV_fm3": 0.40675999425166615,
+            "n_low": 0.071999997,
+            "n_high": 0.09098438506485386,
+            "energy_jump_MeV_fm3": 18.10202643363246,
+            "native_consistency": true,
+            "stellar": {
+              "status": "NATIVE_TOV_AND_COWLING_ATTEMPTED",
+              "evidence": {
+                "native_tov": {
+                  "mass_msun": 1.0860847631401926,
+                  "R_km": 13.071445409000555,
+                  "interfaces": [
+                    {
+                      "h": 0.02513673077229406,
+                      "r_km": 11.348066556452595,
+                      "m_geom_km": 1.547392287178994,
+                      "r_jump_km": 0.0,
+                      "m_jump_km": 0.0,
+                      "p_MeV_fm3": 0.40675999425166615,
+                      "n_low_fm3": 0.071999997,
+                      "n_high_fm3": 0.09098438506485386,
+                      "epsilon_low_MeV_fm3": 68.24680126160807,
+                      "epsilon_high_MeV_fm3": 86.34882769524053
+                    }
+                  ],
+                  "seconds": 0.18486922699958086
+                },
+                "independent_python_tov": {
+                  "mass_msun": 1.0860850065263286,
+                  "R_km": 13.071444138497386
+                },
+                "mass_delta_msun": -2.4338613591190494e-07,
+                "radius_delta_km": 1.2705031693371893e-06,
+                "modes": {
+                  "slow": {
+                    "status": "NATIVE_MODES_VERIFIED",
+                    "modes": [
+                      {
+                        "label": "f",
+                        "frequency_hz": 1988.709480896545,
+                        "matched_relative": 1.5278206467395372e-07,
+                        "join_relative": 1.5278206466762567e-07,
+                        "surface_BC_relative": 0.0,
+                        "interface_count": 1,
+                        "interface_max_traction": 2.1902712728005775e-15,
+                        "W_nodes": 0,
+                        "V_nodes": 0
+                      },
+                      {
+                        "label": "p1",
+                        "frequency_hz": 6065.0512279991935,
+                        "matched_relative": 2.6146721660786713e-06,
+                        "join_relative": 2.614672166034957e-06,
+                        "surface_BC_relative": 5.376064928939497e-18,
+                        "interface_count": 1,
+                        "interface_max_traction": 1.5645275686429738e-16,
+                        "W_nodes": 1,
+                        "V_nodes": 1
+                      }
+                    ],
+                    "detected_brackets": 6
+                  },
+                  "rapid": {
+                    "status": "NATIVE_MODES_VERIFIED",
+                    "modes": [
+                      {
+                        "label": "f",
+                        "frequency_hz": 1988.00350791787,
+                        "matched_relative": -1.4147708821577334e-06,
+                        "join_relative": 1.414770882169593e-06,
+                        "surface_BC_relative": 0.0,
+                        "interface_count": 1,
+                        "interface_max_traction": 8.774314781133846e-16,
+                        "W_nodes": 0,
+                        "V_nodes": 0
+                      },
+                      {
+                        "label": "p1",
+                        "frequency_hz": 5866.616865852032,
+                        "matched_relative": 3.9645605995481125e-06,
+                        "join_relative": 3.964560599511511e-06,
+                        "surface_BC_relative": 0.0,
+                        "interface_count": 1,
+                        "interface_max_traction": 2.235939910655411e-16,
+                        "W_nodes": 1,
+                        "V_nodes": 1
+                      }
+                    ],
+                    "detected_brackets": 6
+                  }
+                },
+                "source": "DDME2",
+                "matching": "phasewise_firstlaw_integrated_css"
+              },
+              "contract_path": "data/cowling_eos_source_calibration_20261119/phase_local_repairs/whole/DDME2/phasewise_firstlaw_integrated/css/REPRESENTATION.json"
+            }
+          }
+        }
+      }
+    }
+  },
+  "status": "COMPLETE_BOUNDED_VARIANT_SCREEN"
+}

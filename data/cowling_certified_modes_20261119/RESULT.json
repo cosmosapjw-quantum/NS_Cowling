@@ -1,0 +1,216 @@
+{
+  "schema": "ns_cowling.sharp_cowling_reference_gated.v1",
+  "original_parent_commit": "1e7823ecd62a2914d40c0948d3811410b1ea16da",
+  "immutable_derived_source_zip_sha256": "299de43bb4f0a87ebfc4f1139ab3c8b51c344937ec3637cdff644e9ca8ab2c04",
+  "source_05_archive": "data/eos_missing_data_recalc_20261119/artifacts/EOS_ALL_REQUESTED_SOURCE_LOCKED_NESTED_20261119.zip",
+  "sources_are_source_derived_not_original_Pais_or_SPG": true,
+  "target_absolute_frequency_comparison_tolerance_Hz": 0.05,
+  "direct_oracle": "phasewise DOP853 on original analytic EOS",
+  "native_backend": "phasewise Fortran DVODE on PCHIP coefficients",
+  "modes": {
+    "SPG_M3_CSS_0p7_slow_p1": {
+      "status": "REFERENCE_ONLY_NATIVE_NOT_CERTIFIED",
+      "frequency_hz": 3736.2088951581254,
+      "selected_backend": "PYTHON_DOP853_DIRECT_EOS",
+      "central_density_fm3": 0.192510767556007,
+      "conversion": "slow",
+      "expected": "p1",
+      "bracket_hz": [
+        3710.0,
+        3760.0
+      ],
+      "node_gate": "STRICT_P1",
+      "expected_mode_identification": "STRICT_CONFIRMED",
+      "native_attempts": [
+        {
+          "samples": 4097,
+          "status": "REJECTED",
+          "reason": "RuntimeError: mode root not physically admitted: matching=6.919824879908166e-05 join=6.919824879905743e-05"
+        },
+        {
+          "samples": 8193,
+          "status": "REJECTED",
+          "reason": "RuntimeError: mode root not physically admitted: matching=2.262413926730167e-05 join=2.262413926736612e-05"
+        }
+      ],
+      "native_convergence": {
+        "status": "UNRESOLVED",
+        "reason": "INSUFFICIENT_ADMITTED_MODES",
+        "native_converged": false,
+        "comparison": null
+      },
+      "python_reference": {
+        "status": "DIRECT_EOS_REFERENCE_ACCEPTED",
+        "frequency_hz": 3736.2088951581254,
+        "relative_join_mismatch": 3.8501943474663964e-10,
+        "matching_residual": 3.8501943091377766e-10,
+        "mass_MSun": 0.6999996323805965,
+        "radius_km": 14.597943099011891,
+        "mass_deviation_from_native_Msun": 4.531900144044698e-08,
+        "reference_nodes": {
+          "W_nodes_per_phase": 1,
+          "V_nodes_per_phase": 1,
+          "n_phases": 2,
+          "one_sided_at_every_sharp_interface": true,
+          "across_interface_zero_counts_included": false
+        },
+        "backend": "PYTHON_DOP853_DIRECT_EOS"
+      },
+      "native_minus_python_reference_hz": null,
+      "native_reference_difference_hz": null,
+      "absolute_tolerance_hz": 0.05,
+      "reference_does_not_establish_global_mode_family": true,
+      "reference_physics": "equilibrium barotropic relativistic Cowling",
+      "source_eos_replaced": false,
+      "source_contract_sha256": "f23fb7020c9de1b65c99ac37690840f7a4d6611f3372409b015d8c3bd7e32f3b",
+      "reference_target_mass_Msun": 0.7,
+      "elapsed_seconds": 46.896392977039795
+    },
+    "SPG_M3_CSS_1p4_slow_W1V2": {
+      "status": "REFERENCE_ONLY_NATIVE_NOT_CERTIFIED",
+      "frequency_hz": 5329.202673891677,
+      "selected_backend": "PYTHON_DOP853_DIRECT_EOS",
+      "central_density_fm3": 0.304225985123765,
+      "conversion": "slow",
+      "expected": "p1",
+      "bracket_hz": [
+        5290.0,
+        5360.0
+      ],
+      "node_gate": "W1_V2_CLASSIFICATION_UNRESOLVED",
+      "expected_mode_identification": "CONDITIONAL_NUMERIC_FAMILY_NOT_STRICT_P1",
+      "native_attempts": [
+        {
+          "samples": 4097,
+          "status": "ADMITTED",
+          "frequency_hz": 5328.5383102545775,
+          "relative_join_mismatch": 5.413826481551833e-07,
+          "matching_residual": 5.413826481018155e-07,
+          "W_nodes_per_phase": 1,
+          "V_nodes_per_phase": 2
+        },
+        {
+          "samples": 8193,
+          "status": "ADMITTED",
+          "frequency_hz": 5329.147442735877,
+          "relative_join_mismatch": 5.523281410014263e-08,
+          "matching_residual": -5.523281407686404e-08,
+          "W_nodes_per_phase": 1,
+          "V_nodes_per_phase": 2
+        }
+      ],
+      "native_convergence": {
+        "status": "UNRESOLVED",
+        "reason": "COEFFICIENT_SAMPLING_NOT_CONVERGED",
+        "native_converged": false,
+        "comparison": {
+          "samples": [
+            4097,
+            8193
+          ],
+          "difference_hz": 0.609132481299639
+        }
+      },
+      "python_reference": {
+        "status": "DIRECT_EOS_REFERENCE_ACCEPTED",
+        "frequency_hz": 5329.202673891677,
+        "relative_join_mismatch": 7.475675445910132e-10,
+        "matching_residual": -7.47567544110717e-10,
+        "mass_MSun": 1.399999588341691,
+        "radius_km": 14.415691505578028,
+        "mass_deviation_from_native_Msun": 4.379186768765919e-08,
+        "reference_nodes": {
+          "W_nodes_per_phase": 1,
+          "V_nodes_per_phase": 2,
+          "n_phases": 2,
+          "one_sided_at_every_sharp_interface": true,
+          "across_interface_zero_counts_included": false
+        },
+        "backend": "PYTHON_DOP853_DIRECT_EOS"
+      },
+      "native_minus_python_reference_hz": null,
+      "native_reference_difference_hz": null,
+      "absolute_tolerance_hz": 0.05,
+      "reference_does_not_establish_global_mode_family": true,
+      "reference_physics": "equilibrium barotropic relativistic Cowling",
+      "source_eos_replaced": false,
+      "source_contract_sha256": "f23fb7020c9de1b65c99ac37690840f7a4d6611f3372409b015d8c3bd7e32f3b",
+      "reference_target_mass_Msun": 1.4,
+      "elapsed_seconds": 36.661392987007275
+    },
+    "SPG_M2_MAXWELL_1p4_slow_p1": {
+      "status": "CERTIFIED_NATIVE_REFERENCE_AGREEMENT",
+      "frequency_hz": 5148.004699553669,
+      "selected_backend": "FORTRAN_DVODE_PCHIP_CROSSCHECKED",
+      "central_density_fm3": 0.30385128926615257,
+      "conversion": "slow",
+      "expected": "p1",
+      "bracket_hz": [
+        5130.0,
+        5160.0
+      ],
+      "node_gate": "STRICT_P1",
+      "expected_mode_identification": "STRICT_CONFIRMED",
+      "native_attempts": [
+        {
+          "samples": 8193,
+          "status": "ADMITTED",
+          "frequency_hz": 5147.989212195709,
+          "relative_join_mismatch": 1.267253143250351e-07,
+          "matching_residual": 1.267253143140278e-07,
+          "W_nodes_per_phase": 1,
+          "V_nodes_per_phase": 1
+        },
+        {
+          "samples": 16385,
+          "status": "ADMITTED",
+          "frequency_hz": 5148.004699553669,
+          "relative_join_mismatch": 8.833847428617186e-07,
+          "matching_residual": 8.833847428420305e-07,
+          "W_nodes_per_phase": 1,
+          "V_nodes_per_phase": 1
+        }
+      ],
+      "native_convergence": {
+        "status": "NATIVE_SAMPLED_CANDIDATE_CONVERGED",
+        "reason": "ALL_NATIVE_SAMPLE_GATES_PASS",
+        "native_converged": true,
+        "comparison": {
+          "samples": [
+            8193,
+            16385
+          ],
+          "difference_hz": 0.015487357959500514,
+          "eigenfunction_overlap": 0.9999999988940715
+        }
+      },
+      "python_reference": {
+        "status": "DIRECT_EOS_REFERENCE_ACCEPTED",
+        "frequency_hz": 5148.0010293536725,
+        "relative_join_mismatch": 1.3274330127405443e-09,
+        "matching_residual": -1.327433012801281e-09,
+        "mass_MSun": 1.3999999194700674,
+        "radius_km": 14.420419591771497,
+        "mass_deviation_from_native_Msun": 1.9012104335303093e-08,
+        "reference_nodes": {
+          "W_nodes_per_phase": 1,
+          "V_nodes_per_phase": 1,
+          "n_phases": 2,
+          "one_sided_at_every_sharp_interface": true,
+          "across_interface_zero_counts_included": false
+        },
+        "backend": "PYTHON_DOP853_DIRECT_EOS"
+      },
+      "native_minus_python_reference_hz": 0.003670199996122392,
+      "native_reference_difference_hz": 0.003670199996122392,
+      "absolute_tolerance_hz": 0.05,
+      "reference_does_not_establish_global_mode_family": true,
+      "reference_physics": "equilibrium barotropic relativistic Cowling",
+      "source_eos_replaced": false,
+      "source_contract_sha256": "59b7cb4671347c33c25133e6497e8be346b4e5b4f871eece9bcaf59155fd8765",
+      "reference_target_mass_Msun": 1.4,
+      "elapsed_seconds": 39.30644340504659
+    }
+  },
+  "status": "BOUNDED_REFERENCE_GATED_RESULTS_RECORDED"
+}

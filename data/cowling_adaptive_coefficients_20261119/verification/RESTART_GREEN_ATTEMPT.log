@@ -1,0 +1,148 @@
+F
+=================================== FAILURES ===================================
+_______ test_native_direct_source_restarts_at_resolved_sound_speed_jumps _______
+
+    @pytest.mark.slow
+    def test_native_direct_source_restarts_at_resolved_sound_speed_jumps():
+        eos=source_eos()
+        bg=solve_sharp_background_native(eos,.192510767556007,
+            surface_h=3e-8,rtol=3e-10,atol=3e-11,
+            max_step_h=.004,native_samples=2049)
+        settings=[CowlingSettings(surface_h=3e-8,rtol=r,
+                     atol=r*1e-3,max_step_h=step)
+                  for r,step in ((1e-8,.002),(1e-9,.001),(1e-10,.0005))]
+        frequencies=[]
+        for setting in settings:
+            native=NativeSharpCowlingDVODE(bg,setting,samples=129,
+                  coefficient_backend="direct_source",
+                  source_restart_relative_jump=.01)
+            assert native.source_restart_count>=30
+>           mode=native.solve_mode((3710.,3760.),conversion="slow",
+                                   profile_points=350)
+
+python_frontend/tests/test_sharp_cowling_exact_source_callback_20261119.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/stellar_sharp_native.py:513: in solve_mode
+    root,info=brentq(lambda f:self.matching_residual(f,conversion=conversion),
+../../.local/lib/python3.12/site-packages/scipy/optimize/_zeros_py.py:846: in brentq
+    r = _zeros._brentq(f, a, b, xtol, rtol, maxiter, args, full_output, disp)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.local/lib/python3.12/site-packages/scipy/optimize/_zeros_py.py:94: in f_raise
+    fx = f(x, *args)
+         ^^^^^^^^^^^
+python_frontend/compose_eos/stellar_sharp_native.py:513: in <lambda>
+    root,info=brentq(lambda f:self.matching_residual(f,conversion=conversion),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+python_frontend/compose_eos/stellar_sharp_native.py:497: in matching_residual
+    return self._matched_shot(frequency_hz,conversion,0)["residual"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+python_frontend/compose_eos/stellar_sharp_native.py:467: in _matched_shot
+    yy,calls=self._integrate_phase(phase,xs_back,y,omega,lib)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <compose_eos.stellar_sharp_native.NativeSharpCowlingDVODE object at 0x7c97e6ca3ef0>
+phase = {'h0': 0.027013361226005884, 'h1': 3e-08, 'mid': 0.013506695613002943, 's': array([0.24604103, 0.24759874, 0.24915645,...2,
+       0.28498373, 0.28654143, 0.28809914, 0.28965685, 0.29121456,
+       0.29277227, 0.29432997, 0.29588768]), ...}
+targets = array([0.29588768, 0.24604103]), y = array([ 1.        , -0.05091767])
+omega = 0.07775585031440739
+lib = <CDLL '/tmp/ns_cowling_native_dvode/libcowling_8304f2f09e71743fad.so', handle 139e7c70 at 0x7c97f4c04500>
+
+    def _integrate_phase(self, phase, targets, y, omega, lib):
+        x=phase["s"]
+        status=ct.c_int()
+        lib.cowling_native_setup(len(x),x,phase["vals"],phase["slopes"],
+                                  ct.byref(status))
+        if status.value:
+            raise RuntimeError("native one-sided phase setup rejected: "+str(status.value))
+        native._ACTIVE=None
+        targets=np.ascontiguousarray(targets,dtype=float)
+        # Physical source discontinuity stops are stronger than ordinary
+        # output waypoints: DVODE is restarted at each selected cs² jump.
+        if self.coefficient_backend=="direct_source":
+            cut_s=(phase["source_break_s"] if self.knot_waypoints
+                   else phase["source_restart_s"])
+        elif self.knot_waypoints:
+            cut_s=phase["source_break_s"]
+        else:
+            cut_s=np.asarray([],float)
+        if len(cut_s):
+            all_targets,wanted_indices=native_shoot_waypoints(targets,cut_s)
+        else:
+            all_targets=targets;wanted_indices=np.arange(len(targets))
+        restart_indices=np.flatnonzero(np.isin(all_targets,phase["source_restart_s"]))
+        restart_indices=restart_indices[(restart_indices>0)&
+                                         (restart_indices<len(all_targets)-1)]
+        restart_indices=np.ascontiguousarray(restart_indices+1,dtype=np.int32)
+        out=np.empty((2,len(all_targets)),dtype=float,order="F")
+        calls=ct.c_int()
+        max_ds=min(self._smax/200,
+                   self.settings.max_step_h/(2*self._smax))
+        callback=None
+        cb_errors=[]
+        cb_status=ct.c_int()
+        if self.coefficient_backend=="direct_source":
+            # The function pointer is held strongly until Fortran returns.
+            # Fortran and source EOS callbacks are process-local and always
+            # serialized by native._LOCK in the calling matched-shot path.
+            CB=ct.CFUNCTYPE(None,ct.c_double,ct.POINTER(ct.c_double),
+                            ct.POINTER(ct.c_int))
+            def exact_background(svalue,coeff_ptr,status_ptr):
+                status_ptr[0]=1
+                try:
+                    svalue=float(np.clip(svalue,x[0],x[-1]))
+                    h=self.background.h_start-svalue*svalue
+                    h=float(np.clip(h,phase["h1"],phase["h0"]))
+                    st=self.background.state_at_enthalpy(
+                        h,self.background.eos.side_for_segment(h,phase["mid"]))
+                    values=(st["r_km"],st["Phi"],st["lambda_metric"],
+                            st["dPhi_dr_km"],st["cs2_over_c2"])
+                    if (not np.all(np.isfinite(values)) or
+                         values[0]<=0 or values[3]<=0 or values[4]<=0):
+                        raise ValueError("source background has nonphysical coefficients")
+                    for i,v in enumerate(values):coeff_ptr[i]=float(v)
+                    self._callback_rhs_calls+=1
+                    status_ptr[0]=0
+                except Exception as error:
+                    cb_errors.append(f"{type(error).__name__}: {error}")
+            callback=CB(exact_background)
+            lib.cowling_native_set_source_callback(
+                  ct.cast(callback,ct.c_void_p),ct.byref(cb_status))
+            if cb_status.value:
+                raise RuntimeError("native EOS callback registration failed")
+        try:
+            if self.coefficient_backend=="direct_source" and len(restart_indices):
+                lib.cowling_native_segment_restarts(
+                    omega,self.settings.ell,self.settings.rtol,
+                    self.settings.atol,max_ds,
+                    {"adams":10,"bdf":22}[self.method],
+                    len(all_targets),all_targets,
+                    len(restart_indices),restart_indices,
+                    np.ascontiguousarray(y),out,ct.byref(calls),ct.byref(status))
+            else:
+                lib.cowling_native_segment(omega,self.settings.ell,
+                    self.settings.rtol,self.settings.atol,max_ds,
+                    {"adams":10,"bdf":22}[self.method],
+                    len(all_targets),all_targets,np.ascontiguousarray(y),
+                    out,ct.byref(calls),ct.byref(status))
+        finally:
+            if callback is not None:
+                lib.cowling_native_set_source_callback(None,ct.byref(cb_status))
+                if cb_status.value:
+                    raise RuntimeError("native EOS callback reset failed")
+        if cb_errors:
+            raise RuntimeError("native direct source callback failed: "+cb_errors[0])
+        if status.value:
+>           raise RuntimeError("native one-sided phase DVODE rejected: "
+                               +str(status.value))
+E           RuntimeError: native one-sided phase DVODE rejected: 14
+
+python_frontend/compose_eos/stellar_sharp_native.py:427: RuntimeError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_sharp_cowling_exact_source_callback_20261119.py::test_native_direct_source_restarts_at_resolved_sound_speed_jumps
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 4 deselected in 11.44s
+ DVODE--  At T(=R1) and step size H(=R2), the error                              
+       test failed repeatedly or with abs(H) = HMIN                              
+      In above,  R1 =  0.2857752792225D+00   R2 = -0.1782006988180D-11

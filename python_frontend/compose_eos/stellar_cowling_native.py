@@ -36,6 +36,7 @@ _LOCK = threading.RLock()
 _DLL = None
 _ACTIVE = None
 _DOUBLE_ARRAY = np.ctypeslib.ndpointer(dtype=np.float64, flags="C_CONTIGUOUS")
+_INT_ARRAY = np.ctypeslib.ndpointer(dtype=np.int32,flags="C_CONTIGUOUS")
 _FORTRAN_ARRAY = np.ctypeslib.ndpointer(dtype=np.float64, flags="F_CONTIGUOUS")
 
 
@@ -76,6 +77,14 @@ def _native_library():
         ct.c_int,ct.c_int,_DOUBLE_ARRAY,_DOUBLE_ARRAY,_FORTRAN_ARRAY,
         ct.POINTER(ct.c_int),ct.POINTER(ct.c_int)]
     dll.cowling_native_segment.restype = None
+    dll.cowling_native_segment_restarts.argtypes = [
+        ct.c_double,ct.c_int,ct.c_double,ct.c_double,ct.c_double,
+        ct.c_int,ct.c_int,_DOUBLE_ARRAY,ct.c_int,_INT_ARRAY,
+        _DOUBLE_ARRAY,_FORTRAN_ARRAY,ct.POINTER(ct.c_int),ct.POINTER(ct.c_int)]
+    dll.cowling_native_segment_restarts.restype = None
+    dll.cowling_native_set_source_callback.argtypes = [
+        ct.c_void_p,ct.POINTER(ct.c_int)]
+    dll.cowling_native_set_source_callback.restype = None
     dll.cowling_native_interface_transfer.argtypes = [
         ct.c_double,ct.c_double,ct.c_double,ct.c_double,ct.c_double,
         ct.c_double,ct.c_double,ct.c_double,ct.c_int,_DOUBLE_ARRAY,

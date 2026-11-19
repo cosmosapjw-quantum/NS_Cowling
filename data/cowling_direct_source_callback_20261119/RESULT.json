@@ -1,0 +1,207 @@
+{
+  "schema": "ns_cowling.direct_source_vs_PCHIP_vs_DOP853.v1",
+  "science_parent_commit": "daf5de300b06009f8654f795aa99fe40d512666e",
+  "original_derived_eos_zip_sha256": "299de43bb4f0a87ebfc4f1139ab3c8b51c344937ec3637cdff644e9ca8ab2c04",
+  "original_reference_sha256": "c7efe92efe40deca8940130c9f437ba7ca94d6125b48b3f10d34e69adc74e32b",
+  "phasewise_sharp_interfaces_unchanged": true,
+  "no_new_density_interpolation_between_phases": true,
+  "test_settings": {
+    "ell": 2,
+    "rtol": 1e-09,
+    "atol": 1e-12,
+    "surface_h": 3e-08,
+    "match_h_fraction": 0.15,
+    "max_step_h": 0.002,
+    "root_xtol_hz": 1e-05
+  },
+  "cases": {
+    "SPG_M3_CSS_0p7_slow_p1": {
+      "reference_case": {
+        "model": "SPG_M3",
+        "method": "css",
+        "nc": 0.192510767556007,
+        "mass": 0.7,
+        "conversion": "slow",
+        "name": "p1",
+        "bracket": [
+          3710.0,
+          3760.0
+        ],
+        "ref_key": "SPG_M3_CSS_0p7_slow_p1"
+      },
+      "source_contract_sha256": "f23fb7020c9de1b65c99ac37690840f7a4d6611f3372409b015d8c3bd7e32f3b",
+      "oracle_Python_direct_EOS_frequency_hz": 3736.2088951581254,
+      "background_native_tov": {
+        "mass_msun": 0.7000000086373105,
+        "radius_km": 14.59794179069283,
+        "elapsed_seconds": 0.20987539300040225
+      },
+      "variants": {
+        "pchip_8193": {
+          "status": "NATIVE_ROOT_REJECTED",
+          "reason": "RuntimeError: mode root not physically admitted: matching=-1.2270079155596656e-05 join=1.2270079155525289e-05",
+          "total_elapsed_seconds": 0.9114933379996728
+        },
+        "direct_source_129": {
+          "status": "NATIVE_ROOT_ADMITTED",
+          "frequency_hz": 3736.2104759296394,
+          "delta_against_DOP853_hz": 0.0015807715139999345,
+          "relative_join_mismatch": 9.578842168778933e-06,
+          "nodes_W": 1,
+          "nodes_V": 1,
+          "source_callback_rhs_calls": 154758,
+          "tabulation_points_per_phase": [
+            33,
+            33
+          ],
+          "setup_elapsed_seconds": 0.17676781099999062,
+          "total_elapsed_seconds": 10.493548247000035
+        },
+        "pchip_16385": {
+          "status": "NATIVE_ROOT_REJECTED",
+          "reason": "RuntimeError: mode root not physically admitted: matching=5.429188234022143e-05 join=5.429188234013189e-05",
+          "total_elapsed_seconds": 1.4785905980006646
+        }
+      }
+    },
+    "SPG_M3_CSS_1p4_slow_W1V2": {
+      "reference_case": {
+        "model": "SPG_M3",
+        "method": "css",
+        "nc": 0.304225985123765,
+        "mass": 1.4,
+        "conversion": "slow",
+        "name": "W1V2",
+        "bracket": [
+          5290.0,
+          5360.0
+        ],
+        "ref_key": "SPG_M3_CSS_1p4_slow_W1V2"
+      },
+      "source_contract_sha256": "f23fb7020c9de1b65c99ac37690840f7a4d6611f3372409b015d8c3bd7e32f3b",
+      "oracle_Python_direct_EOS_frequency_hz": 5329.202673891677,
+      "background_native_tov": {
+        "mass_msun": 1.4000000021001553,
+        "radius_km": 14.41569120650527,
+        "elapsed_seconds": 0.26489460700031486
+      },
+      "variants": {
+        "pchip_8193": {
+          "status": "NATIVE_ROOT_ADMITTED",
+          "frequency_hz": 5329.147251645713,
+          "delta_against_DOP853_hz": -0.05542224596320011,
+          "relative_join_mismatch": 1.3294055822191298e-06,
+          "nodes_W": 1,
+          "nodes_V": 2,
+          "source_callback_rhs_calls": 0,
+          "tabulation_points_per_phase": [
+            12286,
+            2657
+          ],
+          "setup_elapsed_seconds": 0.9666099569994913,
+          "total_elapsed_seconds": 1.0171982069996375
+        },
+        "direct_source_129": {
+          "status": "NATIVE_ROOT_ADMITTED",
+          "frequency_hz": 5329.202222795218,
+          "delta_against_DOP853_hz": -0.00045109645816410193,
+          "relative_join_mismatch": 2.3576793957815463e-08,
+          "nodes_W": 1,
+          "nodes_V": 2,
+          "source_callback_rhs_calls": 87909,
+          "tabulation_points_per_phase": [
+            33,
+            33
+          ],
+          "setup_elapsed_seconds": 0.2455158789998677,
+          "total_elapsed_seconds": 6.155695032999574
+        },
+        "pchip_16385": {
+          "status": "NATIVE_ROOT_ADMITTED",
+          "frequency_hz": 5329.242240899446,
+          "delta_against_DOP853_hz": 0.03956700776961952,
+          "relative_join_mismatch": 1.0076834499508357e-06,
+          "nodes_W": 1,
+          "nodes_V": 2,
+          "source_callback_rhs_calls": 0,
+          "tabulation_points_per_phase": [
+            19841,
+            3294
+          ],
+          "setup_elapsed_seconds": 1.5207763819998945,
+          "total_elapsed_seconds": 1.5844440179998855
+        }
+      }
+    },
+    "SPG_M2_MAXWELL_1p4_slow_p1": {
+      "reference_case": {
+        "model": "SPG_M2",
+        "method": "maxwell",
+        "nc": 0.30385128926615257,
+        "mass": 1.4,
+        "conversion": "slow",
+        "name": "p1",
+        "bracket": [
+          5130.0,
+          5160.0
+        ],
+        "ref_key": "SPG_M2_MAXWELL_1p4_slow_p1"
+      },
+      "source_contract_sha256": "59b7cb4671347c33c25133e6497e8be346b4e5b4f871eece9bcaf59155fd8765",
+      "oracle_Python_direct_EOS_frequency_hz": 5148.0010293536725,
+      "background_native_tov": {
+        "mass_msun": 1.3999999857354968,
+        "radius_km": 14.420419623651872,
+        "elapsed_seconds": 0.3716794980000486
+      },
+      "variants": {
+        "pchip_8193": {
+          "status": "NATIVE_ROOT_ADMITTED",
+          "frequency_hz": 5147.989067049143,
+          "delta_against_DOP853_hz": -0.011962304529333778,
+          "relative_join_mismatch": 4.392649337304362e-06,
+          "nodes_W": 1,
+          "nodes_V": 1,
+          "source_callback_rhs_calls": 0,
+          "tabulation_points_per_phase": [
+            16055,
+            2194
+          ],
+          "setup_elapsed_seconds": 1.193005663999429,
+          "total_elapsed_seconds": 1.3055567480005266
+        },
+        "direct_source_129": {
+          "status": "NATIVE_ROOT_ADMITTED",
+          "frequency_hz": 5148.000867785018,
+          "delta_against_DOP853_hz": -0.0001615686542209005,
+          "relative_join_mismatch": 2.9134463832754563e-07,
+          "nodes_W": 1,
+          "nodes_V": 1,
+          "source_callback_rhs_calls": 86036,
+          "tabulation_points_per_phase": [
+            33,
+            33
+          ],
+          "setup_elapsed_seconds": 0.3941739920001055,
+          "total_elapsed_seconds": 6.0655902259995855
+        },
+        "pchip_16385": {
+          "status": "NATIVE_ROOT_ADMITTED",
+          "frequency_hz": 5148.004149509596,
+          "delta_against_DOP853_hz": 0.003120155923170387,
+          "relative_join_mismatch": 3.281164534047947e-07,
+          "nodes_W": 1,
+          "nodes_V": 1,
+          "source_callback_rhs_calls": 0,
+          "tabulation_points_per_phase": [
+            23916,
+            2525
+          ],
+          "setup_elapsed_seconds": 1.733929838000222,
+          "total_elapsed_seconds": 1.7910566199998357
+        }
+      }
+    }
+  },
+  "status": "BOUNDED_SOURCE_CALLBACK_COMPARISON_RECORDED"
+}

@@ -250,7 +250,8 @@ class NativeSharpCowlingDVODE:
     No interpolation or node count spans the density jump.
     """
     def __init__(self,background,settings=CowlingSettings(),*,samples=8193,
-                 method="adams",knot_waypoints=False):
+                 method="adams",knot_waypoints=False,coefficient_backend="pchip",
+                 source_restart_relative_jump=.01):
         if not isinstance(background,SharpStellarBackground) or not background.interfaces:
             raise ValueError("native sharp Cowling needs a sharp stellar background")
         settings.validate(background)
@@ -264,6 +265,18 @@ class NativeSharpCowlingDVODE:
         self.settings=settings
         self.method=method
         self.samples=samples
+        if coefficient_backend not in ("pchip","direct_source"):
+            raise ValueError("coefficient_backend must be pchip or direct_source")
+        self.coefficient_backend=coefficient_backend
+        if source_restart_relative_jump is not None:
+            if (not isinstance(source_restart_relative_jump,
+                               (int,float,np.integer,np.floating)) or
+                isinstance(source_restart_relative_jump,bool) or
+                not np.isfinite(source_restart_relative_jump) or
+                not 0<source_restart_relative_jump<1):
+                raise ValueError("source_restart_relative_jump must lie in (0,1) or None")
+        self.source_restart_relative_jump=source_restart_relative_jump
+        self._callback_rhs_calls=0
         if not isinstance(knot_waypoints,bool):
             raise ValueError("knot_waypoints must be bool")
         self.knot_waypoints=knot_waypoints
@@ -274,8 +287,15 @@ class NativeSharpCowlingDVODE:
         self._phases=[]
         for h_begin,h_end in zip(bounds[:-1],bounds[1:]):
             mid=(h_begin+h_end)/2.
-            x=_one_phase_grid(h0,hsurface,h_begin,h_end,background.eos.break_h,
-                              samples,extras=h_end==hsurface)
+            if self.coefficient_backend=="direct_source":
+                # Native Fortran receives background data directly at RHS calls.
+                # A minimal source table is needed only for endpoint validation
+                # and for the immutable default PCHIP interface contract.
+                x=np.linspace(np.sqrt(max(h0-h_begin,0.)),
+                              np.sqrt(max(h0-h_end,0.)),33)
+            else:
+                x=_one_phase_grid(h0,hsurface,h_begin,h_end,background.eos.break_h,
+                                  samples,extras=h_end==hsurface)
             values=np.empty((len(x),5),float)
             for i,s in enumerate(x):
                 h=h0-s*s
@@ -291,11 +311,35 @@ class NativeSharpCowlingDVODE:
             source_breaks=np.asarray(background.eos.break_h,dtype=float)
             source_breaks=source_breaks[(source_breaks>h_end)&(source_breaks<h_begin)]
             source_break_s=np.sqrt(np.maximum(h0-source_breaks,0.))
+            source_restart_s=[]
+            if self.coefficient_backend=="direct_source" and                self.source_restart_relative_jump is not None:
+                # Only restart at demonstrated strong EOS sound-speed jumps,
+                # not every source table knot (often >1000 per star).
+                # Evaluate strictly inside the same physical phase on either
+                # side: a Maxwell interface is already a separate phase.
+                for bpoint in source_break_s:
+                    h=h0-float(bpoint)**2
+                    dh=max(2e-11,1e-9*max(h,1e-5))
+                    if h-dh<=h_end or h+dh>=h_begin:
+                        continue
+                    side_lo=background.eos.side_for_segment(h-dh,mid)
+                    side_hi=background.eos.side_for_segment(h+dh,mid)
+                    lo=background.state_at_enthalpy(h-dh,side_lo)["cs2_over_c2"]
+                    hi=background.state_at_enthalpy(h+dh,side_hi)["cs2_over_c2"]
+                    if (not np.isfinite(lo) or not np.isfinite(hi) or
+                        min(lo,hi)<=0):
+                        raise ValueError("source EOS near internal knot is invalid")
+                    relative_jump=abs(hi-lo)/max(abs(hi),abs(lo))
+                    if relative_jump>=self.source_restart_relative_jump:
+                        source_restart_s.append(float(bpoint))
             self._phases.append(dict(h0=h_begin,h1=h_end,mid=mid,
                 s=np.ascontiguousarray(x),vals=np.asfortranarray(values.T),
                 slopes=np.asfortranarray(slopes.T),pchip=pchip,
-                source_break_s=np.unique(source_break_s)))
+                source_break_s=np.unique(source_break_s),
+                source_restart_s=np.unique(np.asarray(source_restart_s,float))))
         self._smax=float(np.sqrt(h0-hsurface))
+        self.source_break_count=sum(len(q["source_break_s"]) for q in self._phases)
+        self.source_restart_count=sum(len(q["source_restart_s"]) for q in self._phases)
 
     def _integrate_phase(self, phase, targets, y, omega, lib):
         x=phase["s"]
@@ -306,19 +350,81 @@ class NativeSharpCowlingDVODE:
             raise RuntimeError("native one-sided phase setup rejected: "+str(status.value))
         native._ACTIVE=None
         targets=np.ascontiguousarray(targets,dtype=float)
-        if self.knot_waypoints:
-            all_targets,wanted_indices=native_shoot_waypoints(targets,phase["source_break_s"])
+        # Physical source discontinuity stops are stronger than ordinary
+        # output waypoints: DVODE is restarted at each selected cs² jump.
+        if self.coefficient_backend=="direct_source":
+            cut_s=(phase["source_break_s"] if self.knot_waypoints
+                   else phase["source_restart_s"])
+        elif self.knot_waypoints:
+            cut_s=phase["source_break_s"]
+        else:
+            cut_s=np.asarray([],float)
+        if len(cut_s):
+            all_targets,wanted_indices=native_shoot_waypoints(targets,cut_s)
         else:
             all_targets=targets;wanted_indices=np.arange(len(targets))
+        restart_indices=np.flatnonzero(np.isin(all_targets,phase["source_restart_s"]))
+        restart_indices=restart_indices[(restart_indices>0)&
+                                         (restart_indices<len(all_targets)-1)]
+        restart_indices=np.ascontiguousarray(restart_indices+1,dtype=np.int32)
         out=np.empty((2,len(all_targets)),dtype=float,order="F")
         calls=ct.c_int()
         max_ds=min(self._smax/200,
                    self.settings.max_step_h/(2*self._smax))
-        lib.cowling_native_segment(omega,self.settings.ell,
-                self.settings.rtol,self.settings.atol,max_ds,
-                {"adams":10,"bdf":22}[self.method],
-                len(all_targets),all_targets,np.ascontiguousarray(y),
-                out,ct.byref(calls),ct.byref(status))
+        callback=None
+        cb_errors=[]
+        cb_status=ct.c_int()
+        if self.coefficient_backend=="direct_source":
+            # The function pointer is held strongly until Fortran returns.
+            # Fortran and source EOS callbacks are process-local and always
+            # serialized by native._LOCK in the calling matched-shot path.
+            CB=ct.CFUNCTYPE(None,ct.c_double,ct.POINTER(ct.c_double),
+                            ct.POINTER(ct.c_int))
+            def exact_background(svalue,coeff_ptr,status_ptr):
+                status_ptr[0]=1
+                try:
+                    svalue=float(np.clip(svalue,x[0],x[-1]))
+                    h=self.background.h_start-svalue*svalue
+                    h=float(np.clip(h,phase["h1"],phase["h0"]))
+                    st=self.background.state_at_enthalpy(
+                        h,self.background.eos.side_for_segment(h,phase["mid"]))
+                    values=(st["r_km"],st["Phi"],st["lambda_metric"],
+                            st["dPhi_dr_km"],st["cs2_over_c2"])
+                    if (not np.all(np.isfinite(values)) or
+                         values[0]<=0 or values[3]<=0 or values[4]<=0):
+                        raise ValueError("source background has nonphysical coefficients")
+                    for i,v in enumerate(values):coeff_ptr[i]=float(v)
+                    self._callback_rhs_calls+=1
+                    status_ptr[0]=0
+                except Exception as error:
+                    cb_errors.append(f"{type(error).__name__}: {error}")
+            callback=CB(exact_background)
+            lib.cowling_native_set_source_callback(
+                  ct.cast(callback,ct.c_void_p),ct.byref(cb_status))
+            if cb_status.value:
+                raise RuntimeError("native EOS callback registration failed")
+        try:
+            if self.coefficient_backend=="direct_source" and len(restart_indices):
+                lib.cowling_native_segment_restarts(
+                    omega,self.settings.ell,self.settings.rtol,
+                    self.settings.atol,max_ds,
+                    {"adams":10,"bdf":22}[self.method],
+                    len(all_targets),all_targets,
+                    len(restart_indices),restart_indices,
+                    np.ascontiguousarray(y),out,ct.byref(calls),ct.byref(status))
+            else:
+                lib.cowling_native_segment(omega,self.settings.ell,
+                    self.settings.rtol,self.settings.atol,max_ds,
+                    {"adams":10,"bdf":22}[self.method],
+                    len(all_targets),all_targets,np.ascontiguousarray(y),
+                    out,ct.byref(calls),ct.byref(status))
+        finally:
+            if callback is not None:
+                lib.cowling_native_set_source_callback(None,ct.byref(cb_status))
+                if cb_status.value:
+                    raise RuntimeError("native EOS callback reset failed")
+        if cb_errors:
+            raise RuntimeError("native direct source callback failed: "+cb_errors[0])
         if status.value:
             raise RuntimeError("native one-sided phase DVODE rejected: "
                                +str(status.value))
@@ -430,7 +536,19 @@ class NativeSharpCowlingDVODE:
             xs=np.concatenate([x for x,y,interp in data])
             ys=np.hstack([y for x,y,interp in data])
             interp=data[0][2]
-            r=interp(xs)[:,0]
+            if self.coefficient_backend=="direct_source":
+                # Profile radii are source evaluated too, not from the
+                # deliberately sparse PCHIP sentinel table.
+                phase=self._phases[j]
+                r=np.asarray([self.background.state_at_enthalpy(
+                    float(np.clip(self.background.h_start-s*s,
+                                  phase["h1"],phase["h0"])),
+                    self.background.eos.side_for_segment(
+                        float(np.clip(self.background.h_start-s*s,
+                                      phase["h1"],phase["h0"])),
+                        phase["mid"]))["r_km"] for s in xs],float)
+            else:
+                r=interp(xs)[:,0]
             W=r**(ell+1)*ys[0]
             V=r**ell*ys[1]
             wcount+=_nodes(W);vcount+=_nodes(V)
@@ -453,6 +571,10 @@ class NativeSharpCowlingDVODE:
                     W_nodes_per_phase=wcount,V_nodes_per_phase=vcount,
                     profile=profile,nfev=shot["nfev"],
                     backend="Fortran DVODE sharp "+self.method.capitalize(),
+                    coefficient_backend=self.coefficient_backend,
+                    source_callback_rhs_calls=int(self._callback_rhs_calls),
+                    source_restart_count=int(self.source_restart_count),
+                    source_restart_relative_jump=self.source_restart_relative_jump,
                     knot_waypoints_used=self.knot_waypoints,
                     source_break_waypoint_count=sum(len(p["source_break_s"])
                           for p in self._phases) if self.knot_waypoints else 0,

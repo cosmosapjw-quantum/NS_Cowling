@@ -5,14 +5,44 @@
 ! a Maxwell interface is permitted in this module.
 ! DVODE uses COMMON workspace: process-local, non-reentrant, serialized in Python.
 module compose_eos_cowling_dvode
-  use iso_c_binding, only: c_int, c_double
+  use iso_c_binding, only: c_int, c_double, c_funptr, c_associated, c_f_procpointer
   use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
   implicit none
   private
   real(c_double), allocatable, save :: knots(:), coeff(:,:), slopes(:,:)
   integer, save :: ntab=0, rhs_failed=0
-  public :: cowling_native_setup, cowling_native_shot, cowling_native_segment, cowling_native_interface_transfer
+  ! A source-evaluated callback is opt-in, process-local, and only enabled
+  ! during a Python-serialized native segment. The default remains PCHIP.
+  abstract interface
+    subroutine source_state_callback(s, values, status) bind(c)
+      import :: c_int, c_double
+      real(c_double), value :: s
+      real(c_double), intent(out) :: values(5)
+      integer(c_int), intent(out) :: status
+    end subroutine
+  end interface
+  procedure(source_state_callback), pointer, save :: active_source => null()
+  ! At a reset knot the RHS derivative has two distinct one-sided limits.
+  ! Query the limit inside the currently integrated subinterval rather
+  ! than evaluating an arbitrary branch at the exact C0 EOS knot.
+  logical,save :: source_restart_active=.false.
+  real(c_double),save :: restart_start=0._c_double,restart_end=0._c_double
+  public :: cowling_native_setup, cowling_native_shot, cowling_native_segment, &
+            cowling_native_interface_transfer, cowling_native_set_source_callback, &
+            cowling_native_segment_restarts
 contains
+  subroutine cowling_native_set_source_callback(ptr,status) bind(c)
+    type(c_funptr), value :: ptr
+    integer(c_int),intent(out) :: status
+    status=0
+    if(c_associated(ptr))then
+      call c_f_procpointer(ptr,active_source)
+      if(.not.associated(active_source))status=1
+    else
+      nullify(active_source)
+    endif
+  end subroutine
+
   subroutine cowling_native_setup(n,s,values,derivatives,status) bind(c)
     integer(c_int),value::n
     real(c_double),intent(in)::s(n),values(5,n),derivatives(5,n)
@@ -20,6 +50,9 @@ contains
     integer::astat
     status=1
     ntab=0
+    ! Disallow persistence of a callback across independent native setups.
+    nullify(active_source)
+    source_restart_active=.false.
     if(allocated(knots))deallocate(knots)
     if(allocated(coeff))deallocate(coeff)
     if(allocated(slopes))deallocate(slopes)
@@ -42,10 +75,31 @@ contains
     real(c_double),intent(out)::v(5)
     logical,intent(out)::ok
     integer::lo,hi,mid
-    real(c_double)::dx,z,z2,z3
+    real(c_double)::dx,z,z2,z3,s_query,boundary_epsilon,orientation
+    integer(c_int)::cbstatus
     ok=.false.;v=0._c_double
     if(ntab<4.or..not.ieee_is_finite(s))return
     if(s<knots(1)-1.e-11_c_double.or.s>knots(ntab)+1.e-11_c_double)return
+    if(associated(active_source))then
+      cbstatus=1
+      s_query=s
+      if(source_restart_active)then
+        ! One-sided limiting value for a derivative jump. A 1e-9 shift
+        ! in s is always further restricted to <=1% of this subinterval.
+        boundary_epsilon=min(1.e-9_c_double, &
+                         0.01_c_double*abs(restart_end-restart_start))
+        orientation=sign(1._c_double,restart_end-restart_start)
+        if(abs(s-restart_start)<=5.e-12_c_double)then
+          s_query=restart_start+orientation*boundary_epsilon
+        else if(abs(s-restart_end)<=5.e-12_c_double)then
+          s_query=restart_end-orientation*boundary_epsilon
+        endif
+      endif
+      call active_source(s_query,v,cbstatus)
+      ok=(cbstatus==0).and.all(ieee_is_finite(v)).and. &
+         v(1)>0._c_double.and.v(4)>0._c_double.and.v(5)>0._c_double
+      return
+    endif
     if(s<=knots(1))then
       v=coeff(:,1)
     else if(s>=knots(ntab))then
@@ -209,6 +263,58 @@ contains
     if(.not.all(ieee_is_finite(initial)))return
     call integrate_shot(targets(1),targets,npts,initial,omega*omega,ell, &
                         rtol,atol,max_ds,mf,output,nfev,status)
+  end subroutine
+
+  ! Integrate with FRESH DVODE history at every selected source EOS sound-speed
+  ! discontinuity. The caller merges the exact breakpoints into the ordered
+  ! output grid and passes their one-based indices. This is opt-in and leaves
+  ! existing segment integration and all physical jump conditions untouched.
+  subroutine cowling_native_segment_restarts(omega,ell,rtol,atol,max_ds,mf, &
+      npts,targets,ncuts,cut_indices,initial,output,nfev,status) bind(c)
+    real(c_double),value :: omega,rtol,atol,max_ds
+    integer(c_int),value :: ell,mf,npts,ncuts
+    real(c_double),intent(in) :: targets(npts),initial(2)
+    integer(c_int),intent(in) :: cut_indices(ncuts)
+    real(c_double),intent(out) :: output(2,npts)
+    integer(c_int),intent(out) :: nfev,status
+    real(c_double) :: scratch(2,npts),ystart(2)
+    integer :: i,nlocal,first,last,calls,local_status
+    status=1;nfev=0;output=0._c_double
+    if(ntab<4.or.npts<2.or.ell<2.or.ncuts<0.or.ncuts>=npts-1)return
+    if(mf/=10.and.mf/=22)return
+    if(.not.all(ieee_is_finite([omega,rtol,atol,max_ds])))return
+    if(omega<=0._c_double.or.rtol<=0._c_double.or.atol<=0._c_double.or.max_ds<=0._c_double)return
+    if(.not.all(ieee_is_finite(initial)).or..not.all(ieee_is_finite(targets)))return
+    if(any(cut_indices<2).or.any(cut_indices>npts-1))return
+    if(ncuts>1)then
+      if(any(cut_indices(2:ncuts)<=cut_indices(1:ncuts-1)))return
+    endif
+    ystart=initial;first=1
+    do i=1,ncuts+1
+      if(i<=ncuts)then
+        last=cut_indices(i)
+      else
+        last=npts
+      endif
+      nlocal=last-first+1
+      if(nlocal<2)then
+        status=3;return
+      endif
+      source_restart_active=.true.
+      restart_start=targets(first);restart_end=targets(last)
+      call integrate_shot(targets(first),targets(first:last),nlocal,ystart, &
+                          omega*omega,ell,rtol,atol,max_ds,mf, &
+                          scratch(:,1:nlocal),calls,local_status)
+      source_restart_active=.false.
+      if(local_status/=0)then
+        status=10+local_status;return
+      endif
+      output(:,first:last)=scratch(:,1:nlocal)
+      nfev=nfev+calls
+      ystart=scratch(:,nlocal)
+      first=last
+    enddo
+    status=0
   end subroutine
 
   ! Scaled w = W/r^(ell+1), v = V/r^ell. Traction ∆P is proportional to

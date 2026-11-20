@@ -1,0 +1,220 @@
+{
+  "schema": "ns_cowling.c10.fortran_brent_real_source_benchmark.v1",
+  "scientific_parent": "0952a5c8ca34c5d94136a2c89c705e000c21ef3f",
+  "source_sha256": "591ac27aa99448512e291684c98f8273efc729d17c63be88e331c20e83bd2653",
+  "compiler": "GNU Fortran native DVODE from checked-out source",
+  "constraints": "smooth equilibrium-barotropic, no frozen-composition/g-mode claims",
+  "threading": {
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "background": {
+    "central_density_fm3": 0.5377339776363226,
+    "mass_msun": 1.4000000333092002,
+    "radius_km": 11.752078302430546,
+    "construction_seconds": 0.20235795500002496
+  },
+  "settings": {
+    "ell": 2,
+    "rtol": 1e-09,
+    "atol": 1e-12,
+    "max_step_h": 0.002,
+    "root_xtol_hz": 1e-06
+  },
+  "cases": {
+    "adams_f": {
+      "method": "adams",
+      "mode": "f",
+      "bracket_hz": [
+        2250.0,
+        2500.0
+      ],
+      "frontend_setup_seconds": 0.00671758199996475,
+      "old_root": {
+        "frequency_hz": 2401.373813542649,
+        "residual": 5.351494147664869e-08,
+        "iterations": 10
+      },
+      "native_root": {
+        "frequency_hz": 2401.3740012982853,
+        "residual": 2.8019610552051623e-08,
+        "iterations": 15,
+        "join": 2.8019610503065292e-08,
+        "W_nodes": 0,
+        "V_nodes": 0
+      },
+      "absolute_frequency_difference_hz": 0.00018775563648887328,
+      "full_mode_wall_runs_seconds": {
+        "python_brentq": [
+          0.019149594000282377,
+          0.019128132000332698,
+          0.018959353999889572,
+          0.019346505000157777,
+          0.018927022999832843,
+          0.019466457999897102,
+          0.018937761999950453
+        ],
+        "fortran": [
+          0.027954048000083276,
+          0.027875125000264234,
+          0.027740855000047304,
+          0.028018522999900597,
+          0.027572699999836914,
+          0.027552069000194024,
+          0.028014532000270265
+        ]
+      },
+      "medians_seconds": {
+        "python_brentq": 0.019128132000332698,
+        "fortran": 0.027875125000264234
+      },
+      "warm_speedup_ratio": 0.6862079362927118
+    },
+    "adams_p1": {
+      "method": "adams",
+      "mode": "p1",
+      "bracket_hz": [
+        6500.0,
+        6750.0
+      ],
+      "frontend_setup_seconds": 0.00671758199996475,
+      "old_root": {
+        "frequency_hz": 6721.953982823018,
+        "residual": -8.048319965264622e-08,
+        "iterations": 13
+      },
+      "native_root": {
+        "frequency_hz": 6721.95534316391,
+        "residual": 1.5588157233146115e-07,
+        "iterations": 15,
+        "join": 1.5588157232981004e-07,
+        "W_nodes": 1,
+        "V_nodes": 1
+      },
+      "absolute_frequency_difference_hz": 0.0013603408915514592,
+      "full_mode_wall_runs_seconds": {
+        "python_brentq": [
+          0.042653786999835575,
+          0.04192531700027757,
+          0.041946017000100255,
+          0.042707162000169774,
+          0.0420254800001203,
+          0.042359046999990824,
+          0.04201834699961182
+        ],
+        "fortran": [
+          0.049845266999909654,
+          0.050090633000309026,
+          0.049472515000161366,
+          0.049910382999769354,
+          0.04981702300028701,
+          0.04959595400032413,
+          0.049767445999805204
+        ]
+      },
+      "medians_seconds": {
+        "python_brentq": 0.0420254800001203,
+        "fortran": 0.04981702300028701
+      },
+      "warm_speedup_ratio": 0.8435967761437326
+    },
+    "bdf_f": {
+      "method": "bdf",
+      "mode": "f",
+      "bracket_hz": [
+        2250.0,
+        2500.0
+      ],
+      "frontend_setup_seconds": 0.005904525999994803,
+      "old_root": {
+        "frequency_hz": 2401.374043330689,
+        "residual": 3.745058588534428e-08,
+        "iterations": 16
+      },
+      "native_root": {
+        "frequency_hz": 2401.3740670442767,
+        "residual": -7.195002536220618e-09,
+        "iterations": 11,
+        "join": 7.195002531558662e-09,
+        "W_nodes": 0,
+        "V_nodes": 0
+      },
+      "absolute_frequency_difference_hz": 2.3713587779639056e-05,
+      "full_mode_wall_runs_seconds": {
+        "python_brentq": [
+          0.04446156999983941,
+          0.04473285300036878,
+          0.044069375000162836,
+          0.04441157800010842,
+          0.04425735999984681,
+          0.04423487599979126,
+          0.04440579699985392
+        ],
+        "fortran": [
+          0.034122312999897986,
+          0.03419262900024478,
+          0.0340551089998371,
+          0.03413233899982515,
+          0.034501223000006576,
+          0.03420336599992879,
+          0.034380829999918205
+        ]
+      },
+      "medians_seconds": {
+        "python_brentq": 0.04440579699985392,
+        "fortran": 0.03419262900024478
+      },
+      "warm_speedup_ratio": 1.2986950198984708
+    },
+    "bdf_p1": {
+      "method": "bdf",
+      "mode": "p1",
+      "bracket_hz": [
+        6500.0,
+        6750.0
+      ],
+      "frontend_setup_seconds": 0.005904525999994803,
+      "old_root": {
+        "frequency_hz": 6721.956290189131,
+        "residual": -1.512215916773424e-08,
+        "iterations": 10
+      },
+      "native_root": {
+        "frequency_hz": 6721.95714824579,
+        "residual": 5.407772008648352e-08,
+        "iterations": 12,
+        "join": 5.407772008769026e-08,
+        "W_nodes": 1,
+        "V_nodes": 1
+      },
+      "absolute_frequency_difference_hz": 0.000858056659126305,
+      "full_mode_wall_runs_seconds": {
+        "python_brentq": [
+          0.054435492000266095,
+          0.05441716699988319,
+          0.05608911599983912,
+          0.057967968999946606,
+          0.05731704800018633,
+          0.05916506699986712,
+          0.05903013599981932
+        ],
+        "fortran": [
+          0.06763802400018903,
+          0.06751610700030142,
+          0.0774089090000416,
+          0.07144845400034683,
+          0.0696136229998956,
+          0.07083718300009423,
+          0.07932923999987906
+        ]
+      },
+      "medians_seconds": {
+        "python_brentq": 0.05731704800018633,
+        "fortran": 0.07083718300009423
+      },
+      "warm_speedup_ratio": 0.8091378789033732
+    }
+  },
+  "status": "PASS_SCOPED_REAL_STAR_ROOT_NUMERIC_PARITY"
+}

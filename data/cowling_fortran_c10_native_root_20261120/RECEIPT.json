@@ -1,0 +1,187 @@
+{
+  "schema": "ns_cowling.c10.fortran_brent_root_release_handoff.v1",
+  "date": "2026-11-20",
+  "parent": "0952a5c8ca34c5d94136a2c89c705e000c21ef3f",
+  "branch": "research/cowling-c10-native-brent-20261120",
+  "verdict": "SCOPED_RELEASE_CANDIDATE_C10_CLOSED_NOT_MERGED",
+  "native_subagent": "NOT_RUN",
+  "source_sha256": {
+    "data/core_support_20261117/primary_v1/REPRESENTATION.json": "591ac27aa99448512e291684c98f8273efc729d17c63be88e331c20e83bd2653",
+    "data/eos_missing_data_recalc_20261119/artifacts/EOS_ALL_REQUESTED_SOURCE_LOCKED_NESTED_20261119.zip": "299de43bb4f0a87ebfc4f1139ab3c8b51c344937ec3637cdff644e9ca8ab2c04"
+  },
+  "key_code_and_test_sha256": {
+    "fortran_eos/src/compose_eos_cowling_dvode.f90": "c5a4f06b071e8680dfdca9c2d3c70d276199e9b005409c0b1f04b040375c0f67",
+    "fortran_eos/tests/cowling_c10_brent_root_test.f90": "982b2308a640d245a721f892f3c79cc092d4c78404d3c97971e9034f2184c7b0",
+    "python_frontend/compose_eos/stellar_cowling_native.py": "a2debccddb472ee11076b9536fcdbbc3a06b97e6a2526716a26e64e88440ba91",
+    "python_frontend/tests/test_cowling_native_root_c10_20261120.py": "dd0ca75b505822d8f93073ba533f4da8ad23f7b8849013b60057b1c7f34230b7",
+    "scripts/benchmark_cowling_c10_native_roots.py": "3b85301a53b56e1fdd3d796d71ca4fa4daffe0f6f821156fac3434c56bd2ac5b",
+    "scripts/run_cowling_c10_native_root_case.py": "5bca80c11f48f0d23531b2851a3d46a9c64216a3faf90ada38d68b46a5fa7319",
+    "scripts/bench_cowling_c10_root_parallel.sh": "882216cdaab4e29638d3cb5411d5519bb78db9929cf262ce58f901e3f5c104dc",
+    "docs/COWLING_FORTRAN_C10_NATIVE_ROOT_HANDOFF_20261120.md": "df8abd97cf7c84aa37bb3f0a6ca44262579cf91ac6f50961ec8caa1ac0e81ef1"
+  },
+  "numeric_status": {
+    "focused_passed": 10,
+    "integrated_passed": 61,
+    "integrated_failed": 0,
+    "integrated_seconds": 71.41,
+    "standalone_fortran": "PASS_SCOPED_BOUNDS_AND_FALSE_SIGN_FLIP",
+    "vendor_full_bounds": "BLOCKED_LEGACY_DGEFA_DECLARATION"
+  },
+  "conservative_root_gate_abs_determinant": 1e-05,
+  "worst_native_vs_legacy_brent_frequency_delta_hz": 0.0013603408915514592,
+  "root_benchmark_speedup_by_mode": {
+    "adams_f": 0.6862079362927118,
+    "adams_p1": 0.8435967761437326,
+    "bdf_f": 1.2986950198984708,
+    "bdf_p1": 0.8091378789033732
+  },
+  "tolerance_sweep": [
+    {
+      "rtol": 1e-09,
+      "atol": 1e-12,
+      "mode": "f",
+      "old_frequency_hz": 2401.373813542649,
+      "native_frequency_hz": 2401.3740012982853,
+      "reference_exact_contract_python_DOP853_hz": 2401.381874932175,
+      "delta_old_native_hz": 0.00018775563648887328,
+      "delta_native_to_reference_hz": -0.007873633889630582,
+      "native_det": 2.8019610552051623e-08,
+      "old_det": 5.351494147664869e-08,
+      "native_join": 2.8019610503065292e-08,
+      "native_iterations": 15
+    },
+    {
+      "rtol": 1e-09,
+      "atol": 1e-12,
+      "mode": "p1",
+      "old_frequency_hz": 6721.953982823018,
+      "native_frequency_hz": 6721.95534316391,
+      "reference_exact_contract_python_DOP853_hz": 6721.957056883109,
+      "delta_old_native_hz": 0.0013603408915514592,
+      "delta_native_to_reference_hz": -0.0017137191989604617,
+      "native_det": 1.5588157233146115e-07,
+      "old_det": -8.048319965264622e-08,
+      "native_join": 1.5588157232981004e-07,
+      "native_iterations": 15
+    },
+    {
+      "rtol": 1e-10,
+      "atol": 1e-13,
+      "mode": "f",
+      "old_frequency_hz": 2401.3741050151975,
+      "native_frequency_hz": 2401.3741576003486,
+      "reference_exact_contract_python_DOP853_hz": 2401.381874932175,
+      "delta_old_native_hz": 5.258515102468664e-05,
+      "delta_native_to_reference_hz": -0.007717331826370355,
+      "native_det": -1.1427174898719849e-08,
+      "old_det": -1.1310213008732145e-08,
+      "native_join": 1.142717486734833e-08,
+      "native_iterations": 10
+    },
+    {
+      "rtol": 1e-10,
+      "atol": 1e-13,
+      "mode": "p1",
+      "old_frequency_hz": 6721.957958442899,
+      "native_frequency_hz": 6721.95795497125,
+      "reference_exact_contract_python_DOP853_hz": 6721.957056883109,
+      "delta_old_native_hz": -3.471649506536778e-06,
+      "delta_native_to_reference_hz": 0.0008980881411844166,
+      "native_det": -3.057416740767144e-09,
+      "old_det": 1.0098940812140701e-08,
+      "native_join": 3.0574167420139237e-09,
+      "native_iterations": 10
+    },
+    {
+      "rtol": 1e-11,
+      "atol": 1e-14,
+      "mode": "f",
+      "old_frequency_hz": 2401.37413181896,
+      "native_frequency_hz": 2401.374132731962,
+      "reference_exact_contract_python_DOP853_hz": 2401.381874932175,
+      "delta_old_native_hz": 9.130021680903155e-07,
+      "delta_native_to_reference_hz": -0.007742200212760508,
+      "native_det": -1.0147465515747915e-08,
+      "old_det": 1.9655483827634563e-10,
+      "native_join": 1.0147465492828631e-08,
+      "native_iterations": 7
+    },
+    {
+      "rtol": 1e-11,
+      "atol": 1e-14,
+      "mode": "p1",
+      "old_frequency_hz": 6721.958002494295,
+      "native_frequency_hz": 6721.958030958164,
+      "reference_exact_contract_python_DOP853_hz": 6721.957056883109,
+      "delta_old_native_hz": 2.846386905730469e-05,
+      "delta_native_to_reference_hz": 0.0009740750556375133,
+      "native_det": 1.0696709760067496e-10,
+      "old_det": 2.1910876087578858e-10,
+      "native_join": 1.0696709916159132e-10,
+      "native_iterations": 8
+    }
+  ],
+  "parallel_real_source_root_candidates": {
+    "REAL_ROOT_P1": {
+      "processes": 1,
+      "stars": 4,
+      "wall_seconds": 4.706466,
+      "root_candidates": 9,
+      "rejected_candidates": 0,
+      "root_frequencies_hz": [
+        2068.494912048465,
+        5225.87266889868,
+        6014.30675679579,
+        2273.52172236919,
+        6237.9503404437455,
+        2404.2014858056114,
+        6731.1272862303595,
+        2569.8313122256163,
+        7142.233736308694
+      ]
+    },
+    "REAL_ROOT_P2": {
+      "processes": 2,
+      "stars": 4,
+      "wall_seconds": 2.387437,
+      "root_candidates": 9,
+      "rejected_candidates": 0,
+      "root_frequencies_hz": [
+        2068.494912048465,
+        5225.87266889868,
+        6014.30675679579,
+        2273.52172236919,
+        6237.9503404437455,
+        2404.2014858056114,
+        6731.1272862303595,
+        2569.8313122256163,
+        7142.233736308694
+      ]
+    },
+    "REAL_ROOT_P4": {
+      "processes": 4,
+      "stars": 4,
+      "wall_seconds": 1.476012,
+      "root_candidates": 9,
+      "rejected_candidates": 0,
+      "root_frequencies_hz": [
+        2068.494912048465,
+        5225.87266889868,
+        6014.30675679579,
+        2273.52172236919,
+        6237.9503404437455,
+        2404.2014858056114,
+        6731.1272862303595,
+        2569.8313122256163,
+        7142.233736308694
+      ]
+    }
+  },
+  "numerical_observables_not_automatically_certified": [
+    "global mode identity",
+    "precision finer than coefficient interpolation floor",
+    "frozen composition gamma1",
+    "all Maxwell conversions"
+  ],
+  "future_work": "new bounded phasewise Maxwell Fortran root and EOS/PCHIP materialization"
+}

@@ -1,0 +1,21 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_native_root_does_not_call_python_residual ________________
+
+star = NativeTOVBackground(eos=<compose_eos.stellar_background.ContractEnthalpyEOS object at 0x76d58badd2e0>, central_density...oordinate': 's=sqrt(h_start-h)', 'original_eos_contract_evaluated_in_python': True}, backend='Fortran DVODE Adams TOV')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x76d588d64aa0>
+
+    def test_native_root_does_not_call_python_residual(star,monkeypatch):
+        solver=NativeCowlingDVODE(star,CowlingSettings(surface_h=1e-4),
+                                  samples=4097)
+        def forbid(*args,**kwargs):
+            raise AssertionError("Fortran root polishing must own function evaluations")
+        monkeypatch.setattr(solver,"matching_residual",forbid)
+>       actual=solver.solve_mode((2250.,2500.),profile_points=160,
+                                 root_backend="fortran")
+E       TypeError: NativeCowlingDVODE.solve_mode() got an unexpected keyword argument 'root_backend'
+
+python_frontend/tests/test_cowling_native_root_c10_20261120.py:49: TypeError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_cowling_native_root_c10_20261120.py::test_native_root_does_not_call_python_residual
+1 failed, 8 deselected in 1.70s

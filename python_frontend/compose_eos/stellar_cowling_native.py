@@ -1,7 +1,8 @@
 """Opt-in Fortran DVODE backend for smooth relativistic Cowling modes.
 
-Python owns EOS/TOV source provenance and root finding; the shooting ODE,
-matched eigenfunctions and f/p1 node profiles are computed with native DVODE.
+Python owns EOS/TOV source provenance and frontend marshaling. Shooting ODE,
+frequency bracketing/root polishing and profiles use native Fortran DVODE.
+The original SciPy brentq reference remains explicitly selectable.
 A sharp Maxwell interface is *not* supported by this smooth backend.
 DVODE's global COMMON workspace is serialized by one process-wide lock.
 """
@@ -77,6 +78,12 @@ def _native_library():
         ct.c_double, ct.c_int, ct.c_double, ct.c_double, _DOUBLE_ARRAY,
         _INT_ARRAY, ct.POINTER(ct.c_int), ct.POINTER(ct.c_int)]
     dll.cowling_native_scan.restype = None
+    dll.cowling_native_root.argtypes = [
+        ct.c_double, ct.c_double, ct.c_int, ct.c_double, ct.c_double,
+        ct.c_double, ct.c_int, ct.c_double, ct.c_double, ct.c_double,
+        ct.POINTER(ct.c_double), ct.POINTER(ct.c_double),
+        ct.POINTER(ct.c_int), ct.POINTER(ct.c_int), ct.POINTER(ct.c_int)]
+    dll.cowling_native_root.restype = None
     dll.cowling_native_segment.argtypes = [
         ct.c_double,ct.c_int,ct.c_double,ct.c_double,ct.c_double,
         ct.c_int,ct.c_int,_DOUBLE_ARRAY,_DOUBLE_ARRAY,_FORTRAN_ARRAY,
@@ -261,15 +268,43 @@ class NativeCowlingDVODE:
                 [dict(frequency_hz=float(f),residual=float(v))
                  for f,v in zip(fs,residuals)])
 
-    def solve_mode(self, bracket_hz, profile_points=1200):
+    def solve_mode(self, bracket_hz, profile_points=1200, *,
+                   root_backend="fortran"):
         lo,hi = map(float,bracket_hz)
         if not (0 < lo < hi and np.isfinite(lo) and np.isfinite(hi)):
             raise ValueError("positive ordered frequency bracket required")
         if profile_points < 20:
             raise ValueError("profile_points must be at least 20")
-        root, info = brentq(self.matching_residual,lo,hi,
-                           xtol=self.settings.root_xtol_hz,
-                           rtol=4*np.finfo(float).eps, full_output=True)
+        if root_backend not in ("fortran", "python_brentq"):
+            raise ValueError("unknown Cowling root_backend")
+        if root_backend == "python_brentq":
+            root, info = brentq(self.matching_residual,lo,hi,
+                               xtol=self.settings.root_xtol_hz,
+                               rtol=4*np.finfo(float).eps, full_output=True)
+            root_iterations = int(info.iterations)
+            root_converged = bool(info.converged)
+        else:
+            root_out, residual_out = ct.c_double(0), ct.c_double(0)
+            iterations = ct.c_int(0)
+            calls, status = ct.c_int(0), ct.c_int(-1)
+            max_ds = min(self.surface_s/200,
+                         self.settings.max_step_h/(2*self.surface_s))
+            with _LOCK:
+                self._setup()
+                self._lib.cowling_native_root(
+                    lo,hi,self.settings.ell,self.settings.rtol,
+                    self.settings.atol,max_ds,self.mf,self.match_s,
+                    self.surface_s,self.settings.root_xtol_hz,
+                    ct.byref(root_out),ct.byref(residual_out),
+                    ct.byref(iterations),ct.byref(calls),ct.byref(status))
+            if status.value == 3:
+                raise ValueError("native Cowling root bracket lacks sign change")
+            if status.value:
+                raise RuntimeError("Fortran DVODE root polishing failed: "
+                                   +str(status.value))
+            root = float(root_out.value)
+            root_iterations = int(iterations.value)
+            root_converged = True
         si,so,inner,outer,residual,nfev = self._shoot(
             root, profile_points//2, profile_points//2)
         at_match = inner[:,-1]
@@ -296,7 +331,9 @@ class NativeCowlingDVODE:
                           gp*states[0,-1]])
         return dict(
             frequency_hz=float(root), ell=ell, bracket_hz=[lo,hi],
-            root_converged=bool(info.converged),root_iterations=int(info.iterations),
+            root_converged=root_converged,root_iterations=root_iterations,
+            root_backend=("fortran_bracketed_brent" if root_backend == "fortran"
+                          else "python_brentq"),
             matching_residual=float(residual),
             relative_join_mismatch=float(np.linalg.norm(at_match-scale*outer_match)
                                          /np.linalg.norm(at_match)),

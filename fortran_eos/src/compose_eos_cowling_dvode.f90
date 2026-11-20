@@ -29,7 +29,8 @@ module compose_eos_cowling_dvode
   real(c_double),save :: restart_start=0._c_double,restart_end=0._c_double
   public :: cowling_native_setup, cowling_native_shot, cowling_native_segment, &
             cowling_native_interface_transfer, cowling_native_set_source_callback, &
-            cowling_native_segment_restarts, cowling_native_scan
+            cowling_native_segment_restarts, cowling_native_scan, &
+            cowling_native_root
 contains
   subroutine cowling_native_set_source_callback(ptr,status) bind(c)
     type(c_funptr), value :: ptr
@@ -324,6 +325,181 @@ contains
       endif
     enddo
     status=0
+  end subroutine
+
+  ! Evaluate one smooth-star normalized determinant in the native kernel.
+  ! Every shot starts fresh DVODE history; the background remains unchanged.
+  subroutine cowling_root_shot(f_hz,ell,rtol,atol,max_ds,mf,si,so, &
+                                residual,nfev,status)
+    real(c_double),intent(in) :: f_hz,rtol,atol,max_ds,si(2),so(2)
+    integer(c_int),intent(in) :: ell,mf
+    real(c_double),intent(out) :: residual
+    integer(c_int),intent(out) :: nfev,status
+    real(c_double),parameter :: hz_to_omega= &
+       2._c_double*3.1415926535897932384626433832795_c_double/299792.458_c_double
+    real(c_double) :: inner(2,2),outer(2,2)
+    call cowling_native_shot(f_hz*hz_to_omega,ell,rtol,atol,max_ds,mf, &
+        2_c_int,si,2_c_int,so,inner,outer,residual,nfev,status)
+  end subroutine
+
+  ! Bracketed Brent-Dekker eigenfrequency polishing, smooth equilibrium EOS.
+  ! Unlike a Python-brentq callback, every residual and root iteration is
+  ! computed inside Fortran. IEEE double, frequency units Hz; xtol_hz is the
+  ! requested bracket uncertainty width, not a residual magnitude.
+  ! Fails closed on malformed or unbracketed intervals, DVODE failure,
+  ! nonfinite function values, or iteration exhaustion. Never crosses a
+  ! sharp phase interface; that requires the separate phasewise solver.
+  subroutine cowling_native_root(lo_hz,hi_hz,ell,rtol,atol,max_ds,mf, &
+     match_s,surface_s,xtol_hz,frequency_hz,residual,iterations, &
+     total_nfev,status) bind(c)
+    real(c_double),value :: lo_hz,hi_hz,rtol,atol,max_ds
+    real(c_double),value :: match_s,surface_s,xtol_hz
+    integer(c_int),value :: ell,mf
+    real(c_double),intent(out) :: frequency_hz,residual
+    integer(c_int),intent(out) :: iterations,total_nfev,status
+    integer,parameter :: max_iterations=128
+    real(c_double) :: a,b,c,fa,fb,fc,d,e,s,p,q,r,tol,xmid
+    real(c_double) :: si(2),so(2)
+    integer(c_int) :: nfev,shot_status
+    integer :: iteration
+
+    frequency_hz=0._c_double
+    residual=0._c_double
+    iterations=0
+    total_nfev=0
+    status=1
+    if(ntab<4.or.ell<2)return
+    ! Keep a native C-ABI call from silently treating an active one-sided
+    ! sharp EOS as a continuous whole-star fluid.
+    if(associated(active_source))then
+      status=2
+      return
+    endif
+    if(mf/=10.and.mf/=22)return
+    if(.not.all(ieee_is_finite([lo_hz,hi_hz,rtol,atol,max_ds, &
+        match_s,surface_s,xtol_hz])))return
+    if(lo_hz<=0._c_double.or.hi_hz<=lo_hz)return
+    if(xtol_hz<=0._c_double.or.xtol_hz>=hi_hz-lo_hz)return
+    if(rtol<1.e-13_c_double.or.rtol>1.e-3_c_double)return
+    if(atol<=0._c_double.or.max_ds<=0._c_double)return
+    if(match_s<=0._c_double.or.match_s>=surface_s)return
+    if(abs(surface_s-knots(ntab))>1.e-12_c_double)return
+    si=[0._c_double,match_s]
+    so=[surface_s,match_s]
+    a=lo_hz
+    b=hi_hz
+    call cowling_root_shot(a,ell,rtol,atol,max_ds,mf,si,so, &
+                           fa,nfev,shot_status)
+    if(shot_status/=0.or..not.ieee_is_finite(fa))then
+      status=10+shot_status
+      return
+    endif
+    total_nfev=total_nfev+nfev
+    call cowling_root_shot(b,ell,rtol,atol,max_ds,mf,si,so, &
+                           fb,nfev,shot_status)
+    if(shot_status/=0.or..not.ieee_is_finite(fb))then
+      total_nfev=0
+      status=10+shot_status
+      return
+    endif
+    total_nfev=total_nfev+nfev
+    if(fa==0._c_double)then
+      frequency_hz=a
+      residual=fa
+      status=0
+      return
+    endif
+    if(fb==0._c_double)then
+      frequency_hz=b
+      residual=fb
+      status=0
+      return
+    endif
+    if(sign(1._c_double,fa)==sign(1._c_double,fb))then
+      total_nfev=0
+      status=3
+      return
+    endif
+    c=a
+    fc=fa
+    d=b-a
+    e=d
+    do iteration=1,max_iterations
+      ! Maintain the best endpoint b and opposite-sign endpoint c.
+      if(abs(fc)<abs(fb))then
+        a=b; b=c; c=a
+        fa=fb; fb=fc; fc=fa
+      endif
+      tol=2._c_double*epsilon(1._c_double)*abs(b)+0.5_c_double*xtol_hz
+      xmid=0.5_c_double*(c-b)
+      if(abs(xmid)<=tol.or.fb==0._c_double)then
+        ! A sign flip of the normalized matching determinant alone is
+        ! not sufficient: an underresolved or unphysical source can
+        ! jump across zero without ever approaching a true eigenvalue.
+        ! Refuse root certification if the computed determinant remains
+        ! large at numerical bracket collapse. This is a conservative
+        ! root-admission gate, not a new physical perturbation equation.
+        if(abs(fb)>1.e-5_c_double)then
+          total_nfev=0
+          status=33
+          return
+        endif
+        frequency_hz=b
+        residual=fb
+        iterations=iteration-1
+        status=0
+        return
+      endif
+      if(abs(e)>=tol.and.abs(fa)>abs(fb))then
+        s=fb/fa
+        if(a==c)then
+          p=2._c_double*xmid*s
+          q=1._c_double-s
+        else
+          q=fa/fc
+          r=fb/fc
+          p=s*(2._c_double*xmid*q*(q-r)-(b-a)*(r-1._c_double))
+          q=(q-1._c_double)*(r-1._c_double)*(s-1._c_double)
+        endif
+        if(p>0._c_double)q=-q
+        p=abs(p)
+        if(q/=0._c_double.and. &
+           2._c_double*p<3._c_double*xmid*q-abs(tol*q).and. &
+           p<abs(0.5_c_double*e*q))then
+          e=d
+          d=p/q
+        else
+          d=xmid
+          e=d
+        endif
+      else
+        d=xmid
+        e=d
+      endif
+      a=b
+      fa=fb
+      if(abs(d)>tol)then
+        b=b+d
+      else
+        b=b+sign(tol,xmid)
+      endif
+      call cowling_root_shot(b,ell,rtol,atol,max_ds,mf,si,so, &
+                             fb,nfev,shot_status)
+      if(shot_status/=0.or..not.ieee_is_finite(fb))then
+        total_nfev=0
+        status=10+shot_status
+        return
+      endif
+      total_nfev=total_nfev+nfev
+      if(sign(1._c_double,fb)==sign(1._c_double,fc))then
+        c=a
+        fc=fa
+        d=b-a
+        e=d
+      endif
+    enddo
+    total_nfev=0
+    status=32
   end subroutine
 
   ! One native integration segment on current one-sided background.

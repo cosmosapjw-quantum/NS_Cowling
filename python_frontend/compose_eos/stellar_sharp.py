@@ -82,6 +82,75 @@ class SharpContractEnthalpyEOS(ContractEnthalpyEOS):
         return "low" if t is not None and midpoint < t["h"] else "high"
 
 
+def audit_equilibrium_cowling_source(eos, h_samples, *, tolerance=5e-5):
+    """Independent phase-local dP/dh and dP/dε audit for sharp source EOS.
+
+    The finite differences check the equilibrium *barotrope*, not the
+    frozen-composition derivative needed for stratified g-modes.
+    No derivative or interpolation is taken across a Maxwell jump.
+    """
+    if not isinstance(eos, SharpContractEnthalpyEOS):
+        raise TypeError("source audit requires a sharp enthalpy EOS")
+    if not np.isfinite(tolerance) or not 0 < tolerance < 1e-2:
+        raise ValueError("finite positive small derivative tolerance required")
+    samples=np.asarray(h_samples,dtype=float)
+    if samples.ndim!=1 or not len(samples) or not np.all(np.isfinite(samples)):
+        raise ValueError("at least one finite enthalpy sample required")
+    if np.any(samples<=0) or np.any(samples>=eos.h_max):
+        raise ValueError("samples outside smooth-interval EOS support")
+    errors_p=[];errors_cs=[]; rows=[]; interfaces=[]
+    for h in samples:
+        # Never use a centered derivative crossing an EOS source knot,
+        # even if the source reports a continuous pressure there.
+        clearance=float(np.min(np.abs(np.asarray(eos.break_h)-h)))
+        dh=min(2e-6,0.1*clearance,0.1*h,0.1*(eos.h_max-h))
+        if dh <= 1e-10:
+            raise ValueError("sample is not strictly inside a smooth-interval EOS segment")
+        side=eos.side_for_segment(float(h),float(h))
+        center=eos.state_at_enthalpy(float(h),side)
+        minus=eos.state_at_enthalpy(float(h-dh),side)
+        plus=eos.state_at_enthalpy(float(h+dh),side)
+        dpdh=(plus["p"]-minus["p"])/(2*dh)
+        dedh=(plus["epsilon"]-minus["epsilon"])/(2*dh)
+        enthalpy_sum=center["epsilon"]+center["p"]
+        cs=center["cs2_over_c2"]
+        if (not np.all(np.isfinite([dpdh,dedh,enthalpy_sum,cs])) or
+            min(dpdh,dedh,enthalpy_sum,cs)<=0 or cs>1):
+            raise ValueError("noncausal or invalid smooth source thermodynamics")
+        ep=abs(dpdh/enthalpy_sum-1)
+        ec=abs((dpdh/dedh)/cs-1)
+        rows.append(dict(h=float(h),side=side,dh=float(dh),
+            cs2_over_c2=float(cs),finite_difference_cs2_over_c2=float(dpdh/dedh),
+            rel_dPdh_error=float(ep),rel_cs2_error=float(ec)))
+        errors_p.append(ep);errors_cs.append(ec)
+    for t in eos.transitions:
+        lo=eos.state_at_enthalpy(t["h"],"low")
+        hi=eos.state_at_enthalpy(t["h"],"high")
+        latent=hi["epsilon"]-lo["epsilon"]
+        reference=lo["mu"]*(hi["n"]-lo["n"])
+        e_p=abs(hi["p"]-lo["p"])/max(1.,abs(hi["p"]),abs(lo["p"]))
+        e_mu=abs(hi["mu"]-lo["mu"])/max(1.,abs(hi["mu"]),abs(lo["mu"]))
+        e_latent=abs(latent-reference)/max(1.,abs(latent),abs(reference))
+        interfaces.append(dict(h=float(t["h"]),
+            delta_epsilon_MeV_fm3=float(latent),
+            mu_delta_n_MeV_fm3=float(reference),
+            max_rel_coexistence_error=float(max(e_p,e_mu,e_latent)),
+            positive_latent_heat=bool(latent>0 and hi["n"]>lo["n"])))
+    failure=(max(errors_p)>tolerance or max(errors_cs)>tolerance or
+             any(not x["positive_latent_heat"] or
+                 x["max_rel_coexistence_error"]>1e-9 for x in interfaces))
+    return dict(schema="ns_cowling.equilibrium_source_closure_audit.v1",
+        status=("FAIL_SOURCE_THERMODYNAMIC_INCONSISTENCY" if failure
+                else "PASS_SCOPED_EQUILIBRIUM_BAROTROPIC"),
+        perturbation_closure="GAMMA1_EQUALS_GAMMA_EQ",
+        frozen_composition_gamma1="NOT_DERIVABLE_FROM_EQUILIBRIUM_BAROTROPE",
+        composition_g_mode_admitted=False,
+        tolerance=float(tolerance),
+        max_rel_dPdh_error=float(max(errors_p)),
+        max_rel_cs2_error=float(max(errors_cs)),
+        smooth_samples=rows,interfaces=interfaces)
+
+
 class _PiecewiseSolution:
     """Dense outputs remain inside their own integrated phase segments."""
     def __init__(self,segments,jumps=()):
@@ -310,6 +379,9 @@ def solve_mode(background,bracket_hz,settings=CowlingSettings(),*,conversion,pro
     terms=np.array([om**2*np.exp(st["lambda_metric"]-2*st["Phi"])*st["r_km"]*ys[1],
                     st["dPhi_dr_km"]*ys[0]])
     return dict(frequency_hz=float(root),ell=settings.ell,conversion=conversion,
+                perturbation_closure="GAMMA1_EQUALS_GAMMA_EQ",
+                frozen_composition_gamma1="NOT_DERIVABLE_FROM_EQUILIBRIUM_BAROTROPE",
+                bulk_composition_g_modes_supported=False,
                 bracket_hz=[lo,hi],root_converged=bool(info.converged),root_iterations=int(info.iterations),
                 matching_residual=matching_residual(background,root,settings,conversion=conversion),
                 relative_join_mismatch=float(np.linalg.norm(ui-scale*uo)/np.linalg.norm(ui)),

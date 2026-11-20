@@ -585,6 +585,9 @@ class NativeSharpCowlingDVODE:
             row["W"]/=norm;row["V_km_inverse"]/=norm
         return dict(frequency_hz=float(root),bracket_hz=[lo,hi],
                     conversion=conversion,ell=ell,
+                    perturbation_closure="GAMMA1_EQUALS_GAMMA_EQ",
+                    frozen_composition_gamma1="NOT_DERIVABLE_FROM_EQUILIBRIUM_BAROTROPE",
+                    bulk_composition_g_modes_supported=False,
                     root_converged=bool(info.converged),root_iterations=int(info.iterations),
                     matching_residual=float(residual),
                     relative_join_mismatch=shot["join_relative"],

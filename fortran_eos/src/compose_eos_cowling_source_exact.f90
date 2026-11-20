@@ -25,6 +25,7 @@ module compose_eos_cowling_source_exact
   public :: cowling_native_source_eos_setup,cowling_native_source_cs2_eval
   public :: cowling_native_source_phase_setup,cowling_native_source_register
   public :: cowling_native_source_unregister
+  public :: cowling_native_source_select_restarts
 contains
   pure real(c_double) function expm1_accurate(z) result(y)
     real(c_double),intent(in) :: z
@@ -203,6 +204,84 @@ contains
       sector=0
       return
     endif
+    status=0
+  end subroutine
+
+  ! Physical one-sided derivative jumps which require fresh DVODE history.
+  ! This reproduces the previous source-contract criterion (not a PCHIP
+  ! numerical cutoff): compare equilibrium c_s² at h +/- dh strictly
+  ! inside one physical phase. Outputs s are sorted ascending.
+  subroutine cowling_native_source_select_restarts(capacity,hstart,hbegin,hend, &
+           relative_jump,side,cuts,ncuts,status) bind(c)
+    integer(c_int),value :: capacity,side
+    real(c_double),value :: hstart,hbegin,hend,relative_jump
+    real(c_double),intent(out)::cuts(capacity)
+    integer(c_int),intent(out)::ncuts,status
+    real(c_double)::h,dh,csl,csh,scale,sx,mu
+    integer(c_int)::rlo,rhi,istatlo,isthi
+    integer::index,j,k,kind
+    ncuts=0;status=1;cuts=0._c_double
+    if(n_outer<2.or.n_upper<4.or.capacity<2)return
+    if(side/=1.and.side/=2)return
+    if(.not.all(ieee_is_finite([hstart,hbegin,hend,relative_jump])))return
+    if(.not.(hstart>=hbegin.and.hbegin>hend.and.hend>=0._c_double))return
+    if(.not.(relative_jump>0._c_double.and.relative_jump<1._c_double))return
+    do index=1,n_outer+n_upper+3
+      if(index==1)then
+        mu=mu_rest
+      else if(index==2)then
+        mu=mu_surface_anchor
+      else if(index<=n_outer+2)then
+        mu=outer_mu(index-2)
+      else if(index==n_outer+3)then
+        mu=mu_bridge_right
+      else
+        mu=upper_mu(index-(n_outer+3))
+      endif
+      if(mu<=0._c_double)cycle
+      h=log(mu/mu_rest)
+      if(h<=hend.or.h>=hbegin)cycle
+      dh=max(2.e-11_c_double,1.e-9_c_double*max(h,1.e-5_c_double))
+      if(h-dh<=hend.or.h+dh>=hbegin)cycle
+      call cowling_native_source_cs2_eval(h-dh,side,csl,rlo,istatlo)
+      call cowling_native_source_cs2_eval(h+dh,side,csh,rhi,isthi)
+      if(istatlo/=0.or.isthi/=0)then
+        status=4
+        ncuts=0;cuts=0._c_double
+        return
+      endif
+      if(min(csl,csh)<=0._c_double)then
+        status=5
+        ncuts=0;cuts=0._c_double
+        return
+      endif
+      if(abs(csh-csl)/max(abs(csh),abs(csl))<relative_jump)cycle
+      sx=sqrt(max(0._c_double,hstart-h))
+      ! Floating-point duplicates at a phase boundary are not extra
+      ! physical transitions. Source knots never merge across the jump.
+      if(ncuts>0)then
+        if(any(abs(cuts(1:ncuts)-sx)<5.e-13_c_double))cycle
+      endif
+      if(ncuts>=capacity)then
+        status=3
+        ncuts=0;cuts=0._c_double
+        return
+      endif
+      ncuts=ncuts+1
+      cuts(ncuts)=sx
+    enddo
+    ! Low/source mu order produces decreasing s: keep caller-independent
+    ! increasing s; reverse direction only when building ODE targets.
+    do j=2,ncuts
+      sx=cuts(j)
+      k=j-1
+      do while(k>=1)
+        if(cuts(k)<=sx)exit
+        cuts(k+1)=cuts(k)
+        k=k-1
+      enddo
+      cuts(k+1)=sx
+    enddo
     status=0
   end subroutine
 

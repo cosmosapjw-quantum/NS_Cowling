@@ -1,0 +1,128 @@
+{
+  "schema": "ns_cowling.c12.source_exact_native_brent_benchmark.v1",
+  "baseline_commit": "7b6bebee997e2a3cad069bddcd8580ea36f63839",
+  "source_bundle_sha256": "299de43bb4f0a87ebfc4f1139ab3c8b51c344937ec3637cdff644e9ca8ab2c04",
+  "scientific_scope": "one sharp Maxwell interface, Gamma1=Gamma_eq, source-exact cs2",
+  "backend_comparison": "same original EOS, Fortran TOV and DVODE, same phase geometry, strong-knot set",
+  "method": "adams",
+  "tolerances": {
+    "rtol": 1e-09,
+    "atol": 1e-12,
+    "max_step_h": 0.002,
+    "root_xtol_hz": 1e-05
+  },
+  "repeated_run_count": 7,
+  "cases": {
+    "M2_MAXWELL_1P4_RAPID_P1": {
+      "model": "SPG_M2",
+      "join": "maxwell",
+      "conversion": "rapid",
+      "source_contract_sha256": "59b7cb4671347c33c25133e6497e8be346b4e5b4f871eece9bcaf59155fd8765",
+      "density_fm3": 0.30385128926615257,
+      "mass_msun": 1.3999999857354968,
+      "radius_km": 14.420419623651872,
+      "background_seconds": 0.40639311899940367,
+      "coefficient_setup_seconds": 1.287966319003317,
+      "bracket_hz": [
+        5110.0,
+        5170.0
+      ],
+      "external_reference_hz": 5143.719721563306,
+      "original_py_brent_freq_hz": 5143.719608336112,
+      "fortran_brent_freq_hz": 5143.719608336112,
+      "frequency_difference_hz": 0.0,
+      "fortran_residual": -1.0990189858798455e-08,
+      "fortran_join_relative": 1.0990189878385637e-08,
+      "fortran_root_iterations": 5,
+      "fortran_root_nfev": 54172,
+      "root_restart_cuts_in_fortran": 39,
+      "root_restart_cuts_previous_python": 39,
+      "python_rhs_callbacks": 0,
+      "nodes": [
+        1,
+        1
+      ],
+      "wall_seconds": {
+        "python_brentq": [
+          0.029052737998426892,
+          0.031385797999973875,
+          0.031107311999221565,
+          0.03575293399990187,
+          0.03776062000179081,
+          0.029176922002079664,
+          0.02930534400002216
+        ],
+        "fortran_source_exact": [
+          0.024588638996647205,
+          0.02542212100161123,
+          0.02717986599964206,
+          0.025192387998686172,
+          0.02591386899803183,
+          0.024676756002008915,
+          0.025269974998082034
+        ]
+      },
+      "median_wall_seconds": {
+        "python_brentq": 0.031107311999221565,
+        "fortran_source_exact": 0.025269974998082034
+      },
+      "median_speedup": 1.2309989226970972
+    },
+    "M3_CSS_0P7_SLOW_P1": {
+      "model": "SPG_M3",
+      "join": "css",
+      "conversion": "slow",
+      "source_contract_sha256": "f23fb7020c9de1b65c99ac37690840f7a4d6611f3372409b015d8c3bd7e32f3b",
+      "density_fm3": 0.192510767556007,
+      "mass_msun": 0.7000000086373105,
+      "radius_km": 14.59794179069283,
+      "background_seconds": 0.21229651200337685,
+      "coefficient_setup_seconds": 0.7300580539995281,
+      "bracket_hz": [
+        3710.0,
+        3760.0
+      ],
+      "external_reference_hz": 3736.2088951581254,
+      "original_py_brent_freq_hz": 3736.21069873971,
+      "fortran_brent_freq_hz": 3736.21069873971,
+      "frequency_difference_hz": 0.0,
+      "fortran_residual": 2.454660667150133e-06,
+      "fortran_join_relative": 2.4546606671702084e-06,
+      "fortran_root_iterations": 10,
+      "fortran_root_nfev": 114671,
+      "root_restart_cuts_in_fortran": 40,
+      "root_restart_cuts_previous_python": 40,
+      "python_rhs_callbacks": 0,
+      "nodes": [
+        1,
+        1
+      ],
+      "wall_seconds": {
+        "python_brentq": [
+          0.038248308999754954,
+          0.03905830700023216,
+          0.03928762899886351,
+          0.03912358999878052,
+          0.03879354799937573,
+          0.038392341000871966,
+          0.038262976999249076
+        ],
+        "fortran_source_exact": [
+          0.029919623000751017,
+          0.030567664998670807,
+          0.030261027000960894,
+          0.030520104999595787,
+          0.030511929999192944,
+          0.030603612001868896,
+          0.03015831300217542
+        ]
+      },
+      "median_wall_seconds": {
+        "python_brentq": 0.03879354799937573,
+        "fortran_source_exact": 0.030511929999192944
+      },
+      "median_speedup": 1.2714222928671455
+    }
+  },
+  "status": "PASS_SCOPED_MATCHED_REAL_SOURCE_MODES"
+}

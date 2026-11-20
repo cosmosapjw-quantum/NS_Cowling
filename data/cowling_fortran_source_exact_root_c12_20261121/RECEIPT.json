@@ -1,0 +1,108 @@
+{
+  "schema": "ns_cowling.c12.source_exact_sharp_brent_native.v1",
+  "date_kst": "2026-11-21",
+  "baseline_commit": "7b6bebee997e2a3cad069bddcd8580ea36f63839",
+  "branch": "research/cowling-fortran-source-exact-sharp-root-c12-20261121",
+  "status": "PASS_SCOPED_ORIGINAL_EOS_FORTRAN_SHARP_ROOT",
+  "native_subagent": "NOT_RUN",
+  "source_archive_sha256": "299de43bb4f0a87ebfc4f1139ab3c8b51c344937ec3637cdff644e9ca8ab2c04",
+  "source_contract_shas": {
+    "SPG_M2": "59b7cb4671347c33c25133e6497e8be346b4e5b4f871eece9bcaf59155fd8765",
+    "SPG_M3": "f23fb7020c9de1b65c99ac37690840f7a4d6611f3372409b015d8c3bd7e32f3b"
+  },
+  "modified_source_and_docs_sha256": {
+    "fortran_eos/src/compose_eos_cowling_source_exact.f90": "b7be45f2e9ae32cad46e6dcdd60333c98b78a7814f9de05aa0b23967989e2945",
+    "fortran_eos/src/compose_eos_cowling_sharp_source_root.f90": "3c92e7da1fb9b1004094a5217242542633dcfc0e50344c712349272e88793c29",
+    "fortran_eos/tests/cowling_source_exact_sharp_root_c12.f90": "6b739a98ec31fd0316c324e7d6b34a8fd3308fe8bc694a86b38fefc30bfdce1e",
+    "python_frontend/compose_eos/stellar_cowling_native.py": "d0ddf180a24b0800c6def3d0d71b7cdd8552ccfb274797ec59713b4bd285b69d",
+    "python_frontend/compose_eos/stellar_sharp_native.py": "a357a7386fbf85aca0f17bae0bcfa6307a8e9d88bc1d673226892bffa870ab5a",
+    "python_frontend/tests/test_cowling_source_exact_native_root_c12_20261121.py": "413047a81185e335976188745a9457327da372bb79fda5f80d82b64b7fc4c7ee",
+    "scripts/bench_cowling_source_exact_root_c12_20261121.py": "afb42f6cd366e6ab546675c5b4dc9c857296ec15609fa3af6e8fe117b0341fba",
+    "scripts/export_cowling_source_exact_root_c12_20261121.py": "febd6bb5227234caf9c0e77201ce03c7c2e9befc9ddc0859b82717561bcc7c83",
+    "scripts/build_cowling_source_exact_root_c12_20261121.sh": "0bb5d6eb760c81b94114fdadc7d98c4a5d314c798b153c3077272e3cf2d7c6c6",
+    "scripts/bench_cowling_source_exact_root_parallel_c12_20261121.sh": "119fe5a8df3ba2a76cd1af4a67f24c0820fb68dd2ba21c365ecc273b2c948308",
+    "docs/COWLING_FORTRAN_SOURCE_EXACT_SHARP_ROOT_C12_20261121.md": "107797c38479c5a5a42861667a0403d9351187f358ba26d02cae4ab264f06a9c"
+  },
+  "source_locked_fortran_inputs_sha256": {
+    "M2": {
+      "uncompressed_sha256": "eee499eb50de4300f9987e05bf46a4fee3ddcbfb2e9b9d99deb9ac8a423c35e5",
+      "gzip_sha256": "21fc726337dba746ba5d461c43a1c429138abd15fb66acb6349d2aeca4b4648e",
+      "gzip_bytes": 1511210
+    },
+    "M3": {
+      "uncompressed_sha256": "f6a7abb566ae68b8ac5f838d410771823634a98024007ca02264bd6e44a0d3b1",
+      "gzip_sha256": "f85dcebf71dd36959a466328ef05e4fbf680cb3485cccd7eb06ddaf382f85dc4",
+      "gzip_bytes": 1034990
+    }
+  },
+  "physical_semantics": "one Maxwell, Gamma1=Gamma_eq, original EOS piecewise laws; slow/rapid junction",
+  "tests": {
+    "focused_passed": 12,
+    "integrated_passed": 107,
+    "failed": 0,
+    "integrated_seconds": 175.24,
+    "abi_safety_passed": true,
+    "fortran_knot_selector_parity_passed": true,
+    "fortran_standalone_adams_bdf": "PASS",
+    "fortran_module_bounds": "PASS_WITH_NETLIB_VENDOR_COMPAT",
+    "all_vendor_memory_bounds": "NOT_VERIFIED",
+    "incorrect_initial_test_premise": "M3 5600\u20135700 Hz interval really contains root; reference-sign-verifying test repaired"
+  },
+  "real_original_source_cases": {
+    "M2_MAXWELL_1P4_RAPID_P1": {
+      "model": "SPG_M2",
+      "join": "maxwell",
+      "conversion": "rapid",
+      "source_contract_sha256": "59b7cb4671347c33c25133e6497e8be346b4e5b4f871eece9bcaf59155fd8765",
+      "mass_msun": 1.3999999857354968,
+      "frequency_difference_hz": 0.0,
+      "fortran_brent_freq_hz": 5143.719608336112,
+      "original_py_brent_freq_hz": 5143.719608336112,
+      "fortran_root_nfev": 54172,
+      "root_restart_cuts_in_fortran": 39,
+      "fortran_join_relative": 1.0990189878385637e-08,
+      "median_speedup": 1.2309989226970972,
+      "median_wall_seconds": {
+        "python_brentq": 0.031107311999221565,
+        "fortran_source_exact": 0.025269974998082034
+      }
+    },
+    "M3_CSS_0P7_SLOW_P1": {
+      "model": "SPG_M3",
+      "join": "css",
+      "conversion": "slow",
+      "source_contract_sha256": "f23fb7020c9de1b65c99ac37690840f7a4d6611f3372409b015d8c3bd7e32f3b",
+      "mass_msun": 0.7000000086373105,
+      "frequency_difference_hz": 0.0,
+      "fortran_brent_freq_hz": 3736.21069873971,
+      "original_py_brent_freq_hz": 3736.21069873971,
+      "fortran_root_nfev": 114671,
+      "root_restart_cuts_in_fortran": 40,
+      "fortran_join_relative": 2.4546606671702084e-06,
+      "median_speedup": 1.2714222928671455,
+      "median_wall_seconds": {
+        "python_brentq": 0.03879354799937573,
+        "fortran_source_exact": 0.030511929999192944
+      }
+    }
+  },
+  "pure_fortran_processes": {
+    "serial_wall_s": 3.773121,
+    "parallel_2_wall_s": 2.103439,
+    "speedup": 1.7937867463710622,
+    "original_eos_stars": 2,
+    "repeated_adams_bdf_roots_per_star": 40,
+    "total_roots": 80,
+    "canonical_science_sha256": "bcb02126b1a61541bfc453422fe8331a85fac13d9cbe41f1759d12a2034d5862"
+  },
+  "limitations": [
+    "strong root numerical accuracy does not certify global EOS-mode error",
+    "Python still prepares original EOS arrays and phase-local PCHIP geometry",
+    "Python still reconstructs final mode profiles",
+    "one Maxwell interface and two original source stars only",
+    "no full-GR gravitational perturbation, frozen-composition gamma1 or bulk g-mode inference",
+    "nonreentrant Netlib DVODE; no OpenMP shared state",
+    "process timings are one bounded run, no statistical confidence interval"
+  ],
+  "next_action": "Fortran-native original source geometry interpolation/PCHIP setup, further EOS and branch continuation convergence."
+}

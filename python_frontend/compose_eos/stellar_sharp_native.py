@@ -643,11 +643,76 @@ class NativeSharpCowlingDVODE:
             raise RuntimeError("Fortran sharp root determinant outside acceptance threshold")
         return float(frequency.value),int(steps.value),int(calls.value)
 
+    def _native_source_exact_root(self,bracket_hz,*,conversion):
+        """Thin frontend for original-source Fortran Brent and knot restarts.
+
+        All determinant shots, analytic c_s² evaluations, selected derivative
+        jumps and DVODE history restarts are native. Existing SciPy Brent
+        stays available as an explicit scientific reference.
+        """
+        if conversion not in ("slow","rapid"):
+            raise ValueError("conversion must be slow or rapid")
+        if self.coefficient_backend!="native_source_cs2":
+            raise ValueError("Fortran source-exact root requires native_source_cs2 backend")
+        if len(self._phases)!=2 or len(self.background.interfaces)!=1:
+            raise ValueError("Fortran native sharp root requires one Maxwell interface")
+        if self.knot_waypoints:
+            raise ValueError("Fortran root requires knot_waypoints=False")
+        if self.source_restart_relative_jump is None:
+            raise ValueError("Fortran root requires explicit restart jump threshold")
+        lo,hi=map(float,bracket_hz)
+        if not (np.isfinite(lo) and np.isfinite(hi) and 0<lo<hi):
+            raise ValueError("ordered positive frequency bracket required")
+        high,low=self._phases
+        ht=self.background.interfaces[0]["h"]
+        state_low=self.background.state_at_enthalpy(ht,"low")
+        state_high=self.background.state_at_enthalpy(ht,"high")
+        for key in ("r_km","Phi","lambda_metric","dPhi_dr_km","p"):
+            if not np.isclose(state_low[key],state_high[key],
+                              rtol=4e-12,atol=1e-14):
+                raise ValueError("Maxwell interface source geometry mismatch: "+key)
+        iface=np.ascontiguousarray([
+           state_low["r_km"],state_low["Phi"],state_low["lambda_metric"],
+           state_low["dPhi_dr_km"],state_low["p"],
+           state_low["epsilon"],state_high["epsilon"]],dtype=np.float64)
+        root,det=ct.c_double(0),ct.c_double(0)
+        iterations,calls,cuts,status=(ct.c_int(0),ct.c_int(0),
+                                    ct.c_int(0),ct.c_int(-1))
+        max_ds=min(self._smax/200,
+                   self.settings.max_step_h/(2*self._smax))
+        with native._LOCK:
+            lib=native._native_library()
+            self._native_exact_eos_setup(lib)
+            try:
+                lib.cowling_native_sharp_source_brent(
+                    lo,hi,self.settings.ell,self.settings.rtol,self.settings.atol,
+                    max_ds,{"adams":10,"bdf":22}[self.method],
+                    len(high["s"]),high["s"],high["vals"],high["slopes"],
+                    len(low["s"]),low["s"],low["vals"],low["slopes"],
+                    self.background.h_start,
+                    0.5*float(high["s"][-1]),iface,
+                    {"slow":1,"rapid":2}[conversion],
+                    self.settings.root_xtol_hz,self.source_restart_relative_jump,
+                    ct.byref(root),ct.byref(det),ct.byref(iterations),
+                    ct.byref(calls),ct.byref(cuts),ct.byref(status))
+            finally:
+                native._ACTIVE=None
+        if status.value==3:
+            raise ValueError("Fortran source-exact root bracket lacks sign change")
+        if status.value==33:
+            raise RuntimeError("Fortran source-exact root bracket discontinuous or underresolved")
+        if status.value:
+            raise RuntimeError("Fortran source-exact root failed status="+str(status.value))
+        if not np.isfinite(root.value) or abs(det.value)>1e-5:
+            raise RuntimeError("Fortran source-exact root outside determinant gate")
+        return float(root.value),int(iterations.value),int(calls.value),int(cuts.value)
+
     def solve_mode(self,bracket_hz,*,conversion,profile_points=600,
                    root_backend="python_brentq"):
         lo,hi=map(float,bracket_hz)
         if not 0<lo<hi or profile_points<40:
             raise ValueError("positive bracket and >=40 profile points required")
+        root_ncuts=None
         if root_backend=="python_brentq":
             root,info=brentq(lambda f:self.matching_residual(f,conversion=conversion),
                             lo,hi,xtol=self.settings.root_xtol_hz,
@@ -657,6 +722,10 @@ class NativeSharpCowlingDVODE:
             root_nfev=None
         elif root_backend=="fortran_phase_pchip":
             root,root_iterations,root_nfev=self._native_root_phase_pchip(
+                bracket_hz,conversion=conversion)
+            root_converged=True
+        elif root_backend=="fortran_source_exact":
+            root,root_iterations,root_nfev,root_ncuts=self._native_source_exact_root(
                 bracket_hz,conversion=conversion)
             root_converged=True
         else:
@@ -715,6 +784,7 @@ class NativeSharpCowlingDVODE:
                     root_converged=root_converged,root_iterations=root_iterations,
                     root_backend=root_backend,
                     root_native_rhs_calls=root_nfev,
+                    root_fortran_restart_count=root_ncuts,
                     matching_residual=float(residual),
                     relative_join_mismatch=shot["join_relative"],
                     surface_BC_relative=shot["surface_bc_relative"],

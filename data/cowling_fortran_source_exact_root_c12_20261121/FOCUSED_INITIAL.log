@@ -1,0 +1,19 @@
+.......F                                                                 [100%]
+=================================== FAILURES ===================================
+________________ test_root_rejects_invalid_onejump_input[case1] ________________
+
+case = ('SPG_M3', 'css', <compose_eos.stellar_sharp_native.NativeSharpCowlingDVODE object at 0x7cc5d368cec0>, 'slow', (3710.0, 3760.0), 3736.2088951581254)
+
+    def test_root_rejects_invalid_onejump_input(case):
+        model,join,solver,conversion,br,reference=case
+        with pytest.raises(ValueError,match="bracket"):
+            solver._native_source_exact_root((br[0],br[0]),conversion=conversion)
+        with pytest.raises(ValueError,match="conversion"):
+            solver._native_source_exact_root(br,conversion="invalid")
+>       with pytest.raises((RuntimeError,ValueError),match="bracket"):
+E       Failed: DID NOT RAISE any of (RuntimeError, ValueError)
+
+python_frontend/tests/test_cowling_source_exact_native_root_c12_20261121.py:105: Failed
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_cowling_source_exact_native_root_c12_20261121.py::test_root_rejects_invalid_onejump_input[case1]
+1 failed, 7 passed in 6.97s

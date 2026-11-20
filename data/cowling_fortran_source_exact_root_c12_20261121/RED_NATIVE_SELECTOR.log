@@ -1,0 +1,43 @@
+F
+=================================== FAILURES ===================================
+_______ test_fortran_knot_selector_matches_original_strong_jumps[case0] ________
+
+case = ('SPG_M2', 'maxwell', <compose_eos.stellar_sharp_native.NativeSharpCowlingDVODE object at 0x754339d61040>, 'rapid', (5110.0, 5170.0), 5143.719721563306)
+
+    def test_fortran_knot_selector_matches_original_strong_jumps(case):
+        model,join,solver,conversion,br,reference=case
+        with native._LOCK:
+            dll=native._native_library()
+            solver._native_exact_eos_setup(dll)
+            for phase in solver._phases:
+                expected=phase["source_restart_s"]
+                capacity=solver._native_source_eos[0].shape[1]+solver._native_source_eos[1].shape[1]+5
+                cuts=np.zeros(capacity,dtype=np.float64)
+                count,status=ct.c_int(-1),ct.c_int(-1)
+>               dll.cowling_native_source_select_restarts(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  capacity,solver.background.h_start,
+                  phase["h0"],phase["h1"],.01,
+                  2 if phase is solver._phases[0] else 1,
+                  cuts,ct.byref(count),ct.byref(status))
+
+python_frontend/tests/test_cowling_source_exact_native_root_c12_20261121.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/ctypes/__init__.py:392: in __getattr__
+    func = self.__getitem__(name)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <CDLL '/tmp/ns_cowling_native_dvode/libcowling_0b789a924c3eac9447.so', handle 2e7d3bc0 at 0x754339448200>
+name_or_ordinal = 'cowling_native_source_select_restarts'
+
+    def __getitem__(self, name_or_ordinal):
+>       func = self._FuncPtr((name_or_ordinal, self))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: /tmp/ns_cowling_native_dvode/libcowling_0b789a924c3eac9447.so: undefined symbol: cowling_native_source_select_restarts. Did you mean: 'cowling_native_segment_restarts'?
+
+/usr/lib/python3.12/ctypes/__init__.py:397: AttributeError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_cowling_source_exact_native_root_c12_20261121.py::test_fortran_knot_selector_matches_original_strong_jumps[case0]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 6 deselected in 4.25s

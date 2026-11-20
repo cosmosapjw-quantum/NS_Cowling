@@ -29,7 +29,7 @@ module compose_eos_cowling_dvode
   real(c_double),save :: restart_start=0._c_double,restart_end=0._c_double
   public :: cowling_native_setup, cowling_native_shot, cowling_native_segment, &
             cowling_native_interface_transfer, cowling_native_set_source_callback, &
-            cowling_native_segment_restarts
+            cowling_native_segment_restarts, cowling_native_scan
 contains
   subroutine cowling_native_set_source_callback(ptr,status) bind(c)
     type(c_funptr), value :: ptr
@@ -260,6 +260,70 @@ contains
       status=31;return
     endif
     nfev=i1+i2;status=0
+  end subroutine
+
+  ! Native bulk smooth-star scan. All ODE integrations and sign-change
+  ! decisions occur in Fortran. The caller only formats the results.
+  ! Each frequency starts a fresh DVODE history via cowling_native_shot;
+  ! DVODE COMMON and SAVEd coefficient arrays require process isolation
+  ! for any concurrent scans (not OpenMP threads).
+  subroutine cowling_native_scan(nfreq,freq_hz,ell,rtol,atol,max_ds,mf, &
+      match_s,surface_s,residuals,bracket_flags,total_nfev,status) bind(c)
+    integer(c_int),value :: nfreq,ell,mf
+    real(c_double),intent(in) :: freq_hz(nfreq)
+    real(c_double),value :: rtol,atol,max_ds,match_s,surface_s
+    real(c_double),intent(out) :: residuals(nfreq)
+    integer(c_int),intent(out) :: bracket_flags(nfreq-1),total_nfev,status
+    real(c_double),parameter :: pi=3.1415926535897932384626433832795_c_double
+    real(c_double),parameter :: c_km_s=299792.458_c_double
+    real(c_double) :: si(2),so(2),inner(2,2),outer(2,2)
+    real(c_double) :: omega,root_residual
+    integer(c_int) :: single_nfev,single_status
+    integer :: j
+    status=1
+    total_nfev=0
+    residuals=0._c_double
+    bracket_flags=0
+    if(nfreq<2.or.ntab<4.or.ell<2)return
+    ! A live callback belongs to a separate one-sided sharp interface path.
+    ! Never silently promote that phase to a smooth whole-star spectrum.
+    if(associated(active_source))then
+      status=2
+      return
+    endif
+    if(mf/=10.and.mf/=22)return
+    if(.not.all(ieee_is_finite(freq_hz)))return
+    if(.not.all(ieee_is_finite([rtol,atol,max_ds,match_s,surface_s])))return
+    if(any(freq_hz<=0._c_double))return
+    if(any(freq_hz(2:nfreq)<=freq_hz(1:nfreq-1)))return
+    if(.not.(0._c_double<match_s.and.match_s<surface_s))return
+    if(abs(surface_s-knots(ntab))>1.e-12_c_double)return
+    if(.not.(rtol>=1.e-13_c_double.and.rtol<=1.e-3_c_double))return
+    if(atol<=0._c_double.or.max_ds<=0._c_double)return
+    si=[0._c_double,match_s]
+    so=[surface_s,match_s]
+    do j=1,nfreq
+      omega=2._c_double*pi*freq_hz(j)/c_km_s
+      call cowling_native_shot(omega,ell,rtol,atol,max_ds,mf, &
+             2_c_int,si,2_c_int,so,inner,outer,root_residual, &
+             single_nfev,single_status)
+      if(single_status/=0.or..not.ieee_is_finite(root_residual))then
+        ! Fail closed, even if earlier shots were valid. No partial scan
+        ! can be misinterpreted as a complete physical bracket census.
+        residuals=0._c_double
+        bracket_flags=0
+        total_nfev=0
+        status=10+single_status
+        return
+      endif
+      residuals(j)=root_residual
+      total_nfev=total_nfev+single_nfev
+      if(j>1)then
+        if(residuals(j-1)*residuals(j)<0._c_double) &
+           bracket_flags(j-1)=1
+      endif
+    enddo
+    status=0
   end subroutine
 
   ! One native integration segment on current one-sided background.

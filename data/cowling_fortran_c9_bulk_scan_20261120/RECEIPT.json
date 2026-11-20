@@ -1,0 +1,112 @@
+{
+  "schema": "ns_cowling.c9.fortran_native_bulk_review.v1",
+  "date": "2026-11-20",
+  "parent_commit": "3e90be5645b10007c82285d274bb7c0c0dfa6674",
+  "branch": "research/cowling-fortran-bulk-scan-c9-20261120",
+  "status": "LOOKS_GOOD_SCOPED_WITH_LIMITATIONS",
+  "new_numerical_kernel": "Fortran DVODE c-binding native bulk scan",
+  "frontend": "Python input/marshaling/output; original PCHIP and SciPy root polish remain",
+  "native_subagent": "NOT_RUN",
+  "original_sources_sha256": {
+    "data/core_support_20261117/primary_v1/REPRESENTATION.json": "591ac27aa99448512e291684c98f8273efc729d17c63be88e331c20e83bd2653",
+    "data/eos_missing_data_recalc_20261119/artifacts/EOS_ALL_REQUESTED_SOURCE_LOCKED_NESTED_20261119.zip": "299de43bb4f0a87ebfc4f1139ab3c8b51c344937ec3637cdff644e9ca8ab2c04"
+  },
+  "changed_source_and_evidence_sha256": {
+    "fortran_eos/src/compose_eos_cowling_dvode.f90": "0ac67bfadaf60dbf77a68b75b7e716eee0e1792a68af48fc386bf878f67ba128",
+    "fortran_eos/tests/cowling_c9_bulk_scan_test.f90": "caa78a7af484e5dbff76e08167840348d3b69091b58fd22c45b306921a550c8d",
+    "python_frontend/compose_eos/stellar_cowling_native.py": "b484334d55138800ca855349a9361efad4d7fe0eaca35a3a4e3d8200765ca27d",
+    "python_frontend/tests/test_native_cowling_bulk_scan_c9_20261120.py": "cda9da9b99eb51faddfa222905dd501fc7d7aa2230375927e2e5226fcb3fc8d9",
+    "scripts/run_cowling_native_bulk_scan_c9.py": "e154de861214944685a5d930a2b063ea0dc89b9eb5f7449ace93e7cc8584ef2f",
+    "scripts/bench_cowling_real_star_cases_c9.sh": "2f473d73006e0c1b91254cd6c89cad58c6dad662319a457d182ddea74104f822",
+    "docs/COWLING_FORTRAN_C9_NATIVE_BULK_REVIEW_20261120.md": "6185e9dc0d398ce472701f93b51cf589a14a34e76fa42a525dbc3b79fccbe882",
+    "data/cowling_fortran_c9_bulk_scan_20261120/REGRESSION_RUN_FINAL.log": "af3994788f0b2b4613ceb7732f3b390203d65c0974f48ac9f67e037733834185",
+    "data/cowling_fortran_c9_bulk_scan_20261120/FORTRAN_TEST_FINAL.log": "b3b6b25d323319ee8b4961532b0d5f548d0e8762942db0e9b68567606d99c9ae",
+    "data/cowling_fortran_c9_bulk_scan_20261120/TIMING.json": "485173f728318a09180143670181b25da37eea4ce470db0ee203d2c32fe74400"
+  },
+  "tests": {
+    "post_repair_python_passed": 51,
+    "failed": 0,
+    "skipped": 0,
+    "suite_wall_s": 70.7,
+    "fortran_adhoc_scoped_bounds": "PASS",
+    "netlib_vendor_full_bounds": "BLOCKED_LEGACY_DGEFA_DECLARATION"
+  },
+  "real_source_timing": {
+    "schema": "ns_cowling.c9.real_smooth_scan_timing.v1",
+    "parent": "3e90be5645b10007c82285d274bb7c0c0dfa6674",
+    "background_setup_seconds": 0.3463212630013004,
+    "native_pchip_samples": 2049,
+    "frequency_count": 241,
+    "model_mass_msun": 1.4000000333092002,
+    "model_radius_km": 11.752078302430546,
+    "tolerances": {
+      "rtol": 1e-09,
+      "atol": 1e-12,
+      "max_step_h": 0.002
+    },
+    "source_sha256": "591ac27aa99448512e291684c98f8273efc729d17c63be88e331c20e83bd2653",
+    "max_abs_matching_residual_difference": 0.0,
+    "scalar_trials_seconds": [
+      0.5514284019991464,
+      0.5343620220010052,
+      0.5573682180001924,
+      0.5373486819989921
+    ],
+    "bulk_trials_seconds": [
+      0.5298117049969733,
+      0.5287933560030069,
+      0.5251962949987501,
+      0.5249547999992501
+    ],
+    "scalar_median_seconds": 0.5443885419990693,
+    "bulk_median_seconds": 0.5269948255008785,
+    "status": "NUMERICALLY_EQUAL_SCOPED_REAL_STAR"
+  },
+  "real_star_process_scaling": {
+    "REAL_P1": {
+      "workers": 1,
+      "cases": 4,
+      "wall_s": 5.098019,
+      "science_manifest_sha256": "ca2d2709aeea3308c79b65c6291d68c20bebdd7c332c955f8ec88a041c427395"
+    },
+    "REAL_P2": {
+      "workers": 2,
+      "cases": 4,
+      "wall_s": 2.616172,
+      "science_manifest_sha256": "ca2d2709aeea3308c79b65c6291d68c20bebdd7c332c955f8ec88a041c427395"
+    },
+    "REAL_P4": {
+      "workers": 4,
+      "cases": 4,
+      "wall_s": 1.404418,
+      "science_manifest_sha256": "ca2d2709aeea3308c79b65c6291d68c20bebdd7c332c955f8ec88a041c427395"
+    },
+    "REAL_P1_FINAL": {
+      "workers": 1,
+      "cases": 4,
+      "wall_s": 4.950767,
+      "science_manifest_sha256": "ca2d2709aeea3308c79b65c6291d68c20bebdd7c332c955f8ec88a041c427395"
+    },
+    "REAL_P4_FINAL": {
+      "workers": 4,
+      "cases": 4,
+      "wall_s": 1.330808,
+      "science_manifest_sha256": "ca2d2709aeea3308c79b65c6291d68c20bebdd7c332c955f8ec88a041c427395"
+    }
+  },
+  "scientific_comparison_manifest_sha256": "ca2d2709aeea3308c79b65c6291d68c20bebdd7c332c955f8ec88a041c427395",
+  "unresolved": [
+    "not a sharp-interface native bulk solver",
+    "not complete Fortran-only EOS preparation and root finding",
+    "no global f/p1 branch identity from sign scan alone",
+    "vendor full bounds instrumentation not established"
+  ],
+  "measured_single_process_frontend_rss_kb": {
+    "scalar_native": 88332,
+    "fortran_bulk": 87952,
+    "no_established_memory_improvement": true,
+    "source": "data/cowling_fortran_c9_bulk_scan_20261120/*FRONTEND_MEM.log"
+  },
+  "verified_scoped_bounds_status": "PASS_NATIVE_MODULES_VENDOR_COMPAT_ONLY",
+  "full_vendor_bounds_observation": "EXIT_2_DGEFA_F77_ARRAY_DECLARATION"
+}

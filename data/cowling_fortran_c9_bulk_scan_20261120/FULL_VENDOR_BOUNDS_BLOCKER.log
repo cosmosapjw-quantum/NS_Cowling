@@ -1,0 +1,27 @@
+At line 87 of file /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/dgefa.f
+Fortran runtime error: Index '2' of dimension 2 of array 'a' above upper bound of 1
+
+Error termination. Backtrace:
+#0  0x737739623e59 in ???
+#1  0x737739624a71 in ???
+#2  0x737739625082 in ???
+#3  0x59d65817d630 in dgefa_
+	at /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/dgefa.f:87
+#4  0x59d65816cb8d in dvjac_
+	at /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3128
+#5  0x59d65817b696 in dvnlsd_
+	at /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:2875
+#6  0x59d65816fbb8 in dvstep_
+	at /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:2181
+#7  0x59d6581781df in dvode_
+	at /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:1426
+#8  0x59d6581671b0 in integrate_shot
+	at /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/src/compose_eos_cowling_dvode.f90:204
+#9  0x59d65816652b in cowling_native_shot
+	at /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/src/compose_eos_cowling_dvode.f90:245
+#10  0x59d658165377 in cowling_native_scan
+	at /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/src/compose_eos_cowling_dvode.f90:315
+#11  0x59d658181bd7 in cowling_c9_bulk_scan_test
+	at /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/tests/cowling_c9_bulk_scan_test.f90:60
+#12  0x59d6581824de in main
+	at /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/tests/cowling_c9_bulk_scan_test.f90:5

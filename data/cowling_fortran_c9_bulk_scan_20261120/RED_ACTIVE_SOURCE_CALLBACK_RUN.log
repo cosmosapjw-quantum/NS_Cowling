@@ -1,0 +1,44 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_bulk_smooth_scan_rejects_active_sharp_source_callback __________
+
+real_star = NativeTOVBackground(eos=<compose_eos.stellar_background.ContractEnthalpyEOS object at 0x722fce37f170>, central_density...oordinate': 's=sqrt(h_start-h)', 'original_eos_contract_evaluated_in_python': True}, backend='Fortran DVODE Adams TOV')
+
+    def test_bulk_smooth_scan_rejects_active_sharp_source_callback(real_star):
+        """Public native ABI must never silently scan a sharp source phase."""
+        solver = NativeCowlingDVODE(real_star, CowlingSettings(surface_h=1e-4),
+                                    samples=1025)
+        calls = []
+        prototype = ct.CFUNCTYPE(
+            None, ct.c_double, ct.POINTER(ct.c_double), ct.POINTER(ct.c_int))
+    
+        @prototype
+        def supplied_sharp_callback(s, values, status):
+            calls.append(float(s))
+            status[0] = 1
+    
+        with native._LOCK:
+            solver._setup()
+            lib = solver._lib
+            register_status = ct.c_int(-1)
+            lib.cowling_native_set_source_callback(
+                ct.cast(supplied_sharp_callback, ct.c_void_p),
+                ct.byref(register_status))
+            assert register_status.value == 0
+            try:
+                frequencies = np.array([2200., 2400.], dtype=np.float64)
+                residuals = np.ones(2, dtype=np.float64)
+                flags = np.ones(1, dtype=np.int32)
+                nfev, status = ct.c_int(-1), ct.c_int(-1)
+                lib.cowling_native_scan(
+                    2, frequencies, 2, 1e-9, 1e-12, .0001, 10,
+                    solver.match_s, solver.surface_s, residuals, flags,
+                    ct.byref(nfev), ct.byref(status))
+>               assert status.value == 2
+E               assert 11 == 2
+E                +  where 11 = c_int(11).value
+
+python_frontend/tests/test_native_cowling_bulk_scan_c9_20261120.py:107: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_native_cowling_bulk_scan_c9_20261120.py::test_bulk_smooth_scan_rejects_active_sharp_source_callback
+1 failed, 3 deselected in 0.70s

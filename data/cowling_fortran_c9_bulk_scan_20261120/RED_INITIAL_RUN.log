@@ -1,0 +1,116 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_______ test_bulk_scan_uses_fortran_and_matches_scalar_real_star[adams] ________
+
+real_star = NativeTOVBackground(eos=<compose_eos.stellar_background.ContractEnthalpyEOS object at 0x7cdb00f60e00>, central_density...oordinate': 's=sqrt(h_start-h)', 'original_eos_contract_evaluated_in_python': True}, backend='Fortran DVODE Adams TOV')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7cdb00094e00>
+method = 'adams'
+
+    @pytest.mark.parametrize("method", ["adams", "bdf"])
+    def test_bulk_scan_uses_fortran_and_matches_scalar_real_star(real_star, monkeypatch, method):
+        settings = CowlingSettings(surface_h=1e-4, rtol=1e-9,
+                                   atol=1e-12, max_step_h=.002)
+        solver = NativeCowlingDVODE(real_star, settings, samples=2049, method=method)
+        frequencies = np.array([2200., 2350., 2475., 6200., 6550., 6750.])
+        scalar = [solver.matching_residual(float(f)) for f in frequencies]
+    
+        def reject_python_shots(*args, **kwargs):
+            raise AssertionError("bulk scan must not run a Python frequency loop")
+    
+        monkeypatch.setattr(solver, "matching_residual", reject_python_shots)
+>       brackets, scan = solver.scan_brackets(frequencies)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_cowling_bulk_scan_c9_20261120.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/stellar_cowling_native.py:238: in scan_brackets
+    values = [self.matching_residual(f) for f in fs]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (np.float64(2200.0),), kwargs = {}
+
+    def reject_python_shots(*args, **kwargs):
+>       raise AssertionError("bulk scan must not run a Python frequency loop")
+E       AssertionError: bulk scan must not run a Python frequency loop
+
+python_frontend/tests/test_native_cowling_bulk_scan_c9_20261120.py:40: AssertionError
+________ test_bulk_scan_uses_fortran_and_matches_scalar_real_star[bdf] _________
+
+real_star = NativeTOVBackground(eos=<compose_eos.stellar_background.ContractEnthalpyEOS object at 0x7cdb00f60e00>, central_density...oordinate': 's=sqrt(h_start-h)', 'original_eos_contract_evaluated_in_python': True}, backend='Fortran DVODE Adams TOV')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7cdb000cc6e0>
+method = 'bdf'
+
+    @pytest.mark.parametrize("method", ["adams", "bdf"])
+    def test_bulk_scan_uses_fortran_and_matches_scalar_real_star(real_star, monkeypatch, method):
+        settings = CowlingSettings(surface_h=1e-4, rtol=1e-9,
+                                   atol=1e-12, max_step_h=.002)
+        solver = NativeCowlingDVODE(real_star, settings, samples=2049, method=method)
+        frequencies = np.array([2200., 2350., 2475., 6200., 6550., 6750.])
+        scalar = [solver.matching_residual(float(f)) for f in frequencies]
+    
+        def reject_python_shots(*args, **kwargs):
+            raise AssertionError("bulk scan must not run a Python frequency loop")
+    
+        monkeypatch.setattr(solver, "matching_residual", reject_python_shots)
+>       brackets, scan = solver.scan_brackets(frequencies)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_native_cowling_bulk_scan_c9_20261120.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/compose_eos/stellar_cowling_native.py:238: in scan_brackets
+    values = [self.matching_residual(f) for f in fs]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (np.float64(2200.0),), kwargs = {}
+
+    def reject_python_shots(*args, **kwargs):
+>       raise AssertionError("bulk scan must not run a Python frequency loop")
+E       AssertionError: bulk scan must not run a Python frequency loop
+
+python_frontend/tests/test_native_cowling_bulk_scan_c9_20261120.py:40: AssertionError
+_____________ test_native_bulk_scan_fails_closed_on_bad_frequency ______________
+
+real_star = NativeTOVBackground(eos=<compose_eos.stellar_background.ContractEnthalpyEOS object at 0x7cdb00f60e00>, central_density...oordinate': 's=sqrt(h_start-h)', 'original_eos_contract_evaluated_in_python': True}, backend='Fortran DVODE Adams TOV')
+
+    def test_native_bulk_scan_fails_closed_on_bad_frequency(real_star):
+        solver = NativeCowlingDVODE(
+            real_star, CowlingSettings(surface_h=1e-4), samples=1025)
+        with pytest.raises(ValueError, match="strictly increasing"):
+            solver.scan_brackets([2350., 2300.])
+        with pytest.raises(ValueError, match="strictly increasing"):
+            solver.scan_brackets([2350., float("nan")])
+        with native._LOCK:
+            solver._setup()
+            lib = solver._lib
+            bad = np.ascontiguousarray(np.array([2000., -1.], dtype=np.float64))
+            residuals = np.zeros(2, dtype=np.float64)
+            nfev, status = ct.c_int(-1), ct.c_int(-1)
+>           lib.cowling_native_scan(
+            ^^^^^^^^^^^^^^^^^^^^^^^
+                2, bad, 2, 1e-9, 1e-12, .0001, 10,
+                solver.match_s, solver.surface_s, residuals,
+                ct.byref(nfev), ct.byref(status))
+
+python_frontend/tests/test_native_cowling_bulk_scan_c9_20261120.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/ctypes/__init__.py:392: in __getattr__
+    func = self.__getitem__(name)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <CDLL '/tmp/ns_cowling_native_dvode/libcowling_df5c46915b829ea70a.so', handle 2805e010 at 0x7cdb02678c80>
+name_or_ordinal = 'cowling_native_scan'
+
+    def __getitem__(self, name_or_ordinal):
+>       func = self._FuncPtr((name_or_ordinal, self))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: /tmp/ns_cowling_native_dvode/libcowling_df5c46915b829ea70a.so: undefined symbol: cowling_native_scan. Did you mean: 'cowling_native_shot'?
+
+/usr/lib/python3.12/ctypes/__init__.py:397: AttributeError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_native_cowling_bulk_scan_c9_20261120.py::test_bulk_scan_uses_fortran_and_matches_scalar_real_star[adams]
+FAILED python_frontend/tests/test_native_cowling_bulk_scan_c9_20261120.py::test_bulk_scan_uses_fortran_and_matches_scalar_real_star[bdf]
+FAILED python_frontend/tests/test_native_cowling_bulk_scan_c9_20261120.py::test_native_bulk_scan_fails_closed_on_bad_frequency
+3 failed in 0.82s

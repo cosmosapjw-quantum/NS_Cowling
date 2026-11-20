@@ -72,6 +72,11 @@ def _native_library():
         _FORTRAN_ARRAY, _FORTRAN_ARRAY,
         ct.POINTER(ct.c_double), ct.POINTER(ct.c_int), ct.POINTER(ct.c_int)]
     dll.cowling_native_shot.restype = None
+    dll.cowling_native_scan.argtypes = [
+        ct.c_int, _DOUBLE_ARRAY, ct.c_int, ct.c_double, ct.c_double,
+        ct.c_double, ct.c_int, ct.c_double, ct.c_double, _DOUBLE_ARRAY,
+        _INT_ARRAY, ct.POINTER(ct.c_int), ct.POINTER(ct.c_int)]
+    dll.cowling_native_scan.restype = None
     dll.cowling_native_segment.argtypes = [
         ct.c_double,ct.c_int,ct.c_double,ct.c_double,ct.c_double,
         ct.c_int,ct.c_int,_DOUBLE_ARRAY,_DOUBLE_ARRAY,_FORTRAN_ARRAY,
@@ -231,15 +236,30 @@ class NativeCowlingDVODE:
         return self._shoot(frequency_hz)[4]
 
     def scan_brackets(self, frequencies_hz):
-        fs = np.asarray(frequencies_hz, dtype=float)
+        """Frontend marshaling only; Fortran evaluates all frequency shots."""
+        fs = np.ascontiguousarray(np.asarray(frequencies_hz, dtype=np.float64))
         if (fs.ndim != 1 or len(fs) < 2 or not np.all(np.isfinite(fs))
             or fs[0] <= 0 or np.any(np.diff(fs) <= 0)):
             raise ValueError("scan frequencies must be strictly increasing and positive")
-        values = [self.matching_residual(f) for f in fs]
+        residuals = np.empty(len(fs), dtype=np.float64)
+        crossings = np.empty(len(fs)-1, dtype=np.int32)
+        calls, status = ct.c_int(0), ct.c_int(-1)
+        max_ds = min(self.surface_s/200,
+                     self.settings.max_step_h/(2*self.surface_s))
+        with _LOCK:
+            self._setup()
+            self._lib.cowling_native_scan(
+                len(fs), fs, self.settings.ell, self.settings.rtol,
+                self.settings.atol, max_ds, self.mf,
+                self.match_s, self.surface_s, residuals, crossings,
+                ct.byref(calls), ct.byref(status))
+        if status.value:
+            raise RuntimeError("Fortran DVODE bulk scan rejected: "
+                               +str(status.value))
         return ([(float(fs[i]),float(fs[i+1])) for i in range(len(fs)-1)
-                 if values[i]*values[i+1] < 0],
+                 if crossings[i]],
                 [dict(frequency_hz=float(f),residual=float(v))
-                 for f,v in zip(fs,values)])
+                 for f,v in zip(fs,residuals)])
 
     def solve_mode(self, bracket_hz, profile_points=1200):
         lo,hi = map(float,bracket_hz)

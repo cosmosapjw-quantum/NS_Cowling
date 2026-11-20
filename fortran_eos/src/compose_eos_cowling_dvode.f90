@@ -10,7 +10,7 @@ module compose_eos_cowling_dvode
   implicit none
   private
   real(c_double), allocatable, save :: knots(:), coeff(:,:), slopes(:,:)
-  integer, save :: ntab=0, rhs_failed=0
+  integer, save :: ntab=0, rhs_failed=0, last_bin=1
   ! A source-evaluated callback is opt-in, process-local, and only enabled
   ! during a Python-serialized native segment. The default remains PCHIP.
   abstract interface
@@ -50,6 +50,7 @@ contains
     integer::astat
     status=1
     ntab=0
+    last_bin=1
     ! Disallow persistence of a callback across independent native setups.
     nullify(active_source)
     source_restart_active=.false.
@@ -105,15 +106,31 @@ contains
     else if(s>=knots(ntab))then
       v=coeff(:,ntab)
     else
-      lo=1;hi=ntab
-      do while(hi-lo>1)
-        mid=(lo+hi)/2
-        if(knots(mid)<=s)then
-          lo=mid
-        else
-          hi=mid
+      ! A native shot evaluates nearby s repeatedly. Reuse the last
+      ! valid Hermite cell, with a full binary fallback for large DVODE
+      ! steps, arbitrary direction changes, or restart jumps.
+      ! DVODE COMMON and these module arrays remain process-serial.
+      lo=max(1,min(last_bin,ntab-1))
+      if(.not.(knots(lo)<=s.and.s<knots(lo+1)))then
+        if(lo>1)then
+          if(knots(lo-1)<=s.and.s<knots(lo))lo=lo-1
         endif
-      enddo
+        if(lo<ntab-1)then
+          if(knots(lo+1)<=s.and.s<knots(lo+2))lo=lo+1
+        endif
+        if(.not.(knots(lo)<=s.and.s<knots(lo+1)))then
+          lo=1;hi=ntab
+          do while(hi-lo>1)
+            mid=(lo+hi)/2
+            if(knots(mid)<=s)then
+              lo=mid
+            else
+              hi=mid
+            endif
+          enddo
+        endif
+      endif
+      last_bin=lo
       dx=knots(lo+1)-knots(lo)
       z=(s-knots(lo))/dx;z2=z*z;z3=z2*z
       v=(2*z3-3*z2+1)*coeff(:,lo)+(z3-2*z2+z)*dx*slopes(:,lo) &

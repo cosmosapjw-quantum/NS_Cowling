@@ -10,7 +10,7 @@ module compose_eos_cowling_tov_dvode
   private
   real(c_double),parameter :: pi=3.1415926535897932384626433832795_c_double
   real(c_double),allocatable,save :: ss(:), pvals(:), evals(:), pd(:), ed(:)
-  integer,save :: ntable=0, rhs_bad=0
+  integer,save :: ntable=0, rhs_bad=0, last_eos_bin=1
   public :: tov_native_profile
 contains
   subroutine interp_eos(s,p,e,ok)
@@ -27,15 +27,29 @@ contains
     else if(s>=ss(ntable))then
       p=pvals(ntable);e=evals(ntable)
     else
-      lo=1;hi=ntable
-      do while(hi-lo>1)
-        mid=(lo+hi)/2
-        if(ss(mid)<=s)then
-          lo=mid
-        else
-          hi=mid
+      ! One-cell cached hint is safe only inside this process-local
+      ! non-reentrant DVODE integration, never across concurrent threads.
+      lo=max(1,min(last_eos_bin,ntable-1))
+      if(.not.(ss(lo)<=s.and.s<ss(lo+1)))then
+        if(lo>1)then
+          if(ss(lo-1)<=s.and.s<ss(lo))lo=lo-1
         endif
-      enddo
+        if(lo<ntable-1)then
+          if(ss(lo+1)<=s.and.s<ss(lo+2))lo=lo+1
+        endif
+        if(.not.(ss(lo)<=s.and.s<ss(lo+1)))then
+          lo=1;hi=ntable
+          do while(hi-lo>1)
+            mid=(lo+hi)/2
+            if(ss(mid)<=s)then
+              lo=mid
+            else
+              hi=mid
+            endif
+          enddo
+        endif
+      endif
+      last_eos_bin=lo
       dx=ss(lo+1)-ss(lo)
       z=(s-ss(lo))/dx;z2=z*z;z3=z2*z
       ax=2*z3-3*z2+1
@@ -112,7 +126,7 @@ contains
     if(rtol<1.e-13_c_double.or.rtol>1.e-3_c_double &
        .or.atol_r<=0._c_double.or.atol_m<=0._c_double.or.ds_max<=0._c_double)return
     if(allocated(ss))deallocate(ss,pvals,evals,pd,ed)
-    ntable=0;rhs_bad=0
+    ntable=0;rhs_bad=0;last_eos_bin=1
     allocate(ss(n),pvals(n),evals(n),pd(n),ed(n),stat=astat)
     if(astat/=0)then
       status=9;return

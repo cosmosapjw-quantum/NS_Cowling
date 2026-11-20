@@ -1,0 +1,74 @@
+{
+  "schema": "ns_cowling.c8.fortran_lookup_process_parallel_benchmark.v1",
+  "date_kst": "2026-11-20",
+  "parent_commit": "d6fdd55d271f397dc7fc9164cddc416ed9ecf655",
+  "branch": "research/cowling-fortran-c8-cache-process-parallel-20261120",
+  "status": "PASS_SCOPED_NATIVE_LOOKUP_AND_PROCESS_ISOLATED_BENCHMARK",
+  "native_subagent": "NOT_RUN",
+  "architecture": {
+    "new_numerical_computation": "Fortran",
+    "orchestration": "Bash; existing Python remains frontend and independent reference",
+    "dvode_shared_common_threadsafe": false,
+    "parallelism": "separate operating system processes",
+    "global_solver_model_unchanged": true
+  },
+  "input_sha256": {
+    "source_eos_zip": "299de43bb4f0a87ebfc4f1139ab3c8b51c344937ec3637cdff644e9ca8ab2c04",
+    "fortran_cowling_before": "6f75a2f218b87af835837a2040ff6c9ce20df7707504209ad3a93916e7097c0b",
+    "fortran_cowling_after": "4f1e948837230e8e5a904569e398898437f9eb8843bd94514a4a7ea95d518c92",
+    "fortran_tov_after": "ed8858a14910f9e6eb7a8ea3623678c08f70065bdae197570dc851c5b77bb174"
+  },
+  "benchmark": {
+    "kind": "synthetic smooth geometric coefficient table; not a physical neutron star",
+    "threads_per_process": 1,
+    "native_pchip_samples": 8193,
+    "rtol": 1e-9,
+    "atol": 1e-12,
+    "max_step_s": 0.005,
+    "one_job_45000": {
+      "shots": 45000,
+      "baseline_wall_seconds": 7.42,
+      "optimized_wall_seconds": 6.84,
+      "baseline_cpu_seconds": 7.417657,
+      "optimized_cpu_seconds": 6.840924,
+      "baseline_nfev": 34710585,
+      "optimized_nfev": 34710585,
+      "baseline_checksum": "2.8647555725735863E+05",
+      "optimized_checksum": "2.8647555725735863E+05"
+    },
+    "batch_8_jobs_12000_each": {
+      "total_shots": 96000,
+      "baseline_1_process_wall_seconds": 15.801767,
+      "optimized_1_process_wall_seconds": 14.688454,
+      "optimized_2_processes_wall_seconds": 7.466657,
+      "optimized_4_processes_wall_seconds": 3.728798,
+      "canonical_result_sha256": "4a70378cf7ecb812030dffcf01a902df0d32c5c580d9ffa3fc1bbd41fd165879",
+      "canonical_result_all_runs_byte_identical": true
+    },
+    "bounds_build": {
+      "compiler": "gfortran 13.3.0 -O0 -g -fcheck=all -std=legacy",
+      "shots": 400,
+      "checksum_identical_to_optimized_o2": true
+    },
+    "rss_kb": {
+      "baseline": 6120,
+      "optimized": 6224,
+      "no_memory_improvement_claimed": true
+    }
+  },
+  "real_original_eos_regression": {
+    "passed": 38,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 72.24,
+    "log": "data/cowling_fortran_c8_20261120/REAL_STAR_REGRESSION.log",
+    "no_end_to_end_speedup_claim": true
+  },
+  "limitations": [
+    "No full-matrix scientific frequency convergence certification",
+    "No production end-to-end real-EOS parallel throughput measurement",
+    "No thread-safe DVODE modification",
+    "Existing Python EOS preparation and root finding not yet ported to Fortran"
+  ],
+  "next_selected_stage": "C9: read-only independent science/numerical review and production star job scheduling, with exact HEAD"
+}

@@ -26,11 +26,28 @@ def choose_verified_backend(case, absolute_freq_tolerance_hz):
     for name,r in case["backend_variants"].items():
         if r.get("status")!="MATCHED_REFERENCE_PASS":
             continue
-        diff=float(r["reference_delta_hz"])
-        t=float(r["total_seconds"])
-        if not math.isfinite(diff) or not math.isfinite(t) or t<=0:
+        # This frozen comparison selects p1, never a faster f/g or
+        # unclassified branch with a copied PASS label.
+        if r.get("nodes")!=[1,1]:
             continue
-        if abs(diff)<=absolute_freq_tolerance_hz and r["join_relative"]<=1e-5:
+        try:
+            diff=float(r["reference_delta_hz"])
+            t=float(r["total_seconds"])
+            join=float(r["join_relative"])
+            frequency=float(r["frequency_hz"])
+            reference=float(case["reference_hz"])
+        except (KeyError,TypeError,ValueError,OverflowError):
+            continue
+        if (not all(map(math.isfinite,(diff,t,join,frequency,reference))) or
+            t<=0 or frequency<=0 or reference<=0 or not 0<=join<=1e-5):
+            continue
+        # A delta recorded against a different source/reference cannot
+        # authorize an apparently accurate backend. Allow only subtraction
+        # roundoff, not a physics-level numerical error budget.
+        subtraction_roundoff=max(1e-9,32*math.ulp(max(frequency,reference)))
+        if abs((frequency-reference)-diff)>subtraction_roundoff:
+            continue
+        if abs(diff)<=absolute_freq_tolerance_hz:
             allowed.append((t,abs(diff),name,r))
     if not allowed:
         return dict(status="NO_VERIFIED_CANDIDATE_AT_REQUESTED_FREQUENCY_TOLERANCE",

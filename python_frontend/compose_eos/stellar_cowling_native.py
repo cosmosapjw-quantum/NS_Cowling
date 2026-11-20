@@ -26,6 +26,7 @@ _ROOT = Path(__file__).resolve().parents[2]
 _FORTRAN = _ROOT / "fortran_eos"
 _SOURCES = [
     _FORTRAN / "src/compose_eos_cowling_dvode.f90",
+    _FORTRAN / "src/compose_eos_cowling_sharp_root.f90",
     _FORTRAN / "src/compose_eos_cowling_tov_dvode.f90",
     _FORTRAN / "vendor/odepack/vode.f",
     _FORTRAN / "vendor/odepack/dgefa.f",
@@ -84,6 +85,15 @@ def _native_library():
         ct.POINTER(ct.c_double), ct.POINTER(ct.c_double),
         ct.POINTER(ct.c_int), ct.POINTER(ct.c_int), ct.POINTER(ct.c_int)]
     dll.cowling_native_root.restype = None
+    dll.cowling_native_sharp_onejump_brent.argtypes = [
+        ct.c_double,ct.c_double,ct.c_int,ct.c_double,ct.c_double,
+        ct.c_double,ct.c_int,
+        ct.c_int,_DOUBLE_ARRAY,_FORTRAN_ARRAY,_FORTRAN_ARRAY,
+        ct.c_int,_DOUBLE_ARRAY,_FORTRAN_ARRAY,_FORTRAN_ARRAY,
+        ct.c_double,_DOUBLE_ARRAY,ct.c_int,ct.c_double,
+        ct.POINTER(ct.c_double),ct.POINTER(ct.c_double),
+        ct.POINTER(ct.c_int),ct.POINTER(ct.c_int),ct.POINTER(ct.c_int)]
+    dll.cowling_native_sharp_onejump_brent.restype = None
     dll.cowling_native_segment.argtypes = [
         ct.c_double,ct.c_int,ct.c_double,ct.c_double,ct.c_double,
         ct.c_int,ct.c_int,_DOUBLE_ARRAY,_DOUBLE_ARRAY,_FORTRAN_ARRAY,

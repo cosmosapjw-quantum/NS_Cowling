@@ -530,13 +530,85 @@ class NativeSharpCowlingDVODE:
                 [dict(frequency_hz=float(f),residual=float(v))
                  for f,v in zip(fs,vals)])
 
-    def solve_mode(self,bracket_hz,*,conversion,profile_points=600):
+    def _native_root_phase_pchip(self,bracket_hz,*,conversion):
+        """Fortran-only numerical root of phasewise PCHIP Maxwell determinant.
+
+        A deliberately opt-in, source-approximate backend: the original
+        hybrid_cs2/direct_source sound-speed callbacks must never be silently
+        substituted by interpolated PCHIP sound speed. Exactly one Maxwell
+        interface is admitted, with the original slow/rapid traction transfer.
+        """
+        if conversion not in ("slow","rapid"):
+            raise ValueError("conversion must be slow or rapid")
+        if self.coefficient_backend!="pchip":
+            raise ValueError("Fortran phase root requires pchip; original source cs2 needs its own backend")
+        if len(self._phases)!=2 or len(self.background.interfaces)!=1:
+            raise ValueError("Fortran phase root requires exactly one Maxwell interface")
+        if self.knot_waypoints:
+            raise ValueError("Fortran phase root requires knot_waypoints=False for matched path")
+        lo,hi=map(float,bracket_hz)
+        if not np.isfinite(lo) or not np.isfinite(hi) or not 0<lo<hi:
+            raise ValueError("positive ordered native root bracket required")
+        high,low=self._phases
+        ht=self.background.interfaces[0]["h"]
+        state_low=self.background.state_at_enthalpy(ht,"low")
+        state_high=self.background.state_at_enthalpy(ht,"high")
+        for field in ("r_km","Phi","lambda_metric","dPhi_dr_km","p"):
+            if not np.isclose(state_low[field],state_high[field],rtol=4e-12,atol=1e-14):
+                raise ValueError("Maxwell interface source geometry is discontinuous: "+field)
+        interface=np.ascontiguousarray([
+            state_low["r_km"],state_low["Phi"],state_low["lambda_metric"],
+            state_low["dPhi_dr_km"],state_low["p"],
+            state_low["epsilon"],state_high["epsilon"]],dtype=np.float64)
+        smatch=0.5*float(high["s"][-1])
+        max_ds=min(self._smax/200,self.settings.max_step_h/(2*self._smax))
+        frequency,residual=ct.c_double(0),ct.c_double(0)
+        steps,calls,status=ct.c_int(0),ct.c_int(0),ct.c_int(-1)
+        with native._LOCK:
+            lib=native._native_library()
+            try:
+                lib.cowling_native_sharp_onejump_brent(
+                    lo,hi,self.settings.ell,self.settings.rtol,self.settings.atol,
+                    max_ds,{"adams":10,"bdf":22}[self.method],
+                    len(high["s"]),high["s"],high["vals"],high["slopes"],
+                    len(low["s"]),low["s"],low["vals"],low["slopes"],
+                    smatch,interface,{"slow":1,"rapid":2}[conversion],
+                    self.settings.root_xtol_hz,ct.byref(frequency),
+                    ct.byref(residual),ct.byref(steps),ct.byref(calls),
+                    ct.byref(status))
+            finally:
+                # The Fortran phase-root implementation replaces the module's
+                # active interpolant on every physical phase. Invalidate the
+                # smooth-star frontend's cached setup identity.
+                native._ACTIVE=None
+        if status.value==3:
+            raise ValueError("native sharp phase root bracket lacks a sign change")
+        if status.value==33:
+            raise RuntimeError("native sharp phase root sign flip not physically admitted")
+        if status.value:
+            raise RuntimeError("Fortran sharp phase root rejected: "+str(status.value))
+        if abs(residual.value)>1e-5 or not np.isfinite(frequency.value):
+            raise RuntimeError("Fortran sharp root determinant outside acceptance threshold")
+        return float(frequency.value),int(steps.value),int(calls.value)
+
+    def solve_mode(self,bracket_hz,*,conversion,profile_points=600,
+                   root_backend="python_brentq"):
         lo,hi=map(float,bracket_hz)
         if not 0<lo<hi or profile_points<40:
             raise ValueError("positive bracket and >=40 profile points required")
-        root,info=brentq(lambda f:self.matching_residual(f,conversion=conversion),
-                        lo,hi,xtol=self.settings.root_xtol_hz,
-                        rtol=4*np.finfo(float).eps,full_output=True)
+        if root_backend=="python_brentq":
+            root,info=brentq(lambda f:self.matching_residual(f,conversion=conversion),
+                            lo,hi,xtol=self.settings.root_xtol_hz,
+                            rtol=4*np.finfo(float).eps,full_output=True)
+            root_converged=bool(info.converged)
+            root_iterations=int(info.iterations)
+            root_nfev=None
+        elif root_backend=="fortran_phase_pchip":
+            root,root_iterations,root_nfev=self._native_root_phase_pchip(
+                bracket_hz,conversion=conversion)
+            root_converged=True
+        else:
+            raise ValueError("unsupported sharp Cowling root_backend")
         shot=self._matched_shot(root,conversion,profile_points)
         residual=float(shot["residual"])
         if abs(residual)>1e-5 or shot["join_relative"]>1e-5:
@@ -588,7 +660,9 @@ class NativeSharpCowlingDVODE:
                     perturbation_closure="GAMMA1_EQUALS_GAMMA_EQ",
                     frozen_composition_gamma1="NOT_DERIVABLE_FROM_EQUILIBRIUM_BAROTROPE",
                     bulk_composition_g_modes_supported=False,
-                    root_converged=bool(info.converged),root_iterations=int(info.iterations),
+                    root_converged=root_converged,root_iterations=root_iterations,
+                    root_backend=root_backend,
+                    root_native_rhs_calls=root_nfev,
                     matching_residual=float(residual),
                     relative_join_mismatch=shot["join_relative"],
                     surface_BC_relative=shot["surface_bc_relative"],

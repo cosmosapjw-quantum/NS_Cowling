@@ -1,0 +1,54 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_native_abi_rejects_stale_source_callback_before_replacing_tables _____
+
+maxwell = <compose_eos.stellar_sharp_native.NativeSharpCowlingDVODE object at 0x79e280c360f0>
+
+    def test_native_abi_rejects_stale_source_callback_before_replacing_tables(maxwell):
+        """A live exact-source callback must not silently become PCHIP physics."""
+        import ctypes as ct
+        from compose_eos import stellar_cowling_native as native
+        call_s=[]
+        callback_type=ct.CFUNCTYPE(
+            None,ct.c_double,ct.POINTER(ct.c_double),ct.POINTER(ct.c_int))
+    
+        @callback_type
+        def source_callback(s,coeff,status):
+            call_s.append(float(s))
+            status[0]=1
+    
+        high,low=maxwell._phases
+        ht=maxwell.background.interfaces[0]["h"]
+        state_low=maxwell.background.state_at_enthalpy(ht,"low")
+        state_high=maxwell.background.state_at_enthalpy(ht,"high")
+        iface=np.ascontiguousarray(
+            [state_low["r_km"],state_low["Phi"],state_low["lambda_metric"],
+             state_low["dPhi_dr_km"],state_low["p"],
+             state_low["epsilon"],state_high["epsilon"]],dtype=np.float64)
+        max_ds=min(maxwell._smax/200,
+                   maxwell.settings.max_step_h/(2*maxwell._smax))
+        with native._LOCK:
+            dll=native._native_library()
+            register=ct.c_int(-1)
+            dll.cowling_native_set_source_callback(
+                ct.cast(source_callback,ct.c_void_p),ct.byref(register))
+            assert register.value==0
+            try:
+                root,resid=ct.c_double(1.),ct.c_double(1.)
+                iters,nfev,status=ct.c_int(-1),ct.c_int(-1),ct.c_int(-1)
+                dll.cowling_native_sharp_onejump_brent(
+                    5110.,5170.,2,maxwell.settings.rtol,maxwell.settings.atol,
+                    max_ds,10,
+                    len(high["s"]),high["s"],high["vals"],high["slopes"],
+                    len(low["s"]),low["s"],low["vals"],low["slopes"],
+                    0.5*float(high["s"][-1]),iface,2,
+                    maxwell.settings.root_xtol_hz,ct.byref(root),ct.byref(resid),
+                    ct.byref(iters),ct.byref(nfev),ct.byref(status))
+>               assert status.value==2
+E               assert 0 == 2
+E                +  where 0 = c_int(0).value
+
+python_frontend/tests/test_sharp_native_onejump_root_20261120.py:174: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_sharp_native_onejump_root_20261120.py::test_native_abi_rejects_stale_source_callback_before_replacing_tables
+1 failed, 10 deselected in 4.20s

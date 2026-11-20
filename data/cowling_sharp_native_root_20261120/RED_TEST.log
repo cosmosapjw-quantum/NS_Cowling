@@ -1,0 +1,130 @@
+FFFFFFFF                                                                 [100%]
+=================================== FAILURES ===================================
+___ test_phasewise_fortran_matches_legacy_brent_source[slow-bracket0-nodes0] ___
+
+maxwell = <compose_eos.stellar_sharp_native.NativeSharpCowlingDVODE object at 0x7e29b79be0f0>
+conversion = 'slow', bracket = (1800.0, 1900.0), nodes = (0, 0)
+
+    @pytest.mark.parametrize("conversion,bracket,nodes",[
+        ("slow",(1800.,1900.),(0,0)),
+        ("rapid",(1800.,1900.),(0,0)),
+        ("slow",(5100.,5200.),(1,1)),
+        ("rapid",(5110.,5170.),(1,1)),
+    ])
+    def test_phasewise_fortran_matches_legacy_brent_source(maxwell,conversion,bracket,nodes):
+>       reference=maxwell.solve_mode(bracket,conversion=conversion,
+            profile_points=200,root_backend="python_brentq")
+E       TypeError: NativeSharpCowlingDVODE.solve_mode() got an unexpected keyword argument 'root_backend'
+
+python_frontend/tests/test_sharp_native_onejump_root_20261120.py:51: TypeError
+__ test_phasewise_fortran_matches_legacy_brent_source[rapid-bracket1-nodes1] ___
+
+maxwell = <compose_eos.stellar_sharp_native.NativeSharpCowlingDVODE object at 0x7e29b79be0f0>
+conversion = 'rapid', bracket = (1800.0, 1900.0), nodes = (0, 0)
+
+    @pytest.mark.parametrize("conversion,bracket,nodes",[
+        ("slow",(1800.,1900.),(0,0)),
+        ("rapid",(1800.,1900.),(0,0)),
+        ("slow",(5100.,5200.),(1,1)),
+        ("rapid",(5110.,5170.),(1,1)),
+    ])
+    def test_phasewise_fortran_matches_legacy_brent_source(maxwell,conversion,bracket,nodes):
+>       reference=maxwell.solve_mode(bracket,conversion=conversion,
+            profile_points=200,root_backend="python_brentq")
+E       TypeError: NativeSharpCowlingDVODE.solve_mode() got an unexpected keyword argument 'root_backend'
+
+python_frontend/tests/test_sharp_native_onejump_root_20261120.py:51: TypeError
+___ test_phasewise_fortran_matches_legacy_brent_source[slow-bracket2-nodes2] ___
+
+maxwell = <compose_eos.stellar_sharp_native.NativeSharpCowlingDVODE object at 0x7e29b79be0f0>
+conversion = 'slow', bracket = (5100.0, 5200.0), nodes = (1, 1)
+
+    @pytest.mark.parametrize("conversion,bracket,nodes",[
+        ("slow",(1800.,1900.),(0,0)),
+        ("rapid",(1800.,1900.),(0,0)),
+        ("slow",(5100.,5200.),(1,1)),
+        ("rapid",(5110.,5170.),(1,1)),
+    ])
+    def test_phasewise_fortran_matches_legacy_brent_source(maxwell,conversion,bracket,nodes):
+>       reference=maxwell.solve_mode(bracket,conversion=conversion,
+            profile_points=200,root_backend="python_brentq")
+E       TypeError: NativeSharpCowlingDVODE.solve_mode() got an unexpected keyword argument 'root_backend'
+
+python_frontend/tests/test_sharp_native_onejump_root_20261120.py:51: TypeError
+__ test_phasewise_fortran_matches_legacy_brent_source[rapid-bracket3-nodes3] ___
+
+maxwell = <compose_eos.stellar_sharp_native.NativeSharpCowlingDVODE object at 0x7e29b79be0f0>
+conversion = 'rapid', bracket = (5110.0, 5170.0), nodes = (1, 1)
+
+    @pytest.mark.parametrize("conversion,bracket,nodes",[
+        ("slow",(1800.,1900.),(0,0)),
+        ("rapid",(1800.,1900.),(0,0)),
+        ("slow",(5100.,5200.),(1,1)),
+        ("rapid",(5110.,5170.),(1,1)),
+    ])
+    def test_phasewise_fortran_matches_legacy_brent_source(maxwell,conversion,bracket,nodes):
+>       reference=maxwell.solve_mode(bracket,conversion=conversion,
+            profile_points=200,root_backend="python_brentq")
+E       TypeError: NativeSharpCowlingDVODE.solve_mode() got an unexpected keyword argument 'root_backend'
+
+python_frontend/tests/test_sharp_native_onejump_root_20261120.py:51: TypeError
+________ test_fortran_root_does_not_call_python_shooting_during_polish _________
+
+maxwell = <compose_eos.stellar_sharp_native.NativeSharpCowlingDVODE object at 0x7e29b79be0f0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7e29b7c579e0>
+
+    def test_fortran_root_does_not_call_python_shooting_during_polish(maxwell,monkeypatch):
+        def forbid(*args,**kw):
+            raise AssertionError("No Python phasewise shooting is allowed while root polishing")
+        monkeypatch.setattr(maxwell,"matching_residual",forbid)
+>       root,iterations,calls=maxwell._native_root_phase_pchip(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            (5110.,5170.),conversion="rapid")
+E       AttributeError: 'NativeSharpCowlingDVODE' object has no attribute '_native_root_phase_pchip'
+
+python_frontend/tests/test_sharp_native_onejump_root_20261120.py:72: AttributeError
+__ test_unbracketed_native_sharp_root_rejected_without_fabricating_frequency ___
+
+maxwell = <compose_eos.stellar_sharp_native.NativeSharpCowlingDVODE object at 0x7e29b79be0f0>
+
+    def test_unbracketed_native_sharp_root_rejected_without_fabricating_frequency(maxwell):
+        with pytest.raises((RuntimeError,ValueError),match="bracket"):
+>           maxwell._native_root_phase_pchip((5600.,5700.),conversion="rapid")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'NativeSharpCowlingDVODE' object has no attribute '_native_root_phase_pchip'
+
+python_frontend/tests/test_sharp_native_onejump_root_20261120.py:80: AttributeError
+______________ test_native_phase_root_rejects_unknown_conversion _______________
+
+maxwell = <compose_eos.stellar_sharp_native.NativeSharpCowlingDVODE object at 0x7e29b79be0f0>
+
+    def test_native_phase_root_rejects_unknown_conversion(maxwell):
+        with pytest.raises(ValueError,match="conversion"):
+>           maxwell._native_root_phase_pchip((5110.,5170.),conversion="unknown")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'NativeSharpCowlingDVODE' object has no attribute '_native_root_phase_pchip'
+
+python_frontend/tests/test_sharp_native_onejump_root_20261120.py:87: AttributeError
+______ test_hybrid_cs2_must_not_silently_relabel_original_source_as_pchip ______
+
+maxwell = <compose_eos.stellar_sharp_native.NativeSharpCowlingDVODE object at 0x7e29b79be0f0>
+
+    def test_hybrid_cs2_must_not_silently_relabel_original_source_as_pchip(maxwell):
+        hybrid=NativeSharpCowlingDVODE(maxwell.background,maxwell.settings,
+                           samples=129,coefficient_backend="hybrid_cs2")
+        with pytest.raises(ValueError,match="pchip"):
+>           hybrid.solve_mode((5110.,5170.),conversion="rapid",
+               profile_points=160,root_backend="fortran_phase_pchip")
+E           TypeError: NativeSharpCowlingDVODE.solve_mode() got an unexpected keyword argument 'root_backend'
+
+python_frontend/tests/test_sharp_native_onejump_root_20261120.py:94: TypeError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_sharp_native_onejump_root_20261120.py::test_phasewise_fortran_matches_legacy_brent_source[slow-bracket0-nodes0]
+FAILED python_frontend/tests/test_sharp_native_onejump_root_20261120.py::test_phasewise_fortran_matches_legacy_brent_source[rapid-bracket1-nodes1]
+FAILED python_frontend/tests/test_sharp_native_onejump_root_20261120.py::test_phasewise_fortran_matches_legacy_brent_source[slow-bracket2-nodes2]
+FAILED python_frontend/tests/test_sharp_native_onejump_root_20261120.py::test_phasewise_fortran_matches_legacy_brent_source[rapid-bracket3-nodes3]
+FAILED python_frontend/tests/test_sharp_native_onejump_root_20261120.py::test_fortran_root_does_not_call_python_shooting_during_polish
+FAILED python_frontend/tests/test_sharp_native_onejump_root_20261120.py::test_unbracketed_native_sharp_root_rejected_without_fabricating_frequency
+FAILED python_frontend/tests/test_sharp_native_onejump_root_20261120.py::test_native_phase_root_rejects_unknown_conversion
+FAILED python_frontend/tests/test_sharp_native_onejump_root_20261120.py::test_hybrid_cs2_must_not_silently_relabel_original_source_as_pchip
+8 failed in 5.19s

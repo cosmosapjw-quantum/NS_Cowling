@@ -1,0 +1,209 @@
+{
+  "schema": "ns_cowling.sharp_onejump_native_root_benchmark.v1",
+  "parent_commit": "436d7e4213d94696cf07defe075fed778587d12a",
+  "source_bundle_sha256": "299de43bb4f0a87ebfc4f1139ab3c8b51c344937ec3637cdff644e9ca8ab2c04",
+  "source_contract_sha256": "59b7cb4671347c33c25133e6497e8be346b4e5b4f871eece9bcaf59155fd8765",
+  "model": "SPG_M2_maxwell",
+  "central_density_fm3": 0.30385128926615257,
+  "background": {
+    "mass_msun": 1.3999999857354968,
+    "radius_km": 14.420419623651872,
+    "phase_count": 2,
+    "source_tov_seconds": 0.3886012130005838,
+    "coefficient_preparation_seconds": 1.2051393649999227,
+    "coefficient_backend": "PCHIP_ONE_SIDED_NOT_EXACT_SOURCE"
+  },
+  "settings": {
+    "rtol": 1e-09,
+    "atol": 1e-12,
+    "max_step_h": 0.002,
+    "root_xtol_hz": 1e-06
+  },
+  "cases": {
+    "slow_f": {
+      "conversion": "slow",
+      "bracket_hz": [
+        1800.0,
+        1900.0
+      ],
+      "expected_nodes": [
+        0,
+        0
+      ],
+      "baseline_frequency_hz": 1842.341048874691,
+      "native_frequency_hz": 1842.341048874691,
+      "delta_frequency_hz": 0.0,
+      "baseline_join": 2.0291918801168462e-07,
+      "native_join": 2.0291918801168462e-07,
+      "native_interface_traction": [
+        8.835099553709585e-16
+      ],
+      "native_native_rhs_calls": 209440,
+      "native_root_iterations": 12,
+      "elapsed_s": {
+        "python_brentq": [
+          0.043564982999669155,
+          0.04359094099891081,
+          0.04509043899997778,
+          0.04496154899970861,
+          0.04594582800018543,
+          0.04598816100042313,
+          0.04578401499929896
+        ],
+        "fortran_phase_pchip": [
+          0.037135747999855084,
+          0.036937934999514255,
+          0.03831976499895973,
+          0.03831762099980551,
+          0.03935631599961198,
+          0.03836107600000105,
+          0.038389220000681235
+        ]
+      },
+      "median_elapsed_s": {
+        "python_brentq": 0.04509043899997778,
+        "fortran_phase_pchip": 0.03831976499895973
+      },
+      "speedup_python_brent_vs_fortran": 1.1766888184518318
+    },
+    "rapid_f": {
+      "conversion": "rapid",
+      "bracket_hz": [
+        1800.0,
+        1900.0
+      ],
+      "expected_nodes": [
+        0,
+        0
+      ],
+      "baseline_frequency_hz": 1842.3118389506906,
+      "native_frequency_hz": 1842.3118389506906,
+      "delta_frequency_hz": 0.0,
+      "baseline_join": 1.5854288131745243e-06,
+      "native_join": 1.5854288131745243e-06,
+      "native_interface_traction": [
+        8.835587817306054e-16
+      ],
+      "native_native_rhs_calls": 207385,
+      "native_root_iterations": 12,
+      "elapsed_s": {
+        "python_brentq": [
+          0.043073877999631804,
+          0.0432698580007127,
+          0.043081091998828924,
+          0.04422395899928233,
+          0.043497378999745706,
+          0.043871300000319025,
+          0.04361402100039413
+        ],
+        "fortran_phase_pchip": [
+          0.03665102900049533,
+          0.03691051199893991,
+          0.03747473600014928,
+          0.03757882699937909,
+          0.037669150000510854,
+          0.03734721500040905,
+          0.03724976599914953
+        ]
+      },
+      "median_elapsed_s": {
+        "python_brentq": 0.043497378999745706,
+        "fortran_phase_pchip": 0.03734721500040905
+      },
+      "speedup_python_brent_vs_fortran": 1.1646753044174591
+    },
+    "slow_p1": {
+      "conversion": "slow",
+      "bracket_hz": [
+        5100.0,
+        5200.0
+      ],
+      "expected_nodes": [
+        1,
+        1
+      ],
+      "baseline_frequency_hz": 5147.989194978253,
+      "native_frequency_hz": 5147.989194978253,
+      "delta_frequency_hz": 0.0,
+      "baseline_join": 6.25000033964756e-07,
+      "native_join": 6.25000033964756e-07,
+      "native_interface_traction": [
+        2.9133122984819276e-16
+      ],
+      "native_native_rhs_calls": 515209,
+      "native_root_iterations": 13,
+      "elapsed_s": {
+        "python_brentq": [
+          0.09824986199964769,
+          0.09014478999961284,
+          0.08993680599996878,
+          0.09011670700056129,
+          0.09082556100111105,
+          0.09236658000008902,
+          0.09229165499891678
+        ],
+        "fortran_phase_pchip": [
+          0.09011532399927091,
+          0.08465402900037589,
+          0.08280012300019735,
+          0.08307528600016667,
+          0.0831760539986135,
+          0.0843050139992556,
+          0.08861533399976906
+        ]
+      },
+      "median_elapsed_s": {
+        "python_brentq": 0.09082556100111105,
+        "fortran_phase_pchip": 0.0843050139992556
+      },
+      "speedup_python_brent_vs_fortran": 1.0773447116907309
+    },
+    "rapid_p1": {
+      "conversion": "rapid",
+      "bracket_hz": [
+        5110.0,
+        5170.0
+      ],
+      "expected_nodes": [
+        1,
+        1
+      ],
+      "baseline_frequency_hz": 5143.70424060145,
+      "native_frequency_hz": 5143.70424060145,
+      "delta_frequency_hz": 0.0,
+      "baseline_join": 8.883046657442431e-07,
+      "native_join": 8.883046657442431e-07,
+      "native_interface_traction": [
+        5.818813216524102e-16
+      ],
+      "native_native_rhs_calls": 623102,
+      "native_root_iterations": 16,
+      "elapsed_s": {
+        "python_brentq": [
+          0.10829994599953352,
+          0.11141466600020067,
+          0.12038053600008425,
+          0.1073688790002052,
+          0.10872103200017591,
+          0.10749302900148905,
+          0.10729083699879993
+        ],
+        "fortran_phase_pchip": [
+          0.10483173299871851,
+          0.09978284499993606,
+          0.10573533000024327,
+          0.09944753499985381,
+          0.09886962399832555,
+          0.09918593700058409,
+          0.10047869499976514
+        ]
+      },
+      "median_elapsed_s": {
+        "python_brentq": 0.10829994599953352,
+        "fortran_phase_pchip": 0.09978284499993606
+      },
+      "speedup_python_brent_vs_fortran": 1.0853563656117735
+    }
+  },
+  "status": "SCOPED_SOURCE_LOCKED_ONEJUMP_NUMERICAL_PARITY"
+}

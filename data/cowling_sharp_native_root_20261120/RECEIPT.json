@@ -1,0 +1,60 @@
+{
+  "schema": "ns_cowling.onejump_pchip_fortran_root_verified.v1",
+  "date_kst": "2026-11-20",
+  "parent_commit": "436d7e4213d94696cf07defe075fed778587d12a",
+  "branch": "research/cowling-sharp-native-root-phase-pchip-20261120",
+  "status": "PASS_SCOPED_ONEJUMP_PCHIP_NATIVE_ROOT",
+  "next_stage": "Native source-exact cs2/phasewise knot handling; M3 CSS slow unresolved",
+  "physics": "equilibrium_barotropic; one Maxwell discontinuity; slow/rapid; source PCHIP only",
+  "native_subagent": "NOT_RUN",
+  "original_source_sha256": "299de43bb4f0a87ebfc4f1139ab3c8b51c344937ec3637cdff644e9ca8ab2c04",
+  "source_contract_sha256": "59b7cb4671347c33c25133e6497e8be346b4e5b4f871eece9bcaf59155fd8765",
+  "scientific_input_sha256_uncompressed": "796c9f5fc92cee7dca11381db71b5fcbc59fd0e90e3c2ddec581c3523d7bb1fd",
+  "scientific_input_sha256_gzip": "d4693cd9a986b54bc3a228430e41a4b0dce29ab7cd518c4b5111aa4c6d0391c1",
+  "modified_sources_sha256": {
+    "fortran_eos/src/compose_eos_cowling_dvode.f90": "07cf48750ab266d198441b3a84066c9659dc6558bce2833538c7c1f06c7d3300",
+    "fortran_eos/src/compose_eos_cowling_sharp_root.f90": "758fa8fc6de3af7e9e52765b65e11feb8a3e10b112a6da69b44444fea948618d",
+    "fortran_eos/tests/cowling_sharp_onejump_root_test.f90": "0f738c4fd4e609ed6667a764f3bb0c28abd00c4830d46a3a3a3959f0b1d8f07d",
+    "python_frontend/compose_eos/stellar_cowling_native.py": "1d2cd2d124cec492d83d0eab64a86724021d14147dc095e782904c145ac57344",
+    "python_frontend/compose_eos/stellar_sharp_native.py": "e3192242dd88114a545bec3ec1c66b1b91252a0cfd8086a00ca4ab1fd1f6a9d2",
+    "python_frontend/tests/test_sharp_native_onejump_root_20261120.py": "b44857d46a1c9e8d9ca93e297afc70af82860dbbe656ea70b95e1ef6ec443ace",
+    "scripts/benchmark_sharp_native_onejump_root_20261120.py": "8a374210de29bf6d98f0b950ed2f4cd1f7e4fe3a45e63238cc29501e5c873307",
+    "scripts/export_sharp_onejump_pchip_fortran_20261120.py": "31131359175320ee978946541d5f26371421df6bd36c7dd60b7f306ba63d63e6",
+    "scripts/bench_sharp_native_onejump_parallel_20261120.sh": "716d7970828f49acbdbc0117271080cdc1aa9eb5258894c4d4facdcf52fc2b62",
+    "scripts/build_sharp_native_onejump_test_20261120.sh": "6953ed13200c7efae2fe026b506decc0c9c293b4a93f7611e213468d36b7882d",
+    "docs/COWLING_SHARP_ONEJUMP_FORTRAN_NATIVE_ROOT_20261120.md": "eaa057a1dbfe1e1a4c5e54d341c4df1c0328e19c2a75a7d47b9d543dcafeb38f",
+    "data/cowling_sharp_native_root_20261120/ORIGINAL_SOURCE_PCHIP_ONEJUMP.dat.gz": "d4693cd9a986b54bc3a228430e41a4b0dce29ab7cd518c4b5111aa4c6d0391c1"
+  },
+  "numeric_checks": {
+    "new_focused_tests_passed": 11,
+    "integrated_tests_passed": 83,
+    "integrated_tests_failed": 0,
+    "integrated_seconds": 134.48,
+    "original_expected_red_failures": 8,
+    "callback_red_regression": 1,
+    "fortran_standalone": "PASS_SCOPED_PROJECT_BOUNDS_AND_VENDOR_COMPAT",
+    "max_frequency_difference_pchip_vs_scipy_hz": 0.0,
+    "max_join_relative": 1.5854288131745243e-06,
+    "m3_css_slow_pchip": "NUMERICALLY_UNRESOLVED",
+    "full_vendor_bounds": "NOT_VERIFIED"
+  },
+  "timings": {
+    "warm_speedup_by_mode": {
+      "slow_f": 1.1766888184518318,
+      "rapid_f": 1.1646753044174591,
+      "slow_p1": 1.0773447116907309,
+      "rapid_p1": 1.0853563656117735
+    },
+    "independent_fortran_process_wall_seconds": {
+      "1": 1.147294,
+      "2": 0.571572,
+      "4": 0.397642
+    },
+    "process_speedup_4_over_1": 2.8852435104943646,
+    "numerical_stage_rss_kb": 7664,
+    "full_frontend_reference_rss_kb": 106468,
+    "measured_memory_reduction_claimed": false
+  },
+  "process_scientific_canonical_sha256": "5dba40ae490deeadc88d0959835fef7e08d37b20e41b0c4922fb0e35cfe8aa9c",
+  "no_absolute_frequency_error_claim_from_root_xtol": true
+}

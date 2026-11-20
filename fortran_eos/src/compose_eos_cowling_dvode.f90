@@ -30,8 +30,12 @@ module compose_eos_cowling_dvode
   public :: cowling_native_setup, cowling_native_shot, cowling_native_segment, &
             cowling_native_interface_transfer, cowling_native_set_source_callback, &
             cowling_native_segment_restarts, cowling_native_scan, &
-            cowling_native_root
+            cowling_native_root, cowling_native_source_callback_is_active
 contains
+  logical function cowling_native_source_callback_is_active()
+    cowling_native_source_callback_is_active=associated(active_source)
+  end function
+
   subroutine cowling_native_set_source_callback(ptr,status) bind(c)
     type(c_funptr), value :: ptr
     integer(c_int),intent(out) :: status

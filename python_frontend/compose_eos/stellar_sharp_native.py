@@ -265,8 +265,10 @@ class NativeSharpCowlingDVODE:
         self.settings=settings
         self.method=method
         self.samples=samples
-        if coefficient_backend not in ("pchip","direct_source","hybrid_cs2"):
-            raise ValueError("coefficient_backend must be pchip, direct_source or hybrid_cs2")
+        if coefficient_backend not in ("pchip","direct_source","hybrid_cs2","native_source_cs2"):
+            raise ValueError("coefficient_backend must be pchip, direct_source, hybrid_cs2 or native_source_cs2")
+        if coefficient_backend=="native_source_cs2" and len(background.interfaces)!=1:
+            raise ValueError("native_source_cs2 currently requires exactly one Maxwell interface")
         self.coefficient_backend=coefficient_backend
         if source_restart_relative_jump is not None:
             if (not isinstance(source_restart_relative_jump,
@@ -312,7 +314,7 @@ class NativeSharpCowlingDVODE:
             source_breaks=source_breaks[(source_breaks>h_end)&(source_breaks<h_begin)]
             source_break_s=np.sqrt(np.maximum(h0-source_breaks,0.))
             source_restart_s=[]
-            if self.coefficient_backend in ("direct_source","hybrid_cs2") and \
+            if self.coefficient_backend in ("direct_source","hybrid_cs2","native_source_cs2") and \
                     self.source_restart_relative_jump is not None:
                 # Only restart at demonstrated strong EOS sound-speed jumps,
                 # not every source table knot (often >1000 per star).
@@ -341,6 +343,36 @@ class NativeSharpCowlingDVODE:
         self._smax=float(np.sqrt(h0-hsurface))
         self.source_break_count=sum(len(q["source_break_s"]) for q in self._phases)
         self.source_restart_count=sum(len(q["source_restart_s"]) for q in self._phases)
+        self._native_source_eos=None
+        if self.coefficient_backend=="native_source_cs2":
+            # Frontend packs original source-contract parameters only.
+            # All c_s² law selection, inversion and evaluation are Fortran.
+            b=background.eos.barotrope
+            outer=np.asfortranarray(np.vstack([
+                b.outer.nb,b.outer.p,b.outer.F,
+                np.r_[b.outer.gamma,b.outer.gamma[-1]]]))
+            upper=np.asfortranarray(np.vstack([
+                b.upper_n,b.upper_p,b.upper_epsilon]))
+            surface=np.ascontiguousarray([
+                b.surface.rest_energy_MeV,b.surface.n0,
+                b.surface.p0,b.surface.gamma],dtype=np.float64)
+            bridge=np.ascontiguousarray([
+                b.bridge.n_left,b.bridge.p_left,b.bridge.epsilon_left,
+                b.bridge.n_right,b.bridge.p_right,b.bridge.epsilon_right,
+                b.bridge.kappa],dtype=np.float64)
+            jump=int(next(iter(b.sharp_interfaces)))
+            self._native_source_eos=(outer,upper,surface,bridge,jump)
+
+    def _native_exact_eos_setup(self,lib):
+        if self._native_source_eos is None:
+            raise RuntimeError("native source EOS contract not configured")
+        outer,upper,surface,bridge,jump=self._native_source_eos
+        status=ct.c_int(-1)
+        lib.cowling_native_source_eos_setup(
+            outer.shape[1],outer,upper.shape[1],upper,surface,bridge,
+            jump,ct.byref(status))
+        if status.value:
+            raise RuntimeError("Fortran original EOS law setup rejected: "+str(status.value))
 
     def _source_coefficients(self,phase,svalue):
         """One original-EOS c_s² with phase-local PCHIP geometry only.
@@ -371,7 +403,7 @@ class NativeSharpCowlingDVODE:
         targets=np.ascontiguousarray(targets,dtype=float)
         # Physical source discontinuity stops are stronger than ordinary
         # output waypoints: DVODE is restarted at each selected cs² jump.
-        if self.coefficient_backend in ("direct_source","hybrid_cs2"):
+        if self.coefficient_backend in ("direct_source","hybrid_cs2","native_source_cs2"):
             cut_s=(phase["source_break_s"] if self.knot_waypoints
                    else phase["source_restart_s"])
         elif self.knot_waypoints:
@@ -391,8 +423,22 @@ class NativeSharpCowlingDVODE:
         max_ds=min(self._smax/200,
                    self.settings.max_step_h/(2*self._smax))
         callback=None
+        native_source_registered=False
         cb_errors=[]
         cb_status=ct.c_int()
+        if self.coefficient_backend=="native_source_cs2":
+            source_side=2 if phase is self._phases[0] else 1
+            lib.cowling_native_source_phase_setup(
+                len(x),x,phase["vals"],phase["slopes"],
+                self.background.h_start,source_side,ct.byref(cb_status))
+            if cb_status.value:
+                raise RuntimeError("Fortran source geometry setup rejected: "+
+                                   str(cb_status.value))
+            lib.cowling_native_source_register(ct.byref(cb_status))
+            if cb_status.value:
+                raise RuntimeError("Fortran source EOS callback registration rejected: "+
+                                   str(cb_status.value))
+            native_source_registered=True
         if self.coefficient_backend in ("direct_source","hybrid_cs2"):
             # The function pointer is held strongly until Fortran returns.
             # Fortran and source EOS callbacks are process-local and always
@@ -426,7 +472,7 @@ class NativeSharpCowlingDVODE:
             if cb_status.value:
                 raise RuntimeError("native EOS callback registration failed")
         try:
-            if self.coefficient_backend in ("direct_source","hybrid_cs2") and len(restart_indices):
+            if self.coefficient_backend in ("direct_source","hybrid_cs2","native_source_cs2") and len(restart_indices):
                 lib.cowling_native_segment_restarts(
                     omega,self.settings.ell,self.settings.rtol,
                     self.settings.atol,max_ds,
@@ -445,6 +491,10 @@ class NativeSharpCowlingDVODE:
                 lib.cowling_native_set_source_callback(None,ct.byref(cb_status))
                 if cb_status.value:
                     raise RuntimeError("native EOS callback reset failed")
+            if native_source_registered:
+                lib.cowling_native_source_unregister(ct.byref(cb_status))
+                if cb_status.value:
+                    raise RuntimeError("Fortran original EOS callback reset failed")
         if cb_errors:
             raise RuntimeError("native direct source callback failed: "+cb_errors[0])
         if status.value:
@@ -467,6 +517,8 @@ class NativeSharpCowlingDVODE:
         traces=[];junctions=[];nfev=0
         with native._LOCK:
             lib=native._native_library()
+            if self.coefficient_backend=="native_source_cs2":
+                self._native_exact_eos_setup(lib)
             phase=self._phases[0]
             x_inner=np.linspace(phase["s"][0],smatch,count)
             inner,calls=self._integrate_phase(phase,x_inner,[1.,-1./self.settings.ell],omega,lib)

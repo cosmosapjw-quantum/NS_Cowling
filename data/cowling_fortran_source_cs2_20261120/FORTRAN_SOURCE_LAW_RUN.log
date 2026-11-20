@@ -1,0 +1,94 @@
+F.F.F..                                                                  [100%]
+=================================== FAILURES ===================================
+_ test_fortran_exact_cs2_matches_original_source_on_four_analytic_regions[SPG_M2-maxwell] _
+
+model = 'SPG_M2', join = 'maxwell'
+
+    @pytest.mark.parametrize("model,join",[
+        ("SPG_M2","maxwell"),("SPG_M3","css")])
+    def test_fortran_exact_cs2_matches_original_source_on_four_analytic_regions(model,join):
+        eos,source_hash=load_eos(model,join)
+>       dll=setup(eos)
+            ^^^^^^^^^^
+
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eos = <compose_eos.stellar_sharp.SharpContractEnthalpyEOS object at 0x707e61d7bb90>
+
+    def setup(eos):
+        arr=arrays(eos)
+        outer,upper,surface,bridge,jump=arr
+        dll=native._native_library()
+        status=ct.c_int(-1)
+        dll.cowling_native_source_eos_setup(
+            outer.shape[1],outer,upper.shape[1],upper,surface,bridge,
+            jump,ct.byref(status))
+>       assert status.value==0
+E       assert 1 == 0
+E        +  where 1 = c_int(1).value
+
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:51: AssertionError
+__ test_fortran_source_cs2_preserves_maxwell_one_sided_limits[SPG_M2-maxwell] __
+
+model = 'SPG_M2', join = 'maxwell'
+
+    @pytest.mark.parametrize("model,join",[
+        ("SPG_M2","maxwell"),("SPG_M3","css")])
+    def test_fortran_source_cs2_preserves_maxwell_one_sided_limits(model,join):
+        eos,_=load_eos(model,join)
+>       dll=setup(eos)
+            ^^^^^^^^^^
+
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eos = <compose_eos.stellar_sharp.SharpContractEnthalpyEOS object at 0x707e61d03ad0>
+
+    def setup(eos):
+        arr=arrays(eos)
+        outer,upper,surface,bridge,jump=arr
+        dll=native._native_library()
+        status=ct.c_int(-1)
+        dll.cowling_native_source_eos_setup(
+            outer.shape[1],outer,upper.shape[1],upper,surface,bridge,
+            jump,ct.byref(status))
+>       assert status.value==0
+E       assert 1 == 0
+E        +  where 1 = c_int(1).value
+
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:51: AssertionError
+_ test_fortran_source_cs2_one_sided_near_outer_and_upper_knots[SPG_M2-maxwell] _
+
+model = 'SPG_M2', join = 'maxwell'
+
+    @pytest.mark.parametrize("model,join",[
+        ("SPG_M2","maxwell"),("SPG_M3","css")])
+    def test_fortran_source_cs2_one_sided_near_outer_and_upper_knots(model,join):
+        eos,_=load_eos(model,join)
+>       dll=setup(eos)
+            ^^^^^^^^^^
+
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:106: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eos = <compose_eos.stellar_sharp.SharpContractEnthalpyEOS object at 0x707e63146120>
+
+    def setup(eos):
+        arr=arrays(eos)
+        outer,upper,surface,bridge,jump=arr
+        dll=native._native_library()
+        status=ct.c_int(-1)
+        dll.cowling_native_source_eos_setup(
+            outer.shape[1],outer,upper.shape[1],upper,surface,bridge,
+            jump,ct.byref(status))
+>       assert status.value==0
+E       assert 1 == 0
+E        +  where 1 = c_int(1).value
+
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:51: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_fortran_source_exact_cs2_20261120.py::test_fortran_exact_cs2_matches_original_source_on_four_analytic_regions[SPG_M2-maxwell]
+FAILED python_frontend/tests/test_fortran_source_exact_cs2_20261120.py::test_fortran_source_cs2_preserves_maxwell_one_sided_limits[SPG_M2-maxwell]
+FAILED python_frontend/tests/test_fortran_source_exact_cs2_20261120.py::test_fortran_source_cs2_one_sided_near_outer_and_upper_knots[SPG_M2-maxwell]
+3 failed, 4 passed in 14.85s

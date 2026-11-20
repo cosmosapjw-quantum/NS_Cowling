@@ -1,0 +1,130 @@
+{
+  "schema": "ns_cowling.native_exact_source_cs2_callback_replacement.v1",
+  "parent_commit": "19e5b16cd0c5542e8fcb91f2fab14f36b1e663df",
+  "source_bundle_sha256": "299de43bb4f0a87ebfc4f1139ab3c8b51c344937ec3637cdff644e9ca8ab2c04",
+  "closure": "GAMMA1_EQUALS_GAMMA_EQ",
+  "frozen_composition_supported": false,
+  "numerical_comparison": "same source EOS and geometry, Fortran DVODE, knot restarts; Python SciPy Brent root remains",
+  "samples_requested": 4097,
+  "cases": {
+    "M2_MAXWELL_RAPID_P1": {
+      "model": "SPG_M2",
+      "join": "maxwell",
+      "conversion": "rapid",
+      "bracket_hz": [
+        5110.0,
+        5170.0
+      ],
+      "original_contract_sha256": "59b7cb4671347c33c25133e6497e8be346b4e5b4f871eece9bcaf59155fd8765",
+      "density_fm3": 0.30385128926615257,
+      "mass_msun": 1.3999999857354968,
+      "reference_exact_source_DOP853_hz": 5143.719721563306,
+      "variants": {
+        "hybrid_cs2": {
+          "frequency_hz": 5143.719666720863,
+          "frequency_minus_external_reference_hz": -5.48424432054162e-05,
+          "nfev": 7440,
+          "node_counts": [
+            1,
+            1
+          ],
+          "root_iterations": 8,
+          "join_relative": 5.936409014833588e-08,
+          "interface_traction_residual_max": 2.9105592460476475e-16,
+          "source_callback_rhs_calls": 308464,
+          "restart_count": 39,
+          "setup_seconds": 1.4290456069975335,
+          "warm_mode_runs_seconds": [
+            4.221256731998437,
+            4.119717162997404,
+            4.154562871000962
+          ],
+          "median_seconds": 4.154562871000962
+        },
+        "native_source_cs2": {
+          "frequency_hz": 5143.719608336112,
+          "frequency_minus_external_reference_hz": -0.00011322719365125522,
+          "nfev": 7931,
+          "node_counts": [
+            1,
+            1
+          ],
+          "root_iterations": 6,
+          "join_relative": 1.0990189878385637e-08,
+          "interface_traction_residual_max": 5.821118525577174e-16,
+          "source_callback_rhs_calls": 0,
+          "restart_count": 39,
+          "setup_seconds": 1.4212860859988723,
+          "warm_mode_runs_seconds": [
+            0.03104472399718361,
+            0.029572755000117468,
+            0.029661522999958834
+          ],
+          "median_seconds": 0.029661522999958834
+        }
+      },
+      "frequency_difference_native_minus_python_callback_hz": -5.838475044583902e-05,
+      "warm_speedup_python_callback_over_fortran_source": 140.0657299696556
+    },
+    "M3_CSS_SLOW_P1": {
+      "model": "SPG_M3",
+      "join": "css",
+      "conversion": "slow",
+      "bracket_hz": [
+        3710.0,
+        3760.0
+      ],
+      "original_contract_sha256": "f23fb7020c9de1b65c99ac37690840f7a4d6611f3372409b015d8c3bd7e32f3b",
+      "density_fm3": 0.192510767556007,
+      "mass_msun": 0.7000000086373105,
+      "reference_exact_source_DOP853_hz": 3736.2088951581254,
+      "variants": {
+        "hybrid_cs2": {
+          "frequency_hz": 3736.210673257724,
+          "frequency_minus_external_reference_hz": 0.0017780995985958725,
+          "nfev": 9666,
+          "node_counts": [
+            1,
+            1
+          ],
+          "root_iterations": 11,
+          "join_relative": 1.5160473837356939e-06,
+          "interface_traction_residual_max": 0.0,
+          "source_callback_rhs_calls": 496928,
+          "restart_count": 40,
+          "setup_seconds": 0.8264163570020173,
+          "warm_mode_runs_seconds": [
+            6.674816630998976,
+            6.674815097001556,
+            6.6702889789994515
+          ],
+          "median_seconds": 6.674815097001556
+        },
+        "native_source_cs2": {
+          "frequency_hz": 3736.21069873971,
+          "frequency_minus_external_reference_hz": 0.001803581584681524,
+          "nfev": 9628,
+          "node_counts": [
+            1,
+            1
+          ],
+          "root_iterations": 11,
+          "join_relative": 2.4546606671702084e-06,
+          "interface_traction_residual_max": 1.450793486080294e-16,
+          "source_callback_rhs_calls": 0,
+          "restart_count": 40,
+          "setup_seconds": 0.8543912599998293,
+          "warm_mode_runs_seconds": [
+            0.04529215599905001,
+            0.045758069998555584,
+            0.044824160999269225
+          ],
+          "median_seconds": 0.04529215599905001
+        }
+      },
+      "frequency_difference_native_minus_python_callback_hz": 2.5481986085651442e-05,
+      "warm_speedup_python_callback_over_fortran_source": 147.37243016520472
+    }
+  },
+  "status": "PASS_SCOPED_SOURCE_EXACT_CS2_AND_REAL_STAR_MODE_PARITY"
+}

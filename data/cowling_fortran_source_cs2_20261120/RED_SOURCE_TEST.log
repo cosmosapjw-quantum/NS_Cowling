@@ -1,0 +1,36 @@
+F
+=================================== FAILURES ===================================
+_ test_fortran_exact_cs2_matches_original_source_on_four_analytic_regions[SPG_M2-maxwell] _
+
+model = 'SPG_M2', join = 'maxwell'
+
+    @pytest.mark.parametrize("model,join",[
+        ("SPG_M2","maxwell"),("SPG_M3","css")])
+    def test_fortran_exact_cs2_matches_original_source_on_four_analytic_regions(model,join):
+        eos,source_hash=load_eos(model,join)
+>       dll=setup(eos)
+            ^^^^^^^^^^
+
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:48: in setup
+    dll.cowling_native_source_eos_setup(
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/ctypes/__init__.py:392: in __getattr__
+    func = self.__getitem__(name)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <CDLL '/tmp/ns_cowling_native_dvode/libcowling_94b9a22df7c062dae7.so', handle 3a2c38b0 at 0x73fa78f6c6b0>
+name_or_ordinal = 'cowling_native_source_eos_setup'
+
+    def __getitem__(self, name_or_ordinal):
+>       func = self._FuncPtr((name_or_ordinal, self))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: /tmp/ns_cowling_native_dvode/libcowling_94b9a22df7c062dae7.so: undefined symbol: cowling_native_source_eos_setup
+
+/usr/lib/python3.12/ctypes/__init__.py:397: AttributeError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_fortran_source_exact_cs2_20261120.py::test_fortran_exact_cs2_matches_original_source_on_four_analytic_regions[SPG_M2-maxwell]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 2.56s

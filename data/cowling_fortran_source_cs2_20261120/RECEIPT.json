@@ -1,0 +1,121 @@
+{
+  "schema": "ns_cowling.source_exact_cs2_native_fortran.v1",
+  "baseline_commit": "19e5b16cd0c5542e8fcb91f2fab14f36b1e663df",
+  "target_branch": "research/cowling-fortran-exact-source-cs2-20261120",
+  "date_kst": "2026-11-20",
+  "status": "PASS_SCOPED_ORIGINAL_EOS_FORTRAN_CS2",
+  "source_archive_sha256": "299de43bb4f0a87ebfc4f1139ab3c8b51c344937ec3637cdff644e9ca8ab2c04",
+  "code_and_docs_sha256": {
+    "fortran_eos/src/compose_eos_cowling_source_exact.f90": "1eb17fb464dec8049b7f83a13602eaabc38e6a6a34fa824897b60d1532b9f3b1",
+    "fortran_eos/tests/cowling_exact_source_cs2_test.f90": "cab3df2f38a4ddcc8928a05ded667ddfffde3818954e30186e033e821ec5c334",
+    "python_frontend/compose_eos/stellar_cowling_native.py": "0f639805503ba4f80140ab740a2ae3c70e62fa8ee79347d4cd16301c01a9741f",
+    "python_frontend/compose_eos/stellar_sharp_native.py": "236c141b186e85dbec91c64486a654686d4b27e99c695a486f3281825d6bca41",
+    "python_frontend/tests/test_fortran_source_exact_cs2_20261120.py": "300265354f74062f03fe0c608798f32f034a7ff59f1c0680622f8cc07d8837b7",
+    "python_frontend/tests/test_cowling_native_source_cs2_modes_20261120.py": "95b950ba3d4e265d27731168f5ddc37f536fd9c7e3e10b75032d11be23dfaaf2",
+    "scripts/bench_fortran_exact_source_cs2_20261120.py": "73b05bec227f9c818c6e9b4dcc33ef2d841e4cfa627ba1d0b651f319ebf9a963",
+    "scripts/export_fortran_exact_source_cs2_20261120.py": "e11602bd61d98b5fc968a240a95377bf1cac5bebf73fba83487b2b415f785fb3",
+    "scripts/run_fortran_source_cs2_case_20261120.py": "946222edc6387c230ffdfa52f24e87a2f9efa121bee44ed29a28177a187eba37",
+    "scripts/build_fortran_source_exact_cs2_test_20261120.sh": "7b3a6b3058a175c967f0beef160f01ba7d74921689a779837eb347e4346606c2",
+    "scripts/bench_fortran_source_cs2_parallel_20261120.sh": "8b58523b60f2ff7d791d4342c05397eb447bd6a4a93a477d7506429fbce68e0b",
+    "docs/COWLING_FORTRAN_ORIGINAL_EOS_SOURCE_CS2_20261120.md": "e6febe028c23354b52aeeccde08d88645713b0980cf086bee6af19a8848b7468"
+  },
+  "native_subagent": "NOT_RUN",
+  "source_law_status": {
+    "standalone_fortran_models": 2,
+    "reference_probes": [
+      178,
+      177
+    ],
+    "max_normalized_relative_error": 8.53284e-12,
+    "source_contract_model_sha256": {
+      "M2_MAXWELL_RAPID_P1": "59b7cb4671347c33c25133e6497e8be346b4e5b4f871eece9bcaf59155fd8765",
+      "M3_CSS_SLOW_P1": "f23fb7020c9de1b65c99ac37690840f7a4d6611f3372409b015d8c3bd7e32f3b"
+    },
+    "project_fortran_bounds": "PASS_VENDOR_COMPAT_ONLY",
+    "vendor_whole_bounds": "NOT_VERIFIED"
+  },
+  "tests": {
+    "source_law": 8,
+    "star_mode": 4,
+    "integrated": 95,
+    "failures": 0,
+    "integrated_seconds": 179.1,
+    "previous_script_error": "PYTHON_SYNTAX_ERROR_DUPLICATE_METADATA_KEY_FIXED",
+    "focused_final": 12,
+    "focused_log": "data/cowling_fortran_source_cs2_20261120/FOCUSED_FINAL.log"
+  },
+  "scientific_case_results": {
+    "M2_MAXWELL_RAPID_P1": {
+      "contract_sha256": "59b7cb4671347c33c25133e6497e8be346b4e5b4f871eece9bcaf59155fd8765",
+      "native_frequency_hz": 5143.719608336112,
+      "baseline_frequency_hz": 5143.719666720863,
+      "native_minus_baseline_hz": -5.838475044583902e-05,
+      "native_RHS_callback_count": 0,
+      "old_RHS_callback_count_cumulative": 308464,
+      "restart_count": 39,
+      "warm_speedup": 140.0657299696556,
+      "native_join": 1.0990189878385637e-08
+    },
+    "M3_CSS_SLOW_P1": {
+      "contract_sha256": "f23fb7020c9de1b65c99ac37690840f7a4d6611f3372409b015d8c3bd7e32f3b",
+      "native_frequency_hz": 3736.21069873971,
+      "baseline_frequency_hz": 3736.210673257724,
+      "native_minus_baseline_hz": 2.5481986085651442e-05,
+      "native_RHS_callback_count": 0,
+      "old_RHS_callback_count_cumulative": 496928,
+      "restart_count": 40,
+      "warm_speedup": 147.37243016520472,
+      "native_join": 2.4546606671702084e-06
+    }
+  },
+  "real_star_parallel": {
+    "REAL_P1_VERIFIED": {
+      "workers": 1,
+      "elapsed_seconds": 7.556697,
+      "models": [
+        {
+          "case": "M2",
+          "frequency_hz": 5143.719608336112,
+          "source_contract_sha256": "59b7cb4671347c33c25133e6497e8be346b4e5b4f871eece9bcaf59155fd8765",
+          "rss_kb": 107520
+        },
+        {
+          "case": "M3",
+          "frequency_hz": 3736.21069873971,
+          "source_contract_sha256": "f23fb7020c9de1b65c99ac37690840f7a4d6611f3372409b015d8c3bd7e32f3b",
+          "rss_kb": 102196
+        }
+      ]
+    },
+    "REAL_P2_VERIFIED": {
+      "workers": 2,
+      "elapsed_seconds": 4.712607,
+      "models": [
+        {
+          "case": "M2",
+          "frequency_hz": 5143.719608336112,
+          "source_contract_sha256": "59b7cb4671347c33c25133e6497e8be346b4e5b4f871eece9bcaf59155fd8765",
+          "rss_kb": 108884
+        },
+        {
+          "case": "M3",
+          "frequency_hz": 3736.21069873971,
+          "source_contract_sha256": "f23fb7020c9de1b65c99ac37690840f7a4d6611f3372409b015d8c3bd7e32f3b",
+          "rss_kb": 101344
+        }
+      ]
+    }
+  },
+  "real_star_science_manifest_sha256": "39bbd55ab477242efd5ad908ad466597a05e778fff56e42977f7bfa4a7b5d25a",
+  "limitations": [
+    "Python prepares source EOS and PCHIP geometry tables",
+    "Python selects strong derivative knots",
+    "Python SciPy brentq still polishes sharp roots",
+    "one Maxwell discontinuity only",
+    "not source-independent microscopic EOS",
+    "not frozen composition, full GR metric perturbations",
+    "not proof of EOS-wide or absolute frequency accuracy"
+  ],
+  "next": "Fortran source-exact sharp Brent and native restart scheduling",
+  "no_merge_or_PR_requested": true
+}

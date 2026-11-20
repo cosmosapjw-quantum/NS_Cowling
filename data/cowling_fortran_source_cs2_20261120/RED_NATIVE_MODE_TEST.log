@@ -1,0 +1,84 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_fortran_exact_source_backend_rejects_missing_or_extra_phase[star_case0] _
+
+star_case = ('SPG_M2', SharpStellarBackground(eos=<compose_eos.stellar_sharp.SharpContractEnthalpyEOS object at 0x773e7e9e0740>, c...ce_h=3e-08, match_h_fraction=0.15, max_step_h=0.002, root_xtol_hz=1e-05), 'rapid', (5110.0, 5170.0), 5143.719721563306)
+
+    def test_fortran_exact_source_backend_rejects_missing_or_extra_phase(star_case):
+        model,bg,opts,conversion,bracket,reference=star_case
+>       obj=NativeSharpCowlingDVODE(bg,opts,samples=1025,
+                 coefficient_backend="native_source_cs2")
+
+python_frontend/tests/test_cowling_native_source_cs2_modes_20261120.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <compose_eos.stellar_sharp_native.NativeSharpCowlingDVODE object at 0x773e80f8b5c0>
+background = SharpStellarBackground(eos=<compose_eos.stellar_sharp.SharpContractEnthalpyEOS object at 0x773e7e9e0740>, central_dens..._high_fm3': 0.01733874533390184, 'epsilon_low_MeV_fm3': 8.572084498151984, 'epsilon_high_MeV_fm3': 16.33826505200197}])
+settings = CowlingSettings(ell=2, rtol=1e-09, atol=1e-12, surface_h=3e-08, match_h_fraction=0.15, max_step_h=0.002, root_xtol_hz=1e-05)
+samples = 1025, method = 'adams', knot_waypoints = False
+coefficient_backend = 'native_source_cs2', source_restart_relative_jump = 0.01
+
+    def __init__(self,background,settings=CowlingSettings(),*,samples=8193,
+                 method="adams",knot_waypoints=False,coefficient_backend="pchip",
+                 source_restart_relative_jump=.01):
+        if not isinstance(background,SharpStellarBackground) or not background.interfaces:
+            raise ValueError("native sharp Cowling needs a sharp stellar background")
+        settings.validate(background)
+        if settings.surface_h<background.surface_h:
+            raise ValueError("Cowling surface outside integrated TOV domain")
+        if method not in ("adams","bdf"):
+            raise ValueError("native Cowling method must be adams or bdf")
+        if samples<129:
+            raise ValueError("at least 129 one-sided samples required")
+        self.background=background
+        self.settings=settings
+        self.method=method
+        self.samples=samples
+        if coefficient_backend not in ("pchip","direct_source","hybrid_cs2"):
+>           raise ValueError("coefficient_backend must be pchip, direct_source or hybrid_cs2")
+E           ValueError: coefficient_backend must be pchip, direct_source or hybrid_cs2
+
+python_frontend/compose_eos/stellar_sharp_native.py:269: ValueError
+_ test_fortran_exact_source_backend_rejects_missing_or_extra_phase[star_case1] _
+
+star_case = ('SPG_M3', SharpStellarBackground(eos=<compose_eos.stellar_sharp.SharpContractEnthalpyEOS object at 0x773e7e9e0830>, c...ce_h=3e-08, match_h_fraction=0.15, max_step_h=0.002, root_xtol_hz=1e-05), 'slow', (3710.0, 3760.0), 3736.2088951581254)
+
+    def test_fortran_exact_source_backend_rejects_missing_or_extra_phase(star_case):
+        model,bg,opts,conversion,bracket,reference=star_case
+>       obj=NativeSharpCowlingDVODE(bg,opts,samples=1025,
+                 coefficient_backend="native_source_cs2")
+
+python_frontend/tests/test_cowling_native_source_cs2_modes_20261120.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <compose_eos.stellar_sharp_native.NativeSharpCowlingDVODE object at 0x773e7e78ae10>
+background = SharpStellarBackground(eos=<compose_eos.stellar_sharp.SharpContractEnthalpyEOS object at 0x773e7e9e0830>, central_dens...n_high_fm3': 0.0941272199725073, 'epsilon_low_MeV_fm3': 76.94982713409907, 'epsilon_high_MeV_fm3': 89.34565739599732}])
+settings = CowlingSettings(ell=2, rtol=1e-09, atol=1e-12, surface_h=3e-08, match_h_fraction=0.15, max_step_h=0.002, root_xtol_hz=1e-05)
+samples = 1025, method = 'adams', knot_waypoints = False
+coefficient_backend = 'native_source_cs2', source_restart_relative_jump = 0.01
+
+    def __init__(self,background,settings=CowlingSettings(),*,samples=8193,
+                 method="adams",knot_waypoints=False,coefficient_backend="pchip",
+                 source_restart_relative_jump=.01):
+        if not isinstance(background,SharpStellarBackground) or not background.interfaces:
+            raise ValueError("native sharp Cowling needs a sharp stellar background")
+        settings.validate(background)
+        if settings.surface_h<background.surface_h:
+            raise ValueError("Cowling surface outside integrated TOV domain")
+        if method not in ("adams","bdf"):
+            raise ValueError("native Cowling method must be adams or bdf")
+        if samples<129:
+            raise ValueError("at least 129 one-sided samples required")
+        self.background=background
+        self.settings=settings
+        self.method=method
+        self.samples=samples
+        if coefficient_backend not in ("pchip","direct_source","hybrid_cs2"):
+>           raise ValueError("coefficient_backend must be pchip, direct_source or hybrid_cs2")
+E           ValueError: coefficient_backend must be pchip, direct_source or hybrid_cs2
+
+python_frontend/compose_eos/stellar_sharp_native.py:269: ValueError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_cowling_native_source_cs2_modes_20261120.py::test_fortran_exact_source_backend_rejects_missing_or_extra_phase[star_case0]
+FAILED python_frontend/tests/test_cowling_native_source_cs2_modes_20261120.py::test_fortran_exact_source_backend_rejects_missing_or_extra_phase[star_case1]
+2 failed, 2 deselected in 5.25s

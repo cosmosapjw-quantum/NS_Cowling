@@ -1,0 +1,581 @@
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+_ test_fortran_exact_cs2_matches_original_source_on_four_analytic_regions[SPG_M2-maxwell] _
+
+model = 'SPG_M2', join = 'maxwell'
+
+    @pytest.mark.parametrize("model,join",[
+        ("SPG_M2","maxwell"),("SPG_M3","css")])
+    def test_fortran_exact_cs2_matches_original_source_on_four_analytic_regions(model,join):
+        eos,source_hash=load_eos(model,join)
+>       dll=setup(eos)
+            ^^^^^^^^^^
+
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:46: in setup
+    dll=native._native_library()
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _native_library():
+        """Compile the independent native source once, keyed by byte identities."""
+        global _DLL
+        if _DLL is not None:
+            return _DLL
+        missing = [str(p) for p in _SOURCES if not p.is_file()]
+        if missing:
+            raise RuntimeError("Fortran Cowling source unavailable: " + str(missing))
+        key = sha256(b"".join(p.read_bytes() for p in _SOURCES)
+                     + b"gfortran -O2 -fPIC -lblas").hexdigest()[:18]
+        directory = Path(tempfile.gettempdir()) / "ns_cowling_native_dvode"
+        directory.mkdir(parents=True, exist_ok=True)
+        target = directory / ("libcowling_" + key + ".so")
+        if not target.exists():
+            temporary = target.with_name(target.name + ".tmp")
+            cmd = ["gfortran", "-O2", "-fPIC", "-shared", "-ffree-line-length-none",
+                   *map(str, _SOURCES), "-lblas", "-o", str(temporary)]
+            run = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            if run.returncode:
+>               raise RuntimeError("Fortran DVODE compiler failure: " + run.stderr[-3000:])
+E               RuntimeError: Fortran DVODE compiler failure:         1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 110 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3406:72:
+E               
+E                3406 |  115     RVOD2(I) = RSAV(LENRV1+I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 115 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3409:72:
+E               
+E                3409 |  120     IVOD1(I) = ISAV(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 120 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3411:72:
+E               
+E                3411 |  125     IVOD2(I) = ISAV(LENIV1+I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 125 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3448:72:
+E               
+E                3448 |  15     EWT(I) = RTOL(1)*ABS(YCUR(I)) + ATOL(1)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 15 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3452:72:
+E               
+E                3452 |  25     EWT(I) = RTOL(1)*ABS(YCUR(I)) + ATOL(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 25 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3456:72:
+E               
+E                3456 |  35     EWT(I) = RTOL(I)*ABS(YCUR(I)) + ATOL(1)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 35 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3460:72:
+E               
+E                3460 |  45     EWT(I) = RTOL(I)*ABS(YCUR(I)) + ATOL(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 45 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3494:72:
+E               
+E                3494 |  10     SUM = SUM + (V(I)*W(I))**2
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 10 at (1)
+
+python_frontend/compose_eos/stellar_cowling_native.py:65: RuntimeError
+_ test_fortran_exact_cs2_matches_original_source_on_four_analytic_regions[SPG_M3-css] _
+
+model = 'SPG_M3', join = 'css'
+
+    @pytest.mark.parametrize("model,join",[
+        ("SPG_M2","maxwell"),("SPG_M3","css")])
+    def test_fortran_exact_cs2_matches_original_source_on_four_analytic_regions(model,join):
+        eos,source_hash=load_eos(model,join)
+>       dll=setup(eos)
+            ^^^^^^^^^^
+
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:46: in setup
+    dll=native._native_library()
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _native_library():
+        """Compile the independent native source once, keyed by byte identities."""
+        global _DLL
+        if _DLL is not None:
+            return _DLL
+        missing = [str(p) for p in _SOURCES if not p.is_file()]
+        if missing:
+            raise RuntimeError("Fortran Cowling source unavailable: " + str(missing))
+        key = sha256(b"".join(p.read_bytes() for p in _SOURCES)
+                     + b"gfortran -O2 -fPIC -lblas").hexdigest()[:18]
+        directory = Path(tempfile.gettempdir()) / "ns_cowling_native_dvode"
+        directory.mkdir(parents=True, exist_ok=True)
+        target = directory / ("libcowling_" + key + ".so")
+        if not target.exists():
+            temporary = target.with_name(target.name + ".tmp")
+            cmd = ["gfortran", "-O2", "-fPIC", "-shared", "-ffree-line-length-none",
+                   *map(str, _SOURCES), "-lblas", "-o", str(temporary)]
+            run = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            if run.returncode:
+>               raise RuntimeError("Fortran DVODE compiler failure: " + run.stderr[-3000:])
+E               RuntimeError: Fortran DVODE compiler failure:         1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 110 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3406:72:
+E               
+E                3406 |  115     RVOD2(I) = RSAV(LENRV1+I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 115 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3409:72:
+E               
+E                3409 |  120     IVOD1(I) = ISAV(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 120 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3411:72:
+E               
+E                3411 |  125     IVOD2(I) = ISAV(LENIV1+I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 125 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3448:72:
+E               
+E                3448 |  15     EWT(I) = RTOL(1)*ABS(YCUR(I)) + ATOL(1)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 15 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3452:72:
+E               
+E                3452 |  25     EWT(I) = RTOL(1)*ABS(YCUR(I)) + ATOL(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 25 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3456:72:
+E               
+E                3456 |  35     EWT(I) = RTOL(I)*ABS(YCUR(I)) + ATOL(1)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 35 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3460:72:
+E               
+E                3460 |  45     EWT(I) = RTOL(I)*ABS(YCUR(I)) + ATOL(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 45 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3494:72:
+E               
+E                3494 |  10     SUM = SUM + (V(I)*W(I))**2
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 10 at (1)
+
+python_frontend/compose_eos/stellar_cowling_native.py:65: RuntimeError
+__ test_fortran_source_cs2_preserves_maxwell_one_sided_limits[SPG_M2-maxwell] __
+
+model = 'SPG_M2', join = 'maxwell'
+
+    @pytest.mark.parametrize("model,join",[
+        ("SPG_M2","maxwell"),("SPG_M3","css")])
+    def test_fortran_source_cs2_preserves_maxwell_one_sided_limits(model,join):
+        eos,_=load_eos(model,join)
+>       dll=setup(eos)
+            ^^^^^^^^^^
+
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:46: in setup
+    dll=native._native_library()
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _native_library():
+        """Compile the independent native source once, keyed by byte identities."""
+        global _DLL
+        if _DLL is not None:
+            return _DLL
+        missing = [str(p) for p in _SOURCES if not p.is_file()]
+        if missing:
+            raise RuntimeError("Fortran Cowling source unavailable: " + str(missing))
+        key = sha256(b"".join(p.read_bytes() for p in _SOURCES)
+                     + b"gfortran -O2 -fPIC -lblas").hexdigest()[:18]
+        directory = Path(tempfile.gettempdir()) / "ns_cowling_native_dvode"
+        directory.mkdir(parents=True, exist_ok=True)
+        target = directory / ("libcowling_" + key + ".so")
+        if not target.exists():
+            temporary = target.with_name(target.name + ".tmp")
+            cmd = ["gfortran", "-O2", "-fPIC", "-shared", "-ffree-line-length-none",
+                   *map(str, _SOURCES), "-lblas", "-o", str(temporary)]
+            run = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            if run.returncode:
+>               raise RuntimeError("Fortran DVODE compiler failure: " + run.stderr[-3000:])
+E               RuntimeError: Fortran DVODE compiler failure:         1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 110 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3406:72:
+E               
+E                3406 |  115     RVOD2(I) = RSAV(LENRV1+I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 115 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3409:72:
+E               
+E                3409 |  120     IVOD1(I) = ISAV(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 120 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3411:72:
+E               
+E                3411 |  125     IVOD2(I) = ISAV(LENIV1+I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 125 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3448:72:
+E               
+E                3448 |  15     EWT(I) = RTOL(1)*ABS(YCUR(I)) + ATOL(1)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 15 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3452:72:
+E               
+E                3452 |  25     EWT(I) = RTOL(1)*ABS(YCUR(I)) + ATOL(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 25 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3456:72:
+E               
+E                3456 |  35     EWT(I) = RTOL(I)*ABS(YCUR(I)) + ATOL(1)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 35 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3460:72:
+E               
+E                3460 |  45     EWT(I) = RTOL(I)*ABS(YCUR(I)) + ATOL(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 45 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3494:72:
+E               
+E                3494 |  10     SUM = SUM + (V(I)*W(I))**2
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 10 at (1)
+
+python_frontend/compose_eos/stellar_cowling_native.py:65: RuntimeError
+____ test_fortran_source_cs2_preserves_maxwell_one_sided_limits[SPG_M3-css] ____
+
+model = 'SPG_M3', join = 'css'
+
+    @pytest.mark.parametrize("model,join",[
+        ("SPG_M2","maxwell"),("SPG_M3","css")])
+    def test_fortran_source_cs2_preserves_maxwell_one_sided_limits(model,join):
+        eos,_=load_eos(model,join)
+>       dll=setup(eos)
+            ^^^^^^^^^^
+
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:46: in setup
+    dll=native._native_library()
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _native_library():
+        """Compile the independent native source once, keyed by byte identities."""
+        global _DLL
+        if _DLL is not None:
+            return _DLL
+        missing = [str(p) for p in _SOURCES if not p.is_file()]
+        if missing:
+            raise RuntimeError("Fortran Cowling source unavailable: " + str(missing))
+        key = sha256(b"".join(p.read_bytes() for p in _SOURCES)
+                     + b"gfortran -O2 -fPIC -lblas").hexdigest()[:18]
+        directory = Path(tempfile.gettempdir()) / "ns_cowling_native_dvode"
+        directory.mkdir(parents=True, exist_ok=True)
+        target = directory / ("libcowling_" + key + ".so")
+        if not target.exists():
+            temporary = target.with_name(target.name + ".tmp")
+            cmd = ["gfortran", "-O2", "-fPIC", "-shared", "-ffree-line-length-none",
+                   *map(str, _SOURCES), "-lblas", "-o", str(temporary)]
+            run = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            if run.returncode:
+>               raise RuntimeError("Fortran DVODE compiler failure: " + run.stderr[-3000:])
+E               RuntimeError: Fortran DVODE compiler failure:         1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 110 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3406:72:
+E               
+E                3406 |  115     RVOD2(I) = RSAV(LENRV1+I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 115 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3409:72:
+E               
+E                3409 |  120     IVOD1(I) = ISAV(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 120 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3411:72:
+E               
+E                3411 |  125     IVOD2(I) = ISAV(LENIV1+I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 125 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3448:72:
+E               
+E                3448 |  15     EWT(I) = RTOL(1)*ABS(YCUR(I)) + ATOL(1)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 15 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3452:72:
+E               
+E                3452 |  25     EWT(I) = RTOL(1)*ABS(YCUR(I)) + ATOL(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 25 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3456:72:
+E               
+E                3456 |  35     EWT(I) = RTOL(I)*ABS(YCUR(I)) + ATOL(1)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 35 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3460:72:
+E               
+E                3460 |  45     EWT(I) = RTOL(I)*ABS(YCUR(I)) + ATOL(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 45 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3494:72:
+E               
+E                3494 |  10     SUM = SUM + (V(I)*W(I))**2
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 10 at (1)
+
+python_frontend/compose_eos/stellar_cowling_native.py:65: RuntimeError
+_ test_fortran_source_cs2_one_sided_near_outer_and_upper_knots[SPG_M2-maxwell] _
+
+model = 'SPG_M2', join = 'maxwell'
+
+    @pytest.mark.parametrize("model,join",[
+        ("SPG_M2","maxwell"),("SPG_M3","css")])
+    def test_fortran_source_cs2_one_sided_near_outer_and_upper_knots(model,join):
+        eos,_=load_eos(model,join)
+>       dll=setup(eos)
+            ^^^^^^^^^^
+
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:106: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:46: in setup
+    dll=native._native_library()
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _native_library():
+        """Compile the independent native source once, keyed by byte identities."""
+        global _DLL
+        if _DLL is not None:
+            return _DLL
+        missing = [str(p) for p in _SOURCES if not p.is_file()]
+        if missing:
+            raise RuntimeError("Fortran Cowling source unavailable: " + str(missing))
+        key = sha256(b"".join(p.read_bytes() for p in _SOURCES)
+                     + b"gfortran -O2 -fPIC -lblas").hexdigest()[:18]
+        directory = Path(tempfile.gettempdir()) / "ns_cowling_native_dvode"
+        directory.mkdir(parents=True, exist_ok=True)
+        target = directory / ("libcowling_" + key + ".so")
+        if not target.exists():
+            temporary = target.with_name(target.name + ".tmp")
+            cmd = ["gfortran", "-O2", "-fPIC", "-shared", "-ffree-line-length-none",
+                   *map(str, _SOURCES), "-lblas", "-o", str(temporary)]
+            run = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            if run.returncode:
+>               raise RuntimeError("Fortran DVODE compiler failure: " + run.stderr[-3000:])
+E               RuntimeError: Fortran DVODE compiler failure:         1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 110 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3406:72:
+E               
+E                3406 |  115     RVOD2(I) = RSAV(LENRV1+I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 115 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3409:72:
+E               
+E                3409 |  120     IVOD1(I) = ISAV(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 120 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3411:72:
+E               
+E                3411 |  125     IVOD2(I) = ISAV(LENIV1+I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 125 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3448:72:
+E               
+E                3448 |  15     EWT(I) = RTOL(1)*ABS(YCUR(I)) + ATOL(1)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 15 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3452:72:
+E               
+E                3452 |  25     EWT(I) = RTOL(1)*ABS(YCUR(I)) + ATOL(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 25 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3456:72:
+E               
+E                3456 |  35     EWT(I) = RTOL(I)*ABS(YCUR(I)) + ATOL(1)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 35 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3460:72:
+E               
+E                3460 |  45     EWT(I) = RTOL(I)*ABS(YCUR(I)) + ATOL(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 45 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3494:72:
+E               
+E                3494 |  10     SUM = SUM + (V(I)*W(I))**2
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 10 at (1)
+
+python_frontend/compose_eos/stellar_cowling_native.py:65: RuntimeError
+___ test_fortran_source_cs2_one_sided_near_outer_and_upper_knots[SPG_M3-css] ___
+
+model = 'SPG_M3', join = 'css'
+
+    @pytest.mark.parametrize("model,join",[
+        ("SPG_M2","maxwell"),("SPG_M3","css")])
+    def test_fortran_source_cs2_one_sided_near_outer_and_upper_knots(model,join):
+        eos,_=load_eos(model,join)
+>       dll=setup(eos)
+            ^^^^^^^^^^
+
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:106: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:46: in setup
+    dll=native._native_library()
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _native_library():
+        """Compile the independent native source once, keyed by byte identities."""
+        global _DLL
+        if _DLL is not None:
+            return _DLL
+        missing = [str(p) for p in _SOURCES if not p.is_file()]
+        if missing:
+            raise RuntimeError("Fortran Cowling source unavailable: " + str(missing))
+        key = sha256(b"".join(p.read_bytes() for p in _SOURCES)
+                     + b"gfortran -O2 -fPIC -lblas").hexdigest()[:18]
+        directory = Path(tempfile.gettempdir()) / "ns_cowling_native_dvode"
+        directory.mkdir(parents=True, exist_ok=True)
+        target = directory / ("libcowling_" + key + ".so")
+        if not target.exists():
+            temporary = target.with_name(target.name + ".tmp")
+            cmd = ["gfortran", "-O2", "-fPIC", "-shared", "-ffree-line-length-none",
+                   *map(str, _SOURCES), "-lblas", "-o", str(temporary)]
+            run = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            if run.returncode:
+>               raise RuntimeError("Fortran DVODE compiler failure: " + run.stderr[-3000:])
+E               RuntimeError: Fortran DVODE compiler failure:         1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 110 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3406:72:
+E               
+E                3406 |  115     RVOD2(I) = RSAV(LENRV1+I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 115 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3409:72:
+E               
+E                3409 |  120     IVOD1(I) = ISAV(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 120 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3411:72:
+E               
+E                3411 |  125     IVOD2(I) = ISAV(LENIV1+I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 125 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3448:72:
+E               
+E                3448 |  15     EWT(I) = RTOL(1)*ABS(YCUR(I)) + ATOL(1)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 15 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3452:72:
+E               
+E                3452 |  25     EWT(I) = RTOL(1)*ABS(YCUR(I)) + ATOL(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 25 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3456:72:
+E               
+E                3456 |  35     EWT(I) = RTOL(I)*ABS(YCUR(I)) + ATOL(1)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 35 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3460:72:
+E               
+E                3460 |  45     EWT(I) = RTOL(I)*ABS(YCUR(I)) + ATOL(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 45 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3494:72:
+E               
+E                3494 |  10     SUM = SUM + (V(I)*W(I))**2
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 10 at (1)
+
+python_frontend/compose_eos/stellar_cowling_native.py:65: RuntimeError
+_ test_fortran_exact_source_evaluator_rejects_invalid_argument_and_zeroes_result _
+
+    def test_fortran_exact_source_evaluator_rejects_invalid_argument_and_zeroes_result():
+        eos,_=load_eos("SPG_M3","css")
+>       dll=setup(eos)
+            ^^^^^^^^^^
+
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_fortran_source_exact_cs2_20261120.py:46: in setup
+    dll=native._native_library()
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _native_library():
+        """Compile the independent native source once, keyed by byte identities."""
+        global _DLL
+        if _DLL is not None:
+            return _DLL
+        missing = [str(p) for p in _SOURCES if not p.is_file()]
+        if missing:
+            raise RuntimeError("Fortran Cowling source unavailable: " + str(missing))
+        key = sha256(b"".join(p.read_bytes() for p in _SOURCES)
+                     + b"gfortran -O2 -fPIC -lblas").hexdigest()[:18]
+        directory = Path(tempfile.gettempdir()) / "ns_cowling_native_dvode"
+        directory.mkdir(parents=True, exist_ok=True)
+        target = directory / ("libcowling_" + key + ".so")
+        if not target.exists():
+            temporary = target.with_name(target.name + ".tmp")
+            cmd = ["gfortran", "-O2", "-fPIC", "-shared", "-ffree-line-length-none",
+                   *map(str, _SOURCES), "-lblas", "-o", str(temporary)]
+            run = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            if run.returncode:
+>               raise RuntimeError("Fortran DVODE compiler failure: " + run.stderr[-3000:])
+E               RuntimeError: Fortran DVODE compiler failure:         1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 110 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3406:72:
+E               
+E                3406 |  115     RVOD2(I) = RSAV(LENRV1+I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 115 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3409:72:
+E               
+E                3409 |  120     IVOD1(I) = ISAV(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 120 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3411:72:
+E               
+E                3411 |  125     IVOD2(I) = ISAV(LENIV1+I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 125 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3448:72:
+E               
+E                3448 |  15     EWT(I) = RTOL(1)*ABS(YCUR(I)) + ATOL(1)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 15 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3452:72:
+E               
+E                3452 |  25     EWT(I) = RTOL(1)*ABS(YCUR(I)) + ATOL(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 25 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3456:72:
+E               
+E                3456 |  35     EWT(I) = RTOL(I)*ABS(YCUR(I)) + ATOL(1)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 35 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3460:72:
+E               
+E                3460 |  45     EWT(I) = RTOL(I)*ABS(YCUR(I)) + ATOL(I)
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 45 at (1)
+E               /home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/fortran_eos/vendor/odepack/vode.f:3494:72:
+E               
+E                3494 |  10     SUM = SUM + (V(I)*W(I))**2
+E                     |                                                                        1
+E               Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 10 at (1)
+
+python_frontend/compose_eos/stellar_cowling_native.py:65: RuntimeError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_fortran_source_exact_cs2_20261120.py::test_fortran_exact_cs2_matches_original_source_on_four_analytic_regions[SPG_M2-maxwell]
+FAILED python_frontend/tests/test_fortran_source_exact_cs2_20261120.py::test_fortran_exact_cs2_matches_original_source_on_four_analytic_regions[SPG_M3-css]
+FAILED python_frontend/tests/test_fortran_source_exact_cs2_20261120.py::test_fortran_source_cs2_preserves_maxwell_one_sided_limits[SPG_M2-maxwell]
+FAILED python_frontend/tests/test_fortran_source_exact_cs2_20261120.py::test_fortran_source_cs2_preserves_maxwell_one_sided_limits[SPG_M3-css]
+FAILED python_frontend/tests/test_fortran_source_exact_cs2_20261120.py::test_fortran_source_cs2_one_sided_near_outer_and_upper_knots[SPG_M2-maxwell]
+FAILED python_frontend/tests/test_fortran_source_exact_cs2_20261120.py::test_fortran_source_cs2_one_sided_near_outer_and_upper_knots[SPG_M3-css]
+FAILED python_frontend/tests/test_fortran_source_exact_cs2_20261120.py::test_fortran_exact_source_evaluator_rejects_invalid_argument_and_zeroes_result
+7 failed in 20.64s

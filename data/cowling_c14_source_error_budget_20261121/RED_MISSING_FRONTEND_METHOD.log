@@ -1,0 +1,50 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__ test_public_frontend_sweep_delegates_entire_batch_to_fortran[source_case0] __
+
+source_case = ('SPG_M2', <compose_eos.stellar_sharp_native.NativeSharpCowlingDVODE object at 0x7ba9b07701a0>, 'rapid', (5110.0, 5170.0), 5143.719634196357)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ba9afc815e0>
+
+    @pytest.mark.slow
+    def test_public_frontend_sweep_delegates_entire_batch_to_fortran(source_case,monkeypatch):
+        model,sol,conversion,br,ref=source_case
+        ds=min(sol._smax/200,sol.settings.max_step_h/(2*sol._smax))
+        controls=[
+          dict(rtol=1e-9,max_step_s=ds,method="adams"),
+          dict(rtol=0.,max_step_s=ds,method="adams"),
+          dict(rtol=1e-9,max_step_s=ds,method="bdf")]
+        def forbid(*args,**kw):
+            raise AssertionError("Python matching_residual invoked by numerical batch")
+        monkeypatch.setattr(sol,"matching_residual",forbid)
+>       results=sol.sweep_native_numerical_controls(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          br,conversion=conversion,controls=controls)
+E       AttributeError: 'NativeSharpCowlingDVODE' object has no attribute 'sweep_native_numerical_controls'
+
+python_frontend/tests/test_cowling_c14_native_error_budget.py:119: AttributeError
+__ test_public_frontend_sweep_delegates_entire_batch_to_fortran[source_case1] __
+
+source_case = ('SPG_M3', <compose_eos.stellar_sharp_native.NativeSharpCowlingDVODE object at 0x7ba9b01c6c90>, 'slow', (3710.0, 3760.0), 3736.210436364205)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ba9af3b15e0>
+
+    @pytest.mark.slow
+    def test_public_frontend_sweep_delegates_entire_batch_to_fortran(source_case,monkeypatch):
+        model,sol,conversion,br,ref=source_case
+        ds=min(sol._smax/200,sol.settings.max_step_h/(2*sol._smax))
+        controls=[
+          dict(rtol=1e-9,max_step_s=ds,method="adams"),
+          dict(rtol=0.,max_step_s=ds,method="adams"),
+          dict(rtol=1e-9,max_step_s=ds,method="bdf")]
+        def forbid(*args,**kw):
+            raise AssertionError("Python matching_residual invoked by numerical batch")
+        monkeypatch.setattr(sol,"matching_residual",forbid)
+>       results=sol.sweep_native_numerical_controls(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          br,conversion=conversion,controls=controls)
+E       AttributeError: 'NativeSharpCowlingDVODE' object has no attribute 'sweep_native_numerical_controls'
+
+python_frontend/tests/test_cowling_c14_native_error_budget.py:119: AttributeError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_cowling_c14_native_error_budget.py::test_public_frontend_sweep_delegates_entire_batch_to_fortran[source_case0]
+FAILED python_frontend/tests/test_cowling_c14_native_error_budget.py::test_public_frontend_sweep_delegates_entire_batch_to_fortran[source_case1]
+2 failed, 4 deselected in 7.42s

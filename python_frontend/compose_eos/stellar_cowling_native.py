@@ -30,6 +30,7 @@ _SOURCES = [
     _FORTRAN / "src/compose_eos_cowling_source_exact.f90",
     _FORTRAN / "src/compose_eos_cowling_sharp_root.f90",
     _FORTRAN / "src/compose_eos_cowling_sharp_source_root.f90",
+    _FORTRAN / "src/compose_eos_cowling_error_budget.f90",
     _FORTRAN / "src/compose_eos_cowling_tov_dvode.f90",
     _FORTRAN / "vendor/odepack/vode.f",
     _FORTRAN / "vendor/odepack/dgefa.f",
@@ -116,6 +117,15 @@ def _native_library():
         ct.POINTER(ct.c_int),ct.POINTER(ct.c_int),
         ct.POINTER(ct.c_int),ct.POINTER(ct.c_int)]
     dll.cowling_native_sharp_source_brent.restype = None
+    dll.cowling_native_sharp_source_sweep.argtypes = [
+        ct.c_int,ct.c_double,ct.c_double,ct.c_int,
+        ct.c_double,ct.c_double,ct.c_double,_DOUBLE_ARRAY,
+        ct.c_int,ct.c_double,ct.c_double,
+        ct.c_int,_DOUBLE_ARRAY,_FORTRAN_ARRAY,_FORTRAN_ARRAY,
+        ct.c_int,_DOUBLE_ARRAY,_FORTRAN_ARRAY,_FORTRAN_ARRAY,
+        _DOUBLE_ARRAY,_DOUBLE_ARRAY,_INT_ARRAY,
+        _DOUBLE_ARRAY,_DOUBLE_ARRAY,_INT_ARRAY,_INT_ARRAY,_INT_ARRAY,_INT_ARRAY]
+    dll.cowling_native_sharp_source_sweep.restype = None
     dll.cowling_native_source_eos_setup.argtypes = [
         ct.c_int,_FORTRAN_ARRAY,ct.c_int,_FORTRAN_ARRAY,
         _DOUBLE_ARRAY,_DOUBLE_ARRAY,ct.c_int,ct.POINTER(ct.c_int)]

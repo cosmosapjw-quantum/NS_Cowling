@@ -1,0 +1,64 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_source_exact_native_batch_global_invalid_bracket_zeroes_outputs[source_case0] _
+
+source_case = ('SPG_M2', <compose_eos.stellar_sharp_native.NativeSharpCowlingDVODE object at 0x75f3d774d820>, 'rapid', (5110.0, 5170.0), 5143.719634196357)
+
+    def test_source_exact_native_batch_global_invalid_bracket_zeroes_outputs(source_case):
+        model,sol,conv,br,ref=source_case
+        ds=min(sol._smax/200,sol.settings.max_step_h/(2*sol._smax))
+>       r,d,it,nf,kn,st=native_batch(sol,conv,(br[0],br[0]),
+                          [1e-9],[ds],[10])
+
+python_frontend/tests/test_cowling_c14_native_error_budget.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_cowling_c14_native_error_budget.py:64: in native_batch
+    dll.cowling_native_sharp_source_sweep(
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/ctypes/__init__.py:392: in __getattr__
+    func = self.__getitem__(name)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <CDLL '/tmp/ns_cowling_native_dvode/libcowling_7dfd059330b024b202.so', handle 234fa300 at 0x75f3d777c3b0>
+name_or_ordinal = 'cowling_native_sharp_source_sweep'
+
+    def __getitem__(self, name_or_ordinal):
+>       func = self._FuncPtr((name_or_ordinal, self))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: /tmp/ns_cowling_native_dvode/libcowling_7dfd059330b024b202.so: undefined symbol: cowling_native_sharp_source_sweep. Did you mean: 'cowling_native_sharp_source_brent'?
+
+/usr/lib/python3.12/ctypes/__init__.py:397: AttributeError
+_ test_source_exact_native_batch_global_invalid_bracket_zeroes_outputs[source_case1] _
+
+source_case = ('SPG_M3', <compose_eos.stellar_sharp_native.NativeSharpCowlingDVODE object at 0x75f3d77114f0>, 'slow', (3710.0, 3760.0), 3736.210436364205)
+
+    def test_source_exact_native_batch_global_invalid_bracket_zeroes_outputs(source_case):
+        model,sol,conv,br,ref=source_case
+        ds=min(sol._smax/200,sol.settings.max_step_h/(2*sol._smax))
+>       r,d,it,nf,kn,st=native_batch(sol,conv,(br[0],br[0]),
+                          [1e-9],[ds],[10])
+
+python_frontend/tests/test_cowling_c14_native_error_budget.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+python_frontend/tests/test_cowling_c14_native_error_budget.py:64: in native_batch
+    dll.cowling_native_sharp_source_sweep(
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/ctypes/__init__.py:392: in __getattr__
+    func = self.__getitem__(name)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <CDLL '/tmp/ns_cowling_native_dvode/libcowling_7dfd059330b024b202.so', handle 234fa300 at 0x75f3d777c3b0>
+name_or_ordinal = 'cowling_native_sharp_source_sweep'
+
+    def __getitem__(self, name_or_ordinal):
+>       func = self._FuncPtr((name_or_ordinal, self))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: /tmp/ns_cowling_native_dvode/libcowling_7dfd059330b024b202.so: undefined symbol: cowling_native_sharp_source_sweep. Did you mean: 'cowling_native_sharp_source_brent'?
+
+/usr/lib/python3.12/ctypes/__init__.py:397: AttributeError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_cowling_c14_native_error_budget.py::test_source_exact_native_batch_global_invalid_bracket_zeroes_outputs[source_case0]
+FAILED python_frontend/tests/test_cowling_c14_native_error_budget.py::test_source_exact_native_batch_global_invalid_bracket_zeroes_outputs[source_case1]
+2 failed, 2 deselected in 7.04s

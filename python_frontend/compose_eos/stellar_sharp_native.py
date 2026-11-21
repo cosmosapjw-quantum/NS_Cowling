@@ -763,6 +763,85 @@ class NativeSharpCowlingDVODE:
             raise RuntimeError("Fortran source-exact root outside determinant gate")
         return float(root.value),int(iterations.value),int(calls.value),int(cuts.value)
 
+    def sweep_native_numerical_controls(self,bracket_hz,*,conversion,controls):
+        """Frontend-only marshaling for a Fortran source-locked error budget.
+
+        Each control is a mapping with rtol, max_step_s and method
+        ('adams'|'bdf'). This routine calls ONE Fortran batch; neither
+        the original EOS c_s² nor any root residual is evaluated here.
+        A zero/failed numeric status is preserved, never promoted into
+        an admissible mode or fabricated eigenfrequency.
+
+        NOTE: Roots are diagnostics. Scientific mode/node admissibility
+        still requires the independent eigenfunction reconstruction.
+        """
+        if self.coefficient_backend!="native_source_cs2":
+            raise ValueError("sweep requires the native_source_cs2 backend")
+        if conversion not in ("slow","rapid"):
+            raise ValueError("conversion must be slow or rapid")
+        if len(self._phases)!=2 or len(self.background.interfaces)!=1:
+            raise ValueError("sweep requires exactly one Maxwell interface")
+        if self.knot_waypoints or self.source_restart_relative_jump is None:
+            raise ValueError("sweep requires native strong-knot configuration")
+        a,b=map(float,bracket_hz)
+        if not (np.isfinite(a) and np.isfinite(b) and 0<a<b):
+            raise ValueError("ordered positive sweep bracket required")
+        controls=list(controls)
+        if not controls or len(controls)>10000:
+            raise ValueError("sweep controls must have 1..10000 entries")
+        method_map={"adams":10,"bdf":22}
+        for item in controls:
+            if item["method"] not in method_map:
+                raise ValueError("unsupported DVODE method in controls")
+        tol=np.ascontiguousarray([float(c["rtol"]) for c in controls],dtype=float)
+        step=np.ascontiguousarray([float(c["max_step_s"]) for c in controls],dtype=float)
+        mf=np.ascontiguousarray([method_map[c["method"]] for c in controls],dtype=np.int32)
+        count=len(controls)
+        frequency=np.zeros(count,dtype=float)
+        det=np.zeros(count,dtype=float)
+        iterations=np.zeros(count,dtype=np.int32)
+        calls=np.zeros(count,dtype=np.int32)
+        cuts=np.zeros(count,dtype=np.int32)
+        status=np.full(count,-1,dtype=np.int32)
+        high,low=self._phases
+        ht=self.background.interfaces[0]["h"]
+        stlow=self.background.state_at_enthalpy(ht,"low")
+        sthigh=self.background.state_at_enthalpy(ht,"high")
+        for key in ("r_km","Phi","lambda_metric","dPhi_dr_km","p"):
+            if not np.isclose(stlow[key],sthigh[key],rtol=4e-12,atol=1e-14):
+                raise ValueError("Maxwell interface geometry mismatch in sweep: "+key)
+        geom=np.ascontiguousarray([
+            stlow["r_km"],stlow["Phi"],stlow["lambda_metric"],
+            stlow["dPhi_dr_km"],stlow["p"],stlow["epsilon"],
+            sthigh["epsilon"]],dtype=np.float64)
+        with native._LOCK:
+            lib=native._native_library()
+            self._native_exact_eos_setup(lib)
+            try:
+                lib.cowling_native_sharp_source_sweep(
+                    count,a,b,self.settings.ell,self.settings.atol,
+                    self.background.h_start,0.5*float(high["s"][-1]),
+                    geom,{"slow":1,"rapid":2}[conversion],
+                    self.settings.root_xtol_hz,self.source_restart_relative_jump,
+                    len(high["s"]),high["s"],high["vals"],high["slopes"],
+                    len(low["s"]),low["s"],low["vals"],low["slopes"],
+                    tol,step,mf,frequency,det,iterations,calls,cuts,status)
+            finally:
+                native._ACTIVE=None
+        results=[]
+        for i,c in enumerate(controls):
+            ok=int(status[i])==0 and abs(det[i])<=1e-5
+            code=int(status[i]) if ok or status[i]!=0 else 91
+            results.append(dict(
+                rtol=float(tol[i]),max_step_s=float(step[i]),
+                method=c["method"],status=code,
+                frequency_hz=float(frequency[i]) if ok else None,
+                matching_residual=float(det[i]) if ok else None,
+                root_iterations=int(iterations[i]) if ok else 0,
+                native_rhs_evaluations=int(calls[i]) if ok else 0,
+                source_restart_count=int(cuts[i]) if ok else 0))
+        return results
+
     def solve_mode(self,bracket_hz,*,conversion,profile_points=600,
                    root_backend="python_brentq"):
         lo,hi=map(float,bracket_hz)

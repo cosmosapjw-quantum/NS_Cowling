@@ -308,13 +308,29 @@ class NativeSharpCowlingDVODE:
                     raise ValueError("sharp EOS must have positive finite cs²")
                 values[i]=[st["r_km"],st["Phi"],st["lambda_metric"],
                            st["dPhi_dr_km"],cs]
-            pchip=PchipInterpolator(x,values,axis=0,extrapolate=False)
-            slopes=pchip(x,nu=1)
+            if self.coefficient_backend=="native_source_cs2":
+                # The Fortran kernel owns the PCHIP slope construction.
+                # No SciPy PCHIP object is created or used in this backend.
+                pchip=None
+                vals_f=np.asfortranarray(values.T)
+                slopes_f=np.empty_like(vals_f,order="F")
+                status=ct.c_int(-1)
+                with native._LOCK:
+                    native._native_library().cowling_native_pchip_slopes(
+                        len(x),np.ascontiguousarray(x),vals_f,
+                        slopes_f,ct.byref(status))
+                if status.value:
+                    raise RuntimeError("native one-sided geometry PCHIP rejected: "+
+                                       str(status.value))
+            else:
+                pchip=PchipInterpolator(x,values,axis=0,extrapolate=False)
+                slopes_f=np.asfortranarray(pchip(x,nu=1).T)
+                vals_f=np.asfortranarray(values.T)
             source_breaks=np.asarray(background.eos.break_h,dtype=float)
             source_breaks=source_breaks[(source_breaks>h_end)&(source_breaks<h_begin)]
             source_break_s=np.sqrt(np.maximum(h0-source_breaks,0.))
             source_restart_s=[]
-            if self.coefficient_backend in ("direct_source","hybrid_cs2","native_source_cs2") and \
+            if self.coefficient_backend in ("direct_source","hybrid_cs2") and \
                     self.source_restart_relative_jump is not None:
                 # Only restart at demonstrated strong EOS sound-speed jumps,
                 # not every source table knot (often >1000 per star).
@@ -336,11 +352,14 @@ class NativeSharpCowlingDVODE:
                     if relative_jump>=self.source_restart_relative_jump:
                         source_restart_s.append(float(bpoint))
             self._phases.append(dict(h0=h_begin,h1=h_end,mid=mid,
-                s=np.ascontiguousarray(x),vals=np.asfortranarray(values.T),
-                slopes=np.asfortranarray(slopes.T),pchip=pchip,
+                s=np.ascontiguousarray(x),vals=vals_f,
+                slopes=slopes_f,pchip=pchip,
                 source_break_s=np.unique(source_break_s),
                 source_restart_s=np.unique(np.asarray(source_restart_s,float))))
         self._smax=float(np.sqrt(h0-hsurface))
+        self.geometry_interpolation_backend=(
+            "fortran_pchip" if self.coefficient_backend=="native_source_cs2"
+            else "python_pchip")
         self.source_break_count=sum(len(q["source_break_s"]) for q in self._phases)
         self.source_restart_count=sum(len(q["source_restart_s"]) for q in self._phases)
         self._native_source_eos=None
@@ -362,6 +381,43 @@ class NativeSharpCowlingDVODE:
                 b.bridge.kappa],dtype=np.float64)
             jump=int(next(iter(b.sharp_interfaces)))
             self._native_source_eos=(outer,upper,surface,bridge,jump)
+            if self.source_restart_relative_jump is not None:
+                # Strong source derivative jumps are classified by the
+                # original EOS evaluator inside Fortran, not in Python.
+                with native._LOCK:
+                    dll=native._native_library()
+                    self._native_exact_eos_setup(dll)
+                    for phase in self._phases:
+                        capacity=outer.shape[1]+upper.shape[1]+5
+                        out=np.zeros(capacity,dtype=np.float64)
+                        count,status=ct.c_int(0),ct.c_int(-1)
+                        dll.cowling_native_source_select_restarts(
+                            capacity,h0,phase["h0"],phase["h1"],
+                            self.source_restart_relative_jump,
+                            2 if phase is self._phases[0] else 1,
+                            out,ct.byref(count),ct.byref(status))
+                        if status.value:
+                            raise RuntimeError("Fortran strong EOS knot selection failed: "+
+                                               str(status.value))
+                        phase["source_restart_s"]=np.ascontiguousarray(
+                            out[:count.value],dtype=np.float64)
+                self.source_restart_count=sum(
+                    len(q["source_restart_s"]) for q in self._phases)
+
+    def _native_phase_profile_values(self,phase,coordinates):
+        """Evaluate phase-local PCHIP fields in Fortran, no SciPy path."""
+        if self.coefficient_backend!="native_source_cs2":
+            raise ValueError("native profile interpolation requires native_source_cs2")
+        x=np.ascontiguousarray(coordinates,dtype=np.float64)
+        out=np.empty((5,len(x)),dtype=np.float64,order="F")
+        st=ct.c_int(-1)
+        with native._LOCK:
+            native._native_library().cowling_native_pchip_values(
+                len(phase["s"]),phase["s"],phase["vals"],phase["slopes"],
+                len(x),x,out,ct.byref(st))
+        if st.value:
+            raise RuntimeError("native PCHIP profile query failed: "+str(st.value))
+        return out
 
     def _native_exact_eos_setup(self,lib):
         if self._native_source_eos is None:
@@ -762,6 +818,8 @@ class NativeSharpCowlingDVODE:
                         float(np.clip(self.background.h_start-s*s,
                                       phase["h1"],phase["h0"])),
                         phase["mid"]))["r_km"] for s in xs],float)
+            elif self.coefficient_backend=="native_source_cs2":
+                r=self._native_phase_profile_values(self._phases[j],xs)[0]
             else:
                 r=interp(xs)[:,0]
             W=r**(ell+1)*ys[0]
@@ -793,6 +851,10 @@ class NativeSharpCowlingDVODE:
                     profile=profile,nfev=shot["nfev"],
                     backend="Fortran DVODE sharp "+self.method.capitalize(),
                     coefficient_backend=self.coefficient_backend,
+                    geometry_interpolation_backend=self.geometry_interpolation_backend,
+                    strong_knot_selector_backend=("fortran_source_exact"
+                        if self.coefficient_backend=="native_source_cs2" else
+                        "python_original_source"),
                     source_callback_rhs_calls=int(self._callback_rhs_calls),
                     source_restart_count=int(self.source_restart_count),
                     source_restart_relative_jump=self.source_restart_relative_jump,

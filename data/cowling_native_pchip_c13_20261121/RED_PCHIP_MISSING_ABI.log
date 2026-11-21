@@ -1,0 +1,42 @@
+F
+=================================== FAILURES ===================================
+____ test_native_pchip_matches_scipy_nonuniform_endpoint_and_flat[monotone] ____
+
+case = 'monotone'
+
+    @pytest.mark.parametrize("case",["monotone","flat","nonmonotone"])
+    def test_native_pchip_matches_scipy_nonuniform_endpoint_and_flat(case):
+        s=np.ascontiguousarray([0.,1e-5,2e-4,2e-3,.125,.3,.9,1.1])
+        y=np.zeros((5,len(s)),dtype=np.float64,order="F")
+        if case=="monotone":
+            for k in range(5):y[k]=np.exp((k+1)*s)
+        if case=="flat":
+            for k in range(5):y[k]=[1.,1.,1.5,1.5,1.5,2.,2.,2.]
+        if case=="nonmonotone":
+            for k in range(5):y[k]=np.sin((k+1)*s)+.03*s
+        dll=native._native_library()
+        slopes=np.empty_like(y,order="F")
+        st=ct.c_int(-1)
+>       dll.cowling_native_pchip_slopes(len(s),s,y,slopes,ct.byref(st))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+python_frontend/tests/test_fortran_pchip_geometry_c13_20261121.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/ctypes/__init__.py:392: in __getattr__
+    func = self.__getitem__(name)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <CDLL '/tmp/ns_cowling_native_dvode/libcowling_25c04fee6b6c84365a.so', handle 7b4e0e0 at 0x7056a108d9d0>
+name_or_ordinal = 'cowling_native_pchip_slopes'
+
+    def __getitem__(self, name_or_ordinal):
+>       func = self._FuncPtr((name_or_ordinal, self))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: /tmp/ns_cowling_native_dvode/libcowling_25c04fee6b6c84365a.so: undefined symbol: cowling_native_pchip_slopes
+
+/usr/lib/python3.12/ctypes/__init__.py:397: AttributeError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_fortran_pchip_geometry_c13_20261121.py::test_native_pchip_matches_scipy_nonuniform_endpoint_and_flat[monotone]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 9 deselected in 0.52s

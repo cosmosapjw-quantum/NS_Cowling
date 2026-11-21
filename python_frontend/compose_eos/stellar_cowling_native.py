@@ -26,6 +26,7 @@ _ROOT = Path(__file__).resolve().parents[2]
 _FORTRAN = _ROOT / "fortran_eos"
 _SOURCES = [
     _FORTRAN / "src/compose_eos_cowling_dvode.f90",
+    _FORTRAN / "src/compose_eos_cowling_pchip.f90",
     _FORTRAN / "src/compose_eos_cowling_source_exact.f90",
     _FORTRAN / "src/compose_eos_cowling_sharp_root.f90",
     _FORTRAN / "src/compose_eos_cowling_sharp_source_root.f90",
@@ -66,6 +67,14 @@ def _native_library():
             raise RuntimeError("Fortran DVODE compiler failure: " + run.stderr[-3000:])
         temporary.replace(target)
     dll = ct.CDLL(str(target))
+    dll.cowling_native_pchip_slopes.argtypes = [
+        ct.c_int,_DOUBLE_ARRAY,_FORTRAN_ARRAY,_FORTRAN_ARRAY,
+        ct.POINTER(ct.c_int)]
+    dll.cowling_native_pchip_slopes.restype = None
+    dll.cowling_native_pchip_values.argtypes = [
+        ct.c_int,_DOUBLE_ARRAY,_FORTRAN_ARRAY,_FORTRAN_ARRAY,
+        ct.c_int,_DOUBLE_ARRAY,_FORTRAN_ARRAY,ct.POINTER(ct.c_int)]
+    dll.cowling_native_pchip_values.restype = None
     dll.cowling_native_setup.argtypes = [
         ct.c_int, _DOUBLE_ARRAY, _FORTRAN_ARRAY, _FORTRAN_ARRAY,
         ct.POINTER(ct.c_int)]

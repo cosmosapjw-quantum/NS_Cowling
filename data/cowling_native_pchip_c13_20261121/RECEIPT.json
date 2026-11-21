@@ -1,0 +1,158 @@
+{
+  "baseline_commit": "a709208588367032cf34b04f502238f773625041",
+  "branch": "research/cowling-native-pchip-geometry-c13-20261121",
+  "canonical_science_manifest_sha256": "077efa2fa53d02562022ab91358b0945fd5c63c34b609fb478d12340909a920e",
+  "convergence": {
+    "M2": {
+      "C12_4097_reference_hz": 5143.719608336112,
+      "frequencies_by_requested_samples_hz": {
+        "1025": 5143.7196635163555,
+        "2049": 5143.71964708719,
+        "4097": 5143.719711814548,
+        "8193": 5143.719634196357
+      },
+      "mass_msun": 1.3999999857354968,
+      "max_join": 1.228616209280206e-07,
+      "max_slope_delta": 4.547473508864641e-13,
+      "source_contract_sha256": "59b7cb4671347c33c25133e6497e8be346b4e5b4f871eece9bcaf59155fd8765"
+    },
+    "M3": {
+      "C12_4097_reference_hz": 3736.21069873971,
+      "frequencies_by_requested_samples_hz": {
+        "1025": 3736.2106098123622,
+        "2049": 3736.2106285913287,
+        "4097": 3736.210706737009,
+        "8193": 3736.210436364205
+      },
+      "mass_msun": 0.7000000086373105,
+      "max_join": 9.565274141946622e-06,
+      "max_slope_delta": 9.094947017729282e-13,
+      "source_contract_sha256": "f23fb7020c9de1b65c99ac37690840f7a4d6611f3372409b015d8c3bd7e32f3b"
+    }
+  },
+  "first_process_comparison_error": "OUTPUT_SERIALIZATION_NONDETERMINISTIC_METADATA_FIXED_RAW_EVIDENCE_PRESERVED",
+  "front_end_parallel_benchmark": {
+    "REAL_P1_SCIENCE": {
+      "cases": {
+        "M2": {
+          "frequency_hz": 5143.719711814548,
+          "peak_rss_kb": 104912
+        },
+        "M3": {
+          "frequency_hz": 3736.210706737009,
+          "peak_rss_kb": 99152
+        }
+      },
+      "elapsed_seconds": 6.924944,
+      "workers": 1
+    },
+    "REAL_P2_SCIENCE": {
+      "cases": {
+        "M2": {
+          "frequency_hz": 5143.719711814548,
+          "peak_rss_kb": 104964
+        },
+        "M3": {
+          "frequency_hz": 3736.210706737009,
+          "peak_rss_kb": 98952
+        }
+      },
+      "elapsed_seconds": 4.380652,
+      "workers": 2
+    }
+  },
+  "immutable_c12_pchip_oracles": {
+    "M2": {
+      "phases": {
+        "high": {
+          "fixture_gzip_sha256": "f709b60e93e4329b93283765d483823fc57f2316e29d13f1544ac86cac4de294",
+          "oracle_sha256": "bc656dc00a17839862f89c00198877fbefaf566d6204163f8548c4ca6a5863a9",
+          "original_grid_points": 12124,
+          "sampled_grid_points": 257,
+          "source_phase_first_s": 0.0,
+          "source_phase_last_s": 0.40750770822458143
+        },
+        "low": {
+          "fixture_gzip_sha256": "5f971c90125acaad006fec892f243961a88a0bf7057c567c9ee34473cb411573",
+          "oracle_sha256": "0ccb2fc4ca65e4093633035d877fbd2f2c5de1845d10a3deb150137928713aaf",
+          "original_grid_points": 2029,
+          "sampled_grid_points": 257,
+          "source_phase_first_s": 0.40750770822458143,
+          "source_phase_last_s": 0.42466506663431547
+        }
+      },
+      "source_c12_gzip_sha256": "21fc726337dba746ba5d461c43a1c429138abd15fb66acb6349d2aeca4b4648e",
+      "source_uncompressed_sha256": "eee499eb50de4300f9987e05bf46a4fee3ddcbfb2e9b9d99deb9ac8a423c35e5"
+    },
+    "M3": {
+      "phases": {
+        "high": {
+          "fixture_gzip_sha256": "296a7fb6750e926a923e03d3f71e29829b9f7711426991a81dee36b7752cd3f5",
+          "oracle_sha256": "7e9a6fad4caa47557771da2c738f06ff8a53818cdf5b1e486ae438c07080a1cf",
+          "original_grid_points": 6601,
+          "sampled_grid_points": 257,
+          "source_phase_first_s": 0.0,
+          "source_phase_last_s": 0.2460410301533134
+        },
+        "low": {
+          "fixture_gzip_sha256": "0d8d7748b085f4524caf2b743efd58087e22fd4724fe9edaee10ede0687201e5",
+          "oracle_sha256": "1138142fc0db1d72bc9d0d74bc7af29f566187f5879bf2d5c560699cd271f64e",
+          "original_grid_points": 2710,
+          "sampled_grid_points": 257,
+          "source_phase_first_s": 0.2460410301533134,
+          "source_phase_last_s": 0.29588768096172835
+        }
+      },
+      "source_c12_gzip_sha256": "f85dcebf71dd36959a466328ef05e4fbf680cb3485cccd7eb06ddaf382f85dc4",
+      "source_uncompressed_sha256": "f6a7abb566ae68b8ac5f838d410771823634a98024007ca02264bd6e44a0d3b1"
+    }
+  },
+  "limitations": [
+    "TOV and source EOS/geometry sampling still use Python as source frontend",
+    "full end-to-end EOS importer and eigenfunction classification are not all Fortran",
+    "mainly 2 original stars and p1 modes; no cross-density branch identity",
+    "source EOS exact derivative belongs to original effective mathematical contract",
+    "no absolute frequency error bound or monotone convergence certified",
+    "Netlib DVODE COMMON is nonreentrant; use process parallelism",
+    "full-pipeline memory reduction not demonstrated"
+  ],
+  "native_subagent": "NOT_RUN",
+  "next_action": "independent background geometry/ODE error separation and mode branch continuation across central density.",
+  "nonmonotonic_frequency_convergence": "UNRESOLVED_NO_RICHARDSON_CERTIFICATE",
+  "original_eos_archive_sha256": "299de43bb4f0a87ebfc4f1139ab3c8b51c344937ec3637cdff644e9ca8ab2c04",
+  "pchip_only_benchmark": {
+    "median_speedup_max": 5.233983783820277,
+    "median_speedup_min": 3.2118848710698567,
+    "scope": "isolated original-source background PCHIP derivative creation only"
+  },
+  "schema": "ns_cowling.c13.fortran_pchip_geometry.source_locked.v1",
+  "scientific_scope": "one-Maxwell M2/M3 source-locked native-source-exact with phase geometry Fortran PCHIP",
+  "source_and_doc_sha256": {
+    "docs/COWLING_FORTRAN_PCHIP_GEOMETRY_C13_20261121.md": "3601f170aa4b1f062abb3f28029b4d2b050db40c8171e1ee3f6a534f76eb1ec0",
+    "fortran_eos/src/compose_eos_cowling_pchip.f90": "19e11afbae151ee1b578adfa5978547aa532a27de20ec97853d50825dbeef787",
+    "fortran_eos/tests/cowling_pchip_c13_standalone.f90": "8f42d64b11d441c3415659c64a6db2a537504a935ab446f274d9c6a4a56486b3",
+    "python_frontend/compose_eos/stellar_cowling_native.py": "dc285c916c274e094e1691b32f9effcfa999e0c9bde87ad8384c55e1695df6a9",
+    "python_frontend/compose_eos/stellar_sharp_native.py": "162e837339ae6d2e7f5c1d04d38d2a7274ef544bc2ed2f241735ac608771b338",
+    "python_frontend/tests/test_fortran_pchip_geometry_c13_20261121.py": "06c5d7cdc31d8c478c7e82a78cf052d1c81fc2de3f479d2c3fe2ef3cf2663928",
+    "scripts/bench_c13_native_pchip_parallel.sh": "cc030cb58f2f0b22824ab4db3bbd5aae94c0ef0dedaad1be68bfff98dc17d341",
+    "scripts/bench_cowling_pchip_c13_convergence.py": "30f56351662ae0e2faed3ba1347d287b0c04d5069e3b23e4adae61146c2a5b74",
+    "scripts/export_c13_original_pchip_fixtures.py": "587aa294b2bcf8a3ef2ee18b85baea67b7bcb0cccc0d81534ab58408e88361f2",
+    "scripts/run_c13_native_pchip_star.py": "70d68e8f212c7b8c6a029ceeee5234f367393677678aa680fc10f6c9c8f19937"
+  },
+  "status": "PASS_SCOPED_FORTRAN_PCHIP_GEOMETRY_WITH_CONVERGENCE_OPEN",
+  "tests": {
+    "checked_and_optimized_fortran_bytes_identical": true,
+    "failed": 0,
+    "final_focused_passed": 33,
+    "initial_c13_passed": 12,
+    "integrated_passed": 119,
+    "integrated_seconds": 189.37,
+    "source_code_module_fcheck_all": "PASS",
+    "standalone_fortran_oracle_passes": 4,
+    "vendor_full_bounds": "NOT_RUN"
+  },
+  "versions": {
+    "gfortran": "13.3.0",
+    "numpy_and_scipy": "see runtime requirements installed; not pinned by this report"
+  }
+}

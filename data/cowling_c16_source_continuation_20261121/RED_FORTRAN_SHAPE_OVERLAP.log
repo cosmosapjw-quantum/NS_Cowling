@@ -1,0 +1,36 @@
+F
+=================================== FAILURES ===================================
+______ test_native_fortran_phase_shape_overlap_identical_and_global_sign _______
+
+    def test_native_fortran_phase_shape_overlap_identical_and_global_sign():
+        dll=native._native_library()
+        phase=np.ascontiguousarray([0,0,0,0,1,1,1,1],dtype=np.int32)
+        r=np.ascontiguousarray([0.,.2,.4,.6,.6,.8,1.0,1.2],dtype=float)
+        w=np.ascontiguousarray([0.,.7,1.,.4,.4,-.1,-.4,-.2],dtype=float)
+        total,inner,outer,status=(ct.c_double(-1),ct.c_double(-1),
+                                  ct.c_double(-1),ct.c_int(-1))
+>       dll.cowling_native_mode_shape_overlap(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           len(r),phase,r,w,len(r),phase,r,w,
+           ct.byref(total),ct.byref(inner),ct.byref(outer),ct.byref(status))
+
+python_frontend/tests/test_c16_source_mode_continuation.py:140: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/ctypes/__init__.py:392: in __getattr__
+    func = self.__getitem__(name)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <CDLL '/tmp/ns_cowling_native_dvode/libcowling_32dcf59d5e044434d9.so', handle 37ddb8c0 at 0x734de2a5af60>
+name_or_ordinal = 'cowling_native_mode_shape_overlap'
+
+    def __getitem__(self, name_or_ordinal):
+>       func = self._FuncPtr((name_or_ordinal, self))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: /tmp/ns_cowling_native_dvode/libcowling_32dcf59d5e044434d9.so: undefined symbol: cowling_native_mode_shape_overlap. Did you mean: 'cowling_native_source_phase_setup'?
+
+/usr/lib/python3.12/ctypes/__init__.py:397: AttributeError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_c16_source_mode_continuation.py::test_native_fortran_phase_shape_overlap_identical_and_global_sign
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 11 deselected in 0.38s

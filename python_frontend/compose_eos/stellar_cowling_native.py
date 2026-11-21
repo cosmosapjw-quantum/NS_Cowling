@@ -30,6 +30,9 @@ _SOURCES = [
     _FORTRAN / "src/compose_eos_cowling_source_exact.f90",
     _FORTRAN / "src/compose_eos_cowling_sharp_root.f90",
     _FORTRAN / "src/compose_eos_cowling_sharp_source_root.f90",
+    _FORTRAN / "src/compose_eos_cowling_source_scan.f90",
+    _FORTRAN / "src/compose_eos_cowling_mode_nodes.f90",
+    _FORTRAN / "src/compose_eos_cowling_mode_overlap.f90",
     _FORTRAN / "src/compose_eos_cowling_error_budget.f90",
     _FORTRAN / "src/compose_eos_cowling_tov_dvode.f90",
     _FORTRAN / "src/compose_eos_cowling_tov_two_phase_sweep.f90",
@@ -118,6 +121,30 @@ def _native_library():
         ct.POINTER(ct.c_int),ct.POINTER(ct.c_int),
         ct.POINTER(ct.c_int),ct.POINTER(ct.c_int)]
     dll.cowling_native_sharp_source_brent.restype = None
+    dll.cowling_native_sharp_source_scan.argtypes = [
+        ct.c_int,_DOUBLE_ARRAY,ct.c_int,ct.c_double,ct.c_double,
+        ct.c_double,ct.c_int,
+        ct.c_int,_DOUBLE_ARRAY,_FORTRAN_ARRAY,_FORTRAN_ARRAY,
+        ct.c_int,_DOUBLE_ARRAY,_FORTRAN_ARRAY,_FORTRAN_ARRAY,
+        ct.c_double,ct.c_double,_DOUBLE_ARRAY,ct.c_int,ct.c_double,
+        _DOUBLE_ARRAY,_INT_ARRAY,_INT_ARRAY,
+        ct.POINTER(ct.c_int),ct.POINTER(ct.c_int)]
+    dll.cowling_native_sharp_source_scan.restype = None
+    dll.cowling_native_phase_nodes.argtypes = [
+        ct.c_int,_INT_ARRAY,_DOUBLE_ARRAY,_DOUBLE_ARRAY,ct.c_double,
+        ct.POINTER(ct.c_int),ct.POINTER(ct.c_int),ct.POINTER(ct.c_int)]
+    dll.cowling_native_phase_nodes.restype = None
+    dll.cowling_native_select_mode_branch.argtypes = [
+        ct.c_int,_DOUBLE_ARRAY,_INT_ARRAY,_INT_ARRAY,_INT_ARRAY,
+        ct.c_int,ct.c_double,ct.c_double,
+        ct.POINTER(ct.c_int),ct.POINTER(ct.c_int)]
+    dll.cowling_native_select_mode_branch.restype = None
+    dll.cowling_native_mode_shape_overlap.argtypes = [
+        ct.c_int,_INT_ARRAY,_DOUBLE_ARRAY,_DOUBLE_ARRAY,
+        ct.c_int,_INT_ARRAY,_DOUBLE_ARRAY,_DOUBLE_ARRAY,
+        ct.POINTER(ct.c_double),ct.POINTER(ct.c_double),
+        ct.POINTER(ct.c_double),ct.POINTER(ct.c_int)]
+    dll.cowling_native_mode_shape_overlap.restype = None
     dll.cowling_native_sharp_source_sweep.argtypes = [
         ct.c_int,ct.c_double,ct.c_double,ct.c_int,
         ct.c_double,ct.c_double,ct.c_double,_DOUBLE_ARRAY,

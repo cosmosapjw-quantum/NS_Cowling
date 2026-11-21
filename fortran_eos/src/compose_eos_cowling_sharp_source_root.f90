@@ -19,7 +19,7 @@ module compose_eos_cowling_sharp_source_root
   private
   real(c_double),parameter :: pi=3.1415926535897932384626433832795_c_double
   real(c_double),parameter :: c_km_s=299792.458_c_double
-  public :: cowling_native_sharp_source_brent
+  public :: cowling_native_sharp_source_brent, exact_onejump_det
 contains
   ! Integrate exactly one physical phase leg. Build and schedule all chosen
   ! one-sided derivative-discontinuity restarts in Fortran, preserving DVODE

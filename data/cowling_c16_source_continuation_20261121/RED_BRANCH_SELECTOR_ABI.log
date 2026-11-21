@@ -1,0 +1,36 @@
+F
+=================================== FAILURES ===================================
+___ test_native_mode_branch_selector_retains_node_identity_without_ambiguity ___
+
+    def test_native_mode_branch_selector_retains_node_identity_without_ambiguity():
+        dll=native._native_library()
+        f=np.ascontiguousarray([1550.,1842.,3710.,5143.,6500.],dtype=float)
+        nw=np.ascontiguousarray([1,0,1,1,2],dtype=np.int32)
+        nv=np.ascontiguousarray([1,0,1,1,2],dtype=np.int32)
+        stat=np.ascontiguousarray([0,0,0,0,0],dtype=np.int32)
+        selected,status=ct.c_int(-9),ct.c_int(-9)
+>       dll.cowling_native_select_mode_branch(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           len(f),f,nw,nv,stat,0,1800.,.12,
+           ct.byref(selected),ct.byref(status))
+
+python_frontend/tests/test_c16_source_mode_continuation.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/ctypes/__init__.py:392: in __getattr__
+    func = self.__getitem__(name)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <CDLL '/tmp/ns_cowling_native_dvode/libcowling_07cfde2fcc4cc124b8.so', handle 21e4c630 at 0x7e3287531970>
+name_or_ordinal = 'cowling_native_select_mode_branch'
+
+    def __getitem__(self, name_or_ordinal):
+>       func = self._FuncPtr((name_or_ordinal, self))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: /tmp/ns_cowling_native_dvode/libcowling_07cfde2fcc4cc124b8.so: undefined symbol: cowling_native_select_mode_branch
+
+/usr/lib/python3.12/ctypes/__init__.py:397: AttributeError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_c16_source_mode_continuation.py::test_native_mode_branch_selector_retains_node_identity_without_ambiguity
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 9 deselected in 0.40s

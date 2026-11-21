@@ -1,0 +1,34 @@
+F
+=================================== FAILURES ===================================
+_______________ test_native_fortran_phase_node_counts_and_zeros ________________
+
+    def test_native_fortran_phase_node_counts_and_zeros():
+        dll=native._native_library()
+        phase=np.ascontiguousarray(np.array([0,0,0,0,1,1,1,1,1],np.int32))
+        w=np.ascontiguousarray([0.,1.,-1.,2.,0.,1.,-1.,0.,2.],np.float64)
+        v=np.ascontiguousarray([0.,1.,1.,-2.,0.,1.,1.,0.,-2.],np.float64)
+        wcount,vcount,st=ct.c_int(-1),ct.c_int(-1),ct.c_int(-1)
+>       dll.cowling_native_phase_nodes(len(w),phase,w,v,1e-9,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            ct.byref(wcount),ct.byref(vcount),ct.byref(st))
+
+python_frontend/tests/test_c16_source_mode_continuation.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/ctypes/__init__.py:392: in __getattr__
+    func = self.__getitem__(name)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <CDLL '/tmp/ns_cowling_native_dvode/libcowling_bd1b9ed6a655753f98.so', handle 109220f0 at 0x719a0fbe7bf0>
+name_or_ordinal = 'cowling_native_phase_nodes'
+
+    def __getitem__(self, name_or_ordinal):
+>       func = self._FuncPtr((name_or_ordinal, self))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: /tmp/ns_cowling_native_dvode/libcowling_bd1b9ed6a655753f98.so: undefined symbol: cowling_native_phase_nodes. Did you mean: 'cowling_native_pchip_slopes'?
+
+/usr/lib/python3.12/ctypes/__init__.py:397: AttributeError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_c16_source_mode_continuation.py::test_native_fortran_phase_node_counts_and_zeros
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 7 deselected in 0.37s

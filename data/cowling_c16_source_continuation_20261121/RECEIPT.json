@@ -1,0 +1,214 @@
+{
+  "EOS_archive_sha256": "299de43bb4f0a87ebfc4f1139ab3c8b51c344937ec3637cdff644e9ca8ab2c04",
+  "baseline_commit": "8c0f70eed5595b10933763b3917ad4e045b6cf94",
+  "branch": "research/cowling-c16-source-mode-continuation-20261121",
+  "date_kst": "2026-11-21",
+  "duplicate_replay_full_json_sha256": {
+    "REAL_P1_SHAPE/M2.json": "9a82e855ce438bf268e8d6d293532eb9cc0fc42e5049d8ff5339ff52f16167a1",
+    "REAL_P1_SHAPE/M3.json": "96f339050f896d536845e24242eafd3281739f1841e8610477df3e3dca78e91f",
+    "REAL_P2_INITIAL/M2.json": "92af1f7a41f4e460cf0596aae222988653d6f9747c00df288a365f014f363f63",
+    "REAL_P2_INITIAL/M3.json": "8099a0d728462f3ba4a7a27c1b64fe115a12067b4e59d60614f419795d53f2b5",
+    "REAL_P2_SHAPE_FINAL/M2.json": "9a82e855ce438bf268e8d6d293532eb9cc0fc42e5049d8ff5339ff52f16167a1",
+    "REAL_P2_SHAPE_FINAL/M3.json": "96f339050f896d536845e24242eafd3281739f1841e8610477df3e3dca78e91f"
+  },
+  "limitations": [
+    "One original EOS and one Maxwell per model, five local densities \u00b12% only",
+    "No true global Sturm/avoided crossing eigenmode-identity proof from W/V nodes",
+    "Shape overlap uses normalized areal radial displacement W in separate phases, not a covariant conserved inner product",
+    "Root frequency scanner range 700-5500 Hz is not exhaustive",
+    "Full TOV and Cowling discretization error budget remains unbounded (C15)",
+    "No full-GR polar metric perturbations, frozen-composition g-modes, or GW damping",
+    "DVODE Fortran COMMON cannot be entered by threads, numerical parallelism is OS processes"
+  ],
+  "models": {
+    "M2": {
+      "center_density_anchor_fm3": 0.30385128926615257,
+      "conversion": "rapid",
+      "density_factors": [
+        0.98,
+        0.99,
+        1.0,
+        1.01,
+        1.02
+      ],
+      "frequencies_hz": {
+        "f": [
+          1829.339786512599,
+          1835.8757960843968,
+          1842.3116593617328,
+          1848.6480516502268,
+          1854.8860238006896
+        ],
+        "p1": [
+          5112.3587698640695,
+          5128.166222921459,
+          5143.71967334719,
+          5159.021026070764,
+          5174.072718421364
+        ]
+      },
+      "local_branch_node_label_admissions": 10,
+      "mass_msun": [
+        1.3639984972665886,
+        1.3820764301833646,
+        1.3999999857354968,
+        1.417762893466443,
+        1.4353582833205287
+      ],
+      "min_abs_radial_W_overlap": 0.9999650165137564,
+      "min_high_phase_W_overlap": 0.999999179642149,
+      "min_low_phase_W_overlap": 0.9999671751088517,
+      "native_candidate_roots": 10,
+      "original_source_contract_sha256": "59b7cb4671347c33c25133e6497e8be346b4e5b4f871eece9bcaf59155fd8765",
+      "phasewise_W_overlap_n": 8,
+      "radius_km": [
+        14.430613932056952,
+        14.425608740605771,
+        14.420419623651872,
+        14.415041389855023,
+        14.409470426389559
+      ],
+      "successful_original_Fortran_scan_points": 485,
+      "total_scan_points": 485
+    },
+    "M3": {
+      "center_density_anchor_fm3": 0.192510767556007,
+      "conversion": "slow",
+      "density_factors": [
+        0.98,
+        0.99,
+        1.0,
+        1.01,
+        1.02
+      ],
+      "frequencies_hz": {
+        "f": [
+          1552.1997385681623,
+          1558.241239186421,
+          1564.2448940763072,
+          1570.2114813148157,
+          1576.1416814344354
+        ],
+        "p1": [
+          3623.515602408915,
+          3679.8927311247,
+          3736.2106883570214,
+          3792.4542803189124,
+          3848.6075615228337
+        ]
+      },
+      "local_branch_node_label_admissions": 10,
+      "mass_msun": [
+        0.676800649208466,
+        0.6883781669630781,
+        0.7000000086373105,
+        0.7116652267763551,
+        0.7233732504992265
+      ],
+      "min_abs_radial_W_overlap": 0.999965259179655,
+      "min_high_phase_W_overlap": 0.9894358691362628,
+      "min_low_phase_W_overlap": 0.9999691326584684,
+      "native_candidate_roots": 15,
+      "original_source_contract_sha256": "f23fb7020c9de1b65c99ac37690840f7a4d6611f3372409b015d8c3bd7e32f3b",
+      "phasewise_W_overlap_n": 8,
+      "radius_km": [
+        14.614210220387225,
+        14.605822193011777,
+        14.59794179069283,
+        14.590535997726732,
+        14.583573040981834
+      ],
+      "successful_original_Fortran_scan_points": 485,
+      "total_scan_points": 485
+    }
+  },
+  "native_subagent": "NOT_RUN",
+  "next_action": "extend central density to transition onset/stability turning point with branch ambiguity preserved, independent TOV convergence and mode-overlap checks",
+  "performance": {
+    "Python_source_EOS_loading_TOV_and_mode_profile_in_full_workload": true,
+    "canonical_science_manifest_sha256": "c6552569bd7edbe7f669502123c165d087f0664b4f378524801ccc367a4e67df",
+    "full_pipeline_memory_saving_claim": false,
+    "full_workload_serial_wall_s": 17.536732,
+    "full_workload_two_process_wall_s": 9.969628,
+    "native_vs_python_frequency_scan_warm_ratio": {
+      "M2": 1.263016715800736,
+      "M3": 1.3691102127067343
+    },
+    "peak_python_frontend_worker_rss_kb": {
+      "REAL_P1_SHAPE": {
+        "M2": 108352,
+        "M3": 103468
+      },
+      "REAL_P2_SHAPE_FINAL": {
+        "M2": 107916,
+        "M3": 102300
+      }
+    },
+    "pure_Fortran_checked_peak_rss_kb": {
+      "M2": 8836,
+      "M3": 7216
+    },
+    "reference_source_det_max_abs_delta": {
+      "M2": 0.0,
+      "M3": 0.0
+    },
+    "two_process_speedup": 1.7590156824306784
+  },
+  "physics": "Gamma1=Gamma_eq, original cold effective EOS, one Maxwell, slow/rapid fixed per model, no full GR",
+  "result": "PASS_SCOPED_SOURCE_EXACT_FORTRAN_F_P1_LOCAL_NODE_AND_W_SHAPE_CONTINUATION",
+  "schema": "ns_cowling.c16.original_source_local_f_p1_branch.v1",
+  "scope": {
+    "adjacent_density_W_shape_diagnostics": 16,
+    "bounded_avoided_crossing_statement": "not excluded outside local density window",
+    "central_density_points_per_star": 5,
+    "density_factors": [
+      0.98,
+      0.99,
+      1,
+      1.01,
+      1.02
+    ],
+    "f_p1_local_node_labeled_point_admissions": 20,
+    "native_fortran_scan_residuals": 970,
+    "original_p1_joint_maxwell_acceptance_gate": "unchanged 1e-5",
+    "original_stars": 2,
+    "phasewise_WV_node_count_fortran": true,
+    "root_candidates_admitted": 25,
+    "scan_frequency_points_per_density": 97,
+    "signed_scan_status_failures": 0,
+    "source_eos_rhs_callbacks_python": 0,
+    "unique_branch_selector_fortran": true
+  },
+  "source_and_docs_sha256": {
+    "docs/COWLING_C16_SOURCE_F_P1_LOCAL_CONTINUATION_20261121.md": "58ba4d5b23c57d278ecc3a6d8ba113e1b02615fa8d92f3f5ef920b390df682ff",
+    "fortran_eos/src/compose_eos_cowling_mode_nodes.f90": "11edd153892ddbb2c65f278797764229008ba24b2c9f29f533c35ceb9762b371",
+    "fortran_eos/src/compose_eos_cowling_mode_overlap.f90": "35daea1943e8e91828e868f63df9ce874b9b43d0acaa01d21973ec6fe7be99c5",
+    "fortran_eos/src/compose_eos_cowling_sharp_source_root.f90": "785ac12839f6f7477da2b1c35fd74dd244e9ae9228f57f465f3619793b14a8ed",
+    "fortran_eos/src/compose_eos_cowling_source_scan.f90": "cff29e0064c37f3042f3bab89f9f74836899642bef3c6870c7c12a6e188ace6b",
+    "fortran_eos/tests/cowling_c16_original_source_f_p1.f90": "0c167136aa1517af9d3070c51b465da6a00cf363e51b69c8218c5cce4dab9d93",
+    "python_frontend/compose_eos/stellar_cowling_native.py": "2c7111d392040c17097d80f647ef93c664d317829d80ec24f7d7e741496a7bfc",
+    "python_frontend/compose_eos/stellar_sharp_native.py": "b9dbecf37b4599ecb6e655a8fa865442193fc3345aff80f6152a6e964cd22312",
+    "python_frontend/tests/test_c16_source_mode_continuation.py": "c7676fdf1e806d71d3165c46fd6fbe2a4710b7e46f075524b83f047ea66d9bdb",
+    "scripts/bench_c16_scanner_speed.py": "afead4278d8870e93bdfe629d55b99d75cb041e1558855ed0f398e8cb19aaaea",
+    "scripts/bench_c16_source_parallel.sh": "0a505cb6f2996f55e10c53d09bcf91f118a0b8fc860d823bc29cb263aff24d7c",
+    "scripts/build_c16_fortran_original_f_p1.sh": "d05dca8ef6fe03e45de00a7e5683d4992fbad669401bc4cb196a8fefb43490e3",
+    "scripts/pilot_c16_source_scan.py": "0d6c7e97c870cb17e9f387427a6a389246d3de6dda3feaa970edaf04bd7607f6",
+    "scripts/run_c16_source_density.py": "538b70f451b936d571b93e6fa25cc0b713087cd3dc9140f62ea096a7375c5d9d"
+  },
+  "tests": {
+    "C7_to_C16_related_integrated_passed": 152,
+    "TDD_RED_ABI_logs_preserved": [
+      "RED_NATIVE_NODE_ABI.log",
+      "RED_BRANCH_SELECTOR_ABI.log",
+      "RED_FORTRAN_SHAPE_OVERLAP.log"
+    ],
+    "c16_focused_passed": 16,
+    "integrated_seconds": 206.95,
+    "related_regression_failed": 0,
+    "standalone_Fortran_original_M2_M3_test": "PASS",
+    "standalone_checked_vs_O2_output_byte_identical": true,
+    "standalone_project_bounds": "PASS",
+    "untouched_Netlib_vendor_full_bounds": "NOT_VERIFIED"
+  },
+  "versioned_evidence_policy": "one full canonical science JSON per source star at REAL_P2_SHAPE; serial/parallel/pre-overlap duplicate full JSON available in local Dropbox replay archive only; retained independent science manifests and logs"
+}

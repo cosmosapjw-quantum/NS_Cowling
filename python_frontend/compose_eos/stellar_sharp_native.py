@@ -827,6 +827,77 @@ class NativeSharpCowlingDVODE:
             raise RuntimeError("Fortran sharp root determinant outside acceptance threshold")
         return float(frequency.value),int(steps.value),int(calls.value)
 
+    def scan_source_brackets_native(self,frequencies_hz,*,conversion):
+        """One Fortran original-source EOS determinant scan for mode candidates.
+
+        The chosen frequency grid, original physical EOS laws, knot
+        restarts, Maxwell junctions and ODE integration are *evaluated*
+        in Fortran. Python only validates inputs and marshals the results.
+        Adjacent finite signed residuals give candidate brackets, not
+        certified f/p1 modes or globally continuous branches.
+        """
+        if self.coefficient_backend!="native_source_cs2":
+            raise ValueError("native source frequency scan requires native_source_cs2")
+        if conversion not in ("slow","rapid"):
+            raise ValueError("conversion must be slow or rapid")
+        if len(self._phases)!=2 or len(self.background.interfaces)!=1:
+            raise ValueError("native frequency scan requires one Maxwell interface")
+        if self.knot_waypoints or self.source_restart_relative_jump is None:
+            raise ValueError("native scan requires native strong-knot restart configuration")
+        freq=np.asarray(frequencies_hz,dtype=np.float64)
+        if (freq.ndim!=1 or not 2<=len(freq)<=512 or
+            np.any(~np.isfinite(freq)) or freq[0]<=0 or
+            np.any(np.diff(freq)<=0)):
+            raise ValueError("frequency scan must be strictly increasing and positive")
+        freq=np.ascontiguousarray(freq)
+        high,low=self._phases
+        ht=self.background.interfaces[0]["h"]
+        slo=self.background.state_at_enthalpy(ht,"low")
+        shi=self.background.state_at_enthalpy(ht,"high")
+        for key in ("r_km","Phi","lambda_metric","dPhi_dr_km","p"):
+            if not np.isclose(slo[key],shi[key],rtol=4e-12,atol=1e-14):
+                raise ValueError("Maxwell interface geometry discontinuity: "+key)
+        geom=np.ascontiguousarray([slo["r_km"],slo["Phi"],
+            slo["lambda_metric"],slo["dPhi_dr_km"],slo["p"],
+            slo["epsilon"],shi["epsilon"]],dtype=np.float64)
+        value=np.zeros(len(freq),dtype=np.float64)
+        rhs=np.zeros(len(freq),dtype=np.int32)
+        statuses=np.full(len(freq),-1,dtype=np.int32)
+        cuts,status=ct.c_int(0),ct.c_int(-1)
+        max_ds=min(self._smax/200,
+                  self.settings.max_step_h/(2*self._smax))
+        with native._LOCK:
+            lib=native._native_library()
+            self._native_exact_eos_setup(lib)
+            try:
+                lib.cowling_native_sharp_source_scan(
+                    len(freq),freq,self.settings.ell,
+                    self.settings.rtol,self.settings.atol,max_ds,
+                    {"adams":10,"bdf":22}[self.method],
+                    len(high["s"]),high["s"],high["vals"],high["slopes"],
+                    len(low["s"]),low["s"],low["vals"],low["slopes"],
+                    self.background.h_start,0.5*float(high["s"][-1]),
+                    geom,{"slow":1,"rapid":2}[conversion],
+                    self.source_restart_relative_jump,
+                    value,rhs,statuses,ct.byref(cuts),ct.byref(status))
+            finally:
+                native._ACTIVE=None
+        if status.value:
+            raise RuntimeError("Fortran source-exact frequency scan rejected: "+str(status.value))
+        sample=[dict(frequency_hz=float(f),
+                     determinant=float(value[i]) if statuses[i]==0 else None,
+                     status=int(statuses[i]),
+                     native_rhs_evaluations=int(rhs[i]) if statuses[i]==0 else 0,
+                     source_restarts=int(cuts.value) if statuses[i]==0 else 0)
+                for i,f in enumerate(freq)]
+        brackets=[]
+        for i in range(len(freq)-1):
+            if statuses[i]!=0 or statuses[i+1]!=0:
+                continue
+            if value[i]*value[i+1]<0:
+                brackets.append((float(freq[i]),float(freq[i+1])))
+        return brackets,sample
+
     def _native_source_exact_root(self,bracket_hz,*,conversion):
         """Thin frontend for original-source Fortran Brent and knot restarts.
 
@@ -1031,12 +1102,32 @@ class NativeSharpCowlingDVODE:
                 r=interp(xs)[:,0]
             W=r**(ell+1)*ys[0]
             V=r**ell*ys[1]
-            wcount+=_nodes(W);vcount+=_nodes(V)
+            if self.coefficient_backend!="native_source_cs2":
+                wcount+=_nodes(W);vcount+=_nodes(V)
             norm=max(norm,float(np.max(abs(W))))
             for s,radius,w,v in zip(xs,r,W,V):
                 profile.append(dict(h=float(self.background.h_start-s*s),
                     r_km=float(radius),W=float(w),V_km_inverse=float(v),
                     phase_index=j))
+        if self.coefficient_backend=="native_source_cs2":
+            # Physical phase-local nodal classification is also Fortran.
+            # Preserve the original 1e-9 relative-component peak rule;
+            # NEVER count a spurious node across the Maxwell interface.
+            phases=np.ascontiguousarray(
+                [row["phase_index"] for row in profile],dtype=np.int32)
+            physical_w=np.ascontiguousarray(
+                [row["W"] for row in profile],dtype=np.float64)
+            physical_v=np.ascontiguousarray(
+                [row["V_km_inverse"] for row in profile],dtype=np.float64)
+            nw,nv,node_status=ct.c_int(0),ct.c_int(0),ct.c_int(-1)
+            with native._LOCK:
+                native._native_library().cowling_native_phase_nodes(
+                    len(profile),phases,physical_w,physical_v,1.e-9,
+                    ct.byref(nw),ct.byref(nv),ct.byref(node_status))
+            if node_status.value:
+                raise RuntimeError("Fortran physical mode node counter rejected: "+
+                                   str(node_status.value))
+            wcount,vcount=int(nw.value),int(nv.value)
         if norm<=0 or not np.isfinite(norm):
             raise RuntimeError("invalid native matched eigenfunction amplitude")
         for row in profile:
@@ -1055,6 +1146,9 @@ class NativeSharpCowlingDVODE:
                     surface_BC_relative=shot["surface_bc_relative"],
                     interface_junctions=shot["junctions"],
                     W_nodes_per_phase=wcount,V_nodes_per_phase=vcount,
+                    node_count_backend=("fortran_phasewise"
+                        if self.coefficient_backend=="native_source_cs2"
+                        else "python_original"),
                     profile=profile,nfev=shot["nfev"],
                     backend="Fortran DVODE sharp "+self.method.capitalize(),
                     coefficient_backend=self.coefficient_backend,

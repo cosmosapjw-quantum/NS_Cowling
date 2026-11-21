@@ -186,6 +186,134 @@ def solve_sharp_background_native(eos,central_density_fm3, *,
     return star
 
 
+def solve_sharp_background_native_sweep(eos,central_density_fm3,controls, *,
+        r0_km=.001,surface_h=0.,native_samples=8193):
+    """Thin source/geometry frontend for Fortran two-phase TOV control batch.
+
+    The fixed original source EOS is sampled once per physical phase.
+    Fortran computes PCHIP thermodynamic derivatives, both TOV ODE phases
+    and every independent DVODE history. This function wraps the native
+    mass/radius/one-sided samples into existing background data types.
+
+    Failed per-control runs have status nonzero and star=None; they do
+    not acquire certified physical observables from another control.
+    """
+    if not isinstance(eos,SharpContractEnthalpyEOS):
+        raise TypeError("native TOV sweep requires SharpContractEnthalpyEOS")
+    if len(eos.transitions)!=1:
+        raise ValueError("native TOV sweep requires exactly one Maxwell interface")
+    if not isinstance(native_samples,int) or native_samples<129:
+        raise ValueError("native_samples must be >=129")
+    controls=list(controls)
+    if not 1<=len(controls)<=32:
+        raise ValueError("controls must contain between 1 and 32 TOV configurations")
+    if not np.isfinite(central_density_fm3) or central_density_fm3<=0:
+        raise ValueError("positive finite central baryon density required")
+    if not np.isfinite(r0_km) or r0_km<=0:
+        raise ValueError("positive finite center starting radius required")
+    if not np.isfinite(surface_h) or surface_h<0:
+        raise ValueError("finite nonnegative TOV surface enthalpy required")
+    methods={"adams":10,"bdf":22}
+    for c in controls:
+        if c["method"] not in methods:
+            raise ValueError("unsupported TOV method in controls")
+    rtols=np.ascontiguousarray([float(c["rtol"]) for c in controls])
+    atols=np.ascontiguousarray([float(c["atol"]) for c in controls])
+    max_step_h=np.ascontiguousarray([float(c["max_step_h"]) for c in controls])
+    mfs=np.ascontiguousarray([methods[c["method"]] for c in controls],
+                            dtype=np.int32)
+    hc=float(eos.enthalpy_at_density(central_density_fm3))
+    if eos._transition(hc) is not None:
+        raise ValueError("central state is on a Maxwell coexistence band")
+    center=eos.state_at_enthalpy(hc,"high")
+    pc=center["p"]*MEV_FM3_TO_GEOM_KM2
+    ec=center["epsilon"]*MEV_FM3_TO_GEOM_KM2
+    hstart=hc-2*pi*(ec/3+pc)*r0_km**2
+    if not (surface_h<hstart<hc):
+        raise ValueError("TOV center expansion leaves physical support")
+    transitions=[t["h"] for t in eos.transitions if surface_h<t["h"]<hstart]
+    if len(transitions)!=1:
+        raise ValueError("center configuration does not cross one Maxwell interface")
+    hjump=float(transitions[0])
+    smax=float(np.sqrt(hstart-surface_h))
+    data=[]
+    for hbegin,hend in ((hstart,hjump),(hjump,surface_h)):
+        grid=_one_phase_grid(hstart,surface_h,hbegin,hend,eos.break_h,
+             native_samples,extras=hend==surface_h)
+        mid=(hbegin+hend)/2.
+        therm=np.empty((len(grid),2),dtype=np.float64)
+        for i,s in enumerate(grid):
+            h=hstart-s*s
+            h=hbegin if i==0 else hend if i==len(grid)-1 else h
+            st=eos.state_at_enthalpy(h,eos.side_for_segment(h,mid))
+            therm[i,:]=[st["p"],st["epsilon"]]
+        if not np.all(np.isfinite(therm)) or np.any(therm<=0):
+            raise ValueError("invalid one-sided native TOV original EOS samples")
+        phys=therm*MEV_FM3_TO_GEOM_KM2
+        data.append((np.ascontiguousarray(grid),
+                     np.ascontiguousarray(phys[:,0]),
+                     np.ascontiguousarray(phys[:,1])))
+    (sh,ph,eh),(sl,pl,el)=data
+    nctrl=len(controls)
+    yhi=np.empty((2,len(sh),nctrl),order="F",dtype=np.float64)
+    ylo=np.empty((2,len(sl),nctrl),order="F",dtype=np.float64)
+    nfevh=np.zeros(nctrl,dtype=np.int32)
+    nfevl=np.zeros(nctrl,dtype=np.int32)
+    statuses=np.full(nctrl,-1,dtype=np.int32)
+    dsmax=np.ascontiguousarray(
+        np.minimum(smax/200.,max_step_h/(2*smax)))
+    initial_r=float(r0_km)
+    initial_m=float(4*pi*ec*r0_km**3/3)
+    with native._LOCK:
+        dll=native._native_library()
+        dll.tov_native_two_phase_sweep(nctrl,len(sh),sh,ph,eh,
+            len(sl),sl,pl,el,initial_r,initial_m,
+            rtols,atols,dsmax,mfs,
+            yhi,ylo,nfevh,nfevl,statuses)
+        native._ACTIVE=None
+    results=[]
+    for k,c in enumerate(controls):
+        status=int(statuses[k])
+        if status!=0:
+            results.append(dict(status=status,star=None,
+                tov_native_nfev=0,control=dict(c),
+                effective_max_step_s=float(dsmax[k])))
+            continue
+        r,m=map(float,ylo[:,-1,k])
+        if not (np.isfinite(r) and np.isfinite(m) and r>2*m>0):
+            raise RuntimeError("native TOV sweep returned nonphysical successful endpoint")
+        pieces=[
+            _NativePhase(hstart,hstart,hjump,sh,
+                yhi[:,:,k].T.copy(),int(nfevh[k])),
+            _NativePhase(hstart,hjump,float(surface_h),sl,
+                ylo[:,:,k].T.copy(),int(nfevl[k]))]
+        source_low=eos.state_at_enthalpy(hjump,"low")
+        source_high=eos.state_at_enthalpy(hjump,"high")
+        interface=dict(h=hjump,r_km=float(yhi[0,-1,k]),
+            m_geom_km=float(yhi[1,-1,k]),r_jump_km=0.,m_jump_km=0.,
+            p_MeV_fm3=float(source_low["p"]),
+            n_low_fm3=float(source_low["n"]),
+            n_high_fm3=float(source_high["n"]),
+            epsilon_low_MeV_fm3=float(source_low["epsilon"]),
+            epsilon_high_MeV_fm3=float(source_high["epsilon"]))
+        cfg=dict(r0_km=r0_km,rtol=float(rtols[k]),atol=float(atols[k]),
+            surface_h=surface_h,max_step_h=float(max_step_h[k]),
+            effective_max_step_s=float(dsmax[k]),
+            native_samples=native_samples,method=c["method"],
+            native_fortran_tov=True,original_python_eos_source=True,
+            no_phase_interpolation=True,tov_eos_slopes_backend="fortran_pchip",
+            tov_batch_controls=nctrl,
+            backend="Fortran DVODE native two-phase TOV sweep")
+        star=SharpStellarBackground(eos,float(central_density_fm3),hc,
+            hstart,float(surface_h),r,m,
+            _PiecewiseSolution(pieces),cfg,[interface])
+        results.append(dict(status=0,star=star,control=dict(c),
+            effective_max_step_s=float(dsmax[k]),
+            tov_native_nfev=int(nfevh[k])+int(nfevl[k]),
+            tov_phase_nfev=[int(nfevh[k]),int(nfevl[k])]))
+    return results
+
+
 def native_interface_transfer(y,source,target,omega,conversion):
     """Native Fortran transfer with independent reconstructed physical residuals."""
     if conversion not in ("slow","rapid"):

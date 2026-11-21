@@ -1,0 +1,30 @@
+F
+=================================== FAILURES ===================================
+___________ test_tov_sweep_bad_control_is_isolated_and_zeroed[case0] ___________
+
+case = ('SPG_M2', <compose_eos.stellar_sharp.SharpContractEnthalpyEOS object at 0x7d4c60f5d2b0>, 0.30385128926615257, 'rapid', (5110.0, 5170.0))
+
+    def test_tov_sweep_bad_control_is_isolated_and_zeroed(case):
+        model,eos,nc,conversion,bracket=case
+>       a=_sweep(eos,nc,[
+            dict(rtol=3e-10,atol=3e-11,max_step_h=.004,method="adams"),
+            dict(rtol=0.,atol=3e-11,max_step_h=.004,method="adams"),
+            dict(rtol=1e-10,atol=3e-11,max_step_h=.002,method="bdf")])
+
+python_frontend/tests/test_c15_tov_source_convergence.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+eos = <compose_eos.stellar_sharp.SharpContractEnthalpyEOS object at 0x7d4c60f5d2b0>
+nc = 0.30385128926615257
+controls = [{'rtol': 3e-10, 'atol': 3e-11, 'max_step_h': 0.004, 'method': 'adams'}, {'rtol': 0.0, 'atol': 3e-11, 'max_step_h': 0.004, 'method': 'adams'}, {'rtol': 1e-10, 'atol': 3e-11, 'max_step_h': 0.002, 'method': 'bdf'}]
+samples = 2049
+
+    def _sweep(eos,nc,controls,samples=2049):
+>       from compose_eos.stellar_sharp_native import solve_sharp_background_native_sweep
+E       ImportError: cannot import name 'solve_sharp_background_native_sweep' from 'compose_eos.stellar_sharp_native' (/home/cosmosapjw/ns_cowling_wt/cowling_selector_validation_20261120/python_frontend/compose_eos/stellar_sharp_native.py)
+
+python_frontend/tests/test_c15_tov_source_convergence.py:37: ImportError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_c15_tov_source_convergence.py::test_tov_sweep_bad_control_is_isolated_and_zeroed[case0]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 8 deselected in 2.51s

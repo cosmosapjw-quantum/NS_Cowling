@@ -81,6 +81,37 @@ contains
     ab=ab/real(ngrid,c_double)
   end subroutine
 
+  ! The two independently integrated shooting legs meet at a single
+  ! interior matching radius. This location is sampled twice; the two W
+  ! samples can differ slightly although the independent full-state
+  ! relative_join_mismatch gate was already checked upstream (<1e-5).
+  ! A harmless matched double entry is NOT the Maxwell density jump.
+  ! We allow one such point per phase with |Delta W|/max_phase|W|<=1e-5.
+  ! This is a separate representation criterion using the locked numeric
+  ! magnitude, NOT a substitute for the full-state interface/root gate.
+  ! Extra or staircase duplicates remain rejected.
+  pure logical function valid_shooting_phase_mesh(r,w,a,b) result(ok)
+    real(c_double),intent(in)::r(:),w(:)
+    integer,intent(in)::a,b
+    real(c_double)::scale
+    integer::j,duplicates
+    ok=.false.
+    if(b-a<2)return
+    if(any(r(a+1:b)<r(a:b-1)))return
+    scale=maxval(abs(w(a:b)))
+    duplicates=0
+    do j=a,b-1
+      if(r(j)>=r(j+1))then
+        duplicates=duplicates+1
+        if(duplicates>1)return
+        if(scale>0._c_double)then
+          if(abs(w(j)/scale-w(j+1)/scale)>1.e-5_c_double)return
+        endif
+      endif
+    enddo
+    ok=.true.
+  end function valid_shooting_phase_mesh
+
   subroutine cowling_native_mode_shape_overlap(n1,phase1,r1,w1, &
        n2,phase2,r2,w2,total,inner,outer,status) bind(c)
     integer(c_int),value::n1,n2
@@ -101,15 +132,15 @@ contains
     if(.not.all(ieee_is_finite(r1)).or..not.all(ieee_is_finite(r2)))return
     if(.not.all(ieee_is_finite(w1)).or..not.all(ieee_is_finite(w2)))return
     if(any(r1<0._c_double).or.any(r2<0._c_double))return
-    ! The Maxwell junction may have r_high=r_low, but neither phase may
-    ! have non-increasing internal radius values.
+    ! The Maxwell junction may have r_high=r_low. Within each phase,
+    ! only a single continuity-matched duplicate shooting point is allowed.
     if(any(r1(2:n1)<r1(1:n1-1)).or.any(r2(2:n2)<r2(1:n2-1)))return
     m1=count(phase1==0_c_int);m2=count(phase2==0_c_int)
     if(m1<3.or.n1-m1<3.or.m2<3.or.n2-m2<3)return
-    if(any(r1(2:m1)<=r1(1:m1-1)))return
-    if(any(r1(m1+2:n1)<=r1(m1+1:n1-1)))return
-    if(any(r2(2:m2)<=r2(1:m2-1)))return
-    if(any(r2(m2+2:n2)<=r2(m2+1:n2-1)))return
+    if(.not.valid_shooting_phase_mesh(r1,w1,1,m1))return
+    if(.not.valid_shooting_phase_mesh(r1,w1,m1+1,n1))return
+    if(.not.valid_shooting_phase_mesh(r2,w2,1,m2))return
+    if(.not.valid_shooting_phase_mesh(r2,w2,m2+1,n2))return
     do p=1,2
       if(p==1)then
         a=1;b=m1;c=1;d=m2

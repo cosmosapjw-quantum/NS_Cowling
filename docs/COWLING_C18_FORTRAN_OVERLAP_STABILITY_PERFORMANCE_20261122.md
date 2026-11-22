@@ -1,5 +1,15 @@
 # NS_Cowling C18: native Fortran phasewise shape overlap, stability and throughput
 
+> **C19 integration correction (2026-11-22).** The strict within-phase
+> duplicate-radius rejection documented below passed the isolated synthetic
+> C18 tests but rejected C17 real original-source eigenfunctions at a
+> legitimate double-sampled internal shooting-match point. The C19 integration
+> replaces it with a fail-closed one-duplicate continuity test, preserves
+> the Maxwell boundary jump and reproduces all 40 original C17 stellar
+> cases. See `docs/COWLING_C19_C17_C18_SOURCE_INTEGRATION_20261122.md`.
+> Do **not** merge the original C18-only strict-mesh implementation into
+> C17 without this correction.
+
 Date: 2026-11-22 (Asia/Seoul). This is one bounded coding/verification
 slice, not a replacement for a full EOS/TOV/Cowling physical validation.
 Parent: `b956e0a21cc31623d5034ab9f0cf9153b46a1d41`

@@ -129,6 +129,22 @@ def test_unknown_layout_is_not_guessed(importer, tmp_path):
     assert not out.exists()
 
 
+@pytest.mark.parametrize("electron_mu,affinity", [("8", 2.0), ("6", 0.0)])
+def test_fixed_cell_frontiers_survive_native_roundtrip(importer, tmp_path, electron_mu, affinity):
+    raw = tmp_path / "frontiers.dat"
+    raw.write_text("".join(f"{n} {offset} {p} 3 -2 {electron_mu}\n" for n, offset, p
+                           in [(".01", "1", ".01"), (".02", "2", ".04"), (".03", "3", ".09")]))
+    out = tmp_path / "projection"
+    result = run_import(importer, "nv_fixed_cell_frontiers", raw, out)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "beta_equilibrated=F" in (out / "eos_data.nml").read_text()
+    with (out / "normalized_eos.csv").open() as stream:
+        for row in csv.DictReader(stream):
+            assert float(row["mu_b_mev"]) == pytest.approx(942)
+            assert 939*float(row["q4_mu_q_over_mn"]) == pytest.approx(-6)
+            assert 939*float(row["q5_mu_l_over_mn"]) == pytest.approx(affinity)
+
+
 @pytest.mark.parametrize("mass,proton", [
     ("939 extra", "938"), ("939,938", "938"), ("939 938", "938"),
     ("1*939", "938"), ("939", "938 extra"),

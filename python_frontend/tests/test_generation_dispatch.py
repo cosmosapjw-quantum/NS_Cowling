@@ -36,7 +36,11 @@ def core_evidence(output, points=3):
 def test_catalog_is_exact_and_scope_is_explicit():
     catalog = dispatch.generator_catalog()
     assert set(catalog) == set(dispatch.MODEL_IDS)
-    assert len(catalog) == 28
+    assert len(catalog) == 29
+    historical = dispatch.generation_request("BPS_MTW1964_MS1966")
+    assert historical["points"] == 601
+    assert historical["contract"]["exact_UCRL11980_equivalence"] is False
+    assert historical["contract"]["region"] == "outer_crust_only"
     assert all(catalog[x]["region"] == "core_only" for x in dispatch.CORE_IDS)
     assert all(catalog[x]["region"] == "inner_crust_only" for x in dispatch.SPG_IDS)
     assert all("masks unavailable" in catalog[x]["composition"] for x in dispatch.TF_IDS)
@@ -187,7 +191,7 @@ def test_tf_partial_segments_are_not_complete(tmp_path):
 
 def test_cli_catalog_and_dispatch(tmp_path,monkeypatch,capsys):
     assert main(["generators"]) == 0
-    assert len(json.loads(capsys.readouterr().out)) == 28
+    assert len(json.loads(capsys.readouterr().out)) == 29
     calls=[]
     monkeypatch.setattr(dispatch,"run_generation",lambda *a,**k: calls.append((a,k)) or 7)
     assert main(["generate","SPG_M1",str(tmp_path/"new"),"--points","17"]) == 7

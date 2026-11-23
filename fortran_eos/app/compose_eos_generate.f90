@@ -81,6 +81,8 @@ program compose_eos_generate
    call generate_bbp_variational_maxwell_native(trim(primary_source_path),n_points,eos,trim(out),status)
   case('NV1973_author_fit')
    call generate_nv_original_native(trim(primary_source_path),n_points,eos,trim(out),status)
+  case('BPS_MTW1964_MS1966')
+   call generate_myers_bps_native(trim(primary_source_path),n_points,eos,trim(out),status,14,historical_catalog=.true.)
   case('BPS_Myers1966_magic14')
    call generate_myers_bps_native(trim(primary_source_path),n_points,eos,trim(out),status,14)
   case('BPS_Myers1966_magic20')

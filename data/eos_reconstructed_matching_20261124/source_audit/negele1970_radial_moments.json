@@ -1,0 +1,261 @@
+{
+  "source": {
+    "negele1970_doi": "10.1103/PhysRevC.1.1260",
+    "negele1970_original_pdf_sha256": "a94340c7704afd4baa119e2ab19cf91ce4b9fa7fb995a8b96759fe7b2e26132b",
+    "locations": [
+      "p.1275 Table IV",
+      "pp.1276\u201377 Eqs. (3.13\u20133.24) and Table V",
+      "Appendix A, four-point interpolation"
+    ],
+    "NV1972_doi": "10.1103/PhysRevC.5.1472",
+    "NV1972_locations": [
+      "pp.1476\u201378 Eqs. (3.4),(3.7),(3.8),(3.11)",
+      "pp.1486,1488 energy adjustment and fitting grid"
+    ],
+    "NV1973_doi": "10.1016/0375-9474(73)90349-7",
+    "NV1973_locations": [
+      "pp.305\u2013306 Table 1 supplies the new bulk polynomial, B/C/D imported from NV72"
+    ],
+    "transcription": "Table IV averaged potentials in MeV; empty CSV fields indicate no published radial sample in that channel. Table V(b) multiplying factors are in the script.",
+    "table_iv_csv_sha256": "c26cc061a9a7e1ef80e435af4e9161527d21987ddb26002cc7c8852f6240d7d0"
+  },
+  "method": [
+    "Equation (3.16) interpolates each averaged radial interaction as v0+v1*kF^a with a=3 short and a=1 otherwise. Equation (3.24) applies the Table V(b) like/unlike factors separately to v0 and v1.",
+    "Radial interpolation uses the local four-point Lagrange rule. The short-range value at the unsampled origin is set to zero. Direct and exchange vanish below their tabulated thresholds. All integrations stop at 7 fm.",
+    "Each tabulated interval has 12-point Gauss-Legendre quadrature. NV72 uses g(x)=(35/2)j3(x)/x^3 and the Slater function 3j1(x)/x. From the spin averages, VD=(1/4) integral d^3r r\u00b2 g v_dir, VE=(1/2) integral d^3r r\u00b2 Slater g v_ex. F uses Eq. (3.8) and C,D use centered differences of F with h=10^-6 fm^-3.",
+    "The q24 check doubles quadrature and halves the finite-difference step. The rmax check omits the final radial interval to quantify finite radial coverage."
+  ],
+  "units": {
+    "n,p": "fm^-3",
+    "kF": "fm^-1",
+    "r": "fm",
+    "source_moment": "MeV fm^3",
+    "B": "MeV fm^2",
+    "C,D": "MeV fm^5"
+  },
+  "table_Va_av_source_moments": [
+    {
+      "kF": 1.0,
+      "channel": "short",
+      "reference": 25.091,
+      "reconstructed": 25.113659554791663,
+      "relative_difference": 0.0009030949261352728
+    },
+    {
+      "kF": 1.0,
+      "channel": "direct",
+      "reference": -39.73,
+      "reconstructed": -39.723835874796215,
+      "relative_difference": -0.00015515039526259322
+    },
+    {
+      "kF": 1.4,
+      "channel": "short",
+      "reference": 26.029,
+      "reconstructed": 26.076090718833328,
+      "relative_difference": 0.0018091635803652029
+    },
+    {
+      "kF": 1.4,
+      "channel": "direct",
+      "reference": -33.089,
+      "reconstructed": -33.08577811349044,
+      "relative_difference": -9.737031973033883e-05
+    }
+  ],
+  "table_Va_exchange_moment_ratios": [
+    {
+      "weight_kF": 1.0,
+      "Va_average_moment_k1_4_over_k1_0": 0.9737542791936098,
+      "quadrature_ratio": 0.9735271335783774,
+      "relative_difference": -0.00023326789939293047
+    },
+    {
+      "weight_kF": 1.4,
+      "Va_average_moment_k1_4_over_k1_0": 0.9807940904893814,
+      "quadrature_ratio": 0.980715959831408,
+      "relative_difference": -7.966061248831924e-05
+    }
+  ],
+  "cross_checks": [
+    {
+      "n": 0.08,
+      "p": 0.08,
+      "from_1970_average_radial_factors": {
+        "B": 12.061886818769334,
+        "C": 37.87309134713188,
+        "D": 132.53123679412877
+      },
+      "q24_h_over_two_minus_q12": {
+        "B": 0.0,
+        "C": 7.105427357601002e-15,
+        "D": -8.881784197001252e-10
+      },
+      "rmax_6_6_minus_rmax_7_fm": {
+        "B": 0.0021964024900018586,
+        "C": -0.02398049334568242,
+        "D": 0.020047221833664253
+      },
+      "NV1972_literal": {
+        "B": 12.185945016355706,
+        "C": 20.93043438350653,
+        "D": 839.6238165644305
+      },
+      "NV1972_D03x100": {
+        "B": 12.185945016355706,
+        "C": 20.93043438350653,
+        "D": 167.80607832443036
+      }
+    },
+    {
+      "n": 0.093,
+      "p": 0.064,
+      "from_1970_average_radial_factors": {
+        "B": 12.278568059909263,
+        "C": 34.113431730485345,
+        "D": 135.18862039767254
+      },
+      "q24_h_over_two_minus_q12": {
+        "B": 0.0,
+        "C": -1.3322605241228302e-09,
+        "D": -2.6645921025192365e-09
+      },
+      "rmax_6_6_minus_rmax_7_fm": {
+        "B": 0.0008614751752915595,
+        "C": -0.022565876549521136,
+        "D": 0.01585299635684123
+      },
+      "NV1972_literal": {
+        "B": 10.994008676890388,
+        "C": 16.950586066994752,
+        "D": 871.735383956827
+      },
+      "NV1972_D03x100": {
+        "B": 10.994008676890388,
+        "C": 16.950586066994752,
+        "D": 172.03392921981708
+      }
+    },
+    {
+      "n": 0.064,
+      "p": 0.093,
+      "from_1970_average_radial_factors": {
+        "B": 11.307851303321357,
+        "C": 44.06309590564048,
+        "D": 135.18862039767254
+      },
+      "q24_h_over_two_minus_q12": {
+        "B": 0.0,
+        "C": -1.3322676295501878e-09,
+        "D": -2.6645921025192365e-09
+      },
+      "rmax_6_6_minus_rmax_7_fm": {
+        "B": 0.0030613276757804897,
+        "C": -0.0036231807058513255,
+        "D": 0.01585299635684123
+      },
+      "NV1972_literal": {
+        "B": 12.901391428465537,
+        "C": 28.881497100064117,
+        "D": 871.735383956827
+      },
+      "NV1972_D03x100": {
+        "B": 12.901391428465537,
+        "C": 28.881497100064117,
+        "D": 172.03392921981705
+      }
+    },
+    {
+      "n": 0.04,
+      "p": 0.04,
+      "from_1970_average_radial_factors": {
+        "B": 8.297251190077024,
+        "C": 57.573239715156376,
+        "D": 214.8321009985379
+      },
+      "q24_h_over_two_minus_q12": {
+        "B": 0.0,
+        "C": 1.7763568394002505e-09,
+        "D": -5.329070518200751e-09
+      },
+      "rmax_6_6_minus_rmax_7_fm": {
+        "B": -0.0003635409524420652,
+        "C": 0.02382019707283689,
+        "D": 0.06754286736406812
+      },
+      "NV1972_literal": {
+        "B": 8.215828991773078,
+        "C": 41.56256116708472,
+        "D": 338.14109154319317
+      },
+      "NV1972_D03x100": {
+        "B": 8.215828991773078,
+        "C": 41.56256116708472,
+        "D": 254.16387426319312
+      }
+    },
+    {
+      "n": 0.03,
+      "p": 0.01,
+      "from_1970_average_radial_factors": {
+        "B": 4.499543351321693,
+        "C": 71.18569175340605,
+        "D": 314.490290361382
+      },
+      "q24_h_over_two_minus_q12": {
+        "B": -8.881784197001252e-16,
+        "C": 1.3322676295501878e-09,
+        "D": -3.2862601528904634e-08
+      },
+      "rmax_6_6_minus_rmax_7_fm": {
+        "B": 0.0002690431773118007,
+        "C": 0.05891364304812896,
+        "D": -0.13989935241835383
+      },
+      "NV1972_literal": {
+        "B": 3.8588421091711673,
+        "C": 53.359743439628666,
+        "D": 357.5201831367807
+      },
+      "NV1972_D03x100": {
+        "B": 3.8588421091711673,
+        "C": 53.359743439628666,
+        "D": 339.1501668567807
+      }
+    },
+    {
+      "n": 0.005,
+      "p": 0.005,
+      "from_1970_average_radial_factors": {
+        "B": 2.109413907997404,
+        "C": 79.5442193354785,
+        "D": 505.38261993918263
+      },
+      "q24_h_over_two_minus_q12": {
+        "B": 4.440892098500626e-16,
+        "C": 1.8873862472901237e-09,
+        "D": -2.6378893380751833e-07
+      },
+      "rmax_6_6_minus_rmax_7_fm": {
+        "B": -0.020606695261677466,
+        "C": 0.5035282960171514,
+        "D": -0.04649874583583369
+      },
+      "NV1972_literal": {
+        "B": 1.9245208860972287,
+        "C": 103.22369422504303,
+        "D": 485.1982872193167
+      },
+      "NV1972_D03x100": {
+        "B": 1.9245208860972287,
+        "C": 103.22369422504303,
+        "D": 485.0342692168166
+      }
+    }
+  ],
+  "limitations": [
+    "The radial calculation uses the 1970 factorized, spin-averaged forms under Eq. (3.24); the separate unscaled like/unlike radial functions and historical 16 by 16 least-squares fit weights are unavailable here.",
+    "The separate starting-energy correction in the 1970 treatment is outside this three-channel check. The 1972 finite-nucleus fit and revised bulk correction are not reconstructed by this radial diagnostic.",
+    "Residuals against Table I are significant. At symmetric saturation the reconstructed D is closer to D03x100 than to literal D. This supports a scale check; this quadrature does not establish the exact coefficients or a Wigner-Seitz EOS."
+  ]
+}

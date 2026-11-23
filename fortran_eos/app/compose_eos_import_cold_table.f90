@@ -14,11 +14,11 @@ program compose_eos_import_cold_table
  real(wp)::mn,mp,values(28),relative_readback,nlo,nhi
  real(wp)::density_scale,energy_scale,pressure_scale
  real(wp),parameter::c_si=299792458._wp,mev_fm3_to_j_m3=1.602176634e32_wp
- real(wp),allocatable::raw(:,:)
+ real(wp),allocatable::raw(:,:),frontier(:,:)
  type(eos_data_t)::eos,back
  integer::columns,density_column,energy_column,pressure_column,u,ios,rows,i,nt,code
  integer::nraw,first,last,excluded_lower,excluded_upper
- logical::exists,total_energy_density,select_density,cgs_units
+ logical::exists,total_energy_density,select_density,cgs_units,fixed_cell
  if(command_argument_count()/=5.and.command_argument_count()/=7) &
   call fail('usage: LAYOUT RAW_FILE NEW_OUTPUT_DIRECTORY MN_HEADER_MEV MP_HEADER_MEV [NMIN NMAX]')
  call get_command_argument(1,layout,status=ios);if(ios/=0)call fail('invalid layout argument')
@@ -37,11 +37,15 @@ program compose_eos_import_cold_table
   if(nlo<0._wp.or.nhi<nlo)call fail('density window requires 0 <= NMIN <= NMAX')
  endif
  density_column=1;total_energy_density=.false.;cgs_units=.false.
+ fixed_cell=trim(layout)=='nv_fixed_cell_frontiers'
  density_scale=1._wp;energy_scale=1._wp;pressure_scale=1._wp
  select case(trim(layout))
  case('gmrs_2022');columns=11;energy_column=8;pressure_column=9
  case('gogny_2020');columns=9;energy_column=5;pressure_column=6
  case('gogny_full_2020');columns=8;energy_column=2;pressure_column=3
+ case('nv_fixed_cell_frontiers')
+  ! n, E/A relative to mn, P, mu_n-mn, mu_p-mp, total electron mu.
+  columns=6;energy_column=2;pressure_column=3
  case('n_eps_pressure')
   columns=3;energy_column=2;pressure_column=3;total_energy_density=.true.
  case('bbp_cgs_2008')
@@ -74,6 +78,7 @@ program compose_eos_import_cold_table
  enddo
  if(rows<3)call fail('at least three raw density rows are required')
  allocate(raw(3,rows));rewind(u);i=0
+ if(fixed_cell)allocate(frontier(3,rows))
  do
   read(u,'(a)',iostat=ios)line
   if(ios<0)exit
@@ -84,6 +89,7 @@ program compose_eos_import_cold_table
   if(i>rows)call fail('source row count changed during read')
   raw(:,i)=[values(density_column)*density_scale,values(energy_column)*energy_scale, &
    values(pressure_column)*pressure_scale]
+  if(fixed_cell)frontier(:,i)=values(4:6)
  enddo
  close(u)
  if(i/=rows)call fail('source row count changed during read')
@@ -113,6 +119,14 @@ program compose_eos_import_cold_table
   eos%q(6,:)=raw(2,first:last)/mn
  endif
  eos%q(7,:)=eos%q(6,:)
+ if(fixed_cell)then
+  ! Occupied orbital frontiers at fixed particle numbers are one-sided
+  ! chemical potentials. Keep the weak-affinity residual in Q5.
+  eos%beta_equilibrated=.false.
+  eos%q(3,:)=frontier(1,first:last)/mn
+  eos%q(4,:)=(frontier(2,first:last)-frontier(1,first:last)+(mp-mn))/mn
+  eos%q(5,:)=eos%q(4,:)+frontier(3,first:last)/mn
+ endif
  if(.not.all(ieee_is_finite(eos%q)))call fail('nonfinite normalized thermodynamics')
  ! Atomic directory creation prevents stale files and duplicate-worker overwrite.
  ! Its parent must exist; orchestration creates the campaign root.
@@ -120,6 +134,7 @@ program compose_eos_import_cold_table
  if(ios/=0.or.code/=0)call fail('cannot create new output directory')
  call write_compose(trim(output),eos,status);call require_ok(status)
  call read_compose(trim(output),back,status);call require_ok(status)
+ if(fixed_cell)back%beta_equilibrated=.false.
  if(back%n/=rows)call fail('native readback row count differs')
  if(any(back%nb/=eos%nb))call fail('native readback density differs')
  relative_readback=maxval(abs(back%q-eos%q)/max(1._wp,abs(eos%q)))
@@ -184,7 +199,13 @@ program compose_eos_import_cold_table
  write(u,'(a,es25.16e3,a,es25.16e3,a,es25.16e3,a)') &
   '"source_unit_scale_to_internal":[',density_scale,',',energy_scale,',',pressure_scale,'],'
  write(u,'(a)')'"source_values_csv":"all_source_rows_in_declared_internal_units",'
- write(u,'(a)')'"chemical_potential":"Euler_from_supplied_pressure_and_energy",'
+ if(fixed_cell)then
+  write(u,'(a)')'"chemical_potential":"occupied_neutron_proton_frontiers_and_total_electron_mu",'
+  write(u,'(a)')'"source_frontier_columns_one_based":[4,5,6],"source_frontier_units":"MeV",'
+  write(u,'(a)')'"thermodynamic_equilibrium_claim":false,"weak_affinity_preserved_in_Q5":true,'
+ else
+  write(u,'(a)')'"chemical_potential":"Euler_from_supplied_pressure_and_energy",'
+ endif
  write(u,'(a)')'"source_energy_pressure":"preserved_without_interpolation_or_repair",'
  write(u,'(a)')'"composition_available":false,"phase_labels_reconstructed":false,'
  write(u,'(a)')'"physical_acceptance_asserted":false}'

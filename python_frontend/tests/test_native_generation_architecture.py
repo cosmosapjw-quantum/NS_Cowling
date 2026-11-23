@@ -23,6 +23,6 @@ def test_catalog_does_not_load_python_physical_solvers():
     code="from compose_eos.generation_dispatch import generator_catalog; import sys,json; c=generator_catalog(); print(json.dumps({'n':len(c),'loaded':[m for m in sys.modules if m.startswith('compose_eos.')]}))"
     p=subprocess.run([sys.executable,'-c',code],capture_output=True,text=True,check=True)
     result=json.loads(p.stdout)
-    assert result['n']==28
+    assert result['n']==29
     forbidden={'compose_eos.core_regeneration','compose_eos.apr_uniform','compose_eos.apr_gibbs','compose_eos.gdfm_uniform','compose_eos.spatial_tf','compose_eos.candidate_gdfm_cld'}
     assert not forbidden.intersection(result['loaded'])

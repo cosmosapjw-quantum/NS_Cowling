@@ -18,8 +18,8 @@ SPG_IDS = tuple(f"SPG_M{i}" for i in range(1, 6))
 TF_IDS = ("GPPVA_DD2", "GPPVA_DDME2", "GPPVA_TW", "GPPVA_FSU2",
           "GPPVA_FSU2R", "GPPVA_FSU2H", "GPPVA_NL3wrL55", "GPPVA_TM1e")
 from .primary_model_contracts import PRIMARY_IDS, primary_crust_catalog
-from .original_model_contracts import ORIGINAL_IDS, original_crust_catalog
-MODEL_IDS = CORE_IDS + SPG_IDS + TF_IDS + PRIMARY_IDS + ORIGINAL_IDS
+from .original_model_contracts import ORIGINAL_IDS, original_crust_catalog, RECONSTRUCTED_BPS_ID, historical_bps_catalog
+MODEL_IDS = CORE_IDS + SPG_IDS + TF_IDS + PRIMARY_IDS + ORIGINAL_IDS + (RECONSTRUCTED_BPS_ID,)
 from .native_model_contracts import SPG_INFERRED_VARIANT, SPG_INFERRED_SURFACE
 
 SPG_VARIANTS = (SPG_INFERRED_VARIANT, "AME2408_candidate", "geometric_area__nine",
@@ -55,6 +55,7 @@ def generator_catalog():
         }
     result.update(primary_crust_catalog())
     result.update(original_crust_catalog())
+    result.update(historical_bps_catalog())
     return result
 
 

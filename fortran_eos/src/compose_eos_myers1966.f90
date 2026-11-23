@@ -5,7 +5,7 @@
 ! is unbounded at large theta, so an unconstrained global minimum is meaningless.
 module compose_eos_myers1966
  use compose_eos_types, only: wp,eos_data_t,allocate_eos
- use compose_eos_bps_primary, only: bps_state_t,bps_isotope_state,BPS_MN,BPS_MP,BPS_ME,BPS_HBARC
+ use compose_eos_bps_primary, only: bps_state_t,bps_isotope_state,BPS_MN,BPS_MP,BPS_ME,BPS_HBARC,BPS_RHO_PER_MEVFM3
  use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
  implicit none
  private
@@ -13,6 +13,7 @@ module compose_eos_myers1966
  real(wp),parameter :: SHELL_C=5.8_wp,SHELL_c0=.26_wp,AR0=.27_wp,DELTA_N=8.07144_wp
  real(wp),parameter :: DELTA_H=7.28899_wp,PAIR=11._wp,PI=acos(-1._wp)
  real(wp),parameter :: E2=BPS_HBARC/137.035999084_wp
+ real(wp),parameter :: ATOMIC_MASS_UNIT_MEV=931.49410242_wp
  real(wp),parameter :: MU_CERT_TOL=5e-11_wp
  integer,parameter :: MAX_PHASES=256
  type,public :: myers_mass_t
@@ -24,6 +25,7 @@ module compose_eos_myers1966
  type,public :: myers_catalog_t
   integer :: count=0,magic=0,nmax=0,zmax=0,shapes=0,particle_rejected=0
   integer,allocatable :: n(:),z(:),a(:)
+  logical,allocatable :: mtw_evaluated(:)
   real(wp),allocatable :: excess(:),binding(:),mass(:),theta(:),alpha(:),sn(:),sp(:)
  end type
  type :: pressure_point_t
@@ -226,6 +228,71 @@ contains
   status='ok'
  end subroutine
 
+ ! BPS Table 1 candidate identities and the available MTW1964 atomic masses
+ ! are the only input data. MS66 excesses are generated from the functional.
+ subroutine load_historical_myers_catalog(path,cat,status)
+  character(*),intent(in)::path
+  type(myers_catalog_t),intent(out)::cat
+  character(*),intent(out)::status
+  integer,parameter::ncat=130
+  real(wp)::atomic_u
+  integer::u,ios,i,z,a,n
+  character(256)::line
+  type(myers_mass_t)::m
+  cat%magic=14;cat%count=ncat
+  allocate(cat%n(ncat),cat%z(ncat),cat%a(ncat),cat%excess(ncat),cat%binding(ncat),cat%mass(ncat),cat%mtw_evaluated(ncat))
+  status='BPS historical candidate file open failed'
+  open(newunit=u,file=path,status='old',action='read',iostat=ios)
+  if(ios/=0)return
+  status='BPS historical candidate file malformed'
+  read(u,'(a)',iostat=ios)line
+  if(ios/=0.or.trim(line)/='A,Z,MTW_atomic_mass_u_or_zero')then;close(u);return;endif
+  do i=1,ncat
+   read(u,'(a)',iostat=ios)line
+   if(ios/=0.or.len_trim(line)>=len(line))then;close(u);return;endif
+   a=0;z=0;atomic_u=-1
+   read(line,*,iostat=ios)a,z,atomic_u
+   if(ios/=0.or.z<24.or.z>48.or.a-z<24.or.a-z>90)then;close(u);return;endif
+   if(.not.ieee_is_finite(atomic_u))then;close(u);return;endif
+   if(atomic_u/=0.and.abs(atomic_u-real(a,wp))>=1)then;close(u);return;endif
+   if(any(cat%z(:i-1)==z.and.cat%a(:i-1)==a))then;close(u);return;endif
+   n=a-z;cat%a(i)=a;cat%n(i)=n;cat%z(i)=z
+   cat%mtw_evaluated(i)=atomic_u/=0
+   if(cat%mtw_evaluated(i))then
+    cat%excess(i)=(atomic_u-a)*ATOMIC_MASS_UNIT_MEV
+   else
+    call myers_mass(n,z,cat%magic,m)
+    if(.not.m%valid)then;status='BPS historical candidate lacks a bound deformation minimum';close(u);return;endif
+    cat%excess(i)=m%excess
+   endif
+   cat%mass(i)=a*ATOMIC_MASS_UNIT_MEV+cat%excess(i)-z*BPS_ME
+   cat%binding(i)=(n*BPS_MN+z*BPS_MP-cat%mass(i))/a
+  enddo
+  read(u,'(a)',iostat=ios)line
+  close(u)
+  if(ios>=0.or.count(cat%mtw_evaluated)/=23)return
+  cat%zmax=maxval(cat%z);cat%nmax=maxval(cat%n)
+  status='ok'
+ end subroutine
+
+ subroutine historical_start_pressure(cat,p,status)
+  type(myers_catalog_t),intent(in)::cat
+  real(wp),intent(out)::p
+  character(*),intent(out)::status
+  real(wp)::lo,hi
+  integer::j
+  type(bps_state_t)::s
+  ! Define the lower boundary by total mass-energy density, not m_u n_B.
+  lo=log(1e-15_wp);hi=log(2e-14_wp)
+  do j=1,55
+   p=exp((lo+hi)/2)
+   call myers_state_at_pressure(cat,p,s,status)
+   if(status/='ok')return
+   if(s%epsilon*BPS_RHO_PER_MEVFM3<1e4_wp)then;lo=log(p);else;hi=log(p);endif
+  enddo
+  if(abs(s%epsilon*BPS_RHO_PER_MEVFM3/1e4_wp-1)>1e-9_wp)status='historical pressure surface outside bracket'
+ end subroutine
+
  subroutine electron_at_pressure(p,z,ne,hz,status)
   real(wp),intent(in)::p
   integer,intent(in)::z
@@ -382,7 +449,8 @@ contains
   call walk_phase_interval(cat,mid,r,depth+1,ids,nph,bounds,left,right,ncert,nquery,status)
  end subroutine
 
- subroutine generate_myers_bps_native(source_path,n_points,eos,output_dir,status,magic_choice)
+ subroutine generate_myers_bps_native(source_path,n_points,eos,output_dir,status,magic_choice,historical_catalog)
+  logical,optional,intent(in)::historical_catalog
   character(*),intent(in)::source_path,output_dir
   integer,intent(in)::n_points,magic_choice
   type(eos_data_t),intent(out)::eos
@@ -393,16 +461,24 @@ contains
   type(bps_state_t)::s,tmp,drip,left(MAX_PHASES),right(MAX_PHASES),s1,s2,sm1,sm2
   real(wp)::p0,pdrip,lo,hi,p,bounds(0:MAX_PHASES),maxpr,maxeuler,maxjump,fdres,h
   integer::ids(MAX_PHASES),i,j,k,nph,nr,nkeep,ncert,nquery,u,ios,closeios,active
-  logical::seen(MAX_PHASES),boundary
+  logical::seen(MAX_PHASES),boundary,historical
   character(2)::magic_text
   status='Myers requires 16 <= n_points <= 100000'
   if(n_points<16.or.n_points>100000)return
   if(magic_choice/=14.and.magic_choice/=20)then;status='Myers magic choice must be 14 or 20';return;endif
-  call load_myers_source(source_path,status);if(status/='ok')return
-  call build_myers_catalog(magic_choice,cat,status);if(status/='ok')return
-  ! Same low-pressure control as historical BPS generator, not a density claim.
-  call bps_isotope_state(6.295e-12_wp,26,56,8.79_wp,s,status);if(status/='ok')return
-  p0=s%pressure;lo=log(1e-5_wp);hi=log(1e-2_wp);nquery=0
+  historical=.false.
+  if(present(historical_catalog))historical=historical_catalog
+  if(historical)then
+   if(magic_choice/=14)then;status='historical reconstruction requires magic 14';return;endif
+   call load_historical_myers_catalog(source_path,cat,status);if(status/='ok')return
+   call historical_start_pressure(cat,p0,status);if(status/='ok')return
+  else
+   call load_myers_source(source_path,status);if(status/='ok')return
+   call build_myers_catalog(magic_choice,cat,status);if(status/='ok')return
+   call bps_isotope_state(6.295e-12_wp,26,56,8.79_wp,s,status);if(status/='ok')return
+   p0=s%pressure
+  endif
+  lo=log(1e-5_wp);hi=log(1e-2_wp);nquery=0
   call myers_state_at_pressure(cat,exp(lo),s,status);if(status/='ok')return
   if(s%mu_b>=BPS_MN)then;status='Myers drip lacks low-pressure bracket';return;endif
   call myers_state_at_pressure(cat,1e-2_wp,s,status);if(status/='ok')return
@@ -448,7 +524,10 @@ contains
    p=sqrt(bounds(i-1)*bounds(i))
    call myers_state_at_pressure(cat,p,s,status);if(status/='ok')return
    if(s%isotope/=ids(i))then;status='Myers phase interior failed global minimum check';return;endif
-   nr=nr+1;rows(nr)=s;k=ids(i);h=1e-3_wp*s%nb
+   if(.not.historical.or..not.any(rows(:n_points)%isotope==ids(i)))then
+    nr=nr+1;rows(nr)=s
+   endif
+   k=ids(i);h=1e-3_wp*s%nb
    call bps_isotope_state(s%nb+h,cat%z(k),cat%a(k),cat%binding(k),s1,status);if(status/='ok')return
    call bps_isotope_state(s%nb+2*h,cat%z(k),cat%a(k),cat%binding(k),s2,status);if(status/='ok')return
    call bps_isotope_state(s%nb-h,cat%z(k),cat%a(k),cat%binding(k),sm1,status);if(status/='ok')return
@@ -520,12 +599,21 @@ contains
   eos%c3_applicable=.true.;eos%c4_applicable=.true.
   open(newunit=u,file=trim(output_dir)//'/myers_mass_catalog.csv',status='replace',iostat=ios)
   if(ios/=0)then;status='Myers cannot write mass catalogue';return;endif
-  write(u,'(a)',iostat=ios)'N,Z,A,atomic_mass_excess_MeV,nuclear_mass_MeV,binding_MeV_per_baryon,theta,alpha,Sn_MeV,Sp_MeV'
-  do i=1,cat%count
-   if(ios/=0)exit
-   write(u,'(3(i0,","),6(es25.16e3,","),es25.16e3)',iostat=ios) &
-    cat%n(i),cat%z(i),cat%a(i),cat%excess(i),cat%mass(i),cat%binding(i),cat%theta(i),cat%alpha(i),cat%sn(i),cat%sp(i)
-  enddo
+  if(historical)then
+   write(u,'(a)',iostat=ios)'N,Z,A,atomic_mass_excess_MeV,nuclear_mass_MeV,binding_MeV_per_baryon,mass_source'
+   do i=1,cat%count
+    if(ios/=0)exit
+    write(u,'(3(i0,","),3(es25.16e3,","),a)',iostat=ios)cat%n(i),cat%z(i),cat%a(i), &
+     cat%excess(i),cat%mass(i),cat%binding(i),trim(merge('MTW1964','MS1966 ',cat%mtw_evaluated(i)))
+   enddo
+  else
+   write(u,'(a)',iostat=ios)'N,Z,A,atomic_mass_excess_MeV,nuclear_mass_MeV,binding_MeV_per_baryon,theta,alpha,Sn_MeV,Sp_MeV'
+   do i=1,cat%count
+    if(ios/=0)exit
+    write(u,'(3(i0,","),6(es25.16e3,","),es25.16e3)',iostat=ios) &
+     cat%n(i),cat%z(i),cat%a(i),cat%excess(i),cat%mass(i),cat%binding(i),cat%theta(i),cat%alpha(i),cat%sn(i),cat%sp(i)
+   enddo
+  endif
   close(u,iostat=closeios)
   if(ios/=0.or.closeios/=0)then;status='Myers mass catalogue write failed';return;endif
   open(newunit=u,file=trim(output_dir)//'/myers_bps_states.csv',status='replace',iostat=ios)
@@ -552,21 +640,32 @@ contains
   open(newunit=u,file=trim(output_dir)//'/MYERS_BPS_GENERATION.json',status='replace',iostat=ios)
   if(ios/=0)then;status='Myers cannot write validation diagnostic';return;endif
   write(magic_text,'(i2)')magic_choice
-  write(u,'(a)',iostat=ios)'{"model":"BPS_Myers1966_magic'//magic_text//'","doi":"10.1016/S0029-5582(66)80001-9",'
+  if(historical)then
+   write(u,'(a)',iostat=ios)'{"model":"BPS_MTW1964_MS1966","table_status":"reconstructed",'
+   if(ios==0)write(u,'(a)',iostat=ios)' "doi":"10.1016/S0029-5582(66)80001-9","MTW_doi":"10.1016/0029-5582(65)90114-8",'
+   if(ios==0)write(u,'(a)',iostat=ios)' "selection":"BPS Table 1 candidates; 23 MTW masses and 107 MS66 formula results",'
+   if(ios==0)write(u,'(a)',iostat=ios)' "mass_convention":"neutral atomic excess, u*c^2=931.49410242 MeV, subtract electron rest mass",'
+  else
+   write(u,'(a)',iostat=ios)'{"model":"BPS_Myers1966_magic'//magic_text//'","doi":"10.1016/S0029-5582(66)80001-9",'
+   if(ios==0)write(u,'(a)',iostat=ios)' "mass_convention":"published atomic excess; physical neutron anchor; electron rest subtraction",'
+   if(ios==0)write(u,'(a)',iostat=ios)' "selection":"Sn>=0, Sp>=-3 MeV, positive binding and stable shape",'
+  endif
   if(ios==0)write(u,'(a)',iostat=ios)' "BPS_doi":"10.1086/151216","full_UCRL11980_catalogue_reproduced":false,'
-  if(ios==0)write(u,'(a)',iostat=ios)' "mass_convention":"published atomic excess; physical neutron anchor; electron rest subtraction",'
   if(ios==0)write(u,'(a)',iostat=ios)' "bound_atomic_electron_corrections":false,"Wigner_term":false,'
   if(ios==0)write(u,'(a)',iostat=ios)' "deformation":"stable local minima of cubic Eq10, prolate and spherical compared",'
-  if(ios==0)write(u,'(a)',iostat=ios)' "selection":"Sn>=0, Sp>=-3 MeV, positive binding and stable shape",'
   if(ios==0)write(u,'(a,i0,a)',iostat=ios)' "magic_choice":',magic_choice,','
   if(ios==0)write(u,'(a,i0,a)',iostat=ios)' "requested_points":',n_points,','
   if(ios==0)write(u,'(a,i0,a)',iostat=ios)' "rows":',nkeep,','
   if(ios==0)write(u,'(a,i0,a)',iostat=ios)' "phase_count":',nph,','
   if(ios==0)write(u,'(a,i0,a)',iostat=ios)' "coexistence_pairs":',nph-1,','
   if(ios==0)write(u,'(a,i0,a)',iostat=ios)' "candidate_count":',cat%count,','
-  if(ios==0)write(u,'(a,i0,a)',iostat=ios)' "stable_shape_count":',cat%shapes,','
-  if(ios==0)write(u,'(a,i0,a)',iostat=ios)' "particle_or_binding_rejected":',cat%particle_rejected,','
-  if(ios==0)write(u,'(a)',iostat=ios)' "N_min":2,"N_max":258,"Z_min":2,"Z_max":184,"selected_boundary_hit":false,'
+  if(historical)then
+   if(ios==0)write(u,'(a)',iostat=ios)' "N_min":28,"N_max":90,"Z_min":24,"Z_max":48,'
+  else
+   if(ios==0)write(u,'(a,i0,a)',iostat=ios)' "stable_shape_count":',cat%shapes,','
+   if(ios==0)write(u,'(a,i0,a)',iostat=ios)' "particle_or_binding_rejected":',cat%particle_rejected,','
+   if(ios==0)write(u,'(a)',iostat=ios)' "N_min":2,"N_max":258,"Z_min":2,"Z_max":184,"selected_boundary_hit":false,'
+  endif
   if(ios==0)write(u,'(a,i0,a)',iostat=ios)' "certified_pressure_intervals":',ncert,','
   if(ios==0)write(u,'(a,i0,a)',iostat=ios)' "phase_search_global_queries":',nquery+2,','
   if(ios==0)write(u,'(a,es25.16e3,a)',iostat=ios)' "Gibbs_certificate_tolerance_MeV":',MU_CERT_TOL,','

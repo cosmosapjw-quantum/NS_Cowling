@@ -74,3 +74,21 @@ ORIGINAL_IDS = tuple(_ORIGINAL)
 def original_crust_catalog():
     return {name: dict(family="primary_crust", **deepcopy(contract))
             for name, contract in _ORIGINAL.items()}
+
+
+# Keep ORIGINAL_IDS immutable for replay of the six-model historical campaign.
+RECONSTRUCTED_BPS_ID = "BPS_MTW1964_MS1966"
+
+def historical_bps_catalog():
+    contract = deepcopy(_MYERS)
+    contract.update(
+        family="primary_crust",
+        representation="Reconstructed BPS Table 1 mass search with MTW1964 evaluations and native MS1966 masses",
+        source_equivalence="RECONSTRUCTED_HISTORICAL_OUTER_CRUST",
+        source_path="data/eos_reconstructed_matching_20261124/source_data/bps/BPS_Table1_MTW1964.csv",
+        mtw_reprint_sha256="18d6b629775e0150f9dbe82026247dedcb76b4eb876e64b8a843ead156a32a23",
+        doi=["10.1086/151216", "10.1016/S0029-5582(66)80001-9", "10.1016/0029-5582(65)90114-8"],
+        exact_UCRL11980_equivalence=False, magic_choice=14, default_points=601,
+        grid_policy="pressure grid plus one-sided transition limits; sample a missed phase interior",
+    )
+    return {RECONSTRUCTED_BPS_ID: contract}

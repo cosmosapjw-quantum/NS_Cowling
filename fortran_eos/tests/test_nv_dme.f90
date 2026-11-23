@@ -16,6 +16,7 @@ program test_nv_dme
  real(wp)::energy,ul(2),bm(2),qg(2),ws,nn,np,tau(2),gr(2),jp,measure(4),jac(7)
  real(wp)::max_poly,max_gradient,max_hessian,max_local,max_uniform,e_expected,mu_expected(2)
  real(wp)::primal(6),twopi,finite_diff_a,diag_a,hh_step
+ real(wp)::t1,t2,b_over_rho
  character(1024)::srcpath,tablepath,line,status,token
  character::kind
  integer::u,ios,i,j,k,l,nread,sample,ix,iy,ii,jj,checks,mode
@@ -69,6 +70,20 @@ program test_nv_dme
  close(u)
  if(nread/=169.or..not.all(seen_b).or..not.all(seen_c).or..not.all(seen_d))error stop 'incomplete table'
  if(any(d/=transpose(d)))error stop 'D symmetry'
+ ! NV1972 Table II set 1 uses Eq. (6.12) at rho_n=rho_p=0.080 fm^-3.
+ ! This anchor comes from a separate table in the same paper. Exercise the
+ ! actual coefficient evaluator used by the EOS generators in both modes.
+ call nv_dme_coefficients(src,.080_wp,.080_wp,co,status,coefficient_mode=mode)
+ call ok()
+ b_over_rho=co%b(1)/.160_wp
+ t1=(8*co%c(1)+4*co%d+4*b_over_rho)/3
+ t2=(12*b_over_rho-8*co%c(1)-4*co%d)/5
+ write(*,'(a,2f16.8)')'NV1972_Table_II_set1_t1_t2_MeV_fm5=',t1,t2
+ if(mode==nv_dme_d03_diagnostic)then
+  if(abs(t1-381.1_wp)>.05_wp.or.abs(t2-15.1_wp)>.05_wp)error stop 'set 1 diagnostic outside printed precision'
+ else
+  if(abs(t1-1276.86245558_wp)>1e-6_wp.or.abs(t2+522.39857302_wp)>1e-6_wp)error stop 'literal set 1 drift'
+ endif
  vq(0:6,0:6)=real(src%vnm,qp)
  if(mode==1)then
   dq(0,3)=-6.62699e5_qp;dq(3,0)=dq(0,3)

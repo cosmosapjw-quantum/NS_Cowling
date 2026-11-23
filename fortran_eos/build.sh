@@ -33,7 +33,7 @@ BUILD="$(cd "$BUILD" && pwd)"
 exec 9>"$BUILD/.build.lock"
 flock 9
 BEFORE="$(signature)"
-if [[ "$MODE" == ensure && -x "$BUILD/compose_eos_fortran" && -x "$BUILD/compose_eos_generate" && -x "$BUILD/compose_eos_import_cold_table" &&
+if [[ "$MODE" == ensure && -x "$BUILD/compose_eos_fortran" && -x "$BUILD/compose_eos_generate" && -x "$BUILD/compose_eos_import_cold_table" && -x "$BUILD/nv_hf_probe" &&
       -f "$BUILD/.source-signature" && "$(cat "$BUILD/.source-signature")" == "$BEFORE" ]]; then
   printf '%s\n' "$BUILD/compose_eos_fortran" "$BUILD/compose_eos_generate"
   exit 0
@@ -74,6 +74,7 @@ NATIVE_MODULES=(
   compose_eos_lower_crust_native compose_eos_crust_attachment compose_eos_tf_models compose_eos_spg_native compose_eos_spatial_tf
   compose_eos_bps_primary compose_eos_bbp_primary compose_eos_nv_primary
   compose_eos_bbp_original compose_eos_nv_original compose_eos_myers1966
+  compose_eos_nv_dme compose_eos_nv_hf
 )
 NATIVE_OBJECTS=()
 for name in "${NATIVE_MODULES[@]}"; do
@@ -84,6 +85,13 @@ compile compose_eos_generate app
 "$FC" "${FARGS[@]}" "$STAGE/obj/compose_eos_types.o" "$STAGE/obj/compose_eos_io.o" \
   "${NATIVE_OBJECTS[@]}" "$STAGE/obj/slsqp_optmz.o" "$STAGE/obj/compose_eos_generate.o" \
   "${LINK_ARGS[@]}" "${LIB_ARGS[@]}" -o "$STAGE/compose_eos_generate"
+compile nv_hf_probe app
+# The HF diagnostic is independent of legacy TF/SPG optimizers. Link only its
+# actual dependency closure, avoiding unused code and SPG trampoline metadata.
+"$FC" "${FARGS[@]}" "$STAGE/obj/compose_eos_types.o" \
+  "$STAGE/obj/compose_eos_nv_primary.o" "$STAGE/obj/compose_eos_nv_original.o" \
+  "$STAGE/obj/compose_eos_nv_dme.o" "$STAGE/obj/compose_eos_nv_hf.o" "$STAGE/obj/nv_hf_probe.o" \
+  "${LINK_ARGS[@]}" "${LIB_ARGS[@]}" -o "$STAGE/nv_hf_probe"
 compile compose_eos_import_cold_table app
 "$FC" "${FARGS[@]}" "$STAGE/obj/compose_eos_types.o" "$STAGE/obj/compose_eos_io.o" \
   "$STAGE/obj/compose_eos_import_cold_table.o" "${LINK_ARGS[@]}" -o "$STAGE/compose_eos_import_cold_table"
@@ -99,6 +107,7 @@ cp "$STAGE/obj/"*.o "$BUILD/obj/"
 mv "$STAGE/compose_eos_fortran" "$BUILD/compose_eos_fortran"
 mv "$STAGE/compose_eos_generate" "$BUILD/compose_eos_generate"
 mv "$STAGE/compose_eos_import_cold_table" "$BUILD/compose_eos_import_cold_table"
+mv "$STAGE/nv_hf_probe" "$BUILD/nv_hf_probe"
 printf '%s\n' "$AFTER" > "$BUILD/.source-signature.tmp"
 mv "$BUILD/.source-signature.tmp" "$BUILD/.source-signature"
 printf '%s\n' "$BUILD/compose_eos_fortran" "$BUILD/compose_eos_generate"

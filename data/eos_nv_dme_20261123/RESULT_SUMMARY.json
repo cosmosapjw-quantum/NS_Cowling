@@ -1,0 +1,78 @@
+{
+  "schema": "ns_cowling.nv1972_hf_source_audit.v1",
+  "status": "IMPLEMENTATION_VERIFIED_SOURCE_AUTHENTICATION_BLOCKED",
+  "baseline_commit": "50be8082b9887f72f89c9d34bf32feac3f9018d3",
+  "branch": "research/nv1972-dme-hartree-fock-20261123",
+  "primary_input": {
+    "doi": "10.1103/PhysRevC.5.1472",
+    "pdf_sha256": "fd981fe5c9d7d914329c533fb57a2ac9375ed3d641f76ecc01b307bf82cd500b",
+    "printed_independent_coefficients_checked": 148,
+    "expanded_coefficients": 169
+  },
+  "production_numerics": "Fortran; Python frontend, input/output, process orchestration only",
+  "coefficient_modes": {
+    "0": "Literal published Table I, default; quarantined as internally inconsistent",
+    "1": "Conditional D03/D30 times100 diagnostic, not an authenticated erratum"
+  },
+  "validation": {
+    "focused_pytest_passed": 140,
+    "native_hf_checks": 67,
+    "basis_extension_single_cell_passed": true,
+    "dme_four_thread_bitwise_test_points": 1000,
+    "final_same_configuration_frontend_replay_passed": true,
+    "initial_lower_iteration_budget_failure_preserved": true
+  },
+  "diagnostic_campaign": {
+    "runs": 28,
+    "scf_pass": 23,
+    "scf_nonconverged": 5,
+    "workers": 4,
+    "threads_per_worker": 1,
+    "additional_relaxed_charge_neighbors": 3,
+    "additional_neighbors_converged": 3,
+    "source_eos_admitted": false
+  },
+  "remaining_combinations": {
+    "core_source_identities": 32,
+    "unique_core_model_names": 19,
+    "unavailable_crusts": 3,
+    "methods": 7,
+    "source_gate_records": 672,
+    "source_gate_workers": 8,
+    "native_matching_calls": 0,
+    "new_matched_eos_admitted": 0
+  },
+  "historical_results": {
+    "public_qualified_candidates": 650,
+    "private_qualified_candidates": 28,
+    "unchanged": true,
+    "rerun": false,
+    "source_commit": "0bb54962e7d199bd20010a6c7b77cba9beb2e1fa"
+  },
+  "native_probe": {
+    "sha256": "8a2cf49d3eaed986403ce1402ec6206940d6f7a36bda2f752adda54b9c0f7dbf",
+    "bytes": 228360,
+    "before_minimal_link_bytes": 1001400,
+    "bytes_removed": 773040,
+    "relative_size_reduction": 0.7719592570401438,
+    "gnu_stack": "RW",
+    "scope": "HF probe only; legacy generator SPG executable-stack warning remains; no wall-time speedup claimed"
+  },
+  "needed_primary_inputs": [
+    {
+      "doi": "10.1103/PhysRevC.1.1260",
+      "needed": "Full effective interaction parameter tables for Eq3.7 reconstruction, or authenticated corrected B/C/D coefficients/author implementation"
+    },
+    {
+      "report": "UCRL-11980",
+      "date": "1965-05-27",
+      "needed": "Appendix D mass table of the exact original report edition; indexed2-pagecover is insufficient"
+    }
+  ],
+  "limits": [
+    "Fixed-composition local SCF solutions are not an all-composition ground-state EOS.",
+    "A finite failed calculation is not a physical no-go theorem.",
+    "D03 diagnostic correction is conditional on preserving printed B/C and does not resolve all stronger average-density identities.",
+    "Observed grid dependence remains material; no full EOS thermodynamic admission performed."
+  ]
+}

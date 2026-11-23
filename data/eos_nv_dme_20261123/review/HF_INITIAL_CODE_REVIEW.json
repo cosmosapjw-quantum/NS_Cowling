@@ -1,0 +1,80 @@
+{
+  "scope": "Read-only independent review of the first NV HF implementation and source campaign frontend",
+  "hf_snapshot_sha256": "a2ff9cb214b6ce7249a375de12bafd5008445f657436e8d44ee1525590315705",
+  "dme_snapshot_sha256": "e4d2f12a8eb9e4e62a11bb7724f4defc2f6bdb51a1e7fd604d71bac1ec1af6a5",
+  "consistent_parts": [
+    "Radial R finite-volume kinetic operator, spherical weights and mixed parity boundary conditions",
+    "Distributed tau agrees with the same discrete kinetic-energy quadratic form",
+    "Proton spin-current density and radial LS potential use the same angular factor",
+    "Density-gradient adjoint is the exact weighted transpose of the chosen discrete gradient",
+    "Neutral-cell Coulomb kernel, Slater exchange derivative and electron potential sign",
+    "Density/tau/gradient/spin-current scaling exponents in the virial pressure",
+    "Frontend process status AND native status guard prevents failed native records from becoming admitted cells"
+  ],
+  "findings": [
+    {
+      "id": "HF-01",
+      "severity": "medium",
+      "target": "nv_hf_probe final exit condition",
+      "finding": "A post-convergence field/dilation validation failure can leave res.converged true; the probe exits zero based solely on that flag even when native status is an error.",
+      "requested_fix": "Require status == ok and converged for success exit; preserve error status. Frontend currently protects itself separately.",
+      "status": "fix_present_on_readback; fresh final-contract execution evidence remains with owner"
+    },
+    {
+      "id": "HF-02",
+      "severity": "scientific_admission",
+      "target": "Nonlinear convergence condition",
+      "finding": "Density-L1 and scalar energy differences do not explicitly verify tau or Jp fixed-point residuals; gradient_residual is initialized to zero but never measured.",
+      "requested_fix": "Measure appropriate tau/Jp or final-Hamiltonian orbital residuals; keep unused diagnostics undefined rather than claiming a verified zero.",
+      "status": "fix_present_on_readback; fresh final-contract execution evidence remains with owner"
+    },
+    {
+      "id": "HF-03",
+      "severity": "scientific_admission",
+      "target": "spectral_complete flag",
+      "finding": "The flag checks whether occupied channels touch the imposed l or radial-state cutoffs. It is a useful sentinel, not an independent convergence proof for omitted channels.",
+      "requested_fix": "Run an enlarged-basis comparison for representative/high-density cells and phrase the flag consistently with its actual test.",
+      "status": "sent_to_owner"
+    },
+    {
+      "id": "HF-04",
+      "severity": "medium",
+      "target": "read_native_cell success receipt contract",
+      "finding": "The initial required-key set does not require energy, pressure, or residual diagnostics, allowing a syntactically successful profile with missing critical success fields.",
+      "requested_fix": "Require the complete native success receipt schema; add malformed/missing-field fixtures.",
+      "status": "fix_present_on_readback; fresh final-contract execution evidence remains with owner"
+    },
+    {
+      "id": "HF-05",
+      "severity": "low",
+      "target": "Experiment plan ID validation",
+      "finding": "The all-characters predicate accepts an empty string ID and would write cells/.txt.",
+      "requested_fix": "Reject empty identifiers explicitly.",
+      "status": "fix_present_on_readback; fresh final-contract execution evidence remains with owner"
+    },
+    {
+      "id": "HF-06",
+      "severity": "low",
+      "target": "Native initialization configuration validation",
+      "finding": "Unknown seed_kind silently uses default initialization, and cluster parameters lack explicit finite/range checks.",
+      "requested_fix": "Validate the seed enumeration and cluster parameter bounds before initialization.",
+      "status": "fix_present_on_readback; fresh final-contract execution evidence remains with owner"
+    }
+  ],
+  "model_conventions_to_record": [
+    "Open-shell spherical configurations use equal filling of degenerate states",
+    "Modern common neutron kinetic mass rather than a claim of literal 1973 numerical constants",
+    "The smoothing averaging interval, width cap and particle renormalization are explicit implementation choices beyond the paper's description",
+    "Finite composition catalog minima do not establish a global ground-state minimum"
+  ],
+  "followup": {
+    "final_replay_fields": "Asked solver to refresh spectral completeness and mu/muplus/beta after final replay, rather than preserve pre-replay values",
+    "read_execution_evidence": {
+      "free_spectrum": "hf_runtime/numerics.log: 43 checks, coarse error1.2709723502e-4, fine3.1774745818e-5, ratio.25000343881",
+      "orbital_variation_initial": "hf_runtime/variation.log:8 checks passed in initial module snapshot; newer two-mode suite still needs fresh readback"
+    },
+    "source_admission": "Printed B/C/D identities inconsistent beyond rounding; high-Q negative kinetic-plus-gradient eigenvalues reported by native source probe; independent source-integrability/ambiguity artifacts document this separately."
+  },
+  "historical_record": true,
+  "superseded_by": "FINAL_INDEPENDENT_HF_REVIEW.json"
+}

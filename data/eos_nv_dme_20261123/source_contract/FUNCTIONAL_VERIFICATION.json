@@ -1,0 +1,82 @@
+{
+  "schema": "ns_cowling.nv_dme_functional_verification.v1",
+  "verification_time_utc": "2026-11-23T13:48:31.769369+00:00",
+  "status": "IMPLEMENTATION_VERIFIED_SOURCE_TABLE_INCONSISTENCY_PRESERVED",
+  "source_status": "TABLE_I_INTERNAL_INCONSISTENCY",
+  "compiler": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "flags": [
+    "-std=f2018",
+    "-O2",
+    "-fopenmp",
+    "-fcheck=all",
+    "-ffpe-trap=invalid,zero,overflow",
+    "-ffree-line-length-none"
+  ],
+  "production_numerics": "Fortran",
+  "independent_reference": "Fortran real128 direct monomial sums and fourth-order finite differences; production uses binary64 differentiated Horner",
+  "tested_source_sha256": {
+    "fortran_eos/src/compose_eos_nv_dme.f90": "27477ef266ee3a9a67e716daebf1e0404510099ad67c3eeca25e44fd2c8ef9f0",
+    "fortran_eos/tests/test_nv_dme.f90": "5dea13e6c153306c94c1a1d94e31a31001e3cb630527727a12c5ad5f5a0dd0b2",
+    "fortran_eos/tests/test_nv_dme_coefficient_consistency.f90": "77e962abe28bb94d97518d5375ed6dad770787cc45c6e7ef67ff347d84092233",
+    "fortran_eos/tests/nv_dme_gradient_stability.f90": "6bb8adc2f34822b41a06dfba07c79eef360303383ac800cf7584da0509115970",
+    "fortran_eos/tests/test_nv_dme_parallel.f90": "48fdc77ede41b18000df34384eb5eccc0b60d9e6b59dbf8badd71960fe556bdc",
+    "data/eos_original_papers_20261123/research_nv/nv1973_original_source.dat": "9370f187fc60be9c6e63ce4aba23bc67d81ce703bb11851bed94e7b062968829",
+    "data/eos_nv_dme_20261123/source_contract/nv1972_table1_bcd.tsv": "545cf15b9bdb89f369d96152f49a57ac0025de0a4c5144df99cad07c24d123ef"
+  },
+  "tests": {
+    "functional_test_printed.txt": {
+      "coefficient_mode": "0",
+      "table_coefficients_checked": "169",
+      "interior_density_points": "100",
+      "max_polynomial_scaled_error": "2.932926982757215E-13",
+      "max_gradient_scaled_error": "4.033358920068150E-12",
+      "max_hessian_scaled_error": "1.056700237593701E-10",
+      "max_full_local_variation_scaled_error": "1.878116920945839E-14",
+      "max_uniform_identity_absolute_error": "1.421085471520200E-14",
+      "output_sha256": "82a09586a252a5c761c752ae997686a0a30e9afbe17b7ca17a65e1b292f38ab9",
+      "passed": true
+    },
+    "functional_test_D03x100.txt": {
+      "coefficient_mode": "1",
+      "table_coefficients_checked": "169",
+      "interior_density_points": "100",
+      "max_polynomial_scaled_error": "2.932926982757215E-13",
+      "max_gradient_scaled_error": "4.033358920068150E-12",
+      "max_hessian_scaled_error": "1.056700237593701E-10",
+      "max_full_local_variation_scaled_error": "1.891087327798550E-14",
+      "max_uniform_identity_absolute_error": "1.421085471520200E-14",
+      "output_sha256": "065a55e6ffa28225e9d4f4dce7eec8ac1c7b8ab9fb5ea475954225bf7d8cc01f",
+      "passed": true
+    },
+    "functional_parallel_test.txt": {
+      "max_openmp_threads": "4",
+      "points_with_alternating_modes": "1000",
+      "output_sha256": "3c0559cd0e52b67c54bddd1640e85ffd876f26a26c05689a2b75e61b2c4af9c5",
+      "passed": true
+    }
+  },
+  "source_audit": {
+    "receipt": "coefficient_consistency_audit.txt",
+    "average_density_G_failed_degrees": [
+      4,
+      5,
+      6
+    ],
+    "general_G_symmetry_failures": 0,
+    "general_G_D_failures": [
+      [
+        0,
+        3
+      ]
+    ],
+    "D03x100_is_authenticated_erratum": false,
+    "conditional_fix_requires_B_C_held_printed": true
+  },
+  "gradient_probe": "gradient_stability_diagnostic.csv",
+  "reentrancy_requirement": "Entire dependency closure compiled with -fopenmp/-frecursive for shared-memory calls; tested four threads. Production multi-process execution is separate.",
+  "limitation": "This verifies a local EDF implementation, not a globally minimized crust EOS or core-crust match.",
+  "primary_input_request": {
+    "doi": "10.1103/PhysRevC.1.1260",
+    "needed": "effective-interaction construction and full spin/isospin G radial/density/energy parameter tables required for NV1972 Eq3.7; alternatively author-corrected B/C/D table or code"
+  }
+}

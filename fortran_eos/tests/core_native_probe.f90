@@ -41,6 +41,8 @@ program core_native_probe
   do i=1,count
    grid(i)=lo*(hi/lo)**(real(i-1,wp)/real(count-1,wp))
   enddo
+  ! Pin intended endpoints, as the production generator does.
+  grid(1)=lo;grid(count)=hi
   call generate_core_native(trim(model),grid,eos,states,status)
   if(trim(status)/='ok')then
    write(*,'(a)')trim(status)

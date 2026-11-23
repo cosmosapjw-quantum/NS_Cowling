@@ -17,9 +17,15 @@ sys.path.insert(0, str(ROOT / "python_frontend"))
 from compose_eos import EOSData, NativeExecutionError, construct_maxwell_transition
 
 
-def physical_pair(il=1):
-    """Exactly quadratic P(mu), one upward density jump at mu=990 MeV."""
-    mu = np.array([950., 960., 980., 1000., 1030., 1040.])
+def physical_pair(il=1, *, mu=None):
+    """Exactly quadratic P(mu), one upward density jump at mu=990 MeV.
+
+    The default grid resolves the same analytic branches for the independent
+    finite-difference verifier. The old six knots left no valid derivative
+    stencil after masking the real transition and unresolved density gaps.
+    No pressure, density, energy or coexistence parameter is fitted or changed.
+    """
+    mu = np.linspace(950., 1040., 31) if mu is None else np.asarray(mu, dtype=float)
     x = mu - 990.
     phases = []
     for upper in (False, True):
@@ -62,8 +68,9 @@ def reencode(data, mn, mp):
 def test_reference_encoding_does_not_change_physical_maxwell(il, mn, mp):
     low, high = physical_pair(il)
     original = {name:getattr(high, name).copy() for name in ("Q1","Q3","Q4","Q6","Q7")}
-    reference, _ = construct_maxwell_transition(
+    reference, reference_report = construct_maxwell_transition(
         low, high, assume_local_charge_neutrality=True, return_report=True)
+    assert reference_report["consistency"]["native_report"]["derivative_points"] > 0
     encoded = reencode(high, mn, mp)
     out, report = construct_maxwell_transition(
         low, encoded, assume_local_charge_neutrality=True, return_report=True)
@@ -100,3 +107,34 @@ def test_header_only_neutron_change_is_not_equivalent_reencoding():
     assert np.max(np.abs(changed.eps-high.eps)) > 1.
     encoded = reencode(high, 950., 938.27203)
     np.testing.assert_allclose(encoded.eps, high.eps, rtol=0., atol=2e-11)
+
+
+@pytest.mark.parametrize("il", [0, 1])
+def test_coarse_analytic_maxwell_has_no_resolved_derivative_coverage(il, tmp_path):
+    """A valid coexistence solve cannot certify fully masked source derivatives.
+
+    Keep the former six-knot fixture as a negative coverage control. Correct
+    endpoint stencil masking must not turn zero tested points into a pass.
+    """
+    from compose_eos.api import check_consistency
+    from compose_eos.native import run_native
+
+    low, high = physical_pair(il, mu=[950., 960., 980., 1000., 1030., 1040.])
+    paths = [tmp_path / name for name in ("low", "high", "output")]
+    low.write_internal_directory(paths[0])
+    high.write_internal_directory(paths[1])
+    paths[2].mkdir()
+    construction = run_native("maxwell-transition", *paths, "true")
+    assert construction["status"] == "ok"
+    assert construction["mu_transition"] == pytest.approx(990., abs=2e-10)
+    out = EOSData.from_internal_directory(paths[2])
+    consistency = check_consistency(out)
+    native = consistency["native_report"]
+    assert native["derivative_points"] == 0
+    assert native["derivative_masked_points"] == out.n
+    assert native["invalid_derivative_points"] == 0
+    assert set(consistency["overall"]["failed_checks"]) == {"C10", "C11"}
+    assert consistency["overall"]["pass_"] is False
+    with pytest.raises(NativeExecutionError, match="C10, C11"):
+        construct_maxwell_transition(
+            low, high, assume_local_charge_neutrality=True, return_report=True)

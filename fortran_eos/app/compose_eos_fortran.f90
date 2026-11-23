@@ -264,7 +264,7 @@ program compose_eos_fortran
     call read_internal_csv(trim(arg2)//'/eos_data.csv',trim(arg2)//'/eos_data.nml',core,status)
     if(status/='ok')then;call emit_failure('invalid core input: '//trim(status));stop 3;endif
     call match_crust_core(crust,core,trim(arg4),n_bridge,drop_composition,out,match_report,status)
-    if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+    if(status/='ok')then;call emit_match_failure(trim(status));stop 3;endif
     call write_internal_csv(trim(arg3)//'/eos_data.csv',out,status)
     if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
     call write_metadata(trim(arg3)//'/eos_data.nml',out,status)
@@ -305,7 +305,7 @@ program compose_eos_fortran
       ',"source_euler_relative_residual":'//real_text(match_report%source_euler_relative_residual)// &
       ',"composition_dropped":'//logical_text(match_report%composition_dropped)// &
       ',"is_exact_maxwell":'//logical_text(match_report%is_exact_maxwell)// &
-      ',"seidov_applicable":'//logical_text(match_report%seidov_applicable)//'}'
+      ',"seidov_applicable":'//logical_text(match_report%seidov_applicable)//match_search_json()//'}'
   case('reconstruct-master')
     if(narg/=8)then
       call emit_failure('reconstruct-master requires INPUT_INTERNAL OUTPUT_INTERNAL SMOOTH SMOOTH_SIGMA FIX_DISSOLUTION DISSOLUTION_TOL RECOMPUTE_EXTRA_CS2');stop 2
@@ -662,6 +662,21 @@ contains
     character(len=*),intent(in)::message
     write(*,'(a)')'{"status":"error","message":"'//trim(message)//'"}'
   end subroutine
+  function match_search_json() result(s)
+    character(len=:),allocatable :: s
+    s=',"window_pairs_total":'//integer_text(match_report%window_pairs_total)// &
+      ',"window_pairs_examined":'//integer_text(match_report%window_pairs_examined)// &
+      ',"window_candidates_constructed":'//integer_text(match_report%window_candidates_constructed)// &
+      ',"window_candidates_rejected":'//integer_text(match_report%window_candidates_rejected)// &
+      ',"window_preferred_candidates":'//integer_text(match_report%window_preferred_candidates)// &
+      ',"window_fallback_used":'//logical_text(match_report%window_fallback_used)// &
+      ',"window_search_exhausted":'//logical_text(match_report%window_search_exhausted)
+  end function match_search_json
+  subroutine emit_match_failure(message)
+    character(len=*),intent(in)::message
+    write(*,'(a)')'{"status":"error","operation":"match-core","message":"'// &
+      trim(message)//'","method":"'//trim(match_report%method)//'"'//match_search_json()//'}'
+  end subroutine emit_match_failure
   subroutine emit_maxwell_failure(message)
     !! Structured failure JSON for the maxwell-transition command. Emits a
     !! stable `category` field (one of the §3/§4 terminal-outcome identifiers)

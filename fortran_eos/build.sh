@@ -33,7 +33,7 @@ BUILD="$(cd "$BUILD" && pwd)"
 exec 9>"$BUILD/.build.lock"
 flock 9
 BEFORE="$(signature)"
-if [[ "$MODE" == ensure && -x "$BUILD/compose_eos_fortran" && -x "$BUILD/compose_eos_generate" &&
+if [[ "$MODE" == ensure && -x "$BUILD/compose_eos_fortran" && -x "$BUILD/compose_eos_generate" && -x "$BUILD/compose_eos_import_cold_table" &&
       -f "$BUILD/.source-signature" && "$(cat "$BUILD/.source-signature")" == "$BEFORE" ]]; then
   printf '%s\n' "$BUILD/compose_eos_fortran" "$BUILD/compose_eos_generate"
   exit 0
@@ -82,17 +82,21 @@ compile compose_eos_generate app
 "$FC" "${FARGS[@]}" "$STAGE/obj/compose_eos_types.o" "$STAGE/obj/compose_eos_io.o" \
   "${NATIVE_OBJECTS[@]}" "$STAGE/obj/slsqp_optmz.o" "$STAGE/obj/compose_eos_generate.o" \
   "${LINK_ARGS[@]}" "${LIB_ARGS[@]}" -o "$STAGE/compose_eos_generate"
+compile compose_eos_import_cold_table app
+"$FC" "${FARGS[@]}" "$STAGE/obj/compose_eos_types.o" "$STAGE/obj/compose_eos_io.o" \
+  "$STAGE/obj/compose_eos_import_cold_table.o" "${LINK_ARGS[@]}" -o "$STAGE/compose_eos_import_cold_table"
 AFTER="$(signature)"
 if [[ "$BEFORE" != "$AFTER" ]]; then
   printf '%s\n' 'Fortran sources or build configuration changed during compilation; refusing to publish a stale build.' >&2
   exit 75
 fi
-# Publish only after both executables have compiled successfully.
+# Publish only after all executables have compiled successfully.
 mkdir -p "$BUILD/mod" "$BUILD/obj"
 cp "$STAGE/mod/"*.mod "$BUILD/mod/"
 cp "$STAGE/obj/"*.o "$BUILD/obj/"
 mv "$STAGE/compose_eos_fortran" "$BUILD/compose_eos_fortran"
 mv "$STAGE/compose_eos_generate" "$BUILD/compose_eos_generate"
+mv "$STAGE/compose_eos_import_cold_table" "$BUILD/compose_eos_import_cold_table"
 printf '%s\n' "$AFTER" > "$BUILD/.source-signature.tmp"
 mv "$BUILD/.source-signature.tmp" "$BUILD/.source-signature"
 printf '%s\n' "$BUILD/compose_eos_fortran" "$BUILD/compose_eos_generate"

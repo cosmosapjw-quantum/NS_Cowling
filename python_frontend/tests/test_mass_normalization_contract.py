@@ -76,13 +76,31 @@ def test_1_to_4_native_maxwell_reference_reencoding(mn, mp):
     assert report["n_low"] == pytest.approx(.12, abs=2e-12)
     assert report["n_high"] == pytest.approx(.13, abs=2e-12)
     assert report["physical_energy_shift_mev"] == 0.
-    for source in (low, original):
-        for index, n in enumerate(source.nb):
-            rows = np.flatnonzero(np.isclose(out.nb, n, rtol=0., atol=1e-13))
-            for row in rows:
-                np.testing.assert_allclose([out.eps[row],out.p[row],out.mub[row],out.muq[row]],
-                    [source.eps[index],source.p[index],source.mub[index],source.muq[index]],
-                    rtol=0.,atol=2e-10)
+    transition_mu = report["mu_transition"]
+    low_rows = int(report["low_phase_rows"])
+    assert low_rows + int(report["high_phase_rows"]) == out.n
+    assert out.Iphase[low_rows - 1] != out.Iphase[low_rows]
+    for source, first, stop, retained in (
+        (low, 0, low_rows, low.mub < transition_mu - 1e-9),
+        (original, low_rows, out.n, original.mub > transition_mu + 1e-9),
+    ):
+        # Density is not a cross-phase identity key. Compare only the retained
+        # chemical-potential domain of this source and its output branch.
+        for index in np.flatnonzero(retained):
+            rows = np.flatnonzero(np.isclose(
+                out.nb[first:stop], source.nb[index], rtol=0., atol=1e-13)) + first
+            assert rows.size == 1
+            row = rows[0]
+            np.testing.assert_allclose([out.eps[row],out.p[row],out.mub[row],out.muq[row]],
+                [source.eps[index],source.p[index],source.mub[index],source.muq[index]],
+                rtol=0.,atol=2e-10)
+    # Explicit false-identity control: discarded low phase at mu=995 has
+    # n=.13, also the *other* phase's transition density at mu=990.
+    discarded = np.flatnonzero(np.isclose(low.mub, 995., rtol=0., atol=1e-10))
+    assert discarded.size == 1 and low.mub[discarded[0]] > transition_mu
+    aliases = np.flatnonzero(np.isclose(out.nb, low.nb[discarded[0]], rtol=0., atol=1e-13))
+    assert aliases.size == 1 and aliases[0] == low_rows
+    assert abs(out.mub[aliases[0]] - low.mub[discarded[0]]) > 1.
 
 
 # ---------------------------------------------------------------- 5-6: single-EOS conventions

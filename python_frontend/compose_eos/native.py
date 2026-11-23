@@ -5,6 +5,7 @@ import os
 import shutil
 import subprocess
 import sys
+import threading
 from pathlib import Path
 from typing import Any
 
@@ -40,31 +41,67 @@ def project_root() -> Path:
         "Fortran sources were not found. Set COMPOSE_EOS_FORTRAN_ROOT to the project root."
     )
 
+# The script owns content hashes, compiler options and cross-process locking.
+# This process-local cache skips repeated shell startup only while every input's
+# metadata (including ctime) and build artifact remain unchanged. Any edit,
+# replacement, chmod or compiler/configuration change reruns --ensure.
+_BUILD_LOCK = threading.Lock()
+_VERIFIED_BUILDS: dict[Path, tuple] = {}
+_BUILD_ENV = ("FC", "FFLAGS", "SLSQP_FFLAGS", "LDFLAGS", "NATIVE_LIBS")
+
+
+def _build_state(root: Path, exe: Path, compiler: str) -> tuple:
+    src = root / "fortran_eos"
+    files = [src / "build.sh", src / "run-generator.sh", Path(compiler),
+             exe, exe.parent / ".source-signature"]
+    for folder in ("src", "app", "vendor"):
+        files.extend(p for p in (src / folder).rglob("*") if p.is_file() and
+                     (p.suffix in (".f90", ".f") or p.name == "PROVENANCE.json" or
+                      "LICENSE" in p.name))
+    records = []
+    for path in sorted(set(files)):
+        try:
+            st = path.stat()
+            state = (st.st_dev, st.st_ino, st.st_size, st.st_mtime_ns,
+                     st.st_ctime_ns, st.st_mode)
+        except FileNotFoundError:
+            state = None
+        records.append((str(path), state))
+    return tuple((name, os.environ.get(name)) for name in _BUILD_ENV), tuple(records)
+
+
 def executable() -> Path:
-    root = project_root()
     override = os.environ.get("COMPOSE_EOS_FORTRAN_EXE")
     if override:
         exe = Path(override).expanduser().resolve()
-        if exe.is_file():
+        if exe.is_file() and os.access(exe, os.X_OK):
             return exe
-        raise NativeExecutionError(f"COMPOSE_EOS_FORTRAN_EXE does not exist: {exe}")
+        raise NativeExecutionError(f"COMPOSE_EOS_FORTRAN_EXE is not an executable file: {exe}")
+    root = project_root()
     exe = root / "build" / "compose_eos_fortran" / "compose_eos_fortran"
-    if exe.is_file():
-        return exe
-    if shutil.which("gfortran") is None:
+    compiler = shutil.which(os.environ.get("FC", "gfortran"))
+    if compiler is None:
         raise NativeExecutionError(
-            "gfortran is required to build the Fortran EOS backend; no Python numerical fallback is enabled."
+            "A Fortran compiler is required to verify the source build; "
+            "use COMPOSE_EOS_FORTRAN_EXE only for an explicitly selected prebuilt executable."
         )
-    build = subprocess.run(
-        ["bash", str(root / "fortran_eos" / "build.sh"), str(exe.parent)],
-        cwd=root, capture_output=True, text=True,
-    )
-    if build.returncode or not exe.is_file():
-        raise NativeExecutionError(
-            "Fortran EOS backend build failed.\n"
-            f"stdout:\n{build.stdout}\nstderr:\n{build.stderr}"
+    with _BUILD_LOCK:
+        state = _build_state(root, exe, compiler)
+        if (_VERIFIED_BUILDS.get(exe) == state and exe.is_file() and
+                os.access(exe, os.X_OK)):
+            return exe
+        build = subprocess.run(
+            ["bash", str(root / "fortran_eos" / "build.sh"), "--ensure", str(exe.parent)],
+            cwd=root, capture_output=True, text=True,
         )
+        if build.returncode or not exe.is_file() or not os.access(exe, os.X_OK):
+            raise NativeExecutionError(
+                "Fortran EOS backend build/verification failed.\n"
+                f"stdout:\n{build.stdout}\nstderr:\n{build.stderr}"
+            )
+        _VERIFIED_BUILDS[exe] = _build_state(root, exe, compiler)
     return exe
+
 
 def run_native(action: str, *args: str | os.PathLike[str]) -> dict[str, Any]:
     exe = executable()

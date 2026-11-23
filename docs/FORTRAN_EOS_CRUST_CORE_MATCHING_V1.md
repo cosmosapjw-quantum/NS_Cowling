@@ -1,306 +1,394 @@
-# Native Fortran smooth crust-core EOS matching v1
+# Native cold crust-core matching: current implementation contract
 
-**Scope.** Six historical smooth, one-dimensional, cold barotropic matching constructions: maxwell (compatibility token), css, cubic_F, cubic_P, quintic_F and quintic_P.
+**Reviewed against source: 2026-11-23.** The historical filename is retained for existing links. This document describes the current Fortran kernels and Python frontend; historical six-token behavior is recorded only in section 10. It is not a survivor census or a claim that every source pair admits a physical match.
 
-**Status.** Native code and the Python wrapper are implemented on the feature branch. Matching-specific CI and the final source-package artifact are the release gates recorded separately in the adversarial audit.
+The implementation authorities are [compose_eos_matching.f90](../fortran_eos/src/compose_eos_matching.f90), [compose_eos_phase_transition.f90](../fortran_eos/src/compose_eos_phase_transition.f90), [compose_eos_verify.f90](../fortran_eos/src/compose_eos_verify.f90), the [native CLI](../fortran_eos/app/compose_eos_fortran.f90), and [api.py](../python_frontend/compose_eos/api.py). Thermodynamic calculations, root solves and admission checks execute in Fortran. Python supplies source selection, serialization, provenance and orchestration.
 
-**Excluded by design.** Microscopic composition reconstruction, the legacy literature_beta_eq approximation, and genuine first-order Maxwell or Gibbs phase transitions are not implemented by this v1.
+## 1. Seven methods and their dispatch
 
-## 1. Problem and conventions
-
-The inputs are two CompOSE-derived cold, one-dimensional barotropes, denoted cr (crust) and co (core). The result is a single-valued barotropic table. A selected upper crust interval and lower core interval are replaced by an interpolated bridge; every source row outside the selected interval is retained.
-
-| Quantity | Meaning | Unit |
+| Campaign method | Python entry point / native operation | Construction |
 |---|---|---|
-| n_B | baryon number density | fm^-3 |
-| P | pressure | MeV fm^-3 |
-| epsilon | total energy density | MeV fm^-3 |
-| F=epsilon/n_B | energy per baryon, including rest mass | MeV |
-| Q1=P/n_B | pressure per baryon | MeV |
-| mu_B | baryon chemical potential | MeV |
-| c_s^2=dP/d epsilon | squared sound speed in units of c^2 | dimensionless |
+| `cubic_F` | `match_crust_core` / `match-core` | Continuous free-energy bridge, using a quadratic or piecewise cubic profile for `Q1` |
+| `quintic_F` | `match_crust_core` / `match-core` | Continuous free-energy bridge with endpoint derivative constraints and a polynomial/spline construction |
+| `cubic_P` | `match_crust_core` / `match-core` | Continuous pressure-potential bridge, using a quadratic or piecewise cubic profile for density as a function of chemical potential |
+| `quintic_P` | `match_crust_core` / `match-core` | Continuous pressure-potential bridge with endpoint derivative constraints and a polynomial/spline construction |
+| `first_law_constrained_hermite_pressure_bridge` | `match_crust_core` / `match-core` | Continuous near-pressure-plateau Hermite bridge; the first law fixes its integral |
+| `css` | `match_crust_core` / `match-core` | One constant-sound-speed phase, a positive crust-side density jump, and a continuous join to the selected core endpoint |
+| `maxwell` | `construct_maxwell_transition` / `maxwell-transition` | Genuine coexistence of two supplied single-phase barotropes at common pressure and chemical potential |
 
-The CompOSE thermodynamic columns are interpreted as
+`match_crust_core(method="maxwell")` is rejected deliberately. A campaign must dispatch that method to `construct_maxwell_transition`; it must not substitute the continuous pressure bridge. The full first-law method name is a supported public token. A Gibbs construction is not among these seven methods: a one-dimensional cold barotrope does not supply the independent charge-chemical-potential surface required for a general two-charge Gibbs construction.
+
+## 2. Variables, source conventions and input contract
+
+The input slices are cold, one-dimensional barotropes. Densities are in `fm^-3`, pressure and total energy density in `MeV fm^-3`, and chemical potentials and energies per baryon in `MeV`. The CompOSE header values `mn` and `mp` are rest-mass energies, i.e. masses multiplied by `c^2`. Define the dimensionless sound-speed ratio
+
 \[
- Q_1=P/n_B,\quad F=(Q_6+1)m_n,\quad
- \mu_B=(Q_3+1)m_n,\quad
- \epsilon=n_B(Q_7+1)m_n.
+ s=\frac{c_s^2}{c^2}=\frac{dP}{d\epsilon}.
 \]
-For cold one-component matter,
+
+For the smooth/CSS kernel, the source energy per baryon and pressure are decoded using each source's own reference:
+
 \[
- \mu_B=\frac{\epsilon+P}{n_B}=F+Q_1,\qquad
- dF=Q_1\,d\ln n_B,\qquad dP=n_B\,d\mu_B.
+ F=(1+Q_6)m_n,\qquad P=n_BQ_1,\qquad
+ \epsilon_{\rm source}=n_B(1+Q_7)m_n.
 \]
-The construction uses F as its thermodynamic master function. Interpolation does not introduce an additional microscopic degree of freedom.
 
-The repository's EOS tables use m_n and m_p in MeV, density in fm^-3 and pressure/energy density in MeV fm^-3. The interface does not add a new units-conversion layer.
+At exactly zero temperature, `Q6=Q7` gives `F=epsilon/n_B`. The constructor's allowed input discrepancy is stated below; it is not an instruction to add a rest-mass correction. The effective chemical potential used in the cold one-variable construction is
 
-## 2. Input-state contract
-
-The native routine requires finite EOS arrays, at least three positive strictly increasing density points, positive pressure, valid nucleon masses, T=0, beta_equilibrated metadata, zero entropy within tolerance, and agreement of Q6 and Q7. More explicitly:
 \[
- |T|\leq10^{-12}\ {\rm MeV},\qquad
- \max_i|Q_{2,i}|\leq10^{-10},\qquad
- \max_i|Q_{6,i}-Q_{7,i}|\leq2\times10^{-6}.
+ \mu_E=F+Q_1.
 \]
-Both input metadata records must also state beta equilibrium.
 
-If either input has an eos.compo file or usable composition, the caller must explicitly pass drop_composition=True. This is not a cosmetic option. The one-dimensional bridge equations determine a barotrope, not the microscopic neutron, proton, electron, muon, nuclear-cluster or phase-index profiles. Native v1 therefore emits a strict thermo-only result with composition_file_present=False, composition_available=False, Nadd=0, zero particle/nuclear arrays and zero phase labels. The output has Q2=Q5=0 and Q6=Q7. The Q4 charge-chemical-potential column is retained on the source portions after mass normalization and smoothly joined through the bridge; it is not the result of a new composition solve.
+The separately decoded source convention is
 
-The Python API refuses composition-bearing inputs unless drop_composition=True. The Fortran routine repeats that check against serialized metadata. This double gate is intentional.
-
-The native implementation does not support core_compo_mode=literature_beta_eq. The historic Python package invokes model-dependent parabolic symmetry-energy fits for selected microscopic EOSs under that option. It is not a general composition reconstruction and is not silently approximated here.
-
-## 3. Transition-window selection
-
-### 3.1 Core starting point
-
-If the core input has usable composition, the search begins at the first homogeneous row with n_B >= 0.03 fm^-3, where homogeneity is identified by Abar=0. Otherwise it begins at the first row with n_B >= 0.045 fm^-3. These are historic screening conventions, not universal crust-core transition densities.
-
-The search scans the upper crust rows in descending density, limited to approximately the last 150 entries, and scans core rows from the selected starting point upward.
-
-### 3.2 Rest-mass gauge alignment
-
-The historic alignment is
 \[
- \Delta m_{\rm cr}=m_n^{\rm co}-m_n^{\rm cr},
- \qquad \Delta m_{\rm co}=0.
+ \mu_{\rm source}^{\rm eff}=
+ \begin{cases}
+ (1+Q_3)m_n,& I_l=1,\\
+ (1+Q_3)m_n+Y_qQ_4m_n,& I_l=0.
+ \end{cases}
 \]
-The crust F and screening chemical potential are shifted by Delta m_cr; the core is unshifted. This aligns rest-mass conventions. It is not a fitted parameter.
 
-For a candidate pair (n_1,P_1,F_1,mu_1^source) and (n_2,P_2,F_2,mu_2^source), define
+Thus, for `Il=0`, the stored `Q3` chemical potential excludes `Yq*mu_q`. The construction must undo that convention when comparing with Euler's relation, and restore it on output. Matching a fixed physical `Yq` slice does not permit relabeling it as `Yq=0`. The cold identities used by the bridge are
+
 \[
- \bar n=\frac{P_2-P_1}{\mu_2^{\rm source}-\mu_1^{\rm source}},
- \quad
- \overline Q_1=\frac{F_2-F_1}{\ln(n_2/n_1)},
+ dF=\frac{P}{n_B}\,d\ln n_B,\qquad
+ dP=n_B\,d\mu_E,\qquad
+ \epsilon=\mu_En_B-P.
+\]
+
+The `match-core` input checks require at least three density points, finite arrays, positive strictly increasing densities, valid positive reference masses, `Il` in `{0,1}`, equal `Il` for both inputs, and equal physical charge-fraction values to `1e-12`. Integer axis indices alone do not identify a physical slice. The explicit cold-state checks are
+
+\[
+ |T|\le10^{-12}\ {\rm MeV},\quad
+ \max|Q_2|\le10^{-10},\quad
+ \max|Q_6-Q_7|\le2\times10^{-6}.
+\]
+
+Both inputs must carry beta-equilibrium metadata; for `Il=1`, the smooth/CSS kernel also enforces `max(abs(Q5)) <= 1e-8`. Every supplied source row is checked against the provider Euler relation before endpoint search, with relative tolerance `5e-4`. A metadata flag cannot override a failed chemical-potential check. Source-input rejection therefore remains distinct from an exhausted endpoint search.
+
+The interface supports `core_compo_mode="strict_thermo_only"` and integer `n_bridge >= 8`. `literature_beta_eq` composition reconstruction is unavailable. If either input has an `eos.compo` file or usable abundances, `drop_composition=True` is required. The separate Maxwell kernel has its own input contract, including single-phase inputs, `Nadd=0`, explicit local-neutrality confirmation and its own source-interpolation checks; see section 6.
+
+### Reference reencoding and Euler closure are separate operations
+
+Changing the output reference from `m_old` to `m_ref` changes the dimensionless encoding, not the physical energy:
+
+\[
+ 1+Q_{j,\rm ref}=\frac{m_{\rm old}}{m_{\rm ref}}(1+Q_{j,\rm old}),
+ \quad j=3,6,7,
+ \qquad
+ Q_{j,\rm ref}=\frac{m_{\rm old}}{m_{\rm ref}}Q_{j,\rm old},
+ \quad j=4,5.
+\]
+
+Density, pressure, physical chemical potentials and total energy density remain unchanged under that operation. Adding `mn_core-mn_crust` to `F`, or adding `n_B*(mn_core-mn_crust)` to `epsilon`, would change the physical EOS and is not performed. The smooth/CSS output uses the core's reference masses. `dm_mass_gauge_meV` and frontend `dm_crust` report the applied physical energy shift, **zero**; `normalization_reference_delta_mev` separately reports the header difference. See [the mass-normalization correction](MASS_NORMALIZATION_CORRECTION_20261115.md).
+
+Output assembly also imposes the cold closure: it derives `Q3` from `F+Q1`, with the `Il=0` charge term restored, and sets `Q7=Q6`. This is separate from reference reencoding. It need not preserve a provider's small allowed `Q3` or `Q6-Q7` tabulation residual bitwise. `source_euler_relative_residual` reports the all-input Euler discrepancy, and `source_euler_residual_meV` reports the retained crust's absolute discrepancy. For source rows already satisfying the exact cold identities, the retained `n_B`, `P`, `F`, `epsilon` and physical charge chemical potential are preserved.
+
+## 3. Endpoint search and its finite scope
+
+The native search returns the first admitted construction in a deterministic order. Historical choices remain a **preference pass**, followed by a fallback over every remaining source endpoint pair. A failed endpoint derivative or failed bridge construction causes a retry of the next candidate; it does not immediately reject the source pair.
+
+The preferred pass uses the historical core onset (`n_B >= 0.03 fm^-3` at `Abar=0` when composition is usable, otherwise `n_B >= 0.045 fm^-3`), upper-crust index bound `max(12, n_crust-148)`, endpoint margins `n2>1.1*n1`, `P2>1.1*P1`, `mu2>mu1+0.2 MeV`, `F2>F1+0.2 MeV`, and the historical normalized integral fractions in `(0.12,0.88)`. These preferences do not exclude a pair from the fallback.
+
+Using zero-based indices, the finite endpoint domain is
+
+\[
+ i_1=N_{\rm crust}-1,\ldots,2,\qquad
+ i_2=0,\ldots,N_{\rm core}-3.
+\]
+
+This leaves at least three source points on each endpoint's retained derivative side. The endpoint derivative uses up to six points, stops at a source phase-label boundary, and requires at least three same-phase points. Its one-sided PCHIP estimate is
+
+\[
+ s=\frac{P}{\epsilon}
+ \frac{d\ln P/d\ln n_B}{d\ln\epsilon/d\ln n_B}.
+\]
+
+The current source-endpoint gate requires `0<s<1`; it does not clip an invalid derivative. These derivatives are cached within the matching call and are independent of other threads or processes.
+
+After inexpensive retained-source checks, a candidate must satisfy `n2>n1`, `P2>P1`, `mu2>mu1` and `F2>F1`. Causality implies `d(n_B/mu_E)/dmu_E >= 0`, hence the necessary average-pressure bound
+
+\[
+ \frac{n_1(\mu_1+\mu_2)}{2\mu_1}
+ \le \frac{P_2-P_1}{\mu_2-\mu_1}
+ \le \frac{n_2(\mu_1+\mu_2)}{2\mu_2}.
+\]
+
+The cheap comparison allows only a machine-roundoff allowance of `64*epsilon` times the comparison scale. A surviving candidate is passed to the actual method constructor and its interval checks. The endpoint first-law residual must satisfy
+
+\[
+ \frac{|F_{\rm bridge}(1)-F_2|}{\max(1\ {\rm MeV},|F_2-F_1|)}\le5\times10^{-9}.
+\]
+
+The native receipt exposes `window_pairs_total`, `window_pairs_examined`, `window_candidates_constructed`, `window_candidates_rejected`, `window_preferred_candidates`, `window_fallback_used` and `window_search_exhausted`. The CLI includes search counters on matching rejection as well as success; frontend reports expose them under `window_search` when available. Inputs rejected before search do not acquire an exhaustion claim.
+
+Exhaustion means that this implementation examined its finite source endpoint grid under the selected method and declared input domain. It does not prove that no different interpolation family, additional source data, different physically authorized support or interior endpoint choice could work. The code does not enumerate every possible bridge function or every successful endpoint pair. Internal polynomial/spline branch selection is also part of the method prescription, rather than a universal existence search.
+
+## 4. The five continuous bridge constructions
+
+Write `x=ln(n_B)`, `Delta x=ln(n2/n1)`, `Delta mu=mu2-mu1`, and `0<=u<=1`. All methods in this section preserve continuous density, pressure, energy and effective chemical potential at the joins. Their method names identify a construction family; they do not guarantee that a successful fallback is one global polynomial of that degree.
+
+### Free-energy families: `cubic_F` and `quintic_F`
+
+The profile is `q(u)=Q1=P/n_B`, with
+
+\[
+ n_B(u)=n_1e^{u\Delta x},\qquad
+ F(u)=F_1+\Delta x\int_0^u q(v)\,dv,
 \]
 \[
- \theta_P=\frac{\bar n-n_1}{n_2-n_1},\qquad
- \theta_F=\frac{\overline Q_1-P_1/n_1}{P_2/n_2-P_1/n_1}.
+ \int_0^1q(u)\,du=\frac{F_2-F_1}{\Delta x},\qquad
+ P=n_Bq,\quad\mu_E=F+q,\quad
+ s=\frac{q+q'/\Delta x}{F+q}.
 \]
-A candidate must meet
+
+For the endpoint-derivative-constrained quintic family,
+
 \[
- n_2>1.10n_1,\quad P_2>1.10P_1,\quad
- \mu_2^{\rm source}>\mu_1^{\rm source}+0.2\ {\rm MeV},\quad
- F_2>F_1+0.2\ {\rm MeV},
+ q'(0)=(\mu_1s_1-q_1)\Delta x,\qquad
+ q'(1)=(\mu_2s_2-q_2)\Delta x.
 \]
-and 0.12 < theta_P, theta_F < 0.88.
 
-These inequalities are a candidate-screening heuristic. They do not prove convexity, stability or causality. Once a pair is selected, the bridge uses the Euler chemical potentials mu_1=F_1+Q_1,1 and mu_2=F_2+Q_1,2, then constructs and validates the complete bridge.
+The cubic family first attempts a quadratic profile, corresponding to a cubic potential. Its prescribed fallback is a C1 cubic profile with one interior knot, whose integral is fixed by a scalar solve. The cubic family does not promise equality of the source and bridge sound speeds at both endpoints.
 
-## 4. Endpoint sound speeds
+The quintic family first attempts a quartic profile obtained from a quintic potential, with exact supplied endpoint slopes. Its fallback uses a C1 piecewise cubic profile with five knots: the two endpoints and three interior points `ua, um, ub`. The historical receipt name is `adaptive_2knot_c2_hermite`; the actual five-knot array in `make_c2_knots` is authoritative. Integrating the C1 profile gives a C2 potential. The reported `spline_mode` distinguishes the polynomial and fallback cases.
 
-The endpoint values are estimated from one-sided shape-preserving cubic Hermite interpolants of ln P and ln epsilon as functions of x=ln n_B. Six points are used on each side. At the endpoint,
+### Pressure-potential families: `cubic_P` and `quintic_P`
+
+Here `mu_E(u)=mu1+u*Delta mu` and the interpolated profile is `n_B(u)`:
+
 \[
- c_s^2=\frac{P}{\epsilon}
- \frac{d\ln P/dx}{d\ln\epsilon/dx}.
+ P(u)=P_1+\Delta\mu\int_0^u n_B(v)\,dv,\qquad
+ F=\mu_E-\frac{P}{n_B},\qquad
+ s=\frac{n_B\Delta\mu}{\mu_E n_B'}.
 \]
-The PCHIP knot derivatives use the Fritsch--Butland weighted harmonic mean internally and the shape-limited one-sided endpoint formula. Non-positive P or epsilon, a non-positive logarithmic energy derivative, or an endpoint sound speed outside (0,1) causes rejection. The code does not clip or repair invalid endpoint derivatives.
 
-This is a numerical derivative of the supplied table, not a microscopic calculation or an uncertainty analysis.
+The required integral is `(P2-P1)/Delta mu`. For the quintic family, the endpoint slopes are
 
-## 5. The six bridge constructions
-
-Let
 \[
- x=\ln n_B,\quad \Delta x=\ln(n_2/n_1),\quad
- \Delta\mu=\mu_2-\mu_1,\quad 0\leq u\leq1.
+ n_B'(0)=\frac{n_1\Delta\mu}{\mu_1s_1},\qquad
+ n_B'(1)=\frac{n_2\Delta\mu}{\mu_2s_2}.
 \]
-All six constructions are single-valued smooth barotropes with no density jump. They differ in which thermodynamic variable is interpolated and how the first law is enforced.
 
-### 5.1 maxwell: smooth near-pressure plateau compatibility bridge
+These methods use the same quadratic/quartic and piecewise cubic profile machinery described above, now for density rather than `Q1`. Integrating the density profile enforces `dP=n_B dmu_E`. Smooth endpoint values alone do not establish mechanical stability or causality; the constructed profile must also pass the interval inequalities in section 7.
 
-The historic method name is retained for API compatibility, but this is **not** an exact Maxwell coexistence transition. It uses a cubic Hermite pressure spline P(u), interior knot positions u_a=0.22 and u_b=0.78, and a near-plateau offset
+### `first_law_constrained_hermite_pressure_bridge`
+
+This method uses a C1 cubic Hermite pressure spline in `u`, with internal knots `0.22` and `0.78` and internal pressures
+
 \[
- \delta P_{\rm plat}=0.015(P_2-P_1).
+ P_a=P_t-0.015(P_2-P_1),\qquad
+ P_b=P_t+0.015(P_2-P_1).
 \]
-The inner pressures are P_a=P_t-delta P_plat and P_b=P_t+delta P_plat. The plateau reference P_t is determined by a scalar root solve using a 64-point Gauss--Legendre rule on the full interval, matching the historical reference implementation. Each partial free-energy integral F(u) uses a 16-point Gauss--Legendre rule on [0,u]. The root solve enforces
+
+The nominal endpoint pressure derivatives are `dP/du=n_B*mu_E*s*Delta x`; the pressure-spline shape limiter may reduce them. The scalar pressure parameter `P_t` is fixed by
+
 \[
- F_2-F_1=\Delta x\int_0^1
- \frac{P(u)}{\exp(x_1+u\Delta x)}\,du.
+ F_2-F_1=\Delta x\int_0^1\frac{P(u)}{n_1e^{u\Delta x}}\,du.
 \]
+
 Then
+
 \[
- n_B(u)=\exp(x_1+u\Delta x),\quad Q_1=P/n_B,
+ F(u)=F_1+\Delta x\int_0^u\frac{P(v)}{n_1e^{v\Delta x}}\,dv,\quad
+ \mu_E=F+\frac{P}{n_B},\quad
+ s=\frac{P'(u)}{\Delta x\,n_B\mu_E}.
+\]
+
+The implementation uses the same 16-point Gauss-Legendre rule separately on each smooth pressure-spline piece for both the endpoint root and partial integrals. Quadrature nodes are cached within each construction. The former order-changing whole-interval quadrature is not the current algorithm. This is a continuous near-plateau bridge with zero density jump, `is_exact_maxwell=false` and `seidov_applicable=false`. Its full method name must not be shortened to `maxwell`.
+
+## 5. CSS: one speed and a positive crust-side jump
+
+Let the retained crust endpoint be `(n_c, P_t, mu_t)` and the selected core endpoint `(n2, P2, mu2)`. The constructor solves for one constant `s=(c_s/c)^2` and a bridge-side transition density `n_b`:
+
+\[
+ n_b=n_2\left(\frac{\mu_t}{\mu_2}\right)^{1/s},
 \]
 \[
- F(u)=F_1+\Delta x\int_0^u
- \frac{P(v)}{\exp(x_1+v\Delta x)}\,dv,\quad \mu_B=F+Q_1,
+ P_2-P_t=n_2\mu_t\frac{s}{1+s}
+ \left[\frac{\mu_2}{\mu_t}-
+ \left(\frac{\mu_t}{\mu_2}\right)^{1/s}\right].
 \]
-and
+
+The current bisection bracket is `s in [1e-10,1]`. The solver rejects an unbracketed root, a nonpositive inferred density jump or a nonpositive energy jump. Across the crust/CSS interface,
+
 \[
- c_s^2(u)=\frac{dP/du}{\Delta x\,n_B(u)\mu_B(u)}.
+ P_-=P_+=P_t,\quad\mu_-^{E}=\mu_+^{E}=\mu_t,\quad
+ \Delta n=n_b-n_c>0,\quad\Delta\epsilon=\mu_t\Delta n>0.
 \]
-The metadata records is_exact_maxwell=False, density_jump_fm3=0 and seidov_applicable=False. A physical Maxwell construction would impose coexistence at equal pressure and chemical potential with a density/energy-density discontinuity. This bridge does not represent that physics.
 
-### 5.2 css: two-segment constant-sound-speed bridge
+Within the bridge,
 
-The bridge uses logarithmic interpolation of chemical potential,
 \[
- \mu_B(u)=\mu_1(\mu_2/\mu_1)^u.
+ n_B(\mu)=n_b\left(\frac{\mu}{\mu_t}\right)^{1/s},\qquad
+ P(\mu)=P_t+n_b\mu_t\frac{s}{1+s}
+ \left[\left(\frac{\mu}{\mu_t}\right)^{1+1/s}-1\right],
 \]
-A scalar parameter s in (0,1) defines
 \[
- \mu_m=\mu_1(\mu_2/\mu_1)^{1-s},\qquad
- n_m=n_1+s(n_2-n_1).
+ \epsilon(\mu)=\mu n_B(\mu)-P(\mu).
 \]
-The two segment sound speeds are
+
+The bridge joins the core endpoint continuously in `n_B`, `P`, `epsilon` and `mu_E`. Its single sound speed need not match the source core derivative. There is no second internal CSS speed.
+
+The output contains two adjacent transition rows with equal `P_t` and `mu_t`, but different `n_B` and `epsilon`. The CSS receipt sets `is_exact_maxwell=true` for this sharp crust-to-constructed-CSS interface. That field does not turn CSS into a coexistence solve between the two supplied source branches. The separate `maxwell-transition` operation has the latter meaning.
+
+CSS also reports the Seidov small-core onset quantities
+
 \[
- c_{s,A}^2=\frac{\ln(\mu_m/\mu_1)}{\ln(n_m/n_1)},\quad
- c_{s,B}^2=\frac{\ln(\mu_2/\mu_m)}{\ln(n_2/n_m)}.
+ \Delta\epsilon_{\rm crit}=\tfrac12\epsilon_-+\tfrac32P_t,
+ \qquad \mathcal S=\frac{\Delta\epsilon}{\Delta\epsilon_{\rm crit}},
 \]
-With gamma_A=1/c_s,A^2 and gamma_B=1/c_s,B^2,
+
+with `seidov_small_core_stable = (Delta epsilon < Delta epsilon_crit)`. This Boolean is a diagnostic, not a complete stellar stable-branch calculation or an unconditional matching rejection. The receipt separately identifies the transition's low/high indices, continuous core-join index, bridge speed and source endpoint speeds.
+
+## 6. Genuine Maxwell coexistence
+
+`construct_maxwell_transition` dispatches to the separate native phase-transition kernel. It requires caller-confirmed local charge neutrality and works with the supplied cold single-phase branches in `P(mu_E)`. Each branch uses cubic Hermite pressure interpolation whose knot slopes are the source densities, so `n_B=dP/dmu_E` and `epsilon=mu_E*n_B-P`.
+
+The constructor seeks equal pressure at equal effective chemical potential with a positive high-minus-low density and energy jump. Source-branch interpolation, coexistence-root and phase-selection gates are separate from the `match-core` endpoint heuristic. Phase input validation requires at least three source knots, one constant `Iphase`, no retained abundance inventory and `Nadd=0`. A provider-specific auxiliary column may be omitted only by an explicit projection that preserves the immutable source, its auxiliary values and the primary thermodynamic columns; it must not be silently interpreted as a generic phase variable.
+
+The Maxwell source interval certificate checks positivity, mechanical stability and causality for that particular cubic `P(mu_E)` representation. It is not a mandatory representation test for every `F(ln n_B)` bridge. A failure of that interpolant does not, by itself, prove that the underlying nuclear model admits no physical EOS.
+
+See [the separate Maxwell interface document](FORTRAN_EOS_MAXWELL_TRANSITION_V1.md) for its dedicated API and output structure; the current code linked above remains authoritative for exact guards and status categories. No inference about a complete globally minimizing multi-phase equation of state follows from a two-branch finite-support coexistence result.
+
+## 7. Validation: bridge, retained table and source coverage
+
+### Continuous bridge admission
+
+The polynomial and spline constructors check physical inequalities over their complete polynomial pieces. In the free-energy representation, with `x=ln n_B`, the checked quantities include
+
 \[
- n_B=n_1(\mu_B/\mu_1)^{\gamma_A}
+ q>0,\quad F>0,\quad\mu_E=F+q>0,\quad
+ D=q+q_x>0,\quad\mu_E-D\ge0.
 \]
-on the first segment and
+
+In the pressure-potential representation, they include positive pressure, density and energy, and
+
 \[
- n_B=n_m(\mu_B/\mu_m)^{\gamma_B}
+ \frac{dn_B}{d\mu_E}>0,\qquad
+ \mu_E\frac{dn_B}{d\mu_E}-n_B\ge0.
 \]
-on the second. Pressure is integrated analytically from dP=n_B dmu_B. The parameter s is solved so the pressure increment equals P_2-P_1. The method is continuous in P, epsilon and mu_B, but c_s^2 may jump at the internal CSS knot. It is not a first-order phase transition.
 
-### 5.3 cubic_P and quintic_P: pressure--chemical-potential bridges
+Polynomial minima are evaluated at endpoints and all stationary roots found by recursive derivative-root isolation, rather than only at output nodes. For the first-law pressure spline, a local cubic `P(t)` with `s_x=Delta x*Delta u>0` obeys
 
-Here mu_B(u)=mu_1+u Delta mu. The density n_B(u) is a monotone Hermite bridge with endpoint derivatives inferred from the source sound speeds:
 \[
- \left.\frac{dn_B}{du}\right|_0=\frac{n_1\Delta\mu}{\mu_1c_{s,1}^2},
- \quad
- \left.\frac{dn_B}{du}\right|_1=\frac{n_2\Delta\mu}{\mu_2c_{s,2}^2}.
+ \epsilon_t=s_x(\epsilon+P),\quad
+ A=P+\frac{P_t}{s_x}+\frac{P_{tt}}{s_x^2}+\frac{P_{ttt}}{s_x^3},
+ \quad\epsilon=(\epsilon_0+A(0))e^{s_xt}-A(t).
 \]
-Then
+
+Its causal margin `G=epsilon+P-P_t/s_x` is an exponential minus a quadratic. The implementation partitions the derivative by the possible single zero of `G''`, isolates stationary points of `G`, and checks them and the interval endpoints. It uses stable positive quadrature moments to evaluate the energy instead of subtracting large primitives. Pressure and its derivative receive their polynomial interval checks as well.
+
+These are continuous-piece checks implemented in floating-point arithmetic with finite root/iteration tolerances, not formal interval-arithmetic proofs. The generated analytic bridge is additionally checked at 401 diagnostic points, including endpoints. The allowed bridge range is `0<s<=1`; the reported minimum/maximum sound speeds are sampled summaries, not necessarily exact global extrema. The finite samples do not replace the continuous-piece admission tests.
+
+### Retained-source and assembled-table checks
+
+Before constructing each candidate, cached crust-prefix/core-suffix tests check positive finite `P`, `F`, `epsilon` and Euler `mu`, nondecreasing pressure, increasing energy, nondecreasing `mu` within roundoff, and the adjacent causal secant bound
+
 \[
- P(u)=P_1+\Delta\mu\int_0^u n_B(v)\,dv,\quad
- Q_1=P/n_B,\quad F=\mu_B-Q_1,
+ \Delta P\le(1+10^{-6})\Delta\epsilon.
 \]
-and
+
+These are necessary finite-table conditions. They do not certify a chosen interpolation between every retained source knot. The supplied source domain is not repaired or truncated at failed physical intervals during this search.
+
+The Python smooth/CSS API independently invokes the native consistency verifier on the assembled table. Its hard result includes C1-C6, C10-C11, pointwise physical-domain checks, resolved derivative-domain failures and thermodynamic-jump consistency. C7-C9 remain finite-difference diagnostics. The verifier records derivative masking and sample counts; phase boundaries and unresolved large log-density steps require attention to that coverage. Positive finite pressure/energy/effective-potential domains cannot be removed by derivative masking.
+
+`match_crust_core` retains its tuple return even when that independent consistency result fails: `info["diagnostic_only"]` is then **true**. Such output is not an admitted matched EOS. A campaign must require the independent hard gate and its declared source-support/representation criteria before classifying a survivor. The genuine-Maxwell Python API instead raises when its assembled output fails the independent consistency verifier.
+
+### Whole-selected support versus a finite component
+
+Retaining an `Iphase` integer is categorical provenance, not authorization to interpolate across an inherited phase boundary. A source census must preserve the full selected source view and distinguish `WHOLE_SELECTED_RETAINED_CHAIN` from `FINITE_COMPONENT_ONLY`. A component candidate may be prescribed by source phase labels or an explicit authoritative source selection; deleting intervals because they failed a physical test cannot establish whole-source admission.
+
+The [2026-11-23 source catalog](../data/eos_matching_reaudit_20261123/SOURCE_CATALOG.json) keeps 101 source records, including blocked sources. Its `matching_views` use source-declared contiguous phase runs and explicit auxiliary projections; legacy diagnostically selected good intervals are not matching authority. These are input/coverage records, not precomputed physical-survivor claims. The complete all-pair campaign's own receipt, source hashes and output checks determine its result.
+
+## 8. Assembly, phase provenance and export
+
+For a continuous bridge, the output rows are the retained crust prefix through `i1`, exactly `n_bridge` interior samples and the retained core suffix beginning at `i2`. Endpoints are not duplicated. CSS additionally inserts the explicit high-density transition row immediately after the crust-side transition row; the equal-pressure jump pair must not be deduplicated or smoothed away.
+
+Abundance arrays are absent as physical data: their numeric placeholders are zero and presence/closure masks are false. The output nevertheless has `composition_file_present=true`, `composition_available=false` and a **phase-only `eos.compo` sidecar** (`Npairs=Nquad=0`). Retained source `Iphase` labels are copied verbatim. The bridge receives the smallest nonnegative label absent from both source label sets. Equality of labels from different providers does not assert equality of their physical phases.
+
+The selected physical `T`, `Yq` and `Il` conventions are retained; the output explicitly represents a `1x1` selected thermodynamic slice. Matched output has `Nadd=0`. Original auxiliary quantities must remain accessible through the source/projection provenance, rather than being invented on the bridge.
+
+The physical charge chemical potential `mu_q=mn*Q4` is retained on source portions. Across the bridge it is joined using `6u^5-15u^4+10u^3`; this is not a composition or charge-neutrality solve. Output has `Q2=Q5=0`, `Q7=Q6` and
+
 \[
- c_s^2(u)=\frac{n_B(u)\Delta\mu}{\mu_B(u)\,dn_B/du}.
+ Q_3=\frac{F+Q_1}{m_{n,\rm out}}-1
+       -\mathbf 1_{I_l=0}Y_qQ_4.
 \]
-This enforces dP=n_B dmu_B by construction.
 
-The cubic method uses a single quadratic density profile when its shape gates pass, and otherwise a one-interior-knot C1 cubic Hermite spline. The quintic method uses a quartic density profile derived from a fifth-order potential when its bounds pass, preserving the endpoint slopes; otherwise it uses an adaptive two-interior-knot cubic Hermite spline for Q1, with harmonic-mean interior slopes and exact endpoint derivatives. The underlying potential is C2; the interpolated derivative profile is C1. The fallback is an explicit numerical branch of the same matching prescription.
+Export must preserve phase labels and any adjacent first-order transition rows. A successful CompOSE round trip does not establish that a downstream smooth TOV/Cowling consumer supports the discontinuity; that consumer's interface contract and tests are separate.
 
-### 5.4 cubic_F and quintic_F: free-energy bridges
+## 9. Interfaces and bounded regression evidence
 
-Here x(u)=x_1+u Delta x and n_B=exp(x). The interpolated variable is Q1(u), constrained by
-\[
- F(u)=F_1+\Delta x\int_0^u Q_1(v)\,dv,\qquad
- \int_0^1 Q_1(u)\,du=\frac{F_2-F_1}{\Delta x}.
-\]
-The derived quantities are
-\[
- \mu_B=F+Q_1,\qquad P=n_BQ_1,\qquad
- c_s^2=\frac{Q_1+(dQ_1/du)/\Delta x}{\mu_B}.
-\]
-The cubic method uses a quadratic Q1 profile when monotonicity/convexity gates pass, otherwise a one-interior-knot cubic Hermite spline. The quintic method derives a quartic Q1 profile from a fifth-order potential and retains exact endpoint derivatives when accepted; otherwise it uses an adaptive two-interior-knot cubic Hermite construction for Q1 with exact endpoint derivatives. The underlying potential is C2 while Q1 is C1.
+For a smooth/CSS method, prepared and source-authorized inputs can be passed as follows:
 
-Endpoint matching alone is insufficient. The dense validation also checks Q1 positivity, the mechanical-stability numerator Q1+dQ1/dx and the causal ratio 0<c_s^2<1.
-
-## 6. Assembly, output columns and diagnostics
-
-The output grid contains: (i) all crust rows through the selected left knot i1; (ii) exactly n_bridge interior points; and (iii) all core rows from the selected right knot i2. Bridge endpoints are not duplicated. Source density knots outside the removed interval are retained.
-
-The output rest-mass convention is that of the core table. The crust F values receive the fixed mass alignment. At every output point,
-\[
- Q_3=\frac{F+Q_1}{m_n}-1,\qquad
- Q_6=Q_7=\frac{F}{m_n}-1,\qquad Q_1=P/n_B.
-\]
-Q4 on source portions is scaled to the output neutron-mass convention. Across the bridge it is joined with the quintic smootherstep s(u)=6u^5-15u^4+10u^3. The composition arrays and phase labels are zeroed because composition has deliberately been omitted.
-
-Every constructed bridge is checked on 401 points, including both endpoints. The check rejects non-finite values, non-positive n_B, P, F or mu_B, non-increasing density, pressure or energy density, or any c_s^2 outside (0,1). The relative endpoint First-Law integral residual must not exceed 5e-9.
-
-The report includes selected indices, endpoints, source/bridge endpoint sound speeds, minimum/maximum bridge sound speed, pressure span, interpolation/fallback mode and First-Law residual. The Python wrapper also evaluates the native C1--C11 consistency report on the assembled table. It returns the full report in info["consistency"]; info["diagnostic_only"] is true when the independent consistency check reports a failed hard gate. A bridge-level pass therefore does not certify every retained source knot.
-
-## 7. Interfaces
-
-### Python API
-
-~~~python
-from compose_eos import read_compose, match_crust_core, write_compose
-
-crust = read_compose("eos_data_normalized/GPPVA_FSU2H")
-core = read_compose("eos_data_normalized/GM_GM1")
+```python
+from compose_eos import match_crust_core, write_compose
 
 matched, info = match_crust_core(
     crust, core,
-    cr_name="GPPVA_FSU2H", co_name="GM_GM1",
     method="quintic_P", n_bridge=40,
     core_compo_mode="strict_thermo_only",
-    drop_composition=True,  # required because this crust has eos.compo
+    drop_composition=True,
 )
+if info["diagnostic_only"]:
+    raise RuntimeError(info["consistency"]["overall"])
+# Apply the campaign's retained-source representation and coverage gates
+# before reporting a survivor. This export alone is not that classification.
 write_compose("output/matched_compose", matched)
-print(info["construction_kind"])
-print(info["consistency"]["overall"])
-~~~
+```
 
-The API preserves the legacy tuple convention (matched_eos, info). It raises NativeFeatureUnavailable for the unported literature_beta_eq option; invalid controls and missing composition consent raise ValueError. Native physical/input-state rejections are surfaced as NativeExecutionError.
+A genuine-Maxwell call is separate. The local-neutrality argument is an explicit physical premise that must be supported for the supplied phases:
 
-### Native CLI
+```python
+from compose_eos import construct_maxwell_transition
 
-Build the executable by running the shell command shown below, then invoke the matching operation with the second command:
-build/compose_eos_fortran match-core \
-  CRUST_INTERNAL_DIR CORE_INTERNAL_DIR OUTPUT_INTERNAL_DIR \
-  quintic_P 40 true
-~~~
+matched, report = construct_maxwell_transition(
+    phase_low, phase_high,
+    assume_local_charge_neutrality=True,
+    drop_composition=True,
+    return_report=True,
+)
+```
 
-The three directories contain eos_data.csv and eos_data.nml. The output directory must already exist. The final argument is a required explicit boolean, true or false.
+Native CLI equivalents, from the repository root:
 
-## 8. Verification and benchmark provenance
+```sh
+bash fortran_eos/build.sh build/native_matching
+mkdir -p output/smooth_internal output/maxwell_internal
+build/native_matching/compose_eos_fortran match-core \
+  CRUST_INTERNAL_DIR CORE_INTERNAL_DIR output/smooth_internal quintic_P 40 true
+build/native_matching/compose_eos_fortran maxwell-transition \
+  LOW_PHASE_INTERNAL_DIR HIGH_PHASE_INTERNAL_DIR output/maxwell_internal true
+```
 
-The regression suite compares native results with the historic Python reference implementation for all six tokens on the repository's GPPVA_FSU2H crust and GM_GM1 core. It compares selected transition indices and the assembled n_B, Q1, Q3, Q4, Q6 and Q7 arrays. It also checks output ordering, source-knot retention, composition omission, positivity, monotonicity, bridge causality and the First-Law residual.
+Each internal directory contains `eos_data.csv` and `eos_data.nml`. `match-core`'s last Boolean means explicit composition-drop consent; `maxwell-transition`'s means local-neutrality confirmation and requires already prepared thermo-only inputs. They are different contracts.
 
-The repository contains legacy matching metadata for this pair. Those records select
-\[
- n_1=0.086999997\ {\rm fm}^{-3},\quad
- n_2=0.14954666667\ {\rm fm}^{-3},
-\]
-\[
- P_1=0.2901099811962072\ {\rm MeV\,fm}^{-3},\quad
- P_2=3.8788625430037915\ {\rm MeV\,fm}^{-3},
-\]
-\[
- \mu_1=953.407676579\ {\rm MeV},\quad
- \mu_2=979.3980753899036\ {\rm MeV}.
-\]
-The historical records report zero density jump and is_exact_maxwell=false for all six tokens. Their bridge sound-speed ranges lie inside the stable causal interval. These are legacy reference values, not a claim that this prose independently verifies the native arrays. The release audit records the native CI comparison at the exact tested commit.
+The 2026-11-23 native matching regression source is pinned by SHA256 `4cc5f32c858a7d9f952f6f7c326c9465667b609ec02caaa264a828aa9ecf186b`. [test_matching_reaudit_20261123.py](../python_frontend/tests/test_matching_reaudit_20261123.py) builds two Fortran test programs under checked/FPE-trap and optimized configurations; the observed result was **4 passed**. Controls include endpoint retry, support outside the old last-149-row cutoff, sub-0.2-MeV endpoint differences, low-density core support, invalid retained energy, an acausal retained core tail, and an inter-node acausal pressure-bridge counterexample with a separate valid control.
 
-Negative tests cover missing composition-drop consent, unavailable literature_beta_eq, nonzero entropy, Q6-Q7 mismatch, non-beta-equilibrated input and invalid controls. CI compiles the executable, runs the frontend/direct-provider tests, verifies the tracked SHA-256 manifest, and packages the exact tested source commit as a workflow artifact.
+The four suites driven by [run_matching_native_adversarial.py](../fortran_eos/tests/run_matching_native_adversarial.py) also passed at that source hash: thermodynamic adversarial cases, interval adversarial cases, slice conventions and extrema controls. Reproduction commands are:
 
-## 9. Limitations and non-equivalences
+```sh
+PYTHONPATH=python_frontend OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 \
+  python3 -m pytest -q python_frontend/tests/test_matching_reaudit_20261123.py
+python3 fortran_eos/tests/run_matching_native_adversarial.py \
+  --build-dir /tmp/ns_matching_controls_build \
+  --log-dir /tmp/ns_matching_controls_logs
+```
 
-- The six smooth barotropic constructions are supported only in strict thermo-only mode. Composition reconstruction, charge-neutrality/lepton splitting, phase-label interpolation and literature symmetry-energy composition approximations are not ported.
-- The public maxwell token does not impose coexistence at equal pressure and chemical potential with a density jump. It constructs a smooth near-pressure-plateau interpolation. There is no latent-heat discontinuity and the Seidov criterion is inapplicable.
-- A genuine Gibbs construction requires a multi-variable thermodynamic surface, for example P(mu_B,mu_Q), and global charge-neutrality constraints. A one-dimensional beta-equilibrated barotrope is insufficient to reconstruct that surface.
-- The css method is a two-segment continuous barotrope with piecewise constant sound speed. It is not interchangeable with all literature CSS parameterizations; some include a sharp first-order transition.
-- Full master-function smoothing/candidate selection, microscopic RMF/Skyrme/APR solvers, a full causal-profile port, and complete native TOV-sequence/stable-branch diagnostics remain outside this feature.
-- A bridge pass does not repair source-table inconsistencies outside the bridge. The C1--C11 report must be inspected, and astrophysical consequences of the selected matching method assessed separately.
+The complete frontend/pipeline CI also exposed 14 failures sharing the analytic Maxwell fixture in [test_maxwell_mass_gate.py](../python_frontend/tests/test_maxwell_mass_gate.py): 12 reference-reencoding cases and two explicit-composition-drop cases. The native coexistence solve succeeded, but the former six-knot grid left **zero** resolved derivative points in its eight-row output after correct gap/transition stencil masking. C10 and C11 therefore failed the existing coverage contract. This was not a change to the EOS curves or an energy-reencoding defect: the corrected mask also excludes one-sided three-knot endpoint stencils when they cross a masked interval.
 
-## 10. Literature and authoritative resources
+The fixture now samples the same quadratic `P(mu)` and its exact derivative on 31 points from 950 to 1040 MeV. The unchanged transition at 990 MeV remains off-grid. Both `Il` controls have 31 resolved derivative points in the 33-row output and pass the consistency gate. The former six-point grid is preserved as two explicit negative-coverage tests: coexistence succeeds, `derivative_points=0`, C10/C11 fail, and the public API rejects that uncertified output. The focused mass-reference plus explicit-drop suites passed **25 tests in 0.62 s** with the pinned native executable. Only test-fixture sampling changed; no production tolerance, mask or physical equation was relaxed. Evidence is recorded in `/tmp/ns_eos_reaudit_20261123/matching/CI_MAXWELL_FIXTURE_REPAIR.json` and `CI_MAXWELL_FIXTURE_GREEN.log`.
 
-1. CompOSE Collaboration, [CompOSE manual and database documentation](https://compose.obspm.fr/manual/). Official definitions for table organization and thermodynamic/composition interfaces.
-2. CompOSE Collaboration, [CompOSE software](https://compose.obspm.fr/software/). Official reader/interpolator software and supporting resources.
-3. Servignat, Davis, Novak, Oertel and Pons (2023), [One- and two-argument equation-of-state parameterizations for neutron stars](https://arxiv.org/abs/2311.02653). Relevant to thermodynamically controlled EOS parameterizations and crust matching; it does not imply the six historical methods are unique or microscopic.
-4. Canullán-Pascual et al. (2025), [Consistent crust-core interpolation and its effect on non-radial neutron star oscillations](https://arxiv.org/abs/2502.02373). A distinct linear P(mu_B)/constant-sound-speed framework; any density jumps in that framework must not be conflated with the smooth bridges implemented here.
-5. Lindblom (2018), [Causal representations of neutron-star equations of state](https://scispace.com/papers/causal-representations-of-neutron-star-equations-of-state-27ptzdab5t). Motivation for explicit stability and causality constraints.
-6. Swesty (1996), [Thermodynamically consistent interpolation for equation-of-state tables](https://doi.org/10.1006/jcph.1996.0162). Foundational work on interpolation based on thermodynamic potentials and derivatives.
-7. Fortin et al. (2016), [Neutron star radii and crusts: uncertainties and unified equations of state](https://journals.aps.org/prc/abstract/10.1103/PhysRevC.94.035804). Relevant to the effect of crust EOS choices on stellar structure.
+An additional dependency check found a test-side identity error in [test_mass_normalization_contract.py](../python_frontend/tests/test_mass_normalization_contract.py): it matched output rows to both source phases by density alone. In the refined analytic fixture, the discarded low-phase state at `mu=995 MeV` and the retained high-phase transition at `mu=990 MeV` both have `n_B=0.13 fm^-3`. The regression now restricts comparison to the retained chemical-potential domain and the corresponding output branch, and explicitly retains that density-alias counterexample. The three affected test modules passed **45 tests in 2.31 s**; `CI_MAXWELL_FIXTURE_ALL_GREEN.log` records the run. No production change was needed.
 
-The historic implementation in this repository is the primary numerical reference for code-to-code differential testing. The literature motivates thermodynamic constraints and provides alternatives; it does not independently certify the historical interpolation heuristics.
+The observed run receipts are `MATCHING_FINAL_RECEIPT.json`, `PYTEST_NATIVE_REGRESSIONS_FINAL.log` and `legacy_controls_final/record.json` under `/tmp/ns_eos_reaudit_20261123/matching/`; final campaign packaging must preserve those receipts. This evidence establishes the listed finite regression outcomes. It is not an all-source pass, proof of interpolation uniqueness, microscopic equilibrium calculation, stellar stable-branch result or blanket guarantee about arbitrary grids.
 
+## 10. Historical records, retained for provenance
 
-## 11. Verified source snapshot
+An earlier version of this document described a six-token interface that included `maxwell` as a continuous near-plateau alias, two-segment continuous CSS, an additive crust energy shift, zeroed phase labels, a last-approximately-150-row endpoint filter and sample-only bridge checks. Those descriptions are superseded by the current implementation above. Historical fixtures and recorded pass counts do not validate those behaviors as current physical contracts.
 
-The six native strict-thermo-only matching methods were built and tested on branch `research/fortran-eos-gap-fill-v1`, final documented HEAD `e2b7ef319b9bb73dc85023a757dc1449c8f22e3c`. Both push GitHub Actions run [42378176837](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42378176837) and pull-request run [42378180891](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42378180891) passed on that exact commit.
+The previous document recorded branch `research/fortran-eos-gap-fill-v1` at commit `e2b7ef319b9bb73dc85023a757dc1449c8f22e3c`, with successful Actions runs [42378176837](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42378176837) and [42378180891](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42378180891). It reported 44 frontend/provider tests, 58 manifest entries and source packaging at that commit. The recorded [source artifact](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42378176837/artifacts/13576661259) had ZIP SHA256 `28793bbbfa0708a8b24d0cc2e128b0833e9eea16e3d30ea547172b172b62474b`. These links and values are preserved historical evidence; availability and CI status were not revalidated by this documentation edit, and the artifact cannot substitute for the current exact-source receipt.
 
-The push run reports a successful native `gfortran` build, 44 frontend/direct-provider tests passed in 23.50 s, 58/58 tracked SHA-256 checks passed, source archive creation and artifact upload. The pull-request run independently reports 44 tests passed in 18.52 s with the same manifest and packaging gates successful.
-
-The exact branch source snapshot is available as [`NS_Cowling-e2b7ef319b9bb73dc85023a757dc1449c8f22e3c`](https://github.com/cosmosapjw-quantum/NS_Cowling/actions/runs/42378176837/artifacts/13576661259), artifact ID `13576661259`, size 198,970,172 bytes, uploaded ZIP SHA-256 `28793bbbfa0708a8b24d0cc2e128b0833e9eea16e3d30ea547172b172b62474b`, retention expiry 2026-12-07. The artifact ZIP digest and the repository's 58-entry source manifest are distinct integrity checks.
-
-
-## 12. Validation boundary with genuine Maxwell coexistence (2026-11-11)
-
-The six methods documented here remain smooth, one-dimensional, first-law-controlled crust-core bridges. In particular method="maxwell" is the historical smooth near-pressure-plateau compatibility bridge. It has no density jump, no latent-energy discontinuity, is_exact_maxwell=false, and seidov_applicable=false. None of the six methods is the genuine one-charge Maxwell construction.
-
-The separate native construct_maxwell_transition operation lives in compose_eos_phase_transition.f90 and uses two supplied cold phases in P(mu_E), with common Euler baryon chemical potential and pressure. Its Il=0 Q3 convention correction is now covered by a native regression; it does not alter any of the six smooth bridge algorithms or their API tokens. Do not compare a smooth-bridge pressure plateau with a physical coexistence pressure as though they were the same object.
-
-The documented six-method differential suite remains the historical reference for the smooth methods. The new full 68-case frontend/pipeline run also includes the genuine-Maxwell Il=0 regression; it is not a claim of 18-source admission or 65-pair physical validation.
+The [2026-11-15 mass-normalization correction](MASS_NORMALIZATION_CORRECTION_20261115.md) explicitly identifies the physical error in the earlier additive energy shift. The older [CSS decision note](CSS_SINGLE_SPEED_CRUST_JUMP_CONTRACT_20261115.md) records the change to one speed and a crust-side jump, but its historical numerical example includes the subsequently rejected energy-shift convention and must not be used as a current numerical acceptance fixture. Use the current Fortran implementation, source hashes and independently observed regression/campaign receipts for current claims.

@@ -542,6 +542,11 @@ contains
   real(wp)::lo,hi,mn,mp
   s=core_state_t()
   call core_model_bounds(model,lo,hi,mn,mp,status);if(status/='ok')return
+  status='density must be finite and positive'
+  if(.not.ieee_is_finite(n))return
+  if(n<=0)return
+  status='density outside declared native core model bounds'
+  if(n<lo.or.n>hi)return
   left=core_state_t();right=core_state_t()
   if(model=='APR_APR')then
    call apr_endpoints(left,right,status);if(status/='ok')return
@@ -563,6 +568,8 @@ contains
   n=size(densities);if(n<3)return
   if(.not.all(ieee_is_finite(densities)))return
   if(any(densities<=0).or.any(densities(2:)<=densities(:n-1)))return
+  status='density outside declared native core model bounds'
+  if(any(densities<lo).or.any(densities>hi))return
   allocate(grid(n+2));grid(:n)=densities
   left=core_state_t();right=core_state_t()
   if(model=='APR_APR')then

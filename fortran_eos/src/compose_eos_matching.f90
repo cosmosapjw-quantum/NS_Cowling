@@ -5,6 +5,12 @@ module compose_eos_matching
   private
   type, public :: match_report_t
     integer :: i1=0, i2=0, n_bridge=0
+    ! A failed preferred construction is not evidence that the source pair
+    ! has no matching window. Count the exhaustive finite endpoint search.
+    integer :: window_pairs_total=0, window_pairs_examined=0
+    integer :: window_candidates_constructed=0, window_candidates_rejected=0
+    integer :: window_preferred_candidates=0
+    logical :: window_fallback_used=.false., window_search_exhausted=.false.
     real(wp) :: n1=0._wp, n2=0._wp, p1=0._wp, p2=0._wp
     real(wp) :: f1=0._wp, f2=0._wp, mu1=0._wp, mu2=0._wp
     real(wp) :: cs2_source_left=0._wp, cs2_source_right=0._wp
@@ -33,7 +39,8 @@ module compose_eos_matching
     ! |mu_B,src - mu_E|/|mu_E| (mu_E = F + P/n_B, Il=0 charge shift undone).
     ! Gated at the provider Euler tolerance 5e-4 declared by the Maxwell kernel.
     real(wp) :: source_euler_relative_residual=0._wp
-    character(len=32) :: method='', spline_mode=''
+    character(len=64) :: method=''
+    character(len=96) :: spline_mode=''
     character(len=64) :: construction_kind=''
     logical :: composition_dropped=.false., is_exact_maxwell=.false., seidov_applicable=.false.
   end type match_report_t
@@ -582,8 +589,9 @@ contains
     enddo
   end subroutine gauss_legendre_rule
 
-  function pressure_work_integral(pt,uend,p1,p2,dpdu1,dpdu2,x1,dx) result(val)
+  function pressure_work_integral(pt,uend,p1,p2,dpdu1,dpdu2,x1,dx,quadrature_x,quadrature_w) result(val)
     real(wp),intent(in)::pt,uend,p1,p2,dpdu1,dpdu2,x1,dx
+    real(wp),intent(in),optional::quadrature_x(16),quadrature_w(16)
     real(wp)::val,kn(4),vv(4),ss(4),u,p,dp,aa,weight
     real(wp)::xg(16),wg(16),lower,upper
     integer::j,k
@@ -591,7 +599,11 @@ contains
     if(uend<=0._wp)return
     ! Integrate each smooth cubic segment separately. A global quadrature
     ! crosses the C1 knots, and changing its order at u=1 breaks dF/du=dx*P/n.
-    call gauss_legendre_rule(16,xg,wg)
+    if(present(quadrature_x).and.present(quadrature_w))then
+      xg=quadrature_x;wg=quadrature_w
+    else
+      call gauss_legendre_rule(16,xg,wg)
+    endif
     call make_pressure_spline(pt,p1,p2,dpdu1,dpdu2,kn,vv,ss)
     do k=1,size(kn)-1
       lower=kn(k);upper=min(uend,kn(k+1))
@@ -604,6 +616,101 @@ contains
       enddo
     enddo
   end function pressure_work_integral
+
+  subroutine pressure_piece_margin(t,span,energy0,a,xg,wg,energy,margin,gradient)
+    ! Stable evaluation of epsilon_t=span*(epsilon+P) with positive
+    ! quadrature moments. Avoid subtracting a large exponential primitive.
+    real(wp),intent(in)::t,span,energy0,a(0:3),xg(:),wg(:)
+    real(wp),intent(out)::energy,margin,gradient
+    real(wp)::v,pressure,dp,ddp,integral
+    integer::j
+    integral=0._wp
+    do j=1,size(xg)
+      v=0.5_wp*t*(xg(j)+1._wp)
+      pressure=((a(3)*v+a(2))*v+a(1))*v+a(0)
+      integral=integral+wg(j)*pressure*exp(-span*v)
+    enddo
+    integral=0.5_wp*t*integral
+    energy=exp(span*t)*(energy0+span*integral)
+    pressure=((a(3)*t+a(2))*t+a(1))*t+a(0)
+    dp=(3._wp*a(3)*t+2._wp*a(2))*t+a(1)
+    ddp=6._wp*a(3)*t+2._wp*a(2)
+    margin=energy+pressure-dp/span
+    gradient=span*margin+2._wp*dp-ddp/span
+  end subroutine pressure_piece_margin
+
+  subroutine certify_pressure_spline(knots,values,slopes,x0,dx,f0,ok,message)
+    ! For each cubic P(t), epsilon=(epsilon0+A0) exp(s*t)-A(t),
+    ! A=P+P_t/s+P_tt/s**2+P_ttt/s**3. The causal margin
+    ! G=epsilon+P-P_t/s is exponential minus quadratic, so G'' has at
+    ! most one zero. Partition G' by that exact zero, isolate every
+    ! stationary point, and test G there and at both endpoints.
+    ! Pressure and dP/dx use the polynomial interval-extrema certificate.
+    real(wp),intent(in)::knots(:),values(:),slopes(:),x0,dx,f0
+    logical,intent(out)::ok
+    character(len=*),intent(out)::message
+    real(wp)::a(0:3),poly(0:5),dpoly(0:5),h,span,change,energy0,energy,margin,gradient
+    real(wp)::scaled_c,ratio,critical,cuts(3),lo,hi,mid,flo,fhi,fmid,min_margin,dummy,endpoint_energy
+    real(wp)::xg(32),wg(32)
+    integer::k,j,ncuts,iteration
+    ok=.false.;message='first-law pressure interval violates positivity, stability or causality'
+    if(.not.all(ieee_is_finite([x0,dx,f0])).or.dx<=0._wp.or.f0<=0._wp)return
+    if(size(knots)<2.or.size(values)/=size(knots).or.size(slopes)/=size(knots))return
+    if(.not.all(ieee_is_finite(knots)).or..not.all(ieee_is_finite(values)).or. &
+       .not.all(ieee_is_finite(slopes)))return
+    call gauss_legendre_rule(32,xg,wg)
+    energy0=exp(x0)*f0
+    if(.not.ieee_is_finite(energy0).or.energy0<=0._wp)return
+    do k=1,size(knots)-1
+      h=knots(k+1)-knots(k);span=dx*h
+      if(span<=0._wp)return
+      change=values(k+1)-values(k)
+      a(0)=values(k);a(1)=h*slopes(k)
+      a(2)=3._wp*change-h*(2._wp*slopes(k)+slopes(k+1))
+      a(3)=-2._wp*change+h*(slopes(k)+slopes(k+1))
+      poly=0._wp;poly(:3)=a;dpoly=0._wp
+      dpoly(:2)=[a(1),2._wp*a(2),3._wp*a(3)]
+      if(polynomial_minimum(poly)<=0._wp.or.polynomial_minimum(dpoly)<=0._wp)return
+      ! scaled_c=(epsilon0+A0)*s**3 avoids inverse powers of small s.
+      scaled_c=(energy0+a(0))*span**3+a(1)*span**2+2._wp*a(2)*span+6._wp*a(3)
+      cuts(1)=0._wp;cuts(2)=1._wp;ncuts=2
+      if(scaled_c/=0._wp.and.a(3)/=0._wp)then
+        ratio=12._wp*a(3)/scaled_c
+        if(ieee_is_finite(ratio).and.ratio>0._wp)then
+          critical=log(ratio)/span
+          if(critical>0._wp.and.critical<1._wp)then
+            cuts(2)=critical;cuts(3)=1._wp;ncuts=3
+          endif
+        endif
+      endif
+      call pressure_piece_margin(0._wp,span,energy0,a,xg,wg,energy,margin,gradient)
+      min_margin=margin
+      call pressure_piece_margin(1._wp,span,energy0,a,xg,wg,endpoint_energy,margin,gradient)
+      min_margin=min(min_margin,margin)
+      do j=1,ncuts-1
+        lo=cuts(j);hi=cuts(j+1)
+        call pressure_piece_margin(lo,span,energy0,a,xg,wg,energy,margin,flo)
+        min_margin=min(min_margin,margin)
+        call pressure_piece_margin(hi,span,energy0,a,xg,wg,energy,margin,fhi)
+        min_margin=min(min_margin,margin)
+        if(.not.all(ieee_is_finite([flo,fhi,min_margin,endpoint_energy])))return
+        if(flo==0._wp.or.fhi==0._wp)cycle
+        if(sign(1._wp,flo)==sign(1._wp,fhi))cycle
+        do iteration=1,80
+          mid=0.5_wp*(lo+hi)
+          call pressure_piece_margin(mid,span,energy0,a,xg,wg,energy,margin,fmid)
+          if(.not.all(ieee_is_finite([margin,fmid])))return
+          if(fmid==0._wp.or.hi-lo<=8._wp*epsilon(1._wp))exit
+          if(sign(1._wp,flo)==sign(1._wp,fmid))then;lo=mid;flo=fmid
+          else;hi=mid;fhi=fmid;endif
+        enddo
+        min_margin=min(min_margin,margin)
+      enddo
+      if(min_margin<0._wp.or.endpoint_energy<=0._wp)return
+      energy0=endpoint_energy
+    enddo
+    ok=.true.;message='first_law_pressure_interval_certified'
+  end subroutine certify_pressure_spline
 
   pure function single_css_pressure_span(cs2,n_high,mu_t,mu_core) result(delta_p)
     real(wp),intent(in)::cs2,n_high,mu_t,mu_core
@@ -689,13 +796,20 @@ contains
     real(wp)::um,nm,csa,csb,ga,gb,pm,nbv,muv,pp,dnbdu,dqdu,d0,d1
     real(wp),allocatable::yy(:),ddy(:),anti(:)
     integer::j,iter
-    real(wp)::knots_dummy(4),values_dummy(4),slopes_dummy(4)
+    real(wp)::knots_dummy(4),values_dummy(4),slopes_dummy(4),quadrature_x(16),quadrature_w(16)
     logical::b_ok
     character(len=160)::b_msg
     ok=.false.;message='uninitialized bridge';allocate(yy(size(u)),ddy(size(u)),anti(size(u)))
+    nb=0._wp;p=0._wp;f=0._wp;mu=0._wp;q=0._wp;cs=0._wp
+    if(size(u)<1)then;message='matching query grid is empty';return;endif
+    if(.not.all(ieee_is_finite([n1,n2,p1,p2,f1,f2,mu1,mu2,q1_1,q1_2,cs1,cs2])).or. &
+       .not.all(ieee_is_finite(u)))then;message='matching endpoints/query contain nonfinite values';return;endif
+    if(min(n1,n2,p1,p2,f1,f2,mu1,mu2)<=0._wp.or.n2<=n1.or.mu2<=mu1.or. &
+       any(u<0._wp).or.any(u>1._wp))then
+      message='matching endpoints/query outside positive ordered domain';return
+    endif
     dx=log(n2/n1);dmu=mu2-mu1
     nbar=(p2-p1)/dmu;qbar=(f2-f1)/dx
-    if(dx<=0._wp.or.dmu<=0._wp)then;message='matching endpoints are not ordered in density and chemical potential';return;endif
     select case(trim(method))
     case('cubic_F','quintic_F')
       dqdu=(mu1*cs1-q1_1)*dx;dpdu2=(mu2*cs2-q1_2)*dx
@@ -748,24 +862,27 @@ contains
       endif
       ok=.true.;message='single_speed_css_analytic'
     case('first_law_constrained_hermite_pressure_bridge')
+      call gauss_legendre_rule(16,quadrature_x,quadrature_w)
       dpdu1=n1*mu1*cs1*dx;dpdu2=n2*mu2*cs2*dx
       lo=p1+1.05_wp*0.015_wp*(p2-p1);hi=p2-1.05_wp*0.015_wp*(p2-p1)
-      fa=dx*pressure_work_integral(lo,1._wp,p1,p2,dpdu1,dpdu2,log(n1),dx)-(f2-f1)
-      fb=dx*pressure_work_integral(hi,1._wp,p1,p2,dpdu1,dpdu2,log(n1),dx)-(f2-f1)
+      fa=dx*pressure_work_integral(lo,1._wp,p1,p2,dpdu1,dpdu2,log(n1),dx,quadrature_x,quadrature_w)-(f2-f1)
+      fb=dx*pressure_work_integral(hi,1._wp,p1,p2,dpdu1,dpdu2,log(n1),dx,quadrature_x,quadrature_w)-(f2-f1)
       if(fa*fb>0._wp)then;message='near-plateau pressure bridge has no integral root';return;endif
       do iter=1,100
         mid=0.5_wp*(lo+hi)
-        fm=dx*pressure_work_integral(mid,1._wp,p1,p2,dpdu1,dpdu2,log(n1),dx)-(f2-f1)
+        fm=dx*pressure_work_integral(mid,1._wp,p1,p2,dpdu1,dpdu2,log(n1),dx,quadrature_x,quadrature_w)-(f2-f1)
         if(abs(fm)<2.e-13_wp*max(1._wp,abs(f2-f1)))exit
         if(fa*fm<=0._wp)then;hi=mid;fb=fm
         else;lo=mid;fa=fm;endif
       enddo
       pt=mid
       call make_pressure_spline(pt,p1,p2,dpdu1,dpdu2,knots_dummy,values_dummy,slopes_dummy)
+      call certify_pressure_spline(knots_dummy,values_dummy,slopes_dummy,log(n1),dx,f1,b_ok,b_msg)
+      if(.not.b_ok)then;message=trim(b_msg);return;endif
       do j=1,size(u)
         call spline_eval(knots_dummy,values_dummy,slopes_dummy,u(j),pp,dnbdu,anti(j))
         nbv=exp(log(n1)+u(j)*dx)
-        nb(j)=nbv;p(j)=pp;f(j)=f1+dx*pressure_work_integral(pt,u(j),p1,p2,dpdu1,dpdu2,log(n1),dx)
+        nb(j)=nbv;p(j)=pp;f(j)=f1+dx*pressure_work_integral(pt,u(j),p1,p2,dpdu1,dpdu2,log(n1),dx,quadrature_x,quadrature_w)
         q(j)=pp/nbv;mu(j)=f(j)+q(j);cs(j)=(dnbdu/dx)/(nbv*mu(j))
       enddo
       ok=.true.;message='first_law_constrained_hermite_pressure_bridge_no_density_jump'
@@ -774,66 +891,147 @@ contains
     end select
   end subroutine construct_bridge
 
-  subroutine find_window(cr,co,i1,i2,nbar,qbar,ok,message,require_single_css)
+  subroutine find_window(cr,co,i1,i2,nbar,qbar,ok,message,method,report)
     type(eos_data_t),intent(in)::cr,co
     integer,intent(out)::i1,i2
     real(wp),intent(out)::nbar,qbar
     logical,intent(out)::ok
     character(len=*),intent(out)::message
-    logical,intent(in),optional::require_single_css
-    real(wp)::n1,n2,p1,p2,f1,f2,mu1,mu2,thp,thf
-    real(wp)::css_candidate,nb_candidate,de_candidate
-    integer::j,k,kcore,imin
-    logical::need_css,css_ok
+    character(len=*),intent(in)::method
+    type(match_report_t),intent(inout)::report
+    real(wp)::n1,n2,p1,p2,f1,f2,mu1,mu2,thp,thf,dx
+    real(wp)::css_candidate,nb_candidate,de_candidate,flow,qlow
+    real(wp)::lower_mean,upper_mean,roundoff,mu_mid,pressure_tol
+    real(wp)::u(3),nb(3),p(3),f(3),mu(3),q(3),cs(3)
+    real(wp),allocatable::pc(:),pk(:),fc(:),fk(:),ec(:),ek(:),mc(:),mk(:),cl(:),ch(:)
+    logical,allocatable::left_valid(:),right_valid(:),left_cached(:),right_cached(:),left_ok(:),right_ok(:)
+    integer::j,k,kcore,imin,pass,i
+    logical::css_mode,preferred,candidate_ok
+    character(len=256)::last_rejection,trial_message
     ok=.false.;i1=0;i2=0;nbar=0._wp;qbar=0._wp
-    message='no convex matching window found'
-    need_css=.false.
-    if(present(require_single_css))need_css=require_single_css
-    if(need_css)message='no causal single-speed CSS window with a positive crust density jump'
+    message='no certified matching window on supplied source endpoint grid'
+    last_rejection='no endpoint pair satisfies necessary ordering/integral/source conditions'
+    css_mode=trim(method)=='css'
+    report%window_pairs_total=max(0,cr%n-2)*max(0,co%n-2)
+    allocate(pc(cr%n),fc(cr%n),ec(cr%n),mc(cr%n),cl(cr%n),left_valid(cr%n),left_cached(cr%n),left_ok(cr%n))
+    allocate(pk(co%n),fk(co%n),ek(co%n),mk(co%n),ch(co%n),right_valid(co%n),right_cached(co%n),right_ok(co%n))
+    pc=cr%nb*cr%q(1,:);fc=(cr%q(6,:)+1._wp)*cr%mn;ec=cr%nb*fc;mc=fc+cr%q(1,:)
+    pk=co%nb*co%q(1,:);fk=(co%q(6,:)+1._wp)*co%mn;ek=co%nb*fk;mk=fk+co%q(1,:)
+    left_cached=.false.;right_cached=.false.;left_ok=.false.;right_ok=.false.;cl=0._wp;ch=0._wp
+    ! Retained thermodynamic rows cannot acquire validity from a bridge.
+    ! These are necessary finite-table checks, not an interpolation certificate.
+    ! The causal secant bound uses the existing verify C10 tolerance 1e-6:
+    ! any causal P(epsilon) connecting the source rows obeys Delta P <= Delta epsilon.
+    left_valid=.false.;right_valid=.false.
+    left_valid(1)=all(ieee_is_finite([pc(1),fc(1),ec(1),mc(1)])).and.min(pc(1),fc(1),ec(1),mc(1))>0._wp
+    pressure_tol=1.e-12_wp*maxval(abs(pc))
+    do i=2,cr%n
+      roundoff=64._wp*epsilon(1._wp)*max(1._wp,abs(mc(i)),abs(mc(i-1)))
+      left_valid(i)=left_valid(i-1).and.all(ieee_is_finite([pc(i),fc(i),ec(i),mc(i)])).and. &
+        min(pc(i),fc(i),ec(i),mc(i))>0._wp.and.pc(i)>=pc(i-1)-pressure_tol.and.ec(i)>ec(i-1).and. &
+        mc(i)>=mc(i-1)-roundoff.and.pc(i)-pc(i-1)<=(1._wp+1.e-6_wp)*(ec(i)-ec(i-1))
+    enddo
+    i=co%n
+    right_valid(i)=all(ieee_is_finite([pk(i),fk(i),ek(i),mk(i)])).and.min(pk(i),fk(i),ek(i),mk(i))>0._wp
+    pressure_tol=1.e-12_wp*maxval(abs(pk))
+    do i=co%n-1,1,-1
+      roundoff=64._wp*epsilon(1._wp)*max(1._wp,abs(mk(i)),abs(mk(i+1)))
+      right_valid(i)=right_valid(i+1).and.all(ieee_is_finite([pk(i),fk(i),ek(i),mk(i)])).and. &
+        min(pk(i),fk(i),ek(i),mk(i))>0._wp.and.pk(i+1)>=pk(i)-pressure_tol.and.ek(i+1)>ek(i).and. &
+        mk(i+1)>=mk(i)-roundoff.and.pk(i+1)-pk(i)<=(1._wp+1.e-6_wp)*(ek(i+1)-ek(i))
+    enddo
+    ! Retain historical preferences only as ordering, never as exclusions.
     kcore=0
     if(co%composition_available)then
-      do k=1,co%n
-        if(co%nb(k)>=0.03_wp.and.co%abar(k)==0._wp)then;kcore=k;exit;endif
-      enddo
+      if(allocated(co%abar))then
+        if(size(co%abar)==co%n)then
+          do k=1,co%n
+            if(co%nb(k)>=0.03_wp.and.co%abar(k)==0._wp)then;kcore=k;exit;endif
+          enddo
+        endif
+      endif
     endif
     if(kcore==0)then
       do k=1,co%n
         if(co%nb(k)>=0.045_wp)then;kcore=k;exit;endif
       enddo
     endif
-    if(kcore==0)then;message='core table has no point at or above n_B=0.045 fm^-3';return;endif
-    imin=max(12,cr%n-148);if(imin>cr%n)imin=cr%n
-    do j=cr%n,imin,-1
-      n1=cr%nb(j);p1=n1*cr%q(1,j);f1=(cr%q(6,j)+1._wp)*cr%mn
-      mu1=f1+cr%q(1,j)
-      do k=kcore,co%n
-        n2=co%nb(k);p2=n2*co%q(1,k);f2=(co%q(6,k)+1._wp)*co%mn
-        mu2=f2+co%q(1,k)
-        ! All constructions use the same Euler-consistent endpoint potential.
-        ! Source Q3 is independently gated below; its tabulation residual is
-        ! not a physical endpoint offset and must not alter the bridge.
-        if(n2<=1.10_wp*n1.or.p2<=1.10_wp*p1.or.mu2<=mu1+0.2_wp.or.f2<=f1+0.2_wp)cycle
-        if(mu2<=mu1.or.n2<=n1)cycle
-        nbar=(p2-p1)/(mu2-mu1);qbar=(f2-f1)/log(n2/n1)
-        thp=(nbar-n1)/(n2-n1)
-        if(co%q(1,k)==cr%q(1,j))then
-          ! A constant P/n has F=F1+(P/n)*log(n/n1), a valid stable
-          ! barotrope. Account only for endpoint subtraction roundoff.
-          if(abs(qbar-cr%q(1,j))>64._wp*epsilon(1._wp)*max(1._wp,abs(f1),abs(f2))/log(n2/n1))cycle
-          thf=0.5_wp
-        else
-          thf=(qbar-cr%q(1,j))/(co%q(1,k)-cr%q(1,j))
-        endif
-        if(ieee_is_finite(thp+thf).and.thp>0.12_wp.and.thp<0.88_wp.and.thf>0.12_wp.and.thf<0.88_wp)then
-          if(need_css)then
-            call solve_single_css_match(n1,n2,p1,p2,mu1,mu2,css_candidate,nb_candidate,de_candidate, &
-                                        css_ok,message)
-            if(.not.css_ok)cycle
+    if(kcore==0)kcore=co%n+1
+    imin=min(cr%n,max(12,cr%n-148))
+    u=[0._wp,0.5_wp,1._wp]
+    do pass=1,2
+      do j=cr%n,3,-1
+        n1=cr%nb(j);p1=pc(j);f1=fc(j);mu1=mc(j)
+        do k=1,co%n-2
+          n2=co%nb(k);p2=pk(k);f2=fk(k);mu2=mk(k)
+          preferred=.false.
+          if(n2>1.10_wp*n1.and.p2>1.10_wp*p1.and.mu2>mu1+0.2_wp.and.f2>f1+0.2_wp)then
+            nbar=(p2-p1)/(mu2-mu1);dx=log(n2/n1);qbar=(f2-f1)/dx
+            thp=(nbar-n1)/(n2-n1)
+            if(co%q(1,k)==cr%q(1,j))then
+              thf=huge(1._wp)
+              if(abs(qbar-cr%q(1,j))<=64._wp*epsilon(1._wp)*max(1._wp,abs(f1),abs(f2))/dx)thf=0.5_wp
+            else
+              thf=(qbar-cr%q(1,j))/(co%q(1,k)-cr%q(1,j))
+            endif
+            preferred=j>=imin.and.k>=kcore.and.ieee_is_finite(thp+thf).and. &
+              thp>0.12_wp.and.thp<0.88_wp.and.thf>0.12_wp.and.thf<0.88_wp
           endif
-          i1=j;i2=k;ok=.true.;message='ok';return
-        endif
+          if((pass==1.and..not.preferred).or.(pass==2.and.preferred))cycle
+          report%window_pairs_examined=report%window_pairs_examined+1
+          if(.not.left_valid(j).or..not.right_valid(k))cycle
+          if(n2<=n1.or.p2<=p1.or.mu2<=mu1.or.f2<=f1)cycle
+          nbar=(p2-p1)/(mu2-mu1);dx=log(n2/n1);qbar=(f2-f1)/dx
+          ! Causality gives d(n/mu)/dmu >= 0. Integrating the endpoint
+          ! bounds on n(mu) gives the necessary pressure-average bounds.
+          mu_mid=0.5_wp*(mu1+mu2)
+          lower_mean=n1*mu_mid/mu1;upper_mean=n2*mu_mid/mu2
+          roundoff=64._wp*epsilon(1._wp)*max(1._wp,abs(nbar),abs(lower_mean),abs(upper_mean))
+          if(nbar<lower_mean-roundoff.or.nbar>upper_mean+roundoff)cycle
+          if(.not.left_cached(j))then
+            call endpoint_cs2(cr,j,'left',cl(j),left_ok(j),trial_message)
+            left_cached(j)=.true.
+          endif
+          if(.not.right_cached(k))then
+            call endpoint_cs2(co,k,'right',ch(k),right_ok(k),trial_message)
+            right_cached(k)=.true.
+          endif
+          if(.not.left_ok(j).or..not.right_ok(k))then
+            last_rejection='endpoint sound speed could not be certified on its retained physical side'
+            cycle
+          endif
+          report%window_candidates_constructed=report%window_candidates_constructed+1
+          if(preferred)report%window_preferred_candidates=report%window_preferred_candidates+1
+          if(css_mode)then
+            call solve_single_css_match(n1,n2,p1,p2,mu1,mu2,css_candidate,nb_candidate,de_candidate,candidate_ok,trial_message)
+            if(candidate_ok)then
+              flow=mu1-p1/nb_candidate;qlow=p1/nb_candidate
+              call construct_bridge(method,u,nb_candidate,n2,p1,p2,flow,f2,mu1,mu2,qlow,co%q(1,k), &
+                css_candidate,css_candidate,nb,p,f,mu,q,cs,candidate_ok,trial_message)
+            endif
+          else
+            call construct_bridge(method,u,n1,n2,p1,p2,f1,f2,mu1,mu2,cr%q(1,j),co%q(1,k),cl(j),ch(k), &
+              nb,p,f,mu,q,cs,candidate_ok,trial_message)
+          endif
+          if(candidate_ok)call validate_bridge(nb,p,f,mu,cs,candidate_ok,trial_message)
+          if(candidate_ok)then
+            if(abs(f(3)-f2)>5.e-9_wp*max(1._wp,abs(f2-f1)))then
+              candidate_ok=.false.;trial_message='candidate violates endpoint first-law integral tolerance'
+            endif
+          endif
+          if(.not.candidate_ok)then
+            report%window_candidates_rejected=report%window_candidates_rejected+1
+            last_rejection=trim(trial_message)
+            cycle
+          endif
+          i1=j;i2=k;ok=.true.;message='ok';report%window_fallback_used=pass==2
+          return
+        enddo
       enddo
     enddo
+    report%window_search_exhausted=.true.
+    write(message,'(a,i0,a,i0,a,a)')'no certified window after exhaustive native endpoint search; constructed=', &
+      report%window_candidates_constructed,'; rejected=',report%window_candidates_rejected,'; last=',trim(last_rejection)
   end subroutine find_window
 
   subroutine validate_bridge(nb,p,f,mu,cs,ok,message)
@@ -947,7 +1145,7 @@ contains
       status='source rows violate the provider Q3 Euler relation mu_B = F + P/n_B '// &
         '(relative tolerance 5e-4)';return
     endif
-    call find_window(cr,co,i1,i2,nbar,qbar,ok1,msg,require_single_css=css_mode)
+    call find_window(cr,co,i1,i2,nbar,qbar,ok1,msg,method,report)
     if(.not.ok1)then;status=trim(msg);return;endif
     call endpoint_cs2(cr,i1,'left',cs1,ok1,msg)
     if(.not.ok1)then;status='invalid crust endpoint sound speed: '//trim(msg);return;endif

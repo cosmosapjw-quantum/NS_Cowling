@@ -1,0 +1,61 @@
+{
+  "status": "PASS_FOCUSED_REGRESSION",
+  "reason": "Existing zero-coverage rejection exposed by corrected one-sided boundary-stencil masking",
+  "original_failure_count": 14,
+  "original_log": "/tmp/ns_eos_reaudit_20261123/CI_FRONTEND_PIPELINE.log",
+  "original_log_sha256": "c0e43ca3cb59e04406b5c301fa5368ff51b336603ac44c4db796c5fa762825a3",
+  "coarse_fixture": {
+    "mu_mev": [
+      950,
+      960,
+      980,
+      1000,
+      1030,
+      1040
+    ],
+    "native_constructor": "PASS",
+    "output_rows": 8,
+    "derivative_points": 0,
+    "derivative_masked_points": 8,
+    "invalid_derivative_points": 0,
+    "failed_checks": [
+      "C10",
+      "C11"
+    ]
+  },
+  "repaired_fixture": {
+    "mu_grid": "linspace(950,1040,31)",
+    "same_pressure_functions": true,
+    "same_density_functions": true,
+    "same_energy_functions": true,
+    "transition_mu_mev": 990,
+    "transition_off_grid": true,
+    "resolved_derivative_points": 31,
+    "output_rows": 33
+  },
+  "new_negative_tests": 2,
+  "tests_passed": 25,
+  "pytest_elapsed_seconds": 0.62,
+  "command": "COMPOSE_EOS_FORTRAN_EXE=/tmp/ns_eos_reaudit_20261123/build/compose_eos_fortran PYTHONPATH=python_frontend OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -m pytest -q python_frontend/tests/test_maxwell_mass_gate.py python_frontend/tests/test_maxwell_explicit_drop_20261117.py",
+  "log_sha256": "e0176634b8dec03880dd8964779324fc6e063daa8091a9ca361bf41dc12b6f15",
+  "files_sha256": {
+    "python_frontend/tests/test_maxwell_mass_gate.py": "35e1939309656eae97e379cced78db9f880aae854f44cf0aac0a79685fa876c5",
+    "docs/FORTRAN_EOS_CRUST_CORE_MATCHING_V1.md": "f77a8242d52f8263835fd19de539a30b52e111b8d26d6ecdd05969393bbe8ba7",
+    "fortran_eos/src/compose_eos_matching.f90": "4cc5f32c858a7d9f952f6f7c326c9465667b609ec02caaa264a828aa9ecf186b",
+    "python_frontend/tests/test_mass_normalization_contract.py": "64848f32824aab434586df40795dbd2c93a5790d0429c295422948d01d77d5f5"
+  },
+  "production_code_modified_by_fixture_repair": false,
+  "source_catalog_modified_by_fixture_repair": false,
+  "git_diff_check": "PASS",
+  "dependent_source_identity_failure": "density-only association crossed phase branch and discarded source domain",
+  "dependent_source_identity_red_log": "CI_MAXWELL_FIXTURE_DEPENDENT.log",
+  "dependent_source_identity_counterexample": {
+    "discarded_low_mu_mev": 995,
+    "retained_high_mu_mev": 990,
+    "same_n_fm3": 0.13
+  },
+  "all_affected_tests_passed": 45,
+  "all_affected_elapsed_seconds": 2.31,
+  "all_affected_log": "CI_MAXWELL_FIXTURE_ALL_GREEN.log",
+  "all_affected_log_sha256": "87ef1daf536d2287189b8a03a250de6d5b6192972de2d5f9b913e8cdf65941a3"
+}

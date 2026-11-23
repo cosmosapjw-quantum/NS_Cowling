@@ -1,0 +1,137 @@
+{
+  "schema": "ns_cowling.expanded_sources_freeze.v1",
+  "status": "PREPARATION_AND_IMPORTER_TESTS_VERIFIED",
+  "files_sha256": {
+    "fortran_eos/app/compose_eos_import_cold_table.f90": "ec68a6868d4e0d18cf3d47c29bb4fde6795eb5f2e5dfbf3a32fdbaaf506e41d3",
+    "python_frontend/tests/test_cold_table_importer_20261123.py": "9fa4ed0edfbfddde4319f959eb36e2c4878b6b08d60aae9cbd9b42a26be2e5e2",
+    "scripts/prepare_eos_reaudit_expanded_sources_20261123.py": "cf443570e00e1d05447c8ded9a460de7f8ff4e0d5235ac6b02c833dea85accbf",
+    "data/eos_matching_reaudit_20261123/SOURCE_CATALOG_EXPANDED.json": "59a30065b31df341b0b0f03c32784fdd64318f1e855f98af78414f0cce9ee085",
+    "data/eos_matching_reaudit_20261123/additional_sources/SOURCE_IDENTITY_PROOF.json": "f103bf57a5bc0d6de099f8c45a0d672a282d87427592d80c6dabcc3c9ca26114"
+  },
+  "native_executable_sha256": "d1600879b3c741bb69f0acd150f05ff129048f244723933b1bb1e79518316588",
+  "native_importer_sha256": "90f24634e20ea73e9629eb6117c85068fc6f3a45575a2af66280780a444a37ee",
+  "original_101_records_value_identical": true,
+  "counts": {
+    "total": 105,
+    "roles": {
+      "core": 32,
+      "crust": 73
+    },
+    "available": 102,
+    "available_roles": {
+      "core": 32,
+      "crust": 70
+    },
+    "statuses": {
+      "SOURCE_SELECTED_VIEW_PREPARED": 102,
+      "BLOCKED_MISSING_PRESSURE": 1,
+      "BLOCKED_NO_SELF_CONTAINED_THERMO_TABLE": 2
+    },
+    "phase_components": 192,
+    "cartesian_cells": 16352
+  },
+  "tests": {
+    "red": "8 failed, 40 passed",
+    "green": "48 passed"
+  },
+  "new_sources": [
+    {
+      "source_id": "secondary_literature:BBP_Diener2008_raw:crust",
+      "role": "crust",
+      "original_source_rows": 35,
+      "full_selected_rows": 26,
+      "selection": {
+        "source_start_zero_based": 0,
+        "source_stop_exclusive": 26,
+        "excluded_lower_rows": 0,
+        "excluded_upper_rows": 9,
+        "basis": "fixed n<=0.08 fm^-3; independent of chosen core; no source-point repair",
+        "application": "APPLIED_ONCE_INSIDE_NATIVE_IMPORTER",
+        "selected_density_fm3": [
+          0.000267,
+          0.07469999999999999
+        ]
+      },
+      "source_identity_sha256": "09b259207d4c532477f8e8d367e8ea28e70b52a5828e956cf17fb56aae301d85",
+      "full_selected_sha256": {
+        "eos_data.csv": "5b9c161d962a94c0f09cf08ef448d28b7100a6cda86d40f87fb67eee31e4adf3",
+        "eos_data.nml": "142db4990ea321c915222b2b607b7277732ad012d065e3b31cf42f935253b847"
+      },
+      "internal_path": "data/eos_matching_reaudit_20261123/additional_sources/secondary_literature__BBP_Diener2008_raw__crust/full_selected/internal",
+      "status": "SOURCE_SELECTED_VIEW_PREPARED"
+    },
+    {
+      "source_id": "historical_reconstructed:BBP_pressure_primary:crust",
+      "role": "crust",
+      "original_source_rows": 26,
+      "full_selected_rows": 26,
+      "selection": {
+        "source_start_zero_based": 0,
+        "source_stop_exclusive": 26,
+        "excluded_lower_rows": 0,
+        "excluded_upper_rows": 0,
+        "basis": "entire typed raw table",
+        "application": "APPLIED_ONCE_INSIDE_NATIVE_IMPORTER",
+        "selected_density_fm3": [
+          0.00026658388851786197,
+          0.07469999999999999
+        ]
+      },
+      "source_identity_sha256": "fdfb22716777a267fd5c7126928ed5b798c0cc0c0e145fc1aa96945d0c096fe6",
+      "full_selected_sha256": {
+        "eos_data.csv": "2e8a585dc2b3ccdb5bae7aa923d946c8577f004b21adbac143ff069d494e45ca",
+        "eos_data.nml": "142db4990ea321c915222b2b607b7277732ad012d065e3b31cf42f935253b847"
+      },
+      "internal_path": "data/eos_matching_reaudit_20261123/additional_sources/historical_reconstructed__BBP_pressure_primary__crust/full_selected/internal",
+      "status": "SOURCE_SELECTED_VIEW_PREPARED"
+    },
+    {
+      "source_id": "provider_attached:APR_outer_prefix:crust",
+      "role": "crust",
+      "original_source_rows": 172,
+      "full_selected_rows": 49,
+      "selection": {
+        "source_start_zero_based": 0,
+        "source_stop_exclusive": 49,
+        "excluded_lower_rows": 0,
+        "excluded_upper_rows": 123,
+        "application": "EXACT_ORIGINAL_COMPOSE_ROW_PROJECTION_ONCE",
+        "basis": "historical fixed provider outer prefix below first BBP knot, independent of chosen core"
+      },
+      "source_identity_sha256": "fb0d71567d7ce6fc161f90334eed2fb883871f23be71a0e7cfebc26aab8b0063",
+      "full_selected_sha256": {
+        "eos_data.csv": "dd740a60ae5a700a6b2ba8865c8d63b0b798061f9053d0d5ef1fad9649969397",
+        "eos_data.nml": "7e8c2e5ae37b7ab60c4d115a9a0597e82109328a171088d51d5bf1c230171091"
+      },
+      "internal_path": "data/eos_matching_reaudit_20261123/additional_sources/provider_attached__APR_outer_prefix__crust/full_selected/internal",
+      "status": "SOURCE_SELECTED_VIEW_PREPARED"
+    },
+    {
+      "source_id": "external_nuda:2020-MVCD-D1MS-full:core",
+      "role": "core",
+      "original_source_rows": 65,
+      "full_selected_rows": 52,
+      "selection": {
+        "source_start_zero_based": 13,
+        "source_stop_exclusive": 65,
+        "excluded_lower_rows": 13,
+        "excluded_upper_rows": 0,
+        "basis": "explicit native density selection",
+        "application": "APPLIED_ONCE_INSIDE_NATIVE_IMPORTER",
+        "selected_density_fm3": [
+          0.0838,
+          1.41
+        ]
+      },
+      "source_identity_sha256": "8ef8ea504f62db5f88227eb1ce44994c9b2368bcba5ab3b2e1e3d24446787304",
+      "full_selected_sha256": {
+        "eos_data.csv": "69743eabea633e2af181eccc078b7b0f683e95d2f523077b90168cff451891f7",
+        "eos_data.nml": "142db4990ea321c915222b2b607b7277732ad012d065e3b31cf42f935253b847"
+      },
+      "internal_path": "data/eos_matching_reaudit_20261123/additional_sources/external_nuda__2020-MVCD-D1MS-full__core/full_selected/internal",
+      "status": "SOURCE_SELECTED_VIEW_PREPARED"
+    }
+  ],
+  "production_numerics": "Fortran only; historical Python BBP input copied without regeneration",
+  "physical_acceptance_asserted": false
+}

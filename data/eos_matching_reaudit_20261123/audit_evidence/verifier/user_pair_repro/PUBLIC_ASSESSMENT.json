@@ -1,0 +1,96 @@
+{
+  "schema": "ns_cowling.user_pair_source_domain_forensics.v1",
+  "pair": {
+    "crust": "user_zip:MYN13_RHF_TF:crust",
+    "core": "user_zip:OMEG1_EoS:core"
+  },
+  "classification": "ADOPTED_RAW_CRUST_MU_NONMONOTONIC_SOURCE_DOMAIN_REJECTION",
+  "production_files_changed": false,
+  "input_values_modified": false,
+  "thresholds_relaxed": false,
+  "native_binary_sha256": "d1600879b3c741bb69f0acd150f05ff129048f244723933b1bb1e79518316588",
+  "input_zip_sha256": "ca42416dfdab5a352139e14ce8a1b86cb6e2a516fcc9c0e07f48350ccd09271c",
+  "sources": {
+    "MYN13": {
+      "raw_sha256": "a4618b645b96695fb561d957caaf47bccebbeb3e687e443c3ab07cfa2f800092",
+      "raw_rows": 448,
+      "selected_rows": 182,
+      "selected_source_rows_zero_based": [
+        0,
+        182
+      ],
+      "density_domain_fm3": [
+        6.0222e-11,
+        0.06757
+      ],
+      "internal_csv_sha256": "6cdf195b24af699fc597b2915e3d49caf3221937cfcf70e67a0751ee91052a15",
+      "mu_decreasing_edges": 24,
+      "mu_decreasing_beyond_native_roundoff_edges": 24,
+      "first_decrease_rows_1based": [
+        1,
+        2
+      ],
+      "first_decrease_delta_mu_mev": -0.002868891686716779,
+      "worst_delta_mu_mev": -0.06312511304975033,
+      "nonpositive_or_nonfinite_points": 0,
+      "pressure_decrease_edges": 0,
+      "energy_nonincrease_edges": 0,
+      "causal_secant_failure_edges": 0,
+      "max_causal_secant": 0.010595647193585347,
+      "native_interval_categories": {
+        "FIRST_LAW_IDENTITY_FAIL": 24,
+        "INTERPOLANT_SHAPE_FAIL": 142,
+        "PASS": 15
+      }
+    },
+    "OMEG1": {
+      "raw_sha256": "76cefb7980974e6cdcaaae8ca84b6b5535df49e780fb77a5959a7ca0c511169d",
+      "raw_rows": 6400,
+      "selected_rows": 6243,
+      "selected_source_rows_zero_based": [
+        157,
+        6400
+      ],
+      "density_domain_fm3": [
+        0.079,
+        3.2
+      ],
+      "internal_csv_sha256": "440ebbead2fdcf72f61e3a6db7b5bc38fae45855189e20fc725b6a54a9c737d8",
+      "mu_decreasing_edges": 0,
+      "nonpositive_or_nonfinite_points": 0,
+      "pressure_decrease_edges": 0,
+      "energy_nonincrease_edges": 0,
+      "causal_secant_failure_edges": 0,
+      "max_causal_secant": 0.4340222392328817,
+      "native_interval_categories": {
+        "PASS": 6242
+      }
+    }
+  },
+  "native_endpoint_search": {
+    "pairs_per_nonmaxwell_method": 1123380,
+    "exhausted_nonmaxwell_methods": 6,
+    "valid_crust_prefix_endpoints": 0,
+    "valid_core_suffix_endpoints": 6241,
+    "pairs_passing_retained_source_gate": 0,
+    "constructed_candidates_per_method": 0,
+    "ordering_pass_pairs_ignoring_source_gate_diagnostic_only": 1123380,
+    "causal_integral_pass_pairs_ignoring_source_gate_diagnostic_only": 1123380,
+    "maxwell_failure": "each phase must have strictly increasing Euler-derived mu_B"
+  },
+  "raw_precision_diagnostic": {
+    "method": "Fortran uses each raw decimal token's last printed place u; independent bounds z ± alpha*u propagate to mu=(epsilon+P)/n. This is sensitivity analysis, not admission or source modification.",
+    "half_last_place": {
+      "robust_adjacent_decrease_edges": 2,
+      "rows_incompatible_with_any_nondecreasing_mu_sequence": 2,
+      "first_incompatible_row_1based": 22
+    },
+    "full_last_place": {
+      "robust_adjacent_decrease_edges": 0,
+      "rows_incompatible_with_any_nondecreasing_mu_sequence": 0
+    },
+    "interpretation": "Printed/source precision sensitivity is demonstrated. The original rounding policy and generator errors are unknown. The full-place envelope is not a proof of first-law or causal consistency and is not used to accept the table."
+  },
+  "recommendation": "Keep all seven adopted-source outcomes rejected. Do not cut out failing source rows, modify original values, loosen thresholds, or infer missing phase labels. A higher-precision source or explicitly identified thermodynamic reconstruction would require a new source identity and separate validation.",
+  "privacy": "This assessment contains source identities, scalar/count diagnostics only. Full per-interval diagnostics remain private under /tmp/ns_eos_reaudit_20261123/private_intake/user_pair_diagnostics and must not be copied to Git."
+}

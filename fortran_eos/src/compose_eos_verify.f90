@@ -7,7 +7,8 @@ module compose_eos_verify
     logical :: c1=.false.,c2=.false.,c2_applicable=.true.,c3=.false.,c4=.false.,c3_available=.false.,c4_available=.false.
     logical :: c5=.false.,c5_applicable=.true.,c6=.false.,c7=.false.,c8=.false.,c9=.false.
     logical :: c10=.false.,c11=.false.,overall=.false.
-    integer :: derivative_points=0,derivative_masked=0,acausal_count=0,acausal_firstlaw_count=0
+    integer :: derivative_points=0,derivative_masked=0,invalid_derivative_points=0
+    integer :: acausal_count=0,acausal_firstlaw_count=0
     integer :: c3_points=0,c3_masked=0,c4_points=0,c4_masked=0
     integer :: thermodynamic_jump_boundaries=0,thermodynamic_jump_failures=0
     real(wp) :: max_thermodynamic_jump_relative_residual=0._wp
@@ -50,26 +51,63 @@ contains
     type(eos_data_t),intent(in)::eos
     type(verify_report_t),intent(out)::report
     real(wp),intent(in),optional::algebraic_tolerance,max_log_step,cs2_tolerance,composition_tolerance
-    real(wp)::atol,dxmax,cstol,comptol,muqv,mulmax
+    real(wp)::atol,dxmax,cstol,comptol
     real(wp)::jump_dn,jump_deps,jump_mu,jump_mu_low,jump_mu_high
     real(wp)::jump_pressure_rel,jump_mu_rel,jump_identity_rel,jump_scale
     real(wp),allocatable::yl(:),dp_m(:),dmub_m(:),p_m(:),nb_m(:),df_m(:),deps_m(:),mub_m(:),cs2_m(:),csfl_m(:)
-    real(wp),allocatable::p(:),f(:),fb(:),eps(:),mub(:),muq(:),mul(:),x(:)
+    real(wp),allocatable::p(:),f(:),fb(:),eps(:),mub(:),muq(:),mul(:),mu_effective(:),mu_euler(:)
     real(wp),allocatable::dp(:),dmub(:),df(:),deps(:),r(:),cs2(:),csfl(:)
     logical,allocatable::mask(:)
     logical::c2app,finite_primary,c3_ready,c4_ready
-    integer::n,i,nbad
-    character(len=8)::names(11)
+    integer::n,i
     atol=2.e-6_wp;dxmax=0.25_wp;cstol=1.e-6_wp;comptol=2.e-5_wp
     if(present(algebraic_tolerance))atol=algebraic_tolerance
     if(present(max_log_step))dxmax=max_log_step
     if(present(cs2_tolerance))cstol=cs2_tolerance
     if(present(composition_tolerance))comptol=composition_tolerance
     report=verify_report_t();n=eos%n
-    if(n<3.or..not.allocated(eos%nb))then
-      report%failed_checks='invalid_input';return
+    ! Public native entry: reject malformed input before LOG, division, array
+    ! expressions or optional composition access. Fortran does not promise
+    ! short-circuit evaluation, so allocation and shape checks stay separate.
+    if(n<3)then
+      report%failed_checks='INVALID_INPUT_SIZE';return
     endif
-    allocate(p(n),f(n),fb(n),eps(n),mub(n),muq(n),mul(n),x(n))
+    if(.not.allocated(eos%nb).or..not.allocated(eos%q).or..not.allocated(eos%iphase))then
+      report%failed_checks='INVALID_INPUT_ALLOCATION';return
+    endif
+    if(size(eos%nb)/=n.or.any(shape(eos%q)/=[7,n]).or.size(eos%iphase)/=n)then
+      report%failed_checks='INVALID_INPUT_SHAPE';return
+    endif
+    if(.not.all(ieee_is_finite(eos%nb)).or..not.all(ieee_is_finite(eos%q)))then
+      report%failed_checks='FINITE';return
+    endif
+    if(.not.all(ieee_is_finite([eos%mn,eos%mp,eos%temperature_mev,eos%charge_fraction_grid])))then
+      report%failed_checks='FINITE_METADATA';return
+    endif
+    if(.not.all(ieee_is_finite([atol,dxmax,cstol,comptol])))then
+      report%failed_checks='INVALID_TOLERANCE';return
+    endif
+    if(atol<=0._wp.or.dxmax<=0._wp.or.cstol<0._wp.or.comptol<0._wp)then
+      report%failed_checks='INVALID_TOLERANCE';return
+    endif
+    if(any(eos%nb<=0._wp).or.any(eos%nb(2:)<=eos%nb(:n-1)))then
+      report%failed_checks='INVALID_DENSITY_GRID';return
+    endif
+    if(eos%mn<=0._wp.or.eos%mp<=0._wp.or.(eos%il/=0.and.eos%il/=1))then
+      report%failed_checks='INVALID_METADATA';return
+    endif
+    if(eos%composition_available)then
+      if(.not.allocated(eos%ye).or..not.allocated(eos%ymu))then
+        report%failed_checks='INVALID_COMPOSITION_ALLOCATION';return
+      endif
+      if(size(eos%ye)/=n.or.size(eos%ymu)/=n)then
+        report%failed_checks='INVALID_COMPOSITION_SHAPE';return
+      endif
+      if(.not.all(ieee_is_finite(eos%ye)).or..not.all(ieee_is_finite(eos%ymu)))then
+        report%failed_checks='FINITE_COMPOSITION';return
+      endif
+    endif
+    allocate(p(n),f(n),fb(n),eps(n),mub(n),muq(n),mul(n),mu_effective(n),mu_euler(n))
     p=eos%q(1,:)*eos%nb
     f=eos%nb*(eos%q(6,:)+1._wp)*eos%mn
     fb=(eos%q(6,:)+1._wp)*eos%mn
@@ -77,9 +115,22 @@ contains
     mub=(eos%q(3,:)+1._wp)*eos%mn
     muq=eos%q(4,:)*eos%mn
     mul=eos%q(5,:)*eos%mn
-    x=log(eos%nb)
+    ! At fixed Yq with Il=0 the density-path conjugate is mu_B+Yq*mu_q.
+    ! Raw Q3 alone is neither d epsilon/d n_B nor the first-law denominator.
+    mu_effective=mub
+    if(eos%il==0)mu_effective=mub+eos%charge_fraction_grid*muq
+    mu_euler=(eps+p)/eos%nb
     finite_primary=all(ieee_is_finite(p)).and.all(ieee_is_finite(f)).and.all(ieee_is_finite(eps)).and. &
-                   all(ieee_is_finite(mub)).and.all(ieee_is_finite(muq)).and.all(ieee_is_finite(mul))
+                   all(ieee_is_finite(mub)).and.all(ieee_is_finite(muq)).and.all(ieee_is_finite(mul)).and. &
+                   all(ieee_is_finite(mu_effective)).and.all(ieee_is_finite(mu_euler))
+    if(.not.finite_primary)then
+      report%failed_checks='FINITE_DERIVED';return
+    endif
+    ! These domains are pointwise physical conditions, including at a genuine
+    ! phase boundary. Derivative masking must never remove them from the gate.
+    if(any(p<0._wp).or.any(eps<=0._wp).or.any(mu_euler<=0._wp).or.any(mu_effective<=0._wp))then
+      report%failed_checks='PHYSICAL_DOMAIN';return
+    endif
 
     report%c1_max_q2=maxval(abs(eos%q(2,:)))
     report%c1_max_q6q7=maxval(abs(eos%q(6,:)-eos%q(7,:)))
@@ -105,24 +156,34 @@ contains
 
     report%c3=.true.;report%c4=.true.
     c3_ready=allocated(eos%c3_applicable).and.allocated(eos%yn_present).and. &
-             allocated(eos%yp_present).and.allocated(eos%yh_present)
+             allocated(eos%yp_present).and.allocated(eos%yh_present).and. &
+             allocated(eos%yn).and.allocated(eos%yp).and.allocated(eos%yh)
     c4_ready=allocated(eos%c4_applicable).and.allocated(eos%yp_present).and. &
              allocated(eos%abar_present).and.allocated(eos%zbar_present).and. &
-             allocated(eos%yh_present).and.allocated(eos%ye_present).and.allocated(eos%ymu_present)
+             allocated(eos%yh_present).and.allocated(eos%ye_present).and.allocated(eos%ymu_present).and. &
+             allocated(eos%yp).and.allocated(eos%abar).and.allocated(eos%zbar).and. &
+             allocated(eos%yh).and.allocated(eos%ye).and.allocated(eos%ymu)
     if(c3_ready)then
       c3_ready=size(eos%c3_applicable)==n.and.size(eos%yn_present)==n.and. &
-               size(eos%yp_present)==n.and.size(eos%yh_present)==n
+               size(eos%yp_present)==n.and.size(eos%yh_present)==n.and. &
+               size(eos%yn)==n.and.size(eos%yp)==n.and.size(eos%yh)==n
     endif
     if(c4_ready)then
       c4_ready=size(eos%c4_applicable)==n.and.size(eos%yp_present)==n.and. &
                size(eos%abar_present)==n.and.size(eos%zbar_present)==n.and. &
-               size(eos%yh_present)==n.and.size(eos%ye_present)==n.and.size(eos%ymu_present)==n
+               size(eos%yh_present)==n.and.size(eos%ye_present)==n.and.size(eos%ymu_present)==n.and. &
+               size(eos%yp)==n.and.size(eos%abar)==n.and.size(eos%zbar)==n.and. &
+               size(eos%yh)==n.and.size(eos%ye)==n.and.size(eos%ymu)==n
     endif
     if(c3_ready)then
       do i=1,n
         if(.not.eos%c3_applicable(i))cycle
         report%c3_points=report%c3_points+1
         if(.not.(eos%yn_present(i).and.eos%yp_present(i).and.eos%yh_present(i)))then
+          report%c3=.false.
+          cycle
+        endif
+        if(.not.all(ieee_is_finite([eos%yn(i),eos%yp(i),eos%yh(i)])))then
           report%c3=.false.
           cycle
         endif
@@ -136,7 +197,15 @@ contains
         if(.not.eos%c4_applicable(i))cycle
         report%c4_points=report%c4_points+1
         if(.not.(eos%yp_present(i).and.eos%abar_present(i).and.eos%zbar_present(i).and. &
-           eos%yh_present(i).and.eos%ye_present(i).and.eos%ymu_present(i)).or.eos%abar(i)<=0._wp)then
+           eos%yh_present(i).and.eos%ye_present(i).and.eos%ymu_present(i)))then
+          report%c4=.false.
+          cycle
+        endif
+        if(.not.all(ieee_is_finite([eos%yp(i),eos%abar(i),eos%zbar(i),eos%yh(i),eos%ye(i),eos%ymu(i)])))then
+          report%c4=.false.
+          cycle
+        endif
+        if(eos%abar(i)<=0._wp)then
           report%c4=.false.
           cycle
         endif
@@ -160,14 +229,14 @@ contains
     report%c6=report%min_delta_p>=-1.e-12_wp*maxval(abs(p))
 
     dp=derivative_nonuniform(eos%nb,p)
-    dmub=derivative_nonuniform(eos%nb,mub)
+    dmub=derivative_nonuniform(eos%nb,mu_effective)
     df=derivative_nonuniform(eos%nb,fb)
     deps=derivative_nonuniform(eos%nb,eps)
     allocate(mask(n),cs2(n),csfl(n));mask=.true.;cs2=0._wp;csfl=0._wp
     do i=1,n-1
-      if(log(eos%nb(i+1)/eos%nb(i))>dxmax)mask(i:i+1)=.false.
+      if(log(eos%nb(i+1))-log(eos%nb(i))>dxmax)call mask_boundary_stencil(mask,i)
       ! A provider phase-label change is a discontinuity marker when present.
-      if(eos%iphase(i+1)/=eos%iphase(i))mask(i:i+1)=.false.
+      if(eos%iphase(i+1)/=eos%iphase(i))call mask_boundary_stencil(mask,i)
 
       ! Thermodynamic-only matched tables intentionally carry Iphase=0 after
       ! composition is dropped. Detect a genuine one-charge Maxwell interface
@@ -196,7 +265,7 @@ contains
           if(jump_deps>0._wp.and.jump_mu>0._wp.and.jump_mu_rel<=1.e-10_wp.and. &
              jump_identity_rel<=1.e-8_wp)then
             report%thermodynamic_jump_boundaries=report%thermodynamic_jump_boundaries+1
-            mask(i:i+1)=.false.
+            call mask_boundary_stencil(mask,i)
           else
             report%thermodynamic_jump_failures=report%thermodynamic_jump_failures+1
           endif
@@ -204,15 +273,30 @@ contains
       endif
     enddo
     do i=1,n
-      if(deps(i)<=0._wp.or.mub(i)<=0._wp)mask(i)=.false.
-      if(mask(i))then
-        cs2(i)=dp(i)/deps(i);csfl(i)=dp(i)/mub(i)
+      if(.not.mask(i))cycle
+      ! An invalid derivative inside a regular, resolved phase is a failed
+      ! domain check, not a reason to silently remove that phase from testing.
+      ! Interface-crossing stencils were excluded above before this decision.
+      if(.not.all(ieee_is_finite([dp(i),dmub(i),df(i),deps(i)])))then
+        report%invalid_derivative_points=report%invalid_derivative_points+1
+        mask(i)=.false.
+        cycle
+      endif
+      if(deps(i)<=0._wp)then
+        report%invalid_derivative_points=report%invalid_derivative_points+1
+        mask(i)=.false.
+        cycle
+      endif
+      cs2(i)=dp(i)/deps(i);csfl(i)=dp(i)/mu_effective(i)
+      if(.not.all(ieee_is_finite([cs2(i),csfl(i)])))then
+        report%invalid_derivative_points=report%invalid_derivative_points+1
+        mask(i)=.false.
       endif
     enddo
     report%derivative_points=count(mask);report%derivative_masked=n-report%derivative_points
     if(report%derivative_points>0)then
       dp_m=pack(dp,mask);dmub_m=pack(dmub,mask);p_m=pack(p,mask);nb_m=pack(eos%nb,mask)
-      df_m=pack(df,mask);deps_m=pack(deps,mask);mub_m=pack(mub,mask)
+      df_m=pack(df,mask);deps_m=pack(deps,mask);mub_m=pack(mu_effective,mask)
       cs2_m=pack(cs2,mask);csfl_m=pack(csfl,mask)
       report%c7_max_rel=maxval(relerr(dp_m,nb_m*dmub_m))
       report%c8_max_rel=maxval(relerr(p_m,nb_m**2*pack(df,mask)))
@@ -231,7 +315,8 @@ contains
       report%c11=report%min_dmubdnb>=-1.e-10_wp
     endif
     report%overall=finite_primary.and.report%c1.and.report%c2.and.report%c3.and.report%c4.and. &
-      report%c5.and.report%c6.and.report%c10.and.report%c11.and.report%thermodynamic_jump_failures==0
+      report%c5.and.report%c6.and.report%c10.and.report%c11.and.report%thermodynamic_jump_failures==0.and. &
+      report%invalid_derivative_points==0
     report%failed_checks=''
     if(.not.finite_primary)call add_failure(report,'FINITE')
     if(.not.report%c1)call add_failure(report,'C1')
@@ -243,7 +328,20 @@ contains
     if(.not.report%c10)call add_failure(report,'C10')
     if(.not.report%c11)call add_failure(report,'C11')
     if(report%thermodynamic_jump_failures>0)call add_failure(report,'THERMODYNAMIC_JUMP')
+    if(report%invalid_derivative_points>0)call add_failure(report,'DERIVATIVE_DOMAIN')
   end subroutine check_consistency
+
+  subroutine mask_boundary_stencil(mask,left)
+    logical,intent(inout)::mask(:)
+    integer,intent(in)::left
+    integer::n
+    n=size(mask)
+    mask(left:left+1)=.false.
+    ! The one-sided endpoint formulas use three points, so an interface on
+    ! the second/penultimate interval also invalidates the endpoint stencil.
+    if(left==2)mask(1)=.false.
+    if(left==n-2)mask(n)=.false.
+  end subroutine mask_boundary_stencil
 
   subroutine add_failure(report,name)
     type(verify_report_t),intent(inout)::report
@@ -311,6 +409,8 @@ contains
     write(u,'(a,i0,a)')'"C4_masked_points":',report%c4_masked,','
     write(u,'(a,i0,a)')'"derivative_points":',report%derivative_points,','
     write(u,'(a,i0,a)')'"derivative_masked_points":',report%derivative_masked,','
+    write(u,'(a,i0,a)')'"invalid_derivative_points":',report%invalid_derivative_points,','
+    write(u,'(a)')'"differential_chemical_potential":"mu_B+Yq*mu_q for Il=0; mu_B for Il=1",'
     write(u,'(a,es25.16e3,a)')'"C1_max_Q2":',report%c1_max_q2,','
     write(u,'(a,es25.16e3,a)')'"C1_max_Q6_minus_Q7":',report%c1_max_q6q7,','
     write(u,'(a,es25.16e3,a)')'"C1_max_mu_l":',report%c1_max_mul,','

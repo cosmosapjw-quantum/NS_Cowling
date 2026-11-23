@@ -70,7 +70,7 @@ def test_native_matching_rejects_invalid_cold_metadata(tmp_path, side, invalid):
 
 
 @pytest.mark.parametrize("side", ["crust", "core"])
-def test_endpoint_derivative_cannot_borrow_points_across_a_phase_boundary(tmp_path, side):
+def test_endpoint_retry_keeps_derivatives_within_the_selected_phase(tmp_path, side):
     crust, core = read_compose(CRUST), read_compose(CORE)
     paths = [tmp_path / name for name in ("crust", "core", "output")]
     for path in paths:
@@ -87,8 +87,37 @@ def test_endpoint_derivative_cannot_borrow_points_across_a_phase_boundary(tmp_pa
     else:
         data.Iphase[:endpoint+2] = 123456
     data.write_internal_directory(paths[0] if side == "crust" else paths[1])
-    with pytest.raises(NativeExecutionError, match="not enough points for one-sided endpoint"):
+    report = run_native("match-core", *paths, "css", "8", "true")
+    selected = report["i1"] if side == "crust" else report["i2"]
+    assert selected != endpoint
+    indices = (range(selected, max(-1, selected-6), -1) if side == "crust"
+               else range(selected, min(data.n, selected+6)))
+    stencil = []
+    for index in indices:
+        if data.Iphase[index] != data.Iphase[selected]:
+            break
+        stencil.append(index)
+    assert len(stencil) >= 3
+    assert endpoint not in stencil
+    cs2 = report["cs2_source_left" if side == "crust" else "cs2_source_right"]
+    assert 0 < cs2 <= 1
+
+
+@pytest.mark.parametrize("side", ["crust", "core"])
+def test_matching_rejects_when_no_phase_has_three_endpoint_stencil_rows(tmp_path, side):
+    """Every contiguous phase has <=2 knots, so retry cannot evade the gate."""
+    import numpy as np
+    crust, core = read_compose(CRUST), read_compose(CORE)
+    data = crust if side == "crust" else core
+    data.Iphase[:] = np.arange(data.n) // 2 + 100000
+    paths = [tmp_path / name for name in ("crust", "core", "output")]
+    for path in paths:
+        path.mkdir()
+    crust.write_internal_directory(paths[0])
+    core.write_internal_directory(paths[1])
+    with pytest.raises(NativeExecutionError, match="endpoint sound speed"):
         run_native("match-core", *paths, "css", "8", "true")
+    assert not (paths[2] / "eos_data.csv").exists()
 
 
 @pytest.mark.parametrize("side", ["crust", "core"])

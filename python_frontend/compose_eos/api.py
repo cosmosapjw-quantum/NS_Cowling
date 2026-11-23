@@ -1467,7 +1467,8 @@ def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
             "method='maxwell' is disabled until the sharp composition-aware transition is integrated into match_crust_core; "
             "the legacy smooth pressure plateau is not a first-order transition"
         )
-    methods = {"css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
+    methods = {"first_law_constrained_hermite_pressure_bridge",
+               "css", "cubic_F", "cubic_P", "quintic_F", "quintic_P"}
     if method not in methods:
         raise ValueError(f"method must be one of {sorted(methods)}")
     if not isinstance(n_bridge, int) or isinstance(n_bridge, bool) or n_bridge < 8:
@@ -1621,6 +1622,10 @@ def match_crust_core(d_cr: EOSData | None = None, d_co: EOSData | None = None,
         "phase_provenance": phase_provenance,
         "source_support": source_support,
         "diagnostic_only": not bool(consistency["overall"]["pass_"]),
+        "window_search": {key.removeprefix("window_"): payload[key] for key in (
+            "window_pairs_total", "window_pairs_examined", "window_candidates_constructed",
+            "window_candidates_rejected", "window_preferred_candidates", "window_fallback_used",
+            "window_search_exhausted") if key in payload},
         "consistency": consistency,
         "native_report": payload,
     }

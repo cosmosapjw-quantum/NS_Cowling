@@ -355,26 +355,37 @@ def test_css_single_speed_rejects_endpoints_with_no_causal_solution():
         f"rejection must cite causality/endpoint failure; got: {excinfo.value!r}")
 
 
-def test_css_single_speed_rejects_nonpositive_density_jump():
-    """§3.5 #10: a deliberately invalid case where the solved bridge density is
-    not larger than the crust-side density (nonpositive density jump). The
-    native matcher must reject it rather than return a continuous match or a
-    clipped jump.  The CSS contract requires Delta n_B = n_b - n_c > 0 at the
-    crust-bridge interface."""
-    # If the crust and core overlap in density (core starts below the crust's
-    # high end) the matcher cannot construct a positive crust-to-bridge jump.
+def test_css_exhaustive_search_finds_positive_jump_in_overlapping_sources(tmp_path):
+    """Density-domain overlap does not forbid another certified CSS window."""
+    from compose_eos import write_compose
+    from compose_eos.native import run_native
     crust = _css_barotrope(rest_mass=939.0, stiffness=1.0, n_min=0.05, n_max=0.50)
     core = _css_barotrope(rest_mass=939.0, stiffness=1.2, n_min=0.45, n_max=1.20)
-    with pytest.raises((NativeExecutionError, ValueError)) as excinfo:
-        match_crust_core(
-            crust, core, cr_name="synth_crust", co_name="synth_core",
-            method="css", n_bridge=40, core_compo_mode="strict_thermo_only",
-            drop_composition=True,
-        )
-    # The rejection must mention density ordering or a nonpositive jump; it
-    # must not be a silent success or an unrelated validation error.
-    msg = str(excinfo.value).lower()
-    assert ("density" in msg or "ordered" in msg or "jump" in msg
-            or "endpoint" in msg or "increase" in msg), (
-        f"rejection must cite density/jump/endpoints; got: {excinfo.value!r}")
+    matched, info = match_crust_core(
+        crust, core, method="css", n_bridge=40, drop_composition=True,
+    )
+    report = info["native_report"]
+    assert report["window_candidates_rejected"] > 0
+    assert report["window_pairs_examined"] > 1
+    assert report["i1"] < crust.n - 1
+    assert core.nb[report["i2"]] > crust.nb[report["i1"]]
+    low, high = report["css_transition_low_index"], report["css_transition_high_index"]
+    assert high == low + 1
+    assert info["density_jump_fm3"] > 0
+    assert matched.nb[high] > matched.nb[low]
+    assert matched.eps[high] > matched.eps[low]
+    assert 0 < report["css_single_sound_speed"] <= 1
+    assert matched.p[high] == pytest.approx(matched.p[low], rel=1e-11, abs=1e-12)
+    assert matched.mub[high] == pytest.approx(matched.mub[low], rel=1e-11, abs=1e-10)
+    target = tmp_path / "overlap_css"
+    write_compose(target, matched)
+    assert run_native("verify", target, tmp_path / "verification.json")["overall"] == "PASS"
 
+
+def test_css_rejects_when_every_endpoint_pair_has_invalid_density_order():
+    """Every core knot is below every crust knot: no ordered window exists."""
+    crust = _css_barotrope(rest_mass=939.0, stiffness=1.0, n_min=0.05, n_max=0.50)
+    core = _css_barotrope(rest_mass=939.0, stiffness=1.2, n_min=0.01, n_max=0.04)
+    assert core.nb[-1] < crust.nb[0]
+    with pytest.raises(NativeExecutionError, match="exhaustive native endpoint search"):
+        match_crust_core(crust, core, method="css", n_bridge=40, drop_composition=True)

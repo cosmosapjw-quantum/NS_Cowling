@@ -4,7 +4,7 @@ program compose_eos_fortran
   use compose_eos_component, only: extract_core_rows, extract_crust_rows, verify_core_roundtrip
   use compose_eos_rmf, only: ddrmf_diagnostic_t, evaluate_ddrmf
   use compose_eos_cld, only: cld_reconstruct_model
-  use compose_eos_tov, only: tov_love_result_t, solve_tov_love_smooth, solve_tov_love_maxwell
+  use compose_eos_tov, only: tov_love_result_t, solve_tov_love_smooth, solve_tov_love_maxwell, solve_tov_love_layered, solve_tov_layered_target
   use compose_eos_io
   use compose_eos_verify
   use compose_eos_reconstruct, only: fill_density_gap, reconstruct_master
@@ -41,6 +41,8 @@ program compose_eos_fortran
   real(wp)::min_ratio_local,best_sel
   real(wp)::cld_sigma_0,cld_b,cld_rho_min,cld_rho_max
   real(wp),allocatable::tov_p_high(:),tov_e_high(:),tov_p_low(:),tov_e_low(:),tov_pc_list(:)
+  real(wp)::layer_dlogp,first_failure_bounds(2)
+  logical::has_layer_audit
   real(wp)::tov_pc,tov_ptrans,tov_deps,tov_p,tov_e
   integer::cld_n_points
   integer::igap_sel
@@ -517,7 +519,7 @@ program compose_eos_fortran
     !   tov-love maxwell <high_P_eps.csv> <low_P_eps.csv> <P_trans_MeV_fm3> <delta_eps_MeV_fm3> <central_pressure_MeV_fm3>
     ! Each CSV is "P,eps" (one pair per line, strictly increasing P), MeV/fm^3.
     if(narg<4)then
-      call emit_failure('tov-love requires mode smooth|maxwell and inputs');stop 2
+      call emit_failure('tov-love requires a mode and its inputs');stop 2
     endif
     select case(trim(arg1))
     case('smooth')
@@ -531,6 +533,44 @@ program compose_eos_fortran
         call emit_failure('tov-love smooth did not converge: '//trim(tov_result%status));stop 3
       endif
       call emit_tov_json('smooth',tov_result)
+    case('layered','layered-target')
+      call read_layer_audit_options(narg,has_layer_audit,first_failure_bounds,status)
+      if(status/='ok')then;call emit_failure(trim(status));stop 2;endif
+      if(arg1=='layered'.and.narg/=4.and.narg/=5)then
+        call emit_failure('tov-love layered requires <CompOSE directory> <Pc> [max_dlogP]');stop 2
+      endif
+      if(arg1=='layered-target'.and.narg/=6.and.narg/=7)then
+        call emit_failure('layered-target requires <CompOSE directory> <mass_Msun> <Pc_min> <Pc_max> [max_dlogP]');stop 2
+      endif
+      read(arg3,*,iostat=ios)tov_pc
+      if(ios/=0)then;call emit_failure('invalid central pressure or target mass');stop 2;endif
+      layer_dlogp=.02_wp
+      if(narg==5)then
+        read(arg4,*,iostat=ios)layer_dlogp
+        if(ios/=0)then;call emit_failure('invalid maximum log-pressure step');stop 2;endif
+      endif
+      call read_compose(trim(arg2),eos,status)
+      if(status/='ok')then;call emit_failure(trim(status));stop 3;endif
+      if(eos%nT/=1.or.eos%nYq/=1.or.eos%temperature_mev/=0.or..not.eos%beta_equilibrated)then
+        call emit_failure('layered solver requires a cold beta-equilibrated one-parameter table');stop 3
+      endif
+      if(arg1=='layered-target')then
+        read(arg4,*,iostat=ios)tov_p
+        if(ios/=0)then;call emit_failure('invalid lower search pressure');stop 2;endif
+        read(arg5,*,iostat=ios)tov_e
+        if(ios/=0)then;call emit_failure('invalid upper search pressure');stop 2;endif
+        if(narg==7)then
+          read(arg6,*,iostat=ios)layer_dlogp
+          if(ios/=0)then;call emit_failure('invalid maximum log-pressure step');stop 2;endif
+        endif
+        call solve_tov_layered_target(eos_pressure(eos),eos_energy(eos),eos%iphase,tov_pc,tov_p,tov_e,layer_dlogp,tov_result)
+      else
+        call solve_tov_love_layered(eos_pressure(eos),eos_energy(eos),eos%iphase,tov_pc,layer_dlogp,tov_result)
+      endif
+      if(.not.tov_result%converged)then
+        call emit_failure(trim(tov_result%status));stop 3
+      endif
+      call emit_tov_json(trim(arg1),tov_result,layer_interval_status(tov_result%central_pressure,has_layer_audit,first_failure_bounds))
     case('batch-smooth')
       ! Reuse the exact source table in native memory for an entire central-
       ! pressure sequence. Python only passes filenames; all TOV+Love numerical
@@ -572,7 +612,7 @@ program compose_eos_fortran
       endif
       call emit_tov_json('maxwell',tov_result)
     case default
-      call emit_failure('tov-love mode must be smooth|maxwell');stop 2
+      call emit_failure('tov-love mode must be smooth|batch-smooth|maxwell|layered|layered-target');stop 2
     end select
   case('wigner-seitz')
     ! §8: production Fortran CLI path for the Wigner-Seitz cell composition
@@ -810,8 +850,57 @@ contains
     status='ok'
   end subroutine read_tov_pc_list
 
+  subroutine read_layer_audit_options(argument_count, has_audit, bounds, message)
+    integer, intent(inout) :: argument_count
+    logical, intent(out) :: has_audit
+    real(wp), intent(out) :: bounds(2)
+    character(*), intent(out) :: message
+    character(128) :: token
+    integer :: j, io
+    has_audit=.false.
+    bounds=0
+    message='ok'
+    call get_command_argument(argument_count,token)
+    if(token=='--audited-clean')then
+      has_audit=.true.
+      argument_count=argument_count-1
+      return
+    endif
+    call get_command_argument(argument_count-2,token)
+    if(token/='--first-failure')return
+    message='first failing interval requires finite positive ordered pressure bounds'
+    do j=1,2
+      call get_command_argument(argument_count-2+j,token)
+      read(token,*,iostat=io)bounds(j)
+      if(io/=0)return
+    enddo
+    if(.not.all(ieee_is_finite(bounds)))return
+    if(bounds(1)<=0.or.bounds(2)<bounds(1))return
+    has_audit=.true.
+    argument_count=argument_count-3
+    message='ok'
+  end subroutine read_layer_audit_options
+
+  pure function layer_interval_status(pc,has_audit,bounds) result(label)
+    real(wp),intent(in) :: pc,bounds(2)
+    logical,intent(in) :: has_audit
+    character(40) :: label
+    if(.not.has_audit)then
+      label='unaudited'
+    else if(bounds(1)==0)then
+      label='no_failed_interval_in_table'
+    else if(pc>=bounds(2))then
+      label='above_first_failed_interval'
+    else if(pc>bounds(1))then
+      label='inside_first_failed_interval'
+    else
+      label='below_first_failed_interval'
+    endif
+  end function layer_interval_status
+
   ! Emit the TOV+Love result as a JSON object to stdout.
-  subroutine emit_tov_json(mode, r)
+  subroutine emit_tov_json(mode, r, interval_label)
+    character(*), optional, intent(in) :: interval_label
     character(len=*), intent(in) :: mode
     type(tov_love_result_t), intent(in) :: r
     write(*, '(a)', advance='no') &
@@ -827,7 +916,14 @@ contains
       ',"central_eps_MeV_fm3":'//trim(real_text(r%central_eps))// &
       ',"n_steps":'//trim(integer_text(r%n_steps))// &
       ',"status_msg":"'//trim(r%status)//'"'
-    if(r%has_transition) then
+    if(present(interval_label))write(*,'(a)',advance='no') ',"causal_interval_status":"'//trim(interval_label)//'"'
+    if(mode=='layered'.or.mode=='layered-target')then
+      write(*,'(a)',advance='no') ',"has_transition":'//merge('true ','false',r%has_transition)// &
+        ',"transition_count":'//trim(integer_text(r%transition_count))// &
+        ',"surface_pressure_MeV_fm3":'//trim(real_text(r%surface_pressure))// &
+        ',"surface_epsilon_MeV_fm3":'//trim(real_text(r%surface_epsilon))// &
+        ',"surface_jump_scale":'//trim(real_text(r%surface_jump_scale))
+    else if(r%has_transition) then
       write(*, '(a)', advance='no') &
         ',"has_transition":true,'// &
         '"r_transition_km":'//trim(real_text(r%r_transition_km))// &

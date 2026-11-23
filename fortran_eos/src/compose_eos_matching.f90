@@ -3,6 +3,12 @@ module compose_eos_matching
   use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
   implicit none
   private
+  integer, parameter :: work_order=16
+  real(wp), parameter :: pressure_knots(4)=[0._wp,0.22_wp,0.78_wp,1._wp]
+  type :: pressure_piece_rule_t
+    real(wp) :: basis(4,work_order), density(work_order), weight(work_order)
+  end type
+
   type, public :: match_report_t
     integer :: i1=0, i2=0, n_bridge=0
     ! A failed preferred construction is not evidence that the source pair
@@ -550,9 +556,9 @@ contains
     real(wp),intent(in)::pt,p1,p2,dpdu1,dpdu2
     real(wp),intent(out)::knots(4),values(4),slopes(4)
     real(wp)::ua,ub,dplat,pa,pb,sec1,secp,sec2
-    ua=0.22_wp;ub=0.78_wp;dplat=0.015_wp*(p2-p1);pa=pt-dplat;pb=pt+dplat
+    ua=pressure_knots(2);ub=pressure_knots(3);dplat=0.015_wp*(p2-p1);pa=pt-dplat;pb=pt+dplat
     sec1=(pa-p1)/ua;secp=(pb-pa)/(ub-ua);sec2=(p2-pb)/(1._wp-ub)
-    knots=[0._wp,ua,ub,1._wp];values=[p1,pa,pb,p2]
+    knots=pressure_knots;values=[p1,pa,pb,p2]
     slopes(1)=min(dpdu1,2.2_wp*max(1.e-12_wp,sec1))
     slopes(2)=min(1.5_wp*secp,1.5_wp*max(1.e-12_wp,sec1))
     slopes(3)=min(1.5_wp*secp,1.5_wp*max(1.e-12_wp,sec2))
@@ -589,32 +595,91 @@ contains
     enddo
   end subroutine gauss_legendre_rule
 
-  function pressure_work_integral(pt,uend,p1,p2,dpdu1,dpdu2,x1,dx,quadrature_x,quadrature_w) result(val)
-    real(wp),intent(in)::pt,uend,p1,p2,dpdu1,dpdu2,x1,dx
-    real(wp),intent(in),optional::quadrature_x(16),quadrature_w(16)
-    real(wp)::val,kn(4),vv(4),ss(4),u,p,dp,aa,weight
-    real(wp)::xg(16),wg(16),lower,upper
-    integer::j,k
+  pure subroutine prepare_pressure_rule(left,right,upper,x1,dx,xg,wg,rule)
+    ! GL16 on [left,upper], evaluated in the Hermite basis of [left,right].
+    real(wp),intent(in)::left,right,upper,x1,dx,xg(work_order),wg(work_order)
+    type(pressure_piece_rule_t),intent(out)::rule
+    real(wp)::u,t,t2,t3,h,width
+    integer::j
+    h=right-left;width=0.5_wp*(upper-left)
+    do j=1,work_order
+      u=left+width*(xg(j)+1._wp)
+      t=max(0._wp,min(1._wp,(u-left)/h));t2=t*t;t3=t2*t
+      rule%basis(:,j)=[2*t3-3*t2+1,(t3-2*t2+t)*h,-2*t3+3*t2,(t3-t2)*h]
+      rule%weight(j)=width*wg(j)
+      rule%density(j)=exp(x1+u*dx)
+    enddo
+  end subroutine
+
+  pure real(wp) function add_pressure_work(start,rule,p0,p1,m0,m1) result(integral)
+    ! Same ordered quadrature sum as the uncached piecewise integral.
+    real(wp),intent(in)::start,p0,p1,m0,m1
+    type(pressure_piece_rule_t),intent(in)::rule
+    real(wp)::pressure
+    integer::j
+    integral=start
+    do j=1,work_order
+      pressure=rule%basis(1,j)*p0+rule%basis(2,j)*m0+rule%basis(3,j)*p1+rule%basis(4,j)*m1
+      integral=integral+rule%weight(j)*pressure/rule%density(j)
+    enddo
+  end function
+
+  pure subroutine complete_pressure_work(values,slopes,rules,work)
+    real(wp),intent(in)::values(4),slopes(4)
+    type(pressure_piece_rule_t),intent(in)::rules(3)
+    real(wp),intent(out)::work(4)
+    integer::k
+    work(1)=0._wp
+    do k=1,3
+      work(k+1)=add_pressure_work(work(k),rules(k),values(k),values(k+1),slopes(k),slopes(k+1))
+    enddo
+  end subroutine
+
+  pure real(wp) function partial_pressure_work(uend,x1,dx,values,slopes,xg,wg,work) result(val)
+    real(wp),intent(in)::uend,x1,dx,values(4),slopes(4),xg(work_order),wg(work_order),work(4)
+    type(pressure_piece_rule_t)::partial
+    integer::k
     val=0._wp
-    if(uend<=0._wp)return
-    ! Integrate each smooth cubic segment separately. A global quadrature
-    ! crosses the C1 knots, and changing its order at u=1 breaks dF/du=dx*P/n.
+    if(uend<=pressure_knots(1))return
+    do k=1,3
+      if(uend==pressure_knots(k))then
+        val=work(k)
+        return
+      endif
+      if(uend>=pressure_knots(k+1))cycle
+      call prepare_pressure_rule(pressure_knots(k),pressure_knots(k+1),uend,x1,dx,xg,wg,partial)
+      val=add_pressure_work(work(k),partial,values(k),values(k+1),slopes(k),slopes(k+1))
+      return
+    enddo
+    val=work(4)
+  end function
+
+  function pressure_work_integral(pt,uend,p1,p2,dpdu1,dpdu2,x1,dx,quadrature_x,quadrature_w,full_rules) result(val)
+    real(wp),intent(in)::pt,uend,p1,p2,dpdu1,dpdu2,x1,dx
+    real(wp),intent(in),optional::quadrature_x(work_order),quadrature_w(work_order)
+    type(pressure_piece_rule_t),intent(in),optional::full_rules(3)
+    real(wp)::val,kn(4),vv(4),ss(4),work(4),xg(work_order),wg(work_order)
+    type(pressure_piece_rule_t)::rules(3)
+    integer::k
+    if(uend<=0._wp)then
+      val=0._wp
+      return
+    endif
     if(present(quadrature_x).and.present(quadrature_w))then
       xg=quadrature_x;wg=quadrature_w
     else
-      call gauss_legendre_rule(16,xg,wg)
+      call gauss_legendre_rule(work_order,xg,wg)
     endif
     call make_pressure_spline(pt,p1,p2,dpdu1,dpdu2,kn,vv,ss)
-    do k=1,size(kn)-1
-      lower=kn(k);upper=min(uend,kn(k+1))
-      if(upper<=lower)exit
-      do j=1,size(xg)
-        u=lower+0.5_wp*(upper-lower)*(xg(j)+1._wp)
-        weight=0.5_wp*(upper-lower)*wg(j)
-        call spline_eval(kn,vv,ss,u,p,dp,aa)
-        val=val+weight*p/exp(x1+u*dx)
+    if(present(full_rules))then
+      call complete_pressure_work(vv,ss,full_rules,work)
+    else
+      do k=1,3
+        call prepare_pressure_rule(kn(k),kn(k+1),kn(k+1),x1,dx,xg,wg,rules(k))
       enddo
-    enddo
+      call complete_pressure_work(vv,ss,rules,work)
+    endif
+    val=partial_pressure_work(uend,x1,dx,vv,ss,xg,wg,work)
   end function pressure_work_integral
 
   subroutine pressure_piece_margin(t,span,energy0,a,xg,wg,energy,margin,gradient)
@@ -797,9 +862,11 @@ contains
     real(wp),allocatable::yy(:),ddy(:),anti(:)
     integer::j,iter
     real(wp)::knots_dummy(4),values_dummy(4),slopes_dummy(4),quadrature_x(16),quadrature_w(16)
+    type(pressure_piece_rule_t)::full_rules(3)
+    real(wp)::knot_work(4),log_n1,unused_integral
     logical::b_ok
     character(len=160)::b_msg
-    ok=.false.;message='uninitialized bridge';allocate(yy(size(u)),ddy(size(u)),anti(size(u)))
+    ok=.false.;message='uninitialized bridge'
     nb=0._wp;p=0._wp;f=0._wp;mu=0._wp;q=0._wp;cs=0._wp
     if(size(u)<1)then;message='matching query grid is empty';return;endif
     if(.not.all(ieee_is_finite([n1,n2,p1,p2,f1,f2,mu1,mu2,q1_1,q1_2,cs1,cs2])).or. &
@@ -812,6 +879,7 @@ contains
     nbar=(p2-p1)/dmu;qbar=(f2-f1)/dx
     select case(trim(method))
     case('cubic_F','quintic_F')
+      allocate(yy(size(u)),ddy(size(u)),anti(size(u)))
       dqdu=(mu1*cs1-q1_1)*dx;dpdu2=(mu2*cs2-q1_2)*dx
       call bridge_profile(q1_1,q1_2,dqdu,dpdu2,qbar,trim(method)=='quintic_F',u,dx,.true., &
         yy,ddy,anti,d0,d1,b_ok,b_msg,0._wp,dx,f1)
@@ -823,6 +891,7 @@ contains
       enddo
       ok=.true.;message=trim(b_msg)
     case('cubic_P','quintic_P')
+      allocate(yy(size(u)),ddy(size(u)),anti(size(u)))
       dpdu1=(n1/(mu1*cs1))*dmu;dpdu2=(n2/(mu2*cs2))*dmu
       call bridge_profile(n1,n2,dpdu1,dpdu2,nbar,trim(method)=='quintic_P',u,0._wp,.false., &
         yy,ddy,anti,d0,d1,b_ok,b_msg,mu1,dmu,p1)
@@ -862,15 +931,20 @@ contains
       endif
       ok=.true.;message='single_speed_css_analytic'
     case('first_law_constrained_hermite_pressure_bridge')
-      call gauss_legendre_rule(16,quadrature_x,quadrature_w)
+      log_n1=log(n1)
+      call gauss_legendre_rule(work_order,quadrature_x,quadrature_w)
+      do j=1,3
+        call prepare_pressure_rule(pressure_knots(j),pressure_knots(j+1),pressure_knots(j+1), &
+                                   log_n1,dx,quadrature_x,quadrature_w,full_rules(j))
+      enddo
       dpdu1=n1*mu1*cs1*dx;dpdu2=n2*mu2*cs2*dx
       lo=p1+1.05_wp*0.015_wp*(p2-p1);hi=p2-1.05_wp*0.015_wp*(p2-p1)
-      fa=dx*pressure_work_integral(lo,1._wp,p1,p2,dpdu1,dpdu2,log(n1),dx,quadrature_x,quadrature_w)-(f2-f1)
-      fb=dx*pressure_work_integral(hi,1._wp,p1,p2,dpdu1,dpdu2,log(n1),dx,quadrature_x,quadrature_w)-(f2-f1)
+      fa=dx*pressure_work_integral(lo,1._wp,p1,p2,dpdu1,dpdu2,log_n1,dx,quadrature_x,quadrature_w,full_rules)-(f2-f1)
+      fb=dx*pressure_work_integral(hi,1._wp,p1,p2,dpdu1,dpdu2,log_n1,dx,quadrature_x,quadrature_w,full_rules)-(f2-f1)
       if(fa*fb>0._wp)then;message='near-plateau pressure bridge has no integral root';return;endif
       do iter=1,100
         mid=0.5_wp*(lo+hi)
-        fm=dx*pressure_work_integral(mid,1._wp,p1,p2,dpdu1,dpdu2,log(n1),dx,quadrature_x,quadrature_w)-(f2-f1)
+        fm=dx*pressure_work_integral(mid,1._wp,p1,p2,dpdu1,dpdu2,log_n1,dx,quadrature_x,quadrature_w,full_rules)-(f2-f1)
         if(abs(fm)<2.e-13_wp*max(1._wp,abs(f2-f1)))exit
         if(fa*fm<=0._wp)then;hi=mid;fb=fm
         else;lo=mid;fa=fm;endif
@@ -879,12 +953,19 @@ contains
       call make_pressure_spline(pt,p1,p2,dpdu1,dpdu2,knots_dummy,values_dummy,slopes_dummy)
       call certify_pressure_spline(knots_dummy,values_dummy,slopes_dummy,log(n1),dx,f1,b_ok,b_msg)
       if(.not.b_ok)then;message=trim(b_msg);return;endif
+      call complete_pressure_work(values_dummy,slopes_dummy,full_rules,knot_work)
+      ! Queries share only immutable coefficients. Keep small search probes serial.
+      !$omp parallel do default(none) if(size(u)>=256) schedule(static) &
+      !$omp shared(u,knots_dummy,values_dummy,slopes_dummy,log_n1,dx,quadrature_x,quadrature_w,knot_work, &
+      !$omp        nb,p,f,mu,q,cs,f1) private(j,pp,dnbdu,nbv,unused_integral)
       do j=1,size(u)
-        call spline_eval(knots_dummy,values_dummy,slopes_dummy,u(j),pp,dnbdu,anti(j))
-        nbv=exp(log(n1)+u(j)*dx)
-        nb(j)=nbv;p(j)=pp;f(j)=f1+dx*pressure_work_integral(pt,u(j),p1,p2,dpdu1,dpdu2,log(n1),dx,quadrature_x,quadrature_w)
+        call spline_eval(knots_dummy,values_dummy,slopes_dummy,u(j),pp,dnbdu,unused_integral)
+        nbv=exp(log_n1+u(j)*dx)
+        nb(j)=nbv;p(j)=pp
+        f(j)=f1+dx*partial_pressure_work(u(j),log_n1,dx,values_dummy,slopes_dummy,quadrature_x,quadrature_w,knot_work)
         q(j)=pp/nbv;mu(j)=f(j)+q(j);cs(j)=(dnbdu/dx)/(nbv*mu(j))
       enddo
+      !$omp end parallel do
       ok=.true.;message='first_law_constrained_hermite_pressure_bridge_no_density_jump'
     case default
       message='unknown smooth matching method; valid methods: first_law_constrained_hermite_pressure_bridge, css, cubic_F, cubic_P, quintic_F, quintic_P'

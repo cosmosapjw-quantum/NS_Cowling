@@ -9,7 +9,10 @@ program nv_profile_generate
  use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
  implicit none
  real(wp), parameter :: pi=acos(-1._wp), tf=(3._wp/5)*(3*pi*pi)**(2._wp/3)
- integer, parameter :: rows=11
+ integer, parameter :: rows=11, cells=8, refinements=17, cache_slots=4093
+ type :: trial_cache
+  real(wp) :: contrast(2,cache_slots), energy(cache_slots)
+ end type
  type(nv_original_source_t) :: src
  type(eos_data_t) :: eos, back
  integer :: mesh, count_nb, i, j, mode, anchor_file, scan_file, last, ios, a, n, z
@@ -117,7 +120,17 @@ program nv_profile_generate
    error stop 1
   endif
  enddo
+ call write_run_info(mesh,count_nb)
 contains
+ subroutine write_run_info(radial_cells,density_nodes)
+  integer,intent(in)::radial_cells,density_nodes
+  integer::unit
+  namelist /profile_run/ radial_cells,density_nodes
+  open(newunit=unit,file=trim(out)//'/profile_run.nml',status='replace',action='write')
+  write(unit,nml=profile_run)
+  close(unit)
+ end subroutine
+
  subroutine setup_cell(jref,density)
   integer,intent(in)::jref
   real(wp),intent(in)::density
@@ -231,22 +244,69 @@ contains
   if(fd_error>2e-5_wp)error stop 'charge derivative mismatch'
  end subroutine
 
+ subroutine score_trials(trials,scores,cache)
+  ! The cache is local to one cell and coefficient mode. The hash only chooses
+  ! a slot. An exact contrast comparison is required to reuse an energy.
+  real(wp),intent(in)::trials(:,:)
+  real(wp),intent(out)::scores(:)
+  type(trial_cache),intent(inout)::cache
+  integer,parameter::resolution=cells*2**refinements
+  integer::k,idx,slot,nmissing,slots(size(scores)),missing(size(scores))
+  real(wp)::pressure,err,rhomax
+  logical::valid
+  nmissing=0
+  do k=1,size(scores)
+   slot=1+modulo(73*nint(trials(1,k)*resolution)+137*nint(trials(2,k)*resolution),cache_slots)
+   slots(k)=slot
+   if(all(trials(:,k)==cache%contrast(:,slot)))then
+    scores(k)=cache%energy(slot)
+   else
+    nmissing=nmissing+1
+    missing(nmissing)=k
+   endif
+  enddo
+  if(nmissing==0)return
+  ! The physical cell, density mesh, source and mode are read-only here. Each
+  ! worker writes a distinct score. Cache updates and tie selection keep their
+  ! original scan order, independent of worker scheduling.
+  !$omp parallel do if(nmissing>1) default(none) shared(nmissing,missing,trials,scores) private(k,pressure,err,rhomax,valid) schedule(static)
+  do idx=1,nmissing
+   k=missing(idx)
+   call evaluate(trials(:,k),scores(k),pressure,err,rhomax,valid)
+   if(.not.valid)scores(k)=huge(1._wp)
+  enddo
+  !$omp end parallel do
+  do idx=1,nmissing
+   k=missing(idx)
+   slot=slots(k)
+   cache%contrast(:,slot)=trials(:,k)
+   cache%energy(slot)=scores(k)
+  enddo
+ end subroutine
+
  subroutine minimize(best_energy,best_pressure,best,particle_error,maxrho,previous_best)
   real(wp),intent(out)::best_energy,best_pressure,best(2),particle_error,maxrho
   real(wp),intent(in),optional::previous_best(2)
-  integer,parameter::cells=8, refinements=17
-  integer::ix,iy,lev,pass,xi,yi,iseed,nseeds
-  real(wp)::step,base(2),trial(2),energy,pressure,err,rhomax,grid(0:cells,0:cells)
+  integer::ix,iy,lev,pass,xi,yi,iseed,nseeds,k,count
+  real(wp)::step,base(2),trial(2),grid(0:cells,0:cells)
   real(wp)::local_best(2),local_energy,starts(2,(cells+1)**2+1)
-  logical::valid,improved
+  real(wp)::trials(2,(cells+1)**2),scores((cells+1)**2)
+  type(trial_cache)::cache
+  logical::valid
   best_energy=huge(1._wp)
   best=0
-  grid=huge(1._wp)
+  cache%contrast=-1
+  k=0
   do ix=0,cells
    do iy=0,cells
-    trial=real([ix,iy],wp)/cells
-    call evaluate(trial,energy,pressure,err,rhomax,valid)
-    if(valid)grid(ix,iy)=energy
+    k=k+1
+    trials(:,k)=real([ix,iy],wp)/cells
+   enddo
+  enddo
+  call score_trials(trials,scores,cache)
+  do ix=0,cells
+   do iy=0,cells
+    grid(ix,iy)=scores(1+ix*(cells+1)+iy)
    enddo
   enddo
   ! Refine every discrete local minimum, including competing uniform/clustered profiles.
@@ -266,37 +326,39 @@ contains
    starts(:,nseeds)=previous_best
   endif
   do iseed=1,nseeds
-    local_best=starts(:,iseed)
-    call evaluate(local_best,local_energy,pressure,err,rhomax,valid)
-    if(.not.valid)cycle
-    step=1._wp/cells
-    do lev=1,refinements
-     step=step/2
-     do pass=1,2*cells+1
-      base=local_best
-      improved=.false.
-      do xi=-2,2
-       do yi=-2,2
-        if(xi==0.and.yi==0)cycle
-        trial=base+step*[xi,yi]
-        if(any(trial<0).or.any(trial>1))cycle
-        call evaluate(trial,energy,pressure,err,rhomax,valid)
-        if(.not.valid)cycle
-        if(energy<local_energy)then
-         local_energy=energy
-         local_best=trial
-         improved=.true.
-        endif
-       enddo
+   local_best=starts(:,iseed)
+   call score_trials(starts(:,iseed:iseed),scores(1:1),cache)
+   local_energy=scores(1)
+   if(local_energy==huge(1._wp))cycle
+   step=1._wp/cells
+   do lev=1,refinements
+    step=step/2
+    do pass=1,2*cells+1
+     base=local_best
+     count=0
+     do xi=-2,2
+      do yi=-2,2
+       if(xi==0.and.yi==0)cycle
+       trial=base+step*[xi,yi]
+       if(any(trial<0).or.any(trial>1))cycle
+       count=count+1
+       trials(:,count)=trial
       enddo
-      if(.not.improved)exit
      enddo
-     if(pass>2*cells+1)error stop 'profile search stalled'
+     call score_trials(trials(:,:count),scores(:count),cache)
+     ! MINLOC chooses the first strict improvement on a tie, as in the
+     ! serial xi-major, yi-minor ordering of the original search.
+     k=minloc(scores(:count),dim=1)
+     if(scores(k)>=local_energy)exit
+     local_energy=scores(k)
+     local_best=trials(:,k)
     enddo
-    if(local_energy<best_energy)then
-     best_energy=local_energy
-     best=local_best
-    endif
+    if(pass>2*cells+1)error stop 'profile search stalled'
+   enddo
+   if(local_energy<best_energy)then
+    best_energy=local_energy
+    best=local_best
+   endif
   enddo
   if(best_energy==huge(1._wp))error stop 'no admissible profile'
   call evaluate(best,best_energy,best_pressure,particle_error,maxrho,valid)

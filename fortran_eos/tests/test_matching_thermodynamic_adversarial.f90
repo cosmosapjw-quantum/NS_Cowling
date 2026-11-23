@@ -85,9 +85,47 @@ program test_matching_thermodynamic_adversarial
     print '(a,2(1x,es24.16))','PRESSURE_WORK_DERIVATIVE',u(2),res
     if(res>2.e-8_wp)failures=failures+1
   enddo
+  call check_pressure_work_knots(failures)
   print '(a,i0)','FAILURES=',failures
   if(failures/=0)stop 1
 contains
+  subroutine check_pressure_work_knots(errors)
+    ! Independent composite GL4 integration tests both sides of the C1 knots,
+    ! tiny and wide log-density spans, and queries in nonmonotone order.
+    integer,intent(inout)::errors
+    real(wp),parameter::nodes(4)=[-.8611363115940526_wp,-.3399810435848563_wp,.3399810435848563_wp,.8611363115940526_wp]
+    real(wp),parameter::weights(4)=[.3478548451374539_wp,.6521451548625461_wp,.6521451548625461_wp,.3478548451374539_wp]
+    real(wp),parameter::spans(2)=[.002_wp,17.3_wp]
+    real(wp)::knots(4),values(4),slopes(4),query(10),upper,width,point,actual,expected,pressure,deriv,anti
+    real(wp)::worst,x1
+    integer::i,k,panel,q,j
+    call make_pressure_spline(2._wp,1._wp,4._wp,4._wp,8._wp,knots,values,slopes)
+    query=[1._wp,knots(3),nearest(knots(2),-1._wp),0._wp,nearest(knots(3),1._wp), &
+           .1_wp,knots(2),nearest(knots(3),-1._wp),.5_wp,nearest(knots(2),1._wp)]
+    worst=0._wp
+    x1=log(1.e-9_wp)
+    do j=1,size(spans)
+      do i=1,size(query)
+        expected=0._wp
+        do k=1,3
+          upper=min(query(i),knots(k+1))
+          if(upper<=knots(k))exit
+          width=(upper-knots(k))/32._wp
+          do panel=0,31
+            do q=1,4
+              point=knots(k)+(panel+.5_wp*(1._wp+nodes(q)))*width
+              call spline_eval(knots,values,slopes,point,pressure,deriv,anti)
+              expected=expected+.5_wp*width*weights(q)*pressure/exp(x1+point*spans(j))
+            enddo
+          enddo
+        enddo
+        actual=pressure_work_integral(2._wp,query(i),1._wp,4._wp,4._wp,8._wp,x1,spans(j))
+        worst=max(worst,abs(actual-expected)/max(1._wp,abs(expected)))
+      enddo
+    enddo
+    print '(a,1x,es24.16)','PRESSURE_WORK_KNOTS_MAX_RELATIVE',worst
+    if(worst>2.e-12_wp)errors=errors+1
+  end subroutine
   subroutine make_soft_source(eos,nlo,nhi,n)
     type(eos_data_t),intent(out)::eos
     real(wp),intent(in)::nlo,nhi

@@ -47,7 +47,7 @@ def project_root() -> Path:
 # replacement, chmod or compiler/configuration change reruns --ensure.
 _BUILD_LOCK = threading.Lock()
 _VERIFIED_BUILDS: dict[Path, tuple] = {}
-_BUILD_ENV = ("FC", "FFLAGS", "SLSQP_FFLAGS", "LDFLAGS", "NATIVE_LIBS")
+_BUILD_ENV = ("FC", "FFLAGS", "SLSQP_FFLAGS", "LDFLAGS", "NATIVE_LIBS", "COMPOSE_EOS_OPENMP")
 
 
 def _build_state(root: Path, exe: Path, compiler: str) -> tuple:
@@ -78,7 +78,18 @@ def executable() -> Path:
             return exe
         raise NativeExecutionError(f"COMPOSE_EOS_FORTRAN_EXE is not an executable file: {exe}")
     root = project_root()
-    exe = root / "build" / "compose_eos_fortran" / "compose_eos_fortran"
+    override_build = os.environ.get("COMPOSE_EOS_NATIVE_BUILD_DIR")
+    if override_build:
+        build_dir = Path(override_build).expanduser().resolve()
+    elif root == (Path(sys.prefix) / "share" / "compose-eos").resolve():
+        # Installed data may be read-only. Keep compiled artifacts in the user's cache.
+        import hashlib
+        install_key = hashlib.sha256(os.fsencode(root)).hexdigest()[:16]
+        cache = Path(os.environ.get("XDG_CACHE_HOME") or Path.home() / ".cache")
+        build_dir = cache / "compose_eos_fortran" / "installed" / install_key
+    else:
+        build_dir = root / "build" / "compose_eos_fortran"
+    exe = build_dir / "compose_eos_fortran"
     compiler = shutil.which(os.environ.get("FC", "gfortran"))
     if compiler is None:
         raise NativeExecutionError(

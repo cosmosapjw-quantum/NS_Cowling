@@ -48,10 +48,8 @@ class NativeTovLove:
         self.timeout_seconds = timeout_seconds
         candidate = binary or os.environ.get("COMPOSE_EOS_FORTRAN_EXE")
         if not candidate:
-            raise FileNotFoundError(
-                "Set COMPOSE_EOS_FORTRAN_EXE to compiled compose_eos_fortran; "
-                "no Python numerical solver fallback is permitted."
-            )
+            from .native import executable
+            candidate = executable()
         self.binary = Path(candidate).resolve()
         if not self.binary.is_file():
             raise FileNotFoundError(self.binary)
@@ -98,6 +96,25 @@ class NativeTovLove:
         return self._run(
             ["smooth", str(self._path(source)), f"{central_pressure:.17e}"],
             expected=1,
+        )[0]
+
+    def layered(
+        self, directory: str | os.PathLike[str], central_pressure: float, max_dlogp: float = 0.02,
+    ) -> dict[str, Any]:
+        """Integrate through labelled CompOSE interfaces to the first pressure row."""
+        return self._run(
+            ["layered", str(Path(directory).resolve(strict=True)), str(central_pressure), str(max_dlogp)],
+            expected=1,
+        )[0]
+
+    def layered_target(
+        self, directory: str | os.PathLike[str], mass_msun: float, min_pressure: float,
+        max_pressure: float, max_dlogp: float = 0.02,
+    ) -> dict[str, Any]:
+        """Locate the first sampled rising mass crossing in the supplied pressure range."""
+        return self._run(
+            ["layered-target", str(Path(directory).resolve(strict=True)), str(mass_msun),
+             str(min_pressure), str(max_pressure), str(max_dlogp)], expected=1,
         )[0]
 
     def maxwell(

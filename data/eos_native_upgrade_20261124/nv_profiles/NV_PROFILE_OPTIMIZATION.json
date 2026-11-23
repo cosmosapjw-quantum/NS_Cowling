@@ -1,0 +1,277 @@
+{
+  "baseline_commit": "cab027e9b5ccbc42d6509531f7a6201f2c13d184",
+  "source_sha256": {
+    "fortran_eos/app/nv_profile_generate.f90": "03ad24d1314b129cba04c0d44bfc73ceff5539c26f569f066ecdf6eb04440d7e",
+    "fortran_eos/run-nv-profile.sh": "4faaea1081f3b8374c2eeee2f9b985e971d9fcc652c3d1a94df5cf0af3523379",
+    "data/eos_original_papers_20261123/research_nv/nv1973_original_source.dat": "9370f187fc60be9c6e63ce4aba23bc67d81ce703bb11851bed94e7b062968829"
+  },
+  "compiler": "GNU Fortran (Debian 14.2.0-19) 14.2.0",
+  "compiler_and_link_flags": {
+    "baseline": "-std=f2008 -ffree-line-length-none -O3 -l:liblapack.so.3 -l:libblas.so.3",
+    "candidate": "-std=f2008 -ffree-line-length-none -O3 -fopenmp -ffunction-sections -fdata-sections -Wl,--gc-sections"
+  },
+  "binaries": {
+    "nv_old": {
+      "sha256": "43b9332c08d56364deb017dbcaea583fbdb8e5f16a46c14d0716f29ad4b1e46f",
+      "size_bytes": 774608,
+      "elf_needed": [
+        "liblapack.so.3",
+        "libm.so.6",
+        "libmvec.so.1",
+        "libgcc_s.so.1",
+        "libc.so.6"
+      ]
+    },
+    "nv_slim": {
+      "sha256": "7a7cb9e6fe22f6e362a9998da6a7b76fa7bc7b59b66cda8dd70b16db54dd2182",
+      "size_bytes": 600840,
+      "elf_needed": [
+        "libm.so.6",
+        "libmvec.so.1",
+        "libgomp.so.1",
+        "libgcc_s.so.1",
+        "libc.so.6"
+      ]
+    }
+  },
+  "cpu": "AMD EPYC 9V45; allocated Linux CPUs 0-3 in this test",
+  "measurement": {
+    "scope": "native wall time incl validation/readback and file I/O; excludes compilation",
+    "n": 49,
+    "radial_cells": 128,
+    "alternating_order": [
+      "base",
+      "new4",
+      "new1",
+      "new2",
+      "new2",
+      "new1",
+      "new4",
+      "base",
+      "new4",
+      "base",
+      "new2",
+      "new1"
+    ],
+    "OMP_DYNAMIC": "FALSE",
+    "OMP_PLACES": "{0},{1},{2},{3}",
+    "OMP_PROC_BIND": "close",
+    "OPENBLAS_NUM_THREADS": "1",
+    "repeats_per_variant": 3,
+    "VmHWM": "/proc child VmHWM sampled at 10 ms while its native executable was running; host-reported KiB, not portable",
+    "timer": "perf_counter with wait4(WNOHANG), 10 ms polling"
+  },
+  "medians": {
+    "base": {
+      "wall_seconds": 10.182060036997427,
+      "user_seconds": 10.169852,
+      "sys_seconds": 0.00822,
+      "sampled_VmHWM_KiB": 2252,
+      "speedup_vs_baseline": 1.0
+    },
+    "new1": {
+      "wall_seconds": 4.243817823000427,
+      "user_seconds": 4.2281,
+      "sys_seconds": 0.004078,
+      "sampled_VmHWM_KiB": 2044,
+      "speedup_vs_baseline": 2.3992688804437408
+    },
+    "new2": {
+      "wall_seconds": 2.332072514000174,
+      "user_seconds": 4.562233,
+      "sys_seconds": 0.01205,
+      "sampled_VmHWM_KiB": 2132,
+      "speedup_vs_baseline": 4.3660992425712655
+    },
+    "new4": {
+      "wall_seconds": 1.5949336839985335,
+      "user_seconds": 6.094379,
+      "sys_seconds": 0.008157,
+      "sampled_VmHWM_KiB": 2212,
+      "speedup_vs_baseline": 6.384002130716044
+    }
+  },
+  "energy_evaluation_calls": {
+    "baseline": 155701,
+    "candidate": 63391,
+    "fraction_avoided": 0.5928670978349528,
+    "method": "Additional single-thread builds inserted one integer increment per evaluate invocation. Counts include final/dilation probes, exclude separate charge-variation probes, no instrumentation in timed binaries."
+  },
+  "checks": {
+    "native_128_49_across_12_runs": "23 inherited files each identical by SHA256",
+    "native_256_49_old_vs_4": "23 inherited files identical by SHA256",
+    "native_32_4_old_vs_1_vs_4": "23 inherited files identical by SHA256",
+    "native_64_11_thread_test": "diff -qr passed across complete 1/4 thread output",
+    "source_shape": "printed/d03x100 each 49 profile rows + 11 anchors; uniform_beta 257 rows",
+    "archived_128_tolerance": "Native Fortran list-directed numeric comparison; fieldwise maxima on all five CSVs are included. Rounded archiving/build variation is separate from exact matched-host executable/regression comparison.",
+    "old_threads_vs_archive_max_abs": {
+      "printed.csv": {
+        "rows": 49,
+        "max_absolute_difference": {
+          "nb_fm3": 0.0,
+          "N": 0.0,
+          "Z": 0.0,
+          "epsilon_MeV_fm3": 0.0,
+          "pressure_MeV_fm3": 0.0,
+          "E_minus_mn_MeV": 0.0,
+          "neutron_contrast": 0.0,
+          "proton_contrast": 0.0,
+          "max_nucleon_density_fm3": 0.0,
+          "max_particle_error": 0.0,
+          "mu_L_MeV": 1.4210854715202e-14,
+          "mu_e_eff_MeV": 1.4210854715202e-14,
+          "mu_L_finite_difference_error_MeV": 9.094947017729282e-10,
+          "profile_sector": 0.0,
+          "dilation_P_rel_error": 0.0
+        }
+      },
+      "d03x100.csv": {
+        "rows": 49,
+        "max_absolute_difference": {
+          "nb_fm3": 0.0,
+          "N": 0.0,
+          "Z": 0.0,
+          "epsilon_MeV_fm3": 0.0,
+          "pressure_MeV_fm3": 1.110223024625157e-16,
+          "E_minus_mn_MeV": 0.0,
+          "neutron_contrast": 0.0,
+          "proton_contrast": 0.0,
+          "max_nucleon_density_fm3": 0.0,
+          "max_particle_error": 0.0,
+          "mu_L_MeV": 1.06581410364015e-14,
+          "mu_e_eff_MeV": 0.0,
+          "mu_L_finite_difference_error_MeV": 4.547544563138221e-10,
+          "profile_sector": 0.0,
+          "dilation_P_rel_error": 0.0
+        }
+      },
+      "printed_anchors.csv": {
+        "rows": 11,
+        "max_absolute_difference": {
+          "nb_fm3": 0.0,
+          "N": 0.0,
+          "Z": 0.0,
+          "epsilon_MeV_fm3": 0.0,
+          "pressure_MeV_fm3": 6.938893903907228e-18,
+          "E_minus_mn_MeV": 0.0,
+          "neutron_contrast": 0.0,
+          "proton_contrast": 0.0,
+          "max_nucleon_density_fm3": 1.387778780781446e-17,
+          "max_particle_error": 0.0,
+          "source_ground_E_minus_mn_MeV": 0.0
+        }
+      },
+      "d03x100_anchors.csv": {
+        "rows": 11,
+        "max_absolute_difference": {
+          "nb_fm3": 0.0,
+          "N": 0.0,
+          "Z": 0.0,
+          "epsilon_MeV_fm3": 0.0,
+          "pressure_MeV_fm3": 6.938893903907228e-18,
+          "E_minus_mn_MeV": 5.759281940243e-16,
+          "neutron_contrast": 0.0,
+          "proton_contrast": 0.0,
+          "max_nucleon_density_fm3": 0.0,
+          "max_particle_error": 0.0,
+          "source_ground_E_minus_mn_MeV": 0.0
+        }
+      },
+      "uniform_beta.csv": {
+        "rows": 257,
+        "max_absolute_difference": {
+          "nb_fm3": 0.0,
+          "epsilon_MeV_fm3": 0.0,
+          "pressure_MeV_fm3": 0.0,
+          "Ye": 0.0,
+          "mu_n_MeV": 0.0,
+          "mu_p_MeV": 0.0,
+          "mu_e_MeV": 0.0,
+          "beta_residual_MeV": 0.0,
+          "beta_curvature_MeV_fm3": 0.0,
+          "first_law_P_rel_error": 0.0,
+          "euler_MeV": 0.0,
+          "cs2_over_c2_FD": 0.0,
+          "min_sampled_energy_excess_MeV": 0.0,
+          "minimum_sampled_charge_curvature_MeV_fm3": 0.0
+        }
+      }
+    },
+    "checked_build_64_11_threads": "1-vs-4 diff -qr passed with -O2 -fopenmp -fcheck=all,no-array-temps -ffpe-trap=invalid,zero,overflow"
+  },
+  "canonical_128_49_sha256": {
+    "d03x100/eos.compo": "9254ea724892d06bb6c1ccd768847cd65558b5c5d648c53eb257698e634f8e0b",
+    "d03x100/eos.nb": "66d3c028a280ade8ac532d05821db63a00051059d91901b7c9caaaad394e995f",
+    "d03x100/eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "d03x100/eos.thermo": "dab211d1fa3f12b63d6eec16fd5b27d809b805794fd8e8439b6b98dbce2dea95",
+    "d03x100/eos.yq": "29da5a8883912b538f0446f754977253186578dd30c412946cebb525416e786a",
+    "d03x100/metadata.nml": "740130280d2277734f62b684cb252bd9875f548b018805a3494f64dc588dc637",
+    "d03x100.csv": "5fab2d8a1aa74223a83bee06d3ef904bc636b08cd46ece0a78f426ef939ed0d5",
+    "d03x100_anchors.csv": "fb685ea7e84201fd6e51123443d441e1acc75e9502280ade19ccdf1cf2ab49c7",
+    "printed/eos.compo": "b648263a5d31c6026b9a2ab672e0f60e3a86df57d8b502e42bf4b1184a557269",
+    "printed/eos.nb": "66d3c028a280ade8ac532d05821db63a00051059d91901b7c9caaaad394e995f",
+    "printed/eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "printed/eos.thermo": "85beb2978ee86893b8c9e0a079b321fb1f7b4d6f79264058c57e33488227eb66",
+    "printed/eos.yq": "29da5a8883912b538f0446f754977253186578dd30c412946cebb525416e786a",
+    "printed/metadata.nml": "740130280d2277734f62b684cb252bd9875f548b018805a3494f64dc588dc637",
+    "printed.csv": "dd0ce05284701515e6936c06c272b51f11aa5aa0a53af6deea510ae614033593",
+    "printed_anchors.csv": "8384169bf99108f563368ad7d663df15d4826609e2d793ed037f0dfc6e6248cb",
+    "uniform_beta/eos.compo": "4909c26834a8e85c4f9e6aae61d503d9d30ec3c2f73f0e972c91318451134941",
+    "uniform_beta/eos.nb": "e8e662145c723405046827003c23c513bb4b1c8a8661be4d9147dfbd774c5ad8",
+    "uniform_beta/eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "uniform_beta/eos.thermo": "99adf671765740e38346a3e1f7b23077bb7e8a12ed14b3e5bf7e44aa9e35105c",
+    "uniform_beta/eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "uniform_beta/metadata.nml": "024fc199899e6d38dfc864ba8e620b484c3f95fc88386aca3e33e7392c2ae826",
+    "uniform_beta.csv": "86a2ecd696094149931146a967f762d6993e8fcd09e06e804ba17508328dce80"
+  },
+  "canonical_256_49_sha256": {
+    "d03x100/eos.compo": "9254ea724892d06bb6c1ccd768847cd65558b5c5d648c53eb257698e634f8e0b",
+    "d03x100/eos.nb": "66d3c028a280ade8ac532d05821db63a00051059d91901b7c9caaaad394e995f",
+    "d03x100/eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "d03x100/eos.thermo": "132753054c536820d005a99019d8ed8f7a30d691b3c1f15c66fea2a298ee9fec",
+    "d03x100/eos.yq": "29da5a8883912b538f0446f754977253186578dd30c412946cebb525416e786a",
+    "d03x100/metadata.nml": "740130280d2277734f62b684cb252bd9875f548b018805a3494f64dc588dc637",
+    "d03x100.csv": "d8e265a5da17c08e4cc04a83ec158c4b193988ac48f43db677365caab7774db7",
+    "d03x100_anchors.csv": "bfc4090ed68a31440c40edea4361fbf6987f9741ab3600d60fd532354b4ee4d9",
+    "printed/eos.compo": "b648263a5d31c6026b9a2ab672e0f60e3a86df57d8b502e42bf4b1184a557269",
+    "printed/eos.nb": "66d3c028a280ade8ac532d05821db63a00051059d91901b7c9caaaad394e995f",
+    "printed/eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "printed/eos.thermo": "b200fa1409786725360eb9e9dc45c758e0cd704f5a72baaf6f1d988569a55af7",
+    "printed/eos.yq": "29da5a8883912b538f0446f754977253186578dd30c412946cebb525416e786a",
+    "printed/metadata.nml": "740130280d2277734f62b684cb252bd9875f548b018805a3494f64dc588dc637",
+    "printed.csv": "6811f4e525c925e1ad05d0022171db73672bd5b71eb735f845975cab1be12e6f",
+    "printed_anchors.csv": "aa270c07990a6332b5e1aac8d0cea430bfd460ba5facac96dca954fd016dc766",
+    "uniform_beta/eos.compo": "4909c26834a8e85c4f9e6aae61d503d9d30ec3c2f73f0e972c91318451134941",
+    "uniform_beta/eos.nb": "e8e662145c723405046827003c23c513bb4b1c8a8661be4d9147dfbd774c5ad8",
+    "uniform_beta/eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "uniform_beta/eos.thermo": "99adf671765740e38346a3e1f7b23077bb7e8a12ed14b3e5bf7e44aa9e35105c",
+    "uniform_beta/eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "uniform_beta/metadata.nml": "024fc199899e6d38dfc864ba8e620b484c3f95fc88386aca3e33e7392c2ae826",
+    "uniform_beta.csv": "86a2ecd696094149931146a967f762d6993e8fcd09e06e804ba17508328dce80"
+  },
+  "canonical_32_4_sha256": {
+    "d03x100/eos.compo": "f8d6af63892f7fb73d2dcb53c53a38ffe1fb0dc0b4665d54055429a948fa9c35",
+    "d03x100/eos.nb": "04dd1154436a74e445f1a2a07836aed90ef0b270ff97bee06b9f22e6e3010412",
+    "d03x100/eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "d03x100/eos.thermo": "3f62527f5aa22ee3f4415d0e7331fc87ba27c49366b16dcfd2e6a74211258426",
+    "d03x100/eos.yq": "29da5a8883912b538f0446f754977253186578dd30c412946cebb525416e786a",
+    "d03x100/metadata.nml": "740130280d2277734f62b684cb252bd9875f548b018805a3494f64dc588dc637",
+    "d03x100.csv": "3676920f6b75e603cc573e122adb146899d4f5c9ebc985292d998b26338c3762",
+    "d03x100_anchors.csv": "2015a9326c8b84d37cf7ed5e9b022a5d5b67ce5720a105fa65e4aadbcfb12c72",
+    "printed/eos.compo": "f8d6af63892f7fb73d2dcb53c53a38ffe1fb0dc0b4665d54055429a948fa9c35",
+    "printed/eos.nb": "04dd1154436a74e445f1a2a07836aed90ef0b270ff97bee06b9f22e6e3010412",
+    "printed/eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "printed/eos.thermo": "3255ab9b96770aca7826da99a44d9b2c24a0f2eb7951475790ff47a19eb4b484",
+    "printed/eos.yq": "29da5a8883912b538f0446f754977253186578dd30c412946cebb525416e786a",
+    "printed/metadata.nml": "740130280d2277734f62b684cb252bd9875f548b018805a3494f64dc588dc637",
+    "printed.csv": "d07a1aa66cf8ec9837d553c1f19aa6bf7e79d029f3cc810055e0ad86ff429ef5",
+    "printed_anchors.csv": "c4bbe54f55ca4036597e2e12fe5205e4a6e36fa1286106670d7b063dd6fb6a2b",
+    "uniform_beta/eos.compo": "4909c26834a8e85c4f9e6aae61d503d9d30ec3c2f73f0e972c91318451134941",
+    "uniform_beta/eos.nb": "e8e662145c723405046827003c23c513bb4b1c8a8661be4d9147dfbd774c5ad8",
+    "uniform_beta/eos.t": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "uniform_beta/eos.thermo": "99adf671765740e38346a3e1f7b23077bb7e8a12ed14b3e5bf7e44aa9e35105c",
+    "uniform_beta/eos.yq": "6057236c19afa99a433747b953c771708bae5462f9373a1e080206189dbe7c9e",
+    "uniform_beta/metadata.nml": "024fc199899e6d38dfc864ba8e620b484c3f95fc88386aca3e33e7392c2ae826",
+    "uniform_beta.csv": "86a2ecd696094149931146a967f762d6993e8fcd09e06e804ba17508328dce80"
+  }
+}

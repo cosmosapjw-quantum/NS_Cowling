@@ -24,7 +24,7 @@ module compose_eos_tov
   private
   public :: tov_love_result_t
   public :: solve_tov_love_smooth
-  public :: solve_tov_love_maxwell
+  public :: solve_tov_love_maxwell, solve_tov_love_layered, solve_tov_layered_target
   ! Read-only low-level scientific validation seam for tidal RHS.
   public :: tov_rhs
 
@@ -49,6 +49,8 @@ module compose_eos_tov
     integer  :: n_steps = 0
     character(len=64) :: status = ''
     ! sharp-Maxwell only: transition diagnostics
+    integer :: transition_count = 0  ! count crossed by the layered integrator
+    real(wp) :: surface_pressure = 0._wp, surface_epsilon = 0._wp, surface_jump_scale = 0._wp
     logical  :: has_transition = .false.
     real(wp) :: r_transition_km = 0._wp
     real(wp) :: m_transition_msun = 0._wp
@@ -699,5 +701,171 @@ contains
     result%converged = .true.
     result%status = 'ok'
   end subroutine solve_tov_love_maxwell
+
+  ! Equilibrium l=2 tide for a cold barotrope with any number of explicitly
+  ! labelled density jumps. Sampled coordinates stop at the finite source
+  ! pressure; k2 and Lambda there are finite-surface proxies.
+  subroutine solve_tov_love_layered(p, e, phase, pc, max_dlogp, result)
+    real(wp), intent(in) :: p(:), e(:), pc, max_dlogp
+    integer, intent(in) :: phase(:)
+    type(tov_love_result_t), intent(out) :: result
+    integer :: i, center, last_continuous, n
+    real(wp) :: ratio, width, slope, xc, z(3), t, goal, h, ptop, etop, ec, dedp
+    real(wp) :: p0, e0, u, dy, k1(3), k2(3), k3(3), k4(3), ps, es, pm, em, pe, ee
+    real(wp), parameter :: jump_tol=32*epsilon(1._wp)
+    logical :: ok
+
+    result=tov_love_result_t()
+    result%central_pressure=pc
+    n=size(p)
+    result%status='invalid layered table, step, or central pressure'
+    if(n<2.or.size(e)/=n.or.size(phase)/=n)return
+    if(.not.all(ieee_is_finite(p)).or..not.all(ieee_is_finite(e)))return
+    if(.not.ieee_is_finite(pc).or..not.ieee_is_finite(max_dlogp))return
+    if(max_dlogp<1.e-5_wp.or.max_dlogp>.1_wp.or.any(p<=0).or.any(e<=0))return
+    result%status='central pressure outside tabulated pressure range'
+    if(pc<=p(1).or.pc>p(n))return
+    center=0
+    last_continuous=0
+    do i=1,n-1
+      result%status='unordered pressure or invalid labelled density jump'
+      ratio=p(i+1)/p(i)
+      if(phase(i)/=phase(i+1).and.abs(ratio-1._wp)<=jump_tol)then
+        if(e(i+1)<=e(i))return
+        ! The central state at an interface is its limit of zero inner-core radius.
+        if(pc>=min(p(i),p(i+1)).and.pc<=max(p(i),p(i+1)))then
+          if(last_continuous==0)return
+          center=last_continuous
+        endif
+      else
+        if(p(i+1)<=p(i))return
+        last_continuous=i
+        if(center==0.and.pc<=p(i+1))center=i
+      endif
+    enddo
+    result%status='no continuous EOS segment at center'
+    if(center==0)return
+    ! Use log-pressure distance x=ln(Pc/P), integration variables
+    ! u=r^2, v=m/r, y=rH'/H. Near x=0, m=(4pi/3)e_c r^3.
+    slope=log(e(center+1)/e(center))/log(p(center+1)/p(center))
+    if(slope<=0.or..not.ieee_is_finite(slope))return
+    ec=e(center)*(pc/p(center))**slope
+    result%central_eps=ec
+    p0=pc*mevfm3_to_km2
+    e0=ec*mevfm3_to_km2
+    dedp=slope*ec/pc
+    xc=min(1.e-8_wp,0.25_wp*log(pc/p(center)))
+    if(xc<=0)return
+    u=xc*p0/(2*pi*(e0+p0)*(e0/3+p0))
+    z=[u,4*pi*e0*u/3,2._wp-4*pi*(e0/3+11*p0+(e0+p0)*dedp)*u/7]
+    t=xc
+    do i=center,1,-1
+      ratio=p(i+1)/p(i)
+      if(phase(i)/=phase(i+1).and.abs(ratio-1._wp)<=jump_tol)then
+        ! Pressure-corrected Takatsy--Kovacs jump, traversed outwards.
+        dy=-4*pi*z(1)*((e(i+1)-e(i))*mevfm3_to_km2)/(z(2)+4*pi*z(1)*p(i)*mevfm3_to_km2)
+        z(3)=z(3)+dy
+        result%transition_count=result%transition_count+1
+        cycle
+      endif
+      ptop=min(pc,p(i+1))
+      slope=log(e(i+1)/e(i))/log(ratio)
+      etop=e(i)*(ptop/p(i))**slope
+      result%status='unstable or acausal active log-linear EOS segment'
+      if(slope<=0.or..not.ieee_is_finite(slope))return
+      ! In a log-linear cell c_s^2/c^2=P/(slope*epsilon) is monotone.
+      if(max(p(i)/e(i),ptop/etop)>slope*(1._wp+1.e-5_wp))return
+      goal=log(pc/p(i))
+      width=log(pc/ptop)
+      do while(t<goal)
+        h=min(max_dlogp,goal-t,.2_wp*t)
+        ps=p0*exp(-t)
+        es=etop*mevfm3_to_km2*exp(-slope*(t-width))
+        pm=ps*exp(-h/2); em=es*exp(-slope*h/2)
+        pe=ps*exp(-h); ee=es*exp(-slope*h)
+        k1=layer_rhs(z,ps,es,slope)
+        k2=layer_rhs(z+h*k1/2,pm,em,slope)
+        k3=layer_rhs(z+h*k2/2,pm,em,slope)
+        k4=layer_rhs(z+h*k3,pe,ee,slope)
+        z=z+h*(k1+2*k2+2*k3+k4)/6
+        result%status='nonfinite or trapped layered stellar solution'
+        if(.not.all(ieee_is_finite(z)).or.z(1)<=0.or.z(2)<=0.or.2*z(2)>=1)return
+        result%n_steps=result%n_steps+1
+        if(h>=goal-t)then
+          t=goal
+        else
+          t=t+h
+        endif
+      enddo
+    enddo
+    result%r_km=sqrt(z(1));result%compactness=z(2)
+    result%m_msun=z(2)*result%r_km/msun_geom_km
+    result%y_surface=z(3)
+    result%has_transition=result%transition_count>0
+    result%surface_pressure=p(1);result%surface_epsilon=e(1)
+    ! Magnitude of the local y correction for a drop by epsilon_cut.
+    ! Report this sensitivity separately; a finite-P endpoint has no vacuum continuation.
+    result%surface_jump_scale=4*pi*z(1)*e(1)*mevfm3_to_km2/(z(2)+4*pi*z(1)*p(1)*mevfm3_to_km2)
+    call love_number_k2(z(2),z(3),result%k2,result%lambda_tidal,ok)
+    result%status='invalid finite-surface tidal response'
+    if(.not.ok.or.result%k2<=0)return
+    result%converged=.true.;result%status='ok'
+  end subroutine solve_tov_love_layered
+
+  ! Find the first sampled ascending mass crossing in a caller-specified
+  ! pressure range. No continuation past a failed or missing EOS interval.
+  subroutine solve_tov_layered_target(p,e,phase,mass,low,high,max_dlogp,result)
+    real(wp),intent(in)::p(:),e(:),mass,low,high,max_dlogp
+    integer,intent(in)::phase(:)
+    type(tov_love_result_t),intent(out)::result
+    integer,parameter::scan_intervals=32, refinements=45
+    real(wp)::previous,current,previous_mass,mid
+    integer::i,j
+    result=tov_love_result_t()
+    result%status='invalid target mass or pressure search interval'
+    if(size(p)<2.or..not.all(ieee_is_finite([mass,low,high])))return
+    if(mass<=0.or.low<=p(1).or.high<=low.or.low>=p(size(p)))return
+    previous=low
+    call solve_tov_love_layered(p,e,phase,low,max_dlogp,result)
+    if(.not.result%converged)return
+    if(abs(result%m_msun-mass)<=1.e-8_wp)return
+    previous_mass=result%m_msun
+    do i=1,scan_intervals
+      current=low*(min(high,p(size(p)))/low)**(real(i,wp)/scan_intervals)
+      if(i==scan_intervals)current=min(high,p(size(p)))
+      call solve_tov_love_layered(p,e,phase,current,max_dlogp,result)
+      if(.not.result%converged)return
+      if(previous_mass<mass.and.result%m_msun>=mass)then
+        do j=1,refinements
+          mid=sqrt(previous*current)
+          call solve_tov_love_layered(p,e,phase,mid,max_dlogp,result)
+          if(.not.result%converged)return
+          if(abs(result%m_msun-mass)<=1.e-8_wp)return
+          if(result%m_msun<mass)then
+            previous=mid
+          else
+            current=mid
+          endif
+        enddo
+        result%converged=.false.;result%status='target mass residual above tolerance'
+        return
+      endif
+      previous_mass=result%m_msun
+      previous=current
+    enddo
+    result%converged=.false.;result%status='no sampled ascending mass crossing in supplied interval'
+  end subroutine solve_tov_layered_target
+
+  pure function layer_rhs(z,p,e,slope) result(d)
+    real(wp), intent(in) :: z(3),p,e,slope
+    real(wp) :: d(3),u,v,y,den,g,k,tidal_f,tidal_q
+    u=z(1);v=z(2);y=z(3)
+    den=1-2*v
+    g=v+4*pi*u*p
+    k=p*den/((e+p)*g)
+    tidal_f=(1+4*pi*u*(p-e))/den
+    tidal_q=(4*pi*u*(5*e+9*p+(e+p)*(slope*e/p))-6)/den-4*(g/den)**2
+    d=[2*u*k,(4*pi*u*e-v)*k,-(y*y+y*tidal_f+tidal_q)*k]
+  end function layer_rhs
 
 end module compose_eos_tov

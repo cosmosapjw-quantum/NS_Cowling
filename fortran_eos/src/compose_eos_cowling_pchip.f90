@@ -13,6 +13,7 @@ module compose_eos_cowling_pchip
   implicit none
   private
   public :: cowling_native_pchip_slopes,cowling_native_pchip_values
+  public :: cowling_native_pchip_slopes_fields,cowling_native_pchip_values_fields
 contains
   pure real(c_double) function end_slope(h0,h1,del0,del1) result(m)
     real(c_double),intent(in)::h0,h1,del0,del1
@@ -33,18 +34,28 @@ contains
     real(c_double),intent(in)::s(n),y(5,n)
     real(c_double),intent(out)::d(5,n)
     integer(c_int),intent(out)::status
+    call cowling_native_pchip_slopes_fields(5_c_int,n,s,y,d,status)
+  end subroutine
+
+  ! Compact field-count ABI: two fields for TOV, five for Cowling.
+  ! No padding, saved state, or allocation is needed by the slope kernel.
+  subroutine cowling_native_pchip_slopes_fields(nfields,n,s,y,d,status) bind(c)
+    integer(c_int),value::nfields,n
+    real(c_double),intent(in)::s(n),y(nfields,n)
+    real(c_double),intent(out)::d(nfields,n)
+    integer(c_int),intent(out)::status
     real(c_double)::hl,hr,dl,dr,w1,w2
     integer::i,j
     status=1
     d=0._c_double
-    if(n<2)return
+    if(nfields<1.or.n<2)return
     if(.not.all(ieee_is_finite(s)).or..not.all(ieee_is_finite(y)))return
     if(any(s(2:n)<=s(1:n-1)))return
     if(n==2)then
       d(:,1)=(y(:,2)-y(:,1))/(s(2)-s(1))
       d(:,2)=d(:,1)
     else
-      do j=1,5
+      do j=1,nfields
         hl=s(2)-s(1)
         hr=s(3)-s(2)
         dl=(y(j,2)-y(j,1))/hl
@@ -87,11 +98,21 @@ contains
     real(c_double),intent(in)::s(n),y(5,n),d(5,n),x(nquery)
     real(c_double),intent(out)::v(5,nquery)
     integer(c_int),intent(out)::status
+    call cowling_native_pchip_values_fields(5_c_int,n,s,y,d,nquery,x,v,status)
+  end subroutine
+
+  ! Batch evaluation validates one complete phase table per call.
+  ! Nearby queries reuse an interval; arbitrary order uses binary fallback.
+  subroutine cowling_native_pchip_values_fields(nfields,n,s,y,d,nquery,x,v,status) bind(c)
+    integer(c_int),value::nfields,n,nquery
+    real(c_double),intent(in)::s(n),y(nfields,n),d(nfields,n),x(nquery)
+    real(c_double),intent(out)::v(nfields,nquery)
+    integer(c_int),intent(out)::status
     real(c_double)::dx,z,z2,z3,q
     integer::i,lo,hi,mid
     status=1
     v=0._c_double
-    if(n<2.or.nquery<1)return
+    if(nfields<1.or.n<2.or.nquery<1)return
     if(.not.all(ieee_is_finite(s)).or..not.all(ieee_is_finite(y)) &
        .or..not.all(ieee_is_finite(d)).or..not.all(ieee_is_finite(x)))return
     if(any(s(2:n)<=s(1:n-1)))return

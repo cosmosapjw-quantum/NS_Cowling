@@ -1,0 +1,74 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__ test_original_tov_and_cowling_build_without_scipy_pchip[original_source0] ___
+
+original_source = ('SPG_M2', <compose_eos.stellar_sharp.SharpContractEnthalpyEOS object at 0x78d25a1fc1a0>, 0.30385128926615257)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x78d258c2bf50>
+
+    def test_original_tov_and_cowling_build_without_scipy_pchip(original_source, monkeypatch):
+        model, eos, nc = original_source
+
+        def disallowed(*args, **kwargs):
+            raise AssertionError("C20: Python PCHIP invoked in source-locked native path")
+
+        monkeypatch.setattr(sharp, "PchipInterpolator", disallowed)
+>       bg = sharp.solve_sharp_background_native(
+            eos, nc, surface_h=3e-8, rtol=3e-10, atol=3e-11,
+            max_step_h=.004, native_samples=2049)
+
+python_frontend/tests/test_c20_native_tov_pchip.py:153:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+python_frontend/compose_eos/stellar_sharp_native.py:149: in solve_sharp_background_native
+    if not trans:
+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = (array([0.00000000e+00, 2.07383058e-04, 4.14766115e-04, ...,
+       4.07501400e-01, 4.07501400e-01, 4.07507708e-01], s... 2.17146412e-05],
+       [1.90521331e-08, 2.17146398e-05],
+       [1.89406105e-08, 2.16291396e-05]], shape=(10159, 2)))
+kwargs = {'axis': 0, 'extrapolate': False}
+
+    def disallowed(*args, **kwargs):
+>       raise AssertionError("C20: Python PCHIP invoked in source-locked native path")
+E       AssertionError: C20: Python PCHIP invoked in source-locked native path
+
+python_frontend/tests/test_c20_native_tov_pchip.py:150: AssertionError
+__ test_original_tov_and_cowling_build_without_scipy_pchip[original_source1] ___
+
+original_source = ('SPG_M3', <compose_eos.stellar_sharp.SharpContractEnthalpyEOS object at 0x78d2586bc530>, 0.192510767556007)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x78d2559fbf50>
+
+    def test_original_tov_and_cowling_build_without_scipy_pchip(original_source, monkeypatch):
+        model, eos, nc = original_source
+
+        def disallowed(*args, **kwargs):
+            raise AssertionError("C20: Python PCHIP invoked in source-locked native path")
+
+        monkeypatch.setattr(sharp, "PchipInterpolator", disallowed)
+>       bg = sharp.solve_sharp_background_native(
+            eos, nc, surface_h=3e-8, rtol=3e-10, atol=3e-11,
+            max_step_h=.004, native_samples=2049)
+
+python_frontend/tests/test_c20_native_tov_pchip.py:153:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+python_frontend/compose_eos/stellar_sharp_native.py:149: in solve_sharp_background_native
+    if not trans:
+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = (array([0.00000000e+00, 1.44559947e-04, 2.89119894e-04, ...,
+       2.45751910e-01, 2.45896470e-01, 2.46041030e-01], s..., 1.18405202e-04],
+       [7.57366559e-07, 1.18341979e-04],
+       [7.48899423e-07, 1.18278758e-04]], shape=(4898, 2)))
+kwargs = {'axis': 0, 'extrapolate': False}
+
+    def disallowed(*args, **kwargs):
+>       raise AssertionError("C20: Python PCHIP invoked in source-locked native path")
+E       AssertionError: C20: Python PCHIP invoked in source-locked native path
+
+python_frontend/tests/test_c20_native_tov_pchip.py:150: AssertionError
+=========================== short test summary info ============================
+FAILED python_frontend/tests/test_c20_native_tov_pchip.py::test_original_tov_and_cowling_build_without_scipy_pchip[original_source0]
+FAILED python_frontend/tests/test_c20_native_tov_pchip.py::test_original_tov_and_cowling_build_without_scipy_pchip[original_source1]
+2 failed, 15 deselected in 6.65s

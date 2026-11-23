@@ -27,6 +27,7 @@ _FORTRAN = _ROOT / "fortran_eos"
 _SOURCES = [
     _FORTRAN / "src/compose_eos_cowling_dvode.f90",
     _FORTRAN / "src/compose_eos_cowling_pchip.f90",
+    _FORTRAN / "src/compose_eos_cowling_tov_geometry.f90",
     _FORTRAN / "src/compose_eos_cowling_source_exact.f90",
     _FORTRAN / "src/compose_eos_cowling_sharp_root.f90",
     _FORTRAN / "src/compose_eos_cowling_sharp_source_root.f90",
@@ -81,6 +82,27 @@ def _native_library():
         ct.c_int,_DOUBLE_ARRAY,_FORTRAN_ARRAY,_FORTRAN_ARRAY,
         ct.c_int,_DOUBLE_ARRAY,_FORTRAN_ARRAY,ct.POINTER(ct.c_int)]
     dll.cowling_native_pchip_values.restype = None
+    dll.cowling_native_pchip_slopes_fields.argtypes = [
+        ct.c_int,ct.c_int,_DOUBLE_ARRAY,_FORTRAN_ARRAY,_FORTRAN_ARRAY,
+        ct.POINTER(ct.c_int)]
+    dll.cowling_native_pchip_slopes_fields.restype = None
+    dll.cowling_native_pchip_values_fields.argtypes = [
+        ct.c_int,ct.c_int,_DOUBLE_ARRAY,_FORTRAN_ARRAY,_FORTRAN_ARRAY,
+        ct.c_int,_DOUBLE_ARRAY,_FORTRAN_ARRAY,ct.POINTER(ct.c_int)]
+    dll.cowling_native_pchip_values_fields.restype = None
+    dll.tov_native_pchip_slopes.argtypes = [
+        ct.c_int,_DOUBLE_ARRAY,_FORTRAN_ARRAY,_FORTRAN_ARRAY,ct.c_int,
+        ct.POINTER(ct.c_int)]
+    dll.tov_native_pchip_slopes.restype = None
+    dll.tov_native_phase_values.argtypes = [
+        ct.c_int,ct.c_double,_DOUBLE_ARRAY,_FORTRAN_ARRAY,_FORTRAN_ARRAY,
+        ct.c_int,_DOUBLE_ARRAY,_FORTRAN_ARRAY,ct.POINTER(ct.c_int)]
+    dll.tov_native_phase_values.restype = None
+    dll.tov_native_geometry.argtypes = [
+        ct.c_int,_DOUBLE_ARRAY,ct.c_double,ct.c_double,ct.c_double,
+        _FORTRAN_ARRAY,_DOUBLE_ARRAY,_DOUBLE_ARRAY,_FORTRAN_ARRAY,
+        ct.POINTER(ct.c_int)]
+    dll.tov_native_geometry.restype = None
     dll.cowling_native_setup.argtypes = [
         ct.c_int, _DOUBLE_ARRAY, _FORTRAN_ARRAY, _FORTRAN_ARRAY,
         ct.POINTER(ct.c_int)]

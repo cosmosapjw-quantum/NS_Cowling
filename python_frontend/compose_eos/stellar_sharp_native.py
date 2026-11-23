@@ -82,20 +82,45 @@ def native_shoot_waypoints(targets, source_break_s):
 
 
 class _NativePhase:
-    """Lightweight exact-endpoint native phase compatible with _PiecewiseSolution."""
+    """Compact native two-field dense output for one physical TOV phase."""
+    interpolation_backend = "fortran_pchip_2field"
+
     def __init__(self,hstart, h0,h1, sgrid, profile, nfev):
         self.t=np.asarray([h0,h1],float)
-        self.y=np.asarray(profile,dtype=float).T
+        self._grid=np.ascontiguousarray(sgrid,dtype=np.float64)
+        data=np.asarray(profile,dtype=np.float64)
+        if (self._grid.ndim!=1 or len(self._grid)<2 or
+                data.shape!=(len(self._grid),2)):
+            raise ValueError("native TOV profile requires n knots and (n,2) values")
+        self.y=np.asfortranarray(data.T)
+        self._slopes=np.empty_like(self.y,order="F")
         self.nfev=int(nfev)
+        self._hstart=float(hstart)
+        status=ct.c_int(-1)
+        with native._LOCK:
+            lib=native._native_library()
+            lib.tov_native_pchip_slopes(
+                len(self._grid),self._grid,self.y,self._slopes,0,
+                ct.byref(status))
+        if status.value:
+            raise RuntimeError("native TOV PCHIP construction failed: "+str(status.value))
         self.success=True
-        self._hstart=hstart
-        self._interp=PchipInterpolator(sgrid,np.asarray(profile),axis=0,
-                                       extrapolate=False)
+
     def sol(self,h):
-        z=np.asarray(h,dtype=float)
-        s=np.sqrt(np.maximum(self._hstart-z,0))
-        out=self._interp(s)
-        return np.moveaxis(out,-1,0)
+        query=np.asarray(h,dtype=np.float64)
+        flat=np.ascontiguousarray(query.reshape(-1))
+        out=np.empty((2,flat.size),dtype=np.float64,order="F")
+        if flat.size:
+            status=ct.c_int(-1)
+            # Keep only arrays/settings on the object so process transport
+            # never serializes a ctypes pointer. The kernel is stateless.
+            with native._LOCK:
+                evaluate=native._native_library().tov_native_phase_values
+            evaluate(len(self._grid),self._hstart,self._grid,
+                self.y,self._slopes,len(flat),flat,out,ct.byref(status))
+            if status.value:
+                raise RuntimeError("native TOV PCHIP query failed: "+str(status.value))
+        return out.reshape((2,)+query.shape)
 
 
 def solve_sharp_background_native(eos,central_density_fm3, *,
@@ -146,8 +171,16 @@ def solve_sharp_background_native(eos,central_density_fm3, *,
             if not np.all(np.isfinite(therm)) or np.any(therm<=0):
                 raise ValueError("one-sided sharp EOS contains invalid thermodynamics")
             phys=therm*MEV_FM3_TO_GEOM_KM2
-            pchip=PchipInterpolator(grid,phys,axis=0,extrapolate=False)
-            slope=pchip(grid,nu=1)
+            # Thermodynamic interpolation coefficients are computed in Fortran.
+            therm_f=np.asfortranarray(phys.T)
+            slopes_f=np.empty_like(therm_f,order="F")
+            slope_status=ct.c_int(-1)
+            lib.tov_native_pchip_slopes(len(grid),
+                np.ascontiguousarray(grid),therm_f,slopes_f,1,
+                ct.byref(slope_status))
+            if slope_status.value:
+                raise RuntimeError("native TOV EOS PCHIP rejected: "+str(slope_status.value))
+            slope=slopes_f.T
             yout=np.empty((2,len(grid)),order="F",dtype=float)
             nfev,status=ct.c_int(),ct.c_int()
             max_ds=min(smax/200.,max_step_h/(2*smax))
@@ -178,7 +211,8 @@ def solve_sharp_background_native(eos,central_density_fm3, *,
     cfg=dict(r0_km=r0_km,rtol=rtol,atol=atol,surface_h=surface_h,
              max_step_h=max_step_h,native_samples=native_samples,
              native_fortran_tov=True,original_python_eos_source=True,method=method,
-             no_phase_interpolation=True)
+             no_phase_interpolation=True,tov_eos_slopes_backend="fortran_pchip",
+             tov_dense_output_backend="fortran_pchip_2field")
     star=SharpStellarBackground(eos,float(central_density_fm3),hc,h0,
                      float(surface_h),float(r),float(m),solution,cfg,interfaces)
     # Unlike SharpStellarBackground.summary, the native path is explicit.
@@ -302,7 +336,7 @@ def solve_sharp_background_native_sweep(eos,central_density_fm3,controls, *,
             native_samples=native_samples,method=c["method"],
             native_fortran_tov=True,original_python_eos_source=True,
             no_phase_interpolation=True,tov_eos_slopes_backend="fortran_pchip",
-            tov_batch_controls=nctrl,
+            tov_dense_output_backend="fortran_pchip_2field",tov_batch_controls=nctrl,
             backend="Fortran DVODE native two-phase TOV sweep")
         star=SharpStellarBackground(eos,float(central_density_fm3),hc,
             hstart,float(surface_h),r,m,
@@ -415,6 +449,10 @@ class NativeSharpCowlingDVODE:
         bounds=[h0,*sorted([x["h"] for x in background.interfaces
                            if hsurface<x["h"]<h0],reverse=True),hsurface]
         self._phases=[]
+        native_background=(self.coefficient_backend=="native_source_cs2" and
+            all(isinstance(p,_NativePhase) for p in background.solution.segments))
+        self.background_geometry_backend=(
+            "fortran_phase_batch" if native_background else "python_state_reference")
         for h_begin,h_end in zip(bounds[:-1],bounds[1:]):
             mid=(h_begin+h_end)/2.
             if self.coefficient_backend=="direct_source":
@@ -426,16 +464,51 @@ class NativeSharpCowlingDVODE:
             else:
                 x=_one_phase_grid(h0,hsurface,h_begin,h_end,background.eos.break_h,
                                   samples,extras=h_end==hsurface)
-            values=np.empty((len(x),5),float)
-            for i,s in enumerate(x):
-                h=h0-s*s
-                h=h_begin if i==0 else h_end if i==len(x)-1 else h
-                st=background.state_at_enthalpy(h,background.eos.side_for_segment(h,mid))
-                cs=st["cs2_over_c2"]
-                if not np.isfinite(cs) or cs<=0:
-                    raise ValueError("sharp EOS must have positive finite cs²")
-                values[i]=[st["r_km"],st["Phi"],st["lambda_metric"],
-                           st["dPhi_dr_km"],cs]
+            if native_background:
+                # Preserve exact one-sided endpoints while batching dense queries.
+                hs=np.ascontiguousarray(h0-x*x)
+                hs[0]=h_begin;hs[-1]=h_end
+                phase=next(p for p in background.solution.segments
+                           if min(p.t)<mid<max(p.t))
+                radius_mass=np.asfortranarray(phase.sol(hs))
+                # Preserve _PiecewiseSolution's high-side geometry convention
+                # at an exactly shared interface. EOS sides remain independent.
+                endpoint_phase=max(
+                    (p for p in background.solution.segments
+                     if min(p.t)<=h_begin<=max(p.t)),
+                    key=lambda p: .5*(p.t[0]+p.t[-1]))
+                if endpoint_phase is not phase:
+                    radius_mass[:,0]=endpoint_phase.sol(h_begin)
+                pressures=np.empty(len(x),dtype=np.float64)
+                cs_values=np.empty(len(x),dtype=np.float64)
+                for i,h in enumerate(hs):
+                    st=background.eos.state_at_enthalpy(
+                        float(h),background.eos.side_for_segment(float(h),mid))
+                    pressures[i]=st["p"]*MEV_FM3_TO_GEOM_KM2
+                    cs_values[i]=st["cs2_over_c2"]
+                values_f=np.empty((5,len(x)),dtype=np.float64,order="F")
+                geometry_status=ct.c_int(-1)
+                with native._LOCK:
+                    native._native_library().tov_native_geometry(
+                        len(x),hs,float(background.surface_h),
+                        float(background.mass_geom_km),float(background.radius_km),
+                        radius_mass,pressures,cs_values,values_f,
+                        ct.byref(geometry_status))
+                if geometry_status.value:
+                    raise RuntimeError("native TOV geometry batch rejected: "+
+                                       str(geometry_status.value))
+                values=values_f.T
+            else:
+                values=np.empty((len(x),5),float)
+                for i,s in enumerate(x):
+                    h=h0-s*s
+                    h=h_begin if i==0 else h_end if i==len(x)-1 else h
+                    st=background.state_at_enthalpy(h,background.eos.side_for_segment(h,mid))
+                    cs=st["cs2_over_c2"]
+                    if not np.isfinite(cs) or cs<=0:
+                        raise ValueError("sharp EOS must have positive finite cs²")
+                    values[i]=[st["r_km"],st["Phi"],st["lambda_metric"],
+                               st["dPhi_dr_km"],cs]
             if self.coefficient_backend=="native_source_cs2":
                 # The Fortran kernel owns the PCHIP slope construction.
                 # No SciPy PCHIP object is created or used in this backend.

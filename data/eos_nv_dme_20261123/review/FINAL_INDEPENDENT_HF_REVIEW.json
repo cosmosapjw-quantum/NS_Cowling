@@ -1,0 +1,229 @@
+{
+  "schema": "ns_cowling.final_independent_nv_hf_review.v1",
+  "review_date": "2026-11-23",
+  "scope": "Independent read-only review of source identities, discrete variation, final code, actual fixed-cell execution evidence and source admission. Only review artifacts were written.",
+  "decision": "NO_CODE_BLOCKER_FOUND_FOR_PUBLISHING_SCOPED_RESEARCH_RESULTS_WITH_SOURCE_QUARANTINE",
+  "strict_original_eos_admitted": false,
+  "diagnostic_ground_state_eos_admitted": false,
+  "fresh_matched_eos": 0,
+  "final_source_sha256": {
+    "fortran_eos/src/compose_eos_nv_hf.f90": "69c3ecd5ab5e045c4fa0157759701e68b4897a20bb8fdb903764faaef8f72946",
+    "fortran_eos/src/compose_eos_nv_dme.f90": "27477ef266ee3a9a67e716daebf1e0404510099ad67c3eeca25e44fd2c8ef9f0",
+    "fortran_eos/app/nv_hf_probe.f90": "6441cc1b8642ff7b50a3e700735cb0d3a4e628ea9b7a6e7f78f686eb17229d9b",
+    "python_frontend/compose_eos/nv_hf_frontend.py": "1b70afe1712e561669169c857a5b860c4ef447ec0baeb56ce507e259156db4b0"
+  },
+  "historical_campaign_provenance": {
+    "binary_sha256": "a0b3ae94260aee443d4e34abb194be2deef399ce2a6b3f394c20f7a963949700",
+    "compiled_hf_sha256": "8b8739d501c539da5fb59c78136c98be52e2cc6e009b783c48e060ea30d202b8",
+    "compiled_dme_sha256": "0d267566b0e2f3a9eb199a5ddea2bf7a4b3bb6eabff88143ef01bcae7d5c27d8",
+    "source_snapshot_files": 7,
+    "independent_diff": "DME changes only add recursive declarations. HF changes refresh the spectral flag and frontier chemical potentials/beta interval after final raw-field replay; no energy, pressure or SCF-trajectory expression changes.",
+    "caveat": "The launch-source audit is not the compilation manifest. The 28-cell campaign belongs to the retained historical source snapshot, not to the final source byte identity."
+  },
+  "native_checks": {
+    "free_spectrum_normalization_adjoint_electrons": 43,
+    "orbital_variation_and_pressure_dilation": 24,
+    "native_total": 67,
+    "actual_postreview_logs_read": true,
+    "reported_exit_status": 0,
+    "free_error_mesh240": 0.00012709723502,
+    "free_error_mesh480": 3.1774745818e-05,
+    "free_error_ratio": 0.25000343881,
+    "maximum_scaled_orbital_variation_error": 3.994084744634e-09,
+    "build_checks": [
+      "-fcheck=all",
+      "-ffpe-trap=invalid,zero,overflow"
+    ],
+    "scope": "Discrete operator and functional checks. These checks do not authenticate source coefficients or establish nonlinear/global ground-state convergence."
+  },
+  "diagnostic_campaign": {
+    "model": "NV1973_DME_D03x100_diagnostic",
+    "all_attempts": 28,
+    "status_ok": 23,
+    "iteration_not_converged": 5,
+    "published_fixed_cells_two_seeds": 22,
+    "published_clustered_seed_ok": 11,
+    "published_uniform_seed_ok": 6,
+    "published_uniform_seed_not_converged": 5,
+    "A180_even_charge_neighbors_mesh320": 6,
+    "A180_even_charge_neighbors_ok": 6,
+    "successful_profiles_with_declared_row_count_checked": 23,
+    "successful_maxima": {
+      "density_residual": 1.9974378388675993e-06,
+      "tau_residual": 1.9972268833816255e-06,
+      "spin_residual": 1.9954206173805005e-06,
+      "raw_replay_residual": 1.3227402771043927e-06,
+      "particle_error": 4.547473508864641e-13,
+      "dilation_pressure_error_MeV_fm3": 2.0538909462075594e-10
+    },
+    "scope": "These are fixed-composition stationary-cell experiments. Failed uniform starts do not rule out other stationary states or minima."
+  },
+  "literal_table_campaign": {
+    "attempts": 22,
+    "ok": 1,
+    "source_domain_step_too_small": 12,
+    "iteration_not_converged": 8,
+    "raw_density_outside_source_domain": 1,
+    "only_ok_cell": "N=140,Z=40,n_b=2.79e-4 fm^-3, uniform seed",
+    "only_ok_energy_MeV_per_baryon": 3.9776460082702765,
+    "inference": "A clustered iteration failure is not a proof that the literal functional has no stationary solution."
+  },
+  "mesh_check": {
+    "N": 140,
+    "Z": 40,
+    "nb_fm3": 0.000279,
+    "mode": 1,
+    "mesh": [
+      160,
+      320,
+      480
+    ],
+    "energy_MeV_per_baryon": [
+      -1.5059714250879563,
+      -1.4575748282093615,
+      -1.4487528816921762
+    ],
+    "pressure_MeV_fm3": [
+      0.000370258649231164,
+      0.0003610633726859385,
+      0.000359412932304163
+    ],
+    "mesh320_diffuse_energy": -1.4575748282094891,
+    "assessment": "Material mesh bias remains. The single-cell trend is consistent with second-order refinement; it does not establish a converged EOS-wide error bound."
+  },
+  "basis_extension": {
+    "N": 130,
+    "Z": 50,
+    "nb_fm3": 0.000279,
+    "mesh": 160,
+    "mode": 1,
+    "base_lmax_radial_states": [
+      16,
+      11
+    ],
+    "enlarged_lmax_radial_states": [
+      18,
+      13
+    ],
+    "energy_difference_MeV_per_baryon": 4.235500838944972e-12,
+    "pressure_difference_MeV_fm3": 2.0761186201190968e-09,
+    "enlarged_raw_replay_residual": 2.5898029923179933e-07,
+    "scope": "Successful occupied-state truncation extension for this cell only; spectral_complete remains a cutoff sentinel, not a universal completeness theorem."
+  },
+  "restricted_composition_check": {
+    "A": 180,
+    "nb_fm3": 0.000279,
+    "mesh": 320,
+    "tested_Z": [
+      40,
+      42,
+      44,
+      46,
+      48,
+      49,
+      50,
+      51,
+      52
+    ],
+    "lowest_tested_Z": 50,
+    "E_Z49": -1.5616116789265069,
+    "E_Z50": -1.5634759226550974,
+    "E_Z51": -1.5352944239631596,
+    "E_Z52": -1.5053494470782462,
+    "beta_interval_Z50_MeV": [
+      -0.16327672268255355,
+      4.914340683984733
+    ],
+    "assessment": "Z=50 has the lowest energy within the declared fixed-A candidate set and beats its relaxed adjacent charges. No minimization over A, cell size, all shapes, all densities or all initial seeds was established."
+  },
+  "final_binary_frontend_replay": {
+    "binary_sha256": "8a2cf49d3eaed986403ce1402ec6206940d6f7a36bda2f752adda54b9c0f7dbf",
+    "same_config": {
+      "N": 140,
+      "Z": 40,
+      "nb_fm3": 0.000279,
+      "mesh": 160,
+      "mode": 1,
+      "seed": 0,
+      "mixing": 0.08,
+      "max_iterations": 1200
+    },
+    "status": "FIXED_COMPOSITION_CELL_CONVERGED",
+    "returncode": 0,
+    "iterations": 225,
+    "inputs_unchanged": true,
+    "energy_MeV_per_baryon": -1.5059714250879563,
+    "pressure_MeV_fm3": 0.000370258649231164,
+    "raw_replay_residual": 8.244583665388887e-07,
+    "beta_interval_MeV": [
+      -7.318522980819694,
+      -3.7452069539948525
+    ],
+    "old_vs_final_energy_pressure": "The recorded decimal E and P strings agree exactly. Updated frontier quantities differ at the expected small final-replay correction and still exclude beta stability."
+  },
+  "preserved_iteration_budget_failure": {
+    "mixing": 0.03,
+    "max_iterations": 600,
+    "status": "NUMERICAL_SCF_NOT_CONVERGED",
+    "energy_valid": true,
+    "spin_residual": 2.201360978997509e-06,
+    "required_density_tau_spin_tolerance": 2e-06,
+    "energy_difference_from_same_config_success_MeV_per_baryon": 2.5579538487363607e-13,
+    "assessment": "Different mixing/iteration budget explains why this run cannot be labeled converged. The final exact-prior-configuration replay resolves the apparent binary discrepancy without relaxing tolerances."
+  },
+  "frontend_regression": {
+    "protocol_cases_read": 11,
+    "focused_suite_observed_passes": 140,
+    "focused_suite_wall_seconds": 31.49,
+    "note": "The 11 frontend cases belong to the focused suite; do not add them to 140 as independent extra tests. The frontend does process orchestration/identity and never admits a ground-state EOS."
+  },
+  "remaining_source_admission": {
+    "core_source_identities": 32,
+    "unique_core_model_names": 19,
+    "crust_source_contracts": 3,
+    "matching_methods": 7,
+    "cells": 672,
+    "blocked_source": 672,
+    "native_matcher_invocations": 0,
+    "new_survivors": 0,
+    "statuses": {
+      "BLOCKED_MISSING_APPENDIX_D": 224,
+      "NOT_ADMITTED_DIAGNOSTIC_CELLS_NOT_GROUND_STATE_EOS": 224,
+      "QUARANTINED_TABLE_I_INTERNAL_INCONSISTENCY": 224
+    },
+    "scope": "An admission census, not 672 numerical matching attempts and not a physical rejection of the pairs."
+  },
+  "findings_disposition": {
+    "HF-01": "Resolved: native success requires status ok and converged; post-validation failures clear convergence.",
+    "HF-02": "Resolved for the implemented convergence contract: rho, tau, J and raw-field replay measured; unmeasured gradient zero removed.",
+    "HF-03": "One enlarged-basis check passed; all-density basis convergence remains an EOS-admission limitation, appropriately unclaimed.",
+    "HF-04": "Resolved: required success diagnostics and complete finite profile checked; malformed receipt regressions present.",
+    "HF-05": "Resolved on source readback: empty experiment identifiers rejected.",
+    "HF-06": "Resolved on source readback: seed enumeration and finite/range checks explicit.",
+    "final_replay_reporting": "Resolved in final source69c3; historical campaign retains its own snapshot."
+  },
+  "scientific_blockers_for_original_or_ground_state_eos": [
+    "Original printed B/C/D coefficient identities are inconsistent beyond their rounding intervals; authentic author-intended correction remains unresolved.",
+    "D03x100 is a conditional diagnostic model and does not repair all identity conflicts or authenticate the author model.",
+    "Raw unsmoothed HF and the paper boundary-smoothing prescription are distinct numerical contracts; the unspecified gas averaging region prevents a literal smoothing reproduction claim.",
+    "Material mesh dependence, limited basis checks, restricted composition search and unresolved metastability prevent a global ground-state EOS claim.",
+    "Discrete dilation pressure validation is not the same as validating a fully minimized EOS branch and its interpolation, convexity and phase transitions."
+  ],
+  "code_blockers_found_within_review_scope": [],
+  "privacy": "No source PDF pages, user device identifiers, private backup locations or private numerical tables are included. Evidence paths in the accompanying report are project relative or logical archived-runtime locations.",
+  "public_evidence_paths": {
+    "hf_campaign_summary": "data/eos_nv_dme_20261123/hf/RESEARCH_SUMMARY.json",
+    "published_cell_replay": "data/eos_nv_dme_20261123/hf/TABLE3_REPLAY.csv",
+    "even_charge_scan": "data/eos_nv_dme_20261123/hf/CHARGE_SCAN.csv",
+    "relaxed_adjacent_charges": "data/eos_nv_dme_20261123/hf/RELAXED_CHARGE_NEIGHBORS.csv",
+    "mesh_refinement": "data/eos_nv_dme_20261123/hf/MESH_REFINEMENT.csv",
+    "campaign_compilation_manifest": "data/eos_nv_dme_20261123/hf/BUILD_PROVENANCE.json",
+    "historical_changed_source_snapshots": "data/eos_nv_dme_20261123/hf/compiled_source_snapshot/",
+    "native_numerics_log": "data/eos_nv_dme_20261123/validation/nv_hf_numerics.log",
+    "native_variation_log": "data/eos_nv_dme_20261123/validation/nv_hf_variation.log",
+    "basis_extension_log": "data/eos_nv_dme_20261123/validation/nv_hf_basis_extension.log",
+    "focused_regression_log": "data/eos_nv_dme_20261123/validation/FOCUSED_REGRESSION.log",
+    "frontend_replay_and_failure": "data/eos_nv_dme_20261123/validation/FRONTEND_CHECKS.json",
+    "source_admission_census": "data/eos_nv_dme_20261123/remaining_census/SUMMARY.json"
+  }
+}

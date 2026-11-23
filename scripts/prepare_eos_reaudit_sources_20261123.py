@@ -34,7 +34,7 @@ OLD_CATALOG_SHA = "d8a2fe3ad429b4dcde2bcec7f1e33c7caa2bd31dc5bf1cd72dcbdfafb8428
 DEFAULT_NUDA = Path("/tmp/ns_eos_reaudit_20261123/generator/NUDA_NATIVE_IMPORT_LAYOUTS.json")
 NUDA_MANIFEST_SHA = "320958a27f9f5f9a86b8347c92d6f8eb80ecc1a973e1a6709c40d2a09ea61320"
 PRIVATE_ZIP_SHA = "ca42416dfdab5a352139e14ce8a1b86cb6e2a516fcc9c0e07f48350ccd09271c"
-OLD_PROVIDER_ROOT = Path("/home/cosmosapjw/ns_cowling_wt/cowling_rmf_source_reconciliation_20261119")
+PROVIDER_ROOT = ROOT
 CONTROLS = ROOT / "data/cowling_maxwell_native_20261119/provider_original_unified/ORIGINAL_CONTROLS.json"
 
 
@@ -327,9 +327,9 @@ def extra_sources() -> list[dict]:
             historical_evaluator=receipt["evaluator"], new_numerical_generation_this_turn=False))
         item = controls["models"][model]
         base = Path("data/cowling_maxwell_native_20261119/provider_original_unified") / model
-        raw = OLD_PROVIDER_ROOT / base / "raw"
+        raw = PROVIDER_ROOT / base / "raw"
         projection = item.get("source_projection")
-        used = OLD_PROVIDER_ROOT / projection["projection_path"] if projection else raw
+        used = PROVIDER_ROOT / projection["projection_path"] if projection else raw
         layout = item["original_layout"]
         start = layout["outer_rows"] + layout["inner_rows"]
         extra.append(dict(source_id=f"public_original:{full}:core", model=full, role="core",

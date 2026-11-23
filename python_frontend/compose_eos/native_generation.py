@@ -14,7 +14,11 @@ NATIVE_DIAGNOSTICS=("sound_speed.csv", "attachment_diagnostics.json", "SUPPORT.j
                     "states.csv", "first_law.csv", "attempts.csv", "profiles.csv", "selected.csv",
                     "primary_source_diagnostics.json", "bps_states.csv", "bps_transitions.csv",
                     "primary_source_values.csv", "primary_source_anchor_comparison.csv",
-                    "NV_PRIMARY_GENERATION.json", "nv_primary_states.csv", "nv_primary_source_comparison.csv")
+                    "NV_PRIMARY_GENERATION.json", "nv_primary_states.csv", "nv_primary_source_comparison.csv",
+                    "bbp_original_diagnostics.json", "bbp_original_states.csv", "bbp_original_transitions.csv",
+                    "nv1973_states.csv", "nv1973_table3_comparison.csv", "nv1973_uniform_reconstruction.csv",
+                    "NV_ORIGINAL_GENERATION.json", "myers_mass_catalog.csv", "myers_bps_states.csv",
+                    "myers_bps_transitions.csv", "MYERS_BPS_GENERATION.json")
 
 def file_sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -147,7 +151,8 @@ def verify_native_generation(output,request):
     rows=receipt.get("rows")
     if not isinstance(rows,int) or isinstance(rows,bool) or rows<3:
         raise ValueError("invalid native row count")
-    needs_composition=request["family"]!="primary_crust" or request["model"]=="BPS1971_sequence"
+    needs_composition=(request["family"]!="primary_crust" or
+                       request["contract"].get("requires_composition",request["model"]=="BPS1971_sequence"))
     grid,hashes,checks=_read_native_table(output,require_composition=needs_composition)
     if rows!=len(grid):
         raise ValueError("native receipt row count differs from actual rows")
@@ -181,6 +186,22 @@ def verify_native_generation(output,request):
             raise ValueError("BPS primary phase-complete row count is inconsistent")
         if model=="BBP1971_pressure_integral" and not count<=rows<=count+26:
             raise ValueError("BBP original knots or requested grid are missing")
+        policy=request["contract"].get("row_policy")
+        if policy=="exact_requested" and rows!=count:
+            raise ValueError("requested original-paper rows missing")
+        if policy in ("phase_complete_pressure_grid","coexistence_density_grid"):
+            details=json.loads((output/request["contract"]["native_grid_receipt"]).read_text())
+            if (details.get("requested_points")!=count or details.get("rows")!=rows or
+                    type(details.get("phase_count")) is not int or details["phase_count"]<1):
+                raise ValueError("native phase-grid receipt differs from the requested rows")
+            if policy=="phase_complete_pressure_grid" and not count<=rows<=count+3*details["phase_count"]:
+                raise ValueError("original mass-model phase-complete grid has an invalid row count")
+            if policy=="coexistence_density_grid":
+                removed=details.get("removed_grid_points")
+                inserted=details.get("inserted_grid_points")
+                if (type(removed) is not int or type(inserted) is not int or
+                        not 0<=removed<count or inserted<0 or rows!=count-removed+inserted):
+                    raise ValueError("native coexistence grid accounting differs from the actual rows")
         for name in request["contract"]["diagnostics"]:
             if not (output/name).is_file():
                 raise ValueError("primary source diagnostic missing: "+name)

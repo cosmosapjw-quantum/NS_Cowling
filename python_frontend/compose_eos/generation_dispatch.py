@@ -18,7 +18,8 @@ SPG_IDS = tuple(f"SPG_M{i}" for i in range(1, 6))
 TF_IDS = ("GPPVA_DD2", "GPPVA_DDME2", "GPPVA_TW", "GPPVA_FSU2",
           "GPPVA_FSU2R", "GPPVA_FSU2H", "GPPVA_NL3wrL55", "GPPVA_TM1e")
 from .primary_model_contracts import PRIMARY_IDS, primary_crust_catalog
-MODEL_IDS = CORE_IDS + SPG_IDS + TF_IDS + PRIMARY_IDS
+from .original_model_contracts import ORIGINAL_IDS, original_crust_catalog
+MODEL_IDS = CORE_IDS + SPG_IDS + TF_IDS + PRIMARY_IDS + ORIGINAL_IDS
 from .native_model_contracts import SPG_INFERRED_VARIANT, SPG_INFERRED_SURFACE
 
 SPG_VARIANTS = (SPG_INFERRED_VARIANT, "AME2408_candidate", "geometric_area__nine",
@@ -53,6 +54,7 @@ def generator_catalog():
             "geometry_scope": "finite geometry, seed, mesh and radius search; no global minimum or continuous interpolation claim",
         }
     result.update(primary_crust_catalog())
+    result.update(original_crust_catalog())
     return result
 
 
@@ -270,7 +272,8 @@ def run_generation(model, output, *, root=None, **options):
     from .native_generation import source_files, surface_input, verify_native_generation
     tracked = [Path(__file__).resolve(), Path(__file__).with_name("native_generation.py"), *source_files(root)]
     if request["family"] == "primary_crust":
-        tracked += [root / request["primary_source_path"], Path(__file__).with_name("primary_model_contracts.py")]
+        tracked += [root / request["primary_source_path"], Path(__file__).with_name("primary_model_contracts.py"),
+                    Path(__file__).with_name("original_model_contracts.py")]
     if request["family"] == "spg":
         tracked.append(root / surface_input(root, model, request["variant"])["path"])
     initial = {str(p): _sha(p) for p in tracked}

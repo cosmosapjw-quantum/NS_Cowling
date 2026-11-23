@@ -13,6 +13,10 @@ program compose_eos_generate
  use compose_eos_bps_primary,only:generate_bps_primary_native
  use compose_eos_bbp_primary,only:generate_bbp_primary_native,generate_bbp_pressure_primary_native
  use compose_eos_nv_primary,only:generate_nv_primary_native
+ use compose_eos_bbp_original,only:generate_bbp_original_published_native, &
+  generate_bbp_original_variational_native,generate_bbp_variational_maxwell_native
+ use compose_eos_nv_original,only:generate_nv_original_native
+ use compose_eos_myers1966,only:generate_myers_bps_native
  use,intrinsic::ieee_arithmetic,only:ieee_is_finite
  implicit none
  character(1024)::request_path,out,mass_catalogue='',primary_source_path=''
@@ -69,6 +73,18 @@ program compose_eos_generate
    call generate_bbp_pressure_primary_native(trim(primary_source_path),n_points,eos,trim(out),status)
   case('NV1974_author_fit')
    call generate_nv_primary_native(trim(primary_source_path),n_points,eos,trim(out),status)
+  case('BBP1971_original_published')
+   call generate_bbp_original_published_native(trim(primary_source_path),n_points,eos,trim(out),status)
+  case('BBP1971_original_variational')
+   call generate_bbp_original_variational_native(trim(primary_source_path),n_points,eos,trim(out),status)
+  case('BBP1971_variational_maxwell')
+   call generate_bbp_variational_maxwell_native(trim(primary_source_path),n_points,eos,trim(out),status)
+  case('NV1973_author_fit')
+   call generate_nv_original_native(trim(primary_source_path),n_points,eos,trim(out),status)
+  case('BPS_Myers1966_magic14')
+   call generate_myers_bps_native(trim(primary_source_path),n_points,eos,trim(out),status,14)
+  case('BPS_Myers1966_magic20')
+   call generate_myers_bps_native(trim(primary_source_path),n_points,eos,trim(out),status,20)
   case default
    call fail('unknown primary crust model')
   end select

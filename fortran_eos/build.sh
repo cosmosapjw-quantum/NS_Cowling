@@ -73,6 +73,7 @@ NATIVE_MODULES=(
   compose_eos_optimize_native compose_eos_core_native compose_eos_core_domain compose_eos_gdfm_native
   compose_eos_lower_crust_native compose_eos_crust_attachment compose_eos_tf_models compose_eos_spg_native compose_eos_spatial_tf
   compose_eos_bps_primary compose_eos_bbp_primary compose_eos_nv_primary
+  compose_eos_bbp_original compose_eos_nv_original compose_eos_myers1966
 )
 NATIVE_OBJECTS=()
 for name in "${NATIVE_MODULES[@]}"; do

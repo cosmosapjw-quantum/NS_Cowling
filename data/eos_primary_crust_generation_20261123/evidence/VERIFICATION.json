@@ -1,0 +1,27 @@
+{
+  "schema": "ns_cowling.primary_generation_verification.v1",
+  "baseline_commit": "7ad3040d93215db67b23041987e17ea19b6c6715",
+  "branch": "research/eos-primary-crust-generation-20261123",
+  "compiler": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "python": "Python 3.12.3",
+  "full_regression": {
+    "command": "PYTHONPATH=python_frontend COMPOSE_EOS_NATIVE_BUILD_DIR=/tmp/ns_eos_primary_crust_20261123/build COMPOSE_EOS_FORTRAN_EXE=/tmp/ns_eos_primary_crust_20261123/build/compose_eos_fortran OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 python3 -m pytest -q python_frontend/tests pipeline/tests",
+    "passed": 1985,
+    "skipped": 35,
+    "subtests_passed": 4,
+    "wall_seconds": 233.5,
+    "log": "evidence/full_pytest.log",
+    "log_sha256": "e59db4ff8f74159aacfdbc804c8809c3b7c3640cc38243ea0bdc59017e57261e"
+  },
+  "matcher_binary_sha256": "d1600879b3c741bb69f0acd150f05ff129048f244723933b1bb1e79518316588",
+  "generator_binary_sha256": "19d56697f46d9d0c3da24d1647d3751de6f80a76d7383acf22006f7982171156",
+  "scientific_validation": "See source-specific Fortran proofs, independent review, and source-qualified campaign; regression success is not full original-model or stellar validation.",
+  "remote_ci": "Not asserted; observed separately after publication.",
+  "log_sha256": {
+    "build.log": "e7549bb4e200f64b3ab701a53e41900c75caee22f08e587c980b23f17bf65635",
+    "dispatch_green_final.log": "53be17100abb7ab4554092572fd25853b7d1b7bbc9959292d6a8039b1e72abc0",
+    "dispatch_red.log": "91c056141bd268eadaa288f1fcd9d77183159a42043a370bbd1ed5bf340e90c2",
+    "full_pytest.log": "e59db4ff8f74159aacfdbc804c8809c3b7c3640cc38243ea0bdc59017e57261e",
+    "source_generation.log": "923f2e24db34677ab442ca3ab7d6ebb844d50a020471c6dbba75d5c8c6e760bf"
+  }
+}

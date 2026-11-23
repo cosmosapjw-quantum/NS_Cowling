@@ -11,7 +11,10 @@ from pathlib import Path
 
 NATIVE_FILES=("eos.nb","eos.t","eos.yq","eos.thermo","eos.compo")
 NATIVE_DIAGNOSTICS=("sound_speed.csv", "attachment_diagnostics.json", "SUPPORT.json",
-                    "states.csv", "first_law.csv", "attempts.csv", "profiles.csv", "selected.csv")
+                    "states.csv", "first_law.csv", "attempts.csv", "profiles.csv", "selected.csv",
+                    "primary_source_diagnostics.json", "bps_states.csv", "bps_transitions.csv",
+                    "primary_source_values.csv", "primary_source_anchor_comparison.csv",
+                    "NV_PRIMARY_GENERATION.json", "nv_primary_states.csv", "nv_primary_source_comparison.csv")
 
 def file_sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -64,6 +67,12 @@ def write_request(root, output, request):
     if request["family"]=="core":
         lines += [" n_points="+str(request["points"]),
                   " n_min="+_real(request["n_min"])," n_max="+_real(request["n_max"])]
+    elif request["family"]=="primary_crust":
+        source=root/request["primary_source_path"]
+        if not source.is_file():
+            raise ValueError("primary source input missing: "+str(source))
+        lines += [" n_points="+str(request["points"]),
+                  " primary_source_path="+_quoted(source.resolve())]
     elif request["family"]=="spg":
         surface=surface_input(root,request["model"],request["variant"])
         lines += [" n_points="+str(request["points"]),
@@ -91,12 +100,14 @@ def source_files(root):
     files+=sorted((root/"fortran_eos/vendor").rglob("*.f"))
     return [p for p in files if p.is_file()]
 
-def _read_native_table(directory):
+def _read_native_table(directory, *, require_composition=True):
     """Use the Fortran reader again; a claimed receipt is not format evidence."""
     from .api import read_compose,check_consistency
     directory=Path(directory)
     hashes={}
-    for name in NATIVE_FILES:
+    names=tuple(name for name in NATIVE_FILES if
+                name!="eos.compo" or require_composition or (directory/name).exists())
+    for name in names:
         path=directory/name
         if not path.is_file() or path.stat().st_size==0:
             raise ValueError("native output missing: "+str(path))
@@ -112,7 +123,9 @@ def _read_native_table(directory):
         raise ValueError("invalid native density grid")
     if table.nT>1 or table.nYq>1 or abs(table.temperature_mev)>1e-12:
         raise ValueError("native generator returned an unexpected thermodynamic slice")
-    if hashes!={name:file_sha(directory/name) for name in NATIVE_FILES}:
+    current_names=tuple(name for name in NATIVE_FILES if
+                        name!="eos.compo" or require_composition or (directory/name).exists())
+    if current_names!=names or hashes!={name:file_sha(directory/name) for name in names}:
         raise ValueError("native output changed during readback")
     return grid,hashes,check_consistency(table,verbose=False)
 
@@ -134,7 +147,8 @@ def verify_native_generation(output,request):
     rows=receipt.get("rows")
     if not isinstance(rows,int) or isinstance(rows,bool) or rows<3:
         raise ValueError("invalid native row count")
-    grid,hashes,checks=_read_native_table(output)
+    needs_composition=request["family"]!="primary_crust" or request["model"]=="BPS1971_sequence"
+    grid,hashes,checks=_read_native_table(output,require_composition=needs_composition)
     if rows!=len(grid):
         raise ValueError("native receipt row count differs from actual rows")
     readbacks={"generated":rows}
@@ -158,6 +172,18 @@ def verify_native_generation(output,request):
         if (not math.isclose(grid[0],lo,rel_tol=5e-13,abs_tol=0.) or
             not math.isclose(grid[-1],hi,rel_tol=5e-13,abs_tol=0.)):
             raise ValueError("core output extends beyond the requested support")
+    elif request["family"]=="primary_crust":
+        count=request["points"]
+        model=request["model"]
+        if model in ("NV1974_author_fit", "BBP1971_table5") and rows!=count:
+            raise ValueError("requested primary crust rows missing")
+        if model=="BPS1971_sequence" and not count<=rows<=count+64:
+            raise ValueError("BPS primary phase-complete row count is inconsistent")
+        if model=="BBP1971_pressure_integral" and not count<=rows<=count+26:
+            raise ValueError("BBP original knots or requested grid are missing")
+        for name in request["contract"]["diagnostics"]:
+            if not (output/name).is_file():
+                raise ValueError("primary source diagnostic missing: "+name)
     elif request["family"]=="spg":
         if rows!=request["points"]:
             raise ValueError("requested SPG rows missing")

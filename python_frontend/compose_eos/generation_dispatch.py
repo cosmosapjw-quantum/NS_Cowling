@@ -17,7 +17,8 @@ CORE_IDS = ("APR_APR", "BBB_BHF2", "GM_GM1", "RG_KDE0v1", "RG_SLY4")
 SPG_IDS = tuple(f"SPG_M{i}" for i in range(1, 6))
 TF_IDS = ("GPPVA_DD2", "GPPVA_DDME2", "GPPVA_TW", "GPPVA_FSU2",
           "GPPVA_FSU2R", "GPPVA_FSU2H", "GPPVA_NL3wrL55", "GPPVA_TM1e")
-MODEL_IDS = CORE_IDS + SPG_IDS + TF_IDS
+from .primary_model_contracts import PRIMARY_IDS, primary_crust_catalog
+MODEL_IDS = CORE_IDS + SPG_IDS + TF_IDS + PRIMARY_IDS
 from .native_model_contracts import SPG_INFERRED_VARIANT, SPG_INFERRED_SURFACE
 
 SPG_VARIANTS = (SPG_INFERRED_VARIANT, "AME2408_candidate", "geometric_area__nine",
@@ -51,6 +52,7 @@ def generator_catalog():
             "composition": "total nucleon profiles and lepton fractions; native free/cluster masks unavailable for nonuniform cells",
             "geometry_scope": "finite geometry, seed, mesh and radius search; no global minimum or continuous interpolation claim",
         }
+    result.update(primary_crust_catalog())
     return result
 
 
@@ -95,6 +97,15 @@ def generation_request(model, *, points=None, n_min=None, n_max=None,
         hi = hi if n_max is None else n_max
         _finite_positive([lo, hi], "core density range")
         request.update(points=count, n_min=lo, n_max=hi)
+    elif family == "primary_crust":
+        if include_lower_crust or any(x is not None for x in (n_min, n_max, densities, resolutions)) or variant != "AME2408_candidate":
+            raise ValueError("primary crust models use their original source support; only --points is configurable")
+        count = catalog[model]["default_points"] if points is None else points
+        if not isinstance(count, int) or isinstance(count, bool) or not catalog[model].get("minimum_points",3) <= count <= 100000:
+            raise ValueError("primary crust points must be an integer in [3,100000]")
+        if model == "BBP1971_table5" and count != 26:
+            raise ValueError("the raw primary BBP table contains exactly26 knots; use pressure_integral for resampling")
+        request.update(points=count, primary_source_path=catalog[model]["source_path"])
     elif family == "spg":
         if any(x is not None for x in (n_min, n_max, densities, resolutions)):
             raise ValueError("SPG uses its independently solved drip/endpoint grid; use --points/--variant")
@@ -258,6 +269,8 @@ def run_generation(model, output, *, root=None, **options):
     command = _command(root, child_output, request)
     from .native_generation import source_files, surface_input, verify_native_generation
     tracked = [Path(__file__).resolve(), Path(__file__).with_name("native_generation.py"), *source_files(root)]
+    if request["family"] == "primary_crust":
+        tracked += [root / request["primary_source_path"], Path(__file__).with_name("primary_model_contracts.py")]
     if request["family"] == "spg":
         tracked.append(root / surface_input(root, model, request["variant"])["path"])
     initial = {str(p): _sha(p) for p in tracked}
@@ -265,6 +278,10 @@ def run_generation(model, output, *, root=None, **options):
                "repository_root": str(root), "source_sha256": initial,
                "backend": "fortran",
                "completion_scope": "requested finite native rows/readback; source equivalence and full-crust completion remain separate"}
+    if request["family"] == "primary_crust":
+        source = root / request["primary_source_path"]
+        receipt["primary_source_input"] = {"path": str(source), "sha256": _sha(source),
+            "source_equivalence": request["contract"]["source_equivalence"]}
     if request["family"] == "spg":
         receipt["surface_input"] = surface_input(root, model, request["variant"])
     if request.get("include_lower_crust"):

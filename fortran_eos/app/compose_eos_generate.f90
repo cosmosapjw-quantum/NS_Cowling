@@ -10,15 +10,18 @@ program compose_eos_generate
  use compose_eos_spatial_tf
  use compose_eos_lower_crust_native
  use compose_eos_crust_attachment
+ use compose_eos_bps_primary,only:generate_bps_primary_native
+ use compose_eos_bbp_primary,only:generate_bbp_primary_native,generate_bbp_pressure_primary_native
+ use compose_eos_nv_primary,only:generate_nv_primary_native
  use,intrinsic::ieee_arithmetic,only:ieee_is_finite
  implicit none
- character(1024)::request_path,out,mass_catalogue=''
+ character(1024)::request_path,out,mass_catalogue='',primary_source_path=''
  character(32)::model='',family='',transition_policy='fixed_density_source'
  integer::n_points=161,n_density=0,n_mesh=0,meshes(64)=0,outer_points=65,lower_points=65
  real(wp)::n_min=0,n_max=0,sigma0=0,surface_b=0,densities(4096)=0
  logical::include_lower_crust=.false.
  namelist/generation/model,family,n_points,n_min,n_max,sigma0,surface_b,transition_policy, &
-  n_density,densities,n_mesh,meshes,include_lower_crust,mass_catalogue,outer_points,lower_points
+  n_density,densities,n_mesh,meshes,include_lower_crust,mass_catalogue,outer_points,lower_points,primary_source_path
  type(eos_data_t)::eos,outer_eos,lower_eos
  type(core_state_t),allocatable::core(:)
  type(core_state_t)::audit,plus1,plus2,minus1,minus2
@@ -50,6 +53,26 @@ program compose_eos_generate
  call mkdir(trim(out))
  if(include_lower_crust.and.family=='core')call fail('core cannot include lower crust')
  select case(trim(family))
+ case('primary_crust')
+  if(include_lower_crust)call fail('primary crust models have explicit source domains; modern lower-crust attachment is unsupported')
+  if(len_trim(primary_source_path)==0)call fail('primary source input is required')
+  if(n_points<3.or.n_points>100000)call fail('primary crust n_points must be in [3,100000]')
+  if(n_min/=0.or.n_max/=0.or.n_density/=0.or.n_mesh/=0.or.sigma0/=0.or.surface_b/=0.or.len_trim(mass_catalogue)/=0) &
+   call fail('primary crust support and calibration are fixed by the primary source')
+  select case(trim(model))
+  case('BPS1971_sequence')
+   call generate_bps_primary_native(trim(primary_source_path),n_points,eos,trim(out),status)
+  case('BBP1971_table5')
+   if(n_points/=26)call fail('BBP1971_table5 retains exactly 26 original knots; request n_points=26')
+   call generate_bbp_primary_native(trim(primary_source_path),n_points,eos,trim(out),status)
+  case('BBP1971_pressure_integral')
+   call generate_bbp_pressure_primary_native(trim(primary_source_path),n_points,eos,trim(out),status)
+  case('NV1974_author_fit')
+   call generate_nv_primary_native(trim(primary_source_path),n_points,eos,trim(out),status)
+  case default
+   call fail('unknown primary crust model')
+  end select
+  call require_ok(status)
  case('core')
   call core_model_bounds(trim(model),lo,hi,mn,mp,status);call require_ok(status)
   if(n_points<3.or.n_points>100000.or.n_min<lo.or.n_max>hi.or.n_max<=n_min)call fail('invalid core support request')
@@ -209,6 +232,11 @@ program compose_eos_generate
  open(newunit=u,file=trim(out)//'/SUPPORT.json',status='replace')
  write(u,'(a)')'{"scope":"computed_native_samples","global_minimum_proven":false,"continuous_mesh_limit_proven":false,'
  write(u,'(a)')'"cross_phase_interpolation":"UNAPPROVED","cross_segment_interpolation":"UNAPPROVED",'
+ if(family=='primary_crust')then
+  write(u,'(a)')'"primary_source_path":'//csvquote(trim(primary_source_path))//','
+  write(u,'(a)')'"representation":"explicit_primary_source_model; see native source diagnostics",'
+  write(u,'(a)')'"original_full_microphysics_reproduced":false,'
+ endif
  if(family=='core')then
   write(u,'(a,es25.16e3,a,es25.16e3,a)')'"computational_interval_fm3":[',lo,',',hi,'],'
   write(u,'(a,es25.16e3,a,es25.16e3,a)')'"requested_sample_interval_fm3":[',n_min,',',n_max,'],'
